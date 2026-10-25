@@ -823,8 +823,8 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Teste confere nome "Gestão da Pelada", `display: standalone`, `lang: pt-BR` e os dois ícones, um deles `maskable`
-- [ ] Gate quick passa
+- [x] Teste confere nome "Gestão da Pelada", `display: standalone`, `lang: pt-BR` e os dois ícones, um deles `maskable` *(`test/manifesto.test.ts`, FUN-32; confere também as cores vindas dos tokens e os PNGs idênticos aos do mockup; `criarOpcoesPwa` fica para a T30)*
+- [x] Gate quick passa *(web 228)*
 
 **Tests**: unit
 **Gate**: quick
