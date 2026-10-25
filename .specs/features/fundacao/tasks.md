@@ -1236,9 +1236,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Os cinco documentos existem e refletem a stack nova
-- [ ] O GUARDRAILS mapeia cada regra para o teste ou a checagem que a protege
-- [ ] Gate de build passa (fecha a fase)
+- [x] Os cinco documentos existem e refletem a stack nova *(PRD, PRD-TECNICO, SDD, GUARDRAILS e THREAT-MODEL em `.md/`, trazidos do legado com o bloco "Consolidação da fundação" (host, migrations, RLS, Lighthouse, plugin de testes, Node 24, deploy) e o SDD com ambientes, stack, CI/CD, índice de ADRs (018 a 028), T-18 e dívidas atualizados)*
+- [x] O GUARDRAILS mapeia cada regra para o teste ou a checagem que a protege *(o GUARDRAILS tem a coluna "Protegida por" com o arquivo de teste ou checagem real (os caminhos citados foram conferidos no `git ls-files`), a coluna "Situação" (ativa ou a feature que cria o código) e as regras novas G-27 a G-30)*
+- [x] Gate de build passa (fecha a fase) *(`format:check` verde. SPEC_DEVIATION: os históricos de rodadas do PRD e do PRD-TECNICO foram mantidos como registro de produto; CTO-REVIEW, PLANO-COMERCIAL, UX-SPEC e as evidências `.md/.seguranca/` do legado não foram trazidos)*
 
 **Tests**: none (documentação)
 **Gate**: build
