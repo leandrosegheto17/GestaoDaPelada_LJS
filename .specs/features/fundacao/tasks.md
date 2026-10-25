@@ -483,9 +483,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] O job roda migrations do zero e a suíte de isolamento, e falha se qualquer uma falhar
-- [ ] `checar-acoes-fixadas` aprova o workflow
-- [ ] Gate de build passa localmente
+- [x] O job roda migrations do zero e a suíte de isolamento, e falha se qualquer uma falhar *(job `banco`, com Postgres 16 de serviço; roda também os demais testes da API, que saíram do job `base` por precisarem de banco. Passos conferidos localmente contra o Postgres do compose; a primeira execução no GitHub fica para o push da T47)*
+- [x] `checar-acoes-fixadas` aprova o workflow
+- [x] Gate de build passa localmente *(lint, format, typecheck, `pnpm test`, `pnpm test:checagens` e as cinco checagens; build, e2e e visual do web entram nas Fases 5 e 6)*
 
 **Tests**: none (workflow; exercita os testes de T10 e T13)
 **Gate**: build

@@ -23,7 +23,9 @@ jobs:
       - run: pnpm lint
       - run: pnpm format:check
       - run: pnpm typecheck
-      - run: pnpm test
+      # Os testes da API precisam de Postgres e rodam no job `banco`.
+      - run: pnpm exec vitest run --dir test
+      - run: pnpm -r --filter '!@pelada/api' test
       - run: node backend/scripts/checagens/checar-ids-tarefa.mjs
       - run: node backend/scripts/checagens/checar-urls-absolutas.mjs
       - run: node backend/scripts/checagens/checar-wrangler-deploy.mjs
@@ -31,6 +33,36 @@ jobs:
       - uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2.3.9
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  banco:
+    runs-on: ubuntu-latest
+    env:
+      CI: 'true'
+      # Postgres descartável do job; a senha é fictícia, a mesma do docker-compose local.
+      DATABASE_URL_TESTE: postgres://postgres:postgres@localhost:5432/postgres
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/preparar-node
+      - name: Migrations do zero (fixtures A, B e C, roles e RLS)
+        run: pnpm --filter @pelada/api exec vitest run test/migracoes
+      - name: Isolamento no banco
+        run: pnpm --filter @pelada/api exec vitest run test/isolamento
+      - name: Demais testes da API
+        run: pnpm --filter @pelada/api exec vitest run --exclude 'test/migracoes/**' --exclude 'test/isolamento/**'
 
   checagens:
     runs-on: ubuntu-latest
