@@ -775,8 +775,8 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Cada componente tem teste de renderização e axe sem violações
-- [ ] Gate quick passa
+- [x] Cada componente tem teste de renderização e axe sem violações *(Dialogo, Folha e OpcaoFolha em `dialogos.test.tsx`, copiado do legado, ligado a FUN-30; axe no diálogo e na folha (a `OpcaoFolha` é coberta dentro da folha))*
+- [x] Gate quick passa *(lint, format, typecheck, `pnpm test` (web 211) e `pnpm test:checagens` verdes)*
 
 **Tests**: unit
 **Gate**: quick
