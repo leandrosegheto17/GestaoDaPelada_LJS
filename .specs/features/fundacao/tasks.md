@@ -320,10 +320,10 @@ T47 → T48 → T49
 
 ### T9: Linha de base do schema com `node-pg-migrate`
 
-**What**: Concatenar as 15 migrations do legado na linha de base e configurar o runner, com apoio de teste de banco temporário.
+**What**: Concatenar as 13 migrations do legado na linha de base e configurar o runner, com apoio de teste de banco temporário.
 **Where**: `backend/api/src/infraestrutura/db/migracoes/`
 **Depends on**: T8
-**Reuses**: legado: as 15 migrations SQL, `backend/api/test/apoio/` (`banco-migracao.ts`, `db-teste.ts`, `setup-global.ts`)
+**Reuses**: legado: as 13 migrations SQL, `backend/api/test/apoio/` (`banco-migracao.ts`, `db-teste.ts`, `setup-global.ts`)
 **Requirement**: FUN-07, FUN-08
 
 **Tools**:
@@ -333,7 +333,7 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [x] A linha de base é a concatenação literal das 15 migrations, sem alteração *(o legado tem 13 migrations em todas as branches, como diz a spec em FUN-08; o "15" do design e desta lista é erro de contagem. A linha de base concatena as 13)*
+- [x] A linha de base é a concatenação literal das 13 migrations, sem alteração *(o legado tem 13 em todas as branches, como diz a spec em FUN-08; o "15" anterior era erro de contagem, corrigido em 2026-10-24)*
 - [x] Cada migration roda na própria transação (`--no-single-transaction`) e há uma migration por mudança
 - [x] Teste: banco vazio migrado tem as mesmas tabelas, colunas, restrições e triggers do legado
 - [x] Gate full passa *(o "full" roda hoje lint, format, typecheck, `pnpm test` e `pnpm test:checagens`; e2e do web entra nas Fases 5 e 6)*
@@ -358,7 +358,7 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [x] Fixture A (15 migrations pelo runner antigo): `migrar` registra a linha de base sem DDL e sem alterar dados (contagem de linhas igual antes e depois); a impressão digital bate com a da fixture B *(13 migrations; ver nota de T9)*
+- [x] Fixture A (13 migrations pelo runner antigo): `migrar` registra a linha de base sem DDL e sem alterar dados (contagem de linhas igual antes e depois); a impressão digital bate com a da fixture B
 - [x] Fixture B (banco vazio): aplica tudo
 - [x] Fixture C (schema parcial): aborta sem alterar nada e lista as diferenças
 - [x] Gate full passa

@@ -40,7 +40,7 @@ Política (AD-002): o que é infra, ferramenta ou visual é **copiado** do legad
 | ESLint com o plugin próprio (domínio sem I/O, `semRelogio`, zonas de import) | `eslint.config.mjs`, `eslint/` | Copiar e retirar as regras de telas e rotas que ainda não existem |
 | Checagens do CI (migração aditiva, URLs absolutas, `wrangler deploy` único, actions fixadas por SHA, ids de tarefa) e os testes delas | `backend/scripts/checagens/` | Copiar. Ajustar a migração aditiva ao nome de arquivo do `node-pg-migrate` (FUN-54) |
 | Trava de host (`exigirHostPermitido`) | `backend/scripts/` | Copiar. Usada por `migrar` e `seed` (FUN-05) |
-| As 15 migrations SQL | `backend/api/src/infraestrutura/db/migracoes/*.sql` | Concatenar, sem alterar, na linha de base `…_linha-de-base.sql`. Cópia literal como fixture de teste (FUN-08, FUN-09) |
+| As 13 migrations SQL | `backend/api/src/infraestrutura/db/migracoes/*.sql` | Concatenar, sem alterar, na linha de base `…_linha-de-base.sql`. Cópia literal como fixture de teste (FUN-08, FUN-09) |
 | Cliente `pg` por requisição via Hyperdrive, com `waitUntil` para fechar | `backend/api/src/infraestrutura/db/cliente.ts` | Copiar. Envolver na transação de contexto (FUN-16) |
 | Cadeia de middlewares (`semCache`, `semSniff`, limite de taxa, `X-Pelada`, `bodyLimit`) | `backend/api/src/entrada/app.ts:43-66`, `middlewares/` | Copiar só os middlewares; as rotas vêm nas features |
 | Config do vitest da API e apoio de teste (banco temporário, fábrica com limpeza, contagem de linhas por tabela) | `backend/api/vitest.config.ts`, `test/apoio/` | Copiar. Migrar para `@cloudflare/vitest-plugin` (codemod oficial) |
@@ -89,7 +89,7 @@ Política (AD-002): o que é infra, ferramenta ou visual é **copiado** do legad
 - **Dependencies**: `node-pg-migrate` 9 com `--no-single-transaction` (cada migration na sua transação) e o advisory lock padrão. A tabela `migracoes_aplicadas` do legado é mantida e não é mais escrita.
 - **Reuses**: os SQL do legado (linha de base), a trava de host e a checagem aditiva.
 - **Testes-chave**:
-  - Fixture A: as 15 migrations do legado aplicadas pelo runner antigo. O `migrar` registra o estado `legado`, faz o *fake* e a impressão digital fica igual à da fixture B.
+  - Fixture A: as 13 migrations do legado aplicadas pelo runner antigo. O `migrar` registra o estado `legado`, faz o *fake* e a impressão digital fica igual à da fixture B.
   - Fixture B: banco vazio, com `migrar` aplicando tudo.
   - Fixture C: schema parcial. O `migrar` aborta sem alterar nada.
 
@@ -103,7 +103,7 @@ Política (AD-002): o que é infra, ferramenta ou visual é **copiado** do legad
     - `pelada_backup NOLOGIN`.
     - O `LOGIN PASSWORD` é definido uma vez pelo runbook, fora do repositório. No local, quem define é o `seed`, a partir do `.env`.
     - **owner** = a role dona das tabelas no Neon (`neondb_owner`), usada só pelo `migrar`.
-  - Grants de `pelada_app`: `SELECT, INSERT, UPDATE` nas tabelas de negócio. `DELETE` só onde o legado apaga por regra: `presencas`, `notas`, `escalacoes`, `vinculos_admin`, `pagamentos_mes`, `lancamentos`, `habilidades`, `partidas`, `jogadores` (sem histórico) e `sessoes`. **Nunca** `TRUNCATE` nem DDL.
+  - Grants de `pelada_app`: `SELECT, INSERT, UPDATE` nas tabelas de negócio. `DELETE` só onde o legado apaga por regra: `presencas`, `notas`, `escalacoes`, `vinculos_admin`, `pagamentos_mes`, `lancamentos`, `habilidades`, `partidas` e `jogadores` (sem histórico). `sessoes` ganha `SELECT` e `DELETE` juntos na `conta-e-acesso`. **Nunca** `TRUNCATE` nem DDL.
   - Funções `app_conta_id()` e `app_slug_publico()`: `nullif(current_setting('app.…', true), '')`. A função `grupos_visiveis()` é `SECURITY DEFINER` com `search_path` fixo e retorna:
     - com conta: os `grupo_id` com vínculo da conta;
     - com slug: o `id` do grupo do slug;
@@ -113,7 +113,8 @@ Política (AD-002): o que é infra, ferramenta ou visual é **copiado** do legad
     - escrita com `WITH CHECK` igual, mais `app_conta_id() IS NOT NULL`. Esse segundo termo bloqueia a escrita pelo slug público (FUN-14).
   - `ENABLE` + `FORCE ROW LEVEL SECURITY` nessas tabelas.
   - `pelada_backup`: `SELECT` em tudo e policy de leitura total (`USING (true)`) só para ela. O dump usa `pg_dump --enable-row-security`.
-  - Tabelas sem `grupo_id` (`contas`, `sessoes`, `tentativas_login`, `pedidos_reset`, `auditoria`, `eventos_uso`): ficam fora do FUN-12 e recebem RLS própria na `conta-e-acesso`. Na fundação, `pelada_app` só tem acesso a elas pelo que a feature 2 definir. Até lá, ficam sem grant.
+  - Tabelas sem `grupo_id` (`contas`, `sessoes`, `tentativas_login`, `pedidos_reset`): ficam fora do FUN-12 e recebem RLS própria na `conta-e-acesso`. Na fundação, `pelada_app` só tem acesso a elas pelo que a feature 2 definir. Até lá, ficam sem grant.
+  - `auditoria` e `eventos_uso` têm a coluna `grupo_id`: entram no FUN-12 (RLS com `FORCE`, policies e a policy `USING (true)` de `pelada_backup`) e seguem sem grant para `pelada_app` até a `conta-e-acesso` (decisão do usuário em 2026-10-24).
 - **Testes-chave**: o isolamento roda **no banco**, como `pelada_app`, sem passar pela API. Para cada tabela com `grupo_id` são três cenários:
   - A lê só os próprios dados;
   - B não lê, não insere, não altera e não apaga nada de A;
