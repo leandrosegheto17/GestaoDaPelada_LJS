@@ -14,7 +14,7 @@ Mudanças em relação à última auditoria do projeto anterior (2026-10-22). Ev
 | Isolamento entre grupos | RLS com `FORCE` por `grupo_id`, runtime na role `pelada_app` sem bypass, contexto por transação (ADR-025). O owner do Neon tem `bypassrls` e nunca é origem do Hyperdrive | Reduz o vazamento entre grupos por filtro esquecido; novo risco: contexto vazar entre requisições pelo Hyperdrive (spike S1; testado) |
 | Backup | Dump com `--enable-row-security` pela role `pelada_backup`, com policy de leitura; a contagem restaurada é conferida contra a origem | Sem a policy, o dump com `FORCE` sai vazio com exit 0; o teste e o runbook cobrem |
 | Host | Domínio próprio `gestaodapelada.ljssoftware.com.br` (ADR-028); HSTS de 1 ano nos assets | T-18 cai para baixa |
-| Cabeçalhos | CSP, `nosniff`, `Referrer-Policy` e HSTS nos assets conferidos por e2e; nas respostas de `/api/*` só `nosniff` | Aberto: CSP, Referrer-Policy e HSTS em `/api/*` (decisão pendente) |
+| Cabeçalhos | CSP, `nosniff`, `Referrer-Policy` e HSTS nos assets conferidos por e2e; nas respostas de `/api/*` só `nosniff` | Aceito: `/api/*` devolve só JSON, então CSP, Referrer-Policy e HSTS ficam nos assets (decisão de 2026-10-25) |
 | Deploy | `deploy.yml` com `concurrency` sem cancelamento, `URL_PUBLICA` obrigatória, `wrangler deploy` único, rollback que não engole erro | Reduz deploy parcial |
 | Monitoramento | Sentry no Worker e no front só com DSN e com remoção de corpo, cookies, `Authorization` e e-mails; UptimeRobot em `/api/health` (ação do usuário) | Detecta indisponibilidade; sem DSN o app funciona sem observabilidade |
 

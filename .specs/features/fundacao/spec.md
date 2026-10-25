@@ -109,7 +109,7 @@ O Gestão da Pelada vai ser recriado do zero no padrão LJS Software. Antes de q
 7. The runbook SHALL descrever a criação do monitor do UptimeRobot em `GET /api/health`. [FUN-25]
 8. The Worker SHALL declarar os bindings de rate limit `LIMITE_ENTRAR` (10/min), `LIMITE_PUBLICO` (60/min) e `LIMITE_WEBHOOK`. [FUN-26]
 9. The Worker SHALL publicar a rota `gestaodapelada.ljssoftware.com.br` com `custom_domain: true`. [FUN-27]
-10. The respostas do domínio SHALL incluir os cabeçalhos de segurança do legado (CSP, `X-Content-Type-Options`, `Referrer-Policy`, HSTS), conferidos por um teste e2e contra o build. [FUN-28]
+10. Os assets estáticos servidos pelo domínio SHALL incluir os cabeçalhos de segurança do legado (CSP, `X-Content-Type-Options`, `Referrer-Policy`, HSTS), conferidos por um teste e2e contra o build; as respostas de `/api/*` (JSON) SHALL incluir `X-Content-Type-Options: nosniff`. [FUN-28]
 
 **Independent Test**: depois do primeiro `deploy.yml`, `curl https://gestaodapelada.ljssoftware.com.br/api/health` = 200 com o SHA publicado, e a página `/` mostra o shell.
 
