@@ -917,9 +917,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Sem `VITE_SENTRY_DSN`, o Sentry não inicializa e nada é enviado
-- [ ] Com DSN, o `beforeSend` remove corpo, cookies, `authorization` e e-mails
-- [ ] Gate quick passa
+- [x] Sem `VITE_SENTRY_DSN`, o Sentry não inicializa e nada é enviado *(`observabilidade.test.ts`, FUN-24; `iniciarObservabilidade` é ligada no `main.tsx` na T34. `VITE_VERSAO` (SHA) é a variável do `release`; quem a define no build é o deploy (T39))*
+- [x] Com DSN, o `beforeSend` remove corpo, cookies, `authorization` e e-mails *(FUN-23; mesmo padrão da T19; `dataCollection` no lugar de `sendDefaultPii`, que não existe nas opções do navegador da 11.9)*
+- [x] Gate quick passa *(web 271; `@sentry/react` 11.9)*
 
 **Tests**: unit
 **Gate**: quick
