@@ -1,10 +1,18 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { App } from './app/App';
+import { iniciarObservabilidade } from './app/observabilidade';
+import { registrarServiceWorker } from './pwa/registro';
 import './estilos/tokens.css';
 import './estilos/global.css';
 
-// SPEC_DEVIATION: o legado monta aqui o `<App />`; o App, as rotas e o shell PWA entram na Fase 6 (T29 em diante).
-// Até lá a página só carrega os estilos globais, para que o build do front base tenha o que empacotar.
+iniciarObservabilidade();
+void registrarServiceWorker();
+
 const raiz = document.getElementById('raiz');
 if (!raiz) throw new Error('Elemento #raiz não encontrado.');
-createRoot(raiz).render(<StrictMode />);
+createRoot(raiz).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+);

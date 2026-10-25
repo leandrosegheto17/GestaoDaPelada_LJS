@@ -1,0 +1,18 @@
+/* Moldura das telas de vitrine: mesma do conteúdo do admin (largura, respiro e título de página). */
+.conteudo {
+  max-width: var(--largura-conteudo);
+  margin: 0 auto;
+  padding: var(--esp-3) var(--esp-4) 112px;
+}
+.titulo {
+  font-size: var(--texto-3xl);
+  font-weight: var(--peso-extra);
+  text-transform: uppercase;
+  letter-spacing: var(--espacamento-caixa-alta);
+  margin: var(--esp-1) 0 var(--esp-4);
+}
+@media (min-width: 600px) {
+  .conteudo {
+    padding: var(--esp-6) var(--esp-6) var(--esp-12);
+  }
+}

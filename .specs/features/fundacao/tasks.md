@@ -609,7 +609,7 @@ T47 → T48 → T49
 **Done when**:
 
 - [x] Teste confere o proxy `/api` → Worker e `localConnectionString` apontando para o Postgres local *(`frontend/web/test/configuracao-servidor.test.ts` e `backend/scripts/test/dev.test.ts`: o `localConnectionString` bate com a porta e o banco do `docker-compose.yml`, e o `pnpm dev` troca a string pela de `pelada_app` com a senha do `.env` via `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE`. Com o banco fora do ar, o `pnpm dev` falha com o aviso do `exigir-banco` antes de subir qualquer coisa: FUN-53 fecha aqui. O `vitest` e o `vite` entram no `package.json` do web)*
-- [ ] Com o compose de pé, `http://localhost:5173` abre e `GET /api/health` = 200 (conferido à mão e registrado) *(em parte, 2026-10-25: com o `fundacao-db-1` de pé, `pnpm dev` subiu os dois; `curl http://localhost:8787/api/health` e `curl http://localhost:5173/api/health` (pelo proxy) deram 200 com `{"status":"ok","versao":"dev"}`, `no-store` e `nosniff`. `http://localhost:5173/` dá 404 porque o web ainda não tem `index.html`: abre com o front base, Fase 5)*
+- [x] Com o compose de pé, `http://localhost:5173` abre e `GET /api/health` = 200 (conferido à mão e registrado) *(fechado em 2026-10-25, na T34: com o `fundacao-db-1` de pé, `pnpm dev` subiu os dois; `curl http://localhost:5173/` deu 200 com o `index.html` (`id="raiz"`), `curl http://localhost:5173/api/health` (pelo proxy) e `curl http://localhost:8787/api/health` deram 200 com `{"status":"ok","versao":"dev"}`; processos parados depois. Antes, em parte, 2026-10-25: com o `fundacao-db-1` de pé, `pnpm dev` subiu os dois; `curl http://localhost:8787/api/health` e `curl http://localhost:5173/api/health` (pelo proxy) deram 200 com `{"status":"ok","versao":"dev"}`, `no-store` e `nosniff`. `http://localhost:5173/` dá 404 porque o web ainda não tem `index.html`: abre com o front base, Fase 5)*
 - [x] Gate quick passa *(`pnpm test:checagens`, `pnpm --filter @pelada/web test`; rodados também lint, format, typecheck e `pnpm test`)*
 
 **Tests**: unit
@@ -941,8 +941,8 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Teste: `/` renderiza a página provisória; as rotas de vitrine só existem com `VITE_VITRINE=1` e nunca no build de produção
-- [ ] Gate quick passa
+- [x] Teste: `/` renderiza a página provisória; as rotas de vitrine só existem com `VITE_VITRINE=1` e nunca no build de produção *(`App.test.tsx` (FUN-37): `/` com axe, as três vitrines por rota e um `vite build` com e sem `VITE_VITRINE` que confere a ausência do marcador `data-vitrine` no de produção. SPEC_DEVIATION: a vitrine fica em `src/vitrine/` e a página provisória em `src/app/PaginaProvisoria.tsx`, não tudo no `App.tsx`; `main.tsx` agora monta o `<App />`, liga `iniciarObservabilidade()` e registra o SW (`src/pwa/registro.ts`, com teste); `workbox-window` saiu das dependências por não ser usado)*
+- [x] Gate quick passa *(web 285; build de produção sem vitrine, 31 entradas no precache; `checar-tokens.py` OK)*
 
 **Tests**: unit
 **Gate**: quick
