@@ -1,0 +1,48 @@
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--cor-superficie);
+  font-variant-numeric: tabular-nums;
+}
+.tabela th,
+.tabela td {
+  padding: var(--esp-2) var(--esp-3);
+  border-bottom: 1px solid var(--cor-linha);
+  text-align: right;
+}
+.tabela th:first-child,
+.tabela td:first-child {
+  text-align: left;
+}
+.tabela thead th {
+  font-size: var(--texto-sm);
+  color: var(--cor-texto-sec);
+  font-weight: var(--peso-forte);
+}
+.cartoes {
+  display: none;
+}
+.cartao {
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-linha);
+  border-radius: var(--raio);
+  padding: var(--esp-4);
+}
+.cartaoTitulo {
+  font-family: var(--fonte-texto);
+  font-size: var(--texto-sm);
+  font-weight: var(--peso-forte);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--cor-texto-sec);
+  margin: var(--esp-3) 0 var(--esp-1);
+}
+@media (max-width: 599px) {
+  .semanas {
+    display: none;
+  }
+  .cartoes {
+    display: grid;
+    gap: var(--esp-2);
+  }
+}

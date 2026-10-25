@@ -37,3 +37,12 @@ describe('aparência = mockup (FUN-29)', () => {
     }
   });
 });
+
+describe('index.html (FUN-29)', () => {
+  it('não tem script nem estilo inline nem recurso de terceiro', () => {
+    const html = readFileSync(join(RAIZ, 'index.html'), 'utf8');
+    expect(html).not.toMatch(/<script(?![^>]*\bsrc=)/);
+    expect(html).not.toMatch(/<style/);
+    expect(html).not.toMatch(/https?:\/\//);
+  });
+});

@@ -1,0 +1,27 @@
+.mes {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--alvo-toque);
+  height: var(--alvo-toque);
+  border: 0;
+  border-radius: var(--raio);
+  background: transparent;
+  color: var(--cor-texto);
+  cursor: pointer;
+}
+.botao:disabled {
+  color: var(--cor-linha);
+  cursor: default;
+}
+.rotulo {
+  min-width: 168px;
+  text-align: center;
+  font-size: var(--texto-2xl);
+  text-transform: capitalize;
+}

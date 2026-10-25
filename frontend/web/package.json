@@ -5,6 +5,7 @@
   "scripts": {
     "test": "vitest run --passWithNoTests",
     "typecheck": "tsc --noEmit -p .",
+    "build": "pnpm typecheck && vite build",
     "lint:css": "stylelint \"src/**/*.css\""
   },
   "devDependencies": {

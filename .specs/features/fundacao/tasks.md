@@ -798,8 +798,8 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Cada componente tem teste de renderização e axe sem violações
-- [ ] Gate de build passa (fecha a fase)
+- [x] Cada componente tem teste de renderização e axe sem violações *(6 componentes: `listas.test.tsx` copiado do legado (Lista, Item, NavegadorMes, TabelaSemanas, TabelaSimples; caminho do mockup trocado de `.md/mockup` para `.specs/mockup`) e `Indicadores.test.tsx` (sem teste no legado); ligados a FUN-30)*
+- [x] Gate de build passa (fecha a fase) *(lint, format, typecheck, `pnpm test` (web 224, api 343, contrato 5), `pnpm test:checagens` (175) e `pnpm --filter @pelada/web build` verdes; `e2e` e `visual` do web ainda não existem (Fase 6) e ficam fora. SPEC_DEVIATION: para o build ter o que empacotar entraram o `index.html` do legado, um `main.tsx` sem o `<App />` e o script `build`; o App e o shell PWA chegam na Fase 6. Teste do `index.html` (sem script/estilo inline nem URL externa) copiado do legado em `estilos.test.ts`)*
 
 **Tests**: unit
 **Gate**: build
