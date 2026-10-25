@@ -1113,10 +1113,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Teste falha se uma variável usada em código, `wrangler.jsonc` ou workflows não estiver no arquivo
-- [ ] Sem segredo versionado; gitleaks verde
-- [ ] Constam `SENTRY_DSN`, `URL_PUBLICA` e os nomes reservados das features futuras (Resend, Web Push), sem valor
-- [ ] Gate de build passa (fecha a fase)
+- [x] Teste falha se uma variável usada em código, `wrangler.jsonc` ou workflows não estiver no arquivo *(`backend/scripts/test/env-example.test.ts` varre código, `wrangler.jsonc`, bindings de `env.ts` e `secrets.`/`vars.` dos workflows; na primeira rodada achou `VERSAO` faltando, que entrou)*
+- [x] Sem segredo versionado; gitleaks verde *(toda variável fica vazia (teste) e `gitleaks dir` local: nenhum vazamento; o CI mantém o gitleaks)*
+- [x] Constam `SENTRY_DSN`, `URL_PUBLICA` e os nomes reservados das features futuras (Resend, Web Push), sem valor *(`SENTRY_DSN`, `VITE_SENTRY_DSN`, `URL_PUBLICA`, `RESEND_*` e `VAPID_*` sem valor, cada uma com obrigatoriedade, formato e segredo)*
+- [x] Gate de build passa (fecha a fase) *(`test:checagens` (310), lint, typecheck e format verdes. SPEC_DEVIATION: as variáveis de ferramentas em `.specs/` (ex.: `CHROME_PATH` do gerador de ícones do mockup) ficam fora da varredura)*
 
 **Tests**: unit
 **Gate**: build
