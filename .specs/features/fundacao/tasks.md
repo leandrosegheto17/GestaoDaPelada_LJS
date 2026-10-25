@@ -358,10 +358,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Fixture A (15 migrations pelo runner antigo): `migrar` registra a linha de base sem DDL e sem alterar dados (contagem de linhas igual antes e depois); a impressão digital bate com a da fixture B
-- [ ] Fixture B (banco vazio): aplica tudo
-- [ ] Fixture C (schema parcial): aborta sem alterar nada e lista as diferenças
-- [ ] Gate full passa
+- [x] Fixture A (15 migrations pelo runner antigo): `migrar` registra a linha de base sem DDL e sem alterar dados (contagem de linhas igual antes e depois); a impressão digital bate com a da fixture B *(13 migrations; ver nota de T9)*
+- [x] Fixture B (banco vazio): aplica tudo
+- [x] Fixture C (schema parcial): aborta sem alterar nada e lista as diferenças
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full

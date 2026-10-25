@@ -10,7 +10,8 @@
     "format:check": "prettier --check .",
     "typecheck": "pnpm -r typecheck && tsc --noEmit -p backend/scripts",
     "test": "vitest run --dir test && pnpm -r test",
-    "test:checagens": "vitest run backend/scripts --testTimeout=30000"
+    "test:checagens": "vitest run backend/scripts --testTimeout=30000",
+    "migrar": "node --env-file-if-exists=.env backend/scripts/migrar.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
