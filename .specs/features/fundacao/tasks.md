@@ -1141,7 +1141,7 @@ T47 → T48 → T49
 **Done when**:
 
 - [x] Os comandos do README levam do clone ao app em `localhost:5173` com health 200 *(conferido neste worktree num banco novo: `pnpm migrar` (3 aplicadas), `pnpm seed` e `pnpm dev`, com `GET localhost:5173/api/health` = 200 `{"status":"ok","versao":"dev"}` e `localhost:5173/` = 200; o banco temporário foi apagado depois)*
-- [ ] Um agente sem contexto segue o README num worktree limpo e chega ao app rodando (teste de aceite da P2) *(aceite da P2 fica para a sessão principal, que despacha o agente sem contexto; o `cp .env.example .env` e o preenchimento das quatro variáveis foram descritos mas o `.env` do worktree não foi sobrescrito)*
+- [x] Um agente sem contexto segue o README num worktree limpo e chega ao app rodando (teste de aceite da P2) *(2026-10-25: agente sem contexto seguiu o README; o `pnpm dev` falhou por faltar o build do web (`frontend/web/dist`); com o build, health 200, `/` 200 e `pnpm test` verde. O README foi corrigido (passo de build e placeholders do `.env` literais); o passo corrigido foi executado pelo agente como contorno, sem nova rodada do zero)*
 - [x] Gate de build passa *(`format:check` verde; documentação sem outros testes)*
 
 **Tests**: none (documentação; aceite pelo agente sem contexto)

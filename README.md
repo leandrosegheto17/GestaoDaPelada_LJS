@@ -31,9 +31,13 @@ Abra o `.env` e preencha quatro variáveis (as outras ficam vazias no uso local)
 ```bash
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/pelada
 DATABASE_URL_TESTE=postgres://postgres:postgres@localhost:5432/pelada_teste
-PELADA_APP_SENHA=<texto sem espaços com 24+ caracteres, ex.: openssl rand -hex 12>
-PELADA_BACKUP_SENHA=<outro texto do mesmo tipo>
+PELADA_APP_SENHA=troque-por-um-texto-sem-espacos-com-24-ou-mais-caracteres
+PELADA_BACKUP_SENHA=troque-por-outro-texto-do-mesmo-tipo
 ```
+
+Os valores acima são exemplos literais (sem `<` nem `>`): troque as duas senhas por textos seus. Para gerar um texto
+de 24 caracteres, use `openssl rand -hex 12` (no Windows, o `openssl` vem com o Git Bash).
+No `.env.example` as quatro variáveis vêm em branco.
 
 A senha do `postgres` (`postgres`) é a fictícia do `docker-compose.yml`; vale só para a sua máquina.
 
@@ -41,6 +45,7 @@ A senha do `postgres` (`postgres`) é a fictícia do `docker-compose.yml`; vale 
 docker compose up -d      # Postgres 16 local, porta 5432 (espere ficar healthy: docker compose ps)
 pnpm migrar               # aplica as migrations (linha de base, roles, RLS)
 pnpm seed                 # dados de exemplo e senha das roles locais
+pnpm --filter @pelada/web build   # gera frontend/web/dist, que o Worker exige para subir
 pnpm dev                  # Worker em :8787 e app em :5173 (Ctrl+C encerra os dois)
 ```
 
