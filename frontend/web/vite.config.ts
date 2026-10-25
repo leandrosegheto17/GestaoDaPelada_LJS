@@ -1,6 +1,8 @@
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import { loadEnv } from 'vite';
 import { defineConfig, type Plugin } from 'vitest/config';
+import { cabecalhosDeSeguranca } from './config/cabecalhos.ts';
 import { criarOpcoesPwa, lerCoresDoTema } from './config/manifesto.ts';
 import { configuracaoServidor } from './configuracao-servidor.ts';
 
@@ -17,7 +19,12 @@ function corDoTema(): Plugin {
 const emTeste = Boolean(process.env.VITEST);
 
 export default defineConfig({
-  plugins: [react(), corDoTema(), ...(emTeste ? [] : [VitePWA(criarOpcoesPwa())])],
+  plugins: [
+    react(),
+    corDoTema(),
+    cabecalhosDeSeguranca(loadEnv('production', import.meta.dirname, 'VITE_').VITE_SENTRY_DSN),
+    ...(emTeste ? [] : [VitePWA(criarOpcoesPwa())]),
+  ],
   build: {
     outDir: 'dist',
     // A página offline é uma entrada própria: o CSS dela sai com hash e entra no precache junto com o shell.

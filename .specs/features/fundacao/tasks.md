@@ -1012,9 +1012,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Teste confere os quatro cabeçalhos nas respostas do domínio
-- [ ] CSP ajustada ao Sentry só quando houver DSN
-- [ ] Gate de build passa (fecha a fase)
+- [x] Teste confere os quatro cabeçalhos nas respostas do domínio *(`e2e/cabecalhos.spec.ts` (FUN-28) confere CSP, `X-Content-Type-Options`, `Referrer-Policy` e HSTS em `/`, rota do app, `offline.html`, fontes, manifest, `sw.js` e no script do build, mais ausência de violação de CSP e `/_headers` não servido. SPEC_DEVIATION: o `_headers` do legado não tinha HSTS; entrou `Strict-Transport-Security: max-age=31536000; includeSubDomains`. Só os assets são conferidos: a API (`/api/*`) só põe `nosniff`, e CSP, Referrer-Policy e HSTS nas respostas dela ficam como ponto aberto no relatório do lote)*
+- [x] CSP ajustada ao Sentry só quando houver DSN *(`config/cabecalhos.ts` e `test/cabecalhos.test.ts`: o plugin reescreve `dist/_headers` com a origem do DSN no `connect-src` só com `VITE_SENTRY_DSN`; sem DSN o arquivo sai idêntico à fonte (testado com `vite build` real nos dois casos))*
+- [x] Gate de build passa (fecha a fase) *(lint, format, typecheck, `pnpm test` (raiz 20, dominio 1, contrato 5, API 343, web 305), `test:checagens` 175, `pnpm --filter @pelada/web build`, `e2e` (11 testes) e `visual` (6 comparações, máx. 0,65%) verdes; `checar-tokens.py frontend/web/src` OK)*
 
 **Tests**: e2e
 **Gate**: build
