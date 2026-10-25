@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import type { ManifestOptions } from 'vite-plugin-pwa';
+import type { ManifestOptions, VitePWAOptions } from 'vite-plugin-pwa';
 import { lerToken } from './tokens.ts';
 
 const RAIZ = join(import.meta.dirname, '..');
@@ -26,5 +26,18 @@ export function criarManifesto(): Partial<ManifestOptions> {
       { src: '/icones/icone-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
       { src: '/icones/icone-512-maskable.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
     ],
+  };
+}
+
+/** Service worker próprio (`injectManifest`): precache do shell e, adiante, os handlers de notificação. */
+export function criarOpcoesPwa(): Partial<VitePWAOptions> {
+  return {
+    strategies: 'injectManifest',
+    srcDir: 'src',
+    filename: 'sw.ts',
+    registerType: 'autoUpdate',
+    injectRegister: false,
+    manifest: criarManifesto(),
+    injectManifest: { globPatterns: ['**/*.{html,js,css,woff2,png,svg,webmanifest}'] },
   };
 }

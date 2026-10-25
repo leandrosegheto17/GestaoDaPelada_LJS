@@ -846,9 +846,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Teste confere o precache do shell e os dois handlers registrados
-- [ ] `tsc` do SW (`tsconfig.sw.json`) verde
-- [ ] Gate quick passa
+- [x] Teste confere o precache do shell e os dois handlers registrados *(`src/sw.test.ts` carrega o SW com `self` e o Workbox simulados, FUN-33; `test/pwa-config.test.ts` confere as opções do plugin. `context7` indisponível: usada a documentação dos pacotes e o build real, que gerou `dist/sw.js` com 27 entradas de precache. SPEC_DEVIATION: o SW fica em `src/sw.ts`, como manda a tarefa (o legado usa `src/pwa/sw.ts`), e a versão nova assume sem faixa de aviso (`skipWaiting` + `clientsClaim`), porque a fundação não leva a `FaixaNovaVersao`)*
+- [x] `tsc` do SW (`tsconfig.sw.json`) verde *(inclui também `sw.test.ts`; o `tsconfig.json` do app os exclui por causa da lib DOM; o `typecheck` roda os dois)*
+- [x] Gate quick passa *(web 232; `vite build` gera o SW; as dependências do PWA entraram junto com a T29)*
 
 **Tests**: unit
 **Gate**: quick

@@ -1,10 +1,23 @@
 import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vitest/config';
+import { VitePWA } from 'vite-plugin-pwa';
+import { defineConfig, type Plugin } from 'vitest/config';
+import { criarOpcoesPwa, lerCoresDoTema } from './config/manifesto.ts';
 import { configuracaoServidor } from './configuracao-servidor.ts';
 
-// O plugin do PWA entra com o shell PWA (Fase 6).
+/** `theme-color` vem do token, sem repetir o valor no HTML-fonte. */
+function corDoTema(): Plugin {
+  return {
+    name: 'cor-do-tema',
+    transformIndexHtml: () => [
+      { tag: 'meta', attrs: { name: 'theme-color', content: lerCoresDoTema().tema }, injectTo: 'head' },
+    ],
+  };
+}
+
+const emTeste = Boolean(process.env.VITEST);
+
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), corDoTema(), ...(emTeste ? [] : [VitePWA(criarOpcoesPwa())])],
   build: { outDir: 'dist' },
   server: configuracaoServidor(process.env),
   test: {
