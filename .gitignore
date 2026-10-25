@@ -4,3 +4,4 @@ __pycache__/
 .specs/spikes/*/codigo/
 node_modules/
 .env
+.wrangler/
