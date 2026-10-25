@@ -209,10 +209,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Teste do plugin falha se `backend/dominio` importar módulo de rede, banco ou `node:fs` (FUN-06)
-- [ ] Regras de telas e rotas que ainda não existem foram retiradas
-- [ ] `pnpm lint` verde
-- [ ] Gate quick passa
+- [x] Teste do plugin falha se `backend/dominio` importar módulo de rede, banco ou `node:fs` (FUN-06)
+- [x] Regras de telas e rotas que ainda não existem foram retiradas
+- [x] `pnpm lint` verde
+- [x] Gate quick passa
 
 **Tests**: unit
 **Gate**: quick
