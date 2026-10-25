@@ -1,6 +1,8 @@
 /// <reference lib="webworker" />
 import { clientsClaim } from 'workbox-core';
-import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching';
+import { cleanupOutdatedCaches, createHandlerBoundToURL, matchPrecache, precacheAndRoute } from 'workbox-precaching';
+import { NavigationRoute, registerRoute } from 'workbox-routing';
+import { responderNavegacao, URL_OFFLINE } from './pwa/regras-sw';
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -17,3 +19,16 @@ clientsClaim();
 // Handlers de push e de clique na notificação ficam registrados e vazios; a feature de notificações os preenche.
 self.addEventListener('push', () => {});
 self.addEventListener('notificationclick', () => {});
+
+// Navegação: o shell (index.html do precache) atende qualquer rota do app; se falhar, a página offline (FUN-34).
+const servirShell = createHandlerBoundToURL('/index.html');
+registerRoute(
+  new NavigationRoute(
+    (opcoes) =>
+      responderNavegacao(
+        () => servirShell(opcoes),
+        () => matchPrecache(URL_OFFLINE),
+      ),
+    { denylist: [/^\/api\//, /^\/\.well-known\//] },
+  ),
+);

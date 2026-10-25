@@ -870,9 +870,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Teste da regra do SW: navegação sem cache e sem rede devolve `offline.html`
-- [ ] A página usa só tokens do guia (checagem de tokens verde)
-- [ ] Gate quick passa
+- [x] Teste da regra do SW: navegação sem cache e sem rede devolve `offline.html` *(`regras-sw.test.ts` e `sw.test.ts` (FUN-34). SPEC_DEVIATION: em vez de `public/offline.html` estático, `offline.html` é uma segunda entrada do Vite (`frontend/web/offline.html` + `src/offline/`) que reaproveita `BarraTitulo` e `TelaMensagem` (a casca de `t03-indisponivel`); assim o CSS sai com hash, entra no precache e não duplica `tokens.css`. O build gera `dist/offline.html` e o precache passa a 31 entradas; `mockup-visual` não foi preciso, o estado existe no mockup)*
+- [x] A página usa só tokens do guia (checagem de tokens verde) *(`checar-tokens.py frontend/web/src` OK; a página só usa componentes e CSS modules com variáveis)*
+- [x] Gate quick passa *(web 241, typecheck, lint, format e build verdes)*
 
 **Tests**: unit
 **Gate**: quick

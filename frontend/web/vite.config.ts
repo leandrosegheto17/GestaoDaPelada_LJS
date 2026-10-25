@@ -18,7 +18,11 @@ const emTeste = Boolean(process.env.VITEST);
 
 export default defineConfig({
   plugins: [react(), corDoTema(), ...(emTeste ? [] : [VitePWA(criarOpcoesPwa())])],
-  build: { outDir: 'dist' },
+  build: {
+    outDir: 'dist',
+    // A página offline é uma entrada própria: o CSS dela sai com hash e entra no precache junto com o shell.
+    rollupOptions: { input: { index: 'index.html', offline: 'offline.html' } },
+  },
   server: configuracaoServidor(process.env),
   test: {
     environment: 'jsdom',
