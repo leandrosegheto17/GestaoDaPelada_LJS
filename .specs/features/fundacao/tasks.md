@@ -706,8 +706,8 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Cada componente tem teste de renderização e axe sem violações
-- [ ] Gate quick passa
+- [x] Cada componente tem teste de renderização e axe sem violações *(9 componentes: `barras.test.tsx` copiado do legado (BarraAcao, BarraAdmin, BarraDono, BarraSuperior, PularConteudo) e `complementares.test.tsx` para BarraCarregando, BarraTitulo, BotaoIcone e BarraInterna; ligados a FUN-30. Vieram também `config/recursos.ts` e seu teste, que `BarraSuperior` usa)*
+- [x] Gate quick passa *(lint, format, typecheck, `pnpm test` (web 104) e `pnpm test:checagens` verdes)*
 
 **Tests**: unit
 **Gate**: quick
