@@ -73,3 +73,42 @@ jobs:
           persist-credentials: false
       - uses: ./.github/actions/preparar-node
       - run: pnpm test:checagens
+
+  # Instalabilidade do PWA (manifest, service worker, ícones, offline) e cabeçalhos de segurança, contra o Worker
+  # local servindo o `dist`. O e2e não gera o `dist`: o build vem antes. Não há job de Lighthouse (AD-005).
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/preparar-node
+      - run: pnpm --filter @pelada/web exec playwright install --with-deps chromium
+      - run: pnpm --filter @pelada/web build
+        env:
+          VITE_VERSAO: ${{ github.sha }}
+      - run: pnpm --filter @pelada/web e2e
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: e2e-resultado
+          path: frontend/web/test-results/
+          if-no-files-found: ignore
+
+  # Comparação visual das telas com o mockup (porta 4183, `VISUAL_PORTA`).
+  visual:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/preparar-node
+      - run: pnpm --filter @pelada/web exec playwright install --with-deps chromium
+      - run: pnpm --filter @pelada/web build
+      - run: pnpm --filter @pelada/web visual
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: visual-resultado
+          path: frontend/web/e2e/resultado/
+          if-no-files-found: ignore

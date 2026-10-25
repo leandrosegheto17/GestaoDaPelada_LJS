@@ -1038,10 +1038,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Todos os jobs da spec (FUN-38) existem e o CI falha se qualquer um falhar
-- [ ] O job de Lighthouse não existe
-- [ ] `checar-acoes-fixadas` aprova o workflow
-- [ ] Gate de build passa localmente
+- [x] Todos os jobs da spec (FUN-38) existem e o CI falha se qualquer um falhar *(jobs base (lint, tokens, format, typecheck, testes, checagens de ids, URLs, wrangler e ações, gitleaks), banco (PostgreSQL 16: migrations do zero e isolamento), checagens, e2e (instalabilidade e cabeçalhos; instala o Chromium e roda o build antes) e visual (porta 4183); sem continue-on-error, então qualquer falha derruba o CI)*
+- [x] O job de Lighthouse não existe *(nenhum job nem passo de Lighthouse)*
+- [x] `checar-acoes-fixadas` aprova o workflow *(`checar-acoes-fixadas` sem achados)*
+- [x] Gate de build passa localmente *(`checar-acoes-fixadas`, `checar-wrangler-deploy`, prettier do .github e `test:checagens` (175) verdes; o YAML roda de verdade só no GitHub (T47). SPEC_DEVIATION: o visual não usa matriz de fatias, porque o `visual.mjs` da fundação não tem `VISUAL_FATIA`)*
 
 **Tests**: none (workflow; exercita os testes das tarefas anteriores)
 **Gate**: build
