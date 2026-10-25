@@ -283,9 +283,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] O workflow roda lint, format, typecheck, testes, checagens e gitleaks, com Node 24
-- [ ] `checar-acoes-fixadas` aprova o workflow
-- [ ] Gate de build passa localmente
+- [x] O workflow roda lint, format, typecheck, testes, checagens e gitleaks, com Node 24
+- [x] `checar-acoes-fixadas` aprova o workflow
+- [x] Gate de build passa localmente
 
 **Tests**: none (workflow; coberto por `checar-acoes-fixadas`)
 **Gate**: build

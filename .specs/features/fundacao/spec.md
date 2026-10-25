@@ -257,13 +257,13 @@ O Gestão da Pelada vai ser recriado do zero no padrão LJS Software. Antes de q
 | FUN-35 | P1: Shell PWA | Design | Pending |
 | FUN-36 | P1: Shell PWA | Design | Pending |
 | FUN-37 | P1: Shell PWA | Design | Pending |
-| FUN-38 | P1: CI e deploy | Design | Pending |
+| FUN-38 | P1: CI e deploy | Design | Implementing |
 | FUN-39 | P1: CI e deploy | Design | Pending |
 | FUN-40 | P1: CI e deploy | Design | Pending |
 | FUN-41 | P1: CI e deploy | Design | Pending |
 | FUN-42 | P1: CI e deploy | Design | Pending |
 | FUN-43 | P1: CI e deploy | Design | Implementing |
-| FUN-44 | P1: CI e deploy | Design | Pending |
+| FUN-44 | P1: CI e deploy | Design | Implementing |
 | FUN-45 | P1: CI e deploy | Design | Pending |
 | FUN-46 | P1: Backup | Design | Pending |
 | FUN-47 | P1: Backup | Design | Pending |
