@@ -1188,9 +1188,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] ADRs para: migrations e linha de base, modelo de RLS, instalabilidade no lugar do Lighthouse, `@cloudflare/vitest-plugin` com `Supersedes: 018` e host próprio com `Supersedes: 020`
-- [ ] Cada ADR tem `Supersedes:` quando substitui outro
-- [ ] Gate de build passa
+- [x] ADRs para: migrations e linha de base, modelo de RLS, instalabilidade no lugar do Lighthouse, `@cloudflare/vitest-plugin` com `Supersedes: 018` e host próprio com `Supersedes: 020` *(ADR-024 (migrations e linha de base), ADR-025 (modelo de RLS), ADR-026 (instalabilidade no lugar do Lighthouse), ADR-027 (`@cloudflare/vitest-plugin`, `Supersedes: 018`) e ADR-028 (host próprio, `Supersedes: 020`))*
+- [x] Cada ADR tem `Supersedes:` quando substitui outro *(`Supersedes:` só nos ADR-027 e ADR-028; o ADR-025 usa `Complementa: ADR-005`, porque a camada de repositório continua valendo)*
+- [x] Gate de build passa *(`format:check` verde; o 018 e o 020 não foram editados (ADR aceito não se edita))*
 
 **Tests**: none (documentação)
 **Gate**: build
