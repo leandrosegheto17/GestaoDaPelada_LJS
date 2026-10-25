@@ -383,10 +383,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] `pelada_app` é `NOLOGIN NOBYPASSRLS`, sem DDL e sem `TRUNCATE`, e com `DELETE` só nas tabelas listadas no design
-- [ ] `pelada_backup` só lê
-- [ ] Teste cobre cada limite (tentativa de DDL, de `TRUNCATE` e de `DELETE` fora da lista falha)
-- [ ] Gate full passa
+- [x] `pelada_app` é `NOLOGIN NOBYPASSRLS`, sem DDL e sem `TRUNCATE`, e com `DELETE` só nas tabelas listadas no design *(`sessoes` fica sem grant até a `conta-e-acesso`, como o design manda para as tabelas sem `grupo_id`; SPEC_DEVIATION anotado na migration)*
+- [x] `pelada_backup` só lê
+- [x] Teste cobre cada limite (tentativa de DDL, de `TRUNCATE` e de `DELETE` fora da lista falha)
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
