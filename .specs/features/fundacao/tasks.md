@@ -259,9 +259,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] O compose sobe só o Postgres 16, sem outros serviços, e `pgcrypto` está disponível
-- [ ] Com o banco fora do ar, `migrar` e `dev` falham com "Rode `docker compose up -d`" (teste)
-- [ ] Gate quick passa
+- [x] O compose sobe só o Postgres 16, sem outros serviços, e `pgcrypto` está disponível
+- [x] Com o banco fora do ar, `migrar` e `dev` falham com "Rode `docker compose up -d`" (teste)
+- [x] Gate quick passa
 
 **Tests**: unit
 **Gate**: quick

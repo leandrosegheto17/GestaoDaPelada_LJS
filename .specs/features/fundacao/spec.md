@@ -222,7 +222,7 @@ O Gestão da Pelada vai ser recriado do zero no padrão LJS Software. Antes de q
 | -------------- | ----------- | ------ | ------- |
 | FUN-01 | P1: Ambiente local | Design | Implementing |
 | FUN-02 | P1: Ambiente local | Design | Implementing |
-| FUN-03 | P1: Ambiente local | Design | Pending |
+| FUN-03 | P1: Ambiente local | Design | Implementing |
 | FUN-04 | P1: Ambiente local | Design | Pending |
 | FUN-05 | P1: Ambiente local | Design | Pending |
 | FUN-06 | P1: Ambiente local | Design | Implementing |
@@ -272,7 +272,7 @@ O Gestão da Pelada vai ser recriado do zero no padrão LJS Software. Antes de q
 | FUN-50 | P2: Documentação | Design | Pending |
 | FUN-51 | P2: Documentação | Design | Pending |
 | FUN-52 | P2: Documentação | Design | Pending |
-| FUN-53 | Edge Cases | Design | Pending |
+| FUN-53 | Edge Cases | Design | Implementing |
 | FUN-54 | Edge Cases | Design | Implementing |
 | FUN-55 | Edge Cases | Design | Pending |
 | FUN-56 | Edge Cases | Design | Pending |
