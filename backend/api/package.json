@@ -7,10 +7,15 @@
     "typecheck": "tsc --noEmit -p ."
   },
   "dependencies": {
+    "hono": "^4.13.13",
+    "kysely": "^0.29.7",
     "node-pg-migrate": "^9.0.0",
     "pg": "^8.23.1"
   },
   "devDependencies": {
-    "@types/pg": "^8.23.1"
+    "@cloudflare/vitest-plugin": "^1.4.7",
+    "@cloudflare/workers-types": "^5.20261024.1",
+    "@types/pg": "^8.23.1",
+    "wrangler": "4.152.0"
   }
 }
