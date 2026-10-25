@@ -234,10 +234,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Cada teste copiado está ligado a um FUN: `checar-urls-absolutas` → FUN-22, `checar-wrangler-deploy` → FUN-43, `checar-migracao-aditiva` → FUN-54
-- [ ] A checagem aditiva reconhece o nome de arquivo do `node-pg-migrate`
-- [ ] `checar-acoes-fixadas` e `checar-ids-tarefa` entram como regras do CI (sem FUN próprio)
-- [ ] `pnpm test:checagens` verde
+- [x] Cada teste copiado está ligado a um FUN: `checar-urls-absolutas` → FUN-22, `checar-wrangler-deploy` → FUN-43, `checar-migracao-aditiva` → FUN-54
+- [x] A checagem aditiva reconhece o nome de arquivo do `node-pg-migrate`
+- [x] `checar-acoes-fixadas` e `checar-ids-tarefa` entram como regras do CI (sem FUN próprio)
+- [x] `pnpm test:checagens` verde
 
 **Tests**: unit
 **Gate**: quick

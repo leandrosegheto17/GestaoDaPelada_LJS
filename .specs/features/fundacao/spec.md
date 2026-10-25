@@ -241,7 +241,7 @@ O Gestão da Pelada vai ser recriado do zero no padrão LJS Software. Antes de q
 | FUN-19 | P1: Esqueleto publicado | Design | Pending |
 | FUN-20 | P1: Esqueleto publicado | Design | Pending |
 | FUN-21 | P1: Esqueleto publicado | Design | Pending |
-| FUN-22 | P1: Esqueleto publicado | Design | Pending |
+| FUN-22 | P1: Esqueleto publicado | Design | Implementing |
 | FUN-23 | P1: Esqueleto publicado | Design | Pending |
 | FUN-24 | P1: Esqueleto publicado | Design | Pending |
 | FUN-25 | P1: Esqueleto publicado | Design | Pending |
@@ -262,7 +262,7 @@ O Gestão da Pelada vai ser recriado do zero no padrão LJS Software. Antes de q
 | FUN-40 | P1: CI e deploy | Design | Pending |
 | FUN-41 | P1: CI e deploy | Design | Pending |
 | FUN-42 | P1: CI e deploy | Design | Pending |
-| FUN-43 | P1: CI e deploy | Design | Pending |
+| FUN-43 | P1: CI e deploy | Design | Implementing |
 | FUN-44 | P1: CI e deploy | Design | Pending |
 | FUN-45 | P1: CI e deploy | Design | Pending |
 | FUN-46 | P1: Backup | Design | Pending |
@@ -273,7 +273,7 @@ O Gestão da Pelada vai ser recriado do zero no padrão LJS Software. Antes de q
 | FUN-51 | P2: Documentação | Design | Pending |
 | FUN-52 | P2: Documentação | Design | Pending |
 | FUN-53 | Edge Cases | Design | Pending |
-| FUN-54 | Edge Cases | Design | Pending |
+| FUN-54 | Edge Cases | Design | Implementing |
 | FUN-55 | Edge Cases | Design | Pending |
 | FUN-56 | Edge Cases | Design | Pending |
 
