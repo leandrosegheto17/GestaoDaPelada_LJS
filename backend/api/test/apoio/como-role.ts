@@ -36,3 +36,22 @@ export async function codigoDoErro(
     return (erro as ErroPg).code ?? 'sem-codigo';
   }
 }
+
+export interface Contexto {
+  conta?: string;
+  slug?: string;
+}
+
+/**
+ * Executa `acao` como pelada_app numa transação com o contexto de RLS definido por
+ * `set_config(..., true)` (vale só na transação) e desfaz tudo no fim.
+ */
+export async function comContexto<T>(cliente: pg.ClientBase, contexto: Contexto, acao: () => Promise<T>): Promise<T> {
+  return comoRole(cliente, 'pelada_app', async () => {
+    await cliente.query("SELECT set_config('app.conta_id', $1, true), set_config('app.slug_publico', $2, true)", [
+      contexto.conta ?? '',
+      contexto.slug ?? '',
+    ]);
+    return acao();
+  });
+}

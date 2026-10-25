@@ -408,10 +408,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] `ENABLE` e `FORCE ROW LEVEL SECURITY` em toda tabela com `grupo_id` (teste lê o catálogo)
-- [ ] Com `app.conta_id`, só grupos com vínculo; com `app.slug_publico`, só leitura do grupo do slug e escrita recusada; sem contexto, zero linhas
-- [ ] `grupos_visiveis()` com `search_path` fixo, `REVOKE` de `PUBLIC` e `GRANT` só a `pelada_app`
-- [ ] Gate full passa
+- [x] `ENABLE` e `FORCE ROW LEVEL SECURITY` em toda tabela com `grupo_id` (teste lê o catálogo) *(14 tabelas mais `grupos`; inclui `auditoria` e `eventos_uso`, que o design dava como sem `grupo_id` mas têm a coluna: SPEC_DEVIATION anotado na migration; a policy `USING (true)` de `pelada_backup` vai em todas)*
+- [x] Com `app.conta_id`, só grupos com vínculo; com `app.slug_publico`, só leitura do grupo do slug e escrita recusada; sem contexto, zero linhas *(pelo slug, `INSERT` é recusado e `UPDATE`/`DELETE` afetam zero linhas; com conta e slug juntos vale a conta, como FUN-13)*
+- [x] `grupos_visiveis()` com `search_path` fixo, `REVOKE` de `PUBLIC` e `GRANT` só a `pelada_app`
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
