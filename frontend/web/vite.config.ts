@@ -28,6 +28,6 @@ export default defineConfig({
     environment: 'jsdom',
     css: { include: /\.module\.css$|\.css\?raw$/ },
     setupFiles: ['./test/apoio/setup.ts'],
-    include: ['src/**/*.test.{ts,tsx}', 'test/**/*.test.{ts,mjs}'],
+    include: ['src/**/*.test.{ts,tsx}', 'test/**/*.test.{ts,mjs}', 'e2e/**/*.test.mjs'],
   },
 });

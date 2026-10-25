@@ -128,6 +128,7 @@ export default tseslint.config(
   {
     ignores: [
       '**/dist/**',
+      '**/dist-visual/**',
       '.md/**',
       '.claude/**',
       '.specs/**',

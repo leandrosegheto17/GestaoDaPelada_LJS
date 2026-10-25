@@ -1,0 +1,6 @@
+# Telas do mockup comparadas no CI (um nome por linha; `#` comenta). O nome é o do arquivo em
+# .specs/mockup/telas/ sem `.html`. Na fundação entram só as telas que os componentes base já produzem,
+# expostas pelas rotas de vitrine do build de teste (VITE_VITRINE=1). Cada feature acrescenta as suas.
+padrao--erro-rede
+padrao--carregando-lista
+t03-indisponivel--erro

@@ -20,3 +20,4 @@ frontend/web/e2e/resultado/
 *.pgdump
 *.sql.age
 identidade-age*
+frontend/web/dist-visual/

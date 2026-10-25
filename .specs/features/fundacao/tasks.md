@@ -964,9 +964,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Telas ativas: `padrao--erro-rede`, `padrao--carregando-lista`, `t03-indisponivel--erro`, em 1280×800 e 390×844, limite de 1% de pixels
-- [ ] Uma divergência injetada faz a comparação falhar (teste do comparador)
-- [ ] Gate full passa
+- [x] Telas ativas: `padrao--erro-rede`, `padrao--carregando-lista`, `t03-indisponivel--erro`, em 1280×800 e 390×844, limite de 1% de pixels *(`pnpm --filter @pelada/web visual` real: 0,00% nas duas de erro e de indisponível, 0,53% e 0,65% no carregando de lista, nos dois tamanhos; `telas-ativas.test.mjs` confere as três, os tamanhos e as rotas. SPEC_DEVIATION: as telas ativas são identificadas pelo nome do arquivo do mockup (o `id` do `telas.json` repete, ex. `PADRAO`), e `config-fundacao.mjs` deriva do `telas.json` um mapa com as rotas de vitrine e sem respostas de API; o build de teste vai para `dist-visual/` e o preview usa a porta 4183 (a 4173 estava ocupada por outro `vite preview` na máquina); sem o ajuste de 7% do runner que o legado tinha, que era da tela T16)*
+- [x] Uma divergência injetada faz a comparação falhar (teste do comparador) *(`e2e/comparador.spec.ts` (Playwright): páginas iguais ≤ 1%, cor trocada > 1%, altura diferente reprovada)*
+- [x] Gate full passa *(lint, format, typecheck, `pnpm test` (raiz 20, dominio 1, contrato 5, API 343, web 295), `test:checagens` 175, `pnpm --filter @pelada/web e2e` (3) e `visual` verdes; o e2e usa a porta 8798 e uma URL de Hyperdrive fictícia, porque a 8788 do legado estava ocupada por outro projeto e o wrangler exige senha na URL local)*
 
 **Tests**: e2e
 **Gate**: full

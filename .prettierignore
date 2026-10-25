@@ -8,3 +8,4 @@ dist
 coverage
 frontend/web/src/estilos/tokens.css
 frontend/web/public/fontes/fontes.css
+dist-visual
