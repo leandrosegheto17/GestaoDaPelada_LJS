@@ -220,8 +220,8 @@ O Gestão da Pelada vai ser recriado do zero no padrão LJS Software. Antes de q
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----------- | ------ | ------- |
-| FUN-01 | P1: Ambiente local | Design | Pending |
-| FUN-02 | P1: Ambiente local | Design | Pending |
+| FUN-01 | P1: Ambiente local | Design | Implementing |
+| FUN-02 | P1: Ambiente local | Design | Implementing |
 | FUN-03 | P1: Ambiente local | Design | Pending |
 | FUN-04 | P1: Ambiente local | Design | Pending |
 | FUN-05 | P1: Ambiente local | Design | Pending |

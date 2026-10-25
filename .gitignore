@@ -4,3 +4,19 @@ __pycache__/
 .specs/spikes/*/codigo/
 node_modules/
 .env
+dist
+coverage
+.wrangler
+.env.*
+!.env.example
+.dev.vars
+test-results
+playwright-report
+frontend/web/e2e/resultado/
+.pnpm-store
+*.tmp.*
+
+# Restauração de backup (dados pessoais e chave privada): nunca versionar
+*.pgdump
+*.sql.age
+identidade-age*

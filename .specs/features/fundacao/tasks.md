@@ -184,10 +184,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] `engines`, `.nvmrc` e `type: module` conferidos por teste (`test/repositorio.test.ts`), que falha se divergirem
-- [ ] `pnpm lint`, `pnpm typecheck` e `pnpm test` saem com código 0 na base limpa, executando em todos os pacotes
-- [ ] `.specs/projeto/testes.json` grava o comando do gate de build desta lista
-- [ ] Testes passam e a contagem fica registrada (sem apagar teste)
+- [x] `engines`, `.nvmrc` e `type: module` conferidos por teste (`test/repositorio.test.ts`), que falha se divergirem
+- [x] `pnpm lint`, `pnpm typecheck` e `pnpm test` saem com código 0 na base limpa, executando em todos os pacotes
+- [x] `.specs/projeto/testes.json` grava o comando do gate de build desta lista
+- [x] Testes passam e a contagem fica registrada (sem apagar teste)
 
 **Tests**: unit
 **Gate**: quick
