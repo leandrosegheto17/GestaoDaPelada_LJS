@@ -634,9 +634,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Teste falha se `frontend/web/src/estilos/tokens.css` divergir de `.specs/mockup/tokens.css`
-- [ ] `python .claude/scripts/checar-tokens.py frontend/web/src` entra no CI
-- [ ] Gate quick passa
+- [x] Teste falha se `frontend/web/src/estilos/tokens.css` divergir de `.specs/mockup/tokens.css` *(`frontend/web/test/estilos.test.ts`, ligado a FUN-29, compara também as fontes; conferido que acrescentar uma linha ao `tokens.css` o faz falhar. Texto compara sem a diferença CRLF/LF do Windows, binário byte a byte. `global.css`, `tokens.css`, fontes, ícones e `config/tokens.ts` vieram do legado sem mudança; `tokens.css` e `fontes.css` entram no `.prettierignore` por serem cópia)*
+- [x] `python .claude/scripts/checar-tokens.py frontend/web/src` entra no CI *(passo no job `base` de `.github/workflows/ci.yml`, depois do `pnpm lint`; rodou local: OK)*
+- [x] Gate quick passa *(lint, format, typecheck, `pnpm test`, `pnpm test:checagens` verdes)*
 
 **Tests**: unit
 **Gate**: quick
