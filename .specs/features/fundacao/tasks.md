@@ -333,10 +333,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] A linha de base é a concatenação literal das 15 migrations, sem alteração
-- [ ] Cada migration roda na própria transação (`--no-single-transaction`) e há uma migration por mudança
-- [ ] Teste: banco vazio migrado tem as mesmas tabelas, colunas, restrições e triggers do legado
-- [ ] Gate full passa
+- [x] A linha de base é a concatenação literal das 15 migrations, sem alteração *(o legado tem 13 migrations em todas as branches, como diz a spec em FUN-08; o "15" do design e desta lista é erro de contagem. A linha de base concatena as 13)*
+- [x] Cada migration roda na própria transação (`--no-single-transaction`) e há uma migration por mudança
+- [x] Teste: banco vazio migrado tem as mesmas tabelas, colunas, restrições e triggers do legado
+- [x] Gate full passa *(o "full" roda hoje lint, format, typecheck, `pnpm test` e `pnpm test:checagens`; e2e do web entra nas Fases 5 e 6)*
 
 **Tests**: integration
 **Gate**: full

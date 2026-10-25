@@ -5,5 +5,12 @@
   "scripts": {
     "test": "vitest run",
     "typecheck": "tsc --noEmit -p ."
+  },
+  "dependencies": {
+    "node-pg-migrate": "^9.0.0",
+    "pg": "^8.23.1"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.23.1"
   }
 }

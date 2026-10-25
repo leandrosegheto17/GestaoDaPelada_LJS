@@ -226,8 +226,8 @@ O Gestão da Pelada vai ser recriado do zero no padrão LJS Software. Antes de q
 | FUN-04 | P1: Ambiente local | Design | Pending |
 | FUN-05 | P1: Ambiente local | Design | Pending |
 | FUN-06 | P1: Ambiente local | Design | Implementing |
-| FUN-07 | P1: Banco | Design | Pending |
-| FUN-08 | P1: Banco | Design | Pending |
+| FUN-07 | P1: Banco | Design | Implementing |
+| FUN-08 | P1: Banco | Design | Implementing |
 | FUN-09 | P1: Banco | Design | Pending |
 | FUN-10 | P1: Banco | Design | Pending |
 | FUN-11 | P1: Banco | Design | Pending |
