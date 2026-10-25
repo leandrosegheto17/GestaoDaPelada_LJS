@@ -1089,9 +1089,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Teste do script: dump com `--enable-row-security`; falha de `pg_dump` ou de `age` faz o job falhar e não publica artefato parcial
-- [ ] Agendamento 07:00 UTC, disparo manual e retenção de 30 dias conferidos por teste do YAML
-- [ ] Gate de build passa
+- [x] Teste do script: dump com `--enable-row-security`; falha de `pg_dump` ou de `age` faz o job falhar e não publica artefato parcial *(`backup.test.mjs` roda o `dump-cifrado.sh` em bash com `docker` e `age` falsos: confere `pg_dump --format=custom --enable-row-security` no cliente `postgres:16`; falha de `pg_dump`, de `age` ou dump vazio saem com erro, sem artefato nem arquivo parcial, e sem vazar URL ou host)*
+- [x] Agendamento 07:00 UTC, disparo manual e retenção de 30 dias conferidos por teste do YAML *(o YAML tem cron `0 7 * * *`, `workflow_dispatch`, `retencao: 30` (também o default da action, com `if-no-files-found: error`) e nenhum `continue-on-error`)*
+- [x] Gate de build passa *(`test:checagens` (ops, 129 testes entre os arquivos copiados e novos), lint, prettier e checagens de ações verdes. SPEC_DEVIATION: a role é `pelada_backup` (a spec cita `backup_ro`), secret `NEON_URL_BACKUP`; o cliente é fixado em `postgres:16` (o legado descobria a versão do servidor) e a contagem restaurada contra a origem fica no runbook (T43), pois o teste de restauração precisa de banco e age reais. Aviso: o job de backup roda sem environment, então os secrets `NEON_URL_BACKUP` e `BACKUP_CHAVE` precisam estar no nível do repositório (T47))*
 
 **Tests**: unit
 **Gate**: build
