@@ -584,9 +584,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Sem `SENTRY_DSN`, o app funciona e nada é enviado
-- [ ] Com DSN, o evento sai com `release` = SHA e sem corpo, cookies, `Authorization` e e-mails (teste do `beforeSend`)
-- [ ] Gate full passa
+- [x] Sem `SENTRY_DSN`, o app funciona e nada é enviado *(DSN ausente ou vazio: `enabled: false`; o teste espia o `fetch` global e não vê nenhuma chamada, nem com erro na rota)*
+- [x] Com DSN, o evento sai com `release` = SHA e sem corpo, cookies, `Authorization` e e-mails (teste do `beforeSend`) *(o `beforeSend` existe na 11.9, conferido nos tipos instalados de `@sentry/core`: a `PREMISSA` do design se confirma. Teste unitário do `limparEvento` e teste de ponta a ponta no workerd que lê o envelope enviado. Na 11.x o `sendDefaultPii` deu lugar a `dataCollection`, configurado sem usuário, cookies, corpos, query e SQL. Cliente por requisição (`cacheClient: false`): com o cliente em cache por isolate, só a primeira requisição descarregava os eventos)*
+- [x] Gate full passa *(lint, format, typecheck, `pnpm test`, `pnpm test:checagens`; o e2e do web só existe a partir da Fase 6)*
 
 **Tests**: unit
 **Gate**: full

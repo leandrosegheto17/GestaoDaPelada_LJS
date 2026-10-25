@@ -9,6 +9,7 @@ import { exigirCabecalhoPelada } from './middlewares/csrf.ts';
 import { criarLimiteTaxa, type Limitador } from './middlewares/limite-taxa.ts';
 import { semSniff } from './middlewares/sem-sniff.ts';
 import { rotaHealth } from './rotas/health.ts';
+import { ligarSentry } from './sentry.ts';
 
 /** Maior corpo aceito em `/api/*`. */
 export const LIMITE_CORPO_BYTES = 16 * 1024;
@@ -32,6 +33,8 @@ export interface OpcoesApp {
 export function criarApp(opcoes: OpcoesApp = {}): Hono<AppEnv> {
   const app = new Hono<AppEnv>();
 
+  // Primeiro de todos, para ver os erros de qualquer middleware. Sem SENTRY_DSN, desligado (FUN-24).
+  ligarSentry(app);
   app.use('/api/*', semCache);
   app.use('/api/*', semSniff);
   app.use(

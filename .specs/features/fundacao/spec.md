@@ -242,8 +242,8 @@ O Gestão da Pelada vai ser recriado do zero no padrão LJS Software. Antes de q
 | FUN-20 | P1: Esqueleto publicado | Design | Implementing |
 | FUN-21 | P1: Esqueleto publicado | Design | Implementing |
 | FUN-22 | P1: Esqueleto publicado | Design | Implementing |
-| FUN-23 | P1: Esqueleto publicado | Design | Pending |
-| FUN-24 | P1: Esqueleto publicado | Design | Pending |
+| FUN-23 | P1: Esqueleto publicado | Design | Implementing |
+| FUN-24 | P1: Esqueleto publicado | Design | Implementing |
 | FUN-25 | P1: Esqueleto publicado | Design | Pending |
 | FUN-26 | P1: Esqueleto publicado | Design | Implementing |
 | FUN-27 | P1: Esqueleto publicado | Design | Implementing |

@@ -10,4 +10,6 @@ export interface Env {
   URL_PUBLICA: string;
   /** SHA do commit publicado, injetado no deploy por `--var VERSAO:<sha>` (FUN-20). */
   VERSAO: string;
+  /** Opcional: sem ele, o Sentry fica desligado (FUN-24). Segredo do Worker, nunca no wrangler.jsonc. */
+  SENTRY_DSN?: string | undefined;
 }
