@@ -1164,9 +1164,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Cobre deploy, falha de migração com restauração pela branch, restauração do backup, rotação de segredos, monitor do UptimeRobot em `/api/health` e remoção do Worker antigo
-- [ ] Exige, antes do primeiro deploy, a remoção confirmada do Worker `pelada` e um dump cifrado
-- [ ] Gate de build passa
+- [x] Cobre deploy, falha de migração com restauração pela branch, restauração do backup, rotação de segredos, monitor do UptimeRobot em `/api/health` e remoção do Worker antigo *(seções 2 (deploy), 3 (falha de migração com restauração pela branch), 4 (restauração do backup), 5 (rotação de segredos), 6 (remoção do Worker antigo) e 7 (monitor do UptimeRobot em `/api/health`))*
+- [x] Exige, antes do primeiro deploy, a remoção confirmada do Worker `pelada` e um dump cifrado *(seção 1: dump cifrado, remoção confirmada do Worker `pelada` e roles conferidas, nesta ordem, antes do primeiro deploy)*
+- [x] Gate de build passa *(`format:check` e checagem do wrangler verdes. A seção 4 cria as roles antes da restauração e reaplica os grants, porque o dump sai com `--no-privileges` (conforme o spike S2); o ensaio de restauração com contagem fica para a T49)*
 
 **Tests**: none (documentação)
 **Gate**: build
