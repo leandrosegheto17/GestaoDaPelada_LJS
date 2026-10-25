@@ -988,9 +988,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Manifest válido (FUN-32), service worker ativo controlando a página, ícones 192 e 512 (um `maskable`) acessíveis e página offline servida sem rede
-- [ ] Sem Lighthouse no CI (AD-005)
-- [ ] Gate full passa
+- [x] Manifest válido (FUN-32), service worker ativo controlando a página, ícones 192 e 512 (um `maskable`) acessíveis e página offline servida sem rede *(`e2e/pwa.spec.ts` (5 testes, FUN-32 a FUN-36) contra o build servido pelo Worker local; confere também `Page.getInstallabilityErrors` vazio e o fallback de navegação para `offline.html` quando o shell sai do precache e não há rede)*
+- [x] Sem Lighthouse no CI (AD-005) *(o repositório não tem dependência nem workflow de Lighthouse; a ausência do job no `ci.yml` é conferida na T38)*
+- [x] Gate full passa *(lint, format, typecheck, `pnpm test` (web 295), `test:checagens` 175 e `e2e` (8 testes) verdes)*
 
 **Tests**: e2e
 **Gate**: full
