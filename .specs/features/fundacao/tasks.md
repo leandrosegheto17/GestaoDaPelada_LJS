@@ -729,8 +729,8 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Cada componente tem teste de renderização e axe sem violações
-- [ ] Gate quick passa
+- [x] Cada componente tem teste de renderização e axe sem violações *(12 componentes: `campos.test.tsx` e `CamposNovaSenha.test.tsx` copiados do legado, mais `CampoBusca.test.tsx` (sem teste no legado); ligados a FUN-30. SPEC_DEVIATION: os campos usam `LIMITES` e a formatação de moeda e datas, que ainda não existiam; entraram só `LIMITES`, `bytesUtf8` e `DIAS_DA_SEMANA` em `@pelada/contrato`, `formatacao/{moeda,datas}` com testes e `rotulos` reduzido a `ROTULO_DIA_SEMANA`)*
+- [x] Gate quick passa *(lint, format, typecheck, `pnpm test` (web 183, contrato 5) e `pnpm test:checagens` verdes)*
 
 **Tests**: unit
 **Gate**: quick

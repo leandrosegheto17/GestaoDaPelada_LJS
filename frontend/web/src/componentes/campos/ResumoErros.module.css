@@ -1,0 +1,7 @@
+.resumo {
+  border: 2px solid var(--cor-erro-texto);
+}
+.resumo ul {
+  margin: var(--esp-1) 0 0;
+  padding-left: var(--esp-5);
+}

@@ -1,0 +1,73 @@
+.campo {
+  display: grid;
+  gap: var(--esp-1);
+}
+.rotulo {
+  font-weight: var(--peso-semi);
+}
+.ajuda {
+  font-size: var(--texto-sm);
+  color: var(--cor-texto-sec);
+}
+.erro {
+  display: flex;
+  gap: var(--esp-1);
+  align-items: flex-start;
+  font-size: var(--texto-sm);
+  font-weight: var(--peso-semi);
+  color: var(--cor-erro-texto);
+  margin: 0;
+}
+.entrada {
+  width: 100%;
+  min-height: var(--alvo-toque);
+  padding: 0 var(--esp-3);
+  border: 2px solid var(--cor-contorno);
+  border-radius: var(--raio-sm);
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+.comErro .entrada {
+  border-color: var(--cor-erro-texto);
+}
+.nota {
+  width: 88px;
+  flex-shrink: 0;
+}
+.linha {
+  display: flex;
+  gap: var(--esp-2);
+  align-items: center;
+}
+.linha .entrada {
+  flex: 1;
+}
+.numero {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-2);
+}
+.numero .entrada {
+  width: 72px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.numeroBotao {
+  width: var(--alvo-toque);
+  height: var(--alvo-toque);
+  border: 2px solid var(--cor-contorno);
+  border-radius: var(--raio-sm);
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  font-size: var(--texto-2xl);
+  font-weight: var(--peso-forte);
+  cursor: pointer;
+}
+.numeroBotao:disabled {
+  background: var(--cor-desabilitado-fundo);
+  color: var(--cor-desabilitado-texto);
+  cursor: default;
+}
