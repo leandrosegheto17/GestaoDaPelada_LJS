@@ -608,9 +608,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Teste confere o proxy `/api` → Worker e `localConnectionString` apontando para o Postgres local
-- [ ] Com o compose de pé, `http://localhost:5173` abre e `GET /api/health` = 200 (conferido à mão e registrado)
-- [ ] Gate quick passa
+- [x] Teste confere o proxy `/api` → Worker e `localConnectionString` apontando para o Postgres local *(`frontend/web/test/configuracao-servidor.test.ts` e `backend/scripts/test/dev.test.ts`: o `localConnectionString` bate com a porta e o banco do `docker-compose.yml`, e o `pnpm dev` troca a string pela de `pelada_app` com a senha do `.env` via `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE`. Com o banco fora do ar, o `pnpm dev` falha com o aviso do `exigir-banco` antes de subir qualquer coisa: FUN-53 fecha aqui. O `vitest` e o `vite` entram no `package.json` do web)*
+- [ ] Com o compose de pé, `http://localhost:5173` abre e `GET /api/health` = 200 (conferido à mão e registrado) *(em parte, 2026-10-25: com o `fundacao-db-1` de pé, `pnpm dev` subiu os dois; `curl http://localhost:8787/api/health` e `curl http://localhost:5173/api/health` (pelo proxy) deram 200 com `{"status":"ok","versao":"dev"}`, `no-store` e `nosniff`. `http://localhost:5173/` dá 404 porque o web ainda não tem `index.html`: abre com o front base, Fase 5)*
+- [x] Gate quick passa *(`pnpm test:checagens`, `pnpm --filter @pelada/web test`; rodados também lint, format, typecheck e `pnpm test`)*
 
 **Tests**: unit
 **Gate**: quick
@@ -1343,7 +1343,7 @@ T47 → T48 → T49
 | FUN-25 | T43 | FUN-48 | T43, T49 |
 | FUN-28 | T37 | FUN-49 | T42 |
 | FUN-50 | T43 | FUN-51 | T8, T44, T46 |
-| FUN-52 | T45 | FUN-53 | T6, T10 |
+| FUN-52 | T45 | FUN-53 | T6, T10, T20 |
 | FUN-54 | T5 | FUN-55, 56 | T39 |
 
 **Cobertura:** 56 requisitos, 56 mapeados a tarefas, 0 sem tarefa.
