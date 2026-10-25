@@ -534,10 +534,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] `GET /api/health` → 200 com `{"status":"ok","versao":"<sha>"}` sem tocar o banco
-- [ ] Toda rota `/api/*`, inclusive a de erro e a inexistente, responde `Cache-Control: no-store`
-- [ ] Testes de rota no pool workerd passam
-- [ ] Gate full passa
+- [x] `GET /api/health` → 200 com `{"status":"ok","versao":"<sha>"}` sem tocar o banco *(o teste espia o binding `HYPERDRIVE`: zero leituras. `VERSAO` tem valor `dev` no `wrangler.jsonc`; o deploy injeta o SHA)*
+- [x] Toda rota `/api/*`, inclusive a de erro e a inexistente, responde `Cache-Control: no-store` *(e `nosniff`; casos 200, 403, 404, 413, 429 e 500)*
+- [x] Testes de rota no pool workerd passam *(`test/rotas/`: health, middlewares e limite de taxa. O `LIMITE_WEBHOOK` fica sem rota até a feature de pagamentos)*
+- [x] Gate full passa *(lint, format, typecheck, `pnpm test`, `pnpm test:checagens`; o e2e do web só existe a partir da Fase 6)*
 
 **Tests**: e2e
 **Gate**: full
