@@ -132,10 +132,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Branch Neon descartável criada **com confirmação específica do usuário** e apagada ao final
-- [ ] Duas requisições concorrentes com contas diferentes pelo Hyperdrive remoto: cada uma vê só o seu contexto
-- [ ] `registro.md` com veredito e nível de confiança; se reprovar, o fallback (conexão direta sem pooling) fica definido e o design é atualizado
-- [ ] Código do spike fora do git e nunca integrado
+- [ ] Branch Neon descartável criada **com confirmação específica do usuário** e apagada ao final *(criada e confirmada em 2026-10-24; baixa pendente: o usuário apaga a branch `spike-descartavel` no Neon e o Hyperdrive `spike-s1` no Cloudflare; vale também para T2)*
+- [x] Duas requisições concorrentes com contas diferentes pelo Hyperdrive remoto: cada uma vê só o seu contexto
+- [x] `registro.md` com veredito e nível de confiança; se reprovar, o fallback (conexão direta sem pooling) fica definido e o design é atualizado
+- [x] Código do spike fora do git e nunca integrado
 
 **Tests**: none (spike descartável; exceção do `CLAUDE.md`)
 **Gate**: quick
@@ -157,10 +157,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] `rolbypassrls` e `relforcerowsecurity` conferidos; o que `neondb_owner` enxerga com `FORCE` ligado está registrado
-- [ ] `pg_dump --enable-row-security` com policy `USING (true)` para a role de backup copia todas as linhas
-- [ ] `registro.md` com veredito; o design é ajustado se o resultado mudar roles ou policies
-- [ ] Mesma branch descartável de T1 (ou nova, com confirmação), apagada ao final
+- [x] `rolbypassrls` e `relforcerowsecurity` conferidos; o que `neondb_owner` enxerga com `FORCE` ligado está registrado
+- [x] `pg_dump --enable-row-security` com policy `USING (true)` para a role de backup copia todas as linhas
+- [x] `registro.md` com veredito; o design é ajustado se o resultado mudar roles ou policies
+- [ ] Mesma branch descartável de T1 (ou nova, com confirmação), apagada ao final *(mesma baixa pendente de T1)*
 
 **Tests**: none (spike descartável)
 **Gate**: quick
