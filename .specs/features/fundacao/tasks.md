@@ -1212,9 +1212,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Descreve a stack, os comandos `pnpm`, o gate de testes e onde ficam `.specs/`, `.md/` e `docs/`
-- [ ] Não altera `.claude/CLAUDE.md`
-- [ ] Gate de build passa
+- [x] Descreve a stack, os comandos `pnpm`, o gate de testes e onde ficam `.specs/`, `.md/` e `docs/` *(stack, comandos `pnpm`, gate de testes (`trava-testes.py --rodar`) e onde ficam `.specs/`, `.md/`, `docs/` e `.claude/`)*
+- [x] Não altera `.claude/CLAUDE.md` *(só o `CLAUDE.md` da raiz foi criado; `.claude/CLAUDE.md` não aparece no diff)*
+- [x] Gate de build passa *(`format:check` verde)*
 
 **Tests**: none (documentação)
 **Gate**: build
