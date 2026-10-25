@@ -1,5 +1,5 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": { "allowImportingTsExtensions": true },
-  "include": ["src", "test", "vite.config.ts", "configuracao-servidor.ts"]
+  "include": ["src", "test", "stylelint.config.mjs", "vite.config.ts", "configuracao-servidor.ts"]
 }

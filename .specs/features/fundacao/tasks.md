@@ -658,9 +658,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Teste com CSS de exemplo: cor, fonte e sombra literais falham; tokens passam
-- [ ] `pnpm lint` (inclui `lint:css`) verde
-- [ ] Gate quick passa
+- [x] Teste com CSS de exemplo: cor, fonte e sombra literais falham; tokens passam *(`frontend/web/test/stylelint.test.ts`, ligado a FUN-31, copiado do legado: 12 CSS recusados, 9 aceitos e o `global.css` real passa. Desvio: a configuração é `frontend/web/stylelint.config.mjs`, como no legado, e não `.stylelintrc.json`; um `.d.ts` de apoio tipa o import no teste)*
+- [x] `pnpm lint` (inclui `lint:css`) verde *(script `lint:css` no `package.json` do web)*
+- [x] Gate quick passa *(lint, format, typecheck, `pnpm test`, `pnpm test:checagens` verdes)*
 
 **Tests**: unit
 **Gate**: quick
