@@ -1063,11 +1063,11 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Teste de estrutura do YAML: ordem build, branch de restauração (mantém 2), dump cifrado, migração com `NEON_URL_MIGRACAO`, `wrangler deploy --var URL_PUBLICA`, health com `versao == github.sha`
-- [ ] Teste: build que falha para antes de tocar o Neon; migração que falha impede o `wrangler deploy`; `URL_PUBLICA` vazia falha antes do deploy
-- [ ] `concurrency` com `cancel-in-progress: false`; `rollback` sem `|| true`; confere o cache do Hyperdrive desligado
-- [ ] `wrangler deploy` só neste arquivo (`checar-wrangler-deploy`)
-- [ ] Gate de build passa
+- [x] Teste de estrutura do YAML: ordem build, branch de restauração (mantém 2), dump cifrado, migração com `NEON_URL_MIGRACAO`, `wrangler deploy --var URL_PUBLICA`, health com `versao == github.sha` *(`backend/scripts/ops/test/deploy-yml.test.mjs` lê o YAML pela estrutura e confere a ordem URL_PUBLICA, build, branch de restauração (mantém 2, testado no `restauracao-neon.test.ts` copiado), dump cifrado, `pnpm migrar --alvo producao` com `NEON_URL_MIGRACAO`, Hyperdrive, `wrangler deploy --var URL_PUBLICA --var VERSAO:<sha>` e health com `versao == github.sha`)*
+- [x] Teste: build que falha para antes de tocar o Neon; migração que falha impede o `wrangler deploy`; `URL_PUBLICA` vazia falha antes do deploy *(build antes de tudo que toca Neon ou Worker; sem `continue-on-error` e só o passo de desfazer tem `if`; `URL_PUBLICA` vazia, http ou com caminho falha (o passo é executado em bash) antes do build e do deploy)*
+- [x] `concurrency` com `cancel-in-progress: false`; `rollback` sem `|| true`; confere o cache do Hyperdrive desligado *(`concurrency` com `cancel-in-progress: false`; rollback sem `|| true`; passo confere o cache do Hyperdrive desligado (scripts `ops/` copiados do legado, com os 99 testes, adaptados para `node` sem `tsx`))*
+- [x] `wrangler deploy` só neste arquivo (`checar-wrangler-deploy`) *(`checar-wrangler-deploy` sem achados)*
+- [x] Gate de build passa *(20 testes do deploy.yml, `test:checagens` e typecheck/lint dos scripts verdes. SPEC_DEVIATION: o health usa `/api/health` e `--var VERSAO:<sha>` (o legado usava `/api/saude`); o passo de dump aponta para a action `dump-cifrado`, criada na T40)*
 
 **Tests**: unit
 **Gate**: build

@@ -1,0 +1,138 @@
+name: deploy
+
+# Único lugar com `wrangler deploy` (conferido por backend/scripts/checagens/checar-wrangler-deploy.mjs).
+# Só produção, sem homologação. Disparo manual (Actions -> Run workflow), sempre pela main; o push não dispara deploy.
+# Ordem, parando no primeiro erro: URL_PUBLICA -> build do web -> branch de restauração no Neon -> dump cifrado ->
+# migração -> cache do Hyperdrive -> wrangler deploy -> saúde (/api/health com o SHA publicado).
+# Runbook: docs/runbook.md.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    # O environment `producao` também restringe o disparo à main (branch policy); o `if` é a segunda trava.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    environment: producao
+    # Duas execuções juntas: a segunda espera a primeira terminar, sem cancelá-la (FUN-55).
+    concurrency:
+      group: deploy-producao
+      cancel-in-progress: false
+    env:
+      AMBIENTE: producao
+      URL_PUBLICA: ${{ vars.URL_PUBLICA }}
+      CLOUDFLARE_API_BASE: https://api.cloudflare.com/client/v4
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/preparar-node
+
+      - name: Conferir URL_PUBLICA (antes de qualquer mudança)
+        run: |
+          set -euo pipefail
+          if [[ ! "${URL_PUBLICA:-}" =~ ^https://[A-Za-z0-9.-]+$ ]]; then
+            echo "A variável URL_PUBLICA do environment producao falta ou não é uma origem https (ex.: https://host)." >&2
+            exit 1
+          fi
+
+      - name: Build do web (antes de tocar no banco)
+        run: pnpm --filter @pelada/web build
+        env:
+          VITE_VERSAO: ${{ github.sha }}
+
+      - name: Branch de restauração no Neon
+        id: restauracao
+        env:
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+          NEON_PROJECT_ID: ${{ secrets.NEON_PROJECT_ID }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          if [[ ! "${NEON_API_KEY:-}" =~ ^[A-Za-z0-9_-]+$ ]]; then
+            echo "NEON_API_KEY ausente ou com caracteres fora de [A-Za-z0-9_-]." >&2
+            exit 1
+          fi
+          # O token vai num arquivo de configuração do curl (modo 600), fora de argv; a validação acima
+          # impede que aspas ou quebra de linha injetem diretivas nele.
+          config="${RUNNER_TEMP}/neon.curl"
+          trap 'rm -f "$config"' EXIT
+          (umask 077; printf 'header = "Authorization: Bearer %s"\n' "$NEON_API_KEY" > "$config")
+          neon() { curl -fsS --config "$config" "$@"; }
+          pai="production"
+          api="https://console.neon.tech/api/v2/projects/${NEON_PROJECT_ID}/branches"
+          id_pai="$(neon "$api" | node backend/scripts/ops/restauracao-neon-cli.ts pai "$pai" --executar)"
+          nome="restauracao-${AMBIENTE}-${RUN_ID}"
+          neon -X POST -H 'Content-Type: application/json' \
+            -d "{\"branch\":{\"name\":\"${nome}\",\"parent_id\":\"${id_pai}\"}}" "$api" >/dev/null
+          echo "nome=${nome}" >> "$GITHUB_OUTPUT"
+          # Mantém só as 2 branches de restauração mais novas (limite do plano gratuito).
+          neon "$api" | node backend/scripts/ops/restauracao-neon-cli.ts antigos "$AMBIENTE" --executar |
+            while read -r antigo; do neon -X DELETE "${api}/${antigo}" >/dev/null; done
+
+      - name: Dump cifrado antes da migração
+        uses: ./.github/actions/dump-cifrado
+        with:
+          url: ${{ secrets.NEON_URL_MIGRACAO }}
+          chave: ${{ secrets.BACKUP_CHAVE }}
+          nome-artefato: dump-predeploy-${{ github.run_id }}
+
+      - name: Migrar o banco
+        id: migrar
+        env:
+          CI: 'true'
+          DATABASE_URL: ${{ secrets.NEON_URL_MIGRACAO }}
+        run: pnpm migrar --alvo producao
+
+      - name: Conferir o cache do Hyperdrive desligado
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          id="$(node backend/scripts/ops/hyperdrive-id.ts)"
+          bash backend/scripts/ops/consultar-hyperdrive.sh "$id" |
+            node backend/scripts/ops/verificar-cache-hyperdrive-cli.ts --executar
+
+      - name: Deploy
+        id: publicar
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          SHA: ${{ github.sha }}
+        run: pnpm --filter @pelada/api exec wrangler deploy -c ../../wrangler.jsonc --var "URL_PUBLICA:${URL_PUBLICA}" --var "VERSAO:${SHA}"
+
+      - name: Conferir a saúde do app (versão publicada = SHA)
+        env:
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          for tentativa in 1 2 3 4 5 6; do
+            versao="$(curl -fsS "${URL_PUBLICA}/api/health" | jq -r '.versao' || true)"
+            if [ "$versao" = "$SHA" ]; then
+              echo "Saúde 200 com a versão ${SHA}."
+              exit 0
+            fi
+            echo "Tentativa ${tentativa}: versão publicada '${versao}', esperada '${SHA}'." >&2
+            sleep 10
+          done
+          exit 1
+
+      - name: Desfazer o deploy e instruir a restauração
+        if: failure() && steps.migrar.outcome == 'success'
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          RESTAURACAO: ${{ steps.restauracao.outputs.nome }}
+          RESULTADO_DEPLOY: ${{ steps.publicar.outcome }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          echo "A migração já foi aplicada. Para restaurar o banco, use a branch '${RESTAURACAO}' do Neon ou o artefato dump-predeploy-${RUN_ID}. Passo a passo: docs/runbook.md."
+          if [ "$RESULTADO_DEPLOY" = "success" ]; then
+            pnpm --filter @pelada/api exec wrangler rollback -c ../../wrangler.jsonc --message "Falha depois do deploy (run ${RUN_ID})"
+          fi
