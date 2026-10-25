@@ -559,10 +559,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] `BEGIN` (`READ ONLY` em GET e HEAD) e `set_config(..., true)` com parâmetros antes de qualquer consulta
-- [ ] `COMMIT` se a resposta for menor que 400, `ROLLBACK` caso contrário; conexão fechada no `waitUntil`
-- [ ] Abrir outra transação dentro da requisição é proibido (teste)
-- [ ] Gate full passa
+- [x] `BEGIN` (`READ ONLY` em GET e HEAD) e `set_config(..., true)` com parâmetros antes de qualquer consulta *(a conexão só abre na primeira consulta; `contaId` e `slugPublico` saem das variáveis do contexto do Hono, lidas nesse momento, e quem as define chega com as features. Forma escolhida: a API conecta direto como `pelada_app`, sem `SET LOCAL ROLE`; o teste confere `current_user` e `session_user` = `pelada_app` sem bypass e a RLS por conta, por slug e sem contexto, inclusive em requisições concorrentes)*
+- [x] `COMMIT` se a resposta for menor que 400, `ROLLBACK` caso contrário; conexão fechada no `waitUntil` *(o `COMMIT` roda antes de responder; erro lançado também desfaz. Testes com 200, 201, 204, 302 e 399 gravando e 400, 404, 422, 500 e erro lançado desfazendo; a sessão some do `pg_stat_activity` depois da resposta)*
+- [x] Abrir outra transação dentro da requisição é proibido (teste) *(`db.transaction()`, `db.startTransaction()` e SQL de `BEGIN`, `START TRANSACTION`, `COMMIT`, `END`, `ROLLBACK`, `ABORT`, `SAVEPOINT`, `RELEASE`, inclusive atrás de comentário, dão `TransacaoAninhada`; várias instruções numa consulta são recusadas pelo protocolo estendido)*
+- [x] Gate full passa *(lint, format, typecheck, `pnpm test`, `pnpm test:checagens`; o e2e do web só existe a partir da Fase 6)*
 
 **Tests**: integration
 **Gate**: full

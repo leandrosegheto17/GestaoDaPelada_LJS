@@ -1,8 +1,10 @@
 import { Hono } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
+import type { Db } from '../infraestrutura/db/index.ts';
 import type { Env } from './env.ts';
 import { corpoGrande, erroInterno, naoEncontrado } from './erros.ts';
 import { semCache } from './middlewares/cache.ts';
+import { comBanco } from './middlewares/com-banco.ts';
 import { exigirCabecalhoPelada } from './middlewares/csrf.ts';
 import { criarLimiteTaxa, type Limitador } from './middlewares/limite-taxa.ts';
 import { semSniff } from './middlewares/sem-sniff.ts';
@@ -11,7 +13,15 @@ import { rotaHealth } from './rotas/health.ts';
 /** Maior corpo aceito em `/api/*`. */
 export const LIMITE_CORPO_BYTES = 16 * 1024;
 
-export type AppEnv = { Bindings: Env };
+export interface Variaveis {
+  /** Banco da requisição, sempre dentro da transação do `comBanco`; só conecta na primeira consulta. */
+  db: Db;
+  /** Contexto de RLS. Quem define (sessão, rota pública) vem nas features; o `comBanco` lê na primeira consulta. */
+  contaId?: string;
+  slugPublico?: string;
+}
+
+export type AppEnv = { Bindings: Env; Variables: Variaveis };
 
 export interface OpcoesApp {
   /** Substitui os limitadores de taxa do ambiente (testes). */
@@ -34,6 +44,7 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<AppEnv> {
   );
   app.use('/api/*', exigirCabecalhoPelada);
   app.use('/api/*', bodyLimit({ maxSize: LIMITE_CORPO_BYTES, onError: (c) => corpoGrande(c) }));
+  app.use('/api/*', comBanco);
 
   app.route('/', rotaHealth);
 
