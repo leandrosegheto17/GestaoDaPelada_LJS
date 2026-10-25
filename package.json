@@ -11,7 +11,8 @@
     "typecheck": "pnpm -r typecheck && tsc --noEmit -p backend/scripts",
     "test": "vitest run --dir test && pnpm -r test",
     "test:checagens": "vitest run backend/scripts --testTimeout=30000",
-    "migrar": "node --env-file-if-exists=.env backend/scripts/migrar.ts"
+    "migrar": "node --env-file-if-exists=.env backend/scripts/migrar.ts",
+    "seed": "node --env-file-if-exists=.env backend/scripts/seed-local.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

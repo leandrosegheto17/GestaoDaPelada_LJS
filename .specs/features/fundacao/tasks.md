@@ -458,10 +458,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Banco local migrado ganha um grupo com jogadores, partidas e uma conta admin
-- [ ] Teste: URL do Neon ou de qualquer host não local é recusada antes de qualquer escrita
-- [ ] O seed também define a senha de login das roles locais a partir do `.env`
-- [ ] Gate full passa
+- [x] Banco local migrado ganha um grupo com jogadores, partidas e uma conta admin *(a conta admin fica sem senha de login válida até a `conta-e-acesso`, que define o formato do hash)*
+- [x] Teste: URL do Neon ou de qualquer host não local é recusada antes de qualquer escrita
+- [x] O seed também define a senha de login das roles locais a partir do `.env` *(`PELADA_APP_SENHA` e `PELADA_BACKUP_SENHA`; entram no `.env.example` na T41. A API conecta direto como `pelada_app`, forma coberta pelo teste do seed)*
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
