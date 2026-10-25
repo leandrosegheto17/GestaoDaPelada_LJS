@@ -307,9 +307,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] 23 ADRs copiados sem alteração de conteúdo
-- [ ] Os ADRs 018 e 020 ficam marcados para `Supersedes:` nos ADRs novos (T44)
-- [ ] Gate de build passa
+- [x] 23 ADRs copiados sem alteração de conteúdo
+- [x] Os ADRs 018 e 020 ficam marcados para `Supersedes:` nos ADRs novos (T44) *(ADR aceito não se edita: 018 e 020 ficam intactos; a marca é esta nota, e o `Supersedes: 018` e o `Supersedes: 020` entram nos ADRs novos em T44)*
+- [x] Gate de build passa
 
 **Tests**: none (documentação)
 **Gate**: build

@@ -270,7 +270,7 @@ O Gestão da Pelada vai ser recriado do zero no padrão LJS Software. Antes de q
 | FUN-48 | P1: Backup | Design | Pending |
 | FUN-49 | P2: Documentação | Design | Pending |
 | FUN-50 | P2: Documentação | Design | Pending |
-| FUN-51 | P2: Documentação | Design | Pending |
+| FUN-51 | P2: Documentação | Design | Implementing |
 | FUN-52 | P2: Documentação | Design | Pending |
 | FUN-53 | Edge Cases | Design | Implementing |
 | FUN-54 | Edge Cases | Design | Implementing |
