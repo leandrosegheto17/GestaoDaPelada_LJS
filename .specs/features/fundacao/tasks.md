@@ -433,10 +433,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Para cada tabela de negócio: A lê só o seu; B não lê, não insere, não altera e não apaga nada de A
-- [ ] O slug não escreve e sem contexto o resultado é zero linhas
-- [ ] Meta-teste falha se surgir tabela com `grupo_id` sem caso de isolamento
-- [ ] Gate full passa
+- [x] Para cada tabela de negócio: A lê só o seu; B não lê, não insere, não altera e não apaga nada de A *(15 casos: as 14 tabelas com `grupo_id` e `grupos`. Em `auditoria` e `eventos_uso`, sem grant para `pelada_app` na fundação, "A lê só o seu" não se aplica: o caso prova que ninguém lê e que B não escreve)*
+- [x] O slug não escreve e sem contexto o resultado é zero linhas *(nas duas tabelas sem grant, sem contexto a leitura é recusada por privilégio)*
+- [x] Meta-teste falha se surgir tabela com `grupo_id` sem caso de isolamento
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full

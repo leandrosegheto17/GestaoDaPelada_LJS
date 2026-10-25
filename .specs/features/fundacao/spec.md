@@ -236,7 +236,7 @@ O Gestão da Pelada vai ser recriado do zero no padrão LJS Software. Antes de q
 | FUN-14 | P1: Banco | Design | Implementing |
 | FUN-15 | P1: Banco | Design | Implementing |
 | FUN-16 | P1: Banco | Design | Pending |
-| FUN-17 | P1: Banco | Design | Pending |
+| FUN-17 | P1: Banco | Design | Implementing |
 | FUN-18 | P1: Banco | Design | Pending |
 | FUN-19 | P1: Esqueleto publicado | Design | Pending |
 | FUN-20 | P1: Esqueleto publicado | Design | Pending |
