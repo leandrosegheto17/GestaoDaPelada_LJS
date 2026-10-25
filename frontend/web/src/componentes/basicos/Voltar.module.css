@@ -1,0 +1,15 @@
+.voltar {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-1);
+  min-height: var(--alvo-toque);
+  text-decoration: none;
+  color: var(--cor-texto);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: var(--peso-semi);
+  cursor: pointer;
+}

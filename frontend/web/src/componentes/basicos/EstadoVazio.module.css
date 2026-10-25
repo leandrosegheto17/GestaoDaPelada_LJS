@@ -1,0 +1,37 @@
+.vazio {
+  text-align: center;
+  padding: var(--esp-8) var(--esp-4);
+  background: var(--cor-superficie);
+  border: 1px dashed var(--cor-contorno);
+  border-radius: var(--raio);
+}
+.icone {
+  color: var(--cor-verde);
+  margin-bottom: var(--esp-3);
+}
+.titulo {
+  font-size: var(--texto-2xl);
+  text-transform: uppercase;
+  margin-bottom: var(--esp-2);
+}
+.texto {
+  color: var(--cor-texto-sec);
+  max-width: 420px;
+  margin: 0 auto var(--esp-4);
+}
+.mensagem {
+  min-height: calc(100vh - 120px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--esp-6) var(--esp-4);
+}
+.mensagem .texto {
+  margin-bottom: var(--esp-6);
+}
+/* No mockup o ícone é filho direto do flex (sem a folga de linha de um svg inline). */
+.mensagem .icone {
+  display: flex;
+}

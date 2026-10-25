@@ -1,0 +1,30 @@
+.selo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-1);
+  padding: 2px var(--esp-2);
+  border-radius: var(--raio-pilula);
+  font-size: var(--texto-sm);
+  font-weight: var(--peso-semi);
+  white-space: nowrap;
+}
+.neutro {
+  background: var(--cor-f-fundo);
+  color: var(--cor-f-texto);
+}
+.info {
+  background: var(--cor-info-fundo);
+  color: var(--cor-info-texto);
+}
+.atencao {
+  background: var(--cor-atencao-fundo);
+  color: var(--cor-atencao-texto);
+}
+.erro {
+  background: var(--cor-erro-fundo);
+  color: var(--cor-erro-texto);
+}
+.sucesso {
+  background: var(--cor-sucesso-fundo);
+  color: var(--cor-sucesso-texto);
+}

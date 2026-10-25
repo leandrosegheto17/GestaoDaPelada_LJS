@@ -1,0 +1,7 @@
+.valor {
+  margin: 0;
+  font-family: var(--fonte-titulo);
+  font-size: var(--texto-4xl);
+  font-weight: var(--peso-extra);
+  font-variant-numeric: tabular-nums;
+}

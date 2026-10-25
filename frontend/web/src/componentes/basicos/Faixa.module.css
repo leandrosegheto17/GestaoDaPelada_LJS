@@ -1,0 +1,52 @@
+.faixa {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--esp-3);
+  padding: var(--esp-3) var(--esp-4);
+  border-radius: var(--raio);
+  margin: 0 0 var(--esp-3);
+  font-size: var(--texto-md);
+}
+.info {
+  background: var(--cor-info-fundo);
+  color: var(--cor-info-texto);
+}
+.sucesso {
+  background: var(--cor-sucesso-fundo);
+  color: var(--cor-sucesso-texto);
+}
+.atencao {
+  background: var(--cor-atencao-fundo);
+  color: var(--cor-atencao-texto);
+}
+.erro {
+  background: var(--cor-erro-fundo);
+  color: var(--cor-erro-texto);
+}
+.faixa a,
+.faixa :global([data-variante='texto']) {
+  color: inherit;
+}
+.texto {
+  flex: 1;
+  margin: 0;
+}
+.texto strong {
+  display: block;
+}
+.fechar {
+  margin: -10px -10px -10px 0;
+  width: var(--alvo-toque);
+  height: var(--alvo-toque);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.topo {
+  border-radius: 0;
+  margin: 0;
+}

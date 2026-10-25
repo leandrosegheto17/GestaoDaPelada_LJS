@@ -682,9 +682,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Cada componente tem teste de renderização e axe sem violações
-- [ ] Os testes copiados estão ligados a FUN-30
-- [ ] Gate quick passa
+- [x] Cada componente tem teste de renderização e axe sem violações *(13 componentes cobertos: `botoes`, `mensagens`, `voltar-erro-envio` e `Esqueleto` copiados do legado, mais `complementares.test.tsx` para Icone, SeloSalvo, ValorDestaque e Esqueleto, que não tinham axe próprio; 77 testes do web verdes)*
+- [x] Os testes copiados estão ligados a FUN-30 *(cabeçalho `Critério: FUN-30` nos 4 arquivos copiados e no complementar. Infraestrutura do web criada aqui: React, Testing Library, jsdom, axe-core, plugin React e setup no Vitest)*
+- [x] Gate quick passa *(lint, format, typecheck, `pnpm test` e `pnpm test:checagens` verdes)*
 
 **Tests**: unit
 **Gate**: quick
