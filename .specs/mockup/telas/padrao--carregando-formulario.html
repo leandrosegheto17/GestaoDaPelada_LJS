@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Carregando (padrão dos formulários do admin)</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<!-- Padrão global de "carregando" para formulários com dados (T16 edição, T18, T20, T23 edição, T24, T28). O estado de ENVIO (botão "Salvando…", "Criando…") segue t04-entrar--carregando. Exemplo com o título de T20. -->
+<header class="barra barra--admin"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span><a class="barra__link" href="t08-grupos--sucesso.html">Trocar grupo</a></div></header>
+<main class="conteudo conteudo--admin conteudo--estreito" aria-busy="true">
+  <h1 class="titulo-pagina">Dados do grupo</h1>
+  <p class="sr" role="status">Carregando…</p>
+  <div aria-hidden="true">
+    <span class="esqueleto esqueleto--linha"></span><span class="esqueleto esqueleto--botao"></span>
+    <span class="esqueleto esqueleto--linha"></span><span class="esqueleto esqueleto--botao"></span>
+    <span class="esqueleto esqueleto--linha"></span><span class="esqueleto esqueleto--botao"></span>
+  </div>
+</main>
+</body>
+</html>

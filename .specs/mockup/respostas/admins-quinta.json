@@ -1,0 +1,7 @@
+{
+  "admins": [
+    { "contaId": "c-leandro", "nome": "Leandro", "email": "leandro@exemplo.com.br", "acessaFinanceiro": true, "voce": true },
+    { "contaId": "c-marquinhos", "nome": "Marquinhos", "email": "marquinhos@exemplo.com.br", "acessaFinanceiro": false, "voce": false }
+  ],
+  "podeGerirFinanceiro": true
+}

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ícone do app: prévia</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../fontes/fontes.css">
+<style>
+  body{margin:0;font-family:var(--fonte-texto);background:var(--cor-fundo);color:var(--cor-texto)}
+  header{background:var(--cor-verde);color:var(--cor-sobre-verde);padding:24px}
+  h1{margin:0;font-family:var(--fonte-titulo);text-transform:uppercase;font-size:32px}
+  main{padding:24px;max-width:1100px}
+  h2{font-family:var(--fonte-titulo);text-transform:uppercase;margin:32px 0 12px}
+  .linha{display:flex;flex-wrap:wrap;gap:16px}
+  .fundo{padding:16px;border-radius:12px;border:1px solid var(--cor-linha)}
+  .claro{background:var(--cor-fundo)}
+  .escuro{background:var(--cor-texto);color:var(--cor-sobre-verde)}
+  figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:14px}
+  .circulo img{clip-path:circle(40%)}
+  .quadro{outline:1px dashed var(--cor-contorno)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Ícone do app</h1>
+  <p>Proposta derivada da direção A, “Gramado”: faixas de gramado e uma bola de futebol branca. Só cores de <code>tokens.css</code>. Aprovado pelo usuário.</p>
+</header>
+<main>
+  <h2>Em fundo claro</h2>
+  <div class="fundo claro linha">
+    <figure><img src="icone-192.png" width="192" height="192" alt="Ícone 192"><figcaption>192 × 192</figcaption></figure>
+    <figure><img src="icone-512.png" width="192" height="192" alt="Ícone 512, exibido a 192"><figcaption>512 × 512 (exibido a 192)</figcaption></figure>
+    <figure><img src="icone-512-maskable.png" width="192" height="192" alt="Ícone maskable 512, exibido a 192"><figcaption>512 maskable (exibido a 192)</figcaption></figure>
+    <figure><img src="apple-touch-180.png" width="180" height="180" alt="Ícone apple-touch 180"><figcaption>Apple touch 180 × 180</figcaption></figure>
+    <figure><img src="icone.svg" width="192" height="192" alt="Ícone em SVG"><figcaption>SVG (fonte)</figcaption></figure>
+  </div>
+
+  <h2>Em fundo escuro</h2>
+  <div class="fundo escuro linha">
+    <figure><img src="icone-192.png" width="192" height="192" alt="Ícone 192 em fundo escuro"><figcaption>192 × 192</figcaption></figure>
+    <figure><img src="icone-512-maskable.png" width="192" height="192" alt="Ícone maskable em fundo escuro"><figcaption>512 maskable</figcaption></figure>
+    <figure><img src="apple-touch-180.png" width="180" height="180" alt="Ícone apple-touch em fundo escuro"><figcaption>Apple touch 180</figcaption></figure>
+  </div>
+
+  <h2>Máscara circular (área segura de 80%)</h2>
+  <div class="fundo claro linha circulo">
+    <figure><img src="icone-512-maskable.png" width="192" height="192" alt="Ícone maskable com máscara circular"><figcaption>Círculo de 80% do lado</figcaption></figure>
+    <figure><img src="icone-192.png" width="96" height="96" alt="Ícone 192 com máscara circular, pequeno"><figcaption>Tamanho de launcher (96)</figcaption></figure>
+    <figure><img src="icone-192.png" width="48" height="48" alt="Ícone 192 com máscara circular, mínimo"><figcaption>48</figcaption></figure>
+  </div>
+</main>
+</body>
+</html>

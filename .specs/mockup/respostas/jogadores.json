@@ -1,0 +1,25 @@
+{
+  "ativos": [
+    { "id": "j-alemao", "apelido": "Alemão", "posicao": "zagueiro", "nivel": 6.1, "semNota": false },
+    { "id": "j-bigode", "apelido": "Bigode", "posicao": "zagueiro", "nivel": 6.9, "semNota": false },
+    { "id": "j-cabeca", "apelido": "Cabeça", "posicao": "atacante", "nivel": 5.8, "semNota": false },
+    { "id": "j-careca", "apelido": "Careca", "posicao": "meia", "nivel": 6.4, "semNota": false },
+    { "id": "j-dudu", "apelido": "Dudu", "posicao": "atacante", "nivel": 6.0, "semNota": false },
+    { "id": "j-fumaca", "apelido": "Fumaça", "posicao": "zagueiro", "nivel": 5.2, "semNota": false },
+    { "id": "j-gordo", "apelido": "Gordo", "posicao": "goleiro", "nivel": 5.6, "semNota": false },
+    { "id": "j-japa", "apelido": "Japa", "posicao": "meia", "nivel": 6.3, "semNota": false },
+    { "id": "j-juninho", "apelido": "Juninho", "posicao": "meia", "nivel": 7.2, "semNota": false },
+    { "id": "j-leo", "apelido": "Léo Baiano", "posicao": "meia", "nivel": 5.5, "semNota": true },
+    { "id": "j-marcao", "apelido": "Marcão", "posicao": "zagueiro", "nivel": 6.6, "semNota": false },
+    { "id": "j-nenem", "apelido": "Neném", "posicao": "atacante", "nivel": 5.9, "semNota": false },
+    { "id": "j-paulinho", "apelido": "Paulinho", "posicao": "goleiro", "nivel": 6.5, "semNota": false },
+    { "id": "j-pedrao", "apelido": "Pedrão", "posicao": "zagueiro", "nivel": 5.7, "semNota": false },
+    { "id": "j-rafinha", "apelido": "Rafinha", "posicao": "meia", "nivel": 7.0, "semNota": false },
+    { "id": "j-serginho", "apelido": "Serginho", "posicao": "atacante", "nivel": 5.5, "semNota": true },
+    { "id": "j-tiago", "apelido": "Tiago", "posicao": "meia", "nivel": 6.2, "semNota": false },
+    { "id": "j-toninho", "apelido": "Toninho", "posicao": "atacante", "nivel": 6.8, "semNota": false },
+    { "id": "j-vini", "apelido": "Vini", "posicao": "atacante", "nivel": 6.7, "semNota": false },
+    { "id": "j-ze", "apelido": "Zé Carlos", "posicao": "zagueiro", "nivel": 6.0, "semNota": false }
+  ],
+  "inativos": []
+}

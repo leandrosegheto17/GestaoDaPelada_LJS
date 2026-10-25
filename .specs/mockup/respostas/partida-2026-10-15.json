@@ -1,0 +1,29 @@
+{
+  "data": "2026-10-15",
+  "hoje": "2026-10-22",
+  "choveu": false,
+  "alteradaPor": "Leandro",
+  "alteradaEm": "2026-10-16T01:41:00Z",
+  "jogadores": [
+    { "id": "j-alemao", "apelido": "Alemão", "situacao": "presente" },
+    { "id": "j-bigode", "apelido": "Bigode", "situacao": "presente" },
+    { "id": "j-cabeca", "apelido": "Cabeça", "situacao": "presente" },
+    { "id": "j-careca", "apelido": "Careca", "situacao": "presente" },
+    { "id": "j-dudu", "apelido": "Dudu", "situacao": "presente" },
+    { "id": "j-fumaca", "apelido": "Fumaça", "situacao": "presente" },
+    { "id": "j-gordo", "apelido": "Gordo", "situacao": "presente" },
+    { "id": "j-japa", "apelido": "Japa", "situacao": "ausente" },
+    { "id": "j-juninho", "apelido": "Juninho", "situacao": "presente" },
+    { "id": "j-leo", "apelido": "Léo Baiano", "situacao": "presente" },
+    { "id": "j-marcao", "apelido": "Marcão", "situacao": "expulso" },
+    { "id": "j-nenem", "apelido": "Neném", "situacao": "ausente" },
+    { "id": "j-paulinho", "apelido": "Paulinho", "situacao": "presente" },
+    { "id": "j-pedrao", "apelido": "Pedrão", "situacao": "ausente" },
+    { "id": "j-rafinha", "apelido": "Rafinha", "situacao": "presente" },
+    { "id": "j-serginho", "apelido": "Serginho", "situacao": "presente" },
+    { "id": "j-tiago", "apelido": "Tiago", "situacao": "presente" },
+    { "id": "j-toninho", "apelido": "Toninho", "situacao": "presente" },
+    { "id": "j-vini", "apelido": "Vini", "situacao": "presente" },
+    { "id": "j-ze", "apelido": "Zé Carlos", "situacao": "ausente" }
+  ]
+}

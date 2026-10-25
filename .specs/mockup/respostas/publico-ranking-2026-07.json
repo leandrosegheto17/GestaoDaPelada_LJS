@@ -1,0 +1,32 @@
+{
+  "grupo": { "nome": "Pelada de Quinta", "slug": "pelada-de-quinta", "diaSemana": "quinta", "frequencia": "semanal", "horario": "20:00" },
+  "mes": "2026-07",
+  "hoje": "2026-10-22",
+  "geradoEm": "2026-10-22T21:41:00Z",
+  "enderecoNovo": null,
+  "navegacao": { "mesAnterior": "2026-06", "mesSeguinte": "2026-08" },
+  "resumoMes": { "partidas": 0, "comChuva": 0 },
+  "partidas": [],
+  "linhas": [
+    { "posicao": 1, "apelido": "Toninho", "ptsInicial": 18, "ptsFinal": 18, "rodadas": [] },
+    { "posicao": 2, "apelido": "Bigode", "ptsInicial": 18, "ptsFinal": 18, "rodadas": [] },
+    { "posicao": 3, "apelido": "Careca", "ptsInicial": 19, "ptsFinal": 19, "rodadas": [] },
+    { "posicao": 4, "apelido": "Juninho", "ptsInicial": 21, "ptsFinal": 21, "rodadas": [] },
+    { "posicao": 5, "apelido": "Marcão", "ptsInicial": 18, "ptsFinal": 18, "rodadas": [] },
+    { "posicao": 6, "apelido": "Paulinho", "ptsInicial": 16, "ptsFinal": 16, "rodadas": [] },
+    { "posicao": 7, "apelido": "Zé Carlos", "ptsInicial": 16, "ptsFinal": 16, "rodadas": [] },
+    { "posicao": 8, "apelido": "Dudu", "ptsInicial": 16, "ptsFinal": 16, "rodadas": [] },
+    { "posicao": 9, "apelido": "Gordo", "ptsInicial": 13, "ptsFinal": 13, "rodadas": [] },
+    { "posicao": 10, "apelido": "Tiago", "ptsInicial": 13, "ptsFinal": 13, "rodadas": [] },
+    { "posicao": 11, "apelido": "Neném", "ptsInicial": 13, "ptsFinal": 13, "rodadas": [] },
+    { "posicao": 12, "apelido": "Rafinha", "ptsInicial": 12, "ptsFinal": 12, "rodadas": [] },
+    { "posicao": 13, "apelido": "Alemão", "ptsInicial": 12, "ptsFinal": 12, "rodadas": [] },
+    { "posicao": 14, "apelido": "Pedrão", "ptsInicial": 9, "ptsFinal": 9, "rodadas": [] },
+    { "posicao": 15, "apelido": "Cabeça", "ptsInicial": 11, "ptsFinal": 11, "rodadas": [] },
+    { "posicao": 16, "apelido": "Vini", "ptsInicial": 9, "ptsFinal": 9, "rodadas": [] },
+    { "posicao": 17, "apelido": "Japa", "ptsInicial": 9, "ptsFinal": 9, "rodadas": [] },
+    { "posicao": 18, "apelido": "Fumaça", "ptsInicial": 7, "ptsFinal": 7, "rodadas": [] },
+    { "posicao": 19, "apelido": "Léo Baiano", "ptsInicial": 0, "ptsFinal": 0, "rodadas": [] },
+    { "posicao": 20, "apelido": "Serginho", "ptsInicial": 0, "ptsFinal": 0, "rodadas": [] }
+  ]
+}

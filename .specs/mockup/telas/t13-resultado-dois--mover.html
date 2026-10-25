@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mover jogador: Japa</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<!-- D3 (folha no celular, menu no PC) aberto ao tocar em Japa (reserva que entra no Time A). Recorte em .folha. -->
+<header class="barra barra--admin" aria-hidden="true"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span></div></header>
+<main class="conteudo conteudo--admin" aria-hidden="true"><p class="titulo-pagina">Times sugeridos</p></main>
+<div class="veu veu--folha">
+  <section class="folha" role="dialog" aria-modal="true" aria-labelledby="d3-t">
+    <h2 id="d3-t" class="folha__titulo">Japa</h2>
+    <ul class="folha__opcoes">
+      <li><button class="folha__opcao" type="button">Titular do Time A</button></li>
+      <li><button class="folha__opcao" type="button">Titular do Time B</button></li>
+      <li><button class="folha__opcao" type="button" aria-current="true">Entra no 2º tempo pelo Time A <span class="selo selo--neutro">atual</span></button></li>
+      <li><button class="folha__opcao" type="button">Entra no 2º tempo pelo Time B</button></li>
+      <li><button class="folha__opcao" type="button">Não entra</button></li>
+      <li><button class="folha__opcao" type="button">Trocar com…</button></li>
+    </ul>
+    <label class="interruptor"><span>Só 1º tempo</span><input type="checkbox" role="switch"><span class="interruptor__trilho" aria-hidden="true"></span><span class="interruptor__estado" aria-hidden="true">Não</span></label>
+  </section>
+</div>
+</body>
+</html>

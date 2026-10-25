@@ -1,0 +1,26 @@
+{
+  "dataSugerida": "2026-10-22",
+  "hoje": "2026-10-22",
+  "jogadores": [
+    { "id": "j-alemao", "apelido": "Alemão", "nivel": 6.1, "semNota": false },
+    { "id": "j-bigode", "apelido": "Bigode", "nivel": 6.9, "semNota": false },
+    { "id": "j-cabeca", "apelido": "Cabeça", "nivel": 5.8, "semNota": false },
+    { "id": "j-careca", "apelido": "Careca", "nivel": 6.4, "semNota": false },
+    { "id": "j-dudu", "apelido": "Dudu", "nivel": 6.0, "semNota": false },
+    { "id": "j-fumaca", "apelido": "Fumaça", "nivel": 5.2, "semNota": false },
+    { "id": "j-gordo", "apelido": "Gordo", "nivel": 5.6, "semNota": false },
+    { "id": "j-japa", "apelido": "Japa", "nivel": 6.3, "semNota": false },
+    { "id": "j-juninho", "apelido": "Juninho", "nivel": 7.2, "semNota": false },
+    { "id": "j-leo", "apelido": "Léo Baiano", "nivel": 5.5, "semNota": true },
+    { "id": "j-marcao", "apelido": "Marcão", "nivel": 6.6, "semNota": false },
+    { "id": "j-nenem", "apelido": "Neném", "nivel": 5.9, "semNota": false },
+    { "id": "j-paulinho", "apelido": "Paulinho", "nivel": 6.5, "semNota": false },
+    { "id": "j-pedrao", "apelido": "Pedrão", "nivel": 5.7, "semNota": false },
+    { "id": "j-rafinha", "apelido": "Rafinha", "nivel": 7.0, "semNota": false },
+    { "id": "j-serginho", "apelido": "Serginho", "nivel": 5.5, "semNota": true },
+    { "id": "j-tiago", "apelido": "Tiago", "nivel": 6.2, "semNota": false },
+    { "id": "j-toninho", "apelido": "Toninho", "nivel": 6.8, "semNota": false },
+    { "id": "j-vini", "apelido": "Vini", "nivel": 6.7, "semNota": false },
+    { "id": "j-ze", "apelido": "Zé Carlos", "nivel": 6.0, "semNota": false }
+  ]
+}

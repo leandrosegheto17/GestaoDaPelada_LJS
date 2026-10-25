@@ -1,0 +1,6 @@
+.claude/.cache/
+__pycache__/
+.worktrees/
+.specs/spikes/*/codigo/
+node_modules/
+.env

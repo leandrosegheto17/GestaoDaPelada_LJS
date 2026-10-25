@@ -1,0 +1,7 @@
+{
+  "conta": { "id": "c-leandro", "nome": "Leandro", "email": "leandro@exemplo.com.br", "eDono": true },
+  "escopo": "completo",
+  "avisoPrivacidadeVisto": true,
+  "enderecoNovo": null,
+  "grupos": []
+}

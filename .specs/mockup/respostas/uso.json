@@ -1,0 +1,8 @@
+{
+  "semanas": [
+    { "inicio": "2026-10-19", "fim": "2026-10-25", "aparelhosRanking": 9, "pdfsExportados": 0, "partidasLancadas": 0, "partidasEm48h": 0, "escalacoesConfirmadas": 1 },
+    { "inicio": "2026-10-12", "fim": "2026-10-18", "aparelhosRanking": 17, "pdfsExportados": 2, "partidasLancadas": 1, "partidasEm48h": 1, "escalacoesConfirmadas": 1 },
+    { "inicio": "2026-10-05", "fim": "2026-10-11", "aparelhosRanking": 15, "pdfsExportados": 0, "partidasLancadas": 1, "partidasEm48h": 1, "escalacoesConfirmadas": 1 },
+    { "inicio": "2026-09-28", "fim": "2026-10-04", "aparelhosRanking": 16, "pdfsExportados": 1, "partidasLancadas": 1, "partidasEm48h": 0, "escalacoesConfirmadas": 0 }
+  ]
+}

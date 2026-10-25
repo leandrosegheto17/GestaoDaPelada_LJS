@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Novo grupo (corrigir)</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<header class="barra barra--dono"><div class="barra__grupo"><span class="barra__nome">Área do dono</span></div></header>
+<main class="conteudo conteudo--admin conteudo--estreito">
+  <a class="voltar" href="t26-dono--sucesso.html"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 18 9 12 15 6"/></svg>Área do dono</a>
+  <h1 class="titulo-pagina">Novo grupo</h1>
+  <form class="formulario" novalidate>
+    <div class="faixa faixa--erro resumo-erros" role="alert"><div class="faixa__texto"><strong>Corrija 3 campos:</strong><ul><li><a href="#nome">Nome do grupo</a></li><li><a href="#hora">Horário</a></li><li><a href="#aemail">E-mail do primeiro admin</a></li></ul></div></div>
+    <div class="campo campo--erro"><label class="campo__rotulo" for="nome">Nome do grupo</label><input class="campo__entrada" id="nome" value="Ra" aria-invalid="true" aria-describedby="nome-ajuda nome-erro"><p class="campo__ajuda" id="nome-ajuda">O link do ranking será criado a partir do nome e não muda depois.</p><p class="campo__erro" id="nome-erro"><svg class="icone" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>O nome precisa ter de 3 a 60 caracteres.</p></div>
+    <div class="duas-colunas">
+      <div class="campo"><label class="campo__rotulo" for="dia">Dia da semana</label><select class="campo__entrada" id="dia"><option selected>Sábado</option></select></div>
+      <div class="campo campo--erro"><label class="campo__rotulo" for="hora">Horário</label><input class="campo__entrada" id="hora" type="time" aria-invalid="true" aria-describedby="hora-erro"><p class="campo__erro" id="hora-erro"><svg class="icone" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>Informe o horário.</p></div>
+    </div>
+    <h2 class="subtitulo">Primeiro admin</h2>
+    <div class="campo"><label class="campo__rotulo" for="anome">Nome</label><input class="campo__entrada" id="anome" value="Rodrigo"></div>
+    <div class="campo campo--erro"><label class="campo__rotulo" for="aemail">E-mail</label><input class="campo__entrada" id="aemail" type="email" value="rodrigo@" aria-invalid="true" aria-describedby="aemail-erro"><p class="campo__erro" id="aemail-erro"><svg class="icone" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>Informe um e-mail válido.</p></div>
+    <div class="barra-acao"><button class="botao botao--principal" type="submit">Criar grupo</button></div>
+  </form>
+</main>
+</body>
+</html>

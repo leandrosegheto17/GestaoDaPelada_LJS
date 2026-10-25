@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Alterar data de início de Toninho</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<!-- Diálogo "Alterar data de início" (falha de rede na prévia). Recorte em .dialogo. -->
+<header class="barra barra--admin" aria-hidden="true"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span></div></header>
+<div class="veu">
+  <section class="dialogo" role="dialog" aria-modal="true" aria-labelledby="ini-t">
+    <h2 id="ini-t" class="dialogo__titulo">Alterar data de início</h2>
+    <div class="campo"><label class="campo__rotulo" for="inicio">Data de início</label><input class="campo__entrada" id="inicio" type="date" max="2026-10-22" value="2026-10-01" aria-describedby="ini-ajuda"><p class="campo__ajuda" id="ini-ajuda">A pontuação do jogador conta a partir desta data. Nada é apagado: voltar a data devolve os pontos.</p></div>
+    <div aria-live="polite"><p class="paragrafo"></p></div>
+    <div class="faixa faixa--erro" role="alert"><svg class="icone" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><p class="faixa__texto">Não foi possível calcular. Verifique a conexão.</p><button class="botao botao--texto" type="button">Tentar de novo</button></div>
+    <div class="dialogo__acoes"><button class="botao botao--secundario" type="button">Cancelar</button><button class="botao botao--principal" type="button" disabled>Confirmar nova data</button></div>
+  </section>
+</div>
+</body>
+</html>

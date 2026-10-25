@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lançar partida (ninguém ativo na data)</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<header class="barra barra--admin"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span><a class="barra__link" href="t08-grupos--sucesso.html">Trocar grupo</a></div></header>
+<main class="conteudo conteudo--admin">
+  <a class="voltar" href="t09-inicio--sucesso.html"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 18 9 12 15 6"/></svg>Início</a>
+  <h1 class="titulo-pagina">Lançar partida</h1>
+  <div class="duas-colunas">
+    <div class="campo"><label class="campo__rotulo" for="data">Data</label><input class="campo__entrada" id="data" type="date" value="2026-01-29" max="2026-10-22"></div>
+    <label class="interruptor"><span>Choveu?</span><input type="checkbox" role="switch"><span class="interruptor__trilho" aria-hidden="true"></span><span class="interruptor__estado" aria-hidden="true">Não</span></label>
+  </div>
+  <div class="vazio acima-4" role="status"><h2 class="vazio__titulo">Ninguém estava ativo nessa data.</h2><p class="vazio__texto">Escolha outra data ou confira as datas de entrada dos jogadores.</p></div>
+  <div class="barra-acao"><button class="botao botao--principal" type="button" disabled>Salvar partida</button></div>
+</main>
+</body>
+</html>

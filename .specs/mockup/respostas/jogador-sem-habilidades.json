@@ -1,0 +1,13 @@
+{
+  "id": "j-leo",
+  "apelido": "Léo Baiano",
+  "anoNascimento": 1991,
+  "posicao": "meia",
+  "telefone": null,
+  "pontuacaoInicial": 0,
+  "situacao": { "ativo": true, "desde": "2026-10-05" },
+  "inicioPontuacao": "2026-10-05",
+  "nivel": 5.5,
+  "semNota": true,
+  "notas": []
+}

@@ -1,0 +1,6 @@
+{
+  "id": "g-firma", "nome": "Futebol da Firma", "slug": "futebol-da-firma", "urlPublica": "https://pelada.gestaodapelada.workers.dev/g/futebol-da-firma",
+  "diaSemana": "terca", "frequencia": "semanal", "horario": "19:00",
+  "situacaoComercial": "uso_proprio", "inicioTrial": null, "criadoEm": "2026-03-10", "arquivadoEm": "2026-10-22",
+  "admins": [ { "contaId": "c-paulo", "nome": "Paulo", "email": "paulo@exemplo.com.br" } ]
+}

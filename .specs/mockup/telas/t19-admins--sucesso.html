@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Admins do grupo</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+<header class="barra barra--admin"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span><a class="barra__link" href="t08-grupos--sucesso.html">Trocar grupo</a></div></header>
+<main id="conteudo" class="conteudo conteudo--admin conteudo--estreito">
+  <a class="voltar" href="t09-inicio--sucesso.html"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 18 9 12 15 6"/></svg>Início</a>
+  <h1 class="titulo-pagina">Admins</h1>
+  <ul class="lista">
+    <li class="item item--quebra"><span class="item__principal"><span class="item__titulo">Leandro (você)</span><span class="item__meta">leandro@exemplo.com.br</span></span><label class="interruptor"><input type="checkbox" role="switch" checked disabled aria-describedby="ajuda-proprio-acesso" aria-label="Acessa financeiro: Leandro"><span class="interruptor__trilho" aria-hidden="true"></span><span class="interruptor__estado" aria-hidden="true">Financeiro</span></label><a class="botao botao--texto" href="t25-senha--vazio.html">Minha senha</a><p class="campo__ajuda" id="ajuda-proprio-acesso" style="flex-basis:100%">Você não pode alterar o seu próprio acesso.</p></li>
+    <li class="item item--quebra"><span class="item__principal"><span class="item__titulo">Marquinhos</span><span class="item__meta">marquinhos@exemplo.com.br</span></span><label class="interruptor"><input type="checkbox" role="switch" aria-label="Acessa financeiro: Marquinhos"><span class="interruptor__trilho" aria-hidden="true"></span><span class="interruptor__estado" aria-hidden="true">Financeiro</span></label><span class="grupo-botoes"><a class="botao botao--texto" href="t19-admins--senha.html">Redefinir senha</a><a class="botao botao--texto botao--texto-destrutivo" href="t19-admins--remover.html">Remover do grupo</a></span></li>
+  </ul>
+  <section class="secao" aria-labelledby="add">
+    <h2 id="add" class="subtitulo">Adicionar admin</h2>
+    <form class="formulario" novalidate>
+      <div class="campo"><label class="campo__rotulo" for="nome">Nome</label><input class="campo__entrada" id="nome" autocomplete="off"></div>
+      <div class="campo"><label class="campo__rotulo" for="email">E-mail</label><input class="campo__entrada" id="email" type="email" autocomplete="off"></div>
+      <div><a class="botao botao--principal" href="t19-admins--senha.html">Adicionar admin</a></div>
+    </form>
+  </section>
+</main>
+</body>
+</html>

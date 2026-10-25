@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Financeiro: julho de 2026</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+<!-- Mês sem lançamentos. A lista de pagamentos (18 ativos em julho, todos "não pagou") aparece reduzida às 3 primeiras linhas; recorte em .saldos e na seção de lançamentos. -->
+<header class="barra barra--admin"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span><a class="barra__link" href="t08-grupos--sucesso.html">Trocar grupo</a></div></header>
+<main id="conteudo" class="conteudo conteudo--admin">
+  <a class="voltar" href="t09-inicio--sucesso.html"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 18 9 12 15 6"/></svg>Início</a>
+  <h1 class="titulo-pagina">Financeiro</h1>
+  <div class="ferramentas"><nav class="mes" aria-label="Mês exibido"><button class="mes__botao" type="button" aria-label="Mês anterior, junho de 2026"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 18 9 12 15 6"/></svg></button><h2 class="mes__rotulo">julho de 2026</h2><button class="mes__botao" type="button" aria-label="Mês seguinte, agosto de 2026"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></button></nav><a class="botao botao--texto" href="t24-config--vazio.html">Configurar caixa</a></div>
+  <section class="saldos" aria-labelledby="saldo"><p class="saldos__rotulo" id="saldo">Saldo atual</p><p class="saldos__valor">R$ 1.245,50</p><dl class="saldos__grade"><dt>Entradas no mês</dt><dd>R$ 0,00</dd><dt>Saídas no mês</dt><dd>R$ 0,00</dd><dt>Resultado do mês</dt><dd>R$ 0,00</dd><dt>Não pagaram</dt><dd>18 jogadores</dd></dl></section>
+  <div class="lado-a-lado">
+    <section aria-labelledby="pag"><h2 id="pag" class="subtitulo">Pagamentos do mês · R$ 75,00</h2><ul class="lista">
+      <li class="item"><span class="item__principal item__titulo">Alemão</span><label class="interruptor"><input type="checkbox" role="switch" aria-label="Pagou: Alemão"><span class="interruptor__trilho" aria-hidden="true"></span><span class="interruptor__estado" aria-hidden="true">Não pagou</span></label></li>
+      <li class="item"><span class="item__principal item__titulo">Bigode</span><label class="interruptor"><input type="checkbox" role="switch" aria-label="Pagou: Bigode"><span class="interruptor__trilho" aria-hidden="true"></span><span class="interruptor__estado" aria-hidden="true">Não pagou</span></label></li>
+      <li class="item"><span class="item__principal item__titulo">Cabeça</span><label class="interruptor"><input type="checkbox" role="switch" aria-label="Pagou: Cabeça"><span class="interruptor__trilho" aria-hidden="true"></span><span class="interruptor__estado" aria-hidden="true">Não pagou</span></label></li>
+    </ul></section>
+    <section aria-labelledby="lan"><h2 id="lan" class="subtitulo">Lançamentos do mês</h2><div class="vazio"><p class="vazio__texto">Nenhum lançamento neste mês.</p></div></section>
+  </div>
+  <div class="barra-acao"><a class="botao botao--principal" href="t23-lancamento--novo.html">Novo lançamento</a></div>
+</main>
+</body>
+</html>

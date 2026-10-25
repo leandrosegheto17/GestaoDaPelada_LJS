@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Admins (único admin)</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<!-- RN-13: com um só admin, não há "Remover" (ninguém remove a si mesmo); o aviso explica que o grupo precisa de pelo menos um admin. A API também recusa remover o último. -->
+<header class="barra barra--admin"><div class="barra__grupo"><span class="barra__nome">Racha de Sábado</span></div></header>
+<main class="conteudo conteudo--admin conteudo--estreito">
+  <a class="voltar" href="t09-inicio--sucesso.html"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 18 9 12 15 6"/></svg>Início</a>
+  <h1 class="titulo-pagina">Admins</h1>
+  <ul class="lista">
+    <li class="item item--quebra"><span class="item__principal"><span class="item__titulo">Carlos (você)</span><span class="item__meta">carlos.racha@exemplo.com.br</span></span><label class="interruptor"><input type="checkbox" role="switch" checked disabled aria-describedby="ajuda-proprio-acesso" aria-label="Acessa financeiro: Carlos"><span class="interruptor__trilho" aria-hidden="true"></span><span class="interruptor__estado" aria-hidden="true">Financeiro</span></label><a class="botao botao--texto" href="t25-senha--vazio.html">Minha senha</a><p class="campo__ajuda" id="ajuda-proprio-acesso" style="flex-basis:100%">Você não pode alterar o seu próprio acesso.</p></li>
+  </ul>
+  <p class="campo__ajuda acima-2">Você é o único admin deste grupo. Todo grupo precisa de pelo menos um admin.</p>
+  <section class="secao" aria-labelledby="add">
+    <h2 id="add" class="subtitulo">Adicionar admin</h2>
+    <form class="formulario" novalidate>
+      <div class="campo"><label class="campo__rotulo" for="nome">Nome</label><input class="campo__entrada" id="nome"></div>
+      <div class="campo"><label class="campo__rotulo" for="email">E-mail</label><input class="campo__entrada" id="email" type="email"></div>
+      <div><button class="botao botao--principal" type="submit">Adicionar admin</button></div>
+    </form>
+  </section>
+</main>
+</body>
+</html>

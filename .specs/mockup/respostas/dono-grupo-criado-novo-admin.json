@@ -1,0 +1,4 @@
+{
+  "grupo": { "id": "g-sabado", "nome": "Racha de Sábado", "slug": "racha-de-sabado", "urlPublica": "https://pelada.gestaodapelada.workers.dev/g/racha-de-sabado" },
+  "primeiroAdmin": { "contaId": "c-rodrigo", "nome": "Rodrigo", "contaNova": true, "senhaTemporaria": "Pv8cNz5hKt2r" }
+}

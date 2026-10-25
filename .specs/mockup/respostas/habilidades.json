@@ -1,0 +1,10 @@
+{
+  "habilidades": [
+    { "id": "h-visao", "nome": "Visão de Jogo" },
+    { "id": "h-passe", "nome": "Passe" },
+    { "id": "h-preparo", "nome": "Preparo Físico" },
+    { "id": "h-drible", "nome": "Drible" },
+    { "id": "h-chute", "nome": "Chute" },
+    { "id": "h-desarme", "nome": "Desarme" }
+  ]
+}

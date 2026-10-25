@@ -1,0 +1,11 @@
+{
+  "grupo": { "nome": "Racha de Domingo", "slug": "racha-de-domingo", "diaSemana": "domingo", "frequencia": "quinzenal", "horario": "09:00" },
+  "mes": "2026-10",
+  "hoje": "2026-10-22",
+  "geradoEm": "2026-10-22T21:40:00Z",
+  "enderecoNovo": null,
+  "navegacao": { "mesAnterior": null, "mesSeguinte": null },
+  "resumoMes": { "partidas": 0, "comChuva": 0 },
+  "partidas": [],
+  "linhas": []
+}

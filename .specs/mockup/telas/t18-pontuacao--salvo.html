@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pontuação (nova configuração salva)</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<!-- Depois de salvar: a nova configuração vira a vigente (desde hoje, 22/10) e a anterior vai para o histórico. Recorte em .faixa--sucesso e .cartao. -->
+<header class="barra barra--admin"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span><a class="barra__link" href="t08-grupos--sucesso.html">Trocar grupo</a></div></header>
+<main class="conteudo conteudo--admin conteudo--estreito">
+  <h1 class="titulo-pagina">Pontuação</h1>
+  <div class="faixa faixa--sucesso" role="status"><svg class="icone" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 6 9 17l-5-5"/></svg><p class="faixa__texto">Nova configuração vale a partir de hoje.</p></div>
+  <section class="cartao" aria-labelledby="vig">
+    <h2 id="vig" class="subtitulo sem-topo">Vigente desde 22/10/2026</h2>
+    <table class="tabela-simples"><caption class="sr">Pesos vigentes</caption><thead><tr><th scope="col">Situação</th><th scope="col">Pontos</th></tr></thead><tbody>
+      <tr><th scope="row">Presença sem chuva</th><td>1</td></tr>
+      <tr><th scope="row">Presença com chuva</th><td>2</td></tr>
+      <tr><th scope="row">Lesionado sem chuva</th><td>1</td></tr>
+      <tr><th scope="row">Lesionado com chuva</th><td>2</td></tr>
+      <tr><th scope="row">Expulso sem chuva</th><td>−1</td></tr>
+      <tr><th scope="row">Expulso com chuva</th><td>−1</td></tr>
+    </tbody></table>
+  </section>
+  <section class="secao" aria-labelledby="hist">
+    <h2 id="hist" class="subtitulo">Histórico</h2>
+    <ul class="lista">
+      <li class="item"><span class="item__principal"><span class="item__titulo">De 01/09/2026 a 21/10/2026</span><span class="item__meta">1 · 2 · 1 · 1 · −1 · −1 · registrado por Leandro</span></span></li>
+      <li class="item"><span class="item__principal"><span class="item__titulo">De 05/02/2026 a 31/08/2026</span><span class="item__meta">1 · 1 · 1 · 1 · −1 · −1 · registrado por Leandro</span></span></li>
+    </ul>
+  </section>
+</main>
+</body>
+</html>

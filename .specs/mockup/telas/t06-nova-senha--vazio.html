@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Crie sua senha</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<header class="barra"><p class="barra__titulo">Gestão da Pelada</p></header>
+<main class="conteudo conteudo--estreito">
+  <h1 class="titulo-pagina">Crie sua senha</h1>
+  <p class="paragrafo">Por segurança, crie sua senha antes de continuar.</p>
+  <form class="formulario" novalidate>
+    <div class="campo"><label class="campo__rotulo" for="nova">Nova senha</label><input class="campo__entrada" id="nova" type="password" autocomplete="new-password" aria-describedby="nova-ajuda"><p class="campo__ajuda" id="nova-ajuda">De 8 a 72 caracteres.</p></div>
+    <div class="campo"><label class="campo__rotulo" for="conf">Confirmar nova senha</label><input class="campo__entrada" id="conf" type="password" autocomplete="new-password"></div>
+    <button class="botao botao--principal botao--bloco" type="submit">Salvar e continuar</button>
+    <button class="botao botao--texto" type="button">Sair</button>
+  </form>
+</main>
+</body>
+</html>

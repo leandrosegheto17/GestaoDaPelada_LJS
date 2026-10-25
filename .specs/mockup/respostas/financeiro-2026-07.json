@@ -1,0 +1,14 @@
+{
+  "mes": "2026-07",
+  "hoje": "2026-10-22",
+  "navegacao": { "mesAnterior": "2026-06", "mesSeguinte": "2026-08" },
+  "config": { "mensalidadeCentavos": 7500, "saldoInicialCentavos": 35000, "dataSaldoInicial": "2026-02-05" },
+  "saldoAtualCentavos": 124550,
+  "resumoMes": { "entradasCentavos": 0, "saidasCentavos": 0, "resultadoCentavos": 0, "naoPagaram": 18 },
+  "pagamentos": [
+    { "jogadorId": "j-alemao", "apelido": "Alemão", "pagou": false },
+    { "jogadorId": "j-bigode", "apelido": "Bigode", "pagou": false },
+    { "jogadorId": "j-cabeca", "apelido": "Cabeça", "pagou": false }
+  ],
+  "lancamentos": []
+}

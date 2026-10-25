@@ -1,0 +1,7 @@
+{
+  "alterado": true,
+  "periodos": [
+    { "id": "p-gil-1", "tipo": "entrada", "inicio": "2026-02-05", "fim": "2026-10-05", "corrigivel": { "saida": true, "retorno": false } },
+    { "id": "p-gil-2", "tipo": "retorno", "inicio": "2026-10-12", "fim": null, "corrigivel": { "saida": false, "retorno": true } }
+  ]
+}

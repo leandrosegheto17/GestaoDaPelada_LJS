@@ -1,0 +1,12 @@
+{
+  "pedidosReset": [
+    { "contaId": "c-marquinhos", "email": "marquinhos@exemplo.com.br", "grupos": ["Pelada de Quinta"], "ultimoPedidoEm": "2026-10-21T12:12:00Z" },
+    { "contaId": "c-carlos", "email": "carlos.racha@exemplo.com.br", "grupos": ["Racha de Domingo"], "ultimoPedidoEm": "2026-10-20T22:40:00Z" }
+  ],
+  "grupos": [
+    { "id": "g-quinta", "nome": "Pelada de Quinta", "diaSemana": "quinta", "frequencia": "semanal", "horario": "20:00", "situacaoComercial": "uso_proprio", "inicioTrial": null, "admins": ["Leandro", "Marquinhos"], "criadoEm": "2026-02-05", "arquivadoEm": null },
+    { "id": "g-domingo", "nome": "Racha de Domingo", "diaSemana": "domingo", "frequencia": "quinzenal", "horario": "09:00", "situacaoComercial": "uso_proprio", "inicioTrial": null, "admins": ["Carlos", "Leandro"], "criadoEm": "2026-06-14", "arquivadoEm": null },
+    { "id": "g-firma", "nome": "Futebol da Firma", "diaSemana": "terca", "frequencia": "semanal", "horario": "19:00", "situacaoComercial": "uso_proprio", "inicioTrial": null, "admins": ["Paulo"], "criadoEm": "2026-03-10", "arquivadoEm": "2026-10-22" }
+  ],
+  "dono": { "tambemAdmin": true }
+}

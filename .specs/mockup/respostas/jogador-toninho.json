@@ -1,0 +1,20 @@
+{
+  "id": "j-toninho",
+  "apelido": "Toninho",
+  "anoNascimento": 1978,
+  "posicao": "atacante",
+  "telefone": "11987654321",
+  "pontuacaoInicial": 0,
+  "situacao": { "ativo": true, "desde": "2026-02-05" },
+  "inicioPontuacao": "2026-02-05",
+  "nivel": 6.8,
+  "semNota": false,
+  "notas": [
+    { "habilidadeId": "h-visao", "habilidade": "Visão de Jogo", "nota": 8 },
+    { "habilidadeId": "h-passe", "habilidade": "Passe", "nota": 7 },
+    { "habilidadeId": "h-preparo", "habilidade": "Preparo Físico", "nota": 6 },
+    { "habilidadeId": "h-drible", "habilidade": "Drible", "nota": 7 },
+    { "habilidadeId": "h-chute", "habilidade": "Chute", "nota": 8 },
+    { "habilidadeId": "h-desarme", "habilidade": "Desarme", "nota": 5 }
+  ]
+}

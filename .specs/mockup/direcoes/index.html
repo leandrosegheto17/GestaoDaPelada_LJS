@@ -1,0 +1,146 @@
+<title>Pelada: direções do Ranking</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Galeria utilitária, tema claro fixo de propósito (as direções têm cada uma o seu tema). */
+:root{--fundo:#F4F4F1;--texto:#1D1F1C;--sec:#575A54;--linha:#D6D7D1;--destaque:#0B6B34;--cartao:#FDFDFB;--reco:#E8F3EC;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fundo);color:var(--texto);font-family:"Segoe UI",system-ui,sans-serif;font-size:16px;line-height:1.5;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.topo{padding-block:32px 16px;max-width:1500px;margin:0 auto}
+h1{margin:0 0 8px;font-size:28px;text-wrap:balance}
+.topo p{margin:4px 0;color:var(--sec);max-width:900px}
+main{max-width:1500px;margin:0 auto;padding-block:0 48px}
+section.direcao{background:var(--cartao);border:1px solid var(--linha);border-radius:12px;padding:clamp(12px,3vw,24px);margin:24px 0}
+.rolar{max-width:100%;overflow-x:auto}
+section.direcao h2{margin:0 0 4px;font-size:24px}
+.conceito{margin:0 0 16px;color:var(--sec);max-width:960px}
+.vitrine{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap}
+figure{margin:0;max-width:100%;overflow-x:auto}
+figcaption{font-size:14px;color:var(--sec);margin-bottom:6px}
+figcaption a{color:var(--texto)}
+.moldura-cel{width:390px;height:844px;border:10px solid #22241F;border-radius:36px;overflow:hidden;background:#000}
+.moldura-cel iframe{width:370px;height:824px;border:0;display:block}
+.moldura-pc{width:640px;height:400px;border:1px solid var(--linha);border-radius:8px;overflow:hidden;background:#fff}
+.moldura-pc iframe{width:1280px;height:800px;border:0;transform:scale(.5);transform-origin:0 0;display:block}
+.lado{flex:1 1 300px;min-width:0}
+table.contraste{border-collapse:collapse;font-size:14px;width:100%;max-width:640px;margin-top:16px}
+table.contraste th,table.contraste td{border-bottom:1px solid var(--linha);padding:6px 8px;text-align:left}
+table.contraste td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.amostra{display:inline-block;width:14px;height:14px;border:1px solid #888;vertical-align:-2px;margin-right:2px}
+ul.pros{margin:8px 0;padding-left:20px}
+.recomendacao{background:var(--reco);border:2px solid var(--destaque);border-radius:12px;padding:20px 24px;margin:24px 0}
+.recomendacao h2{margin:0 0 8px}
+.nota{font-size:14px;color:var(--sec)}
+</style>
+<header class="topo">
+  <h1>Direções visuais: T01 Ranking público</h1>
+  <p>Etapa B2 do Loop B. São três caminhos para a mesma tela, com os mesmos dados fictícios: a "Pelada de Quinta", 20 jogadores, outubro de 2026 com 3 partidas, uma com chuva. Cada direção aparece no celular (390 px) e no PC (1280 px, mostrado em 50%). A página de cada direção é uma só e se adapta ao tamanho da tela, como o app.</p>
+  <p>As três já cumprem o contraste WCAG AA (texto ≥ 4,5:1; ícones e contornos ≥ 3:1), nenhuma marca depende só de cor, e os alvos de toque têm 44 px ou mais. <strong>Escolha uma direção</strong>, ou uma mistura (ex.: "cores da A com as marcas da C"). Depois disso vem o mockup completo, com todas as telas e estados.</p>
+  <p class="nota">O que já aparece em todas as direções: nome do grupo e horário, engrenagem (área do admin) e "$" (financeiro), navegação de mês com o "›" desativado no mês atual, tabela com #, apelido, pontos acumulados, presenças e faltas do mês e uma coluna por partida (chuva marcada com ícone), marcações P/L/E/F/–, um empate em pontos resolvido pela idade (Bigode e Careca, 30 pts), jogadores que entraram no meio do mês ("–"), legenda, "Exportar PDF" (fixo embaixo no celular, no topo no PC) e o link de privacidade.</p>
+</header>
+
+<main>
+  <section class="direcao" aria-labelledby="t-a">
+    <h2 id="t-a">A. Gramado</h2>
+    <p class="conceito">Fundo claro, barra verde com as faixas do gramado cortado e botão amarelo-bola. Os títulos e números usam letra condensada esportiva (Barlow Condensed). As marcações são etiquetas coloridas suaves com a letra. Feita para ler no sol, na beira da quadra.</p>
+    <div class="vitrine">
+      <figure><figcaption>Celular, 390 × 844 · <a href="a-gramado/ranking.html">abrir em tela cheia</a></figcaption><div class="moldura-cel"><iframe src="a-gramado/ranking.html" title="Direção A, Gramado, no celular" loading="lazy"></iframe></div></figure>
+      <div class="lado">
+        <figure><figcaption>PC, 1280 × 800 (50%) · <a href="a-gramado/ranking.html">abrir em tela cheia</a></figcaption><div class="moldura-pc"><iframe src="a-gramado/ranking.html" title="Direção A, Gramado, no PC" loading="lazy"></iframe></div></figure>
+        <ul class="pros">
+          <li><strong>A favor:</strong> é a melhor leitura ao ar livre (fundo claro, tinta quase preta). A identidade de futebol aparece sem exagero, e as cores das marcações ajudam a varrer a grade com o olho.</li>
+          <li><strong>Contra:</strong> verde e amarelo são o caminho "óbvio" para futebol. O PDF terá de imitar as etiquetas coloridas, que gastam mais tinta se alguém imprimir.</li>
+        </ul>
+        <table class="contraste">
+          <caption style="text-align:left;font-weight:600">Contraste (WCAG 2.1)</caption>
+          <thead><tr><th>Par</th><th>Uso</th><th>Razão</th></tr></thead>
+          <tbody>
+            <tr><td><span class="amostra" style="background:#14201A"></span>#14201A / <span class="amostra" style="background:#F9FBF8"></span>#F9FBF8</td><td>Texto principal / fundo</td><td class="num">16,1:1</td></tr>
+            <tr><td>#14201A / #F2F6F3</td><td>Texto / linha zebrada</td><td class="num">15,6:1</td></tr>
+            <tr><td>#4A5A50 / #F9FBF8</td><td>Texto secundário</td><td class="num">7,0:1</td></tr>
+            <tr><td>#FEFFFD / #0B6B34 · #0E7A3C</td><td>Título da barra (faixa escura · clara)</td><td class="num">6,6 · 5,4:1</td></tr>
+            <tr><td>#EAF7EE / #0E7A3C</td><td>Subtítulo da barra (pior caso)</td><td class="num">4,9:1</td></tr>
+            <tr><td>#14201A / #FFD23F</td><td>Botão Exportar PDF</td><td class="num">11,6:1</td></tr>
+            <tr><td>#0A4D26 / #D7F0DF</td><td>Marca P</td><td class="num">8,3:1</td></tr>
+            <tr><td>#6B4A00 / #FFF0C2</td><td>Marca L</td><td class="num">7,1:1</td></tr>
+            <tr><td>#8A1414 / #FBD9D9</td><td>Marca E</td><td class="num">7,3:1</td></tr>
+            <tr><td>#4A5A50 / #ECEFED</td><td>Marca F</td><td class="num">6,3:1</td></tr>
+            <tr><td>#1E5AA8 / #FEFFFD</td><td>Ícone de chuva (≥ 3:1)</td><td class="num">6,8:1</td></tr>
+            <tr><td>#FFD23F / #0E7A3C</td><td>Anel de foco na barra (≥ 3:1)</td><td class="num">3,8:1</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="direcao" aria-labelledby="t-b">
+    <h2 id="t-b">B. Placar</h2>
+    <p class="conceito">Painel de estádio: fundo grafite, números em âmbar, letra de placar (Saira Condensed) em caixa alta e uma linha de "lâmpadas" sob o título. As marcações são blocos acesos (verde, âmbar, vermelho). É a mais "evento", e um print fica bonito no WhatsApp.</p>
+    <div class="vitrine">
+      <figure><figcaption>Celular, 390 × 844 · <a href="b-placar/ranking.html">abrir em tela cheia</a></figcaption><div class="moldura-cel"><iframe src="b-placar/ranking.html" title="Direção B, Placar, no celular" loading="lazy"></iframe></div></figure>
+      <div class="lado">
+        <figure><figcaption>PC, 1280 × 800 (50%) · <a href="b-placar/ranking.html">abrir em tela cheia</a></figcaption><div class="moldura-pc"><iframe src="b-placar/ranking.html" title="Direção B, Placar, no PC" loading="lazy"></iframe></div></figure>
+        <ul class="pros">
+          <li><strong>A favor:</strong> é a identidade mais marcante, que combina com o clima de "ranking". À noite, na quadra iluminada, cansa menos a vista.</li>
+          <li><strong>Contra:</strong> fundo escuro em tela de celular <strong>sob o sol</strong> fica difícil de ler (reflexo). O PDF precisaria de outra paleta, porque ninguém imprime fundo preto, e tela e PDF ficariam com caras diferentes. A caixa alta nos apelidos lê um pouco mais devagar.</li>
+        </ul>
+        <table class="contraste">
+          <caption style="text-align:left;font-weight:600">Contraste (WCAG 2.1)</caption>
+          <thead><tr><th>Par</th><th>Uso</th><th>Razão</th></tr></thead>
+          <tbody>
+            <tr><td><span class="amostra" style="background:#F2F4F5"></span>#F2F4F5 / <span class="amostra" style="background:#1A222B"></span>#1A222B</td><td>Texto principal / superfície</td><td class="num">14,6:1</td></tr>
+            <tr><td>#F2F4F5 / #0F1419</td><td>Texto / fundo</td><td class="num">16,8:1</td></tr>
+            <tr><td>#9AA7B2 / #1A222B · #202A34</td><td>Texto secundário (superfície · zebra)</td><td class="num">6,5 · 5,9:1</td></tr>
+            <tr><td>#FFB800 / #1A222B · #202A34</td><td>Pontos em âmbar (superfície · zebra)</td><td class="num">9,3 · 8,4:1</td></tr>
+            <tr><td>#FFB800 / #0F1419</td><td>Título da barra</td><td class="num">10,7:1</td></tr>
+            <tr><td>#0F1419 / #FFB800</td><td>Botão Exportar PDF; marca L</td><td class="num">10,7:1</td></tr>
+            <tr><td>#0F1419 / #34D17A</td><td>Marca P</td><td class="num">9,3:1</td></tr>
+            <tr><td>#0F1419 / #FF5C5C</td><td>Marca E</td><td class="num">6,1:1</td></tr>
+            <tr><td>#9AA7B2 / #2A3440</td><td>Marca F</td><td class="num">5,1:1</td></tr>
+            <tr><td>#5AB0FF / #1A222B</td><td>Ícone de chuva (≥ 3:1)</td><td class="num">6,9:1</td></tr>
+            <tr><td>#9AA7B2 / #0F1419</td><td>Contorno dos botões (≥ 3:1)</td><td class="num">7,5:1</td></tr>
+            <tr><td>#FFB800 / #0F1419</td><td>Anel de foco (≥ 3:1)</td><td class="num">10,7:1</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="direcao" aria-labelledby="t-c">
+    <h2 id="t-c">C. Súmula</h2>
+    <p class="conceito">Papel de súmula de jogo: fundo creme, tinta azul-noite, grade com pauta e o vermelho de carimbo. Os títulos usam letra serifada de máquina de escrever moderna (Zilla Slab). P é uma bolinha cheia, L é um anel, E é um carimbo vermelho torto. A tela já tem a cara do PDF que vai para o grupo.</p>
+    <div class="vitrine">
+      <figure><figcaption>Celular, 390 × 844 · <a href="c-sumula/ranking.html">abrir em tela cheia</a></figcaption><div class="moldura-cel"><iframe src="c-sumula/ranking.html" title="Direção C, Súmula, no celular" loading="lazy"></iframe></div></figure>
+      <div class="lado">
+        <figure><figcaption>PC, 1280 × 800 (50%) · <a href="c-sumula/ranking.html">abrir em tela cheia</a></figcaption><div class="moldura-pc"><iframe src="c-sumula/ranking.html" title="Direção C, Súmula, no PC" loading="lazy"></iframe></div></figure>
+        <ul class="pros">
+          <li><strong>A favor:</strong> tela e PDF ficam idênticos (o PDF é quase monocromático e imprime bem). Lê bem no sol e tem personalidade sem parecer app genérico.</li>
+          <li><strong>Contra:</strong> as marcações dependem mais de forma (cheio, anel, tracejado) do que de cor, então a varredura rápida da grade é um pouco mais lenta que na A. O tom "papel" pode parecer sério demais para uma pelada.</li>
+        </ul>
+        <table class="contraste">
+          <caption style="text-align:left;font-weight:600">Contraste (WCAG 2.1)</caption>
+          <thead><tr><th>Par</th><th>Uso</th><th>Razão</th></tr></thead>
+          <tbody>
+            <tr><td><span class="amostra" style="background:#1B1F2A"></span>#1B1F2A / <span class="amostra" style="background:#FBF8F1"></span>#FBF8F1</td><td>Texto principal / superfície</td><td class="num">15,5:1</td></tr>
+            <tr><td>#1B1F2A / #F6F1E6</td><td>Texto / papel</td><td class="num">14,6:1</td></tr>
+            <tr><td>#5A5648 / #FBF8F1</td><td>Texto secundário; marca F</td><td class="num">6,9:1</td></tr>
+            <tr><td>#F6F1E6 / #1B1F2A</td><td>Título da barra</td><td class="num">14,6:1</td></tr>
+            <tr><td>#CFC6B0 / #1B1F2A</td><td>Subtítulo da barra</td><td class="num">9,7:1</td></tr>
+            <tr><td>#FBF8F1 / #B3261E</td><td>Botão Exportar PDF; marca E</td><td class="num">6,2:1</td></tr>
+            <tr><td>#FBF8F1 / #1B1F2A</td><td>Marca P</td><td class="num">15,5:1</td></tr>
+            <tr><td>#1B1F2A / #FBF8F1</td><td>Marca L (anel)</td><td class="num">15,5:1</td></tr>
+            <tr><td>#1F4E8C / #FBF8F1</td><td>Ícone de chuva (≥ 3:1)</td><td class="num">7,4:1</td></tr>
+            <tr><td>#1B1F2A / #F6F1E6</td><td>Contorno dos botões e anel de foco (≥ 3:1)</td><td class="num">14,6:1</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="recomendacao" aria-labelledby="t-rec">
+    <h2 id="t-rec">Recomendação do Coordenador: A, Gramado</h2>
+    <p>O uso real decide: celular, ao ar livre, logo depois do jogo, e um PDF que circula no WhatsApp. A <strong>A</strong> é a de melhor leitura no sol, e as marcações coloridas com letra são as mais rápidas de varrer numa grade de 20 linhas. Ela também tem o "jeito de futebol" sem depender de fundo escuro.</p>
+    <p>A <strong>C</strong> é uma boa segunda opção, se você valoriza que a tela e o PDF sejam a mesma coisa. Uma mistura possível: as cores e a tipografia da A, com o PDF em tons mais leves para imprimir bem. A <strong>B</strong> é a mais vistosa, mas o fundo escuro atrapalha no sol e obriga a ter duas identidades (tela escura, PDF claro).</p>
+  </section>
+
+  <p class="nota">Estas páginas são só direções. A escolhida vira, na etapa B3, o mockup completo em <code>.md/mockup/</code>: <code>tokens.css</code>, fontes auto-hospedadas e todas as telas × estados. As fontes aqui vêm do Google Fonts só por conveniência desta etapa. As direções não escolhidas ficam nesta pasta como histórico e não servem de referência para a implementação.</p>
+</main>

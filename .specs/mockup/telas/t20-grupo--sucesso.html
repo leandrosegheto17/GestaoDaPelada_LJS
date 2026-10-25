@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dados do grupo</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+<header class="barra barra--admin"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span><a class="barra__link" href="t08-grupos--sucesso.html">Trocar grupo</a></div></header>
+<main id="conteudo" class="conteudo conteudo--admin conteudo--estreito">
+  <a class="voltar" href="t09-inicio--sucesso.html"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 18 9 12 15 6"/></svg>Início</a>
+  <h1 class="titulo-pagina">Dados do grupo</h1>
+  <form class="formulario" novalidate>
+    <div class="campo"><label class="campo__rotulo" for="nome">Nome</label><input class="campo__entrada" id="nome" value="Pelada de Quinta" maxlength="60" aria-describedby="nome-ajuda"><p class="campo__ajuda" id="nome-ajuda">Mudar o nome não muda o link do ranking.</p></div>
+    <div class="duas-colunas">
+      <div class="campo"><label class="campo__rotulo" for="dia">Dia da semana</label><select class="campo__entrada" id="dia"><option>Domingo</option><option>Segunda</option><option>Terça</option><option>Quarta</option><option selected>Quinta</option><option>Sexta</option><option>Sábado</option></select></div>
+      <div class="campo"><label class="campo__rotulo" for="hora">Horário</label><input class="campo__entrada" id="hora" type="time" value="20:00"></div>
+    </div>
+    <fieldset class="segmentado"><legend class="campo__rotulo">Frequência</legend><label><input type="radio" name="freq" checked><span>Semanal</span></label><label><input type="radio" name="freq"><span>Quinzenal</span></label><label><input type="radio" name="freq"><span>Mensal</span></label></fieldset>
+    <div><button class="botao botao--principal" type="submit">Salvar</button></div>
+  </form>
+  <section class="cartao secao" aria-labelledby="link">
+    <h2 id="link" class="subtitulo sem-topo">Link do ranking</h2>
+    <p class="paragrafo" id="url"><strong>https://pelada.gestaodapelada.workers.dev/g/pelada-de-quinta</strong></p>
+    <div class="grupo-botoes"><a class="botao botao--secundario" href="t20-grupo--link-copiado.html" aria-describedby="url">Copiar link</a><button class="botao botao--secundario" type="button" aria-describedby="url">Compartilhar</button></div>
+  </section>
+</main>
+</body>
+</html>

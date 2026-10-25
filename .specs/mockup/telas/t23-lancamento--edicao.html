@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Editar lançamento</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<header class="barra barra--admin"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span><a class="barra__link" href="t08-grupos--sucesso.html">Trocar grupo</a></div></header>
+<main class="conteudo conteudo--admin conteudo--estreito">
+  <a class="voltar" href="t22-financeiro--sucesso.html"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 18 9 12 15 6"/></svg>Financeiro</a>
+  <h1 class="titulo-pagina">Editar lançamento</h1>
+  <form class="formulario" novalidate>
+    <fieldset class="segmentado"><legend class="sr">Tipo</legend><label><input type="radio" name="tipo"><span>Entrada</span></label><label><input type="radio" name="tipo" checked><span>Saída</span></label></fieldset>
+    <div class="campo"><label class="campo__rotulo" for="data">Data</label><input class="campo__entrada" id="data" type="date" value="2026-10-05"></div>
+    <div class="campo"><label class="campo__rotulo" for="desc">Descrição</label><input class="campo__entrada" id="desc" maxlength="80" value="Aluguel da quadra outubro" aria-describedby="desc-cont"><p class="campo__ajuda" id="desc-cont">25 de 80</p></div>
+    <div class="campo"><label class="campo__rotulo" for="valor">Valor (R$)</label><input class="campo__entrada" id="valor" inputmode="decimal" value="800,00"></div>
+    <p class="campo__ajuda">Última alteração: Leandro, 05/10 09:14</p>
+    <div class="barra-acao"><div class="grupo-botoes"><button class="botao botao--principal" type="submit">Salvar</button><a class="botao botao--texto botao--texto-destrutivo" href="t23-lancamento--excluir.html">Excluir</a></div></div>
+  </form>
+</main>
+</body>
+</html>

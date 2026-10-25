@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Carregando (padrão das telas de lista do admin)</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<!-- Padrão global de "carregando" para telas de lista do admin (T08, T09, T10, T15, T17, T19, T21, T22, T26): barra real, título da tela em esqueleto, linhas em esqueleto. Aparece só depois de 300 ms. Exemplo com o título de T15. -->
+<header class="barra barra--admin"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span><a class="barra__link" href="t08-grupos--sucesso.html">Trocar grupo</a></div></header>
+<main class="conteudo conteudo--admin" aria-busy="true">
+  <h1 class="titulo-pagina">Jogadores</h1>
+  <p class="sr" role="status">Carregando…</p>
+  <div class="lista" aria-hidden="true"><span class="esqueleto esqueleto--bloco"></span><span class="esqueleto esqueleto--bloco"></span><span class="esqueleto esqueleto--bloco"></span><span class="esqueleto esqueleto--bloco"></span><span class="esqueleto esqueleto--bloco"></span><span class="esqueleto esqueleto--bloco"></span></div>
+</main>
+</body>
+</html>

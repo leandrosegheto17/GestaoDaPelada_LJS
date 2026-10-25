@@ -1,0 +1,13 @@
+{
+  "formato": "varios_times",
+  "data": "2026-10-22",
+  "n": 4,
+  "avisos": [ { "tipo": "sem_nota", "texto": "Léo Baiano e Serginho não têm nota: usamos nível 5,5." } ],
+  "times": [
+    { "nome": "Time 1", "incompleto": false, "jogadores": [ { "id": "j-toninho", "apelido": "Toninho", "semNota": false }, { "id": "j-nenem", "apelido": "Neném", "semNota": false }, { "id": "j-vini", "apelido": "Vini", "semNota": false }, { "id": "j-serginho", "apelido": "Serginho", "semNota": true } ], "indicadores": { "jogadores": 4, "nivelMedio": 6.2, "nivelSoma": 24.9, "idadeMedia": 35.0 } },
+    { "nome": "Time 2", "incompleto": false, "jogadores": [ { "id": "j-bigode", "apelido": "Bigode", "semNota": false }, { "id": "j-gordo", "apelido": "Gordo", "semNota": false }, { "id": "j-cabeca", "apelido": "Cabeça", "semNota": false }, { "id": "j-japa", "apelido": "Japa", "semNota": false } ], "indicadores": { "jogadores": 4, "nivelMedio": 6.2, "nivelSoma": 24.6, "idadeMedia": 41.3 } },
+    { "nome": "Time 3", "incompleto": false, "jogadores": [ { "id": "j-careca", "apelido": "Careca", "semNota": false }, { "id": "j-juninho", "apelido": "Juninho", "semNota": false }, { "id": "j-pedrao", "apelido": "Pedrão", "semNota": false }, { "id": "j-leo", "apelido": "Léo Baiano", "semNota": true } ], "indicadores": { "jogadores": 4, "nivelMedio": 6.2, "nivelSoma": 24.8, "idadeMedia": 40.5 } },
+    { "nome": "Time 4", "incompleto": false, "jogadores": [ { "id": "j-marcao", "apelido": "Marcão", "semNota": false }, { "id": "j-paulinho", "apelido": "Paulinho", "semNota": false }, { "id": "j-alemao", "apelido": "Alemão", "semNota": false }, { "id": "j-dudu", "apelido": "Dudu", "semNota": false } ], "indicadores": { "jogadores": 4, "nivelMedio": 6.3, "nivelSoma": 25.2, "idadeMedia": 43.8 } },
+    { "nome": "Time 5", "incompleto": true, "jogadores": [ { "id": "j-ze", "apelido": "Zé Carlos", "semNota": false }, { "id": "j-rafinha", "apelido": "Rafinha", "semNota": false } ], "indicadores": { "jogadores": 2, "nivelMedio": 6.5, "nivelSoma": 13.0, "idadeMedia": 33.5 } }
+  ]
+}

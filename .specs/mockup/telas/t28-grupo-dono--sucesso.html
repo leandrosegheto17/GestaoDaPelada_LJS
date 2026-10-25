@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Grupo (visão do dono): Pelada de Quinta</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<!-- Só metadados (RF-07): nenhum atalho para jogadores, partidas, notas ou financeiro. -->
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+<header class="barra barra--dono"><div class="barra__grupo"><span class="barra__nome">Área do dono</span><a class="barra__link" href="t08-grupos--sucesso.html">Meus grupos como admin</a></div><nav class="barra__acoes" aria-label="Atalhos"><a class="botao-icone botao-icone--sem-borda" href="t09-inicio--menu-conta.html" aria-label="Menu da conta" aria-haspopup="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></a></nav></header>
+<main id="conteudo" class="conteudo conteudo--admin conteudo--estreito">
+  <a class="voltar" href="t26-dono--sucesso.html"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 18 9 12 15 6"/></svg>Área do dono</a>
+  <h1 class="titulo-pagina">Pelada de Quinta</h1>
+  <dl class="indicadores cartao"><dt>Dia e frequência</dt><dd>Quinta, semanal</dd><dt>Horário</dt><dd>20:00</dd><dt>Criado em</dt><dd>05/02/2026</dd></dl>
+  <section class="secao" aria-labelledby="link"><h2 id="link" class="subtitulo">Link do ranking</h2><p class="paragrafo" id="url" style="overflow-wrap:anywhere"><strong>https://pelada.gestaodapelada.workers.dev/g/pelada-de-quinta</strong></p><button class="botao botao--secundario" type="button" aria-describedby="url">Copiar</button></section>
+  <section class="secao" aria-labelledby="sit">
+    <h2 id="sit" class="subtitulo">Situação comercial</h2>
+    <form class="formulario" novalidate>
+      <div class="campo"><label class="sr" for="situacao">Situação comercial</label><select class="campo__entrada" id="situacao" aria-describedby="sit-ajuda"><option selected>Uso próprio</option><option>Trial</option><option>Ativo</option><option>Inadimplente</option><option>Cancelado</option></select><p class="campo__ajuda" id="sit-ajuda">Não muda nada no app nesta fase.</p></div>
+      <div><button class="botao botao--secundario" type="submit">Salvar situação</button></div>
+    </form>
+  </section>
+  <section class="secao" aria-labelledby="adm">
+    <h2 id="adm" class="subtitulo">Admins</h2>
+    <ul class="lista">
+      <li class="item"><span class="item__principal"><span class="item__titulo">Leandro</span><span class="item__meta">leandro@exemplo.com.br</span></span></li>
+      <li class="item"><span class="item__principal"><span class="item__titulo">Marquinhos</span><span class="item__meta">marquinhos@exemplo.com.br</span></span><a class="botao botao--texto" href="t26-dono--senha.html">Redefinir senha</a></li>
+    </ul>
+  </section>
+  <section class="secao" aria-labelledby="arq">
+    <h2 id="arq" class="subtitulo">Arquivamento</h2>
+    <p class="paragrafo">Arquivar bloqueia o acesso dos admins, e o link passa a mostrar “Grupo indisponível”. Os dados ficam guardados.</p>
+    <a class="botao botao--destrutivo" href="t28-grupo-dono--arquivar.html">Arquivar grupo</a>
+  </section>
+</main>
+</body>
+</html>
