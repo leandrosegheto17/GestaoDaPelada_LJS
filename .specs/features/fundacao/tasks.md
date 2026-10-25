@@ -894,8 +894,8 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Teste: Safari iOS fora de standalone mostra a instrução; em standalone ou em outro navegador, não
-- [ ] Gate quick passa
+- [x] Teste: Safari iOS fora de standalone mostra a instrução; em standalone ou em outro navegador, não *(`instalacao.ts` e o teste copiados do legado, mais testes de `lerAmbienteEDecidir` (FUN-35); o componente de aviso do legado fica com a tela que o usa)*
+- [x] Gate quick passa *(web 264)*
 
 **Tests**: unit
 **Gate**: quick
