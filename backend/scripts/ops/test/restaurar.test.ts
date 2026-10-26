@@ -161,6 +161,75 @@ describe('restaurar: trava de host antes do pg_restore (SEC-009)', () => {
     }
   });
 
+  describe('SEC-011: quem conecta é a libpq, então a URL e o ambiente não podem desviar o destino', () => {
+    it.each([
+      ['service', 'postgres://postgres:s@localhost/postgres?service=prod'],
+      ['service codificado', 'postgres://postgres:s@localhost/postgres?%73ervice=prod'],
+      ['hostaddr', 'postgres://postgres:s@localhost/postgres?hostaddr=10.255.255.1'],
+      ['host', 'postgres://postgres:s@localhost/postgres?host=10.255.255.1'],
+      ['passfile', 'postgres://postgres:s@localhost/postgres?passfile=/tmp/pgpass'],
+      ['options', 'postgres://postgres:s@localhost/postgres?options=-c%20endpoint%3Dep-producao-9'],
+      ['dbname', 'postgres://postgres:s@localhost/postgres?dbname=postgresql://ep-producao-9.aws.neon.tech/x'],
+      ['parâmetro desconhecido', 'postgres://postgres:s@localhost/postgres?qualquer=1'],
+      ['SSLMODE em maiúsculas', 'postgres://postgres:s@localhost/postgres?SSLMODE=require'],
+      ['permitido junto de um proibido', 'postgres://postgres:s@localhost/postgres?sslmode=require&service=prod'],
+    ])('parâmetro fora da lista de permissão é recusado: %s', async (_nome, url) => {
+      const { base, chamadas } = opcoes({ url });
+      await expect(restaurar(base)).rejects.toThrow(/parâmetro/i);
+      expect(chamadas).toEqual([]);
+    });
+
+    it('os parâmetros da lista de permissão passam', async () => {
+      const url =
+        'postgres://postgres:s@localhost/postgres?sslmode=require&channel_binding=require&connect_timeout=10&application_name=restaurar';
+      const { base, chamadas } = opcoes({ url });
+      await expect(restaurar(base)).resolves.toBe(0);
+      expect(chamadas).toHaveLength(1);
+    });
+
+    it('senha na consulta (password=) é recusada, sem expor o valor', async () => {
+      const { base, chamadas } = opcoes({ url: 'postgres://postgres@localhost/postgres?password=senha-na-url' });
+      const erro = (await restaurar(base).catch((e: unknown) => e)) as Error;
+      expect(erro).toBeInstanceOf(Error);
+      expect(erro.message).toMatch(/PGPASSWORD/);
+      expect(erro.message).not.toContain('senha-na-url');
+      expect(chamadas).toEqual([]);
+    });
+
+    it('o pg_restore roda com ambiente limpo: nenhuma variável PG* herdada chega ao processo filho', async () => {
+      const ambiente = {
+        PGHOSTADDR: '10.255.255.1',
+        PGHOST: 'ep-producao-9.aws.neon.tech',
+        PGPORT: '6543',
+        PGSERVICE: 'prod',
+        PGSERVICEFILE: '/tmp/pg_service.conf',
+        PGDATABASE: 'producao',
+        PGOPTIONS: '-c endpoint=ep-producao-9',
+        PGSSLMODE: 'disable',
+        PGUSER: 'dono',
+        OUTRA: 'nao-passa',
+        PATH: '/usr/bin',
+        SystemRoot: 'C:\\Windows',
+      };
+      const { base, chamadas } = opcoes({ ambiente });
+      await restaurar(base);
+      const env = chamadas[0]?.env ?? {};
+      expect(Object.keys(env).filter((nome) => /^PG/i.test(nome))).toEqual(['PGPASSWORD']);
+      expect(env['PGPASSWORD']).toBe('senha-local');
+      expect(env['PATH']).toBe('/usr/bin');
+      expect(env['SystemRoot']).toBe('C:\\Windows');
+      expect(env['OUTRA']).toBeUndefined();
+    });
+
+    it('sem senha na URL, o PGPASSWORD herdado é o único PG* que passa', async () => {
+      const ambiente = { PGPASSWORD: 'da-sessao', PGHOSTADDR: '10.255.255.1', Path: 'C:\\bin' };
+      const { base, chamadas } = opcoes({ url: 'postgres://postgres@localhost/postgres', ambiente });
+      await restaurar(base);
+      const env = chamadas[0]?.env ?? {};
+      expect(env).toEqual({ PGPASSWORD: 'da-sessao', Path: 'C:\\bin' });
+    });
+  });
+
   it('sem arquivo, ou arquivo inexistente, falha antes de rodar', async () => {
     for (const arquivo of [undefined, join(pasta, 'nao-existe.pgdump')]) {
       const { base, chamadas } = opcoes({ arquivo });

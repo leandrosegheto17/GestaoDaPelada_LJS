@@ -17,7 +17,7 @@ async function principal(): Promise<number> {
     confirmar: confirmarHost,
     comando: process.env['PG_RESTORE'],
     executar: (comando, args, env) => {
-      const r = spawnSync(comando, args, { stdio: 'inherit', env: { ...process.env, ...env } });
+      const r = spawnSync(comando, args, { stdio: 'inherit', env }); // ambiente já limpo (SEC-011)
       if (r.error) throw new Error(`Não foi possível rodar ${comando} (instale o cliente do PostgreSQL 16).`);
       return r.status ?? 1;
     },
