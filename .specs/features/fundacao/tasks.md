@@ -1091,7 +1091,7 @@ T47 → T48 → T49
 
 - [x] Teste do script: dump com `--enable-row-security`; falha de `pg_dump` ou de `age` faz o job falhar e não publica artefato parcial *(`backup.test.mjs` roda o `dump-cifrado.sh` em bash com `docker` e `age` falsos: confere `pg_dump --format=custom --enable-row-security` no cliente `postgres:16`; falha de `pg_dump`, de `age` ou dump vazio saem com erro, sem artefato nem arquivo parcial, e sem vazar URL ou host)*
 - [x] Agendamento 07:00 UTC, disparo manual e retenção de 30 dias conferidos por teste do YAML *(o YAML tem cron `0 7 * * *`, `workflow_dispatch`, `retencao: 30` (também o default da action, com `if-no-files-found: error`) e nenhum `continue-on-error`)*
-- [x] Gate de build passa *(`test:checagens` (ops, 129 testes entre os arquivos copiados e novos), lint, prettier e checagens de ações verdes. SPEC_DEVIATION: a role é `pelada_backup` (a spec cita `backup_ro`), secret `NEON_URL_BACKUP`; o cliente é fixado em `postgres:16` (o legado descobria a versão do servidor) e a contagem restaurada contra a origem fica no runbook (T43), pois o teste de restauração precisa de banco e age reais. Aviso: o job de backup roda sem environment, então os secrets `NEON_URL_BACKUP` e `BACKUP_CHAVE` precisam estar no nível do repositório (T47))*
+- [x] Gate de build passa *(`test:checagens` (ops, 129 testes entre os arquivos copiados e novos), lint, prettier e checagens de ações verdes. SPEC_DEVIATION: a role é `pelada_backup` (a spec cita `backup_ro`), secret `NEON_URL_BACKUP`; o cliente é fixado em `postgres:16` (o legado descobria a versão do servidor) e a contagem restaurada contra a origem fica no runbook (T43), pois o teste de restauração precisa de banco e age reais. Aviso: o job de backup roda sem environment, então os secrets `NEON_URL_BACKUP` e `BACKUP_CHAVE` precisam estar no nível do repositório (T47). **Superado pela correção do SEC-001** (`seguranca.md`): o job declara `environment: backup` e os secrets ficam só nos environments `backup` e `producao`)*
 
 **Tests**: unit
 **Gate**: build
@@ -1249,7 +1249,7 @@ T47 → T48 → T49
 
 ### T47: Repositório no GitHub, environment e secrets (ação externa)
 
-**What**: Criar o repositório privado, o environment `producao` e os secrets, e publicar a `main`.
+**What**: Criar o repositório privado, os environments `producao` e `backup` (branch policy só `main`) com os secrets de cada um, e publicar a `main`. Nenhum secret no nível do repositório (SEC-001; lista em `docs/runbook.md`, seção 2).
 **Where**: GitHub (repositório novo)
 **Depends on**: T46
 **Reuses**: Nomes dos secrets do legado (`NEON_*`, `BACKUP_CHAVE`, `CLOUDFLARE_*`)
@@ -1263,6 +1263,7 @@ T47 → T48 → T49
 **Done when**:
 
 - [ ] **Confirmação específica do usuário** para criar o repositório e para o `git push`
+- [ ] Environment `producao` (variável `URL_PUBLICA`; secrets `NEON_URL_MIGRACAO`, `NEON_API_KEY`, `NEON_PROJECT_ID`, `BACKUP_CHAVE`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `VITE_SENTRY_DSN`) e environment `backup` (secrets `NEON_URL_BACKUP` e `BACKUP_CHAVE`), ambos restritos à `main`; "Repository secrets" vazio
 - [ ] Checagem final: `python .claude/scripts/trava-testes.py --rodar` verde, resultado mostrado
 - [ ] O CI roda no primeiro push e fica verde
 

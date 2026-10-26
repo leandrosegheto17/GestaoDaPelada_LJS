@@ -5,7 +5,7 @@ antigo e monitor de uptime. Cada seção aponta para o arquivo que faz o trabalh
 Nenhuma senha, chave ou string de conexão vai neste arquivo. Os itens de webhook, pagamento e reativação entram
 com as features `planos-e-cobranca` e seguintes.
 
-Nomes usados: Worker novo `gestaodapelada`, Worker antigo `pelada`, environment do GitHub `producao`, roles do banco
+Nomes usados: Worker novo `gestaodapelada`, Worker antigo `pelada`, environments do GitHub `producao` e `backup`, roles do banco
 `pelada_app` (runtime, sem bypass de RLS), `pelada_backup` (leitura) e o owner do Neon (migração, tem `bypassrls`).
 
 ## 1. Antes do primeiro deploy (obrigatório, uma vez)
@@ -35,10 +35,21 @@ Registre a data e quem confirmou cada item na entrada da liberação (`.specs/li
 - Se o build ou a conferência de `URL_PUBLICA` falhar, nada em produção mudou. Se a migração falhar, o
   `wrangler deploy` não roda (seção 3).
 - **Conferir à mão:** `curl -fsS https://<host>/api/health` deve devolver `{"status":"ok","versao":"<sha>"}`.
-- **Variáveis do environment `producao`:** `URL_PUBLICA` (origem https, sem barra final). **Secrets** (repositório ou
-  environment): `NEON_URL_MIGRACAO`, `NEON_API_KEY`, `NEON_PROJECT_ID`, `BACKUP_CHAVE`, `CLOUDFLARE_API_TOKEN`,
-  `CLOUDFLARE_ACCOUNT_ID`. O `backup.yml` roda sem environment: `NEON_URL_BACKUP` e `BACKUP_CHAVE` precisam estar no
-  nível do repositório. Formatos no [`.env.example`](../.env.example).
+- **Environments e secrets (nunca no nível do repositório).** Secret de repositório vale para qualquer workflow de
+  qualquer branch, então quem tem escrita no repositório poderia lê-lo sem passar pela `main`. Todos ficam em
+  environment com branch policy só `main` (Settings, Environments, Deployment branches and tags, Selected branches,
+  `main`):
+  - **`producao`** (usado pelo `deploy.yml`): variável `URL_PUBLICA` (origem https, sem barra final); secrets
+    `NEON_URL_MIGRACAO`, `NEON_API_KEY`, `NEON_PROJECT_ID`, `BACKUP_CHAVE`, `CLOUDFLARE_API_TOKEN`,
+    `CLOUDFLARE_ACCOUNT_ID` e `VITE_SENTRY_DSN`.
+  - **`backup`** (usado pelo `backup.yml`): secrets `NEON_URL_BACKUP` e `BACKUP_CHAVE` (a mesma chave pública do
+    `producao`).
+  - Em Settings, Secrets and variables, Actions, a lista "Repository secrets" fica vazia. Se algum desses segredos já
+    esteve lá, mova-o e gire a credencial (seção 5). O teste `segredos-workflows.test.mjs` exige o environment em todo
+    job que usa secret.
+
+  Formatos no [`.env.example`](../.env.example).
+
 - **Token da Cloudflare:** Workers (edição) para publicar e `Account > Hyperdrive: Read` para a conferência do cache.
   Sem a segunda, o passo falha fechado e o deploy não segue.
 - Só o `deploy.yml` chama `wrangler deploy` (o CI confere com `checar-wrangler-deploy.mjs`).
@@ -107,16 +118,16 @@ pessoais e a identidade privada do `age` não pode parar no git (o `.gitignore` 
 
 Faça um por vez, confira o `/api/health` e, quando houver deploy, o workflow verde.
 
-| Segredo                       | Onde vale                   | Como girar                                                                                                                                                                                                                        |
-| ----------------------------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Senha da role `pelada_app`    | Neon e origem do Hyperdrive | `ALTER ROLE pelada_app WITH PASSWORD '<nova>'` no Neon (digitada só no terminal) e `wrangler hyperdrive update <id> --origin-password <nova> --caching-disabled`; confira `/api/health` e uma leitura real.                       |
-| Senha da role `pelada_backup` | `NEON_URL_BACKUP`           | `ALTER ROLE pelada_backup WITH PASSWORD '<nova>'` e atualize o secret; dispare o `backup.yml` à mão para provar.                                                                                                                  |
-| `NEON_URL_MIGRACAO`           | deploy                      | Gire a senha do owner no console do Neon e atualize o secret; o próximo deploy prova.                                                                                                                                             |
-| `NEON_API_KEY`                | deploy                      | Crie a chave nova no Neon, atualize o secret, revogue a antiga depois de um deploy verde.                                                                                                                                         |
-| `CLOUDFLARE_API_TOKEN`        | deploy                      | Crie o token novo (Workers edição e Hyperdrive leitura), atualize o secret, revogue o antigo.                                                                                                                                     |
-| `BACKUP_CHAVE`                | backup e dump do deploy     | `age-keygen -o identidade.txt`, guarde a identidade no gerenciador de senhas, grave só a linha `Public key` no secret. Os backups antigos só se decifram com a identidade antiga: guarde as duas até o fim da retenção (30 dias). |
-| `SENTRY_DSN`                  | Worker                      | `wrangler secret put SENTRY_DSN`.                                                                                                                                                                                                 |
-| `VITE_SENTRY_DSN`             | build do web (deploy)       | Em GitHub, Settings, Secrets and variables, Actions, crie o secret `VITE_SENTRY_DSN` com o DSN do projeto Sentry do front (Sentry, Settings, Client Keys). Sem ele, o Sentry do front não inicializa.                             |
+| Segredo                       | Onde vale                   | Como girar                                                                                                                                                                                                                                                                       |
+| ----------------------------- | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Senha da role `pelada_app`    | Neon e origem do Hyperdrive | `ALTER ROLE pelada_app WITH PASSWORD '<nova>'` no Neon (digitada só no terminal) e `wrangler hyperdrive update <id> --origin-password <nova> --caching-disabled`; confira `/api/health` e uma leitura real.                                                                      |
+| Senha da role `pelada_backup` | `NEON_URL_BACKUP`           | `ALTER ROLE pelada_backup WITH PASSWORD '<nova>'` e atualize o secret no environment `backup`; dispare o `backup.yml` à mão para provar.                                                                                                                                         |
+| `NEON_URL_MIGRACAO`           | deploy                      | Gire a senha do owner no console do Neon e atualize o secret; o próximo deploy prova.                                                                                                                                                                                            |
+| `NEON_API_KEY`                | deploy                      | Crie a chave nova no Neon, atualize o secret, revogue a antiga depois de um deploy verde.                                                                                                                                                                                        |
+| `CLOUDFLARE_API_TOKEN`        | deploy                      | Crie o token novo (Workers edição e Hyperdrive leitura), atualize o secret, revogue o antigo.                                                                                                                                                                                    |
+| `BACKUP_CHAVE`                | backup e dump do deploy     | `age-keygen -o identidade.txt`, guarde a identidade no gerenciador de senhas, grave só a linha `Public key` no secret (nos dois environments, `producao` e `backup`). Os backups antigos só se decifram com a identidade antiga: guarde as duas até o fim da retenção (30 dias). |
+| `SENTRY_DSN`                  | Worker                      | `wrangler secret put SENTRY_DSN`.                                                                                                                                                                                                                                                |
+| `VITE_SENTRY_DSN`             | build do web (deploy)       | Em GitHub, Settings, Environments, `producao`, crie o secret `VITE_SENTRY_DSN` com o DSN do projeto Sentry do front (Sentry, Settings, Client Keys). Sem ele, o Sentry do front não inicializa.                                                                                  |
 
 ## 6. Remoção do Worker antigo `pelada`
 
@@ -142,6 +153,6 @@ Crie a conta e o monitor no painel do UptimeRobot (ação sua; o código funcion
 
 ## 8. Backup diário
 
-O `backup.yml` roda às 07:00 UTC (04:00 em Brasília) e sob demanda. Falha de dump ou de cifragem deixa o job vermelho
+O `backup.yml` roda às 07:00 UTC (04:00 em Brasília) e sob demanda, no environment `backup` (seção 2). Falha de dump ou de cifragem deixa o job vermelho
 e não publica artefato; o GitHub avisa por e-mail se as notificações de Actions estiverem ligadas. O artefato fica 30
 dias. O dump é feito pela role `pelada_backup` com `--enable-row-security` e o cliente do PostgreSQL 16.
