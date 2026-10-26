@@ -882,7 +882,7 @@ T47 → T48 → T49
 ### T32: Instruções de instalação no Safari do iOS
 
 **What**: Mostrar a instrução de instalação fora do modo standalone no iOS.
-**Where**: `frontend/web/src/pwa/instalacao.ts`
+**Where**: `frontend/web/src/pwa/instalacao.ts`, `frontend/web/src/pwa/AvisoInstalacao.tsx`
 **Depends on**: T31
 **Reuses**: legado: `frontend/web/src/pwa/instalacao.ts` e testes
 **Requirement**: FUN-35
@@ -894,7 +894,7 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [x] Teste: Safari iOS fora de standalone mostra a instrução; em standalone ou em outro navegador, não *(`instalacao.ts` e o teste copiados do legado, mais testes de `lerAmbienteEDecidir` (FUN-35); o componente de aviso do legado fica com a tela que o usa)*
+- [x] Teste: Safari iOS fora de standalone mostra a instrução; em standalone ou em outro navegador, não *(`instalacao.ts` e o teste copiados do legado, mais testes de `lerAmbienteEDecidir` (FUN-35); `AvisoInstalacao.tsx` (faixa `info` do guia, dispensável) é exibido na página provisória, com `AvisoInstalacao.test.tsx`)*
 - [x] Gate quick passa *(web 264)*
 
 **Tests**: unit
