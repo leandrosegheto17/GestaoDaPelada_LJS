@@ -56,6 +56,9 @@ describe('deploy.yml: ordem dos passos (FUN-40)', () => {
   it('o build do web recebe o SHA como VITE_VERSAO', () => {
     expect(passo('@pelada/web build').env.VITE_VERSAO).toBe('${{ github.sha }}');
   });
+  it('o build do web recebe o DSN do Sentry de um secret ou variável, nunca literal (FUN-23)', () => {
+    expect(passo('@pelada/web build').env.VITE_SENTRY_DSN).toMatch(/^\$\{\{ (secrets|vars)\.[A-Z_]+ \}\}$/);
+  });
   it('a branch de restauração mantém só as 2 mais novas (apaga as antigas)', () => {
     const run = passo('restauracao-neon-cli.ts pai').run;
     expect(run).toContain('restauracao-neon-cli.ts antigos');

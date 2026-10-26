@@ -116,6 +116,7 @@ Faça um por vez, confira o `/api/health` e, quando houver deploy, o workflow ve
 | `CLOUDFLARE_API_TOKEN`        | deploy                      | Crie o token novo (Workers edição e Hyperdrive leitura), atualize o secret, revogue o antigo.                                                                                                                                     |
 | `BACKUP_CHAVE`                | backup e dump do deploy     | `age-keygen -o identidade.txt`, guarde a identidade no gerenciador de senhas, grave só a linha `Public key` no secret. Os backups antigos só se decifram com a identidade antiga: guarde as duas até o fim da retenção (30 dias). |
 | `SENTRY_DSN`                  | Worker                      | `wrangler secret put SENTRY_DSN`.                                                                                                                                                                                                 |
+| `VITE_SENTRY_DSN`             | build do web (deploy)       | Em GitHub, Settings, Secrets and variables, Actions, crie o secret `VITE_SENTRY_DSN` com o DSN do projeto Sentry do front (Sentry, Settings, Client Keys). Sem ele, o Sentry do front não inicializa.                             |
 
 ## 6. Remoção do Worker antigo `pelada`
 

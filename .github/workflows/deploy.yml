@@ -44,6 +44,7 @@ jobs:
         run: pnpm --filter @pelada/web build
         env:
           VITE_VERSAO: ${{ github.sha }}
+          VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
 
       - name: Branch de restauração no Neon
         id: restauracao
