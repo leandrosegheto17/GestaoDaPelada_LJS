@@ -1262,10 +1262,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] **Confirmação específica do usuário** para criar o repositório e para o `git push`
-- [ ] Environment `producao` (variável `URL_PUBLICA`; secrets `NEON_URL_MIGRACAO`, `NEON_API_KEY`, `NEON_PROJECT_ID`, `BACKUP_CHAVE`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `VITE_SENTRY_DSN`) e environment `backup` (secrets `NEON_URL_BACKUP` e `BACKUP_CHAVE`), ambos restritos à `main`; "Repository secrets" vazio
-- [ ] Checagem final: `python .claude/scripts/trava-testes.py --rodar` verde, resultado mostrado
-- [ ] O CI roda no primeiro push e fica verde
+- [x] **Confirmação específica do usuário** para criar o repositório e para o `git push` *(2026-10-25 e 2026-10-26; repositório criado e depois tornado público por decisão do usuário)*
+- [x] Environment `producao` (variável `URL_PUBLICA`; secrets `NEON_URL_MIGRACAO`, `NEON_API_KEY`, `NEON_PROJECT_ID`, `BACKUP_CHAVE`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `VITE_SENTRY_DSN`) e environment `backup` (secrets `NEON_URL_BACKUP` e `BACKUP_CHAVE`), ambos restritos à `main`; "Repository secrets" vazio *(SPEC_DEVIATION: `VITE_SENTRY_DSN` não cadastrado, por decisão do usuário, que não tem conta no Sentry; o front roda sem ele)*
+- [x] Checagem final: `python .claude/scripts/trava-testes.py --rodar` verde, resultado mostrado *(na integração, 2026-10-26)*
+- [x] O CI roda no primeiro push e fica verde *(run 40257431839 na `main`, commit `d50f81b`)*
 - Sem ruleset na `main` por enquanto (pergunta 4 do reteste em `seguranca.md`): o repositório não tem colaboradores, então a branch policy dos environments basta. Risco baixo aceito pelo usuário; com colaborador com escrita, criar ruleset na `main` (PR obrigatório, sem bypass) antes de dar o acesso.
 
 **Tests**: none (ação externa; o CI roda a suíte)
@@ -1288,10 +1288,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] **Confirmação específica do usuário em cada passo**: remover o Worker `pelada`, migrar produção e `wrangler deploy`
-- [ ] `curl https://gestaodapelada.ljssoftware.com.br/api/health` = 200 com o SHA do deploy
-- [ ] Contagem de linhas do grupo de teste idêntica antes e depois da migração
-- [ ] Resultado registrado em `.specs/liberacao.md` (skill `liberacao`)
+- [x] **Confirmação específica do usuário em cada passo**: remover o Worker `pelada`, migrar produção e `wrangler deploy` *(2026-10-26: backup, Hyperdrive, remoção do Worker `pelada` e `deploy.yml`, cada um confirmado à parte)*
+- [x] `curl https://gestaodapelada.ljssoftware.com.br/api/health` = 200 com o SHA do deploy *(200, versão `d50f81b…`; raiz 200 `text/html`, manifest 200)*
+- [x] Contagem de linhas do grupo de teste idêntica antes e depois da migração *(backup 40365506581, antes, contra o 40379156441, depois, restaurados no Postgres local: as 20 tabelas do legado idênticas; só aparece a tabela nova `pgmigrations`, 3 linhas)*
+- [ ] Resultado registrado em `.specs/liberacao.md` (skill `liberacao`) *(fica para a fase 11, que cria o arquivo)*
 
 **Tests**: none (ação externa; verificação por `curl` e contagem de linhas registradas)
 **Gate**: build
@@ -1313,9 +1313,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Artefato cifrado baixado e decifrado com a chave privada guardada fora do GitHub
-- [ ] `pg_restore` no Postgres local, pelo `pnpm restaurar` (trava de host, SEC-009); contagem de linhas por tabela conferida contra a produção
-- [ ] Data e contagens registradas no runbook
+- [x] Artefato cifrado baixado e decifrado com a chave privada guardada fora do GitHub *(runs 40365506581 e 40379156441; identidade em `age-pelada`, fora do repositório)*
+- [x] `pg_restore` no Postgres local, pelo `pnpm restaurar` (trava de host, SEC-009); contagem de linhas por tabela conferida contra a produção *(`pg_restore` 16.15; 21 tabelas sem diferença contra a origem lida pelo owner)*
+- [x] Data e contagens registradas no runbook *(registro abaixo da seção 4 do `docs/runbook.md`)*
 
 **Tests**: none (ação operacional; evidência registrada no runbook)
 **Gate**: build

@@ -123,6 +123,15 @@ pessoais e a identidade privada do `age` não pode parar no git (o `.gitignore` 
 9. **Registre** a data, o artefato e a contagem conferida em `.specs/liberacao.md`. A restauração precisa ser
    executada uma vez de ponta a ponta, com a contagem conferida, antes de o backup ser considerado confiável.
 
+Dica para o Windows: o `psql` ignora opções depois da URL, então passe a URL por `-d "<url>"` e o arquivo por `-f`.
+
+Registro das restaurações ensaiadas:
+
+- 2026-10-26, artefato `backup-2026-10-26-40379156441` (run 40379156441): restaurado com `pg_restore` 16.15 pelo
+  `pnpm restaurar` num banco local novo; as 21 tabelas de `public` com a mesma contagem da origem, lida pelo owner.
+- 2026-10-26, artefato `backup-2026-10-26-40365506581` (run 40365506581, antes da migração): as 20 tabelas do legado
+  com as mesmas contagens do backup posterior, o que mostra que a migração não alterou dados.
+
 ## 5. Rotação de segredos
 
 Faça um por vez, confira o `/api/health` e, quando houver deploy, o workflow verde.

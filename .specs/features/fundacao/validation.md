@@ -328,3 +328,107 @@ Comando de `.specs/projeto/testes.json`, mais `checar-tokens`, na árvore real. 
 Lacunas que permanecem, sem bloquear o veredito (todas já registradas na rodada 1): L4 (limite de `LIMITE_WEBHOOK` não fixado na spec), L5 (policies de `auditoria` e `eventos_uso` não exercitadas por falta de grant, e exceção `-- contrair:` que não confere se o ADR existe), L7 (README sem segunda rodada do zero) e o nome das roles (`pelada_app`, `pelada_backup`) diferente da spec.
 
 **Geral**: ✅ Pronto para a entrega. Falta só T47 a T49: push, deploy, migração de produção, backup real com restauração registrada, criação do secret `VITE_SENTRY_DSN` e das contas externas.
+
+
+---
+
+# Rodada 3 — entrega (T47 a T49)
+
+**Data**: 2026-10-26
+**HEAD**: `1644a44` na `main` (código publicado: `d50f81b`). Verificador independente; só este arquivo foi escrito. Produção e Cloudflare/Neon: somente leitura (`gh run view`, `gh api`, `curl` GET).
+
+**Result**: PASS ✅ — os 15 critérios que estavam "pendentes de entrega" têm evidência de execução real (abaixo). Não há lacuna de critério; restam ressalvas e itens do usuário, listados ao fim. Gate local verde (raiz 20, domínio 1, contrato 5, API 346, web 310, checagens 778 com cópia em dobro, 11 e2e e 6 comparações visuais, 0 falhas) e sensor 10/10 mortas.
+
+## Evidências de entrega (execuções reais, GitHub Actions)
+
+| Run | Workflow | Resultado | Fato conferido |
+| --- | -------- | --------- | -------------- |
+| 40257431839 | `ci` (push na `main`, `d50f81b`) | success | jobs `base`, `banco`, `checagens`, `e2e`, `visual` verdes. Runs anteriores `40255389126` e `40256202233` ficaram vermelhos (5 jobs, G-18) e foram corrigidos pelo PR #2: o CI realmente falha quando algo falha |
+| 40370936469 | `deploy` (`workflow_dispatch`, `main`, `d50f81b`) | success, 1m46s | 11 passos na ordem do `deploy.yml`: URL_PUBLICA, build, branch de restauração, dump cifrado (artefato `dump-predeploy-40370936469`, 106.901 bytes), migração (`estado: legado`, `1 registrada(s) sem executar, 2 aplicada(s)`: `roles` e `rls`), cache do Hyperdrive, `wrangler deploy` (`gestaodapelada.ljssoftware.com.br (custom domain)`, binding `HYPERDRIVE` e `VERSAO`), saúde (`Saúde 200 com a versão d50f81b…`); passo de rollback `skipped` |
+| 40365506581 | `backup` (manual) | success | artefato `backup-2026-10-26-40365506581`, 106.907 bytes, `expires_at` = criação + 30 dias, `retention-days: 30` no log |
+| 40379156441 | `backup` (manual, após a migração) | success | artefato `backup-2026-10-26-40379156441`, 146.866 bytes, expira em 2026-11-25 |
+| 40335757122 | `backup` (agendado) | failure | `PG_URL ausente` (secrets ainda vazios); `artifacts total_count = 0`: job vermelho sem artefato parcial (FUN-47 em execução real) |
+
+Produção (GET, 2026-10-26 19:09Z): `/api/health` 200 `{"status":"ok","versao":"d50f81b22090e21e2a3ec4e214feaae072b453e4"}` com `Cache-Control: no-store` e `X-Content-Type-Options: nosniff`; `/` 200 `text/html` com CSP, HSTS (`max-age=31536000`), `referrer-policy`, `nosniff`; `/manifest.webmanifest` 200 (`name` "Gestão da Pelada", `display` standalone, `lang` pt-BR, ícones 192, 512 e 512 maskable); ícones 192 e maskable 200 `image/png`; `/sw.js` 200. Environments `producao` e `backup` existem, com branch policy personalizada; segredos no nível do repositório: 0; repositório `public`.
+
+## Critérios que mudaram de estado (rodada 2 → rodada 3)
+
+Legenda: ✅ verificado com execução real · ✅* verificado com ressalva (descrita na linha).
+
+| Requisito | Resultado esperado pela spec | Evidência (arquivo:linha, run, comando) | Estado |
+| --------- | ---------------------------- | --------------------------------------- | ------ |
+| FUN-18 cache do Hyperdrive desligado | `caching.disabled === true` conferido no deploy | Passo 9 "Conferir o cache do Hyperdrive desligado" do run 40370936469 = success (`deploy.yml:92-100`); falha fechada: `backend/scripts/ops/verificar-cache-hyperdrive.ts:20` lança se `caching.disabled !== true`; `verificar-cache-hyperdrive.test.ts:22-26` (ligado, ausente, vazio, texto e número recusados). STATE.md (Retomada): Hyperdrive `e06363bd…` com cache desligado e origem `pelada_app`, atualizado pelo usuário. Não li a config na Cloudflare (sem credencial, só leitura): prova indireta pelo passo que reprova | ✅* |
+| FUN-19 assets SPA, `/api/*` pelo Hono | SPA fallback nos assets, API pelo Worker | `curl` GET: `/` e `/grupo-qualquer` 200 `text/html` (mesmos 886 bytes, fallback SPA); `/api/inexistente` 404 `application/json` (Hono); `/sw.js` 200; log do deploy: "Read 33 files from the assets directory" e binding `HYPERDRIVE` | ✅ |
+| FUN-27 rota `custom_domain` | domínio publicado | Log do deploy: `gestaodapelada.ljssoftware.com.br (custom domain)`; `curl https://gestaodapelada.ljssoftware.com.br/api/health` 200. Mutação W1 morta | ✅ |
+| FUN-38 `ci.yml` | tudo verde e falha se algo falhar | Run 40257431839 (push, `d50f81b`): `base`, `banco`, `checagens`, `e2e`, `visual` = success; runs 40255389126 e 40256202233 = failure (G-18) antes da correção do PR #2 | ✅ |
+| FUN-39 `deploy.yml` só `workflow_dispatch` na `main`, environment `producao`, sem cancelar | gatilho único, `if main`, `cancel-in-progress:false` | Run 40370936469: evento `workflow_dispatch`, `headSha` `d50f81b`, environment `producao` (`gh api .../environments`: `producao` e `backup` com `custom_branch_policies:true`); `deploy.yml:10,18,20,24`; `deploy-yml.test.mjs:22,25,26,29`. Mutações D2 e D4 mortas | ✅ |
+| FUN-40 ordem dos passos | build, restauração, dump, migração, deploy `--var URL_PUBLICA`, saúde = SHA | Run 40370936469, passos 4 a 11 em ordem, todos success (17:41:41 a 17:43:03); "Saúde 200 com a versão d50f81b22090e21e2a3ec4e214feaae072b453e4" (tentativa 1 devolveu versão vazia, a 2 passou: propagação); `deploy.yml:108` `--var "URL_PUBLICA:${URL_PUBLICA}"`. Mutação D1 morta. Só existia uma branch de restauração, então "manter só as 2 mais recentes" não foi exercido em produção (coberto por `restauracao-neon.test.ts`) | ✅* |
+| FUN-41 build falha: para antes de Neon/Worker | build antes de qualquer passo que toque Neon ou Worker | Ordem real (build 17:41:41-47 antes da branch Neon 17:41:47); `deploy-yml.test.mjs:96`; nenhum `continue-on-error` nem `always()` em `deploy.yml` (grep). Caminho negativo não injetado em produção | ✅* |
+| FUN-42 migração falha: sem `wrangler deploy`; runbook com restauração | `Deploy` depois de `Migrar`, sem `if` | `deploy.yml:85-108`; `deploy-yml.test.mjs:100-101`; `docs/runbook.md:57-77`. Mutação D3 (`if: always()` no Deploy) morta. Caminho negativo não injetado em produção | ✅* |
+| FUN-45 runbook exige remoção do Worker `pelada` e dump antes do 1º deploy | seção "Antes do primeiro deploy" cumprida | `docs/runbook.md:11-24`. Ordem real pelos horários dos runs e pelo STATE.md: backup manual 40365506581 (17:06Z), Hyperdrive atualizado (17:34Z), `wrangler delete pelada` com confirmação do usuário, deploy 17:41Z. A ausência do Worker foi confirmada pela API na sessão anterior (registro no STATE.md; não reverifiquei, sem credencial) | ✅* |
+| FUN-46 `backup.yml` 07:00 UTC e manual, `pg_dump -Fc`, `age`, 30 dias | cron, dispatch, retenção 30 | Runs manuais 40365506581 e 40379156441 = success; artefatos de 106.907 e 146.866 bytes com `expires_at` = criação + 30 dias (`gh api .../artifacts`); log `retention-days: 30`; `backup.yml:9-10,37`; `backup.test.mjs:113,121`. Mutações B1 (cron) e B2 (retenção) mortas. Ressalva: a única execução agendada (run 40335757122) disparou às 14:01Z, não às 07:00Z, e falhou por secrets ainda vazios; a primeira agendada verde ainda não existe e deve ser conferida em 27/10 | ✅* |
+| FUN-47 falha visível, sem artefato parcial | job vermelho, 0 artefato | Em produção: run 40335757122 = failure (`PG_URL ausente`, `dump-cifrado.sh:10`) e `artifacts total_count = 0` | ✅ |
+| FUN-48 restauração executada e registrada | procedimento + registro com data e contagem | `docs/runbook.md:79-126` (procedimento) e `:128-133` (registro de 2026-10-26: runs 40379156441 e 40365506581, `pg_restore` 16.15 pelo `pnpm restaurar`, 21 tabelas sem diferença contra a origem). Ressalvas: as contagens por tabela não estão no runbook (só "mesma contagem"; exemplos no STATE.md: jogadores 57, partidas 231, presencas 6342, pgmigrations 3), e o registro está só na árvore de trabalho, **não commitado** | ✅* |
+| FUN-55 duas execuções juntas | segunda espera | `deploy.yml:22-24` `concurrency: group deploy-producao, cancel-in-progress: false`; `deploy-yml.test.mjs:29`; mutação M11 (rodada 1) morta. O comportamento é do GitHub; não disparei dois deploys (proibido) | ✅* |
+| FUN-25 runbook descreve o monitor do UptimeRobot | seção com passos | `docs/runbook.md:161-170` (seção 7, URL `https://<host>/api/health`). O critério é de documentação; criar a conta e o monitor é ação do usuário e não faz parte do critério | ✅ |
+
+Critérios de sucesso da spec (Success Criteria): clone até o app local (rodadas 1 e 2); `https://gestaodapelada.ljssoftware.com.br/api/health` = 200 com o SHA do último deploy (`d50f81b…`, conferido agora); isolamento no CI (job `banco` verde); banco de produção migrado sem perda (migração `estado: legado`, só `roles` e `rls` aplicadas; as 20 tabelas do legado idênticas entre os backups de antes e depois, mais `pgmigrations` com 3 linhas); restauração executada e registrada; instalabilidade e visual sem divergência no CI (jobs `e2e` e `visual`).
+
+## Itens que eram "pendente do usuário" e agora estão feitos
+
+- Instalação do PWA no Chrome desktop (botão Instalar) e no celular: confirmada pelo usuário na sessão (declaração dele, não reproduzida por mim). Fecha o item manual do Independent Test de FUN-36 e o de T20. Conferência de fora: manifest 200 válido, ícones 192, 512 e maskable 200, `sw.js` 200.
+- Rotas `/vitrine/*`: só existem com `VITE_VITRINE=1` (`frontend/web/src/app/rotas.tsx:5-17`). O servidor responde 200 com o `index.html` (fallback SPA) e o roteador do React mostra a tela de erro, por desenho. As 3 telas de vitrine são cobertas pelo `visual` (6 comparações, máx. 0,65%), não pelo site publicado.
+
+## Gate (rodada 3)
+
+Comando de `.specs/projeto/testes.json` na árvore real (`HEAD 1644a44`), Postgres local `fundacao-db-1`.
+
+- O Docker Desktop reiniciou durante a rodada e derrubou `fundacao-db-1`. Religuei só esse container (`docker start fundacao-db-1`, saudável) e rodei de novo; os outros containers não foram tocados.
+- `pnpm lint`, `pnpm format:check`, `pnpm typecheck`: código 0.
+- `pnpm test`: raiz 20, domínio 1, contrato 5, API 346 (17 arquivos), web 310 (35 arquivos). `pnpm test:checagens`: 36 arquivos, 778 testes, 0 falhas, 0 pulados. O número é o dobro do real (389) porque o filtro `backend/scripts` também casa a cópia em `.worktrees/fundacao` (ignorada pelo git), que tem os mesmos 18 arquivos de teste.
+- `pnpm --filter @pelada/web build`, e2e (11 aprovados) e `visual` (6 comparações, máx. 0,65%): código 0.
+- `python .claude/scripts/checar-tokens.py frontend/web/src --permitir tokens.css`: "OK: nenhuma cor ou fonte fora do tokens.css".
+- API passou de 343 (rodada 2) para 346 testes; nenhum teste foi removido nesta faixa.
+
+## Sensor de discriminação (rodada 3)
+
+Cópia isolada: `git worktree add --detach` no scratchpad, `pnpm install --frozen-lockfile --offline`, `.env` copiado. Linha de base na cópia: `deploy-yml.test.mjs` e `backup.test.mjs` com 32 passando; `wrangler.test.ts` com 18 passando. Cópia removida (`git worktree list` só com `main` e `.worktrees/fundacao`); `git status --porcelain` da árvore real igual ao de antes (só este arquivo a mais). As primeiras mutações W1 a W3 vazaram entre si (o `git checkout` rodou só na subpasta); descartei esse resultado e refiz em cópia nova, restaurando o arquivo a cada mutação.
+
+| Mutação | Arquivo | Descrição | Morta? |
+| ------- | ------- | --------- | ------ |
+| D1 | `.github/workflows/deploy.yml` | Tirou `--var "URL_PUBLICA:${URL_PUBLICA}"` do `wrangler deploy` | ✅ morta (1 falha) |
+| D2 | idem | Removeu `environment: producao` | ✅ morta (3) |
+| D3 | idem | `if: always()` no passo Deploy (publicaria após migração falha) | ✅ morta (2) |
+| D4 | idem | Gatilho extra `push` | ✅ morta (1) |
+| B1 | `.github/workflows/backup.yml` | cron `0 7` para `0 8` | ✅ morta (1) |
+| B2 | idem | `retencao` `30` para `7` | ✅ morta (1) |
+| B3 | idem | Removeu `environment: backup` | ✅ morta (2) |
+| W1 | `wrangler.jsonc` | `custom_domain: true` para `false` | ✅ morta (1) |
+| W2 | idem | `run_worker_first` `["/api/*"]` para `[]` | ✅ morta (1) |
+| W3 | idem | Tirou `nodejs_compat` | ✅ morta (1) |
+
+**Profundidade**: leve, dirigida ao que esta rodada fecha (deploy, backup, Worker). **Resultado**: 10/10 mortas, 0 sobreviveram. As mutações das rodadas 1 e 2 (20 + 7) seguem valendo para o código que não mudou desde então.
+
+## Segurança (`seguranca.md`)
+
+Nenhum achado crítico ou alto em aberto. Corrigidos: SEC-001 e SEC-002 (médios), SEC-004, SEC-009, SEC-010 e SEC-011 (baixos) — tabela "Correções" (`seguranca.md:282-295`) e "Situação após o reteste: Nenhum crítico ou alto" (`seguranca.md:471`). Abertos, todos baixos: SEC-003, SEC-005, SEC-006, SEC-007, SEC-008. Observações desta rodada: SEC-007 cita vulnerabilidade "alta" do `zod`, mas só em dependência de desenvolvimento (plugin de testes), por isso classificada baixa; SEC-008 segue verdadeira (`wrangler.jsonc` não declara `workers_dev` nem `preview_urls`); SEC-006 pesa mais porque o repositório agora é público (`gh api`: `visibility: public`). SEC-001 está efetiva no GitHub: `producao` e `backup` com branch policy e 0 secrets no nível do repositório (`gh api .../actions/secrets`: `total_count 0`).
+
+## Lacunas e ressalvas restantes (nenhuma bloqueia o veredito)
+
+1. **Registro não commitado**: as evidências de T47 a T49 (`docs/runbook.md:123-133`, `tasks.md:1265-1319`, `STATE.md`) e o commit `1644a44` estão só na cópia local; este `validation.md` também. Precisam de commit e push (com confirmação e trava de testes) para existir no repositório.
+2. **L8 (baixo, novo)**: em rota inexistente do front (`/vitrine/*` em produção, `/grupo-qualquer`) aparece a tela de erro padrão do React Router, porque `frontend/web/src/app/rotas.tsx:19-20` só tem a rota `/` e nenhum `errorElement` nem rota `*`. O HTTP é 200 (fallback SPA), não 404. Não fere critério da spec; tratar na feature de telas.
+3. **FUN-46**: primeira execução agendada verde ainda não observada (a de 26/10 foi 14:01Z e falhou por secrets vazios). Conferir o run de 27/10 em torno de 07:00Z.
+4. **T1 e T2 (seguem abertos, ação do usuário)**: apagar a branch Neon `spike-descartavel` e o Hyperdrive `spike-s1` (`tasks.md:135,163`). Não verificável por mim (sem acesso às contas). Não é critério FUN.
+5. **T16 item 3 (`tasks.md:514`)**: o critério está provado (FUN-18), mas a caixa continua `[ ]`; marcar com a referência ao run 40370936469.
+6. **T48**: "Resultado registrado em `.specs/liberacao.md`" fica para a fase 11 (`tasks.md:1294`).
+7. **Caminhos negativos de deploy (FUN-41, FUN-42, FUN-55)** estão provados por teste estrutural e sensor, não por execução real com erro injetado; é o limite do que se faz sem escrever em produção.
+8. Lacunas das rodadas anteriores, sem mudança: L4 (limite de `LIMITE_WEBHOOK`), L5 (policies de `auditoria` e `eventos_uso`; `-- contrair:` sem conferir o ADR), L7 (README sem segunda rodada) e o nome das roles (`pelada_app`, `pelada_backup`) diferente da spec. Cosmético novo: `pnpm test:checagens` na raiz roda também a cópia de `.worktrees/fundacao`.
+
+## Rastreabilidade (proposta; não editei a spec)
+
+| Requisito | Estado anterior | Novo estado |
+| --------- | --------------- | ----------- |
+| FUN-18, FUN-19, FUN-25, FUN-27, FUN-38 a FUN-42, FUN-45, FUN-46, FUN-48, FUN-55 | 🕓 pendente de entrega | ✅ Verificado (com as ressalvas acima) |
+| Os demais requisitos | ✅ | ✅ (sem mudança) |
+
+**Geral**: ✅ Pronto para a fase 11 (liberação), depois de commitar o registro (ressalva 1).
