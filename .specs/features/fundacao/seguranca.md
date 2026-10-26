@@ -290,8 +290,11 @@ Em 2026-10-25, depois da auditoria, um commit por achado, cada um com teste que 
 | SEC-002 | Corrigido: só `content-type`, `content-length` e `x-pelada` saem; IP, país e user-agent não | `e9c95eb` | `backend/api/test/rotas/sentry-com-dsn.test.ts`, `sentry.test.ts` |
 | SEC-004 | Corrigido no `dump-cifrado.sh` e no CI (digest de 2026-10-25); G-24 confere imagens. `docker-compose.yml` local segue por tag (pergunta pendente) | `c56c2d2` | `checar-acoes-fixadas.test.mjs`, `backup.test.mjs` |
 | SEC-009 | Corrigido: `pnpm restaurar` com a trava de host, recusa `--alvo producao` e o host de `URL_ORIGEM` | `1c16e75` | `backend/scripts/ops/test/restaurar.test.ts` |
+| SEC-009 (reteste: parcial) | Corrigido: com destino remoto, `URL_ORIGEM` é obrigatória, e origem e destino são comparados pelo endpoint do Neon (sem `-pooler`, minúsculas, sem ponto final) | `a4e09a6` | `backend/scripts/ops/test/restaurar.test.ts` |
+| SEC-010 | Corrigido: o teste de secrets conta `secrets['X']`, `toJSON(secrets)` e `secrets: inherit`; a G-24 confere `docker container run`, `docker create`, `docker container create`, `podman run` e opções globais antes do subcomando | `70d165a` | `segredos-workflows.test.mjs`, `checar-acoes-fixadas.test.mjs` |
+| SEC-011 | Corrigido: lista de permissão na consulta da URL (`sslmode`, `channel_binding`, `connect_timeout`, `application_name`), `password=` recusado, `pg_restore` com ambiente limpo (nenhum `PG*` herdado além do `PGPASSWORD`) | `da885b2` | `backend/scripts/ops/test/restaurar.test.ts` |
 
-SEC-003, SEC-005, SEC-006, SEC-007 e SEC-008 seguem abertos (baixos).
+SEC-003, SEC-005, SEC-006, SEC-007 e SEC-008 seguem abertos (baixos). As linhas do reteste (SEC-009 parcial, SEC-010 e SEC-011) foram corrigidas depois da seção "Reteste" abaixo, que fica como registro.
 
 ## Perguntas para o usuário
 

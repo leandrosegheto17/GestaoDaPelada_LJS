@@ -1266,6 +1266,7 @@ T47 → T48 → T49
 - [ ] Environment `producao` (variável `URL_PUBLICA`; secrets `NEON_URL_MIGRACAO`, `NEON_API_KEY`, `NEON_PROJECT_ID`, `BACKUP_CHAVE`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `VITE_SENTRY_DSN`) e environment `backup` (secrets `NEON_URL_BACKUP` e `BACKUP_CHAVE`), ambos restritos à `main`; "Repository secrets" vazio
 - [ ] Checagem final: `python .claude/scripts/trava-testes.py --rodar` verde, resultado mostrado
 - [ ] O CI roda no primeiro push e fica verde
+- Sem ruleset na `main` por enquanto (pergunta 4 do reteste em `seguranca.md`): o repositório não tem colaboradores, então a branch policy dos environments basta. Risco baixo aceito pelo usuário; com colaborador com escrita, criar ruleset na `main` (PR obrigatório, sem bypass) antes de dar o acesso.
 
 **Tests**: none (ação externa; o CI roda a suíte)
 **Gate**: build
