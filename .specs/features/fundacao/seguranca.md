@@ -279,6 +279,20 @@ financeiro), credenciais do Neon e da Cloudflare, dumps cifrados.
 - Neon: roles e senhas de produção, ausência de outros usuários com `bypassrls` na origem.
 - semgrep e osv-scanner (não instalados).
 
+## Correções
+
+Em 2026-10-25, depois da auditoria, um commit por achado, cada um com teste que falhava antes (detalhes e desvios no
+`tasks.md`, seção "Correções da auditoria de segurança"). Os achados acima ficam como registro.
+
+| Achado | Situação | Commit | Teste |
+|---|---|---|---|
+| SEC-001 | Corrigido no código e no runbook. Falta criar os environments no GitHub (T47) e, se algum secret já esteve no nível do repositório, girá-lo | `221c000`, `fae82d2` | `backend/scripts/ops/test/segredos-workflows.test.mjs` |
+| SEC-002 | Corrigido: só `content-type`, `content-length` e `x-pelada` saem; IP, país e user-agent não | `e9c95eb` | `backend/api/test/rotas/sentry-com-dsn.test.ts`, `sentry.test.ts` |
+| SEC-004 | Corrigido no `dump-cifrado.sh` e no CI (digest de 2026-10-25); G-24 confere imagens. `docker-compose.yml` local segue por tag (pergunta pendente) | `c56c2d2` | `checar-acoes-fixadas.test.mjs`, `backup.test.mjs` |
+| SEC-009 | Corrigido: `pnpm restaurar` com a trava de host, recusa `--alvo producao` e o host de `URL_ORIGEM` | `1c16e75` | `backend/scripts/ops/test/restaurar.test.ts` |
+
+SEC-003, SEC-005, SEC-006, SEC-007 e SEC-008 seguem abertos (baixos).
+
 ## Perguntas para o usuário
 
 1. **O repositório `GestaoDaPelada_LJS` no GitHub é público?** (afeta SEC-006 e o peso de SEC-001)

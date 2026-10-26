@@ -1313,11 +1313,22 @@ T47 → T48 → T49
 **Done when**:
 
 - [ ] Artefato cifrado baixado e decifrado com a chave privada guardada fora do GitHub
-- [ ] `pg_restore` no Postgres local; contagem de linhas por tabela conferida contra a produção
+- [ ] `pg_restore` no Postgres local, pelo `pnpm restaurar` (trava de host, SEC-009); contagem de linhas por tabela conferida contra a produção
 - [ ] Data e contagens registradas no runbook
 
 **Tests**: none (ação operacional; evidência registrada no runbook)
 **Gate**: build
+
+---
+
+## Correções da auditoria de segurança (`seguranca.md`)
+
+Feitas depois da validação, uma por commit, com teste que falhava antes da correção. Desvios e decisões:
+
+- **SEC-001** (`221c000`, `fae82d2`): `backup.yml` no environment `backup`; todos os secrets só nos environments `producao` e `backup` (T47 atualizada). `BACKUP_CHAVE` fica nos dois (é a chave pública). Teste: `backend/scripts/ops/test/segredos-workflows.test.mjs`.
+- **SEC-002** (`e9c95eb`): lista de permissão de cabeçalhos no Sentry do Worker: `content-type`, `content-length` e `x-pelada`. SPEC_DEVIATION: o auditor sugeria permitir `user-agent`; ficou de fora (é identificador da pessoa), e `x-pelada` entrou porque o teste existente de `limparEvento` já o exigia. Observado no teste: antes da correção, o que saía era o `User-Agent`; os valores de IP já eram cortados pela integração `RequestData` do SDK (`userInfo: false`); a lista de permissão garante os dois.
+- **SEC-004** (`c56c2d2`): `postgres:16@sha256:9e2cf6287f25c3151f4c9421ccce2b17f3e60061c111a29165e0d2cdd9ff0a97` (índice multi-arch, consultado em 2026-10-25) no `dump-cifrado.sh` e no service do CI; `checar-acoes-fixadas.mjs` (G-24) passa a exigir digest em `services`, `container` e `docker run`. Pendente: `docker-compose.yml` segue em `postgres:16` por tag (só local, sem credencial real), porque `docker-compose.test.ts` exige o texto exato e mudar teste existente pede aprovação.
+- **SEC-009** (`1c16e75`): `pnpm restaurar` (`backend/scripts/ops/restaurar.ts`) chama `exigirHostPermitido` antes do `pg_restore --clean`. Regras além da trava (da recomendação do auditor e do "nunca a URL de produção" do runbook): `--alvo producao` é sempre recusado, e destino no mesmo host de `URL_ORIGEM` também. A senha vai em `PGPASSWORD`. Runbook §4 e `.env.example` atualizados.
 
 ---
 
