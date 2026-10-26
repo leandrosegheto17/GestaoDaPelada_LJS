@@ -511,7 +511,7 @@ T47 → T48 → T49
 
 - [x] Teste de config confere `single-page-application`, `run_worker_first: ["/api/*"]`, `nodejs_compat`, bindings `LIMITE_ENTRAR` (10/min), `LIMITE_PUBLICO` (60/min) e `LIMITE_WEBHOOK`, e a rota com `custom_domain: true` *(`backend/api/test/config/wrangler.test.ts`, com a lista fechada de chaves do legado mais `routes`. O número do `LIMITE_WEBHOOK` não está na spec: 60/min provisório, marcado `[A ESCLARECER]` no `wrangler.jsonc`; o teste só exige o binding)*
 - [x] Testes de API migrados para `@cloudflare/vitest-plugin` (codemod oficial), com `compatibility_date` conforme o ADR a escrever na T44 *(o worktree não tinha testes de workerd: o vitest da API ganhou os projetos `node` e `workers` com `cloudflareTest` do `@cloudflare/vitest-plugin` 1.4.7, que é o que o codemod troca no import do legado; nenhum teste existente mudou. `compatibility_date` = `2026-10-19`, a data do workerd 1.20261019.1 do plugin, conferida por teste)*
-- [ ] A origem do Hyperdrive aponta para `pelada_app` e o cache fica desligado (conferência fica no deploy, T39) *(em aberto: são propriedades da config do Hyperdrive na Cloudflare, não do `wrangler.jsonc`; o arquivo só documenta e o local usa `pelada_app`)*
+- [x] A origem do Hyperdrive aponta para `pelada_app` e o cache fica desligado (conferência fica no deploy, T39) *(fechado em 2026-10-26: Hyperdrive `e06363bd…` com origem `pelada_app` e cache desligado, conferido pelo usuário e pelo passo do `deploy.yml` no run 40370936469; provado pelo verificador na rodada 3, `validation.md`, FUN-18. Antes: são propriedades da config do Hyperdrive na Cloudflare, não do `wrangler.jsonc`; o arquivo só documenta e o local usa `pelada_app`)*
 - [x] Gate full passa *(lint, format, typecheck, `pnpm test`, `pnpm test:checagens`; o e2e do web só existe a partir da Fase 6)*
 
 **Tests**: unit
@@ -1291,7 +1291,7 @@ T47 → T48 → T49
 - [x] **Confirmação específica do usuário em cada passo**: remover o Worker `pelada`, migrar produção e `wrangler deploy` *(2026-10-26: backup, Hyperdrive, remoção do Worker `pelada` e `deploy.yml`, cada um confirmado à parte)*
 - [x] `curl https://gestaodapelada.ljssoftware.com.br/api/health` = 200 com o SHA do deploy *(200, versão `d50f81b…`; raiz 200 `text/html`, manifest 200)*
 - [x] Contagem de linhas do grupo de teste idêntica antes e depois da migração *(backup 40365506581, antes, contra o 40379156441, depois, restaurados no Postgres local: as 20 tabelas do legado idênticas; só aparece a tabela nova `pgmigrations`, 3 linhas)*
-- [ ] Resultado registrado em `.specs/liberacao.md` (skill `liberacao`) *(fica para a fase 11, que cria o arquivo)*
+- [x] Resultado registrado em `.specs/liberacao.md` (skill `liberacao`) *(fase 11, 2026-10-26, commit `9de5016`)*
 
 **Tests**: none (ação externa; verificação por `curl` e contagem de linhas registradas)
 **Gate**: build
