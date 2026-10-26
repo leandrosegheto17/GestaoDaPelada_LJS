@@ -131,7 +131,7 @@ O Gestão da Pelada vai ser recriado do zero no padrão LJS Software. Antes de q
 6. IF o usuário abre o app sem conexão numa rota que não está em cache THEN o service worker SHALL mostrar a página offline, no visual do legado. [FUN-34]
 7. WHEN o app é aberto no Safari do iOS fora do modo standalone THEN o front SHALL mostrar a instrução de instalação do legado (`pwa/instalacao.ts`). [FUN-35]
 8. WHEN o CI roda o teste de instalabilidade (Playwright contra o build) THEN ele SHALL confirmar o manifest válido (FUN-32), o service worker ativo controlando a página, os ícones 192 e 512 (um `maskable`) acessíveis e a página offline servida sem rede. Isso substitui o "Lighthouse PWA ≥ 90" do padrão LJS, porque a categoria PWA saiu do Lighthouse (decisão do usuário em 2026-10-24, AD-005). [FUN-36]
-9. The comparação visual (porta do `comparar-visual` do legado, limite de 1% de pixels, viewports de 1280×800 e 390×844) SHALL rodar no CI e falhar se uma tela ativa divergir de `.specs/mockup/telas.json`. Na fundação, a lista de telas ativas cobre só a página provisória e o guia de componentes. [FUN-37]
+9. The comparação visual (porta do `comparar-visual` do legado, limite de 1% de pixels, viewports de 1280×800 e 390×844) SHALL rodar no CI e falhar se uma tela ativa divergir de `.specs/mockup/telas.json`. Na fundação, a lista de telas ativas cobre as 3 telas de vitrine do mockup (erro de rede, carregando em lista e grupo indisponível); a página provisória não é comparada. [FUN-37]
 
 **Independent Test**: instalar o PWA a partir do build local no Chrome do Android e no Safari do iOS, abrir sem rede e ver a página offline. A comparação visual e a instalabilidade ficam verdes no CI.
 
