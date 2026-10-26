@@ -4,7 +4,8 @@ import { restaurar } from './restaurar.ts';
 
 /**
  * `pnpm restaurar --arquivo dump.pgdump [--alvo teste]`, com o destino em `DATABASE_URL` (runbook, seção 4).
- * Opcionais: `URL_ORIGEM` (produção; recusa destino no mesmo host) e `PG_RESTORE` (caminho do `pg_restore` 16).
+ * `URL_ORIGEM` (produção) é obrigatória com destino remoto: recusa destino no mesmo endpoint do Neon. Opcional:
+ * `PG_RESTORE` (caminho do `pg_restore` 16).
  */
 async function principal(): Promise<number> {
   return restaurar({

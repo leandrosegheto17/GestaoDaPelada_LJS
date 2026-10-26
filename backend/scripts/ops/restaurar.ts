@@ -1,5 +1,10 @@
 import { existsSync } from 'node:fs';
-import { exigirHostPermitido, hostDaUrl, HostRecusado } from '../../api/src/infraestrutura/seguranca/trava-host.ts';
+import {
+  exigirHostPermitido,
+  hostDaUrl,
+  hostELocal,
+  HostRecusado,
+} from '../../api/src/infraestrutura/seguranca/trava-host.ts';
 
 /**
  * Restauração de um dump (`docs/runbook.md`, seção 4, passo 5) com a trava de host antes de qualquer escrita (SEC-009,
@@ -7,7 +12,9 @@ import { exigirHostPermitido, hostDaUrl, HostRecusado } from '../../api/src/infr
  * - a trava de host vale como no `pnpm migrar`: host local passa; host remoto exige `--alvo teste` e a confirmação
  *   digitada do host (ou `CI=true`);
  * - `--alvo producao` é sempre recusado: a restauração vai para uma branch nova ou um banco local, nunca para produção;
- * - com `URL_ORIGEM` (a origem de produção, a mesma do passo 6 do runbook), destino no mesmo host é recusado.
+ * - destino remoto exige `URL_ORIGEM` (a origem de produção, a mesma do passo 6 do runbook), e destino no mesmo
+ *   endpoint do Neon é recusado. A comparação é pelo identificador do endpoint (o primeiro rótulo do host, sem o
+ *   sufixo `-pooler`, em minúsculas e sem ponto final), então o pooler e o host com ponto final contam como o mesmo.
  * A senha sai da URL e vai em `PGPASSWORD`, fora da linha de comando. Nenhuma mensagem traz a URL.
  */
 export interface OpcoesRestaurar {
@@ -17,13 +24,19 @@ export interface OpcoesRestaurar {
   arquivo: string | undefined;
   alvo?: string | undefined;
   ci?: string | undefined;
-  /** URL da origem de produção (`URL_ORIGEM`), opcional. */
+  /** URL da origem de produção (`URL_ORIGEM`), obrigatória quando o destino é remoto. */
   urlOrigem?: string | undefined;
   confirmar?: () => string | Promise<string>;
   /** Roda o comando e devolve o código de saída. */
   executar: (comando: string, args: string[], env: Record<string, string>) => number | Promise<number>;
   /** Binário do `pg_restore` (PostgreSQL 16). Padrão: `pg_restore` do PATH. */
   comando?: string | undefined;
+}
+
+/** Identificador do endpoint do Neon: primeiro rótulo do host, sem `-pooler`, em minúsculas e sem ponto final. */
+export function endpointDoHost(host: string): string {
+  const [primeiro = ''] = host.toLowerCase().replace(/\.+$/, '').split('.');
+  return primeiro.replace(/-pooler$/, '');
 }
 
 export async function restaurar(opcoes: OpcoesRestaurar): Promise<number> {
@@ -36,8 +49,18 @@ export async function restaurar(opcoes: OpcoesRestaurar): Promise<number> {
     ci: opcoes.ci,
     confirmar: opcoes.confirmar,
   });
-  if (opcoes.urlOrigem && hostDaUrl(opcoes.urlOrigem) === host) {
-    throw new HostRecusado(`Destino no mesmo host da origem (${host}): restaure numa branch nova ou no banco local.`);
+  if (!hostELocal(host)) {
+    if (!opcoes.urlOrigem) {
+      throw new HostRecusado(
+        'Destino remoto: informe URL_ORIGEM (a origem de produção) para a trava conferir o endpoint.',
+      );
+    }
+    const endpoint = endpointDoHost(host);
+    if (endpointDoHost(hostDaUrl(opcoes.urlOrigem)) === endpoint) {
+      throw new HostRecusado(
+        `Destino no mesmo host da origem (mesmo endpoint ${endpoint}): restaure numa branch nova ou no banco local.`,
+      );
+    }
   }
   if (!opcoes.arquivo || !existsSync(opcoes.arquivo)) {
     throw new Error('Informe --arquivo com o dump decifrado (dump.pgdump).');

@@ -102,7 +102,8 @@ pessoais e a identidade privada do `age` não pode parar no git (o `.gitignore` 
    `DATABASE_URL="$URL_NOVA" URL_ORIGEM="$URL_ORIGEM" pnpm restaurar --arquivo <pasta-temporária>/dump.pgdump --alvo teste`
    (no banco local, sem `--alvo`). Ele roda `pg_restore --no-owner --no-privileges --clean --if-exists` com a senha em
    `PGPASSWORD`, fora da linha de comando. Recusa: host remoto sem `--alvo teste` e sem a confirmação digitada do host;
-   `--alvo producao` sempre; destino no mesmo host de `URL_ORIGEM` (a origem de produção, a mesma do passo 6). Outro
+   `--alvo producao` sempre; destino remoto sem `URL_ORIGEM` (a origem de produção, a mesma do passo 6); destino no
+   mesmo endpoint do Neon que a origem (o pooler `-pooler` e o host com ponto final contam como o mesmo). Outro
    `pg_restore` 16: `PG_RESTORE=<caminho>`. Nunca rode o `pg_restore --clean` à mão. Como o dump sai sem
    privilégios, reaplique os grants e a senha de login depois:
    `psql "$URL_NOVA" -f backend/api/src/infraestrutura/db/migracoes/1792843260000_roles.sql` (idempotente) e
