@@ -308,3 +308,173 @@ SEC-003, SEC-005, SEC-006, SEC-007 e SEC-008 seguem abertos (baixos).
 3. **O `SENTRY_DSN` do Worker já está configurado?** (SEC-002)
    - Não (Recomendado: corrigir antes de configurar): nenhum IP saiu ainda.
    - Sim: corrigir já e avaliar apagar do projeto Sentry os eventos com cabeçalhos de IP.
+
+## Reteste
+
+**Data:** 2026-10-25 · **Commit:** `1351181` (correções em `743658b..HEAD`) · **Auditor:** agente `auditor-seguranca`
+**Escopo:** só SEC-001, SEC-002, SEC-004 e SEC-009, mais regressões desses commits. As mutações rodaram num worktree
+temporário fora do projeto (já removido). O teste do Worker usou o banco temporário `teste_auditoria_worker` no
+`fundacao-db-1`, apagado ao fim (conferido: 0 bancos `teste_auditoria_*`). Nada rodou contra Neon, Cloudflare ou
+GitHub. A única consulta externa foi a leitura pública do índice da imagem no Docker Hub (`imagetools inspect`).
+Sondas: `reteste-sec009.mjs` na pasta de rascunho da sessão; a sonda do Worker foi um teste temporário dentro do
+worktree removido.
+
+| Achado | Veredito | Resumo |
+|---|---|---|
+| SEC-001 | **Corrigido** (no código) | O `backup.yml` declara `environment: backup`. Os segredos de deploy só aparecem no job `producao`. O runbook §2, a T47 e o `.env.example` estão coerentes com os workflows. Falta a configuração no GitHub (T47). A guarda de regressão tem lacunas (SEC-010) |
+| SEC-002 | **Corrigido** | Nenhum IP, país, user-agent ou cabeçalho de resposta chega ao envelope |
+| SEC-004 | **Corrigido** (CI e dump) | O digest é de um índice OCI multi-arch real e a G-24 recusa tag mutável. O `docker-compose.yml` local segue por tag (pergunta pendente). A checagem tem lacunas (SEC-010) |
+| SEC-009 | **Parcial** | A trava de host funciona e recusa `--alvo producao`. A recusa do host de produção, porém, depende de `URL_ORIGEM` (opcional) e de comparação literal. A libpq ainda aceita desvios do destino (SEC-011) |
+
+### SEC-001: corrigido no código
+
+- `.github/workflows/backup.yml:24` declara `environment: backup`. `deploy.yml:20` declara `environment: producao` e
+  concentra `NEON_URL_MIGRACAO`, `NEON_API_KEY`, `NEON_PROJECT_ID`, `CLOUDFLARE_*`, `VITE_SENTRY_DSN` e `BACKUP_CHAVE`.
+  O `ci.yml` usa só o `GITHUB_TOKEN`. As permissões seguem em `contents: read`.
+- O runbook (§2, §5, §8), a T47 ("Repository secrets" vazio, dois environments restritos à `main`) e o `.env.example`
+  listam os mesmos secrets que os workflows usam.
+- `segredos-workflows.test.mjs` com mutação (worktree temporário):
+
+  | Mutação | Resultado |
+  |---|---|
+  | Tirar o `environment: backup` | 2 falhas |
+  | Trocar o secret do backup por `NEON_URL_MIGRACAO` | 2 falhas |
+  | Job novo no CI com `secrets.X` e `environment: ${{ github.ref_name }}` | 1 falha |
+  | Job sem environment com `secrets['NEON_URL_BACKUP']` | **passa** |
+  | Job sem environment com `toJSON(secrets)` | **passa** |
+  | Job sem environment com `secrets: inherit` | **passa** |
+
+  As três últimas formas ficam registradas em SEC-010.
+- Ainda fora do alcance local: criar os environments com a branch policy, deixar vazio o nível do repositório e girar
+  as credenciais se algum secret já esteve lá (T47). Ver a pergunta 4.
+
+### SEC-002: corrigido
+
+- `backend/api/src/entrada/sentry.ts`: `httpHeaders: { request: { allow: [content-type, content-length, x-pelada] },
+  response: false }`, e o `limparEvento` agora usa lista de permissão por nome exato.
+- Reprodução pelo SDK real (`@sentry/cloudflare` 11.9.0 no workerd, `fetch` espiado, DSN fictício). A requisição levou
+  `CF-Connecting-IP`, `X-Forwarded-For`, `X-Real-IP`, `CF-IPCountry`, `User-Agent`, `True-Client-IP` e `Forwarded`,
+  além de nomes que contêm as palavras permitidas (`X-Content-Type-Ip`, `X-Pelada-Ip`):
+  ```
+  RETESTE eventos: 1 headers: [{"content-type":"application/json","x-pelada":"1"}]
+  RETESTE user: [null] contexts: [["trace","cloud_resource","runtime"]]
+  ```
+  Nenhum dos valores (`200.1.2.*`, país, UA) nem `ip_address` aparece no envelope.
+- Cabeçalho de resposta: uma rota que define `X-Resposta-Secreta` e lança erro gera envelope sem o valor e sem
+  contexto `response`.
+- `sentry-com-dsn.test.ts` e `sentry.test.ts`: verdes (14 testes no total, com a sonda).
+- Observação sem severidade: o SDK põe `user_agent.original` como atributo do span sem passar pela lista de permissão
+  (`@sentry/cloudflare .../wrapRequestHandlerWithInit.js`). Spans só saem com tracing, e o projeto não define
+  `tracesSampleRate`, então hoje nada sai. Se o tracing for ligado, o UA vai nas transações, que não passam pelo
+  `beforeSend`. Nesse caso, usar `beforeSendTransaction`.
+
+### SEC-004: corrigido no dump e no CI
+
+- `dump-cifrado.sh:33` e `ci.yml:48` usam `postgres:16@sha256:9e2cf628...0a97`.
+- `docker buildx imagetools inspect` mostra MediaType `application/vnd.oci.image.index.v1+json` (índice multi-arch),
+  com `linux/amd64` presente (versão 16.15, criada em 2026-10-21, base `debian:trixie-slim`). Hoje a tag `postgres:16`
+  resolve para o mesmo digest.
+- `checar-acoes-fixadas.mjs` com mutação: a tag mutável no `docker run` do `.sh` sai com código 1. Também acusa a tag
+  no `services.postgres.image`, com `--network host`, com a imagem entre aspas e em `uses: docker://postgres:16`. Não
+  detecta `docker container run`, `docker --log-level error run` nem `docker create` (SEC-010).
+- Detalhe sem severidade: a mensagem aponta a linha do comentário (`dump-cifrado.sh:30`) e não a do `docker run`,
+  porque o `linhaDe` pega a primeira ocorrência do texto.
+- `checar-acoes-fixadas.test.mjs`, `backup.test.mjs` e `restaurar.test.ts`: 72 testes verdes.
+
+### SEC-009: parcial
+
+- `pnpm restaurar` = `node backend/scripts/ops/restaurar-cli.ts`, que chama `restaurar()`, que chama
+  `exigirHostPermitido` antes do `pg_restore`.
+- **Recusados** (biblioteca e CLI real, `PG_RESTORE` inexistente para provar que nada rodou):
+  - host do Neon sem `--alvo`;
+  - `--alvo producao` (com host local, e com `CI=true` mais a confirmação certa);
+  - mesmo host de `URL_ORIGEM` (também em maiúsculas);
+  - `?host=`, `?%68ost=` e `?hostaddr=`;
+  - vários hosts e socket `%2F`;
+  - `--alvo teste` sem TTY;
+  - `--alvo=producao`.
+- Nenhuma mensagem traz senha ou usuário.
+- **Senha fora do argv:** confirmado. O argv leva `postgres://p@host/db` e a senha (inclusive `%40`) vai em
+  `PGPASSWORD`. Exceção: senha passada em `?password=` continua no argv (SEC-011).
+- **Aceitos, apontando para o endpoint de produção** (`restaurar.ts:39` compara o texto do host e só quando
+  `URL_ORIGEM` existe):
+  - sem `URL_ORIGEM` (o runbook o mostra, mas o script o trata como opcional), com `--alvo teste` e a confirmação
+    digitada do host de produção;
+  - destino `ep-producao-9-pooler...` contra a origem `ep-producao-9...` (mesmo endpoint do Neon por outro nome);
+  - destino com ponto final (`...neon.tech.`).
+- **Correção recomendada:** tornar `URL_ORIGEM` obrigatória quando o host é remoto (ou trocar por `HOST_PRODUCAO`, só
+  o host, sem credencial). Comparar pelo id do endpoint do Neon (`ep-...`, sem `-pooler` e sem ponto final). Com
+  `--alvo teste`, recusar destino cujo endpoint seja o de produção. Cobrir no `restaurar.test.ts` os três casos acima.
+
+### Achados novos
+
+#### SEC-010 [BAIXO] As guardas de regressão de SEC-001 e SEC-004 deixam passar formas equivalentes
+
+- **Evidência:**
+  - `backend/scripts/ops/test/segredos-workflows.test.mjs:15` reconhece só `secrets.NOME`. Ficam de fora
+    `secrets['NOME']`, `toJSON(secrets)` e `secrets: inherit`; as três mutações passaram.
+  - `backend/scripts/checagens/checar-acoes-fixadas.mjs:71` reconhece só `docker run`. Ficam de fora
+    `docker container run`, opções globais antes do `run` e `docker create`; as três mutações passaram.
+- **Por que baixo:** são guardas contra regressão acidental, não fronteira de segurança. Quem tem escrita no
+  repositório altera o próprio teste. O controle real de SEC-001 é a configuração do GitHub.
+- **Correção:**
+  - No teste de secrets, tratar qualquer ocorrência de `secrets` numa expressão (`/\bsecrets\b/` fora de
+    `secrets.GITHUB_TOKEN`) e `secrets: inherit` como uso de secret.
+  - Na G-24, casar `docker\s+(?:[-\w=]+\s+)*?(?:container\s+)?(?:run|create)` e também `podman run`.
+  - Acrescentar as mutações acima como casos de teste.
+
+#### SEC-011 [BAIXO] A trava do `pnpm restaurar` valida a URL com o parser WHATWG, mas quem conecta é a libpq: `?service=` e variáveis `PG*` do ambiente desviam o destino
+
+- **Evidência:**
+  - `trava-host.ts:39` recusa só `host` e `hostaddr` na consulta.
+  - `restaurar.ts:50` passa a URL inteira (com a consulta) ao `pg_restore`.
+  - `restaurar-cli.ts:19` repassa todo o `process.env` ao processo filho.
+  - Os scripts antigos usam o `pg` do Node, que ignora esses parâmetros. Este é o primeiro script da trava que usa a
+    libpq.
+- **Reprodução local** (libpq do `fundacao-db-1`, IP inalcançável `10.255.255.1`):
+  - `postgresql://postgres@localhost/postgres?service=prod`, com um arquivo de serviço que define `hostaddr`:
+    `connection to server at "10.255.255.1" ... timeout expired`. O host da URL é `localhost`, então a trava aprova
+    sem `--alvo` e sem confirmação, e a libpq conecta no endereço do serviço.
+  - Mesmo efeito com `PGHOSTADDR=10.255.255.1` no ambiente e a URL `localhost`.
+  - `?HOSTADDR=` em maiúsculas passa pela trava, mas a libpq o rejeita (`invalid URI query parameter`).
+- **Cenário:** é erro do operador, não ataque. Quem usa `pg_service.conf` ou deixa `PGSERVICE`/`PGHOSTADDR` exportado
+  para produção roda `pnpm restaurar` "no banco local" e o `pg_restore --clean` vai para outro servidor. Para o Neon
+  ainda seriam precisos o SNI ou `options=endpoint=...` e a senha certa, o que reduz a chance.
+- **Correção:**
+  - Aceitar só uma lista de permissão de parâmetros na consulta (`sslmode`, `channel_binding`, `connect_timeout`,
+    `application_name`).
+  - Rodar o `pg_restore` com um ambiente limpo, sem `PGHOST`, `PGHOSTADDR`, `PGPORT`, `PGSERVICE`, `PGSERVICEFILE`,
+    `PGDATABASE` e `PGOPTIONS`, só com o `PGPASSWORD` necessário.
+  - Recusar `password=` na consulta.
+  - Testar `?service=` e `PGHOSTADDR` no `restaurar.test.ts`.
+
+### Regressões e segredos
+
+- `gitleaks git --redact .`: 76 commits, 0 vazamentos. `gitleaks dir . --redact`: 0.
+- As credenciais dos testes novos (`segredo`, `outra`, `senha-local`) são fictícias.
+- Nenhum log novo traz URL ou senha. O `restaurar-cli` imprime só `erro.message`, e a checagem da G-24 imprime só o
+  nome da imagem.
+- Nenhuma permissão foi ampliada: os três workflows seguem em `contents: read`, e não há `pull_request_target` nem
+  `${{ }}` novo em `run:`.
+- `pnpm restaurar` não carrega o `.env` (diferente de `migrar`/`seed`). Isso é mais seguro, porque o destino precisa
+  ser explícito.
+
+### Situação após o reteste
+
+- Corrigidos: SEC-001 (falta a configuração T47), SEC-002, SEC-004.
+- Parcial: SEC-009.
+- Novos, baixos: SEC-010, SEC-011.
+- Seguem abertos, baixos: SEC-003, SEC-005, SEC-006, SEC-007, SEC-008.
+- Nenhum crítico ou alto. Não bloqueia o lançamento.
+
+### Perguntas do reteste
+
+4. **A `main` terá proteção (PR obrigatório ou ruleset) no GitHub?** A branch policy dos environments `producao` e
+   `backup` só protege os secrets se não for possível dar push direto na `main`.
+   - Repositório só seu, sem colaboradores (Recomendado: registrar na T47 e seguir): o risco residual é baixo.
+   - Haverá colaboradores com escrita: incluir na T47 uma ruleset na `main` (PR obrigatório, sem bypass).
+5. **SEC-009 e SEC-011: corrigir agora ou depois?**
+   - Corrigir antes do primeiro restore real, que é o teste de restauração da T49 (Recomendado): `URL_ORIGEM` (ou o
+     host de produção) obrigatória para destino remoto, comparação por endpoint do Neon, lista de permissão na consulta
+     e ambiente limpo.
+   - Aceitar como risco baixo e registrar: o operador segue o runbook e confere o host à mão.
