@@ -10,6 +10,8 @@ import { lerYaml, linhaDe, percorrerMapas } from './yaml-estrutura.mjs';
 // SEC-004: imagem Docker também só por digest (`nome:tag@sha256:<64 hex>`): `services` e `container` dos jobs e todo
 // `docker run` em `run:` de workflow ou action e em script `.sh` dentro de `.github/`. Opção desconhecida do
 // `docker run` é tratada como opção com valor, então a imagem nunca é pulada sem ser conferida (falha fechado).
+// SEC-010: vale também para `docker container run`, `docker create`, `docker container create`, `podman run` e com
+// opções globais antes do subcomando (`docker --context x run`).
 const RAIZ = process.argv[2] ?? process.cwd();
 const CAMINHO_ACAO = /^\.github\/(workflows\/[^/]+\.ya?ml|actions\/[^/]+\/action\.ya?ml)$/i;
 const PNPM = 'pnpm-workspace.yaml';
@@ -38,6 +40,8 @@ const OPCOES_SEM_VALOR = new Set([
   '--read-only',
   '--privileged',
 ]);
+/** Opções globais do `docker`/`podman` sem valor; as demais (`--context x`, `--log-level x`, `-H x`) levam um. */
+const GLOBAIS_SEM_VALOR = new Set(['-D', '--debug', '--tls', '--tlsverify']);
 
 const arquivos = arquivosVersionados(RAIZ, (c) => CAMINHO_ACAO.test(c) || SCRIPT_GITHUB.test(c) || c === PNPM);
 const achados = [];
@@ -68,13 +72,20 @@ function imagensDockerRun(shell) {
     .join('\n')
     .replace(/\\\n/g, ' ');
   for (const linha of logico.split('\n')) {
-    for (const achado of linha.matchAll(/\bdocker\s+run\s+(.*)/g)) {
+    for (const achado of linha.matchAll(/\b(?:docker|podman)\s+(.*)/g)) {
       const tokens = achado[1].split(/\s+/).map((t) => t.replace(/^['"]|['"]$/g, ''));
+      // SEC-010: opções globais antes do subcomando (`docker --context x run`) e `container run|create`, `create`.
       let i = 0;
+      while (i < tokens.length && tokens[i].startsWith('-')) {
+        i += GLOBAIS_SEM_VALOR.has(tokens[i]) || tokens[i].includes('=') ? 1 : 2;
+      }
+      if (tokens[i] === 'container') i += 1;
+      if (tokens[i] !== 'run' && tokens[i] !== 'create') continue;
+      i += 1;
       while (i < tokens.length && tokens[i].startsWith('-')) {
         i += OPCOES_SEM_VALOR.has(tokens[i]) || tokens[i].includes('=') ? 1 : 2;
       }
-      imagens.push(tokens[i] ?? '(imagem ausente)');
+      imagens.push(tokens[i] || '(imagem ausente)');
     }
   }
   return imagens;

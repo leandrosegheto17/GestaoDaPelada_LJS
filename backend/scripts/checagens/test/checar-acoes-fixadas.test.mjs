@@ -151,6 +151,18 @@ describe('checar-acoes-fixadas', () => {
         { '.github/actions/x/x.sh': `docker run --network=host -i postgres:16@${DIGEST} psql\n` },
       ],
       ['docker run só em comentário', { '.github/actions/x/x.sh': '# docker run postgres:16\necho ok\n' }],
+      // SEC-010 (reteste): outras formas de criar contêiner, também por digest.
+      [
+        'docker container run por digest',
+        { '.github/actions/x/x.sh': `docker container run --rm postgres:16@${DIGEST}\n` },
+      ],
+      [
+        'docker com opções globais por digest',
+        { '.github/actions/x/x.sh': `docker --context ci --log-level error run --rm postgres:16@${DIGEST}\n` },
+      ],
+      ['docker create por digest', { '.github/actions/x/x.sh': `docker create --name pg postgres:16@${DIGEST}\n` }],
+      ['podman run por digest', { '.github/actions/x/x.sh': `podman run --rm postgres:16@${DIGEST}\n` }],
+      ['docker sem criar contêiner', { '.github/actions/x/x.sh': 'docker ps\ndocker image ls postgres\n' }],
     ])('passa: %s', (_nome, arquivos) => {
       const r = rodar(repositorio(arquivos));
       expect(r.stderr).toBe('');
@@ -192,6 +204,43 @@ describe('checar-acoes-fixadas', () => {
       [
         'docker run em script de workflow',
         { '.github/workflows/a.yml': 'jobs:\n  a:\n    steps:\n      - run: docker run --rm alpine:3 true\n' },
+        /alpine:3/,
+      ],
+      // SEC-010 (reteste): formas equivalentes que a primeira versão da G-24 deixava passar.
+      [
+        'docker container run por tag',
+        { '.github/actions/x/x.sh': 'docker container run --rm postgres:16 psql\n' },
+        /x\.sh:1: .*postgres:16/,
+      ],
+      [
+        'docker --context x run por tag',
+        { '.github/actions/x/x.sh': 'docker --context x run --rm postgres:16 psql\n' },
+        /postgres:16/,
+      ],
+      [
+        'docker --log-level error run por tag',
+        { '.github/actions/x/x.sh': 'docker --log-level error run --rm postgres:16 psql\n' },
+        /postgres:16/,
+      ],
+      ['docker -D run por tag', { '.github/actions/x/x.sh': 'docker -D run --rm postgres:16\n' }, /postgres:16/],
+      [
+        'docker --host=x run por tag',
+        { '.github/actions/x/x.sh': 'docker --host=tcp://h:2375 run postgres:16\n' },
+        /postgres:16/,
+      ],
+      ['docker create por tag', { '.github/actions/x/x.sh': 'docker create --name pg postgres:16\n' }, /postgres:16/],
+      [
+        'docker container create por tag',
+        { '.github/actions/x/x.sh': 'docker container create postgres:16\n' },
+        /postgres:16/,
+      ],
+      ['podman run por tag', { '.github/actions/x/x.sh': 'podman run --rm postgres:16\n' }, /postgres:16/],
+      [
+        'docker --context x container run em workflow',
+        {
+          '.github/workflows/a.yml':
+            'jobs:\n  a:\n    steps:\n      - run: docker --context x container run alpine:3\n',
+        },
         /alpine:3/,
       ],
     ])('falha: %s', (_nome, arquivos, esperado) => {
