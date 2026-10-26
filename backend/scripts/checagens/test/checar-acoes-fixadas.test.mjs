@@ -129,6 +129,78 @@ describe('checar-acoes-fixadas', () => {
     expect(rodar(raiz, { ...process.env, PATH: '' }).status).toBe(2);
   });
 
+  // SEC-004: imagem Docker por tag mutável pode ser trocada no registro e recebe as credenciais do job.
+  const DIGEST = `sha256:${'a'.repeat(64)}`;
+  describe('imagens Docker fixadas por digest (SEC-004)', () => {
+    it.each([
+      [
+        'service por digest',
+        { '.github/workflows/a.yml': `jobs:\n  a:\n    services:\n      pg:\n        image: postgres:16@${DIGEST}\n` },
+      ],
+      ['container por digest', { '.github/workflows/a.yml': `jobs:\n  a:\n    container: node:24@${DIGEST}\n` }],
+      [
+        'container em mapa por digest',
+        { '.github/workflows/a.yml': `jobs:\n  a:\n    container:\n      image: node:24@${DIGEST}\n` },
+      ],
+      [
+        'docker run por digest',
+        { '.github/actions/x/x.sh': `docker run --rm -e PG_URL postgres:16@${DIGEST} \\\n  sh -c 'pg_dump'\n` },
+      ],
+      [
+        'docker run com opção --x=y',
+        { '.github/actions/x/x.sh': `docker run --network=host -i postgres:16@${DIGEST} psql\n` },
+      ],
+      ['docker run só em comentário', { '.github/actions/x/x.sh': '# docker run postgres:16\necho ok\n' }],
+    ])('passa: %s', (_nome, arquivos) => {
+      const r = rodar(repositorio(arquivos));
+      expect(r.stderr).toBe('');
+      expect(r.status).toBe(0);
+    });
+
+    it.each([
+      [
+        'service por tag',
+        { '.github/workflows/a.yml': 'jobs:\n  a:\n    services:\n      pg:\n        image: postgres:16\n' },
+        /a\.yml:5: .*postgres:16/,
+      ],
+      [
+        'service em texto curto',
+        { '.github/workflows/a.yml': 'jobs:\n  a:\n    services:\n      pg: postgres:16\n' },
+        /postgres:16/,
+      ],
+      ['container por tag', { '.github/workflows/a.yml': 'jobs:\n  a:\n    container: node:24\n' }, /node:24/],
+      [
+        'container em mapa por tag',
+        { '.github/workflows/a.yml': 'jobs:\n  a:\n    container:\n      image: node:24\n' },
+        /node:24/,
+      ],
+      [
+        'digest curto',
+        { '.github/workflows/a.yml': 'jobs:\n  a:\n    container: node:24@sha256:abc\n' },
+        /node:24@sha256:abc/,
+      ],
+      [
+        'docker run por tag',
+        { '.github/actions/x/x.sh': 'docker run --rm -e PG_URL postgres:16 \\\n  sh -c "pg_dump"\n' },
+        /x\.sh:1: .*postgres:16/,
+      ],
+      [
+        'docker run sem tag',
+        { '.github/actions/x/x.sh': 'if ! docker run --rm postgres psql; then exit 1; fi\n' },
+        /x\.sh:1: .*postgres/,
+      ],
+      [
+        'docker run em script de workflow',
+        { '.github/workflows/a.yml': 'jobs:\n  a:\n    steps:\n      - run: docker run --rm alpine:3 true\n' },
+        /alpine:3/,
+      ],
+    ])('falha: %s', (_nome, arquivos, esperado) => {
+      const r = rodar(repositorio(arquivos));
+      expect(r.status).toBe(1);
+      expect(r.stderr).toMatch(esperado);
+    });
+  });
+
   it('o repositório real está verde', () => {
     expect(rodar(resolve(import.meta.dirname, '../../../..')).status).toBe(0);
   });

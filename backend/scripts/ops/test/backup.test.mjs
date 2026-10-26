@@ -64,6 +64,12 @@ describe('dump-cifrado.sh (FUN-46, FUN-47)', () => {
     expect(readFileSync(r.saida, 'utf8')).toContain('DUMP-BINARIO');
   });
 
+  it('o cliente postgres:16 vai fixado por digest sha256, nunca só pela tag (SEC-004)', () => {
+    expect(rodar().status).toBe(0);
+    const chamada = readFileSync(join(pasta, 'docker.log'), 'utf8');
+    expect(chamada).toMatch(/(^|\s)postgres:16@sha256:[0-9a-f]{64}\s/);
+  });
+
   it('falha de pg_dump falha o job e não deixa artefato, nem parcial', () => {
     const r = rodar({ docker: 'echo "erro com host-secreto" >&2; echo PARCIAL; exit 3' });
     expect(r.status).not.toBe(0);
