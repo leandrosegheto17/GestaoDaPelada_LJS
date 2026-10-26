@@ -31,8 +31,11 @@ export function eventosDe(envelope: string): ErrorEvent[] {
   return eventos;
 }
 
-/** App com uma rota que registra um breadcrumb com e-mail e lança um erro com e-mail. */
-export async function requisicaoQueFalha(ambiente: Cloudflare.Env): Promise<Response> {
+/** App com uma rota que registra um breadcrumb com e-mail e lança um erro com e-mail; `cabecalhosExtras` vão na requisição. */
+export async function requisicaoQueFalha(
+  ambiente: Cloudflare.Env,
+  cabecalhosExtras: Record<string, string> = {},
+): Promise<Response> {
   const app = criarApp({ limitadores: { entrar: SEM_LIMITE, publico: SEM_LIMITE } });
   app.post('/api/teste/falha', async (c) => {
     await c.req.text();
@@ -48,6 +51,7 @@ export async function requisicaoQueFalha(ambiente: Cloudflare.Env): Promise<Resp
         Cookie: 'sessao=segredo-do-cookie',
         Authorization: 'Bearer segredo-do-token',
         'Content-Type': 'application/json',
+        ...cabecalhosExtras,
       },
       body: JSON.stringify({ email: EMAIL, senha: 'segredo-da-senha' }),
     }),

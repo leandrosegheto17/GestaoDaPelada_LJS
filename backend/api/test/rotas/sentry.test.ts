@@ -69,6 +69,33 @@ describe('Sentry no Worker (FUN-23, FUN-24)', () => {
       expect(limpo?.request?.headers).toEqual({ 'X-Pelada': '1' });
     });
 
+    it('só deixa passar cabeçalhos da lista de permissão: sem IP, país nem user-agent (SEC-002)', () => {
+      const e = evento();
+      if (e.request) {
+        e.request.headers = {
+          'Content-Type': 'application/json',
+          'X-Pelada': '1',
+          'CF-Connecting-IP': '200.1.2.3',
+          'x-forwarded-for': '200.1.2.4',
+          'X-Real-IP': '200.1.2.5',
+          'cf-ipcountry': 'BR',
+          'User-Agent': 'Mozilla/5.0',
+          'X-Desconhecido': 'qualquer',
+        };
+      }
+      expect(limparEvento(e)?.request?.headers).toEqual({ 'Content-Type': 'application/json', 'X-Pelada': '1' });
+    });
+
+    it('opções: cabeçalhos da requisição só por lista de permissão, e nenhum da resposta (SEC-002)', () => {
+      const cabecalhos = opcoesSentry({ ...env, SENTRY_DSN: DSN }).dataCollection?.httpHeaders;
+      expect(cabecalhos).toEqual({ request: { allow: expect.any(Array) as unknown }, response: false });
+      const permitidos = (cabecalhos as { request: { allow: string[] } }).request.allow;
+      // O SDK compara por "contém": nenhum termo pode casar com os cabeçalhos de IP, país ou user-agent.
+      for (const proibido of ['cf-connecting-ip', 'x-forwarded-for', 'x-real-ip', 'cf-ipcountry', 'user-agent']) {
+        expect(permitidos.some((termo) => proibido.includes(termo.toLowerCase()))).toBe(false);
+      }
+    });
+
     it('troca e-mails em mensagem, exceção, breadcrumbs, URL, usuário e extras', () => {
       const limpo = limparEvento(evento());
       expect(JSON.stringify(limpo)).not.toMatch(/fulano\.silva@exemplo\.com/i);

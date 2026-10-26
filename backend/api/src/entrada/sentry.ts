@@ -7,7 +7,11 @@ import type { Env } from './env.ts';
 // E-mail em texto puro ou com o `@` codificado em URL (`%40`).
 const EMAIL = /[a-z0-9._%+-]+(?:@|%40)[a-z0-9-]+(?:\.[a-z0-9-]+)*\.[a-z]{2,}/gi;
 const SUBSTITUTO = '[email removido]';
-const CABECALHOS_PROIBIDOS = new Set(['cookie', 'authorization']);
+// SEC-002: lista de permissão (não de bloqueio). Fica de fora todo o resto, inclusive `Cookie`, `Authorization`, os
+// cabeçalhos de IP e país que a Cloudflare acrescenta (`CF-Connecting-IP`, `X-Forwarded-For`, `X-Real-IP`,
+// `CF-IPCountry`) e o `User-Agent`: dado pessoal (LGPD) que não vai a terceiro.
+const CABECALHOS_PERMITIDOS = ['content-type', 'content-length', 'x-pelada'] as const;
+const PERMITIDOS = new Set<string>(CABECALHOS_PERMITIDOS);
 
 function semEmails<T>(valor: T): T {
   if (typeof valor === 'string') return valor.replace(EMAIL, SUBSTITUTO) as T;
@@ -21,8 +25,8 @@ function semEmails<T>(valor: T): T {
 }
 
 /**
- * `beforeSend` (FUN-23): tira do evento o corpo da requisição, os cookies e os cabeçalhos `Cookie` e `Authorization`,
- * e troca todo e-mail (mensagem, exceção, breadcrumbs, URL, usuário, extras) por `[email removido]`.
+ * `beforeSend` (FUN-23): tira do evento o corpo da requisição, os cookies e todo cabeçalho fora da lista de permissão
+ * (sem `Cookie`, `Authorization`, IP, país nem user-agent; SEC-002), e troca todo e-mail (mensagem, exceção, breadcrumbs, URL, usuário, extras) por `[email removido]`.
  */
 export function limparEvento(evento: ErrorEvent): ErrorEvent {
   const copia: ErrorEvent = { ...evento };
@@ -33,7 +37,7 @@ export function limparEvento(evento: ErrorEvent): ErrorEvent {
     copia.request = resto;
     if (headers) {
       copia.request.headers = Object.fromEntries(
-        Object.entries(headers).filter(([nome]) => !CABECALHOS_PROIBIDOS.has(nome.toLowerCase())),
+        Object.entries(headers).filter(([nome]) => PERMITIDOS.has(nome.toLowerCase())),
       );
     }
   }
@@ -47,13 +51,17 @@ export function opcoesSentry(env: Env): CloudflareOptions {
     dsn,
     enabled: dsn !== undefined,
     release: env.VERSAO,
-    // Na 11.x, `dataCollection` substitui o `sendDefaultPii`: nada de usuário, cookies, corpos, query nem SQL.
+    // Na 11.x, `dataCollection` substitui o `sendDefaultPii`: nada de usuário, cookies, corpos, query, SQL nem
+    // cabeçalhos fora da lista de permissão.
     dataCollection: {
       userInfo: false,
       cookies: false,
       httpBodies: [],
       urlQueryParams: false,
       databaseQueryData: false,
+      // SEC-002: o padrão copia todos os cabeçalhos. O SDK compara por "contém"; o `limparEvento` refaz o corte por
+      // nome exato (defesa em profundidade).
+      httpHeaders: { request: { allow: [...CABECALHOS_PERMITIDOS] }, response: false },
     },
     // Cliente por requisição: as opções dependem do `env` (com ou sem DSN), e com o cliente em cache por isolate só
     // a primeira requisição descarregava os eventos no pool de testes do workerd.
