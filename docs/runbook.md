@@ -88,8 +88,8 @@ pessoais e a identidade privada do `age` não pode parar no git (o `.gitignore` 
    o destinatário público (`age1...`); a identidade privada (`AGE-SECRET-KEY-1...`) fica só no gerenciador de senhas
    e num arquivo temporário criado já restrito (`(umask 077; touch identidade-age.txt)`). Apague-o depois.
 3. **Prepare o destino:** uma branch nova e vazia no Neon, ou um banco novo no Postgres local
-   (`docker compose up -d` e `createdb`). **Nunca** a URL de produção: `--clean` apaga tabelas. Confira o host
-   antes de rodar.
+   (`docker compose up -d` e `createdb`). **Nunca** a URL de produção: `--clean` apaga tabelas. O `pnpm restaurar`
+   (passo 5) recusa produção, mas confira o host antes de rodar.
 4. **Crie as roles antes de restaurar.** O dump leva as policies (`CREATE POLICY ... TO pelada_backup`), e sem a
    role no servidor o `pg_restore` sai com erro `role ... does not exist`. Num servidor onde elas não existem:
    ```sql
@@ -98,7 +98,12 @@ pessoais e a identidade privada do `age` não pode parar no git (o `.gitignore` 
    ```
    Numa branch do Neon filha de produção as roles já existem (são do servidor).
 5. **Restaure com o `pg_restore` do PostgreSQL 16** (a versão do dump; um cliente mais novo gera arquivo que o 16 não
-   lê): `pg_restore --no-owner --no-privileges --clean --if-exists -d "$URL_NOVA" dump.pgdump`. Como o dump sai sem
+   lê), sempre pelo script, que passa pela trava de host antes de escrever:
+   `DATABASE_URL="$URL_NOVA" URL_ORIGEM="$URL_ORIGEM" pnpm restaurar --arquivo <pasta-temporária>/dump.pgdump --alvo teste`
+   (no banco local, sem `--alvo`). Ele roda `pg_restore --no-owner --no-privileges --clean --if-exists` com a senha em
+   `PGPASSWORD`, fora da linha de comando. Recusa: host remoto sem `--alvo teste` e sem a confirmação digitada do host;
+   `--alvo producao` sempre; destino no mesmo host de `URL_ORIGEM` (a origem de produção, a mesma do passo 6). Outro
+   `pg_restore` 16: `PG_RESTORE=<caminho>`. Nunca rode o `pg_restore --clean` à mão. Como o dump sai sem
    privilégios, reaplique os grants e a senha de login depois:
    `psql "$URL_NOVA" -f backend/api/src/infraestrutura/db/migracoes/1792843260000_roles.sql` (idempotente) e
    `ALTER ROLE pelada_app WITH LOGIN PASSWORD '<senha>'` (digite a senha só no terminal). Códigos de saída diferentes

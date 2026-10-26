@@ -13,7 +13,8 @@
     "test:checagens": "vitest run backend/scripts --testTimeout=30000",
     "dev": "node --env-file-if-exists=.env backend/scripts/dev.ts",
     "migrar": "node --env-file-if-exists=.env backend/scripts/migrar.ts",
-    "seed": "node --env-file-if-exists=.env backend/scripts/seed-local.ts"
+    "seed": "node --env-file-if-exists=.env backend/scripts/seed-local.ts",
+    "restaurar": "node backend/scripts/ops/restaurar-cli.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
