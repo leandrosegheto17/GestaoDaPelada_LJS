@@ -1,0 +1,11 @@
+.md/
+.claude/
+.specs/
+.worktrees/
+pnpm-lock.yaml
+dist
+.wrangler
+coverage
+frontend/web/src/estilos/tokens.css
+frontend/web/public/fontes/fontes.css
+dist-visual

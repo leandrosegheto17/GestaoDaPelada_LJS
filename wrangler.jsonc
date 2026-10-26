@@ -1,0 +1,39 @@
+{
+  // Worker único: arquivos estáticos do app e a API em /api/* no mesmo host (FUN-19).
+  "name": "gestaodapelada",
+  "main": "backend/api/src/entrada/worker.ts",
+  // Data máxima aceita pelo workerd do @cloudflare/vitest-plugin (1.20261019.x). Regra no ADR novo da T44 (substitui o 018).
+  "compatibility_date": "2026-10-19",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "frontend/web/dist",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+  // O mesmo Hyperdrive do legado. A origem dele é a role pelada_app (nunca o owner, que tem bypassrls) e o cache
+  // fica desligado (`wrangler hyperdrive update --caching-disabled`, FUN-18): as duas coisas são da config do
+  // Hyperdrive, não deste arquivo, e o deploy confere (T39).
+  // Local: o `pnpm dev` troca esta string pela de CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE, montada
+  // a partir do .env (pelada_app com PELADA_APP_SENHA); a senha nunca fica neste arquivo.
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "e06363bd85874f1eaffc6382da6d394b",
+      "localConnectionString": "postgres://pelada_app@localhost:5432/pelada"
+    }
+  ],
+  // FUN-26. O período só aceita 10 ou 60 segundos.
+  // [A ESCLARECER: limite do LIMITE_WEBHOOK; a spec não fixa o número. 60/min provisório, nenhuma rota o usa na fundação]
+  "ratelimits": [
+    { "name": "LIMITE_ENTRAR", "namespace_id": "1001", "simple": { "limit": 10, "period": 60 } },
+    { "name": "LIMITE_PUBLICO", "namespace_id": "1002", "simple": { "limit": 60, "period": 60 } },
+    { "name": "LIMITE_WEBHOOK", "namespace_id": "1003", "simple": { "limit": 60, "period": 60 } }
+  ],
+  // FUN-27: domínio próprio do Worker.
+  "routes": [{ "pattern": "gestaodapelada.ljssoftware.com.br", "custom_domain": true }],
+  // URL_PUBLICA e VERSAO valem para dev e testes; o deploy injeta os valores reais por `--var` (FUN-22, FUN-20).
+  "vars": {
+    "URL_PUBLICA": "http://localhost:8787",
+    "VERSAO": "dev"
+  }
+}

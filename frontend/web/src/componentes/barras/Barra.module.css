@@ -1,0 +1,92 @@
+.barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-3);
+  padding: var(--esp-3) var(--esp-4) var(--esp-4);
+  color: var(--cor-sobre-verde);
+  background: repeating-linear-gradient(
+    90deg,
+    var(--cor-verde) 0 var(--largura-faixa-gramado),
+    var(--cor-verde-faixa) var(--largura-faixa-gramado) calc(2 * var(--largura-faixa-gramado))
+  );
+}
+.barra :focus-visible {
+  outline-color: var(--cor-foco-sobre-verde);
+}
+.barra a {
+  color: var(--cor-sobre-verde);
+}
+.titulo {
+  font-weight: var(--peso-extra);
+  font-size: var(--texto-3xl);
+  text-transform: uppercase;
+  letter-spacing: var(--espacamento-caixa-alta);
+}
+.sub {
+  margin-top: var(--esp-1);
+  font-size: var(--texto-sm);
+  font-weight: var(--peso-medio);
+  color: var(--cor-sobre-verde-sec);
+}
+.acoes {
+  display: flex;
+  gap: var(--esp-2);
+  flex-shrink: 0;
+}
+.interna {
+  background: var(--cor-verde);
+  padding: var(--esp-2) var(--esp-2) var(--esp-2) var(--esp-4);
+  min-height: 60px;
+}
+.grupo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.nome {
+  font-family: var(--fonte-titulo);
+  font-weight: var(--peso-extra);
+  font-size: var(--texto-xl);
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.link {
+  font-size: var(--texto-sm);
+  font-weight: var(--peso-semi);
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+}
+.botaoIcone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--alvo-toque);
+  height: var(--alvo-toque);
+  border-radius: var(--raio);
+  border: 2px solid var(--cor-sobre-verde);
+  color: var(--cor-sobre-verde);
+  text-decoration: none;
+  font-family: var(--fonte-titulo);
+  font-size: var(--texto-2xl);
+  font-weight: var(--peso-extra);
+  background: transparent;
+  cursor: pointer;
+}
+.semBorda {
+  border-color: transparent;
+}
+@media (min-width: 600px) {
+  .barra {
+    padding: var(--esp-5) var(--esp-8);
+  }
+  .titulo {
+    font-size: var(--texto-4xl);
+  }
+  .interna {
+    padding: var(--esp-2) var(--esp-6);
+  }
+}

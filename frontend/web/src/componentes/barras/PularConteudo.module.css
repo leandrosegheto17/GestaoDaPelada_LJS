@@ -1,0 +1,14 @@
+.pular {
+  position: absolute;
+  left: var(--esp-2);
+  top: -80px;
+  background: var(--cor-amarelo);
+  color: var(--cor-sobre-amarelo);
+  padding: var(--esp-3) var(--esp-4);
+  border-radius: var(--raio);
+  font-weight: var(--peso-forte);
+  z-index: 30;
+}
+.pular:focus {
+  top: var(--esp-2);
+}

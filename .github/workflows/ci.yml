@@ -1,0 +1,116 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  base:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: ./.github/actions/preparar-node
+      - run: pnpm lint
+      - run: python .claude/scripts/checar-tokens.py frontend/web/src
+      - run: pnpm format:check
+      - run: pnpm typecheck
+      # Os testes da API precisam de Postgres e rodam no job `banco`.
+      - run: pnpm exec vitest run --dir test
+      - run: pnpm -r --filter '!@pelada/api' test
+      - run: node backend/scripts/checagens/checar-ids-tarefa.mjs
+      - run: node backend/scripts/checagens/checar-urls-absolutas.mjs
+      - run: node backend/scripts/checagens/checar-migracao-aditiva.mjs
+      - run: node backend/scripts/checagens/checar-wrangler-deploy.mjs
+      - run: node backend/scripts/checagens/checar-acoes-fixadas.mjs
+      - uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2.3.9
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  banco:
+    runs-on: ubuntu-latest
+    env:
+      CI: 'true'
+      # Postgres descartável do job; a senha é fictícia, a mesma do docker-compose local.
+      DATABASE_URL_TESTE: postgres://postgres:postgres@localhost:5432/postgres
+    services:
+      postgres:
+        # Por digest (índice multi-arch de postgres:16, consultado em 2026-10-25; SEC-004).
+        image: postgres:16@sha256:9e2cf6287f25c3151f4c9421ccce2b17f3e60061c111a29165e0d2cdd9ff0a97
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/preparar-node
+      - name: Migrations do zero (fixtures A, B e C, roles e RLS)
+        run: pnpm --filter @pelada/api exec vitest run test/migracoes
+      - name: Isolamento no banco
+        run: pnpm --filter @pelada/api exec vitest run test/isolamento
+      - name: Demais testes da API
+        run: pnpm --filter @pelada/api exec vitest run --exclude 'test/migracoes/**' --exclude 'test/isolamento/**'
+
+  checagens:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/preparar-node
+      - run: pnpm test:checagens
+
+  # Instalabilidade do PWA (manifest, service worker, ícones, offline) e cabeçalhos de segurança, contra o Worker
+  # local servindo o `dist`. O e2e não gera o `dist`: o build vem antes. Não há job de Lighthouse (AD-005).
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/preparar-node
+      - run: pnpm --filter @pelada/web exec playwright install --with-deps chromium
+      - run: pnpm --filter @pelada/web build
+        env:
+          VITE_VERSAO: ${{ github.sha }}
+      - run: pnpm --filter @pelada/web e2e
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: e2e-resultado
+          path: frontend/web/test-results/
+          if-no-files-found: ignore
+
+  # Comparação visual das telas com o mockup (porta 4183, `VISUAL_PORTA`).
+  visual:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/preparar-node
+      - run: pnpm --filter @pelada/web exec playwright install --with-deps chromium
+      - run: pnpm --filter @pelada/web build
+      - run: pnpm --filter @pelada/web visual
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: visual-resultado
+          path: frontend/web/e2e/resultado/
+          if-no-files-found: ignore

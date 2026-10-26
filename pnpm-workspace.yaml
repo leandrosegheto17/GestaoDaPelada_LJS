@@ -1,0 +1,21 @@
+packages:
+  - backend/contrato
+  - backend/dominio
+  - backend/api
+  - frontend/web
+allowBuilds:
+  unrs-resolver: false
+  esbuild: true
+  workerd: true
+  core-js: false
+blockExoticSubdeps: true
+minimumReleaseAge: 1440
+trustPolicy: no-downgrade
+trustPolicyExclude:
+  - '@cloudflare/vitest-pool-workers@0.23.0'
+  - '@trickfilm400/rollup-plugin-off-main-thread@3.0.0-pre1'
+  - semver@6.3.1
+  - undici-types@6.21.0
+overrides:
+  sharp: '>=0.35.5'
+  undici: '>=7.29.1'

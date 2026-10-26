@@ -1,0 +1,35 @@
+{
+  "name": "gestao-da-pelada",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "scripts": {
+    "lint": "eslint . && pnpm -r --if-present lint:css",
+    "format:check": "prettier --check .",
+    "typecheck": "pnpm -r typecheck && tsc --noEmit -p backend/scripts",
+    "test": "vitest run --dir test && pnpm -r test",
+    "test:checagens": "vitest run backend/scripts --testTimeout=30000",
+    "dev": "node --env-file-if-exists=.env backend/scripts/dev.ts",
+    "migrar": "node --env-file-if-exists=.env backend/scripts/migrar.ts",
+    "seed": "node --env-file-if-exists=.env backend/scripts/seed-local.ts",
+    "restaurar": "node backend/scripts/ops/restaurar-cli.ts"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^24.0.0",
+    "eslint": "^10.12.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-import-resolver-typescript": "^4.4.5",
+    "eslint-plugin-import-x": "^4.17.1",
+    "globals": "^17.13.0",
+    "js-yaml": "^4.3.2",
+    "prettier": "^3.9.10",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.71.2",
+    "vitest": "^4.1.12"
+  },
+  "packageManager": "pnpm@11.23.0"
+}

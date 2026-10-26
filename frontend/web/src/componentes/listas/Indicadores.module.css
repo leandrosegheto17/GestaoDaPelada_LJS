@@ -1,0 +1,19 @@
+.indicadores {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px var(--esp-3);
+  margin: var(--esp-3) 0 0;
+  font-size: var(--texto-sm);
+  font-variant-numeric: tabular-nums;
+}
+.par {
+  display: contents;
+}
+.indicadores dt {
+  color: var(--cor-texto-sec);
+}
+.indicadores dd {
+  margin: 0;
+  font-weight: var(--peso-forte);
+  text-align: right;
+}

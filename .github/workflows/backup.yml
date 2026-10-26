@@ -1,0 +1,37 @@
+name: backup
+
+# Backup diário às 04:00 de Brasília (07:00 UTC) e sob demanda. pg_dump -Fc pela role de backup (somente leitura),
+# cifrado com age (só a chave pública fica no GitHub), artefato por 30 dias. Falha de dump ou de cifragem deixa o job
+# vermelho e não publica artefato parcial. Restauração: docs/runbook.md.
+
+on:
+  schedule:
+    - cron: '0 7 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-24.04
+    # Os secrets ficam no environment `backup` (branch policy só `main`), nunca no nível do repositório: lá valeriam
+    # para qualquer workflow de qualquer branch (SEC-001). Criação: docs/runbook.md, seção 2.
+    environment: backup
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - name: Data do backup (São Paulo)
+        id: data
+        run: echo "dia=$(TZ=America/Sao_Paulo date +%F)" >> "$GITHUB_OUTPUT"
+      - uses: ./.github/actions/dump-cifrado
+        with:
+          url: ${{ secrets.NEON_URL_BACKUP }}
+          chave: ${{ secrets.BACKUP_CHAVE }}
+          nome-artefato: backup-${{ steps.data.outputs.dia }}-${{ github.run_id }}
+          retencao: '30'

@@ -1,0 +1,45 @@
+.veu {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: var(--cor-veu);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--esp-4);
+}
+.dialogo {
+  width: 100%;
+  max-width: 440px;
+  background: var(--cor-superficie);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra-dialogo);
+  padding: var(--esp-6);
+  position: relative;
+}
+.titulo {
+  font-size: var(--texto-2xl);
+  text-transform: uppercase;
+  margin-bottom: var(--esp-3);
+}
+.texto {
+  margin-bottom: var(--esp-4);
+}
+.acoes {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--esp-2);
+  margin-top: var(--esp-4);
+}
+.acoes > * {
+  width: 100%;
+}
+@media (min-width: 600px) {
+  .acoes {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+  .acoes > * {
+    width: auto;
+  }
+}

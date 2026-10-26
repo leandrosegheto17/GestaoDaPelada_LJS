@@ -1,0 +1,13 @@
+.caixa {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-2);
+  min-height: var(--alvo-toque);
+  cursor: pointer;
+}
+.caixa input {
+  width: 24px;
+  height: 24px;
+  accent-color: var(--cor-verde);
+  margin: 0;
+}

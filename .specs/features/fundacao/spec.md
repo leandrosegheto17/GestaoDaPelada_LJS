@@ -109,7 +109,7 @@ O Gestão da Pelada vai ser recriado do zero no padrão LJS Software. Antes de q
 7. The runbook SHALL descrever a criação do monitor do UptimeRobot em `GET /api/health`. [FUN-25]
 8. The Worker SHALL declarar os bindings de rate limit `LIMITE_ENTRAR` (10/min), `LIMITE_PUBLICO` (60/min) e `LIMITE_WEBHOOK`. [FUN-26]
 9. The Worker SHALL publicar a rota `gestaodapelada.ljssoftware.com.br` com `custom_domain: true`. [FUN-27]
-10. The respostas do domínio SHALL incluir os cabeçalhos de segurança do legado (CSP, `X-Content-Type-Options`, `Referrer-Policy`, HSTS), conferidos por um teste e2e contra o build. [FUN-28]
+10. Os assets estáticos servidos pelo domínio SHALL incluir os cabeçalhos de segurança do legado (CSP, `X-Content-Type-Options`, `Referrer-Policy`, HSTS), conferidos por um teste e2e contra o build; as respostas de `/api/*` (JSON) SHALL incluir `X-Content-Type-Options: nosniff`. [FUN-28]
 
 **Independent Test**: depois do primeiro `deploy.yml`, `curl https://gestaodapelada.ljssoftware.com.br/api/health` = 200 com o SHA publicado, e a página `/` mostra o shell.
 
@@ -131,7 +131,7 @@ O Gestão da Pelada vai ser recriado do zero no padrão LJS Software. Antes de q
 6. IF o usuário abre o app sem conexão numa rota que não está em cache THEN o service worker SHALL mostrar a página offline, no visual do legado. [FUN-34]
 7. WHEN o app é aberto no Safari do iOS fora do modo standalone THEN o front SHALL mostrar a instrução de instalação do legado (`pwa/instalacao.ts`). [FUN-35]
 8. WHEN o CI roda o teste de instalabilidade (Playwright contra o build) THEN ele SHALL confirmar o manifest válido (FUN-32), o service worker ativo controlando a página, os ícones 192 e 512 (um `maskable`) acessíveis e a página offline servida sem rede. Isso substitui o "Lighthouse PWA ≥ 90" do padrão LJS, porque a categoria PWA saiu do Lighthouse (decisão do usuário em 2026-10-24, AD-005). [FUN-36]
-9. The comparação visual (porta do `comparar-visual` do legado, limite de 1% de pixels, viewports de 1280×800 e 390×844) SHALL rodar no CI e falhar se uma tela ativa divergir de `.specs/mockup/telas.json`. Na fundação, a lista de telas ativas cobre só a página provisória e o guia de componentes. [FUN-37]
+9. The comparação visual (porta do `comparar-visual` do legado, limite de 1% de pixels, viewports de 1280×800 e 390×844) SHALL rodar no CI e falhar se uma tela ativa divergir de `.specs/mockup/telas.json`. Na fundação, a lista de telas ativas cobre as 3 telas de vitrine do mockup (erro de rede, carregando em lista e grupo indisponível); a página provisória não é comparada. [FUN-37]
 
 **Independent Test**: instalar o PWA a partir do build local no Chrome do Android e no Safari do iOS, abrir sem rede e ver a página offline. A comparação visual e a instalabilidade ficam verdes no CI.
 
@@ -220,33 +220,33 @@ O Gestão da Pelada vai ser recriado do zero no padrão LJS Software. Antes de q
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----------- | ------ | ------- |
-| FUN-01 | P1: Ambiente local | Design | Pending |
-| FUN-02 | P1: Ambiente local | Design | Pending |
-| FUN-03 | P1: Ambiente local | Design | Pending |
-| FUN-04 | P1: Ambiente local | Design | Pending |
-| FUN-05 | P1: Ambiente local | Design | Pending |
-| FUN-06 | P1: Ambiente local | Design | Pending |
-| FUN-07 | P1: Banco | Design | Pending |
-| FUN-08 | P1: Banco | Design | Pending |
-| FUN-09 | P1: Banco | Design | Pending |
-| FUN-10 | P1: Banco | Design | Pending |
-| FUN-11 | P1: Banco | Design | Pending |
-| FUN-12 | P1: Banco | Design | Pending |
-| FUN-13 | P1: Banco | Design | Pending |
-| FUN-14 | P1: Banco | Design | Pending |
-| FUN-15 | P1: Banco | Design | Pending |
-| FUN-16 | P1: Banco | Design | Pending |
-| FUN-17 | P1: Banco | Design | Pending |
-| FUN-18 | P1: Banco | Design | Pending |
-| FUN-19 | P1: Esqueleto publicado | Design | Pending |
-| FUN-20 | P1: Esqueleto publicado | Design | Pending |
-| FUN-21 | P1: Esqueleto publicado | Design | Pending |
-| FUN-22 | P1: Esqueleto publicado | Design | Pending |
-| FUN-23 | P1: Esqueleto publicado | Design | Pending |
-| FUN-24 | P1: Esqueleto publicado | Design | Pending |
+| FUN-01 | P1: Ambiente local | Design | Implementing |
+| FUN-02 | P1: Ambiente local | Design | Implementing |
+| FUN-03 | P1: Ambiente local | Design | Implementing |
+| FUN-04 | P1: Ambiente local | Design | Implementing |
+| FUN-05 | P1: Ambiente local | Design | Implementing |
+| FUN-06 | P1: Ambiente local | Design | Implementing |
+| FUN-07 | P1: Banco | Design | Implementing |
+| FUN-08 | P1: Banco | Design | Implementing |
+| FUN-09 | P1: Banco | Design | Implementing |
+| FUN-10 | P1: Banco | Design | Implementing |
+| FUN-11 | P1: Banco | Design | Implementing |
+| FUN-12 | P1: Banco | Design | Implementing |
+| FUN-13 | P1: Banco | Design | Implementing |
+| FUN-14 | P1: Banco | Design | Implementing |
+| FUN-15 | P1: Banco | Design | Implementing |
+| FUN-16 | P1: Banco | Design | Implementing |
+| FUN-17 | P1: Banco | Design | Implementing |
+| FUN-18 | P1: Banco | Design | Implementing |
+| FUN-19 | P1: Esqueleto publicado | Design | Implementing |
+| FUN-20 | P1: Esqueleto publicado | Design | Implementing |
+| FUN-21 | P1: Esqueleto publicado | Design | Implementing |
+| FUN-22 | P1: Esqueleto publicado | Design | Implementing |
+| FUN-23 | P1: Esqueleto publicado | Design | Implementing |
+| FUN-24 | P1: Esqueleto publicado | Design | Implementing |
 | FUN-25 | P1: Esqueleto publicado | Design | Pending |
-| FUN-26 | P1: Esqueleto publicado | Design | Pending |
-| FUN-27 | P1: Esqueleto publicado | Design | Pending |
+| FUN-26 | P1: Esqueleto publicado | Design | Implementing |
+| FUN-27 | P1: Esqueleto publicado | Design | Implementing |
 | FUN-28 | P1: Esqueleto publicado | Design | Pending |
 | FUN-29 | P1: Shell PWA | Design | Pending |
 | FUN-30 | P1: Shell PWA | Design | Pending |
@@ -257,23 +257,23 @@ O Gestão da Pelada vai ser recriado do zero no padrão LJS Software. Antes de q
 | FUN-35 | P1: Shell PWA | Design | Pending |
 | FUN-36 | P1: Shell PWA | Design | Pending |
 | FUN-37 | P1: Shell PWA | Design | Pending |
-| FUN-38 | P1: CI e deploy | Design | Pending |
+| FUN-38 | P1: CI e deploy | Design | Implementing |
 | FUN-39 | P1: CI e deploy | Design | Pending |
 | FUN-40 | P1: CI e deploy | Design | Pending |
 | FUN-41 | P1: CI e deploy | Design | Pending |
 | FUN-42 | P1: CI e deploy | Design | Pending |
-| FUN-43 | P1: CI e deploy | Design | Pending |
-| FUN-44 | P1: CI e deploy | Design | Pending |
+| FUN-43 | P1: CI e deploy | Design | Implementing |
+| FUN-44 | P1: CI e deploy | Design | Implementing |
 | FUN-45 | P1: CI e deploy | Design | Pending |
 | FUN-46 | P1: Backup | Design | Pending |
 | FUN-47 | P1: Backup | Design | Pending |
 | FUN-48 | P1: Backup | Design | Pending |
 | FUN-49 | P2: Documentação | Design | Pending |
 | FUN-50 | P2: Documentação | Design | Pending |
-| FUN-51 | P2: Documentação | Design | Pending |
+| FUN-51 | P2: Documentação | Design | Implementing |
 | FUN-52 | P2: Documentação | Design | Pending |
-| FUN-53 | Edge Cases | Design | Pending |
-| FUN-54 | Edge Cases | Design | Pending |
+| FUN-53 | Edge Cases | Design | Implementing |
+| FUN-54 | Edge Cases | Design | Implementing |
 | FUN-55 | Edge Cases | Design | Pending |
 | FUN-56 | Edge Cases | Design | Pending |
 

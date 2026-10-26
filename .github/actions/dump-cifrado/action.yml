@@ -1,0 +1,38 @@
+name: Dump cifrado
+description: pg_dump cifrado com age e enviado como artefato (nunca em claro).
+
+inputs:
+  url:
+    description: Conexão direta com o Postgres (usuário só de leitura no backup).
+    required: true
+  chave:
+    description: Destinatário público age (age1...). Nunca a identidade privada.
+    required: true
+  nome-artefato:
+    description: Nome do artefato.
+    required: true
+  retencao:
+    description: Dias de retenção do artefato.
+    required: false
+    default: '30'
+
+runs:
+  using: composite
+  steps:
+    - name: Instalar age
+      shell: bash
+      run: sudo apt-get update -qq && sudo apt-get install -y -qq age
+    - name: Gerar o dump cifrado
+      shell: bash
+      env:
+        PG_URL: ${{ inputs.url }}
+        CHAVE_AGE: ${{ inputs.chave }}
+        SAIDA: ${{ runner.temp }}/${{ inputs.nome-artefato }}.sql.age
+      run: bash "$GITHUB_ACTION_PATH/dump-cifrado.sh"
+    - name: Enviar o artefato cifrado
+      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      with:
+        name: ${{ inputs.nome-artefato }}
+        path: ${{ runner.temp }}/${{ inputs.nome-artefato }}.sql.age
+        retention-days: ${{ inputs.retencao }}
+        if-no-files-found: error

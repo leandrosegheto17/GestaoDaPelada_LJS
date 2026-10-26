@@ -1,0 +1,49 @@
+.interruptor {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-2);
+  min-height: var(--alvo-toque);
+  cursor: pointer;
+  font-weight: var(--peso-semi);
+}
+.interruptor input {
+  position: absolute;
+  opacity: 0;
+}
+.trilho {
+  position: relative;
+  width: 52px;
+  height: 30px;
+  border-radius: var(--raio-pilula);
+  border: 2px solid var(--cor-contorno);
+  background: var(--cor-superficie);
+  flex-shrink: 0;
+}
+.trilho::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--cor-contorno);
+}
+.interruptor input:checked + .trilho {
+  background: var(--cor-verde);
+  border-color: var(--cor-verde);
+}
+.interruptor input:checked + .trilho::after {
+  left: 25px;
+  background: var(--cor-sobre-verde);
+}
+.interruptor input:focus-visible + .trilho {
+  outline: var(--foco-largura) solid var(--cor-foco);
+  outline-offset: var(--foco-afastamento);
+}
+.estado {
+  min-width: 28px;
+}
+.interruptor input:disabled + .trilho {
+  opacity: 0.5;
+}

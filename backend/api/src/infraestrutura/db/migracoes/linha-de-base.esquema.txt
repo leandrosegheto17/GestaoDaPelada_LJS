@@ -1,0 +1,303 @@
+coluna auditoria.acao text not null
+coluna auditoria.autor_conta_id uuid
+coluna auditoria.autor_tipo text not null
+coluna auditoria.entidade text not null
+coluna auditoria.entidade_id text
+coluna auditoria.grupo_id uuid
+coluna auditoria.id bigint not null identity always
+coluna auditoria.momento timestamp with time zone not null
+coluna auditoria.resumo jsonb not null default '{}'::jsonb
+coluna config_financeira.data_saldo_inicial date not null
+coluna config_financeira.grupo_id uuid not null
+coluna config_financeira.mensalidade_centavos integer
+coluna config_financeira.saldo_inicial_centavos integer not null
+coluna config_pesos.expulso smallint not null
+coluna config_pesos.expulso_com_chuva smallint not null default '-1'::integer
+coluna config_pesos.grupo_id uuid not null
+coluna config_pesos.id uuid not null default gen_random_uuid()
+coluna config_pesos.lesionado_com_chuva smallint not null
+coluna config_pesos.lesionado_sem_chuva smallint not null
+coluna config_pesos.presenca_com_chuva smallint not null
+coluna config_pesos.presenca_sem_chuva smallint not null
+coluna config_pesos.registrado_em timestamp with time zone not null
+coluna config_pesos.registrado_por uuid not null
+coluna config_pesos.vigente_desde date not null
+coluna contas.aviso_privacidade_visto_em timestamp with time zone
+coluna contas.criada_em timestamp with time zone not null
+coluna contas.e_dono boolean not null default false
+coluna contas.email text not null
+coluna contas.id uuid not null default gen_random_uuid()
+coluna contas.nome text not null
+coluna contas.senha_hash text not null
+coluna contas.senha_temporaria boolean not null default false
+coluna escalacoes.composicao jsonb not null
+coluna escalacoes.confirmada_em timestamp with time zone not null
+coluna escalacoes.confirmada_por uuid not null
+coluna escalacoes.data date not null
+coluna escalacoes.formato text not null
+coluna escalacoes.grupo_id uuid not null
+coluna escalacoes.id uuid not null default gen_random_uuid()
+coluna escalacoes.k smallint
+coluna escalacoes.n smallint not null
+coluna eventos_uso.data_partida date
+coluna eventos_uso.dispositivo_id uuid
+coluna eventos_uso.grupo_id uuid not null
+coluna eventos_uso.id bigint not null identity always
+coluna eventos_uso.mes_exportado text
+coluna eventos_uso.momento timestamp with time zone not null
+coluna eventos_uso.tipo text not null
+coluna grupos.arquivado_em timestamp with time zone
+coluna grupos.criado_em timestamp with time zone not null
+coluna grupos.criado_por uuid not null
+coluna grupos.dia_semana text not null
+coluna grupos.frequencia text not null
+coluna grupos.horario time without time zone not null
+coluna grupos.id uuid not null default gen_random_uuid()
+coluna grupos.nome text not null
+coluna grupos.situacao_comercial text not null default 'uso_proprio'::text
+coluna grupos.slug text not null
+coluna grupos.trial_inicio date
+coluna habilidades.grupo_id uuid not null
+coluna habilidades.id uuid not null default gen_random_uuid()
+coluna habilidades.nome text not null
+coluna habilidades.ordem bigint not null identity always
+coluna jogadores.alterado_em timestamp with time zone not null
+coluna jogadores.alterado_por uuid not null
+coluna jogadores.ano_nascimento smallint
+coluna jogadores.apelido text not null
+coluna jogadores.criado_em timestamp with time zone not null
+coluna jogadores.criado_por uuid not null
+coluna jogadores.grupo_id uuid not null
+coluna jogadores.id uuid not null default gen_random_uuid()
+coluna jogadores.inicio_pontuacao date
+coluna jogadores.pontuacao_inicial integer not null default 0
+coluna jogadores.posicao text
+coluna jogadores.telefone text
+coluna lancamentos.alterado_em timestamp with time zone not null
+coluna lancamentos.alterado_por uuid not null
+coluna lancamentos.criado_em timestamp with time zone not null
+coluna lancamentos.criado_por uuid not null
+coluna lancamentos.data date not null
+coluna lancamentos.descricao text not null
+coluna lancamentos.grupo_id uuid not null
+coluna lancamentos.id uuid not null default gen_random_uuid()
+coluna lancamentos.tipo text not null
+coluna lancamentos.valor_centavos integer not null
+coluna notas.grupo_id uuid not null
+coluna notas.habilidade_id uuid not null
+coluna notas.jogador_id uuid not null
+coluna notas.valor smallint not null
+coluna pagamentos_mes.grupo_id uuid not null
+coluna pagamentos_mes.jogador_id uuid not null
+coluna pagamentos_mes.lancamento_id uuid
+coluna pagamentos_mes.marcado_em timestamp with time zone not null
+coluna pagamentos_mes.marcado_por uuid not null
+coluna pagamentos_mes.mes text not null
+coluna partidas.alterada_em timestamp with time zone not null
+coluna partidas.alterada_por uuid not null
+coluna partidas.choveu boolean not null default false
+coluna partidas.criada_em timestamp with time zone not null
+coluna partidas.criada_por uuid not null
+coluna partidas.data date not null
+coluna partidas.grupo_id uuid not null
+coluna partidas.id uuid not null default gen_random_uuid()
+coluna pedidos_reset.conta_id uuid not null
+coluna pedidos_reset.id uuid not null default gen_random_uuid()
+coluna pedidos_reset.resolvido_em timestamp with time zone
+coluna pedidos_reset.resolvido_por uuid
+coluna pedidos_reset.ultimo_pedido_em timestamp with time zone not null
+coluna periodos_ativos.fim date
+coluna periodos_ativos.grupo_id uuid not null
+coluna periodos_ativos.id uuid not null default gen_random_uuid()
+coluna periodos_ativos.inicio date not null
+coluna periodos_ativos.jogador_id uuid not null
+coluna presencas.grupo_id uuid not null
+coluna presencas.jogador_id uuid not null
+coluna presencas.partida_id uuid not null
+coluna presencas.situacao text not null
+coluna sessoes.conta_id uuid not null
+coluna sessoes.criada_em timestamp with time zone not null
+coluna sessoes.escopo text not null
+coluna sessoes.expira_em timestamp with time zone not null
+coluna sessoes.id uuid not null default gen_random_uuid()
+coluna sessoes.token_hash bytea not null
+coluna sessoes.ultimo_uso_em timestamp with time zone not null
+coluna tentativas_login.email text not null
+coluna tentativas_login.id bigint not null identity always
+coluna tentativas_login.momento timestamp with time zone not null
+coluna tentativas_login.sucesso boolean not null
+coluna vinculos_admin.acessa_financeiro boolean not null default false
+coluna vinculos_admin.conta_id uuid not null
+coluna vinculos_admin.criado_em timestamp with time zone not null
+coluna vinculos_admin.criado_por uuid not null
+coluna vinculos_admin.grupo_id uuid not null
+indice auditoria.auditoria_grupo_momento CREATE INDEX auditoria_grupo_momento ON public.auditoria USING btree (grupo_id, momento)
+indice auditoria.auditoria_pkey CREATE UNIQUE INDEX auditoria_pkey ON public.auditoria USING btree (id)
+indice config_financeira.config_financeira_pkey CREATE UNIQUE INDEX config_financeira_pkey ON public.config_financeira USING btree (grupo_id)
+indice config_pesos.config_pesos_grupo_id_vigente_desde_key CREATE UNIQUE INDEX config_pesos_grupo_id_vigente_desde_key ON public.config_pesos USING btree (grupo_id, vigente_desde)
+indice config_pesos.config_pesos_pkey CREATE UNIQUE INDEX config_pesos_pkey ON public.config_pesos USING btree (id)
+indice contas.contas_email_unico CREATE UNIQUE INDEX contas_email_unico ON public.contas USING btree (email)
+indice contas.contas_pkey CREATE UNIQUE INDEX contas_pkey ON public.contas USING btree (id)
+indice contas.contas_um_dono CREATE UNIQUE INDEX contas_um_dono ON public.contas USING btree ((true)) WHERE e_dono
+indice escalacoes.escalacoes_grupo_data CREATE UNIQUE INDEX escalacoes_grupo_data ON public.escalacoes USING btree (grupo_id, data)
+indice escalacoes.escalacoes_pkey CREATE UNIQUE INDEX escalacoes_pkey ON public.escalacoes USING btree (id)
+indice eventos_uso.eventos_uso_grupo_momento CREATE INDEX eventos_uso_grupo_momento ON public.eventos_uso USING btree (grupo_id, momento)
+indice eventos_uso.eventos_uso_pkey CREATE UNIQUE INDEX eventos_uso_pkey ON public.eventos_uso USING btree (id)
+indice grupos.grupos_pkey CREATE UNIQUE INDEX grupos_pkey ON public.grupos USING btree (id)
+indice grupos.grupos_slug_key CREATE UNIQUE INDEX grupos_slug_key ON public.grupos USING btree (slug)
+indice habilidades.habilidades_id_grupo_id_key CREATE UNIQUE INDEX habilidades_id_grupo_id_key ON public.habilidades USING btree (id, grupo_id)
+indice habilidades.habilidades_nome_grupo CREATE UNIQUE INDEX habilidades_nome_grupo ON public.habilidades USING btree (grupo_id, lower(nome))
+indice habilidades.habilidades_pkey CREATE UNIQUE INDEX habilidades_pkey ON public.habilidades USING btree (id)
+indice jogadores.jogadores_apelido_grupo CREATE UNIQUE INDEX jogadores_apelido_grupo ON public.jogadores USING btree (grupo_id, lower(apelido))
+indice jogadores.jogadores_id_grupo_id_key CREATE UNIQUE INDEX jogadores_id_grupo_id_key ON public.jogadores USING btree (id, grupo_id)
+indice jogadores.jogadores_pkey CREATE UNIQUE INDEX jogadores_pkey ON public.jogadores USING btree (id)
+indice lancamentos.lancamentos_grupo_data CREATE INDEX lancamentos_grupo_data ON public.lancamentos USING btree (grupo_id, data)
+indice lancamentos.lancamentos_id_grupo_id_key CREATE UNIQUE INDEX lancamentos_id_grupo_id_key ON public.lancamentos USING btree (id, grupo_id)
+indice lancamentos.lancamentos_pkey CREATE UNIQUE INDEX lancamentos_pkey ON public.lancamentos USING btree (id)
+indice notas.notas_grupo_jogador CREATE INDEX notas_grupo_jogador ON public.notas USING btree (grupo_id, jogador_id)
+indice notas.notas_pkey CREATE UNIQUE INDEX notas_pkey ON public.notas USING btree (jogador_id, habilidade_id)
+indice pagamentos_mes.pagamentos_mes_grupo_mes CREATE INDEX pagamentos_mes_grupo_mes ON public.pagamentos_mes USING btree (grupo_id, mes)
+indice pagamentos_mes.pagamentos_mes_lancamento_id_key CREATE UNIQUE INDEX pagamentos_mes_lancamento_id_key ON public.pagamentos_mes USING btree (lancamento_id)
+indice pagamentos_mes.pagamentos_mes_pkey CREATE UNIQUE INDEX pagamentos_mes_pkey ON public.pagamentos_mes USING btree (jogador_id, mes)
+indice partidas.partidas_grupo_id_data_key CREATE UNIQUE INDEX partidas_grupo_id_data_key ON public.partidas USING btree (grupo_id, data)
+indice partidas.partidas_id_grupo_id_key CREATE UNIQUE INDEX partidas_id_grupo_id_key ON public.partidas USING btree (id, grupo_id)
+indice partidas.partidas_pkey CREATE UNIQUE INDEX partidas_pkey ON public.partidas USING btree (id)
+indice pedidos_reset.pedidos_reset_pkey CREATE UNIQUE INDEX pedidos_reset_pkey ON public.pedidos_reset USING btree (id)
+indice pedidos_reset.pedidos_reset_um_pendente CREATE UNIQUE INDEX pedidos_reset_um_pendente ON public.pedidos_reset USING btree (conta_id) WHERE (resolvido_em IS NULL)
+indice periodos_ativos.periodos_ativos_pkey CREATE UNIQUE INDEX periodos_ativos_pkey ON public.periodos_ativos USING btree (id)
+indice periodos_ativos.periodos_grupo_jogador CREATE INDEX periodos_grupo_jogador ON public.periodos_ativos USING btree (grupo_id, jogador_id, inicio)
+indice periodos_ativos.periodos_um_aberto CREATE UNIQUE INDEX periodos_um_aberto ON public.periodos_ativos USING btree (jogador_id) WHERE (fim IS NULL)
+indice presencas.presencas_grupo_jogador CREATE INDEX presencas_grupo_jogador ON public.presencas USING btree (grupo_id, jogador_id)
+indice presencas.presencas_pkey CREATE UNIQUE INDEX presencas_pkey ON public.presencas USING btree (partida_id, jogador_id)
+indice sessoes.sessoes_conta CREATE INDEX sessoes_conta ON public.sessoes USING btree (conta_id)
+indice sessoes.sessoes_pkey CREATE UNIQUE INDEX sessoes_pkey ON public.sessoes USING btree (id)
+indice sessoes.sessoes_token_hash_key CREATE UNIQUE INDEX sessoes_token_hash_key ON public.sessoes USING btree (token_hash)
+indice tentativas_login.tentativas_login_email_momento CREATE INDEX tentativas_login_email_momento ON public.tentativas_login USING btree (email, momento)
+indice tentativas_login.tentativas_login_pkey CREATE UNIQUE INDEX tentativas_login_pkey ON public.tentativas_login USING btree (id)
+indice vinculos_admin.vinculos_admin_grupo CREATE INDEX vinculos_admin_grupo ON public.vinculos_admin USING btree (grupo_id)
+indice vinculos_admin.vinculos_admin_pkey CREATE UNIQUE INDEX vinculos_admin_pkey ON public.vinculos_admin USING btree (conta_id, grupo_id)
+restricao auditoria.auditoria_autor CHECK ((autor_tipo = 'conta'::text) = (autor_conta_id IS NOT NULL))
+restricao auditoria.auditoria_autor_conta_id_fkey FOREIGN KEY (autor_conta_id) REFERENCES contas(id)
+restricao auditoria.auditoria_autor_tipo_check CHECK (autor_tipo = ANY (ARRAY['conta'::text, 'infraestrutura'::text]))
+restricao auditoria.auditoria_pkey PRIMARY KEY (id)
+restricao config_financeira.config_financeira_grupo_id_fkey FOREIGN KEY (grupo_id) REFERENCES grupos(id)
+restricao config_financeira.config_financeira_mensalidade_centavos_check CHECK (mensalidade_centavos >= 1 AND mensalidade_centavos <= 99999999)
+restricao config_financeira.config_financeira_pkey PRIMARY KEY (grupo_id)
+restricao config_financeira.config_financeira_saldo_inicial_centavos_check CHECK (saldo_inicial_centavos >= '-99999999'::integer AND saldo_inicial_centavos <= 99999999)
+restricao config_pesos.config_pesos_expulso_check CHECK (expulso >= '-10'::integer AND expulso <= 10)
+restricao config_pesos.config_pesos_expulso_com_chuva_check CHECK (expulso_com_chuva >= '-10'::integer AND expulso_com_chuva <= 10)
+restricao config_pesos.config_pesos_grupo_id_fkey FOREIGN KEY (grupo_id) REFERENCES grupos(id)
+restricao config_pesos.config_pesos_grupo_id_vigente_desde_key UNIQUE (grupo_id, vigente_desde)
+restricao config_pesos.config_pesos_lesionado_com_chuva_check CHECK (lesionado_com_chuva >= '-10'::integer AND lesionado_com_chuva <= 10)
+restricao config_pesos.config_pesos_lesionado_sem_chuva_check CHECK (lesionado_sem_chuva >= '-10'::integer AND lesionado_sem_chuva <= 10)
+restricao config_pesos.config_pesos_pkey PRIMARY KEY (id)
+restricao config_pesos.config_pesos_presenca_com_chuva_check CHECK (presenca_com_chuva >= '-10'::integer AND presenca_com_chuva <= 10)
+restricao config_pesos.config_pesos_presenca_sem_chuva_check CHECK (presenca_sem_chuva >= '-10'::integer AND presenca_sem_chuva <= 10)
+restricao config_pesos.config_pesos_registrado_por_fkey FOREIGN KEY (registrado_por) REFERENCES contas(id)
+restricao contas.contas_dono_email CHECK (NOT e_dono OR email = 'leandrosegheto17@gmail.com'::text)
+restricao contas.contas_email_check CHECK (email = lower(btrim(email)) AND char_length(email) <= 254)
+restricao contas.contas_nome_check CHECK (char_length(nome) >= 2 AND char_length(nome) <= 60)
+restricao contas.contas_pkey PRIMARY KEY (id)
+restricao escalacoes.escalacoes_composicao_check CHECK (jsonb_typeof(composicao) = 'object'::text)
+restricao escalacoes.escalacoes_confirmada_por_fkey FOREIGN KEY (confirmada_por) REFERENCES contas(id)
+restricao escalacoes.escalacoes_formato_check CHECK (formato = ANY (ARRAY['dois_times'::text, 'varios_times'::text]))
+restricao escalacoes.escalacoes_grupo_data UNIQUE (grupo_id, data)
+restricao escalacoes.escalacoes_grupo_id_fkey FOREIGN KEY (grupo_id) REFERENCES grupos(id)
+restricao escalacoes.escalacoes_k_check CHECK (k >= 0 AND k <= 20)
+restricao escalacoes.escalacoes_k_so_em_dois_times CHECK (formato = 'dois_times'::text OR k IS NULL)
+restricao escalacoes.escalacoes_n_check CHECK (n >= 2 AND n <= 11)
+restricao escalacoes.escalacoes_pkey PRIMARY KEY (id)
+restricao eventos_uso.eventos_uso_data CHECK ((tipo = ANY (ARRAY['partida_lancada'::text, 'escalacao_confirmada'::text])) = (data_partida IS NOT NULL))
+restricao eventos_uso.eventos_uso_dispositivo CHECK ((tipo = 'ranking_aberto'::text) = (dispositivo_id IS NOT NULL))
+restricao eventos_uso.eventos_uso_grupo_id_fkey FOREIGN KEY (grupo_id) REFERENCES grupos(id)
+restricao eventos_uso.eventos_uso_mes CHECK ((tipo = 'pdf_exportado'::text) = (mes_exportado IS NOT NULL))
+restricao eventos_uso.eventos_uso_mes_exportado_check CHECK (mes_exportado ~ '^[0-9]{4}-(0[1-9]|1[0-2])$'::text)
+restricao eventos_uso.eventos_uso_pkey PRIMARY KEY (id)
+restricao eventos_uso.eventos_uso_tipo_check CHECK (tipo = ANY (ARRAY['ranking_aberto'::text, 'pdf_exportado'::text, 'partida_lancada'::text, 'escalacao_confirmada'::text]))
+restricao grupos.grupos_criado_por_fkey FOREIGN KEY (criado_por) REFERENCES contas(id)
+restricao grupos.grupos_dia_semana_check CHECK (dia_semana = ANY (ARRAY['domingo'::text, 'segunda'::text, 'terca'::text, 'quarta'::text, 'quinta'::text, 'sexta'::text, 'sabado'::text]))
+restricao grupos.grupos_frequencia_check CHECK (frequencia = ANY (ARRAY['semanal'::text, 'quinzenal'::text, 'mensal'::text]))
+restricao grupos.grupos_nome_check CHECK (char_length(nome) >= 3 AND char_length(nome) <= 60)
+restricao grupos.grupos_pkey PRIMARY KEY (id)
+restricao grupos.grupos_situacao_comercial_check CHECK (situacao_comercial = ANY (ARRAY['uso_proprio'::text, 'trial'::text, 'ativo'::text, 'inadimplente'::text, 'cancelado'::text]))
+restricao grupos.grupos_slug_check CHECK (slug ~ '^[a-z0-9-]{1,64}$'::text)
+restricao grupos.grupos_slug_key UNIQUE (slug)
+restricao grupos.grupos_trial CHECK ((situacao_comercial = 'trial'::text) = (trial_inicio IS NOT NULL))
+restricao habilidades.habilidades_grupo_id_fkey FOREIGN KEY (grupo_id) REFERENCES grupos(id)
+restricao habilidades.habilidades_id_grupo_id_key UNIQUE (id, grupo_id)
+restricao habilidades.habilidades_nome_check CHECK (char_length(btrim(nome)) >= 2 AND char_length(btrim(nome)) <= 30)
+restricao habilidades.habilidades_pkey PRIMARY KEY (id)
+restricao jogadores.jogadores_alterado_por_fkey FOREIGN KEY (alterado_por) REFERENCES contas(id)
+restricao jogadores.jogadores_ano_nascimento_check CHECK (ano_nascimento >= 1940)
+restricao jogadores.jogadores_apelido_check CHECK (char_length(btrim(apelido)) >= 2 AND char_length(btrim(apelido)) <= 30)
+restricao jogadores.jogadores_criado_por_fkey FOREIGN KEY (criado_por) REFERENCES contas(id)
+restricao jogadores.jogadores_grupo_id_fkey FOREIGN KEY (grupo_id) REFERENCES grupos(id)
+restricao jogadores.jogadores_id_grupo_id_key UNIQUE (id, grupo_id)
+restricao jogadores.jogadores_pkey PRIMARY KEY (id)
+restricao jogadores.jogadores_pontuacao_inicial_check CHECK (pontuacao_inicial >= 0 AND pontuacao_inicial <= 9999)
+restricao jogadores.jogadores_posicao_check CHECK (posicao = ANY (ARRAY['goleiro'::text, 'zagueiro'::text, 'lateral'::text, 'volante'::text, 'meia'::text, 'atacante'::text, 'centroavante'::text]))
+restricao jogadores.jogadores_telefone_check CHECK (telefone ~ '^[0-9]{11}$'::text)
+restricao lancamentos.lancamentos_alterado_por_fkey FOREIGN KEY (alterado_por) REFERENCES contas(id)
+restricao lancamentos.lancamentos_criado_por_fkey FOREIGN KEY (criado_por) REFERENCES contas(id)
+restricao lancamentos.lancamentos_descricao_check CHECK (char_length(btrim(descricao)) >= 1 AND char_length(btrim(descricao)) <= 80)
+restricao lancamentos.lancamentos_grupo_id_fkey FOREIGN KEY (grupo_id) REFERENCES grupos(id)
+restricao lancamentos.lancamentos_id_grupo_id_key UNIQUE (id, grupo_id)
+restricao lancamentos.lancamentos_pkey PRIMARY KEY (id)
+restricao lancamentos.lancamentos_tipo_check CHECK (tipo = ANY (ARRAY['entrada'::text, 'saida'::text]))
+restricao lancamentos.lancamentos_valor_centavos_check CHECK (valor_centavos >= 1 AND valor_centavos <= 99999999)
+restricao notas.notas_habilidade_id_grupo_id_fkey FOREIGN KEY (habilidade_id, grupo_id) REFERENCES habilidades(id, grupo_id) ON DELETE CASCADE
+restricao notas.notas_jogador_id_grupo_id_fkey FOREIGN KEY (jogador_id, grupo_id) REFERENCES jogadores(id, grupo_id)
+restricao notas.notas_pkey PRIMARY KEY (jogador_id, habilidade_id)
+restricao notas.notas_valor_check CHECK (valor >= 1 AND valor <= 10)
+restricao pagamentos_mes.pagamentos_mes_jogador_id_grupo_id_fkey FOREIGN KEY (jogador_id, grupo_id) REFERENCES jogadores(id, grupo_id)
+restricao pagamentos_mes.pagamentos_mes_lancamento_id_grupo_id_fkey FOREIGN KEY (lancamento_id, grupo_id) REFERENCES lancamentos(id, grupo_id) ON DELETE RESTRICT
+restricao pagamentos_mes.pagamentos_mes_lancamento_id_key UNIQUE (lancamento_id)
+restricao pagamentos_mes.pagamentos_mes_marcado_por_fkey FOREIGN KEY (marcado_por) REFERENCES contas(id)
+restricao pagamentos_mes.pagamentos_mes_mes_check CHECK (mes ~ '^[0-9]{4}-(0[1-9]|1[0-2])$'::text)
+restricao pagamentos_mes.pagamentos_mes_pkey PRIMARY KEY (jogador_id, mes)
+restricao partidas.partidas_alterada_por_fkey FOREIGN KEY (alterada_por) REFERENCES contas(id)
+restricao partidas.partidas_criada_por_fkey FOREIGN KEY (criada_por) REFERENCES contas(id)
+restricao partidas.partidas_grupo_id_data_key UNIQUE (grupo_id, data)
+restricao partidas.partidas_grupo_id_fkey FOREIGN KEY (grupo_id) REFERENCES grupos(id)
+restricao partidas.partidas_id_grupo_id_key UNIQUE (id, grupo_id)
+restricao partidas.partidas_pkey PRIMARY KEY (id)
+restricao pedidos_reset.pedidos_reset_conta_id_fkey FOREIGN KEY (conta_id) REFERENCES contas(id)
+restricao pedidos_reset.pedidos_reset_pkey PRIMARY KEY (id)
+restricao pedidos_reset.pedidos_reset_resolvido_por_fkey FOREIGN KEY (resolvido_por) REFERENCES contas(id)
+restricao periodos_ativos.periodo_fim_depois_inicio CHECK (fim IS NULL OR fim >= inicio)
+restricao periodos_ativos.periodos_ativos_jogador_id_grupo_id_fkey FOREIGN KEY (jogador_id, grupo_id) REFERENCES jogadores(id, grupo_id) ON DELETE CASCADE
+restricao periodos_ativos.periodos_ativos_pkey PRIMARY KEY (id)
+restricao presencas.presencas_jogador_id_grupo_id_fkey FOREIGN KEY (jogador_id, grupo_id) REFERENCES jogadores(id, grupo_id)
+restricao presencas.presencas_partida_id_grupo_id_fkey FOREIGN KEY (partida_id, grupo_id) REFERENCES partidas(id, grupo_id) ON DELETE CASCADE
+restricao presencas.presencas_pkey PRIMARY KEY (partida_id, jogador_id)
+restricao presencas.presencas_situacao_check CHECK (situacao = ANY (ARRAY['presente'::text, 'lesionado'::text, 'expulso'::text]))
+restricao sessoes.sessoes_conta_id_fkey FOREIGN KEY (conta_id) REFERENCES contas(id)
+restricao sessoes.sessoes_escopo_check CHECK (escopo = ANY (ARRAY['completo'::text, 'troca_de_senha'::text]))
+restricao sessoes.sessoes_pkey PRIMARY KEY (id)
+restricao sessoes.sessoes_token_hash_check CHECK (octet_length(token_hash) = 32)
+restricao sessoes.sessoes_token_hash_key UNIQUE (token_hash)
+restricao tentativas_login.tentativas_login_pkey PRIMARY KEY (id)
+restricao vinculos_admin.vinculos_admin_conta_id_fkey FOREIGN KEY (conta_id) REFERENCES contas(id)
+restricao vinculos_admin.vinculos_admin_criado_por_fkey FOREIGN KEY (criado_por) REFERENCES contas(id)
+restricao vinculos_admin.vinculos_admin_grupo_id_fkey FOREIGN KEY (grupo_id) REFERENCES grupos(id)
+restricao vinculos_admin.vinculos_admin_pkey PRIMARY KEY (conta_id, grupo_id)
+tabela auditoria
+tabela config_financeira
+tabela config_pesos
+tabela contas
+tabela escalacoes
+tabela eventos_uso
+tabela grupos
+tabela habilidades
+tabela jogadores
+tabela lancamentos
+tabela notas
+tabela pagamentos_mes
+tabela partidas
+tabela pedidos_reset
+tabela periodos_ativos
+tabela presencas
+tabela sessoes
+tabela tentativas_login
+tabela vinculos_admin
+trigger grupos.grupos_slug_imutavel CREATE TRIGGER grupos_slug_imutavel BEFORE UPDATE OF slug ON grupos FOR EACH ROW EXECUTE FUNCTION grupos_slug_imutavel()

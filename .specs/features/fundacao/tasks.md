@@ -132,10 +132,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Branch Neon descartável criada **com confirmação específica do usuário** e apagada ao final
-- [ ] Duas requisições concorrentes com contas diferentes pelo Hyperdrive remoto: cada uma vê só o seu contexto
-- [ ] `registro.md` com veredito e nível de confiança; se reprovar, o fallback (conexão direta sem pooling) fica definido e o design é atualizado
-- [ ] Código do spike fora do git e nunca integrado
+- [ ] Branch Neon descartável criada **com confirmação específica do usuário** e apagada ao final *(criada e confirmada em 2026-10-24; baixa pendente: o usuário apaga a branch `spike-descartavel` no Neon e o Hyperdrive `spike-s1` no Cloudflare; vale também para T2)*
+- [x] Duas requisições concorrentes com contas diferentes pelo Hyperdrive remoto: cada uma vê só o seu contexto
+- [x] `registro.md` com veredito e nível de confiança; se reprovar, o fallback (conexão direta sem pooling) fica definido e o design é atualizado
+- [x] Código do spike fora do git e nunca integrado
 
 **Tests**: none (spike descartável; exceção do `CLAUDE.md`)
 **Gate**: quick
@@ -157,10 +157,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] `rolbypassrls` e `relforcerowsecurity` conferidos; o que `neondb_owner` enxerga com `FORCE` ligado está registrado
-- [ ] `pg_dump --enable-row-security` com policy `USING (true)` para a role de backup copia todas as linhas
-- [ ] `registro.md` com veredito; o design é ajustado se o resultado mudar roles ou policies
-- [ ] Mesma branch descartável de T1 (ou nova, com confirmação), apagada ao final
+- [x] `rolbypassrls` e `relforcerowsecurity` conferidos; o que `neondb_owner` enxerga com `FORCE` ligado está registrado
+- [x] `pg_dump --enable-row-security` com policy `USING (true)` para a role de backup copia todas as linhas
+- [x] `registro.md` com veredito; o design é ajustado se o resultado mudar roles ou policies
+- [ ] Mesma branch descartável de T1 (ou nova, com confirmação), apagada ao final *(mesma baixa pendente de T1)*
 
 **Tests**: none (spike descartável)
 **Gate**: quick
@@ -184,10 +184,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] `engines`, `.nvmrc` e `type: module` conferidos por teste (`test/repositorio.test.ts`), que falha se divergirem
-- [ ] `pnpm lint`, `pnpm typecheck` e `pnpm test` saem com código 0 na base limpa, executando em todos os pacotes
-- [ ] `.specs/projeto/testes.json` grava o comando do gate de build desta lista
-- [ ] Testes passam e a contagem fica registrada (sem apagar teste)
+- [x] `engines`, `.nvmrc` e `type: module` conferidos por teste (`test/repositorio.test.ts`), que falha se divergirem
+- [x] `pnpm lint`, `pnpm typecheck` e `pnpm test` saem com código 0 na base limpa, executando em todos os pacotes
+- [x] `.specs/projeto/testes.json` grava o comando do gate de build desta lista
+- [x] Testes passam e a contagem fica registrada (sem apagar teste)
 
 **Tests**: unit
 **Gate**: quick
@@ -209,10 +209,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Teste do plugin falha se `backend/dominio` importar módulo de rede, banco ou `node:fs` (FUN-06)
-- [ ] Regras de telas e rotas que ainda não existem foram retiradas
-- [ ] `pnpm lint` verde
-- [ ] Gate quick passa
+- [x] Teste do plugin falha se `backend/dominio` importar módulo de rede, banco ou `node:fs` (FUN-06)
+- [x] Regras de telas e rotas que ainda não existem foram retiradas
+- [x] `pnpm lint` verde
+- [x] Gate quick passa
 
 **Tests**: unit
 **Gate**: quick
@@ -234,10 +234,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Cada teste copiado está ligado a um FUN: `checar-urls-absolutas` → FUN-22, `checar-wrangler-deploy` → FUN-43, `checar-migracao-aditiva` → FUN-54
-- [ ] A checagem aditiva reconhece o nome de arquivo do `node-pg-migrate`
-- [ ] `checar-acoes-fixadas` e `checar-ids-tarefa` entram como regras do CI (sem FUN próprio)
-- [ ] `pnpm test:checagens` verde
+- [x] Cada teste copiado está ligado a um FUN: `checar-urls-absolutas` → FUN-22, `checar-wrangler-deploy` → FUN-43, `checar-migracao-aditiva` → FUN-54
+- [x] A checagem aditiva reconhece o nome de arquivo do `node-pg-migrate`
+- [x] `checar-acoes-fixadas` e `checar-ids-tarefa` entram como regras do CI (sem FUN próprio)
+- [x] `pnpm test:checagens` verde
 
 **Tests**: unit
 **Gate**: quick
@@ -259,9 +259,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] O compose sobe só o Postgres 16, sem outros serviços, e `pgcrypto` está disponível
-- [ ] Com o banco fora do ar, `migrar` e `dev` falham com "Rode `docker compose up -d`" (teste)
-- [ ] Gate quick passa
+- [x] O compose sobe só o Postgres 16, sem outros serviços, e `pgcrypto` está disponível
+- [x] Com o banco fora do ar, `migrar` e `dev` falham com "Rode `docker compose up -d`" (teste)
+- [x] Gate quick passa
 
 **Tests**: unit
 **Gate**: quick
@@ -283,9 +283,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] O workflow roda lint, format, typecheck, testes, checagens e gitleaks, com Node 24
-- [ ] `checar-acoes-fixadas` aprova o workflow
-- [ ] Gate de build passa localmente
+- [x] O workflow roda lint, format, typecheck, testes, checagens e gitleaks, com Node 24
+- [x] `checar-acoes-fixadas` aprova o workflow
+- [x] Gate de build passa localmente
 
 **Tests**: none (workflow; coberto por `checar-acoes-fixadas`)
 **Gate**: build
@@ -307,9 +307,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] 23 ADRs copiados sem alteração de conteúdo
-- [ ] Os ADRs 018 e 020 ficam marcados para `Supersedes:` nos ADRs novos (T44)
-- [ ] Gate de build passa
+- [x] 23 ADRs copiados sem alteração de conteúdo
+- [x] Os ADRs 018 e 020 ficam marcados para `Supersedes:` nos ADRs novos (T44) *(ADR aceito não se edita: 018 e 020 ficam intactos; a marca é esta nota, e o `Supersedes: 018` e o `Supersedes: 020` entram nos ADRs novos em T44)*
+- [x] Gate de build passa
 
 **Tests**: none (documentação)
 **Gate**: build
@@ -320,10 +320,10 @@ T47 → T48 → T49
 
 ### T9: Linha de base do schema com `node-pg-migrate`
 
-**What**: Concatenar as 15 migrations do legado na linha de base e configurar o runner, com apoio de teste de banco temporário.
+**What**: Concatenar as 13 migrations do legado na linha de base e configurar o runner, com apoio de teste de banco temporário.
 **Where**: `backend/api/src/infraestrutura/db/migracoes/`
 **Depends on**: T8
-**Reuses**: legado: as 15 migrations SQL, `backend/api/test/apoio/` (`banco-migracao.ts`, `db-teste.ts`, `setup-global.ts`)
+**Reuses**: legado: as 13 migrations SQL, `backend/api/test/apoio/` (`banco-migracao.ts`, `db-teste.ts`, `setup-global.ts`)
 **Requirement**: FUN-07, FUN-08
 
 **Tools**:
@@ -333,10 +333,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] A linha de base é a concatenação literal das 15 migrations, sem alteração
-- [ ] Cada migration roda na própria transação (`--no-single-transaction`) e há uma migration por mudança
-- [ ] Teste: banco vazio migrado tem as mesmas tabelas, colunas, restrições e triggers do legado
-- [ ] Gate full passa
+- [x] A linha de base é a concatenação literal das 13 migrations, sem alteração *(o legado tem 13 em todas as branches, como diz a spec em FUN-08; o "15" anterior era erro de contagem, corrigido em 2026-10-24)*
+- [x] Cada migration roda na própria transação (`--no-single-transaction`) e há uma migration por mudança
+- [x] Teste: banco vazio migrado tem as mesmas tabelas, colunas, restrições e triggers do legado
+- [x] Gate full passa *(o "full" roda hoje lint, format, typecheck, `pnpm test` e `pnpm test:checagens`; e2e do web entra nas Fases 5 e 6)*
 
 **Tests**: integration
 **Gate**: full
@@ -358,10 +358,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Fixture A (15 migrations pelo runner antigo): `migrar` registra a linha de base sem DDL e sem alterar dados (contagem de linhas igual antes e depois); a impressão digital bate com a da fixture B
-- [ ] Fixture B (banco vazio): aplica tudo
-- [ ] Fixture C (schema parcial): aborta sem alterar nada e lista as diferenças
-- [ ] Gate full passa
+- [x] Fixture A (13 migrations pelo runner antigo): `migrar` registra a linha de base sem DDL e sem alterar dados (contagem de linhas igual antes e depois); a impressão digital bate com a da fixture B
+- [x] Fixture B (banco vazio): aplica tudo
+- [x] Fixture C (schema parcial): aborta sem alterar nada e lista as diferenças
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
@@ -383,10 +383,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] `pelada_app` é `NOLOGIN NOBYPASSRLS`, sem DDL e sem `TRUNCATE`, e com `DELETE` só nas tabelas listadas no design
-- [ ] `pelada_backup` só lê
-- [ ] Teste cobre cada limite (tentativa de DDL, de `TRUNCATE` e de `DELETE` fora da lista falha)
-- [ ] Gate full passa
+- [x] `pelada_app` é `NOLOGIN NOBYPASSRLS`, sem DDL e sem `TRUNCATE`, e com `DELETE` só nas tabelas listadas no design *(`sessoes` fica sem grant até a `conta-e-acesso`, como o design manda para as tabelas sem `grupo_id`; SPEC_DEVIATION anotado na migration)*
+- [x] `pelada_backup` só lê
+- [x] Teste cobre cada limite (tentativa de DDL, de `TRUNCATE` e de `DELETE` fora da lista falha)
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
@@ -408,10 +408,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] `ENABLE` e `FORCE ROW LEVEL SECURITY` em toda tabela com `grupo_id` (teste lê o catálogo)
-- [ ] Com `app.conta_id`, só grupos com vínculo; com `app.slug_publico`, só leitura do grupo do slug e escrita recusada; sem contexto, zero linhas
-- [ ] `grupos_visiveis()` com `search_path` fixo, `REVOKE` de `PUBLIC` e `GRANT` só a `pelada_app`
-- [ ] Gate full passa
+- [x] `ENABLE` e `FORCE ROW LEVEL SECURITY` em toda tabela com `grupo_id` (teste lê o catálogo) *(14 tabelas mais `grupos`; inclui `auditoria` e `eventos_uso`, que o design dava como sem `grupo_id` mas têm a coluna: SPEC_DEVIATION anotado na migration; a policy `USING (true)` de `pelada_backup` vai em todas)*
+- [x] Com `app.conta_id`, só grupos com vínculo; com `app.slug_publico`, só leitura do grupo do slug e escrita recusada; sem contexto, zero linhas *(pelo slug, `INSERT` é recusado e `UPDATE`/`DELETE` afetam zero linhas; com conta e slug juntos vale a conta, como FUN-13)*
+- [x] `grupos_visiveis()` com `search_path` fixo, `REVOKE` de `PUBLIC` e `GRANT` só a `pelada_app`
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
@@ -433,10 +433,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Para cada tabela de negócio: A lê só o seu; B não lê, não insere, não altera e não apaga nada de A
-- [ ] O slug não escreve e sem contexto o resultado é zero linhas
-- [ ] Meta-teste falha se surgir tabela com `grupo_id` sem caso de isolamento
-- [ ] Gate full passa
+- [x] Para cada tabela de negócio: A lê só o seu; B não lê, não insere, não altera e não apaga nada de A *(15 casos: as 14 tabelas com `grupo_id` e `grupos`. Em `auditoria` e `eventos_uso`, sem grant para `pelada_app` na fundação, "A lê só o seu" não se aplica: o caso prova que ninguém lê e que B não escreve)*
+- [x] O slug não escreve e sem contexto o resultado é zero linhas *(nas duas tabelas sem grant, sem contexto a leitura é recusada por privilégio)*
+- [x] Meta-teste falha se surgir tabela com `grupo_id` sem caso de isolamento
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
@@ -458,10 +458,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Banco local migrado ganha um grupo com jogadores, partidas e uma conta admin
-- [ ] Teste: URL do Neon ou de qualquer host não local é recusada antes de qualquer escrita
-- [ ] O seed também define a senha de login das roles locais a partir do `.env`
-- [ ] Gate full passa
+- [x] Banco local migrado ganha um grupo com jogadores, partidas e uma conta admin *(a conta admin fica sem senha de login válida até a `conta-e-acesso`, que define o formato do hash)*
+- [x] Teste: URL do Neon ou de qualquer host não local é recusada antes de qualquer escrita
+- [x] O seed também define a senha de login das roles locais a partir do `.env` *(`PELADA_APP_SENHA` e `PELADA_BACKUP_SENHA`; entram no `.env.example` na T41. A API conecta direto como `pelada_app`, forma coberta pelo teste do seed)*
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
@@ -483,9 +483,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] O job roda migrations do zero e a suíte de isolamento, e falha se qualquer uma falhar
-- [ ] `checar-acoes-fixadas` aprova o workflow
-- [ ] Gate de build passa localmente
+- [x] O job roda migrations do zero e a suíte de isolamento, e falha se qualquer uma falhar *(job `banco`, com Postgres 16 de serviço; roda também os demais testes da API, que saíram do job `base` por precisarem de banco. Passos conferidos localmente contra o Postgres do compose; a primeira execução no GitHub fica para o push da T47)*
+- [x] `checar-acoes-fixadas` aprova o workflow
+- [x] Gate de build passa localmente *(lint, format, typecheck, `pnpm test`, `pnpm test:checagens` e as cinco checagens; build, e2e e visual do web entram nas Fases 5 e 6)*
 
 **Tests**: none (workflow; exercita os testes de T10 e T13)
 **Gate**: build
@@ -509,10 +509,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Teste de config confere `single-page-application`, `run_worker_first: ["/api/*"]`, `nodejs_compat`, bindings `LIMITE_ENTRAR` (10/min), `LIMITE_PUBLICO` (60/min) e `LIMITE_WEBHOOK`, e a rota com `custom_domain: true`
-- [ ] Testes de API migrados para `@cloudflare/vitest-plugin` (codemod oficial), com `compatibility_date` conforme o ADR a escrever na T44
-- [ ] A origem do Hyperdrive aponta para `pelada_app` e o cache fica desligado (conferência fica no deploy, T39)
-- [ ] Gate full passa
+- [x] Teste de config confere `single-page-application`, `run_worker_first: ["/api/*"]`, `nodejs_compat`, bindings `LIMITE_ENTRAR` (10/min), `LIMITE_PUBLICO` (60/min) e `LIMITE_WEBHOOK`, e a rota com `custom_domain: true` *(`backend/api/test/config/wrangler.test.ts`, com a lista fechada de chaves do legado mais `routes`. O número do `LIMITE_WEBHOOK` não está na spec: 60/min provisório, marcado `[A ESCLARECER]` no `wrangler.jsonc`; o teste só exige o binding)*
+- [x] Testes de API migrados para `@cloudflare/vitest-plugin` (codemod oficial), com `compatibility_date` conforme o ADR a escrever na T44 *(o worktree não tinha testes de workerd: o vitest da API ganhou os projetos `node` e `workers` com `cloudflareTest` do `@cloudflare/vitest-plugin` 1.4.7, que é o que o codemod troca no import do legado; nenhum teste existente mudou. `compatibility_date` = `2026-10-19`, a data do workerd 1.20261019.1 do plugin, conferida por teste)*
+- [ ] A origem do Hyperdrive aponta para `pelada_app` e o cache fica desligado (conferência fica no deploy, T39) *(em aberto: são propriedades da config do Hyperdrive na Cloudflare, não do `wrangler.jsonc`; o arquivo só documenta e o local usa `pelada_app`)*
+- [x] Gate full passa *(lint, format, typecheck, `pnpm test`, `pnpm test:checagens`; o e2e do web só existe a partir da Fase 6)*
 
 **Tests**: unit
 **Gate**: full
@@ -534,10 +534,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] `GET /api/health` → 200 com `{"status":"ok","versao":"<sha>"}` sem tocar o banco
-- [ ] Toda rota `/api/*`, inclusive a de erro e a inexistente, responde `Cache-Control: no-store`
-- [ ] Testes de rota no pool workerd passam
-- [ ] Gate full passa
+- [x] `GET /api/health` → 200 com `{"status":"ok","versao":"<sha>"}` sem tocar o banco *(o teste espia o binding `HYPERDRIVE`: zero leituras. `VERSAO` tem valor `dev` no `wrangler.jsonc`; o deploy injeta o SHA)*
+- [x] Toda rota `/api/*`, inclusive a de erro e a inexistente, responde `Cache-Control: no-store` *(e `nosniff`; casos 200, 403, 404, 413, 429 e 500)*
+- [x] Testes de rota no pool workerd passam *(`test/rotas/`: health, middlewares e limite de taxa. O `LIMITE_WEBHOOK` fica sem rota até a feature de pagamentos)*
+- [x] Gate full passa *(lint, format, typecheck, `pnpm test`, `pnpm test:checagens`; o e2e do web só existe a partir da Fase 6)*
 
 **Tests**: e2e
 **Gate**: full
@@ -559,10 +559,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] `BEGIN` (`READ ONLY` em GET e HEAD) e `set_config(..., true)` com parâmetros antes de qualquer consulta
-- [ ] `COMMIT` se a resposta for menor que 400, `ROLLBACK` caso contrário; conexão fechada no `waitUntil`
-- [ ] Abrir outra transação dentro da requisição é proibido (teste)
-- [ ] Gate full passa
+- [x] `BEGIN` (`READ ONLY` em GET e HEAD) e `set_config(..., true)` com parâmetros antes de qualquer consulta *(a conexão só abre na primeira consulta; `contaId` e `slugPublico` saem das variáveis do contexto do Hono, lidas nesse momento, e quem as define chega com as features. Forma escolhida: a API conecta direto como `pelada_app`, sem `SET LOCAL ROLE`; o teste confere `current_user` e `session_user` = `pelada_app` sem bypass e a RLS por conta, por slug e sem contexto, inclusive em requisições concorrentes)*
+- [x] `COMMIT` se a resposta for menor que 400, `ROLLBACK` caso contrário; conexão fechada no `waitUntil` *(o `COMMIT` roda antes de responder; erro lançado também desfaz. Testes com 200, 201, 204, 302 e 399 gravando e 400, 404, 422, 500 e erro lançado desfazendo; a sessão some do `pg_stat_activity` depois da resposta)*
+- [x] Abrir outra transação dentro da requisição é proibido (teste) *(`db.transaction()`, `db.startTransaction()` e SQL de `BEGIN`, `START TRANSACTION`, `COMMIT`, `END`, `ROLLBACK`, `ABORT`, `SAVEPOINT`, `RELEASE`, inclusive atrás de comentário, dão `TransacaoAninhada`; várias instruções numa consulta são recusadas pelo protocolo estendido)*
+- [x] Gate full passa *(lint, format, typecheck, `pnpm test`, `pnpm test:checagens`; o e2e do web só existe a partir da Fase 6)*
 
 **Tests**: integration
 **Gate**: full
@@ -584,9 +584,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Sem `SENTRY_DSN`, o app funciona e nada é enviado
-- [ ] Com DSN, o evento sai com `release` = SHA e sem corpo, cookies, `Authorization` e e-mails (teste do `beforeSend`)
-- [ ] Gate full passa
+- [x] Sem `SENTRY_DSN`, o app funciona e nada é enviado *(DSN ausente ou vazio: `enabled: false`; o teste espia o `fetch` global e não vê nenhuma chamada, nem com erro na rota)*
+- [x] Com DSN, o evento sai com `release` = SHA e sem corpo, cookies, `Authorization` e e-mails (teste do `beforeSend`) *(o `beforeSend` existe na 11.9, conferido nos tipos instalados de `@sentry/core`: a `PREMISSA` do design se confirma. Teste unitário do `limparEvento` e teste de ponta a ponta no workerd que lê o envelope enviado. Na 11.x o `sendDefaultPii` deu lugar a `dataCollection`, configurado sem usuário, cookies, corpos, query e SQL. Cliente por requisição (`cacheClient: false`): com o cliente em cache por isolate, só a primeira requisição descarregava os eventos)*
+- [x] Gate full passa *(lint, format, typecheck, `pnpm test`, `pnpm test:checagens`; o e2e do web só existe a partir da Fase 6)*
 
 **Tests**: unit
 **Gate**: full
@@ -608,9 +608,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Teste confere o proxy `/api` → Worker e `localConnectionString` apontando para o Postgres local
-- [ ] Com o compose de pé, `http://localhost:5173` abre e `GET /api/health` = 200 (conferido à mão e registrado)
-- [ ] Gate quick passa
+- [x] Teste confere o proxy `/api` → Worker e `localConnectionString` apontando para o Postgres local *(`frontend/web/test/configuracao-servidor.test.ts` e `backend/scripts/test/dev.test.ts`: o `localConnectionString` bate com a porta e o banco do `docker-compose.yml`, e o `pnpm dev` troca a string pela de `pelada_app` com a senha do `.env` via `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE`. Com o banco fora do ar, o `pnpm dev` falha com o aviso do `exigir-banco` antes de subir qualquer coisa: FUN-53 fecha aqui. O `vitest` e o `vite` entram no `package.json` do web)*
+- [x] Com o compose de pé, `http://localhost:5173` abre e `GET /api/health` = 200 (conferido à mão e registrado) *(fechado em 2026-10-25, na T34: com o `fundacao-db-1` de pé, `pnpm dev` subiu os dois; `curl http://localhost:5173/` deu 200 com o `index.html` (`id="raiz"`), `curl http://localhost:5173/api/health` (pelo proxy) e `curl http://localhost:8787/api/health` deram 200 com `{"status":"ok","versao":"dev"}`; processos parados depois. Antes, em parte, 2026-10-25: com o `fundacao-db-1` de pé, `pnpm dev` subiu os dois; `curl http://localhost:8787/api/health` e `curl http://localhost:5173/api/health` (pelo proxy) deram 200 com `{"status":"ok","versao":"dev"}`, `no-store` e `nosniff`. `http://localhost:5173/` dá 404 porque o web ainda não tem `index.html`: abre com o front base, Fase 5)*
+- [x] Gate quick passa *(`pnpm test:checagens`, `pnpm --filter @pelada/web test`; rodados também lint, format, typecheck e `pnpm test`)*
 
 **Tests**: unit
 **Gate**: quick
@@ -634,9 +634,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Teste falha se `frontend/web/src/estilos/tokens.css` divergir de `.specs/mockup/tokens.css`
-- [ ] `python .claude/scripts/checar-tokens.py frontend/web/src` entra no CI
-- [ ] Gate quick passa
+- [x] Teste falha se `frontend/web/src/estilos/tokens.css` divergir de `.specs/mockup/tokens.css` *(`frontend/web/test/estilos.test.ts`, ligado a FUN-29, compara também as fontes; conferido que acrescentar uma linha ao `tokens.css` o faz falhar. Texto compara sem a diferença CRLF/LF do Windows, binário byte a byte. `global.css`, `tokens.css`, fontes, ícones e `config/tokens.ts` vieram do legado sem mudança; `tokens.css` e `fontes.css` entram no `.prettierignore` por serem cópia)*
+- [x] `python .claude/scripts/checar-tokens.py frontend/web/src` entra no CI *(passo no job `base` de `.github/workflows/ci.yml`, depois do `pnpm lint`; rodou local: OK)*
+- [x] Gate quick passa *(lint, format, typecheck, `pnpm test`, `pnpm test:checagens` verdes)*
 
 **Tests**: unit
 **Gate**: quick
@@ -658,9 +658,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Teste com CSS de exemplo: cor, fonte e sombra literais falham; tokens passam
-- [ ] `pnpm lint` (inclui `lint:css`) verde
-- [ ] Gate quick passa
+- [x] Teste com CSS de exemplo: cor, fonte e sombra literais falham; tokens passam *(`frontend/web/test/stylelint.test.ts`, ligado a FUN-31, copiado do legado: 12 CSS recusados, 9 aceitos e o `global.css` real passa. Desvio: a configuração é `frontend/web/stylelint.config.mjs`, como no legado, e não `.stylelintrc.json`; um `.d.ts` de apoio tipa o import no teste)*
+- [x] `pnpm lint` (inclui `lint:css`) verde *(script `lint:css` no `package.json` do web)*
+- [x] Gate quick passa *(lint, format, typecheck, `pnpm test`, `pnpm test:checagens` verdes)*
 
 **Tests**: unit
 **Gate**: quick
@@ -682,9 +682,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Cada componente tem teste de renderização e axe sem violações
-- [ ] Os testes copiados estão ligados a FUN-30
-- [ ] Gate quick passa
+- [x] Cada componente tem teste de renderização e axe sem violações *(13 componentes cobertos: `botoes`, `mensagens`, `voltar-erro-envio` e `Esqueleto` copiados do legado, mais `complementares.test.tsx` para Icone, SeloSalvo, ValorDestaque e Esqueleto, que não tinham axe próprio; 77 testes do web verdes)*
+- [x] Os testes copiados estão ligados a FUN-30 *(cabeçalho `Critério: FUN-30` nos 4 arquivos copiados e no complementar. Infraestrutura do web criada aqui: React, Testing Library, jsdom, axe-core, plugin React e setup no Vitest)*
+- [x] Gate quick passa *(lint, format, typecheck, `pnpm test` e `pnpm test:checagens` verdes)*
 
 **Tests**: unit
 **Gate**: quick
@@ -706,8 +706,8 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Cada componente tem teste de renderização e axe sem violações
-- [ ] Gate quick passa
+- [x] Cada componente tem teste de renderização e axe sem violações *(9 componentes: `barras.test.tsx` copiado do legado (BarraAcao, BarraAdmin, BarraDono, BarraSuperior, PularConteudo) e `complementares.test.tsx` para BarraCarregando, BarraTitulo, BotaoIcone e BarraInterna; ligados a FUN-30. Vieram também `config/recursos.ts` e seu teste, que `BarraSuperior` usa)*
+- [x] Gate quick passa *(lint, format, typecheck, `pnpm test` (web 104) e `pnpm test:checagens` verdes)*
 
 **Tests**: unit
 **Gate**: quick
@@ -729,8 +729,8 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Cada componente tem teste de renderização e axe sem violações
-- [ ] Gate quick passa
+- [x] Cada componente tem teste de renderização e axe sem violações *(12 componentes: `campos.test.tsx` e `CamposNovaSenha.test.tsx` copiados do legado, mais `CampoBusca.test.tsx` (sem teste no legado); ligados a FUN-30. SPEC_DEVIATION: os campos usam `LIMITES` e a formatação de moeda e datas, que ainda não existiam; entraram só `LIMITES`, `bytesUtf8` e `DIAS_DA_SEMANA` em `@pelada/contrato`, `formatacao/{moeda,datas}` com testes e `rotulos` reduzido a `ROTULO_DIA_SEMANA`)*
+- [x] Gate quick passa *(lint, format, typecheck, `pnpm test` (web 183, contrato 5) e `pnpm test:checagens` verdes)*
 
 **Tests**: unit
 **Gate**: quick
@@ -752,8 +752,8 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Cada componente tem teste de renderização e axe sem violações
-- [ ] Gate quick passa
+- [x] Cada componente tem teste de renderização e axe sem violações *(3 componentes (Segmentado, Interruptor, CaixaSelecao) em `escolhas.test.tsx`, copiado do legado, ligado a FUN-30; o teste de axe cobre os três)*
+- [x] Gate quick passa *(lint, format, typecheck, `pnpm test` (web 211) e `pnpm test:checagens` verdes)*
 
 **Tests**: unit
 **Gate**: quick
@@ -775,8 +775,8 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Cada componente tem teste de renderização e axe sem violações
-- [ ] Gate quick passa
+- [x] Cada componente tem teste de renderização e axe sem violações *(Dialogo, Folha e OpcaoFolha em `dialogos.test.tsx`, copiado do legado, ligado a FUN-30; axe no diálogo e na folha (a `OpcaoFolha` é coberta dentro da folha))*
+- [x] Gate quick passa *(lint, format, typecheck, `pnpm test` (web 211) e `pnpm test:checagens` verdes)*
 
 **Tests**: unit
 **Gate**: quick
@@ -798,8 +798,8 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Cada componente tem teste de renderização e axe sem violações
-- [ ] Gate de build passa (fecha a fase)
+- [x] Cada componente tem teste de renderização e axe sem violações *(6 componentes: `listas.test.tsx` copiado do legado (Lista, Item, NavegadorMes, TabelaSemanas, TabelaSimples; caminho do mockup trocado de `.md/mockup` para `.specs/mockup`) e `Indicadores.test.tsx` (sem teste no legado); ligados a FUN-30)*
+- [x] Gate de build passa (fecha a fase) *(lint, format, typecheck, `pnpm test` (web 224, api 343, contrato 5), `pnpm test:checagens` (175) e `pnpm --filter @pelada/web build` verdes; `e2e` e `visual` do web ainda não existem (Fase 6) e ficam fora. SPEC_DEVIATION: para o build ter o que empacotar entraram o `index.html` do legado, um `main.tsx` sem o `<App />` e o script `build`; o App e o shell PWA chegam na Fase 6. Teste do `index.html` (sem script/estilo inline nem URL externa) copiado do legado em `estilos.test.ts`)*
 
 **Tests**: unit
 **Gate**: build
@@ -823,8 +823,8 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Teste confere nome "Gestão da Pelada", `display: standalone`, `lang: pt-BR` e os dois ícones, um deles `maskable`
-- [ ] Gate quick passa
+- [x] Teste confere nome "Gestão da Pelada", `display: standalone`, `lang: pt-BR` e os dois ícones, um deles `maskable` *(`test/manifesto.test.ts`, FUN-32; confere também as cores vindas dos tokens e os PNGs idênticos aos do mockup; `criarOpcoesPwa` fica para a T30)*
+- [x] Gate quick passa *(web 228)*
 
 **Tests**: unit
 **Gate**: quick
@@ -846,9 +846,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Teste confere o precache do shell e os dois handlers registrados
-- [ ] `tsc` do SW (`tsconfig.sw.json`) verde
-- [ ] Gate quick passa
+- [x] Teste confere o precache do shell e os dois handlers registrados *(`src/sw.test.ts` carrega o SW com `self` e o Workbox simulados, FUN-33; `test/pwa-config.test.ts` confere as opções do plugin. `context7` indisponível: usada a documentação dos pacotes e o build real, que gerou `dist/sw.js` com 27 entradas de precache. SPEC_DEVIATION: o SW fica em `src/sw.ts`, como manda a tarefa (o legado usa `src/pwa/sw.ts`), e a versão nova assume sem faixa de aviso (`skipWaiting` + `clientsClaim`), porque a fundação não leva a `FaixaNovaVersao`)*
+- [x] `tsc` do SW (`tsconfig.sw.json`) verde *(inclui também `sw.test.ts`; o `tsconfig.json` do app os exclui por causa da lib DOM; o `typecheck` roda os dois)*
+- [x] Gate quick passa *(web 232; `vite build` gera o SW; as dependências do PWA entraram junto com a T29)*
 
 **Tests**: unit
 **Gate**: quick
@@ -870,9 +870,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Teste da regra do SW: navegação sem cache e sem rede devolve `offline.html`
-- [ ] A página usa só tokens do guia (checagem de tokens verde)
-- [ ] Gate quick passa
+- [x] Teste da regra do SW: navegação sem cache e sem rede devolve `offline.html` *(`regras-sw.test.ts` e `sw.test.ts` (FUN-34). SPEC_DEVIATION: em vez de `public/offline.html` estático, `offline.html` é uma segunda entrada do Vite (`frontend/web/offline.html` + `src/offline/`) que reaproveita `BarraTitulo` e `TelaMensagem` (a casca de `t03-indisponivel`); assim o CSS sai com hash, entra no precache e não duplica `tokens.css`. O build gera `dist/offline.html` e o precache passa a 31 entradas; `mockup-visual` não foi preciso, o estado existe no mockup)*
+- [x] A página usa só tokens do guia (checagem de tokens verde) *(`checar-tokens.py frontend/web/src` OK; a página só usa componentes e CSS modules com variáveis)*
+- [x] Gate quick passa *(web 241, typecheck, lint, format e build verdes)*
 
 **Tests**: unit
 **Gate**: quick
@@ -882,7 +882,7 @@ T47 → T48 → T49
 ### T32: Instruções de instalação no Safari do iOS
 
 **What**: Mostrar a instrução de instalação fora do modo standalone no iOS.
-**Where**: `frontend/web/src/pwa/instalacao.ts`
+**Where**: `frontend/web/src/pwa/instalacao.ts`, `frontend/web/src/pwa/AvisoInstalacao.tsx`
 **Depends on**: T31
 **Reuses**: legado: `frontend/web/src/pwa/instalacao.ts` e testes
 **Requirement**: FUN-35
@@ -894,8 +894,8 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Teste: Safari iOS fora de standalone mostra a instrução; em standalone ou em outro navegador, não
-- [ ] Gate quick passa
+- [x] Teste: Safari iOS fora de standalone mostra a instrução; em standalone ou em outro navegador, não *(`instalacao.ts` e o teste copiados do legado, mais testes de `lerAmbienteEDecidir` (FUN-35); `AvisoInstalacao.tsx` (faixa `info` do guia, dispensável) é exibido na página provisória, com `AvisoInstalacao.test.tsx`)*
+- [x] Gate quick passa *(web 264)*
 
 **Tests**: unit
 **Gate**: quick
@@ -917,9 +917,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Sem `VITE_SENTRY_DSN`, o Sentry não inicializa e nada é enviado
-- [ ] Com DSN, o `beforeSend` remove corpo, cookies, `authorization` e e-mails
-- [ ] Gate quick passa
+- [x] Sem `VITE_SENTRY_DSN`, o Sentry não inicializa e nada é enviado *(`observabilidade.test.ts`, FUN-24; `iniciarObservabilidade` é ligada no `main.tsx` na T34. `VITE_VERSAO` (SHA) é a variável do `release`; quem a define no build é o deploy (T39))*
+- [x] Com DSN, o `beforeSend` remove corpo, cookies, `authorization` e e-mails *(FUN-23; mesmo padrão da T19; `dataCollection` no lugar de `sendDefaultPii`, que não existe nas opções do navegador da 11.9)*
+- [x] Gate quick passa *(web 271; `@sentry/react` 11.9)*
 
 **Tests**: unit
 **Gate**: quick
@@ -941,8 +941,8 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Teste: `/` renderiza a página provisória; as rotas de vitrine só existem com `VITE_VITRINE=1` e nunca no build de produção
-- [ ] Gate quick passa
+- [x] Teste: `/` renderiza a página provisória; as rotas de vitrine só existem com `VITE_VITRINE=1` e nunca no build de produção *(`App.test.tsx` (FUN-37): `/` com axe, as três vitrines por rota e um `vite build` com e sem `VITE_VITRINE` que confere a ausência do marcador `data-vitrine` no de produção. SPEC_DEVIATION: a vitrine fica em `src/vitrine/` e a página provisória em `src/app/PaginaProvisoria.tsx`, não tudo no `App.tsx`; `main.tsx` agora monta o `<App />`, liga `iniciarObservabilidade()` e registra o SW (`src/pwa/registro.ts`, com teste); `workbox-window` saiu das dependências por não ser usado)*
+- [x] Gate quick passa *(web 285; build de produção sem vitrine, 31 entradas no precache; `checar-tokens.py` OK)*
 
 **Tests**: unit
 **Gate**: quick
@@ -964,9 +964,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Telas ativas: `padrao--erro-rede`, `padrao--carregando-lista`, `t03-indisponivel--erro`, em 1280×800 e 390×844, limite de 1% de pixels
-- [ ] Uma divergência injetada faz a comparação falhar (teste do comparador)
-- [ ] Gate full passa
+- [x] Telas ativas: `padrao--erro-rede`, `padrao--carregando-lista`, `t03-indisponivel--erro`, em 1280×800 e 390×844, limite de 1% de pixels *(`pnpm --filter @pelada/web visual` real: 0,00% nas duas de erro e de indisponível, 0,53% e 0,65% no carregando de lista, nos dois tamanhos; `telas-ativas.test.mjs` confere as três, os tamanhos e as rotas. SPEC_DEVIATION: as telas ativas são identificadas pelo nome do arquivo do mockup (o `id` do `telas.json` repete, ex. `PADRAO`), e `config-fundacao.mjs` deriva do `telas.json` um mapa com as rotas de vitrine e sem respostas de API; o build de teste vai para `dist-visual/` e o preview usa a porta 4183 (a 4173 estava ocupada por outro `vite preview` na máquina); sem o ajuste de 7% do runner que o legado tinha, que era da tela T16)*
+- [x] Uma divergência injetada faz a comparação falhar (teste do comparador) *(`e2e/comparador.spec.ts` (Playwright): páginas iguais ≤ 1%, cor trocada > 1%, altura diferente reprovada)*
+- [x] Gate full passa *(lint, format, typecheck, `pnpm test` (raiz 20, dominio 1, contrato 5, API 343, web 295), `test:checagens` 175, `pnpm --filter @pelada/web e2e` (3) e `visual` verdes; o e2e usa a porta 8798 e uma URL de Hyperdrive fictícia, porque a 8788 do legado estava ocupada por outro projeto e o wrangler exige senha na URL local)*
 
 **Tests**: e2e
 **Gate**: full
@@ -988,9 +988,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Manifest válido (FUN-32), service worker ativo controlando a página, ícones 192 e 512 (um `maskable`) acessíveis e página offline servida sem rede
-- [ ] Sem Lighthouse no CI (AD-005)
-- [ ] Gate full passa
+- [x] Manifest válido (FUN-32), service worker ativo controlando a página, ícones 192 e 512 (um `maskable`) acessíveis e página offline servida sem rede *(`e2e/pwa.spec.ts` (5 testes, FUN-32 a FUN-36) contra o build servido pelo Worker local; confere também `Page.getInstallabilityErrors` vazio e o fallback de navegação para `offline.html` quando o shell sai do precache e não há rede)*
+- [x] Sem Lighthouse no CI (AD-005) *(o repositório não tem dependência nem workflow de Lighthouse; a ausência do job no `ci.yml` é conferida na T38)*
+- [x] Gate full passa *(lint, format, typecheck, `pnpm test` (web 295), `test:checagens` 175 e `e2e` (8 testes) verdes)*
 
 **Tests**: e2e
 **Gate**: full
@@ -1012,9 +1012,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Teste confere os quatro cabeçalhos nas respostas do domínio
-- [ ] CSP ajustada ao Sentry só quando houver DSN
-- [ ] Gate de build passa (fecha a fase)
+- [x] Teste confere os quatro cabeçalhos nas respostas do domínio *(`e2e/cabecalhos.spec.ts` (FUN-28) confere CSP, `X-Content-Type-Options`, `Referrer-Policy` e HSTS em `/`, rota do app, `offline.html`, fontes, manifest, `sw.js` e no script do build, mais ausência de violação de CSP e `/_headers` não servido. SPEC_DEVIATION: o `_headers` do legado não tinha HSTS; entrou `Strict-Transport-Security: max-age=31536000; includeSubDomains`. Só os assets são conferidos: a API (`/api/*`) só põe `nosniff`, e CSP, Referrer-Policy e HSTS nas respostas dela ficam como ponto aberto no relatório do lote)*
+- [x] CSP ajustada ao Sentry só quando houver DSN *(`config/cabecalhos.ts` e `test/cabecalhos.test.ts`: o plugin reescreve `dist/_headers` com a origem do DSN no `connect-src` só com `VITE_SENTRY_DSN`; sem DSN o arquivo sai idêntico à fonte (testado com `vite build` real nos dois casos))*
+- [x] Gate de build passa (fecha a fase) *(lint, format, typecheck, `pnpm test` (raiz 20, dominio 1, contrato 5, API 343, web 305), `test:checagens` 175, `pnpm --filter @pelada/web build`, `e2e` (11 testes) e `visual` (6 comparações, máx. 0,65%) verdes; `checar-tokens.py frontend/web/src` OK)*
 
 **Tests**: e2e
 **Gate**: build
@@ -1038,10 +1038,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Todos os jobs da spec (FUN-38) existem e o CI falha se qualquer um falhar
-- [ ] O job de Lighthouse não existe
-- [ ] `checar-acoes-fixadas` aprova o workflow
-- [ ] Gate de build passa localmente
+- [x] Todos os jobs da spec (FUN-38) existem e o CI falha se qualquer um falhar *(jobs base (lint, tokens, format, typecheck, testes, checagens de ids, URLs, wrangler e ações, gitleaks), banco (PostgreSQL 16: migrations do zero e isolamento), checagens, e2e (instalabilidade e cabeçalhos; instala o Chromium e roda o build antes) e visual (porta 4183); sem continue-on-error, então qualquer falha derruba o CI; o job `base` também roda `checar-migracao-aditiva` (FUN-54), que não estava ligado ao CI)*
+- [x] O job de Lighthouse não existe *(nenhum job nem passo de Lighthouse)*
+- [x] `checar-acoes-fixadas` aprova o workflow *(`checar-acoes-fixadas` sem achados)*
+- [x] Gate de build passa localmente *(`checar-acoes-fixadas`, `checar-wrangler-deploy`, prettier do .github e `test:checagens` (175) verdes; o YAML roda de verdade só no GitHub (T47). SPEC_DEVIATION: o visual não usa matriz de fatias, porque o `visual.mjs` da fundação não tem `VISUAL_FATIA`)*
 
 **Tests**: none (workflow; exercita os testes das tarefas anteriores)
 **Gate**: build
@@ -1063,11 +1063,11 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Teste de estrutura do YAML: ordem build, branch de restauração (mantém 2), dump cifrado, migração com `NEON_URL_MIGRACAO`, `wrangler deploy --var URL_PUBLICA`, health com `versao == github.sha`
-- [ ] Teste: build que falha para antes de tocar o Neon; migração que falha impede o `wrangler deploy`; `URL_PUBLICA` vazia falha antes do deploy
-- [ ] `concurrency` com `cancel-in-progress: false`; `rollback` sem `|| true`; confere o cache do Hyperdrive desligado
-- [ ] `wrangler deploy` só neste arquivo (`checar-wrangler-deploy`)
-- [ ] Gate de build passa
+- [x] Teste de estrutura do YAML: ordem build, branch de restauração (mantém 2), dump cifrado, migração com `NEON_URL_MIGRACAO`, `wrangler deploy --var URL_PUBLICA`, health com `versao == github.sha` *(`backend/scripts/ops/test/deploy-yml.test.mjs` lê o YAML pela estrutura e confere a ordem URL_PUBLICA, build, branch de restauração (mantém 2, testado no `restauracao-neon.test.ts` copiado), dump cifrado, `pnpm migrar --alvo producao` com `NEON_URL_MIGRACAO`, Hyperdrive, `wrangler deploy --var URL_PUBLICA --var VERSAO:<sha>` e health com `versao == github.sha`)*
+- [x] Teste: build que falha para antes de tocar o Neon; migração que falha impede o `wrangler deploy`; `URL_PUBLICA` vazia falha antes do deploy *(build antes de tudo que toca Neon ou Worker; sem `continue-on-error` e só o passo de desfazer tem `if`; `URL_PUBLICA` vazia, http ou com caminho falha (o passo é executado em bash) antes do build e do deploy)*
+- [x] `concurrency` com `cancel-in-progress: false`; `rollback` sem `|| true`; confere o cache do Hyperdrive desligado *(`concurrency` com `cancel-in-progress: false`; rollback sem `|| true`; passo confere o cache do Hyperdrive desligado (scripts `ops/` copiados do legado, com os 99 testes, adaptados para `node` sem `tsx`))*
+- [x] `wrangler deploy` só neste arquivo (`checar-wrangler-deploy`) *(`checar-wrangler-deploy` sem achados)*
+- [x] Gate de build passa *(20 testes do deploy.yml, `test:checagens` e typecheck/lint dos scripts verdes. SPEC_DEVIATION: o health usa `/api/health` e `--var VERSAO:<sha>` (o legado usava `/api/saude`); o passo de dump aponta para a action `dump-cifrado`, criada na T40)*
 
 **Tests**: unit
 **Gate**: build
@@ -1089,9 +1089,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Teste do script: dump com `--enable-row-security`; falha de `pg_dump` ou de `age` faz o job falhar e não publica artefato parcial
-- [ ] Agendamento 07:00 UTC, disparo manual e retenção de 30 dias conferidos por teste do YAML
-- [ ] Gate de build passa
+- [x] Teste do script: dump com `--enable-row-security`; falha de `pg_dump` ou de `age` faz o job falhar e não publica artefato parcial *(`backup.test.mjs` roda o `dump-cifrado.sh` em bash com `docker` e `age` falsos: confere `pg_dump --format=custom --enable-row-security` no cliente `postgres:16`; falha de `pg_dump`, de `age` ou dump vazio saem com erro, sem artefato nem arquivo parcial, e sem vazar URL ou host)*
+- [x] Agendamento 07:00 UTC, disparo manual e retenção de 30 dias conferidos por teste do YAML *(o YAML tem cron `0 7 * * *`, `workflow_dispatch`, `retencao: 30` (também o default da action, com `if-no-files-found: error`) e nenhum `continue-on-error`)*
+- [x] Gate de build passa *(`test:checagens` (ops, 129 testes entre os arquivos copiados e novos), lint, prettier e checagens de ações verdes. SPEC_DEVIATION: a role é `pelada_backup` (a spec cita `backup_ro`), secret `NEON_URL_BACKUP`; o cliente é fixado em `postgres:16` (o legado descobria a versão do servidor) e a contagem restaurada contra a origem fica no runbook (T43), pois o teste de restauração precisa de banco e age reais. Aviso: o job de backup roda sem environment, então os secrets `NEON_URL_BACKUP` e `BACKUP_CHAVE` precisam estar no nível do repositório (T47). **Superado pela correção do SEC-001** (`seguranca.md`): o job declara `environment: backup` e os secrets ficam só nos environments `backup` e `producao`)*
 
 **Tests**: unit
 **Gate**: build
@@ -1113,10 +1113,10 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Teste falha se uma variável usada em código, `wrangler.jsonc` ou workflows não estiver no arquivo
-- [ ] Sem segredo versionado; gitleaks verde
-- [ ] Constam `SENTRY_DSN`, `URL_PUBLICA` e os nomes reservados das features futuras (Resend, Web Push), sem valor
-- [ ] Gate de build passa (fecha a fase)
+- [x] Teste falha se uma variável usada em código, `wrangler.jsonc` ou workflows não estiver no arquivo *(`backend/scripts/test/env-example.test.ts` varre código, `wrangler.jsonc`, bindings de `env.ts` e `secrets.`/`vars.` dos workflows; na primeira rodada achou `VERSAO` faltando, que entrou)*
+- [x] Sem segredo versionado; gitleaks verde *(toda variável fica vazia (teste) e `gitleaks dir` local: nenhum vazamento; o CI mantém o gitleaks)*
+- [x] Constam `SENTRY_DSN`, `URL_PUBLICA` e os nomes reservados das features futuras (Resend, Web Push), sem valor *(`SENTRY_DSN`, `VITE_SENTRY_DSN`, `URL_PUBLICA`, `RESEND_*` e `VAPID_*` sem valor, cada uma com obrigatoriedade, formato e segredo)*
+- [x] Gate de build passa (fecha a fase) *(`test:checagens` (310), lint, typecheck e format verdes. SPEC_DEVIATION: as variáveis de ferramentas em `.specs/` (ex.: `CHROME_PATH` do gerador de ícones do mockup) ficam fora da varredura)*
 
 **Tests**: unit
 **Gate**: build
@@ -1140,9 +1140,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Os comandos do README levam do clone ao app em `localhost:5173` com health 200
-- [ ] Um agente sem contexto segue o README num worktree limpo e chega ao app rodando (teste de aceite da P2)
-- [ ] Gate de build passa
+- [x] Os comandos do README levam do clone ao app em `localhost:5173` com health 200 *(conferido neste worktree num banco novo: `pnpm migrar` (3 aplicadas), `pnpm seed` e `pnpm dev`, com `GET localhost:5173/api/health` = 200 `{"status":"ok","versao":"dev"}` e `localhost:5173/` = 200; o banco temporário foi apagado depois)*
+- [x] Um agente sem contexto segue o README num worktree limpo e chega ao app rodando (teste de aceite da P2) *(2026-10-25: agente sem contexto seguiu o README; o `pnpm dev` falhou por faltar o build do web (`frontend/web/dist`); com o build, health 200, `/` 200 e `pnpm test` verde. O README foi corrigido (passo de build e placeholders do `.env` literais); o passo corrigido foi executado pelo agente como contorno, sem nova rodada do zero)*
+- [x] Gate de build passa *(`format:check` verde; documentação sem outros testes)*
 
 **Tests**: none (documentação; aceite pelo agente sem contexto)
 **Gate**: build
@@ -1164,9 +1164,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Cobre deploy, falha de migração com restauração pela branch, restauração do backup, rotação de segredos, monitor do UptimeRobot em `/api/health` e remoção do Worker antigo
-- [ ] Exige, antes do primeiro deploy, a remoção confirmada do Worker `pelada` e um dump cifrado
-- [ ] Gate de build passa
+- [x] Cobre deploy, falha de migração com restauração pela branch, restauração do backup, rotação de segredos, monitor do UptimeRobot em `/api/health` e remoção do Worker antigo *(seções 2 (deploy), 3 (falha de migração com restauração pela branch), 4 (restauração do backup), 5 (rotação de segredos), 6 (remoção do Worker antigo) e 7 (monitor do UptimeRobot em `/api/health`))*
+- [x] Exige, antes do primeiro deploy, a remoção confirmada do Worker `pelada` e um dump cifrado *(seção 1: dump cifrado, remoção confirmada do Worker `pelada` e roles conferidas, nesta ordem, antes do primeiro deploy)*
+- [x] Gate de build passa *(`format:check` e checagem do wrangler verdes. A seção 4 cria as roles antes da restauração e reaplica os grants, porque o dump sai com `--no-privileges` (conforme o spike S2); o ensaio de restauração com contagem fica para a T49)*
 
 **Tests**: none (documentação)
 **Gate**: build
@@ -1188,9 +1188,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] ADRs para: migrations e linha de base, modelo de RLS, instalabilidade no lugar do Lighthouse, `@cloudflare/vitest-plugin` com `Supersedes: 018` e host próprio com `Supersedes: 020`
-- [ ] Cada ADR tem `Supersedes:` quando substitui outro
-- [ ] Gate de build passa
+- [x] ADRs para: migrations e linha de base, modelo de RLS, instalabilidade no lugar do Lighthouse, `@cloudflare/vitest-plugin` com `Supersedes: 018` e host próprio com `Supersedes: 020` *(ADR-024 (migrations e linha de base), ADR-025 (modelo de RLS), ADR-026 (instalabilidade no lugar do Lighthouse), ADR-027 (`@cloudflare/vitest-plugin`, `Supersedes: 018`) e ADR-028 (host próprio, `Supersedes: 020`))*
+- [x] Cada ADR tem `Supersedes:` quando substitui outro *(`Supersedes:` só nos ADR-027 e ADR-028; o ADR-025 usa `Complementa: ADR-005`, porque a camada de repositório continua valendo)*
+- [x] Gate de build passa *(`format:check` verde; o 018 e o 020 não foram editados (ADR aceito não se edita))*
 
 **Tests**: none (documentação)
 **Gate**: build
@@ -1212,9 +1212,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Descreve a stack, os comandos `pnpm`, o gate de testes e onde ficam `.specs/`, `.md/` e `docs/`
-- [ ] Não altera `.claude/CLAUDE.md`
-- [ ] Gate de build passa
+- [x] Descreve a stack, os comandos `pnpm`, o gate de testes e onde ficam `.specs/`, `.md/` e `docs/` *(stack, comandos `pnpm`, gate de testes (`trava-testes.py --rodar`) e onde ficam `.specs/`, `.md/`, `docs/` e `.claude/`)*
+- [x] Não altera `.claude/CLAUDE.md` *(só o `CLAUDE.md` da raiz foi criado; `.claude/CLAUDE.md` não aparece no diff)*
+- [x] Gate de build passa *(`format:check` verde)*
 
 **Tests**: none (documentação)
 **Gate**: build
@@ -1236,9 +1236,9 @@ T47 → T48 → T49
 
 **Done when**:
 
-- [ ] Os cinco documentos existem e refletem a stack nova
-- [ ] O GUARDRAILS mapeia cada regra para o teste ou a checagem que a protege
-- [ ] Gate de build passa (fecha a fase)
+- [x] Os cinco documentos existem e refletem a stack nova *(PRD, PRD-TECNICO, SDD, GUARDRAILS e THREAT-MODEL em `.md/`, trazidos do legado com o bloco "Consolidação da fundação" (host, migrations, RLS, Lighthouse, plugin de testes, Node 24, deploy) e o SDD com ambientes, stack, CI/CD, índice de ADRs (018 a 028), T-18 e dívidas atualizados)*
+- [x] O GUARDRAILS mapeia cada regra para o teste ou a checagem que a protege *(o GUARDRAILS tem a coluna "Protegida por" com o arquivo de teste ou checagem real (os caminhos citados foram conferidos no `git ls-files`), a coluna "Situação" (ativa ou a feature que cria o código) e as regras novas G-27 a G-30)*
+- [x] Gate de build passa (fecha a fase) *(`format:check` verde. SPEC_DEVIATION: os históricos de rodadas do PRD e do PRD-TECNICO foram mantidos como registro de produto; CTO-REVIEW, PLANO-COMERCIAL, UX-SPEC e as evidências `.md/.seguranca/` do legado não foram trazidos)*
 
 **Tests**: none (documentação)
 **Gate**: build
@@ -1249,7 +1249,7 @@ T47 → T48 → T49
 
 ### T47: Repositório no GitHub, environment e secrets (ação externa)
 
-**What**: Criar o repositório privado, o environment `producao` e os secrets, e publicar a `main`.
+**What**: Criar o repositório privado, os environments `producao` e `backup` (branch policy só `main`) com os secrets de cada um, e publicar a `main`. Nenhum secret no nível do repositório (SEC-001; lista em `docs/runbook.md`, seção 2).
 **Where**: GitHub (repositório novo)
 **Depends on**: T46
 **Reuses**: Nomes dos secrets do legado (`NEON_*`, `BACKUP_CHAVE`, `CLOUDFLARE_*`)
@@ -1263,8 +1263,10 @@ T47 → T48 → T49
 **Done when**:
 
 - [ ] **Confirmação específica do usuário** para criar o repositório e para o `git push`
+- [ ] Environment `producao` (variável `URL_PUBLICA`; secrets `NEON_URL_MIGRACAO`, `NEON_API_KEY`, `NEON_PROJECT_ID`, `BACKUP_CHAVE`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `VITE_SENTRY_DSN`) e environment `backup` (secrets `NEON_URL_BACKUP` e `BACKUP_CHAVE`), ambos restritos à `main`; "Repository secrets" vazio
 - [ ] Checagem final: `python .claude/scripts/trava-testes.py --rodar` verde, resultado mostrado
 - [ ] O CI roda no primeiro push e fica verde
+- Sem ruleset na `main` por enquanto (pergunta 4 do reteste em `seguranca.md`): o repositório não tem colaboradores, então a branch policy dos environments basta. Risco baixo aceito pelo usuário; com colaborador com escrita, criar ruleset na `main` (PR obrigatório, sem bypass) antes de dar o acesso.
 
 **Tests**: none (ação externa; o CI roda a suíte)
 **Gate**: build
@@ -1312,11 +1314,25 @@ T47 → T48 → T49
 **Done when**:
 
 - [ ] Artefato cifrado baixado e decifrado com a chave privada guardada fora do GitHub
-- [ ] `pg_restore` no Postgres local; contagem de linhas por tabela conferida contra a produção
+- [ ] `pg_restore` no Postgres local, pelo `pnpm restaurar` (trava de host, SEC-009); contagem de linhas por tabela conferida contra a produção
 - [ ] Data e contagens registradas no runbook
 
 **Tests**: none (ação operacional; evidência registrada no runbook)
 **Gate**: build
+
+---
+
+## Correções da auditoria de segurança (`seguranca.md`)
+
+Feitas depois da validação, uma por commit, com teste que falhava antes da correção. Desvios e decisões:
+
+- **SEC-001** (`221c000`, `fae82d2`): `backup.yml` no environment `backup`; todos os secrets só nos environments `producao` e `backup` (T47 atualizada). `BACKUP_CHAVE` fica nos dois (é a chave pública). Teste: `backend/scripts/ops/test/segredos-workflows.test.mjs`.
+- **SEC-002** (`e9c95eb`): lista de permissão de cabeçalhos no Sentry do Worker: `content-type`, `content-length` e `x-pelada`. SPEC_DEVIATION: o auditor sugeria permitir `user-agent`; ficou de fora (é identificador da pessoa), e `x-pelada` entrou porque o teste existente de `limparEvento` já o exigia. Observado no teste: antes da correção, o que saía era o `User-Agent`; os valores de IP já eram cortados pela integração `RequestData` do SDK (`userInfo: false`); a lista de permissão garante os dois.
+- **SEC-004** (`c56c2d2`): `postgres:16@sha256:9e2cf6287f25c3151f4c9421ccce2b17f3e60061c111a29165e0d2cdd9ff0a97` (índice multi-arch, consultado em 2026-10-25) no `dump-cifrado.sh` e no service do CI; `checar-acoes-fixadas.mjs` (G-24) passa a exigir digest em `services`, `container` e `docker run`. Pendente: `docker-compose.yml` segue em `postgres:16` por tag (só local, sem credencial real), porque `docker-compose.test.ts` exige o texto exato e mudar teste existente pede aprovação.
+- **SEC-009** (`1c16e75`): `pnpm restaurar` (`backend/scripts/ops/restaurar.ts`) chama `exigirHostPermitido` antes do `pg_restore --clean`. Regras além da trava (da recomendação do auditor e do "nunca a URL de produção" do runbook): `--alvo producao` é sempre recusado, e destino no mesmo host de `URL_ORIGEM` também. A senha vai em `PGPASSWORD`. Runbook §4 e `.env.example` atualizados.
+- **SEC-009, reteste** (parcial no reteste): com destino remoto, `URL_ORIGEM` passa a ser obrigatória (sem ela, recusa), e origem e destino são comparados pelo identificador do endpoint do Neon (primeiro rótulo do host, sem `-pooler`, em minúsculas, sem ponto final), então o pooler, o ponto final e o segmento `c-N.` do mesmo endpoint são recusados. Destino local segue sem exigir `URL_ORIGEM`. A checagem de `URL_ORIGEM` vem depois da trava (a confirmação digitada ainda é pedida antes), para manter as mensagens dos casos já testados. **Teste existente alterado:** o caso aceito de "host remoto com --alvo teste exige a confirmação digitada do host" (`restaurar.test.ts`) passou a informar `urlOrigem`, porque a nova regra recusa destino remoto sem ela; o que o teste prova não mudou (a recusa sem confirmação certa segue igual). Pede ratificação do usuário. Runbook §4 atualizado.
+- **SEC-011**: o `pnpm restaurar` valida a consulta da URL de destino por lista de permissão (`sslmode`, `channel_binding`, `connect_timeout`, `application_name`, nomes exatos como a libpq os lê; `service`, `hostaddr`, `host`, `passfile`, `options`, `dbname`, maiúsculas e qualquer outro são recusados), antes da trava de host; `password=` na consulta é recusado (senha pela URL ou `PGPASSWORD`). O `pg_restore` roda com ambiente limpo: só `PATH`, `SystemRoot`, `WINDIR`, `TEMP`, `TMP`, `HOME`, `APPDATA`, `LANG`, `LC_ALL` e `PGPASSWORD` (o da URL; sem senha na URL, o herdado). A lista vale só para o `pg_restore` (libpq); a trava compartilhada (`trava-host.ts`) não mudou, porque os outros scripts usam o `pg` do Node. O ambiente limpo é provado no teste da biblioteca (o CLI repassa o `env` recebido sem acrescentar nada); não há teste do CLI com `pg_restore` de verdade. Runbook §4 atualizado.
+- **SEC-010**: `segredos-workflows.test.mjs` trata como uso de secret toda ocorrência do contexto `secrets` numa expressão `${{ }}` (`secrets.X`, `secrets['X']`, `secrets["X"]`, `toJSON(secrets)`, índice calculado) e o `secrets: inherit`; `GITHUB_TOKEN` segue de fora e a palavra fora de expressão não conta. A G-24 (`checar-acoes-fixadas.mjs`) confere a imagem de `docker run`, `docker container run`, `docker create`, `docker container create` e `podman run`, também com opções globais antes do subcomando (`--context x`, `--log-level x`, `-D`, `--host=x`). Limite conhecido: opção global sem valor fora de `-D`, `--debug`, `--tls` e `--tlsverify` é lida como opção com valor e pode esconder o subcomando (guarda contra regressão, não fronteira de segurança; ver a justificativa do achado). Os testes existentes não mudaram; os casos novos falhavam antes.
 
 ---
 
@@ -1343,7 +1359,7 @@ T47 → T48 → T49
 | FUN-25 | T43 | FUN-48 | T43, T49 |
 | FUN-28 | T37 | FUN-49 | T42 |
 | FUN-50 | T43 | FUN-51 | T8, T44, T46 |
-| FUN-52 | T45 | FUN-53 | T6, T10 |
+| FUN-52 | T45 | FUN-53 | T6, T10, T20 |
 | FUN-54 | T5 | FUN-55, 56 | T39 |
 
 **Cobertura:** 56 requisitos, 56 mapeados a tarefas, 0 sem tarefa.

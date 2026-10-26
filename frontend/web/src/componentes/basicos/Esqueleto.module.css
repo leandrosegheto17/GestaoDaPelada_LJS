@@ -1,0 +1,46 @@
+.esqueleto {
+  display: block;
+  background: var(--cor-esqueleto);
+  border-radius: var(--raio-sm);
+  animation: pulsar 1.4s ease-in-out infinite;
+}
+@keyframes pulsar {
+  50% {
+    opacity: 0.55;
+  }
+}
+.linha {
+  height: 16px;
+  margin: var(--esp-2) 0;
+}
+.titulo {
+  height: 28px;
+  width: 60%;
+  margin: var(--esp-2) 0 var(--esp-4);
+}
+.bloco {
+  height: 60px;
+  margin: 0 0 1px;
+  border-radius: 0;
+}
+.botao {
+  height: var(--altura-botao);
+  width: 100%;
+  border-radius: var(--raio);
+}
+.naBarra {
+  background: var(--cor-verde-faixa);
+  height: 28px;
+  width: 220px;
+  margin: 0;
+}
+.mes {
+  height: 28px;
+  width: 180px;
+  margin: var(--esp-2) auto;
+}
+.linhaTabela {
+  height: 46px;
+  margin: 0 0 1px;
+  border-radius: 0;
+}

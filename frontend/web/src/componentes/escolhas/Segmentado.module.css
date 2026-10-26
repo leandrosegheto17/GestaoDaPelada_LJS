@@ -1,0 +1,42 @@
+.segmentado {
+  display: flex;
+  border: 2px solid var(--cor-texto);
+  border-radius: var(--raio);
+  overflow: hidden;
+  padding: 0;
+  margin: 0;
+}
+.segmentado legend {
+  padding: 0;
+}
+.opcao {
+  flex: 1;
+  display: flex;
+}
+.opcao input {
+  position: absolute;
+  opacity: 0;
+}
+.opcao span {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--alvo-toque);
+  padding: 0 var(--esp-2);
+  text-align: center;
+  font-weight: var(--peso-semi);
+  background: var(--cor-superficie);
+  cursor: pointer;
+}
+.opcao + .opcao span {
+  border-left: 2px solid var(--cor-texto);
+}
+.opcao input:checked + span {
+  background: var(--cor-texto);
+  color: var(--cor-superficie);
+}
+.opcao input:focus-visible + span {
+  outline: var(--foco-largura) solid var(--cor-foco);
+  outline-offset: -6px;
+}
