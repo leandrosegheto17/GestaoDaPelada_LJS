@@ -1,4 +1,4 @@
-// Critério: FUN-30 (componentes base: renderização e axe; CampoMoeda e NavegadorMes dependem desta formatação). Copiado do legado: frontend/web/src/componentes/campos/campos.test.tsx
+// CritÃ©rio: FUN-30 (componentes base: renderizaÃ§Ã£o e axe; CampoMoeda e NavegadorMes dependem desta formataÃ§Ã£o). Copiado do legado: frontend/web/src/componentes/campos/campos.test.tsx
 
 import { LIMITES } from '@pelada/contrato';
 import { render, screen } from '@testing-library/react';

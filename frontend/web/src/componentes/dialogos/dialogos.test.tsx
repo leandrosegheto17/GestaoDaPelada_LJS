@@ -1,4 +1,4 @@
-// Critério: FUN-30 (componentes base: renderização e axe). Copiado do legado: frontend/web/src/componentes/dialogos/dialogos.test.tsx
+// CritÃ©rio: FUN-30 (componentes base: renderizaÃ§Ã£o e axe). Copiado do legado: frontend/web/src/componentes/dialogos/dialogos.test.tsx
 
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';

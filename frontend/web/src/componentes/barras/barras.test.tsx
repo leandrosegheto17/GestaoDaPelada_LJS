@@ -1,4 +1,4 @@
-// Critério: FUN-30 (componentes base: renderização e axe). Copiado do legado: frontend/web/src/componentes/barras/barras.test.tsx
+// CritÃ©rio: FUN-30 (componentes base: renderizaÃ§Ã£o e axe). Copiado do legado: frontend/web/src/componentes/barras/barras.test.tsx
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';

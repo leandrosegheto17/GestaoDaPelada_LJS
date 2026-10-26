@@ -1,4 +1,4 @@
-// Critério: FUN-30 (limites de entrada usados pelos campos do front). Copiado do legado: backend/contrato/test/limites.test.ts
+// CritÃ©rio: FUN-30 (limites de entrada usados pelos campos do front). Copiado do legado: backend/contrato/test/limites.test.ts
 
 import { describe, expect, it } from 'vitest';
 import { LIMITES, bytesUtf8 } from '../src/index';

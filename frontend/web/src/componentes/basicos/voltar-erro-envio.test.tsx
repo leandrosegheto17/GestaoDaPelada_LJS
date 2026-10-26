@@ -1,4 +1,4 @@
-// Critério: FUN-30 (componentes base: renderização e axe). Copiado do legado: frontend/web/src/componentes/basicos/voltar-erro-envio.test.tsx
+// CritÃ©rio: FUN-30 (componentes base: renderizaÃ§Ã£o e axe). Copiado do legado: frontend/web/src/componentes/basicos/voltar-erro-envio.test.tsx
 
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';

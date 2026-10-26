@@ -1,4 +1,4 @@
-// Critério: FUN-30 (componentes base: renderização e axe; CampoMoeda e NavegadorMes dependem desta formatação). Copiado do legado: frontend/web/src/componentes/campos/CamposNovaSenha.test.tsx
+// CritÃ©rio: FUN-30 (componentes base: renderizaÃ§Ã£o e axe; CampoMoeda e NavegadorMes dependem desta formataÃ§Ã£o). Copiado do legado: frontend/web/src/componentes/campos/CamposNovaSenha.test.tsx
 
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';

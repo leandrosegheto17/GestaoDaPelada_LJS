@@ -1,4 +1,4 @@
-// Critério: FUN-30 (componentes base: renderização e axe; CampoMoeda e NavegadorMes dependem desta formatação). Copiado do legado: frontend/web/src/formatacao/moeda.test.ts
+// CritÃ©rio: FUN-30 (componentes base: renderizaÃ§Ã£o e axe; CampoMoeda e NavegadorMes dependem desta formataÃ§Ã£o). Copiado do legado: frontend/web/src/formatacao/moeda.test.ts
 
 import { describe, expect, it } from 'vitest';
 import { formatarMoeda, lerMoeda } from './moeda';

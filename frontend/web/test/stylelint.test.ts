@@ -1,3 +1,4 @@
+// Critério: FUN-31 (Stylelint recusa cor, fonte e sombra literais fora de tokens.css).
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import stylelint from 'stylelint';

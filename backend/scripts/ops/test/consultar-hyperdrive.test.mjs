@@ -1,3 +1,4 @@
+// Critério: FUN-18 (cache do Hyperdrive desligado, conferido no deploy).
 import { spawn, spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';

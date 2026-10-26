@@ -1,3 +1,4 @@
+// Critério: FUN-40 (branch de restauração no Neon, mantendo só as 2 mais recentes).
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';

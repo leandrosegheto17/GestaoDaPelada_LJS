@@ -1,3 +1,4 @@
+// Critério: regra de CI sem FUN próprio (T5); ações fixadas por SHA.
 import { execFileSync, spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
