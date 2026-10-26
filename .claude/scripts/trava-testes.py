@@ -36,7 +36,26 @@ PUSH_OU_PR = re.compile(INICIO + r"(?:git\s+push\b|gh\s+pr\s+create\b)")
 MERGE = re.compile(INICIO + r"git\s+merge\s+(?:-[^\s]+\s+)*(?P<alvo>[^\s;&|\"'-][^\s;&|\"']*)")
 
 
+CD_INICIAL = re.compile(r"^\s*cd\s+(?:\"([^\"]+)\"|'([^']+)'|([^\s;&|]+))\s*(?:&&|;)")
+
+
+def diretorio_do_comando(dados):
+    """Pasta em que o comando roda: o `cd <pasta> &&` inicial, ou o cwd informado pelo hook."""
+    comando = (dados.get("tool_input") or {}).get("command", "")
+    achado = CD_INICIAL.match(comando)
+    alvo = next((g for g in achado.groups() if g), None) if achado else None
+    base = alvo or dados.get("cwd") or os.getcwd()
+    base = re.sub(r"^/([a-zA-Z])/", r"\1:/", base)  # caminho do Git Bash (/c/...) para Windows
+    return base
+
+
 def raiz_projeto(dados=None):
+    """Raiz do projeto. Num worktree, vale o worktree em que o comando roda (ele tem seu
+    próprio testes.json e registro de commits verdes); senão, CLAUDE_PROJECT_DIR."""
+    if dados:
+        topo = git(diretorio_do_comando(dados), "rev-parse", "--show-toplevel")
+        if topo and (Path(topo) / ".specs" / "projeto" / "testes.json").exists():
+            return Path(topo)
     base = os.environ.get("CLAUDE_PROJECT_DIR") or (dados or {}).get("cwd") or os.getcwd()
     return Path(base)
 
@@ -68,8 +87,23 @@ def gravar_verde(raiz, commit, resumo):
 
 
 def git(raiz, *args):
-    r = subprocess.run(["git", *args], cwd=raiz, capture_output=True, text=True)
+    try:
+        r = subprocess.run(["git", *args], cwd=raiz, capture_output=True, text=True)
+    except OSError:
+        return None
     return r.stdout.strip() if r.returncode == 0 else None
+
+
+def worktree_da_branch(raiz, branch):
+    """Pasta do worktree em que `branch` está em uso, se tiver testes.json; senão None."""
+    saida = git(raiz, "worktree", "list", "--porcelain") or ""
+    pasta = None
+    for linha in saida.splitlines():
+        if linha.startswith("worktree "):
+            pasta = Path(linha[len("worktree "):])
+        elif linha == f"branch refs/heads/{branch}" and pasta and (pasta / ".specs" / "projeto" / "testes.json").exists():
+            return pasta
+    return None
 
 
 def arvore_limpa(raiz):
