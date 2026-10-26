@@ -43,3 +43,12 @@ describe('checar-urls-absolutas: domínio do app (FUN-22)', () => {
     expect(rodar(raiz).status).toBe(0);
   });
 });
+
+describe('checar-urls-absolutas: o repositório real (G-18)', () => {
+  // O CI roda o script sobre os arquivos versionados; os testes acima só usam repositórios fabricados.
+  it('passa sobre os arquivos versionados deste repositório', () => {
+    const r = rodar(resolve(import.meta.dirname, '..', '..', '..', '..'));
+    expect(r.stderr + r.stdout).not.toMatch(/URL absoluta/);
+    expect(r.status).toBe(0);
+  });
+});
