@@ -24,6 +24,10 @@ const EXCECOES = [
   'https://biomejs.dev/',
   'https://developers.cloudflare.com/',
   'https://pnpm.io/',
+  // deploy.yml: API da Cloudflare (conferência do Hyperdrive) e a validação de formato de URL_PUBLICA.
+  'https://api.cloudflare.com/client/v4',
+  '=~ ^https://[A-Za-z0-9.-]+$',
+  '(ex.: https://host)',
 ];
 
 const arquivos = arquivosVersionados(RAIZ, (c) => ESCOPO.test(c) && !FORA.test(c));
