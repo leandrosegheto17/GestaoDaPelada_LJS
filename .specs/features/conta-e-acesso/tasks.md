@@ -1006,8 +1006,8 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] A página mostra a versão, o selo e as seções do mockup; axe sem violação
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] A página mostra a versão, o selo e as seções do mockup; axe sem violação
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
