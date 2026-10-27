@@ -110,16 +110,17 @@
 ## Retomada
 
 - **Fluxo**: 1, Projeto novo para vender — skill `projeto-novo`
-- **Item**: `.specs/features/conta-e-acesso/` (feature 2 de 8, AD-001), já integrada na `main` (merge `ee202e2`, sem push). A branch `feat/conta-e-acesso` e o worktree `.worktrees/conta-e-acesso` ainda existem, para limpar depois do push.
-- **Fase aprovada**: 10, Validação, em 2026-10-27: verificador PASS na volta 3 (`validation.md`), auditoria de segurança sem achado crítico ou alto (`seguranca.md`), aceite visual do usuário (galeria https://claude.ai/artifact/CXKJkAy93LV7mGqzHSDLKD) e trava de testes verde no `803c6ee`.
-- **Próxima fase**: 11, Lançamento (skill `liberacao`) — modelo indicado: sonnet. Antes de liberar: tratar os 4 médios de segurança (AD-012) e conferir as pendências do usuário.
-- **Progresso**: Plano: Faltam 7 de 8 features: 12% concluído (a `conta-e-acesso` só vira Concluída na liberação). Item atual: todas as 52 tarefas da feature concluídas, conferido na branch. Projeto: faltam 2 de 101 tarefas (T1 e T2 da fundação, ações do usuário).
+- **Item**: `.specs/features/conta-e-acesso/` (feature 2 de 8, AD-001), integrada na `main` (merge `ee202e2`, sem push). A branch `feat/conta-e-acesso` e o worktree `.worktrees/conta-e-acesso` ainda existem, para limpar depois do push.
+- **Fase aprovada**: 8, Preparação das correções, em 2026-10-27: o usuário aprovou as tarefas T57 a T64 (Phase 11 do `tasks.md`) e a volta à construção para tratar os 4 médios de segurança (AD-012), com ajuste dos testes de confirmação pelo ACE-06 novo (T59). Turnstile fica fora desta rodada.
+- **Próxima fase**: 9, Construção das T57 a T64 (`tlc-spec-driven`, Execute; `implementador-dominio` em T58, T61 e T63, `implementador` nas demais; isolar com `using-git-worktrees`, a partir da `main`) — modelo indicado: sonnet. Depois: 10 (verificador sobre as correções, reteste dos SEC-CA-01 a 04, trava de testes) e 11 (skill `liberacao`).
+- **Progresso**: Plano: Faltam 7 de 8 features: 12% concluído. Item atual: faltam 8 de 64 tarefas: 88% concluído. Projeto: faltam 10 de 113 tarefas: 91% concluído (conferido em 2026-10-27).
 - **Combinado na conversa e não registrado em artefato**:
-  - Push: o usuário já confirmou o push da `main` depois da trava verde. Falta rodar a trava no `HEAD` final da `main` e pedir a confirmação do comando de push na hora. A trava guarda o registro de suíte verde por pasta; para integrar uma branch de worktree rodei a suíte na `main` com checkout destacado do commit (o `worktree_da_branch` do `trava-testes.py` existe e não é usado no merge).
-  - Banco local: `conta-e-acesso-db-1` (porta 5432), compose do worktree, migrado e com seed. O `.env` da `main` agora tem `SEED_SENHA_ADMIN` (fora do git), necessário para o e2e de acesso. Não mexer em `controleemcasa_ljs-banco-1` (55432) nem em `evolucao-segura-postgres` (5433).
+  - Push: o usuário já confirmou o push da `main` depois da trava verde, mas o push e o deploy só acontecem na liberação, depois das correções. Rodar a trava no `HEAD` final e pedir a confirmação do comando de push na hora. A trava guarda o registro de suíte verde por pasta; para integrar uma branch de worktree, rodar a suíte na `main` com checkout destacado do commit.
+  - Banco local: `conta-e-acesso-db-1` (porta 5432), compose do worktree, migrado e com seed. O `.env` da `main` tem `SEED_SENHA_ADMIN` (fora do git), necessário para o e2e de acesso. Não mexer em `controleemcasa_ljs-banco-1` (55432) nem em `evolucao-segura-postgres` (5433).
   - `TERMOS_VERSAO` provisório (`2026-10-27`).
+  - Os baixos SEC-CA-05 a 12 seguem sem decisão e entram na liberação como itens a decidir (perguntas 4 de `seguranca.md`: remoção entre admins e contas do legado com senha temporária).
   - Pendências do usuário: apagar a branch Neon `spike-descartavel` e o Hyperdrive `spike-s1`; conferir o backup agendado; antes do deploy desta feature, verificar o domínio no Resend (runbook, seção 9).
-- **Gravada em**: 2026-10-27 (após a integração local da `conta-e-acesso`)
+- **Gravada em**: 2026-10-27 (após aprovar as tarefas de correção de segurança)
 
 ## Modelo
 

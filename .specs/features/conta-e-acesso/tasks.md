@@ -149,6 +149,19 @@ Tarefas de correção do verificador (volta 1) e das lacunas que ele apontou sem
 T45, T46, T47, T48, T49, T50, T51, T52, T53, T54, T55, T56 (independentes)
 ```
 
+### Phase 11: Correções da auditoria de segurança (AD-012)
+
+Os 4 médios SEC-CA-01 a 04. T58 e T59 tratam a confirmação sem sessão; T60 e T61, o bcrypt das rotas com sessão; T62, o IPv6; T63, o teto de e-mails.
+
+```
+T57 → T58 → T59
+T57 → T60 → T61
+T57 → T62
+T57 → T63
+T61 → T64
+T63 → T64
+```
+
 ---
 
 ## Task Breakdown
@@ -1510,6 +1523,202 @@ T45, T46, T47, T48, T49, T50, T51, T52, T53, T54, T55, T56 (independentes)
 
 ---
 
+## Correções da auditoria de segurança (AD-012)
+
+Tratam os médios SEC-CA-01 a 04 de `seguranca.md`, decididos pelo usuário em 2026-10-27 (fase 11). O Turnstile fica
+fora desta rodada: as defesas abaixo não mexem em telas além do aviso de T59.
+
+### T57: Spec: confirmar o e-mail não abre sessão (ACE-06) e novos critérios de abuso
+
+**What**: na `spec.md`, trocar o ACE-06 ("abrir uma sessão e levar a pessoa para `/app`") por "marcar o e-mail como confirmado, sem abrir sessão, e levar a pessoa para `/entrar` com o aviso de e-mail confirmado"; acrescentar critérios `ACE-60` (rotas com sessão que rodam bcrypt têm limitador por IP e bloqueio de 15 min por conta após 5 falhas da senha atual), `ACE-61` (no IPv6 a chave do limitador e do `ip_hash` é o prefixo /64) e `ACE-62` (teto global de e-mails por janela, com reserva para recuperação de senha). Atualizar a matriz de rastreio.
+**Estimativa**: 30 min
+**Where**: `.specs/features/conta-e-acesso/spec.md`
+**Depends on**: None
+**Requirement**: ACE-06, ACE-60, ACE-61, ACE-62
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] ACE-06 reescrito e ACE-60 a ACE-62 escritos em EARS, com a matriz de rastreio
+- [ ] `validate_spec.py` passa
+
+**Tests**: none
+**Gate**: quick
+
+---
+
+### T58: `link_confirmar` só confirma o e-mail e não cria sessão (SEC-CA-01)
+
+**What**: migration nova e aditiva que redefine `link_confirmar` para confirmar o e-mail sem criar sessão (a migration `1792843440000` já aplicada não se edita); ajustar o repositório `links.confirmar`. Teste de integração primeiro: confirmar com link válido marca `email_confirmado` e não cria linha em `sessoes`; link vencido, usado ou inexistente segue devolvendo nulo.
+**Estimativa**: 1,5h
+**Where**: `backend/api/src/infraestrutura/db/migracoes/` (migration nova), `backend/api/src/infraestrutura/db/repositorios/links.ts`, teste de integração do banco
+**Depends on**: T57
+**Requirement**: ACE-06, ACE-07
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] O teste falha no código antigo (sessão criada) e passa depois
+- [ ] Nenhuma migration aplicada foi editada
+- [ ] `pnpm test` (API, com Postgres local) e `pnpm typecheck` passam
+
+**Tests**: integration
+**Gate**: quick
+
+---
+
+### T59: Rota e tela de confirmação levam a `/entrar` sem cookie (SEC-CA-01)
+
+**What**: `POST /api/conta/confirmar` responde 204 sem `Set-Cookie`; a tela `Confirmar` envia a pessoa a `/entrar` com o aviso "E-mail confirmado. Entre com a sua senha." (mesma faixa de aviso das outras telas de acesso, sem tela nova). Atualizar os testes que esperavam a sessão aberta (fluxo ponta a ponta de cadastro e `casos.ts` do isolamento), pelo critério ACE-06 novo e não pelo código.
+**Estimativa**: 1,5h
+**Where**: `backend/api/src/entrada/rotas/conta-cadastro.ts`, `frontend/web/src/telas/confirmar/`, testes da rota, e2e de acesso, `backend/api/test/isolamento/casos.ts`
+**Depends on**: T58
+**Requirement**: ACE-06, ACE-07
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] Teste da rota prova que confirmar não devolve `Set-Cookie`
+- [ ] Teste da tela prova o redirecionamento para `/entrar` com o aviso
+- [ ] A alteração de teste existente tem motivo registrado (ACE-06 mudou) e foi aprovada na fase de tarefas
+- [ ] `pnpm test`, `pnpm --filter @pelada/web e2e` e `pnpm --filter @pelada/web visual` passam
+
+**Tests**: e2e
+**Gate**: full
+
+---
+
+### T60: Limitador por IP em `/api/conta/senha` e `/api/conta/excluir` (SEC-CA-03)
+
+**What**: incluir as duas rotas em `ROTAS_LIMITE_ENTRAR` (`app.ts`). Teste primeiro: com o limitador de teste negando, as duas rotas respondem 429 antes de rodar o bcrypt.
+**Estimativa**: 1h
+**Where**: `backend/api/src/entrada/app.ts`, teste da rota
+**Depends on**: T57
+**Requirement**: ACE-60
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] O teste falha sem a inclusão e passa com ela
+- [ ] O teste que lista `ROTAS_LIMITE_ENTRAR` contra a tabela do design está atualizado
+- [ ] `pnpm test` e `pnpm typecheck` passam
+
+**Tests**: e2e
+**Gate**: quick
+
+---
+
+### T61: Bloqueio por conta após falhas da senha atual (SEC-CA-03)
+
+**What**: contar as falhas da senha atual por conta em `/api/conta/senha` e `/api/conta/excluir`, com o mesmo bloqueio de 15 min do login (5 falhas); migration aditiva para a contagem e as funções que a usam. Teste de integração primeiro: a 6ª tentativa em 15 min recebe o erro de bloqueio sem rodar o bcrypt; acerto zera a contagem; passados 15 min, libera.
+**Estimativa**: 2h
+**Where**: `backend/api/src/infraestrutura/db/migracoes/` (migration nova), `backend/api/src/entrada/rotas/conta-minha.ts`, repositório de contas, testes
+**Depends on**: T60
+**Requirement**: ACE-60
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] Os três cenários do teste (bloqueia, zera no acerto, libera após 15 min) passam e falhariam sem a mudança
+- [ ] O bloqueio é por conta, não por IP, e não revela se a conta existe
+- [ ] `pnpm test` e `pnpm typecheck` passam
+
+**Tests**: integration
+**Gate**: quick
+
+---
+
+### T62: Chave do limitador e `ip_hash` pelo prefixo /64 no IPv6 (SEC-CA-04)
+
+**What**: função pura que normaliza o IP (IPv4 inteiro; IPv6 reduzido ao prefixo /64) usada como chave do `criarLimiteTaxa` e do `ip_hash` do bloqueio por e-mail e IP. Teste unitário primeiro: dois endereços do mesmo /64 dão a mesma chave, /64 diferentes dão chaves diferentes, IPv4 não muda, ausência de IP segue em `sem-ip`.
+**Estimativa**: 1h
+**Where**: `backend/api/src/entrada/middlewares/limite-taxa.ts`, `backend/api/src/entrada/rotas/sessao.ts`, função nova e teste
+**Depends on**: T57
+**Requirement**: ACE-61
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] Os casos do teste unitário passam e falhariam sem a normalização
+- [ ] Limitador e `ip_hash` usam a mesma função
+- [ ] `pnpm test` e `pnpm typecheck` passam
+
+**Tests**: unit
+**Gate**: quick
+
+---
+
+### T63: Teto global de e-mails por janela, com reserva para recuperação de senha (SEC-CA-02)
+
+**What**: contador global de envios por janela no banco (migration aditiva), consultado antes de enviar. Cadastro, reenvio e convite param ao passar de 80% da cota diária (`LIMITE_EMAILS_DIA`, padrão 100, em `.env.example`); "esqueci a senha" usa a cota inteira. Acima do teto, a rota responde 503 `email_indisponivel` (ACE-52). Teste de integração primeiro com o contador simulado.
+**Estimativa**: 2h
+**Where**: `backend/api/src/infraestrutura/db/migracoes/` (migration nova), `backend/api/src/entrada/enviar-email.ts`, `.env.example`, testes
+**Depends on**: T57
+**Requirement**: ACE-62, ACE-52
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] Teste prova que cadastro é recusado acima de 80% e "esqueci a senha" ainda envia até 100%
+- [ ] O contador zera na virada do dia no fuso de São Paulo (ADR-012)
+- [ ] `pnpm test`, `pnpm typecheck` e `pnpm test:checagens` passam
+
+**Tests**: integration
+**Gate**: quick
+
+---
+
+### T64: Runbook e THREAT-MODEL: cota, suspensão do Resend e Turnstile adiado
+
+**What**: no `docs/runbook.md`, o que fazer se a cota ou o domínio do Resend esgotar ou for suspenso, e como conferir o consumo (alerta manual aos 50%); no THREAT-MODEL 1a, linha D, citar as rotas `/api/conta/senha` e `/api/conta/excluir` e registrar o Turnstile como adiado, com o risco residual de *password spraying* distribuído.
+**Estimativa**: 30 min
+**Where**: `docs/runbook.md`, `.md/THREAT-MODEL.md`
+**Depends on**: T61, T63
+**Requirement**: ACE-62
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] Os dois documentos têm as seções
+- [ ] `pnpm format:check` e `pnpm test:checagens` passam
+
+**Tests**: none
+**Gate**: quick
+
+---
+
 ## Phase Execution Map
 
 ```
@@ -1530,6 +1739,12 @@ Phase 7:  T30, T31, T32, T33, T34, T35, T36 (independentes)
 Phase 8:  T37, T38, T39, T40, T41 (independentes)
 Phase 9:  T42 → T43 → T44
 Phase 10: T45, T46, T47, T48, T49, T50, T51, T52, T53, T54, T55, T56 (independentes)
+Phase 11: T57 → T58 → T59
+          T57 → T60 → T61
+          T57 → T62
+          T57 → T63
+          T61 → T64
+          T63 → T64
 ```
 
 Execução estritamente sequencial: um trabalhador faz uma tarefa por vez, em ordem.
@@ -1546,6 +1761,7 @@ Execução estritamente sequencial: um trabalhador faz uma tarefa por vez, em or
 | 6 | 7 | T30 a T36 | `implementador` |
 | 7 | 8 e 9 | T37 a T44 | `implementador` |
 | 8 | 10 | T45 a T56 (T45 a T50 feitas na volta 1 do verificador; T51 a T55 na volta 2; T56 na auditoria de segurança) | `implementador` |
+| 9 | 11 | T57 a T64 (correções dos 4 médios da auditoria, AD-012) | `implementador-dominio` (T58, T61, T63) e `implementador` (as demais) |
 
 ---
 
@@ -1566,6 +1782,7 @@ Execução estritamente sequencial: um trabalhador faz uma tarefa por vez, em or
 | T43 | um arquivo de e2e | ✅ |
 | T44 | documentação da feature | ⚠️ coeso (docs do mesmo fechamento) |
 | T45 a T56 | uma correção ou prova cada (T47 e T50 tocam dois arquivos do mesmo assunto) | ✅ |
+| T57 a T64 | uma correção de segurança cada (T59, T62 e T64 tocam arquivos do mesmo assunto) | ✅ |
 
 ## Diagram-Definition Cross-Check
 
@@ -1605,6 +1822,13 @@ Execução estritamente sequencial: um trabalhador faz uma tarefa por vez, em or
 | T43 | T42 | T42 → T43 | ✅ |
 | T44 | T43 | T43 → T44 | ✅ |
 | T45 a T56 | None | — | ✅ |
+| T57 | None | — | ✅ |
+| T58 | T57 | T57 → T58 | ✅ |
+| T59 | T58 | T58 → T59 | ✅ |
+| T60 | T57 | T57 → T60 | ✅ |
+| T61 | T60 | T60 → T61 | ✅ |
+| T62, T63 | T57 | T57 → T62, T57 → T63 | ✅ |
+| T64 | T61, T63 | T61 → T64, T63 → T64 | ✅ |
 
 ## Test Co-location Validation
 
@@ -1630,3 +1854,7 @@ Execução estritamente sequencial: um trabalhador faz uma tarefa por vez, em or
 | T47 | Front: comparação visual | e2e visual | e2e | ✅ |
 | T49 | Lint das rotas | unit | unit | ✅ |
 | T52 | Rotas da API | e2e | e2e | ✅ |
+| T57, T64 | Documentação | none | none | ✅ |
+| T58, T61, T63 | Banco e repositórios | integration | integration | ✅ |
+| T59, T60 | Rotas da API e telas | e2e | e2e | ✅ |
+| T62 | Middleware do limitador | unit | unit | ✅ |
