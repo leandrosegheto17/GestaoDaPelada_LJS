@@ -23,10 +23,14 @@ export async function pedir(db: Db, email: string, tipo: TipoLink, tokenHash: Ui
   return { enviar: linha.enviar, nome: linha.nome };
 }
 
-/** Consome o link de confirmação e cria a sessão com `tokenSessaoHash`. Devolve a conta, ou nulo (ACE-06, ACE-07). */
-export async function confirmar(db: Db, tokenHash: Uint8Array, tokenSessaoHash: Uint8Array): Promise<string | null> {
+/**
+ * Consome o link de confirmação e marca o e-mail como confirmado, sem abrir sessão. Devolve a conta, ou nulo se o
+ * link está vencido, usado ou não existe (ACE-06, ACE-07). O segundo parâmetro da função do banco não é mais usado
+ * (migration 1792843740000) e vai nulo.
+ */
+export async function confirmar(db: Db, tokenHash: Uint8Array): Promise<string | null> {
   const { rows } = await sql<{ conta_id: string | null }>`
-    SELECT link_confirmar(${tokenHash}, ${tokenSessaoHash}) AS conta_id
+    SELECT link_confirmar(${tokenHash}, NULL) AS conta_id
   `.execute(db);
   return rows[0]?.conta_id ?? null;
 }

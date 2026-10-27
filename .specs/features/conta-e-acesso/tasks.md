@@ -1568,9 +1568,9 @@ fora desta rodada: as defesas abaixo não mexem em telas além do aviso de T59.
 
 **Done when**:
 
-- [ ] O teste falha no código antigo (sessão criada) e passa depois
-- [ ] Nenhuma migration aplicada foi editada
-- [ ] `pnpm test` (API, com Postgres local) e `pnpm typecheck` passam
+- [x] O teste falha no código antigo (sessão criada) e passa depois
+- [x] Nenhuma migration aplicada foi editada
+- [x] `pnpm test` (API, com Postgres local) e `pnpm typecheck` passam
 
 **Tests**: integration
 **Gate**: quick

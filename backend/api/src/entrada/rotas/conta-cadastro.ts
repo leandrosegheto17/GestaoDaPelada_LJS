@@ -49,8 +49,10 @@ export const rotaContaCadastro = new Hono<AppEnv>()
     const corpo = await lerCorpo(c, tokenCorpo);
     if (!corpo.ok) return corpo.resposta;
 
+    // SPEC_DEVIATION: o banco já não cria a sessão (T58, ACE-06 novo), mas a rota ainda manda o cookie de um token
+    // sem sessão. Responder 204 sem Set-Cookie e levar a /entrar é a T59.
     const sessao = await gerarToken();
-    const contaId = await links.confirmar(c.var.db, await sha256(corpo.dado.token), sessao.hash);
+    const contaId = await links.confirmar(c.var.db, await sha256(corpo.dado.token));
     if (!contaId) return linkInvalido(c);
     definirCookieSessao(c, sessao.token);
     return c.body(null, 204);

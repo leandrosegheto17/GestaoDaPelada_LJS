@@ -1,6 +1,6 @@
 import { TERMOS_VERSAO } from '@pelada/contrato';
 import { describe, expect, it } from 'vitest';
-import { cenarioDeAcesso, cookieDaResposta, REMETENTE_QUE_FALHA, SENHA } from '../apoio/acesso.ts';
+import { cenarioDeAcesso, REMETENTE_QUE_FALHA, SENHA } from '../apoio/acesso.ts';
 import { PENDENTE_FALHA, PENDENTE_REENVIO } from '../apoio/contas-antigas.ts';
 import { capturarLog } from '../apoio/log.ts';
 import { comoOwner } from '../apoio/owner-worker.ts';
@@ -162,15 +162,17 @@ describe('POST /api/conta', () => {
 });
 
 describe('POST /api/conta/confirmar', () => {
-  it('o link confirma o e-mail e abre a sessão (ACE-06)', async () => {
+  // ACE-06 reescrito na T57 (SEC-CA-01): confirmar não abre sessão. Este caso esperava GET /api/sessao 200 com o
+  // cookie da confirmação; a ausência do Set-Cookie fica para a T59.
+  it('o link confirma o e-mail sem abrir sessão, e a pessoa entra com a senha (ACE-06)', async () => {
     const { pedir, tokenDoEmail } = cenarioDeAcesso();
     const email = emailNovo();
     await pedir('POST', '/api/conta', cadastro(email));
     const r = await pedir('POST', '/api/conta/confirmar', { token: tokenDoEmail(email) });
     expect(r.status).toBe(204);
-    const eu = await pedir('GET', '/api/sessao', undefined, { cookie: cookieDaResposta(r) });
-    expect(eu.status).toBe(200);
-    expect(eu.corpo).toMatchObject({ email, nome: 'Maria Souza' });
+    const par = (r.headers.get('Set-Cookie') ?? '').split(';')[0] ?? '';
+    const eu = await pedir('GET', '/api/sessao', undefined, par ? { cookie: par } : {});
+    expect(eu.status).toBe(401);
     const entra = await pedir('POST', '/api/sessao/entrar', { email, senha: SENHA });
     expect(entra.status).toBe(200);
   });

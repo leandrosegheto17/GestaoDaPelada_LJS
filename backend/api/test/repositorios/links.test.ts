@@ -41,7 +41,7 @@ describe('links.pedir', () => {
       enviar: true,
       nome: 'Pessoa Link',
     });
-    expect(await semConta((db) => links.confirmar(db, linkConfirmacao, hash()))).toBeNull();
+    expect(await semConta((db) => links.confirmar(db, linkConfirmacao))).toBeNull();
   });
 
   it('segundo pedido em menos de 60 s: enviar falso (ACE-51)', async () => {
@@ -62,21 +62,36 @@ describe('links.pedir', () => {
 });
 
 describe('links.confirmar', () => {
-  it('link válido: confirma o e-mail, cria a sessão com o hash dado e devolve a conta (ACE-06)', async () => {
+  // ACE-06 reescrito na T57 (SEC-CA-01): confirmar não abre sessão. Este caso esperava a sessão criada.
+  it('link válido: confirma o e-mail, consome o link, devolve a conta e não cria sessão (ACE-06)', async () => {
     const { id, linkConfirmacao } = await contaNova();
-    const sessao = hash();
-    expect(await semConta((db) => links.confirmar(db, linkConfirmacao, sessao))).toBe(id);
+    expect(await semConta((db) => links.confirmar(db, linkConfirmacao))).toBe(id);
     const conta = await b.owner.query('SELECT email_confirmado_em IS NOT NULL AS ok FROM contas WHERE id = $1', [id]);
     expect(conta.rows[0]).toEqual({ ok: true });
-    const s = await b.owner.query('SELECT conta_id FROM sessoes WHERE token_hash = $1', [sessao]);
-    expect(s.rows).toEqual([{ conta_id: id }]);
+    const link = await b.owner.query('SELECT usado_em IS NOT NULL AS usado FROM links_conta WHERE token_hash = $1', [
+      linkConfirmacao,
+    ]);
+    expect(link.rows).toEqual([{ usado: true }]);
+    expect((await b.owner.query('SELECT 1 FROM sessoes WHERE conta_id = $1', [id])).rowCount).toBe(0);
   });
 
-  it('link inexistente ou já usado: nulo (ACE-07)', async () => {
-    const { linkConfirmacao } = await contaNova();
-    expect(await semConta((db) => links.confirmar(db, hash(), hash()))).toBeNull();
-    await semConta((db) => links.confirmar(db, linkConfirmacao, hash()));
-    expect(await semConta((db) => links.confirmar(db, linkConfirmacao, hash()))).toBeNull();
+  it('link inexistente ou já usado: nulo e nenhuma sessão (ACE-07)', async () => {
+    const { id, linkConfirmacao } = await contaNova();
+    expect(await semConta((db) => links.confirmar(db, hash()))).toBeNull();
+    await semConta((db) => links.confirmar(db, linkConfirmacao));
+    expect(await semConta((db) => links.confirmar(db, linkConfirmacao))).toBeNull();
+    expect((await b.owner.query('SELECT 1 FROM sessoes WHERE conta_id = $1', [id])).rowCount).toBe(0);
+  });
+
+  it('link vencido: nulo, sem confirmar o e-mail e sem sessão (ACE-07)', async () => {
+    const { id, linkConfirmacao } = await contaNova();
+    await b.owner.query("UPDATE links_conta SET expira_em = now() - interval '1 second' WHERE token_hash = $1", [
+      linkConfirmacao,
+    ]);
+    expect(await semConta((db) => links.confirmar(db, linkConfirmacao))).toBeNull();
+    const conta = await b.owner.query('SELECT email_confirmado_em IS NULL AS pendente FROM contas WHERE id = $1', [id]);
+    expect(conta.rows[0]).toEqual({ pendente: true });
+    expect((await b.owner.query('SELECT 1 FROM sessoes WHERE conta_id = $1', [id])).rowCount).toBe(0);
   });
 });
 

@@ -170,7 +170,8 @@ describe('conta_cadastrar (ACE-01, ACE-04, ACE-05)', () => {
 });
 
 describe('link_confirmar (ACE-06, ACE-07)', () => {
-  it('dentro das 24 h, confirma o e-mail, consome o link e cria a sessão de 12 h', async () => {
+  // ACE-06 reescrito na T57 (SEC-CA-01): confirmar o e-mail não abre sessão. Este caso esperava a sessão de 12 h.
+  it('dentro das 24 h, confirma o e-mail e consome o link sem criar sessão, mesmo recebendo um hash de sessão', async () => {
     const email = novoEmail();
     const token = novoHash();
     const { conta_id } = await cadastrar(email, token);
@@ -181,7 +182,24 @@ describe('link_confirmar (ACE-06, ACE-07)', () => {
 
     expect((await conta(email))?.email_confirmado_em).toBeInstanceOf(Date);
     expect((await link(token))?.usado).toBe(true);
-    expect(await sessoesDe(conta_id)).toEqual([{ token_hash: sessao, horas: 12 }]);
+    expect(await sessoesDe(conta_id)).toEqual([]);
+    const { rows } = await cliente.query('SELECT 1 FROM sessoes WHERE token_hash = $1', [sessao]);
+    expect(rows).toEqual([]);
+  });
+
+  it('o segundo parâmetro (hash de sessão, sem uso desde o ACE-06 novo) pode ser nulo', async () => {
+    const email = novoEmail();
+    const token = novoHash();
+    const { conta_id } = await cadastrar(email, token);
+
+    const r = await comoApp(cliente, {}, async () => {
+      const { rows } = await cliente.query<{ r: string | null }>('SELECT link_confirmar($1, NULL) AS r', [token]);
+      return rows[0]?.r ?? null;
+    });
+
+    expect(r).toBe(conta_id);
+    expect((await conta(email))?.email_confirmado_em).toBeInstanceOf(Date);
+    expect(await sessoesDe(conta_id)).toEqual([]);
   });
 
   it('link vencido: nulo, sem sessão e sem confirmar', async () => {
@@ -195,17 +213,21 @@ describe('link_confirmar (ACE-06, ACE-07)', () => {
     expect(await sessoesDe(conta_id)).toEqual([]);
   });
 
-  it('link já usado: nulo e nenhuma sessão nova', async () => {
+  // ACE-06 reescrito na T57: o primeiro uso já não cria sessão, então o esperado passa de 1 sessão para nenhuma.
+  it('link já usado: nulo e nenhuma sessão', async () => {
     const token = novoHash();
     const { conta_id } = await cadastrar(novoEmail(), token);
     await confirmar(token);
 
     expect(await confirmar(token)).toBeNull();
-    expect(await sessoesDe(conta_id)).toHaveLength(1);
+    expect(await sessoesDe(conta_id)).toEqual([]);
   });
 
-  it('link inexistente: nulo', async () => {
-    expect(await confirmar(novoHash())).toBeNull();
+  it('link inexistente: nulo e nenhuma sessão criada', async () => {
+    const sessao = novoHash();
+    expect(await confirmar(novoHash(), sessao)).toBeNull();
+    const { rows } = await cliente.query('SELECT 1 FROM sessoes WHERE token_hash = $1', [sessao]);
+    expect(rows).toEqual([]);
   });
 });
 

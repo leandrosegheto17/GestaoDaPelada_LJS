@@ -43,7 +43,7 @@ const emailNovo = () => `sessao-${crypto.randomUUID()}@exemplo.com`;
 
 /**
  * Conta nova com uma sessão válida, criada só pelas funções do banco (o Worker de teste não tem o owner).
- * Sem `grupo`: cadastro e confirmação pelo link (conta sem vínculo). Com `grupo`: convite criado pela conta do
+ * Sem `grupo`: cadastro, confirmação pelo link e entrada com a senha (conta sem vínculo). Com `grupo`: convite criado pela conta do
  * cenário e cadastro pelo convite (conta com vínculo no grupo).
  */
 export async function criarSessao(grupo?: IdsDoGrupo): Promise<SessaoDeTeste> {
@@ -73,7 +73,13 @@ export async function criarSessao(grupo?: IdsDoGrupo): Promise<SessaoDeTeste> {
         tokenHash: link.hash,
       }),
     );
-    contaId = await noBanco(undefined, (db) => links.confirmar(db, link.hash, sessao.hash));
+    // Confirmar o e-mail não abre sessão (ACE-06, T58): a sessão vem de entrar com a senha, como na rota.
+    const confirmada = await noBanco(undefined, (db) => links.confirmar(db, link.hash));
+    const ipHash = crypto.getRandomValues(new Uint8Array(32));
+    const entrou = confirmada
+      ? await noBanco(undefined, (db) => contas.entrar(db, { email, senha: SENHA, ipHash, tokenHash: sessao.hash }))
+      : undefined;
+    contaId = entrou?.resultado === 'ok' ? entrou.contaId : null;
   }
   if (!contaId) throw new Error('não foi possível criar a sessão de teste');
   return {
