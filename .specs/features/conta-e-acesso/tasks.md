@@ -25,6 +25,8 @@ Implemente estas tarefas com a skill `tlc-spec-driven`: **acione-a pelo nome e s
 
 > **Registro do lote 4 (2026-10-27, aprovado pelo usuário):** rotas T17 a T23. Entrar roda em transação própria (`emTransacaoPropria`) para não perder a contagem de falhas (ACE-13); `@pelada/contrato` entra como dependência da API; `SEED_SENHA_ADMIN` fica só no `.env.example` (SPEC_DEVIATION); apoios de teste novos em `backend/api/test/apoio/` (binding `HYPERDRIVE_OWNER_TESTE` só no teste). Respostas das rotas listadas no relatório do lote, para o front.
 
+> **Registro do lote 5 (2026-10-27, aprovado pelo usuário):** T24 a T29. Mudança em teste existente aprovada: `App.test.tsx` passa a esperar "Página não encontrada" (tela própria exigida pela T29) no lugar de `404|Not Found`. Regra de lint `pelada/sem-escrita-dono` ligada em `backend/api/src/**` (ACE-63). Comando do dono: `pnpm dono -- --email <e-mail> [--alvo producao]`. As telas T30 a T41 sobrescrevem os 12 componentes provisórios "Tela em construção" mantendo o nome exportado. `rodarSeed` dos testes passa `SEED_SENHA_ADMIN` por padrão.
+
 ---
 
 ## Test Coverage Matrix
