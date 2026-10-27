@@ -796,8 +796,8 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] `decidirRota` cobre: sem sessão em `/app/conta` → `/entrar?volta=/app/conta`; depois do login → `/app/conta`; logado em `/entrar` → `/app` (ACE-19, ACE-65)
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] `decidirRota` cobre: sem sessão em `/app/conta` → `/entrar?volta=/app/conta`; depois do login → `/app/conta`; logado em `/entrar` → `/app` (ACE-19, ACE-65)
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
