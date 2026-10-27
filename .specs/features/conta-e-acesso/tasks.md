@@ -1054,8 +1054,8 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] Os estados do mockup; 409 mostra os grupos; depois de excluir, a tela vai a `/` com "Sua conta foi excluída"; axe sem violação
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Os estados do mockup; 409 mostra os grupos; depois de excluir, a tela vai a `/` com "Sua conta foi excluída"; axe sem violação
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
