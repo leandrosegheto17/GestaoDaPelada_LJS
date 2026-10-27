@@ -27,6 +27,8 @@ Implemente estas tarefas com a skill `tlc-spec-driven`: **acione-a pelo nome e s
 
 > **Registro do lote 5 (2026-10-27, aprovado pelo usuário):** T24 a T29. Mudança em teste existente aprovada: `App.test.tsx` passa a esperar "Página não encontrada" (tela própria exigida pela T29) no lugar de `404|Not Found`. Regra de lint `pelada/sem-escrita-dono` ligada em `backend/api/src/**` (ACE-63). Comando do dono: `pnpm dono -- --email <e-mail> [--alvo producao]`. As telas T30 a T41 sobrescrevem os 12 componentes provisórios "Tela em construção" mantendo o nome exportado. `rodarSeed` dos testes passa `SEED_SENHA_ADMIN` por padrão.
 
+> **Registro do lote 6 (2026-10-27, aprovado pelo usuário):** T30 a T36. `CaixaSelecao` (fora do Where) passa a aceitar `ReactNode` no rótulo e ganha `id`, `aria-describedby` e `aria-invalid`, para os links dos termos no aceite (ACE-59). Apoios novos em `telas/compartilhado/` (`PaginaAcesso`, `PaginaTexto`, `falhas.ts`, `usarTokenDoLink.ts`) e `test/apoio/tela.tsx`. Combinações de URL: `/entrar?aviso=sessao-expirada|senha-alterada` e `?volta=`. 422 em `/conta/confirmar` e `/sessao/nova-senha` vale como link inválido. Pendência: o e2e `cabecalhos.spec.ts:58` (CSP, "Refused to load: script-src") falha desde antes do lote; investigar e corrigir antes do lote 7.
+
 ---
 
 ## Test Coverage Matrix
