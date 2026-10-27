@@ -3,6 +3,7 @@ import { aplicarMigracoes } from '../../src/infraestrutura/db/migracoes/executar
 import { exigirHostPermitido } from '../../src/infraestrutura/seguranca/trava-host.ts';
 import { comCliente, urlDeTeste, urlDoBanco } from './banco.ts';
 import { BANCO_DO_WORKER } from './banco-worker.ts';
+import { gravarContasAntigas } from './contas-antigas.ts';
 import { gravarDoisGrupos } from './cenario-dois-grupos.ts';
 import { gravarGrupoIsolado } from './grupo-isolado.ts';
 
@@ -29,6 +30,7 @@ export default async function preparar(): Promise<() => Promise<void>> {
   await comCliente(url, async (owner) => {
     await gravarDoisGrupos(owner);
     await gravarGrupoIsolado(owner);
+    await gravarContasAntigas(owner);
     await owner.query(`ALTER ROLE pelada_app LOGIN PASSWORD ${owner.escapeLiteral(senha)}`);
   });
 

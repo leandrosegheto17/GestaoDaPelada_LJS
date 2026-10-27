@@ -192,5 +192,17 @@ export const CASOS_ROTAS: Record<string, CasoRota> = {
     tipo: 'nao_se_aplica',
     motivo: 'Dado da própria conta da sessão (RLS por conta) e os grupos em que ela tem vínculo; não é rota de grupo.',
   },
+  'POST /api/conta': {
+    tipo: 'nao_se_aplica',
+    motivo: 'Sem sessão: cria a conta pela função do banco; sem dado de grupo.',
+  },
+  'POST /api/conta/confirmar': {
+    tipo: 'nao_se_aplica',
+    motivo: 'Sem sessão: consome o link de confirmação pela função do banco; sem dado de grupo.',
+  },
+  'POST /api/conta/reenviar-confirmacao': {
+    tipo: 'nao_se_aplica',
+    motivo: 'Sem sessão: pede novo link pela função do banco; sem dado de grupo.',
+  },
   'POST /api/sessao/sair': { tipo: 'nao_se_aplica', motivo: 'Apaga a sessão da própria conta (RLS por conta).' },
 };

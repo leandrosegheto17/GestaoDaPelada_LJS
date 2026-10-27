@@ -49,11 +49,12 @@ export function modeloConvite(d: { urlPublica: string; grupoNome: string; token:
   );
 }
 
-export function modeloCadastroDuplicado(d: { urlPublica: string; nome: string }): Modelo {
+/** `nome` é opcional: quem recebe o aviso é o dono do e-mail, e o nome dele não é lido sem sessão (AD-008). */
+export function modeloCadastroDuplicado(d: { urlPublica: string; nome?: string }): Modelo {
   return montar(
     'Tentativa de cadastro com o seu e-mail',
     [
-      `Olá, ${d.nome}.`,
+      d.nome ? `Olá, ${d.nome}.` : 'Olá.',
       'Alguém tentou criar uma conta com este e-mail, mas ele já tem cadastro. Nada foi alterado. Se foi você, entre ou recupere a senha.',
     ],
     `${base(d.urlPublica)}/entrar`,

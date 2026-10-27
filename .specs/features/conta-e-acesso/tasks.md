@@ -573,11 +573,11 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] Cadastro novo e cadastro com e-mail existente respondem 201 com a mesma mensagem; o segundo manda o aviso ao dono do e-mail (ACE-01, ACE-04)
-- [ ] 422 `termos_obrigatorios` e 422 com o campo inválido (ACE-02, ACE-03)
-- [ ] O link capturado confirma e abre sessão; o link inválido responde 410 `link_invalido` (ACE-06, ACE-07)
-- [ ] Remetente que falha leva a 503 `email_indisponivel`, e pedir de novo envia (ACE-52)
-- [ ] Gate full passa
+- [x] Cadastro novo e cadastro com e-mail existente respondem 201 com a mesma mensagem; o segundo manda o aviso ao dono do e-mail (ACE-01, ACE-04)
+- [x] 422 `termos_obrigatorios` e 422 com o campo inválido (ACE-02, ACE-03)
+- [x] O link capturado confirma e abre sessão; o link inválido responde 410 `link_invalido` (ACE-06, ACE-07)
+- [x] Remetente que falha leva a 503 `email_indisponivel`, e pedir de novo envia (ACE-52)
+- [x] Gate full passa
 
 **Tests**: e2e
 **Gate**: full
