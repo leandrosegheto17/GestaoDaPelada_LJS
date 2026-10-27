@@ -1397,9 +1397,11 @@ T45, T46, T47, T48, T49, T50, T51, T52 (independentes)
 
 **Done when**:
 
-- [ ] Nenhum log de `esqueci-senha` contém o token do link nem o corpo da requisição, no sucesso e na falha
-- [ ] Nenhum log de `nova-senha` contém o token, a senha nova nem o corpo, no sucesso e na falha
-- [ ] Gate full passa
+- [x] Nenhum log de `esqueci-senha` contém o token do link nem o corpo da requisição, no sucesso e na falha
+- [x] Nenhum log de `nova-senha` contém o token, a senha nova nem o corpo, no sucesso e na falha
+- [x] Gate full passa
+
+**Registro**: `sessao-recuperacao.test.ts` ganhou 2 testes de log (esqueci-senha e nova-senha, sucesso e falha); nenhum vazamento encontrado, sem mudança na rota.
 
 **Tests**: e2e
 **Gate**: full

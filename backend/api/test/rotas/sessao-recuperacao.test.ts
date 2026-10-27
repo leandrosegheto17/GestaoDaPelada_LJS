@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { cenarioDeAcesso, cookieDaResposta, REMETENTE_QUE_FALHA } from '../apoio/acesso.ts';
+import { capturarLog } from '../apoio/log.ts';
 import { RECUPERA_ENVIO, RECUPERA_FALHA, RECUPERA_NOVA_SENHA, SENHA_ANTIGA } from '../apoio/contas-antigas.ts';
 
 // Rotas de recuperação de senha (design C4; ACE-22 a ACE-25, ACE-51, ACE-52).
@@ -109,5 +110,44 @@ describe('POST /api/sessao/nova-senha', () => {
     const r = await pedir('POST', '/api/sessao/nova-senha', { token: 'x'.repeat(43), senha: 'curta' });
     expect(r.status).toBe(422);
     expect(r.corpo).toMatchObject({ erro: { codigo: 'dados_invalidos', campos: { senha: expect.any(String) } } });
+  });
+});
+
+describe('log das rotas de recuperação (ACE-21, G-08)', () => {
+  it('esqueci-senha: o log não contém o e-mail do corpo nem o token do link, no sucesso e na falha', async () => {
+    const { pedir, remetente, tokenDoEmail, contaConfirmada } = cenarioDeAcesso();
+    const { email } = await contaConfirmada();
+    remetente.mensagens.length = 0;
+    const { log } = await capturarLog(async () => {
+      await pedir('POST', '/api/sessao/esqueci-senha', { email }, { remetente: REMETENTE_QUE_FALHA });
+      await pedir('POST', '/api/sessao/esqueci-senha', { email });
+      await pedir('POST', '/api/sessao/esqueci-senha', { email: 'invalido' });
+    });
+    const token = tokenDoEmail(email, 'senha');
+    expect(remetente.mensagens).toHaveLength(1);
+    expect(log).not.toContain(token);
+    expect(log).not.toContain(email);
+  });
+
+  it('nova-senha: o log não contém a senha, o token nem o corpo, no sucesso e na falha', async () => {
+    const { pedir, tokenDoEmail, contaConfirmada } = cenarioDeAcesso();
+    const { email } = await contaConfirmada();
+    await pedir('POST', '/api/sessao/esqueci-senha', { email });
+    const senhaSecreta = 'segredo-de-recuperacao-que-nao-vaza-7';
+    const tokenInexistente = 'z'.repeat(43);
+    const tokenValido = tokenDoEmail(email, 'senha');
+    const { resultado, log } = await capturarLog(async () => {
+      const falha = await pedir('POST', '/api/sessao/nova-senha', { token: tokenInexistente, senha: senhaSecreta });
+      const invalida = await pedir('POST', '/api/sessao/nova-senha', { token: tokenValido, senha: 'curta' });
+      const sucesso = await pedir('POST', '/api/sessao/nova-senha', { token: tokenValido, senha: senhaSecreta });
+      return { falha, invalida, sucesso };
+    });
+    expect(resultado.falha.status).toBe(410);
+    expect(resultado.invalida.status).toBe(422);
+    expect(resultado.sucesso.status).toBe(200);
+    expect(log).not.toContain(senhaSecreta);
+    expect(log).not.toContain(tokenInexistente);
+    expect(log).not.toContain(tokenValido);
+    expect(log).not.toContain(JSON.stringify({ token: tokenValido, senha: senhaSecreta }));
   });
 });
