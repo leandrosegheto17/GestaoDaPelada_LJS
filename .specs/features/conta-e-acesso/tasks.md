@@ -21,6 +21,8 @@ Implemente estas tarefas com a skill `tlc-spec-driven`: **acione-a pelo nome e s
 
 > **Registro do lote 2 (2026-10-27, aprovado pelo usuário):** mudanças em testes existentes (`roles.test.ts`: `contas` e `sessoes` saem da lista "não lê" e ganham testes por coluna e de auditoria; `migrar.test.ts`: fixture A passa a exigir o schema do legado contido e igual ao de um banco migrado do zero) aprovadas, com o motivo no código. `convites_admin` lê só com conta (SPEC_DEVIATION do design C1, aprovado). A auditoria de exclusão e de convites é gravada pelas próprias funções; as rotas não gravam de novo.
 
+> **Registro do lote 3 (2026-10-27, aprovado pelo usuário):** função `admins_listar` (migration `1792843680000_conta-admins-listar.sql`, SPEC_DEVIATION do C1) para o ACE-37 sob a RLS de `contas`, com o acréscimo dela em `funcoes-definer.test.ts`.
+
 ---
 
 ## Test Coverage Matrix

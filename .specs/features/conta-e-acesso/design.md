@@ -109,6 +109,7 @@ graph TD
     | `convite_ler(token_hash)` | dados mínimos do convite válido | `(email, grupo_nome, conta_existe boolean)` |
     | `convite_aceitar(token_hash)` | com `app_conta_id()`, confere o e-mail, trava o convite (`FOR UPDATE`) e cria o vínculo | `(resultado, grupo_id)` |
     | `convite_cadastrar(token_hash, nome, senha, termos_versao, token_sessao_hash)` | cria a conta já confirmada com o e-mail do convite, o vínculo e a sessão | `(resultado, conta_id, grupo_id)` |
+    | `admins_listar(grupo_id)` | só com vínculo; lista id, nome, e-mail e `acessa_financeiro` dos admins (acrescentada no lote 3, aprovada em 2026-10-27) | linhas |
     | `conta_definir_senha(email, senha, dono boolean)` | só para o script `dono.ts` (sem `EXECUTE` para o `pelada_app`; roda como owner) | `conta_id` |
 
   - **Exclusão como anonimização**: `grupos.criado_por`, `vinculos_admin.criado_por`, `auditoria.autor_conta_id` e `pedidos_reset.resolvido_por` referenciam `contas`, então apagar a linha quebraria o histórico. `conta_excluir` apaga sessões, vínculos, links e convites enviados ao e-mail. Na linha da conta, troca o e-mail por `excluida-<id>@invalido`, o nome por "Conta excluída" e o hash por `!` (nunca casa), e grava `excluida_em`. Assim, nenhum nome ou e-mail da pessoa fica no banco, e a auditoria mostra "Conta excluída" como autor (ACE-28).
