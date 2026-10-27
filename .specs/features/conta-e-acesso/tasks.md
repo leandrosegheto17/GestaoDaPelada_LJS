@@ -1100,8 +1100,8 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] Os cinco estados; no cadastro pelo convite, o e-mail vem preenchido e só leitura; axe sem violação
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Os cinco estados; no cadastro pelo convite, o e-mail vem preenchido e só leitura; axe sem violação
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick

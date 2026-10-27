@@ -1,0 +1,9 @@
+.erroAceite {
+  display: flex;
+  gap: var(--esp-1);
+  align-items: flex-start;
+  margin: var(--esp-1) 0 0;
+  font-size: var(--texto-sm);
+  font-weight: var(--peso-semi);
+  color: var(--cor-erro-texto);
+}
