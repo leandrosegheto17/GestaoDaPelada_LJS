@@ -914,8 +914,8 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] Sucesso leva a `/app`; 410 mostra "Link inválido ou vencido" com o pedido de novo link; axe sem violação
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Sucesso leva a `/app`; 410 mostra "Link inválido ou vencido" com o pedido de novo link; axe sem violação
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
