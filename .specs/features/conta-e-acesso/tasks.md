@@ -23,6 +23,8 @@ Implemente estas tarefas com a skill `tlc-spec-driven`: **acione-a pelo nome e s
 
 > **Registro do lote 3 (2026-10-27, aprovado pelo usuário):** função `admins_listar` (migration `1792843680000_conta-admins-listar.sql`, SPEC_DEVIATION do C1) para o ACE-37 sob a RLS de `contas`, com o acréscimo dela em `funcoes-definer.test.ts`.
 
+> **Registro do lote 4 (2026-10-27, aprovado pelo usuário):** rotas T17 a T23. Entrar roda em transação própria (`emTransacaoPropria`) para não perder a contagem de falhas (ACE-13); `@pelada/contrato` entra como dependência da API; `SEED_SENHA_ADMIN` fica só no `.env.example` (SPEC_DEVIATION); apoios de teste novos em `backend/api/test/apoio/` (binding `HYPERDRIVE_OWNER_TESTE` só no teste). Respostas das rotas listadas no relatório do lote, para o front.
+
 ---
 
 ## Test Coverage Matrix
