@@ -748,9 +748,9 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] Depois do seed, `conta_entrar` com o e-mail do seed e a senha do `.env` devolve `ok`
-- [ ] Sem `SEED_SENHA_ADMIN`, o seed sai com erro e não grava nada
-- [ ] Gate full passa
+- [x] Depois do seed, `conta_entrar` com o e-mail do seed e a senha do `.env` devolve `ok`
+- [x] Sem `SEED_SENHA_ADMIN`, o seed sai com erro e não grava nada
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full

@@ -19,6 +19,8 @@ export interface DadosDoSeed {
 export interface SenhasDasRoles {
   app: string;
   backup: string;
+  /** Senha da conta admin do seed (SEED_SENHA_ADMIN); a conta entra pela tela com ela (ACE-64). */
+  admin: string;
 }
 
 export interface ResumoDoSeed {
@@ -43,10 +45,11 @@ export async function semearBancoLocal(url: string, dados: DadosDoSeed, senhas: 
 
     const conta = await umId(
       c,
-      // A senha de login da conta chega com a feature conta-e-acesso; até lá, a conta não entra (hash inválido).
+      // Nasce com hash inválido e logo recebe a senha pela função do owner (confirma o e-mail).
       "INSERT INTO contas (email, nome, senha_hash, criada_em) VALUES ($1, $2, '!', $3) RETURNING id",
       [dados.admin.email, dados.admin.nome, dados.momento],
     );
+    await c.query('SELECT conta_definir_senha($1, $2, false)', [dados.admin.email, senhas.admin]);
     const grupo = await umId(
       c,
       `INSERT INTO grupos (nome, slug, dia_semana, frequencia, horario, criado_por, criado_em)

@@ -13,12 +13,15 @@ const SENHAS = {
   backup: process.env['PELADA_BACKUP_SENHA'] || randomBytes(12).toString('hex'),
 };
 
+const SENHA_ADMIN = 'senha-do-seed-1';
+
 function rodarSeed(url: string, extra: NodeJS.ProcessEnv = {}, args: string[] = []) {
   const env: NodeJS.ProcessEnv = {
     ...process.env,
     DATABASE_URL: url,
     PELADA_APP_SENHA: SENHAS.app,
     PELADA_BACKUP_SENHA: SENHAS.backup,
+    SEED_SENHA_ADMIN: SENHA_ADMIN,
     ...extra,
   };
   if (!('CI' in extra)) delete env['CI'];
@@ -103,6 +106,40 @@ describe('pnpm seed (FUN-05)', () => {
       'SELECT count(*) AS n FROM jogadores',
     );
     expect(total).toBe(20);
+  });
+
+  it('a conta admin do seed entra com a senha de SEED_SENHA_ADMIN e está confirmada (ACE-64)', async () => {
+    expect(rodarSeed(banco.url).status).toBe(0);
+    const entrar = (senha: string) =>
+      comCliente(banco.url, async (c) => {
+        const { rows } = await c.query<{ resultado: string }>('SELECT resultado FROM conta_entrar($1, $2, $3, $4)', [
+          'admin@exemplo.com.br',
+          senha,
+          randomBytes(32),
+          randomBytes(32),
+        ]);
+        return rows[0]?.resultado;
+      });
+    expect(await entrar('outra-senha-qualquer')).toBe('invalida');
+    expect(await entrar(SENHA_ADMIN)).toBe('ok');
+  });
+
+  it.each([
+    ['vazia', ''],
+    ['curta demais', 'curta'],
+  ])('sem SEED_SENHA_ADMIN válida (%s), sai com erro e não grava nada (ACE-64)', async (_nome, valor) => {
+    const vazio = await criarBancoTemporario();
+    try {
+      await migrar(vazio.url);
+      const r = rodarSeed(vazio.url, { SEED_SENHA_ADMIN: valor });
+      expect(r.status).toBe(1);
+      expect(r.stderr).toContain('Defina SEED_SENHA_ADMIN');
+      expect(r.stderr).not.toContain(valor || 'x'.repeat(40));
+      expect(await contar(vazio.url, 'SELECT count(*) AS n FROM contas')).toBe(0);
+      expect(await contar(vazio.url, 'SELECT count(*) AS n FROM grupos')).toBe(0);
+    } finally {
+      await vazio.remover();
+    }
   });
 
   it('falha sem as senhas das roles no ambiente, antes de escrever', async () => {

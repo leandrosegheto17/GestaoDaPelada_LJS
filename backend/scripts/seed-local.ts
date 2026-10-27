@@ -1,5 +1,6 @@
 import { semearBancoLocal } from '../api/src/infraestrutura/db/repositorios/seed-local.ts';
 import { exigirHostPermitido } from '../api/src/infraestrutura/seguranca/trava-host.ts';
+import { senha as esquemaSenha } from '../contrato/src/primitivos.ts';
 import { exigirBancoNoAr } from './comum/exigir-banco.ts';
 import { DADOS_DO_SEED } from './seed-local/dados.ts';
 
@@ -14,9 +15,13 @@ async function principal(): Promise<void> {
   const app = process.env['PELADA_APP_SENHA'];
   const backup = process.env['PELADA_BACKUP_SENHA'];
   if (!app || !backup) throw new Error('Defina PELADA_APP_SENHA e PELADA_BACKUP_SENHA no .env antes do seed.');
+  const admin = process.env['SEED_SENHA_ADMIN'];
+  if (!admin || !esquemaSenha.safeParse(admin).success) {
+    throw new Error('Defina SEED_SENHA_ADMIN no .env (8 a 72 caracteres) antes do seed.');
+  }
   await exigirBancoNoAr(url);
 
-  const resumo = await semearBancoLocal(url as string, DADOS_DO_SEED, { app, backup });
+  const resumo = await semearBancoLocal(url as string, DADOS_DO_SEED, { app, backup, admin });
   console.log('Seed local concluído:', JSON.stringify(resumo));
   console.log(`Grupo: ${DADOS_DO_SEED.grupo.slug}. Conta admin: ${DADOS_DO_SEED.admin.email}.`);
 }
