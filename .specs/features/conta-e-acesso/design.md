@@ -91,7 +91,7 @@ graph TD
   - `convites_admin (id, grupo_id, email, token_hash bytea(32) único, criado_por, criado_em, expira_em, usado_em, cancelado_em)`, com índice único parcial de um pendente por grupo e e-mail.
   - `envios_email (destino_hash bytea, tipo text, enviado_em timestamptz, PRIMARY KEY (destino_hash, tipo))`: guarda o último envio para o intervalo de 60 s (ACE-51).
   - RLS `ENABLE` + `FORCE` em `contas`, `sessoes`, `tentativas_login`, `links_conta`, `envios_email`, `pedidos_reset` e `convites_admin`, com policy `USING (true)` para `pelada_backup` em todas (G-27, G-29).
-  - Policies do `pelada_app`: `contas` lê e altera `id = app_conta_id()`; `sessoes` lê e apaga `conta_id = app_conta_id()`; `convites_admin` segue o padrão de grupo (`grupo_id IN (SELECT grupos_visiveis())`, escrita com conta).
+  - Policies do `pelada_app`: `contas` lê e altera `id = app_conta_id()`; `sessoes` lê e apaga `conta_id = app_conta_id()`; `convites_admin` segue o padrão de grupo, mas a leitura também exige conta (ajuste aprovado em 2026-10-27: o slug público nunca lê o e-mail de quem foi convidado).
   - Grants do `pelada_app`: `SELECT, UPDATE (nome)` em `contas`; `SELECT, DELETE` em `sessoes`; `SELECT, INSERT, UPDATE` em `convites_admin`; `INSERT` em `auditoria`. Nenhum grant em `tentativas_login`, `links_conta`, `envios_email`, `pedidos_reset`. A coluna `senha_hash` fica fora do `SELECT` por grant de coluna.
   - Funções (`SECURITY DEFINER`, `SET search_path = public, pg_temp`, `EXECUTE` só para `pelada_app`; `REVOKE` de `PUBLIC`). Toda senha chega como parâmetro e o hash é `crypt($senha, gen_salt('bf', 12))`:
 

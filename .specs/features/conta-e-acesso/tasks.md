@@ -19,6 +19,8 @@ Implemente estas tarefas com a skill `tlc-spec-driven`: **acione-a pelo nome e s
 > - O banco local (`docker compose up -d`, `pnpm migrar`) precisa estar de pé para os gates full e build. A limpeza de disco de 2026-10-27 apagou os containers: recriar no início da construção.
 > - Ações externas (push, criar domínio e chave no Resend, secrets no GitHub, deploy) ficam fora destas tarefas e pedem confirmação específica na fase 11.
 
+> **Registro do lote 2 (2026-10-27, aprovado pelo usuário):** mudanças em testes existentes (`roles.test.ts`: `contas` e `sessoes` saem da lista "não lê" e ganham testes por coluna e de auditoria; `migrar.test.ts`: fixture A passa a exigir o schema do legado contido e igual ao de um banco migrado do zero) aprovadas, com o motivo no código. `convites_admin` lê só com conta (SPEC_DEVIATION do design C1, aprovado). A auditoria de exclusão e de convites é gravada pelas próprias funções; as rotas não gravam de novo.
+
 ---
 
 ## Test Coverage Matrix
