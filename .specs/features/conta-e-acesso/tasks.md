@@ -167,9 +167,9 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] `cadastroCorpo` recusa `termos: false` e campo extra
-- [ ] `sessaoEu` e `adminsResposta` têm as formas do design (Data Models)
-- [ ] Gate quick passa: `pnpm --filter @pelada/contrato test`
+- [x] `cadastroCorpo` recusa `termos: false` e campo extra
+- [x] `sessaoEu` e `adminsResposta` têm as formas do design (Data Models)
+- [x] Gate quick passa: `pnpm --filter @pelada/contrato test`
 
 **Tests**: unit
 **Gate**: quick
