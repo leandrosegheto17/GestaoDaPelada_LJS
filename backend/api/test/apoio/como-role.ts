@@ -55,3 +55,25 @@ export async function comContexto<T>(cliente: pg.ClientBase, contexto: Contexto,
     return acao();
   });
 }
+
+/**
+ * Executa `acao` como pelada_app numa transação com o contexto de RLS e a CONFIRMA no fim (ROLLBACK se `acao`
+ * falhar). Para os testes das funções do banco, em que cada chamada é uma requisição (uma transação) e o estado
+ * precisa ficar entre elas.
+ */
+export async function comoApp<T>(cliente: pg.ClientBase, contexto: Contexto, acao: () => Promise<T>): Promise<T> {
+  await cliente.query('BEGIN');
+  try {
+    await cliente.query('SET LOCAL ROLE pelada_app');
+    await cliente.query("SELECT set_config('app.conta_id', $1, true), set_config('app.slug_publico', $2, true)", [
+      contexto.conta ?? '',
+      contexto.slug ?? '',
+    ]);
+    const resultado = await acao();
+    await cliente.query('COMMIT');
+    return resultado;
+  } catch (erro) {
+    await cliente.query('ROLLBACK');
+    throw erro;
+  }
+}

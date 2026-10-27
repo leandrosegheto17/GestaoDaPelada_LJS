@@ -312,11 +312,11 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] `conta_cadastrar` com e-mail novo cria a conta não confirmada com `termos_versao`; com e-mail existente devolve `existente` e não altera a conta (ACE-01, ACE-04)
-- [ ] `link_confirmar` aceita o link dentro de 24 h e cria a sessão; recusa vencido, usado ou inexistente (ACE-06, ACE-07)
-- [ ] Pedir um novo link invalida o anterior do mesmo tipo; o segundo pedido em menos de 60 s devolve `enviar = false` (ACE-08, ACE-23, ACE-51)
-- [ ] `link_nova_senha` troca a senha, confirma o e-mail e apaga todas as sessões; o link de 1 h vencido é recusado (ACE-24, ACE-25)
-- [ ] Gate full passa
+- [x] `conta_cadastrar` com e-mail novo cria a conta não confirmada com `termos_versao`; com e-mail existente devolve `existente` e não altera a conta (ACE-01, ACE-04)
+- [x] `link_confirmar` aceita o link dentro de 24 h e cria a sessão; recusa vencido, usado ou inexistente (ACE-06, ACE-07)
+- [x] Pedir um novo link invalida o anterior do mesmo tipo; o segundo pedido em menos de 60 s devolve `enviar = false` (ACE-08, ACE-23, ACE-51)
+- [x] `link_nova_senha` troca a senha, confirma o e-mail e apaga todas as sessões; o link de 1 h vencido é recusado (ACE-24, ACE-25)
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
