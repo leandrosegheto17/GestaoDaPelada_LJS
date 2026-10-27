@@ -1123,8 +1123,8 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] Os estados do mockup; o diálogo de remoção segue o `t19-admins--remover`; axe sem violação
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Os estados do mockup; o diálogo de remoção segue o `t19-admins--remover`; axe sem violação
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
