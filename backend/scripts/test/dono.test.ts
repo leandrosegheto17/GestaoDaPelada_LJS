@@ -94,7 +94,36 @@ describe('ACE-63: nenhuma rota lê ou escreve e_dono (G-11)', () => {
     expect(await regras('const o = { eDono: true };', arquivo)).toBeGreaterThan(0);
   });
 
-  it('não barra a leitura de eDono', async () => {
-    expect(await regras('export const f = (c: { eDono: boolean }) => c.eDono;', 'backend/api/src/x.ts')).toBe(0);
+  // Motivo da mudança (T49, decisão do usuário em 2026-10-27, ACE-63): a spec diz "nenhuma rota que LEIA ou escreva
+  // e_dono"; o teste antigo "não barra a leitura de eDono" afirmava o oposto e foi trocado por estes.
+  it.each([
+    ['acesso à propriedade', 'export const f = (c: { eDono: boolean }) => c.eDono;'],
+    ['acesso por colchetes', "export const f = (c: Record<string, boolean>) => c['e_dono'];"],
+    ['desestruturação', 'export const f = (c: { e_dono: boolean }) => { const { e_dono } = c; return e_dono; };'],
+    ['projeção da resposta', 'export const f = (c: { eDono: boolean }) => ({ eDono: c.eDono });'],
+    ['coluna no construtor de consulta', "export const q = (db: any) => db.selectFrom('contas').select('e_dono');"],
+    ['SQL de leitura', "export const q = 'SELECT e_dono FROM contas';"],
+    ['SQL de leitura em template', 'export const q = `SELECT id, e_dono FROM contas WHERE id = $1`;'],
+  ])('o lint barra a leitura de e_dono: %s', async (_nome, codigo) => {
+    for (const arquivo of [
+      'backend/api/src/entrada/rotas/x.ts',
+      'backend/api/src/infraestrutura/db/repositorios/x.ts',
+    ]) {
+      expect(await regras(codigo, arquivo)).toBeGreaterThan(0);
+    }
+  });
+
+  it('não barra o que não cita o papel de dono (tipos que só declaram a coluna, outros nomes)', async () => {
+    const arquivo = 'backend/api/src/x.ts';
+    expect(await regras('export interface T { e_dono: boolean; eDono: boolean }', arquivo)).toBe(0);
+    expect(
+      await regras("export const q = 'SELECT id, nome FROM contas'; export const d = 'dono do e-mail';", arquivo),
+    ).toBe(0);
+  });
+
+  it('o código atual da API está limpo', async () => {
+    const resultados = await eslint.lintFiles(['backend/api/src/**/*.ts']);
+    const achados = resultados.flatMap((r) => r.messages.filter((m) => m.ruleId === 'pelada/sem-escrita-dono'));
+    expect(achados).toEqual([]);
   });
 });

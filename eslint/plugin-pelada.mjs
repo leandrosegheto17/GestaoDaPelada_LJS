@@ -1,19 +1,9 @@
 // Regras de ESLint próprias do projeto, escritas sobre a árvore sintática (não sobre o texto do código).
 
 const NOME_DONO = /^e_?dono$/i;
-const ESCRITA_SQL = /\b(?:insert|update|upsert|set|values)\b|\bon\s+conflict\b/i;
-// Métodos do Kysely cujos argumentos descrevem uma escrita.
-const METODOS_DE_ESCRITA = new Set([
-  'set',
-  'values',
-  'columns',
-  'onConflict',
-  'doUpdateSet',
-  'insertInto',
-  'updateTable',
-]);
-const COMPARACOES = new Set(['===', '!==', '==', '!=', '<', '<=', '>', '>=', 'in', 'instanceof']);
-const MENSAGEM_DONO = 'Escrita do papel de dono fora de backend/scripts e das migrações (G-11).';
+// Nome do papel de dono dentro de um texto (SQL, nome de coluna): `e_dono` ou `eDono` como palavra inteira.
+const CITA_DONO = /\be_?dono\b/i;
+const MENSAGEM_DONO = 'Leitura ou escrita do papel de dono fora de backend/scripts e das migrações (G-11, ACE-63).';
 
 /** Texto de uma expressão feita só de literais de texto (`'e_' + 'dono'`), ou `undefined`. */
 function textoFixo(no) {
@@ -31,36 +21,6 @@ function textoFixo(no) {
 function nomeDaChave(chave, computada) {
   if (!computada && chave.type === 'Identifier') return chave.name;
   return textoFixo(chave);
-}
-
-function raizDoEncadeamento(no) {
-  let atual = no;
-  while (atual) {
-    if (atual.type === 'Identifier') return atual.name;
-    if (atual.type === 'MemberExpression') atual = atual.object;
-    else if (atual.type === 'CallExpression') atual = atual.callee;
-    else return undefined;
-  }
-  return undefined;
-}
-
-/** Valor que só lê (projeção de resposta, comparação, schema zod): não escreve o papel. */
-function ehLeitura(valor) {
-  switch (valor.type) {
-    case 'MemberExpression':
-    case 'ChainExpression':
-      return true;
-    case 'BinaryExpression':
-      return COMPARACOES.has(valor.operator);
-    case 'TSAsExpression':
-    case 'TSNonNullExpression':
-    case 'TSSatisfiesExpression':
-      return ehLeitura(valor.expression);
-    case 'CallExpression':
-      return raizDoEncadeamento(valor.callee) === 'z';
-    default:
-      return false;
-  }
 }
 
 const semEscritaDono = {
@@ -89,48 +49,25 @@ const semEscritaDono = {
     const relatar = (no) => {
       if (!dentroDePermitida(no)) context.report({ node: no, message: MENSAGEM_DONO });
     };
-    const alvoDeEscrita = (alvo) => {
-      if (alvo.type !== 'MemberExpression') return;
-      const nome = nomeDaChave(alvo.property, alvo.computed);
-      if (nome && NOME_DONO.test(nome)) relatar(alvo);
-    };
     const textoSql = (no, texto) => {
-      if (/e_?dono/i.test(texto) && ESCRITA_SQL.test(texto)) relatar(no);
+      if (CITA_DONO.test(texto)) relatar(no);
     };
 
     return {
-      // `{ e_dono: true }`, `{ 'eDono': !!x }`, `{ [chave]: v }` com chave fixa; projeção (`eDono: c.eDono`) não conta.
-      Property(no) {
-        if (no.parent.type !== 'ObjectExpression') return;
-        const nome = nomeDaChave(no.key, no.computed);
-        if (nome && NOME_DONO.test(nome) && !ehLeitura(no.value)) relatar(no);
+      // `c.eDono`, `{ eDono: x }`, `const { e_dono } = c`, `o.e_dono = v`: qualquer uso do nome, lendo ou escrevendo.
+      // Só a declaração de tipo (`interface T { e_dono: boolean }`) é permitida: ela não lê nem escreve nada.
+      Identifier(no) {
+        if (!NOME_DONO.test(no.name)) return;
+        if (no.parent.type === 'TSPropertySignature' && no.parent.key === no) return;
+        relatar(no);
       },
-      // `o.e_dono = v`, `o['eDono'] ||= v`, `o.eDono++`.
-      AssignmentExpression(no) {
-        alvoDeEscrita(no.left);
-      },
-      UpdateExpression(no) {
-        alvoDeEscrita(no.argument);
-      },
-      // SQL escrito à mão: o texto cita o papel e tem verbo de escrita.
+      // SQL escrito à mão que cita o papel, seja SELECT, seja escrita.
       TemplateLiteral(no) {
         textoSql(no, no.quasis.map((q) => q.value.cooked ?? '').join(' '));
       },
+      // `.select('e_dono')`, `c['eDono']`, `{ 'e_dono': x }`, `'SELECT e_dono FROM contas'`.
       Literal(no) {
-        if (typeof no.value === 'string') {
-          textoSql(no, no.value);
-          // `.set('e_dono', v)`, `.columns(['e_dono'])`: nome de coluna como argumento de um método de escrita.
-          if (NOME_DONO.test(no.value)) {
-            const chamada = no.parent.type === 'ArrayExpression' ? no.parent.parent : no.parent;
-            const metodo = chamada.type === 'CallExpression' ? chamada.callee : undefined;
-            if (
-              metodo?.type === 'MemberExpression' &&
-              METODOS_DE_ESCRITA.has(nomeDaChave(metodo.property, metodo.computed))
-            ) {
-              relatar(no);
-            }
-          }
-        }
+        if (typeof no.value === 'string') textoSql(no, no.value);
       },
       // Nome do papel montado em tempo de execução: `'e_' + 'dono'`, `'e_' + x`.
       BinaryExpression(no) {

@@ -1271,8 +1271,10 @@ T42 → T43 → T44
 **Requirement**: ACE-63
 **Done when**:
 
-- [ ] Teste do lint falha para ler e para escrever `e_dono` em rota; `pnpm lint` limpo
-- [ ] Gate quick passa
+- [x] Teste do lint falha para ler e para escrever `e_dono` em rota; `pnpm lint` limpo
+- [x] Gate quick passa
+
+**Registro**: teste existente `dono.test.ts` "não barra a leitura de eDono" (afirmava o contrário da decisão do usuário) trocado por testes que exigem a barra da leitura (7 formas) e da escrita, em rota e repositório, e por um que prova o código atual limpo; nenhum teste de escrita foi tirado. A regra mantém o nome `sem-escrita-dono` (citado em GUARDRAILS, ADR-029 e config); só a mensagem mudou. Passa a barrar qualquer uso do identificador `e_dono`/`eDono` e SQL ou nome de coluna que o cite; só a declaração em `interface` fica livre. Os handlers antigos de escrita ficaram contidos na regra mais ampla e foram removidos.
 
 **Tests**: unit
 **Gate**: quick
