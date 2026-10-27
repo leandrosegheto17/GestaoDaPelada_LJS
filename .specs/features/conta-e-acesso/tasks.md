@@ -672,10 +672,10 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] Convidar responde 201 e manda o e-mail; já admin responde 409 (ACE-31, ACE-32)
-- [ ] Listar traz admins e convites pendentes; cancelar e remover respondem 204 e gravam auditoria (ACE-37 a ACE-39, ACE-42)
-- [ ] Remover o último admin responde 409 `ultimo_admin`; outra conta sem vínculo recebe 404 (ACE-40, ACE-41)
-- [ ] Gate full passa
+- [x] Convidar responde 201 e manda o e-mail; já admin responde 409 (ACE-31, ACE-32)
+- [x] Listar traz admins e convites pendentes; cancelar e remover respondem 204 e gravam auditoria (ACE-37 a ACE-39, ACE-42)
+- [x] Remover o último admin responde 409 `ultimo_admin`; outra conta sem vínculo recebe 404 (ACE-40, ACE-41)
+- [x] Gate full passa
 
 **Tests**: e2e
 **Gate**: full

@@ -229,5 +229,9 @@ export const CASOS_ROTAS: Record<string, CasoRota> = {
     tipo: 'nao_se_aplica',
     motivo: 'Sem sessão: cadastra pelo convite, na função do banco; o grupo vem do convite.',
   },
+  'GET /api/grupos/:grupoId/admins': { tipo: 'grupo' },
+  'POST /api/grupos/:grupoId/admins/convites': { tipo: 'grupo' },
+  'DELETE /api/grupos/:grupoId/admins/convites/:id': { tipo: 'grupo' },
+  'DELETE /api/grupos/:grupoId/admins/:contaId': { tipo: 'grupo' },
   'POST /api/sessao/sair': { tipo: 'nao_se_aplica', motivo: 'Apaga a sessão da própria conta (RLS por conta).' },
 };

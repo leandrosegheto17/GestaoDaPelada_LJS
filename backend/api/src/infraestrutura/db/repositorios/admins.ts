@@ -52,3 +52,9 @@ export async function remover(db: Db, grupoId: string, contaId: string): Promise
   await db.deleteFrom('vinculos_admin').where('grupo_id', '=', grupoId).where('conta_id', '=', contaId).execute();
   return 'ok';
 }
+
+/** Nome do grupo visível à conta da requisição (vínculo, pela RLS); nulo se não vê o grupo. */
+export async function nomeDoGrupo(db: Db, grupoId: string): Promise<string | null> {
+  const grupo = await db.selectFrom('grupos').select('nome').where('id', '=', grupoId).executeTakeFirst();
+  return grupo?.nome ?? null;
+}
