@@ -697,9 +697,9 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] Sem `EMAIL_DEV`, a rota responde 404; com ele, lista as mensagens do remetente em memória
-- [ ] `env-example.test.ts` e `wrangler.test.ts` passam com as variáveis novas
-- [ ] Gate full passa
+- [x] Sem `EMAIL_DEV`, a rota responde 404; com ele, lista as mensagens do remetente em memória
+- [x] `env-example.test.ts` e `wrangler.test.ts` passam com as variáveis novas
+- [x] Gate full passa
 
 **Tests**: e2e
 **Gate**: full

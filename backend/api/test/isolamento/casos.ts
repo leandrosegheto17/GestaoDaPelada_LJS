@@ -233,5 +233,9 @@ export const CASOS_ROTAS: Record<string, CasoRota> = {
   'POST /api/grupos/:grupoId/admins/convites': { tipo: 'grupo' },
   'DELETE /api/grupos/:grupoId/admins/convites/:id': { tipo: 'grupo' },
   'DELETE /api/grupos/:grupoId/admins/:contaId': { tipo: 'grupo' },
+  'GET /api/dev/emails': {
+    tipo: 'nao_se_aplica',
+    motivo: 'Só com EMAIL_DEV=1 (desenvolvimento local): lista a caixa de e-mails em memória; sem banco.',
+  },
   'POST /api/sessao/sair': { tipo: 'nao_se_aplica', motivo: 'Apaga a sessão da própria conta (RLS por conta).' },
 };

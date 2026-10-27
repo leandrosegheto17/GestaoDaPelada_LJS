@@ -16,4 +16,9 @@ export interface Env {
   RESEND_API_KEY?: string | undefined;
   /** Endereço de remetente verificado no Resend. */
   RESEND_REMETENTE?: string | undefined;
+  /**
+   * Só no desenvolvimento local (`.dev.vars`): `1` troca o Resend pela caixa em memória e liga `GET /api/dev/emails`.
+   * O `wrangler.jsonc` de produção não a define (teste de configuração).
+   */
+  EMAIL_DEV?: string | undefined;
 }
