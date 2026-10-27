@@ -599,9 +599,9 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] A mesma resposta 200 para e-mail com e sem conta; só a conta existente recebe o e-mail (ACE-22, ACE-23)
-- [ ] A nova senha com link válido responde 200, encerra as sessões e a senha antiga deixa de entrar; link inválido responde 410 (ACE-24, ACE-25)
-- [ ] Gate full passa
+- [x] A mesma resposta 200 para e-mail com e sem conta; só a conta existente recebe o e-mail (ACE-22, ACE-23)
+- [x] A nova senha com link válido responde 200, encerra as sessões e a senha antiga deixa de entrar; link inválido responde 410 (ACE-24, ACE-25)
+- [x] Gate full passa
 
 **Tests**: e2e
 **Gate**: full

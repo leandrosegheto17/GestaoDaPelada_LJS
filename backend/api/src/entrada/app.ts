@@ -14,6 +14,7 @@ import { carregarSessao, exigirSessao } from './middlewares/sessao.ts';
 import { exigirVinculo } from './middlewares/vinculo.ts';
 import { rotaContaCadastro } from './rotas/conta-cadastro.ts';
 import { rotaHealth } from './rotas/health.ts';
+import { rotaSessaoRecuperacao } from './rotas/sessao-recuperacao.ts';
 import { rotaSessao } from './rotas/sessao.ts';
 import { ligarSentry } from './sentry.ts';
 
@@ -86,6 +87,7 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<AppEnv> {
   app.route('/', rotaHealth);
   app.route('/', rotaSessao);
   app.route('/', rotaContaCadastro);
+  app.route('/', rotaSessaoRecuperacao);
 
   app.notFound((c) => naoEncontrado(c));
   app.onError((erro, c) => {

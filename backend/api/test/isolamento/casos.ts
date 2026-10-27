@@ -204,5 +204,13 @@ export const CASOS_ROTAS: Record<string, CasoRota> = {
     tipo: 'nao_se_aplica',
     motivo: 'Sem sessão: pede novo link pela função do banco; sem dado de grupo.',
   },
+  'POST /api/sessao/esqueci-senha': {
+    tipo: 'nao_se_aplica',
+    motivo: 'Sem sessão: pede o link de recuperação pela função do banco; sem dado de grupo.',
+  },
+  'POST /api/sessao/nova-senha': {
+    tipo: 'nao_se_aplica',
+    motivo: 'Sem sessão: consome o link de recuperação pela função do banco; sem dado de grupo.',
+  },
   'POST /api/sessao/sair': { tipo: 'nao_se_aplica', motivo: 'Apaga a sessão da própria conta (RLS por conta).' },
 };
