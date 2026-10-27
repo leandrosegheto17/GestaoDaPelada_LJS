@@ -891,8 +891,8 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] Vazio, carregando, erro com resumo e sucesso "Verifique seu e-mail"; o aceite nasce desmarcado; axe sem violação
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Vazio, carregando, erro com resumo e sucesso "Verifique seu e-mail"; o aceite nasce desmarcado; axe sem violação
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
