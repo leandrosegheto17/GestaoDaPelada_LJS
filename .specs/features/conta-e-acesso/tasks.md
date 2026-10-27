@@ -772,9 +772,9 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] Toda escrita envia `X-Pelada: 1`; o erro padrão da API vira um erro tipado com `codigo` e `campos`
-- [ ] 401 `sessao_expirada` navega para `/entrar` com o aviso da spec (ACE-20)
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Toda escrita envia `X-Pelada: 1`; o erro padrão da API vira um erro tipado com `codigo` e `campos`
+- [x] 401 `sessao_expirada` navega para `/entrar` com o aviso da spec (ACE-20)
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
