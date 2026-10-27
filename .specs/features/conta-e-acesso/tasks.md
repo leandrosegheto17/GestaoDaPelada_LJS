@@ -1528,13 +1528,15 @@ T63 → T64
 Tratam os médios SEC-CA-01 a 04 de `seguranca.md`, decididos pelo usuário em 2026-10-27 (fase 11). O Turnstile fica
 fora desta rodada: as defesas abaixo não mexem em telas além do aviso de T59.
 
+> **Registro da T57 (2026-10-27):** os IDs ACE-60 a ACE-62 já existiam na spec (termos e script do dono). Os critérios novos de abuso entram como ACE-70 (bloqueio por conta e limitador das rotas com senha), ACE-71 (IPv6) e ACE-72 (teto de e-mails), e as tarefas T57 a T64 foram renumeradas.
+
 ### T57: Spec: confirmar o e-mail não abre sessão (ACE-06) e novos critérios de abuso
 
-**What**: na `spec.md`, trocar o ACE-06 ("abrir uma sessão e levar a pessoa para `/app`") por "marcar o e-mail como confirmado, sem abrir sessão, e levar a pessoa para `/entrar` com o aviso de e-mail confirmado"; acrescentar critérios `ACE-60` (rotas com sessão que rodam bcrypt têm limitador por IP e bloqueio de 15 min por conta após 5 falhas da senha atual), `ACE-61` (no IPv6 a chave do limitador e do `ip_hash` é o prefixo /64) e `ACE-62` (teto global de e-mails por janela, com reserva para recuperação de senha). Atualizar a matriz de rastreio.
+**What**: na `spec.md`, trocar o ACE-06 ("abrir uma sessão e levar a pessoa para `/app`") por "marcar o e-mail como confirmado, sem abrir sessão, e levar a pessoa para `/entrar` com o aviso de e-mail confirmado"; acrescentar critérios `ACE-70` (rotas com sessão que rodam bcrypt têm limitador por IP e bloqueio de 15 min por conta após 5 falhas da senha atual), `ACE-71` (no IPv6 a chave do limitador e do `ip_hash` é o prefixo /64) e `ACE-72` (teto global de e-mails por janela, com reserva para recuperação de senha). Atualizar a matriz de rastreio.
 **Estimativa**: 30 min
 **Where**: `.specs/features/conta-e-acesso/spec.md`
 **Depends on**: None
-**Requirement**: ACE-06, ACE-60, ACE-61, ACE-62
+**Requirement**: ACE-06, ACE-70, ACE-71, ACE-72
 
 **Tools**:
 
@@ -1543,8 +1545,8 @@ fora desta rodada: as defesas abaixo não mexem em telas além do aviso de T59.
 
 **Done when**:
 
-- [ ] ACE-06 reescrito e ACE-60 a ACE-62 escritos em EARS, com a matriz de rastreio
-- [ ] `validate_spec.py` passa
+- [x] ACE-06 reescrito e ACE-70 a ACE-72 escritos em EARS, com a matriz de rastreio
+- [x] `validate_spec.py` passa
 
 **Tests**: none
 **Gate**: quick
@@ -1606,7 +1608,7 @@ fora desta rodada: as defesas abaixo não mexem em telas além do aviso de T59.
 **Estimativa**: 1h
 **Where**: `backend/api/src/entrada/app.ts`, teste da rota
 **Depends on**: T57
-**Requirement**: ACE-60
+**Requirement**: ACE-70
 
 **Tools**:
 
@@ -1630,7 +1632,7 @@ fora desta rodada: as defesas abaixo não mexem em telas além do aviso de T59.
 **Estimativa**: 2h
 **Where**: `backend/api/src/infraestrutura/db/migracoes/` (migration nova), `backend/api/src/entrada/rotas/conta-minha.ts`, repositório de contas, testes
 **Depends on**: T60
-**Requirement**: ACE-60
+**Requirement**: ACE-70
 
 **Tools**:
 
@@ -1654,7 +1656,7 @@ fora desta rodada: as defesas abaixo não mexem em telas além do aviso de T59.
 **Estimativa**: 1h
 **Where**: `backend/api/src/entrada/middlewares/limite-taxa.ts`, `backend/api/src/entrada/rotas/sessao.ts`, função nova e teste
 **Depends on**: T57
-**Requirement**: ACE-61
+**Requirement**: ACE-71
 
 **Tools**:
 
@@ -1678,7 +1680,7 @@ fora desta rodada: as defesas abaixo não mexem em telas além do aviso de T59.
 **Estimativa**: 2h
 **Where**: `backend/api/src/infraestrutura/db/migracoes/` (migration nova), `backend/api/src/entrada/enviar-email.ts`, `.env.example`, testes
 **Depends on**: T57
-**Requirement**: ACE-62, ACE-52
+**Requirement**: ACE-72, ACE-52
 
 **Tools**:
 
@@ -1702,7 +1704,7 @@ fora desta rodada: as defesas abaixo não mexem em telas além do aviso de T59.
 **Estimativa**: 30 min
 **Where**: `docs/runbook.md`, `.md/THREAT-MODEL.md`
 **Depends on**: T61, T63
-**Requirement**: ACE-62
+**Requirement**: ACE-72
 
 **Tools**:
 

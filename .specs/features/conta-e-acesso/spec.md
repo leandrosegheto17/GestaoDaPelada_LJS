@@ -78,12 +78,12 @@ depender de ninguém.
 3. IF o nome, o e-mail ou a senha estão fora dos limites THEN o sistema SHALL responder 422 com o campo inválido no corpo e não criar a conta. [ACE-03]
 4. IF o e-mail do cadastro já pertence a uma conta THEN o sistema SHALL responder exatamente como no cadastro novo (201, mesma mensagem), não alterar a conta existente e enviar ao dono do e-mail o aviso de tentativa de cadastro. [ACE-04]
 5. The sistema SHALL guardar o e-mail em minúsculas e sem espaços nas pontas, e tratar como iguais e-mails que só diferem nisso. [ACE-05]
-6. WHEN a pessoa abre o link de confirmação dentro de 24 h THEN o sistema SHALL marcar o e-mail como confirmado, abrir uma sessão e levar a pessoa para `/app`. [ACE-06]
+6. WHEN a pessoa abre o link de confirmação dentro de 24 h THEN o sistema SHALL marcar o e-mail como confirmado, sem abrir sessão, e levar a pessoa para `/entrar` com o aviso "E-mail confirmado. Entre com a sua senha.". [ACE-06]
 7. IF o link de confirmação está vencido, já foi usado ou não existe THEN o sistema SHALL mostrar a tela "Link inválido ou vencido" com a ação de pedir um novo link, sem abrir sessão. [ACE-07]
 8. WHEN a pessoa pede um novo link de confirmação THEN o sistema SHALL invalidar o link anterior e enviar um novo, respondendo com a mesma mensagem de sucesso exista ou não a conta. [ACE-08]
 
-**Independent Test**: num banco local vazio, cadastrar pela tela, abrir o link capturado pelo remetente falso e chegar a
-`/app` logado.
+**Independent Test**: num banco local vazio, cadastrar pela tela, abrir o link capturado pelo remetente falso, chegar a
+`/entrar` com o aviso de e-mail confirmado e entrar com a senha até `/app`.
 
 ---
 
@@ -290,6 +290,9 @@ aceitar.
 - IF duas pessoas aceitam o mesmo convite ao mesmo tempo THEN o sistema SHALL criar no máximo um vínculo, e a segunda resposta SHALL ser 410 `link_invalido`. [ACE-67]
 - WHEN a senha tem caracteres acentuados ou emoji que somam mais de 72 bytes THEN o sistema SHALL recusar com 422, mesmo com menos de 72 caracteres. [ACE-68]
 - IF a conta foi excluída enquanto havia uma sessão aberta em outro aparelho THEN a próxima requisição desse aparelho SHALL receber 401 `sessao_expirada`. [ACE-69]
+- WHEN `POST /api/conta/senha` ou `POST /api/conta/excluir` recebe a senha atual errada 5 vezes para a mesma conta em 15 min THEN o sistema SHALL recusar as tentativas seguintes com o erro de bloqueio, sem rodar o bcrypt, até 15 min depois da quinta falha; a senha certa antes disso zera a contagem; o bloqueio é por conta e a resposta não revela se a conta existe. As duas rotas SHALL também passar pelo limitador por IP do login, que responde 429 antes do bcrypt. [ACE-70]
+- WHEN o IP do cliente é IPv6 THEN o sistema SHALL usar o prefixo /64 como chave do limitador por IP e do `ip_hash` do bloqueio por e-mail e IP; IPv4 SHALL ser usado inteiro e a ausência de IP SHALL manter a chave `sem-ip`. [ACE-71]
+- IF o total de e-mails enviados no dia (fuso de São Paulo) passa de 80% de `LIMITE_EMAILS_DIA` (padrão 100) THEN o cadastro, o reenvio de confirmação e o convite SHALL responder 503 `email_indisponivel` sem enviar; "esqueci a senha" SHALL continuar enviando até 100% da cota; o contador SHALL zerar na virada do dia. [ACE-72]
 
 ---
 
@@ -382,14 +385,17 @@ aceitar.
 | ACE-67 | Edge Cases | Design | Pending |
 | ACE-68 | Edge Cases | Design | Pending |
 | ACE-69 | Edge Cases | Design | Pending |
+| ACE-70 | Edge Cases | T57 | Pending |
+| ACE-71 | Edge Cases | T57 | Pending |
+| ACE-72 | Edge Cases | T57 | Pending |
 
-**Coverage:** 69 total, 0 mapped to tasks, 69 unmapped ⚠️ (o mapeamento nasce no `tasks.md`)
+**Coverage:** 72 total, 0 mapped to tasks, 72 unmapped ⚠️ (o mapeamento nasce no `tasks.md`)
 
 ---
 
 ## Success Criteria
 
-- [ ] Cadastro, confirmação e primeiro acesso a `/app` em menos de 2 minutos, no celular, com o e-mail chegando pelo Resend em produção.
+- [ ] Cadastro, confirmação, entrada com a senha e primeiro acesso a `/app` em menos de 2 minutos, no celular, com o e-mail chegando pelo Resend em produção.
 - [ ] A conta do grupo de teste entra em produção com a senha que já tinha.
 - [ ] Suíte de isolamento verde com casos para as tabelas de conta e para todas as rotas novas.
 - [ ] Comparação visual das telas de acesso sem divergência em PC e celular.
