@@ -90,6 +90,14 @@
 - **Date**: 2026-10-27
 - **Status**: active
 
+### AD-012
+- **Decision**: Os 4 achados médios da auditoria de segurança da `conta-e-acesso` (`seguranca.md`) não bloqueiam a integração na `main` e são pendência obrigatória antes da liberação (fase 11): SEC-CA-01 (o link de confirmação só confirma o e-mail e leva a `/entrar`, sem abrir sessão; muda o ACE-06), SEC-CA-02 e SEC-CA-04 (Turnstile no cadastro, no "esqueci a senha" e depois de várias falhas, mais teto global de e-mails e chave de bloqueio por /64 de IPv6; mexe nas telas t04, t05 e t29, com mockup e visual novos), SEC-CA-03 (`LIMITE_ENTRAR` e contador de falhas por conta em `/api/conta/senha` e `/api/conta/excluir`). Os baixos SEC-CA-05 a 12 (incluindo contas do legado com senha temporária e remoção entre admins) seguem sem decisão e entram na liberação como itens a decidir.
+- **Reason**: Nenhum achado crítico ou alto; os médios são de abuso e disponibilidade e só importam em produção. Integrar agora evita mais voltas de verificação sobre uma feature já validada.
+- **Trade-off**: A `main` fica com a brecha de tomada antecipada de conta até a correção. Sem deploy antes do tratamento, não há exposição.
+- **Scope**: `conta-e-acesso`, fase 11
+- **Date**: 2026-10-27
+- **Status**: active
+
 ## Handoff
 
 - **Feature**: `conta-e-acesso` (fase 9, Execute do `tlc-spec-driven`)
@@ -102,20 +110,16 @@
 ## Retomada
 
 - **Fluxo**: 1, Projeto novo para vender — skill `projeto-novo`
-- **Item**: `.specs/features/conta-e-acesso/` (feature 2 de 8, AD-001). Os artefatos atualizados estão na branch `feat/conta-e-acesso` (worktree `.worktrees/conta-e-acesso`); a `main` tem spec, design, mockup e tasks até `9085f80`.
-- **Fase aprovada**: 8, Preparação, em 2026-10-27 (tarefas aprovadas; execução por subagentes, um lote por vez). Antes: 6 (spec, `bc4ed57`) e 7 (desenho `1012c79` e mockup `0b7535d`, galeria https://claude.ai/artifact/UqN3tUswVizPSCVAd7NfX7).
-- **Próxima fase**: 9, Construção, em andamento — modelo indicado: sonnet
-- **Construção**: lote 7 de 8 concluído (T1 a T41); próximo: lote 8 = Fase 9, visual, ponta a ponta e documentação, T42 a T44 (`implementador`). O tlc retoma pelo `tasks.md` da branch; os registros de aprovação dos lotes 2 a 7 estão no topo dele. Depois do T44: verificador independente, auditor de segurança, aceite visual, `trava-testes.py --rodar` e `finishing-a-development-branch` (fase 10).
-- **Progresso**: Plano: Faltam 7 de 8 features: 12% concluído. Projeto: Faltam 5 de 93 tarefas: 95% concluído (item atual: faltam 3 de 44), conferida em 2026-10-27 (o `progresso.py` ainda aponta o item errado; os números vêm da contagem do `tasks.md`).
+- **Item**: `.specs/features/conta-e-acesso/` (feature 2 de 8, AD-001), já integrada na `main` (merge `ee202e2`, sem push). A branch `feat/conta-e-acesso` e o worktree `.worktrees/conta-e-acesso` ainda existem, para limpar depois do push.
+- **Fase aprovada**: 10, Validação, em 2026-10-27: verificador PASS na volta 3 (`validation.md`), auditoria de segurança sem achado crítico ou alto (`seguranca.md`), aceite visual do usuário (galeria https://claude.ai/artifact/CXKJkAy93LV7mGqzHSDLKD) e trava de testes verde no `803c6ee`.
+- **Próxima fase**: 11, Lançamento (skill `liberacao`) — modelo indicado: sonnet. Antes de liberar: tratar os 4 médios de segurança (AD-012) e conferir as pendências do usuário.
+- **Progresso**: Plano: Faltam 7 de 8 features: 12% concluído (a `conta-e-acesso` só vira Concluída na liberação). Item atual: todas as 52 tarefas da feature concluídas, conferido na branch. Projeto: faltam 2 de 101 tarefas (T1 e T2 da fundação, ações do usuário).
 - **Combinado na conversa e não registrado em artefato**:
-  - Banco local: a limpeza de disco de 2026-10-27 apagou os containers; o `conta-e-acesso-db-1` (compose do worktree, porta 5432) foi recriado, migrado e com seed. O `.env` do worktree veio do worktree da fundação. Não mexer em `controleemcasa_ljs-banco-1` (55432) nem em `evolucao-segura-postgres` (5433).
-  - Na `main`, `0b7535d`, `9085f80` e as retomadas estão sem push; na `feat/conta-e-acesso` (HEAD `500c1cd`), nada foi enviado. Push só com confirmação e a trava de testes.
-  - Para o front (lotes 6 e 7), o que o lote 5 entregou: cliente em `dados/cliente.ts` (`ler`, `escrever`, `semCorpo`; escrita leva `X-Pelada: 1`); erros em `dados/erros.ts` (`ErroApi` com `status`, `codigo`, `campos`, `extras`; `unico_admin` traz `extras.grupos`); 401 `sessao_expirada` leva a `/entrar?aviso=sessao-expirada` (a T30 mostra "Sua sessão expirou. Entre de novo."); `useSessao`, `useSair`, `chaveSessao = ['sessao','eu']` (invalidar depois de entrar ou cadastrar); `destinoAposEntrar(volta)` em `app/guarda/decidir-rota.ts`; `lerTokenDoFragmento()` em `dados/fragmento.ts`. Respostas das rotas: entrar 200 {nome,email}; cadastro 201 {mensagem}; confirmar 204 com cookie; reenviar e esqueci-senha 200 {mensagem}; nova-senha 200 {mensagem}; aceitar convite 200 {grupoId}; cadastrar por convite 201 {grupoId} com cookie; ler convite {email, grupoNome, contaExiste}; 409 `unico_admin` com `erro.grupos`; 409 `conta_existente`; 422 `dados_invalidos` com `campos` (ou `termos_obrigatorios` quando só termos). Rodar a API e o resto do `pnpm test` em paralelo no mesmo banco de teste dá falha falsa: rodar em sequência.
-  - Lotes 6 e 7: o e2e de CSP (`cabecalhos.spec.ts:58`) quebrou em `1f9679f` porque o Zod chamava `Function`; corrigido em `34332b9` (`backend/contrato/src/zod.ts` liga o `jitless`; todo schema novo importa o `z` de lá). SPEC_DEVIATION aprovados: T37 sem a recorrência do grupo; T40 sem o nome de quem convidou e, com conta existente sem sessão, sem levar o token à URL. O convite aceito leva a `/app/grupos/:id/admins` até a feature de grupos criar a página do grupo. A T42 deve incluir as telas dos lotes 6 e 7 na comparação visual (hoje compara 6 telas).
-  - `TERMOS_VERSAO` provisório
-  - Pendências do usuário: apagar a branch Neon `spike-descartavel` e o Hyperdrive `spike-s1`; conferir o backup agendado; antes do deploy desta feature, verificar o domínio no Resend.
-  - Fases 8 e 9 (lotes 1 a 3) rodaram em Opus por escolha do usuário (seção Modelo); a partir do lote 4, Sonnet.
-- **Gravada em**: 2026-10-27 (após o lote 7)
+  - Push: o usuário já confirmou o push da `main` depois da trava verde. Falta rodar a trava no `HEAD` final da `main` e pedir a confirmação do comando de push na hora. A trava guarda o registro de suíte verde por pasta; para integrar uma branch de worktree rodei a suíte na `main` com checkout destacado do commit (o `worktree_da_branch` do `trava-testes.py` existe e não é usado no merge).
+  - Banco local: `conta-e-acesso-db-1` (porta 5432), compose do worktree, migrado e com seed. O `.env` da `main` agora tem `SEED_SENHA_ADMIN` (fora do git), necessário para o e2e de acesso. Não mexer em `controleemcasa_ljs-banco-1` (55432) nem em `evolucao-segura-postgres` (5433).
+  - `TERMOS_VERSAO` provisório (`2026-10-27`).
+  - Pendências do usuário: apagar a branch Neon `spike-descartavel` e o Hyperdrive `spike-s1`; conferir o backup agendado; antes do deploy desta feature, verificar o domínio no Resend (runbook, seção 9).
+- **Gravada em**: 2026-10-27 (após a integração local da `conta-e-acesso`)
 
 ## Modelo
 
