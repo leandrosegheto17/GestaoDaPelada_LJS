@@ -83,12 +83,36 @@ jobs:
   # local servindo o `dist`. O e2e não gera o `dist`: o build vem antes. Não há job de Lighthouse (AD-005).
   e2e:
     runs-on: ubuntu-latest
+    env:
+      CI: 'true'
+      # Banco descartável do job para os fluxos de acesso (acesso.spec.ts): migrations e seed locais. Todas as senhas
+      # são fictícias e só valem neste job.
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/pelada
+      PELADA_APP_SENHA: e2e-pelada-app-senha-ficticia-0001
+      PELADA_BACKUP_SENHA: e2e-pelada-backup-senha-ficticia-01
+      SEED_SENHA_ADMIN: e2e-seed-senha-admin-0001
+    services:
+      postgres:
+        # Por digest (índice multi-arch de postgres:16, consultado em 2026-10-25; SEC-004).
+        image: postgres:16@sha256:9e2cf6287f25c3151f4c9421ccce2b17f3e60061c111a29165e0d2cdd9ff0a97
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: pelada
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           persist-credentials: false
       - uses: ./.github/actions/preparar-node
       - run: pnpm --filter @pelada/web exec playwright install --with-deps chromium
+      - run: pnpm migrar
+      - run: pnpm seed
       - run: pnpm --filter @pelada/web build
         env:
           VITE_VERSAO: ${{ github.sha }}

@@ -1174,8 +1174,8 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] Os quatro fluxos passam contra o build e o Worker local com `EMAIL_DEV=1`
-- [ ] Gate full passa (com `pnpm --filter @pelada/web e2e`)
+- [x] Os quatro fluxos passam contra o build e o Worker local com `EMAIL_DEV=1`
+- [x] Gate full passa (com `pnpm --filter @pelada/web e2e`)
 
 **Tests**: e2e
 **Gate**: full
