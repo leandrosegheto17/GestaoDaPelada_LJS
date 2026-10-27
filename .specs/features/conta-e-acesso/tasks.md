@@ -960,8 +960,8 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] Os quatro estados; senhas diferentes mostram "As senhas não conferem."; axe sem violação
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Os quatro estados; senhas diferentes mostram "As senhas não conferem."; axe sem violação
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
