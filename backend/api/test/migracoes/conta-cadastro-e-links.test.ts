@@ -214,9 +214,9 @@ describe('link_pedir (ACE-08, ACE-23, ACE-51)', () => {
     const email = novoEmail();
     await cadastrar(email);
     await passarSegundosDosEnvios(email, 59);
-    expect((await pedir(email, 'confirmacao')).enviar).toBe(false);
+    expect((await pedir(email, 'confirmacao'))?.enviar).toBe(false);
     await passarSegundosDosEnvios(email, 2);
-    expect((await pedir(email, 'confirmacao')).enviar).toBe(true);
+    expect((await pedir(email, 'confirmacao'))?.enviar).toBe(true);
   });
 
   it('novo link de confirmação invalida o anterior; dentro de 60 s não envia e o anterior continua valendo', async () => {
