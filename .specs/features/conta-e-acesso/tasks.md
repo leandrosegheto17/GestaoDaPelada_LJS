@@ -390,11 +390,11 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] `convite_criar` só funciona com vínculo no grupo, recusa quem já é admin (`ja_e_admin`) e respeita os 60 s (ACE-31, ACE-32)
-- [ ] `convite_aceitar` cria o vínculo com `acessa_financeiro` falso; recusa e-mail de outra conta (`convite_de_outro_email`) e convite vencido, usado ou cancelado (ACE-33, ACE-35, ACE-36)
-- [ ] `convite_cadastrar` cria a conta já confirmada com o e-mail do convite, o vínculo e a sessão (ACE-34)
-- [ ] Dois aceites simultâneos do mesmo convite criam um vínculo só (ACE-67)
-- [ ] Gate full passa
+- [x] `convite_criar` só funciona com vínculo no grupo, recusa quem já é admin (`ja_e_admin`) e respeita os 60 s (ACE-31, ACE-32)
+- [x] `convite_aceitar` cria o vínculo com `acessa_financeiro` falso; recusa e-mail de outra conta (`convite_de_outro_email`) e convite vencido, usado ou cancelado (ACE-33, ACE-35, ACE-36)
+- [x] `convite_cadastrar` cria a conta já confirmada com o e-mail do convite, o vínculo e a sessão (ACE-34)
+- [x] Dois aceites simultâneos do mesmo convite criam um vínculo só (ACE-67)
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
