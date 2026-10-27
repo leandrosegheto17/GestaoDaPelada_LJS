@@ -623,9 +623,9 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] Troca de senha responde 204 e a sessão de outro aparelho passa a 401; senha atual errada responde 401 (ACE-26, ACE-27)
-- [ ] Exclusão responde 204 e o login seguinte responde 401; único admin responde 409 com os grupos; senha errada responde 401 (ACE-28 a ACE-30)
-- [ ] Gate full passa
+- [x] Troca de senha responde 204 e a sessão de outro aparelho passa a 401; senha atual errada responde 401 (ACE-26, ACE-27)
+- [x] Exclusão responde 204 e o login seguinte responde 401; único admin responde 409 com os grupos; senha errada responde 401 (ACE-28 a ACE-30)
+- [x] Gate full passa
 
 **Tests**: e2e
 **Gate**: full

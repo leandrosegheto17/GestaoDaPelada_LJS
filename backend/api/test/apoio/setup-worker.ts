@@ -5,7 +5,7 @@ import { comCliente, urlDeTeste, urlDoBanco } from './banco.ts';
 import { BANCO_DO_WORKER } from './banco-worker.ts';
 import { gravarContasAntigas } from './contas-antigas.ts';
 import { gravarDoisGrupos } from './cenario-dois-grupos.ts';
-import { gravarGrupoIsolado } from './grupo-isolado.ts';
+import { gravarAdminUnico, gravarGrupoIsolado } from './grupo-isolado.ts';
 
 async function comAdmin(acao: (admin: pg.Client) => Promise<unknown>): Promise<void> {
   await comCliente(urlDoBanco(urlDeTeste(), 'postgres'), async (admin) => {
@@ -30,6 +30,7 @@ export default async function preparar(): Promise<() => Promise<void>> {
   await comCliente(url, async (owner) => {
     await gravarDoisGrupos(owner);
     await gravarGrupoIsolado(owner);
+    await gravarAdminUnico(owner);
     await gravarContasAntigas(owner);
     await owner.query(`ALTER ROLE pelada_app LOGIN PASSWORD ${owner.escapeLiteral(senha)}`);
   });
