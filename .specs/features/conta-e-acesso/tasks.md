@@ -144,7 +144,7 @@ T42 → T43 → T44
 Tarefas de correção do verificador (volta 1) e das lacunas que ele apontou sem bloquear. Independentes entre si.
 
 ```
-T45, T46, T47, T48, T49, T50, T51, T52 (independentes)
+T45, T46, T47, T48, T49, T50, T51, T52, T53, T54, T55 (independentes)
 ```
 
 ---
@@ -1408,6 +1408,80 @@ T45, T46, T47, T48, T49, T50, T51, T52 (independentes)
 
 ---
 
+### T53: Cadastro grava a versão dos termos e a hora do aceite
+
+**What**: depois de um cadastro com sucesso (`POST /api/conta` e `POST /api/convites/cadastrar`), ler `termos_versao` e `termos_aceitos_em` pelo owner e conferir `TERMOS_VERSAO` e data não nula. Mata os mutantes N7 e N16 (`termosVersao: 'x'`).
+**Estimativa**: 1h
+**Where**: `backend/api/test/rotas/conta-cadastro.test.ts` e `backend/api/test/rotas/convites.test.ts`
+**Depends on**: None
+**Reuses**: `backend/api/test/apoio/owner-worker.ts`
+**Requirement**: ACE-01, ACE-58
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [x] Os dois cadastros gravam `termos_versao === TERMOS_VERSAO` e `termos_aceitos_em` não nulo
+- [x] Os mutantes N7 e N16 passam a falhar (editados, rodados e revertidos)
+- [x] Gate full passa
+
+**Registro**: um teste novo em `conta-cadastro.test.ts` e uma asserção a mais no cadastro por convite em `convites.test.ts`. Com N7, falhou o teste novo; com N16, falhou o de convite. Árvore revertida com `git checkout`.
+
+**Tests**: e2e
+**Gate**: full
+
+---
+
+### T54: Mockups t25 regravados em UTF-8
+
+**What**: os três mockups `t25-senha--*.html` estavam em Latin-1 (`Gestão`); converter só os bytes inválidos para UTF-8, sem mudar o resto, e provar que o visual das t25 segue abaixo de 1%.
+**Estimativa**: 30 min
+**Where**: `.specs/mockup/telas/t25-senha--vazio.html`, `t25-senha--erro.html`, `t25-senha--sucesso.html`
+**Depends on**: None
+**Requirement**: ACE-58
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] Os três arquivos decodificam em UTF-8
+- [ ] Visual das t25 < 1% e visual completo verde
+- [ ] Gate full passa
+
+**Tests**: e2e
+**Gate**: full
+
+---
+
+### T55: Runbook avisa que só hash `$2a$` funciona no `conta_entrar`
+
+**What**: uma linha no `docs/runbook.md`: o filtro de `conta_entrar` aceita `$2a$`, `$2b$` e `$2y$`, mas só `$2a$` (de `gen_salt('bf', 12)` do pgcrypto) funciona no Postgres 16; `$2b$` ou `$2y$` importado de fora entraria como senha errada.
+**Estimativa**: 15 min
+**Where**: `docs/runbook.md`
+**Depends on**: None
+**Requirement**: ACE-06
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] A linha está no runbook
+- [ ] `pnpm format:check` e `pnpm test:checagens` passam
+
+**Tests**: none
+**Gate**: quick
+
+---
+
 ## Phase Execution Map
 
 ```
@@ -1427,7 +1501,7 @@ Phase 6:  T26 → T27 → T28 → T29
 Phase 7:  T30, T31, T32, T33, T34, T35, T36 (independentes)
 Phase 8:  T37, T38, T39, T40, T41 (independentes)
 Phase 9:  T42 → T43 → T44
-Phase 10: T45, T46, T47, T48, T49, T50, T51, T52 (independentes)
+Phase 10: T45, T46, T47, T48, T49, T50, T51, T52, T53, T54, T55 (independentes)
 ```
 
 Execução estritamente sequencial: um trabalhador faz uma tarefa por vez, em ordem.
@@ -1443,7 +1517,7 @@ Execução estritamente sequencial: um trabalhador faz uma tarefa por vez, em or
 | 5 | 5 e 6 | T24 a T29 | `implementador` |
 | 6 | 7 | T30 a T36 | `implementador` |
 | 7 | 8 e 9 | T37 a T44 | `implementador` |
-| 8 | 10 | T45 a T52 (T45 a T50 feitas na volta 1 do verificador; T51 e T52 pendentes) | `implementador` |
+| 8 | 10 | T45 a T55 (T45 a T50 feitas na volta 1 do verificador; T51 a T55 na volta 2) | `implementador` |
 
 ---
 
@@ -1463,7 +1537,7 @@ Execução estritamente sequencial: um trabalhador faz uma tarefa por vez, em or
 | T42 | registro das telas na comparação visual | ✅ |
 | T43 | um arquivo de e2e | ✅ |
 | T44 | documentação da feature | ⚠️ coeso (docs do mesmo fechamento) |
-| T45 a T52 | uma correção ou prova cada (T47 e T50 tocam dois arquivos do mesmo assunto) | ✅ |
+| T45 a T55 | uma correção ou prova cada (T47 e T50 tocam dois arquivos do mesmo assunto) | ✅ |
 
 ## Diagram-Definition Cross-Check
 
@@ -1502,7 +1576,7 @@ Execução estritamente sequencial: um trabalhador faz uma tarefa por vez, em or
 | T42 | None | — | ✅ |
 | T43 | T42 | T42 → T43 | ✅ |
 | T44 | T43 | T43 → T44 | ✅ |
-| T45 a T52 | None | — | ✅ |
+| T45 a T55 | None | — | ✅ |
 
 ## Test Co-location Validation
 
@@ -1520,6 +1594,9 @@ Execução estritamente sequencial: um trabalhador faz uma tarefa por vez, em or
 | T43 | Front: fluxos ponta a ponta | e2e | e2e | ✅ |
 | T44 | Documentação | none | none | ✅ |
 | T45, T48, T51 | Banco e conta (testes de integração) | integration | integration | ✅ |
+| T53 | Rotas da API (versão dos termos gravada) | e2e | e2e | ✅ |
+| T54 | Mockup (codificação dos arquivos) | e2e visual | e2e | ✅ |
+| T55 | Documentação | none | none | ✅ |
 | T46, T50 | Front: App e termos | unit | unit | ✅ |
 | T47 | Front: comparação visual | e2e visual | e2e | ✅ |
 | T49 | Lint das rotas | unit | unit | ✅ |

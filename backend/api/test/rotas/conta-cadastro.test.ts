@@ -1,7 +1,9 @@
+import { TERMOS_VERSAO } from '@pelada/contrato';
 import { describe, expect, it } from 'vitest';
 import { cenarioDeAcesso, cookieDaResposta, REMETENTE_QUE_FALHA, SENHA } from '../apoio/acesso.ts';
 import { PENDENTE_FALHA, PENDENTE_REENVIO } from '../apoio/contas-antigas.ts';
 import { capturarLog } from '../apoio/log.ts';
+import { comoOwner } from '../apoio/owner-worker.ts';
 
 // Rotas de cadastro e confirmação (design C4; ACE-01 a ACE-08, ACE-21, ACE-51, ACE-52).
 
@@ -26,6 +28,18 @@ describe('POST /api/conta', () => {
     expect(remetente.mensagens[0]).toMatchObject({ para: email, assunto: 'Confirme seu e-mail' });
     expect(remetente.mensagens[0]?.texto).toContain('http://localhost:8787/confirmar#t=');
     expect(tokenDoEmail(email)).toHaveLength(43);
+  });
+
+  it('grava a versão dos termos vigente e a hora do aceite (ACE-01, ACE-58)', async () => {
+    const { pedir } = cenarioDeAcesso();
+    const email = emailNovo();
+    expect((await pedir('POST', '/api/conta', cadastro(email))).status).toBe(201);
+    const [conta] = await comoOwner<{ termos_versao: string; termos_aceitos_em: Date | null }>(
+      'select termos_versao, termos_aceitos_em from contas where email = $1',
+      [email],
+    );
+    expect(conta?.termos_versao).toBe(TERMOS_VERSAO);
+    expect(conta?.termos_aceitos_em).not.toBeNull();
   });
 
   it('a conta nasce sem e-mail confirmado: entrar responde 403 até confirmar (ACE-01)', async () => {

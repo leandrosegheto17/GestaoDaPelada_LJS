@@ -1,9 +1,11 @@
+import { TERMOS_VERSAO } from '@pelada/contrato';
 import { describe, expect, it } from 'vitest';
 import * as convites from '../../src/infraestrutura/db/repositorios/convites.ts';
 import { gerarToken } from '../../src/infraestrutura/sessao/token.ts';
 import { cenarioDeAcesso, cookieDaResposta, SENHA } from '../apoio/acesso.ts';
 import { GRUPO_A, GRUPO_B } from '../apoio/cenario-dois-grupos.ts';
 import { capturarLog } from '../apoio/log.ts';
+import { comoOwner } from '../apoio/owner-worker.ts';
 import { criarSessao, noBanco } from '../apoio/sessao-worker.ts';
 
 // Rotas de convite vistas por quem recebe (design C4; ACE-33 a ACE-36).
@@ -113,6 +115,13 @@ describe('POST /api/convites/cadastrar', () => {
     });
     // O e-mail nasce confirmado: dá para entrar sem passar pelo link.
     expect((await pedir('POST', '/api/sessao/entrar', { email, senha: SENHA })).status).toBe(200);
+    // Grava a versão dos termos vigente e a hora do aceite (ACE-58).
+    const [conta] = await comoOwner<{ termos_versao: string; termos_aceitos_em: Date | null }>(
+      'select termos_versao, termos_aceitos_em from contas where email = $1',
+      [email],
+    );
+    expect(conta?.termos_versao).toBe(TERMOS_VERSAO);
+    expect(conta?.termos_aceitos_em).not.toBeNull();
   });
 
   it('convite usado, cancelado ou que não existe: 410 link_invalido, sem sessão (ACE-36)', async () => {
