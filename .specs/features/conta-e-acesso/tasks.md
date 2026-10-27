@@ -238,9 +238,9 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] O `Set-Cookie` tem `HttpOnly; Secure; SameSite=Lax; Path=/`, sem `Domain`, e `Max-Age` de 12 h (G-09)
-- [ ] `limparCookieSessao` envia o cookie vencido
-- [ ] Gate quick passa: `pnpm --filter @pelada/api test`
+- [x] O `Set-Cookie` tem `HttpOnly; Secure; SameSite=Lax; Path=/`, sem `Domain`, e `Max-Age` de 12 h (G-09)
+- [x] `limparCookieSessao` envia o cookie vencido
+- [x] Gate quick passa: `pnpm --filter @pelada/api test`
 
 **Tests**: unit
 **Gate**: quick
