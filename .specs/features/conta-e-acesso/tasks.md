@@ -842,9 +842,9 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] `/termos` e `/privacidade` abrem sem sessão; `/app` sem sessão vai para `/entrar` (ACE-19, ACE-58)
-- [ ] Rota inexistente mostra a tela de erro do projeto, não a padrão do React Router (achado L8 da fundação)
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] `/termos` e `/privacidade` abrem sem sessão; `/app` sem sessão vai para `/entrar` (ACE-19, ACE-58)
+- [x] Rota inexistente mostra a tela de erro do projeto, não a padrão do React Router (achado L8 da fundação)
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick

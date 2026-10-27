@@ -1,4 +1,6 @@
 import type { RouteObject } from 'react-router';
+import { RotaProtegida } from './guarda/RotaProtegida';
+import { PaginaErroDeRota, PaginaNaoEncontrada } from './PaginaNaoEncontrada';
 import { PaginaProvisoria } from './PaginaProvisoria';
 
 /**
@@ -15,6 +17,74 @@ export const rotasVitrine: RouteObject[] =
       ]
     : [];
 
+/**
+ * Rotas do app (design C7). Cada tela carrega sob demanda. Só `/entrar` (ACE-65) e `/app` (ACE-19) passam pela
+ * guarda de sessão; `/termos`, `/privacidade` e as telas de link por e-mail abrem sem sessão (ACE-58).
+ */
 export function criarRotas(extras: RouteObject[] = rotasVitrine): RouteObject[] {
-  return [{ path: '/', Component: PaginaProvisoria }, ...extras];
+  return [
+    {
+      errorElement: <PaginaErroDeRota />,
+      children: [
+        { path: '/', Component: PaginaProvisoria },
+        {
+          Component: RotaProtegida,
+          children: [
+            {
+              path: '/entrar',
+              lazy: async () => ({ Component: (await import('../telas/entrar/Entrar')).Entrar }),
+            },
+            {
+              path: '/app',
+              lazy: async () => ({ Component: (await import('../telas/grupos/SeusGrupos')).SeusGrupos }),
+            },
+            {
+              path: '/app/conta',
+              lazy: async () => ({ Component: (await import('../telas/minha-conta/MinhaConta')).MinhaConta }),
+            },
+            {
+              path: '/app/conta/senha',
+              lazy: async () => ({ Component: (await import('../telas/minha-senha/MinhaSenha')).MinhaSenha }),
+            },
+            {
+              path: '/app/grupos/:grupoId/admins',
+              lazy: async () => ({ Component: (await import('../telas/admins/PaginaAdmins')).PaginaAdmins }),
+            },
+          ],
+        },
+        {
+          path: '/cadastro',
+          lazy: async () => ({ Component: (await import('../telas/cadastro/Cadastro')).Cadastro }),
+        },
+        {
+          path: '/confirmar',
+          lazy: async () => ({ Component: (await import('../telas/confirmar/Confirmar')).Confirmar }),
+        },
+        {
+          path: '/entrar/esqueci',
+          lazy: async () => ({ Component: (await import('../telas/esqueci/EsqueciSenha')).EsqueciSenha }),
+        },
+        {
+          path: '/entrar/nova-senha',
+          lazy: async () => ({ Component: (await import('../telas/nova-senha/NovaSenha')).NovaSenha }),
+        },
+        {
+          path: '/convite',
+          lazy: async () => ({ Component: (await import('../telas/convite/Convite')).Convite }),
+        },
+        {
+          path: '/termos',
+          lazy: async () => ({ Component: (await import('../telas/termos/PaginaTermos')).PaginaTermos }),
+        },
+        {
+          path: '/privacidade',
+          lazy: async () => ({
+            Component: (await import('../telas/privacidade/PaginaPrivacidade')).PaginaPrivacidade,
+          }),
+        },
+        ...extras,
+        { path: '*', Component: PaginaNaoEncontrada },
+      ],
+    },
+  ];
 }
