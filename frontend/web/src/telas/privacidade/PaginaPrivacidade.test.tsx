@@ -1,6 +1,5 @@
 // Critério: ACE-58, ACE-60 (mockup t07 novo: versão, selo de rascunho, e-mails, exclusão pela própria conta)
 
-import { TERMOS_VERSAO } from '@pelada/contrato';
 import { screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { violacoes } from '../../../test/apoio/axe';
@@ -12,7 +11,11 @@ describe('PaginaPrivacidade (t07)', () => {
     const { container } = montarTela(<PaginaPrivacidade />, '/privacidade', ['/']);
     expect(screen.getByRole('heading', { level: 1, name: 'Privacidade' })).toBeVisible();
     expect(screen.getByText('Rascunho para revisão')).toBeVisible();
-    expect(screen.getByText(`Versão ${TERMOS_VERSAO}`)).toBeVisible();
+    // ACE-58: a versão exibida é uma data AAAA-MM-DD válida (a spec fixa o formato, não compara com a constante).
+    const versao = screen.getByText(/^Versão \d{4}-\d{2}-\d{2}$/);
+    expect(versao).toBeVisible();
+    const data = versao.textContent?.replace('Versão ', '') ?? '';
+    expect(new Date(`${data}T00:00:00Z`).toISOString().slice(0, 10)).toBe(data);
     for (const secao of ['O que guardamos', 'E-mails', 'Quem vê', 'Como excluir seus dados']) {
       expect(screen.getByRole('heading', { level: 2, name: secao })).toBeVisible();
     }

@@ -1,6 +1,5 @@
 // Critério: ACE-58, ACE-60 (mockup t33: página de termos com versão e selo de rascunho)
 
-import { TERMOS_VERSAO } from '@pelada/contrato';
 import { screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { violacoes } from '../../../test/apoio/axe';
@@ -12,7 +11,11 @@ describe('PaginaTermos (t33)', () => {
     const { container } = montarTela(<PaginaTermos />, '/termos', ['/cadastro']);
     expect(screen.getByRole('heading', { level: 1, name: 'Termos de uso' })).toBeVisible();
     expect(screen.getByText('Rascunho para revisão')).toBeVisible();
-    expect(screen.getByText(`Versão ${TERMOS_VERSAO}`)).toBeVisible();
+    // ACE-58: a versão exibida é uma data AAAA-MM-DD válida (a spec fixa o formato, não compara com a constante).
+    const versao = screen.getByText(/^Versão \d{4}-\d{2}-\d{2}$/);
+    expect(versao).toBeVisible();
+    const data = versao.textContent?.replace('Versão ', '') ?? '';
+    expect(new Date(`${data}T00:00:00Z`).toISOString().slice(0, 10)).toBe(data);
     for (const secao of ['O serviço', 'Sua conta', 'Encerramento']) {
       expect(screen.getByRole('heading', { level: 2, name: secao })).toBeVisible();
     }

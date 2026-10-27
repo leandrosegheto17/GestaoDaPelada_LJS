@@ -3,7 +3,7 @@ import { bytesUtf8, LIMITES } from './limites.ts';
 import { email, nomeConta, senha } from './primitivos.ts';
 
 /** Versão dos termos de uso e da privacidade aceita no cadastro (ACE-01, ACE-58). */
-// SPEC_DEVIATION: a spec não fixa o valor; usa-se a data da aprovação do desenho como versão inicial (rascunho, ACE-60).
+// A spec fixa o formato `AAAA-MM-DD` (ACE-58); o valor é provisório (rascunho, ACE-60) até o usuário aprovar o texto.
 export const TERMOS_VERSAO = '2026-10-27';
 
 const MENSAGEM_SENHA = `A senha precisa ter de ${LIMITES.senha.min} a ${LIMITES.senha.max} caracteres.`;

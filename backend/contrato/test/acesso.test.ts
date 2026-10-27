@@ -95,7 +95,8 @@ describe('respostas', () => {
 });
 
 describe('TERMOS_VERSAO', () => {
-  it('é um texto não vazio', () => {
-    expect(TERMOS_VERSAO).toMatch(/\S/);
+  it('tem o formato AAAA-MM-DD de uma data válida (ACE-58)', () => {
+    expect(TERMOS_VERSAO).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(new Date(`${TERMOS_VERSAO}T00:00:00Z`).toISOString().slice(0, 10)).toBe(TERMOS_VERSAO);
   });
 });

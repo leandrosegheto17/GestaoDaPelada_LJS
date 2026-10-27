@@ -1286,8 +1286,10 @@ T42 → T43 → T44
 **Requirement**: ACE-58, ACE-60
 **Done when**:
 
-- [ ] Spec e teste alinhados; suíte verde
-- [ ] Gate quick passa
+- [x] Spec e teste alinhados; suíte verde
+- [x] Gate quick passa
+
+**Registro**: spec: ACE-58 e ACE-60 fixam o formato `AAAA-MM-DD` da versão. Testes existentes alterados por decisão do usuário (mais fortes): `PaginaTermos.test.tsx` e `PaginaPrivacidade.test.tsx` deixam de comparar a tela com `TERMOS_VERSAO` e exigem a data `AAAA-MM-DD` válida no texto exibido; `acesso.test.ts` troca "não vazio" pelo formato e pela data válida. `TERMOS_VERSAO` segue `2026-10-27`, provisório (rascunho).
 
 **Tests**: unit
 **Gate**: quick

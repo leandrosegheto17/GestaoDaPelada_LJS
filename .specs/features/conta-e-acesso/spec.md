@@ -245,9 +245,9 @@ aceitar.
 
 **Acceptance Criteria**:
 
-1. The páginas `/termos` e `/privacidade` SHALL ser públicas, abrir sem sessão e mostrar a versão e a data do texto. [ACE-58]
+1. The páginas `/termos` e `/privacidade` SHALL ser públicas, abrir sem sessão e mostrar a versão e a data do texto; a versão dos termos tem o formato `AAAA-MM-DD` (a data do texto) e é a mesma gravada no aceite do cadastro. [ACE-58]
 2. The cadastro SHALL ter um campo de aceite com links para as duas páginas, desmarcado por padrão. [ACE-59]
-3. The texto das duas páginas SHALL vir marcado como rascunho para revisão do usuário até ele aprovar a versão. [ACE-60]
+3. The texto das duas páginas SHALL vir marcado como rascunho para revisão do usuário até ele aprovar a versão; enquanto for rascunho, a versão exibida mantém o formato `AAAA-MM-DD`. [ACE-60]
 
 **Independent Test**: abrir `/termos` e `/privacidade` sem sessão; tentar cadastrar sem o aceite e ver o erro.
 
