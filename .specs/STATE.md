@@ -82,6 +82,14 @@
 - **Date**: 2026-10-27
 - **Status**: active
 
+### AD-011
+- **Decision**: O `tasks.md` da `conta-e-acesso` segue a regra de tarefas do `CLAUDE.md`: toda tarefa tem `**Estimativa**` (aproximada nas concluídas), nenhuma passa de 2h e não há limite de quantidade. Entram T51 (conta com hash bcrypt gerado fora do `pgcrypto`) e T52 (log sem segredo em `esqueci-senha` e `nova-senha`), e as correções T45 a T52 formam a Phase 10. Ações externas (branch Neon e Hyperdrive do spike, domínio no Resend, secrets, backup) ficam no runbook e neste arquivo, fora do `tasks.md`. As 8 features do roteiro não mudam.
+- **Reason**: Meta de até 2h por tarefa; o verificador achou lacunas de teste sem tarefa correspondente.
+- **Trade-off**: A Estimativa das tarefas concluídas é aproximada. A `fundacao` não recebe Estimativa.
+- **Scope**: `conta-e-acesso` e roteiro
+- **Date**: 2026-10-27
+- **Status**: active
+
 ## Handoff
 
 - **Feature**: `conta-e-acesso` (fase 9, Execute do `tlc-spec-driven`)
