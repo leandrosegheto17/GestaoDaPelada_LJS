@@ -1,0 +1,6 @@
+{
+  "erro": {
+    "codigo": "link_invalido",
+    "mensagem": "Link inválido ou vencido."
+  }
+}

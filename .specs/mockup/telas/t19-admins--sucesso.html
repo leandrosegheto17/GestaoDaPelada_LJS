@@ -9,21 +9,24 @@
 <link rel="stylesheet" href="../base.css">
 </head>
 <body>
-<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+<!-- Muda: convite por e-mail e convites pendentes no lugar de nome + senha temporária (ACE-31, ACE-37, ACE-38). Remover e último admin seguem as telas atuais (t19-admins--remover, t19-admins--ultimo-admin), sem o formulário de nome. -->
 <header class="barra barra--admin"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span><a class="barra__link" href="t08-grupos--sucesso.html">Trocar grupo</a></div></header>
-<main id="conteudo" class="conteudo conteudo--admin conteudo--estreito">
-  <a class="voltar" href="t09-inicio--sucesso.html"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 18 9 12 15 6"/></svg>Início</a>
+<main class="conteudo conteudo--admin conteudo--estreito">
+  <a class="voltar" href="../telas/t09-inicio--sucesso.html"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 18 9 12 15 6"/></svg>Início</a>
   <h1 class="titulo-pagina">Admins</h1>
+  
   <ul class="lista">
-    <li class="item item--quebra"><span class="item__principal"><span class="item__titulo">Leandro (você)</span><span class="item__meta">leandro@exemplo.com.br</span></span><label class="interruptor"><input type="checkbox" role="switch" checked disabled aria-describedby="ajuda-proprio-acesso" aria-label="Acessa financeiro: Leandro"><span class="interruptor__trilho" aria-hidden="true"></span><span class="interruptor__estado" aria-hidden="true">Financeiro</span></label><a class="botao botao--texto" href="t25-senha--vazio.html">Minha senha</a><p class="campo__ajuda" id="ajuda-proprio-acesso" style="flex-basis:100%">Você não pode alterar o seu próprio acesso.</p></li>
-    <li class="item item--quebra"><span class="item__principal"><span class="item__titulo">Marquinhos</span><span class="item__meta">marquinhos@exemplo.com.br</span></span><label class="interruptor"><input type="checkbox" role="switch" aria-label="Acessa financeiro: Marquinhos"><span class="interruptor__trilho" aria-hidden="true"></span><span class="interruptor__estado" aria-hidden="true">Financeiro</span></label><span class="grupo-botoes"><a class="botao botao--texto" href="t19-admins--senha.html">Redefinir senha</a><a class="botao botao--texto botao--texto-destrutivo" href="t19-admins--remover.html">Remover do grupo</a></span></li>
+    <li class="item item--quebra"><span class="item__principal"><span class="item__titulo">Leandro (você)</span><span class="item__meta">leandro@exemplo.com.br</span></span><span class="selo selo--neutro">Financeiro</span></li>
+    <li class="item item--quebra"><span class="item__principal"><span class="item__titulo">Marquinhos</span><span class="item__meta">marquinhos@exemplo.com.br</span></span><a class="botao botao--texto botao--texto-destrutivo" href="../telas/t19-admins--remover.html">Remover</a></li>
   </ul>
+  <h2 class="subtitulo">Convites pendentes</h2>
+  <ul class="lista"><li class="item item--quebra"><span class="item__principal"><span class="item__titulo">paulo.goleiro@exemplo.com.br</span><span class="item__meta">Vale até 30/10/2026</span></span><button class="botao botao--texto botao--texto-destrutivo" type="button">Cancelar convite</button></li></ul>
   <section class="secao" aria-labelledby="add">
-    <h2 id="add" class="subtitulo">Adicionar admin</h2>
+    <h2 id="add" class="subtitulo">Convidar admin</h2>
+    <p class="paragrafo">A pessoa recebe um link por e-mail. Se ainda não tiver conta, cria uma pelo próprio link.</p>
     <form class="formulario" novalidate>
-      <div class="campo"><label class="campo__rotulo" for="nome">Nome</label><input class="campo__entrada" id="nome" autocomplete="off"></div>
-      <div class="campo"><label class="campo__rotulo" for="email">E-mail</label><input class="campo__entrada" id="email" type="email" autocomplete="off"></div>
-      <div><a class="botao botao--principal" href="t19-admins--senha.html">Adicionar admin</a></div>
+      <div class="campo"><label class="campo__rotulo" for="email-convite">E-mail</label><input class="campo__entrada" id="email-convite" type="email" inputmode="email"></div>
+      <div><button class="botao botao--principal" type="submit">Enviar convite</button></div>
     </form>
   </section>
 </main>

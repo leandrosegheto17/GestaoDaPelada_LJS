@@ -31,6 +31,8 @@ Implemente estas tarefas com a skill `tlc-spec-driven`: **acione-a pelo nome e s
 
 > **Registro do lote 7 (2026-10-27, aprovado pelo usuário):** T37 a T41. Fora do Where, mudanças compatíveis: `telas/compartilhado/PaginaInterna.tsx` (barra e menu da conta), `app/PaginaProvisoria.tsx` com `?aviso=conta-excluida` e `CampoTexto` com `somenteLeitura`. SPEC_DEVIATION: T37 sem a recorrência do grupo (`GET /api/sessao` não a devolve); T40 com o texto "Você foi convidado para administrar o grupo X" (a rota não devolve quem convidou) e, para conta existente sem sessão, manda entrar e abrir o link de novo, sem levar o token à URL (AD-010). Depois de aceitar o convite a tela vai a `/app/grupos/:id/admins`, a única rota de grupo; ajustar quando a feature de grupos criar a página do grupo.
 
+> **Registro do lote 8 (2026-10-27, T42 a T44):** mudanças aprovadas pelo usuário. (1) `frontend/web/e2e/telas-ativas.test.mjs`: o teste "são exatamente as três do critério" passa a exigir as 3 telas da fundação mais as 36 do mockup do módulo (nenhuma asserção removida; ganha um teste das rotas reais), porque a T42 acrescenta as telas de acesso a `telas-ativas.txt`. (2) SPEC_DEVIATION em `frontend/web/e2e/config-fundacao.mjs` (só `montarMapa`): tela com `"real": true` no `telas.json` é comparada na rota real, com passos, recorte e respostas do próprio mapa. (3) Promoção do mockup: as 36 telas foram para `.specs/mockup/telas/` (10 legadas homônimas sobrescritas) e as respostas novas são `.specs/mockup/respostas/acesso-*.json`. (4) Mockup promovido alinhado ao que o app faz: `botao botao--texto botao--texto-destrutivo` (como o guia), `t31` sem o nome de quem convidou e `t08-grupos--sucesso` sem a recorrência (divergências aprovadas no lote 7), `t32-conta--carregando` em branco (a guarda não mostra nada enquanto a sessão carrega). (5) Recortes na comparação, onde o mockup omite ou simplifica parte da página: `t05-esqueci--erro` (só `.faixa--erro`; o mockup omite o parágrafo de apoio), `t06-nova-senha--sucesso` e `t32-conta--excluida` (só `.faixa--sucesso`; o mockup é uma página simplificada), `t06-nova-senha--erro` (só `#nova` e `#conf`; o resumo "Corrija 1 campo" do mockup contraria o `ResumoErros`, que só aparece com 2 erros ou mais) e `t32-conta--excluir` (só o `alertdialog`; o fundo do mockup é vazio). (6) App: layout das páginas em `estilos/global.css` (faltava), classe `recuo-3`, faixa de convite enviado no topo de `PaginaAdmins`, aviso de conta excluída na largura de conteúdo. (7) T43: `playwright.config.ts` e o job `e2e` do CI (Postgres de serviço, migrations e seed) ajustados como SPEC_DEVIATION mínimo.
+
 ---
 
 ## Test Coverage Matrix
@@ -1148,9 +1150,9 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] `pnpm --filter @pelada/web visual` compara as 36 telas nos dois viewports, com diferença máxima abaixo de 1%
-- [ ] `python .claude/scripts/checar-tokens.py frontend/web/src` passa
-- [ ] Gate build passa
+- [x] `pnpm --filter @pelada/web visual` compara as 36 telas nos dois viewports, com diferença máxima abaixo de 1%
+- [x] `python .claude/scripts/checar-tokens.py frontend/web/src` passa
+- [x] Gate build passa
 
 **Tests**: e2e
 **Gate**: build

@@ -52,7 +52,7 @@ export function NovaSenha() {
     return (
       <PaginaAcesso titulo="Link inválido ou vencido">
         <Faixa tipo="atencao">Este link já foi usado ou passou do prazo de 1 hora.</Faixa>
-        <div className="acima-3">
+        <div className="recuo-3">
           <BotaoLink to="/entrar/esqueci" bloco>
             Pedir novo link
           </BotaoLink>

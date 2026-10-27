@@ -6,7 +6,13 @@ import { AvisoInstalacao } from '../pwa/AvisoInstalacao';
 
 function AvisoDaUrl() {
   const [parametros] = useSearchParams();
-  return parametros.get('aviso') === 'conta-excluida' ? <Faixa tipo="sucesso">Sua conta foi excluída.</Faixa> : null;
+  if (parametros.get('aviso') !== 'conta-excluida') return null;
+  // Na largura de conteúdo das telas de acesso, como no mockup (t32, conta excluída).
+  return (
+    <div className="conteudo conteudo--estreito">
+      <Faixa tipo="sucesso">Sua conta foi excluída.</Faixa>
+    </div>
+  );
 }
 
 /**

@@ -32,7 +32,7 @@ export function PaginaAcesso({
       <title>{titulo}</title>
       <PularConteudo />
       <BarraTitulo titulo="Gestão da Pelada" />
-      <main id="conteudo" tabIndex={-1} className="conteudo" aria-busy={ocupado || undefined}>
+      <main id="conteudo" tabIndex={-1} className="conteudo conteudo--estreito" aria-busy={ocupado || undefined}>
         {voltarPara && voltarRotulo ? (
           <Voltar para={voltarPara} rotulo={voltarRotulo} {...(aoVoltar ? { aoClicar: aoVoltar } : {})} />
         ) : null}

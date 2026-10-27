@@ -91,16 +91,23 @@ function DialogoRemover({ grupoId, admin, aoFechar, aoRemovido, aoUltimoAdmin }:
 }
 
 /** Formulário de convite por e-mail (ACE-31, ACE-32). */
-function ConvidarAdmin({ grupoId, aoConvidar }: { grupoId: string; aoConvidar: () => void }) {
+function ConvidarAdmin({
+  grupoId,
+  aoComecar,
+  aoConvidar,
+}: {
+  grupoId: string;
+  aoComecar: () => void;
+  aoConvidar: (email: string) => void;
+}) {
   const [email, setEmail] = useState('');
   const [erro, setErro] = useState<string | undefined>();
   const [enviando, setEnviando] = useState(false);
   const [falha, setFalha] = useState<'indisponivel' | 'conexao' | null>(null);
-  const [enviado, setEnviado] = useState<string | null>(null);
 
   const enviar = async () => {
     setFalha(null);
-    setEnviado(null);
+    aoComecar();
     const analise = conviteCorpo.safeParse({ email });
     if (!analise.success) {
       setErro(analise.error.issues[0]?.message ?? 'Informe um e-mail válido.');
@@ -110,9 +117,8 @@ function ConvidarAdmin({ grupoId, aoConvidar }: { grupoId: string; aoConvidar: (
     setEnviando(true);
     try {
       await escrever('POST', `/grupos/${grupoId}/admins/convites`, { email }, semCorpo);
-      setEnviado(email);
       setEmail('');
-      aoConvidar();
+      aoConvidar(email);
     } catch (falhaEnvio) {
       if (falhaEnvio instanceof ErroApi && falhaEnvio.status === 409 && falhaEnvio.codigo === 'ja_e_admin') {
         setErro(TEXTO_JA_E_ADMIN);
@@ -134,7 +140,6 @@ function ConvidarAdmin({ grupoId, aoConvidar }: { grupoId: string; aoConvidar: (
       <p className="paragrafo">
         A pessoa recebe um link por e-mail. Se ainda não tiver conta, cria uma pelo próprio link.
       </p>
-      {enviado ? <Faixa tipo="sucesso">Convite enviado para {enviado}. Vale por 7 dias.</Faixa> : null}
       <Formulario aoEnviar={() => void enviar()} enviando={enviando}>
         <CampoTexto
           id="email-convite"
@@ -169,6 +174,7 @@ export function PaginaAdmins() {
   });
   const [removendo, setRemovendo] = useState<Admin | null>(null);
   const [avisoUltimo, setAvisoUltimo] = useState(false);
+  const [convidado, setConvidado] = useState<string | null>(null);
   const [falhaCancelar, setFalhaCancelar] = useState(false);
   const [cancelando, setCancelando] = useState<string | null>(null);
 
@@ -210,6 +216,7 @@ export function PaginaAdmins() {
       ) : null}
       {lista.isError ? <ErroRede aoTentar={() => void lista.refetch()} /> : null}
       {avisoUltimo ? <Faixa tipo="erro">{TEXTO_ULTIMO_ADMIN}</Faixa> : null}
+      {convidado ? <Faixa tipo="sucesso">Convite enviado para {convidado}. Vale por 7 dias.</Faixa> : null}
       {dados ? (
         <>
           <Lista>
@@ -275,7 +282,14 @@ export function PaginaAdmins() {
           ) : null}
         </>
       ) : null}
-      <ConvidarAdmin grupoId={grupoId} aoConvidar={atualizar} />
+      <ConvidarAdmin
+        grupoId={grupoId}
+        aoComecar={() => setConvidado(null)}
+        aoConvidar={(email) => {
+          setConvidado(email);
+          atualizar();
+        }}
+      />
       {removendo ? (
         <DialogoRemover
           grupoId={grupoId}

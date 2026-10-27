@@ -1,0 +1,19 @@
+{
+  "id": "c-leandro",
+  "nome": "Leandro",
+  "email": "leandro@exemplo.com.br",
+  "grupos": [
+    {
+      "id": "g-quinta",
+      "nome": "Pelada de Quinta",
+      "slug": "pelada-de-quinta",
+      "acessaFinanceiro": true
+    },
+    {
+      "id": "g-domingo",
+      "nome": "Racha de Domingo",
+      "slug": "racha-de-domingo",
+      "acessaFinanceiro": false
+    }
+  ]
+}

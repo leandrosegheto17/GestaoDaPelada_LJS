@@ -1,5 +1,5 @@
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -31,8 +31,27 @@ describe('lerTelasAtivas', () => {
 describe('telas ativas da fundação', () => {
   const arquivo = readFileSync(join(import.meta.dirname, 'telas-ativas.txt'), 'utf8');
 
-  it('são exatamente as três do critério, todas existentes no mockup', () => {
-    expect(lerTelasAtivas(arquivo, nomesValidos(mapaDoMockup))).toEqual(ATIVAS);
+  // Motivo da mudança (T42, conta-e-acesso, aprovada pelo usuário em 2026-10-27): a feature acrescenta as telas de
+  // acesso a `telas-ativas.txt`; a asserção das três da fundação continua, e entram as 36 do mockup do módulo.
+  it('são as três da fundação e as 36 telas do mockup do módulo de acesso, todas existentes no mockup', () => {
+    const ativas = lerTelasAtivas(arquivo, nomesValidos(mapaDoMockup));
+    expect(ativas.slice(0, 3)).toEqual(ATIVAS);
+    const doModulo = readdirSync(join(MOCKUP, '../features/conta-e-acesso/mockup/telas'))
+      .map((f) => f.replace(/\.html$/, ''))
+      .sort();
+    expect(doModulo).toHaveLength(36);
+    expect(ativas.slice(3).sort()).toEqual(doModulo);
+  });
+
+  it('as telas de acesso usam a rota real do app, com respostas de API, sem rota de vitrine', () => {
+    const ativas = lerTelasAtivas(arquivo, nomesValidos(mapaDoMockup)).slice(3);
+    const mapa = montarMapa(mapaDoMockup, ativas, MOCKUP, join(import.meta.dirname, 'resultado'));
+    expect(mapa.telas).toHaveLength(36);
+    for (const tela of mapa.telas) {
+      expect(tela.viewports).toEqual(['pc', 'celular']);
+      expect(tela.rota).not.toMatch(/^\/vitrine\//);
+      expect(tela.rota).toMatch(/^\//);
+    }
   });
 
   it('o mapa derivado usa 1280×800 e 390×844, as rotas de vitrine e nenhuma resposta de API', () => {

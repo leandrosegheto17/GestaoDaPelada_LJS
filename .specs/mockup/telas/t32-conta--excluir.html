@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Excluir conta</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<!-- ACE-28, ACE-30: senha errada mostra "Senha incorreta." no campo. -->
+<header class="barra barra--admin" aria-hidden="true"><div class="barra__grupo"><span class="barra__nome">Gestão da Pelada</span></div><nav class="barra__acoes" aria-label="Atalhos"><a class="botao-icone botao-icone--sem-borda" href="t09-inicio--menu-conta.html" aria-label="Menu da conta"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></a></nav></header>
+<div class="veu">
+  <section class="dialogo" role="alertdialog" aria-modal="true" aria-labelledby="dx-t" aria-describedby="dx-x">
+    <button class="dialogo__fechar" type="button" aria-label="Fechar"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <h2 id="dx-t" class="dialogo__titulo">Excluir sua conta?</h2>
+    <p id="dx-x" class="dialogo__texto">Não dá para desfazer. Digite sua senha para confirmar.</p>
+    <form class="formulario acima-3" novalidate>
+      <div class="campo"><label class="campo__rotulo" for="senha-excluir">Senha</label><div class="campo__linha"><input class="campo__entrada" id="senha-excluir" type="password" autocomplete="current-password"><button class="botao botao--secundario" type="button" aria-pressed="false" aria-controls="senha-excluir">Mostrar</button></div></div>
+    </form>
+    <div class="dialogo__acoes"><button class="botao botao--secundario" type="button" autofocus>Cancelar</button><button class="botao botao--destrutivo" type="button">Excluir conta</button></div>
+  </section>
+</div>
+</body>
+</html>

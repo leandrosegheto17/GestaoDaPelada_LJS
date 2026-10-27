@@ -1,0 +1,6 @@
+{
+  "erro": {
+    "codigo": "email_nao_confirmado",
+    "mensagem": "Confirme seu e-mail para entrar."
+  }
+}

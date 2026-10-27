@@ -71,7 +71,7 @@ export function Confirmar() {
     return (
       <PaginaAcesso titulo="Verifique seu e-mail">
         <Faixa tipo="info">Se houver uma conta com esse e-mail, enviamos um novo link de confirmação.</Faixa>
-        <div className="acima-3">
+        <div className="recuo-3">
           <BotaoLink to="/entrar" variante="secundario" bloco>
             Voltar para entrar
           </BotaoLink>

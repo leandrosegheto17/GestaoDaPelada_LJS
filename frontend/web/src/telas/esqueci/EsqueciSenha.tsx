@@ -43,7 +43,7 @@ export function EsqueciSenha() {
     return (
       <PaginaAcesso titulo="Esqueci a senha">
         <Faixa tipo="info">{TEXTO_ENVIADO}</Faixa>
-        <div className="acima-3">
+        <div className="recuo-3">
           <BotaoLink to="/entrar" variante="secundario" bloco>
             Voltar para entrar
           </BotaoLink>

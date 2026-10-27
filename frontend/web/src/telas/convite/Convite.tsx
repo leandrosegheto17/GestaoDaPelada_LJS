@@ -111,9 +111,11 @@ function AceitarConvite({ token, convite, emailDaConta, aoInvalido, aoOutroEmail
       <Apresentacao grupoNome={convite.grupoNome} />
       <p className="paragrafo">Você está conectado como {emailDaConta}.</p>
       {falhou ? <ErroEnvio /> : null}
-      <Botao bloco carregando={enviando} rotuloCarregando="Aceitando…" onClick={() => void aceitar()}>
-        Aceitar e abrir o grupo
-      </Botao>
+      <div className="recuo-3">
+        <Botao bloco carregando={enviando} rotuloCarregando="Aceitando…" onClick={() => void aceitar()}>
+          Aceitar e abrir o grupo
+        </Botao>
+      </div>
       <BotaoLink to="/app" variante="texto">
         Agora não
       </BotaoLink>
@@ -312,7 +314,7 @@ export function Convite() {
         <Faixa tipo="atencao" papel="status">
           Este convite já foi usado, foi cancelado ou passou do prazo de 7 dias. Peça um novo ao admin do grupo.
         </Faixa>
-        <div className="acima-3">
+        <div className="recuo-3">
           <BotaoLink to="/entrar" variante="secundario" bloco>
             Ir para entrar
           </BotaoLink>
@@ -364,7 +366,7 @@ export function Convite() {
         <>
           <Apresentacao grupoNome={convite.grupoNome} />
           <Faixa tipo="info">Este e-mail já tem conta. Entre e abra o link do convite de novo para aceitar.</Faixa>
-          <div className="acima-3">
+          <div className="recuo-3">
             <BotaoLink to="/entrar" bloco>
               Ir para entrar
             </BotaoLink>
