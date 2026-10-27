@@ -33,6 +33,8 @@ Implemente estas tarefas com a skill `tlc-spec-driven`: **acione-a pelo nome e s
 
 > **Registro do lote 8 (2026-10-27, T42 a T44):** mudanças aprovadas pelo usuário. (1) `frontend/web/e2e/telas-ativas.test.mjs`: o teste "são exatamente as três do critério" passa a exigir as 3 telas da fundação mais as 36 do mockup do módulo (nenhuma asserção removida; ganha um teste das rotas reais), porque a T42 acrescenta as telas de acesso a `telas-ativas.txt`. (2) SPEC_DEVIATION em `frontend/web/e2e/config-fundacao.mjs` (só `montarMapa`): tela com `"real": true` no `telas.json` é comparada na rota real, com passos, recorte e respostas do próprio mapa. (3) Promoção do mockup: as 36 telas foram para `.specs/mockup/telas/` (10 legadas homônimas sobrescritas) e as respostas novas são `.specs/mockup/respostas/acesso-*.json`. (4) Mockup promovido alinhado ao que o app faz: `botao botao--texto botao--texto-destrutivo` (como o guia), `t31` sem o nome de quem convidou e `t08-grupos--sucesso` sem a recorrência (divergências aprovadas no lote 7), `t32-conta--carregando` em branco (a guarda não mostra nada enquanto a sessão carrega). (5) Recortes na comparação, onde o mockup omite ou simplifica parte da página: `t05-esqueci--erro` (só `.faixa--erro`; o mockup omite o parágrafo de apoio), `t06-nova-senha--sucesso` e `t32-conta--excluida` (só `.faixa--sucesso`; o mockup é uma página simplificada), `t06-nova-senha--erro` (só `#nova` e `#conf`; o resumo "Corrija 1 campo" do mockup contraria o `ResumoErros`, que só aparece com 2 erros ou mais) e `t32-conta--excluir` (só o `alertdialog`; o fundo do mockup é vazio). (6) App: layout das páginas em `estilos/global.css` (faltava), classe `recuo-3`, faixa de convite enviado no topo de `PaginaAdmins`, aviso de conta excluída na largura de conteúdo. (7) T43: `playwright.config.ts` e o job `e2e` do CI (Postgres de serviço, migrations e seed) ajustados como SPEC_DEVIATION mínimo. (8) Registro tardio, achado pelo verificador: `backend/api/test/migracoes/rls.test.ts` mudou na T8 a T11 (`convites_admin` entra em `COM_GRUPO_ID`; `LEGIVEIS_PELO_SLUG` exclui `convites_admin`, com teste próprio de que o slug público não o lê; `DE_CONTA` e o bloco "RLS com FORCE nas tabelas de conta"). Nenhuma asserção removida: a lista trocou de nome e o caso de `convites_admin` ganhou teste.
 
+> **Registro da reorganização (2026-10-27, aprovada pelo usuário):** regra nova de tarefas (CLAUDE.md, seção Tarefas). Todas as 52 tarefas ganham `**Estimativa**` (aproximada nas concluídas: 2h para T6 a T11, T13, T14, T17, T18, T43 e T44; 1,5h para T27, T42 e T47; 45 min para T48 e T50; 1h nas demais). Nenhuma tarefa passa de 2h e nenhuma foi dividida. Entram T51 (conta com hash bcrypt gerado fora do `pgcrypto`, meta 5 da spec) e T52 (log sem segredo em `esqueci-senha` e `nova-senha`, ACE-21), lacunas não bloqueantes do verificador. T45 a T52 formam a Phase 10. Ações externas (branch Neon e Hyperdrive do spike, domínio no Resend, secrets, backup) ficam no runbook e no `STATE.md`, fora do `tasks.md`.
+
 ---
 
 ## Test Coverage Matrix
@@ -137,6 +139,14 @@ Telas independentes entre si: T37, T38, T39, T40, T41.
 T42 → T43 → T44
 ```
 
+### Phase 10: Correções da validação (mecânica)
+
+Tarefas de correção do verificador (volta 1) e das lacunas que ele apontou sem bloquear. Independentes entre si.
+
+```
+T45, T46, T47, T48, T49, T50, T51, T52 (independentes)
+```
+
 ---
 
 ## Task Breakdown
@@ -144,6 +154,7 @@ T42 → T43 → T44
 ### T1: Zod e primitivos no contrato
 
 **What**: Adicionar `zod >= 4.6.6` ao `@pelada/contrato` (e o override no `pnpm-workspace.yaml`) e criar os primitivos `email` (minúsculas, sem espaços nas pontas, até 254), `senha` (8 a 72 caracteres e até 72 bytes UTF-8) e `nomeConta` (2 a 60).
+**Estimativa**: 1h
 **Where**: `backend/contrato/src/primitivos.ts`
 **Depends on**: None
 **Reuses**: `backend/contrato/src/limites.ts` (`LIMITES`, `bytesUtf8`); legado: `backend/contrato/src/primitivos.ts`
@@ -169,6 +180,7 @@ T42 → T43 → T44
 ### T2: Schemas das rotas de conta e acesso
 
 **What**: Schemas `.strict()` de corpo e resposta (`cadastroCorpo`, `entrarCorpo`, `emailCorpo`, `tokenCorpo`, `novaSenhaCorpo`, `trocarSenhaCorpo`, `excluirCorpo`, `conviteCorpo`, `conviteCadastroCorpo`, `sessaoEu`, `adminsResposta`) e a constante `TERMOS_VERSAO`.
+**Estimativa**: 1h
 **Where**: `backend/contrato/src/acesso.ts` (e o export em `index.ts`)
 **Depends on**: T1
 **Reuses**: legado: `backend/contrato/src/sessao.ts`
@@ -193,6 +205,7 @@ T42 → T43 → T44
 ### T3: Snapshot de compatibilidade do contrato (G-20)
 
 **What**: Script `checar-compatibilidade` que gera a forma JSON de cada schema exportado e falha quando um campo é removido, renomeado ou fica obrigatório sem entrada em `QUEBRAS.md`; snapshot inicial gravado.
+**Estimativa**: 1h
 **Where**: `backend/contrato/scripts/checar-compatibilidade.ts`
 **Depends on**: T2
 **Reuses**: `z.toJSONSchema` do zod 4
@@ -217,6 +230,7 @@ T42 → T43 → T44
 ### T4: Token e hash
 
 **What**: `gerarToken()` (32 bytes aleatórios em base64url e o SHA-256 em bytes) e `hashIp(ip)` (SHA-256 do `CF-Connecting-IP`).
+**Estimativa**: 1h
 **Where**: `backend/api/src/infraestrutura/sessao/token.ts`
 **Depends on**: None
 **Reuses**: Web Crypto do Workers
@@ -240,6 +254,7 @@ T42 → T43 → T44
 ### T5: Cookie de sessão
 
 **What**: `definirCookieSessao`, `limparCookieSessao` e `lerTokenSessao` com `__Host-sessao`.
+**Estimativa**: 1h
 **Where**: `backend/api/src/infraestrutura/sessao/cookie.ts`
 **Depends on**: T4
 **Reuses**: legado: `backend/api/src/infraestrutura/sessao/cookie.ts`
@@ -264,6 +279,7 @@ T42 → T43 → T44
 ### T6: Remetente de e-mail
 
 **What**: Interface `Remetente`, `remetenteResend` (`fetch` com `Idempotency-Key`, `text` e `html`), `remetenteMemoria` e os modelos de confirmação, recuperação, convite e aviso de cadastro duplicado, com o link montado de `URL_PUBLICA` e o token no fragmento.
+**Estimativa**: 2h
 **Where**: `backend/api/src/infraestrutura/email/` (um arquivo por peça: `remetente.ts`, `resend.ts`, `memoria.ts`, `modelos.ts`)
 **Depends on**: None
 **Reuses**: pesquisa do Resend de 2026-10-26 (design, C5)
@@ -288,6 +304,7 @@ T42 → T43 → T44
 ### T7: Migration das tabelas, RLS e grants de conta
 
 **What**: Migration nova com as colunas de `contas` (`email_confirmado_em` com o preenchimento das contas existentes, `termos_versao`, `termos_aceitos_em`, `excluida_em`) e de `tentativas_login` (`ip_hash`), as tabelas `links_conta`, `convites_admin` e `envios_email`, a RLS `FORCE` com as policies e os grants do C1.
+**Estimativa**: 2h
 **Where**: `backend/api/src/infraestrutura/db/migracoes/<timestamp>_conta-tabelas.sql`
 **Depends on**: None
 **Reuses**: `1792843320000_rls.sql` (padrão de policies); `backend/api/test/isolamento/casos.ts`
@@ -314,6 +331,7 @@ T42 → T43 → T44
 ### T8: Funções de cadastro e links
 
 **What**: Migration nova com `conta_cadastrar`, `link_pedir`, `link_confirmar` e `link_nova_senha`, com o intervalo de 60 s em `envios_email`.
+**Estimativa**: 2h
 **Where**: `backend/api/src/infraestrutura/db/migracoes/<timestamp>_conta-cadastro-e-links.sql`
 **Depends on**: T7
 **Reuses**: legado: `repositorios/contas.ts` (`crypt`, `HASH_FIXO`)
@@ -340,6 +358,7 @@ T42 → T43 → T44
 ### T9: Funções de entrar e de sessão
 
 **What**: Migration nova com `conta_entrar` (trava por e-mail e IP, bloqueio de 5 falhas em 15 min, hash fixo para e-mail inexistente, criação da sessão) e `sessao_tocar` (15 min de inatividade, 12 h absolutas, renovação).
+**Estimativa**: 2h
 **Where**: `backend/api/src/infraestrutura/db/migracoes/<timestamp>_conta-entrar-e-sessao.sql`
 **Depends on**: T8
 **Reuses**: legado: `repositorios/tentativas.ts:58-69` (trava por e-mail), `repositorios/sessoes.ts`
@@ -366,6 +385,7 @@ T42 → T43 → T44
 ### T10: Funções de troca de senha e exclusão de conta
 
 **What**: Migration nova com `conta_trocar_senha` e `conta_excluir` (recusa de único admin e anonimização).
+**Estimativa**: 2h
 **Where**: `backend/api/src/infraestrutura/db/migracoes/<timestamp>_conta-senha-e-exclusao.sql`
 **Depends on**: T9
 **Reuses**: design C1 ("Exclusão como anonimização")
@@ -392,6 +412,7 @@ T42 → T43 → T44
 ### T11: Funções de convite
 
 **What**: Migration nova com `convite_criar`, `convite_ler`, `convite_aceitar` e `convite_cadastrar`.
+**Estimativa**: 2h
 **Where**: `backend/api/src/infraestrutura/db/migracoes/<timestamp>_conta-convites.sql`
 **Depends on**: T10
 **Reuses**: `grupos_visiveis()`
@@ -418,6 +439,7 @@ T42 → T43 → T44
 ### T12: Proteções das funções do banco
 
 **What**: Teste que lista as funções `SECURITY DEFINER` e falha se alguma não tiver `search_path` fixo ou tiver `EXECUTE` para `PUBLIC`, e checagem que falha com `crypt(` fora das migrations (G-02).
+**Estimativa**: 1h
 **Where**: `backend/api/test/migracoes/funcoes-definer.test.ts`
 **Depends on**: T11
 **Reuses**: `backend/api/test/apoio/como-role.ts`
@@ -443,6 +465,7 @@ T42 → T43 → T44
 ### T13: Repositórios de contas, sessões e links
 
 **What**: Repositórios finos sobre as funções (cadastrar, entrar, eu, trocar senha, excluir, tocar sessão em transação curta, encerrar sessão, pedir, confirmar e consumir links) e os tipos Kysely das tabelas.
+**Estimativa**: 2h
 **Where**: `backend/api/src/infraestrutura/db/repositorios/contas.ts` (e `sessoes.ts`, `links.ts`, `tipos.ts` no mesmo commit)
 **Depends on**: T12
 **Reuses**: `transacao-da-requisicao.ts` (para a transação curta de `sessoes.tocar`)
@@ -467,6 +490,7 @@ T42 → T43 → T44
 ### T14: Repositórios de convites, admins e auditoria
 
 **What**: `convites.*`, `admins.listar` e `admins.remover` (com o `FOR UPDATE` do último admin) e `auditoria.registrar`, todos com `grupoId` como primeiro parâmetro.
+**Estimativa**: 2h
 **Where**: `backend/api/src/infraestrutura/db/repositorios/admins.ts` (e `convites.ts`, `auditoria.ts` no mesmo commit)
 **Depends on**: T13
 **Reuses**: legado: `aplicacao/acesso/vinculo.ts`
@@ -494,6 +518,7 @@ T42 → T43 → T44
 ### T15: Middlewares de sessão e ordem da entrada
 
 **What**: `carregarSessao` e `exigirSessao`; em `criarApp`, `exigirCabecalhoPelada` antes dos limitadores, `LIMITE_ENTRAR` nas rotas sem sessão da tabela do C4 e `carregarSessao` antes do `comBanco`.
+**Estimativa**: 1h
 **Where**: `backend/api/src/entrada/middlewares/sessao.ts` (e a ordem em `app.ts`)
 **Depends on**: T14
 **Reuses**: legado: `entrada/middlewares/sessao.ts`; `backend/api/test/apoio/cliente.ts` (gancho `preparar` para uma rota de prova)
@@ -521,6 +546,7 @@ T42 → T43 → T44
 ### T16: Middleware de vínculo e listagem de rotas (G-04)
 
 **What**: `exigirVinculo` em `/api/grupos/:grupoId/*` (404 sem vínculo) e o meta-teste que lista as rotas registradas no Hono e falha se alguma não tiver caso em `casos.ts`.
+**Estimativa**: 1h
 **Where**: `backend/api/src/entrada/middlewares/vinculo.ts`
 **Depends on**: T15
 **Reuses**: `backend/api/test/isolamento/meta.test.ts`
@@ -545,6 +571,7 @@ T42 → T43 → T44
 ### T17: Rotas de sessão (entrar, eu, sair)
 
 **What**: `POST /api/sessao/entrar`, `GET /api/sessao` e `POST /api/sessao/sair`, com os casos em `casos.ts`.
+**Estimativa**: 2h
 **Where**: `backend/api/src/entrada/rotas/sessao.ts`
 **Depends on**: T16
 **Reuses**: legado: `entrada/rotas/sessao-entrar.ts`, `aplicacao/acesso/sessao-eu.ts`
@@ -571,6 +598,7 @@ T42 → T43 → T44
 ### T18: Rotas de cadastro e confirmação
 
 **What**: `POST /api/conta`, `POST /api/conta/confirmar` e `POST /api/conta/reenviar-confirmacao`, com o remetente em memória nos testes.
+**Estimativa**: 2h
 **Where**: `backend/api/src/entrada/rotas/conta-cadastro.ts`
 **Depends on**: T17
 **Reuses**: T6, T13
@@ -597,6 +625,7 @@ T42 → T43 → T44
 ### T19: Rotas de recuperação de senha
 
 **What**: `POST /api/sessao/esqueci-senha` e `POST /api/sessao/nova-senha`.
+**Estimativa**: 1h
 **Where**: `backend/api/src/entrada/rotas/sessao-recuperacao.ts`
 **Depends on**: T18
 **Reuses**: T13
@@ -621,6 +650,7 @@ T42 → T43 → T44
 ### T20: Rotas de minha conta
 
 **What**: `POST /api/conta/senha` e `POST /api/conta/excluir`.
+**Estimativa**: 1h
 **Where**: `backend/api/src/entrada/rotas/conta-minha.ts`
 **Depends on**: T19
 **Reuses**: T13
@@ -645,6 +675,7 @@ T42 → T43 → T44
 ### T21: Rotas de convite (aceitar e cadastrar)
 
 **What**: `POST /api/convites/ler`, `POST /api/convites/aceitar` e `POST /api/convites/cadastrar`.
+**Estimativa**: 1h
 **Where**: `backend/api/src/entrada/rotas/convites.ts`
 **Depends on**: T17
 **Reuses**: T14
@@ -670,6 +701,7 @@ T42 → T43 → T44
 ### T22: Rotas de admins do grupo
 
 **What**: `GET /api/grupos/:grupoId/admins`, `POST …/admins/convites`, `DELETE …/admins/convites/:id` e `DELETE …/admins/:contaId`.
+**Estimativa**: 1h
 **Where**: `backend/api/src/entrada/rotas/admins.ts`
 **Depends on**: T17
 **Reuses**: T14, T16; legado: `entrada/rotas/grupos/admins/`
@@ -695,6 +727,7 @@ T42 → T43 → T44
 ### T23: Caixa de e-mails de desenvolvimento e variáveis
 
 **What**: Rota `GET /api/dev/emails` registrada só com `EMAIL_DEV=1`; `RESEND_API_KEY`, `RESEND_REMETENTE`, `EMAIL_DEV` e `SEED_SENHA_ADMIN` no `.env.example`, no `env.ts` e no `.dev.vars` de exemplo; teste de que o `wrangler.jsonc` de produção não define `EMAIL_DEV`.
+**Estimativa**: 1h
 **Where**: `backend/api/src/entrada/rotas/dev-emails.ts`
 **Depends on**: T18
 **Reuses**: `backend/scripts/test/env-example.test.ts` (G-28), `backend/api/test/config/wrangler.test.ts`
@@ -719,6 +752,7 @@ T42 → T43 → T44
 ### T24: Script do dono
 
 **What**: `pnpm dono -- --email <e-mail> [--alvo producao]`, que lê a senha sem eco e chama `conta_definir_senha` como owner.
+**Estimativa**: 1h
 **Where**: `backend/scripts/dono.ts`
 **Depends on**: None
 **Reuses**: legado: `backend/scripts/dono.ts`; `infraestrutura/seguranca/trava-host.ts`
@@ -744,6 +778,7 @@ T42 → T43 → T44
 ### T25: Seed com conta que entra
 
 **What**: O seed passa a criar a conta admin confirmada com a senha de `SEED_SENHA_ADMIN` e recusa rodar sem ela.
+**Estimativa**: 1h
 **Where**: `backend/api/src/infraestrutura/db/repositorios/seed-local.ts`
 **Depends on**: T24
 **Reuses**: `conta_definir_senha`
@@ -768,6 +803,7 @@ T42 → T43 → T44
 ### T26: Cliente HTTP e provedor de consultas
 
 **What**: `ler`, `escrever` (com `X-Pelada: 1` e `credentials: 'same-origin'`) e o `QueryClientProvider`; 401 `sessao_expirada` limpa o cache e leva a `/entrar` com o aviso.
+**Estimativa**: 1h
 **Where**: `frontend/web/src/dados/cliente.ts`
 **Depends on**: None
 **Reuses**: legado: `frontend/web/src/dados/cliente.ts`
@@ -792,6 +828,7 @@ T42 → T43 → T44
 ### T27: Sessão no front e guarda de rota
 
 **What**: `useSessao`, `useSair`, `RotaProtegida` e `decidirRota` (sem sessão vai a `/entrar` e volta depois; com sessão, `/entrar` vai a `/app`).
+**Estimativa**: 1,5h
 **Where**: `frontend/web/src/app/guarda/decidir-rota.ts` (e `RotaProtegida.tsx`, `dados/sessao.ts` no mesmo commit)
 **Depends on**: T26
 **Reuses**: legado: `frontend/web/src/app/guarda/`, `dados/sessao.ts`
@@ -815,6 +852,7 @@ T42 → T43 → T44
 ### T28: Leitura do token no fragmento
 
 **What**: `lerTokenDoFragmento()`, que lê `#t=`, apaga o fragmento com `history.replaceState` e devolve o token.
+**Estimativa**: 1h
 **Where**: `frontend/web/src/dados/fragmento.ts`
 **Depends on**: T27
 **Reuses**: nada
@@ -838,6 +876,7 @@ T42 → T43 → T44
 ### T29: Rotas do app
 
 **What**: As rotas do C7 em `criarRotas()`, carregadas sob demanda, com `/app` sob a guarda; `/` continua a página provisória.
+**Estimativa**: 1h
 **Where**: `frontend/web/src/app/rotas.tsx`
 **Depends on**: T28
 **Reuses**: `frontend/web/src/app/rotas.tsx` atual
@@ -862,6 +901,7 @@ T42 → T43 → T44
 ### T30: Tela Entrar
 
 **What**: A tela `/entrar` conforme t04 (vazio, carregando, erro, bloqueado, e-mail não confirmado com reenviar, sessão expirada, link "Criar conta").
+**Estimativa**: 1h
 **Where**: `frontend/web/src/telas/entrar/Entrar.tsx`
 **Depends on**: None
 **Reuses**: legado: `telas/entrar/Entrar.tsx`; mockup `t04-entrar--*`
@@ -885,6 +925,7 @@ T42 → T43 → T44
 ### T31: Tela Cadastro
 
 **What**: A tela `/cadastro` conforme t29, com o aceite dos termos desmarcado.
+**Estimativa**: 1h
 **Where**: `frontend/web/src/telas/cadastro/Cadastro.tsx`
 **Depends on**: None
 **Reuses**: `CampoSenha`, `ResumoErros`, `CaixaSelecao`; mockup `t29-cadastro--*`
@@ -908,6 +949,7 @@ T42 → T43 → T44
 ### T32: Tela Confirmar e-mail
 
 **What**: A tela `/confirmar` conforme t30 (confirmando, link inválido com pedir novo, reenviado).
+**Estimativa**: 1h
 **Where**: `frontend/web/src/telas/confirmar/Confirmar.tsx`
 **Depends on**: None
 **Reuses**: `lerTokenDoFragmento`; mockup `t30-confirmar--*`
@@ -931,6 +973,7 @@ T42 → T43 → T44
 ### T33: Tela Esqueci a senha
 
 **What**: A tela `/entrar/esqueci` conforme t05 (vazio, enviado, e-mail indisponível).
+**Estimativa**: 1h
 **Where**: `frontend/web/src/telas/esqueci/EsqueciSenha.tsx`
 **Depends on**: None
 **Reuses**: legado: `telas/esqueci/EsqueciSenha.tsx`; mockup `t05-esqueci--*`
@@ -954,6 +997,7 @@ T42 → T43 → T44
 ### T34: Tela Nova senha
 
 **What**: A tela `/entrar/nova-senha` conforme t06 (vazio, erro, link inválido, sucesso indo a `/entrar` com o aviso).
+**Estimativa**: 1h
 **Where**: `frontend/web/src/telas/nova-senha/NovaSenha.tsx`
 **Depends on**: None
 **Reuses**: `CamposNovaSenha`, `lerTokenDoFragmento`; mockup `t06-nova-senha--*`
@@ -977,6 +1021,7 @@ T42 → T43 → T44
 ### T35: Página Termos de uso
 
 **What**: A página pública `/termos` conforme t33, com a versão de `TERMOS_VERSAO` e o selo de rascunho.
+**Estimativa**: 1h
 **Where**: `frontend/web/src/telas/termos/PaginaTermos.tsx`
 **Depends on**: None
 **Reuses**: mockup `t33-termos--pagina`
@@ -1000,6 +1045,7 @@ T42 → T43 → T44
 ### T36: Página Privacidade
 
 **What**: A página `/privacidade` conforme o t07 novo (versão, selo de rascunho, e-mails, exclusão pela própria conta).
+**Estimativa**: 1h
 **Where**: `frontend/web/src/telas/privacidade/PaginaPrivacidade.tsx`
 **Depends on**: None
 **Reuses**: legado: `telas/privacidade/PaginaPrivacidade.tsx`; mockup `t07-privacidade--pagina`
@@ -1023,6 +1069,7 @@ T42 → T43 → T44
 ### T37: Tela Seus grupos e menu da conta
 
 **What**: `/app` conforme t08 (vazio e lista) e o menu da conta conforme t09 (Minha conta, Privacidade, Termos, Sair).
+**Estimativa**: 1h
 **Where**: `frontend/web/src/telas/grupos/SeusGrupos.tsx`
 **Depends on**: None
 **Reuses**: legado: `telas/grupos/EscolherGrupo.tsx`; mockup `t08-grupos--*`, `t09-inicio--menu-conta`
@@ -1046,6 +1093,7 @@ T42 → T43 → T44
 ### T38: Tela Minha conta
 
 **What**: `/app/conta` conforme t32 (dados, trocar senha, diálogo de exclusão com senha, único admin com a lista de grupos, conta excluída).
+**Estimativa**: 1h
 **Where**: `frontend/web/src/telas/minha-conta/MinhaConta.tsx`
 **Depends on**: None
 **Reuses**: `Dialogo`, `Lista`; mockup `t32-conta--*`
@@ -1069,6 +1117,7 @@ T42 → T43 → T44
 ### T39: Tela Minha senha
 
 **What**: `/app/conta/senha` conforme t25 (vazio, erro, sucesso "Senha trocada. Outros aparelhos foram desconectados.").
+**Estimativa**: 1h
 **Where**: `frontend/web/src/telas/minha-senha/MinhaSenha.tsx`
 **Depends on**: None
 **Reuses**: legado: `telas/minha-senha/MinhaSenha.tsx`; mockup `t25-senha--*`
@@ -1092,6 +1141,7 @@ T42 → T43 → T44
 ### T40: Tela Convite
 
 **What**: `/convite` conforme t31 (carregando, logado, sem conta com e-mail travado, outro e-mail, inválido).
+**Estimativa**: 1h
 **Where**: `frontend/web/src/telas/convite/Convite.tsx`
 **Depends on**: None
 **Reuses**: `lerTokenDoFragmento`; mockup `t31-convite--*`
@@ -1115,6 +1165,7 @@ T42 → T43 → T44
 ### T41: Tela Admins do grupo
 
 **What**: `/app/grupos/:grupoId/admins` conforme t19 novo (lista, convites pendentes, convidar, convite enviado, já admin, remover, último admin, carregando).
+**Estimativa**: 1h
 **Where**: `frontend/web/src/telas/admins/PaginaAdmins.tsx`
 **Depends on**: None
 **Reuses**: legado: `telas/admins/PaginaAdmins.tsx`; mockup `t19-admins--*`
@@ -1138,6 +1189,7 @@ T42 → T43 → T44
 ### T42: Comparação visual das telas de acesso
 
 **What**: Promover o mockup do módulo para `.specs/mockup/telas/` (caminhos `../../../../mockup/` viram `../`), registrar as telas em `.specs/mockup/telas.json` com rota e respostas de exemplo, e incluí-las em `frontend/web/e2e/telas-ativas.txt`.
+**Estimativa**: 1,5h
 **Where**: `frontend/web/e2e/telas-ativas.txt` (e as telas e o `telas.json` em `.specs/mockup/`)
 **Depends on**: None
 **Reuses**: `frontend/web/e2e/visual.mjs`, `.specs/mockup/respostas/`
@@ -1162,6 +1214,7 @@ T42 → T43 → T44
 ### T43: Fluxos ponta a ponta de acesso
 
 **What**: Testes Playwright dos "Independent Test" da spec: cadastro → link da caixa de dev → `/app`; entrar e sair; recuperação; convite entre duas contas.
+**Estimativa**: 2h
 **Where**: `frontend/web/e2e/acesso.spec.ts`
 **Depends on**: T42
 **Reuses**: `frontend/web/e2e/playwright.config.ts`; rota `GET /api/dev/emails` (T23)
@@ -1185,6 +1238,7 @@ T42 → T43 → T44
 ### T44: Documentação da feature
 
 **What**: GUARDRAILS (G-03, G-04, G-08, G-09, G-11, G-20 passam a "Ativa"), ADR-029 (sessão e funções `SECURITY DEFINER`, AD-007 e AD-008), runbook (verificar o domínio no Resend, secrets `RESEND_API_KEY` e `RESEND_REMETENTE`, uso do `dono.ts`, cota de 100 e-mails por dia), README (variáveis novas e caixa de dev) e THREAT-MODEL (rotas de autenticação).
+**Estimativa**: 2h
 **Where**: `.md/adr/029-sessao-em-transacao-propria-e-funcoes-de-conta.md` (e os documentos citados no mesmo commit)
 **Depends on**: T43
 **Reuses**: formato dos ADRs 024 a 028
@@ -1213,6 +1267,7 @@ T42 → T43 → T44
 ### T45: Escrita sem WHERE de `sessoes` e `contas` provada sozinha
 
 **What**: B executa `DELETE`/`UPDATE` sem `WHERE` e as linhas de A não mudam (mutantes M17 e M18).
+**Estimativa**: 1h
 **Where**: `backend/api/test/isolamento/contas.test.ts`
 **Requirement**: ACE-43, ACE-44
 **Done when**:
@@ -1226,6 +1281,7 @@ T42 → T43 → T44
 ### T46: Sessão expirada leva a `/entrar` com o aviso (ligação do `App`)
 
 **What**: teste do `App` em que 401 `sessao_expirada` estando em `/app/conta` leva a `/entrar` com "Sua sessão expirou. Entre de novo." (mutante F1).
+**Estimativa**: 1h
 **Where**: `frontend/web/src/app/App.test.tsx` (ou teste novo ao lado)
 **Requirement**: ACE-20
 **Done when**:
@@ -1239,6 +1295,7 @@ T42 → T43 → T44
 ### T47: Tela t25 (`/conta/senha`) na comparação visual
 
 **What**: ativar `t25-senha--vazio`, `--erro` e `--sucesso` (`"real": true`, rota, passos, respostas, recortes com motivo) e `telas-ativas.txt`.
+**Estimativa**: 1,5h
 **Where**: `.specs/mockup/telas.json`, `frontend/web/e2e/telas-ativas.txt`
 **Requirement**: ACE-54
 **Done when**:
@@ -1254,6 +1311,7 @@ T42 → T43 → T44
 ### T48: Borda de 60 s entre e-mails
 
 **What**: 59 s bloqueia e 61 s permite, em `link_pedir` e `conta_cadastrar` (mutante M26).
+**Estimativa**: 45 min
 **Where**: `backend/api/test/migracoes/conta-cadastro-e-links.test.ts`
 **Requirement**: ACE-51
 **Done when**:
@@ -1267,6 +1325,7 @@ T42 → T43 → T44
 ### T49: Lint barra leitura e escrita de `e_dono` nas rotas
 
 **What**: `pelada/sem-escrita-dono` passa a barrar também a leitura de `e_dono` em `backend/api/src/**` (decisão do usuário).
+**Estimativa**: 1h
 **Where**: `backend/scripts/test/dono.test.ts` e a regra de lint
 **Requirement**: ACE-63
 **Done when**:
@@ -1282,6 +1341,7 @@ T42 → T43 → T44
 ### T50: Versão dos termos no formato `AAAA-MM-DD`
 
 **What**: a spec fixa o formato; o teste confere o formato e o valor exibido, sem comparar a tela com a própria constante (decisão do usuário).
+**Estimativa**: 45 min
 **Where**: `spec.md` (ACE-58, ACE-60) e `frontend/web/src/telas/termos/PaginaTermos.test.tsx`
 **Requirement**: ACE-58, ACE-60
 **Done when**:
@@ -1296,10 +1356,60 @@ T42 → T43 → T44
 
 ---
 
+### T51: Conta com hash bcrypt gerado fora do `pgcrypto` entra com a senha atual
+
+**What**: teste de integração com um hash bcrypt de custo 12 literal, gerado fora do Postgres, gravado em uma conta existente; a conta entra com a senha atual e a senha errada é recusada (meta 5 da spec, decisão "Contas que já existem").
+**Estimativa**: 1,5h
+**Where**: `backend/api/test/migracoes/conta-entrar-hash-externo.test.ts`
+**Depends on**: None
+**Reuses**: `backend/api/test/migracoes/conta-cadastro-e-links.test.ts`; helpers de banco de `backend/api/test/`
+**Requirement**: ACE-06
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] Conta com o hash literal entra com a senha atual e abre sessão (mesma resposta do login normal)
+- [ ] A mesma conta com senha errada recebe 401 `credenciais_invalidas` e conta uma falha
+- [ ] Gate full passa
+
+**Tests**: integration
+**Gate**: full
+
+---
+
+### T52: Log sem segredo em `esqueci-senha` e `nova-senha`
+
+**What**: testes de que `POST /api/sessao/esqueci-senha` e `POST /api/sessao/nova-senha` não gravam no log a senha, o token do link nem o corpo, no sucesso e na falha, como já existe em `sessao.test.ts`.
+**Estimativa**: 1h
+**Where**: `backend/api/test/rotas/sessao-recuperacao.test.ts`
+**Depends on**: None
+**Reuses**: o caso de log de `backend/api/test/rotas/sessao.test.ts`
+**Requirement**: ACE-21
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] Nenhum log de `esqueci-senha` contém o token do link nem o corpo da requisição, no sucesso e na falha
+- [ ] Nenhum log de `nova-senha` contém o token, a senha nova nem o corpo, no sucesso e na falha
+- [ ] Gate full passa
+
+**Tests**: e2e
+**Gate**: full
+
+---
+
 ## Phase Execution Map
 
 ```
-Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5 → Phase 6 → Phase 7 → Phase 8 → Phase 9
+Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5 → Phase 6 → Phase 7 → Phase 8 → Phase 9 → Phase 10
 
 Phase 1:  T1 → T2 → T3
           T4 → T5
@@ -1315,6 +1425,7 @@ Phase 6:  T26 → T27 → T28 → T29
 Phase 7:  T30, T31, T32, T33, T34, T35, T36 (independentes)
 Phase 8:  T37, T38, T39, T40, T41 (independentes)
 Phase 9:  T42 → T43 → T44
+Phase 10: T45, T46, T47, T48, T49, T50, T51, T52 (independentes)
 ```
 
 Execução estritamente sequencial: um trabalhador faz uma tarefa por vez, em ordem.
@@ -1330,6 +1441,7 @@ Execução estritamente sequencial: um trabalhador faz uma tarefa por vez, em or
 | 5 | 5 e 6 | T24 a T29 | `implementador` |
 | 6 | 7 | T30 a T36 | `implementador` |
 | 7 | 8 e 9 | T37 a T44 | `implementador` |
+| 8 | 10 | T45 a T52 (T45 a T50 feitas na volta 1 do verificador; T51 e T52 pendentes) | `implementador` |
 
 ---
 
@@ -1349,6 +1461,7 @@ Execução estritamente sequencial: um trabalhador faz uma tarefa por vez, em or
 | T42 | registro das telas na comparação visual | ✅ |
 | T43 | um arquivo de e2e | ✅ |
 | T44 | documentação da feature | ⚠️ coeso (docs do mesmo fechamento) |
+| T45 a T52 | uma correção ou prova cada (T47 e T50 tocam dois arquivos do mesmo assunto) | ✅ |
 
 ## Diagram-Definition Cross-Check
 
@@ -1387,6 +1500,7 @@ Execução estritamente sequencial: um trabalhador faz uma tarefa por vez, em or
 | T42 | None | — | ✅ |
 | T43 | T42 | T42 → T43 | ✅ |
 | T44 | T43 | T43 → T44 | ✅ |
+| T45 a T52 | None | — | ✅ |
 
 ## Test Co-location Validation
 
@@ -1403,3 +1517,8 @@ Execução estritamente sequencial: um trabalhador faz uma tarefa por vez, em or
 | T42 | Front: comparação visual | e2e visual | e2e | ✅ |
 | T43 | Front: fluxos ponta a ponta | e2e | e2e | ✅ |
 | T44 | Documentação | none | none | ✅ |
+| T45, T48, T51 | Banco e conta (testes de integração) | integration | integration | ✅ |
+| T46, T50 | Front: App e termos | unit | unit | ✅ |
+| T47 | Front: comparação visual | e2e visual | e2e | ✅ |
+| T49 | Lint das rotas | unit | unit | ✅ |
+| T52 | Rotas da API | e2e | e2e | ✅ |
