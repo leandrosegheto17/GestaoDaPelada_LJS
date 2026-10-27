@@ -215,8 +215,8 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] Dois tokens seguidos são diferentes; o hash tem 32 bytes e é o SHA-256 do token
-- [ ] Gate quick passa: `pnpm --filter @pelada/api test`
+- [x] Dois tokens seguidos são diferentes; o hash tem 32 bytes e é o SHA-256 do token
+- [x] Gate quick passa: `pnpm --filter @pelada/api test`
 
 **Tests**: unit
 **Gate**: quick
