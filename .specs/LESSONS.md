@@ -44,6 +44,12 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: ACE-58 ACE-60 ACE-56 (spec)
 - last seen: 2026-10-27T17:34:21Z
 
+### L-006 - Teste de rota que grava dado exigido pela spec (versão dos termos aceitos) confere o valor gravado no banco, não só o status 201 da resposta
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `routes` · harmful: 0
+- features: conta-e-acesso
+- evidence: N7/N16 backend/api/src/entrada/rotas/conta-cadastro.ts:27 e convites.ts:46 (ACE-01, ACE-58) (routes)
+- last seen: 2026-10-27T19:32:05Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

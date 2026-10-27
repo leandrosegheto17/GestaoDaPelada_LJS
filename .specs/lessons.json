@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 6,
+  "next_id": 7,
   "lessons": [
     {
       "id": "L-001",
@@ -94,6 +94,24 @@
       ],
       "created": "2026-10-27T17:34:21Z",
       "last_seen": "2026-10-27T17:34:21Z"
+    },
+    {
+      "id": "L-006",
+      "key": "surviving_mutant::teste de rota que grava dado exigido pela spec versao dos termos aceitos confere o valor gravado no banco nao so o status 201 da resposta",
+      "text": "Teste de rota que grava dado exigido pela spec (versão dos termos aceitos) confere o valor gravado no banco, não só o status 201 da resposta",
+      "signal": "surviving_mutant",
+      "scope": "routes",
+      "status": "candidate",
+      "features": [
+        "conta-e-acesso"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "N7/N16 backend/api/src/entrada/rotas/conta-cadastro.ts:27 e convites.ts:46 (ACE-01, ACE-58) (routes)"
+      ],
+      "created": "2026-10-27T19:32:05Z",
+      "last_seen": "2026-10-27T19:32:05Z"
     }
   ]
 }
