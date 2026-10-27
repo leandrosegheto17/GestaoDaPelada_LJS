@@ -1,0 +1,16 @@
+{
+  "erro": {
+    "codigo": "unico_admin",
+    "mensagem": "Você é o único admin.",
+    "grupos": [
+      {
+        "id": "g-quinta",
+        "nome": "Pelada de Quinta"
+      },
+      {
+        "id": "g-domingo",
+        "nome": "Racha de Domingo"
+      }
+    ]
+  }
+}

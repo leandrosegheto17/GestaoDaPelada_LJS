@@ -1,0 +1,4 @@
+# Copie para `.dev.vars` (ignorado pelo git) para o Worker local (`pnpm dev`) ler. Só valores de desenvolvimento.
+# EMAIL_DEV=1 guarda os e-mails de conta numa caixa em memória, lida em http://localhost:8787/api/dev/emails, em vez
+# de enviar pelo Resend. Produção nunca define esta variável.
+EMAIL_DEV=1

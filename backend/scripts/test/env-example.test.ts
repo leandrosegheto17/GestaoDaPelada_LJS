@@ -117,6 +117,20 @@ describe('.env.example (FUN-44)', () => {
     }
   });
 
+  it('constam as variáveis da conta e acesso: RESEND_REMETENTE, EMAIL_DEV (não segredo) e SEED_SENHA_ADMIN (segredo)', () => {
+    const porNome = new Map(entradas.map((e) => [e.nome, e]));
+    for (const nome of ['RESEND_API_KEY', 'RESEND_REMETENTE', 'EMAIL_DEV', 'SEED_SENHA_ADMIN']) {
+      expect(porNome.has(nome), nome).toBe(true);
+    }
+    expect(porNome.get('EMAIL_DEV')?.comentario).toMatch(/Segredo: não/);
+    expect(porNome.get('SEED_SENHA_ADMIN')?.comentario).toMatch(/Segredo: sim/);
+    expect(porNome.get('RESEND_API_KEY')?.comentario).toMatch(/Segredo: sim/);
+  });
+
+  it('o .dev.vars.example liga o EMAIL_DEV só para o desenvolvimento local', () => {
+    expect(lerTexto('.dev.vars.example')).toMatch(/^EMAIL_DEV=1$/m);
+  });
+
   it('o gitleaks fica configurado no CI', () => {
     const ci = yaml.load(lerTexto('.github/workflows/ci.yml')) as { jobs: { base: { steps: { uses?: string }[] } } };
     expect(ci.jobs.base.steps.some((p) => p.uses?.startsWith('gitleaks/gitleaks-action@'))).toBe(true);

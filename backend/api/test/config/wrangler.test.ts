@@ -106,6 +106,15 @@ describe('wrangler.jsonc', () => {
     expect(config.vars['VERSAO']).toBeTruthy();
   });
 
+  it('o wrangler.jsonc de produção não define EMAIL_DEV, nem na raiz nem em env (ACE-52, design C5)', () => {
+    const lido = lerWranglerJsonc(readFileSync(CAMINHO_WRANGLER, 'utf8'));
+    expect(Object.keys(config.vars)).not.toContain('EMAIL_DEV');
+    const ambientes = (lido['env'] ?? {}) as Record<string, { vars?: Record<string, unknown> }>;
+    for (const ambiente of Object.values(ambientes))
+      expect(Object.keys(ambiente.vars ?? {})).not.toContain('EMAIL_DEV');
+    expect(readFileSync(CAMINHO_WRANGLER, 'utf8')).not.toContain('EMAIL_DEV');
+  });
+
   it('compatibility_date é a data máxima do workerd do @cloudflare/vitest-plugin', () => {
     expect(config.compatibility_date).toBe(dataDoWorkerdDoPlugin());
   });

@@ -91,7 +91,7 @@ graph TD
   - `convites_admin (id, grupo_id, email, token_hash bytea(32) único, criado_por, criado_em, expira_em, usado_em, cancelado_em)`, com índice único parcial de um pendente por grupo e e-mail.
   - `envios_email (destino_hash bytea, tipo text, enviado_em timestamptz, PRIMARY KEY (destino_hash, tipo))`: guarda o último envio para o intervalo de 60 s (ACE-51).
   - RLS `ENABLE` + `FORCE` em `contas`, `sessoes`, `tentativas_login`, `links_conta`, `envios_email`, `pedidos_reset` e `convites_admin`, com policy `USING (true)` para `pelada_backup` em todas (G-27, G-29).
-  - Policies do `pelada_app`: `contas` lê e altera `id = app_conta_id()`; `sessoes` lê e apaga `conta_id = app_conta_id()`; `convites_admin` segue o padrão de grupo (`grupo_id IN (SELECT grupos_visiveis())`, escrita com conta).
+  - Policies do `pelada_app`: `contas` lê e altera `id = app_conta_id()`; `sessoes` lê e apaga `conta_id = app_conta_id()`; `convites_admin` segue o padrão de grupo, mas a leitura também exige conta (ajuste aprovado em 2026-10-27: o slug público nunca lê o e-mail de quem foi convidado).
   - Grants do `pelada_app`: `SELECT, UPDATE (nome)` em `contas`; `SELECT, DELETE` em `sessoes`; `SELECT, INSERT, UPDATE` em `convites_admin`; `INSERT` em `auditoria`. Nenhum grant em `tentativas_login`, `links_conta`, `envios_email`, `pedidos_reset`. A coluna `senha_hash` fica fora do `SELECT` por grant de coluna.
   - Funções (`SECURITY DEFINER`, `SET search_path = public, pg_temp`, `EXECUTE` só para `pelada_app`; `REVOKE` de `PUBLIC`). Toda senha chega como parâmetro e o hash é `crypt($senha, gen_salt('bf', 12))`:
 
@@ -109,6 +109,7 @@ graph TD
     | `convite_ler(token_hash)` | dados mínimos do convite válido | `(email, grupo_nome, conta_existe boolean)` |
     | `convite_aceitar(token_hash)` | com `app_conta_id()`, confere o e-mail, trava o convite (`FOR UPDATE`) e cria o vínculo | `(resultado, grupo_id)` |
     | `convite_cadastrar(token_hash, nome, senha, termos_versao, token_sessao_hash)` | cria a conta já confirmada com o e-mail do convite, o vínculo e a sessão | `(resultado, conta_id, grupo_id)` |
+    | `admins_listar(grupo_id)` | só com vínculo; lista id, nome, e-mail e `acessa_financeiro` dos admins (acrescentada no lote 3, aprovada em 2026-10-27) | linhas |
     | `conta_definir_senha(email, senha, dono boolean)` | só para o script `dono.ts` (sem `EXECUTE` para o `pelada_app`; roda como owner) | `conta_id` |
 
   - **Exclusão como anonimização**: `grupos.criado_por`, `vinculos_admin.criado_por`, `auditoria.autor_conta_id` e `pedidos_reset.resolvido_por` referenciam `contas`, então apagar a linha quebraria o histórico. `conta_excluir` apaga sessões, vínculos, links e convites enviados ao e-mail. Na linha da conta, troca o e-mail por `excluida-<id>@invalido`, o nome por "Conta excluída" e o hash por `!` (nunca casa), e grava `excluida_em`. Assim, nenhum nome ou e-mail da pessoa fica no banco, e a auditoria mostra "Conta excluída" como autor (ACE-28).

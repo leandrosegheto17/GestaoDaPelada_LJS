@@ -7,6 +7,20 @@ export const CODIGOS_ERRO = {
   requisicaoRecusada: 'requisicao_recusada',
   muitasRequisicoes: 'muitas_requisicoes',
   corpoGrande: 'corpo_grande',
+  sessaoExpirada: 'sessao_expirada',
+  dadosInvalidos: 'dados_invalidos',
+  termosObrigatorios: 'termos_obrigatorios',
+  credenciaisInvalidas: 'credenciais_invalidas',
+  emailNaoConfirmado: 'email_nao_confirmado',
+  bloqueadoTemporariamente: 'bloqueado_temporariamente',
+  linkInvalido: 'link_invalido',
+  emailIndisponivel: 'email_indisponivel',
+  senhaAtualIncorreta: 'senha_atual_incorreta',
+  unicoAdmin: 'unico_admin',
+  conviteDeOutroEmail: 'convite_de_outro_email',
+  contaExistente: 'conta_existente',
+  jaEAdmin: 'ja_e_admin',
+  ultimoAdmin: 'ultimo_admin',
 } as const;
 
 /** Erro padrão da API: `{ erro: { codigo, mensagem, campos? } }`. */
@@ -36,4 +50,32 @@ export function corpoGrande(c: Context): Response {
 
 export function muitasRequisicoes(c: Context): Response {
   return c.json(corpoErro(CODIGOS_ERRO.muitasRequisicoes, 'Muitas requisições. Tente de novo em instantes.'), 429);
+}
+
+export function sessaoExpirada(c: Context): Response {
+  return c.json(corpoErro(CODIGOS_ERRO.sessaoExpirada, 'Sua sessão expirou. Entre de novo.'), 401);
+}
+
+/** Erro com código e mensagem próprios (as rotas de conta e acesso). */
+export function erroComStatus(
+  c: Context,
+  status: 401 | 403 | 404 | 409 | 410 | 422 | 429 | 503,
+  codigo: string,
+  mensagem: string,
+  campos?: Record<string, string>,
+): Response {
+  return c.json(corpoErro(codigo, mensagem, campos), status);
+}
+
+export function emailIndisponivel(c: Context): Response {
+  return erroComStatus(
+    c,
+    503,
+    CODIGOS_ERRO.emailIndisponivel,
+    'Não conseguimos enviar o e-mail agora. Tente de novo em alguns minutos.',
+  );
+}
+
+export function linkInvalido(c: Context): Response {
+  return erroComStatus(c, 410, CODIGOS_ERRO.linkInvalido, 'Link inválido ou vencido.');
 }

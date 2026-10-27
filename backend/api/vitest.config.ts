@@ -4,7 +4,7 @@ import { existsSync, mkdirSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
 import { defineConfig } from 'vitest/config';
-import { urlDoWorker } from './test/apoio/banco-worker.ts';
+import { urlDoOwnerDoWorker, urlDoWorker } from './test/apoio/banco-worker.ts';
 
 // Local: as URLs dos bancos de teste vêm do `.env` da raiz (fora do git). No CI, do ambiente do job.
 const ENV = join(import.meta.dirname, '../../.env');
@@ -22,6 +22,11 @@ process.env['PELADA_APP_SENHA'] ||= randomBytes(12).toString('hex');
 const HYPERDRIVE_DE_TESTE = urlDoWorker(
   process.env['DATABASE_URL_TESTE'] ?? 'postgres://postgres:postgres@localhost:5432/pelada_teste',
   process.env['PELADA_APP_SENHA'],
+);
+
+// Só os testes de rota usam: leem o que a pelada_app não lê (a auditoria, ACE-46).
+const OWNER_DE_TESTE = urlDoOwnerDoWorker(
+  process.env['DATABASE_URL_TESTE'] ?? 'postgres://postgres:postgres@localhost:5432/pelada_teste',
 );
 
 // O `exports.import` do pg-protocol aponta para um .js em ESM sem "type": "module", que o pool de workers carrega
@@ -59,7 +64,7 @@ export default defineConfig({
         plugins: [
           cloudflareTest({
             wrangler: { configPath: '../../wrangler.jsonc' },
-            miniflare: { hyperdrives: { HYPERDRIVE: HYPERDRIVE_DE_TESTE } },
+            miniflare: { hyperdrives: { HYPERDRIVE: HYPERDRIVE_DE_TESTE, HYPERDRIVE_OWNER_TESTE: OWNER_DE_TESTE } },
           }),
         ],
         test: {

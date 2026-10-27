@@ -1,0 +1,6 @@
+{
+  "erro": {
+    "codigo": "ja_e_admin",
+    "mensagem": "Essa pessoa já é admin do grupo."
+  }
+}

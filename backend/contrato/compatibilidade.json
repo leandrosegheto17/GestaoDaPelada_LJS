@@ -1,0 +1,238 @@
+{
+  "adminsResposta": {
+    "": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "admins": {
+      "tipo": "array",
+      "obrigatorio": true
+    },
+    "admins[]": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "admins[].id": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "admins[].nome": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "admins[].email": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "admins[].acessaFinanceiro": {
+      "tipo": "boolean",
+      "obrigatorio": true
+    },
+    "convites": {
+      "tipo": "array",
+      "obrigatorio": true
+    },
+    "convites[]": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "convites[].id": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "convites[].email": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "convites[].expiraEm": {
+      "tipo": "string",
+      "obrigatorio": true
+    }
+  },
+  "cadastroCorpo": {
+    "": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "nome": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "email": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "senha": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "termos": {
+      "tipo": "boolean",
+      "obrigatorio": true
+    }
+  },
+  "conviteCadastroCorpo": {
+    "": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "token": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "nome": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "senha": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "termos": {
+      "tipo": "boolean",
+      "obrigatorio": true
+    }
+  },
+  "conviteCorpo": {
+    "": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "email": {
+      "tipo": "string",
+      "obrigatorio": true
+    }
+  },
+  "email": {
+    "": {
+      "tipo": "string",
+      "obrigatorio": true
+    }
+  },
+  "emailCorpo": {
+    "": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "email": {
+      "tipo": "string",
+      "obrigatorio": true
+    }
+  },
+  "entrarCorpo": {
+    "": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "email": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "senha": {
+      "tipo": "string",
+      "obrigatorio": true
+    }
+  },
+  "excluirCorpo": {
+    "": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "senha": {
+      "tipo": "string",
+      "obrigatorio": true
+    }
+  },
+  "nomeConta": {
+    "": {
+      "tipo": "string",
+      "obrigatorio": true
+    }
+  },
+  "novaSenhaCorpo": {
+    "": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "token": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "senha": {
+      "tipo": "string",
+      "obrigatorio": true
+    }
+  },
+  "senha": {
+    "": {
+      "tipo": "string",
+      "obrigatorio": true
+    }
+  },
+  "sessaoEu": {
+    "": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "id": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "nome": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "email": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "grupos": {
+      "tipo": "array",
+      "obrigatorio": true
+    },
+    "grupos[]": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "grupos[].id": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "grupos[].nome": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "grupos[].slug": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "grupos[].acessaFinanceiro": {
+      "tipo": "boolean",
+      "obrigatorio": true
+    }
+  },
+  "tokenCorpo": {
+    "": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "token": {
+      "tipo": "string",
+      "obrigatorio": true
+    }
+  },
+  "trocarSenhaCorpo": {
+    "": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "senhaAtual": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "novaSenha": {
+      "tipo": "string",
+      "obrigatorio": true
+    }
+  }
+}

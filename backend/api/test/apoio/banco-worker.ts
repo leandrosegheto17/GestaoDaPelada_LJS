@@ -14,3 +14,14 @@ export function urlDoWorker(urlTeste: string, senhaApp: string): string {
   if (url.hostname === 'localhost') url.hostname = '127.0.0.1';
   return url.toString();
 }
+
+/**
+ * URL do banco do Worker de teste como o usuário de `DATABASE_URL_TESTE` (owner), para os testes de rota conferirem
+ * o que a pelada_app não lê (a auditoria). Nunca serve à API.
+ */
+export function urlDoOwnerDoWorker(urlTeste: string): string {
+  const url = new URL(urlTeste);
+  url.pathname = `/${BANCO_DO_WORKER}`;
+  if (url.hostname === 'localhost') url.hostname = '127.0.0.1';
+  return url.toString();
+}

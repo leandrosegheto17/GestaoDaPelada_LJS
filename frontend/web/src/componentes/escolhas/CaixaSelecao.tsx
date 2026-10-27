@@ -1,7 +1,12 @@
+import type { ReactNode } from 'react';
 import estilos from './CaixaSelecao.module.css';
 
 interface Props {
-  rotulo?: string;
+  /** Texto do rótulo; pode levar links (ex.: aceite dos termos). */
+  rotulo?: ReactNode;
+  id?: string;
+  'aria-describedby'?: string;
+  'aria-invalid'?: true;
   /** Vira `aria-label` quando não há rótulo visível. */
   rotuloAcessivel?: string;
   marcada: boolean;
@@ -9,10 +14,11 @@ interface Props {
   desabilitada?: boolean;
 }
 
-export function CaixaSelecao({ rotulo, rotuloAcessivel, marcada, aoMudar, desabilitada }: Props) {
+export function CaixaSelecao({ rotulo, rotuloAcessivel, marcada, aoMudar, desabilitada, ...ligacoes }: Props) {
   return (
     <label className={estilos.caixa}>
       <input
+        {...ligacoes}
         type="checkbox"
         aria-label={rotulo ? undefined : rotuloAcessivel}
         checked={marcada}

@@ -1,0 +1,6 @@
+{
+  "erro": {
+    "codigo": "email_indisponivel",
+    "mensagem": "Não conseguimos enviar o e-mail agora."
+  }
+}

@@ -3,6 +3,7 @@ import tseslint from 'typescript-eslint';
 import prettier from 'eslint-config-prettier';
 import globals from 'globals';
 import { importX } from 'eslint-plugin-import-x';
+import pluginPelada from './eslint/plugin-pelada.mjs';
 import { semAsUnknownAs, semDocumentCookie, semRelogio } from './eslint/regras-sintaxe.mjs';
 import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript';
 
@@ -160,6 +161,13 @@ export default tseslint.config(
     rules: {
       'no-restricted-syntax': sintaxe(dinamicos([...PROIBIDAS_GLOBAL, ...BANCO]), semRelogio, semAsUnknownAs),
     },
+  },
+  {
+    // G-11 (ACE-63): nenhuma escrita de e_dono na API; sem exceção para rotas. Só scripts e migrações a fazem.
+    files: ['backend/api/src/**'],
+    ignores: ['backend/api/src/infraestrutura/db/migracoes/**'],
+    plugins: { pelada: pluginPelada },
+    rules: { 'pelada/sem-escrita-dono': 'error' },
   },
   {
     // Apoio de teste da API conecta no Postgres de teste (nunca em produção).

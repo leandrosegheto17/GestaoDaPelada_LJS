@@ -70,3 +70,53 @@ p {
 .rolagem-bloqueada {
   overflow: hidden;
 }
+/* Páginas: layout das telas (de .specs/mockup/base.css, seção "Conteúdo" e "Formulário"). */
+.conteudo {
+  max-width: var(--largura-conteudo);
+  margin: 0 auto;
+  padding: var(--esp-3) var(--esp-2) 112px;
+}
+.conteudo--estreito {
+  max-width: var(--largura-formulario);
+  padding-left: var(--esp-4);
+  padding-right: var(--esp-4);
+}
+.titulo {
+  font-size: var(--texto-3xl);
+  font-weight: var(--peso-extra);
+  text-transform: uppercase;
+  letter-spacing: var(--espacamento-caixa-alta);
+  margin: var(--esp-1) 0 var(--esp-4);
+}
+.subtitulo {
+  font-size: var(--texto-xl);
+  text-transform: uppercase;
+  letter-spacing: var(--espacamento-caixa-alta);
+  margin: var(--esp-6) 0 var(--esp-3);
+}
+.paragrafo {
+  margin: 0 0 var(--esp-3);
+  overflow-wrap: anywhere;
+}
+.secao {
+  margin-top: var(--esp-6);
+  padding-top: var(--esp-4);
+  border-top: 1px solid var(--cor-linha);
+}
+.formulario {
+  display: grid;
+  gap: var(--esp-4);
+}
+.ajuda {
+  font-size: var(--texto-sm);
+  color: var(--cor-texto-sec);
+}
+@media (min-width: 600px) {
+  .conteudo {
+    padding: var(--esp-6) var(--esp-6) var(--esp-12);
+  }
+}
+/* Recuo de cima que não colapsa com a margem da faixa anterior (no mockup o botão é inline e as margens somam). */
+.recuo-3 {
+  padding-top: var(--esp-3);
+}

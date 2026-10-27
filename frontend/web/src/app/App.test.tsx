@@ -44,7 +44,7 @@ describe('rotas de vitrine', () => {
 
   it.each(VITRINES)('sem VITE_VITRINE, %s não existe', async (caminho) => {
     abrir(await rotasCom(undefined), caminho);
-    expect(await screen.findByText(/404|Not Found/i)).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 1, name: 'Página não encontrada' })).toBeInTheDocument();
   });
 
   it('com VITE_VITRINE=1, o erro de rede aparece com "Tentar de novo"', async () => {

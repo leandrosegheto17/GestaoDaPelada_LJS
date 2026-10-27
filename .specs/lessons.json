@@ -1,0 +1,117 @@
+{
+  "schema": 1,
+  "promote_threshold": 2,
+  "window_days": 45,
+  "quarantine_threshold": 2,
+  "next_id": 7,
+  "lessons": [
+    {
+      "id": "L-001",
+      "key": "surviving_mutant::prove a policy de escrita de rls com update e delete sem where pois com where a policy de select mascara uma policy de escrita aberta",
+      "text": "Prove a policy de escrita de RLS com UPDATE e DELETE sem WHERE, pois com WHERE a policy de SELECT mascara uma policy de escrita aberta",
+      "signal": "surviving_mutant",
+      "scope": "rls",
+      "status": "candidate",
+      "features": [
+        "conta-e-acesso"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M17,M18 backend/api/test/isolamento/contas.test.ts:84 (rls)"
+      ],
+      "created": "2026-10-27T17:34:20Z",
+      "last_seen": "2026-10-27T17:34:20Z"
+    },
+    {
+      "id": "L-002",
+      "key": "surviving_mutant::teste de intervalo de tempo exercita os dois lados da borda nao so o instante zero e um valor folgado acima do limite",
+      "text": "Teste de intervalo de tempo exercita os dois lados da borda, não só o instante zero e um valor folgado acima do limite",
+      "signal": "surviving_mutant",
+      "scope": "tempo",
+      "status": "candidate",
+      "features": [
+        "conta-e-acesso"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "M26 backend/api/test/migracoes/conta-cadastro-e-links.test.ts:152 (tempo)"
+      ],
+      "created": "2026-10-27T17:34:21Z",
+      "last_seen": "2026-10-27T17:34:21Z"
+    },
+    {
+      "id": "L-003",
+      "key": "ac_gap::teste a ligacao entre o evento do cliente e a navegacao de destino nao so cada lado isolado com o valor escrito a mao",
+      "text": "Teste a ligação entre o evento do cliente e a navegação de destino, não só cada lado isolado com o valor escrito à mão",
+      "signal": "ac_gap",
+      "scope": "frontend",
+      "status": "candidate",
+      "features": [
+        "conta-e-acesso"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "ACE-20 frontend/web/src/app/App.tsx:10 (frontend)"
+      ],
+      "created": "2026-10-27T17:34:21Z",
+      "last_seen": "2026-10-27T17:34:21Z"
+    },
+    {
+      "id": "L-004",
+      "key": "ac_gap::confira que toda tela citada no criterio de comparacao visual esta na lista de telas comparadas",
+      "text": "Confira que toda tela citada no critério de comparação visual está na lista de telas comparadas",
+      "signal": "ac_gap",
+      "scope": "visual",
+      "status": "candidate",
+      "features": [
+        "conta-e-acesso"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "ACE-54 frontend/web/e2e/telas-ativas.txt (visual)"
+      ],
+      "created": "2026-10-27T17:34:21Z",
+      "last_seen": "2026-10-27T17:34:21Z"
+    },
+    {
+      "id": "L-005",
+      "key": "spec_precision_gap::especifique valor e formato de versao e data de texto legal e o ambiente em que a checagem de acessibilidade vale",
+      "text": "Especifique valor e formato de versão e data de texto legal e o ambiente em que a checagem de acessibilidade vale",
+      "signal": "spec_precision_gap",
+      "scope": "spec",
+      "status": "candidate",
+      "features": [
+        "conta-e-acesso"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "ACE-58 ACE-60 ACE-56 (spec)"
+      ],
+      "created": "2026-10-27T17:34:21Z",
+      "last_seen": "2026-10-27T17:34:21Z"
+    },
+    {
+      "id": "L-006",
+      "key": "surviving_mutant::teste de rota que grava dado exigido pela spec versao dos termos aceitos confere o valor gravado no banco nao so o status 201 da resposta",
+      "text": "Teste de rota que grava dado exigido pela spec (versão dos termos aceitos) confere o valor gravado no banco, não só o status 201 da resposta",
+      "signal": "surviving_mutant",
+      "scope": "routes",
+      "status": "candidate",
+      "features": [
+        "conta-e-acesso"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "N7/N16 backend/api/src/entrada/rotas/conta-cadastro.ts:27 e convites.ts:46 (ACE-01, ACE-58) (routes)"
+      ],
+      "created": "2026-10-27T19:32:05Z",
+      "last_seen": "2026-10-27T19:32:05Z"
+    }
+  ]
+}

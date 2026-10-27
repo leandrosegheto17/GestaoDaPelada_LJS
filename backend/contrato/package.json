@@ -7,6 +7,10 @@
   },
   "scripts": {
     "test": "vitest run",
-    "typecheck": "tsc --noEmit -p ."
+    "typecheck": "tsc --noEmit -p .",
+    "checar-compatibilidade": "node scripts/checar-compatibilidade.ts"
+  },
+  "dependencies": {
+    "zod": "^4.6.7"
   }
 }

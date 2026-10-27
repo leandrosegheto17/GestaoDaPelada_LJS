@@ -26,18 +26,19 @@ pnpm install
 cp .env.example .env
 ```
 
-Abra o `.env` e preencha quatro variáveis (as outras ficam vazias no uso local):
+Abra o `.env` e preencha cinco variáveis (as outras ficam vazias no uso local):
 
 ```bash
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/pelada
 DATABASE_URL_TESTE=postgres://postgres:postgres@localhost:5432/pelada_teste
 PELADA_APP_SENHA=troque-por-um-texto-sem-espacos-com-24-ou-mais-caracteres
 PELADA_BACKUP_SENHA=troque-por-outro-texto-do-mesmo-tipo
+SEED_SENHA_ADMIN=troque-por-uma-senha-de-8-a-72-caracteres
 ```
 
-Os valores acima são exemplos literais (sem `<` nem `>`): troque as duas senhas por textos seus. Para gerar um texto
+Os valores acima são exemplos literais (sem `<` nem `>`): troque as senhas por textos seus. `SEED_SENHA_ADMIN` é a senha da conta `admin@exemplo.com.br` do seed, com a qual você entra pela tela. Para gerar um texto
 de 24 caracteres, use `openssl rand -hex 12` (no Windows, o `openssl` vem com o Git Bash).
-No `.env.example` as quatro variáveis vêm em branco.
+No `.env.example` as cinco variáveis vêm em branco.
 
 A senha do `postgres` (`postgres`) é a fictícia do `docker-compose.yml`; vale só para a sua máquina.
 
@@ -51,6 +52,18 @@ pnpm dev                  # Worker em :8787 e app em :5173 (Ctrl+C encerra os do
 
 Confira: `curl http://localhost:5173/api/health` devolve `{"status":"ok","versao":"dev"}` com status 200 e
 `http://localhost:5173` abre o app.
+
+### Conta, e-mail e caixa de desenvolvimento
+
+O cadastro, a confirmação de e-mail, a recuperação de senha e o convite de admin mandam e-mail pelo Resend. No local
+não há envio: crie o arquivo `.dev.vars` na raiz (fora do git) com `EMAIL_DEV=1` antes de `pnpm dev`. Com ele o Worker
+guarda as mensagens numa caixa em memória e `GET /api/dev/emails` as devolve; o link de cada e-mail está no campo
+`texto`. Sem `EMAIL_DEV`, a rota responde 404. Em produção a variável nunca existe e valem `RESEND_API_KEY` e
+`RESEND_REMETENTE` (secrets do Worker, runbook, seção 9). Quando o provedor falha ou a cota diária acaba (100 e-mails por
+dia no plano gratuito), a API responde 503 `email_indisponivel` (ACE-52).
+
+Para a conta do dono: `pnpm dono -- --email <e-mail>` (pede a senha sem eco e usa o banco local; em produção, só com
+`--alvo producao` e a confirmação do runbook).
 
 Se o Postgres não estiver de pé, `pnpm dev` e `pnpm migrar` avisam e mandam rodar `docker compose up -d`.
 `pnpm dev` só roda com banco local e recusa host remoto. As portas 5432, 5173 e 8787 precisam estar livres.
@@ -71,7 +84,7 @@ pnpm test                              # raiz, dominio, contrato, API (precisa d
 pnpm test:checagens                    # checagens do repositório e dos scripts
 pnpm --filter @pelada/web build        # build do web
 pnpm --filter @pelada/web exec playwright install chromium   # uma vez
-pnpm --filter @pelada/web e2e          # instalabilidade do PWA e cabeçalhos (precisa do build)
+pnpm --filter @pelada/web e2e          # PWA, cabeçalhos e fluxos de acesso (precisa do build, do banco com seed e de SEED_SENHA_ADMIN)
 pnpm --filter @pelada/web visual       # comparação visual com o mockup
 python .claude/scripts/checar-tokens.py frontend/web/src
 ```

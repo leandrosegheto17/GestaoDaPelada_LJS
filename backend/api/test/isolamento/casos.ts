@@ -136,6 +136,15 @@ export const CASOS: Record<string, Caso> = {
       [conta(g), g.grupo],
     ],
   },
+  convites_admin: {
+    coluna: 'grupo_id',
+    acesso: 'negocio',
+    inserir: (g) => [
+      `INSERT INTO convites_admin (grupo_id, email, token_hash, criado_por, criado_em, expira_em)
+       VALUES ($1, 'intruso@exemplo.com', digest('intruso-' || $3, 'sha256'), $2, now(), now() + interval '7 days')`,
+      [g.grupo, conta(g), g.slug],
+    ],
+  },
   eventos_uso: {
     coluna: 'grupo_id',
     acesso: 'sem-grant',
@@ -144,4 +153,89 @@ export const CASOS: Record<string, Caso> = {
       [g.grupo],
     ],
   },
+};
+
+export interface CasoConta {
+  /**
+   * `propria`: pelada_app lê só as linhas da conta da sessão (pela `coluna`).
+   * `sem-grant`: pelada_app não lê nem escreve; só as funções SECURITY DEFINER tocam a tabela.
+   */
+  acesso: 'propria' | 'sem-grant';
+  /** Coluna que liga a linha à conta (`id` em `contas`, `conta_id` em `sessoes`). Só no acesso `propria`. */
+  coluna?: 'id' | 'conta_id';
+}
+
+/** Tabelas de conta, sem grupo_id (ACE-43 a ACE-45): isolamento por conta, com duas contas. */
+export const CASOS_CONTA: Record<string, CasoConta> = {
+  contas: { acesso: 'propria', coluna: 'id' },
+  sessoes: { acesso: 'propria', coluna: 'conta_id' },
+  tentativas_login: { acesso: 'sem-grant' },
+  links_conta: { acesso: 'sem-grant' },
+  envios_email: { acesso: 'sem-grant' },
+  pedidos_reset: { acesso: 'sem-grant' },
+};
+
+/**
+ * Caso de cada rota registrada no Hono (G-04, ACE-48). `grupo`: rota de dado de grupo, sob
+ * `/api/grupos/:grupoId/`, atrás do `exigirVinculo`. `nao_se_aplica`: rota pública ou de sessão, com o motivo.
+ */
+export type CasoRota = { tipo: 'grupo' } | { tipo: 'nao_se_aplica'; motivo: string };
+
+/** Chave: `MÉTODO /caminho`, como o Hono registra. O meta-teste exige um caso para cada rota e vice-versa. */
+export const CASOS_ROTAS: Record<string, CasoRota> = {
+  'GET /api/health': { tipo: 'nao_se_aplica', motivo: 'Saúde do serviço: não lê dado de grupo nem de conta.' },
+  'POST /api/sessao/entrar': {
+    tipo: 'nao_se_aplica',
+    motivo: 'Sem sessão: entra com e-mail e senha pela função do banco; não lê dado de grupo.',
+  },
+  'GET /api/sessao': {
+    tipo: 'nao_se_aplica',
+    motivo: 'Dado da própria conta da sessão (RLS por conta) e os grupos em que ela tem vínculo; não é rota de grupo.',
+  },
+  'POST /api/conta': {
+    tipo: 'nao_se_aplica',
+    motivo: 'Sem sessão: cria a conta pela função do banco; sem dado de grupo.',
+  },
+  'POST /api/conta/confirmar': {
+    tipo: 'nao_se_aplica',
+    motivo: 'Sem sessão: consome o link de confirmação pela função do banco; sem dado de grupo.',
+  },
+  'POST /api/conta/reenviar-confirmacao': {
+    tipo: 'nao_se_aplica',
+    motivo: 'Sem sessão: pede novo link pela função do banco; sem dado de grupo.',
+  },
+  'POST /api/sessao/esqueci-senha': {
+    tipo: 'nao_se_aplica',
+    motivo: 'Sem sessão: pede o link de recuperação pela função do banco; sem dado de grupo.',
+  },
+  'POST /api/sessao/nova-senha': {
+    tipo: 'nao_se_aplica',
+    motivo: 'Sem sessão: consome o link de recuperação pela função do banco; sem dado de grupo.',
+  },
+  'POST /api/conta/senha': { tipo: 'nao_se_aplica', motivo: 'Troca a senha da própria conta (RLS por conta).' },
+  'POST /api/conta/excluir': {
+    tipo: 'nao_se_aplica',
+    motivo: 'Exclui a própria conta pela função do banco, que só enxerga os vínculos dela.',
+  },
+  'POST /api/convites/ler': {
+    tipo: 'nao_se_aplica',
+    motivo: 'Sem sessão: lê o convite pelo hash do token, na função do banco; o grupo vem do convite.',
+  },
+  'POST /api/convites/aceitar': {
+    tipo: 'nao_se_aplica',
+    motivo: 'Aceita o convite pelo hash do token, na função do banco, que confere o e-mail da conta da sessão.',
+  },
+  'POST /api/convites/cadastrar': {
+    tipo: 'nao_se_aplica',
+    motivo: 'Sem sessão: cadastra pelo convite, na função do banco; o grupo vem do convite.',
+  },
+  'GET /api/grupos/:grupoId/admins': { tipo: 'grupo' },
+  'POST /api/grupos/:grupoId/admins/convites': { tipo: 'grupo' },
+  'DELETE /api/grupos/:grupoId/admins/convites/:id': { tipo: 'grupo' },
+  'DELETE /api/grupos/:grupoId/admins/:contaId': { tipo: 'grupo' },
+  'GET /api/dev/emails': {
+    tipo: 'nao_se_aplica',
+    motivo: 'Só com EMAIL_DEV=1 (desenvolvimento local): lista a caixa de e-mails em memória; sem banco.',
+  },
+  'POST /api/sessao/sair': { tipo: 'nao_se_aplica', motivo: 'Apaga a sessão da própria conta (RLS por conta).' },
 };
