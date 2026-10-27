@@ -7,6 +7,7 @@ export const CODIGOS_ERRO = {
   requisicaoRecusada: 'requisicao_recusada',
   muitasRequisicoes: 'muitas_requisicoes',
   corpoGrande: 'corpo_grande',
+  sessaoExpirada: 'sessao_expirada',
 } as const;
 
 /** Erro padrão da API: `{ erro: { codigo, mensagem, campos? } }`. */
@@ -36,4 +37,8 @@ export function corpoGrande(c: Context): Response {
 
 export function muitasRequisicoes(c: Context): Response {
   return c.json(corpoErro(CODIGOS_ERRO.muitasRequisicoes, 'Muitas requisições. Tente de novo em instantes.'), 429);
+}
+
+export function sessaoExpirada(c: Context): Response {
+  return c.json(corpoErro(CODIGOS_ERRO.sessaoExpirada, 'Sua sessão expirou. Entre de novo.'), 401);
 }

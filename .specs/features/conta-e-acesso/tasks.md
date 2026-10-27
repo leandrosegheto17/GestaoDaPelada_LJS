@@ -494,10 +494,12 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] 11 POST sem `X-Pelada` seguidos de 1 com o cabeçalho: o último não recebe 429 (ACE-49, SEC-005)
-- [ ] Com cookie válido, a primeira consulta da rota já roda com `app.conta_id` da sessão e em `READ ONLY` num GET (ACE-47)
-- [ ] Sessão vencida responde 401 `sessao_expirada` e limpa o cookie (ACE-15, ACE-16)
-- [ ] Gate full passa
+- [x] 11 POST sem `X-Pelada` seguidos de 1 com o cabeçalho: o último não recebe 429 (ACE-49, SEC-005)
+- [x] Com cookie válido, a primeira consulta da rota já roda com `app.conta_id` da sessão e em `READ ONLY` num GET (ACE-47)
+- [x] Sessão vencida responde 401 `sessao_expirada` e limpa o cookie (ACE-15, ACE-16)
+- [x] Gate full passa
+
+> Nota (T15): no pool workerd não há o owner para envelhecer a sessão; o teste de rota usa a sessão apagada, o estado em que `sessao_tocar` deixa a vencida. Os 15 min e as 12 h são provados em `test/repositorios/sessoes.test.ts` (pela mesma `sessoes.tocar` que o middleware chama) e em `test/migracoes/conta-entrar-e-sessao.test.ts`.
 
 **Tests**: e2e
 **Gate**: full
