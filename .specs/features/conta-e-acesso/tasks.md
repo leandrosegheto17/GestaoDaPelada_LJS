@@ -1197,9 +1197,9 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] Cada guardrail citado aponta para o teste que existe agora
-- [ ] O runbook lista os passos externos da liberação desta feature, cada um com confirmação
-- [ ] Gate build passa
+- [x] Cada guardrail citado aponta para o teste que existe agora
+- [x] O runbook lista os passos externos da liberação desta feature, cada um com confirmação
+- [x] Gate build passa
 
 **Tests**: none
 **Gate**: build

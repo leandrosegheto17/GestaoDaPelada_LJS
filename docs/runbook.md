@@ -1,7 +1,7 @@
 # Runbook de operação
 
 Roteiro de quem opera a produção: deploy, falha de migração, restauração, rotação de segredos, remoção do Worker
-antigo e monitor de uptime. Cada seção aponta para o arquivo que faz o trabalho; aqui ficam a ordem e os comandos.
+antigo, monitor de uptime e os passos externos da liberação da conta e acesso (seção 9). Cada seção aponta para o arquivo que faz o trabalho; aqui ficam a ordem e os comandos.
 Nenhuma senha, chave ou string de conexão vai neste arquivo. Os itens de webhook, pagamento e reativação entram
 com as features `planos-e-cobranca` e seguintes.
 
@@ -174,3 +174,39 @@ Crie a conta e o monitor no painel do UptimeRobot (ação sua; o código funcion
 O `backup.yml` roda às 07:00 UTC (04:00 em Brasília) e sob demanda, no environment `backup` (seção 2). Falha de dump ou de cifragem deixa o job vermelho
 e não publica artefato; o GitHub avisa por e-mail se as notificações de Actions estiverem ligadas. O artefato fica 30
 dias. O dump é feito pela role `pelada_backup` com `--enable-row-security` e o cliente do PostgreSQL 16.
+
+## 9. Liberação da feature `conta-e-acesso` (passos externos)
+
+Estes passos acontecem fora do código, na conta do Resend, no GitHub e na Cloudflare. **Cada um pede confirmação
+específica de quem opera**, mesmo com a fase aprovada, e nenhum deles é feito por script do repositório. Sem os itens 1 a
+3 o app abre, mas cadastro, confirmação, recuperação de senha e convite respondem 503 `email_indisponivel` (ACE-52).
+Registre a data e quem confirmou cada item na entrada da liberação (`.specs/liberacao.md`).
+
+1. **Verificar o domínio no Resend.** No painel do Resend, Domains, adicione o domínio de envio (por exemplo
+   `ljssoftware.com.br`) e crie na zona da Cloudflare os registros DNS que o Resend pedir (SPF e DKIM). Espere o estado
+   **Verified**. Confirmação: "o domínio está Verified no Resend".
+2. **Criar a chave de API do Resend e gravar os secrets do Worker.** Crie a chave só com permissão de envio. Grave nos
+   secrets do Worker `gestaodapelada`, digitando o valor só no terminal:
+   `pnpm --filter @pelada/api exec wrangler secret put RESEND_API_KEY --config ../../wrangler.jsonc` e o mesmo para
+   `RESEND_REMETENTE` (endereço do domínio verificado, no formato `Gestão da Pelada <acesso@dominio>`). Nenhum dos dois
+   vai para o repositório, para o `.env` de produção ou para o `wrangler.jsonc`. Confirmação: "os dois secrets existem
+   no Worker" (`wrangler secret list`).
+3. **Conferir a cota.** O plano gratuito do Resend envia **100 e-mails por dia**. Cadastro, confirmação, reenvio,
+   recuperação e convite gastam a mesma cota. Passando dela, a API responde 503 `email_indisponivel` e a tela mostra
+   "Não conseguimos enviar o e-mail agora" (ACE-52). Se o uso real passar disso, a decisão de mudar de plano é do
+   dono do projeto. Confirmação: "estou ciente da cota de 100 por dia".
+4. **Conferir que `EMAIL_DEV` não existe em produção.** `wrangler secret list` e as variáveis do Worker não podem listar
+   `EMAIL_DEV` (com ele a caixa de desenvolvimento, `GET /api/dev/emails`, responderia). Confirmação: "`EMAIL_DEV`
+   ausente".
+5. **Criar a conta do dono em produção (`dono.ts`).** Depois do primeiro deploy com as migrations de conta, rode, com
+   `DATABASE_URL` apontando para o owner de produção (só no terminal) e digitando a senha sem eco:
+   `pnpm dono -- --email <e-mail do dono> --alvo producao`. O script recusa host remoto sem `--alvo producao`, pede a
+   confirmação do host e nunca imprime a senha. É comando em banco de produção: **só com confirmação específica**, com o
+   dump cifrado da seção 1 já feito. A segunda execução troca a senha do dono. Nenhuma rota escreve o papel de dono
+   (G-11).
+6. **Depois do deploy.** Abra `https://<host de URL_PUBLICA>/api/health` (seção 2), cadastre uma conta de teste com um
+   e-mail seu, confirme pelo link recebido, entre, saia e exclua a conta de teste pela tela Minha conta. Se o e-mail não
+   chegar, veja a caixa de spam, o estado do domínio no Resend e a cota do dia.
+
+Rotação da chave do Resend: crie a nova no painel, grave com `wrangler secret put RESEND_API_KEY`, confira um cadastro
+de teste e só depois revogue a antiga.

@@ -47,6 +47,24 @@ Operador (máquina local, `DATABASE_URL` própria) -> Neon por script. GitHub Ac
 | D: custo do bcrypt | Limitador por IP + bloqueio por e-mail | Só verificável em ambiente publicado |
 | E: sessão roubada | Cookie `HttpOnly; Secure; SameSite=Lax; Path=/`, sem `Domain`, hash no banco, logout encerra | `Set-Cookie` conferido no login |
 
+### 1a. Conta e acesso: cadastro, confirmação, recuperação, exclusão e convites (`/api/conta/*`, `/api/sessao/*`, `/api/convites/*`, `/api/grupos/:grupoId/admins/*`)
+
+Entra com a feature `conta-e-acesso` (2026-10-27). As funções que acham uma conta sem sessão são `SECURITY DEFINER` e o
+`pelada_app` nunca lê o hash de senha (ADR-029).
+
+| Ameaça | Controle | Evidência |
+|---|---|---|
+| S: enumeração de e-mail no cadastro, na recuperação e no reenvio | Mesma resposta para e-mail novo e e-mail que já tem conta (ACE-04); mesma mensagem de login para e-mail inexistente e senha errada (ACE-11); `email_nao_confirmado` só com a senha certa | `backend/api/test/rotas/conta-cadastro.test.ts`, `backend/api/test/rotas/sessao.test.ts`, `backend/api/test/rotas/sessao-recuperacao.test.ts` |
+| S/E: token de link roubado ou reaproveitado | Token de 32 bytes no fragmento da URL (`#t=`), que não vai ao servidor nem ao `Referer`; o banco guarda só o SHA-256; uso único; validade de 24 h (confirmação), 1 h (recuperação) e 7 dias (convite); o front apaga o fragmento depois de ler (AD-010) | `backend/api/test/infraestrutura/token.test.ts`, `backend/api/test/repositorios/links.test.ts`, `frontend/web/src/dados/fragmento.test.ts` |
+| S: convite aceito pela pessoa errada | O convite só vale para o e-mail convidado; outra conta recebe 403 `convite_de_outro_email` e nada é criado (ACE-35); convite usado, cancelado ou vencido responde 410 | `backend/api/test/rotas/convites.test.ts`, `backend/api/test/repositorios/convites.test.ts` |
+| T: CSRF e escrita cruzada | `X-Pelada: 1` em toda escrita, `SameSite=Lax`; admin só vê e altera o grupo em que tem vínculo (404 no resto) | `backend/api/test/rotas/app.test.ts`, `backend/api/test/rotas/vinculo-middleware.test.ts`, `backend/api/test/isolamento/` |
+| R: negar autoria de exclusão e convite | A auditoria é gravada pelas próprias funções do banco, não pelas rotas | `backend/api/test/migracoes/conta-senha-e-exclusao.test.ts`, `backend/api/test/migracoes/conta-convites.test.ts` |
+| I: senha ou token em log, resposta ou erro | Nenhum log traz senha ou token (ACE-21, G-08); o hash só existe no banco; e-mail do convite só leva o link | `backend/api/test/rotas/sessao.test.ts`, `backend/api/test/rotas/conta-minha.test.ts` |
+| D: bombardeio de e-mails e custo do bcrypt | Todas as rotas sem sessão passam pelo `LIMITE_ENTRAR` (10/min por IP, ACE-50); 5 falhas por e-mail e IP bloqueiam o login por 15 min (ACE-13); a cota de 100 e-mails por dia do Resend esgotada vira 503 `email_indisponivel` (ACE-52), sem derrubar a rota | `backend/api/test/rotas/limite-taxa.test.ts`, `backend/api/test/rotas/sessao.test.ts`, `backend/api/test/infraestrutura/email.test.ts` |
+| E: sessões antigas depois de trocar a senha ou excluir a conta | Trocar a senha encerra as sessões dos outros aparelhos e mantém a atual (ACE-26); a recuperação por link encerra todas (ACE-24); excluir a conta exige a senha e encerra todas (ACE-28, ACE-69) | `backend/api/test/rotas/conta-minha.test.ts`, `backend/api/test/rotas/sessao-recuperacao.test.ts` |
+| E: virar dono por uma rota | Só `backend/scripts/dono.ts` define o papel de dono; nenhuma rota lê ou escreve `e_dono` (ACE-63, G-11) | `backend/scripts/test/dono.test.ts`, regra ESLint `pelada/sem-escrita-dono` |
+| I/E: caixa de e-mail de desenvolvimento em produção | `GET /api/dev/emails` só responde com `EMAIL_DEV=1`, que nunca existe em produção; fora disso é 404 | `backend/api/test/rotas/dev-emails.test.ts` |
+
 ### 2. Ranking público sem login (`/api/publico/*`)
 
 | Ameaça | Controle | Evidência |
