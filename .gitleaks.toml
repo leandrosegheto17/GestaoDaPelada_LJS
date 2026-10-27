@@ -3,6 +3,13 @@ title = "Gestão da Pelada"
 [extend]
 useDefault = true
 
-[allowlist]
+[[allowlists]]
 description = "Manifesto de instalação dos fluxos: só hashes SHA-256 de arquivos, nenhum segredo."
 paths = ['''^\.claude/\.instalacao\.json$''']
+
+[[allowlists]]
+description = "Fixtures de teste: senha fictícia em teste de log sem segredo (T56, INF-01)."
+condition = "AND"
+regexTarget = "line"
+paths = ['''^backend/api/test/rotas/(sessao|sessao-recuperacao)\.test\.ts$''']
+regexes = ['''senhaSecreta = '[^']+\'''']

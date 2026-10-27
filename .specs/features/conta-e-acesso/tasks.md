@@ -144,7 +144,7 @@ T42 → T43 → T44
 Tarefas de correção do verificador (volta 1) e das lacunas que ele apontou sem bloquear. Independentes entre si.
 
 ```
-T45, T46, T47, T48, T49, T50, T51, T52, T53, T54, T55 (independentes)
+T45, T46, T47, T48, T49, T50, T51, T52, T53, T54, T55, T56 (independentes)
 ```
 
 ---
@@ -1484,6 +1484,30 @@ T45, T46, T47, T48, T49, T50, T51, T52, T53, T54, T55 (independentes)
 
 ---
 
+### T56: Allowlist estreito do gitleaks para as fixtures `senhaSecreta`
+
+**What**: o gitleaks (regra `generic-api-key`) acusa a senha fictícia `senhaSecreta` em `backend/api/test/rotas/sessao.test.ts` e `sessao-recuperacao.test.ts` (INF-01 do `seguranca.md`). Acrescentar ao `.gitleaks.toml` um allowlist que exige o caminho dos dois testes e a linha `senhaSecreta = '...'`; migrar o `[allowlist]` antigo para `[[allowlists]]` (o formato antigo não convive com o novo).
+**Estimativa**: 30 min
+**Where**: `.gitleaks.toml`
+**Depends on**: None
+**Requirement**: ACE-21
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [x] `gitleaks git` (histórico inteiro e `9085f80..HEAD`) não acusa mais nada
+- [x] Nenhuma asserção de teste foi alterada
+- [x] `pnpm lint`, `pnpm format:check` e `pnpm test:checagens` passam
+
+**Tests**: none
+**Gate**: quick
+
+---
+
 ## Phase Execution Map
 
 ```
@@ -1503,7 +1527,7 @@ Phase 6:  T26 → T27 → T28 → T29
 Phase 7:  T30, T31, T32, T33, T34, T35, T36 (independentes)
 Phase 8:  T37, T38, T39, T40, T41 (independentes)
 Phase 9:  T42 → T43 → T44
-Phase 10: T45, T46, T47, T48, T49, T50, T51, T52, T53, T54, T55 (independentes)
+Phase 10: T45, T46, T47, T48, T49, T50, T51, T52, T53, T54, T55, T56 (independentes)
 ```
 
 Execução estritamente sequencial: um trabalhador faz uma tarefa por vez, em ordem.
@@ -1519,7 +1543,7 @@ Execução estritamente sequencial: um trabalhador faz uma tarefa por vez, em or
 | 5 | 5 e 6 | T24 a T29 | `implementador` |
 | 6 | 7 | T30 a T36 | `implementador` |
 | 7 | 8 e 9 | T37 a T44 | `implementador` |
-| 8 | 10 | T45 a T55 (T45 a T50 feitas na volta 1 do verificador; T51 a T55 na volta 2) | `implementador` |
+| 8 | 10 | T45 a T56 (T45 a T50 feitas na volta 1 do verificador; T51 a T55 na volta 2; T56 na auditoria de segurança) | `implementador` |
 
 ---
 
@@ -1539,7 +1563,7 @@ Execução estritamente sequencial: um trabalhador faz uma tarefa por vez, em or
 | T42 | registro das telas na comparação visual | ✅ |
 | T43 | um arquivo de e2e | ✅ |
 | T44 | documentação da feature | ⚠️ coeso (docs do mesmo fechamento) |
-| T45 a T55 | uma correção ou prova cada (T47 e T50 tocam dois arquivos do mesmo assunto) | ✅ |
+| T45 a T56 | uma correção ou prova cada (T47 e T50 tocam dois arquivos do mesmo assunto) | ✅ |
 
 ## Diagram-Definition Cross-Check
 
@@ -1578,7 +1602,7 @@ Execução estritamente sequencial: um trabalhador faz uma tarefa por vez, em or
 | T42 | None | — | ✅ |
 | T43 | T42 | T42 → T43 | ✅ |
 | T44 | T43 | T43 → T44 | ✅ |
-| T45 a T55 | None | — | ✅ |
+| T45 a T56 | None | — | ✅ |
 
 ## Test Co-location Validation
 
@@ -1599,6 +1623,7 @@ Execução estritamente sequencial: um trabalhador faz uma tarefa por vez, em or
 | T53 | Rotas da API (versão dos termos gravada) | e2e | e2e | ✅ |
 | T54 | Mockup (codificação dos arquivos) | e2e visual | e2e | ✅ |
 | T55 | Documentação | none | none | ✅ |
+| T56 | Configuração do gitleaks | none | none | ✅ |
 | T46, T50 | Front: App e termos | unit | unit | ✅ |
 | T47 | Front: comparação visual | e2e visual | e2e | ✅ |
 | T49 | Lint das rotas | unit | unit | ✅ |
