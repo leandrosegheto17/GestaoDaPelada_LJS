@@ -338,11 +338,11 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] E-mail inexistente e senha errada devolvem o mesmo resultado `invalida`; conta não confirmada com senha certa devolve `nao_confirmado` sem sessão (ACE-11, ACE-12)
-- [ ] 5 falhas do par e-mail e IP bloqueiam esse par, mesmo com a senha certa, até 15 min depois da quinta; outro IP sem falhas entra (ACE-13, ACE-14)
-- [ ] Duas falhas simultâneas do mesmo par contam 2 (ACE-66)
-- [ ] `sessao_tocar` recusa e apaga a sessão parada há 15 min e a criada há 12 h, mesmo em uso (relógio controlado no teste) (ACE-15, ACE-16)
-- [ ] Gate full passa
+- [x] E-mail inexistente e senha errada devolvem o mesmo resultado `invalida`; conta não confirmada com senha certa devolve `nao_confirmado` sem sessão (ACE-11, ACE-12)
+- [x] 5 falhas do par e-mail e IP bloqueiam esse par, mesmo com a senha certa, até 15 min depois da quinta; outro IP sem falhas entra (ACE-13, ACE-14)
+- [x] Duas falhas simultâneas do mesmo par contam 2 (ACE-66)
+- [x] `sessao_tocar` recusa e apaga a sessão parada há 15 min e a criada há 12 h, mesmo em uso (relógio controlado no teste) (ACE-15, ACE-16)
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
