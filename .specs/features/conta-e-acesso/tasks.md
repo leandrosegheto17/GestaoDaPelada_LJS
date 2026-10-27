@@ -1258,8 +1258,8 @@ T42 → T43 → T44
 **Requirement**: ACE-51
 **Done when**:
 
-- [ ] M26 (60 s para 10 s) passa a falhar; suíte verde
-- [ ] Gate quick passa
+- [x] M26 (60 s para 10 s) passa a falhar; suíte verde
+- [x] Gate quick passa
 
 **Tests**: integration
 **Gate**: quick

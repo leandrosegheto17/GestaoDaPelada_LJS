@@ -157,6 +157,16 @@ describe('conta_cadastrar (ACE-01, ACE-04, ACE-05)', () => {
     await passarSegundosDosEnvios(email, 61);
     expect((await cadastrar(email)).enviar).toBe(true);
   });
+
+  it('a borda dos 60 s: com 59 s ainda bloqueia e com 61 s libera (ACE-51)', async () => {
+    const email = novoEmail();
+    await cadastrar(email);
+    expect((await cadastrar(email)).enviar).toBe(true);
+    await passarSegundosDosEnvios(email, 59);
+    expect((await cadastrar(email)).enviar).toBe(false);
+    await passarSegundosDosEnvios(email, 2);
+    expect((await cadastrar(email)).enviar).toBe(true);
+  });
 });
 
 describe('link_confirmar (ACE-06, ACE-07)', () => {
@@ -200,6 +210,15 @@ describe('link_confirmar (ACE-06, ACE-07)', () => {
 });
 
 describe('link_pedir (ACE-08, ACE-23, ACE-51)', () => {
+  it('a borda dos 60 s: com 59 s ainda bloqueia e com 61 s libera (ACE-51)', async () => {
+    const email = novoEmail();
+    await cadastrar(email);
+    await passarSegundosDosEnvios(email, 59);
+    expect((await pedir(email, 'confirmacao')).enviar).toBe(false);
+    await passarSegundosDosEnvios(email, 2);
+    expect((await pedir(email, 'confirmacao')).enviar).toBe(true);
+  });
+
   it('novo link de confirmação invalida o anterior; dentro de 60 s não envia e o anterior continua valendo', async () => {
     const email = novoEmail();
     const primeiro = novoHash();
