@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Admins (carregando)</title>
+<link rel="stylesheet" href="../../../../mockup/fontes/fontes.css">
+<link rel="stylesheet" href="../../../../mockup/tokens.css">
+<link rel="stylesheet" href="../../../../mockup/base.css">
+</head>
+<body>
+<!-- Padrão de carregando de lista. -->
+<header class="barra barra--admin"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span><a class="barra__link" href="t08-grupos--sucesso.html">Trocar grupo</a></div></header>
+<main class="conteudo conteudo--admin conteudo--estreito" aria-busy="true">
+  <a class="voltar" href="../../../../mockup/telas/t09-inicio--sucesso.html"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 18 9 12 15 6"/></svg>Início</a>
+  <h1 class="titulo-pagina">Admins</h1>
+  
+  <p class="sr" role="status">Carregando…</p><div aria-hidden="true"><span class="esqueleto esqueleto--linha"></span><span class="esqueleto esqueleto--linha"></span><span class="esqueleto esqueleto--linha"></span></div>
+  <section class="secao" aria-labelledby="add">
+    <h2 id="add" class="subtitulo">Convidar admin</h2>
+    <p class="paragrafo">A pessoa recebe um link por e-mail. Se ainda não tiver conta, cria uma pelo próprio link.</p>
+    <form class="formulario" novalidate>
+      <div class="campo"><label class="campo__rotulo" for="email-convite">E-mail</label><input class="campo__entrada" id="email-convite" type="email" inputmode="email"></div>
+      <div><button class="botao botao--principal" type="submit">Enviar convite</button></div>
+    </form>
+  </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Criar conta (erro)</title>
+<link rel="stylesheet" href="../../../../mockup/fontes/fontes.css">
+<link rel="stylesheet" href="../../../../mockup/tokens.css">
+<link rel="stylesheet" href="../../../../mockup/base.css">
+</head>
+<body>
+<!-- ACE-02, ACE-03: resumo de erros e erro por campo. -->
+<header class="barra"><p class="barra__titulo">Gestão da Pelada</p></header>
+<main class="conteudo conteudo--estreito">
+  <a class="voltar" href="t04-entrar--vazio.html"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 18 9 12 15 6"/></svg>Voltar para entrar</a>
+  <h1 class="titulo-pagina">Criar conta</h1>
+  <p class="paragrafo">Organize presença, times e ranking da sua pelada. Grátis para começar.</p>
+  <form class="formulario" novalidate>
+    <div class="faixa faixa--erro resumo-erros" role="alert"><div class="faixa__texto"><strong>Corrija 3 campos:</strong><ul><li><a href="#email">E-mail</a></li><li><a href="#senha">Senha</a></li><li><a href="#termos">Aceite dos termos</a></li></ul></div></div><div class="campo"><label class="campo__rotulo" for="nome">Seu nome</label><input class="campo__entrada" id="nome" autocomplete="name" value="Leandro" aria-describedby="nome-ajuda"><p class="campo__ajuda" id="nome-ajuda">Como os outros admins vão ver você.</p></div><div class="campo campo--erro"><label class="campo__rotulo" for="email">E-mail</label><input class="campo__entrada" id="email" type="email" autocomplete="username" inputmode="email" value="leandro@" aria-invalid="true" aria-describedby="email-erro"><p class="campo__erro" id="email-erro"><svg class="icone" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>Informe um e-mail válido.</p></div><div class="campo campo--erro"><label class="campo__rotulo" for="senha">Senha</label><input class="campo__entrada" id="senha" type="password" autocomplete="new-password" value="•••••" aria-invalid="true" aria-describedby="senha-ajuda senha-erro"><p class="campo__ajuda" id="senha-ajuda">De 8 a 72 caracteres.</p><p class="campo__erro" id="senha-erro"><svg class="icone" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>A senha precisa ter pelo menos 8 caracteres.</p></div><div class="campo campo--erro"><label class="caixa"><input type="checkbox" id="termos" aria-invalid="true" aria-describedby="termos-erro"><span>Li e aceito os <a href="t33-termos--pagina.html">termos de uso</a> e a <a href="t07-privacidade--pagina.html">política de privacidade</a></span></label><p class="campo__erro" id="termos-erro"><svg class="icone" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>Aceite os termos para criar a conta.</p></div><button class="botao botao--principal botao--bloco" type="submit">Criar conta</button><a class="botao botao--texto" href="t04-entrar--vazio.html">Já tenho conta</a>
+  </form>
+</main>
+</body>
+</html>

@@ -2,6 +2,7 @@
 
 **Spec**: `.specs/features/conta-e-acesso/spec.md` (e `context.md`)
 **Status**: Approved (usuário, 2026-10-27)
+**Mockup**: aprovado em 2026-10-27, `.specs/features/conta-e-acesso/mockup/` (36 telas; galeria https://claude.ai/artifact/UqN3tUswVizPSCVAd7NfX7)
 **Abordagem escolhida pelo usuário (2026-10-27)**: funções `SECURITY DEFINER` no banco para toda operação que precisa
 achar uma conta sem sessão. Alternativas recusadas: role separada `pelada_auth` (um segredo e uma conexão a mais, e a
 role leria qualquer conta) e contexto extra na RLS (`app.email_login`), que faria o isolamento depender da aplicação.

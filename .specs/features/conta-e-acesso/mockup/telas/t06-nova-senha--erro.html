@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nova senha (erro)</title>
+<link rel="stylesheet" href="../../../../mockup/fontes/fontes.css">
+<link rel="stylesheet" href="../../../../mockup/tokens.css">
+<link rel="stylesheet" href="../../../../mockup/base.css">
+</head>
+<body>
+<!-- Erro de validação no cliente. -->
+<header class="barra"><p class="barra__titulo">Gestão da Pelada</p></header>
+<main class="conteudo conteudo--estreito">
+  <h1 class="titulo-pagina">Crie uma nova senha</h1>
+  <p class="paragrafo">Depois de salvar, todos os aparelhos conectados à sua conta saem e você entra de novo com a senha nova.</p>
+  <form class="formulario" novalidate>
+    <div class="faixa faixa--erro resumo-erros" role="alert"><div class="faixa__texto"><strong>Corrija 1 campo:</strong><ul><li><a href="#conf">Confirmar nova senha</a></li></ul></div></div><div class="campo"><label class="campo__rotulo" for="nova">Nova senha</label><input class="campo__entrada" id="nova" type="password" autocomplete="new-password" value="••••••••••" aria-describedby="nova-ajuda"><p class="campo__ajuda" id="nova-ajuda">De 8 a 72 caracteres.</p></div><div class="campo campo--erro"><label class="campo__rotulo" for="conf">Confirmar nova senha</label><input class="campo__entrada" id="conf" type="password" autocomplete="new-password" value="•••••••••" aria-invalid="true" aria-describedby="conf-erro"><p class="campo__erro" id="conf-erro"><svg class="icone" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>As senhas não conferem.</p></div>
+    <button class="botao botao--principal botao--bloco" type="submit">Salvar nova senha</button>
+  </form>
+</main>
+</body>
+</html>

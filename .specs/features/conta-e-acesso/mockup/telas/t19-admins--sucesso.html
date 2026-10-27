@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Admins do grupo</title>
+<link rel="stylesheet" href="../../../../mockup/fontes/fontes.css">
+<link rel="stylesheet" href="../../../../mockup/tokens.css">
+<link rel="stylesheet" href="../../../../mockup/base.css">
+</head>
+<body>
+<!-- Muda: convite por e-mail e convites pendentes no lugar de nome + senha temporária (ACE-31, ACE-37, ACE-38). Remover e último admin seguem as telas atuais (t19-admins--remover, t19-admins--ultimo-admin), sem o formulário de nome. -->
+<header class="barra barra--admin"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span><a class="barra__link" href="t08-grupos--sucesso.html">Trocar grupo</a></div></header>
+<main class="conteudo conteudo--admin conteudo--estreito">
+  <a class="voltar" href="../../../../mockup/telas/t09-inicio--sucesso.html"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 18 9 12 15 6"/></svg>Início</a>
+  <h1 class="titulo-pagina">Admins</h1>
+  
+  <ul class="lista">
+    <li class="item item--quebra"><span class="item__principal"><span class="item__titulo">Leandro (você)</span><span class="item__meta">leandro@exemplo.com.br</span></span><span class="selo selo--neutro">Financeiro</span></li>
+    <li class="item item--quebra"><span class="item__principal"><span class="item__titulo">Marquinhos</span><span class="item__meta">marquinhos@exemplo.com.br</span></span><a class="botao botao--texto-destrutivo" href="../../../../mockup/telas/t19-admins--remover.html">Remover</a></li>
+  </ul>
+  <h2 class="subtitulo">Convites pendentes</h2>
+  <ul class="lista"><li class="item item--quebra"><span class="item__principal"><span class="item__titulo">paulo.goleiro@exemplo.com.br</span><span class="item__meta">Vale até 30/10/2026</span></span><button class="botao botao--texto-destrutivo" type="button">Cancelar convite</button></li></ul>
+  <section class="secao" aria-labelledby="add">
+    <h2 id="add" class="subtitulo">Convidar admin</h2>
+    <p class="paragrafo">A pessoa recebe um link por e-mail. Se ainda não tiver conta, cria uma pelo próprio link.</p>
+    <form class="formulario" novalidate>
+      <div class="campo"><label class="campo__rotulo" for="email-convite">E-mail</label><input class="campo__entrada" id="email-convite" type="email" inputmode="email"></div>
+      <div><button class="botao botao--principal" type="submit">Enviar convite</button></div>
+    </form>
+  </section>
+</main>
+</body>
+</html>

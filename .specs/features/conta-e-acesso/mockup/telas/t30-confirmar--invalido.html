@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Link inválido ou vencido</title>
+<link rel="stylesheet" href="../../../../mockup/fontes/fontes.css">
+<link rel="stylesheet" href="../../../../mockup/tokens.css">
+<link rel="stylesheet" href="../../../../mockup/base.css">
+</head>
+<body>
+<!-- ACE-07, ACE-08. -->
+<header class="barra"><p class="barra__titulo">Gestão da Pelada</p></header>
+<main class="conteudo conteudo--estreito">
+  <h1 class="titulo-pagina">Link inválido ou vencido</h1>
+  <div class="faixa faixa--atencao" role="status"><svg class="icone" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><p class="faixa__texto">Este link já foi usado ou passou do prazo de 24 horas.</p></div>
+  <form class="formulario acima-3" novalidate>
+    <div class="campo"><label class="campo__rotulo" for="email">E-mail da conta</label><input class="campo__entrada" id="email" type="email" autocomplete="username" inputmode="email"></div>
+    <button class="botao botao--principal botao--bloco" type="submit">Enviar novo link</button>
+  </form>
+  <a class="botao botao--texto" href="t04-entrar--vazio.html">Voltar para entrar</a>
+</main>
+</body>
+</html>

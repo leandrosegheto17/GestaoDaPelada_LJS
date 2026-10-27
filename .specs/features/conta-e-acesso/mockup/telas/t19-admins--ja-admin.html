@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Admins (já é admin)</title>
+<link rel="stylesheet" href="../../../../mockup/fontes/fontes.css">
+<link rel="stylesheet" href="../../../../mockup/tokens.css">
+<link rel="stylesheet" href="../../../../mockup/base.css">
+</head>
+<body>
+<!-- ACE-32 (409 ja_e_admin). -->
+<header class="barra barra--admin"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span><a class="barra__link" href="t08-grupos--sucesso.html">Trocar grupo</a></div></header>
+<main class="conteudo conteudo--admin conteudo--estreito">
+  <a class="voltar" href="../../../../mockup/telas/t09-inicio--sucesso.html"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 18 9 12 15 6"/></svg>Início</a>
+  <h1 class="titulo-pagina">Admins</h1>
+  
+  <ul class="lista">
+    <li class="item item--quebra"><span class="item__principal"><span class="item__titulo">Leandro (você)</span><span class="item__meta">leandro@exemplo.com.br</span></span><span class="selo selo--neutro">Financeiro</span></li>
+    <li class="item item--quebra"><span class="item__principal"><span class="item__titulo">Marquinhos</span><span class="item__meta">marquinhos@exemplo.com.br</span></span><a class="botao botao--texto-destrutivo" href="../../../../mockup/telas/t19-admins--remover.html">Remover</a></li>
+  </ul>
+  <h2 class="subtitulo">Convites pendentes</h2>
+  <ul class="lista"><li class="item item--quebra"><span class="item__principal"><span class="item__titulo">rodrigo@exemplo.com.br</span><span class="item__meta">Vale até 03/11/2026</span></span><button class="botao botao--texto-destrutivo" type="button">Cancelar convite</button></li></ul>
+  <section class="secao" aria-labelledby="add">
+    <h2 id="add" class="subtitulo">Convidar admin</h2>
+    <p class="paragrafo">A pessoa recebe um link por e-mail. Se ainda não tiver conta, cria uma pelo próprio link.</p>
+    <form class="formulario" novalidate>
+      <div class="campo campo--erro"><label class="campo__rotulo" for="email-convite">E-mail</label><input class="campo__entrada" id="email-convite" type="email" inputmode="email" value="marquinhos@exemplo.com.br" aria-invalid="true" aria-describedby="email-convite-erro"><p class="campo__erro" id="email-convite-erro"><svg class="icone" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>Essa pessoa já é admin do grupo.</p></div>
+      <div><button class="botao botao--principal" type="submit">Enviar convite</button></div>
+    </form>
+  </section>
+</main>
+</body>
+</html>
