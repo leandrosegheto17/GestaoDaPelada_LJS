@@ -210,3 +210,7 @@ Registre a data e quem confirmou cada item na entrada da liberação (`.specs/li
 
 Rotação da chave do Resend: crie a nova no painel, grave com `wrangler secret put RESEND_API_KEY`, confira um cadastro
 de teste e só depois revogue a antiga.
+
+Hash de senha importado de fora: o filtro de `conta_entrar` aceita `$2a$`, `$2b$` e `$2y$`, mas no Postgres 16 só
+funcionam os hashes `$2a$` (os que `gen_salt('bf', 12)` do pgcrypto gera). Um hash `$2b$` ou `$2y$` importado de fora entraria como
+senha errada: converta para `$2a$` antes de gravar.
