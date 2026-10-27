@@ -364,11 +364,11 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] A troca de senha apaga as outras sessões e mantém a atual; senha atual errada não troca (ACE-26, ACE-27)
-- [ ] A exclusão de conta sem grupo como único admin apaga sessões, vínculos e links, deixa a linha sem nome, e-mail nem senha válidos, e a auditoria passa a mostrar "Conta excluída" (ACE-28)
-- [ ] A conta que é a única admin de um grupo não arquivado recebe `unico_admin` com a lista dos grupos e nada muda; senha errada não apaga nada (ACE-29, ACE-30)
-- [ ] Depois da exclusão, `sessao_tocar` com a sessão antiga devolve nulo (ACE-69)
-- [ ] Gate full passa
+- [x] A troca de senha apaga as outras sessões e mantém a atual; senha atual errada não troca (ACE-26, ACE-27)
+- [x] A exclusão de conta sem grupo como único admin apaga sessões, vínculos e links, deixa a linha sem nome, e-mail nem senha válidos, e a auditoria passa a mostrar "Conta excluída" (ACE-28)
+- [x] A conta que é a única admin de um grupo não arquivado recebe `unico_admin` com a lista dos grupos e nada muda; senha errada não apaga nada (ACE-29, ACE-30)
+- [x] Depois da exclusão, `sessao_tocar` com a sessão antiga devolve nulo (ACE-69)
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
