@@ -647,10 +647,10 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] Ler devolve o nome do grupo e se a conta existe; aceitar com a conta certa cria o vínculo (ACE-33)
-- [ ] Cadastrar pelo convite abre sessão com o grupo em `GET /api/sessao` (ACE-34)
-- [ ] 403 `convite_de_outro_email` e 410 `link_invalido` (ACE-35, ACE-36)
-- [ ] Gate full passa
+- [x] Ler devolve o nome do grupo e se a conta existe; aceitar com a conta certa cria o vínculo (ACE-33)
+- [x] Cadastrar pelo convite abre sessão com o grupo em `GET /api/sessao` (ACE-34)
+- [x] 403 `convite_de_outro_email` e 410 `link_invalido` (ACE-35, ACE-36)
+- [x] Gate full passa
 
 **Tests**: e2e
 **Gate**: full

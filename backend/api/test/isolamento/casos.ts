@@ -217,5 +217,17 @@ export const CASOS_ROTAS: Record<string, CasoRota> = {
     tipo: 'nao_se_aplica',
     motivo: 'Exclui a própria conta pela função do banco, que só enxerga os vínculos dela.',
   },
+  'POST /api/convites/ler': {
+    tipo: 'nao_se_aplica',
+    motivo: 'Sem sessão: lê o convite pelo hash do token, na função do banco; o grupo vem do convite.',
+  },
+  'POST /api/convites/aceitar': {
+    tipo: 'nao_se_aplica',
+    motivo: 'Aceita o convite pelo hash do token, na função do banco, que confere o e-mail da conta da sessão.',
+  },
+  'POST /api/convites/cadastrar': {
+    tipo: 'nao_se_aplica',
+    motivo: 'Sem sessão: cadastra pelo convite, na função do banco; o grupo vem do convite.',
+  },
   'POST /api/sessao/sair': { tipo: 'nao_se_aplica', motivo: 'Apaga a sessão da própria conta (RLS por conta).' },
 };

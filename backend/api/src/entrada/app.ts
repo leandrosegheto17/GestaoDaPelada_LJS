@@ -12,6 +12,7 @@ import { criarLimiteTaxa, type Limitador } from './middlewares/limite-taxa.ts';
 import { semSniff } from './middlewares/sem-sniff.ts';
 import { carregarSessao, exigirSessao } from './middlewares/sessao.ts';
 import { exigirVinculo } from './middlewares/vinculo.ts';
+import { rotaConvites } from './rotas/convites.ts';
 import { rotaContaMinha } from './rotas/conta-minha.ts';
 import { rotaContaCadastro } from './rotas/conta-cadastro.ts';
 import { rotaHealth } from './rotas/health.ts';
@@ -90,6 +91,7 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<AppEnv> {
   app.route('/', rotaContaCadastro);
   app.route('/', rotaSessaoRecuperacao);
   app.route('/', rotaContaMinha);
+  app.route('/', rotaConvites);
 
   app.notFound((c) => naoEncontrado(c));
   app.onError((erro, c) => {
