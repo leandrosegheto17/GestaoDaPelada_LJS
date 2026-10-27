@@ -1372,9 +1372,9 @@ T45, T46, T47, T48, T49, T50, T51, T52 (independentes)
 
 **Done when**:
 
-- [ ] Conta com o hash literal entra com a senha atual e abre sessão (mesma resposta do login normal)
-- [ ] A mesma conta com senha errada recebe 401 `credenciais_invalidas` e conta uma falha
-- [ ] Gate full passa
+- [x] Conta com o hash literal entra com a senha atual e abre sessão (mesma resposta do login normal)
+- [x] A mesma conta com senha errada recebe 401 `credenciais_invalidas` e conta uma falha
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
