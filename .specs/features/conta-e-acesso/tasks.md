@@ -1450,9 +1450,11 @@ T45, T46, T47, T48, T49, T50, T51, T52, T53, T54, T55 (independentes)
 
 **Done when**:
 
-- [ ] Os três arquivos decodificam em UTF-8
-- [ ] Visual das t25 < 1% e visual completo verde
-- [ ] Gate full passa
+- [x] Os três arquivos decodificam em UTF-8
+- [x] Visual das t25 < 1% e visual completo verde
+- [x] Gate full passa
+
+**Registro**: só o byte `ã` (`ã`) virou `C3 A3` em cada arquivo (+1 byte). Visual das t25: 0,00% (antes 0,13% e 0,40%); visual completo: 84 linhas OK, nenhuma DIVERGE.
 
 **Tests**: e2e
 **Gate**: full
@@ -1474,8 +1476,8 @@ T45, T46, T47, T48, T49, T50, T51, T52, T53, T54, T55 (independentes)
 
 **Done when**:
 
-- [ ] A linha está no runbook
-- [ ] `pnpm format:check` e `pnpm test:checagens` passam
+- [x] A linha está no runbook
+- [x] `pnpm format:check` e `pnpm test:checagens` passam
 
 **Tests**: none
 **Gate**: quick
