@@ -1031,8 +1031,8 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] Sem vínculos, o estado vazio do t08; com vínculos, a lista com o selo "Sem acesso ao financeiro"; Sair chama `useSair`; axe sem violação
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Sem vínculos, o estado vazio do t08; com vínculos, a lista com o selo "Sem acesso ao financeiro"; Sair chama `useSair`; axe sem violação
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
