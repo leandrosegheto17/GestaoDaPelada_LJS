@@ -142,10 +142,10 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] `email` normaliza `" Leandro@Ex.com "` para `leandro@ex.com` e recusa 255 caracteres (ACE-05, ACE-03)
-- [ ] `senha` recusa 7 caracteres, aceita 8 e 72, e recusa 20 emojis (mais de 72 bytes) (ACE-68)
-- [ ] `pnpm audit` não lista `zod < 4.6.6` (SEC-007)
-- [ ] Gate quick passa: `pnpm --filter @pelada/contrato test`
+- [x] `email` normaliza `" Leandro@Ex.com "` para `leandro@ex.com` e recusa 255 caracteres (ACE-05, ACE-03)
+- [x] `senha` recusa 7 caracteres, aceita 8 e 72, e recusa 20 emojis (mais de 72 bytes) (ACE-68)
+- [x] `pnpm audit` não lista `zod < 4.6.6` (SEC-007)
+- [x] Gate quick passa: `pnpm --filter @pelada/contrato test`
 
 **Tests**: unit
 **Gate**: quick
