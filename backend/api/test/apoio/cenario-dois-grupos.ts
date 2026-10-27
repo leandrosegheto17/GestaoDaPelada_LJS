@@ -29,7 +29,8 @@ export const GRUPO_B = ids('2', 'grupo-b');
 
 /**
  * Grava, como owner (sem RLS), dois grupos com contas diferentes e uma linha de cada grupo
- * em toda tabela que tem grupo_id. A conta de cada grupo só tem vínculo com o próprio grupo.
+ * em toda tabela que tem grupo_id, e uma linha de cada conta nas tabelas de conta (sessões, tentativas, links,
+ * envios, pedidos de reset). A conta de cada grupo só tem vínculo com o próprio grupo.
  */
 export async function gravarDoisGrupos(cliente: pg.ClientBase): Promise<void> {
   for (const g of [GRUPO_A, GRUPO_B]) {
@@ -103,6 +104,33 @@ export async function gravarDoisGrupos(cliente: pg.ClientBase): Promise<void> {
         `INSERT INTO auditoria (autor_tipo, autor_conta_id, acao, entidade, grupo_id, momento)
          VALUES ('conta', $1, 'criar', 'grupo', $2, now())`,
         [conta, grupo],
+      ],
+      // Tabelas de conta (conta-e-acesso): uma linha de cada conta em cada uma.
+      [
+        `INSERT INTO sessoes (token_hash, conta_id, escopo, criada_em, ultimo_uso_em, expira_em)
+         VALUES (digest($2 || '-sessao', 'sha256'), $1, 'completo', now(), now(), now() + interval '12 hours')`,
+        [conta, slug],
+      ],
+      [
+        `INSERT INTO tentativas_login (email, ip_hash, momento, sucesso)
+         VALUES ($1 || '@exemplo.com', digest($1 || '-ip', 'sha256'), now(), false)`,
+        [slug],
+      ],
+      [
+        `INSERT INTO links_conta (conta_id, tipo, token_hash, criado_em, expira_em)
+         VALUES ($1, 'recuperacao', digest($2 || '-link', 'sha256'), now(), now() + interval '1 hour')`,
+        [conta, slug],
+      ],
+      [
+        "INSERT INTO envios_email (destino_hash, tipo, enviado_em) VALUES (digest($1 || '@exemplo.com', 'sha256'), 'recuperacao', now())",
+        [slug],
+      ],
+      ['INSERT INTO pedidos_reset (conta_id, ultimo_pedido_em) VALUES ($1, now())', [conta]],
+      [
+        `INSERT INTO convites_admin (grupo_id, email, token_hash, criado_por, criado_em, expira_em)
+         VALUES ($1, 'convidado-' || $2 || '@exemplo.com', digest($2 || '-convite', 'sha256'), $3, now(),
+                 now() + interval '7 days')`,
+        [grupo, slug, conta],
       ],
     ];
     for (const [sql, params] of comandos) await cliente.query(sql, params);

@@ -136,6 +136,15 @@ export const CASOS: Record<string, Caso> = {
       [conta(g), g.grupo],
     ],
   },
+  convites_admin: {
+    coluna: 'grupo_id',
+    acesso: 'negocio',
+    inserir: (g) => [
+      `INSERT INTO convites_admin (grupo_id, email, token_hash, criado_por, criado_em, expira_em)
+       VALUES ($1, 'intruso@exemplo.com', digest('intruso-' || $3, 'sha256'), $2, now(), now() + interval '7 days')`,
+      [g.grupo, conta(g), g.slug],
+    ],
+  },
   eventos_uso: {
     coluna: 'grupo_id',
     acesso: 'sem-grant',
@@ -144,4 +153,24 @@ export const CASOS: Record<string, Caso> = {
       [g.grupo],
     ],
   },
+};
+
+export interface CasoConta {
+  /**
+   * `propria`: pelada_app lê só as linhas da conta da sessão (pela `coluna`).
+   * `sem-grant`: pelada_app não lê nem escreve; só as funções SECURITY DEFINER tocam a tabela.
+   */
+  acesso: 'propria' | 'sem-grant';
+  /** Coluna que liga a linha à conta (`id` em `contas`, `conta_id` em `sessoes`). Só no acesso `propria`. */
+  coluna?: 'id' | 'conta_id';
+}
+
+/** Tabelas de conta, sem grupo_id (ACE-43 a ACE-45): isolamento por conta, com duas contas. */
+export const CASOS_CONTA: Record<string, CasoConta> = {
+  contas: { acesso: 'propria', coluna: 'id' },
+  sessoes: { acesso: 'propria', coluna: 'conta_id' },
+  tentativas_login: { acesso: 'sem-grant' },
+  links_conta: { acesso: 'sem-grant' },
+  envios_email: { acesso: 'sem-grant' },
+  pedidos_reset: { acesso: 'sem-grant' },
 };

@@ -286,11 +286,11 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] Uma conta existente antes da migration fica com `email_confirmado_em = criada_em`
-- [ ] Como `pelada_app`, a conta A lê só a própria linha de `contas` e as próprias `sessoes`; não lê `senha_hash`; não lê `tentativas_login`, `links_conta`, `envios_email` nem `pedidos_reset` (ACE-43, ACE-44)
-- [ ] `convites_admin` entra em `casos.ts` e passa nos cenários de isolamento por grupo; `rls.test.ts` e `roles.test.ts` incluem as tabelas novas; `auditoria` aceita `INSERT` e recusa `UPDATE` e `DELETE` (ACE-45, ACE-46)
-- [ ] `pelada_backup` lê todas as tabelas novas
-- [ ] Gate full passa
+- [x] Uma conta existente antes da migration fica com `email_confirmado_em = criada_em`
+- [x] Como `pelada_app`, a conta A lê só a própria linha de `contas` e as próprias `sessoes`; não lê `senha_hash`; não lê `tentativas_login`, `links_conta`, `envios_email` nem `pedidos_reset` (ACE-43, ACE-44)
+- [x] `convites_admin` entra em `casos.ts` e passa nos cenários de isolamento por grupo; `rls.test.ts` e `roles.test.ts` incluem as tabelas novas; `auditoria` aceita `INSERT` e recusa `UPDATE` e `DELETE` (ACE-45, ACE-46)
+- [x] `pelada_backup` lê todas as tabelas novas
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full

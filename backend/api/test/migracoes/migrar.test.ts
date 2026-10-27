@@ -69,11 +69,23 @@ describe('fixture A: 13 migrations aplicadas pelo runner antigo (FUN-09)', () =>
 
     expect(resultado).toEqual({ estado: 'legado', registradas: [LINHA_DE_BASE], aplicadas: NOVAS });
     expect(await registradasEmPgmigrations(a.url)).toEqual(TODAS);
-    expect(await comCliente(a.url, contarLinhas)).toEqual(antes);
+    // As tabelas que as migrations novas criam (conta-e-acesso) nascem vazias; as do legado ficam como estavam.
+    expect(await comCliente(a.url, contarLinhas)).toEqual({
+      ...antes,
+      convites_admin: 0,
+      envios_email: 0,
+      links_conta: 0,
+    });
     expect(antes['jogadores']).toBe(5);
     expect(antes['presencas']).toBe(5);
-    // A linha de base não rodou: as tabelas, colunas, restrições, índices e triggers continuam os mesmos.
-    expect(await comCliente(a.url, lerEsquema)).toEqual(esquemaAntes);
+    // A linha de base não rodou: as tabelas, colunas, restrições, índices e triggers do legado continuam os mesmos.
+    // Motivo da mudança (conta-e-acesso, T7): as migrations novas passaram a acrescentar schema; o que muda é só o
+    // que elas trazem, e o resultado é o mesmo schema de um banco vazio com todas as migrations.
+    const esquemaDepois = await comCliente(a.url, lerEsquema);
+    expect(esquemaDepois).toEqual(expect.arrayContaining(esquemaAntes));
+    const b = await novoBanco();
+    await aplicarMigracoes({ url: b.url });
+    expect(esquemaDepois).toEqual(await comCliente(b.url, lerEsquema));
   });
 
   it('rodar migrar de novo não aplica nada (estado gerenciado)', async () => {
