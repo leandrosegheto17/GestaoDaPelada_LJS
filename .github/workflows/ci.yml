@@ -27,6 +27,7 @@ jobs:
       # Os testes da API precisam de Postgres e rodam no job `banco`.
       - run: pnpm exec vitest run --dir test
       - run: pnpm -r --filter '!@pelada/api' test
+      - run: pnpm --filter @pelada/contrato checar-compatibilidade
       - run: node backend/scripts/checagens/checar-ids-tarefa.mjs
       - run: node backend/scripts/checagens/checar-urls-absolutas.mjs
       - run: node backend/scripts/checagens/checar-migracao-aditiva.mjs

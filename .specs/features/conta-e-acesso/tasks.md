@@ -191,9 +191,9 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] Remover um campo de `sessaoEu` numa cópia faz o script sair com código diferente de 0; acrescentar um campo opcional passa
-- [ ] `pnpm --filter @pelada/contrato checar-compatibilidade` existe e roda no job `base` do `ci.yml`
-- [ ] Gate quick passa: `pnpm --filter @pelada/contrato test`
+- [x] Remover um campo de `sessaoEu` numa cópia faz o script sair com código diferente de 0; acrescentar um campo opcional passa
+- [x] `pnpm --filter @pelada/contrato checar-compatibilidade` existe e roda no job `base` do `ci.yml`
+- [x] Gate quick passa: `pnpm --filter @pelada/contrato test`
 
 **Tests**: unit
 **Gate**: quick

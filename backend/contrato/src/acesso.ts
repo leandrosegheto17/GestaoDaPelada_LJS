@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { bytesUtf8, LIMITES } from './limites';
-import { email, nomeConta, senha } from './primitivos';
+import { bytesUtf8, LIMITES } from './limites.ts';
+import { email, nomeConta, senha } from './primitivos.ts';
 
 /** Versão dos termos de uso e da privacidade aceita no cadastro (ACE-01, ACE-58). */
 // SPEC_DEVIATION: a spec não fixa o valor; usa-se a data da aprovação do desenho como versão inicial (rascunho, ACE-60).
