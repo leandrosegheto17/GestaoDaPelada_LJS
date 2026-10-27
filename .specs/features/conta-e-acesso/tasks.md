@@ -723,10 +723,10 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] No banco temporário, o script cria a conta do dono e uma segunda execução troca a senha (ACE-61)
-- [ ] Host remoto sem `--alvo` é recusado sem alterar nada (ACE-62)
-- [ ] O lint `pelada/sem-escrita-dono` continua sem exceção nas rotas (ACE-63)
-- [ ] Gate quick passa: `pnpm test:checagens`
+- [x] No banco temporário, o script cria a conta do dono e uma segunda execução troca a senha (ACE-61)
+- [x] Host remoto sem `--alvo` é recusado sem alterar nada (ACE-62)
+- [x] O lint `pelada/sem-escrita-dono` continua sem exceção nas rotas (ACE-63)
+- [x] Gate quick passa: `pnpm test:checagens`
 
 **Tests**: integration
 **Gate**: full

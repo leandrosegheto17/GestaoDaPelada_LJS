@@ -7,6 +7,10 @@
   { "arquivo": "links.ts", "motivo": "Links de confirmação e recuperação da conta, achados pelo hash do token." },
   { "arquivo": "seed-local.ts", "motivo": "Seed do banco local: roda como owner, fora das requisições." },
   {
+    "arquivo": "definir-senha.ts",
+    "motivo": "Senha da conta pelo script do dono e pelo seed: roda como owner, fora das requisições."
+  },
+  {
     "arquivo": "convites.ts",
     "funcao": "ler",
     "motivo": "Parte só do token: o grupo vem do convite, dentro da função do banco."
