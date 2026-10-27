@@ -26,6 +26,8 @@ const EXCECOES = [
   'https://pnpm.io/',
   // deploy.yml: API da Cloudflare (conferência do Hyperdrive) e a validação de formato de URL_PUBLICA.
   'https://api.cloudflare.com/client/v4',
+  // Resend: API de envio dos e-mails de conta (infraestrutura/email/resend.ts).
+  'https://api.resend.com/emails',
   '=~ ^https://[A-Za-z0-9.-]+$',
   '(ex.: https://host)',
 ];

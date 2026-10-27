@@ -262,9 +262,9 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] Com `fetch` simulado: 200 vira `'enviado'`; 429 `daily_quota_exceeded` e 500 viram `'falhou'`, e o log só traz o status e o código, nunca o corpo nem o link (ACE-52, ACE-21)
-- [ ] O link do modelo é `${URL_PUBLICA}/confirmar#t=<token>` e não tem URL absoluta fixa (G-18)
-- [ ] Gate quick passa: `pnpm --filter @pelada/api test`
+- [x] Com `fetch` simulado: 200 vira `'enviado'`; 429 `daily_quota_exceeded` e 500 viram `'falhou'`, e o log só traz o status e o código, nunca o corpo nem o link (ACE-52, ACE-21)
+- [x] O link do modelo é `${URL_PUBLICA}/confirmar#t=<token>` e não tem URL absoluta fixa (G-18)
+- [x] Gate quick passa: `pnpm --filter @pelada/api test`
 
 **Tests**: unit
 **Gate**: quick
