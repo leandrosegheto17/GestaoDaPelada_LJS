@@ -1230,8 +1230,8 @@ T42 → T43 → T44
 **Requirement**: ACE-20
 **Done when**:
 
-- [ ] F1 (`ROTA_SESSAO_EXPIRADA = '/entrar'`) passa a falhar; suíte verde
-- [ ] Gate quick passa
+- [x] F1 (`ROTA_SESSAO_EXPIRADA = '/entrar'`) passa a falhar; suíte verde
+- [x] Gate quick passa
 
 **Tests**: unit
 **Gate**: quick
