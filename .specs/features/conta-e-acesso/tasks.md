@@ -937,8 +937,8 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] Os três estados com os textos da spec; axe sem violação
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Os três estados com os textos da spec; axe sem violação
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
