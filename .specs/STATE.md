@@ -119,3 +119,4 @@
 | Data | Fluxo | Item | Fase | Indicado | Usado |
 | --- | --- | --- | --- | --- | --- |
 | 2026-10-27 | 1, projeto novo | `conta-e-acesso` | 8, Preparação | Sonnet | Opus (escolha do usuário: seguir na mesma sessão) |
+| 2026-10-27 | 1, projeto novo | `conta-e-acesso` | 9, Construção | Sonnet | Opus (escolha do usuário: seguir na mesma sessão) |
