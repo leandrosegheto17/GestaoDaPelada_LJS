@@ -35,6 +35,15 @@ async function conteudo(tabela: string): Promise<string> {
   return `${rows[0]?.n}:${rows[0]?.h}`;
 }
 
+/** Conteúdo só das linhas de A (pela coluna da conta), visto pelo owner. */
+async function conteudoDeA(tabela: string, coluna: string): Promise<string> {
+  const { rows } = await cliente.query<{ h: string | null; n: string }>(
+    `SELECT md5(string_agg(t::text, '|' ORDER BY t::text)) AS h, count(*) AS n FROM ${tabela} t WHERE ${coluna} = $1`,
+    [A],
+  );
+  return `${rows[0]?.n}:${rows[0]?.h}`;
+}
+
 /** Tenta a escrita e devolve as linhas afetadas, ou o código do erro se for recusada. */
 async function escrever(sql: string, params: unknown[] = []): Promise<number | string> {
   await cliente.query('SAVEPOINT escrita');
@@ -102,6 +111,27 @@ describe.each(PROPRIAS)('isolamento por conta de %s (ACE-43, ACE-44)', (tabela, 
     });
     expect(depois).toBe(antes);
     expect(antes.startsWith('2:')).toBe(true);
+  });
+});
+
+describe.each(PROPRIAS)('%s: escrita sem WHERE de B não toca em A (ACE-43, ACE-44)', (tabela, caso) => {
+  // Com WHERE, a policy de leitura já esconde as linhas de A; sem WHERE só a policy de escrita as protege.
+  it('UPDATE e DELETE sem WHERE de B deixam as linhas de A iguais', async () => {
+    const coluna = caso.coluna ?? 'id';
+    const antes = await conteudoDeA(tabela, coluna);
+    const depois = await comContexto(cliente, { conta: B }, async () => {
+      const alterar =
+        tabela === 'contas'
+          ? await escrever("UPDATE contas SET nome = 'Invasor'")
+          : await escrever(`UPDATE ${tabela} SET ${coluna} = ${coluna}`);
+      expect(recusadaOuNenhuma(alterar) || alterar === 1).toBe(true);
+      const apagar = await escrever(`DELETE FROM ${tabela}`);
+      expect(recusadaOuNenhuma(apagar) || apagar === 1).toBe(true);
+      await cliente.query('RESET ROLE');
+      return conteudoDeA(tabela, coluna);
+    });
+    expect(antes.startsWith('1:')).toBe(true);
+    expect(depois).toBe(antes);
   });
 });
 
