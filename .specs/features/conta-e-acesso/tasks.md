@@ -443,9 +443,9 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] `sessoes.tocar` abre e fecha a própria transação e devolve o `conta_id` ou nulo
-- [ ] Cada função do repositório tem o caminho feliz e um de erro testados no Postgres local
-- [ ] Gate full passa
+- [x] `sessoes.tocar` abre e fecha a própria transação e devolve o `conta_id` ou nulo
+- [x] Cada função do repositório tem o caminho feliz e um de erro testados no Postgres local
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
