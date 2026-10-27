@@ -35,6 +35,8 @@ Implemente estas tarefas com a skill `tlc-spec-driven`: **acione-a pelo nome e s
 
 > **Registro da reorganização (2026-10-27, aprovada pelo usuário):** regra nova de tarefas (CLAUDE.md, seção Tarefas). Todas as 52 tarefas ganham `**Estimativa**` (aproximada nas concluídas: 2h para T6 a T11, T13, T14, T17, T18, T43 e T44; 1,5h para T27, T42 e T47; 45 min para T48 e T50; 1h nas demais). Nenhuma tarefa passa de 2h e nenhuma foi dividida. Entram T51 (conta com hash bcrypt gerado fora do `pgcrypto`, meta 5 da spec) e T52 (log sem segredo em `esqueci-senha` e `nova-senha`, ACE-21), lacunas não bloqueantes do verificador. T45 a T52 formam a Phase 10. Ações externas (branch Neon e Hyperdrive do spike, domínio no Resend, secrets, backup) ficam no runbook e no `STATE.md`, fora do `tasks.md`.
 
+> **Registro do aceite visual (2026-10-27, aceito pelo usuário):** galeria "Mockup × App" (84 comparações, maior diferença 0,65%, nenhuma acima de 1%). Aceitos sem ressalvas: os alinhamentos do mockup ao app (convite sem o nome de quem convidou, lista de grupos sem a recorrência, Minha conta carregando em branco, classe do botão de texto destrutivo) e as 12 comparações parciais. Verificador: PASS na volta 3. Auditoria de segurança: sem achado crítico ou alto; os 4 médios (SEC-CA-01 a 04) seguem como pendência obrigatória da fase 11.
+
 ---
 
 ## Test Coverage Matrix
