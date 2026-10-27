@@ -868,8 +868,8 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] Cada estado do mockup aparece com o texto da spec; axe sem violação
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Cada estado do mockup aparece com o texto da spec; axe sem violação
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
