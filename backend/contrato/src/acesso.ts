@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from './zod.ts';
 import { bytesUtf8, LIMITES } from './limites.ts';
 import { email, nomeConta, senha } from './primitivos.ts';
 

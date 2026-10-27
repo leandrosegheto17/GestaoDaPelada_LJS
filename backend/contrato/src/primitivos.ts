@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from './zod.ts';
 import { LIMITES, bytesUtf8 } from './limites.ts';
 
 /** E-mail normalizado: sem espaços nas pontas, em minúsculas, até 254 caracteres (ACE-03, ACE-05). */
