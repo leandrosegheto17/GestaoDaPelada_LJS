@@ -416,10 +416,10 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] Uma função de teste sem `SET search_path` faz o teste falhar (provado numa cópia)
-- [ ] `conta_definir_senha` não tem `EXECUTE` para `pelada_app`
-- [ ] A checagem do `crypt(` fora de `migracoes/` roda no `pnpm test:checagens` e no job `base`
-- [ ] Gate full passa
+- [x] Uma função de teste sem `SET search_path` faz o teste falhar (provado numa cópia)
+- [x] `conta_definir_senha` não tem `EXECUTE` para `pelada_app`
+- [x] A checagem do `crypt(` fora de `migracoes/` roda no `pnpm test:checagens` e no job `base`
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full

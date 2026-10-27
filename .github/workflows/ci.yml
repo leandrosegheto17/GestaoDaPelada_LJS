@@ -33,6 +33,7 @@ jobs:
       - run: node backend/scripts/checagens/checar-migracao-aditiva.mjs
       - run: node backend/scripts/checagens/checar-wrangler-deploy.mjs
       - run: node backend/scripts/checagens/checar-acoes-fixadas.mjs
+      - run: node backend/scripts/checagens/checar-crypt.mjs
       - uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2.3.9
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
