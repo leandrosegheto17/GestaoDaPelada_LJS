@@ -1243,8 +1243,10 @@ T42 → T43 → T44
 **Requirement**: ACE-54
 **Done when**:
 
-- [ ] `pnpm --filter @pelada/web visual` compara as t25 nos dois viewports com diferença abaixo de 1%
-- [ ] Gate build passa
+- [x] `pnpm --filter @pelada/web visual` compara as t25 nos dois viewports com diferença abaixo de 1%
+- [x] Gate build passa
+
+**Registro**: sem recortes. O mockup da t25 foi alinhado ao app (divergência já aprovada nas telas do módulo): nome na barra "Gestão da Pelada" (a página não tem grupo) e botão `botao--bloco`. Resposta nova: `respostas/acesso-erro-senha-atual-incorreta.json` (401 `senha_atual_incorreta`). Teste existente `telas-ativas.test.mjs`: o corte das 36 do módulo virou `slice(3, 39)`, a contagem do mapa passou a 39 e há um teste novo das três t25 (nenhuma asserção removida). Diferença: 0,13% (PC) e 0,40% (celular).
 
 **Tests**: e2e
 **Gate**: build

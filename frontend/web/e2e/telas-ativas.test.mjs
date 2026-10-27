@@ -40,13 +40,20 @@ describe('telas ativas da fundação', () => {
       .map((f) => f.replace(/\.html$/, ''))
       .sort();
     expect(doModulo).toHaveLength(36);
-    expect(ativas.slice(3).sort()).toEqual(doModulo);
+    expect(ativas.slice(3, 39).sort()).toEqual(doModulo);
+  });
+
+  // Motivo (T47, volta 1 do verificador, ACE-54): a t25 (Minha senha) é do mockup anterior, mas é tela da feature e
+  // entra na comparação; as asserções acima seguem valendo para as 36 do módulo, e esta fixa as acrescentadas.
+  it('a tela Minha senha (t25) também é comparada, nos três estados', () => {
+    const ativas = lerTelasAtivas(arquivo, nomesValidos(mapaDoMockup));
+    expect(ativas.slice(39)).toEqual(['t25-senha--vazio', 't25-senha--erro', 't25-senha--sucesso']);
   });
 
   it('as telas de acesso usam a rota real do app, com respostas de API, sem rota de vitrine', () => {
     const ativas = lerTelasAtivas(arquivo, nomesValidos(mapaDoMockup)).slice(3);
     const mapa = montarMapa(mapaDoMockup, ativas, MOCKUP, join(import.meta.dirname, 'resultado'));
-    expect(mapa.telas).toHaveLength(36);
+    expect(mapa.telas).toHaveLength(39);
     for (const tela of mapa.telas) {
       expect(tela.viewports).toEqual(['pc', 'celular']);
       expect(tela.rota).not.toMatch(/^\/vitrine\//);

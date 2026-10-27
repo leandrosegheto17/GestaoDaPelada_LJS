@@ -41,3 +41,6 @@ t32-conta--carregando
 t32-conta--excluir
 t32-conta--unico-admin
 t32-conta--excluida
+t25-senha--vazio
+t25-senha--erro
+t25-senha--sucesso
