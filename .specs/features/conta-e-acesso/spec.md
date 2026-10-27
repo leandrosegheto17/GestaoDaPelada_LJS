@@ -144,7 +144,7 @@ segurança e dos meus dados.
 
 1. WHEN a pessoa logada envia a senha atual correta e uma senha nova válida para `POST /api/conta/senha` THEN o sistema SHALL trocar a senha, encerrar as outras sessões da conta, manter a sessão atual e responder 204. [ACE-26]
 2. IF a senha atual está errada THEN o sistema SHALL responder 401 com o código `senha_atual_incorreta` e não trocar a senha. [ACE-27]
-3. WHEN a pessoa logada confirma a exclusão com a senha correta e não é a única admin de nenhum grupo não arquivado THEN o sistema SHALL apagar a conta, as sessões, os vínculos e os links pendentes, trocar o autor das linhas de `auditoria` por "conta excluída" sem nome nem e-mail, responder 204 e levar a tela para `/` com o aviso "Sua conta foi excluída". [ACE-28]
+3. WHEN a pessoa logada confirma a exclusão com a senha correta e não é a única admin de nenhum grupo não arquivado THEN o sistema SHALL apagar as sessões, os vínculos e os links pendentes, anonimizar a conta (sem nome, e-mail nem senha que entre; a auditoria passa a mostrar "Conta excluída" como autor), responder 204 e levar a tela para `/` com o aviso "Sua conta foi excluída". [ACE-28]
 4. IF a conta é a única admin de algum grupo não arquivado THEN o sistema SHALL responder 409 com o código `unico_admin` e a lista desses grupos (id e nome), sem apagar nada. [ACE-29]
 5. IF a senha informada na exclusão está errada THEN o sistema SHALL responder 401 com `senha_atual_incorreta` e não apagar nada. [ACE-30]
 

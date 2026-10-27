@@ -50,6 +50,38 @@
 - **Date**: 2026-10-24
 - **Status**: active
 
+### AD-007
+- **Decision**: A sessão é resolvida numa transação curta própria (`sessao_tocar`), antes do `comBanco`. A transação da rota já abre com `app.conta_id`, e as leituras continuam `READ ONLY`.
+- **Reason**: ADR-025 deixou em aberto que a busca da sessão acontece antes de existir conta. A renovação da inatividade (D7) precisa escrever, e o FUN-16 mantém GET e HEAD em `READ ONLY`.
+- **Trade-off**: Duas idas ao banco por requisição autenticada. O custo de CPU é medido no deploy (G-12).
+- **Scope**: API, todas as rotas com sessão
+- **Date**: 2026-10-27
+- **Status**: active
+
+### AD-008
+- **Decision**: Toda operação que acha uma conta sem sessão (entrar, cadastro, links, convites) passa por função `SECURITY DEFINER` com `search_path` fixo. O `pelada_app` só tem `EXECUTE` nelas e nunca lê a linha de outra conta nem um hash de senha.
+- **Reason**: Escolha do usuário na fase 7 da `conta-e-acesso`. Mesmo padrão do `grupos_visiveis()`, com o isolamento no banco.
+- **Trade-off**: Mais SQL nas migrations. O `crypt` sai do repositório de contas (G-02 alterado).
+- **Scope**: banco e repositórios de conta
+- **Date**: 2026-10-27
+- **Status**: active
+
+### AD-009
+- **Decision**: O `@pelada/contrato` usa zod (`>= 4.6.6`, SEC-007) com schemas `.strict()`, e o snapshot de compatibilidade (G-20) nasce na `conta-e-acesso`.
+- **Reason**: O legado usa zod e o web já consome o contrato. Um só lugar para limites e formas.
+- **Trade-off**: Dependência nova em produção, no Worker e no web.
+- **Scope**: contrato, API e web
+- **Date**: 2026-10-27
+- **Status**: active
+
+### AD-010
+- **Decision**: Tokens de link (confirmação, recuperação, convite) têm 32 bytes, vão no fragmento da URL (`#t=`) e chegam à API no corpo de um POST. O banco guarda só o SHA-256.
+- **Reason**: O fragmento não vai ao servidor, a log de acesso nem ao `Referer`.
+- **Trade-off**: O front precisa ler e apagar o fragmento. Links abertos sem JavaScript não funcionam.
+- **Scope**: e-mails, API e web
+- **Date**: 2026-10-27
+- **Status**: active
+
 ## Handoff
 
 ## Retomada
