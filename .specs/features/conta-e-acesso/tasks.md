@@ -467,10 +467,12 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] Duas remoções simultâneas dos dois últimos admins deixam um admin (ACE-40)
-- [ ] A remoção grava uma linha em `auditoria` na mesma transação (ACE-42)
-- [ ] A checagem `checar-grupo-id` (G-03) nasce aqui e roda no `pnpm test:checagens`
-- [ ] Gate full passa
+- [x] Duas remoções simultâneas dos dois últimos admins deixam um admin (ACE-40)
+- [x] A remoção grava uma linha em `auditoria` na mesma transação (ACE-42)
+- [x] A checagem `checar-grupo-id` (G-03) nasce aqui e roda no `pnpm test:checagens`
+- [x] Gate full passa
+
+> SPEC_DEVIATION (T14): a RLS de `contas` não deixa a `pelada_app` ler o nome e o e-mail dos outros admins (ACE-43), então `admins.listar` usa a função nova `admins_listar(grupo_id)` (`SECURITY DEFINER`, migration `1792843680000_conta-admins-listar.sql`, aditiva). `funcoes-definer.test.ts` ganhou o nome dela na lista esperada (só acréscimo).
 
 **Tests**: integration
 **Gate**: full

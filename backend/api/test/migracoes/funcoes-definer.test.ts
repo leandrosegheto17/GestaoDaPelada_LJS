@@ -55,7 +55,9 @@ function problemas(funcoes: Definer[]): string[] {
 
 describe('funções SECURITY DEFINER (AD-008)', () => {
   it('as funções de conta e grupos_visiveis existem como SECURITY DEFINER', async () => {
+    // admins_listar entrou na T14 (lista dos admins com nome e e-mail sob a RLS de contas; ver a migration).
     expect((await definers()).map((f) => f.nome)).toEqual([
+      'admins_listar',
       'conta_cadastrar',
       'conta_definir_senha',
       'conta_entrar',
