@@ -983,8 +983,8 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] A página mostra a versão e o selo "Rascunho para revisão"; axe sem violação
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] A página mostra a versão e o selo "Rascunho para revisão"; axe sem violação
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
