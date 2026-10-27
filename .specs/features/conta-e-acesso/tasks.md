@@ -819,8 +819,8 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] Com `#t=abc`, devolve `abc` e a URL fica sem fragmento; sem fragmento, devolve nulo
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Com `#t=abc`, devolve `abc` e a URL fica sem fragmento; sem fragmento, devolve nulo
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
