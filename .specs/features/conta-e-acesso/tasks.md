@@ -547,11 +547,11 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] Entrar certo responde 200 com nome e e-mail e o cookie do G-09; o banco guarda só o hash (ACE-09, ACE-10)
-- [ ] 401 `credenciais_invalidas`, 403 `email_nao_confirmado` e 429 `bloqueado_temporariamente` nos casos da spec (ACE-11 a ACE-14)
-- [ ] `GET /api/sessao` lista os grupos com vínculo; sem sessão, 401; sair apaga a sessão e responde 204 (ACE-17, ACE-18)
-- [ ] O log capturado do teste não contém a senha nem o token (ACE-21, G-08)
-- [ ] Gate full passa
+- [x] Entrar certo responde 200 com nome e e-mail e o cookie do G-09; o banco guarda só o hash (ACE-09, ACE-10)
+- [x] 401 `credenciais_invalidas`, 403 `email_nao_confirmado` e 429 `bloqueado_temporariamente` nos casos da spec (ACE-11 a ACE-14)
+- [x] `GET /api/sessao` lista os grupos com vínculo; sem sessão, 401; sair apaga a sessão e responde 204 (ACE-17, ACE-18)
+- [x] O log capturado do teste não contém a senha nem o token (ACE-21, G-08)
+- [x] Gate full passa
 
 **Tests**: e2e
 **Gate**: full

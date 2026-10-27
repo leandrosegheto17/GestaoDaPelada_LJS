@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
 import type { Db } from '../infraestrutura/db/index.ts';
+import { remetenteDoAmbiente } from '../infraestrutura/email/ambiente.ts';
+import type { Remetente } from '../infraestrutura/email/remetente.ts';
 import type { Env } from './env.ts';
 import { corpoGrande, erroInterno, naoEncontrado } from './erros.ts';
 import { semCache } from './middlewares/cache.ts';
@@ -11,6 +13,7 @@ import { semSniff } from './middlewares/sem-sniff.ts';
 import { carregarSessao, exigirSessao } from './middlewares/sessao.ts';
 import { exigirVinculo } from './middlewares/vinculo.ts';
 import { rotaHealth } from './rotas/health.ts';
+import { rotaSessao } from './rotas/sessao.ts';
 import { ligarSentry } from './sentry.ts';
 
 /** Maior corpo aceito em `/api/*`. */
@@ -39,6 +42,8 @@ export interface Variaveis {
   slugPublico?: string;
   /** SHA-256 do token da sessão da requisição (sair, trocar a senha mantendo a sessão atual). */
   tokenHash?: Uint8Array;
+  /** Quem envia os e-mails de conta: o do ambiente, ou o de teste. */
+  remetente: Remetente;
 }
 
 export type AppEnv = { Bindings: Env; Variables: Variaveis };
@@ -46,6 +51,8 @@ export type AppEnv = { Bindings: Env; Variables: Variaveis };
 export interface OpcoesApp {
   /** Substitui os limitadores de taxa do ambiente (testes). */
   limitadores?: { entrar?: Limitador; publico?: Limitador };
+  /** Substitui o remetente de e-mail do ambiente (testes). */
+  remetente?: Remetente;
 }
 
 /** Monta o app Hono. É uma fábrica: nada é guardado entre requisições. */
@@ -66,12 +73,17 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<AppEnv> {
   );
   app.use('/api/*', bodyLimit({ maxSize: LIMITE_CORPO_BYTES, onError: (c) => corpoGrande(c) }));
   // A sessão é resolvida numa transação curta própria antes da transação da rota (AD-007, ACE-47).
+  app.use('/api/*', async (c, proximo) => {
+    c.set('remetente', opcoes.remetente ?? remetenteDoAmbiente(c.env));
+    await proximo();
+  });
   app.use('/api/*', carregarSessao);
   app.use('/api/*', comBanco);
   // Toda rota de dado de grupo: sessão e vínculo com o grupo (G-03, ACE-41).
   app.use('/api/grupos/:grupoId/*', exigirSessao, exigirVinculo);
 
   app.route('/', rotaHealth);
+  app.route('/', rotaSessao);
 
   app.notFound((c) => naoEncontrado(c));
   app.onError((erro, c) => {

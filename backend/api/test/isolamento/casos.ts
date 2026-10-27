@@ -184,4 +184,13 @@ export type CasoRota = { tipo: 'grupo' } | { tipo: 'nao_se_aplica'; motivo: stri
 /** Chave: `MÉTODO /caminho`, como o Hono registra. O meta-teste exige um caso para cada rota e vice-versa. */
 export const CASOS_ROTAS: Record<string, CasoRota> = {
   'GET /api/health': { tipo: 'nao_se_aplica', motivo: 'Saúde do serviço: não lê dado de grupo nem de conta.' },
+  'POST /api/sessao/entrar': {
+    tipo: 'nao_se_aplica',
+    motivo: 'Sem sessão: entra com e-mail e senha pela função do banco; não lê dado de grupo.',
+  },
+  'GET /api/sessao': {
+    tipo: 'nao_se_aplica',
+    motivo: 'Dado da própria conta da sessão (RLS por conta) e os grupos em que ela tem vínculo; não é rota de grupo.',
+  },
+  'POST /api/sessao/sair': { tipo: 'nao_se_aplica', motivo: 'Apaga a sessão da própria conta (RLS por conta).' },
 };

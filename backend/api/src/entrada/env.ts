@@ -12,4 +12,8 @@ export interface Env {
   VERSAO: string;
   /** Opcional: sem ele, o Sentry fica desligado (FUN-24). Segredo do Worker, nunca no wrangler.jsonc. */
   SENTRY_DSN?: string | undefined;
+  /** Segredo do Worker: chave de API do Resend. Sem ela (e sem `EMAIL_DEV`), o envio de e-mail falha (ACE-52). */
+  RESEND_API_KEY?: string | undefined;
+  /** Endereço de remetente verificado no Resend. */
+  RESEND_REMETENTE?: string | undefined;
 }

@@ -4,6 +4,7 @@ import { exigirHostPermitido } from '../../src/infraestrutura/seguranca/trava-ho
 import { comCliente, urlDeTeste, urlDoBanco } from './banco.ts';
 import { BANCO_DO_WORKER } from './banco-worker.ts';
 import { gravarDoisGrupos } from './cenario-dois-grupos.ts';
+import { gravarGrupoIsolado } from './grupo-isolado.ts';
 
 async function comAdmin(acao: (admin: pg.Client) => Promise<unknown>): Promise<void> {
   await comCliente(urlDoBanco(urlDeTeste(), 'postgres'), async (admin) => {
@@ -27,6 +28,7 @@ export default async function preparar(): Promise<() => Promise<void>> {
   await aplicarMigracoes({ url });
   await comCliente(url, async (owner) => {
     await gravarDoisGrupos(owner);
+    await gravarGrupoIsolado(owner);
     await owner.query(`ALTER ROLE pelada_app LOGIN PASSWORD ${owner.escapeLiteral(senha)}`);
   });
 

@@ -27,6 +27,9 @@ export async function noBanco<T>(contaId: string | undefined, acao: (db: Db) => 
 
 export interface SessaoDeTeste {
   contaId: string;
+  /** E-mail e senha da conta, para entrar de novo pela rota. */
+  email: string;
+  senha: string;
   /** Token do cookie `__Host-sessao`. */
   token: string;
   /** SHA-256 do token (o que o banco guarda). */
@@ -45,10 +48,11 @@ const emailNovo = () => `sessao-${crypto.randomUUID()}@exemplo.com`;
  */
 export async function criarSessao(grupo?: IdsDoGrupo): Promise<SessaoDeTeste> {
   const sessao = await gerarToken();
+  const email = emailNovo();
   const link = await gerarToken();
   let contaId: string | null;
   if (grupo) {
-    await noBanco(grupo.conta, (db) => convites.criar(db, grupo.grupo, emailNovo(), link.hash));
+    await noBanco(grupo.conta, (db) => convites.criar(db, grupo.grupo, email, link.hash));
     const r = await noBanco(undefined, (db) =>
       convites.cadastrar(db, {
         tokenHash: link.hash,
@@ -62,7 +66,7 @@ export async function criarSessao(grupo?: IdsDoGrupo): Promise<SessaoDeTeste> {
   } else {
     await noBanco(undefined, (db) =>
       contas.cadastrar(db, {
-        email: emailNovo(),
+        email,
         nome: 'Pessoa Sessão',
         senha: SENHA,
         termosVersao: 'teste',
@@ -72,5 +76,12 @@ export async function criarSessao(grupo?: IdsDoGrupo): Promise<SessaoDeTeste> {
     contaId = await noBanco(undefined, (db) => links.confirmar(db, link.hash, sessao.hash));
   }
   if (!contaId) throw new Error('não foi possível criar a sessão de teste');
-  return { contaId, token: sessao.token, hash: sessao.hash, cookie: `__Host-sessao=${sessao.token}` };
+  return {
+    contaId,
+    email,
+    senha: SENHA,
+    token: sessao.token,
+    hash: sessao.hash,
+    cookie: `__Host-sessao=${sessao.token}`,
+  };
 }

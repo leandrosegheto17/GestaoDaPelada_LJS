@@ -7,3 +7,4 @@ export {
   type Db,
   type TransacaoDaRequisicao,
 } from './transacao-da-requisicao.ts';
+export { emTransacaoPropria } from './transacao-propria.ts';
