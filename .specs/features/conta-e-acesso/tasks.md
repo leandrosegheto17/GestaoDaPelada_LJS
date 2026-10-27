@@ -1077,8 +1077,8 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] Os três estados; 401 marca o campo "Senha atual"; axe sem violação
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Os três estados; 401 marca o campo "Senha atual"; axe sem violação
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
