@@ -1,8 +1,11 @@
+import type { Hono } from 'hono';
+import { inspectRoutes } from 'hono/dev';
 import pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { migrar } from '../../src/infraestrutura/db/migracoes/migrar.ts';
 import { criarBancoTemporario, type BancoTemporario } from '../apoio/banco.ts';
-import { CASOS } from './casos.ts';
+import { criarApp, type AppEnv } from '../../src/entrada/app.ts';
+import { CASOS, CASOS_ROTAS, type CasoRota } from './casos.ts';
 
 let banco: BancoTemporario;
 let cliente: pg.Client;
@@ -49,5 +52,66 @@ describe('a suíte de isolamento cobre toda tabela com grupo_id (FUN-17)', () =>
     } finally {
       await cliente.query('ROLLBACK');
     }
+  });
+});
+
+const PREFIXO_GRUPO = '/api/grupos/:grupoId/';
+
+/** Rotas registradas no app (sem os middlewares), como `MÉTODO /caminho`. */
+function rotasDoApp(app: Hono<AppEnv>): string[] {
+  return [
+    ...new Set(
+      inspectRoutes(app)
+        .filter((r) => !r.isMiddleware)
+        .map((r) => `${r.method} ${r.path}`),
+    ),
+  ].sort();
+}
+
+/** O que falta ou está errado entre as rotas do app e os casos de `CASOS_ROTAS`. */
+function problemasDasRotas(rotas: string[], casos: Record<string, CasoRota>): string[] {
+  const problemas: string[] = [];
+  for (const rota of rotas) if (!(rota in casos)) problemas.push(`${rota}: sem caso`);
+  for (const [rota, caso] of Object.entries(casos)) {
+    const caminho = rota.slice(rota.indexOf(' ') + 1);
+    if (!rotas.includes(rota)) problemas.push(`${rota}: caso sem rota`);
+    if (caso.tipo === 'grupo' && !caminho.startsWith(PREFIXO_GRUPO))
+      problemas.push(`${rota}: grupo fora de ${PREFIXO_GRUPO}`);
+    if (caso.tipo === 'nao_se_aplica' && caminho.startsWith(PREFIXO_GRUPO))
+      problemas.push(`${rota}: rota de grupo sem caso de grupo`);
+    if (caso.tipo === 'nao_se_aplica' && !caso.motivo.trim()) problemas.push(`${rota}: "não se aplica" sem motivo`);
+  }
+  return problemas;
+}
+
+describe('a suíte de isolamento cobre toda rota registrada no Hono (G-04, ACE-48)', () => {
+  it('toda rota do app tem caso, e todo caso é de uma rota que existe', () => {
+    const rotas = rotasDoApp(criarApp());
+    expect(rotas).toContain('GET /api/health');
+    expect(problemasDasRotas(rotas, CASOS_ROTAS)).toEqual([]);
+  });
+
+  it('uma rota nova sem caso é apontada', () => {
+    const app = criarApp();
+    app.post('/api/teste/sem-caso', (c) => c.json({ ok: true }));
+    expect(problemasDasRotas(rotasDoApp(app), CASOS_ROTAS)).toEqual(['POST /api/teste/sem-caso: sem caso']);
+  });
+
+  it('rota de grupo marcada como "não se aplica", caso de grupo fora do prefixo e caso sem motivo são apontados', () => {
+    const app = criarApp();
+    app.get('/api/grupos/:grupoId/coisa', (c) => c.json({ ok: true }));
+    app.get('/api/fora', (c) => c.json({ ok: true }));
+    app.get('/api/sem-motivo', (c) => c.json({ ok: true }));
+    const casos: Record<string, CasoRota> = {
+      ...CASOS_ROTAS,
+      'GET /api/grupos/:grupoId/coisa': { tipo: 'nao_se_aplica', motivo: 'errado' },
+      'GET /api/fora': { tipo: 'grupo' },
+      'GET /api/sem-motivo': { tipo: 'nao_se_aplica', motivo: ' ' },
+    };
+    expect(problemasDasRotas(rotasDoApp(app), casos)).toEqual([
+      'GET /api/grupos/:grupoId/coisa: rota de grupo sem caso de grupo',
+      'GET /api/fora: grupo fora de /api/grupos/:grupoId/',
+      'GET /api/sem-motivo: "não se aplica" sem motivo',
+    ]);
   });
 });

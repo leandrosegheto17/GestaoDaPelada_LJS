@@ -8,7 +8,8 @@ import { comBanco } from './middlewares/com-banco.ts';
 import { exigirCabecalhoPelada } from './middlewares/csrf.ts';
 import { criarLimiteTaxa, type Limitador } from './middlewares/limite-taxa.ts';
 import { semSniff } from './middlewares/sem-sniff.ts';
-import { carregarSessao } from './middlewares/sessao.ts';
+import { carregarSessao, exigirSessao } from './middlewares/sessao.ts';
+import { exigirVinculo } from './middlewares/vinculo.ts';
 import { rotaHealth } from './rotas/health.ts';
 import { ligarSentry } from './sentry.ts';
 
@@ -67,6 +68,8 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<AppEnv> {
   // A sessão é resolvida numa transação curta própria antes da transação da rota (AD-007, ACE-47).
   app.use('/api/*', carregarSessao);
   app.use('/api/*', comBanco);
+  // Toda rota de dado de grupo: sessão e vínculo com o grupo (G-03, ACE-41).
+  app.use('/api/grupos/:grupoId/*', exigirSessao, exigirVinculo);
 
   app.route('/', rotaHealth);
 

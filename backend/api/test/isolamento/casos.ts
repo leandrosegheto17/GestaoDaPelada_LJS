@@ -174,3 +174,14 @@ export const CASOS_CONTA: Record<string, CasoConta> = {
   envios_email: { acesso: 'sem-grant' },
   pedidos_reset: { acesso: 'sem-grant' },
 };
+
+/**
+ * Caso de cada rota registrada no Hono (G-04, ACE-48). `grupo`: rota de dado de grupo, sob
+ * `/api/grupos/:grupoId/`, atrás do `exigirVinculo`. `nao_se_aplica`: rota pública ou de sessão, com o motivo.
+ */
+export type CasoRota = { tipo: 'grupo' } | { tipo: 'nao_se_aplica'; motivo: string };
+
+/** Chave: `MÉTODO /caminho`, como o Hono registra. O meta-teste exige um caso para cada rota e vice-versa. */
+export const CASOS_ROTAS: Record<string, CasoRota> = {
+  'GET /api/health': { tipo: 'nao_se_aplica', motivo: 'Saúde do serviço: não lê dado de grupo nem de conta.' },
+};

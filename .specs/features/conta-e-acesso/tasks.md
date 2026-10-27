@@ -521,9 +521,9 @@ T42 → T43 → T44
 
 **Done when**:
 
-- [ ] Conta sem vínculo com o grupo recebe 404 numa rota de prova do grupo (ACE-41)
-- [ ] Registrar uma rota sem caso em `casos.ts` faz o meta-teste falhar (ACE-48)
-- [ ] Gate full passa
+- [x] Conta sem vínculo com o grupo recebe 404 numa rota de prova do grupo (ACE-41)
+- [x] Registrar uma rota sem caso em `casos.ts` faz o meta-teste falhar (ACE-48)
+- [x] Gate full passa
 
 **Tests**: e2e
 **Gate**: full
