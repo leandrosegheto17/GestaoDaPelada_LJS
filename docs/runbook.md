@@ -136,13 +136,41 @@ sido aplicadas, e as migrations são aditivas (o app anterior continua funcionan
    sem alterar nada.
 3. Para voltar ao banco de antes da migração, use o artefato cifrado `dump-predeploy-<run_id>` (seção 4), o único
    ponto de retorno: restaure-o na branch `dev` (ou num banco local) e confira a contagem de linhas.
-4. Só em emergência, e com confirmação específica, aponte a origem do Hyperdrive para a `dev` restaurada (o `id` está
-   em `hyperdrive[0].id` do `wrangler.jsonc`):
+4. Só em emergência, e com confirmação específica, a `dev` restaurada vira a produção temporária (seção 3.1). Para
+   apontar a origem do Hyperdrive para ela (o `id` está em `hyperdrive[0].id` do `wrangler.jsonc`):
    `pnpm --filter @pelada/api exec wrangler hyperdrive update <id> --origin-host <host> --origin-user pelada_app --origin-password <senha> --database pelada --caching-disabled`.
    Mantenha `--caching-disabled`. A senha na linha de comando fica no histórico do shell e aparece no `ps` enquanto o
    comando roda: comece o comando por um espaço com `HISTCONTROL=ignorespace`, ou no PowerShell desligue o histórico
    da sessão (`Set-PSReadLineOption -HistorySaveStyle SaveNothing`). Nunca cole o comando em chat nem em arquivo.
 5. Confira `GET /api/health` e a contagem de linhas (seção 4, passo 6).
+
+### 3.1 Emergência: a `dev` como produção temporária
+
+Quando a `main` perdeu dados e o app precisa voltar já, a `dev` serve de produção temporária (ADR-030). O procedimento
+é manual, cada passo com confirmação específica de quem opera, e o `pnpm restaurar` **nunca** é liberado para
+produção: a restauração vai sempre para a `dev`.
+
+1. **Restaure o dump cifrado na `dev`** (seção 4): o `dump-predeploy-<run_id>` do deploy que falhou, ou o backup
+   diário mais recente sem o dano, com `NEON_URL_DEV` e `pnpm restaurar --alvo teste`. Reaplique os grants e dê à
+   `pelada_app` da `dev` a mesma senha da origem do Hyperdrive (seção 4, passo 5).
+2. **Confira a contagem de linhas** da `dev` contra o que se espera do dump (seção 4, passo 6).
+3. **Aponte o Hyperdrive para a `dev`**: o comando da seção 3, passo 4, com o host direto da `dev` (sem `-pooler`),
+   `--origin-user pelada_app`, `--database pelada` e `--caching-disabled`. Confira `GET /api/health` e uma leitura
+   real pela tela. A partir daqui a `dev` é a produção: não rode ensaio, migração de teste nem "Reset from parent"
+   nela, e não dispare o `deploy.yml` (o secret `NEON_URL_MIGRACAO` ainda aponta para a `main`).
+4. **Volte ao padrão `main`/`dev`** por um destes caminhos, no console do Neon:
+   - **Promover:** torne a `dev` a branch padrão (Branches, `dev`, "Set as default"), renomeie a `main` antiga (ou
+     apague-a, só depois de um dump cifrado dela) e renomeie a `dev` para `main`; crie uma `dev` nova filha da `main`.
+     O host de cada branch é o do endpoint dela e não muda com o nome: a nova `main` tem o endpoint da antiga `dev`.
+     Troque `NEON_URL_MIGRACAO`, `NEON_URL_BACKUP`, `NEON_URL_ORIGEM` e `NEON_URL_DEV` para os hosts certos e confira
+     que a origem do Hyperdrive aponta para a nova `main`.
+   - **Reset:** restaure a `main` a partir do estado da `dev` pelo recurso de restauração de branch do console
+     (Branches, `main`, Restore, escolhendo a `dev` como origem), aponte o Hyperdrive de volta para a `main` e faça
+     "Reset from parent" na `dev`. Os hosts não mudam. Se o console não oferecer a `dev` como origem, use o promover.
+5. **Confira** `GET /api/health`, a contagem de linhas na `main` e um backup manual (`gh workflow run backup.yml --ref
+main`) verde antes de liberar o próximo deploy.
+6. **Registre** em `.specs/liberacao.md` a data, o artefato restaurado, o caminho escolhido (promover ou reset) e quem
+   confirmou cada passo.
 
 **O deploy ou a checagem de saúde falhou depois da migração:** o workflow roda `wrangler rollback` (e falha de
 verdade se o rollback falhar) e imprime o nome do artefato `dump-predeploy-<run_id>`. O banco já migrado serve à
