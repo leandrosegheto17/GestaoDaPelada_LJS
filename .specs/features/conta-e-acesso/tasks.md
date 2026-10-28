@@ -1641,9 +1641,9 @@ fora desta rodada: as defesas abaixo não mexem em telas além do aviso de T59.
 
 **Done when**:
 
-- [ ] Os três cenários do teste (bloqueia, zera no acerto, libera após 15 min) passam e falhariam sem a mudança
-- [ ] O bloqueio é por conta, não por IP, e não revela se a conta existe
-- [ ] `pnpm test` e `pnpm typecheck` passam
+- [x] Os três cenários do teste (bloqueia, zera no acerto, libera após 15 min) passam e falhariam sem a mudança
+- [x] O bloqueio é por conta, não por IP, e não revela se a conta existe
+- [x] `pnpm test` e `pnpm typecheck` passam
 
 **Tests**: integration
 **Gate**: quick

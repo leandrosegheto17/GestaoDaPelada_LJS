@@ -126,6 +126,8 @@ export async function gravarDoisGrupos(cliente: pg.ClientBase): Promise<void> {
         [slug],
       ],
       ['INSERT INTO pedidos_reset (conta_id, ultimo_pedido_em) VALUES ($1, now())', [conta]],
+      // T61 (ACE-70): falhas da senha atual por conta.
+      ['INSERT INTO falhas_senha_atual (conta_id, momento) VALUES ($1, now())', [conta]],
       [
         `INSERT INTO convites_admin (grupo_id, email, token_hash, criado_por, criado_em, expira_em)
          VALUES ($1, 'convidado-' || $2 || '@exemplo.com', digest($2 || '-convite', 'sha256'), $3, now(),

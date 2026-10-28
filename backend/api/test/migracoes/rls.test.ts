@@ -27,8 +27,16 @@ const COM_GRUPO_ID = [
 const LEGIVEIS = ['grupos', ...COM_GRUPO_ID.filter((t) => t !== 'auditoria' && t !== 'eventos_uso')];
 // Pelo slug público: as legíveis, menos convites_admin (traz o e-mail do convidado; a leitura exige conta).
 const LEGIVEIS_PELO_SLUG = LEGIVEIS.filter((t) => t !== 'convites_admin');
-// Tabelas de conta, sem grupo_id, com RLS própria (conta-e-acesso, ACE-45).
-const DE_CONTA = ['contas', 'envios_email', 'links_conta', 'pedidos_reset', 'sessoes', 'tentativas_login'];
+// Tabelas de conta, sem grupo_id, com RLS própria (conta-e-acesso, ACE-45). falhas_senha_atual entrou na T61 (ACE-70).
+const DE_CONTA = [
+  'contas',
+  'envios_email',
+  'falhas_senha_atual',
+  'links_conta',
+  'pedidos_reset',
+  'sessoes',
+  'tentativas_login',
+];
 const colunaGrupo = (t: string) => (t === 'grupos' ? 'id' : 'grupo_id');
 
 let banco: BancoTemporario;

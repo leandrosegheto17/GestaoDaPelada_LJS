@@ -124,3 +124,42 @@ describe('POST /api/conta/excluir', () => {
     expect(r.status).toBe(401);
   });
 });
+
+describe('bloqueio por conta após 5 falhas da senha atual (ACE-70)', () => {
+  // Cada pedido sai de um IP diferente: o bloqueio é por conta, e o limitador por IP não interfere.
+  let octeto = 0;
+  const ipNovo = () => `10.70.${Math.floor(++octeto / 250)}.${(octeto % 250) + 1}`;
+  const trocar = (cookie: string, senhaAtual: string) =>
+    pedir('POST', '/api/conta/senha', { senhaAtual, novaSenha: SENHA_NOVA }, { cookie, ip: ipNovo() });
+  const excluir = (cookie: string, senha: string) =>
+    pedir('POST', '/api/conta/excluir', { senha }, { cookie, ip: ipNovo() });
+  const BLOQUEIO = { erro: { codigo: 'bloqueado_temporariamente' } };
+
+  it('5 falhas na troca: a troca e a exclusão com a senha certa respondem 429 e nada muda', async () => {
+    const s = await criarSessao();
+    for (let i = 0; i < 5; i++) expect((await trocar(s.cookie, 'errada-errada-1')).status).toBe(401);
+
+    const troca = await trocar(s.cookie, s.senha);
+    expect(troca.status).toBe(429);
+    expect(troca.corpo).toMatchObject(BLOQUEIO);
+    const exclusao = await excluir(s.cookie, s.senha);
+    expect(exclusao.status).toBe(429);
+    expect(exclusao.corpo).toMatchObject(BLOQUEIO);
+    expect(exclusao.headers.get('Set-Cookie')).toBeNull();
+
+    // A senha não mudou e a conta não foi excluída: a sessão segue válida e a senha antiga entra.
+    expect((await pedir('GET', '/api/sessao', undefined, { cookie: s.cookie })).status).toBe(200);
+    expect((await pedir('POST', '/api/sessao/entrar', { email: s.email, senha: s.senha })).status).toBe(200);
+  });
+
+  it('5 falhas na exclusão bloqueiam a exclusão e a troca da mesma conta, e não outra conta', async () => {
+    const s = await criarSessao();
+    const outra = await criarSessao();
+    for (let i = 0; i < 5; i++) expect((await excluir(s.cookie, 'errada-errada-1')).status).toBe(401);
+
+    expect((await excluir(s.cookie, s.senha)).corpo).toMatchObject(BLOQUEIO);
+    expect((await trocar(s.cookie, s.senha)).corpo).toMatchObject(BLOQUEIO);
+
+    expect((await trocar(outra.cookie, outra.senha)).status).toBe(204);
+  });
+});

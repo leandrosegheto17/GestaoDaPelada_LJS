@@ -99,23 +99,30 @@ export interface DadosTrocarSenha {
   tokenSessaoHash: Uint8Array;
 }
 
-/** Troca a senha da conta da requisição. Falso se a senha atual não confere: nada muda (ACE-27). */
-export async function trocarSenha(db: Db, dados: DadosTrocarSenha): Promise<boolean> {
-  const { rows } = await sql<{ ok: boolean }>`
+/**
+ * Troca a senha da conta da requisição. `false` se a senha atual não confere: a falha fica gravada e nada mais muda
+ * (ACE-27). `'bloqueado'` depois de 5 falhas da senha atual da conta em 15 min: a senha nem é conferida (ACE-70).
+ * A falha só conta se a transação for confirmada: a rota chama numa transação própria.
+ */
+export async function trocarSenha(db: Db, dados: DadosTrocarSenha): Promise<boolean | 'bloqueado'> {
+  const { rows } = await sql<{ ok: boolean | null }>`
     SELECT conta_trocar_senha(${dados.senhaAtual}, ${dados.senhaNova}, ${dados.tokenSessaoHash}) AS ok
   `.execute(db);
-  return rows[0]?.ok === true;
+  const ok = rows[0]?.ok;
+  if (ok === null) return 'bloqueado';
+  return ok === true;
 }
 
 export interface ResultadoExcluir {
-  resultado: 'ok' | 'senha_incorreta' | 'unico_admin';
+  resultado: 'ok' | 'senha_incorreta' | 'unico_admin' | 'bloqueado';
   /** Com `unico_admin`, os grupos não arquivados em que a conta é a única admin (ACE-29). */
   grupos: { id: string; nome: string }[];
 }
 
 /**
  * Exclui (anonimiza) a conta da requisição (ACE-28 a ACE-30, ACE-69). A auditoria da exclusão é gravada pela
- * própria função do banco.
+ * própria função do banco. `bloqueado` depois de 5 falhas da senha atual da conta em 15 min (ACE-70); a falha só
+ * conta se a transação for confirmada.
  */
 export async function excluir(db: Db, senha: string): Promise<ResultadoExcluir> {
   const { rows } = await sql<{ resultado: ResultadoExcluir['resultado']; grupos: { id: string; nome: string }[] }>`

@@ -187,6 +187,8 @@ describe('roles (FUN-11)', () => {
     'pgmigrations',
     'links_conta',
     'envios_email',
+    // T61 (ACE-70): falhas da senha atual por conta.
+    'falhas_senha_atual',
   ])('pelada_app não lê nem apaga %s (sem grant de leitura)', async (tabela) => {
     await comoRole(cliente, 'pelada_app', async () => {
       expect(await codigoDoErro(cliente, `SELECT 1 FROM ${tabela}`)).toBe(SEM_PRIVILEGIO);
@@ -282,5 +284,6 @@ function todasAsTabelas_(): string[] {
     'convites_admin',
     'links_conta',
     'envios_email',
+    'falhas_senha_atual',
   ];
 }

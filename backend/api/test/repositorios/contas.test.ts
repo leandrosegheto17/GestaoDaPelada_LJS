@@ -214,6 +214,26 @@ describe('contas.excluir', () => {
     });
   });
 
+  it('5 falhas da senha atual: troca e exclusão devolvem "bloqueado" e nada muda (ACE-70)', async () => {
+    const { id, email } = await contaConfirmada();
+    const atual = await sessaoDe(email);
+    for (let i = 0; i < 5; i++) {
+      expect(await comoConta(id, (db) => contas.excluir(db, 'senha-errada-1'))).toEqual({
+        resultado: 'senha_incorreta',
+        grupos: [],
+      });
+    }
+    expect(
+      await comoConta(id, (db) =>
+        contas.trocarSenha(db, { senhaAtual: SENHA, senhaNova: 'senha-nova-123', tokenSessaoHash: atual }),
+      ),
+    ).toBe('bloqueado');
+    expect(await comoConta(id, (db) => contas.excluir(db, SENHA))).toEqual({ resultado: 'bloqueado', grupos: [] });
+    expect((await b.owner.query('SELECT excluida_em FROM contas WHERE id = $1', [id])).rows[0]).toEqual({
+      excluida_em: null,
+    });
+  });
+
   it('única admin de um grupo não arquivado: "unico_admin" com os grupos (id e nome) (ACE-29)', async () => {
     const { id } = await contaConfirmada();
     const grupo = await grupoCom([id], 'Grupo Solitário');

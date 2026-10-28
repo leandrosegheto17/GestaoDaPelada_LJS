@@ -65,7 +65,16 @@ const SEM_GRANT = Object.entries(CASOS_CONTA).filter(([, c]) => c.acesso === 'se
 describe('as tabelas de conta têm caso de isolamento (ACE-45)', () => {
   it('contas, sessoes, tentativas_login e as tabelas de apoio novas estão em CASOS_CONTA', () => {
     expect(Object.keys(CASOS_CONTA).sort()).toEqual(
-      ['contas', 'envios_email', 'links_conta', 'pedidos_reset', 'sessoes', 'tentativas_login'].sort(),
+      // falhas_senha_atual entrou na T61 (bloqueio da senha atual por conta, ACE-70).
+      [
+        'contas',
+        'envios_email',
+        'falhas_senha_atual',
+        'links_conta',
+        'pedidos_reset',
+        'sessoes',
+        'tentativas_login',
+      ].sort(),
     );
   });
 });
@@ -180,6 +189,7 @@ const UMA_COLUNA: Record<string, string> = {
   links_conta: 'usado_em',
   envios_email: 'enviado_em',
   pedidos_reset: 'resolvido_em',
+  falhas_senha_atual: 'momento',
 };
 
 describe.each(SEM_GRANT)('%s: só as funções do banco tocam (ACE-43, ACE-45)', (tabela) => {
