@@ -716,3 +716,115 @@ liberação: o usuário decide entre corrigir o SEC-CA-15 e estender a aceitaç�
   sessões abertas (que a recuperação já derrubava, ACE-24); o atacante pode recomeçar o bloqueio depois.
 - SEC-CA-16: quem divide o IPv4 ou o /48 com o atacante pode receber 429 no cadastro, no reenvio, no convite e no
   "esqueci a senha" por até 1 h; o login não é afetado. Acompanhar os 429 do teto depois da liberação.
+
+## Terceiro reteste (2026-10-28)
+
+**Escopo**: só a correção do SEC-CA-15, commit `a233d42` (T72): a migration
+`mig/1792844160000_conta-nova-senha-zera-falhas.sql` e o teste `test/migracoes/conta-nova-senha-zera-falhas.test.ts`.
+O `61dffdf` (T73) é só documentação. Os resíduos aceitos (oráculo na faixa de 80% a 100%, SEC-CA-14, SEC-CA-16 e os
+baixos SEC-CA-05 a 12) não são achados novos.
+**Modo**: leitura do código (migration, `conta_entrar`, rota `/api/sessao/nova-senha`, tela `NovaSenha.tsx`, limitador)
+e consultas `SELECT` ao catálogo do banco local (`conta-e-acesso-seguranca-db-1`, banco `pelada`). Nesta rodada não
+rodou nenhuma suíte nem sonda HTTP, o Worker não subiu e nenhum dado foi gravado. Ao fim, `tentativas_login` tinha 0
+linhas e `contas` tinha 1, sem mudança. Não houve acesso à produção, à Cloudflare nem a outros contêineres.
+
+### Resultado
+
+| Achado | Antes | Agora | Situação |
+| --- | --- | --- | --- |
+| SEC-CA-15 | Médio | Baixo (resíduo) | **Fechado como médio**: a recuperação dá ao dono uma saída real. Fica uma corrida contra o atacante que reage (abaixo) |
+| Novo | — | — | Nenhum achado novo. A correção não abriu caminho para zerar as falhas sem acesso à caixa de e-mail |
+
+### O dono volta a entrar depois da recuperação?
+
+- **Sim, contra o atacante que só renova o bloqueio no relógio.** `link_nova_senha` (`mig/1792844160000:18-33`) apaga
+  todas as linhas de `tentativas_login` do e-mail na mesma transação em que troca a senha. Com isso somem o bloqueio da
+  conta e o de todos os pares. Na consulta seguinte, `conta_entrar` (`mig/1792844040000:58-73`) não encontra 50 falhas
+  e confere a senha nova. O teste `conta-nova-senha-zera-falhas.test.ts:88` cobre esse caminho.
+- **Contra o atacante que sonda, a saída vira uma corrida, e o dono pode repeti-la.** O cenário original do SEC-CA-15
+  já supõe um atacante automatizado ("uma falha logo depois de o bloqueio vencer").
+  - Durante o bloqueio, as tentativas não são gravadas e respondem 429 com o código `bloqueadoTemporariamente`
+    (`entrada/rotas/sessao.ts:26-32`), diferente do 429 do limitador.
+  - Depois da recuperação, a próxima tentativa do atacante passa a responder 401. Esse é o sinal de que a vítima trocou
+    a senha. O atacante então manda mais 49 falhas de cerca de 10 /64 (5 por par, `LIMITE_ENTRAR` de 10/min por /64) e
+    volta a bloquear a conta.
+  - A troca de senha não abre sessão: a rota responde "Entre com a nova senha" (`sessao-recuperacao.ts:40`) e a tela leva
+    para `/entrar?aviso=senha-alterada` (`NovaSenha.tsx:75`). Ou seja, o dono precisa de um `conta_entrar` depois da
+    troca, e esse pedido entra na mesma disputa.
+  - A janela da vítima vai do commit da troca até a 50ª falha nova ser gravada. Ela soma o intervalo de sondagem do
+    atacante e cerca de 50 bcrypt de custo 12 executados um depois do outro: a trava `pg_advisory_xact_lock('entrar|'
+    || e-mail)` (`mig/1792844040000:38`) serializa as tentativas do mesmo e-mail, e a da vítima entra na mesma fila.
+    PREMISSA, não medida: cerca de 200 a 300 ms por bcrypt no Neon, o que dá uma janela da ordem de 10 a 20 s.
+  - Quem digita a senha à mão pode perder a corrida. Mesmo assim, cada nova recuperação abre outra janela, até o teto
+    de 20 pedidos de e-mail por hora por origem.
+- **Por que baixo**: antes da correção não havia saída, só a brecha de segundos, em momento imprevisível, entre o fim
+  do bloqueio e a falha seguinte. Agora quem abre a janela é a vítima, que pode repeti-la, e para manter o bloqueio o
+  atacante precisa ficar sondando sem parar (contra cerca de 50 requisições por hora antes). O registro no
+  THREAT-MODEL ("o atacante pode recomeçar o bloqueio depois") cobre esse resíduo em espírito. Fica registrado que o
+  "depois" pode ser questão de segundos e que o 401 avisa o atacante que a vítima trocou a senha.
+- **Para fechar a corrida, se o usuário quiser** (decisão dele):
+  - a nova senha pela recuperação abrir a sessão na hora, porque quem consumiu o link provou que tem a caixa de e-mail.
+    Não é o caso do SEC-CA-01, em que o link de confirmação abria sessão sem que a pessoa tivesse definido a senha;
+  - ou isentar do bloqueio por conta, por 1 h, o /64 que consumiu o link (o bloqueio do par continua valendo).
+
+### (a) Alguém sem acesso ao e-mail consegue zerar o contador?
+
+Não. O `DELETE` só roda depois do `UPDATE links_conta ... RETURNING`, e esse `UPDATE` exige um link do tipo
+`recuperacao`, não usado e no prazo (`mig/1792844160000:18-23`).
+
+- O token tem 32 bytes aleatórios e o banco guarda só o SHA-256 dele (`sessao/token.ts`). `token_hash` é único.
+- O link chega só ao e-mail da conta. Conta não confirmada recebe o link no mesmo endereço (`link_pedir_com_confirmacao`).
+  Por isso, quem cria uma conta com o e-mail da vítima e não confirma não recebe o link e não zera nada.
+- Link vencido ou já usado: `false`, sem `DELETE`. O teste `conta-nova-senha-zera-falhas.test.ts:124` cobre esse caso.
+- Maiúsculas e espaços: `contas.email` tem `CHECK (email = lower(btrim(email)))` (conferido no catálogo), e
+  `conta_entrar` grava `lower(btrim(p_email))`. As duas formas batem, e o `DELETE` atinge só o e-mail da conta dona do
+  link. Uma variação que normaliza para outro endereço é outro e-mail, com contador próprio, e não alcança a conta da
+  vítima.
+- O dono da caixa já é dono da conta, então zerar as falhas não dá a ele nada a mais. Cada recuperação devolve a
+  terceiros 50 tentativas contra a senha **nova**, e só quando a vítima decide recuperar: a vantagem é desprezível.
+
+### (b) O `DELETE` só acontece com a troca efetiva?
+
+Sim. A ordem dentro da função é consumir o link, `RETURN false` se ele for inválido, `UPDATE contas`, apagar as sessões
+e só então apagar as tentativas, tudo na mesma transação (`mig/1792844160000:18-33`). Se a conta não existir (o que não
+deve acontecer, pela FK de `links_conta`), `v_email` fica nulo e o `DELETE` não apaga nada.
+
+### (c) Corrida entre `conta_entrar` e `link_nova_senha`
+
+`link_nova_senha` não pega a trava `entrar|<e-mail>`. Os efeitos são pequenos:
+
+- Uma falha que `conta_entrar` gravou mas ainda não confirmou quando o `DELETE` roda continua na tabela. Como a trava
+  por e-mail deixa só um `conta_entrar` em andamento por vez, sobra no máximo uma falha. Ela não chega perto de 50.
+- Uma tentativa que começou antes do commit da troca pode ver as linhas antigas e responder `bloqueado`, ou conferir a
+  senha antiga. É passageiro: a tentativa seguinte já vê o estado novo.
+- **Informativo**: dá para haver *deadlock* entre o expurgo de linhas com mais de 24 h em `conta_entrar`
+  (`mig/1792844040000:40`, sem filtro de e-mail) e o `DELETE` por e-mail de `link_nova_senha`. Isso só acontece se
+  houver linhas com mais de 24 h desse e-mail, o que é raro, porque cada login apaga essas linhas. O Postgres desfaz
+  uma das duas transações. Se for a da troca, o link não é consumido e a pessoa tenta de novo. O mesmo padrão já
+  existia na exclusão de conta. Sem achado.
+
+### (d) Permissões (conferido no catálogo, sem achado)
+
+- `link_nova_senha(bytea, text)`: `SECURITY DEFINER`, `proconfig = search_path=public, pg_temp`, `EXECUTE` só para
+  `postgres` e `pelada_app`. `PUBLIC` não tem `EXECUTE`. O corpo aplicado tem o `DELETE FROM tentativas_login`, e a
+  migration `1792844160000` está registrada em `pgmigrations`.
+- `tentativas_login`: RLS com `FORCE` e uma única política (`SELECT` para `pelada_backup`). A `pelada_app` não tem
+  `SELECT` nem `DELETE` nela e não tem `CREATE` em `public`.
+- Owner local `postgres` (superusuário). Em produção, o owner tem `bypassrls`, como já foi conferido no segundo reteste.
+
+### (e) O que sobra de negação de acesso contra a vítima
+
+- **Sumiu**: o bloqueio renovável **sem saída**. A recuperação zera o bloqueio da conta e o dos pares.
+- **Fica** (resíduo baixo, acima): contra um atacante que sonda sem parar, cada recuperação abre uma janela da ordem de
+  segundos, e a vítima perde as sessões abertas em cada troca (ACE-24, como antes).
+- **Fica, sem mudança**: o atacante que divide o IPv4 com a vítima (CGNAT) pode esgotar o `LIMITE_ENTRAR` dela. Isso
+  já existia antes do T72.
+- O teste novo não cobre o atacante que volta a bloquear logo depois da recuperação. Essa cobertura só faz sentido
+  junto com uma das correções sugeridas acima.
+
+### Veredito do terceiro reteste
+
+**Sem crítico, alto ou médio.** O SEC-CA-15 deixa de ser médio: a recuperação libera o login e não pode ser acionada
+por quem não tem a caixa de e-mail. A correção não abriu brecha nova. Fica um resíduo **baixo**: contra um atacante
+automatizado que sonda, a saída é uma corrida de segundos que o dono pode repetir. Fechá-la (a recuperação abrir a
+sessão, ou isentar o /64 que consumiu o link) ou aceitá-la é decisão do usuário.
