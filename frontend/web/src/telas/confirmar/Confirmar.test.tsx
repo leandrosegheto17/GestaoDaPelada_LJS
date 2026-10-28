@@ -21,8 +21,9 @@ function abrirComToken(token = TOKEN, elemento = <Confirmar />) {
   return montarTela(elemento, '/confirmar');
 }
 
+// Mudança aprovada na fase de tarefas (T57/T59): ACE-06 novo, confirmar não abre sessão e leva a /entrar com o aviso.
 describe('Confirmar: confirmando (t30, ACE-06)', () => {
-  it('lê o token do fragmento, apaga o fragmento, mostra "Confirmando…" e vai a /app com a sessão aberta', async () => {
+  it('lê o token do fragmento, apaga o fragmento, mostra "Confirmando…" e vai a /entrar com o aviso, sem abrir sessão', async () => {
     let liberar: (r: Response) => void = () => undefined;
     const f = simularApi((url) =>
       url.endsWith('/api/conta/confirmar') ? new Promise<Response>((r) => (liberar = r)) : json(EU),
@@ -36,7 +37,9 @@ describe('Confirmar: confirmando (t30, ACE-06)', () => {
     await waitFor(() => expect(f).toHaveBeenCalled());
     expect(corpoEnviado(f)).toEqual({ token: TOKEN });
     liberar(new Response(null, { status: 204 }));
-    await waitFor(() => expect(roteador.state.location.pathname).toBe('/app'));
+    await waitFor(() => expect(roteador.state.location.pathname).toBe('/entrar'));
+    expect(roteador.state.location.search).toBe('?aviso=email-confirmado');
+    expect(f.mock.calls.some(([url]) => String(url).endsWith('/api/sessao'))).toBe(false);
   });
 
   it('no StrictMode o token continua sendo enviado uma vez', async () => {
@@ -49,7 +52,7 @@ describe('Confirmar: confirmando (t30, ACE-06)', () => {
         <Confirmar />
       </StrictMode>,
     );
-    await waitFor(() => expect(roteador.state.location.pathname).toBe('/app'));
+    await waitFor(() => expect(roteador.state.location.pathname).toBe('/entrar'));
     expect(f.mock.calls.filter(([url]) => String(url).endsWith('/api/conta/confirmar'))).toHaveLength(1);
   });
 
@@ -64,7 +67,7 @@ describe('Confirmar: confirmando (t30, ACE-06)', () => {
     const { roteador } = abrirComToken();
     const u = userEvent.setup();
     await u.click(await screen.findByRole('button', { name: 'Tentar de novo' }));
-    await waitFor(() => expect(roteador.state.location.pathname).toBe('/app'));
+    await waitFor(() => expect(roteador.state.location.pathname).toBe('/entrar'));
   });
 });
 

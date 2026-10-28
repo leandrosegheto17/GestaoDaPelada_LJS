@@ -130,6 +130,11 @@ describe('Entrar: avisos vindos da URL', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Senha alterada. Entre com a nova senha.');
   });
 
+  it('ACE-06: aviso=email-confirmado mostra "E-mail confirmado. Entre com a sua senha."', () => {
+    montarTela(<Entrar />, '/entrar?aviso=email-confirmado');
+    expect(screen.getByText('E-mail confirmado. Entre com a sua senha.')).toBeVisible();
+  });
+
   it('aviso desconhecido é ignorado', () => {
     montarTela(<Entrar />, '/entrar?aviso=qualquer');
     expect(screen.queryByRole('status')).toBeNull();

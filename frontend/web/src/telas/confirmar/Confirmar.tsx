@@ -1,7 +1,5 @@
-import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { ROTA_INICIAL } from '../../dados/destino';
 import { Botao } from '../../componentes/basicos/Botao';
 import { BotaoLink } from '../../componentes/basicos/BotaoLink';
 import { ErroEnvio } from '../../componentes/basicos/ErroEnvio';
@@ -11,7 +9,6 @@ import { Faixa } from '../../componentes/basicos/Faixa';
 import { CampoTexto } from '../../componentes/campos/CampoTexto';
 import { escrever, semCorpo } from '../../dados/cliente';
 import { ErroApi } from '../../dados/erros';
-import { chaveSessao, lerSessao } from '../../dados/sessao';
 import { ehEmailIndisponivel, TEXTO_EMAIL_INDISPONIVEL } from '../compartilhado/falhas';
 import { Formulario, PaginaAcesso } from '../compartilhado/PaginaAcesso';
 import { usarTokenDoLink } from '../compartilhado/usarTokenDoLink';
@@ -23,11 +20,10 @@ function ehLinkInvalido(erro: unknown): boolean {
   return erro instanceof ErroApi && (erro.status === 410 || erro.status === 422);
 }
 
-/** T30: confirma o e-mail pelo token do link (`#t=`) e leva a `/app` (ACE-06 a ACE-08). */
+/** T30: confirma o e-mail pelo token do link (`#t=`) e leva a `/entrar` com o aviso, sem abrir sessão (ACE-06 a ACE-08). */
 export function Confirmar() {
   const { pronto, token } = usarTokenDoLink();
   const navegar = useNavigate();
-  const cliente = useQueryClient();
   const iniciou = useRef(false);
 
   const [etapa, setEtapa] = useState<Etapa>('confirmando');
@@ -39,8 +35,7 @@ export function Confirmar() {
     setEtapa('confirmando');
     try {
       await escrever('POST', '/conta/confirmar', { token: valor }, semCorpo);
-      await cliente.fetchQuery({ queryKey: chaveSessao, queryFn: lerSessao, staleTime: 0 });
-      void navegar(ROTA_INICIAL, { replace: true });
+      void navegar('/entrar?aviso=email-confirmado', { replace: true });
     } catch (erro) {
       setEtapa(ehLinkInvalido(erro) ? 'invalido' : 'conexao');
     }

@@ -1592,10 +1592,10 @@ fora desta rodada: as defesas abaixo não mexem em telas além do aviso de T59.
 
 **Done when**:
 
-- [ ] Teste da rota prova que confirmar não devolve `Set-Cookie`
-- [ ] Teste da tela prova o redirecionamento para `/entrar` com o aviso
-- [ ] A alteração de teste existente tem motivo registrado (ACE-06 mudou) e foi aprovada na fase de tarefas
-- [ ] `pnpm test`, `pnpm --filter @pelada/web e2e` e `pnpm --filter @pelada/web visual` passam
+- [x] Teste da rota prova que confirmar não devolve `Set-Cookie`
+- [x] Teste da tela prova o redirecionamento para `/entrar` com o aviso
+- [x] A alteração de teste existente tem motivo registrado (ACE-06 mudou) e foi aprovada na fase de tarefas
+- [x] `pnpm test`, `pnpm --filter @pelada/web e2e` e `pnpm --filter @pelada/web visual` passam
 
 **Tests**: e2e
 **Gate**: full

@@ -30,10 +30,11 @@ function falhaDeEntrar(erro: unknown): Falha {
   return 'conexao';
 }
 
-/** Avisos que outras telas deixam na URL (`?aviso=`): sessão expirada (ACE-20) e senha trocada (ACE-24). */
+/** Avisos que outras telas deixam na URL (`?aviso=`): sessão expirada (ACE-20) senha trocada (ACE-24) e e-mail confirmado (ACE-06). */
 function AvisoDaUrl({ aviso }: { aviso: string | null }) {
   if (aviso === 'sessao-expirada') return <Faixa tipo="info">Sua sessão expirou. Entre de novo.</Faixa>;
   if (aviso === 'senha-alterada') return <Faixa tipo="sucesso">Senha alterada. Entre com a nova senha.</Faixa>;
+  if (aviso === 'email-confirmado') return <Faixa tipo="sucesso">E-mail confirmado. Entre com a sua senha.</Faixa>;
   return null;
 }
 

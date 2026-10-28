@@ -59,7 +59,7 @@ async function linkDoEmail(request: APIRequestContext, para: string, caminho: st
   return achado;
 }
 
-/** Cria uma conta pela API, confirma pelo link da caixa de dev e encerra a sessão que a confirmação abre. */
+/** Cria uma conta pela API, confirma pelo link da caixa de dev (sem sessão, ACE-06). */
 async function criarContaConfirmada(request: APIRequestContext, prefixo: string): Promise<string> {
   const email = emailNovo(prefixo);
   const criada = await request.post('/api/conta', {
@@ -93,7 +93,7 @@ async function novaPagina(browser: Browser, titulo: string): Promise<Page> {
   return contexto.newPage();
 }
 
-// ACE-01, ACE-06: cadastrar pela tela, abrir o link capturado e chegar a /app logado.
+// ACE-01, ACE-06: cadastrar pela tela, abrir o link capturado, ver o aviso em /entrar e entrar com a senha.
 test('cadastro: tela, link da caixa de dev e /app logado', async ({ page }) => {
   const email = emailNovo('cadastro');
   await page.goto('/cadastro');
@@ -106,6 +106,13 @@ test('cadastro: tela, link da caixa de dev e /app logado', async ({ page }) => {
 
   const link = await linkDoEmail(page.request, email, '/confirmar');
   await page.goto(link);
+  // ACE-06: confirmar não abre sessão; a pessoa cai em /entrar com o aviso e entra com a senha.
+  await expect(page).toHaveURL(/\/entrar\?aviso=email-confirmado$/);
+  await expect(page.getByText('E-mail confirmado. Entre com a sua senha.')).toBeVisible();
+  expect(await sessaoEstaAberta(page.request)).toBe(false);
+  await page.getByLabel('E-mail').fill(email);
+  await page.getByLabel('Senha').fill(SENHA);
+  await page.getByRole('button', { name: 'Entrar', exact: true }).click();
   await expect(page).toHaveURL(/\/app$/);
   await expect(page.getByRole('heading', { name: 'Seus grupos' })).toBeVisible();
   expect(await sessaoEstaAberta(page.request)).toBe(true);
