@@ -53,9 +53,9 @@ async function novaConta(): Promise<{ email: string; id: string }> {
   return { email, id };
 }
 
-const entrar = (email: string, senha: string, ip = novoHash()) =>
-  comoApp(cliente, {}, async () => {
-    const { rows } = await cliente.query<Entrada>('SELECT * FROM conta_entrar($1, $2, $3, $4)', [
+const entrar = (email: string, senha: string, ip = novoHash(), c: pg.Client = cliente) =>
+  comoApp(c, {}, async () => {
+    const { rows } = await c.query<Entrada>('SELECT * FROM conta_entrar($1, $2, $3, $4)', [
       email,
       senha,
       ip,
@@ -161,5 +161,33 @@ describe('conta_entrar: teto por conta somando os IPs (ACE-74)', () => {
     ]);
     expect((await entrar(outro, 'senha-errada')).resultado).toBe('invalida');
     expect(await entrar(outro, SENHA)).toMatchObject(BLOQUEADO);
+  });
+});
+
+describe('conta_entrar: teto por conta sob concorrência (ACE-74, T70)', () => {
+  // A trava é por e-mail, de qualquer IP: tentativas simultâneas da mesma conta, vindas de IPs diferentes, são
+  // avaliadas uma depois da outra. Se a trava fosse pelo par (e-mail, IP), as cinco leriam 49 falhas e passariam.
+  it('49 falhas e 5 tentativas erradas simultâneas de IPs diferentes: 1 invalida e 4 bloqueado', async () => {
+    const { email } = await novaConta();
+    await falhasDeOrigensDiferentes(email, 49, (i) => 50 - i);
+    const conexoes = await Promise.all(
+      Array.from({ length: 5 }, async () => {
+        const c = new pg.Client({ connectionString: banco.url });
+        await c.connect();
+        return c;
+      }),
+    );
+    try {
+      const rs = await Promise.all(conexoes.map((c) => entrar(email, 'senha-errada', novoHash(), c)));
+      const resultados = rs.map((r) => r.resultado).sort();
+      expect(resultados).toEqual(['bloqueado', 'bloqueado', 'bloqueado', 'bloqueado', 'invalida']);
+      const { rows } = await cliente.query<{ n: number }>(
+        'SELECT count(*)::int AS n FROM tentativas_login WHERE email = $1 AND NOT sucesso',
+        [email],
+      );
+      expect(rows[0]?.n).toBe(50);
+    } finally {
+      await Promise.all(conexoes.map((c) => c.end()));
+    }
   });
 });

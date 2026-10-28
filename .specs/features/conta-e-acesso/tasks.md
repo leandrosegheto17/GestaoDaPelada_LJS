@@ -1857,8 +1857,8 @@ Tratam os achados que o reteste de 2026-10-28 (`seguranca.md`, seção "Reteste 
 
 **Done when**:
 
-- [ ] O teste passa com a migration atual e falha com a trava em (e-mail, IP) (provar na cópia, sem commitar a mutação)
-- [ ] `pnpm test` e `pnpm typecheck` passam
+- [x] O teste passa com a migration atual e falha com a trava em (e-mail, IP) (provar na cópia, sem commitar a mutação)
+- [x] `pnpm test` e `pnpm typecheck` passam
 
 **Tests**: integration
 **Gate**: quick
