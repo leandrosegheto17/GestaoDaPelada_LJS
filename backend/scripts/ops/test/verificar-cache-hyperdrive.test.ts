@@ -72,6 +72,7 @@ describe('origemDoHyperdriveNoNeon (ADR-032)', () => {
     ['host local', resposta({ origin: { ...ORIGEM, host: 'localhost' } })],
     ['fora do Neon', resposta({ origin: { ...ORIGEM, host: 'banco.exemplo.com' } })],
     ['owner como origem (bypassrls)', resposta({ origin: { ...ORIGEM, user: 'pelada_owner' } })],
+    ['outro database', resposta({ origin: { ...ORIGEM, database: 'neondb' } })],
     ['usuário ausente', resposta({ origin: { ...ORIGEM, user: undefined } })],
     ['JSON inválido', '<html>502</html>'],
   ])('falha fechado: %s', (_nome, corpo) => {

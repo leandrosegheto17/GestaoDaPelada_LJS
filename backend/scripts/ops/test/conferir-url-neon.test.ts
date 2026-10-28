@@ -31,6 +31,7 @@ describe('conferir-url-neon (main)', () => {
     ['papel trocado', ['--papel', 'backup', '--executar'], OWNER],
     ['pooler', ['--papel', 'backup', '--executar'], BACKUP.replace('123456.', '123456-pooler.')],
     ['sem TLS', ['--papel', 'backup', '--executar'], BACKUP.replace('?sslmode=require', '')],
+    ['outro database', ['--papel', 'backup', '--executar'], BACKUP.replace('/pelada?', '/neondb?')],
     ['local', ['--papel', 'backup', '--executar'], 'postgres://pelada_backup_ro:x@localhost/pelada?sslmode=require'],
   ])('recusa: %s', (_nome, argv, url) => {
     expect(main(argv, { PG_URL: url })).toBe(1);

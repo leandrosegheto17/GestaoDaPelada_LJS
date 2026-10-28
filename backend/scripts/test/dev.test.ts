@@ -63,7 +63,7 @@ describe('pnpm dev (FUN-04)', () => {
     it('recusa host remoto antes de qualquer coisa', () => {
       expect(() =>
         ambienteDoDev({
-          DATABASE_URL: 'postgres://u:segredo@ep-x.sa-east-1.aws.neon.tech/neondb',
+          DATABASE_URL: 'postgres://u:segredo@ep-x.sa-east-1.aws.neon.tech/pelada',
           PELADA_APP_SENHA: 'x',
         }),
       ).toThrow(/só roda com o banco local/);
@@ -106,7 +106,7 @@ describe('pnpm dev (FUN-04)', () => {
 
   it('com host remoto, recusa sem conectar e sem vazar a senha', () => {
     const r = rodarDev({
-      DATABASE_URL: 'postgres://u:segredo@ep-x.sa-east-1.aws.neon.tech/neondb',
+      DATABASE_URL: 'postgres://u:segredo@ep-x.sa-east-1.aws.neon.tech/pelada',
       PELADA_APP_SENHA: 'x',
     });
     expect(r.status).toBe(1);

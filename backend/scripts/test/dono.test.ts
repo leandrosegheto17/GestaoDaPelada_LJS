@@ -70,7 +70,7 @@ describe('pnpm dono', () => {
   });
 
   it('recusa host remoto sem --alvo antes de conectar (ACE-62)', () => {
-    const r = rodar('postgres://u:segredo@ep-x.sa-east-1.aws.neon.tech/neondb', 'senha-dono-tres\n', '--email', EMAIL);
+    const r = rodar('postgres://u:segredo@ep-x.sa-east-1.aws.neon.tech/pelada', 'senha-dono-tres\n', '--email', EMAIL);
     expect(r.status).toBe(1);
     expect(r.stderr).toContain('informe --alvo producao ou --alvo teste');
     expect(r.stderr).not.toContain('segredo');

@@ -11,7 +11,7 @@ import { restaurar, type OpcoesRestaurar } from '../restaurar.ts';
 const script = fileURLToPath(new URL('../restaurar-cli.ts', import.meta.url));
 // Motivo da mudança (ADR-032): o destino remoto aceito passa a ser a conexão direta do owner no Neon (pelada_owner).
 const REMOTO = 'postgres://pelada_owner:segredo@ep-nova-123.sa-east-1.aws.neon.tech/pelada?sslmode=require';
-const PRODUCAO = 'postgres://dono:outra@ep-producao-9.sa-east-1.aws.neon.tech/neondb?sslmode=require';
+const PRODUCAO = 'postgres://dono:outra@ep-producao-9.sa-east-1.aws.neon.tech/pelada?sslmode=require';
 const LOCAL = 'postgres://postgres:senha-local@localhost:5432/restaurado';
 
 let pasta: string;
@@ -143,7 +143,7 @@ describe('restaurar: trava de host antes do pg_restore (SEC-009)', () => {
       ['pelo pooler num host com outro segmento de região', 'ep-producao-9-pooler.c-2.sa-east-1.aws.neon.tech'],
     ])('destino no endpoint de produção %s é recusado', async (_nome, host) => {
       const { base, chamadas } = opcoes({
-        url: `postgres://dono:outra@${host}/neondb?sslmode=require`,
+        url: `postgres://dono:outra@${host}/pelada?sslmode=require`,
         alvo: 'teste',
         urlOrigem: PRODUCAO,
         confirmar: () => host.toLowerCase(),
@@ -156,7 +156,7 @@ describe('restaurar: trava de host antes do pg_restore (SEC-009)', () => {
       const { base, chamadas } = opcoes({
         url: PRODUCAO,
         alvo: 'teste',
-        urlOrigem: 'postgres://dono:x@ep-producao-9-pooler.sa-east-1.aws.neon.tech./neondb',
+        urlOrigem: 'postgres://dono:x@ep-producao-9-pooler.sa-east-1.aws.neon.tech./pelada',
         confirmar: () => HOST_PRODUCAO,
       });
       await expect(restaurar(base)).rejects.toThrow(/mesmo endpoint/);

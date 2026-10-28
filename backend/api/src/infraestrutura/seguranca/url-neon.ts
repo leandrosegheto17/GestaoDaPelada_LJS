@@ -4,9 +4,13 @@ import { hostDaUrl, hostELocal, HostRecusado } from './trava-host.ts';
  * Validação única do destino no Neon (ADR-032), usada em todo caminho que toca o Neon: `pnpm migrar --alvo
  * producao|teste`, `pnpm dono --alvo ...`, `pnpm restaurar --alvo teste`, o dump cifrado (backup e deploy) e a origem do
  * Hyperdrive. Complementa a trava de host (`trava-host.ts`), que continua decidindo se um host remoto pode ser usado.
- * Recusa host local, host fora de `.neon.tech`, host do pooler (`-pooler`), URL sem TLS e usuário fora do papel.
+ * Recusa host local, host fora de `.neon.tech`, host do pooler (`-pooler`), URL sem TLS, database diferente de
+ * `pelada` e usuário fora do papel.
  * Nenhuma mensagem traz a URL nem a senha.
  */
+
+/** Database do Neon, o mesmo nas branches `main` e `dev` (ADR-032). */
+export const BANCO_NEON = 'pelada';
 
 /** Roles padronizadas por papel (`<projeto>_owner`, `<projeto>_app`, `<projeto>_backup_ro`). */
 export const ROLES_NEON = {
@@ -52,6 +56,7 @@ export function conferirDestinoNeon(partes: PartesDoDestino, papel: PapelNeon): 
   }
   const banco = typeof partes.banco === 'string' ? partes.banco : '';
   if (banco === '') throw new UrlNeonRecusada('Destino do Neon sem nome de banco.');
+  if (banco !== BANCO_NEON) throw new UrlNeonRecusada(`Database do Neon diferente de ${BANCO_NEON}.`);
   return { host, banco, usuario };
 }
 

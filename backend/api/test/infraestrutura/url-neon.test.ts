@@ -2,6 +2,7 @@
 import { describe, expect, it } from 'vitest';
 import { HostRecusado } from '../../src/infraestrutura/seguranca/trava-host.ts';
 import {
+  BANCO_NEON,
   conferirDestinoNeon,
   conferirUrlNeon,
   ROLES_NEON,
@@ -10,6 +11,18 @@ import {
 
 const HOST = 'ep-calmo-rio-123456.sa-east-1.aws.neon.tech';
 const url = (usuario: string, resto = `${HOST}/pelada?sslmode=require`) => `postgres://${usuario}:s3gr3do@${resto}`;
+
+describe('database padronizado', () => {
+  it('é pelada, o mesmo nas branches main e dev', () => {
+    expect(BANCO_NEON).toBe('pelada');
+  });
+
+  it.each(['neondb', 'postgres', 'Pelada', 'pelada_teste', 'pelada%2Foutro'])('recusa o database %s', (banco) => {
+    expect(() => conferirUrlNeon(url('pelada_owner', `${HOST}/${banco}?sslmode=require`), 'owner')).toThrow(
+      /Database do Neon diferente de pelada/,
+    );
+  });
+});
 
 describe('roles padronizadas', () => {
   it('owner, app e backup seguem <projeto>_owner, _app e _backup_ro', () => {
@@ -104,6 +117,7 @@ describe('conferirDestinoNeon (origem do Hyperdrive, sem URL)', () => {
     ['owner como origem', { host: HOST, banco: 'pelada', usuario: 'pelada_owner' }],
     ['usuário ausente', { host: HOST, banco: 'pelada' }],
     ['banco ausente', { host: HOST, usuario: 'pelada_app' }],
+    ['outro banco', { host: HOST, banco: 'neondb', usuario: 'pelada_app' }],
   ])('recusa: %s', (_nome, partes) => {
     expect(() => conferirDestinoNeon(partes, 'app')).toThrow(UrlNeonRecusada);
   });

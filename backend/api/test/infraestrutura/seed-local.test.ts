@@ -156,10 +156,10 @@ describe('pnpm seed (FUN-05)', () => {
   });
 
   it.each([
-    ['URL do Neon', 'postgres://u:segredo@ep-x.sa-east-1.aws.neon.tech/neondb', {}, []],
+    ['URL do Neon', 'postgres://u:segredo@ep-x.sa-east-1.aws.neon.tech/pelada', {}, []],
     [
       'URL do Neon mesmo com --alvo producao e CI=true',
-      'postgres://u:segredo@ep-x.aws.neon.tech/neondb',
+      'postgres://u:segredo@ep-x.aws.neon.tech/pelada',
       { CI: 'true' },
       ['--alvo', 'producao'],
     ],

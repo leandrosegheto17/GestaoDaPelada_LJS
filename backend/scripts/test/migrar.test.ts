@@ -32,7 +32,7 @@ describe('pnpm migrar', () => {
   });
 
   it('recusa host remoto sem --alvo antes de conectar (trava de host)', () => {
-    const r = rodarMigrar('postgres://u:segredo@ep-x.sa-east-1.aws.neon.tech/neondb');
+    const r = rodarMigrar('postgres://u:segredo@ep-x.sa-east-1.aws.neon.tech/pelada');
     expect(r.status).toBe(1);
     expect(r.stderr).toContain('informe --alvo producao ou --alvo teste');
     expect(r.stderr).not.toContain('segredo');

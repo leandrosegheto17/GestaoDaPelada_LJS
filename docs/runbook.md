@@ -85,8 +85,16 @@ caminho (`pelada_owner` na migração, no dono, na restauração e no dump do de
 `pelada_app` na origem do Hyperdrive). A mensagem de recusa nunca traz a URL nem a senha. A trava de host
 (`trava-host.ts`) continua valendo: host remoto exige `--alvo` e a confirmação digitada do host (ou `CI=true`).
 
-Formato de cada secret: `postgres://<role>:<senha>@<endpoint>.<região>.aws.neon.tech/<banco>?sslmode=require`, com a
+Formato de cada secret: `postgres://<role>:<senha>@<endpoint>.<região>.aws.neon.tech/pelada?sslmode=require`, com a
 string **direta** do console do Neon (Connect, sem "Connection pooling").
+
+**Database:** o Neon tem um database só, **`pelada`**, o mesmo nas branches `main` e `dev` (ADR-032); a validação
+recusa qualquer outro nome, inclusive o padrão `neondb`, e a origem do Hyperdrive também usa `pelada`
+(`--database pelada`). O banco local do `docker compose` também se chama `pelada`; os testes criam bancos temporários
+`teste_<aleatório>` no servidor de `DATABASE_URL_TESTE` (o `pelada_teste` da URL de exemplo é só o banco de conexão) e
+os apagam no fim. Se os dados de produção ainda estiverem noutro database do Neon, copie-os para `pelada` (dump cifrado
+e `pg_restore`, com confirmação específica) **antes** de trocar os secrets e a origem do Hyperdrive: apontar para um
+`pelada` vazio faria o `pnpm migrar` criar um schema novo e o app abrir sem dados.
 
 ### 2.3 Roles do banco
 
@@ -119,7 +127,7 @@ sido aplicadas, e as migrations são aditivas (o app anterior continua funcionan
    ponto de retorno: restaure-o na branch `dev` (ou num banco local) e confira a contagem de linhas.
 4. Só em emergência, e com confirmação específica, aponte a origem do Hyperdrive para a `dev` restaurada (o `id` está
    em `hyperdrive[0].id` do `wrangler.jsonc`):
-   `pnpm --filter @pelada/api exec wrangler hyperdrive update <id> --origin-host <host> --origin-user pelada_app --origin-password <senha> --database <banco> --caching-disabled`.
+   `pnpm --filter @pelada/api exec wrangler hyperdrive update <id> --origin-host <host> --origin-user pelada_app --origin-password <senha> --database pelada --caching-disabled`.
    Mantenha `--caching-disabled`. A senha na linha de comando fica no histórico do shell e aparece no `ps` enquanto o
    comando roda: comece o comando por um espaço com `HISTCONTROL=ignorespace`, ou no PowerShell desligue o histórico
    da sessão (`Set-PSReadLineOption -HistorySaveStyle SaveNothing`). Nunca cole o comando em chat nem em arquivo.
