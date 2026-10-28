@@ -18,33 +18,48 @@ async function codigoDoErro(resposta: Response): Promise<string> {
   }
 }
 
+/**
+ * Tempo máximo de um envio ao Resend (ACE-75; SEC-CA-13). Acima dele, o pedido é abortado e vira `falhou`: a rota
+ * responde 503 e a transação desfaz a reserva da cota, que não fica presa à espera de um provedor lento.
+ */
+export const TEMPO_MAXIMO_RESEND_MS = 10_000;
+
 export function remetenteResend(config: ConfigResend, buscar: typeof fetch = fetch): Remetente {
   return {
     async enviar(mensagem) {
-      let resposta: Response;
+      // AbortController com setTimeout (e não AbortSignal.timeout) para o relógio simulado dos testes valer.
+      const controle = new AbortController();
+      const relogio = setTimeout(() => controle.abort(), TEMPO_MAXIMO_RESEND_MS);
       try {
-        resposta = await buscar(ENDERECO, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${config.RESEND_API_KEY}`,
-            'Content-Type': 'application/json',
-            'Idempotency-Key': mensagem.chave,
-          },
-          body: JSON.stringify({
-            from: config.RESEND_REMETENTE,
-            to: [mensagem.para],
-            subject: mensagem.assunto,
-            text: mensagem.texto,
-            html: mensagem.html,
-          }),
-        });
-      } catch (erro) {
-        console.error(`email: falha de rede (${erro instanceof Error ? erro.name : 'erro'})`);
+        let resposta: Response;
+        try {
+          resposta = await buscar(ENDERECO, {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${config.RESEND_API_KEY}`,
+              'Content-Type': 'application/json',
+              'Idempotency-Key': mensagem.chave,
+            },
+            body: JSON.stringify({
+              from: config.RESEND_REMETENTE,
+              to: [mensagem.para],
+              subject: mensagem.assunto,
+              text: mensagem.texto,
+              html: mensagem.html,
+            }),
+            signal: controle.signal,
+          });
+        } catch (erro) {
+          const motivo = controle.signal.aborted ? 'tempo esgotado' : erro instanceof Error ? erro.name : 'erro';
+          console.error(`email: falha de rede (${motivo})`);
+          return 'falhou';
+        }
+        if (resposta.ok) return 'enviado';
+        console.error(`email: Resend recusou status=${resposta.status} codigo=${await codigoDoErro(resposta)}`);
         return 'falhou';
+      } finally {
+        clearTimeout(relogio);
       }
-      if (resposta.ok) return 'enviado';
-      console.error(`email: Resend recusou status=${resposta.status} codigo=${await codigoDoErro(resposta)}`);
-      return 'falhou';
     },
   };
 }

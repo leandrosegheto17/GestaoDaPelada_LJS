@@ -42,7 +42,8 @@ export function tetoDoEnvio(limite: number, categoria: CategoriaEnvio): number {
 
 /**
  * Envia o e-mail pelo remetente do app. Antes, reserva o envio no total do dia (fuso de São Paulo); acima do teto da
- * categoria, não envia (ACE-72). Verdadeiro se saiu; falso se o teto barrou ou o remetente falhou: a rota responde
+ * categoria, não envia (ACE-72); se o contador do dia fica travado por outro envio por mais de 2 s, também não (ACE-75).
+ * Verdadeiro se saiu; falso se o teto ou a trava barrou ou o remetente falhou (o Resend tem 10 s): a rota responde
  * 503 `email_indisponivel` e a transação desfaz o cadastro ou o pedido, e também a reserva, então pedir de novo
  * funciona e o envio que falhou não conta (ACE-52).
  */
@@ -51,9 +52,11 @@ export async function enviarModelo(
   envio: { para: string; modelo: Modelo; chave: string; categoria: CategoriaEnvio },
 ): Promise<boolean> {
   const teto = tetoDoEnvio(limiteEmailsDia(c.env.LIMITE_EMAILS_DIA), envio.categoria);
-  if (!(await cotaEmail.reservar(c.var.db, teto))) {
+  const reserva = await cotaEmail.reservar(c.var.db, teto);
+  if (reserva !== 'reservado') {
     // Só a categoria vai para o log: nunca o destino nem o conteúdo (ACE-52).
-    console.error(`email: teto diário de envios atingido (${envio.categoria})`);
+    const motivo = reserva === 'teto' ? 'teto diário de envios atingido' : 'contador do dia ocupado por mais de 2 s';
+    console.error(`email: ${motivo} (${envio.categoria})`);
     return false;
   }
   const { assunto, texto, html } = envio.modelo;

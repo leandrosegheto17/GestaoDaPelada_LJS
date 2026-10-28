@@ -1,16 +1,28 @@
 import { sql } from 'kysely';
 import type { Db } from '../index.ts';
 
-// Teto global de e-mails por dia (ACE-72; migration 1792843860000) e teto por origem em 1 h (ACE-73; migration
+// Teto global de e-mails por dia (ACE-72; migration 1792843860000; espera máxima pela trava, ACE-75) e teto por origem em 1 h (ACE-73; migration
 // 1792843980000), sobre as funções do banco.
 
+/** Resultado da reserva: `reservado` (somou 1), `teto` (o total do dia já chegou ao teto) ou `trava` (ACE-75). */
+export type ResultadoReserva = 'reservado' | 'teto' | 'trava';
+
+/** SQLSTATE do `lock_timeout` estourado (lock_not_available). */
+const TRAVA_OCUPADA = '55P03';
+
 /**
- * Reserva um envio no total do dia (fuso de São Paulo). Verdadeiro se o total estava abaixo do teto (e somou 1);
- * falso se o teto já foi atingido. A reserva some se a transação da requisição terminar em ROLLBACK.
+ * Reserva um envio no total do dia (fuso de São Paulo). A reserva some se a transação da requisição terminar em
+ * ROLLBACK. A função do banco espera no máximo 2 s pela trava da linha do dia (migration 1792844100000); acima disso,
+ * `trava`, e a transação da requisição fica abortada: a rota responde 503 sem consultar mais nada.
  */
-export async function reservar(db: Db, teto: number): Promise<boolean> {
-  const { rows } = await sql<{ ok: boolean }>`SELECT email_cota_reservar(${teto}::integer) AS ok`.execute(db);
-  return rows[0]?.ok === true;
+export async function reservar(db: Db, teto: number): Promise<ResultadoReserva> {
+  try {
+    const { rows } = await sql<{ ok: boolean }>`SELECT email_cota_reservar(${teto}::integer) AS ok`.execute(db);
+    return rows[0]?.ok === true ? 'reservado' : 'teto';
+  } catch (erro) {
+    if ((erro as { code?: unknown } | null)?.code === TRAVA_OCUPADA) return 'trava';
+    throw erro;
+  }
 }
 
 /**

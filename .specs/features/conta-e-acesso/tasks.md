@@ -1811,8 +1811,8 @@ Tratam os achados que o reteste de 2026-10-28 (`seguranca.md`, seção "Reteste 
 
 **Done when**:
 
-- [ ] Os dois testes falhariam sem o tempo máximo
-- [ ] `pnpm test` e `pnpm typecheck` passam
+- [x] Os dois testes falhariam sem o tempo máximo
+- [x] `pnpm test` e `pnpm typecheck` passam
 
 **Tests**: integration
 **Gate**: quick

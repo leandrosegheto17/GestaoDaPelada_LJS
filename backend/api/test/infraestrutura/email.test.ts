@@ -90,6 +90,47 @@ describe('remetenteResend', () => {
     expect(await remetenteResend(CONFIG, buscar).enviar(mensagem)).toBe('falhou');
     expect(logs()).not.toContain(TOKEN);
   });
+
+  describe('tempo máximo de 10 s (ACE-75; SEC-CA-13, T68)', () => {
+    afterEach(() => vi.useRealTimers());
+
+    /** Provedor que não responde: só termina quando o pedido é abortado. */
+    const semResposta = () =>
+      vi.fn<typeof fetch>(
+        (_url, init) =>
+          new Promise<Response>((_resolver, rejeitar) => {
+            init?.signal?.addEventListener('abort', () =>
+              rejeitar(new DOMException('O pedido foi abortado.', 'AbortError')),
+            );
+          }),
+      );
+
+    it('provedor que não responde: aborta aos 10 s e vira falhou', async () => {
+      vi.useFakeTimers();
+      const logs = espiarLogs();
+      const buscar = semResposta();
+      let resultado: string | undefined;
+      const envio = remetenteResend(CONFIG, buscar)
+        .enviar(mensagem)
+        .then((r) => (resultado = r));
+
+      await vi.advanceTimersByTimeAsync(9_999);
+      expect(resultado).toBeUndefined();
+      await vi.advanceTimersByTimeAsync(1);
+      await envio;
+      expect(resultado).toBe('falhou');
+      expect(buscar.mock.calls[0]?.[1]?.signal?.aborted).toBe(true);
+      expect(logs()).toContain('email:');
+      expect(logs()).not.toContain(TOKEN);
+    });
+
+    it('resposta dentro do prazo: enviado, e o relógio não fica armado', async () => {
+      vi.useFakeTimers();
+      const buscar = vi.fn<typeof fetch>().mockResolvedValue(resposta(200, { id: 'x' }));
+      expect(await remetenteResend(CONFIG, buscar).enviar(mensagem)).toBe('enviado');
+      expect(vi.getTimerCount()).toBe(0);
+    });
+  });
 });
 
 describe('remetenteMemoria', () => {
