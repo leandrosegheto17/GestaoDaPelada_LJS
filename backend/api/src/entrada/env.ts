@@ -26,4 +26,9 @@ export interface Env {
    * reenvio e convite param em 80%; "esqueci a senha" usa a cota inteira. Não é segredo.
    */
   LIMITE_EMAILS_DIA?: string | undefined;
+  /**
+   * Pedidos de e-mail de conta por origem (IPv4 ou /48 do IPv6) em 1 h (ACE-73): inteiro positivo, padrão 20 quando
+   * ausente ou inválido. O 21º pedido recebe 429. Não é segredo.
+   */
+  LIMITE_EMAILS_IP_HORA?: string | undefined;
 }

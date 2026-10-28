@@ -8,6 +8,7 @@ import { corpoGrande, erroInterno, naoEncontrado } from './erros.ts';
 import { semCache } from './middlewares/cache.ts';
 import { comBanco } from './middlewares/com-banco.ts';
 import { exigirCabecalhoPelada } from './middlewares/csrf.ts';
+import { limiteEmailsOrigem } from './middlewares/limite-emails-origem.ts';
 import { criarLimiteTaxa, type Limitador } from './middlewares/limite-taxa.ts';
 import { semSniff } from './middlewares/sem-sniff.ts';
 import { carregarSessao, exigirSessao } from './middlewares/sessao.ts';
@@ -38,6 +39,17 @@ export const ROTAS_LIMITE_ENTRAR = [
   // Rotas com sessão que verificam a senha atual (bcrypt): limitam por IP também (ACE-70).
   '/api/conta/senha',
   '/api/conta/excluir',
+] as const;
+
+/**
+ * Rotas que enviam e-mail de conta (POST): somam no teto de pedidos por IPv4 ou /48 em 1 h (ACE-73). O convite passa
+ * antes pela sessão e pelo vínculo: pedido sem sessão não conta.
+ */
+export const ROTAS_TETO_EMAILS_ORIGEM = [
+  '/api/conta',
+  '/api/conta/reenviar-confirmacao',
+  '/api/sessao/esqueci-senha',
+  '/api/grupos/:grupoId/admins/convites',
 ] as const;
 
 export interface Variaveis {
@@ -90,6 +102,8 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<AppEnv> {
   app.use('/api/*', comBanco);
   // Toda rota de dado de grupo: sessão e vínculo com o grupo (G-03, ACE-41).
   app.use('/api/grupos/:grupoId/*', exigirSessao, exigirVinculo);
+  // Teto de e-mails por origem, antes de a rota reservar a cota do dia (ACE-73).
+  for (const caminho of ROTAS_TETO_EMAILS_ORIGEM) app.use(caminho, limiteEmailsOrigem);
 
   app.route('/', rotaHealth);
   app.route('/', rotaSessao);

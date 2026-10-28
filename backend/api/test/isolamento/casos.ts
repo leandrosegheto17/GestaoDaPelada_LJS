@@ -177,6 +177,8 @@ export const CASOS_CONTA: Record<string, CasoConta> = {
   falhas_senha_atual: { acesso: 'sem-grant' },
   // T63 (ACE-72): total de e-mails do dia; só a função do teto toca.
   envios_email_dia: { acesso: 'sem-grant' },
+  // T66 (ACE-73): pedidos de e-mail por origem na última hora; só a função do teto por origem toca.
+  pedidos_email_origem: { acesso: 'sem-grant' },
 };
 
 /**

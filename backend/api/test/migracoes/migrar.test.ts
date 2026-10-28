@@ -78,6 +78,8 @@ describe('fixture A: 13 migrations aplicadas pelo runner antigo (FUN-09)', () =>
       falhas_senha_atual: 0,
       // Entrou na T63 (teto diário de e-mails, ACE-72): tabela nova, vazia.
       envios_email_dia: 0,
+      // Entrou na T66 (teto de e-mails por origem, ACE-73): tabela nova, vazia.
+      pedidos_email_origem: 0,
       links_conta: 0,
     });
     expect(antes['jogadores']).toBe(5);

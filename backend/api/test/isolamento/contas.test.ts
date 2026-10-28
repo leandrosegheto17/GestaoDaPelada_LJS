@@ -73,6 +73,8 @@ describe('as tabelas de conta têm caso de isolamento (ACE-45)', () => {
         'envios_email_dia',
         'falhas_senha_atual',
         'links_conta',
+        // pedidos_email_origem entrou na T66 (teto de e-mails por origem, ACE-73).
+        'pedidos_email_origem',
         'pedidos_reset',
         'sessoes',
         'tentativas_login',
@@ -193,6 +195,7 @@ const UMA_COLUNA: Record<string, string> = {
   pedidos_reset: 'resolvido_em',
   falhas_senha_atual: 'momento',
   envios_email_dia: 'total',
+  pedidos_email_origem: 'momento',
 };
 
 describe.each(SEM_GRANT)('%s: só as funções do banco tocam (ACE-43, ACE-45)', (tabela) => {

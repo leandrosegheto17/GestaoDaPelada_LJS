@@ -191,6 +191,8 @@ describe('roles (FUN-11)', () => {
     'falhas_senha_atual',
     // T63 (ACE-72): total de e-mails do dia; só a função do teto toca.
     'envios_email_dia',
+    // T66 (ACE-73): pedidos de e-mail por origem; só a função do teto por origem toca.
+    'pedidos_email_origem',
   ])('pelada_app não lê nem apaga %s (sem grant de leitura)', async (tabela) => {
     await comoRole(cliente, 'pelada_app', async () => {
       expect(await codigoDoErro(cliente, `SELECT 1 FROM ${tabela}`)).toBe(SEM_PRIVILEGIO);
@@ -289,5 +291,7 @@ function todasAsTabelas_(): string[] {
     'falhas_senha_atual',
     // T63 (ACE-72): teto diário de e-mails.
     'envios_email_dia',
+    // T66 (ACE-73): teto de e-mails por origem.
+    'pedidos_email_origem',
   ];
 }

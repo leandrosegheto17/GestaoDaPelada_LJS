@@ -1763,9 +1763,9 @@ Tratam os achados que o reteste de 2026-10-28 (`seguranca.md`, seção "Reteste 
 
 **Done when**:
 
-- [ ] Dois endereços do mesmo /48 compartilham a contagem; /48 diferentes não
-- [ ] O 21º pedido em 1 h recebe 429 sem consumir a cota de e-mail
-- [ ] `pnpm test` e `pnpm typecheck` passam
+- [x] Dois endereços do mesmo /48 compartilham a contagem; /48 diferentes não
+- [x] O 21º pedido em 1 h recebe 429 sem consumir a cota de e-mail
+- [x] `pnpm test` e `pnpm typecheck` passam
 
 **Tests**: unit + integration
 **Gate**: quick

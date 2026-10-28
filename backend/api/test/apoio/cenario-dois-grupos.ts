@@ -133,6 +133,11 @@ export async function gravarDoisGrupos(cliente: pg.ClientBase): Promise<void> {
         "INSERT INTO envios_email_dia (dia, total) VALUES (CASE $1 WHEN 'grupo-a' THEN date '2026-01-01' ELSE date '2026-01-02' END, 1)",
         [slug],
       ],
+      // T66 (ACE-73): pedidos de e-mail por origem. Também do app, não da conta: uma origem por grupo do cenário.
+      [
+        "INSERT INTO pedidos_email_origem (chave_hash, momento) VALUES (digest($1 || '-origem', 'sha256'), now())",
+        [slug],
+      ],
       [
         `INSERT INTO convites_admin (grupo_id, email, token_hash, criado_por, criado_em, expira_em)
          VALUES ($1, 'convidado-' || $2 || '@exemplo.com', digest($2 || '-convite', 'sha256'), $3, now(),

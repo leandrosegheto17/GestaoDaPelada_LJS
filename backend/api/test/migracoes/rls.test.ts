@@ -35,6 +35,8 @@ const DE_CONTA = [
   'envios_email_dia',
   'falhas_senha_atual',
   'links_conta',
+  // pedidos_email_origem entrou na T66 (teto de e-mails por origem, ACE-73).
+  'pedidos_email_origem',
   'pedidos_reset',
   'sessoes',
   'tentativas_login',

@@ -1,6 +1,7 @@
-// Critério: ACE-71 (IPv6 pelo prefixo /64; IPv4 inteiro; ausência de IP segue em `sem-ip`).
+// Critério: ACE-71 (IPv6 pelo prefixo /64; IPv4 inteiro; ausência de IP segue em `sem-ip`) e ACE-73 (/48 no teto de
+// e-mails por origem).
 import { describe, expect, it } from 'vitest';
-import { chaveDoIp } from '../../src/infraestrutura/sessao/chave-ip.ts';
+import { chaveDoIp, chaveDoIp48 } from '../../src/infraestrutura/sessao/chave-ip.ts';
 
 describe('chaveDoIp (ACE-71)', () => {
   it('IPv4 não muda', () => {
@@ -45,5 +46,33 @@ describe('chaveDoIp (ACE-71)', () => {
 
   it('a chave de IPv6 não se confunde com um IPv4', () => {
     expect(chaveDoIp('2001:db8::1')).toContain(':');
+  });
+});
+
+describe('chaveDoIp48 (ACE-73)', () => {
+  it('dois endereços do mesmo /48, em /64 diferentes, dão a mesma chave', () => {
+    expect(chaveDoIp48('2001:db8:1:2::1')).toBe(chaveDoIp48('2001:db8:1:ffff:aaaa::9'));
+    expect(chaveDoIp48('2001:db8:1::')).toBe(chaveDoIp48('2001:DB8:0001:0002:0003:0004:0005:0006'));
+  });
+
+  it('/48 diferentes dão chaves diferentes', () => {
+    expect(chaveDoIp48('2001:db8:1:2::1')).not.toBe(chaveDoIp48('2001:db8:2:2::1'));
+    expect(chaveDoIp48('2001:db8:1::1')).not.toBe(chaveDoIp48('2001:db9:1::1'));
+  });
+
+  it('IPv4 não muda e IPv4 mapeado vale como o IPv4', () => {
+    expect(chaveDoIp48('203.0.113.7')).toBe('203.0.113.7');
+    expect(chaveDoIp48('203.0.113.8')).not.toBe(chaveDoIp48('203.0.113.7'));
+    expect(chaveDoIp48('::ffff:203.0.113.7')).toBe('203.0.113.7');
+  });
+
+  it('ausência de IP dá sem-ip', () => {
+    expect(chaveDoIp48(undefined)).toBe('sem-ip');
+    expect(chaveDoIp48(null)).toBe('sem-ip');
+    expect(chaveDoIp48(' ')).toBe('sem-ip');
+  });
+
+  it('não se confunde com a chave /64 do mesmo endereço', () => {
+    expect(chaveDoIp48('2001:db8:1:2::1')).not.toBe(chaveDoIp('2001:db8:1:2::1'));
   });
 });
