@@ -60,7 +60,7 @@ jobs:
         id: migrar
         env:
           CI: 'true'
-          DATABASE_URL: ${{ secrets.NEON_URL_MIGRACAO }}
+          NEON_URL_MIGRACAO: ${{ secrets.NEON_URL_MIGRACAO }}
         run: pnpm migrar --alvo producao
 
       - name: Conferir o cache do Hyperdrive desligado

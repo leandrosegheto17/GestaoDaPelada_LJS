@@ -273,4 +273,19 @@ describe('restaurar-cli', () => {
     expect(r.stderr).toContain('informe --alvo producao ou --alvo teste');
     expect(r.stderr).not.toContain('segredo');
   });
+
+  // ADR-032: com --alvo teste o destino é NEON_URL_DEV (branch dev); DATABASE_URL vale só para o banco local.
+  it('com --alvo teste lê NEON_URL_DEV e ignora DATABASE_URL', () => {
+    const env: NodeJS.ProcessEnv = { ...process.env, DATABASE_URL: REMOTO, PATH: '' };
+    delete env['CI'];
+    delete env['NEON_URL_DEV'];
+    const r = spawnSync(process.execPath, [script, '--arquivo', dump, '--alvo', 'teste'], {
+      env,
+      encoding: 'utf8',
+      timeout: 60_000,
+    });
+    expect(r.status).toBe(1);
+    expect(r.stderr).toContain('Defina NEON_URL_DEV');
+    expect(r.stderr).not.toContain('segredo');
+  });
 });

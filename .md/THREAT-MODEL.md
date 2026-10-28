@@ -32,7 +32,7 @@ Mudanças em relação à última auditoria do projeto anterior (2026-10-22). Ev
 ## Fronteiras de confiança
 
 Navegador (sem confiança) -> Worker Cloudflare (`/api/*` primeiro, assets estáticos) -> Hyperdrive (TLS) -> Neon.
-Operador (máquina local, `DATABASE_URL` própria) -> Neon por script. GitHub Actions (ambiente `producao`) -> Cloudflare e Neon.
+Operador (máquina local, `NEON_URL_MIGRACAO` ou `NEON_URL_DEV` próprias, ADR-032) -> Neon por script. GitHub Actions (ambiente `producao`) -> Cloudflare e Neon.
 
 ## STRIDE por superfície
 
@@ -90,7 +90,7 @@ Entra com a feature `conta-e-acesso` (2026-10-27). As funções que acham uma co
 
 | Ameaça | Controle |
 |---|---|
-| T: gravar no banco errado | `exigirHostPermitido` (G-21), `DATABASE_URL` só do ambiente do operador, confirmação de backup digitada |
+| T: gravar no banco errado | `exigirHostPermitido` (G-21) e a validação única da URL do Neon (ADR-032), `NEON_URL_*` só do ambiente do operador, confirmação de backup digitada |
 | I: dado pessoal do legado no repositório ou no log | Telefone nunca lido; só o ano de nascimento; log só com contagens; arquivo de entrada fora do repositório (ver débito: `.gitignore` não cobre o arquivo do legado) |
 | T: carga parcial ou repetida | Transação única; recusa se o grupo já tem partida ou apelido repetido |
 | E: uso por agente em produção | A execução em produção é do usuário (ADR-021 item 6) |

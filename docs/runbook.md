@@ -65,10 +65,13 @@ restauração: se aparecer outra, apague-a no console do Neon (com confirmação
 | Branch | Papel                                                                                | Quem aponta para ela                                                                                                                            |
 | ------ | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | `main` | Produção (branch padrão do projeto)                                                  | origem do Hyperdrive (role `pelada_app`, cache desligado); secret `NEON_URL_MIGRACAO` (owner, deploy); secret `NEON_URL_BACKUP` (backup diário) |
-| `dev`  | Desenvolvimento e ensaios (restauração, migração antes de produção); filha da `main` | nenhum secret do GitHub; só o terminal de quem opera, com `--alvo teste`                                                                        |
+| `dev`  | Desenvolvimento e ensaios (restauração, migração antes de produção); filha da `main` | `NEON_URL_DEV` (owner), só no terminal de quem opera, com `--alvo teste`; nenhum secret do GitHub                                               |
 
-O banco local (`docker compose`) e os bancos temporários dos testes não são branches do Neon e usam `DATABASE_URL` e
-`DATABASE_URL_TESTE`. Para renovar a `dev` com os dados atuais da produção, use "Reset from parent" na `dev` (console
+Conexão com o Neon é sempre por `NEON_URL_*` (ADR-032): `NEON_URL_MIGRACAO` e `NEON_URL_BACKUP` (secrets) e
+`NEON_URL_ORIGEM` (só no terminal, para a restauração conferir a origem) apontam para a `main`; `NEON_URL_DEV`, para a
+`dev`. Com `--alvo producao` os scripts leem `NEON_URL_MIGRACAO`, com `--alvo teste` leem `NEON_URL_DEV`, e nunca
+`DATABASE_URL`. O banco local (`docker compose`) e os bancos temporários dos testes não são branches do Neon e usam
+`DATABASE_URL` e `DATABASE_URL_TESTE`. Para renovar a `dev` com os dados atuais da produção, use "Reset from parent" na `dev` (console
 do Neon, Branches); isso apaga o que havia nela.
 
 ### 2.2 Validação da URL do Neon
@@ -153,10 +156,10 @@ pessoais e a identidade privada do `age` não pode parar no git (o `.gitignore` 
    Na branch `dev` (filha da `main`) as roles já existem (são do servidor).
 5. **Restaure com o `pg_restore` do PostgreSQL 18** (a versão do `pg_dump` que gerou o dump, ADR-031; um `pg_restore` mais antigo não
    lê), sempre pelo script, que passa pela trava de host antes de escrever:
-   `DATABASE_URL="$URL_NOVA" URL_ORIGEM="$URL_ORIGEM" pnpm restaurar --arquivo <pasta-temporária>/dump.pgdump --alvo teste`
-   (no banco local, sem `--alvo`). Ele roda `pg_restore --no-owner --no-privileges --clean --if-exists` com a senha em
+   `NEON_URL_DEV="$URL_NOVA" NEON_URL_ORIGEM="$URL_ORIGEM" pnpm restaurar --arquivo <pasta-temporária>/dump.pgdump --alvo teste`
+   (no banco local, `DATABASE_URL="$URL_NOVA"` e sem `--alvo`). Ele roda `pg_restore --no-owner --no-privileges --clean --if-exists` com a senha em
    `PGPASSWORD`, fora da linha de comando. Recusa: host remoto sem `--alvo teste` e sem a confirmação digitada do host;
-   `--alvo producao` sempre; destino remoto sem `URL_ORIGEM` (a origem de produção, a mesma do passo 6); destino no
+   `--alvo producao` sempre; destino remoto sem `NEON_URL_ORIGEM` (a origem de produção, a mesma do passo 6); destino no
    mesmo endpoint do Neon que a origem (o pooler `-pooler` e o host com ponto final contam como o mesmo); parâmetro
    na consulta da URL fora de `sslmode`, `channel_binding`, `connect_timeout` e `application_name` (nada de
    `service`, `hostaddr` ou `password`). O `pg_restore` roda com ambiente limpo: `PGHOST`, `PGHOSTADDR`, `PGSERVICE`
@@ -256,7 +259,7 @@ Registre a data e quem confirmou cada item na entrada da liberação (`.specs/li
    `EMAIL_DEV` (com ele a caixa de desenvolvimento, `GET /api/dev/emails`, responderia). Confirmação: "`EMAIL_DEV`
    ausente".
 5. **Criar a conta do dono em produção (`dono.ts`).** Depois do primeiro deploy com as migrations de conta, rode, com
-   `DATABASE_URL` apontando para `pelada_owner` na `main` (só no terminal) e digitando a senha sem eco:
+   `NEON_URL_MIGRACAO` apontando para `pelada_owner` na `main` (só no terminal) e digitando a senha sem eco:
    `pnpm dono -- --email <e-mail do dono> --alvo producao`. O script recusa host remoto sem `--alvo producao`, pede a
    confirmação do host e nunca imprime a senha. É comando em banco de produção: **só com confirmação específica**, com o
    dump cifrado da seção 1 já feito. A segunda execução troca a senha do dono. Nenhuma rota escreve o papel de dono

@@ -75,9 +75,11 @@ describe('deploy.yml: ordem dos passos (FUN-40)', () => {
     expect(p.with.url).toBe('${{ secrets.NEON_URL_MIGRACAO }}');
     expect(p.with.chave).toBe('${{ secrets.BACKUP_CHAVE }}');
   });
-  it('a migração usa NEON_URL_MIGRACAO (role owner) e o alvo producao', () => {
+  // Motivo da mudança (ADR-032): DATABASE_URL vale só para o banco local; o deploy passa NEON_URL_MIGRACAO direto.
+  it('a migração usa NEON_URL_MIGRACAO (role owner) e o alvo producao, nunca DATABASE_URL', () => {
     const p = passo('pnpm migrar');
-    expect(p.env.DATABASE_URL).toBe('${{ secrets.NEON_URL_MIGRACAO }}');
+    expect(p.env.NEON_URL_MIGRACAO).toBe('${{ secrets.NEON_URL_MIGRACAO }}');
+    expect(JSON.stringify(documento)).not.toContain('DATABASE_URL');
     expect(p.run).toContain('--alvo producao');
   });
   it('a publicação injeta URL_PUBLICA e a versão (SHA)', () => {

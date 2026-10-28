@@ -13,7 +13,7 @@ import { conferirUrlNeon } from '../../api/src/infraestrutura/seguranca/url-neon
  * - a trava de host vale como no `pnpm migrar`: host local passa; host remoto exige `--alvo teste` e a confirmação
  *   digitada do host (ou `CI=true`);
  * - `--alvo producao` é sempre recusado: a restauração vai para uma branch nova ou um banco local, nunca para produção;
- * - destino remoto exige `URL_ORIGEM` (a origem de produção, a mesma do passo 6 do runbook), e destino no mesmo
+ * - destino remoto exige `NEON_URL_ORIGEM` (a origem de produção, a mesma do passo 6 do runbook), e destino no mesmo
  *   endpoint do Neon é recusado. A comparação é pelo identificador do endpoint (o primeiro rótulo do host, sem o
  *   sufixo `-pooler`, em minúsculas e sem ponto final), então o pooler e o host com ponto final contam como o mesmo.
  * A senha sai da URL e vai em `PGPASSWORD`, fora da linha de comando. Nenhuma mensagem traz a URL.
@@ -23,13 +23,13 @@ import { conferirUrlNeon } from '../../api/src/infraestrutura/seguranca/url-neon
  * `PG*` herdada (`PGHOSTADDR`, `PGSERVICE`...) chega a ele, só o `PGPASSWORD` e o mínimo para o processo rodar.
  */
 export interface OpcoesRestaurar {
-  /** URL do banco de destino (`DATABASE_URL`). */
+  /** URL do banco de destino (`DATABASE_URL` local ou `NEON_URL_DEV` com `--alvo teste`). */
   url: string | undefined;
   /** Dump já decifrado (`pg_dump -Fc`). */
   arquivo: string | undefined;
   alvo?: string | undefined;
   ci?: string | undefined;
-  /** URL da origem de produção (`URL_ORIGEM`), obrigatória quando o destino é remoto. */
+  /** URL da origem de produção (`NEON_URL_ORIGEM`), obrigatória quando o destino é remoto. */
   urlOrigem?: string | undefined;
   confirmar?: () => string | Promise<string>;
   /** Roda o comando com exatamente o ambiente recebido (já limpo) e devolve o código de saída. */
@@ -106,7 +106,7 @@ export async function restaurar(opcoes: OpcoesRestaurar): Promise<number> {
   if (!hostELocal(host)) {
     if (!opcoes.urlOrigem) {
       throw new HostRecusado(
-        'Destino remoto: informe URL_ORIGEM (a origem de produção) para a trava conferir o endpoint.',
+        'Destino remoto: informe NEON_URL_ORIGEM (a origem de produção) para a trava conferir o endpoint.',
       );
     }
     const endpoint = endpointDoHost(host);

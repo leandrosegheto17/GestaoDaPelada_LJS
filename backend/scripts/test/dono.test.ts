@@ -21,7 +21,11 @@ afterAll(async () => {
 });
 
 function rodar(url: string, entrada: string, ...args: string[]) {
-  const env: NodeJS.ProcessEnv = { ...process.env, DATABASE_URL: url };
+  return rodarCom({ DATABASE_URL: url }, entrada, ...args);
+}
+
+function rodarCom(variaveis: NodeJS.ProcessEnv, entrada: string, ...args: string[]) {
+  const env: NodeJS.ProcessEnv = { ...process.env, ...variaveis };
   delete env['CI'];
   return spawnSync(process.execPath, ['backend/scripts/dono.ts', ...args], {
     cwd: raiz,
@@ -75,9 +79,19 @@ describe('pnpm dono', () => {
   // ADR-032: com --alvo producao, só a conexão direta do owner no Neon, com TLS.
   it('recusa --alvo producao com a URL do pooler antes de conectar', () => {
     const url = 'postgres://pelada_owner:segredo@ep-x-pooler.sa-east-1.aws.neon.tech/pelada?sslmode=require';
-    const r = rodar(url, 'senha-dono-tres\n', '--email', EMAIL, '--alvo', 'producao');
+    const r = rodarCom({ NEON_URL_MIGRACAO: url }, 'senha-dono-tres\n', '--email', EMAIL, '--alvo', 'producao');
     expect(r.status).toBe(1);
     expect(r.stderr).toMatch(/pooler/);
+    expect(r.stderr).not.toContain('segredo');
+  });
+
+  // ADR-032: com --alvo producao a URL vem de NEON_URL_MIGRACAO; DATABASE_URL vale só para o banco local.
+  it('com --alvo producao ignora DATABASE_URL e pede NEON_URL_MIGRACAO', () => {
+    const url = 'postgres://pelada_owner:segredo@ep-x.sa-east-1.aws.neon.tech/pelada?sslmode=require';
+    const env = { DATABASE_URL: url, NEON_URL_MIGRACAO: '' };
+    const r = rodarCom(env, 'senha-dono-tres\n', '--email', EMAIL, '--alvo', 'producao');
+    expect(r.status).toBe(1);
+    expect(r.stderr).toContain('Defina NEON_URL_MIGRACAO');
     expect(r.stderr).not.toContain('segredo');
   });
 

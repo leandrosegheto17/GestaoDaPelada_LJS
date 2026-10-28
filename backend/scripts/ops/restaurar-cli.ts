@@ -1,19 +1,24 @@
 import { spawnSync } from 'node:child_process';
+import { UrlDoAlvoAusente, urlDoAlvo } from '../comum/alvo-neon.ts';
 import { argumento, confirmarHost } from '../comum/argumentos.ts';
 import { restaurar } from './restaurar.ts';
 
 /**
- * `pnpm restaurar --arquivo dump.pgdump [--alvo teste]`, com o destino em `DATABASE_URL` (runbook, seção 4).
- * `URL_ORIGEM` (produção) é obrigatória com destino remoto: recusa destino no mesmo endpoint do Neon. Opcional:
+ * `pnpm restaurar --arquivo dump.pgdump [--alvo teste]`, com o destino em `DATABASE_URL` (banco local) ou, com
+ * `--alvo teste`, em `NEON_URL_DEV` (branch `dev`), runbook, seção 4 e ADR-032.
+ * `NEON_URL_ORIGEM` (produção) é obrigatória com destino remoto: recusa destino no mesmo endpoint do Neon. Opcional:
  * `PG_RESTORE` (caminho do `pg_restore` 18).
  */
 async function principal(): Promise<number> {
+  const alvo = argumento('alvo');
+  const url = urlDoAlvo(alvo, process.env);
+  if (alvo === 'teste' && !url) throw new UrlDoAlvoAusente('NEON_URL_DEV');
   return restaurar({
-    url: process.env['DATABASE_URL'],
+    url,
     arquivo: argumento('arquivo'),
-    alvo: argumento('alvo'),
+    alvo,
     ci: process.env['CI'],
-    urlOrigem: process.env['URL_ORIGEM'],
+    urlOrigem: process.env['NEON_URL_ORIGEM'],
     confirmar: confirmarHost,
     comando: process.env['PG_RESTORE'],
     executar: (comando, args, env) => {
