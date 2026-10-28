@@ -215,6 +215,11 @@ Hash de senha importado de fora: o filtro de `conta_entrar` aceita `$2a$`, `$2b$
 funcionam os hashes `$2a$` (os que `gen_salt('bf', 12)` do pgcrypto gera). Um hash `$2b$` ou `$2y$` importado de fora entraria como
 senha errada: converta para `$2a$` antes de gravar.
 
+Login bloqueado: 5 senhas erradas do mesmo e-mail e IP bloqueiam esse par por 15 min (ACE-13), e 50 senhas erradas
+para o mesmo e-mail em 1 h, de quaisquer IPs, bloqueiam o login dele por 10 min (429, ACE-74), mesmo com a senha certa.
+Se alguém relatar que continua bloqueado, oriente o "esqueci a senha": a nova senha pela recuperação apaga as falhas de
+login do e-mail e libera o login na hora (ACE-76). As sessões abertas da conta caem na troca.
+
 ## 10. Cota e suspensão do Resend
 
 O plano gratuito envia **100 e-mails por dia** (`LIMITE_EMAILS_DIA`, padrão 100). A API conta os envios do dia, no fuso

@@ -700,3 +700,19 @@ testes automatizados. Não houve acesso à produção, à Cloudflare, ao Resend 
 trouxe um **médio novo (SEC-CA-15)**: o bloqueio por conta, que deveria ser curto, pode ser mantido sem fim, e a
 recuperação de senha não o desfaz. Há também um baixo novo (SEC-CA-16). Pelo AD-012, médio é pendência antes da
 liberação: o usuário decide entre corrigir o SEC-CA-15 e estender a aceitação do AD-013 a ele.
+
+### Correções depois do segundo reteste
+
+| Achado | Situação | Correção | Commits |
+| --- | --- | --- | --- |
+| SEC-CA-15 | **Corrigido** (resíduo abaixo) | A nova senha pela recuperação (`link_nova_senha`) apaga as tentativas de login do e-mail da conta, na mesma transação em que troca a senha: o bloqueio por conta e o do par não sobrevivem à recuperação, e o dono entra com a senha nova (ACE-76). Link inválido não apaga nada, e as falhas de outro e-mail ficam | `a233d42` (T72) |
+| SEC-CA-16 | **Aceito por ora, a decidir na liberação** | Sem mudança. Saída operacional já no runbook (seção 10): subir `LIMITE_EMAILS_IP_HORA` | — |
+
+**Resíduos aceitos, registrados no THREAT-MODEL 1a, linha D:**
+
+- SEC-CA-15: o bloqueio por conta continua renovável por quem manda cerca de 50 falhas por hora para o e-mail da
+  vítima (a 2ª correção sugerida, não renovar com falhas novas, não foi feita). A saída agora existe: a recuperação de
+  senha zera as falhas e o dono entra com a senha nova. O custo para a vítima é o "esqueci a senha" e a perda das
+  sessões abertas (que a recuperação já derrubava, ACE-24); o atacante pode recomeçar o bloqueio depois.
+- SEC-CA-16: quem divide o IPv4 ou o /48 com o atacante pode receber 429 no cadastro, no reenvio, no convite e no
+  "esqueci a senha" por até 1 h; o login não é afetado. Acompanhar os 429 do teto depois da liberação.
