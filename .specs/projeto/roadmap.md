@@ -5,7 +5,7 @@ As 8 features do MVP (AD-001), na ordem de construção. A **Situação** usa o 
 | # | Feature | Situação | Observação |
 |---|---|---|---|
 | 1 | `fundacao` | Concluída | Liberada em 2026-10-26 |
-| 2 | `conta-e-acesso` | Em andamento | Integrada na `main` (52 tarefas, verificador PASS, aceite visual); 4 médios de segurança pendentes para a fase 11 (AD-012); falta liberar |
+| 2 | `conta-e-acesso` | Concluída | Liberada em 2026-10-28 |
 | 3 | `grupos-e-elenco` | Não começada |  |
 | 4 | `partidas-e-ranking` | Não começada |  |
 | 5 | `simulador` | Não começada |  |
