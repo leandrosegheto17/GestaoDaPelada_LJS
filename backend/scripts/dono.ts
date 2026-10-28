@@ -1,6 +1,7 @@
 import { email as esquemaEmail, senha as esquemaSenha } from '../contrato/src/primitivos.ts';
 import { definirSenhaDaConta } from '../api/src/infraestrutura/db/repositorios/definir-senha.ts';
 import { exigirHostPermitido, HostRecusado } from '../api/src/infraestrutura/seguranca/trava-host.ts';
+import { conferirAlvoNeon } from './comum/alvo-neon.ts';
 import { argumento, confirmarHost } from './comum/argumentos.ts';
 import { lerSenhaSemEco } from './comum/senha.ts';
 
@@ -16,7 +17,9 @@ async function principal(): Promise<void> {
   const email = esquemaEmail.safeParse(argumento('email'));
   if (!email.success) throw new Abortar('Uso: pnpm dono -- --email <e-mail> [--alvo producao|teste]');
   const url = process.env['DATABASE_URL'];
-  await exigirHostPermitido({ url, alvo: argumento('alvo'), ci: process.env['CI'], confirmar: confirmarHost });
+  const alvo = argumento('alvo');
+  conferirAlvoNeon(url, alvo); // ADR-032: --alvo producao|teste só aceita a conexão direta do owner no Neon.
+  await exigirHostPermitido({ url, alvo, ci: process.env['CI'], confirmar: confirmarHost });
 
   const senha = await lerSenhaSemEco('Senha nova do dono (sem eco): ');
   if (!esquemaSenha.safeParse(senha).success) {

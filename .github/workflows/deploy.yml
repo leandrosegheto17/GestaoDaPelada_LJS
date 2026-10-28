@@ -3,7 +3,8 @@ name: deploy
 # Único lugar com `wrangler deploy` (conferido por backend/scripts/checagens/checar-wrangler-deploy.mjs).
 # Só produção, sem homologação. Disparo manual (Actions -> Run workflow), sempre pela main; o push não dispara deploy.
 # Ordem, parando no primeiro erro: URL_PUBLICA -> build do web -> dump cifrado -> migração -> cache do Hyperdrive ->
-# wrangler deploy -> saúde (/api/health com o SHA publicado). O ponto de retorno antes de migrar é só o dump cifrado:
+# wrangler deploy -> saúde (/api/health com o SHA publicado). Cada URL do Neon passa pela validação única antes de
+# conectar (ADR-032): o dump (action dump-cifrado), a migração (pnpm migrar --alvo produção) e a origem do Hyperdrive. O ponto de retorno antes de migrar é só o dump cifrado:
 # o Neon tem duas branches permanentes, `main` (produção) e `dev`, e nenhuma branch por deploy (ADR-030).
 # Runbook: docs/runbook.md.
 
@@ -52,6 +53,7 @@ jobs:
         with:
           url: ${{ secrets.NEON_URL_MIGRACAO }}
           chave: ${{ secrets.BACKUP_CHAVE }}
+          papel: owner
           nome-artefato: dump-predeploy-${{ github.run_id }}
 
       - name: Migrar o banco

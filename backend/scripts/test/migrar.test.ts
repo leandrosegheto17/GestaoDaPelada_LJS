@@ -33,4 +33,28 @@ describe('pnpm migrar', () => {
     expect(r.stderr).toContain('informe --alvo producao ou --alvo teste');
     expect(r.stderr).not.toContain('segredo');
   });
+
+  // ADR-032: com --alvo, o destino passa pela validação única do Neon antes da trava de host e de conectar.
+  it.each([
+    [
+      'producao',
+      'pooler',
+      'postgres://pelada_owner:segredo@ep-x-pooler.sa-east-1.aws.neon.tech/pelada?sslmode=require',
+      /pooler/,
+    ],
+    ['producao', 'sem TLS', 'postgres://pelada_owner:segredo@ep-x.sa-east-1.aws.neon.tech/pelada', /TLS/],
+    [
+      'producao',
+      'role do app',
+      'postgres://pelada_app:segredo@ep-x.sa-east-1.aws.neon.tech/pelada?sslmode=require',
+      /pelada_owner/,
+    ],
+    ['producao', 'host local', 'postgres://pelada_owner:segredo@localhost:5432/pelada?sslmode=require', /local/],
+    ['teste', 'fora do Neon', 'postgres://pelada_owner:segredo@banco.exemplo.com/pelada?sslmode=require', /neon\.tech/],
+  ])('--alvo %s com %s é recusado antes de conectar', (alvo, _nome, url, motivo) => {
+    const r = rodarMigrar(url, '--alvo', alvo);
+    expect(r.status).toBe(1);
+    expect(r.stderr).toMatch(motivo);
+    expect(r.stderr).not.toContain('segredo');
+  });
 });

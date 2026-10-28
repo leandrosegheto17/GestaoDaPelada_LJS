@@ -9,7 +9,8 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { restaurar, type OpcoesRestaurar } from '../restaurar.ts';
 
 const script = fileURLToPath(new URL('../restaurar-cli.ts', import.meta.url));
-const REMOTO = 'postgres://dono:segredo@ep-nova-123.sa-east-1.aws.neon.tech/neondb?sslmode=require';
+// Motivo da mudança (ADR-032): o destino remoto aceito passa a ser a conexão direta do owner no Neon (pelada_owner).
+const REMOTO = 'postgres://pelada_owner:segredo@ep-nova-123.sa-east-1.aws.neon.tech/pelada?sslmode=require';
 const PRODUCAO = 'postgres://dono:outra@ep-producao-9.sa-east-1.aws.neon.tech/neondb?sslmode=require';
 const LOCAL = 'postgres://postgres:senha-local@localhost:5432/restaurado';
 
@@ -81,6 +82,19 @@ describe('restaurar: trava de host antes do pg_restore (SEC-009)', () => {
     });
     await expect(restaurar(aceita.base)).resolves.toBe(0);
     expect(aceita.chamadas).toHaveLength(1);
+  });
+
+  // ADR-032: com --alvo teste confirmado e URL_ORIGEM, o destino ainda passa pela validação única do Neon.
+  it.each([
+    ['pooler', REMOTO.replace('ep-nova-123.', 'ep-nova-123-pooler.')],
+    ['sem TLS', REMOTO.replace('?sslmode=require', '')],
+    ['outra role', REMOTO.replace('pelada_owner', 'pelada_app')],
+    ['fora de .neon.tech', REMOTO.replace('neon.tech', 'exemplo.com')],
+  ])('destino remoto recusado pela validação do Neon: %s', async (_nome, url) => {
+    const host = new URL(url).hostname;
+    const { base, chamadas } = opcoes({ url, alvo: 'teste', urlOrigem: PRODUCAO, confirmar: () => host });
+    await expect(restaurar(base)).rejects.toThrow();
+    expect(chamadas).toEqual([]);
   });
 
   it('--alvo producao é sempre recusado, mesmo com CI=true e confirmação certa', async () => {

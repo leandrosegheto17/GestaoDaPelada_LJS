@@ -7,7 +7,7 @@ com as features `planos-e-cobranca` e seguintes.
 
 Nomes usados: Worker novo `gestaodapelada`, Worker antigo `pelada`, environments do GitHub `producao` e `backup`, roles do banco
 `pelada_owner` (owner: migração e DDL, tem `bypassrls` no Neon), `pelada_app` (runtime, sem bypass de RLS) e
-`pelada_backup_ro` (somente leitura, backup) (seção 2.2), branches do Neon `main` (produção) e `dev` (seção 2.1).
+`pelada_backup_ro` (somente leitura, backup) (seção 2.3), branches do Neon `main` (produção) e `dev` (seção 2.1).
 
 ## 1. Antes do primeiro deploy (obrigatório, uma vez)
 
@@ -30,7 +30,8 @@ Registre a data e quem confirmou cada item na entrada da liberação (`.specs/li
   workflow). O push não dispara deploy. Não há homologação. Duas execuções juntas: a segunda espera a primeira.
 - **Ordem do workflow**, parando no primeiro erro: (1) `URL_PUBLICA` conferida; (2) build do web; (3) dump cifrado
   (`dump-predeploy-<run_id>`), o único ponto de retorno antes de migrar; (4) migração com `NEON_URL_MIGRACAO`
-  (`pnpm migrar --alvo producao`); (5) cache do Hyperdrive conferido como desligado; (6) `wrangler deploy` com
+  (`pnpm migrar --alvo producao`); (5) cache do Hyperdrive conferido como desligado e a origem dele
+  conferida (conexão direta do Neon, role `pelada_app`); (6) `wrangler deploy` com
   `URL_PUBLICA` e `VERSAO` (o SHA); (7) `GET /api/health` = 200 com `versao` igual ao SHA do commit. O deploy não cria
   nem apaga branch no Neon (ADR-030).
 - Se o build ou a conferência de `URL_PUBLICA` falhar, nada em produção mudou. Se a migração falhar, o
@@ -70,7 +71,21 @@ O banco local (`docker compose`) e os bancos temporários dos testes não são b
 `DATABASE_URL_TESTE`. Para renovar a `dev` com os dados atuais da produção, use "Reset from parent" na `dev` (console
 do Neon, Branches); isso apaga o que havia nela.
 
-### 2.2 Roles do banco
+### 2.2 Validação da URL do Neon
+
+Todo caminho que toca o Neon passa pela mesma validação (`backend/api/src/infraestrutura/seguranca/url-neon.ts`,
+ADR-032) antes de conectar: o dump cifrado do deploy e do backup (action `dump-cifrado`), `pnpm migrar` e `pnpm dono`
+com `--alvo`, `pnpm restaurar` com destino remoto e a origem do Hyperdrive no deploy. Ela recusa host local, host fora
+de `.neon.tech`, host do pooler (`-pooler`), URL sem TLS (`sslmode=require`, `verify-ca` ou `verify-full`), parâmetro
+na URL fora de `sslmode`, `channel_binding`, `connect_timeout` e `application_name`, e usuário diferente da role do
+caminho (`pelada_owner` na migração, no dono, na restauração e no dump do deploy; `pelada_backup_ro` no backup;
+`pelada_app` na origem do Hyperdrive). A mensagem de recusa nunca traz a URL nem a senha. A trava de host
+(`trava-host.ts`) continua valendo: host remoto exige `--alvo` e a confirmação digitada do host (ou `CI=true`).
+
+Formato de cada secret: `postgres://<role>:<senha>@<endpoint>.<região>.aws.neon.tech/<banco>?sslmode=require`, com a
+string **direta** do console do Neon (Connect, sem "Connection pooling").
+
+### 2.3 Roles do banco
 
 Padrão `<projeto>_owner`, `<projeto>_app` e `<projeto>_backup_ro` (ADR-032):
 

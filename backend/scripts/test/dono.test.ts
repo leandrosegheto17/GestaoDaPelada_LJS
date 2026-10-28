@@ -72,6 +72,15 @@ describe('pnpm dono', () => {
     expect(r.stderr).not.toContain('segredo');
   });
 
+  // ADR-032: com --alvo producao, só a conexão direta do owner no Neon, com TLS.
+  it('recusa --alvo producao com a URL do pooler antes de conectar', () => {
+    const url = 'postgres://pelada_owner:segredo@ep-x-pooler.sa-east-1.aws.neon.tech/pelada?sslmode=require';
+    const r = rodar(url, 'senha-dono-tres\n', '--email', EMAIL, '--alvo', 'producao');
+    expect(r.status).toBe(1);
+    expect(r.stderr).toMatch(/pooler/);
+    expect(r.stderr).not.toContain('segredo');
+  });
+
   it('recusa sem --email', () => {
     const r = rodar(banco.url, 'senha-dono-tres\n');
     expect(r.status).toBe(1);

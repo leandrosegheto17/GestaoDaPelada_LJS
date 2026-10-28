@@ -132,6 +132,29 @@ describe('backup.yml e a action (FUN-46)', () => {
     expect(passos.every((p) => p.if === undefined)).toBe(true);
   });
 
+  // ADR-032: a URL do Neon passa pela validação única antes de qualquer conexão do pg_dump.
+  it('a action confere a URL do Neon antes do dump, com o papel recebido', () => {
+    const acao = lerYaml('.github/actions/dump-cifrado/action.yml');
+    expect(acao.inputs.papel.required).toBe(true);
+    const passosAcao = acao.runs.steps;
+    const conferir = passosAcao.findIndex((p) => p.run?.includes('conferir-url-neon-cli.ts'));
+    const dump = passosAcao.findIndex((p) => p.run?.includes('dump-cifrado.sh'));
+    expect(conferir).toBeGreaterThanOrEqual(0);
+    expect(conferir).toBeLessThan(dump);
+    const passo = passosAcao[conferir];
+    expect(passo.env.PG_URL).toBe('${{ inputs.url }}');
+    expect(passo.run).toContain('--papel "$PAPEL" --executar');
+    expect(passo.run).not.toContain('inputs.url');
+    expect(passosAcao.slice(0, conferir).some((p) => p.uses?.startsWith('actions/setup-node@'))).toBe(true);
+  });
+
+  it('o backup usa o papel backup e o deploy o papel owner', () => {
+    const dump = passos.find((p) => p.uses === './.github/actions/dump-cifrado');
+    expect(dump.with.papel).toBe('backup');
+    const deploy = lerYaml('.github/workflows/deploy.yml').jobs.deploy.steps;
+    expect(deploy.find((p) => p.uses === './.github/actions/dump-cifrado').with.papel).toBe('owner');
+  });
+
   it('não corre em paralelo consigo mesmo nem cancela o anterior', () => {
     expect(documento.concurrency['cancel-in-progress']).toBe(false);
   });

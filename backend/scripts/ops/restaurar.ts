@@ -5,6 +5,7 @@ import {
   hostELocal,
   HostRecusado,
 } from '../../api/src/infraestrutura/seguranca/trava-host.ts';
+import { conferirUrlNeon } from '../../api/src/infraestrutura/seguranca/url-neon.ts';
 
 /**
  * Restauração de um dump (`docs/runbook.md`, seção 4, passo 5) com a trava de host antes de qualquer escrita (SEC-009,
@@ -114,6 +115,8 @@ export async function restaurar(opcoes: OpcoesRestaurar): Promise<number> {
         `Destino no mesmo host da origem (mesmo endpoint ${endpoint}): restaure na branch dev ou no banco local.`,
       );
     }
+    // ADR-032: destino remoto é a branch dev do Neon, pela conexão direta do owner, com TLS.
+    conferirUrlNeon(opcoes.url, 'owner');
   }
   if (!opcoes.arquivo || !existsSync(opcoes.arquivo)) {
     throw new Error('Informe --arquivo com o dump decifrado (dump.pgdump).');

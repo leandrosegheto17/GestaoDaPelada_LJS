@@ -31,5 +31,5 @@ Os projetos irmãos davam nomes diferentes às roles, ao database e às variáve
 
 **Negativas**
 
-- Ações manuais no Neon e no GitHub antes do próximo deploy: a role owner precisa se chamar `pelada_owner`, o database `pelada`, e os secrets precisam usar esses nomes e a conexão direta com `sslmode=require` (runbook, seção 2.2).
+- Ações manuais no Neon e no GitHub antes do próximo deploy: a role owner precisa se chamar `pelada_owner`, o database `pelada`, e os secrets precisam usar esses nomes e a conexão direta com `sslmode=require` (runbook, seções 2.2 e 2.3).
 - Um backup antigo (antes da renomeação) traz policies `TO pelada_backup`: para restaurá-lo, a role `pelada_backup` precisa existir no destino (runbook, seção 4).

@@ -3,7 +3,7 @@ import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { cacheDoHyperdriveDesligado, main } from '../verificar-cache-hyperdrive.ts';
+import { cacheDoHyperdriveDesligado, main, origemDoHyperdriveNoNeon } from '../verificar-cache-hyperdrive.ts';
 
 const script = fileURLToPath(new URL('../verificar-cache-hyperdrive-cli.ts', import.meta.url));
 
@@ -11,6 +11,14 @@ const rodar = (stdin: string, ...args: string[]) =>
   spawnSync(process.execPath, [script, ...args], { input: stdin, encoding: 'utf8', timeout: 60_000 });
 
 const resposta = (result: unknown, success: unknown = true) => JSON.stringify({ success, errors: [], result });
+// Origem como a API devolve (sem a senha): conexão direta do Neon, role pelada_app (ADR-032).
+const ORIGEM = {
+  host: 'ep-calmo-rio-123456.sa-east-1.aws.neon.tech',
+  port: 5432,
+  database: 'pelada',
+  user: 'pelada_app',
+  scheme: 'postgres',
+};
 
 describe('cacheDoHyperdriveDesligado', () => {
   it('passa com caching.disabled === true (formato da API)', () => {
@@ -49,6 +57,25 @@ describe('cacheDoHyperdriveDesligado', () => {
     } catch (e) {
       expect((e as Error).message).not.toContain('segredo-xyz');
     }
+  });
+});
+
+describe('origemDoHyperdriveNoNeon (ADR-032)', () => {
+  it('passa com a conexão direta do Neon e a role pelada_app', () => {
+    expect(() => origemDoHyperdriveNoNeon(resposta({ caching: { disabled: true }, origin: ORIGEM }))).not.toThrow();
+  });
+
+  it.each([
+    ['origem ausente', resposta({ caching: { disabled: true } })],
+    ['origem nula', resposta({ caching: { disabled: true }, origin: null })],
+    ['pooler', resposta({ origin: { ...ORIGEM, host: 'ep-calmo-rio-123456-pooler.sa-east-1.aws.neon.tech' } })],
+    ['host local', resposta({ origin: { ...ORIGEM, host: 'localhost' } })],
+    ['fora do Neon', resposta({ origin: { ...ORIGEM, host: 'banco.exemplo.com' } })],
+    ['owner como origem (bypassrls)', resposta({ origin: { ...ORIGEM, user: 'pelada_owner' } })],
+    ['usuário ausente', resposta({ origin: { ...ORIGEM, user: undefined } })],
+    ['JSON inválido', '<html>502</html>'],
+  ])('falha fechado: %s', (_nome, corpo) => {
+    expect(() => origemDoHyperdriveNoNeon(corpo)).toThrow();
   });
 });
 
@@ -108,13 +135,19 @@ describe('ponto de entrada sem condição por ambiente (texto dos arquivos)', ()
 });
 
 describe('script como processo', () => {
-  const valido = resposta({ caching: { disabled: true } });
+  // Motivo da mudança (ADR-032): o deploy passa a conferir também a origem; a resposta válida traz a origem.
+  const valido = resposta({ caching: { disabled: true }, origin: ORIGEM });
 
   it.each([
     ['cache ligado', resposta({ caching: { disabled: false } })],
     ['lixo', '<html>502</html>'],
     ['vazio', ''],
     ['objeto vazio', '{}'],
+    [
+      'cache desligado e origem no pooler',
+      resposta({ caching: { disabled: true }, origin: { ...ORIGEM, host: 'ep-x-pooler.sa-east-1.aws.neon.tech' } }),
+    ],
+    ['cache desligado sem origem', resposta({ caching: { disabled: true } })],
   ])('com --executar e stdin %s sai com 1', (_nome, stdin) => {
     expect(rodar(stdin, '--executar').status).toBe(1);
   });
