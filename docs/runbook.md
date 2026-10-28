@@ -96,13 +96,6 @@ os apagam no fim. Se os dados de produção ainda estiverem noutro database do N
 e `pg_restore`, com confirmação específica) **antes** de trocar os secrets e a origem do Hyperdrive: apontar para um
 `pelada` vazio faria o `pnpm migrar` criar um schema novo e o app abrir sem dados.
 
-### 2.4 Tempo limite da conexão do Worker
-
-A transação de cada requisição desiste de conectar em **8 s** (`connectionTimeoutMillis`, ADR-033), sem nova
-tentativa: com o Neon ou o Hyperdrive sem resposta, as rotas com banco respondem erro em vez de ficarem presas, e o
-`/api/health` (que não toca o banco) continua 200. Muitos erros de banco de uma vez apontam para o Neon (página de
-status e console) ou para a origem do Hyperdrive, não para o código.
-
 ### 2.3 Roles do banco
 
 Padrão `<projeto>_owner`, `<projeto>_app` e `<projeto>_backup_ro` (ADR-032):
@@ -120,6 +113,17 @@ o usuário do secret `NEON_URL_BACKUP` para `pelada_backup_ro`, senão o backup 
 do console do Neon (Roles): ela precisa se chamar `pelada_owner` e ser a dona do database. Se hoje tem outro nome (por
 exemplo `neondb_owner`), crie `pelada_owner` no console, transfira a posse do database e dos objetos
 (`REASSIGN OWNED BY <antiga> TO pelada_owner`, com confirmação específica) e troque o usuário de `NEON_URL_MIGRACAO`.
+Antes do primeiro deploy com `pelada_owner`, a role antiga dá a ela a administração das roles da aplicação
+(`GRANT pelada_app, pelada_backup TO pelada_owner WITH ADMIN OPTION, INHERIT FALSE, SET FALSE`, no SQL Editor do Neon, conectado como a role
+antiga): sem isso o PostgreSQL recusa a `pelada_owner` renomear `pelada_backup` (a migration de roles padronizadas) e
+o deploy para na migração, sem publicar. Confira no console do Neon que a `pelada_owner` tem `CREATEROLE`.
+
+### 2.4 Tempo limite da conexão do Worker
+
+A transação de cada requisição desiste de conectar em **8 s** (`connectionTimeoutMillis`, ADR-033), sem nova
+tentativa: com o Neon ou o Hyperdrive sem resposta, as rotas com banco respondem erro em vez de ficarem presas, e o
+`/api/health` (que não toca o banco) continua 200. Muitos erros de banco de uma vez apontam para o Neon (página de
+status e console) ou para a origem do Hyperdrive, não para o código.
 
 ## 3. Falha de migração e volta pelo dump
 
