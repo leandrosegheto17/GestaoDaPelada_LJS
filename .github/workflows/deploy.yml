@@ -2,8 +2,9 @@ name: deploy
 
 # Único lugar com `wrangler deploy` (conferido por backend/scripts/checagens/checar-wrangler-deploy.mjs).
 # Só produção, sem homologação. Disparo manual (Actions -> Run workflow), sempre pela main; o push não dispara deploy.
-# Ordem, parando no primeiro erro: URL_PUBLICA -> build do web -> branch de restauração no Neon -> dump cifrado ->
-# migração -> cache do Hyperdrive -> wrangler deploy -> saúde (/api/health com o SHA publicado).
+# Ordem, parando no primeiro erro: URL_PUBLICA -> build do web -> dump cifrado -> migração -> cache do Hyperdrive ->
+# wrangler deploy -> saúde (/api/health com o SHA publicado). O ponto de retorno antes de migrar é só o dump cifrado:
+# o Neon tem duas branches permanentes, `main` (produção) e `dev`, e nenhuma branch por deploy (ADR-030).
 # Runbook: docs/runbook.md.
 
 on:
@@ -45,35 +46,6 @@ jobs:
         env:
           VITE_VERSAO: ${{ github.sha }}
           VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
-
-      - name: Branch de restauração no Neon
-        id: restauracao
-        env:
-          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
-          NEON_PROJECT_ID: ${{ secrets.NEON_PROJECT_ID }}
-          RUN_ID: ${{ github.run_id }}
-        run: |
-          set -euo pipefail
-          if [[ ! "${NEON_API_KEY:-}" =~ ^[A-Za-z0-9_-]+$ ]]; then
-            echo "NEON_API_KEY ausente ou com caracteres fora de [A-Za-z0-9_-]." >&2
-            exit 1
-          fi
-          # O token vai num arquivo de configuração do curl (modo 600), fora de argv; a validação acima
-          # impede que aspas ou quebra de linha injetem diretivas nele.
-          config="${RUNNER_TEMP}/neon.curl"
-          trap 'rm -f "$config"' EXIT
-          (umask 077; printf 'header = "Authorization: Bearer %s"\n' "$NEON_API_KEY" > "$config")
-          neon() { curl -fsS --config "$config" "$@"; }
-          pai="production"
-          api="https://console.neon.tech/api/v2/projects/${NEON_PROJECT_ID}/branches"
-          id_pai="$(neon "$api" | node backend/scripts/ops/restauracao-neon-cli.ts pai "$pai" --executar)"
-          nome="restauracao-${AMBIENTE}-${RUN_ID}"
-          neon -X POST -H 'Content-Type: application/json' \
-            -d "{\"branch\":{\"name\":\"${nome}\",\"parent_id\":\"${id_pai}\"}}" "$api" >/dev/null
-          echo "nome=${nome}" >> "$GITHUB_OUTPUT"
-          # Mantém só as 2 branches de restauração mais novas (limite do plano gratuito).
-          neon "$api" | node backend/scripts/ops/restauracao-neon-cli.ts antigos "$AMBIENTE" --executar |
-            while read -r antigo; do neon -X DELETE "${api}/${antigo}" >/dev/null; done
 
       - name: Dump cifrado antes da migração
         uses: ./.github/actions/dump-cifrado
@@ -128,12 +100,11 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          RESTAURACAO: ${{ steps.restauracao.outputs.nome }}
           RESULTADO_DEPLOY: ${{ steps.publicar.outcome }}
           RUN_ID: ${{ github.run_id }}
         run: |
           set -euo pipefail
-          echo "A migração já foi aplicada. Para restaurar o banco, use a branch '${RESTAURACAO}' do Neon ou o artefato dump-predeploy-${RUN_ID}. Passo a passo: docs/runbook.md."
+          echo "A migração já foi aplicada. Para restaurar o banco, use o artefato cifrado dump-predeploy-${RUN_ID}. Passo a passo: docs/runbook.md."
           if [ "$RESULTADO_DEPLOY" = "success" ]; then
             pnpm --filter @pelada/api exec wrangler rollback -c ../../wrangler.jsonc --message "Falha depois do deploy (run ${RUN_ID})"
           fi

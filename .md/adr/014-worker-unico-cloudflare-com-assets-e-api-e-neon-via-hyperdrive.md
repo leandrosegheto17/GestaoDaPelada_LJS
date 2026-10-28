@@ -1,6 +1,6 @@
 # ADR-014: Um único Cloudflare Worker (arquivos estáticos do PWA + API Hono no mesmo domínio), com Neon em São Paulo acessado por Hyperdrive
 
-- **Status:** Accepted (rascunho do Loop B, rodada 2, sujeito à aprovação do usuário). A ordem de saída do §5 (simulador) foi substituída pelo ADR-017 na rodada 3. O §7 (Lightsail só como contingência) continua valendo.
+- **Status:** Accepted (rascunho do Loop B, rodada 2, sujeito à aprovação do usuário). A ordem de saída do §5 (simulador) foi substituída pelo ADR-017 na rodada 3. O §7 (Lightsail só como contingência) continua valendo. Trecho: o branch de restauração do deploy (passo 1 e volta atrás) Superseded by ADR-030.
 - **Data:** 2026-10-16
 - **Decisores:** Coordenador (chapéu Software Architect), a partir da escolha do usuário pela Cloudflare (rodada 2)
 - **Supersedes:** ADR-001 (o padrão "monólito modular em TypeScript, tela e API no mesmo domínio" continua; muda o runtime) e ADR-002 (hospedagem Vercel)

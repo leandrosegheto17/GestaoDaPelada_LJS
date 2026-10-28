@@ -1,6 +1,6 @@
 # ADR-023: Data de início do jogador como regra de pontuação, separada do início do primeiro período
 
-- **Status:** Accepted (demanda "Data de início do jogador"; decisão do Coordenador dentro de RF-69 a RF-74, RN-25 a RN-29)
+- **Status:** Accepted (demanda "Data de início do jogador"; decisão do Coordenador dentro de RF-69 a RF-74, RN-25 a RN-29); a volta atrás pelo branch do Neon Superseded by ADR-030.
 - **Data:** 2026-10-20
 - **Decisores:** Coordenador (chapéu Software Architect); P-33 a P-41 decididas pelo usuário
 - **Requisitos:** RF-69 a RF-74, RN-25 a RN-29, RNF-12, RNF-13; I-49; ADR-006, ADR-011, ADR-021

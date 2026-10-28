@@ -6,7 +6,8 @@ Nenhuma senha, chave ou string de conexão vai neste arquivo. Os itens de webhoo
 com as features `planos-e-cobranca` e seguintes.
 
 Nomes usados: Worker novo `gestaodapelada`, Worker antigo `pelada`, environments do GitHub `producao` e `backup`, roles do banco
-`pelada_app` (runtime, sem bypass de RLS), `pelada_backup` (leitura) e o owner do Neon (migração, tem `bypassrls`).
+`pelada_app` (runtime, sem bypass de RLS), `pelada_backup` (leitura) e o owner do Neon (migração, tem `bypassrls`),
+branches do Neon `main` (produção) e `dev` (seção 2.1).
 
 ## 1. Antes do primeiro deploy (obrigatório, uma vez)
 
@@ -27,11 +28,11 @@ Registre a data e quem confirmou cada item na entrada da liberação (`.specs/li
 
 - **Produção:** disparo manual do `deploy.yml` na `main` (`gh workflow run deploy.yml --ref main`, ou Actions, Run
   workflow). O push não dispara deploy. Não há homologação. Duas execuções juntas: a segunda espera a primeira.
-- **Ordem do workflow**, parando no primeiro erro: (1) `URL_PUBLICA` conferida; (2) build do web; (3) branch de
-  restauração no Neon (`restauracao-producao-<run_id>`, mantém só as 2 mais recentes); (4) dump cifrado
-  (`dump-predeploy-<run_id>`); (5) migração com `NEON_URL_MIGRACAO` (`pnpm migrar --alvo producao`); (6) cache do
-  Hyperdrive conferido como desligado; (7) `wrangler deploy` com `URL_PUBLICA` e `VERSAO` (o SHA); (8) `GET /api/health`
-  = 200 com `versao` igual ao SHA do commit.
+- **Ordem do workflow**, parando no primeiro erro: (1) `URL_PUBLICA` conferida; (2) build do web; (3) dump cifrado
+  (`dump-predeploy-<run_id>`), o único ponto de retorno antes de migrar; (4) migração com `NEON_URL_MIGRACAO`
+  (`pnpm migrar --alvo producao`); (5) cache do Hyperdrive conferido como desligado; (6) `wrangler deploy` com
+  `URL_PUBLICA` e `VERSAO` (o SHA); (7) `GET /api/health` = 200 com `versao` igual ao SHA do commit. O deploy não cria
+  nem apaga branch no Neon (ADR-030).
 - Se o build ou a conferência de `URL_PUBLICA` falhar, nada em produção mudou. Se a migração falhar, o
   `wrangler deploy` não roda (seção 3).
 - **Conferir à mão:** `curl -fsS https://<host>/api/health` deve devolver `{"status":"ok","versao":"<sha>"}`.
@@ -40,8 +41,9 @@ Registre a data e quem confirmou cada item na entrada da liberação (`.specs/li
   environment com branch policy só `main` (Settings, Environments, Deployment branches and tags, Selected branches,
   `main`):
   - **`producao`** (usado pelo `deploy.yml`): variável `URL_PUBLICA` (origem https, sem barra final); secrets
-    `NEON_URL_MIGRACAO`, `NEON_API_KEY`, `NEON_PROJECT_ID`, `BACKUP_CHAVE`, `CLOUDFLARE_API_TOKEN`,
-    `CLOUDFLARE_ACCOUNT_ID` e `VITE_SENTRY_DSN`.
+    `NEON_URL_MIGRACAO`, `BACKUP_CHAVE`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` e `VITE_SENTRY_DSN`. Os
+    antigos `NEON_API_KEY` e `NEON_PROJECT_ID` (da branch de restauração, removida pelo ADR-030) não são mais usados:
+    apague-os do environment e revogue a chave no Neon.
   - **`backup`** (usado pelo `backup.yml`): secrets `NEON_URL_BACKUP` e `BACKUP_CHAVE` (a mesma chave pública do
     `producao`).
   - Em Settings, Secrets and variables, Actions, a lista "Repository secrets" fica vazia. Se algum desses segredos já
@@ -54,7 +56,21 @@ Registre a data e quem confirmou cada item na entrada da liberação (`.specs/li
   Sem a segunda, o passo falha fechado e o deploy não segue.
 - Só o `deploy.yml` chama `wrangler deploy` (o CI confere com `checar-wrangler-deploy.mjs`).
 
-## 3. Falha de migração e restauração pela branch
+### 2.1 Branches do Neon
+
+O projeto do Neon tem **só duas branches permanentes** (ADR-030). Nada de branch por PR, por deploy ou de
+restauração: se aparecer outra, apague-a no console do Neon (com confirmação de quem opera).
+
+| Branch | Papel                                                                                | Quem aponta para ela                                                                                                                            |
+| ------ | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `main` | Produção (branch padrão do projeto)                                                  | origem do Hyperdrive (role `pelada_app`, cache desligado); secret `NEON_URL_MIGRACAO` (owner, deploy); secret `NEON_URL_BACKUP` (backup diário) |
+| `dev`  | Desenvolvimento e ensaios (restauração, migração antes de produção); filha da `main` | nenhum secret do GitHub; só o terminal de quem opera, com `--alvo teste`                                                                        |
+
+O banco local (`docker compose`) e os bancos temporários dos testes não são branches do Neon e usam `DATABASE_URL` e
+`DATABASE_URL_TESTE`. Para renovar a `dev` com os dados atuais da produção, use "Reset from parent" na `dev` (console
+do Neon, Branches); isso apaga o que havia nela.
+
+## 3. Falha de migração e volta pelo dump
 
 **A migração falhou** (passo 5 vermelho): o `wrangler deploy` não rodou, o app continua na versão anterior. Cada
 migration roda na sua transação, então a que falhou não deixou meia alteração; as anteriores do mesmo lote podem ter
@@ -63,9 +79,10 @@ sido aplicadas, e as migrations são aditivas (o app anterior continua funcionan
 1. Leia o erro no log do passo. Corrija a migration em PR novo; nunca edite uma migration já aplicada.
 2. Se o banco ficou num estado estranho, `pnpm migrar` diz o estado detectado e recusa sozinho quando é `parcial`,
    sem alterar nada.
-3. Para voltar ao banco de antes da migração, use a branch `restauracao-producao-<run_id>` do Neon (cópia do banco
-   no instante anterior) ou o artefato `dump-predeploy-<run_id>` (seção 4).
-4. Aponte a origem do Hyperdrive para a branch de restauração (o `id` está em `hyperdrive[0].id` do `wrangler.jsonc`):
+3. Para voltar ao banco de antes da migração, use o artefato cifrado `dump-predeploy-<run_id>` (seção 4), o único
+   ponto de retorno: restaure-o na branch `dev` (ou num banco local) e confira a contagem de linhas.
+4. Só em emergência, e com confirmação específica, aponte a origem do Hyperdrive para a `dev` restaurada (o `id` está
+   em `hyperdrive[0].id` do `wrangler.jsonc`):
    `pnpm --filter @pelada/api exec wrangler hyperdrive update <id> --origin-host <host> --origin-user pelada_app --origin-password <senha> --database <banco> --caching-disabled`.
    Mantenha `--caching-disabled`. A senha na linha de comando fica no histórico do shell e aparece no `ps` enquanto o
    comando roda: comece o comando por um espaço com `HISTCONTROL=ignorespace`, ou no PowerShell desligue o histórico
@@ -73,7 +90,7 @@ sido aplicadas, e as migrations são aditivas (o app anterior continua funcionan
 5. Confira `GET /api/health` e a contagem de linhas (seção 4, passo 6).
 
 **O deploy ou a checagem de saúde falhou depois da migração:** o workflow roda `wrangler rollback` (e falha de
-verdade se o rollback falhar) e imprime o nome da branch de restauração e do artefato. O banco já migrado serve à
+verdade se o rollback falhar) e imprime o nome do artefato `dump-predeploy-<run_id>`. O banco já migrado serve à
 versão anterior, porque as migrations são aditivas; só restaure o banco se houve dano a dado.
 
 ## 4. Restauração do backup
@@ -87,7 +104,8 @@ pessoais e a identidade privada do `age` não pode parar no git (o `.gitignore` 
 2. **Decifre:** `age -d -i <arquivo-da-identidade> -o dump.pgdump <nome>.sql.age`. O secret `BACKUP_CHAVE` guarda só
    o destinatário público (`age1...`); a identidade privada (`AGE-SECRET-KEY-1...`) fica só no gerenciador de senhas
    e num arquivo temporário criado já restrito (`(umask 077; touch identidade-age.txt)`). Apague-o depois.
-3. **Prepare o destino:** uma branch nova e vazia no Neon, ou um banco novo no Postgres local
+3. **Prepare o destino:** a branch `dev` do Neon (seção 2.1; o `--clean` apaga o que houver nela), ou um banco novo
+   no Postgres local
    (`docker compose up -d` e `createdb`). **Nunca** a URL de produção: `--clean` apaga tabelas. O `pnpm restaurar`
    (passo 5) recusa produção, mas confira o host antes de rodar.
 4. **Crie as roles antes de restaurar.** O dump leva as policies (`CREATE POLICY ... TO pelada_backup`), e sem a
@@ -96,7 +114,7 @@ pessoais e a identidade privada do `age` não pode parar no git (o `.gitignore` 
    CREATE ROLE pelada_app NOLOGIN NOBYPASSRLS NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION;
    CREATE ROLE pelada_backup NOLOGIN NOBYPASSRLS NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION;
    ```
-   Numa branch do Neon filha de produção as roles já existem (são do servidor).
+   Na branch `dev` (filha da `main`) as roles já existem (são do servidor).
 5. **Restaure com o `pg_restore` do PostgreSQL 16** (a versão do dump; um cliente mais novo gera arquivo que o 16 não
    lê), sempre pelo script, que passa pela trava de host antes de escrever:
    `DATABASE_URL="$URL_NOVA" URL_ORIGEM="$URL_ORIGEM" pnpm restaurar --arquivo <pasta-temporária>/dump.pgdump --alvo teste`

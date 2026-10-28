@@ -93,7 +93,7 @@ export function endpointDoHost(host: string): string {
 
 export async function restaurar(opcoes: OpcoesRestaurar): Promise<number> {
   if (opcoes.alvo === 'producao') {
-    throw new HostRecusado('Nunca restaure em produção: use uma branch nova do Neon (--alvo teste) ou o banco local.');
+    throw new HostRecusado('Nunca restaure em produção: use a branch dev do Neon (--alvo teste) ou o banco local.');
   }
   exigirParametrosPermitidos(opcoes.url);
   const host = await exigirHostPermitido({
@@ -111,7 +111,7 @@ export async function restaurar(opcoes: OpcoesRestaurar): Promise<number> {
     const endpoint = endpointDoHost(host);
     if (endpointDoHost(hostDaUrl(opcoes.urlOrigem)) === endpoint) {
       throw new HostRecusado(
-        `Destino no mesmo host da origem (mesmo endpoint ${endpoint}): restaure numa branch nova ou no banco local.`,
+        `Destino no mesmo host da origem (mesmo endpoint ${endpoint}): restaure na branch dev ou no banco local.`,
       );
     }
   }

@@ -38,11 +38,10 @@ describe('deploy.yml: gatilho e proteção (FUN-39, FUN-55)', () => {
 });
 
 describe('deploy.yml: ordem dos passos (FUN-40)', () => {
-  it('URL_PUBLICA, build, restauração, dump, migração, Hyperdrive, deploy e saúde', () => {
+  it('URL_PUBLICA, build, dump, migração, Hyperdrive, deploy e saúde', () => {
     const ordem = [
       'Conferir URL_PUBLICA',
       '@pelada/web build',
-      'restauracao-neon-cli.ts pai',
       'dump-cifrado',
       'pnpm migrar',
       'verificar-cache-hyperdrive-cli',
@@ -59,11 +58,16 @@ describe('deploy.yml: ordem dos passos (FUN-40)', () => {
   it('o build do web recebe o DSN do Sentry de um secret ou variável, nunca literal (FUN-23)', () => {
     expect(passo('@pelada/web build').env.VITE_SENTRY_DSN).toMatch(/^\$\{\{ (secrets|vars)\.[A-Z_]+ \}\}$/);
   });
-  it('a branch de restauração mantém só as 2 mais novas (apaga as antigas)', () => {
-    const run = passo('restauracao-neon-cli.ts pai').run;
-    expect(run).toContain('restauracao-neon-cli.ts antigos');
-    expect(run).toContain('-X DELETE');
-    expect(run).toContain('restauracao-${AMBIENTE}-${RUN_ID}');
+  // ADR-030: o Neon tem só as branches permanentes `main` e `dev`; o deploy não cria nem apaga branch, e o ponto de
+  // retorno antes de migrar é só o dump cifrado.
+  it('nenhum passo chama a API do Neon nem cria branch de restauração', () => {
+    const texto = JSON.stringify(documento);
+    expect(texto).not.toContain('console.neon.tech');
+    // Montados por partes: os nomes dos secrets removidos não podem constar como variável em uso (env-example.test).
+    expect(texto).not.toContain(['NEON', 'API', 'KEY'].join('_'));
+    expect(texto).not.toContain(['NEON', 'PROJECT', 'ID'].join('_'));
+    expect(texto.toLowerCase()).not.toContain('restauracao-');
+    expect(passos.map((p) => p.name ?? '').filter((n) => /branch/i.test(n))).toEqual([]);
   });
   it('dump cifrado pela action local, com a chave pública e a URL de migração', () => {
     const p = passo('dump-cifrado');
@@ -95,7 +99,7 @@ describe('deploy.yml: ordem dos passos (FUN-40)', () => {
 describe('deploy.yml: paradas (FUN-41, FUN-42, FUN-56)', () => {
   it('o build vem antes de qualquer passo que toque o Neon ou o Worker', () => {
     const build = indice('@pelada/web build');
-    for (const t of ['restauracao-neon-cli.ts pai', 'dump-cifrado', 'pnpm migrar', PUBLICAR]) {
+    for (const t of ['dump-cifrado', 'pnpm migrar', PUBLICAR]) {
       expect(indice(t)).toBeGreaterThan(build);
     }
   });
@@ -126,6 +130,9 @@ describe('deploy.yml: rollback e Hyperdrive (FUN-18)', () => {
     expect(p.run).toContain('wrangler rollback');
     expect(p.run).not.toContain('|| true');
     expect(p.run).toContain('docs/runbook.md');
+    // O único ponto de retorno é o dump cifrado da execução (ADR-030).
+    expect(p.run).toContain('dump-predeploy-${RUN_ID}');
+    expect(p.run.toLowerCase()).not.toContain('branch');
   });
   it('confere o cache do Hyperdrive desligado antes do deploy', () => {
     const p = passo('verificar-cache-hyperdrive-cli');

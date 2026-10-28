@@ -1,6 +1,6 @@
 # ADR-011: Backup diário por pg_dump cifrado em GitHub Actions, somado ao histórico do Neon, com restauração testada antes do go-live
 
-- **Status:** Accepted (rascunho do Loop B, sujeito à aprovação do usuário)
+- **Status:** Accepted (rascunho do Loop B, sujeito à aprovação do usuário); decisão 2 (branch do Neon antes da migração) Superseded by ADR-030.
 - **Data:** 2026-10-16
 - **Decisores:** Coordenador (chapéu Software Architect)
 - **Requisitos:** RNF-07 (RPO até 24 h, cópia restaurável testada antes do go-live), RNF-08, RNF-06

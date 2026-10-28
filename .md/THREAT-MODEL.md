@@ -110,8 +110,8 @@ Entra com a feature `conta-e-acesso` (2026-10-27). As funções que acham uma co
 | I: credencial do banco no Worker | Só o binding `HYPERDRIVE`; `localConnectionString` do `wrangler.jsonc` é só a de desenvolvimento local |
 | I: cache de resposta com dado de outro grupo | Cache do Hyperdrive desligado (G-17), conferido no `deploy.yml` antes de publicar |
 | T/I: Neon exposto | Não exposto ao navegador; TLS |
-| R: perda de dado na migração | Branch de restauração + dump cifrado antes de migrar |
-| T/R: migração que contrai o esquema (`202610210000_contrai_posicao`: converte `defensor`/`meio_campo` e recria o CHECK de posição) | Roda depois do branch + dump do `deploy.yml`; `UPDATE` antes do `DROP/ADD CONSTRAINT` na mesma migração; `checar-migracao-aditiva` aceita a contração prevista em `QUEBRAS.md`. Conferido no banco de desenvolvimento: CHECK com as 7 posições e 0 linhas com posição antiga |
+| R: perda de dado na migração | Dump cifrado antes de migrar (ADR-030) |
+| T/R: migração que contrai o esquema (`202610210000_contrai_posicao`: converte `defensor`/`meio_campo` e recria o CHECK de posição) | Roda depois do dump cifrado do `deploy.yml`; `UPDATE` antes do `DROP/ADD CONSTRAINT` na mesma migração; `checar-migracao-aditiva` aceita a contração prevista em `QUEBRAS.md`. Conferido no banco de desenvolvimento: CHECK com as 7 posições e 0 linhas com posição antiga |
 
 ### 7. `deploy.yml` e CI
 
