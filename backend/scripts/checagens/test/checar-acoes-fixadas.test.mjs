@@ -163,6 +163,15 @@ describe('checar-acoes-fixadas', () => {
       ['docker create por digest', { '.github/actions/x/x.sh': `docker create --name pg postgres:16@${DIGEST}\n` }],
       ['podman run por digest', { '.github/actions/x/x.sh': `podman run --rm postgres:16@${DIGEST}\n` }],
       ['docker sem criar contêiner', { '.github/actions/x/x.sh': 'docker ps\ndocker image ls postgres\n' }],
+      // ADR-034: postgres:18 é a única imagem aceita pela tag exata.
+      [
+        'service postgres:18 por tag',
+        { '.github/workflows/a.yml': 'jobs:\n  a:\n    services:\n      pg:\n        image: postgres:18\n' },
+      ],
+      [
+        'docker run postgres:18 por tag',
+        { '.github/actions/x/x.sh': 'docker run --rm -e PG_URL postgres:18 \\\n  sh -c "pg_dump"\n' },
+      ],
     ])('passa: %s', (_nome, arquivos) => {
       const r = rodar(repositorio(arquivos));
       expect(r.stderr).toBe('');
@@ -235,6 +244,22 @@ describe('checar-acoes-fixadas', () => {
         /postgres:16/,
       ],
       ['podman run por tag', { '.github/actions/x/x.sh': 'podman run --rm postgres:16\n' }, /postgres:16/],
+      // ADR-034: a exceção é só a tag exata postgres:18.
+      [
+        'postgres:18-alpine por tag',
+        { '.github/actions/x/x.sh': 'docker run --rm postgres:18-alpine psql\n' },
+        /postgres:18-alpine/,
+      ],
+      [
+        'postgres:latest por tag',
+        { '.github/workflows/a.yml': 'jobs:\n  a:\n    container: postgres:latest\n' },
+        /postgres:latest/,
+      ],
+      [
+        'postgres:18 de outro registro',
+        { '.github/actions/x/x.sh': 'docker run --rm ghcr.io/x/postgres:18 psql\n' },
+        /ghcr\.io/,
+      ],
       [
         'docker --context x container run em workflow',
         {

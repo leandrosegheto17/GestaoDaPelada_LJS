@@ -64,10 +64,11 @@ describe('dump-cifrado.sh (FUN-46, FUN-47)', () => {
     expect(readFileSync(r.saida, 'utf8')).toContain('DUMP-BINARIO');
   });
 
-  it('o cliente postgres:18 vai fixado por digest sha256, nunca só pela tag (SEC-004)', () => {
+  // Motivo da mudança (ADR-034, aprovado pelo usuário): a imagem vai pela tag oficial postgres:18, sem digest.
+  it('o cliente é a imagem oficial pela tag exata postgres:18 (ADR-034)', () => {
     expect(rodar().status).toBe(0);
     const chamada = readFileSync(join(pasta, 'docker.log'), 'utf8');
-    expect(chamada).toMatch(/(^|\s)postgres:18@sha256:[0-9a-f]{64}\s/);
+    expect(chamada).toMatch(/(^|\s)postgres:18\s/);
   });
 
   it('falha de pg_dump falha o job e não deixa artefato, nem parcial', () => {

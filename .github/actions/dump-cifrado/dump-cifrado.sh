@@ -27,10 +27,9 @@ parcial="${SAIDA}.parcial"
 trap 'rm -f "$erro" "$parcial"' EXIT
 rm -f "$SAIDA" "$parcial"
 
-# Imagem por digest (índice multi-arch de postgres:18, consultado em 2026-10-28 com `docker buildx imagetools inspect`):
-# uma tag trocada no registro receberia a URL do banco (SEC-004). O digest fica literal na linha do `docker run`, onde
-# o checar-acoes-fixadas.mjs o confere. Para atualizar, consulte de novo e troque o digest.
-if ! docker run --rm -e PG_URL postgres:18@sha256:979bccfde35445db618c65107d27d08c6c21339d8dc3ad4c830c6633947be0e4 \
+# Imagem pela tag oficial postgres:18, a mesma nos três projetos (ADR-034). É a única imagem que o
+# checar-acoes-fixadas.mjs aceita por tag; qualquer outra continua exigindo digest (SEC-004).
+if ! docker run --rm -e PG_URL postgres:18 \
   sh -c 'pg_dump --format=custom --no-owner --no-privileges --enable-row-security "$PG_URL"' 2>"$erro" |
   age -r "$CHAVE_AGE" -o "$parcial"; then
   echo 'Falha ao gerar o dump.' >&2

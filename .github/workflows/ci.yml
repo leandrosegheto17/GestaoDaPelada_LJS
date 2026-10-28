@@ -47,8 +47,8 @@ jobs:
       DATABASE_URL_TESTE: postgres://postgres:postgres@localhost:5432/postgres
     services:
       postgres:
-        # Por digest (índice multi-arch de postgres:18, consultado em 2026-10-28; SEC-004).
-        image: postgres:18@sha256:979bccfde35445db618c65107d27d08c6c21339d8dc3ad4c830c6633947be0e4
+        # Tag oficial postgres:18, a mesma nos três projetos (ADR-034; única imagem aceita por tag no checar-acoes-fixadas).
+        image: postgres:18
         env:
           POSTGRES_PASSWORD: postgres
         ports:
@@ -93,8 +93,8 @@ jobs:
       SEED_SENHA_ADMIN: e2e-seed-senha-admin-0001
     services:
       postgres:
-        # Por digest (índice multi-arch de postgres:18, consultado em 2026-10-28; SEC-004).
-        image: postgres:18@sha256:979bccfde35445db618c65107d27d08c6c21339d8dc3ad4c830c6633947be0e4
+        # Tag oficial postgres:18, a mesma nos três projetos (ADR-034; única imagem aceita por tag no checar-acoes-fixadas).
+        image: postgres:18
         env:
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: pelada

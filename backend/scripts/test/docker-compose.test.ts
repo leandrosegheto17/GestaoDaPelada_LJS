@@ -34,15 +34,16 @@ describe('docker-compose.yml (FUN-03)', () => {
   });
 });
 
-// ADR-031: os serviços de banco do CI usam a mesma versão do local, fixada por digest (SEC-004).
+// ADR-031 e ADR-034: os serviços de banco do CI usam a mesma imagem do local, pela tag oficial postgres:18.
+// Motivo da mudança (aprovado pelo usuário): o digest sai; a tag é a mesma nos três projetos.
 describe('ci.yml: Postgres de serviço', () => {
   const ci = yaml.load(readFileSync(resolve(raiz, '.github/workflows/ci.yml'), 'utf8')) as {
     jobs: Record<string, { services?: Record<string, { image: string }> }>;
   };
   const imagens = Object.values(ci.jobs).flatMap((job) => Object.values(job.services ?? {}).map((s) => s.image));
 
-  it('todo serviço de banco é postgres:18 fixado por digest sha256', () => {
+  it('todo serviço de banco é postgres:18 pela tag exata', () => {
     expect(imagens.length).toBeGreaterThan(0);
-    for (const imagem of imagens) expect(imagem).toMatch(/^postgres:18@sha256:[0-9a-f]{64}$/);
+    for (const imagem of imagens) expect(imagem).toBe('postgres:18');
   });
 });

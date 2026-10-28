@@ -1,6 +1,6 @@
 # ADR-031: PostgreSQL 18 em todo ambiente
 
-- **Status:** Accepted (padronização do Neon entre os projetos)
+- **Status:** Accepted (padronização do Neon entre os projetos); a decisão 2 (imagem fixada por digest) Superseded by ADR-034.
 - **Data:** 2026-10-28
 - **Decisores:** usuário
 - **Requisitos:** FUN-03, FUN-46
