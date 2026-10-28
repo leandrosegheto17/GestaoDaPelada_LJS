@@ -167,7 +167,7 @@ describe('grupos_visiveis() (FUN-13 a FUN-15, design C3)', () => {
       "SELECT proowner::regrole::text AS d FROM pg_proc WHERE proname = 'grupos_visiveis'",
     );
     expect(rows.map((r) => r.grantee).sort()).toEqual([dono[0]?.d, 'pelada_app'].sort());
-    await comoRole(cliente, 'pelada_backup', async () => {
+    await comoRole(cliente, 'pelada_backup_ro', async () => {
       expect(await codigoDoErro(cliente, 'SELECT grupos_visiveis()')).toBe('42501');
     });
   });
@@ -175,9 +175,9 @@ describe('grupos_visiveis() (FUN-13 a FUN-15, design C3)', () => {
 
 describe('policy de leitura total do backup (spike S2)', () => {
   it.each([...COM_GRUPO_ID, 'grupos'])(
-    'pelada_backup lê as linhas dos dois grupos em %s, sem contexto',
+    'pelada_backup_ro lê as linhas dos dois grupos em %s, sem contexto',
     async (tabela) => {
-      const vistos = await comoRole(cliente, 'pelada_backup', () => gruposVistos(tabela));
+      const vistos = await comoRole(cliente, 'pelada_backup_ro', () => gruposVistos(tabela));
       expect(vistos).toEqual([GRUPO_A.grupo, GRUPO_B.grupo]);
     },
   );
@@ -194,8 +194,8 @@ describe('RLS com FORCE nas tabelas de conta (ACE-45)', () => {
     expect(rows).toEqual(DE_CONTA.map((relname) => ({ relname, ligada: true, forcada: true })));
   });
 
-  it.each(DE_CONTA)('pelada_backup lê as linhas das duas contas em %s, sem contexto', async (tabela) => {
-    const n = await comoRole(cliente, 'pelada_backup', async () => {
+  it.each(DE_CONTA)('pelada_backup_ro lê as linhas das duas contas em %s, sem contexto', async (tabela) => {
+    const n = await comoRole(cliente, 'pelada_backup_ro', async () => {
       const { rows } = await cliente.query<{ n: string }>(`SELECT count(*) AS n FROM ${tabela}`);
       return Number(rows[0]?.n);
     });

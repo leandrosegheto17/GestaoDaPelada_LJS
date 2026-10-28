@@ -89,7 +89,7 @@ jobs:
       # são fictícias e só valem neste job.
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/pelada
       PELADA_APP_SENHA: e2e-pelada-app-senha-ficticia-0001
-      PELADA_BACKUP_SENHA: e2e-pelada-backup-senha-ficticia-01
+      PELADA_BACKUP_RO_SENHA: e2e-pelada-backup-ro-senha-ficticia-1
       SEED_SENHA_ADMIN: e2e-seed-senha-admin-0001
     services:
       postgres:

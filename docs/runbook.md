@@ -6,8 +6,8 @@ Nenhuma senha, chave ou string de conexão vai neste arquivo. Os itens de webhoo
 com as features `planos-e-cobranca` e seguintes.
 
 Nomes usados: Worker novo `gestaodapelada`, Worker antigo `pelada`, environments do GitHub `producao` e `backup`, roles do banco
-`pelada_app` (runtime, sem bypass de RLS), `pelada_backup` (leitura) e o owner do Neon (migração, tem `bypassrls`),
-branches do Neon `main` (produção) e `dev` (seção 2.1).
+`pelada_owner` (owner: migração e DDL, tem `bypassrls` no Neon), `pelada_app` (runtime, sem bypass de RLS) e
+`pelada_backup_ro` (somente leitura, backup) (seção 2.2), branches do Neon `main` (produção) e `dev` (seção 2.1).
 
 ## 1. Antes do primeiro deploy (obrigatório, uma vez)
 
@@ -20,7 +20,7 @@ cumprir os três itens, nesta ordem. Cada um pede confirmação explícita de qu
 2. **Remoção confirmada do Worker `pelada`.** Veja a seção 6. Só depois do item 1, e só com a confirmação de que o
    Worker antigo saiu do ar e nada mais o chama.
 3. **Roles e senhas de login conferidas.** Em produção, `pelada_app` precisa ter login e a mesma senha que a origem
-   do Hyperdrive usa (seção 5). O owner do Neon nunca vira origem do Hyperdrive.
+   do Hyperdrive usa (seção 5). O owner (`pelada_owner`) nunca vira origem do Hyperdrive.
 
 Registre a data e quem confirmou cada item na entrada da liberação (`.specs/liberacao.md`).
 
@@ -70,9 +70,27 @@ O banco local (`docker compose`) e os bancos temporários dos testes não são b
 `DATABASE_URL_TESTE`. Para renovar a `dev` com os dados atuais da produção, use "Reset from parent" na `dev` (console
 do Neon, Branches); isso apaga o que havia nela.
 
+### 2.2 Roles do banco
+
+Padrão `<projeto>_owner`, `<projeto>_app` e `<projeto>_backup_ro` (ADR-032):
+
+| Role               | Papel                                                          | Quem conecta com ela                                       |
+| ------------------ | -------------------------------------------------------------- | ---------------------------------------------------------- |
+| `pelada_owner`     | Dono do schema: migração, DDL, script do dono; tem `bypassrls` | `NEON_URL_MIGRACAO` (deploy); nunca a API nem o Hyperdrive |
+| `pelada_app`       | Runtime: `NOBYPASSRLS`, sem DDL nem `TRUNCATE`                 | origem do Hyperdrive (cache desligado)                     |
+| `pelada_backup_ro` | Somente leitura: `NOBYPASSRLS`, `SELECT` e policy de leitura   | `NEON_URL_BACKUP` (backup diário)                          |
+
+`pelada_app` e `pelada_backup_ro` nascem pelas migrations (`NOLOGIN NOBYPASSRLS`); a senha de login é dada no Neon
+(seção 5). A role de backup se chamava `pelada_backup`: a migration `1792844220000_roles-padronizadas` a renomeia no
+primeiro deploy depois de 2026-10-28 (a senha SCRAM, os grants e as policies seguem a role). **No mesmo dia**, troque
+o usuário do secret `NEON_URL_BACKUP` para `pelada_backup_ro`, senão o backup diário seguinte falha. A role owner é a
+do console do Neon (Roles): ela precisa se chamar `pelada_owner` e ser a dona do database. Se hoje tem outro nome (por
+exemplo `neondb_owner`), crie `pelada_owner` no console, transfira a posse do database e dos objetos
+(`REASSIGN OWNED BY <antiga> TO pelada_owner`, com confirmação específica) e troque o usuário de `NEON_URL_MIGRACAO`.
+
 ## 3. Falha de migração e volta pelo dump
 
-**A migração falhou** (passo 5 vermelho): o `wrangler deploy` não rodou, o app continua na versão anterior. Cada
+**A migração falhou** (passo 4 vermelho): o `wrangler deploy` não rodou, o app continua na versão anterior. Cada
 migration roda na sua transação, então a que falhou não deixou meia alteração; as anteriores do mesmo lote podem ter
 sido aplicadas, e as migrations são aditivas (o app anterior continua funcionando).
 
@@ -108,12 +126,15 @@ pessoais e a identidade privada do `age` não pode parar no git (o `.gitignore` 
    no Postgres local
    (`docker compose up -d` e `createdb`). **Nunca** a URL de produção: `--clean` apaga tabelas. O `pnpm restaurar`
    (passo 5) recusa produção, mas confira o host antes de rodar.
-4. **Crie as roles antes de restaurar.** O dump leva as policies (`CREATE POLICY ... TO pelada_backup`), e sem a
+4. **Crie as roles antes de restaurar.** O dump leva as policies (`CREATE POLICY ... TO pelada_backup_ro`), e sem a
    role no servidor o `pg_restore` sai com erro `role ... does not exist`. Num servidor onde elas não existem:
    ```sql
    CREATE ROLE pelada_app NOLOGIN NOBYPASSRLS NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION;
-   CREATE ROLE pelada_backup NOLOGIN NOBYPASSRLS NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION;
+   CREATE ROLE pelada_backup_ro NOLOGIN NOBYPASSRLS NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION;
    ```
+   Dump feito antes da renomeação (backups até o primeiro deploy depois de 2026-10-28) cita a role antiga: crie também
+   `pelada_backup` do mesmo jeito e, depois do passo 5, rode a migration `1792844220000_roles-padronizadas.sql` no
+   destino, que passa as policies para `pelada_backup_ro`.
    Na branch `dev` (filha da `main`) as roles já existem (são do servidor).
 5. **Restaure com o `pg_restore` do PostgreSQL 18** (a versão do `pg_dump` que gerou o dump, ADR-031; um `pg_restore` mais antigo não
    lê), sempre pelo script, que passa pela trava de host antes de escrever:
@@ -127,7 +148,9 @@ pessoais e a identidade privada do `age` não pode parar no git (o `.gitignore` 
    e as demais variáveis `PG*` da sessão não chegam a ele, só o `PGPASSWORD`. Outro
    `pg_restore` 18: `PG_RESTORE=<caminho>`. Nunca rode o `pg_restore --clean` à mão. Como o dump sai sem
    privilégios, reaplique os grants e a senha de login depois:
-   `psql "$URL_NOVA" -f backend/api/src/infraestrutura/db/migracoes/1792843260000_roles.sql` (idempotente) e
+   `psql "$URL_NOVA" -f backend/api/src/infraestrutura/db/migracoes/1792843260000_roles.sql` e, logo depois,
+   `-f backend/api/src/infraestrutura/db/migracoes/1792844220000_roles-padronizadas.sql` (as duas idempotentes; a segunda
+   leva os grants para `pelada_backup_ro`) e
    `ALTER ROLE pelada_app WITH LOGIN PASSWORD '<senha>'` (digite a senha só no terminal). Códigos de saída diferentes
    de zero são erro de verdade; avisos de objeto inexistente com `--if-exists` não são.
 6. **Confira a contagem de linhas contra a origem.** Um dump feito com `FORCE` de RLS e sem policy de leitura sai
@@ -154,16 +177,16 @@ Registro das restaurações ensaiadas:
 
 Faça um por vez, confira o `/api/health` e, quando houver deploy, o workflow verde.
 
-| Segredo                       | Onde vale                   | Como girar                                                                                                                                                                                                                                                                       |
-| ----------------------------- | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Senha da role `pelada_app`    | Neon e origem do Hyperdrive | `ALTER ROLE pelada_app WITH PASSWORD '<nova>'` no Neon (digitada só no terminal) e `wrangler hyperdrive update <id> --origin-password <nova> --caching-disabled`; confira `/api/health` e uma leitura real.                                                                      |
-| Senha da role `pelada_backup` | `NEON_URL_BACKUP`           | `ALTER ROLE pelada_backup WITH PASSWORD '<nova>'` e atualize o secret no environment `backup`; dispare o `backup.yml` à mão para provar.                                                                                                                                         |
-| `NEON_URL_MIGRACAO`           | deploy                      | Gire a senha do owner no console do Neon e atualize o secret; o próximo deploy prova.                                                                                                                                                                                            |
-| `NEON_API_KEY`                | deploy                      | Crie a chave nova no Neon, atualize o secret, revogue a antiga depois de um deploy verde.                                                                                                                                                                                        |
-| `CLOUDFLARE_API_TOKEN`        | deploy                      | Crie o token novo (Workers edição e Hyperdrive leitura), atualize o secret, revogue o antigo.                                                                                                                                                                                    |
-| `BACKUP_CHAVE`                | backup e dump do deploy     | `age-keygen -o identidade.txt`, guarde a identidade no gerenciador de senhas, grave só a linha `Public key` no secret (nos dois environments, `producao` e `backup`). Os backups antigos só se decifram com a identidade antiga: guarde as duas até o fim da retenção (30 dias). |
-| `SENTRY_DSN`                  | Worker                      | `wrangler secret put SENTRY_DSN`. No projeto do Sentry, ligue também Settings, Security & Privacy, "Prevent Storing of IP Addresses" (segunda camada; o código já filtra os cabeçalhos).                                                                                         |
-| `VITE_SENTRY_DSN`             | build do web (deploy)       | Em GitHub, Settings, Environments, `producao`, crie o secret `VITE_SENTRY_DSN` com o DSN do projeto Sentry do front (Sentry, Settings, Client Keys). Sem ele, o Sentry do front não inicializa.                                                                                  |
+| Segredo                          | Onde vale                   | Como girar                                                                                                                                                                                                                                                                       |
+| -------------------------------- | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Senha da role `pelada_app`       | Neon e origem do Hyperdrive | `ALTER ROLE pelada_app WITH PASSWORD '<nova>'` no Neon (digitada só no terminal) e `wrangler hyperdrive update <id> --origin-password <nova> --caching-disabled`; confira `/api/health` e uma leitura real.                                                                      |
+| Senha da role `pelada_backup_ro` | `NEON_URL_BACKUP`           | `ALTER ROLE pelada_backup_ro WITH PASSWORD '<nova>'` e atualize o secret no environment `backup`; dispare o `backup.yml` à mão para provar.                                                                                                                                      |
+| `NEON_URL_MIGRACAO`              | deploy                      | Gire a senha de `pelada_owner` no console do Neon e atualize o secret; o próximo deploy prova.                                                                                                                                                                                   |
+| `NEON_API_KEY`                   | deploy                      | Crie a chave nova no Neon, atualize o secret, revogue a antiga depois de um deploy verde.                                                                                                                                                                                        |
+| `CLOUDFLARE_API_TOKEN`           | deploy                      | Crie o token novo (Workers edição e Hyperdrive leitura), atualize o secret, revogue o antigo.                                                                                                                                                                                    |
+| `BACKUP_CHAVE`                   | backup e dump do deploy     | `age-keygen -o identidade.txt`, guarde a identidade no gerenciador de senhas, grave só a linha `Public key` no secret (nos dois environments, `producao` e `backup`). Os backups antigos só se decifram com a identidade antiga: guarde as duas até o fim da retenção (30 dias). |
+| `SENTRY_DSN`                     | Worker                      | `wrangler secret put SENTRY_DSN`. No projeto do Sentry, ligue também Settings, Security & Privacy, "Prevent Storing of IP Addresses" (segunda camada; o código já filtra os cabeçalhos).                                                                                         |
+| `VITE_SENTRY_DSN`                | build do web (deploy)       | Em GitHub, Settings, Environments, `producao`, crie o secret `VITE_SENTRY_DSN` com o DSN do projeto Sentry do front (Sentry, Settings, Client Keys). Sem ele, o Sentry do front não inicializa.                                                                                  |
 
 ## 6. Remoção do Worker antigo `pelada`
 
@@ -191,7 +214,7 @@ Crie a conta e o monitor no painel do UptimeRobot (ação sua; o código funcion
 
 O `backup.yml` roda às 07:00 UTC (04:00 em Brasília) e sob demanda, no environment `backup` (seção 2). Falha de dump ou de cifragem deixa o job vermelho
 e não publica artefato; o GitHub avisa por e-mail se as notificações de Actions estiverem ligadas. O artefato fica 30
-dias. O dump é feito pela role `pelada_backup` com `--enable-row-security` e o cliente do PostgreSQL 18. Dumps feitos antes de 2026-10-28 saíram do
+dias. O dump é feito pela role `pelada_backup_ro` com `--enable-row-security` e o cliente do PostgreSQL 18. Dumps feitos antes de 2026-10-28 saíram do
 cliente 16 e também abrem no `pg_restore` 18.
 
 ## 9. Liberação da feature `conta-e-acesso` (passos externos)
@@ -218,7 +241,7 @@ Registre a data e quem confirmou cada item na entrada da liberação (`.specs/li
    `EMAIL_DEV` (com ele a caixa de desenvolvimento, `GET /api/dev/emails`, responderia). Confirmação: "`EMAIL_DEV`
    ausente".
 5. **Criar a conta do dono em produção (`dono.ts`).** Depois do primeiro deploy com as migrations de conta, rode, com
-   `DATABASE_URL` apontando para o owner de produção (só no terminal) e digitando a senha sem eco:
+   `DATABASE_URL` apontando para `pelada_owner` na `main` (só no terminal) e digitando a senha sem eco:
    `pnpm dono -- --email <e-mail do dono> --alvo producao`. O script recusa host remoto sem `--alvo producao`, pede a
    confirmação do host e nunca imprime a senha. É comando em banco de produção: **só com confirmação específica**, com o
    dump cifrado da seção 1 já feito. A segunda execução troca a senha do dono. Nenhuma rota escreve o papel de dono
@@ -260,7 +283,7 @@ com a cota longe do teto e o painel do Resend sem erros apontam para lentidão d
 Resend antes de mexer em configuração.
 
 **Conferir o consumo.** O número do dia está na tabela `envios_email_dia` (colunas `dia` e `total`); leia-o com a role
-`pelada_backup`, nunca com o owner de produção para algo que não seja operação. O painel do Resend (Emails) mostra os
+`pelada_backup_ro`, nunca com o owner de produção para algo que não seja operação. O painel do Resend (Emails) mostra os
 envios e as falhas. **Alerta manual aos 50%:** olhe o consumo ao fim da tarde nos primeiros dias depois da liberação e
 sempre que houver divulgação do app. Passando de 50 e-mails antes do meio do dia, avise o dono do projeto.
 

@@ -32,7 +32,7 @@ Abra o `.env` e preencha cinco variáveis (as outras ficam vazias no uso local):
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/pelada
 DATABASE_URL_TESTE=postgres://postgres:postgres@localhost:5432/pelada_teste
 PELADA_APP_SENHA=troque-por-um-texto-sem-espacos-com-24-ou-mais-caracteres
-PELADA_BACKUP_SENHA=troque-por-outro-texto-do-mesmo-tipo
+PELADA_BACKUP_RO_SENHA=troque-por-outro-texto-do-mesmo-tipo
 SEED_SENHA_ADMIN=troque-por-uma-senha-de-8-a-72-caracteres
 ```
 

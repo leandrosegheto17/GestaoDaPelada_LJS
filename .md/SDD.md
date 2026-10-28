@@ -396,7 +396,7 @@ entrada (worker.ts, rotas Hono, middlewares) ─▶ aplicacao (casos de uso) ─
 
 | # | Pré-requisito | Quem | Observação |
 |---|---|---|---|
-| PI-1 | **Projeto no Neon**, região **`aws-sa-east-1` (São Paulo)**, plano grátis, **PostgreSQL 18**, com a extensão `pgcrypto`, as branches `main` (produção) e `dev` (ADR-030), as roles `pelada_app` (runtime) e `pelada_backup` (leitura) e a conexão direta do owner para a migração | Usuário | A região é fixa por projeto. Nenhuma outra branch: nada de branch por PR, por deploy ou de restauração (ADR-020, ADR-030). Senhas de login das roles conforme o runbook |
+| PI-1 | **Projeto no Neon**, região **`aws-sa-east-1` (São Paulo)**, plano grátis, **PostgreSQL 18**, com a extensão `pgcrypto`, as branches `main` (produção) e `dev` (ADR-030), as roles `pelada_owner` (owner, migração), `pelada_app` (runtime) e `pelada_backup_ro` (leitura) (ADR-032) e a conexão direta do owner para a migração | Usuário | A região é fixa por projeto. Nenhuma outra branch: nada de branch por PR, por deploy ou de restauração (ADR-020, ADR-030). Senhas de login das roles conforme o runbook |
 | PI-2 | Zona `ljssoftware.com.br` na Cloudflare e rota `custom_domain` `gestaodapelada.ljssoftware.com.br` no `wrangler.jsonc`; remoção do Worker antigo `pelada` antes do primeiro deploy (FUN-45) | Usuário | ADR-028; runbook, seções 1 e 6 |
 | PI-3 | Configuração do Hyperdrive `pelada-prod`, **com cache desligado**, apontando para a string **direta** do Neon da branch `main` | Executor, com credenciais do usuário | ADR-014 |
 | PI-4 | Secrets do GitHub: `CLOUDFLARE_API_TOKEN` (escopo mínimo), as strings diretas do Neon (migração e backup só de leitura) e a chave do backup (também no gerenciador de senhas) | Usuário | ADR-011, ADR-014 |
@@ -440,7 +440,7 @@ O workerd local **não impõe o limite de 10 ms de CPU**. O orçamento é verifi
 |---|---|---|
 | `ci.yml` | push e PR | `base`: lint, tokens, formato, tipos, testes, checagens (ids de tarefa, URLs absolutas, migração aditiva, `wrangler deploy` único, ações fixadas) e gitleaks; `banco`: migrations do zero, isolamento e testes da API num PostgreSQL 18 de serviço; `checagens`; `e2e` (instalabilidade do PWA e cabeçalhos, depois do build do web); `visual` (comparação visual). Sem Lighthouse (ADR-026) |
 | `deploy.yml` | disparo manual na `main` (`gh workflow run deploy.yml --ref main`; o push não dispara deploy), só produção, environment `producao`, `concurrency` sem cancelamento; sem homologação | 1) `URL_PUBLICA` conferida; 2) build do web; 3) dump cifrado (único ponto de retorno, ADR-030); 4) `pnpm migrar --alvo producao` com a role owner; 5) cache do Hyperdrive conferido como desligado; 6) `wrangler deploy --var URL_PUBLICA --var VERSAO`; 7) `GET /api/health` com a versão igual ao SHA. Falha depois da migração: `wrangler rollback` + instrução de restauração (`docs/runbook.md`) |
-| `backup.yml` | cron diário às 07:00 UTC (04:00 de São Paulo) + manual | `pg_dump -Fc --enable-row-security` (cliente PostgreSQL 18) pela role `pelada_backup`, cifrado com `age`, artefato por 30 dias, sem artefato parcial em falha (ADR-011) |
+| `backup.yml` | cron diário às 07:00 UTC (04:00 de São Paulo) + manual | `pg_dump -Fc --enable-row-security` (cliente PostgreSQL 18) pela role `pelada_backup_ro`, cifrado com `age`, artefato por 30 dias, sem artefato parcial em falha (ADR-011) |
 
 ---
 

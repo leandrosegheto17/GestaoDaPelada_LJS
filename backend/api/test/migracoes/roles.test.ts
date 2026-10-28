@@ -95,19 +95,32 @@ async function privilegios(role: string): Promise<Record<string, string[]>> {
   return mapa;
 }
 
+/** Migration que renomeia a role de backup (ADR-032). */
+const padronizadas = () => readFileSync(join(PASTA_MIGRACOES, '1792844220000_roles-padronizadas.sql'), 'utf8');
+
+/** Dentro da transação do teste: renomeia a role, se existir, para o cenário começar sem ela (o ROLLBACK desfaz). */
+async function tirarDoCaminho(nome: string): Promise<void> {
+  const { rows } = await cliente.query('SELECT 1 FROM pg_roles WHERE rolname = $1', [nome]);
+  if (rows.length > 0) await cliente.query(`ALTER ROLE ${nome} RENAME TO ${nome}_existente`);
+}
+
 describe('roles (FUN-11)', () => {
-  it('a migration cria pelada_app e pelada_backup NOLOGIN NOBYPASSRLS, sem superusuário nem criação de role ou banco', async () => {
-    // As roles são do servidor e podem já existir (com a senha local do seed). Para ver o que a migration cria,
-    // renomeia-se as existentes numa transação, roda-se a migration de roles e desfaz-se tudo no fim.
-    const sql = readFileSync(join(PASTA_MIGRACOES, '1792843260000_roles.sql'), 'utf8');
+  // Motivo da mudança (ADR-032): a role de backup passa a se chamar pelada_backup_ro. A migration antiga de roles
+  // continua criando pelada_backup; a 1792844220000_roles-padronizadas a renomeia. O teste roda as duas, em ordem.
+  it('as migrations criam pelada_app e pelada_backup_ro NOLOGIN NOBYPASSRLS, sem superusuário nem criação de role ou banco', async () => {
+    // As roles são do servidor e podem já existir (com a senha local do seed). Para ver o que as migrations criam,
+    // renomeia-se as existentes numa transação, rodam-se as migrations de roles e desfaz-se tudo no fim.
+    const roles = readFileSync(join(PASTA_MIGRACOES, '1792843260000_roles.sql'), 'utf8');
     await cliente.query('BEGIN');
     try {
       await cliente.query('ALTER ROLE pelada_app RENAME TO pelada_app_existente');
-      await cliente.query('ALTER ROLE pelada_backup RENAME TO pelada_backup_existente');
-      await cliente.query(sql);
+      await cliente.query('ALTER ROLE pelada_backup_ro RENAME TO pelada_backup_ro_existente');
+      await tirarDoCaminho('pelada_backup');
+      await cliente.query(roles);
+      await cliente.query(padronizadas());
       const { rows } = await cliente.query(
         `SELECT rolname, rolcanlogin, rolbypassrls, rolsuper, rolcreaterole, rolcreatedb, rolreplication
-           FROM pg_roles WHERE rolname IN ('pelada_app', 'pelada_backup') ORDER BY rolname`,
+           FROM pg_roles WHERE rolname IN ('pelada_app', 'pelada_backup', 'pelada_backup_ro') ORDER BY rolname`,
       );
       const atributos = {
         rolcanlogin: false,
@@ -119,7 +132,7 @@ describe('roles (FUN-11)', () => {
       };
       expect(rows).toEqual([
         { rolname: 'pelada_app', ...atributos },
-        { rolname: 'pelada_backup', ...atributos },
+        { rolname: 'pelada_backup_ro', ...atributos },
       ]);
     } finally {
       await cliente.query('ROLLBACK');
@@ -129,12 +142,91 @@ describe('roles (FUN-11)', () => {
   it('nenhuma das duas roles tem bypass de RLS nem superusuário', async () => {
     const { rows } = await cliente.query(
       `SELECT rolname, rolbypassrls, rolsuper FROM pg_roles
-        WHERE rolname IN ('pelada_app', 'pelada_backup') ORDER BY rolname`,
+        WHERE rolname IN ('pelada_app', 'pelada_backup_ro') ORDER BY rolname`,
     );
     expect(rows).toEqual([
       { rolname: 'pelada_app', rolbypassrls: false, rolsuper: false },
-      { rolname: 'pelada_backup', rolbypassrls: false, rolsuper: false },
+      { rolname: 'pelada_backup_ro', rolbypassrls: false, rolsuper: false },
     ]);
+  });
+
+  it('no banco migrado, nenhum grant nem policy fica com o nome antigo pelada_backup', async () => {
+    const { rows } = await cliente.query<{ n: number }>(
+      `SELECT (SELECT count(*) FROM pg_policy p JOIN pg_roles r ON r.oid = ANY (p.polroles)
+                WHERE r.rolname = 'pelada_backup')
+            + (SELECT count(*) FROM pg_class c CROSS JOIN LATERAL aclexplode(c.relacl) a
+                 JOIN pg_roles r ON r.oid = a.grantee WHERE r.rolname = 'pelada_backup')
+            + (SELECT count(*) FROM pg_namespace n CROSS JOIN LATERAL aclexplode(n.nspacl) a
+                 JOIN pg_roles r ON r.oid = a.grantee WHERE r.rolname = 'pelada_backup') AS n`,
+    );
+    expect(Number(rows[0]?.n)).toBe(0);
+    const policies = await cliente.query<{ n: number }>(
+      `SELECT count(*)::int AS n FROM pg_policy p JOIN pg_roles r ON r.oid = ANY (p.polroles)
+        WHERE r.rolname = 'pelada_backup_ro' AND right(p.polname, 7) = '_backup'`,
+    );
+    expect(policies.rows[0]?.n).toBeGreaterThan(0);
+  });
+
+  // Caso 1 da migration (produção): só pelada_backup existe; o RENAME guarda a role (OID), a senha e os grants.
+  it('renomeia pelada_backup para pelada_backup_ro mantendo a role, a senha e os grants', async () => {
+    await cliente.query('BEGIN');
+    try {
+      await tirarDoCaminho('pelada_backup');
+      await cliente.query('ALTER ROLE pelada_backup_ro RENAME TO pelada_backup');
+      await cliente.query("ALTER ROLE pelada_backup PASSWORD 'senha-do-caso-um'");
+      const antes = await cliente.query<{ oid: number; senha: string }>(
+        "SELECT oid, rolpassword AS senha FROM pg_authid WHERE rolname = 'pelada_backup'",
+      );
+      await cliente.query(padronizadas());
+      const depois = await cliente.query<{ oid: number; senha: string; rolname: string }>(
+        `SELECT oid, rolpassword AS senha, rolname FROM pg_authid
+          WHERE rolname IN ('pelada_backup', 'pelada_backup_ro')`,
+      );
+      expect(depois.rows).toEqual([{ ...antes.rows[0], rolname: 'pelada_backup_ro' }]);
+      expect(await privilegios('pelada_backup_ro')).toEqual(
+        Object.fromEntries(todasAsTabelas.map((t) => [t, ['SELECT']])),
+      );
+    } finally {
+      await cliente.query('ROLLBACK');
+    }
+  });
+
+  // Caso 2 da migration (servidor com vários bancos): as duas existem; grants e policies do banco mudam de role.
+  it('com pelada_backup e pelada_backup_ro no servidor, passa os grants e as policies do banco para a _ro', async () => {
+    await cliente.query('BEGIN');
+    try {
+      await tirarDoCaminho('pelada_backup');
+      await cliente.query('CREATE ROLE pelada_backup NOLOGIN NOBYPASSRLS');
+      await cliente.query('CREATE TABLE intrusa_backup (id int, segredo text)');
+      await cliente.query('ALTER TABLE intrusa_backup ENABLE ROW LEVEL SECURITY');
+      await cliente.query(
+        'CREATE POLICY intrusa_backup_backup ON intrusa_backup FOR SELECT TO pelada_backup USING (true)',
+      );
+      await cliente.query(
+        'CREATE POLICY intrusa_backup_ambas ON intrusa_backup FOR SELECT TO pelada_backup, pelada_app USING (true)',
+      );
+      await cliente.query('GRANT SELECT ON intrusa_backup TO pelada_backup');
+      await cliente.query('GRANT SELECT (id) ON contas TO pelada_backup');
+      await cliente.query('GRANT USAGE ON SCHEMA public TO pelada_backup');
+      await cliente.query(padronizadas());
+
+      const politicas = await cliente.query<{ polname: string; papeis: string[] }>(
+        `SELECT p.polname, array_agg(r.rolname::text ORDER BY r.rolname) AS papeis
+           FROM pg_policy p JOIN pg_roles r ON r.oid = ANY (p.polroles)
+          WHERE p.polrelid = 'intrusa_backup'::regclass GROUP BY p.polname ORDER BY p.polname`,
+      );
+      expect(politicas.rows).toEqual([
+        { polname: 'intrusa_backup_ambas', papeis: ['pelada_app', 'pelada_backup_ro'] },
+        { polname: 'intrusa_backup_backup', papeis: ['pelada_backup_ro'] },
+      ]);
+      const ok = (texto: string) => cliente.query<{ ok: boolean }>(texto).then((r) => r.rows[0]?.ok);
+      expect(await ok("SELECT has_table_privilege('pelada_backup_ro', 'intrusa_backup', 'SELECT') AS ok")).toBe(true);
+      expect(await ok("SELECT has_column_privilege('pelada_backup_ro', 'contas', 'id', 'SELECT') AS ok")).toBe(true);
+      // A antiga sai deste banco e, sem dependência em outro banco do servidor, deixa de existir.
+      expect(await ok("SELECT NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'pelada_backup') AS ok")).toBe(true);
+    } finally {
+      await cliente.query('ROLLBACK');
+    }
   });
 
   // Motivo da mudança (conta-e-acesso, T7): as tabelas de conta ganham os grants do design C1 (DE_CONTA).
@@ -259,13 +351,13 @@ describe('roles (FUN-11)', () => {
     });
   });
 
-  it('pelada_backup: só SELECT, em todas as tabelas', async () => {
+  it('pelada_backup_ro: só SELECT, em todas as tabelas', async () => {
     const esperado = Object.fromEntries(todasAsTabelas.map((t) => [t, ['SELECT']]));
-    expect(await privilegios('pelada_backup')).toEqual(esperado);
+    expect(await privilegios('pelada_backup_ro')).toEqual(esperado);
   });
 
-  it('pelada_backup não escreve nem faz DDL', async () => {
-    await comoRole(cliente, 'pelada_backup', async () => {
+  it('pelada_backup_ro não escreve nem faz DDL', async () => {
+    await comoRole(cliente, 'pelada_backup_ro', async () => {
       expect(await codigoDoErro(cliente, 'SELECT count(*) FROM contas')).toBeNull();
       expect(await codigoDoErro(cliente, "UPDATE grupos SET nome = 'x' WHERE false")).toBe(SEM_PRIVILEGIO);
       expect(await codigoDoErro(cliente, 'DELETE FROM jogadores WHERE false')).toBe(SEM_PRIVILEGIO);

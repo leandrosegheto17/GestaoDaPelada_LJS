@@ -1,6 +1,6 @@
 # ADR-025: Isolamento entre grupos por RLS com FORCE e contexto por transação
 
-- **Status:** Accepted (decisão AD-004 da fundação); a versão do Postgres da decisão 6 Superseded by ADR-031.
+- **Status:** Accepted (decisão AD-004 da fundação); a versão do Postgres da decisão 6 Superseded by ADR-031; o nome da role de backup da decisão 4 (`pelada_backup`, agora `pelada_backup_ro`) Superseded by ADR-032.
 - **Data:** 2026-10-25
 - **Decisores:** usuário e Coordenador
 - **Requisitos:** FUN-11 a FUN-18
