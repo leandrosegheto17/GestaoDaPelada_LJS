@@ -1,145 +1,155 @@
-# Conta e acesso — Validação (volta 4: correções de segurança T57 a T64)
+# Conta e acesso — Validação (volta 5: correções do reteste de segurança T65 a T69)
 
 **Data**: 2026-10-28
 **Spec**: `.specs/features/conta-e-acesso/spec.md`
-**Intervalo de commits**: `8df20cc..db0412e` (branch `fix/conta-e-acesso-seguranca`, 11 commits: T57 a T64, a retomada e o planejamento; 52 arquivos, 1687 linhas
-a mais e 100 a menos). Esta volta verifica o intervalo todo das correções dos médios de segurança (AD-012) e refaz a leitura dos critérios tocados
-(ACE-06 a ACE-08, ACE-50 a ACE-52, ACE-13, ACE-26 a ACE-30) e dos novos (ACE-70, ACE-71, ACE-72). `seguranca.md` tem alteração não commitada do auditor; não foi tocado.
-**Verificador**: subagente independente (autor ≠ verificador). Derivou a cobertura sozinho a partir da spec e do diff.
+**Intervalo de commits**: `cc844c5..70fce3b` (branch `fix/conta-e-acesso-seguranca`, 5 commits: `d0e4ea0` T65, `a81d70a` T66, `f309ad4` T67, `b1d4581` T68,
+`70fce3b` T69; 38 arquivos, 1365 linhas a mais e 67 a menos). Esta volta verifica ACE-72 (redação "atinge 80%"), ACE-73, ACE-74 e ACE-75 e refaz a leitura dos
+critérios que o diff toca (ACE-13/14, ACE-66, ACE-22, ACE-45/46, ACE-52). Decisão de origem: AD-013.
+**Verificador**: subagente independente (autor ≠ verificador). Derivou a cobertura sozinho a partir da spec e do diff, sem confiar no relato do implementador.
 
-**Result**: PASS
+**Result**: FAIL
 
-Resumo: os três critérios novos (ACE-70, ACE-71, ACE-72) e o ACE-06 reescrito têm evidência localizada em asserções que conferem o resultado definido na spec.
-Gate verde na árvore real: lint, format, typecheck, `pnpm test` (1269 testes, 0 falhas, na última execução) e `pnpm test:checagens` (432 testes). Sensor: 25
-mutações nas regras novas, 24 mortas e 1 sobreviveu, **equivalente** (o valor que a mutação muda nunca é lido; ver abaixo). Observações que não bloqueiam: uma
-lacuna de precisão da spec no ACE-72 (limite de 80% inclusivo ou exclusivo), uma cláusula do ACE-70 sem prova própria ("não revela se a conta existe") e
-dois testes de tela que estouram o tempo padrão de 5 s quando a máquina está carregada (flake, sem relação com o diff). E2E e visual não foram rodados, por pedido.
+Resumo: os quatro critérios (ACE-72, 73, 74, 75) têm evidência localizada em asserções que conferem o resultado definido na spec, e o gate está verde (lint, format,
+typecheck, `pnpm test` com 1317 testes, `pnpm test:checagens` com 432). O veredito é FAIL por **uma lacuna de teste**: o mutante M17 (trocar a trava do `conta_entrar` de
+"por e-mail" de volta para "por e-mail e IP") **sobreviveu**, e essa serialização é justamente a decisão (b) que a T67 tomou para a regra do ACE-74 valer sob
+concorrência (tentativas paralelas de IPs diferentes contra a mesma conta). Nenhum teste a exercita. Uma sonda escrita pelo verificador (fora do repositório) passa
+com o código atual e mata o mutante, então o teste que falta é pequeno. Nada mais bloqueia: 26 dos 29 mutantes morreram, e os 2 outros sobreviventes são equivalentes.
 
-Convenção de caminhos: `api/test/` = `backend/api/test/`; `web/` = `frontend/web/src/`; `e2e/` = `frontend/web/e2e/`.
+Convenção de caminhos: `api/test/` = `backend/api/test/`; `api/src/` = `backend/api/src/`; `mig/` = `backend/api/src/infraestrutura/db/migracoes/`; `e2e/` = `frontend/web/e2e/`.
 
 ---
 
 ## Resumo das voltas anteriores
 
-- **Volta 1 (FAIL)**: gate verde, 31 mutações (27 mortas). Quatro lacunas: M17 e M18 (policies de escrita de `sessoes` e `contas` abertas, ACE-43 e
-  ACE-44), F1 (ligação entre sessão expirada e `/entrar`, ACE-20), M26 (intervalo de 60 s só testado em 0 s e 61 s, ACE-51) e a t25 fora da
-  comparação visual (ACE-54). Corrigidas em T45 a T52. Relatório completo no histórico do git (`a8ec48f`).
-- **Volta 2 (FAIL)**: as quatro lacunas anteriores fechadas; 19 mutações, 17 mortas. Sobreviveram N7 e N16 (nenhum teste de rota conferia o valor de
-  `termos_versao` gravado em `POST /api/conta` e em `POST /api/convites/cadastrar`; ACE-01 e a cláusula "é a mesma gravada no aceite" do ACE-58) e achou-se o
-  byte inválido em três mockups t25. Corrigidas em T53 a T56. Relatório completo no histórico do git (`62aa021` e `45e7dca`).
+- **Volta 1 (FAIL)**: gate verde, 31 mutações (27 mortas). Quatro lacunas: M17 e M18 (policies de escrita de `sessoes` e `contas` abertas, ACE-43 e ACE-44), F1
+  (ligação entre sessão expirada e `/entrar`, ACE-20), M26 (intervalo de 60 s só testado em 0 s e 61 s, ACE-51) e a t25 fora da comparação visual (ACE-54). Corrigidas
+  em T45 a T52. Relatório completo no histórico do git (`a8ec48f`).
+- **Volta 2 (FAIL)**: as quatro lacunas anteriores fechadas; 19 mutações, 17 mortas. Sobreviveram N7 e N16 (nenhum teste de rota conferia o valor de `termos_versao`
+  gravado em `POST /api/conta` e em `POST /api/convites/cadastrar`; ACE-01 e a cláusula "é a mesma gravada no aceite" do ACE-58) e achou-se o byte inválido em três
+  mockups t25. Corrigidas em T53 a T56. Relatório completo no histórico do git (`62aa021` e `45e7dca`).
 - **Volta 3 (PASS)**: 69 de 69 critérios com o resultado da spec provados (1 lacuna de precisão, ACE-56, não bloqueante); gate verde (1203 + 432 + 15 testes e 84
-  comparações visuais); `gitleaks` sem vazamento; 9 mutações, 9 mortas. A tabela completa dos 69 critérios com `arquivo:linha` está no histórico do git
-  (`04cdca1`); os critérios que esta volta não toca continuam valendo com as mesmas evidências, e o gate completo desta volta as reexecuta (716 testes de API e 493 de web).
+  comparações visuais); `gitleaks` sem vazamento; 9 mutações, 9 mortas. A tabela completa dos 69 critérios com `arquivo:linha` está no histórico do git (`04cdca1`).
+- **Volta 4 (PASS)**: correções dos médios de segurança T57 a T64 (`8df20cc..db0412e`): ACE-06 reescrito, ACE-70, ACE-71 e ACE-72 provados; 25 mutações, 24 mortas e 1
+  sobrevivente equivalente (M11, `conta_senha_bloqueada_ate` devolve um valor que ninguém lê); gate verde (716 testes de API, 493 de web, 432 de checagens); duas
+  lacunas de precisão (fronteira do 80% do ACE-72, agora fechada pela redação "atinge"; cláusula "não revela se a conta existe" do ACE-70). Relatório completo no
+  histórico do git (`cc844c5`).
+
+Os critérios que esta volta não toca continuam valendo com as mesmas evidências; o gate completo desta volta as reexecuta.
 
 ---
 
 ## Conclusão das tarefas
 
-64 tarefas (T1 a T64). Phase 11 (correções da auditoria, AD-012), tudo marcado em `tasks.md`:
+69 tarefas (T1 a T69). Phase 12 (reteste de segurança, AD-013), todas marcadas em `tasks.md`:
 
 | Tarefa | Estado | Conferência desta volta |
 | --- | --- | --- |
-| T57 spec: ACE-06 reescrito, ACE-70 a ACE-72 | ✅ | `spec.md` (ACE-06 em 81; ACE-70 a ACE-72 nas linhas 293 a 295); `design.md` cita ACE-70 nas duas rotas. Os IDs 60 a 62 já existiam (termos e script do dono) e não foram tocados; as regras novas entraram como 70 a 72 |
-| T58 `link_confirmar` sem sessão | ✅ | migration aditiva `1792843740000_conta-confirmar-sem-sessao.sql` (mesma assinatura, segundo parâmetro sem uso); nenhuma migration aplicada foi editada |
-| T59 rota e tela levam a `/entrar` sem cookie | ✅ | `conta-cadastro.ts` (confirmar sem `definirCookieSessao`), `Confirmar.tsx`, `Entrar.tsx` |
-| T60 limitador por IP em senha e exclusão | ✅ | `app.ts`: `ROTAS_LIMITE_ENTRAR` ganha `/api/conta/senha` e `/api/conta/excluir` |
-| T61 bloqueio por conta | ✅ | migration `1792843800000_conta-senha-bloqueio.sql` + `conta-minha.ts` (transação própria) |
-| T62 /64 do IPv6 | ✅ | `infraestrutura/sessao/chave-ip.ts`, usado por `limite-taxa.ts` e `sessao.ts` |
-| T63 teto de e-mails | ✅ | migration `1792843860000_conta-teto-emails.sql`, `cota-email.ts`, `enviar-email.ts`, `.env.example` |
-| T64 runbook e THREAT-MODEL | ✅ | `docs/runbook.md` (cota do Resend), `.md/THREAT-MODEL.md:63` (linha D com as rotas novas, os critérios e o Turnstile adiado) |
+| T65 "esqueci a senha" de conta não confirmada gasta a cota de cadastro | ✅ | migration `mig/1792843920000_conta-esqueci-nao-confirmada.sql` (função nova `link_pedir_com_confirmacao`; `link_pedir` redefinida com a mesma assinatura e colunas, chamando a nova), `repositorios/links.ts` (`pedirRecuperacao`), `rotas/sessao-recuperacao.ts`, `enviar-email.ts` (categoria `recuperacao_nao_confirmada`) |
+| T66 teto de 20 e-mails por hora por IPv4 ou /48 | ✅ | migration `mig/1792843980000_conta-teto-emails-origem.sql` (tabela `pedidos_email_origem`, RLS com `FORCE`, só `pelada_backup` lê; `email_origem_registrar` com `SECURITY DEFINER`), `middlewares/limite-emails-origem.ts`, `app.ts` (`ROTAS_TETO_EMAILS_ORIGEM`), `chave-ip.ts` (`chaveDoIp48`), `LIMITE_EMAILS_IP_HORA` |
+| T67 teto de 50 falhas por hora por conta | ✅ | migration `mig/1792844040000_conta-entrar-teto-conta.sql` (`conta_entrar` redefinida com a mesma assinatura e colunas; sem tabela nova) |
+| T68 tempo máximo no Resend e na trava da cota | ✅ | `resend.ts` (`TEMPO_MAXIMO_RESEND_MS = 10_000`), migration `mig/1792844100000_conta-cota-trava.sql` (`ALTER FUNCTION email_cota_reservar(integer) SET lock_timeout = '2s'`), `cota-email.ts` (55P03 vira `trava`), `enviar-email.ts` |
+| T69 runbook, THREAT-MODEL, seguranca.md | ✅ | `docs/runbook.md` (cota, teto por origem, Resend lento), `.md/THREAT-MODEL.md` (linha D), `seguranca.md` (seção "Correções do reteste") |
 
-**Integridade dos testes** (`git diff 8df20cc..HEAD -- '*.test.*' '*.spec.ts'`): 31 linhas removidas em 19 arquivos de teste; todas são decorrentes do ACE-06
-reescrito (confirmar deixa de abrir sessão) ou do ACE-70 (as duas rotas deixam de ser "com sessão que não passa pelo `LIMITE_ENTRAR`"), cada uma com comentário
-de motivo e substituída por asserção igual ou mais forte:
+**Migrations**: `git diff --name-status cc844c5..HEAD -- mig/` mostra só quatro `A` (adicionadas); nenhuma migration aplicada foi editada. As funções `link_pedir` e
+`conta_entrar` são redefinidas com `CREATE OR REPLACE` mantendo assinatura e colunas (rollback do Worker, G-14). RLS e grants: `pedidos_email_origem` com `ENABLE` e `FORCE`
+(`mig/1792843980000...sql:18-19`), policy de leitura só para `pelada_backup` (`:20-21`), sem grant para a `pelada_app`; `email_origem_registrar_em` sem `SECURITY DEFINER` e
+sem `EXECUTE` (`:46`), `email_origem_registrar` com `SECURITY DEFINER`, `search_path` fixo e `EXECUTE` só para `pelada_app` (`:50-57`); `link_pedir_com_confirmacao` idem
+(`1792843920000...sql:9-12, 43-44`). O owner tem `BYPASSRLS` (`1792843320000_rls.sql:15`), o mesmo padrão de `envios_email_dia` (T63). Provas: `api/test/migracoes/conta-teto-emails-origem.test.ts:109-118`
+(`42501` em SELECT/INSERT/DELETE e na função com momento explícito), `api/test/migracoes/rls.test.ts`, `roles.test.ts`, `funcoes-definer.test.ts`, `api/test/isolamento/casos.ts`
+(`pedidos_email_origem: { acesso: 'sem-grant' }`) e `isolamento/contas.test.ts`.
 
-- `api/test/rotas/conta-cadastro.test.ts:165-176`: saiu `GET /api/sessao` 200 com o cookie da confirmação; entrou `Set-Cookie` nulo (`:173`), `GET /api/sessao` 401 (`:175`) e entrar 200 (`:177`).
-- `api/test/migracoes/conta-cadastro-e-links.test.ts:172-232`: saiu a sessão de 12 h; entrou `sessoesDe(...) toEqual([])` e a prova de que o hash de sessão passado não vira linha; casos novos (segundo parâmetro nulo; link inexistente sem sessão).
-- `api/test/repositorios/links.test.ts:65-95`: assinatura de `links.confirmar` sem o hash; asserções novas de link consumido e sem sessão; caso novo de link vencido.
-- `api/test/rotas/sessao-middleware.test.ts:59-64, 95-108`: as duas rotas saíram da lista "com sessão" e entraram em `ROTAS_SEM_SESSAO`, com um teste novo que prova 429 sem tocar no banco (`sonda.acessos() toBe(0)`).
-- `web/telas/confirmar/Confirmar.test.tsx:21-72` (pathname `/entrar`, `search` `?aviso=email-confirmado`, nenhuma chamada a `/api/sessao`) e `e2e/acesso.spec.ts:106-118`: pelo ACE-06 novo. A aprovação dessas mudanças está registrada em `STATE.md` (decisões das correções) e nas tarefas T57/T59.
-- Nenhum teste apagado, pulado, comentado ou enfraquecido; `git grep` de `.skip/.only/.todo/xit/xdescribe` sem ocorrência real (os acertos são `process.exit(`).
+**Integridade dos testes** (`git diff cc844c5..HEAD -- '*.test.*'` e arquivos de apoio): **2 linhas removidas** em todo o diff de testes, ambas em
+`api/test/infraestrutura/chave-ip.test.ts` (o comentário de cabeçalho, ampliado para citar o ACE-73, e a linha de `import`, que ganhou `chaveDoIp48`). Todo o resto é
+acréscimo: itens novos nas listas de tabelas (`rls.test.ts`, `roles.test.ts` duas vezes, `contas.test.ts` duas vezes, `migrar.test.ts`, `casos.ts`, `cenario-dois-grupos.ts`) e de
+funções (`funcoes-definer.test.ts`: `email_origem_registrar` e `link_pedir_com_confirmacao`) e blocos `describe` novos (em `teto-emails.test.ts`, `email.test.ts`, `links.test.ts`).
+Nenhum teste apagado, pulado, comentado ou enfraquecido; o relato do implementador confere.
 
-**Contagem de testes** (volta 3 → volta 4): API 651 → 716 (+65), web 492 → 493 (+1), contrato 39, raiz 20, domínio 1, checagens 432 (igual). Nenhum a menos.
+**Contagem de testes** (volta 4 → volta 5): API 716 → 764 (+48, 53 arquivos), web 493 (igual), contrato 39, raiz 20, domínio 1, checagens 432 (igual). Nenhum a menos.
 
 ---
 
 ## Critérios de aceite ancorados na spec
 
-### Critérios novos e reescritos
-
 | Critério | Resultado definido na spec | `arquivo:linha` + asserção | Resultado |
 | --- | --- | --- | --- |
-| ACE-06 (reescrito) confirmar em 24 h | e-mail confirmado; **sem sessão**; vai a `/entrar` com "E-mail confirmado. Entre com a sua senha." | Banco: `api/test/migracoes/conta-cadastro-e-links.test.ts:181-188` (a 23,9 h) `email_confirmado_em toBeInstanceOf(Date)`, `link(token).usado toBe(true)`, `sessoesDe(conta_id) toEqual([])`, nenhuma linha em `sessoes` para o hash passado; `:190-203` com o 2º parâmetro nulo. Repositório: `api/test/repositorios/links.test.ts:66-76` `conta.rows[0] toEqual({ ok: true })`, `link.rows toEqual([{ usado: true }])`, `rowCount toBe(0)`. Rota: `api/test/rotas/conta-cadastro.test.ts:172-177` `status toBe(204)`, `headers.get('Set-Cookie') toBeNull()`, `GET /api/sessao` 401, entrar 200 (prova que o e-mail ficou confirmado). Tela: `web/telas/confirmar/Confirmar.test.tsx:40-42` `pathname toBe('/entrar')`, `search toBe('?aviso=email-confirmado')`, nenhuma chamada a `/api/sessao`; `web/telas/entrar/Entrar.test.tsx:135` `getByText('E-mail confirmado. Entre com a sua senha.') toBeVisible()`. E2E (não rodado): `e2e/acesso.spec.ts:109-115`. Mutantes M16 a M19 mortos | ✅ PASS |
-| ACE-07 (ajustado) link inválido | 410 `link_invalido`, sem sessão | `api/test/rotas/conta-cadastro.test.ts:180-191` `status toBe(410)`, `codigo: 'link_invalido'`, `Set-Cookie` nulo; `api/test/repositorios/links.test.ts:78-95` (inexistente, usado e vencido: nulo, e-mail sem confirmar, sem sessão); `api/test/migracoes/conta-cadastro-e-links.test.ts:205-212` (a 24 h: nulo) | ✅ PASS |
-| ACE-70a bloqueio por conta | 5 falhas da senha atual na mesma conta em 15 min: as seguintes recebem o erro de bloqueio (429 `bloqueado_temporariamente`) sem rodar o bcrypt, até 15 min depois da quinta; a senha certa antes disso zera a contagem; o bloqueio é por conta | Banco: `api/test/migracoes/conta-senha-bloqueio.test.ts:123-133` (6ª tentativa com a senha certa: `trocarSenha toBeNull()`, retrato da conta/sessões/vínculos igual, senha antiga ainda entra), `:135-144` (`excluir toBe('bloqueado')`), `:146-158` (hash que faria o `crypt` falhar: o controle lança `invalid salt`, a tentativa bloqueada responde o bloqueio, logo o bcrypt não roda), `:160-166` (`falhasDa toBe(5)`: tentativa bloqueada não conta), `:168-172` (4 falhas não bloqueiam), `:174-181` (acerto zera: `falhasDa toBe(0)` e mais 4 falhas não bloqueiam), `:183-198` (acerto recusado por única admin também zera), `:200-208` (14 min: bloqueado; 15 min: `trocarSenha toBe(true)`), `:210-222` (prazo da quinta falha; 5 falhas espalhadas não bloqueiam), `:224-230` (troca e exclusão somam), `:232-240` (outra conta não é afetada), `:250-302` (concorrência: duas falhas simultâneas contam 2; a quinta e a seguinte). Repositório: `api/test/repositorios/contas.test.ts:217-235` `toBe('bloqueado')` e `toEqual({ resultado: 'bloqueado', grupos: [] })`. Rota: `api/test/rotas/conta-minha.test.ts:138-153` `troca.status toBe(429)`, `corpo toMatchObject({ erro: { codigo: 'bloqueado_temporariamente' } })`, `exclusao.status toBe(429)`, sem `Set-Cookie`, senha antiga ainda entra; `:155-165` (5 falhas na exclusão bloqueiam também a troca; `outra` conta troca com 204). Mutantes M10 a M15, M24 e M25 mortos | ✅ PASS |
-| ACE-70b limitador por IP nas duas rotas | as duas rotas passam pelo limitador por IP do login e respondem 429 antes do bcrypt | `api/test/rotas/sessao-middleware.test.ts:83-92` (`it.each(ROTAS_SEM_SESSAO)` com `/api/conta/senha` e `/api/conta/excluir`: `status toBe(429)`, `codigo: 'muitas_requisicoes'`, `entrar.chaves toHaveLength(1)`) e `:95-108` (`status toBe(429)` e `sonda.acessos() toBe(0)`: nem sessão nem bcrypt rodam). Mutante M9 morto | ✅ PASS |
-| ACE-70c "a resposta não revela se a conta existe" | bloqueio por conta sem revelar a existência | As rotas exigem sessão, então não há consulta por e-mail que sirva de oráculo; a ramificação "conta inexistente" do banco devolve `false` (igual a senha errada) e não tem teste próprio | ⚠️ Lacuna de precisão da spec |
-| ACE-71 IPv6 /64 | chave do limitador por IP e `ip_hash` do bloqueio por e-mail e IP usam o /64; IPv4 inteiro; sem IP, `sem-ip` | Função: `api/test/infraestrutura/chave-ip.test.ts:7` `chaveDoIp('203.0.113.7') toBe('203.0.113.7')`, `:12-14` `'sem-ip'` (undefined, null, vazio), `:18` mesmo /64 dá a mesma chave, `:22-23` /64 diferentes dão chaves diferentes, `:27-32` forma compactada/caixa/zeros, `:36-38` expansão do `::`, `:42-43` IPv4 mapeado vale como IPv4. Limitador: `api/test/rotas/limite-taxa.test.ts:50-58` (mesmo /64: o 2º recebe 429, outro /64 não, `chaves[0] toBe(chaves[1])`; sem IP: `:91` `chaves toEqual(['sem-ip'])`). `ip_hash`: `api/test/rotas/sessao.test.ts:92-119` (5 falhas de endereços do mesmo /64, escritos de formas diferentes, somam: `mesmo64.status toBe(429)`; outro /64: `toBe(200)`). Mutantes M6, M7, M8 e M23 mortos | ✅ PASS |
-| ACE-72 teto diário de e-mails | acima de 80% de `LIMITE_EMAILS_DIA` (padrão 100), cadastro, reenvio e convite respondem 503 `email_indisponivel` sem enviar; "esqueci a senha" envia até 100%; o contador zera na virada do dia de São Paulo | Rota (limite 10): `api/test/rotas/teto-emails.test.ts:50-74` cadastro: total 7 envia (201, total passa a 8), total 8 dá `status toBe(503)`, `corpo toMatchObject({ erro: { codigo: 'email_indisponivel' } })`, nada enviado, conta não criada, log sem o e-mail; `:76-88` e-mail que já tem conta recebe o mesmo 503 do cadastro novo e nenhum aviso (ACE-04); `:91-110` reenvio; `:113-129` convite (503 e o convite não fica); `:132-155` recuperação: total 8 e 9 enviam (200), total 10 dá 503; `:158-173` `LIMITE_EMAILS_DIA=50` (teto 40 e 50); `:175-187` valor ausente, vazio, texto, zero, negativo e decimal voltam ao padrão 100; `:191-204` regras puras. Banco: `api/test/migracoes/conta-teto-emails.test.ts:42-48` reserva até o teto e recusa o seguinte, `:50-59` 80% e 100% convivem, `:66-76` zera na virada do dia de São Paulo (23:59 e 00:01 de SP, mesmo dia UTC), `:78-84` não zera na virada do dia UTC, `:86-92` o envio que falha (ROLLBACK) não conta, `:95-121` a `pelada_app` só executa `email_cota_reservar`, `:124-181` concorrência (dez simultâneos com teto 4: exatamente 4). Mutantes M1 a M5, M20 a M22 mortos | ✅ PASS (ver lacuna de precisão abaixo) |
-| ACE-72 "passa de 80%" (fronteira) | "o total passa de 80%": a spec não diz se o 80º e-mail ainda sai | A implementação envia até o 80º e barra o 81º (`teto = floor(limite × 0,8)`, reserva com `total < teto`); `api/test/rotas/teto-emails.test.ts:98-103` (total 8 de 10 já dá 503, e total 7 envia). Uma leitura literal de "passa de 80%" poderia deixar sair o 81º | ⚠️ Lacuna de precisão da spec |
+| ACE-72 (redação "atinge 80%") | `spec.md:295`: "atinge 80% … o 80º e-mail ainda sai, o 81º não"; "esqueci a senha" até 100%; zera na virada do dia. A lacuna de precisão da volta 4 está fechada | Rota (limite 10, teto 8): `api/test/rotas/teto-emails.test.ts:52-56` (total 7: a rota responde 201 e o total passa a 8, `lerTotalHoje() toBe(8)`), `:62` `recusado.status toBe(503)` com o total em 8 (`:65`); reenvio `:98-103` (`503` com 8) e `:105-109` (`200` com 7); convite `:119-121`; recuperação `:139-151` (8 e 9 enviam, 10 dá 503). Runbook diz "ao atingir 80%" (`docs/runbook.md`). Banco: `api/test/migracoes/conta-teto-emails.test.ts` (inalterado, fronteira `total < teto`). Mutantes M25 morto (90% no lugar de 80%: 13 falhas) | ✅ PASS |
+| ACE-73a "esqueci a senha" de conta não confirmada gasta a cota de cadastro | com a cota de cadastro cheia (80%), conta **não** confirmada recebe 503 `email_indisponivel` sem enviar; conta confirmada ainda envia (reserva dos 20%) | Rota: `api/test/rotas/teto-emails.test.ts:176` `r.status toBe(503)`, `:177` `r.corpo toMatchObject(ERRO)`, `:178` `enviadosPara(naoConfirmada) toHaveLength(0)`, `:179` `lerTotalHoje() toBe(8)`, `:182` `(await esqueci(confirmada.email)).status toBe(200)`, `:184` total 9; `:189-193` abaixo de 80%: 200, 1 e-mail, total 8. Banco: `api/test/migracoes/conta-esqueci-nao-confirmada.test.ts:49-77` (`toEqual({ enviar: true, nome, confirmada: false })`, `confirmada: true`, e sem conta `{ enviar: false, nome: null, confirmada: false }`) e `:79-93` (`link_pedir` mantém as duas colunas e o intervalo de 60 s). Repositório: `api/test/repositorios/links.test.ts` (`links.pedirRecuperacao`, três casos). Mutantes M1, M2, M3, M4, M24 mortos | ✅ PASS |
+| ACE-73b teto de 20 pedidos por hora por IPv4 ou /48 | mais de 20 e-mails (cadastro, reenvio, convite ou "esqueci a senha") por hora do mesmo IPv4 ou /48 recebem 429 `muitas_requisicoes`, sem enviar | Rota: `api/test/rotas/teto-emails-origem.test.ts:57-72` (20 pedidos das 4 rotas, cada um de um /64 diferente do mesmo /48: 201, 200, 201, 200), `:77` `r.status toBe(429)`, `:78` `r.corpo toMatchObject({ erro: { codigo: 'muitas_requisicoes' } })`, `:79` `enviadosPara(...) toHaveLength(0)`, `:80` `lerTotalHoje() toBe(antes)` (nem a cota do dia foi gasta), `:84` cadastro e `:91` convite do mesmo /48: `toBe(429)`, `:94-96` outro /48: `200` e 1 e-mail. IPv4: `:118` 20 pedidos `toBe(200)`, `:120-121` o 21º `429`, `:124` outro IPv4 `200`; mapeado `:131-132` `toBe(200)` e `:132` `429`. Rotas que não enviam não contam (`:102-111`, login 401). Função da chave: `api/test/infraestrutura/chave-ip.test.ts:52-78` (`chaveDoIp48`: mesmo /48 dá a mesma chave, /48 diferentes não, IPv4 inteiro, mapeado, `sem-ip`). Banco: `api/test/migracoes/conta-teto-emails-origem.test.ts:55-61` (20 passam, o 21º `false` e não é gravado), `:63-72` (janela de 1 h exata), `:121-139` (dez simultâneos com teto 4: exatamente 4). Mutantes M5, M6, M7a a M7d, M8, M9, M11, M12 mortos; M10 equivalente | ✅ PASS |
+| ACE-74 50 falhas por hora por conta, de qualquer IP | 50 senhas erradas em 1 h para a mesma conta, de quaisquer IPs: as seguintes recebem 429 `bloqueado_temporariamente`, sem bcrypt, por 10 min; resposta igual para conta inexistente; a senha certa zera a contagem só fora do bloqueio | Rota: `api/test/rotas/entrar-teto-conta.test.ts:32` `r.status toBe(429)` com a senha certa e IP novo, `:33` `codigo: 'bloqueado_temporariamente'`, `:34` `Set-Cookie` nulo; `:50-52` conta inexistente: `semConta.status toBe(comConta.status)`, `semConta.corpo toEqual(comConta.corpo)`, `toBe(429)`; `:62` 49 falhas e a senha certa: `toBe(200)`. Banco (`api/test/migracoes/conta-entrar-teto-conta.test.ts`): `:88` 50 falhas de /64 e /48 diferentes `toMatchObject(BLOQUEADO)`; `:94-95` 49 falhas não bloqueiam e a 51ª é bloqueada; `:101` 49 e senha certa `ok`; `:108-115` a 9 min 50 s ainda bloqueado e `bloqueado_ate` entre 0 e 10 min, `:120` a 10 min 10 s liberado; `:126-127` 50 espalhadas por mais de 1 h não bloqueiam; `:133` e-mail sem conta `toMatchObject(BLOQUEADO)`; `:136-143` hash que faria o `crypt` falhar (a tentativa bloqueada não roda o bcrypt) e nada é gravado; `:146-163` a senha certa zera fora do bloqueio e não durante ele. Mutantes M13, M14a, M14b, M15, M18 mortos; M16 equivalente; **M17 sobreviveu (ver lacuna)** | ✅ PASS nas cláusulas da spec; ❌ lacuna de teste na serialização (abaixo) |
+| ACE-75a fetch do Resend aborta em 10 s | o Resend sem resposta por 10 s é abortado e tratado como falha (503 `email_indisponivel`, sem gastar a cota) | `api/test/infraestrutura/email.test.ts:118` (aos 9.999 ms `resultado toBeUndefined()`), `:121` (aos 10.000 ms `resultado toBe('falhou')`), `:122` `signal.aborted toBe(true)`, `:124` o log não leva o token, `:131` `vi.getTimerCount() toBe(0)` (resposta dentro do prazo não deixa relógio armado). A falha do remetente vira 503 e desfaz a reserva pelo caminho já provado no ACE-52 (`api/test/rotas/conta-cadastro.test.ts:143`, `sessao-recuperacao.test.ts:59`) e `api/test/migracoes/conta-teto-emails.test.ts:86-92` (ROLLBACK não conta). Mutantes M19, M20, M21 mortos | ✅ PASS (a cadeia "provedor mudo, 503, cota intacta" é provada em partes; ver observação 5) |
+| ACE-75b `lock_timeout` de 2 s na reserva | a reserva espera no máximo 2 s pela trava da linha do dia; acima disso, 503 `email_indisponivel` sem gastar cota | Banco: `api/test/migracoes/conta-cota-trava.test.ts:61` `resultado toBe('55P03')`, `:62` `decorrido toBeGreaterThanOrEqual(1_900)`, `:63` `toBeLessThan(4_000)` (duas variantes: linha do dia existente e linha sendo criada); `:75` `lock_timeout` volta a `'0'` depois da função. Rota: `api/test/rotas/teto-emails-trava.test.ts:44` `r.status toBe(503)`, `:45` `codigo: 'email_indisponivel'`, `:46` `decorrido toBeLessThan(5_000)`, `:47` `remetente.mensagens toHaveLength(0)`, `:48` o log não leva o e-mail, `:51` total igual a antes. Mutantes M22 e M23 mortos | ✅ PASS |
 
 ### Critérios tocados pelo diff e reexecutados (regressão)
 
-Todos reexecutados no gate desta volta (API 716 testes, web 493), com as evidências da volta 3 (`04cdca1`) intactas; citados aqui só os pontos que o diff alterou:
-
 | Critério | Ponto tocado | Evidência desta volta |
 | --- | --- | --- |
-| ACE-04 aviso de cadastro duplicado | passa pelo mesmo teto do cadastro novo (categoria `cadastro`) | `api/test/rotas/teto-emails.test.ts:76-88` `duplicado.corpo toEqual(novo.corpo)`; M21 morto |
-| ACE-13/14 bloqueio do login | `ip_hash` agora pela `chaveDoIp` | `api/test/rotas/sessao.test.ts:71-90` (IPv4 inalterado) e `:92-119` (IPv6) |
-| ACE-26 a ACE-30 troca e exclusão | agora em transação própria com a conta da sessão | `api/test/rotas/conta-minha.test.ts` inteiro (troca 204, atual 401, exclusão, única admin 409, senha errada 401); M15 morto |
-| ACE-49/50 CSRF e `LIMITE_ENTRAR` | duas rotas a mais na lista | `api/test/rotas/sessao-middleware.test.ts:64-92` |
-| ACE-52 falha do remetente | 503 também pelo teto, sem vazar o destino | `api/test/rotas/teto-emails.test.ts:67-68` `log not.toContain(barrado)` |
-| ACE-45/46 RLS e `sem-grant` das tabelas de conta | duas tabelas novas (`falhas_senha_atual`, `envios_email_dia`) | `api/test/isolamento/casos.ts:176-179`, `api/test/isolamento/contas.test.ts:68-79`, `:194-195`, `api/test/migracoes/rls.test.ts:30-41`, `api/test/migracoes/roles.test.ts:190-193`; as tabelas novas têm RLS com `FORCE` e só a `pelada_backup` lê |
-| ACE-60 a 62 (termos e script do dono) | não alterados pelo diff | `backend/scripts/test/dono.test.ts` e `web/telas/termos/*.test.tsx` passaram no gate |
+| ACE-13/14 bloqueio do login por e-mail e IP | `conta_entrar` redefinida; a trava passou de (e-mail, IP) para e-mail | `api/test/migracoes/conta-entrar-e-sessao.test.ts` inteiro verde (28 testes com M17 aplicado, ou seja, também verdes com a trava antiga: ver a lacuna) |
+| ACE-66 concorrência do par | trava agora é do e-mail | `api/test/migracoes/conta-entrar-e-sessao.test.ts:239-251` (duas falhas simultâneas do mesmo par contam 2) e `:255-282` (a quinta grava e a outra encontra o bloqueio) |
+| ACE-22 e ACE-04 mesma resposta exista a conta ou não | "esqueci a senha" usa `pedirRecuperacao` | `api/test/rotas/sessao-recuperacao.test.ts` verde; ver observação 4 (oráculo residual com a cota entre 80% e 100%) |
+| ACE-45/46 RLS e `sem-grant` | tabela nova `pedidos_email_origem` | `api/test/isolamento/casos.ts`, `isolamento/contas.test.ts`, `migracoes/rls.test.ts`, `roles.test.ts` |
+| ACE-52 falha do remetente sem vazar o destino | 503 também pela trava | `api/test/rotas/teto-emails-trava.test.ts:48` |
+| ACE-50 limitador por IP | sem mudança | `api/test/rotas/sessao-middleware.test.ts` verde |
 
-**Status**: ✅ ACE-06, ACE-70, ACE-71 e ACE-72 provados com o resultado definido na spec. ⚠️ Duas lacunas de precisão da spec, não bloqueantes: (a) ACE-72, fronteira de
-"passa de 80%"; (b) ACE-70, a cláusula "não revela se a conta existe" não tem consulta que a exercite. (A lacuna anterior, ACE-56, segue como na volta 3.)
+**Status**: ✅ ACE-72, ACE-73 e ACE-75 provados com o resultado da spec. ACE-74 tem todas as cláusulas da spec provadas, mas a serialização por conta (decisão (b)) não tem prova: ❌ uma lacuna.
 
 ---
 
 ## Discrimination Sensor
 
-Cópia isolada: `git worktree add --detach` na pasta de rascunho do verificador, com `pnpm install --offline --frozen-lockfile` e o `.env` local copiado.
-Cada mutação foi aplicada por script que exige exatamente uma ocorrência do trecho, rodou os testes que cobrem a regra (banco `conta-e-acesso-seguranca-db-1`,
-uma execução por vez) e restaurou o arquivo a partir do original lido em memória. Ao fim, a cópia foi removida (as 2118 junctions de `node_modules` sem seguir
-os links), `git worktree prune` limpo e `git worktree list` sem ela. `git status --porcelain` da árvore real: só ` M .specs/features/conta-e-acesso/seguranca.md`
-(a alteração do auditor), idêntico antes e depois. O resíduo da tentativa anterior (um diretório `mut` sem registro no git, com `node_modules`) foi removido do mesmo modo.
+Cópia isolada: `git worktree add --detach` no diretório de rascunho do verificador, com `pnpm install --offline --frozen-lockfile` e o `.env` local copiado. Cada mutação foi aplicada
+por script que exige exatamente uma ocorrência do trecho, rodou os testes que cobrem a regra (banco `conta-e-acesso-seguranca-db-1`, uma execução por vez) e restaurou o
+arquivo a partir do original lido em memória. Ao fim, as pastas `node_modules` da cópia foram apagadas sem seguir links (a `node_modules` da árvore real conferida depois: 679 pacotes em
+`.pnpm`, igual a antes), o worktree temporário removido (`git worktree remove --force`, `git worktree prune`; `git worktree list` sem ele) e `git status --porcelain` da árvore real
+ficou **vazio, igual ao de antes**.
 
 | # | Arquivo | Mutação (regra crítica) | Testes executados | Resultado |
 | --- | --- | --- | --- | --- |
-| M1 | `enviar-email.ts` (`tetoDoEnvio`) | a recuperação perde a reserva (usa 80%) | `rotas/teto-emails` | ✅ Morta (3 falhas) |
-| M2 | `enviar-email.ts` (`tetoDoEnvio`) | 80% vira 90% | idem | ✅ Morta (12 falhas) |
-| M3 | `enviar-email.ts` (`enviarModelo`) | remove a reserva do teto (`if (false)`) | idem | ✅ Morta (12 falhas) |
-| M4 | `1792843860000_conta-teto-emails.sql` | `e.total < p_teto` vira `<=` (erro de um) | `migracoes/conta-teto-emails` | ✅ Morta (7 falhas) |
-| M5 | idem | dia em UTC no lugar de São Paulo | idem | ✅ Morta (2 falhas: as duas viradas de dia) |
-| M6 | `sessao/chave-ip.ts` | prefixo de 5 grupos no lugar de 4 (/80) | `infraestrutura/chave-ip` | ✅ Morta (3 falhas) |
-| M7 | `rotas/sessao.ts` | `ip_hash` sem o /64 | `rotas/sessao` | ✅ Morta (1 falha: o teste IPv6) |
-| M8 | `middlewares/limite-taxa.ts` | chave do limitador sem o /64 | `rotas/limite-taxa` | ✅ Morta (1 falha) |
-| M9 | `app.ts` | `/api/conta/excluir` sai do limitador por IP | `rotas/sessao-middleware` | ✅ Morta (2 falhas) |
-| M10 | `1792843800000_conta-senha-bloqueio.sql` | bloqueio só na 6ª falha (`>= 6`) | `conta-senha-bloqueio`, `rotas/conta-minha` | ✅ Morta (11 falhas) |
-| M11 | idem (`conta_senha_bloqueada_ate`) | `+ interval '15 minutes'` vira `'10 minutes'` | `conta-senha-bloqueio` | ➖ Sobreviveu, **equivalente** (ver nota) |
-| M12 | idem (`conta_trocar_senha`) | o acerto não zera a contagem | idem | ✅ Morta (1 falha) |
-| M13 | idem (`conta_excluir`) | a exclusão ignora o bloqueio | `conta-senha-bloqueio`, `repositorios/contas` | ✅ Morta (6 falhas) |
-| M14 | idem (`conta_trocar_senha`) | a troca não grava a falha | `conta-senha-bloqueio` | ✅ Morta (9 falhas) |
-| M15 | `rotas/conta-minha.ts` | a falha corre na transação da requisição (que o 401 desfaz) | `rotas/conta-minha` | ✅ Morta (2 falhas) |
-| M16 | `1792843740000_conta-confirmar-sem-sessao.sql` | confirmar não marca o e-mail | `repositorios/links`, `conta-cadastro-e-links`, `rotas/conta-cadastro` | ✅ Morta (6 falhas) |
-| M17 | `rotas/conta-cadastro.ts` | confirmar devolve `Set-Cookie` | `rotas/conta-cadastro` | ✅ Morta (1 falha) |
-| M18 | `Confirmar.tsx` | confirmar leva a `/app` | `Confirmar.test.tsx` | ✅ Morta (3 falhas) |
-| M19 | `Entrar.tsx` | o texto do aviso muda | `Entrar.test.tsx` | ✅ Morta (1 falha) |
-| M20 | `rotas/sessao-recuperacao.ts` | "esqueci a senha" entra na cota de 80% | `rotas/teto-emails` | ✅ Morta (2 falhas) |
-| M21 | `rotas/conta-cadastro.ts` | cadastro e aviso duplicado entram na cota de 100% | idem | ✅ Morta (9 falhas) |
-| M22 | `enviar-email.ts` | padrão de `LIMITE_EMAILS_DIA` vira 1000 | idem | ✅ Morta (7 falhas) |
-| M23 | `sessao/chave-ip.ts` | IPv4 mapeado em IPv6 deixa de valer como o IPv4 | `infraestrutura/chave-ip` | ✅ Morta (1 falha) |
-| M24 | `1792843800000_conta-senha-bloqueio.sql` | o bloqueio nunca expira (tira a janela de 15 min) | `conta-senha-bloqueio` | ✅ Morta (1 falha: "ainda bloqueado 14 min depois da quinta falha; liberado 15 min depois") |
-| M25 | `repositorios/contas.ts` | o repositório não distingue o bloqueio (`ok === null`) | `repositorios/contas`, `rotas/conta-minha` | ✅ Morta (3 falhas) |
+| M1 | `enviar-email.ts` (`tetoDoEnvio`) | a categoria `recuperacao_nao_confirmada` usa a cota inteira | `rotas/teto-emails` | ✅ Morta (1 falha) |
+| M2 | `rotas/sessao-recuperacao.ts` | a rota sempre usa a categoria `recuperacao` | idem | ✅ Morta (1 falha) |
+| M3 | idem | `pedido.confirmada` invertido | idem | ✅ Morta (3 falhas) |
+| M4 | `1792843920000_conta-esqueci-nao-confirmada.sql` | `confirmada` ignora o e-mail confirmado | `migracoes/conta-esqueci-nao-confirmada` | ✅ Morta (2 falhas) |
+| M5 | `sessao/chave-ip.ts` | `chaveDoIp48` usa 4 grupos (/64) | `infraestrutura/chave-ip`, `rotas/teto-emails-origem` | ✅ Morta (4 falhas) |
+| M6 | idem | `chaveDoIp48` usa 2 grupos (/32) | `infraestrutura/chave-ip` | ✅ Morta (1 falha) |
+| M7a | `app.ts` | o convite sai da lista do teto por origem | `rotas/teto-emails-origem` | ✅ Morta (1 falha) |
+| M7b | idem | o reenvio sai da lista | idem | ✅ Morta (1 falha) |
+| M7c | idem | "esqueci a senha" sai da lista | idem | ✅ Morta (4 falhas) |
+| M7d | idem | o cadastro (`/api/conta`) sai da lista | idem | ✅ Morta (1 falha) |
+| M8 | `middlewares/limite-emails-origem.ts` | padrão 20 vira 21 | idem | ✅ Morta (3 falhas) |
+| M9 | `1792843980000_conta-teto-emails-origem.sql` | `v_total >= p_teto` vira `>` (erro de um) | `migracoes/conta-teto-emails-origem` | ✅ Morta (6 falhas) |
+| M10 | idem | janela do `count` de 1 h vira 2 h | idem | ➖ Sobreviveu, **equivalente** (ver nota) |
+| M11 | idem | remove o `pg_advisory_xact_lock` da origem | idem | ✅ Morta (1 falha: os dez simultâneos) |
+| M12 | `middlewares/limite-emails-origem.ts` | a chave usa o /64 e não o /48 | `rotas/teto-emails-origem` | ✅ Morta (4 falhas) |
+| M13 | `1792844040000_conta-entrar-teto-conta.sql` | `>= 50` vira `>= 51` | `migracoes/conta-entrar-teto-conta` | ✅ Morta (6 falhas) |
+| M14a | idem | o bloqueio dura 15 min e não 10 | idem | ✅ Morta (1 falha) |
+| M14b | idem | só as falhas dos últimos 5 min bloqueiam | idem | ✅ Morta (1 falha) |
+| M15 | idem | janela da conta de 1 h vira 2 h | idem | ✅ Morta (1 falha) |
+| M16 | idem | o filtro externo perde `f.momento > v_ultimo_sucesso_conta` | idem | ➖ Sobreviveu, **equivalente** (ver nota) |
+| **M17** | idem | **a trava volta a ser (e-mail, IP)** | `migracoes/conta-entrar-teto-conta`, `migracoes/conta-entrar-e-sessao` (28 testes) | ❌ **SOBREVIVEU** |
+| M18 | idem | a contagem da conta só soma as falhas do mesmo IP | `migracoes/conta-entrar-teto-conta` | ✅ Morta (6 falhas) |
+| M19 | `email/resend.ts` | tempo máximo de 10 s vira 30 s | `infraestrutura/email` | ✅ Morta (1 falha) |
+| M20 | idem | o `fetch` perde o `signal` | idem | ✅ Morta (1 falha) |
+| M21 | idem | o `clearTimeout` some | idem | ✅ Morta (1 falha) |
+| M22 | `1792844100000_conta-cota-trava.sql` | `lock_timeout` de 2 s vira 8 s | `migracoes/conta-cota-trava` | ✅ Morta (2 falhas) |
+| M23 | `repositorios/cota-email.ts` | o código 55P03 deixa de ser reconhecido | `rotas/teto-emails-trava` | ✅ Morta |
+| M24 | `repositorios/links.ts` | `pedirRecuperacao` devolve `confirmada: true` sempre | `repositorios/links`, `rotas/teto-emails` | ✅ Morta (3 falhas) |
+| M25 | `enviar-email.ts` | teto de 80% vira 90% | `rotas/teto-emails` | ✅ Morta (13 falhas) |
+| M17p | idem M17, com a sonda do verificador | trava (e-mail, IP) | sonda abaixo | ✅ Morta (a sonda falha com a mutação e passa com o código atual) |
 
-**M11, equivalente.** `conta_senha_bloqueada_ate` devolve um instante, mas as duas únicas chamadas (`1792843800000_conta-senha-bloqueio.sql:67` e `:107`) só testam
-`IS NOT NULL`. Quem decide quanto o bloqueio dura é a janela `f.momento > now() - interval '15 minutes'` (M24 a derruba), e a mutação só muda um valor que ninguém lê:
-nenhum teste poderia distingui-la sem mudar o comportamento. Não é fraqueza dos testes; fica como sugestão de limpeza (a função poderia devolver `boolean`),
-sem tarefa de correção.
+**M10, equivalente.** Em `email_origem_registrar_em`, o `DELETE` que precede a contagem já apaga os pedidos com `momento <= p_momento - 1 hora`, então a janela do `count`
+(`> p_momento - 1 hora`) é redundante: a mutação não muda nenhum resultado observável.
 
-**Profundidade**: P0 completo (autenticação, sessão e dados de conta; mais de 5 mutações manuais cobrindo todos os ramos das regras novas).
-**Resultado**: 24 de 24 mutantes não equivalentes mortos (25 injetados, 1 equivalente). ✅ PASS.
+**M16, equivalente.** O filtro `f.momento > v_ultimo_sucesso_conta` da consulta externa é redundante com o da subconsulta: uma falha anterior ao último sucesso tem zero falhas
+posteriores a ele até ela mesma, logo nunca chega a 50.
+
+**M17, lacuna real.** A migration (`1792844040000...sql:7-8, 38`) trava `'entrar|' || v_email` justamente para que tentativas simultâneas do mesmo e-mail, de IPs diferentes, sejam
+avaliadas uma depois da outra. Com a trava antiga (por e-mail e IP), 49 falhas e cinco tentativas simultâneas de IPs diferentes deixam as cinco passarem pela verificação do
+bloqueio (todas leem 49), e o ACE-74 ("recusar as tentativas seguintes") deixa de valer sob rajada: o atacante com muitos IPs ultrapassa o teto. Os testes existentes só têm
+concorrência do **mesmo par** (`conta-entrar-e-sessao.test.ts:239-282`, ACE-66) e o teste do ACE-74 grava as 50 falhas como owner, em série. Sonda do verificador, fora do
+repositório (no rascunho do verificador, `conta-entrar-paralelo.test.ts`): 49 falhas do e-mail, cinco chamadas simultâneas a `conta_entrar` com senha errada e hashes de IP diferentes,
+esperando `['bloqueado','bloqueado','bloqueado','bloqueado','invalida']`. Resultado: **passa** com o código atual e **falha** com a trava de M17 (as cinco voltam `invalida`).
+
+**Profundidade**: P0 completo (autenticação, sessão e dados de conta; mais de 5 mutações manuais cobrindo os ramos das regras novas).
+**Resultado**: 29 mutantes injetados; 26 mortos, 2 sobreviventes **equivalentes** (M10, M16) e **1 sobrevivente real (M17)**. ❌ FAIL.
 
 ---
 
@@ -147,25 +157,31 @@ sem tarefa de correção.
 
 | Princípio | Estado |
 | --- | --- |
-| Mínimo de código, sem abstração de uso único | ✅ (`chaveDoIp`, `cota-email.ts` e `comContaDaSessao` têm mais de um uso ou isolam a regra testável) |
-| Mudanças cirúrgicas | ✅ (52 arquivos, todos nos `Where` de T57 a T64; `vitest.config.ts`, `playwright.config.ts` e `cenario-dois-grupos.ts` só ganham o necessário para o teto e as tabelas novas) |
-| Segue os padrões existentes | ✅ (migrations aditivas com a assinatura preservada para o rollback do Worker, G-14; tabelas novas com RLS `FORCE`, só `pelada_backup` lê; funções `SECURITY DEFINER` com `search_path` fixo) |
-| Testes mapeiam critérios e não são rasos | ✅ (cada teste novo cita ACE-06, 70, 71 ou 72; 24 mutantes mortos) |
-| Resultado asserido bate com a spec | ✅ (429 `bloqueado_temporariamente`, 503 `email_indisponivel`, 5 falhas, 15 min, 80% e 100% conferidos pelos valores) |
+| Mínimo de código, sem abstração de uso único | ✅ (`chavePorPrefixo` serve a `chaveDoIp` e `chaveDoIp48`; `limiteEmailsOrigem` é um middleware aplicado a quatro rotas) |
+| Mudanças cirúrgicas | ✅ (38 arquivos, todos nos `Where` de T65 a T69; `vitest.config.ts` e `playwright.config.ts` só ganham `LIMITE_EMAILS_IP_HORA` alto) |
+| Segue os padrões existentes | ✅ (migrations aditivas com assinatura preservada, G-14; tabela nova com RLS `FORCE`, só `pelada_backup` lê; funções `SECURITY DEFINER` com `search_path` fixo; IP só como SHA-256) |
+| Testes mapeiam critérios e não são rasos | ⚠️ (cada teste novo cita ACE-72 a 75; 26 mutantes mortos; M17 sobrevive) |
+| Resultado asserido bate com a spec | ✅ (429 `muitas_requisicoes`, 429 `bloqueado_temporariamente`, 503 `email_indisponivel`, 20, 50, 10 min, 10 s, 2 s, 80% e 100% conferidos pelos valores) |
 | Nenhum teste órfão | ✅ |
-| Testes existentes alterados | ✅ só os decorrentes de ACE-06 e ACE-70, com motivo e substituição igual ou mais forte (lista acima) |
-| Guias seguidos | `CLAUDE.md` da raiz (migration aditiva, rota nova em `casos.ts`, datas em São Paulo, `.env.example`), `.md/GUARDRAILS.md` G-14 |
+| Testes existentes alterados | ✅ só o cabeçalho e o `import` de `chave-ip.test.ts` (2 linhas), com acréscimo |
+| Configuração | ✅ `LIMITE_EMAILS_IP_HORA` em `.env.example` (formato, padrão e se é segredo), `api/src/entrada/env.ts`, `vitest.config.ts` (`bindings`) e `e2e/playwright.config.ts` (`--var`) |
+| Guias seguidos | `CLAUDE.md` da raiz (migration aditiva, rota nova em `casos.ts`, `.env.example`), `.md/GUARDRAILS.md` G-14 |
 
 ---
 
 ## Casos limite
 
-- [x] Confirmar sem sessão com o 2º parâmetro nulo (rollback do Worker): `api/test/migracoes/conta-cadastro-e-links.test.ts:190-203`
-- [x] Falha simultânea na senha atual: `api/test/migracoes/conta-senha-bloqueio.test.ts:257-302`
-- [x] Reserva de e-mail simultânea e ROLLBACK: `api/test/migracoes/conta-teto-emails.test.ts:131-181` e `:86-92`
-- [x] IPv6 com `::` no começo, no meio e no fim, e IPv4 mapeado: `api/test/infraestrutura/chave-ip.test.ts:26-44`
-- [x] `LIMITE_EMAILS_DIA` inválido: `api/test/rotas/teto-emails.test.ts:175-187`
-- [x] Tentativa bloqueada não prolonga o bloqueio nem é contada: `api/test/migracoes/conta-senha-bloqueio.test.ts:160-166`
+- [x] 49 falhas não bloqueiam e a 50ª tentativa é avaliada: `api/test/migracoes/conta-entrar-teto-conta.test.ts:91-102`
+- [x] Bloqueio expira em 10 min exatos (9 min 50 s bloqueado; 10 min 10 s liberado): `:104-121`
+- [x] Falhas com mais de 1 h não contam: `:123-128`
+- [x] Conta inexistente com a mesma resposta: `api/test/rotas/entrar-teto-conta.test.ts:50-52` e `conta-entrar-teto-conta.test.ts:130-134`
+- [x] Tentativa bloqueada não roda o bcrypt nem é gravada: `conta-entrar-teto-conta.test.ts:136-144`
+- [x] 21º pedido na fronteira da janela de 1 h: `api/test/migracoes/conta-teto-emails-origem.test.ts:63-72`
+- [x] Dez pedidos simultâneos da mesma origem, teto 4: `conta-teto-emails-origem.test.ts:121-139`
+- [x] IPv4 mapeado em IPv6 e `sem-ip`: `api/test/infraestrutura/chave-ip.test.ts:52-78`, `rotas/teto-emails-origem.test.ts:127-133`
+- [x] `LIMITE_EMAILS_IP_HORA` inválido volta ao padrão 20: `rotas/teto-emails-origem.test.ts:137-141`
+- [x] Trava ocupada por mais de 2 s e `lock_timeout` restrito à função: `conta-cota-trava.test.ts:61-63, 75`
+- [ ] **Rajada simultânea de IPs diferentes contra a mesma conta**: sem teste (M17)
 
 ---
 
@@ -178,31 +194,22 @@ Comando: etapas do gate Build de `tasks.md` que o pedido incluiu (sem `build`, e
 | `pnpm lint` | ✅ exit 0 |
 | `pnpm format:check` | ✅ exit 0 |
 | `pnpm typecheck` | ✅ exit 0 |
-| `pnpm test` | ✅ exit 0 na 3ª execução: raiz 20, domínio 1, contrato 39, web 493 (54 arquivos), API 716 (46 arquivos) = 1269 testes, 0 falhas. Ver nota de flake |
+| `pnpm test` | ✅ exit 0 na 1ª execução: raiz 20, domínio 1, contrato 39, web 493 (54 arquivos), API 764 (53 arquivos) = 1317 testes, 0 falhas, 0 pulados. Nenhum teste de tela estourou o tempo desta vez |
 | `pnpm test:checagens` | ✅ exit 0: 432 testes (21 arquivos), 0 falhas, 0 pulados |
-| `python .claude/scripts/checar-tokens.py frontend/web/src` | ✅ "OK: nenhuma cor ou fonte fora do tokens.css" |
-| `build`, `e2e`, `visual`, `gitleaks` | não rodados (fora do pedido desta volta) |
-
-**Nota de flake (não bloqueante).** Na 1ª execução de `pnpm test` (que roda web e API em paralelo) falharam dois testes de tela por estouro dos 5 s padrão
-(`web/app/App.sessao-expirada.test.tsx`, ACE-20, e `web/app/rotas.test.tsx`, "/termos abre sem sessão"), o `pnpm -r` abortou a API, e o `test:checagens`
-seguinte falhou no `beforeAll` de `backend/scripts/test/dono.test.ts` (10 s) por conexão do banco cortada, tudo com a máquina carregada. Reexecutados em separado: API
-716/716 e checagens 432/432 passaram; o web repetiu a falha do ACE-20 (5182 ms) numa execução isolada, mas esse teste sozinho passa (tempo de testes 3,3 s) e uma
-nova execução completa de `pnpm test` fechou verde, com web 493/493. Os testes envolvidos não foram alterados nesta branch e não têm relação com as tarefas T57 a T64. O ACE-20 fica
-perto do limite de 5 s numa máquina lenta; elevar o `testTimeout` desse arquivo é decisão do usuário (mudar teste pede aprovação).
-
-- **Contagem antes e depois**: ver a seção "Integridade dos testes" (+66 testes em `pnpm test`).
-- **Pulados**: nenhum. **Falhas persistentes**: nenhuma.
+| `build`, `e2e`, `visual`, `gitleaks`, `checar-tokens.py` | não rodados (fora do pedido desta volta; esta volta não toca o web) |
 
 ---
 
 ## Observações que não bloqueiam
 
-1. **Lacuna de precisão ACE-72 (fronteira)**: a spec diz "passa de 80%"; a implementação barra a partir do momento em que o total *atinge* 80% (o 81º e-mail não sai). É a leitura conservadora; convém a spec dizer "atinge" ou "chega a".
-2. **Lacuna de precisão ACE-70 (existência da conta)**: a rota exige sessão, então o oráculo de existência não existe nas duas rotas; a ramificação "conta inexistente → falso" do banco (`conta_trocar_senha`) não tem teste. Sem risco hoje.
-3. **Rollback do Worker (aceito na decisão das correções)**: uma conta já bloqueada que tente excluir receberia 204 sem ser excluída com o Worker antigo (não conhece `bloqueado`). Registrado em `STATE.md`; só dura o rollback.
-4. **ACE-72 e falha do remetente**: a regra "o envio que falhou não conta" é provada no banco (ROLLBACK, `conta-teto-emails.test.ts:86-92`), mas nenhum teste de rota simula a falha do Resend e confere o contador depois (`REMETENTE_QUE_FALHA` não aparece em `teto-emails.test.ts`). Depende do desfazer da transação da requisição, que já vale para o ACE-52.
-5. **Contração futura**: o 2º parâmetro de `link_confirmar` ficou sem uso (G-14); `conta_senha_bloqueada_ate` poderia devolver `boolean` (M11).
-6. **Segurança**: SEC-CA-01 a 04 têm correção testada (T58 a T63); o Turnstile ficou adiado, com o risco de *password spraying* distribuído registrado em `.md/THREAT-MODEL.md:63`. A revisão final do auditor está no `seguranca.md` (alteração do auditor não commitada, não avaliada aqui).
+1. **Mensagem do bloqueio (decisão (d))**: o 429 do login diz "Tente de novo em 15 minutos" (`api/src/entrada/rotas/sessao.ts:33` e `web/telas/entrar/Entrar.tsx:18`) também no bloqueio da conta, que dura 10 min. A spec do ACE-74 não define o texto, então é uma lacuna de precisão, não uma falha; a mensagem é conservadora e igual nos dois bloqueios (o que ajuda a não distinguir os casos). Convém dizer na spec que o texto é único.
+2. **Lacuna de precisão ACE-73**: a spec diz "pede mais de 20 e-mails". A implementação conta **pedidos** às quatro rotas (`POST`), tenha conta ou não o e-mail, e antes da validação do corpo, e conta mesmo o pedido que a rota depois recusa (409, 503 etc.). É a leitura segura (a resposta não revela nada) e está no comentário do middleware, mas a spec poderia dizer "pedidos".
+3. **Chave `sem-ip`**: pedidos sem `CF-Connecting-IP` dividem a mesma chave. Em produção a Cloudflare sempre envia o cabeçalho; no `pnpm dev` local (sem o cabeçalho) o padrão de 20 por hora vale para todos juntos. Por isso os testes e o e2e sobem o limite. Documentado no `.env.example`; vale uma frase no README.
+4. **Oráculo residual (ACE-22 e ACE-04)**: com o total do dia entre 80% e 100% da cota, "esqueci a senha" de conta **não confirmada** responde 503, e de e-mail sem conta, 200. Isso revela que a conta existe e que não está confirmada, só enquanto a cota está nessa faixa. É consequência literal do ACE-73 (a spec manda contar na cota de cadastro) e o THREAT-MODEL não o registra. Ver pergunta ao usuário.
+5. **Cadeia do ACE-75a**: nenhum teste de rota usa um remetente que demora 10 s e confere 503 e o contador; a cadeia é provada em partes (timeout do `fetch` → `falhou`; `falhou` → 503; ROLLBACK não conta). Mesma observação da volta 4 (item 4).
+6. **Bloqueio remoto curto (decisão (b))**: o teto por conta permite que alguém trave o login de uma vítima por 10 min de cada vez (50 senhas erradas por hora). O autor registrou o risco no `seguranca.md` e no THREAT-MODEL, em linha com o AD-013. A serialização por e-mail também enfileira, na conta atacada, os logins legítimos atrás dos bcrypts do atacante; o limitador de 10 por minuto por IP e a rejeição rápida (sem bcrypt) depois de 50 falhas limitam o efeito.
+7. **Segurança**: o `seguranca.md` diz que as correções do reteste ainda não foram reverificadas pelo `auditor-seguranca`; fica para a próxima rodada de segurança.
+8. **Rollback do Worker**: as migrations são aditivas e mantêm assinatura e colunas de `link_pedir` e `conta_entrar`; um Worker anterior continua funcionando, sem o teto por origem nem a categoria nova.
 
 ---
 
@@ -210,27 +217,37 @@ perto do limite de 5 s numa máquina lenta; elevar o `testTimeout` desse arquivo
 
 | Requisito | Estado anterior | Novo estado |
 | --- | --- | --- |
-| ACE-06, ACE-07 | ✅ Verificado (versão antiga do ACE-06) | ✅ Verificado (T58, T59; M16 a M19 mortos) |
-| ACE-70, ACE-71, ACE-72 | Pending | ✅ Verificado (T59 a T63), com duas lacunas de precisão da spec |
-| ACE-01 a ACE-05, ACE-08 a ACE-55, ACE-57 a ACE-69 | ✅ Verificado (volta 3) | ✅ Sem mudança (regressão no gate) |
-| ACE-56 | ⚠️ | ⚠️ Lacuna de precisão da spec (não bloqueante) |
+| ACE-72 | ✅ Verificado (com lacuna de precisão da fronteira) | ✅ Verificado (redação "atinge"; lacuna fechada) |
+| ACE-73, ACE-75 | Pending | ✅ Verificado (T65, T66, T68; M1 a M12, M19 a M24 mortos) |
+| ACE-74 | Pending | ⚠️ Cláusulas da spec provadas (T67); serialização sob concorrência sem teste (M17). Fica pendente até o teste entrar |
+| ACE-01 a ACE-71 | ✅ Verificado (voltas 3 e 4) | ✅ Sem mudança (regressão no gate) |
 
-(`spec.md` não foi alterado pelo verificador; a tabela de rastreabilidade da spec ainda mostra ACE-70 a ACE-72 como `Pending`, o que o autor atualiza na integração.)
+(`spec.md` não foi alterado pelo verificador; a tabela de rastreabilidade da spec ainda mostra ACE-73 a ACE-75 como `Pending`, o que o autor atualiza na integração.)
 
 ---
 
 ## Resumo
 
-**Geral**: ✅ Pronto para integrar. As correções dos médios de segurança (SEC-CA-01 a 04) estão implementadas, testadas e discriminadas.
+**Geral**: ❌ Não integrar ainda: uma lacuna de teste, pequena, no ACE-74.
 
-**Verificação ancorada na spec**: ACE-06, ACE-70, ACE-71 e ACE-72 provados com o resultado da spec; 2 lacunas de precisão novas (ACE-72 fronteira de 80%; ACE-70 existência da conta) e 1 antiga (ACE-56).
-**Sensor**: 24 de 24 mutantes não equivalentes mortos (1 equivalente).
-**Gate**: lint, format, typecheck, `pnpm test` (1269) e `test:checagens` (432) verdes; e2e e visual não rodados por pedido.
+**Verificação ancorada na spec**: ACE-72, 73 e 75 provados com o resultado da spec; ACE-74 com todas as cláusulas da spec provadas, mais uma decisão de projeto (trava por e-mail) sem prova.
+**Sensor**: 26 de 29 mutantes mortos; 2 equivalentes (M10, M16); 1 real (M17).
+**Gate**: lint, format, typecheck, `pnpm test` (1317) e `test:checagens` (432) verdes; e2e e visual não rodados por pedido.
 
-**O que funciona**: confirmar o e-mail sem abrir sessão e levar a `/entrar` com o aviso; bloqueio de 15 min após 5 falhas da senha atual por conta (troca e exclusão
-somam); limitador por IP nas duas rotas antes do bcrypt; chave do limitador e `ip_hash` pelo /64 do IPv6; teto diário de e-mails com reserva para a recuperação,
-zerando na virada do dia de São Paulo.
+**Lacuna em ordem de gravidade**:
 
-**Problemas**: nenhum bloqueante.
+1. Rajada simultânea de IPs diferentes contra a mesma conta não tem teste (M17), `1792844040000_conta-entrar-teto-conta.sql:38` — ACE-74 — sem evidência. Correção sugerida (tarefa T70): em
+   `api/test/migracoes/conta-entrar-teto-conta.test.ts`, 49 falhas do e-mail, cinco chamadas simultâneas a `conta_entrar` com senha errada e `ip_hash` diferentes, esperando exatamente uma
+   `invalida` e quatro `bloqueado` (a sonda do verificador faz isto e já passa com o código atual).
 
-**Próximos passos**: o usuário decide a redação da fronteira do ACE-72 e se eleva o tempo limite do teste ACE-20; rodar e2e e visual (T59 mudou o fluxo de cadastro) na checagem final antes de integrar.
+**Próximos passos**: o autor acrescenta o teste (T70) e o verificador reverifica só o M17 (volta 6); depois, e2e e visual na checagem final antes de integrar.
+
+## Perguntas para o usuário
+
+1. **O oráculo de "esqueci a senha" entre 80% e 100% da cota (observação 4) é aceitável?** Hoje, nessa faixa, conta não confirmada recebe 503 e e-mail sem conta recebe 200.
+   - (a) Aceitar e registrar no THREAT-MODEL como resíduo do ACE-73 (Recomendado: o risco é pequeno e exige a cota nessa faixa).
+   - (b) Responder 200 nos dois casos sem enviar (a conta não confirmada fica sem e-mail e sem aviso, mas a resposta não revela nada; muda o ACE-73).
+   - (c) Contar o pedido de e-mail sem conta na mesma cota, para igualar a resposta (gasta cota sem enviar e abre outro vetor de esgotamento).
+2. **A mensagem "Tente de novo em 15 minutos" deve virar um texto que valha para os dois bloqueios (observação 1)?**
+   - (a) Manter e registrar na spec que o texto é único e conservador (Recomendado: não distingue os dois bloqueios).
+   - (b) Trocar por "Tente de novo em alguns minutos" nas duas rotas e na tela (muda testes de texto, exige aprovação).

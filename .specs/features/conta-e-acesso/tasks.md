@@ -1842,6 +1842,52 @@ Tratam os achados que o reteste de 2026-10-28 (`seguranca.md`, seção "Reteste 
 
 ---
 
+### T70: Teste da serialização por e-mail do `conta_entrar` (ACE-74)
+
+**What**: teste de banco para a trava por e-mail do `conta_entrar` (mutante M17 da volta 5): com 49 falhas já registradas para o e-mail, 5 chamadas simultâneas com senha errada vindas de IPs diferentes resultam em exatamente 1 `invalida` e 4 `bloqueado`. O teste deve falhar se a trava voltar para o par (e-mail, IP).
+**Estimativa**: 45 min
+**Where**: `backend/api/test/migracoes/conta-entrar-teto-conta.test.ts`
+**Depends on**: T67
+**Requirement**: ACE-74
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] O teste passa com a migration atual e falha com a trava em (e-mail, IP) (provar na cópia, sem commitar a mutação)
+- [ ] `pnpm test` e `pnpm typecheck` passam
+
+**Tests**: integration
+**Gate**: quick
+
+---
+
+### T71: Documentação: oráculo na faixa de 80%, texto do bloqueio e variável do IP
+
+**What**: na `spec.md`, trocar "e-mails" por "pedidos de e-mail" no ACE-73 e registrar no ACE-74 que o texto do bloqueio é único e conservador ("Tente de novo em 15 minutos"), valendo também para o de 10 min; no THREAT-MODEL, registrar o resíduo de que, com a cota entre 80% e 100%, "esqueci a senha" responde 503 para conta não confirmada e 200 para e-mail sem conta; no README, uma frase sobre `LIMITE_EMAILS_IP_HORA` (padrão 20; sem IP, a chave `sem-ip` é compartilhada no `pnpm dev`). Em `seguranca.md`, SEC-CA-05 passa a citar essa faixa.
+**Estimativa**: 30 min
+**Where**: `.specs/features/conta-e-acesso/spec.md`, `.md/THREAT-MODEL.md`, `README.md`, `.specs/features/conta-e-acesso/seguranca.md`
+**Depends on**: T69
+**Requirement**: ACE-73, ACE-74
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] Os quatro documentos atualizados
+- [ ] `pnpm format:check` e `pnpm test:checagens` passam
+
+**Tests**: none
+**Gate**: quick
+
+---
+
 ## Phase Execution Map
 
 ```
@@ -1876,6 +1922,8 @@ Phase 12: T63 → T65 → T66
           T66 → T69
           T67 → T69
           T68 → T69
+          T67 → T70
+          T69 → T71
 ```
 
 Execução estritamente sequencial: um trabalhador faz uma tarefa por vez, em ordem.
