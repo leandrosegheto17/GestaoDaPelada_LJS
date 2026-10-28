@@ -292,7 +292,10 @@ aceitar.
 - IF a conta foi excluída enquanto havia uma sessão aberta em outro aparelho THEN a próxima requisição desse aparelho SHALL receber 401 `sessao_expirada`. [ACE-69]
 - WHEN `POST /api/conta/senha` ou `POST /api/conta/excluir` recebe a senha atual errada 5 vezes para a mesma conta em 15 min THEN o sistema SHALL recusar as tentativas seguintes com o erro de bloqueio, sem rodar o bcrypt, até 15 min depois da quinta falha; a senha certa antes disso zera a contagem; o bloqueio é por conta e a resposta não revela se a conta existe. As duas rotas SHALL também passar pelo limitador por IP do login, que responde 429 antes do bcrypt. [ACE-70]
 - WHEN o IP do cliente é IPv6 THEN o sistema SHALL usar o prefixo /64 como chave do limitador por IP e do `ip_hash` do bloqueio por e-mail e IP; IPv4 SHALL ser usado inteiro e a ausência de IP SHALL manter a chave `sem-ip`. [ACE-71]
-- IF o total de e-mails enviados no dia (fuso de São Paulo) passa de 80% de `LIMITE_EMAILS_DIA` (padrão 100) THEN o cadastro, o reenvio de confirmação e o convite SHALL responder 503 `email_indisponivel` sem enviar; "esqueci a senha" SHALL continuar enviando até 100% da cota; o contador SHALL zerar na virada do dia. [ACE-72]
+- IF o total de e-mails enviados no dia (fuso de São Paulo) atinge 80% de `LIMITE_EMAILS_DIA` (padrão 100) THEN o cadastro, o reenvio de confirmação e o convite SHALL responder 503 `email_indisponivel` sem enviar (o 80º e-mail ainda sai, o 81º não); "esqueci a senha" SHALL continuar enviando até 100% da cota; o contador SHALL zerar na virada do dia. [ACE-72]
+- IF "esqueci a senha" é pedido para uma conta com o e-mail ainda não confirmado THEN o sistema SHALL contar o envio na cota de cadastro (os 80%), e não na reserva da recuperação; WHEN um mesmo IPv4 ou prefixo /48 de IPv6 pede mais de 20 e-mails (cadastro, reenvio, convite ou "esqueci a senha") em 1 h THEN o sistema SHALL responder 429 `muitas_requisicoes` sem enviar. [ACE-73]
+- WHEN o login (`POST /api/sessao/entrar`) soma 50 senhas erradas em 1 h para a mesma conta, vindas de quaisquer IPs, THEN o sistema SHALL recusar as tentativas seguintes com 429 `bloqueado_temporariamente`, sem rodar o bcrypt, por 10 min; a resposta SHALL ser a mesma para conta que não existe, e o login com a senha certa SHALL zerar a contagem apenas fora do bloqueio. [ACE-74]
+- IF o Resend não responde em 10 s THEN o sistema SHALL abortar o envio e tratá-lo como falha (503 `email_indisponivel`, sem gastar a cota); a reserva de cota SHALL esperar no máximo 2 s pela trava da linha do dia, e acima disso responder 503 `email_indisponivel`. [ACE-75]
 
 ---
 
@@ -388,8 +391,11 @@ aceitar.
 | ACE-70 | Edge Cases | T57 | Pending |
 | ACE-71 | Edge Cases | T57 | Pending |
 | ACE-72 | Edge Cases | T57 | Pending |
+| ACE-73 | Edge Cases | T65, T66 | Pending |
+| ACE-74 | Edge Cases | T67 | Pending |
+| ACE-75 | Edge Cases | T68 | Pending |
 
-**Coverage:** 72 total, 0 mapped to tasks, 72 unmapped ⚠️ (o mapeamento nasce no `tasks.md`)
+**Coverage:** 75 total, 0 mapped to tasks, 75 unmapped ⚠️ (o mapeamento nasce no `tasks.md`)
 
 ---
 

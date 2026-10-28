@@ -1721,6 +1721,127 @@ fora desta rodada: as defesas abaixo não mexem em telas além do aviso de T59.
 
 ---
 
+## Correções do reteste de segurança (AD-013)
+
+Tratam os achados que o reteste de 2026-10-28 (`seguranca.md`, seção "Reteste das correções dos médios") deixou em aberto: SEC-CA-02, SEC-CA-04 e SEC-CA-13, decididos pelo usuário na fase 10. O SEC-CA-14 e os baixos SEC-CA-05 a 12 ficam como itens a decidir na liberação. O ACE-72 foi só reescrito (a fronteira do 80º e-mail); ACE-73 a ACE-75 são os critérios novos.
+
+### T65: "Esqueci a senha" de conta não confirmada gasta a cota de cadastro (SEC-CA-02)
+
+**What**: em `email_cota_reservar` e na rota de "esqueci a senha", o envio para conta com o e-mail ainda não confirmado passa a contar na cota de cadastro (80%) e responde 503 `email_indisponivel` ao atingi-la; conta confirmada segue usando a cota inteira. Teste de integração primeiro: com a cota de cadastro cheia, "esqueci a senha" de conta não confirmada recebe 503 e de conta confirmada ainda envia.
+**Estimativa**: 1h 30min
+**Where**: `backend/api/src/entrada/enviar-email.ts`, rota `esqueci-senha`, migration aditiva só se a função do banco precisar de parâmetro novo, testes
+**Depends on**: T63
+**Requirement**: ACE-73, ACE-72
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] Teste prova que a reserva da recuperação não é consumida por contas não confirmadas e falharia sem a mudança
+- [ ] `pnpm test`, `pnpm typecheck` e `pnpm test:checagens` passam
+
+**Tests**: integration
+**Gate**: quick
+
+---
+
+### T66: Teto de e-mails por IPv4 ou /48 em 1 h (SEC-CA-02)
+
+**What**: limitador por chave (IPv4 inteiro ou prefixo /48 do IPv6, nova função ao lado da /64 de T62) nas rotas que enviam e-mail (cadastro, reenvio, convite e "esqueci a senha"): mais de 20 envios por hora respondem 429 `muitas_requisicoes` antes de reservar a cota. Teste unitário da chave /48 primeiro, depois o de rota.
+**Estimativa**: 1h 30min
+**Where**: `backend/api/src/entrada/middlewares/limite-taxa.ts`, função de chave nova, rotas de envio, testes
+**Depends on**: T65
+**Requirement**: ACE-73
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] Dois endereços do mesmo /48 compartilham a contagem; /48 diferentes não
+- [ ] O 21º pedido em 1 h recebe 429 sem consumir a cota de e-mail
+- [ ] `pnpm test` e `pnpm typecheck` passam
+
+**Tests**: unit + integration
+**Gate**: quick
+
+---
+
+### T67: Teto suave por conta no login, somando todos os IPs (SEC-CA-04)
+
+**What**: no `conta_entrar`, contar as falhas de senha por conta em 1 h independentemente do IP; ao somar 50, bloquear a conta por 10 min com 429 `bloqueado_temporariamente`, sem rodar o bcrypt, e dar a mesma resposta para conta inexistente (migration aditiva, padrão da T61). Teste de banco primeiro: 50 falhas de IPs diferentes bloqueiam; 49 não; o bloqueio expira em 10 min.
+**Estimativa**: 2h
+**Where**: migration nova, `backend/api/src/entrada/rotas/sessao.ts`, testes
+**Depends on**: T61, T62
+**Requirement**: ACE-74
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] Teste prova o bloqueio com falhas vindas de /64 e /48 diferentes e falharia sem a migration
+- [ ] A resposta não distingue conta inexistente
+- [ ] `pnpm test`, `pnpm typecheck` e `pnpm test:checagens` passam
+
+**Tests**: integration
+**Gate**: quick
+
+---
+
+### T68: Tempo máximo no envio ao Resend e na trava da cota (SEC-CA-13)
+
+**What**: `AbortSignal.timeout(10_000)` no `fetch` de `resend.ts`, tratando o aborto como falha de envio (503, sem gastar a cota), e `lock_timeout` de 2 s antes de `email_cota_reservar`, também com 503. Teste primeiro: um provedor que não responde aborta em 10 s (relógio simulado) e uma reserva segurada por outra transação falha em 2 s.
+**Estimativa**: 1h 30min
+**Where**: `backend/api/src/infraestrutura/email/resend.ts`, `backend/api/src/entrada/enviar-email.ts`, testes
+**Depends on**: T63
+**Requirement**: ACE-75
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] Os dois testes falhariam sem o tempo máximo
+- [ ] `pnpm test` e `pnpm typecheck` passam
+
+**Tests**: integration
+**Gate**: quick
+
+---
+
+### T69: Runbook, THREAT-MODEL e seguranca.md refletem as correções do reteste
+
+**What**: registrar em `seguranca.md` o SEC-CA-02, 04 e 13 como corrigidos (e o SEC-CA-14 como decidir na liberação), ajustar a seção 10 do `docs/runbook.md` (a reserva agora também vale contra contas não confirmadas) e o THREAT-MODEL (resíduos: rotação com muitos /48 e *bounces*).
+**Estimativa**: 30 min
+**Where**: `.specs/features/conta-e-acesso/seguranca.md`, `docs/runbook.md`, `.md/THREAT-MODEL.md`
+**Depends on**: T65, T66, T67, T68
+**Requirement**: ACE-73, ACE-74, ACE-75
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] Os três documentos atualizados
+- [ ] `pnpm format:check` e `pnpm test:checagens` passam
+
+**Tests**: none
+**Gate**: quick
+
+---
+
 ## Phase Execution Map
 
 ```
@@ -1747,6 +1868,14 @@ Phase 11: T57 → T58 → T59
           T57 → T63
           T61 → T64
           T63 → T64
+Phase 12: T63 → T65 → T66
+          T61 → T67
+          T62 → T67
+          T63 → T68
+          T65 → T69
+          T66 → T69
+          T67 → T69
+          T68 → T69
 ```
 
 Execução estritamente sequencial: um trabalhador faz uma tarefa por vez, em ordem.

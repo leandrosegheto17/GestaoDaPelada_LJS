@@ -319,3 +319,211 @@ Convenção de caminhos: `api/` = `backend/api/src/`; `mig/` = `backend/api/src/
    - SEC-CA-07: quem não acessa o financeiro pode remover quem acessa? (a) Não **(Recomendado)**; (b) Sim, como na spec.
    - SEC-CA-11: o que fazer com as contas do legado com senha temporária? (a) Invalidar o hash e obrigar a recuperação por
      e-mail **(Recomendado)**; (b) Manter como está.
+
+## Reteste das correções dos médios (2026-10-28)
+
+**Escopo**: só as correções dos SEC-CA-01 a 04, commits `8df20cc..db0412e` da branch `fix/conta-e-acesso-seguranca`
+(T57 a T64). Os baixos SEC-CA-05 a 12 ficaram fora; abaixo só se diz o que mudou neles.
+**Modo**: revisão do diff e teste ativo **só no local**. Foi usado o Worker local (`wrangler dev` em `127.0.0.1:8797`,
+`EMAIL_DEV=1` e `LIMITE_EMAILS_DIA=10` por `--var`), ligado ao banco `pelada` do contêiner `conta-e-acesso-db-1`
+(porta 5432) como `pelada_app`. Foram feitas sondas HTTP com o `CF-Connecting-IP` forjado, que só é possível no local
+(na borda, a Cloudflare sobrescreve o cabeçalho). Não houve acesso à produção, à Cloudflare, ao Resend, nem aos
+contêineres `controleemcasa_ljs-banco-1` e `evolucao-segura-postgres`.
+**Testes do diff**: `vitest run` das 9 suítes tocadas (teto, bloqueio, chave de IP, conta-minha, limite-taxa,
+conta-cadastro, links, sessão) deu 113 de 116 verdes. As 3 falhas foram todas em `test/rotas/teto-emails.test.ts`: o
+contador do dia leu 79 onde esperava 8. A suíte sozinha passou 14 de 14. Como o `fileParallelism` está em `false`, a
+causa provável é outra execução da suíte, ao mesmo tempo, no mesmo banco de teste do Worker. Não é defeito do código,
+mas o contador global é compartilhado: duas execuções simultâneas da suíte interferem uma na outra.
+**Resíduo das sondas no banco local `pelada`**: contas fictícias `*@reteste.invalid` e o contador
+`envios_email_dia` de 2026-10-28 em 10. Nada foi apagado.
+
+### Resultado por achado
+
+| Achado | Antes | Agora | Situação |
+| --- | --- | --- | --- |
+| SEC-CA-01 | Médio | — | **Fechado** |
+| SEC-CA-02 | Médio | Médio | **Parcialmente corrigido; continua em aberto** |
+| SEC-CA-03 | Médio | — | **Fechado** |
+| SEC-CA-04 | Médio | Médio | **Parcialmente corrigido; continua em aberto** (o /64 fechou, o /48 e o /56 não) |
+| SEC-CA-13 (novo) | — | Baixo | Em aberto |
+| SEC-CA-14 (novo) | — | Baixo | Em aberto |
+
+### SEC-CA-01: fechado
+
+- **Correção**: `link_confirmar` foi redefinida sem criar sessão (`mig/1792843740000_conta-confirmar-sem-sessao.sql:9-28`).
+  A rota não chama mais `definirCookieSessao` (`api/entrada/rotas/conta-cadastro.ts:52-55`), e a tela leva a
+  `/entrar?aviso=email-confirmado` (`web/telas/confirmar/Confirmar.tsx`).
+- **Prova** (ataque original, no local):
+  1. O atacante cadastra `vitima@` com a senha dele: 201. Antes da confirmação, o login do atacante dá 403
+     `email_nao_confirmado`.
+  2. A vítima abre o link (`POST /api/conta/confirmar`): 204, **sem `Set-Cookie`**. O reuso do link dá 410.
+  3. A vítima não entra sem saber a senha. Pelo "esqueci a senha", ela define uma senha nova (200, sem cookie). Com
+     isso, a sessão que o atacante tinha aberto passa a dar 401 `sessao_expirada`, e a senha antiga dele dá 401.
+  4. A variante de login CSRF também fechou: confirmar não troca a sessão de quem está logado.
+- **Resíduo (informativo, sem severidade)**: entre a confirmação e a recuperação feita pela vítima, o atacante entra
+  numa conta confirmada com o e-mail da vítima. Se a vítima nunca usar o app, essa conta fica com ele. Ele pode criar
+  grupos aparentando ser a vítima. Não pode aceitar convites mandados a ela, porque o token só chega à caixa dela. A
+  opção (b) original (pedir a senha para confirmar) fecharia também isso.
+
+### SEC-CA-02: parcialmente corrigido; continua MÉDIO
+
+- **Correção**: há um contador por dia de São Paulo (`envios_email_dia`). Cadastro, reenvio e convite param em 80% de
+  `LIMITE_EMAILS_DIA`, e a recuperação vai até 100% (`api/entrada/enviar-email.ts:16-59`,
+  `mig/1792843860000_conta-teto-emails.sql:30-50`). O runbook ganhou a seção 10. O Turnstile foi adiado.
+- **O que fechou**: o envio nunca passa da cota contratada. A cota já não é ultrapassada sem limite, e o teto vale
+  também para envios simultâneos (prova `conta-teto-emails.test.ts:131`).
+- **O que continua (prova no local, limite 10, ou seja, 8 para cadastro e 10 para recuperação)**:
+  1. Contas não confirmadas criadas pelo próprio atacante, mais cadastros com e-mails inventados: cadastro, reenvio e
+     convite ficam recusados (503) para todo mundo até a virada do dia. O cadastro duplicado e o novo dão o mesmo 503,
+     então não há enumeração nesse ponto.
+  2. A **reserva de 20% para a recuperação é consumível pelo atacante**: o "esqueci a senha" das contas que ele mesmo
+     criou (ainda não confirmadas) envia normalmente (200 200) até o teto. Depois disso, a recuperação da vítima
+     responde 503 em todas as tentativas.
+  3. Com a cota real de 100, o ataque custa cerca de 100 requisições. Ele precisa de uns 20 e-mails próprios para
+     contornar o intervalo de 60 s por destino. Com rotação de IPv6 (ver SEC-CA-04), leva segundos. Pode ser repetido
+     todo dia.
+  4. Os destinatários são endereços inventados, então **até 100 *hard bounces* por dia** continuam possíveis, e o risco
+     de suspensão do domínio no Resend continua.
+  5. O login de quem já tem conta não é afetado (200 com a cota esgotada).
+- **Por que continua médio**: qualquer pessoa, sem conta e com pouco esforço, tira do ar todo dia o cadastro, o convite
+  e a recuperação de senha, e ainda ameaça a reputação do domínio. O runbook (seção 10) diz que a recuperação usa a
+  cota inteira "para que quem já tem conta consiga recuperar o acesso", mas isso só vale sem ataque. O THREAT-MODEL 1a,
+  linha D, não registra esse resíduo.
+- **Correção sugerida**:
+  - Turnstile no cadastro e no "esqueci a senha" (o que estava no AD-012);
+  - ou, no mínimo, o "esqueci a senha" de conta **não confirmada** gastar a cota de cadastro (80%), e não a reserva;
+  - um teto por /64 ou /48 de envios por dia;
+  - registrar o resíduo no THREAT-MODEL.
+- **Nota (PREMISSA)**: o contador vira à meia-noite de São Paulo. Se o Resend contar a cota diária em UTC (não
+  verificado), os dois dias ficam desalinhados em 3 h. Um atacante que gaste os 80% nas 3 últimas horas de um dia de
+  São Paulo e de novo logo depois da virada passa da cota do Resend com o contador local abaixo do teto. Conferir no
+  painel do Resend.
+
+### SEC-CA-03: fechado
+
+- **Correção**: `/api/conta/senha` e `/api/conta/excluir` entraram em `ROTAS_LIMITE_ENTRAR` (`api/entrada/app.ts:38-40`).
+  A tabela `falhas_senha_atual` conta as falhas por conta. A linha da conta fica travada (`FOR UPDATE`) e o bloqueio é
+  conferido antes do `crypt()` (`mig/1792843800000_conta-senha-bloqueio.sql:62-70` e `:102-110`). A falha é gravada numa
+  transação própria, que sobrevive ao 401 (`api/entrada/rotas/conta-minha.ts:22-49`). A sessão é resolvida numa
+  transação curta separada (`middlewares/sessao.ts:14-27`), então não há trava presa entre as duas.
+- **Prova** (no local):
+  1. Do mesmo IP, 11 `POST /api/conta/senha` com a senha errada. As 5 primeiras dão 401 e levam de 0,6 a 1,3 s
+     (bcrypt). Da 6ª à 10ª, 429 `bloqueado_temporariamente`, em 0,16 a 0,3 s (sem bcrypt). A 11ª dá 429
+     `muitas_requisicoes` (limitador por IP, 18 ms).
+  2. Trocando o IP a cada pedido, `/api/conta/excluir` continua em 429 `bloqueado`: o bloqueio é da conta. A senha certa
+     durante o bloqueio também recebe 429.
+  3. Durante o bloqueio, o login com a senha certa segue funcionando (200) e a sessão continua válida. O bloqueio não
+     vira negação de serviço contra o login.
+  4. Para disparar o bloqueio é preciso estar com a sessão da conta, e sem sessão a resposta é 401. Então não há
+     enumeração nem bloqueio de longe.
+  5. Os testes cobrem a corrida (`conta-senha-bloqueio.test.ts:257` e `:272`).
+- **Efeito colateral bom**: criar contas exige confirmar o e-mail, e o teto de 80% limita os cadastros a cerca de 80
+  por dia no total. Isso limita o custo de bcrypt por "muitas contas" a cerca de 20 por hora por conta.
+- **Novo efeito**: SEC-CA-14, abaixo.
+
+### SEC-CA-04: parcialmente corrigido; continua MÉDIO
+
+- **Correção**: `chaveDoIp` (`api/infraestrutura/sessao/chave-ip.ts:46-58`) reduz o IPv6 ao /64 e trata IPv4 mapeado
+  como IPv4. É a chave do limitador (`middlewares/limite-taxa.ts:27`) e do `ip_hash` (`rotas/sessao.ts:21`).
+- **Prova do que fechou** (no local, um endereço diferente do mesmo /64 a cada pedido):
+  - 5 falhas de login dão 401, e o 6º endereço, mesmo com a senha certa, recebe 429 `bloqueado_temporariamente`.
+  - A mesma rede escrita em maiúsculas e expandida (`2001:DB8:4:1:FFFF:0:0:99`) também cai no bloqueio.
+  - No limitador, 10 pedidos dão 200 e o 11º dá 429.
+- **O que continua**:
+  - Outro /64 do mesmo /48 com a senha certa é avaliado normalmente (200), como manda o ACE-14.
+  - Em 4 /64 do mesmo /48, 20 falhas seguidas contra uma conta foram **todas avaliadas** (20 × 401, nenhum bloqueio).
+  - Um /48 de *tunnel broker* gratuito, ou o /56 que vários provedores de VPS dão, tem de 256 a 65 536 /64. Cada um
+    rende 5 tentativas a cada 15 min por conta e 10 requisições por minuto no limitador. Assim a força bruta contra
+    **uma** conta e a saturação da CPU do banco por bcrypt no `/api/sessao/entrar` (sem sessão) continuam ao alcance de
+    uma única máquina.
+  - O teto suave por conta somando todos os IPs (sugerido no achado original) e o Turnstile não foram feitos.
+  - O THREAT-MODEL 1a, linha D, registra como resíduo só o *password spraying* (muitas contas). Não registra a força
+    bruta contra uma conta a partir de muitos /64, nem o custo de CPU.
+- **Correção sugerida**:
+  - um teto suave por conta no login (por exemplo, 50 falhas por hora somando todos os IPs) que peça o Turnstile em vez
+    de bloquear;
+  - ou um limitador adicional pelo /48 no `/api/sessao/entrar`;
+  - ou aceitar formalmente o resíduo e registrá-lo como acima.
+
+### SEC-CA-13 [BAIXO, novo] A reserva da cota trava a linha do dia durante a chamada ao Resend e serializa todos os envios
+
+- **Onde**:
+  - `mig/1792843860000_conta-teto-emails.sql:30-36`: o `INSERT … ON CONFLICT (dia) DO UPDATE` trava a única linha do dia
+    até o fim da transação da requisição.
+  - `api/entrada/enviar-email.ts:51-57`: a reserva acontece antes do `fetch` ao Resend, dentro dessa transação.
+  - `api/infraestrutura/email/resend.ts:26-40`: o `fetch` não tem `AbortSignal` nem tempo máximo.
+  - Não há `lock_timeout` nem `statement_timeout` na conexão.
+- **Prova** (no local, tudo em `BEGIN … ROLLBACK`):
+  - Com uma transação segurando `email_cota_reservar(1000000)` por 6 s, a segunda reserva **esperou 4 990 ms**.
+  - A espera vale também quando o teto já foi atingido: o `ON CONFLICT DO UPDATE` trava a linha mesmo com o `WHERE`
+    falso, conforme a documentação do PostgreSQL.
+- **Cenário**: cada envio de e-mail do app (cadastro, reenvio, convite, recuperação) espera o anterior terminar a ida e
+  volta ao Resend. A vazão global fica em uns 3 a 5 envios por segundo. Se o Resend ficar lento ou parar de responder,
+  todas as requisições de envio se acumulam, cada uma segurando uma conexão do Hyperdrive com o Neon. Um atacante que
+  dispare muitos cadastros simultâneos (com rotação de /64) piora a fila e pode esgotar as conexões do resto do app
+  enquanto o contador estiver abaixo do teto.
+- **Por que baixo**: depende de o Resend estar lento, ou de uma rajada antes de o teto ser atingido. O efeito é
+  temporário e não toca em dados.
+- **Correção sugerida**:
+  - tempo máximo no `fetch` do Resend (`AbortSignal.timeout`, alguns segundos);
+  - `SET LOCAL lock_timeout` curto antes da reserva;
+  - ou reservar numa transação própria e curta, devolvendo a vaga numa segunda transação se o envio falhar.
+
+### SEC-CA-14 [BAIXO, novo] Com uma sessão roubada, o atacante trava a troca de senha da vítima
+
+- **Onde**: `mig/1792843800000_conta-senha-bloqueio.sql:23-38` (o bloqueio é por conta, sem distinguir a sessão) e
+  `api/entrada/rotas/conta-minha.ts:33-49`.
+- **Cenário**:
+  1. Quem está com a sessão roubada da vítima (por exemplo, num aparelho compartilhado) manda 5 senhas erradas a cada
+     15 min. Com isso, a vítima, na própria sessão, recebe 429 ao tentar trocar a senha (o que derrubaria as outras
+     sessões, ACE-26) ou excluir a conta.
+  2. A saída que sobra é o "esqueci a senha", e o atacante pode fechá-la esgotando a cota do dia (SEC-CA-02).
+  3. Assim ele mantém a sessão pelo prazo absoluto de 12 h.
+- **Por que baixo**: pede uma sessão já roubada e dura no máximo 12 h. Antes da T61, a vítima expulsava o invasor
+  trocando a senha a qualquer momento.
+- **Correção sugerida** (uma das três):
+  - contar as falhas por sessão, mais um teto por conta mais alto;
+  - deixar "encerrar as outras sessões" sem pedir a senha;
+  - a senha certa vinda de uma sessão diferente da que gerou as falhas não ser bloqueada.
+
+### Baixos SEC-CA-05 a 12: o que mudou
+
+- **SEC-CA-05 (agravado, segue baixo)**: o teto da T63 dá ao atacante um gatilho barato e determinístico para o
+  oráculo do 503.
+  - Com a cota esgotada, `esqueci-senha` responde **503 para o e-mail com conta e 200 para o sem conta**, sempre: o
+    rollback desfaz também o registro do intervalo de 60 s.
+  - Nenhum e-mail chega à vítima, então a enumeração fica silenciosa, no ritmo do limitador.
+  - Prova no local: e-mail inexistente deu 200; o da vítima deu 503, e 503 de novo.
+- **SEC-CA-10**: o `ip_hash` passou a ser o SHA-256 do /64 no IPv6. Segue sem sal, e o IPv4 continua reversível. Sem
+  mudança de severidade.
+- **SEC-CA-12**: a `conta_trocar_senha` foi redefinida na T61 e continua sem invalidar os links de recuperação
+  pendentes. Sem mudança.
+- SEC-CA-06 a 09 e 11: sem mudança.
+
+### Veredito do reteste
+
+**Sem crítico nem alto.** SEC-CA-01 e SEC-CA-03 estão fechados. SEC-CA-02 e SEC-CA-04 continuam médios, por causa do
+Turnstile e do teto por conta adiados na T64. Os dois foram reduzidos: a cota já não passa do contratado, e o ataque
+pela rotação dentro do /64 fechou. Há 2 baixos novos (SEC-CA-13 e 14). Pelo AD-012, os médios são pendência
+obrigatória antes da liberação. Por isso, os dois resíduos pedem que o usuário decida: corrigir ou aceitar
+formalmente (perguntas abaixo).
+
+### Perguntas para o usuário (reteste)
+
+1. **SEC-CA-02, resíduo da cota de e-mail (o AD-012 previa o Turnstile; a T64 o adiou).**
+   - (a) Fazer agora o "esqueci a senha" de conta não confirmada gastar a cota de cadastro, mais um teto de envios por
+     /48 **(Recomendado)**: fecha o consumo da reserva com pouca mudança e sem tela nova. A queda diária do cadastro
+     continua possível.
+   - (b) Turnstile no cadastro e no "esqueci a senha" antes da liberação: fecha o abuso automatizado. Mexe nas telas
+     t04, t05 e t29 e põe uma dependência da Cloudflare.
+   - (c) Aceitar e registrar no THREAT-MODEL: nada muda, e o domínio fica exposto a *bounces*.
+2. **SEC-CA-04, força bruta a partir de muitos /64.**
+   - (a) Teto suave por conta no login (50 falhas por hora, somando os IPs), com resposta de bloqueio curta
+     **(Recomendado)**: segue o padrão da T61. Pode virar bloqueio remoto da conta, então o prazo tem de ser curto.
+   - (b) Limitador adicional pelo /48 no `/api/sessao/entrar`: mudança pequena, que não pega quem tem vários /48 ou
+     usa IPv4 de proxies.
+   - (c) Aceitar e registrar no THREAT-MODEL o resíduo completo (força bruta numa conta e CPU, além do *spraying*).
+3. **SEC-CA-13 e SEC-CA-14 (baixos novos).**
+   - (a) Corrigir já o SEC-CA-13 (tempo máximo no `fetch` e `lock_timeout`) e deixar o SEC-CA-14 para a liberação
+     **(Recomendado)**: duas linhas com teste. Tira o risco de a lentidão do Resend derrubar o app.
+   - (b) Os dois entram como itens a decidir na liberação, junto com os SEC-CA-05 a 12.

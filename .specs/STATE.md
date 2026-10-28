@@ -98,6 +98,14 @@
 - **Date**: 2026-10-27
 - **Status**: active
 
+### AD-013
+- **Decision**: Reteste de segurança (2026-10-28): SEC-CA-01 e SEC-CA-03 fechados. SEC-CA-02 (cota de e-mail) e SEC-CA-04 (força bruta com vários /64) corrigidos só em parte e tratados sem Turnstile: "esqueci a senha" de conta não confirmada gasta a cota de cadastro e há teto de 20 e-mails por hora por IPv4 ou /48 (ACE-73, T65 e T66); teto suave de 50 falhas por hora por conta no login, com bloqueio de 10 min (ACE-74, T67). O SEC-CA-13 (sem tempo máximo no Resend e na trava da cota) é corrigido já (ACE-75, T68). O SEC-CA-14 e os baixos SEC-CA-05 a 12 entram na liberação como itens a decidir. O ACE-72 passa a dizer "atinge 80%", como o código já faz. Altera o AD-012 no ponto do Turnstile.
+- **Reason**: Nenhum achado crítico ou alto, mas o AD-012 exige tratar os médios antes da liberação; o Turnstile mexe em telas e depende da Cloudflare, e as defesas no servidor cobrem o abuso sem isso.
+- **Trade-off**: Continuam possíveis a queda diária do cadastro por esgotamento da cota e a força bruta lenta (abaixo de 50 falhas por hora por conta); o THREAT-MODEL registra (T69).
+- **Scope**: `conta-e-acesso`, fase 10 (volta à 9 para T65 a T69)
+- **Date**: 2026-10-28
+- **Status**: active
+
 ## Handoff
 
 - **Feature**: `conta-e-acesso` (fase 9, Execute do `tlc-spec-driven`)
