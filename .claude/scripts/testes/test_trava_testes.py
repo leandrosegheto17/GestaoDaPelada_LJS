@@ -53,8 +53,8 @@ class TestTrava(unittest.TestCase):
                            encoding="utf-8", env=env)
         return r.returncode, r.stderr
 
-    def rodar(self):
-        env = dict(os.environ, CLAUDE_PROJECT_DIR=str(self.repo))
+    def rodar(self, pasta=None):
+        env = dict(os.environ, CLAUDE_PROJECT_DIR=str(pasta or self.repo))
         r = subprocess.run([sys.executable, str(SCRIPT), "--rodar"], capture_output=True, text=True,
                            encoding="utf-8", env=env)
         return r.returncode, r.stdout
@@ -88,6 +88,32 @@ class TestTrava(unittest.TestCase):
         self.assertEqual(self.rodar()[0], 0)
         git(self.repo, "checkout", "-q", "main")
         self.assertEqual(self.hook("git merge --no-ff feat")[0], 0)
+
+    def worktree(self, branch):
+        """Worktree novo da branch, numa pasta temporária fora do repositório."""
+        fora = tempfile.TemporaryDirectory(ignore_cleanup_errors=True)
+        self.addCleanup(fora.cleanup)
+        pasta = Path(fora.name) / branch
+        git(self.repo, "worktree", "add", "-q", "-b", branch, str(pasta))
+        return pasta
+
+    def test_merge_de_branch_testada_no_proprio_worktree_libera(self):
+        # A suíte verde fica registrada no worktree da branch; o merge roda na main.
+        self.config({"comando": PASSA})
+        pasta = self.worktree("feat")
+        (pasta / "b.txt").write_text("b", encoding="utf-8")
+        commitar(pasta, "feat")
+        self.assertEqual(self.hook("git merge --ff-only feat")[0], 2)
+        self.assertEqual(self.rodar(pasta)[0], 0)
+        self.assertEqual(self.hook("git merge --ff-only feat")[0], 0)
+
+    def test_merge_de_worktree_com_suite_verde_noutro_commit_bloqueia(self):
+        self.config({"comando": PASSA})
+        pasta = self.worktree("feat")
+        self.assertEqual(self.rodar(pasta)[0], 0)
+        (pasta / "b.txt").write_text("b", encoding="utf-8")
+        commitar(pasta, "depois do verde")
+        self.assertEqual(self.hook("git merge --ff-only feat")[0], 2)
 
     def test_rodar_com_falha_nao_registra_verde(self):
         self.config({"comando": FALHA})

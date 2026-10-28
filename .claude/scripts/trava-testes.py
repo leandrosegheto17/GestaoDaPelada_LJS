@@ -176,6 +176,10 @@ def modo_hook():
         commit = git(raiz, "rev-parse", alvo)
         if commit is None or commit in verdes:
             return 0
+        # A suíte da branch pode ter rodado no worktree dela, que tem registro próprio.
+        pasta = worktree_da_branch(raiz, alvo)
+        if pasta and pasta.resolve() != raiz.resolve() and commit in ler_verdes(pasta):
+            return 0
         bloquear(
             f"Trava de testes: o último commit de `{alvo}` ({commit[:7]}) não tem a suíte verde registrada.\n"
             f"Teste a branch antes do merge: `git checkout {alvo}` e "
