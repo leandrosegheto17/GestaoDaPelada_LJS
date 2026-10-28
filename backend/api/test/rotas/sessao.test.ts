@@ -89,6 +89,35 @@ describe('POST /api/sessao/entrar', () => {
     expect(outroIp.status).toBe(200);
   });
 
+  it('IPv6: falhas de dois endereços do mesmo /64 somam no mesmo bloqueio; outro /64 não (ACE-71)', async () => {
+    const s = await criarSessao();
+    const enderecos = [
+      '2001:db8:1:2::1',
+      '2001:db8:1:2:aaaa::2',
+      '2001:DB8:1:2::3',
+      '2001:db8:1:2::4',
+      '2001:db8:1:2::5',
+    ];
+    for (const ip of enderecos) {
+      const falha = await pedir('POST', '/api/sessao/entrar', { email: s.email, senha: 'errada-errada' }, { ip });
+      expect(falha.status).toBe(401);
+    }
+    const mesmo64 = await pedir(
+      'POST',
+      '/api/sessao/entrar',
+      { email: s.email, senha: s.senha },
+      { ip: '2001:db8:1:2:9::9' },
+    );
+    expect(mesmo64.status).toBe(429);
+    const outro64 = await pedir(
+      'POST',
+      '/api/sessao/entrar',
+      { email: s.email, senha: s.senha },
+      { ip: '2001:db8:1:3::1' },
+    );
+    expect(outro64.status).toBe(200);
+  });
+
   it('corpo fora dos limites: 422 dados_invalidos com o campo', async () => {
     const r = await pedir('POST', '/api/sessao/entrar', { email: 'nao-e-email', senha: SENHA });
     expect(r.status).toBe(422);

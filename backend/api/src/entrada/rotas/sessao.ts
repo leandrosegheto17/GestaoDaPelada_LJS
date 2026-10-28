@@ -4,14 +4,12 @@ import { emTransacaoPropria } from '../../infraestrutura/db/index.ts';
 import * as contas from '../../infraestrutura/db/repositorios/contas.ts';
 import * as sessoes from '../../infraestrutura/db/repositorios/sessoes.ts';
 import { definirCookieSessao, limparCookieSessao } from '../../infraestrutura/sessao/cookie.ts';
+import { chaveDoIp } from '../../infraestrutura/sessao/chave-ip.ts';
 import { gerarToken, hashIp } from '../../infraestrutura/sessao/token.ts';
 import type { AppEnv } from '../app.ts';
 import { lerCorpo } from '../corpo.ts';
 import { CODIGOS_ERRO, erroComStatus, sessaoExpirada } from '../erros.ts';
 import { exigirSessao } from '../middlewares/sessao.ts';
-
-/** Sem `CF-Connecting-IP` (fora da Cloudflare), todos dividem a mesma chave: falha fechada, como no limitador. */
-const IP_DESCONHECIDO = 'sem-ip';
 
 /** Entrar, consultar a sessão e sair (ACE-09 a ACE-14, ACE-17, ACE-18). */
 export const rotaSessao = new Hono<AppEnv>()
@@ -20,7 +18,7 @@ export const rotaSessao = new Hono<AppEnv>()
     if (!corpo.ok) return corpo.resposta;
 
     const sessao = await gerarToken();
-    const ipHash = await hashIp(c.req.header('CF-Connecting-IP') ?? IP_DESCONHECIDO);
+    const ipHash = await hashIp(chaveDoIp(c.req.header('CF-Connecting-IP')));
     // Transação própria: a falha de login precisa ficar gravada mesmo com a resposta 401 (a da requisição desfaz).
     const resultado = await emTransacaoPropria(c.env.HYPERDRIVE.connectionString, {}, (db) =>
       contas.entrar(db, { email: corpo.dado.email, senha: corpo.dado.senha, ipHash, tokenHash: sessao.hash }),

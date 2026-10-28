@@ -1665,9 +1665,9 @@ fora desta rodada: as defesas abaixo não mexem em telas além do aviso de T59.
 
 **Done when**:
 
-- [ ] Os casos do teste unitário passam e falhariam sem a normalização
-- [ ] Limitador e `ip_hash` usam a mesma função
-- [ ] `pnpm test` e `pnpm typecheck` passam
+- [x] Os casos do teste unitário passam e falhariam sem a normalização
+- [x] Limitador e `ip_hash` usam a mesma função
+- [x] `pnpm test` e `pnpm typecheck` passam
 
 **Tests**: unit
 **Gate**: quick

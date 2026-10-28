@@ -47,6 +47,16 @@ describe('limite de taxa por IP (FUN-26)', () => {
     expect(publico.chaves).toEqual([IP_A, IP_A, IP_B]);
   });
 
+  it('IPv6: dois endereços do mesmo /64 compartilham a chave do limitador (ACE-71)', async () => {
+    const publico = limitadorDe(1);
+    const opcoes = { app: { limitadores: { publico } } };
+    expect((await chamar('/api/publico/x/ranking', ip('2001:db8:1:2::1'), opcoes)).status).not.toBe(429);
+    expect((await chamar('/api/publico/x/ranking', ip('2001:DB8:1:2:ffff::9'), opcoes)).status).toBe(429);
+    expect((await chamar('/api/publico/x/ranking', ip('2001:db8:1:3::1'), opcoes)).status).not.toBe(429);
+    expect(publico.chaves[0]).toBe(publico.chaves[1]);
+    expect(publico.chaves[2]).not.toBe(publico.chaves[0]);
+  });
+
   it('rotas fora de /api/sessao/entrar e /api/publico/* não passam pelos limitadores', async () => {
     const entrar = limitadorDe(0);
     const publico = limitadorDe(0);
