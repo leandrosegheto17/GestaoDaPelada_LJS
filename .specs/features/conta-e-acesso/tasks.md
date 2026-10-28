@@ -1903,9 +1903,9 @@ Tratam os achados que o reteste de 2026-10-28 (`seguranca.md`, seção "Reteste 
 
 **Done when**:
 
-- [ ] O teste falha sem a migration e passa com ela
-- [ ] As falhas de outro e-mail seguem intactas e o rollback do Worker preserva a assinatura de `link_nova_senha`
-- [ ] `pnpm test`, `pnpm typecheck` e `pnpm test:checagens` passam
+- [x] O teste falha sem a migration e passa com ela
+- [x] As falhas de outro e-mail seguem intactas e o rollback do Worker preserva a assinatura de `link_nova_senha`
+- [x] `pnpm test`, `pnpm typecheck` e `pnpm test:checagens` passam
 
 **Tests**: integration
 **Gate**: quick
