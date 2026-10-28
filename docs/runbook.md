@@ -96,6 +96,13 @@ os apagam no fim. Se os dados de produção ainda estiverem noutro database do N
 e `pg_restore`, com confirmação específica) **antes** de trocar os secrets e a origem do Hyperdrive: apontar para um
 `pelada` vazio faria o `pnpm migrar` criar um schema novo e o app abrir sem dados.
 
+### 2.4 Tempo limite da conexão do Worker
+
+A transação de cada requisição desiste de conectar em **8 s** (`connectionTimeoutMillis`, ADR-033), sem nova
+tentativa: com o Neon ou o Hyperdrive sem resposta, as rotas com banco respondem erro em vez de ficarem presas, e o
+`/api/health` (que não toca o banco) continua 200. Muitos erros de banco de uma vez apontam para o Neon (página de
+status e console) ou para a origem do Hyperdrive, não para o código.
+
 ### 2.3 Roles do banco
 
 Padrão `<projeto>_owner`, `<projeto>_app` e `<projeto>_backup_ro` (ADR-032):

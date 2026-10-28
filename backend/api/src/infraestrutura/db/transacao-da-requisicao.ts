@@ -13,6 +13,12 @@ import type { Banco } from './tipos.ts';
 
 const OID_DATE = 1082;
 
+/**
+ * Tempo limite para abrir a conexão (ADR-033): com o Neon acordando ou o Hyperdrive sem resposta, a requisição falha
+ * em 8 s em vez de prender o Worker. Sem nova tentativa: o erro sobe e a rota responde com erro.
+ */
+export const TEMPO_LIMITE_CONEXAO_MS = 8_000;
+
 /** `date` volta como texto `AAAA-MM-DD` (nunca como Date com fuso); o resto segue o padrão do pg. */
 const tiposDoBanco = {
   getTypeParser: ((oid: number, formato?: 'text' | 'binary') =>
@@ -88,7 +94,11 @@ export function abrirTransacaoDaRequisicao(opcoes: OpcoesTransacao): TransacaoDa
 
   const iniciar = (): Promise<pg.Client> =>
     (inicio ??= (async () => {
-      const novo = new pg.Client({ connectionString: opcoes.connectionString(), types: tiposDoBanco });
+      const novo = new pg.Client({
+        connectionString: opcoes.connectionString(),
+        types: tiposDoBanco,
+        connectionTimeoutMillis: TEMPO_LIMITE_CONEXAO_MS,
+      });
       // Ao fechar, o socket do Workers cancela a leitura pendente e o erro sobe até o cliente; sem ouvinte vira
       // rejeição não tratada.
       novo.on('error', () => undefined);
