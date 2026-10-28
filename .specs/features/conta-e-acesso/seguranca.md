@@ -494,6 +494,10 @@ mas o contador global é compartilhado: duas execuções simultâneas da suíte 
     rollback desfaz também o registro do intervalo de 60 s.
   - Nenhum e-mail chega à vítima, então a enumeração fica silenciosa, no ritmo do limitador.
   - Prova no local: e-mail inexistente deu 200; o da vítima deu 503, e 503 de novo.
+  - Depois da T65 (ACE-73), há também a faixa entre 80% e 100% da cota do dia: "esqueci a senha" de conta **não
+    confirmada** (que agora conta nos 80% de cadastro) responde 503, e o de e-mail sem conta, 200. Isso revela que a
+    conta existe e não está confirmada, só enquanto a cota está nessa faixa. O usuário aceitou o resíduo (T71),
+    registrado no THREAT-MODEL 1a, linha da enumeração.
 - **SEC-CA-10**: o `ip_hash` passou a ser o SHA-256 do /64 no IPv6. Segue sem sal, e o IPv4 continua reversível. Sem
   mudança de severidade.
 - **SEC-CA-12**: a `conta_trocar_senha` foi redefinida na T61 e continua sem invalidar os links de recuperação

@@ -1880,8 +1880,8 @@ Tratam os achados que o reteste de 2026-10-28 (`seguranca.md`, seção "Reteste 
 
 **Done when**:
 
-- [ ] Os quatro documentos atualizados
-- [ ] `pnpm format:check` e `pnpm test:checagens` passam
+- [x] Os quatro documentos atualizados
+- [x] `pnpm format:check` e `pnpm test:checagens` passam
 
 **Tests**: none
 **Gate**: quick

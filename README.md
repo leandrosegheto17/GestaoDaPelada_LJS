@@ -60,7 +60,9 @@ não há envio: crie o arquivo `.dev.vars` na raiz (fora do git) com `EMAIL_DEV=
 guarda as mensagens numa caixa em memória e `GET /api/dev/emails` as devolve; o link de cada e-mail está no campo
 `texto`. Sem `EMAIL_DEV`, a rota responde 404. Em produção a variável nunca existe e valem `RESEND_API_KEY` e
 `RESEND_REMETENTE` (secrets do Worker, runbook, seção 9). Quando o provedor falha ou a cota diária acaba (100 e-mails por
-dia no plano gratuito), a API responde 503 `email_indisponivel` (ACE-52).
+dia no plano gratuito), a API responde 503 `email_indisponivel` (ACE-52). `LIMITE_EMAILS_IP_HORA` (padrão 20) limita os
+pedidos de e-mail por hora por IPv4 ou /48 de IPv6 (429 acima disso); sem o cabeçalho `CF-Connecting-IP`, como no
+`pnpm dev`, todos os pedidos dividem a chave `sem-ip`, então suba o valor no `.dev.vars` se testar muitos envios.
 
 Para a conta do dono: `pnpm dono -- --email <e-mail>` (pede a senha sem eco e usa o banco local; em produção, só com
 `--alvo producao` e a confirmação do runbook).
