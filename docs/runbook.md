@@ -115,7 +115,7 @@ pessoais e a identidade privada do `age` não pode parar no git (o `.gitignore` 
    CREATE ROLE pelada_backup NOLOGIN NOBYPASSRLS NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION;
    ```
    Na branch `dev` (filha da `main`) as roles já existem (são do servidor).
-5. **Restaure com o `pg_restore` do PostgreSQL 16** (a versão do dump; um cliente mais novo gera arquivo que o 16 não
+5. **Restaure com o `pg_restore` do PostgreSQL 18** (a versão do `pg_dump` que gerou o dump, ADR-031; um `pg_restore` mais antigo não
    lê), sempre pelo script, que passa pela trava de host antes de escrever:
    `DATABASE_URL="$URL_NOVA" URL_ORIGEM="$URL_ORIGEM" pnpm restaurar --arquivo <pasta-temporária>/dump.pgdump --alvo teste`
    (no banco local, sem `--alvo`). Ele roda `pg_restore --no-owner --no-privileges --clean --if-exists` com a senha em
@@ -125,7 +125,7 @@ pessoais e a identidade privada do `age` não pode parar no git (o `.gitignore` 
    na consulta da URL fora de `sslmode`, `channel_binding`, `connect_timeout` e `application_name` (nada de
    `service`, `hostaddr` ou `password`). O `pg_restore` roda com ambiente limpo: `PGHOST`, `PGHOSTADDR`, `PGSERVICE`
    e as demais variáveis `PG*` da sessão não chegam a ele, só o `PGPASSWORD`. Outro
-   `pg_restore` 16: `PG_RESTORE=<caminho>`. Nunca rode o `pg_restore --clean` à mão. Como o dump sai sem
+   `pg_restore` 18: `PG_RESTORE=<caminho>`. Nunca rode o `pg_restore --clean` à mão. Como o dump sai sem
    privilégios, reaplique os grants e a senha de login depois:
    `psql "$URL_NOVA" -f backend/api/src/infraestrutura/db/migracoes/1792843260000_roles.sql` (idempotente) e
    `ALTER ROLE pelada_app WITH LOGIN PASSWORD '<senha>'` (digite a senha só no terminal). Códigos de saída diferentes
@@ -191,7 +191,8 @@ Crie a conta e o monitor no painel do UptimeRobot (ação sua; o código funcion
 
 O `backup.yml` roda às 07:00 UTC (04:00 em Brasília) e sob demanda, no environment `backup` (seção 2). Falha de dump ou de cifragem deixa o job vermelho
 e não publica artefato; o GitHub avisa por e-mail se as notificações de Actions estiverem ligadas. O artefato fica 30
-dias. O dump é feito pela role `pelada_backup` com `--enable-row-security` e o cliente do PostgreSQL 16.
+dias. O dump é feito pela role `pelada_backup` com `--enable-row-security` e o cliente do PostgreSQL 18. Dumps feitos antes de 2026-10-28 saíram do
+cliente 16 e também abrem no `pg_restore` 18.
 
 ## 9. Liberação da feature `conta-e-acesso` (passos externos)
 
@@ -229,7 +230,7 @@ Registre a data e quem confirmou cada item na entrada da liberação (`.specs/li
 Rotação da chave do Resend: crie a nova no painel, grave com `wrangler secret put RESEND_API_KEY`, confira um cadastro
 de teste e só depois revogue a antiga.
 
-Hash de senha importado de fora: o filtro de `conta_entrar` aceita `$2a$`, `$2b$` e `$2y$`, mas no Postgres 16 só
+Hash de senha importado de fora: o filtro de `conta_entrar` aceita `$2a$`, `$2b$` e `$2y$`, mas no pgcrypto (Postgres 16 e 18) só
 funcionam os hashes `$2a$` (os que `gen_salt('bf', 12)` do pgcrypto gera). Um hash `$2b$` ou `$2y$` importado de fora entraria como
 senha errada: converta para `$2a$` antes de gravar.
 

@@ -12,14 +12,14 @@ em conversa, artefatos e commits; identificadores de código seguem as convenç�
 - `backend/contrato` (schemas), `backend/dominio` (regras puras, sem I/O nem relógio), `backend/scripts` (dev, migração,
   seed, checagens e operação).
 - `frontend/web`: React 19, Vite 8, React Router 8, PWA com service worker (Workbox, `injectManifest`).
-- Banco: PostgreSQL 16 (Neon em produção, `docker compose` no local), migrations com `node-pg-migrate`, RLS com `FORCE`
+- Banco: PostgreSQL 18 (Neon em produção, `docker compose` no local), migrations com `node-pg-migrate`, RLS com `FORCE`
   por `grupo_id` (ADR-024 e ADR-025). O runtime conecta como `pelada_app`, nunca como o owner.
 - Produção: um Worker `gestaodapelada` com os assets e a API em `/api/*`, em `gestaodapelada.ljssoftware.com.br` (ADR-028).
 
 ## Comandos (na raiz do repositório)
 
 ```bash
-docker compose up -d          # Postgres 16 local
+docker compose up -d          # Postgres 18 local
 pnpm migrar                   # migrations (linha de base, roles, RLS)
 pnpm seed                     # dados de exemplo
 pnpm dev                      # Worker :8787 e app :5173

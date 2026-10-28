@@ -5,7 +5,7 @@ import { restaurar } from './restaurar.ts';
 /**
  * `pnpm restaurar --arquivo dump.pgdump [--alvo teste]`, com o destino em `DATABASE_URL` (runbook, seção 4).
  * `URL_ORIGEM` (produção) é obrigatória com destino remoto: recusa destino no mesmo endpoint do Neon. Opcional:
- * `PG_RESTORE` (caminho do `pg_restore` 16).
+ * `PG_RESTORE` (caminho do `pg_restore` 18).
  */
 async function principal(): Promise<number> {
   return restaurar({
@@ -18,7 +18,7 @@ async function principal(): Promise<number> {
     comando: process.env['PG_RESTORE'],
     executar: (comando, args, env) => {
       const r = spawnSync(comando, args, { stdio: 'inherit', env }); // ambiente já limpo (SEC-011)
-      if (r.error) throw new Error(`Não foi possível rodar ${comando} (instale o cliente do PostgreSQL 16).`);
+      if (r.error) throw new Error(`Não foi possível rodar ${comando} (instale o cliente do PostgreSQL 18).`);
       return r.status ?? 1;
     },
   });

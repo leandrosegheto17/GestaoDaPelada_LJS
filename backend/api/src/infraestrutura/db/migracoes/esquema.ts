@@ -24,7 +24,7 @@ JOIN pg_attribute a ON a.attrelid = t.oid AND a.attnum > 0 AND NOT a.attisdroppe
 LEFT JOIN pg_attrdef d ON d.adrelid = t.oid AND d.adnum = a.attnum
 UNION ALL
 SELECT format('restricao %s.%s %s', t.relname, r.conname, pg_get_constraintdef(r.oid, true))
-FROM tabelas t JOIN pg_constraint r ON r.conrelid = t.oid
+FROM tabelas t JOIN pg_constraint r ON r.conrelid = t.oid AND r.contype <> 'n'
 UNION ALL
 SELECT format('indice %s.%s %s', t.relname, i.relname, pg_get_indexdef(i.oid))
 FROM tabelas t JOIN pg_index x ON x.indrelid = t.oid JOIN pg_class i ON i.oid = x.indexrelid
@@ -35,6 +35,8 @@ FROM tabelas t JOIN pg_trigger g ON g.tgrelid = t.oid AND NOT g.tgisinternal`;
 /**
  * Descreve o schema `public` da aplicação lendo só o `pg_catalog`, sem dados: tabelas, colunas
  * (tipo, nulidade, identity, default), restrições, índices e triggers. Uma linha por item, ordenadas.
+ * O PostgreSQL 18 passou a guardar o NOT NULL também em `pg_constraint` (`contype = 'n'`); essas linhas ficam de fora,
+ * porque a nulidade já está na linha da coluna. Assim a impressão digital é a mesma no 16 e no 18 (ADR-031).
  */
 export async function lerEsquema(cliente: pg.ClientBase): Promise<string[]> {
   const { rows } = await cliente.query<{ linha: string }>(CONSULTA);

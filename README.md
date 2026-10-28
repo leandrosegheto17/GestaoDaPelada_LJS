@@ -8,7 +8,7 @@ o CI, o deploy e o backup. As regras de negócio chegam nas features seguintes (
 
 - Front: React 19, Vite 8, PWA (service worker em `frontend/web/src/pwa`).
 - API: Hono num Cloudflare Worker (`backend/api`), Postgres pelo Hyperdrive, Kysely.
-- Banco: PostgreSQL 16 (Neon em produção, Docker no seu computador), migrations com `node-pg-migrate`, isolamento por RLS.
+- Banco: PostgreSQL 18 (Neon em produção, Docker no seu computador), migrations com `node-pg-migrate`, isolamento por RLS.
 - Pacotes: `backend/contrato` (schemas), `backend/dominio` (regras puras), `backend/scripts` (dev, migração, seed, checagens).
 
 ## Pré-requisitos
@@ -43,7 +43,7 @@ No `.env.example` as cinco variáveis vêm em branco.
 A senha do `postgres` (`postgres`) é a fictícia do `docker-compose.yml`; vale só para a sua máquina.
 
 ```bash
-docker compose up -d      # Postgres 16 local, porta 5432 (espere ficar healthy: docker compose ps)
+docker compose up -d      # Postgres 18 local, porta 5432 (espere ficar healthy: docker compose ps)
 pnpm migrar               # aplica as migrations (linha de base, roles, RLS)
 pnpm seed                 # dados de exemplo e senha das roles locais
 pnpm --filter @pelada/web build   # gera frontend/web/dist, que o Worker exige para subir

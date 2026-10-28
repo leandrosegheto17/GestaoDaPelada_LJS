@@ -54,20 +54,20 @@ function rodar({
 }
 
 describe('dump-cifrado.sh (FUN-46, FUN-47)', () => {
-  it('gera o dump com pg_dump -Fc e --enable-row-security no cliente do PostgreSQL 16', () => {
+  it('gera o dump com pg_dump -Fc e --enable-row-security no cliente do PostgreSQL 18 (ADR-031)', () => {
     const r = rodar();
     expect(r.status).toBe(0);
     const chamada = readFileSync(join(pasta, 'docker.log'), 'utf8');
-    expect(chamada).toContain('postgres:16');
+    expect(chamada).toContain('postgres:18');
     expect(chamada).toContain('--format=custom');
     expect(chamada).toContain('--enable-row-security');
     expect(readFileSync(r.saida, 'utf8')).toContain('DUMP-BINARIO');
   });
 
-  it('o cliente postgres:16 vai fixado por digest sha256, nunca só pela tag (SEC-004)', () => {
+  it('o cliente postgres:18 vai fixado por digest sha256, nunca só pela tag (SEC-004)', () => {
     expect(rodar().status).toBe(0);
     const chamada = readFileSync(join(pasta, 'docker.log'), 'utf8');
-    expect(chamada).toMatch(/(^|\s)postgres:16@sha256:[0-9a-f]{64}\s/);
+    expect(chamada).toMatch(/(^|\s)postgres:18@sha256:[0-9a-f]{64}\s/);
   });
 
   it('falha de pg_dump falha o job e não deixa artefato, nem parcial', () => {

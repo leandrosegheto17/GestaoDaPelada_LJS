@@ -35,7 +35,7 @@ export interface OpcoesRestaurar {
   executar: (comando: string, args: string[], env: Record<string, string>) => number | Promise<number>;
   /** Ambiente de onde sai o mínimo repassado ao `pg_restore`. Padrão: `process.env`. */
   ambiente?: Record<string, string | undefined> | undefined;
-  /** Binário do `pg_restore` (PostgreSQL 16). Padrão: `pg_restore` do PATH. */
+  /** Binário do `pg_restore` (PostgreSQL 18). Padrão: `pg_restore` do PATH. */
   comando?: string | undefined;
 }
 

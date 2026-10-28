@@ -1,9 +1,11 @@
 # Ambiente local descartável: só o banco. A API (wrangler dev) e o web (Vite) rodam com `pnpm dev`.
 # A senha abaixo é fictícia e vale só para esta máquina.
-# A imagem oficial postgres:16 traz as extensões contrib; o pgcrypto é criado pela migration.
+# A imagem oficial postgres:18 traz as extensões contrib; o pgcrypto é criado pela migration.
+# A partir da 18 a imagem guarda os dados em /var/lib/postgresql/18/docker: o volume monta /var/lib/postgresql. O
+# volume tem nome novo (dados_db_18) porque os dados da 16 não abrem na 18 (ADR-031).
 services:
   db:
-    image: postgres:16
+    image: postgres:18
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -11,7 +13,7 @@ services:
     ports:
       - '127.0.0.1:5432:5432'
     volumes:
-      - dados_db:/var/lib/postgresql/data
+      - dados_db_18:/var/lib/postgresql
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U postgres']
       interval: 5s
@@ -19,4 +21,4 @@ services:
       retries: 10
 
 volumes:
-  dados_db:
+  dados_db_18:
