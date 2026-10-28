@@ -1787,9 +1787,9 @@ Tratam os achados que o reteste de 2026-10-28 (`seguranca.md`, seção "Reteste 
 
 **Done when**:
 
-- [ ] Teste prova o bloqueio com falhas vindas de /64 e /48 diferentes e falharia sem a migration
-- [ ] A resposta não distingue conta inexistente
-- [ ] `pnpm test`, `pnpm typecheck` e `pnpm test:checagens` passam
+- [x] Teste prova o bloqueio com falhas vindas de /64 e /48 diferentes e falharia sem a migration
+- [x] A resposta não distingue conta inexistente
+- [x] `pnpm test`, `pnpm typecheck` e `pnpm test:checagens` passam
 
 **Tests**: integration
 **Gate**: quick
