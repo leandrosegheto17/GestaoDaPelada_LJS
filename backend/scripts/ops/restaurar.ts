@@ -12,7 +12,7 @@ import { conferirUrlNeon } from '../../api/src/infraestrutura/seguranca/url-neon
  * G-16). `pg_restore --clean` apaga tabelas, então:
  * - a trava de host vale como no `pnpm migrar`: host local passa; host remoto exige `--alvo teste` e a confirmação
  *   digitada do host (ou `CI=true`);
- * - `--alvo producao` é sempre recusado: a restauração vai para uma branch nova ou um banco local, nunca para produção;
+ * - `--alvo producao` é sempre recusado: a restauração vai para a branch `dev` do Neon ou um banco local, nunca para produção;
  * - destino remoto exige `NEON_URL_ORIGEM` (a origem de produção, a mesma do passo 6 do runbook), e destino no mesmo
  *   endpoint do Neon é recusado. A comparação é pelo identificador do endpoint (o primeiro rótulo do host, sem o
  *   sufixo `-pooler`, em minúsculas e sem ponto final), então o pooler e o host com ponto final contam como o mesmo.

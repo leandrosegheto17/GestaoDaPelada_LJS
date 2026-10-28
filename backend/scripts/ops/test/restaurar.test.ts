@@ -73,7 +73,7 @@ describe('restaurar: trava de host antes do pg_restore (SEC-009)', () => {
     await expect(restaurar(recusa.base)).rejects.toThrow(/confirmação ausente ou diferente/);
     expect(recusa.chamadas).toEqual([]);
 
-    // Reteste de SEC-009: destino remoto exige URL_ORIGEM, então o caso aceito a informa.
+    // Reteste de SEC-009: destino remoto exige NEON_URL_ORIGEM, então o caso aceito a informa.
     const aceita = opcoes({
       url: REMOTO,
       alvo: 'teste',
@@ -84,7 +84,7 @@ describe('restaurar: trava de host antes do pg_restore (SEC-009)', () => {
     expect(aceita.chamadas).toHaveLength(1);
   });
 
-  // ADR-032: com --alvo teste confirmado e URL_ORIGEM, o destino ainda passa pela validação única do Neon.
+  // ADR-032: com --alvo teste confirmado e NEON_URL_ORIGEM, o destino ainda passa pela validação única do Neon.
   it.each([
     ['pooler', REMOTO.replace('ep-nova-123.', 'ep-nova-123-pooler.')],
     ['sem TLS', REMOTO.replace('?sslmode=require', '')],
@@ -108,7 +108,7 @@ describe('restaurar: trava de host antes do pg_restore (SEC-009)', () => {
     expect(chamadas).toEqual([]);
   });
 
-  it('destino com o mesmo host da origem (URL_ORIGEM, produção) é recusado mesmo com --alvo teste confirmado', async () => {
+  it('destino com o mesmo host da origem (NEON_URL_ORIGEM, produção) é recusado mesmo com --alvo teste confirmado', async () => {
     const { base, chamadas } = opcoes({
       url: PRODUCAO,
       alvo: 'teste',
@@ -122,15 +122,15 @@ describe('restaurar: trava de host antes do pg_restore (SEC-009)', () => {
   describe('reteste de SEC-009: produção reconhecida pelo endpoint do Neon', () => {
     const HOST_PRODUCAO = 'ep-producao-9.sa-east-1.aws.neon.tech';
 
-    it('destino remoto sem URL_ORIGEM é recusado, mesmo com --alvo teste confirmado', async () => {
+    it('destino remoto sem NEON_URL_ORIGEM é recusado, mesmo com --alvo teste confirmado', async () => {
       for (const urlOrigem of [undefined, '']) {
         const { base, chamadas } = opcoes({ url: PRODUCAO, alvo: 'teste', urlOrigem, confirmar: () => HOST_PRODUCAO });
-        await expect(restaurar(base)).rejects.toThrow(/URL_ORIGEM/);
+        await expect(restaurar(base)).rejects.toThrow(/NEON_URL_ORIGEM/);
         expect(chamadas).toEqual([]);
       }
     });
 
-    it('destino local continua sem exigir URL_ORIGEM', async () => {
+    it('destino local continua sem exigir NEON_URL_ORIGEM', async () => {
       const { base, chamadas } = opcoes();
       await expect(restaurar(base)).resolves.toBe(0);
       expect(chamadas).toHaveLength(1);
