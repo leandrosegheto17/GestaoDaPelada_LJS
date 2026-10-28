@@ -18,12 +18,14 @@ export const rotaSessaoRecuperacao = new Hono<AppEnv>()
     const { email } = corpo.dado;
 
     const link = await gerarToken();
-    const pedido = await links.pedir(c.var.db, email, 'recuperacao', link.hash);
+    const pedido = await links.pedirRecuperacao(c.var.db, email, link.hash);
     if (pedido.enviar && pedido.nome !== null) {
       const modelo = modeloRecuperacao({ urlPublica: c.env.URL_PUBLICA, nome: pedido.nome, token: link.token });
       const chave = chaveDeEnvio('recuperacao', link.hash);
-      // "Esqueci a senha" usa a cota inteira do dia (ACE-72).
-      const envio = { para: email, modelo, chave, categoria: 'recuperacao' } as const;
+      // "Esqueci a senha" de conta confirmada usa a cota inteira do dia (ACE-72); de conta não confirmada, a de
+      // cadastro (80%), para a reserva da recuperação não ser gasta por contas criadas e não confirmadas (ACE-73).
+      const categoria = pedido.confirmada ? 'recuperacao' : 'recuperacao_nao_confirmada';
+      const envio = { para: email, modelo, chave, categoria } as const;
       if (!(await enviarModelo(c, envio))) return emailIndisponivel(c);
     }
     // A mesma resposta exista a conta ou não (ACE-22).

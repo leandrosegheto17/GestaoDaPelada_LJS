@@ -1740,8 +1740,8 @@ Tratam os achados que o reteste de 2026-10-28 (`seguranca.md`, seção "Reteste 
 
 **Done when**:
 
-- [ ] Teste prova que a reserva da recuperação não é consumida por contas não confirmadas e falharia sem a mudança
-- [ ] `pnpm test`, `pnpm typecheck` e `pnpm test:checagens` passam
+- [x] Teste prova que a reserva da recuperação não é consumida por contas não confirmadas e falharia sem a mudança
+- [x] `pnpm test`, `pnpm typecheck` e `pnpm test:checagens` passam
 
 **Tests**: integration
 **Gate**: quick

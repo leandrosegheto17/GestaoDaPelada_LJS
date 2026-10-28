@@ -61,6 +61,35 @@ describe('links.pedir', () => {
   });
 });
 
+describe('links.pedirRecuperacao (ACE-73, T65)', () => {
+  it('conta não confirmada: envia e confirmada falso', async () => {
+    const { email } = await contaNova();
+    expect(await semConta((db) => links.pedirRecuperacao(db, email, hash()))).toEqual({
+      enviar: true,
+      nome: 'Pessoa Link',
+      confirmada: false,
+    });
+  });
+
+  it('conta confirmada: envia e confirmada verdadeiro', async () => {
+    const { email, linkConfirmacao } = await contaNova();
+    await semConta((db) => links.confirmar(db, linkConfirmacao));
+    expect(await semConta((db) => links.pedirRecuperacao(db, email, hash()))).toEqual({
+      enviar: true,
+      nome: 'Pessoa Link',
+      confirmada: true,
+    });
+  });
+
+  it('e-mail sem conta: não envia, sem nome e confirmada falso', async () => {
+    expect(await semConta((db) => links.pedirRecuperacao(db, 'ninguem@exemplo.com', hash()))).toEqual({
+      enviar: false,
+      nome: null,
+      confirmada: false,
+    });
+  });
+});
+
 describe('links.confirmar', () => {
   // ACE-06 reescrito na T57 (SEC-CA-01): confirmar não abre sessão. Este caso esperava a sessão criada.
   it('link válido: confirma o e-mail, consome o link, devolve a conta e não cria sessão (ACE-06)', async () => {

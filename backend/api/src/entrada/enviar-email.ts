@@ -14,9 +14,11 @@ export function chaveDeEnvio(tipo: string, tokenHash: Uint8Array): string {
 
 /**
  * Categoria do envio para o teto diário (ACE-72). O aviso de cadastro duplicado é `cadastro`, como a confirmação
- * do cadastro novo: os dois param juntos, e a resposta não revela se o e-mail tem conta (ACE-04).
+ * do cadastro novo: os dois param juntos, e a resposta não revela se o e-mail tem conta (ACE-04). "Esqueci a senha"
+ * de conta com o e-mail ainda não confirmado é `recuperacao_nao_confirmada`: gasta a cota de cadastro, para quem cria
+ * contas sem confirmar não consumir a reserva da recuperação (ACE-73).
  */
-export type CategoriaEnvio = 'cadastro' | 'reenvio' | 'convite' | 'recuperacao';
+export type CategoriaEnvio = 'cadastro' | 'reenvio' | 'convite' | 'recuperacao' | 'recuperacao_nao_confirmada';
 
 /** Padrão de `LIMITE_EMAILS_DIA`: a cota diária do plano gratuito do Resend. */
 export const LIMITE_EMAILS_DIA_PADRAO = 100;
@@ -30,8 +32,9 @@ export function limiteEmailsDia(valor: string | undefined): number {
 }
 
 /**
- * Quantos e-mails do dia a categoria pode ver enviados, contando o dela: "esqueci a senha" usa a cota inteira;
- * cadastro, reenvio e convite param em 80% (arredondado para baixo), para sobrar cota para a recuperação (ACE-72).
+ * Quantos e-mails do dia a categoria pode ver enviados, contando o dela: "esqueci a senha" de conta confirmada usa a
+ * cota inteira; cadastro, reenvio, convite e "esqueci a senha" de conta não confirmada param em 80% (arredondado para
+ * baixo), para sobrar cota para a recuperação de quem já usa o app (ACE-72, ACE-73).
  */
 export function tetoDoEnvio(limite: number, categoria: CategoriaEnvio): number {
   return categoria === 'recuperacao' ? limite : Math.floor((limite * 80) / 100);

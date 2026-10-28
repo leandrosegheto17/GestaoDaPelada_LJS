@@ -155,6 +155,45 @@ describe('POST /api/sessao/esqueci-senha com o teto (ACE-72)', () => {
   });
 });
 
+describe('POST /api/sessao/esqueci-senha de conta não confirmada (ACE-73; SEC-CA-02, T65)', () => {
+  /** Conta cadastrada pela rota, com o e-mail ainda não confirmado. */
+  async function contaNaoConfirmada(): Promise<string> {
+    const email = emailNovo();
+    expect((await pedir('POST', '/api/conta', cadastro(email))).status).toBe(201);
+    remetente.mensagens.length = 0;
+    return email;
+  }
+
+  it('com a cota de cadastro cheia (80%): 503 sem enviar, e a reserva da recuperação fica intacta', async () => {
+    const naoConfirmada = await contaNaoConfirmada();
+    const confirmada = await contaConfirmada();
+    await liberarIntervalo(confirmada.email);
+    remetente.mensagens.length = 0;
+    const esqueci = (email: string) => pedir('POST', '/api/sessao/esqueci-senha', { email }, { env: DEZ });
+
+    await totalHoje(8);
+    const r = await esqueci(naoConfirmada);
+    expect(r.status).toBe(503);
+    expect(r.corpo).toMatchObject(ERRO);
+    expect(enviadosPara(naoConfirmada)).toHaveLength(0);
+    expect(await lerTotalHoje()).toBe(8);
+
+    // A conta confirmada ainda tem a reserva (até 100%).
+    expect((await esqueci(confirmada.email)).status).toBe(200);
+    expect(enviadosPara(confirmada.email)).toHaveLength(1);
+    expect(await lerTotalHoje()).toBe(9);
+  });
+
+  it('abaixo de 80%: envia e conta normalmente', async () => {
+    const naoConfirmada = await contaNaoConfirmada();
+    await totalHoje(7);
+    const r = await pedir('POST', '/api/sessao/esqueci-senha', { email: naoConfirmada }, { env: DEZ });
+    expect(r.status).toBe(200);
+    expect(enviadosPara(naoConfirmada)).toHaveLength(1);
+    expect(await lerTotalHoje()).toBe(8);
+  });
+});
+
 describe('LIMITE_EMAILS_DIA (ACE-72)', () => {
   it('valor customizado é respeitado: 50 dá teto 40 no cadastro e 50 na recuperação', async () => {
     const cinquenta = comLimite('50');

@@ -23,6 +23,28 @@ export async function pedir(db: Db, email: string, tipo: TipoLink, tokenHash: Ui
   return { enviar: linha.enviar, nome: linha.nome };
 }
 
+export interface ResultadoPedirRecuperacao extends ResultadoPedir {
+  /** Verdadeiro só para conta com o e-mail confirmado: decide a cota do envio (ACE-73). Nunca vai para a resposta. */
+  confirmada: boolean;
+}
+
+/**
+ * Link de recuperação, como `pedir`, dizendo também se o e-mail da conta já foi confirmado: "esqueci a senha" de conta
+ * não confirmada gasta a cota de cadastro, e não a reserva da recuperação (ACE-73; migration 1792843920000).
+ */
+export async function pedirRecuperacao(
+  db: Db,
+  email: string,
+  tokenHash: Uint8Array,
+): Promise<ResultadoPedirRecuperacao> {
+  const { rows } = await sql<ResultadoPedirRecuperacao>`
+    SELECT enviar, nome, confirmada FROM link_pedir_com_confirmacao(${email}, 'recuperacao', ${tokenHash})
+  `.execute(db);
+  const linha = rows[0];
+  if (!linha) throw new Error('link_pedir_com_confirmacao não devolveu linha');
+  return { enviar: linha.enviar, nome: linha.nome, confirmada: linha.confirmada };
+}
+
 /**
  * Consome o link de confirmação e marca o e-mail como confirmado, sem abrir sessão. Devolve a conta, ou nulo se o
  * link está vencido, usado ou não existe (ACE-06, ACE-07). O segundo parâmetro da função do banco não é mais usado

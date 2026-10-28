@@ -73,6 +73,8 @@ describe('funções SECURITY DEFINER (AD-008)', () => {
       'link_confirmar',
       'link_nova_senha',
       'link_pedir',
+      // link_pedir_com_confirmacao entrou na T65 ("esqueci a senha" de conta não confirmada, ACE-73).
+      'link_pedir_com_confirmacao',
       'sessao_tocar',
     ]);
   });
