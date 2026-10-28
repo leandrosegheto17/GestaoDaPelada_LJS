@@ -1888,6 +1888,53 @@ Tratam os achados que o reteste de 2026-10-28 (`seguranca.md`, seção "Reteste 
 
 ---
 
+### T72: Recuperação de senha zera as falhas de login do e-mail (SEC-CA-15)
+
+**What**: `link_nova_senha` passa a apagar as linhas de `tentativas_login` do e-mail da conta, para o bloqueio por conta do ACE-74 não sobreviver à recuperação (migration nova que redefine a função com a mesma assinatura, sem editar a aplicada). Teste de banco primeiro: com 50 falhas e a conta bloqueada, a nova senha pela recuperação libera o login com a senha nova; sem a mudança, o login continua em `bloqueado`. Cobrir também que as falhas de outro e-mail não são apagadas.
+**Estimativa**: 1h 30min
+**Where**: migration nova em `backend/api/src/infraestrutura/db/migracoes/`, teste em `backend/api/test/migracoes/`
+**Depends on**: T67
+**Requirement**: ACE-76, ACE-74
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] O teste falha sem a migration e passa com ela
+- [ ] As falhas de outro e-mail seguem intactas e o rollback do Worker preserva a assinatura de `link_nova_senha`
+- [ ] `pnpm test`, `pnpm typecheck` e `pnpm test:checagens` passam
+
+**Tests**: integration
+**Gate**: quick
+
+---
+
+### T73: Documentação: SEC-CA-15 corrigido e SEC-CA-16 a decidir na liberação
+
+**What**: em `seguranca.md`, registrar o SEC-CA-15 como corrigido (com o commit da T72) e o SEC-CA-16 como aceito por ora e item a decidir na liberação; no THREAT-MODEL, citar o resíduo (bloqueio renovável por 50 falhas por hora, com saída pela recuperação) e o teto de e-mails por origem compartilhada; no `docs/runbook.md`, dizer que a recuperação de senha também libera o login bloqueado.
+**Estimativa**: 30 min
+**Where**: `.specs/features/conta-e-acesso/seguranca.md`, `.md/THREAT-MODEL.md`, `docs/runbook.md`
+**Depends on**: T72
+**Requirement**: ACE-76
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] Os três documentos atualizados
+- [ ] `pnpm format:check` e `pnpm test:checagens` passam
+
+**Tests**: none
+**Gate**: quick
+
+---
+
 ## Phase Execution Map
 
 ```
@@ -1924,6 +1971,8 @@ Phase 12: T63 → T65 → T66
           T68 → T69
           T67 → T70
           T69 → T71
+          T67 → T72
+          T72 → T73
 ```
 
 Execução estritamente sequencial: um trabalhador faz uma tarefa por vez, em ordem.

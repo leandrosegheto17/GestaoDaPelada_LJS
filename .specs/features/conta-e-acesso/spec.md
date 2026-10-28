@@ -296,6 +296,7 @@ aceitar.
 - IF "esqueci a senha" é pedido para uma conta com o e-mail ainda não confirmado THEN o sistema SHALL contar o envio na cota de cadastro (os 80%), e não na reserva da recuperação; WHEN um mesmo IPv4 ou prefixo /48 de IPv6 faz mais de 20 pedidos de e-mail (cadastro, reenvio, convite ou "esqueci a senha", contados ao chegar, tenha conta ou não o e-mail e mesmo que a rota depois os recuse) em 1 h THEN o sistema SHALL responder 429 `muitas_requisicoes` sem enviar. [ACE-73]
 - WHEN o login (`POST /api/sessao/entrar`) soma 50 senhas erradas em 1 h para a mesma conta, vindas de quaisquer IPs, THEN o sistema SHALL recusar as tentativas seguintes com 429 `bloqueado_temporariamente`, sem rodar o bcrypt, por 10 min; a resposta SHALL ser a mesma para conta que não existe, e o login com a senha certa SHALL zerar a contagem apenas fora do bloqueio. O texto do 429 SHALL ser único e conservador, o mesmo do bloqueio por e-mail e IP do ACE-13 ("Muitas tentativas. Tente de novo em 15 minutos."), valendo também para este bloqueio de 10 min, para a resposta não distinguir os dois bloqueios. [ACE-74]
 - IF o Resend não responde em 10 s THEN o sistema SHALL abortar o envio e tratá-lo como falha (503 `email_indisponivel`, sem gastar a cota); a reserva de cota SHALL esperar no máximo 2 s pela trava da linha do dia, e acima disso responder 503 `email_indisponivel`. [ACE-75]
+- WHEN a senha é trocada pela recuperação ("esqueci a senha", `link_nova_senha`) THEN o sistema SHALL zerar as falhas de login registradas para o e-mail e o bloqueio por conta que elas causaram, para que o dono da conta volte a entrar com a senha nova. [ACE-76]
 
 ---
 
@@ -394,8 +395,9 @@ aceitar.
 | ACE-73 | Edge Cases | T65, T66 | Pending |
 | ACE-74 | Edge Cases | T67 | Pending |
 | ACE-75 | Edge Cases | T68 | Pending |
+| ACE-76 | Edge Cases | T72 | Pending |
 
-**Coverage:** 75 total, 0 mapped to tasks, 75 unmapped ⚠️ (o mapeamento nasce no `tasks.md`)
+**Coverage:** 76 total, 0 mapped to tasks, 76 unmapped ⚠️ (o mapeamento nasce no `tasks.md`)
 
 ---
 

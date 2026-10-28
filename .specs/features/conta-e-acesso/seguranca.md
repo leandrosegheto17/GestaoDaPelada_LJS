@@ -554,3 +554,149 @@ validação).
 - SEC-CA-04: força bruta lenta abaixo de 50 falhas por hora por conta (cerca de 50 tentativas por hora, mais 1 a cada
   10 min depois do bloqueio) e *password spraying* em muitas contas. O teto por conta pode ser usado para travar o
   login de uma vítima por 10 min de cada vez (bloqueio remoto curto, aceito em troca de não haver força bruta rápida).
+
+## Segundo reteste (2026-10-28)
+
+**Escopo**: só as correções dos achados que ficaram em aberto no primeiro reteste, commits `d0e4ea0..HEAD` (T65 a T71):
+SEC-CA-02 (T65 e T66), SEC-CA-04 (T67 e T70) e SEC-CA-13 (T68). Os resíduos aceitos no AD-013 (oráculo na faixa de
+80% a 100% da cota, força bruta lenta abaixo de 50 falhas por hora por conta, SEC-CA-14 e os baixos SEC-CA-05 a 12)
+não são achados novos. Para eles, só se diz se algo piorou.
+**Modo**: revisão do diff, consulta ao catálogo do banco local (`conta-e-acesso-seguranca-db-1`, banco `pelada`) e a
+suíte do próprio projeto. Rodaram as 13 suítes tocadas (`conta-teto-emails-origem`, `conta-entrar-teto-conta`,
+`conta-cota-trava`, `conta-esqueci-nao-confirmada`, `funcoes-definer`, `roles`, `rls`, `teto-emails-origem`,
+`teto-emails-trava`, `entrar-teto-conta`, `teto-emails`, `chave-ip`, `email`): **211 de 211 verdes**.
+**Limitação**: nesta rodada **não houve sondas HTTP**. O Worker local chegou a subir em `127.0.0.1:8798` e foi
+encerrado sem receber nenhuma requisição. As conclusões vêm da leitura do código e das funções SQL, do catálogo e dos
+testes automatizados. Não houve acesso à produção, à Cloudflare, ao Resend nem aos contêineres
+`controleemcasa_ljs-banco-1` e `evolucao-segura-postgres`.
+**Resíduo no banco local**: nenhum. Depois da rodada, `contas` tem 1 linha (a do seed), e `envios_email_dia`,
+`pedidos_email_origem` e `tentativas_login` estão vazias.
+
+### Resultado por achado
+
+| Achado | Antes | Agora | Situação |
+| --- | --- | --- | --- |
+| SEC-CA-02 | Médio | — | **Fechado**, com o resíduo aceito no AD-013 |
+| SEC-CA-04 | Médio | — | **Fechado** quanto à força bruta rápida. A regressão da correção virou o SEC-CA-15 |
+| SEC-CA-13 | Baixo | — | **Fechado** |
+| SEC-CA-15 (novo) | — | Médio | Em aberto: o bloqueio por conta pode ser mantido sem fim e não tem saída |
+| SEC-CA-16 (novo) | — | Baixo | Em aberto: o teto por origem pune quem divide o IPv4 ou o /48 |
+
+### SEC-CA-02: fechado (com o resíduo aceito)
+
+- **Reserva da recuperação**: o "esqueci a senha" de conta não confirmada cai na categoria
+  `recuperacao_nao_confirmada`, que usa o teto de 80% (`api/entrada/rotas/sessao-recuperacao.ts:27`,
+  `api/entrada/enviar-email.ts:40`). A coluna `confirmada` vem de `link_pedir_com_confirmacao`
+  (`mig/1792843920000_conta-esqueci-nao-confirmada.sql:9-44`). O ataque 2 do primeiro reteste (gastar os 20% com o
+  "esqueci a senha" de contas próprias não confirmadas) fechou.
+- **Teto por origem**: `limiteEmailsOrigem` (`api/entrada/middlewares/limite-emails-origem.ts:28-37`) vale para as
+  4 rotas que chamam `enviarModelo` (`api/entrada/app.ts:48-53`). Conferi pelos chamadores: `admins.ts:42`,
+  `conta-cadastro.ts:44` e `:67`, `sessao-recuperacao.ts:29`. Não há rota que envie e-mail fora da lista.
+  - O registro roda **antes** da rota e numa transação própria, então o rollback do 503 não desfaz a contagem.
+  - Os pedidos simultâneos de uma origem passam pela trava de `pg_advisory_xact_lock`, um de cada vez
+    (`mig/1792843980000_conta-teto-emails-origem.sql:36`): não há corrida para passar do teto.
+  - Middleware e rota usam o mesmo roteador do Hono. Por isso, variar o caminho (barra no fim, maiúsculas) não chega a
+    uma rota que envie sem passar pelo teto.
+- **Origem confiável**: a chave vem só de `CF-Connecting-IP` (`limite-emails-origem.ts:30`). O `X-Forwarded-For` é
+  ignorado. Na borda, a Cloudflare sobrescreve esse cabeçalho (PREMISSA já usada no primeiro reteste e não verificada
+  em produção nesta rodada). Só no local dá para forjá-lo.
+- **Enumeração**: o 429 do teto não depende do e-mail, porque todo pedido conta antes de a rota rodar. Não há oráculo
+  novo. O oráculo do 503 (SEC-CA-05) e a faixa de 80% a 100% continuam como foram aceitos e não pioraram.
+- **Resíduo aceito, sem mudança**: quem tem muitos IPv4 ou muitos /48 ainda esgota os 80% do cadastro, e os *hard
+  bounces* continuam possíveis até o teto do dia.
+
+### SEC-CA-04: fechado quanto à força bruta rápida
+
+- `conta_entrar` (`mig/1792844040000_conta-entrar-teto-conta.sql:58-72`) bloqueia o e-mail depois de 50 falhas em 1 h,
+  de qualquer IP. O bloqueio vem antes do `crypt()` e vale igual para e-mail sem conta. A trava por e-mail (`:38`)
+  avalia uma tentativa de cada vez, e os testes cobrem a corrida (`test/migracoes/conta-entrar-teto-conta.test.ts:170`).
+- O e-mail é normalizado pelo contrato e por `lower(btrim())`. Uma variação do endereço não escapa da contagem, porque
+  cai noutro e-mail, sem a senha da vítima.
+- A força bruta a partir de muitos /64 fica limitada a cerca de 50 tentativas por hora por conta, que é o resíduo
+  aceito. O efeito colateral está no SEC-CA-15.
+
+### SEC-CA-13: fechado
+
+- A função tem `lock_timeout=2s` (conferido no catálogo: `proconfig` de `email_cota_reservar`). O `55P03` vira `trava`
+  e depois 503 (`api/infraestrutura/db/repositorios/cota-email.ts:18-26`). O `fetch` do Resend é abortado aos 10 s
+  (`api/infraestrutura/email/resend.ts:25-61`). Os testes `teto-emails-trava.test.ts:25` e `email.test.ts` passam.
+- **Derrubar envios legítimos pela trava**: para manter a linha do dia presa, o atacante precisa de envios em
+  andamento. Ele fica limitado pelo teto por origem e, depois de 80% da cota, só segura a trava por milissegundos (o
+  `teto` responde na hora). O efeito é pequeno e passageiro e não justifica achado novo.
+- **Informativo**: se o Resend aceitar o e-mail mas responder depois de 10 s, o envio sai e a reserva é desfeita, e o
+  contador do dia fica abaixo do real. Depende de o provedor estar lento e não está sob controle do atacante.
+
+### SEC-CA-15 [MÉDIO, novo] O bloqueio de login por conta pode ser mantido sem fim, e a recuperação de senha não o desfaz
+
+- **Onde**:
+  - `mig/1792844040000_conta-entrar-teto-conta.sql:11-13` e `:58-72`: depois do bloqueio, cada nova falha bloqueia por
+    mais 10 min enquanto houver 50 falhas na última hora. O próprio comentário da função diz isso.
+  - `mig/1792843440000_conta-cadastro-e-links.sql:125-146`: `link_nova_senha` não limpa `tentativas_login` (só a
+    exclusão de conta limpa) e **apaga todas as sessões** da conta.
+- **Cenário** (sem conta, só com o e-mail da vítima):
+  1. O atacante manda 50 senhas erradas de 10 /64 de um mesmo /48, ou de 10 IPv4. São 5 por par, abaixo do
+     bloqueio por e-mail e IP e do limitador de 10 por minuto.
+  2. A partir daí, a cada 10 min, uma falha logo depois de o bloqueio vencer renova o bloqueio. Quando as 50 falhas
+     iniciais saem da janela de 1 h, uma nova rajada de cerca de 45 falhas recomeça o ciclo. O custo fica em cerca de
+     50 requisições por hora, a partir de uma só máquina.
+  3. A vítima recebe 429 mesmo com a senha certa. Se tentar o "esqueci a senha", define uma senha nova, **perde as
+     sessões que tinha** e continua bloqueada no login. A única saída é acertar a brecha de segundos entre o fim do
+     bloqueio e a falha seguinte.
+- **Por que médio**: é uma negação de acesso contra uma conta escolhida, sem prazo, barata e sem pré-requisito além do
+  e-mail. O alvo natural são os admins de um grupo (o e-mail aparece em convites). O AD-013 aceitou um "bloqueio remoto
+  curto, 10 min de cada vez". A leitura do código mostra que ele é renovável sem fim e que a recuperação o agrava. Cabe
+  ao usuário dizer se a aceitação cobre isso.
+- **Prova**: leitura da função e do comentário dela. Os testes cobrem o bloqueio de 10 min
+  (`conta-entrar-teto-conta.test.ts:104`), mas não a renovação nem a interação com a recuperação. Sem sondas HTTP
+  nesta rodada.
+- **Correção sugerida** (uma ou mais):
+  - a nova senha pela recuperação (`link_nova_senha`) zerar as falhas do e-mail, porque quem tem a caixa de e-mail é o
+    dono;
+  - não renovar o bloqueio com falhas vindas durante ou logo depois dele (contar só falhas novas, exigir 50 novas);
+  - deixar passar a senha certa vinda de um /64 que já entrou com sucesso nessa conta antes (dispositivo conhecido).
+
+### SEC-CA-16 [BAIXO, novo] O teto de e-mails por origem pune quem divide o IPv4 ou o /48 com o atacante
+
+- **Onde**: `api/infraestrutura/sessao/chave-ip.ts` (`chaveDoIp48`) e `limite-emails-origem.ts:30`.
+- **Cenário**: operadoras móveis no Brasil usam CGNAT no IPv4 e podem dar /64 a aparelhos diferentes dentro do mesmo
+  /48 (PREMISSA, não verificada). Quem está atrás da mesma origem esgota os 20 pedidos por hora dela, e quem divide essa
+  origem recebe 429 no cadastro e no "esqueci a senha" por até 1 h. O uso legítimo concentrado (o Wi-Fi da quadra, que
+  o runbook já cita) cai no mesmo teto.
+- **Por que baixo**: o atacante não escolhe a vítima (só atinge quem divide a origem com ele), o efeito dura 1 h e o
+  login não é afetado. O runbook (seção 10) já traz a saída operacional: subir `LIMITE_EMAILS_IP_HORA`.
+- **Correção sugerida**: acompanhar os 429 do teto depois da liberação; se aparecerem falsos positivos, contar por /64
+  dentro de um teto mais alto por /48.
+
+### Permissões das funções e da tabela novas (conferido sem achado)
+
+- `email_origem_registrar(bytea, integer)`: `SECURITY DEFINER`, `search_path = public, pg_temp`, `EXECUTE` só para
+  `postgres` e `pelada_app`.
+- `email_origem_registrar_em`: sem `SECURITY DEFINER` e sem `EXECUTE` para a `pelada_app`, então o momento não pode ser
+  forjado.
+- `conta_entrar`, `link_pedir` e `link_pedir_com_confirmacao`: `DEFINER`, com `search_path` fixo e grant só para a
+  `pelada_app`.
+- `pedidos_email_origem`: RLS com `FORCE`, uma única política (`SELECT` para `pelada_backup`), nenhum grant para a
+  `pelada_app` e sem `USAGE` na sequência.
+- A `pelada_app` não tem `CREATE` em `public`, então não há como sequestrar o `search_path`.
+- O owner local é o `postgres` (superusuário). Em produção, o owner tem `bypassrls` (`wrangler.jsonc`), e as funções
+  `DEFINER` passam pelo `FORCE`.
+
+### Logs e dados pessoais
+
+- Os logs novos levam só a categoria e o motivo (`enviar-email.ts:55-59`, `resend.ts:53`), sem IP, e-mail ou destino.
+- `pedidos_email_origem` guarda o SHA-256 sem sal da origem por 1 h. O SEC-CA-10 vale também para essa tabela (o IPv4
+  é reversível), sem mudança de severidade.
+
+### O que mudou nos resíduos aceitos
+
+- **SEC-CA-05**: sem mudança.
+- **SEC-CA-14**: não piorou. A recuperação continua derrubando a sessão roubada (`link_nova_senha` apaga as sessões).
+  Somada ao SEC-CA-15, porém, a vítima fica sem a sessão do invasor e sem a própria.
+- **Força bruta lenta abaixo de 50 por hora por conta**: como foi aceita.
+
+### Veredito do segundo reteste
+
+**Sem crítico nem alto.** SEC-CA-02, SEC-CA-04 e SEC-CA-13 estão fechados nos termos do AD-013. A correção do SEC-CA-04
+trouxe um **médio novo (SEC-CA-15)**: o bloqueio por conta, que deveria ser curto, pode ser mantido sem fim, e a
+recuperação de senha não o desfaz. Há também um baixo novo (SEC-CA-16). Pelo AD-012, médio é pendência antes da
+liberação: o usuário decide entre corrigir o SEC-CA-15 e estender a aceitação do AD-013 a ele.
