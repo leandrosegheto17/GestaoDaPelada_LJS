@@ -1713,8 +1713,8 @@ fora desta rodada: as defesas abaixo não mexem em telas além do aviso de T59.
 
 **Done when**:
 
-- [ ] Os dois documentos têm as seções
-- [ ] `pnpm format:check` e `pnpm test:checagens` passam
+- [x] Os dois documentos têm as seções
+- [x] `pnpm format:check` e `pnpm test:checagens` passam
 
 **Tests**: none
 **Gate**: quick

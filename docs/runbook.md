@@ -192,7 +192,7 @@ Registre a data e quem confirmou cada item na entrada da liberação (`.specs/li
    vai para o repositório, para o `.env` de produção ou para o `wrangler.jsonc`. Confirmação: "os dois secrets existem
    no Worker" (`wrangler secret list`).
 3. **Conferir a cota.** O plano gratuito do Resend envia **100 e-mails por dia**. Cadastro, confirmação, reenvio,
-   recuperação e convite gastam a mesma cota. Passando dela, a API responde 503 `email_indisponivel` e a tela mostra
+   recuperação e convite gastam a mesma cota (a API reserva os últimos 20%, ver a seção 10). Passando dela, a API responde 503 `email_indisponivel` e a tela mostra
    "Não conseguimos enviar o e-mail agora" (ACE-52). Se o uso real passar disso, a decisão de mudar de plano é do
    dono do projeto. Confirmação: "estou ciente da cota de 100 por dia".
 4. **Conferir que `EMAIL_DEV` não existe em produção.** `wrangler secret list` e as variáveis do Worker não podem listar
@@ -214,3 +214,28 @@ de teste e só depois revogue a antiga.
 Hash de senha importado de fora: o filtro de `conta_entrar` aceita `$2a$`, `$2b$` e `$2y$`, mas no Postgres 16 só
 funcionam os hashes `$2a$` (os que `gen_salt('bf', 12)` do pgcrypto gera). Um hash `$2b$` ou `$2y$` importado de fora entraria como
 senha errada: converta para `$2a$` antes de gravar.
+
+## 10. Cota e suspensão do Resend
+
+O plano gratuito envia **100 e-mails por dia** (`LIMITE_EMAILS_DIA`, padrão 100). A API conta os envios do dia, no fuso
+de São Paulo, e se protege sozinha (ACE-72): cadastro, reenvio de confirmação e convite param ao passar de **80%** da
+cota, e "esqueci a senha" usa a cota inteira, para que quem já tem conta consiga recuperar o acesso. Acima do teto a
+rota responde 503 `email_indisponivel` e a tela mostra "Não conseguimos enviar o e-mail agora" (ACE-52).
+
+**Conferir o consumo.** O número do dia está na tabela `envios_email_dia` (colunas `dia` e `total`); leia-o com a role
+`pelada_backup`, nunca com o owner de produção para algo que não seja operação. O painel do Resend (Emails) mostra os
+envios e as falhas. **Alerta manual aos 50%:** olhe o consumo ao fim da tarde nos primeiros dias depois da liberação e
+sempre que houver divulgação do app. Passando de 50 e-mails antes do meio do dia, avise o dono do projeto.
+
+**Cota esgotada.** Os cadastros novos recebem 503 até a virada do dia (00:00 de São Paulo); nada se perde, a pessoa
+tenta de novo. Se o uso real passa do plano gratuito com frequência, a decisão de mudar de plano é do dono do projeto;
+depois de mudar, ajuste `LIMITE_EMAILS_DIA` na configuração do Worker (variável, não é segredo) e confira com um
+cadastro de teste.
+
+**Domínio ou conta suspensos no Resend.** Sintoma: 503 `email_indisponivel` com a cota longe do teto, e o painel do
+Resend mostrando o domínio fora de **Verified** ou a conta suspensa. Passos: 1) abra o painel e leia o motivo e o
+e-mail que o Resend enviou; 2) se for DNS (SPF ou DKIM) quebrado, corrija os registros na zona da Cloudflare e espere
+voltar a **Verified**; 3) se for suspensão da conta, abra o chamado com o suporte do Resend e, se a demora passar de um
+dia, avalie outro provedor, o que pede `escolha-tecnologia` e ADR novo; 4) enquanto isso, quem já tem conta continua entrando, e quem perdeu a senha fica sem recuperação até o envio
+voltar. Confirme com um cadastro de teste
+quando voltar.
