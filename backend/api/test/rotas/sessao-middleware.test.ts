@@ -59,6 +59,9 @@ const ROTAS_SEM_SESSAO = [
   '/api/sessao/nova-senha',
   '/api/convites/ler',
   '/api/convites/cadastrar',
+  // ACE-70 (T60): as rotas com senha atual também passam pelo limitador por IP, antes do bcrypt.
+  '/api/conta/senha',
+  '/api/conta/excluir',
 ];
 
 describe('CSRF antes dos limitadores (ACE-49, SEC-005)', () => {
@@ -89,11 +92,25 @@ describe('LIMITE_ENTRAR nas rotas sem sessão da tabela do C4 (ACE-50)', () => {
     expect(entrar.chaves).toHaveLength(1);
   });
 
+  it.each(['/api/conta/senha', '/api/conta/excluir'])(
+    'POST %s esgotado: 429 sem tocar no banco (nem sessão nem bcrypt rodam)',
+    async (caminho) => {
+      const sonda = espiaoDoBanco();
+      const entrar = limitadorDe(0);
+      const corpo = JSON.stringify({ senhaAtual: 'qualquer-senha-1', novaSenha: 'outra-senha-123' });
+      const r = await chamar(
+        caminho,
+        { method: 'POST', headers: { 'X-Pelada': '1', 'Content-Type': 'application/json' }, body: corpo },
+        { env: sonda.env, app: { limitadores: { entrar } } },
+      );
+      expect(r.status).toBe(429);
+      expect(sonda.acessos()).toBe(0);
+    },
+  );
+
   it.each([
     ['GET', '/api/sessao'],
     ['POST', '/api/sessao/sair'],
-    ['POST', '/api/conta/senha'],
-    ['POST', '/api/conta/excluir'],
     ['POST', '/api/convites/aceitar'],
   ])('%s %s (com sessão) não passa pelo LIMITE_ENTRAR', async (method, caminho) => {
     const entrar = limitadorDe(0);

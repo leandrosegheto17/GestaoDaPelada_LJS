@@ -35,6 +35,9 @@ export const ROTAS_LIMITE_ENTRAR = [
   '/api/sessao/nova-senha',
   '/api/convites/ler',
   '/api/convites/cadastrar',
+  // Rotas com sessão que verificam a senha atual (bcrypt): limitam por IP também (ACE-70).
+  '/api/conta/senha',
+  '/api/conta/excluir',
 ] as const;
 
 export interface Variaveis {

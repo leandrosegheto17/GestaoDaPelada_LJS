@@ -1617,9 +1617,9 @@ fora desta rodada: as defesas abaixo não mexem em telas além do aviso de T59.
 
 **Done when**:
 
-- [ ] O teste falha sem a inclusão e passa com ela
-- [ ] O teste que lista `ROTAS_LIMITE_ENTRAR` contra a tabela do design está atualizado
-- [ ] `pnpm test` e `pnpm typecheck` passam
+- [x] O teste falha sem a inclusão e passa com ela
+- [x] O teste que lista `ROTAS_LIMITE_ENTRAR` contra a tabela do design está atualizado
+- [x] `pnpm test` e `pnpm typecheck` passam
 
 **Tests**: e2e
 **Gate**: quick

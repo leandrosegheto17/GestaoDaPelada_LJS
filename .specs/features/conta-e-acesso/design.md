@@ -159,8 +159,8 @@ graph TD
   | `POST /api/sessao/sair` | sim | — | ACE-17 |
   | `POST /api/sessao/esqueci-senha` `{email}` | não | `LIMITE_ENTRAR` | ACE-22, ACE-23 |
   | `POST /api/sessao/nova-senha` `{token, senha}` | não | `LIMITE_ENTRAR` | ACE-24, ACE-25 |
-  | `POST /api/conta/senha` | sim | — | ACE-26, ACE-27 |
-  | `POST /api/conta/excluir` `{senha}` | sim | — | ACE-28 a ACE-30 |
+  | `POST /api/conta/senha` | sim | — | ACE-26, ACE-27, ACE-70 |
+  | `POST /api/conta/excluir` `{senha}` | sim | — | ACE-28 a ACE-30, ACE-70 |
   | `POST /api/convites/ler` `{token}` | não | `LIMITE_ENTRAR` | ACE-34, ACE-36 |
   | `POST /api/convites/aceitar` `{token}` | sim | — | ACE-33, ACE-35, ACE-36 |
   | `POST /api/convites/cadastrar` `{token, nome, senha, termos}` | não | `LIMITE_ENTRAR` | ACE-34 |
