@@ -22,7 +22,9 @@ export const rotaSessaoRecuperacao = new Hono<AppEnv>()
     if (pedido.enviar && pedido.nome !== null) {
       const modelo = modeloRecuperacao({ urlPublica: c.env.URL_PUBLICA, nome: pedido.nome, token: link.token });
       const chave = chaveDeEnvio('recuperacao', link.hash);
-      if (!(await enviarModelo(c, { para: email, modelo, chave }))) return emailIndisponivel(c);
+      // "Esqueci a senha" usa a cota inteira do dia (ACE-72).
+      const envio = { para: email, modelo, chave, categoria: 'recuperacao' } as const;
+      if (!(await enviarModelo(c, envio))) return emailIndisponivel(c);
     }
     // A mesma resposta exista a conta ou não (ACE-22).
     return c.json({ mensagem: MENSAGEM_PEDIDO });

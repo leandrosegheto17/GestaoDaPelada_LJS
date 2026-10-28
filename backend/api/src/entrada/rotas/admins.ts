@@ -38,7 +38,8 @@ export const rotaAdmins = new Hono<AppEnv>()
       const grupoNome = (await admins.nomeDoGrupo(c.var.db, grupoId)) ?? 'o grupo';
       const modelo = modeloConvite({ urlPublica: c.env.URL_PUBLICA, grupoNome, token: link.token });
       const chave = chaveDeEnvio('convite', link.hash);
-      if (!(await enviarModelo(c, { para: corpo.dado.email, modelo, chave }))) return emailIndisponivel(c);
+      const envio = { para: corpo.dado.email, modelo, chave, categoria: 'convite' } as const;
+      if (!(await enviarModelo(c, envio))) return emailIndisponivel(c);
     }
     return c.json({ id: convite.conviteId, email: corpo.dado.email, expiraEm: convite.expiraEm.toISOString() }, 201);
   })

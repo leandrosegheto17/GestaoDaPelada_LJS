@@ -31,6 +31,8 @@ const LEGIVEIS_PELO_SLUG = LEGIVEIS.filter((t) => t !== 'convites_admin');
 const DE_CONTA = [
   'contas',
   'envios_email',
+  // envios_email_dia entrou na T63 (teto diário de e-mails, ACE-72).
+  'envios_email_dia',
   'falhas_senha_atual',
   'links_conta',
   'pedidos_reset',

@@ -5,6 +5,7 @@
     "motivo": "Sessão da conta: resolvida pelo hash do token, antes de existir grupo na requisição."
   },
   { "arquivo": "links.ts", "motivo": "Links de confirmação e recuperação da conta, achados pelo hash do token." },
+  { "arquivo": "cota-email.ts", "motivo": "Teto global de e-mails do dia (ACE-72): um total do app, não de grupo." },
   { "arquivo": "seed-local.ts", "motivo": "Seed do banco local: roda como owner, fora das requisições." },
   {
     "arquivo": "definir-senha.ts",

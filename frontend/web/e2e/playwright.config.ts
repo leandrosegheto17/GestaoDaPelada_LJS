@@ -34,8 +34,10 @@ export default defineConfig({
   workers: 1,
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'], baseURL: 'http://127.0.0.1:8798' } }],
   webServer: {
+    // LIMITE_EMAILS_DIA alto (T63, ACE-72): o banco local acumula o total do dia entre execuções do e2e, e o teto
+    // padrão (100) barraria os cadastros depois de algumas rodadas no mesmo dia.
     command:
-      'pnpm --filter @pelada/api exec wrangler dev --config ../../wrangler.jsonc --port 8798 --ip 127.0.0.1 --var EMAIL_DEV:1',
+      'pnpm --filter @pelada/api exec wrangler dev --config ../../wrangler.jsonc --port 8798 --ip 127.0.0.1 --var EMAIL_DEV:1 --var LIMITE_EMAILS_DIA:1000000',
     cwd: '../../..',
     url: 'http://127.0.0.1:8798',
     reuseExistingServer: !process.env.CI,

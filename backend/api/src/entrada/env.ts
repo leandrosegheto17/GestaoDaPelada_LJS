@@ -21,4 +21,9 @@ export interface Env {
    * O `wrangler.jsonc` de produção não a define (teste de configuração).
    */
   EMAIL_DEV?: string | undefined;
+  /**
+   * Cota diária de e-mails de conta (ACE-72): inteiro positivo, padrão 100 quando ausente ou inválido. Cadastro,
+   * reenvio e convite param em 80%; "esqueci a senha" usa a cota inteira. Não é segredo.
+   */
+  LIMITE_EMAILS_DIA?: string | undefined;
 }

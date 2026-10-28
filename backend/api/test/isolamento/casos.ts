@@ -175,6 +175,8 @@ export const CASOS_CONTA: Record<string, CasoConta> = {
   pedidos_reset: { acesso: 'sem-grant' },
   // T61 (ACE-70): falhas da senha atual por conta; só as funções de troca de senha e exclusão tocam.
   falhas_senha_atual: { acesso: 'sem-grant' },
+  // T63 (ACE-72): total de e-mails do dia; só a função do teto toca.
+  envios_email_dia: { acesso: 'sem-grant' },
 };
 
 /**

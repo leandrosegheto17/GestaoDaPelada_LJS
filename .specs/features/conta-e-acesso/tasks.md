@@ -1689,9 +1689,9 @@ fora desta rodada: as defesas abaixo não mexem em telas além do aviso de T59.
 
 **Done when**:
 
-- [ ] Teste prova que cadastro é recusado acima de 80% e "esqueci a senha" ainda envia até 100%
-- [ ] O contador zera na virada do dia no fuso de São Paulo (ADR-012)
-- [ ] `pnpm test`, `pnpm typecheck` e `pnpm test:checagens` passam
+- [x] Teste prova que cadastro é recusado acima de 80% e "esqueci a senha" ainda envia até 100%
+- [x] O contador zera na virada do dia no fuso de São Paulo (ADR-012)
+- [x] `pnpm test`, `pnpm typecheck` e `pnpm test:checagens` passam
 
 **Tests**: integration
 **Gate**: quick

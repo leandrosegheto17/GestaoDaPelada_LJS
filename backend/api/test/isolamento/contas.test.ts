@@ -69,6 +69,8 @@ describe('as tabelas de conta têm caso de isolamento (ACE-45)', () => {
       [
         'contas',
         'envios_email',
+        // envios_email_dia entrou na T63 (teto diário de e-mails, ACE-72).
+        'envios_email_dia',
         'falhas_senha_atual',
         'links_conta',
         'pedidos_reset',
@@ -190,6 +192,7 @@ const UMA_COLUNA: Record<string, string> = {
   envios_email: 'enviado_em',
   pedidos_reset: 'resolvido_em',
   falhas_senha_atual: 'momento',
+  envios_email_dia: 'total',
 };
 
 describe.each(SEM_GRANT)('%s: só as funções do banco tocam (ACE-43, ACE-45)', (tabela) => {

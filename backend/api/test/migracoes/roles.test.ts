@@ -189,6 +189,8 @@ describe('roles (FUN-11)', () => {
     'envios_email',
     // T61 (ACE-70): falhas da senha atual por conta.
     'falhas_senha_atual',
+    // T63 (ACE-72): total de e-mails do dia; só a função do teto toca.
+    'envios_email_dia',
   ])('pelada_app não lê nem apaga %s (sem grant de leitura)', async (tabela) => {
     await comoRole(cliente, 'pelada_app', async () => {
       expect(await codigoDoErro(cliente, `SELECT 1 FROM ${tabela}`)).toBe(SEM_PRIVILEGIO);
@@ -285,5 +287,7 @@ function todasAsTabelas_(): string[] {
     'links_conta',
     'envios_email',
     'falhas_senha_atual',
+    // T63 (ACE-72): teto diário de e-mails.
+    'envios_email_dia',
   ];
 }

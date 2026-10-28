@@ -128,6 +128,11 @@ export async function gravarDoisGrupos(cliente: pg.ClientBase): Promise<void> {
       ['INSERT INTO pedidos_reset (conta_id, ultimo_pedido_em) VALUES ($1, now())', [conta]],
       // T61 (ACE-70): falhas da senha atual por conta.
       ['INSERT INTO falhas_senha_atual (conta_id, momento) VALUES ($1, now())', [conta]],
+      // T63 (ACE-72): total de e-mails do dia. O contador é do app, não da conta: um dia passado por grupo do cenário.
+      [
+        "INSERT INTO envios_email_dia (dia, total) VALUES (CASE $1 WHEN 'grupo-a' THEN date '2026-01-01' ELSE date '2026-01-02' END, 1)",
+        [slug],
+      ],
       [
         `INSERT INTO convites_admin (grupo_id, email, token_hash, criado_por, criado_em, expira_em)
          VALUES ($1, 'convidado-' || $2 || '@exemplo.com', digest($2 || '-convite', 'sha256'), $3, now(),

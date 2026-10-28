@@ -64,7 +64,12 @@ export default defineConfig({
         plugins: [
           cloudflareTest({
             wrangler: { configPath: '../../wrangler.jsonc' },
-            miniflare: { hyperdrives: { HYPERDRIVE: HYPERDRIVE_DE_TESTE, HYPERDRIVE_OWNER_TESTE: OWNER_DE_TESTE } },
+            miniflare: {
+              hyperdrives: { HYPERDRIVE: HYPERDRIVE_DE_TESTE, HYPERDRIVE_OWNER_TESTE: OWNER_DE_TESTE },
+              // T63 (ACE-72): os testes de rota enviam centenas de e-mails no mesmo dia e banco; o teto diário fica
+              // alto por padrão. Os testes do teto passam o próprio LIMITE_EMAILS_DIA (test/rotas/teto-emails.test.ts).
+              bindings: { LIMITE_EMAILS_DIA: '1000000' },
+            },
           }),
         ],
         test: {

@@ -11,6 +11,8 @@ export interface Extras {
   cookie?: string;
   ip?: string;
   remetente?: Remetente;
+  /** Ambiente do Worker no lugar do padrão do teste (ex.: outro `LIMITE_EMAILS_DIA`, T63). */
+  env?: Cloudflare.Env;
 }
 
 /** Chamadas JSON às rotas de acesso, com um remetente em memória que guarda os e-mails do teste. */
@@ -24,7 +26,10 @@ export function cenarioDeAcesso() {
     if (extras.ip) headers['CF-Connecting-IP'] = extras.ip;
     const init: RequestInit = { method: metodo, headers };
     if (corpo !== undefined) init.body = JSON.stringify(corpo);
-    return chamar(caminho, init, { app: { remetente: extras.remetente ?? remetente } });
+    return chamar(caminho, init, {
+      app: { remetente: extras.remetente ?? remetente },
+      ...(extras.env ? { env: extras.env } : {}),
+    });
   }
 
   /** Último token de link que o e-mail de `para` recebeu (`#t=` no link). */

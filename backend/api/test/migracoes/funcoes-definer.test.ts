@@ -67,6 +67,8 @@ describe('funções SECURITY DEFINER (AD-008)', () => {
       'convite_cadastrar',
       'convite_criar',
       'convite_ler',
+      // email_cota_reservar entrou na T63 (teto diário de e-mails, ACE-72).
+      'email_cota_reservar',
       'grupos_visiveis',
       'link_confirmar',
       'link_nova_senha',

@@ -40,7 +40,8 @@ export const rotaContaCadastro = new Hono<AppEnv>()
               chave: chaveDeEnvio('aviso-cadastro', link.hash),
             };
       // Falhou: 503, e o fim da transação desfaz a conta e o registro do envio, então pedir de novo funciona.
-      if (!(await enviarModelo(c, { para: email, ...envio }))) return emailIndisponivel(c);
+      // Os dois e-mails são da categoria cadastro: o teto barra os dois igual e não revela a conta (ACE-04, ACE-72).
+      if (!(await enviarModelo(c, { para: email, ...envio, categoria: 'cadastro' }))) return emailIndisponivel(c);
     }
     return c.json({ mensagem: MENSAGEM_ENVIADO }, 201);
   })
@@ -63,7 +64,7 @@ export const rotaContaCadastro = new Hono<AppEnv>()
     if (pedido.enviar && pedido.nome !== null) {
       const modelo = modeloConfirmacao({ urlPublica: c.env.URL_PUBLICA, nome: pedido.nome, token: link.token });
       const chave = chaveDeEnvio('confirmacao', link.hash);
-      if (!(await enviarModelo(c, { para: email, modelo, chave }))) return emailIndisponivel(c);
+      if (!(await enviarModelo(c, { para: email, modelo, chave, categoria: 'reenvio' }))) return emailIndisponivel(c);
     }
     // A mesma resposta exista a conta ou não, esteja confirmada ou não (ACE-08).
     return c.json({ mensagem: MENSAGEM_ENVIADO });
