@@ -527,3 +527,26 @@ formalmente (perguntas abaixo).
    - (a) Corrigir já o SEC-CA-13 (tempo máximo no `fetch` e `lock_timeout`) e deixar o SEC-CA-14 para a liberação
      **(Recomendado)**: duas linhas com teste. Tira o risco de a lentidão do Resend derrubar o app.
    - (b) Os dois entram como itens a decidir na liberação, junto com os SEC-CA-05 a 12.
+
+## Correções do reteste (T65 a T68, AD-013)
+
+O usuário escolheu, na fase 10, a opção (a) das três perguntas acima. As correções foram feitas sem Turnstile, com
+defesas no servidor, e ainda **não foram reverificadas** pelo `auditor-seguranca` (o reteste delas cabe à próxima
+validação).
+
+| Achado | Situação | Correção | Commits |
+| --- | --- | --- | --- |
+| SEC-CA-02 | **Corrigido** (resíduo abaixo) | "Esqueci a senha" de conta não confirmada gasta a cota de cadastro (80%), e não a reserva da recuperação; teto de 20 pedidos de e-mail por hora por IPv4 ou /48 de IPv6, somando cadastro, reenvio, convite e "esqueci a senha", com 429 antes de reservar a cota (ACE-73) | `d0e4ea0` (T65), `a81d70a` (T66) |
+| SEC-CA-04 | **Corrigido** (resíduo abaixo) | Teto suave por conta no login: 50 senhas erradas em 1 h para o mesmo e-mail, de quaisquer IPs, bloqueiam por 10 min, sem bcrypt e com a mesma resposta para e-mail sem conta (ACE-74) | `f309ad4` (T67) |
+| SEC-CA-13 | **Corrigido** | `fetch` do Resend abortado aos 10 s (vira 503, sem gastar a cota) e `lock_timeout` de 2 s em `email_cota_reservar` (503 acima disso) (ACE-75) | `b1d4581` (T68) |
+| SEC-CA-14 | **A decidir na liberação** | Sem mudança | — |
+| SEC-CA-05 a 12 | **A decidir na liberação** | Sem mudança (o SEC-CA-05 segue agravado pelo teto da T63, como descrito acima) | — |
+
+**Resíduos aceitos (AD-013), registrados no THREAT-MODEL 1a, linha D:**
+
+- SEC-CA-02: quem tem muitos IPv4 ou muitos /48 (proxies, várias contas de *tunnel broker* ou de VPS) ainda esgota os
+  80% de cadastro no dia, a 20 pedidos por hora por origem; a reserva de 20% para a recuperação de contas confirmadas
+  fica protegida. Os *hard bounces* de endereços inventados continuam possíveis até o teto do dia.
+- SEC-CA-04: força bruta lenta abaixo de 50 falhas por hora por conta (cerca de 50 tentativas por hora, mais 1 a cada
+  10 min depois do bloqueio) e *password spraying* em muitas contas. O teto por conta pode ser usado para travar o
+  login de uma vítima por 10 min de cada vez (bloqueio remoto curto, aceito em troca de não haver força bruta rápida).

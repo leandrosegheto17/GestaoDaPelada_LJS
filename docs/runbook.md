@@ -218,9 +218,22 @@ senha errada: converta para `$2a$` antes de gravar.
 ## 10. Cota e suspensão do Resend
 
 O plano gratuito envia **100 e-mails por dia** (`LIMITE_EMAILS_DIA`, padrão 100). A API conta os envios do dia, no fuso
-de São Paulo, e se protege sozinha (ACE-72): cadastro, reenvio de confirmação e convite param ao passar de **80%** da
-cota, e "esqueci a senha" usa a cota inteira, para que quem já tem conta consiga recuperar o acesso. Acima do teto a
-rota responde 503 `email_indisponivel` e a tela mostra "Não conseguimos enviar o e-mail agora" (ACE-52).
+de São Paulo, e se protege sozinha (ACE-72): cadastro, reenvio de confirmação e convite param ao atingir **80%** da
+cota, e "esqueci a senha" de conta **confirmada** usa a cota inteira, para que quem já usa o app consiga recuperar o
+acesso. A reserva vale também contra contas não confirmadas: o "esqueci a senha" delas conta nos 80% do cadastro, então
+quem cria contas sem confirmar não gasta os 20% da recuperação (ACE-73). Acima do teto a rota responde 503
+`email_indisponivel` e a tela mostra "Não conseguimos enviar o e-mail agora" (ACE-52).
+
+**Teto por origem.** Cada IPv4, ou cada /48 de IPv6, pede no máximo **20 e-mails por hora** (`LIMITE_EMAILS_IP_HORA`,
+padrão 20), somando cadastro, reenvio, convite e "esqueci a senha"; o pedido seguinte recebe 429 `muitas_requisicoes`
+sem gastar a cota (ACE-73). Se um evento legítimo concentrar muita gente atrás do mesmo IP (por exemplo, um Wi-Fi de
+quadra), o dono do projeto pode subir a variável no Worker por algumas horas. A tabela `pedidos_email_origem` guarda só
+o SHA-256 da origem e apaga os pedidos com mais de 1 h.
+
+**Resend lento.** O envio ao Resend é abortado aos 10 s e a reserva da cota espera no máximo 2 s pela trava do contador
+do dia (ACE-75): com o Resend lento, as rotas de e-mail respondem 503 rápido em vez de acumular conexões. Muitos 503
+com a cota longe do teto e o painel do Resend sem erros apontam para lentidão do provedor: veja a página de status do
+Resend antes de mexer em configuração.
 
 **Conferir o consumo.** O número do dia está na tabela `envios_email_dia` (colunas `dia` e `total`); leia-o com a role
 `pelada_backup`, nunca com o owner de produção para algo que não seja operação. O painel do Resend (Emails) mostra os
