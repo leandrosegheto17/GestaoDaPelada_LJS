@@ -23,6 +23,8 @@ export const CODIGOS_ERRO = {
   ultimoAdmin: 'ultimo_admin',
   // grupos-e-elenco (GEL-26): escrita em grupo arquivado.
   grupoArquivado: 'grupo_arquivado',
+  // grupos-e-elenco (GEL-24): arquivar e reativar só por quem criou o grupo.
+  soQuemCriou: 'so_quem_criou',
 } as const;
 
 /** Erro padrão da API: `{ erro: { codigo, mensagem, campos? } }`. */

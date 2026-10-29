@@ -994,11 +994,11 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Duas contas admin: a não criadora recebe 403 `so_quem_criou`; a criadora arquiva com o nome exato; nome errado → 422 "O nome digitado não confere com o nome do grupo." no campo `nomeConfirmacao`
-- [ ] Depois de arquivar, a outra conta recebe 404 em `GET /api/grupos/:id`; o criador recebe 409 `grupo_arquivado` em `PATCH` e consegue `reativar`
-- [ ] Repetir arquivar ou reativar → 200 sem auditoria nova
-- [ ] Casos `grupo` das duas rotas em `casos.ts`
-- [ ] Gate full passa
+- [x] Duas contas admin: a não criadora recebe 403 `so_quem_criou`; a criadora arquiva com o nome exato; nome errado → 422 "O nome digitado não confere com o nome do grupo." no campo `nomeConfirmacao`
+- [x] Depois de arquivar, a outra conta recebe 404 em `GET /api/grupos/:id`; o criador recebe 409 `grupo_arquivado` em `PATCH` e consegue `reativar`
+- [x] Repetir arquivar ou reativar → 200 sem auditoria nova
+- [x] Casos `grupo` das duas rotas em `casos.ts`
+- [x] Gate full passa
 
 **Tests**: e2e
 **Gate**: full

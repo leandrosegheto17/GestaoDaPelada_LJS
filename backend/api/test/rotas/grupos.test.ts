@@ -307,3 +307,121 @@ describe('PATCH /api/grupos/:grupoId (GEL-16, GEL-18, GEL-19)', () => {
     expect(r.corpo).toMatchObject({ erro: { campos: { nome: 'O nome precisa ter de 3 a 60 caracteres.' } } });
   });
 });
+
+/** Grupo criado pela criadora pela rota, com uma segunda admin por convite. */
+async function grupoComDuasAdmins(nome: string) {
+  const criadora = await criarSessao();
+  const criado = (await pedir('POST', '/api/grupos', valido(nome), { cookie: criadora.cookie })).corpo as Criado;
+  const outra = await criarSessao({
+    conta: criadora.contaId,
+    grupo: criado.id,
+    slug: criado.slug,
+    jogador: '',
+    habilidade: '',
+    partida: '',
+    lancamento: '',
+  });
+  return { criadora, outra, criado };
+}
+
+const auditoriaDoGrupo = (grupoId: string, acao: string) =>
+  comoOwner('SELECT autor_conta_id FROM auditoria WHERE grupo_id = $1 AND acao = $2', [grupoId, acao]);
+
+describe('POST /api/grupos/:grupoId/arquivar e /reativar (GEL-22 a GEL-26, GEL-29)', () => {
+  it('a não criadora recebe 403 so_quem_criou e nada muda (GEL-24)', async () => {
+    const nome = `Arquivar Alheio ${unico()}`;
+    const { outra, criado } = await grupoComDuasAdmins(nome);
+    const r = await pedir(
+      'POST',
+      `/api/grupos/${criado.id}/arquivar`,
+      { nomeConfirmacao: nome },
+      { cookie: outra.cookie },
+    );
+    expect(r.status).toBe(403);
+    expect(r.corpo).toMatchObject({ erro: { codigo: 'so_quem_criou' } });
+    expect(await comoOwner('SELECT arquivado_em FROM grupos WHERE id = $1', [criado.id])).toEqual([
+      { arquivado_em: null },
+    ]);
+    const reativar = await pedir('POST', `/api/grupos/${criado.id}/reativar`, undefined, { cookie: outra.cookie });
+    expect(reativar.status).toBe(403);
+    expect(reativar.corpo).toMatchObject({ erro: { codigo: 'so_quem_criou' } });
+  });
+
+  it('nome errado: 422 com a mensagem no campo nomeConfirmacao e nada muda (GEL-23)', async () => {
+    const nome = `Nome Certo ${unico()}`;
+    const { criadora, criado } = await grupoComDuasAdmins(nome);
+    for (const errado of [nome.toLowerCase(), ` ${nome}`, 'Outro']) {
+      const r = await pedir(
+        'POST',
+        `/api/grupos/${criado.id}/arquivar`,
+        { nomeConfirmacao: errado },
+        { cookie: criadora.cookie },
+      );
+      expect(r.status).toBe(422);
+      expect(r.corpo).toMatchObject({
+        erro: { campos: { nomeConfirmacao: 'O nome digitado não confere com o nome do grupo.' } },
+      });
+    }
+    expect(await comoOwner('SELECT arquivado_em FROM grupos WHERE id = $1', [criado.id])).toEqual([
+      { arquivado_em: null },
+    ]);
+  });
+
+  it('ciclo: a criadora arquiva (200 grupoDetalhe e auditoria); a outra recebe 404; PATCH da criadora 409; reativa', async () => {
+    const nome = `Ciclo ${unico()}`;
+    const { criadora, outra, criado } = await grupoComDuasAdmins(nome);
+
+    const arquivar = await pedir(
+      'POST',
+      `/api/grupos/${criado.id}/arquivar`,
+      { nomeConfirmacao: nome },
+      { cookie: criadora.cookie },
+    );
+    expect(arquivar.status).toBe(200);
+    expect(grupoDetalhe.safeParse(arquivar.corpo).success).toBe(true);
+    expect(arquivar.corpo).toMatchObject({ id: criado.id, souCriador: true });
+    expect(await auditoriaDoGrupo(criado.id, 'grupo_arquivado')).toEqual([{ autor_conta_id: criadora.contaId }]);
+
+    expect((await pedir('GET', `/api/grupos/${criado.id}`, undefined, { cookie: outra.cookie })).status).toBe(404);
+    const patch = await pedir('PATCH', `/api/grupos/${criado.id}`, valido('Mudou'), { cookie: criadora.cookie });
+    expect(patch.status).toBe(409);
+    expect(patch.corpo).toMatchObject({ erro: { codigo: 'grupo_arquivado' } });
+
+    const reativar = await pedir('POST', `/api/grupos/${criado.id}/reativar`, undefined, { cookie: criadora.cookie });
+    expect(reativar.status).toBe(200);
+    expect(grupoDetalhe.safeParse(reativar.corpo).success).toBe(true);
+    expect(await auditoriaDoGrupo(criado.id, 'grupo_reativado')).toEqual([{ autor_conta_id: criadora.contaId }]);
+    expect((await pedir('GET', `/api/grupos/${criado.id}`, undefined, { cookie: outra.cookie })).status).toBe(200);
+  });
+
+  it('repetir arquivar ou reativar: 200 sem auditoria nova (GEL-29)', async () => {
+    const nome = `Repetir ${unico()}`;
+    const { criadora, criado } = await grupoComDuasAdmins(nome);
+    const arquivar = () =>
+      pedir('POST', `/api/grupos/${criado.id}/arquivar`, { nomeConfirmacao: nome }, { cookie: criadora.cookie });
+    const reativar = () => pedir('POST', `/api/grupos/${criado.id}/reativar`, undefined, { cookie: criadora.cookie });
+
+    expect((await reativar()).status).toBe(200);
+    expect(await auditoriaDoGrupo(criado.id, 'grupo_reativado')).toEqual([]);
+    expect((await arquivar()).status).toBe(200);
+    expect((await arquivar()).status).toBe(200);
+    expect(await auditoriaDoGrupo(criado.id, 'grupo_arquivado')).toHaveLength(1);
+    expect((await reativar()).status).toBe(200);
+    expect((await reativar()).status).toBe(200);
+    expect(await auditoriaDoGrupo(criado.id, 'grupo_reativado')).toHaveLength(1);
+  });
+
+  it('sem vínculo: 404 em arquivar e reativar', async () => {
+    const nome = `Sem Vinculo ${unico()}`;
+    const { criado } = await grupoComDuasAdmins(nome);
+    const estranha = await criarSessao();
+    const a = await pedir(
+      'POST',
+      `/api/grupos/${criado.id}/arquivar`,
+      { nomeConfirmacao: nome },
+      { cookie: estranha.cookie },
+    );
+    const r = await pedir('POST', `/api/grupos/${criado.id}/reativar`, undefined, { cookie: estranha.cookie });
+    expect([a.status, r.status]).toEqual([404, 404]);
+  });
+});

@@ -1,10 +1,10 @@
-import { criarGrupoCorpo, editarGrupoCorpo, type GrupoDetalhe } from '@pelada/contrato';
+import { arquivarCorpo, criarGrupoCorpo, editarGrupoCorpo, type GrupoDetalhe } from '@pelada/contrato';
 import { slugBase } from '@pelada/dominio';
-import { Hono } from 'hono';
+import { Hono, type Context } from 'hono';
 import * as grupos from '../../infraestrutura/db/repositorios/grupos.ts';
 import type { AppEnv } from '../app.ts';
 import { lerCorpo } from '../corpo.ts';
-import { naoEncontrado } from '../erros.ts';
+import { CODIGOS_ERRO, erroComStatus, naoEncontrado } from '../erros.ts';
 import { exigirSessao } from '../middlewares/sessao.ts';
 
 /** Link público do grupo (GEL-17): o endereço vem só de `URL_PUBLICA`, nunca de um valor fixo no código. */
@@ -27,6 +27,24 @@ function detalhe(urlPublica: string, g: grupos.GrupoLido): GrupoDetalhe {
     admins: g.admins,
     souCriador: g.souCriador,
   };
+}
+
+/**
+ * Resposta de arquivar e reativar (GEL-22, GEL-24, GEL-28, GEL-29): 200 com o grupo (também quando já estava no
+ * estado pedido), 403 `so_quem_criou` para a admin que não criou, 404 sem vínculo.
+ */
+async function responderArquivamento(
+  c: Context<AppEnv>,
+  grupoId: string,
+  resultado: Exclude<grupos.ResultadoArquivamento, 'nome_nao_confere'>,
+): Promise<Response> {
+  if (resultado === 'nao_encontrado') return naoEncontrado(c);
+  if (resultado === 'so_quem_criou') {
+    return erroComStatus(c, 403, CODIGOS_ERRO.soQuemCriou, 'Só quem criou o grupo pode arquivar ou reativar.');
+  }
+  const g = await grupos.ler(c.var.db, grupoId);
+  if (!g) return naoEncontrado(c);
+  return c.json(detalhe(c.env.URL_PUBLICA, g));
 }
 
 /**
@@ -55,4 +73,20 @@ export const rotaGrupos = new Hono<AppEnv>()
     const g = await grupos.ler(c.var.db, grupoId);
     if (!g) return naoEncontrado(c);
     return c.json(detalhe(c.env.URL_PUBLICA, g));
+  })
+  .post('/api/grupos/:grupoId/arquivar', async (c) => {
+    const corpo = await lerCorpo(c, arquivarCorpo);
+    if (!corpo.ok) return corpo.resposta;
+    const grupoId = c.req.param('grupoId');
+    const resultado = await grupos.arquivar(c.var.db, grupoId, corpo.dado.nomeConfirmacao);
+    if (resultado === 'nome_nao_confere') {
+      return erroComStatus(c, 422, CODIGOS_ERRO.dadosInvalidos, 'Corrija os campos indicados.', {
+        nomeConfirmacao: 'O nome digitado não confere com o nome do grupo.',
+      });
+    }
+    return responderArquivamento(c, grupoId, resultado);
+  })
+  .post('/api/grupos/:grupoId/reativar', async (c) => {
+    const grupoId = c.req.param('grupoId');
+    return responderArquivamento(c, grupoId, await grupos.reativar(c.var.db, grupoId));
   });

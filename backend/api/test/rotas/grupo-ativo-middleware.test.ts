@@ -4,10 +4,15 @@ import { describe, expect, it } from 'vitest';
 import type { AppEnv } from '../../src/entrada/app.ts';
 import { exigirGrupoAtivo } from '../../src/entrada/middlewares/grupo-ativo.ts';
 import { chamar, ehErroPadrao } from '../apoio/cliente.ts';
+import { comoOwner } from '../apoio/owner-worker.ts';
 import { criarSessao, noBanco, type SessaoDeTeste } from '../apoio/sessao-worker.ts';
 
 // exigirGrupoAtivo (T25; GEL-26): no grupo arquivado, toda escrita sob /api/grupos/:grupoId/* recebe 409
-// grupo_arquivado, também para a criadora; a única exceção é POST /api/grupos/:grupoId/reativar. GET e HEAD passam.
+// grupo_arquivado, também para a criadora; as exceções são POST /api/grupos/:grupoId/reativar e, pela GEL-29 (arquivar
+// de novo responde 200 sem mudança; decisão do usuário de 2026-10-29), POST /api/grupos/:grupoId/arquivar. GET e HEAD
+// passam.
+// Motivo da mudança (T31, aprovada pelo usuário): as rotas reais de arquivar e reativar passaram a existir e respondem
+// antes das rotas de prova; o teste do reativar confere agora o efeito da rota real.
 
 let executadas: string[] = [];
 const ESCRITAS = ['POST', 'PUT', 'PATCH', 'DELETE'] as const;
@@ -20,7 +25,6 @@ function rotasDeProva(app: Hono<AppEnv>): void {
     return c.json({ ok: true });
   };
   app.on(['GET', 'HEAD', ...ESCRITAS], '/api/grupos/:grupoId/prova', registrar('prova'));
-  app.post('/api/grupos/:grupoId/reativar', registrar('reativar'));
   app.post('/api/grupos/:grupoId/prova/reativar', registrar('prova/reativar'));
 }
 
@@ -73,13 +77,29 @@ describe('exigirGrupoAtivo no grupo arquivado (GEL-26)', () => {
     expect(executadas).toEqual(['GET prova', 'HEAD prova']);
   });
 
-  it('POST /api/grupos/:grupoId/reativar passa mesmo arquivado', async () => {
-    executadas = [];
+  it('POST /api/grupos/:grupoId/reativar passa mesmo arquivado (a rota real reativa)', async () => {
     const s = await criarSessao();
     const grupo = await grupoDe(s, true);
     const r = await chamar(`/api/grupos/${grupo}/reativar`, pedido('POST', s.cookie), opcoes);
     expect(r.status).toBe(200);
-    expect(executadas).toEqual(['POST reativar']);
+    expect(await comoOwner('SELECT arquivado_em FROM grupos WHERE id = $1', [grupo])).toEqual([{ arquivado_em: null }]);
+  });
+
+  it('POST /api/grupos/:grupoId/arquivar passa mesmo arquivado: 200 sem mudança (GEL-29)', async () => {
+    const s = await criarSessao();
+    const grupo = await grupoDe(s, true);
+    const antes = await comoOwner('SELECT arquivado_em FROM grupos WHERE id = $1', [grupo]);
+    const r = await chamar(
+      `/api/grupos/${grupo}/arquivar`,
+      {
+        method: 'POST',
+        headers: { Cookie: s.cookie, 'X-Pelada': '1', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nomeConfirmacao: 'Grupo Ativo Teste' }),
+      },
+      opcoes,
+    );
+    expect(r.status).toBe(200);
+    expect(await comoOwner('SELECT arquivado_em FROM grupos WHERE id = $1', [grupo])).toEqual(antes);
   });
 
   it('outro caminho que termina em /reativar (ex.: de jogador) continua barrado', async () => {
