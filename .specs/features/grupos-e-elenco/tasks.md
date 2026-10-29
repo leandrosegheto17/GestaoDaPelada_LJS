@@ -390,11 +390,11 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Corrigir saída de período aberto → "Este período não tem data de saída."; corrigir o início do primeiro → mensagem do GEL-73
-- [ ] Saída do primeiro período antes do início da pontuação → mensagem do GEL-69
-- [ ] Com duas falhas ao mesmo tempo, vence a primeira na ordem do GEL-62 (teste dedicado)
-- [ ] A função não lê relógio: `hoje` entra por parâmetro; `pnpm lint` confirma a regra `DOMINIO_PROIBIDAS`
-- [ ] Gate quick passa: `pnpm --filter @pelada/dominio test`
+- [x] Corrigir saída de período aberto → "Este período não tem data de saída."; corrigir o início do primeiro → mensagem do GEL-73
+- [x] Saída do primeiro período antes do início da pontuação → mensagem do GEL-69
+- [x] Com duas falhas ao mesmo tempo, vence a primeira na ordem do GEL-62 (teste dedicado)
+- [x] A função não lê relógio: `hoje` entra por parâmetro; `pnpm lint` confirma a regra `DOMINIO_PROIBIDAS`
+- [x] Gate quick passa: `pnpm --filter @pelada/dominio test`
 
 **Tests**: unit
 **Gate**: quick
