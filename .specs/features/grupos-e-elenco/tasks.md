@@ -1678,9 +1678,9 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] `formatarNivel(683)` → "6,8"; 685 → "6,9"; `semNota` → "sem nota"
-- [ ] A mutação invalida a ficha e a lista
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] `formatarNivel(683)` → "6,8"; 685 → "6,9"; `semNota` → "sem nota"
+- [x] A mutação invalida a ficha e a lista
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
