@@ -106,6 +106,22 @@
 - **Date**: 2026-10-28
 - **Status**: active
 
+### AD-014
+- **Decision**: A visibilidade do grupo arquivado é decidida no banco: `grupos_visiveis()` só devolve um grupo arquivado à conta que tem vínculo e é a criadora. A escrita no grupo arquivado é barrada pelo middleware `exigirGrupoAtivo` (409 `grupo_arquivado`), exceto a reativação. A criação de grupo passa pela função `grupo_criar` (`SECURITY DEFINER`). ADR-035.
+- **Reason**: Escolha do usuário na fase 7 da `grupos-e-elenco`. As features seguintes herdam o filtro sem código, e a RLS impede o `pelada_app` de criar um grupo que ainda não tem vínculo.
+- **Trade-off**: A troca da função afeta todas as policies e exige a suíte de isolamento inteira. O sufixo do slug fica em SQL.
+- **Scope**: banco e todas as features que leem dados de grupo
+- **Date**: 2026-10-29
+- **Status**: active
+
+### AD-015
+- **Decision**: A API lê a data só pelo `Relogio` injetado no contexto do Hono (`hoje()` em America/Sao_Paulo, cópia do legado). Regra de data nunca usa `now()` nem `current_date` do SQL, e o domínio recebe `hoje` como parâmetro.
+- **Reason**: ADR-012 e GEL-70. Perto da meia-noite, o `now()` do banco em UTC dá o dia errado, e os testes precisam fixar a data.
+- **Trade-off**: Mais um item no contexto da requisição. O `now()` continua valendo para carimbos de momento (auditoria, sessão).
+- **Scope**: API, a partir da `grupos-e-elenco`
+- **Date**: 2026-10-29
+- **Status**: active
+
 ## Handoff
 
 - **Feature**: `conta-e-acesso` (fase 9, Execute do `tlc-spec-driven`)
@@ -120,7 +136,7 @@
 - **Fluxo**: 1, Projeto novo para vender — skill `projeto-novo`
 - **Item**: `.specs/features/grupos-e-elenco/` (feature 3 de 8, AD-001). A spec e o `context.md` estão na `main` (merge `d04f201`). Trabalhar no checkout principal; para a construção, abrir worktree novo a partir da `main`.
 - **Fase aprovada**: 6 (Specify), aprovada pelo usuário em 2026-10-29: `spec.md` (GEL-01 a GEL-118, `validate_spec.py` sem erros) e `context.md` (decisões C1 a C10).
-- **Próximo passo**: fase 7, Design (`tlc-spec-driven`) e depois o mockup do módulo (`mockup-visual`, modo módulo). Modelo indicado: Opus.
+- **Próximo passo**: fase 7, segunda parte: mockup do módulo (`mockup-visual`, modo módulo) com t08 ("Criar grupo" e "Arquivados"), t27 sem "Primeiro admin", t20 com arquivar só para quem criou e t16 sem prévias e com o texto novo da exclusão. O Design (`design.md`) foi aprovado em 2026-10-29 (AD-014, AD-015, ADR-035). Modelo indicado: Opus.
 - **Progresso**: Plano: Faltam 6 de 8 features: 25% concluído. A feature atual ainda não tem tarefas.
 - **Combinado na conversa e não registrado em artefato**:
   - Padronização do Neon (ADR-030 a ADR-034) liberada em 2026-10-29 (`.specs/liberacao.md`). Abertos: teste de fumaça do usuário; `neondb_owner` ainda administra a `pelada_app` e o database `neondb` antigo continua no Neon; revogar a `NEON_API_KEY` no console do Neon.
