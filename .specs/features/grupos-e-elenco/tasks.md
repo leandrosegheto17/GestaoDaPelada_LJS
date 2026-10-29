@@ -1134,11 +1134,11 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Cadastro válido → 201; `dataEntrada` no futuro → 422 "A data não pode ser no futuro." no campo `dataEntrada` (hoje do `Relogio`, às 22h de São Paulo)
-- [ ] Cada 422 da spec com a mensagem e o campo certos (apelido, ano, posição, telefone, pontuação); campo desconhecido → 422
-- [ ] `GET` devolve ativos e inativos com nível; sem sessão → 401; outro grupo → 404
-- [ ] Casos `grupo` dos dois métodos em `casos.ts`
-- [ ] Gate full passa
+- [x] Cadastro válido → 201; `dataEntrada` no futuro → 422 "A data não pode ser no futuro." no campo `dataEntrada` (hoje do `Relogio`, às 22h de São Paulo)
+- [x] Cada 422 da spec com a mensagem e o campo certos (apelido, ano, posição, telefone, pontuação); campo desconhecido → 422
+- [x] `GET` devolve ativos e inativos com nível; sem sessão → 401; outro grupo → 404
+- [x] Casos `grupo` dos dois métodos em `casos.ts`
+- [x] Gate full passa
 
 **Tests**: e2e
 **Gate**: full
