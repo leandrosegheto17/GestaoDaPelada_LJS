@@ -10,7 +10,7 @@ Implemente estas tarefas com a skill `tlc-spec-driven`: **acione-a pelo nome e s
 
 **Design**: `.specs/features/grupos-e-elenco/design.md` (mockup aprovado em `mockup/`)
 **Spec**: `.specs/features/grupos-e-elenco/spec.md` (decisões C1 a C10 em `context.md`)
-**Status**: Draft (aguardando aprovação da fase 8)
+**Status**: Approved (usuário, 2026-10-29; execução por subagentes, um lote por vez; ferramentas como estão)
 
 > Premissas desta lista:
 > - Caminhos `legado:` são relativos a `C:\Leandro\Projetos\GestaoDaPelada`, somente leitura (AD-002). Teste copiado do legado só entra ligado a um `GEL-NN`.
