@@ -39,6 +39,12 @@ interface Props {
   /** Nome na barra; sem ele, "Gestão da Pelada". */
   nomeGrupo?: string;
   destinoTrocarGrupo?: string;
+  /** Atalho "Ver ranking" na barra (rota do app, ex.: `/g/<slug>`). */
+  destinoRanking?: string;
+  /** Título só para leitores de tela (o início do grupo, t09). */
+  tituloOculto?: boolean;
+  /** Largura cheia do conteúdo, sem o limite das telas de formulário (t09). */
+  largo?: boolean;
   voltarPara?: string;
   voltarRotulo?: string;
   /** Mostra o botão do menu da conta na barra (t08 e t32). */
@@ -53,6 +59,9 @@ export function PaginaInterna({
   tituloDocumento,
   nomeGrupo,
   destinoTrocarGrupo,
+  destinoRanking,
+  tituloOculto,
+  largo,
   voltarPara,
   voltarRotulo,
   comMenu,
@@ -67,11 +76,17 @@ export function PaginaInterna({
       <BarraAdmin
         {...(nomeGrupo ? { nomeGrupo } : {})}
         {...(destinoTrocarGrupo ? { destinoTrocarGrupo } : {})}
+        {...(destinoRanking ? { destinoRanking } : {})}
         {...(comMenu ? { aoAbrirMenu: () => setMenuAberto(true), menuAberto } : {})}
       />
-      <main id="conteudo" tabIndex={-1} className="conteudo conteudo--estreito" aria-busy={ocupado || undefined}>
+      <main
+        id="conteudo"
+        tabIndex={-1}
+        className={largo ? 'conteudo' : 'conteudo conteudo--estreito'}
+        aria-busy={ocupado || undefined}
+      >
         {voltarPara && voltarRotulo ? <Voltar para={voltarPara} rotulo={voltarRotulo} /> : null}
-        <h1 className="titulo">{titulo}</h1>
+        <h1 className={tituloOculto ? 'sr' : 'titulo'}>{titulo}</h1>
         {children}
       </main>
       {menuAberto ? <MenuConta aoFechar={() => setMenuAberto(false)} /> : null}

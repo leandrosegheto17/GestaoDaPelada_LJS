@@ -1758,10 +1758,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Estados t09: sem jogadores e sucesso ("6 habilidades", "1 admin")
-- [ ] Sem item "Pontuação"; links para jogadores, habilidades, admins e dados do grupo
-- [ ] axe sem violação; só tokens
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Estados t09: sem jogadores e sucesso ("6 habilidades", "1 admin")
+- [x] Sem item "Pontuação"; links para jogadores, habilidades, admins e dados do grupo
+- [x] axe sem violação; só tokens
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
