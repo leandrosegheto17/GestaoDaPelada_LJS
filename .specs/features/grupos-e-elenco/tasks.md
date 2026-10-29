@@ -501,12 +501,12 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Apelido de 1 e 31 caracteres recusado com "O apelido precisa ter de 2 a 30 caracteres."
-- [ ] Ano 1939 e `hoje − 9` recusados com "O ano precisa estar entre 1940 e 2016." (em 2026); ausente e não inteiro também
-- [ ] Telefone com máscara vira 11 dígitos; vazio e nulo viram ausente; 10 dígitos, DDD com zero e sem o 9 são recusados com "Informe o telefone como (DD) 9XXXX-XXXX."
-- [ ] Pontuação -1, 10000 e 1,5 recusadas; omitida no cadastro vale 0 e na edição mantém o valor (campo ausente no resultado)
-- [ ] Posição fora das 7 recusada; `dataEntrada` opcional no cadastro e inexistente na edição (strict)
-- [ ] Gate quick passa: `pnpm --filter @pelada/contrato test`
+- [x] Apelido de 1 e 31 caracteres recusado com "O apelido precisa ter de 2 a 30 caracteres."
+- [x] Ano 1939 e `hoje − 9` recusados com "O ano precisa estar entre 1940 e 2016." (em 2026); ausente e não inteiro também
+- [x] Telefone com máscara vira 11 dígitos; vazio e nulo viram ausente; 10 dígitos, DDD com zero e sem o 9 são recusados com "Informe o telefone como (DD) 9XXXX-XXXX."
+- [x] Pontuação -1, 10000 e 1,5 recusadas; omitida no cadastro vale 0 e na edição mantém o valor (campo ausente no resultado)
+- [x] Posição fora das 7 recusada; `dataEntrada` opcional no cadastro e inexistente na edição (strict)
+- [x] Gate quick passa: `pnpm --filter @pelada/contrato test`
 
 **Tests**: unit
 **Gate**: quick
