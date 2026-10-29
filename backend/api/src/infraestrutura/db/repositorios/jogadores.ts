@@ -433,3 +433,41 @@ export async function inativar(
   await auditoria.registrar(db, grupoId, 'jogador_inativado', 'jogador', jogadorId, { periodo: aberto.id, saida });
   return { ok: true };
 }
+
+export type ResultadoReativar = { ok: true } | { ok: false; codigo: 'ja_ativo' } | RecusaPeriodo | null;
+
+/**
+ * Reativa o jogador inativo (GEL-54 a GEL-58): com a linha travada, avalia o retorno (sem data, `hoje`) e abre um
+ * período novo a partir dele, sem mexer em `inicio_pontuacao` nem na pontuação inicial; audita `jogador_reativado`
+ * com o retorno e a saída anterior. Já ativo: `ja_ativo`, sem alterar nada. De outro grupo: nulo.
+ */
+export async function reativar(
+  db: Db,
+  grupoId: string,
+  jogadorId: string,
+  data: string | undefined,
+  hoje: string,
+): Promise<ResultadoReativar> {
+  const j = await travarParaPeriodo(db, grupoId, jogadorId, hoje);
+  if (!j) return null;
+  if (j.periodos.some((p) => p.fim === null)) return { ok: false, codigo: 'ja_ativo' };
+  const retorno = data ?? hoje;
+  const avaliacao = avaliarPeriodos({
+    periodos: j.periodos,
+    operacao: { tipo: 'reativar', data: retorno },
+    hoje,
+    inicioPontuacao: j.inicioPontuacao,
+    presencas: j.presencas,
+  });
+  if (!avaliacao.ok) return { ok: false, campo: avaliacao.campo, mensagem: avaliacao.mensagem };
+  await db
+    .insertInto('periodos_ativos')
+    .values({ grupo_id: grupoId, jogador_id: jogadorId, inicio: retorno })
+    .execute();
+  const saidas = j.periodos.flatMap((p) => (p.fim === null ? [] : [p.fim])).sort();
+  await auditoria.registrar(db, grupoId, 'jogador_reativado', 'jogador', jogadorId, {
+    retorno,
+    saidaAnterior: saidas[saidas.length - 1] ?? null,
+  });
+  return { ok: true };
+}

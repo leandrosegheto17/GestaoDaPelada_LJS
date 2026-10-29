@@ -645,3 +645,99 @@ describe('jogadores.inativar (T38; GEL-51 a GEL-53, GEL-58, GEL-68, GEL-109)', (
     expect(await periodosDe(alheio)).toEqual([{ inicio: '2026-09-01', fim: null }]);
   });
 });
+
+describe('jogadores.reativar (T39; GEL-54 a GEL-57)', () => {
+  it('retorno em 12/10 depois da saída em 05/10: cria [12/10, ∞) sem mudar início nem pontuação; audita as duas datas', async () => {
+    const c = await novoCenario();
+    const id = await criado(c, { ...NOVO, pontuacaoInicial: 77, dataEntrada: '2026-09-01' }, HOJE_P);
+    await como(c.conta, (db) => jogadores.inativar(db, c.grupo, id, '2026-10-05', HOJE_P));
+    expect(await como(c.conta, (db) => jogadores.reativar(db, c.grupo, id, '2026-10-12', HOJE_P))).toEqual({
+      ok: true,
+    });
+    expect(await periodosDe(id)).toEqual([
+      { inicio: '2026-09-01', fim: '2026-10-05' },
+      { inicio: '2026-10-12', fim: null },
+    ]);
+    expect(await linhaDe(id)).toMatchObject({ inicio_pontuacao: '2026-09-01', pontuacao_inicial: 77 });
+    expect(await auditoriaDe(c.grupo, 'jogador_reativado')).toEqual([
+      { autor_conta_id: c.conta, entidade_id: id, resumo: { retorno: '2026-10-12', saidaAnterior: '2026-10-05' } },
+    ]);
+  });
+
+  it('com dois períodos encerrados, a saída anterior auditada é a mais recente', async () => {
+    const c = await novoCenario();
+    const id = await gravarJogador(c, 'Vaivem', [
+      ['2026-06-01', '2026-07-01'],
+      ['2026-01-01', '2026-03-01'],
+    ]);
+    expect(await como(c.conta, (db) => jogadores.reativar(db, c.grupo, id, '2026-08-01', HOJE_P))).toEqual({
+      ok: true,
+    });
+    expect(await auditoriaDe(c.grupo, 'jogador_reativado')).toMatchObject([
+      { resumo: { retorno: '2026-08-01', saidaAnterior: '2026-07-01' } },
+    ]);
+  });
+
+  it('sem data: usa hoje', async () => {
+    const c = await novoCenario();
+    const id = await gravarJogador(c, 'Hoje', [['2026-01-01', '2026-03-01']]);
+    expect(await como(c.conta, (db) => jogadores.reativar(db, c.grupo, id, undefined, HOJE_P))).toEqual({ ok: true });
+    expect(await periodosDe(id)).toEqual([
+      { inicio: '2026-01-01', fim: '2026-03-01' },
+      { inicio: HOJE_P, fim: null },
+    ]);
+  });
+
+  it('retorno antes da saída anterior: recusa com a mensagem do GEL-66 e nada muda', async () => {
+    const c = await novoCenario();
+    const id = await gravarJogador(c, 'Cedo', [['2026-09-01', '2026-10-05']]);
+    expect(await como(c.conta, (db) => jogadores.reativar(db, c.grupo, id, '2026-10-04', HOJE_P))).toEqual({
+      ok: false,
+      campo: 'retorno',
+      mensagem: 'O retorno não pode ser antes da saída anterior (05/10/2026).',
+    });
+    expect(await periodosDe(id)).toEqual([{ inicio: '2026-09-01', fim: '2026-10-05' }]);
+    expect(await auditoriaDe(c.grupo, 'jogador_reativado')).toEqual([]);
+  });
+
+  it('sair e voltar no mesmo dia: aceita, sem sobreposição (GEL-61)', async () => {
+    const c = await novoCenario();
+    const id = await gravarJogador(c, 'Mesmo Dia', [['2026-09-01', '2026-10-05']]);
+    expect(await como(c.conta, (db) => jogadores.reativar(db, c.grupo, id, '2026-10-05', HOJE_P))).toEqual({
+      ok: true,
+    });
+    expect(await periodosDe(id)).toEqual([
+      { inicio: '2026-09-01', fim: '2026-10-05' },
+      { inicio: '2026-10-05', fim: null },
+    ]);
+  });
+
+  it('data futura: recusa no retorno', async () => {
+    const c = await novoCenario();
+    const id = await gravarJogador(c, 'Futuro', [['2026-09-01', '2026-10-05']]);
+    expect(await como(c.conta, (db) => jogadores.reativar(db, c.grupo, id, '2026-10-30', HOJE_P))).toEqual({
+      ok: false,
+      campo: 'retorno',
+      mensagem: 'A data não pode ser no futuro.',
+    });
+  });
+
+  it('já ativo: ja_ativo, sem alterar nada nem auditar', async () => {
+    const c = await novoCenario();
+    const id = await gravarJogador(c, 'Ativo', [['2026-09-01', null]]);
+    expect(await como(c.conta, (db) => jogadores.reativar(db, c.grupo, id, '2026-10-12', HOJE_P))).toEqual({
+      ok: false,
+      codigo: 'ja_ativo',
+    });
+    expect(await periodosDe(id)).toEqual([{ inicio: '2026-09-01', fim: null }]);
+    expect(await auditoriaDe(c.grupo, 'jogador_reativado')).toEqual([]);
+  });
+
+  it('jogador de outro grupo: nulo', async () => {
+    const a = await novoCenario();
+    const outro = await novoCenario();
+    const alheio = await gravarJogador(outro, 'Alheio', [['2026-09-01', '2026-10-05']]);
+    expect(await como(a.conta, (db) => jogadores.reativar(db, a.grupo, alheio, '2026-10-12', HOJE_P))).toBeNull();
+    expect(await periodosDe(alheio)).toEqual([{ inicio: '2026-09-01', fim: '2026-10-05' }]);
+  });
+});

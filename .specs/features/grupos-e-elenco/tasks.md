@@ -1218,10 +1218,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Retorno em 12/10 depois de saída em 05/10 cria o período [12/10, ∞); `inicio_pontuacao` igual ao anterior
-- [ ] Retorno antes da saída anterior → 422 "O retorno não pode ser antes da saída anterior (05/10/2026)."; sair e voltar no mesmo dia aceita
-- [ ] Já ativo → erro `ja_ativo`; auditoria `jogador_reativado` com as duas datas
-- [ ] Gate full passa
+- [x] Retorno em 12/10 depois de saída em 05/10 cria o período [12/10, ∞); `inicio_pontuacao` igual ao anterior
+- [x] Retorno antes da saída anterior → 422 "O retorno não pode ser antes da saída anterior (05/10/2026)."; sair e voltar no mesmo dia aceita
+- [x] Já ativo → erro `ja_ativo`; auditoria `jogador_reativado` com as duas datas
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
