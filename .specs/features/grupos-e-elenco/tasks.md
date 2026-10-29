@@ -309,10 +309,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Sair e voltar no mesmo dia não sobrepõe: [01/10, 05/10) e [05/10, ∞)
-- [ ] Períodos que se tocam por um dia sobrepõem
-- [ ] `formatarData("2026-10-05")` → `05/10/2026`
-- [ ] Gate quick passa: `pnpm --filter @pelada/dominio test`
+- [x] Sair e voltar no mesmo dia não sobrepõe: [01/10, 05/10) e [05/10, ∞)
+- [x] Períodos que se tocam por um dia sobrepõem
+- [x] `formatarData("2026-10-05")` → `05/10/2026`
+- [x] Gate quick passa: `pnpm --filter @pelada/dominio test`
 
 **Tests**: unit
 **Gate**: quick
