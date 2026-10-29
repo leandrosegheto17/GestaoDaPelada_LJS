@@ -254,9 +254,9 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Lista exata: Visão de Jogo, Passe, Preparo Físico, Drible, Chute, Desarme, nessa ordem
-- [ ] Exportada de `@pelada/dominio`
-- [ ] Gate quick passa: `pnpm --filter @pelada/dominio test`
+- [x] Lista exata: Visão de Jogo, Passe, Preparo Físico, Drible, Chute, Desarme, nessa ordem
+- [x] Exportada de `@pelada/dominio`
+- [x] Gate quick passa: `pnpm --filter @pelada/dominio test`
 
 **Tests**: unit
 **Gate**: quick
