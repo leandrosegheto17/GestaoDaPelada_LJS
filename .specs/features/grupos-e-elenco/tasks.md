@@ -1381,10 +1381,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Fixture com `insertInto('periodos_ativos')` num arquivo fora do repositório → a checagem sai com erro; o mesmo para `updateTable`, `deleteFrom`, SQL cru e `inicio_pontuacao`
-- [ ] O repositório real e as migrations passam; o repositório atual do app passa
-- [ ] Entra no `pnpm test:checagens` e no job `base` do CI (`.github/workflows/ci.yml`)
-- [ ] Gate full passa
+- [x] Fixture com `insertInto('periodos_ativos')` num arquivo fora do repositório → a checagem sai com erro; o mesmo para `updateTable`, `deleteFrom`, SQL cru e `inicio_pontuacao`
+- [x] O repositório real e as migrations passam; o repositório atual do app passa
+- [x] Entra no `pnpm test:checagens` e no job `base` do CI (`.github/workflows/ci.yml`)
+- [x] Gate full passa
 
 **Tests**: unit
 **Gate**: full
