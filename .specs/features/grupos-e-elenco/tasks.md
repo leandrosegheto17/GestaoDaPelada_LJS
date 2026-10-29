@@ -445,9 +445,9 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Teste de pacote lista as exportações novas (`slugBase`, `compararApelido`, `chaveBusca`, `calcularNivel`, `HABILIDADES_INICIAIS`, `anoNascimentoMaximo`, `avaliarPeriodos`, `avaliarInicio`, `formatarData`)
-- [ ] `pnpm lint` passa: nenhum arquivo do domínio importa I/O, relógio ou zod
-- [ ] Gate quick passa: `pnpm --filter @pelada/dominio test`
+- [x] Teste de pacote lista as exportações novas (`slugBase`, `compararApelido`, `chaveBusca`, `calcularNivel`, `HABILIDADES_INICIAIS`, `anoNascimentoMaximo`, `avaliarPeriodos`, `avaliarInicio`, `formatarData`)
+- [x] `pnpm lint` passa: nenhum arquivo do domínio importa I/O, relógio ou zod
+- [x] Gate quick passa: `pnpm --filter @pelada/dominio test`
 
 **Tests**: unit
 **Gate**: quick
