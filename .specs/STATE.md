@@ -134,18 +134,19 @@
 ## Retomada
 
 - **Fluxo**: 1, Projeto novo para vender — skill `projeto-novo`
-- **Item**: `.specs/features/grupos-e-elenco/` (feature 3 de 8, AD-001). A spec e o `context.md` estão na `main` (merge `d04f201`). Trabalhar no checkout principal; para a construção, abrir worktree novo a partir da `main`.
-- **Fase aprovada**: 7 (Desenho) em 2026-10-29: `design.md` (AD-014, AD-015, ADR-035; commit `4383582`) e mockup do módulo em `.specs/features/grupos-e-elenco/mockup/` (34 telas, galeria https://claude.ai/artifact/7RrxLj5uGBvKBuVQb2GR3L; commit `5492f7b`). A fase 6 (spec) foi aprovada no mesmo dia (`d6827a9`).
-- **Próxima fase**: 8, Preparação (`tlc-spec-driven`, fase Tasks: `tasks.md` com Estimativa até 2h e Risco por tarefa) — modelo indicado: sonnet. O projeto já tem repositório, ambiente, esqueleto e CI: as primeiras tarefas não precisam recriá-los. Lembretes para as tarefas: domínio do legado portado com testes ligados a GEL; telas novas em `frontend/web/e2e/telas-ativas.txt` e `telas.json` (mesmo mapeamento usado para t08 e t19); seed com grupo pela `grupo_criar`; teste de `POST /api/grupos` rodando como `pelada_app`; suíte de isolamento inteira depois da troca de `grupos_visiveis()`.
-- **Progresso**: Produto: Faltam 6 de 8 features: 25% concluído; Feature atual (grupos-e-elenco): sem tarefas ainda; conferida em 2026-10-29.
+- **Item**: `.specs/features/grupos-e-elenco/` (feature 3 de 8, AD-001). Spec, `context.md`, `design.md`, mockup e `tasks.md` estão na `main`. Trabalhar no checkout principal; a construção abre worktree novo a partir da `main` (`using-git-worktrees`).
+- **Fase aprovada**: 8 (Preparação) em 2026-10-29: `tasks.md` com 70 tarefas em 12 Phases (~110h estimadas, nenhuma acima de 2h), 118 requisitos GEL mapeados, `validate_tasks.py` sem erro (commits `c8d529d` e `127e55a`). Fases 6 e 7 aprovadas no mesmo dia.
+- **Próxima fase**: 9, Construção (`tlc-spec-driven`, Execute) — modelo indicado: sonnet. Sempre por subagente, um lote por vez (`python .claude/scripts/progresso.py --lote`: 5 lotes; o 1º tem 16 tarefas, 19h30, Phases 1 a 3 do `tasks.md`). Trabalhador: `implementador-dominio` se o lote tiver tarefa de `**Risco**: alto`, senão `implementador`. Antes: subir o Postgres local (`docker compose up -d`, `pnpm migrar`) e abrir o worktree. Marco de troca de sessão a cada 2 ou 3 lotes.
+- **Progresso**: Produto: Faltam 6 de 8 features: 25% concluído; Feature atual (grupos-e-elenco): Faltam 70 de 70 tarefas: 0% concluído; Projeto: Faltam 72 de 192 tarefas: 62% concluído; conferida em 2026-10-29.
 - **Combinado na conversa e não registrado em artefato**:
+  - Desvios do `tasks.md` em relação ao design, já escritos nas premissas dele: três migrations aditivas (T17, T18, T20) no lugar de uma; contratos de período e habilidade em `periodos.ts` e `habilidades.ts`.
   - O `leitor-codigo` não achou `test/lint-dominio.test.ts` no repositório: a regra do domínio está em `eslint.config.mjs:41-52, 245-249`. Conferir de onde veio a falha citada abaixo antes de investigar.
   - Padronização do Neon (ADR-030 a ADR-034) liberada em 2026-10-29 (`.specs/liberacao.md`). Abertos: teste de fumaça do usuário; `neondb_owner` ainda administra a `pelada_app` e o database `neondb` antigo continua no Neon; revogar a `NEON_API_KEY` no console do Neon.
   - Fragilidade nova: `test/lint-dominio.test.ts` falhou uma vez na trava da `main` e não repetiu. Investigar em tarefa à parte.
   - A correção do `trava-testes.py` (`67a700a`) precisa ser levada ao Rascunho (`C:\Leandro\Projetos\Rascunho\.claude`) e registrada no `.rascunho/DECISOES.md` de lá.
   - Limpezas pendentes (pedem confirmação): branches `padronizar-neon`, `feat/grupos-e-elenco` (local e remota), `fix/conta-e-acesso-seguranca`, `feat/fundacao`, `fix/g18-deploy-yml`; worktrees `.worktrees/conta-e-acesso-seguranca` e `.worktrees/fundacao`; contêineres parados `conta-e-acesso-seguranca-db-1` e `conta-e-acesso-db-1`. Pendências do usuário: monitor de uptime (runbook §7), alerta manual da cota de e-mail aos 50%, apagar a branch Neon `spike-descartavel` e o Hyperdrive `spike-s1`.
   - Banco local: `gestaodapelada_ljs-db-1` (PostgreSQL 18, porta 5432), migrado até `1792844220000`, com seed. O `.env` local ganhou `PELADA_BACKUP_RO_SENHA`. Não mexer em `controleemcasa_ljs-banco-1` (55432) nem em `evolucao-segura-postgres` (5433).
-- **Gravada em**: 2026-10-29 (fim da fase 7 da `grupos-e-elenco`)
+- **Gravada em**: 2026-10-29 (fim da fase 8 da `grupos-e-elenco`)
 
 ## Modelo
 
