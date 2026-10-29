@@ -1078,11 +1078,11 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Criar sem data de entrada usa `hoje`; o período aberto e o `inicio_pontuacao` têm a data de entrada
-- [ ] "Toninho" e "toninho" colidem (422 com a mensagem do GEL-35); "José" e "Jose" coexistem
-- [ ] Corrida de dois INSERTs com o mesmo apelido: o segundo cai no índice único e vira o mesmo 422 (23505 traduzido pelo nome da constraint)
-- [ ] Telefone ausente grava nulo; auditoria `jogador_criado` sem telefone nem ano
-- [ ] Gate full passa
+- [x] Criar sem data de entrada usa `hoje`; o período aberto e o `inicio_pontuacao` têm a data de entrada
+- [x] "Toninho" e "toninho" colidem (422 com a mensagem do GEL-35); "José" e "Jose" coexistem
+- [x] Corrida de dois INSERTs com o mesmo apelido: o segundo cai no índice único e vira o mesmo 422 (23505 traduzido pelo nome da constraint)
+- [x] Telefone ausente grava nulo; auditoria `jogador_criado` sem telefone nem ano
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full

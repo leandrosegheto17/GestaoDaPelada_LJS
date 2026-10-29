@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import type { KyselyPlugin } from 'kysely';
+import pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { Db } from '../../src/infraestrutura/db/index.ts';
 import * as grupos from '../../src/infraestrutura/db/repositorios/grupos.ts';
@@ -252,3 +253,150 @@ describe('jogadores.ler (T33; GEL-44, GEL-46)', () => {
     expect(await como(a.conta, (db) => jogadores.ler(db, a.grupo, randomUUID()))).toBeNull();
   });
 });
+
+const HOJE = '2026-07-15';
+const NOVO = { apelido: 'Toninho', anoNascimento: 1990, posicao: 'meia', telefone: null, pontuacaoInicial: 0 } as const;
+
+const periodosDe = async (jogador: string) =>
+  (
+    await b.owner.query<{ inicio: string; fim: string | null }>(
+      "SELECT to_char(inicio, 'YYYY-MM-DD') AS inicio, to_char(fim, 'YYYY-MM-DD') AS fim FROM periodos_ativos WHERE jogador_id = $1 ORDER BY inicio",
+      [jogador],
+    )
+  ).rows;
+
+const linhaDe = async (jogador: string) =>
+  (
+    await b.owner.query(
+      `SELECT apelido, ano_nascimento, posicao, telefone, pontuacao_inicial,
+              to_char(inicio_pontuacao, 'YYYY-MM-DD') AS inicio_pontuacao
+       FROM jogadores WHERE id = $1`,
+      [jogador],
+    )
+  ).rows[0];
+
+const auditoriaDe = async (grupo: string, acao: string) =>
+  (
+    await b.owner.query<{ autor_conta_id: string; entidade_id: string; resumo: Record<string, unknown> }>(
+      'SELECT autor_conta_id, entidade_id, resumo FROM auditoria WHERE grupo_id = $1 AND acao = $2 ORDER BY momento, id',
+      [grupo, acao],
+    )
+  ).rows;
+
+const contarJogadores = async (grupo: string, apelido: string) =>
+  Number(
+    (
+      await b.owner.query<{ n: string }>(
+        'SELECT count(*) AS n FROM jogadores WHERE grupo_id = $1 AND lower(apelido) = lower($2)',
+        [grupo, apelido],
+      )
+    ).rows[0]?.n,
+  );
+
+async function criado(c: Cenario, dados: Parameters<typeof jogadores.criar>[2], hoje = HOJE): Promise<string> {
+  const r = await como(c.conta, (db) => jogadores.criar(db, c.grupo, dados, hoje));
+  if (!r.ok) throw new Error(`criar recusou: ${r.mensagem}`);
+  return r.id;
+}
+
+describe('jogadores.criar (T34; GEL-31, GEL-32, GEL-35, GEL-38, GEL-45)', () => {
+  it('sem data de entrada usa hoje (do parâmetro): período aberto e inicio_pontuacao em hoje', async () => {
+    const c = await novoCenario();
+    const id = await criado(c, NOVO);
+    expect(await periodosDe(id)).toEqual([{ inicio: HOJE, fim: null }]);
+    expect(await linhaDe(id)).toEqual({
+      apelido: 'Toninho',
+      ano_nascimento: 1990,
+      posicao: 'meia',
+      telefone: null,
+      pontuacao_inicial: 0,
+      inicio_pontuacao: HOJE,
+    });
+  });
+
+  it('com data de entrada: o período aberto e o inicio_pontuacao têm essa data; grava telefone e pontuação', async () => {
+    const c = await novoCenario();
+    const id = await criado(c, { ...NOVO, telefone: '11987654321', pontuacaoInicial: 120, dataEntrada: '2026-03-02' });
+    expect(await periodosDe(id)).toEqual([{ inicio: '2026-03-02', fim: null }]);
+    expect(await linhaDe(id)).toMatchObject({
+      telefone: '11987654321',
+      pontuacao_inicial: 120,
+      inicio_pontuacao: '2026-03-02',
+    });
+    expect(await como(c.conta, (db) => jogadores.ler(db, c.grupo, id))).toMatchObject({
+      situacao: 'ativo',
+      desde: '2026-03-02',
+    });
+  });
+
+  it('"Toninho" e depois "toninho": recusa no apelido com a mensagem do GEL-35 e nada é criado', async () => {
+    const c = await novoCenario();
+    await criado(c, NOVO);
+    const r = await como(c.conta, (db) => jogadores.criar(db, c.grupo, { ...NOVO, apelido: 'toninho' }, HOJE));
+    expect(r).toEqual({ ok: false, campo: 'apelido', mensagem: 'Já existe um jogador com esse apelido neste grupo.' });
+    expect(await contarJogadores(c.grupo, 'toninho')).toBe(1);
+  });
+
+  it('"José" e "Jose" coexistem (acento conta); o mesmo apelido em outro grupo também', async () => {
+    const c = await novoCenario();
+    await criado(c, { ...NOVO, apelido: 'José' });
+    const r = await como(c.conta, (db) => jogadores.criar(db, c.grupo, { ...NOVO, apelido: 'Jose' }, HOJE));
+    expect(r.ok).toBe(true);
+    const outro = await novoCenario();
+    expect(
+      (await como(outro.conta, (db) => jogadores.criar(db, outro.grupo, { ...NOVO, apelido: 'José' }, HOJE))).ok,
+    ).toBe(true);
+  });
+
+  it('corrida: o INSERT que passa da consulta cai no índice único e vira a mesma recusa (23505 traduzido)', async () => {
+    const c = await novoCenario();
+    const ocupante = new pg.Client({ connectionString: b.banco.url });
+    await ocupante.connect();
+    try {
+      const pidOcupante = (await ocupante.query<{ pid: number }>('SELECT pg_backend_pid() AS pid')).rows[0]!.pid;
+      await ocupante.query('BEGIN');
+      // Gravado e ainda não confirmado: invisível à consulta do repositório, mas o INSERT dele espera no índice.
+      await ocupante.query(
+        `INSERT INTO jogadores (grupo_id, apelido, criado_por, criado_em, alterado_por, alterado_em)
+         VALUES ($1, 'Corrida', $2, now(), $2, now())`,
+        [c.grupo, c.conta],
+      );
+      const pedido = como(c.conta, (db) => jogadores.criar(db, c.grupo, { ...NOVO, apelido: 'CORRIDA' }, HOJE));
+      await esperarAlguemTravadoPor(pidOcupante);
+      await ocupante.query('COMMIT');
+      expect(await pedido).toEqual({
+        ok: false,
+        campo: 'apelido',
+        mensagem: 'Já existe um jogador com esse apelido neste grupo.',
+      });
+    } finally {
+      await ocupante.end();
+    }
+    expect(await contarJogadores(c.grupo, 'corrida')).toBe(1);
+  });
+
+  it('auditoria jogador_criado pela conta, sem telefone nem ano de nascimento (GEL-113)', async () => {
+    const c = await novoCenario();
+    const id = await criado(c, { ...NOVO, anoNascimento: 1987, telefone: '21987654321', dataEntrada: '2026-02-01' });
+    const linhas = await auditoriaDe(c.grupo, 'jogador_criado');
+    expect(linhas).toEqual([
+      { autor_conta_id: c.conta, entidade_id: id, resumo: { dataEntrada: '2026-02-01', pontuacaoInicial: 0 } },
+    ]);
+    const texto = JSON.stringify(linhas[0]?.resumo);
+    expect(texto).not.toContain('21987654321');
+    expect(texto).not.toContain('1987');
+  });
+});
+
+/** Espera algum backend do banco ficar travado esperando a transação do backend `por`. */
+async function esperarAlguemTravadoPor(por: number): Promise<void> {
+  for (let i = 0; i < 1000; i++) {
+    const { rows } = await b.owner.query(
+      'SELECT pid FROM pg_stat_activity WHERE $1::int = ANY (pg_blocking_pids(pid))',
+      [por],
+    );
+    if (rows.length > 0) return;
+    await new Promise((r) => setTimeout(r, 10));
+  }
+  throw new Error(`ninguém chegou a esperar o backend ${por}`);
+}

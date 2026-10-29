@@ -2,6 +2,7 @@ import { calcularNivel, compararApelido } from '@pelada/dominio';
 import { sql } from 'kysely';
 import type { Db } from '../index.ts';
 import type { Posicao } from '../tipos.ts';
+import * as auditoria from './auditoria.ts';
 
 // Jogadores do grupo (grupos-e-elenco, design C5; GEL-31 a GEL-50, GEL-84, GEL-85). Todo acesso filtra por
 // `grupo_id` e roda sob a RLS da conta da requisição. É o único escritor de `periodos_ativos` e de
@@ -153,4 +154,87 @@ export async function ler(db: Db, grupoId: string, jogadorId: string): Promise<J
     periodos,
     notas: notas.map((n) => ({ habilidadeId: n.id, habilidade: n.nome, nota: n.valor })),
   };
+}
+
+const MENSAGEM_APELIDO_REPETIDO = 'Já existe um jogador com esse apelido neste grupo.';
+
+/** Dados do cadastro e da edição, já validados pelo contrato (apelido sem os espaços das pontas). */
+export interface DadosJogador {
+  apelido: string;
+  anoNascimento: number;
+  posicao: Posicao;
+  telefone: string | null;
+  pontuacaoInicial: number;
+}
+
+/** Recusa de um campo, com a mensagem que a tela mostra ao lado dele. */
+export interface Recusa<C extends string = string> {
+  ok: false;
+  campo: C;
+  mensagem: string;
+}
+
+const apelidoRepetido: Recusa<'apelido'> = { ok: false, campo: 'apelido', mensagem: MENSAGEM_APELIDO_REPETIDO };
+
+/** Erro do pg com o código SQLSTATE e o nome da constraint. */
+const violouApelido = (erro: unknown): boolean => {
+  const e = erro as { code?: string; constraint?: string } | null;
+  return e?.code === '23505' && e.constraint === 'jogadores_apelido_grupo';
+};
+
+/** Outro jogador do grupo com o mesmo apelido, ignorando a caixa; acentos contam (GEL-35, mesmo critério do índice). */
+async function apelidoEmUso(db: Db, grupoId: string, apelido: string, exceto?: string): Promise<boolean> {
+  let consulta = db
+    .selectFrom('jogadores')
+    .select('id')
+    .where('grupo_id', '=', grupoId)
+    .where(sql<string>`lower(apelido)`, '=', sql<string>`lower(${apelido})`);
+  if (exceto) consulta = consulta.where('id', '<>', exceto);
+  return (await consulta.executeTakeFirst()) !== undefined;
+}
+
+/**
+ * Cadastra o jogador (GEL-31, GEL-32, GEL-35, GEL-38, GEL-45): o jogador, o primeiro período aberto e
+ * `inicio_pontuacao` na data de entrada (sem ela, `hoje`), e a auditoria `jogador_criado` sem telefone nem ano
+ * (GEL-113). Apelido repetido é recusado pela consulta e, na corrida que passar dela, pelo índice único
+ * `jogadores_apelido_grupo` (23505), com a mesma recusa.
+ */
+export async function criar(
+  db: Db,
+  grupoId: string,
+  dados: DadosJogador & { dataEntrada?: string | undefined },
+  hoje: string,
+): Promise<{ ok: true; id: string } | Recusa<'apelido'>> {
+  if (await apelidoEmUso(db, grupoId, dados.apelido)) return apelidoRepetido;
+  const dataEntrada = dados.dataEntrada ?? hoje;
+  let id: string;
+  try {
+    const linha = await db
+      .insertInto('jogadores')
+      .values({
+        grupo_id: grupoId,
+        apelido: dados.apelido,
+        ano_nascimento: dados.anoNascimento,
+        posicao: dados.posicao,
+        telefone: dados.telefone,
+        pontuacao_inicial: dados.pontuacaoInicial,
+        inicio_pontuacao: dataEntrada,
+        criado_por: sql<string>`app_conta_id()`,
+        criado_em: sql<Date>`now()`,
+        alterado_por: sql<string>`app_conta_id()`,
+        alterado_em: sql<Date>`now()`,
+      })
+      .returning('id')
+      .executeTakeFirstOrThrow();
+    id = linha.id;
+  } catch (erro) {
+    if (violouApelido(erro)) return apelidoRepetido;
+    throw erro;
+  }
+  await db.insertInto('periodos_ativos').values({ grupo_id: grupoId, jogador_id: id, inicio: dataEntrada }).execute();
+  await auditoria.registrar(db, grupoId, 'jogador_criado', 'jogador', id, {
+    dataEntrada,
+    pontuacaoInicial: dados.pontuacaoInicial,
+  });
+  return { ok: true, id };
 }
