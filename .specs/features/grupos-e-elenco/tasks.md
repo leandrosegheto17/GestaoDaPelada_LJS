@@ -694,10 +694,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] `UPDATE grupos SET criado_por = ...` como `pelada_app` falha com permissão negada; o mesmo para `situacao_comercial`, `trial_inicio` e `slug`
-- [ ] `UPDATE` de `nome` e `arquivado_em` continua funcionando; a trigger de slug imutável continua barrando
-- [ ] `roles.test.ts` verde (sem asserção removida: a lista de colunas escrevíveis ganha o caso novo)
-- [ ] Gate full passa
+- [x] `UPDATE grupos SET criado_por = ...` como `pelada_app` falha com permissão negada; o mesmo para `situacao_comercial`, `trial_inicio` e `slug`
+- [x] `UPDATE` de `nome` e `arquivado_em` continua funcionando; a trigger de slug imutável continua barrando
+- [x] `roles.test.ts` verde (sem asserção removida: a lista de colunas escrevíveis ganha o caso novo)
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
