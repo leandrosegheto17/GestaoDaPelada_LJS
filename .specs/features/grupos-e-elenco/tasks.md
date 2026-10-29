@@ -280,10 +280,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] `2026-10-29` → 2016; `2027-01-01` → 2017 (o limite acompanha a virada do ano)
-- [ ] Data inválida é recusada com erro claro
-- [ ] Exportada de `@pelada/dominio`
-- [ ] Gate quick passa: `pnpm --filter @pelada/dominio test`
+- [x] `2026-10-29` → 2016; `2027-01-01` → 2017 (o limite acompanha a virada do ano)
+- [x] Data inválida é recusada com erro claro
+- [x] Exportada de `@pelada/dominio`
+- [x] Gate quick passa: `pnpm --filter @pelada/dominio test`
 
 **Tests**: unit
 **Gate**: quick
