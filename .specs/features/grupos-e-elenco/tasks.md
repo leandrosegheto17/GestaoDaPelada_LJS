@@ -530,10 +530,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] `dataCorpo` aceita corpo sem data (usa hoje na rota) e recusa campo extra
-- [ ] `corrigirPeriodoCorpo` aceita só `saida`, só `retorno` ou os dois; recusa corpo vazio de campos
-- [ ] `inicioCorpo` exige `data`; as datas são só texto AAAA-MM-DD (a validade é do domínio)
-- [ ] Gate quick passa: `pnpm --filter @pelada/contrato test`
+- [x] `dataCorpo` aceita corpo sem data (usa hoje na rota) e recusa campo extra
+- [x] `corrigirPeriodoCorpo` aceita só `saida`, só `retorno` ou os dois; recusa corpo vazio de campos
+- [x] `inicioCorpo` exige `data`; as datas são só texto AAAA-MM-DD (a validade é do domínio)
+- [x] Gate quick passa: `pnpm --filter @pelada/contrato test`
 
 **Tests**: unit
 **Gate**: quick
