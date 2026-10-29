@@ -611,12 +611,12 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Como `pelada_app` com a conta criadora: vê o grupo arquivado; com outro admin do mesmo grupo: não vê (zero linhas em `grupos` e em `jogadores`)
-- [ ] Grupo ativo continua visível aos dois admins; o ramo do slug público não mudou (grupo arquivado por slug segue a regra anterior)
-- [ ] Mesmos `SECURITY DEFINER`, `search_path` fixo e grants da função anterior; `funcoes-definer.test.ts` verde
-- [ ] Suíte de isolamento e `rls.test.ts` inteiros verdes depois da troca
-- [ ] `checar-migracao-aditiva` passa: migration nova, nenhuma editada
-- [ ] Gate full passa
+- [x] Como `pelada_app` com a conta criadora: vê o grupo arquivado; com outro admin do mesmo grupo: não vê (zero linhas em `grupos` e em `jogadores`)
+- [x] Grupo ativo continua visível aos dois admins; o ramo do slug público não mudou (grupo arquivado por slug segue a regra anterior)
+- [x] Mesmos `SECURITY DEFINER`, `search_path` fixo e grants da função anterior; `funcoes-definer.test.ts` verde
+- [x] Suíte de isolamento e `rls.test.ts` inteiros verdes depois da troca
+- [x] `checar-migracao-aditiva` passa: migration nova, nenhuma editada
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
