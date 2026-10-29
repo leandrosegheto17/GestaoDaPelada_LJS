@@ -238,3 +238,109 @@ export async function criar(
   });
   return { ok: true, id };
 }
+
+/** Trava a linha do jogador do grupo até o fim da transação (`FOR UPDATE`); de outro grupo, nula. */
+function travar(db: Db, grupoId: string, jogadorId: string) {
+  return db
+    .selectFrom('jogadores')
+    .select(['id', 'apelido', 'pontuacao_inicial', 'inicio_pontuacao'])
+    .where('grupo_id', '=', grupoId)
+    .where('id', '=', jogadorId)
+    .forUpdate()
+    .executeTakeFirst();
+}
+
+/**
+ * Edita os dados cadastrais (GEL-41): apelido, ano, posição, telefone e pontuação inicial. Pontuação omitida mantém a
+ * atual (GEL-43); mudada, audita `jogador_pontuacao_inicial_alterada` com o valor anterior e o novo (GEL-42). Não mexe
+ * em `inicio_pontuacao` nem nos períodos. Jogador de outro grupo: nulo (GEL-44).
+ */
+export async function editar(
+  db: Db,
+  grupoId: string,
+  jogadorId: string,
+  dados: Omit<DadosJogador, 'pontuacaoInicial'> & { pontuacaoInicial?: number | undefined },
+): Promise<{ ok: true } | Recusa<'apelido'> | null> {
+  const atual = await travar(db, grupoId, jogadorId);
+  if (!atual) return null;
+  if (await apelidoEmUso(db, grupoId, dados.apelido, jogadorId)) return apelidoRepetido;
+  const pontuacao = dados.pontuacaoInicial ?? atual.pontuacao_inicial;
+  try {
+    await db
+      .updateTable('jogadores')
+      .set({
+        apelido: dados.apelido,
+        ano_nascimento: dados.anoNascimento,
+        posicao: dados.posicao,
+        telefone: dados.telefone,
+        pontuacao_inicial: pontuacao,
+        alterado_por: sql<string>`app_conta_id()`,
+        alterado_em: sql<Date>`now()`,
+      })
+      .where('grupo_id', '=', grupoId)
+      .where('id', '=', jogadorId)
+      .execute();
+  } catch (erro) {
+    if (violouApelido(erro)) return apelidoRepetido;
+    throw erro;
+  }
+  if (pontuacao !== atual.pontuacao_inicial) {
+    await auditoria.registrar(db, grupoId, 'jogador_pontuacao_inicial_alterada', 'jogador', jogadorId, {
+      anterior: atual.pontuacao_inicial,
+      novo: pontuacao,
+    });
+  }
+  return { ok: true };
+}
+
+export interface ComHistorico {
+  ok: false;
+  codigo: 'jogador_com_historico';
+  apelido: string;
+}
+
+/**
+ * Exclui o jogador sem histórico (GEL-84): apaga o jogador e, pela chave com cascade, os períodos, e audita
+ * `jogador_excluido` só com o id. Com presença, nota ou pagamento mensal, recusa com `jogador_com_historico` sem
+ * apagar nada (GEL-85). A trava do jogador faz uma presença nova esperar a exclusão terminar. De outro grupo: nulo.
+ */
+export async function excluir(db: Db, grupoId: string, jogadorId: string): Promise<{ ok: true } | ComHistorico | null> {
+  const atual = await travar(db, grupoId, jogadorId);
+  if (!atual) return null;
+  const comHistorico: ComHistorico = { ok: false, codigo: 'jogador_com_historico', apelido: atual.apelido };
+  const historico = await db
+    .selectNoFrom((eb) => [
+      eb
+        .exists(
+          eb
+            .selectFrom('presencas')
+            .select('jogador_id')
+            .where('grupo_id', '=', grupoId)
+            .where('jogador_id', '=', jogadorId),
+        )
+        .as('presenca'),
+      eb
+        .exists(
+          eb
+            .selectFrom('notas')
+            .select('jogador_id')
+            .where('grupo_id', '=', grupoId)
+            .where('jogador_id', '=', jogadorId),
+        )
+        .as('nota'),
+      eb
+        .exists(
+          eb
+            .selectFrom('pagamentos_mes')
+            .select('jogador_id')
+            .where('grupo_id', '=', grupoId)
+            .where('jogador_id', '=', jogadorId),
+        )
+        .as('pagamento'),
+    ])
+    .executeTakeFirstOrThrow();
+  if (historico.presenca || historico.nota || historico.pagamento) return comHistorico;
+  await db.deleteFrom('jogadores').where('grupo_id', '=', grupoId).where('id', '=', jogadorId).execute();
+  await auditoria.registrar(db, grupoId, 'jogador_excluido', 'jogador', jogadorId);
+  return { ok: true };
+}

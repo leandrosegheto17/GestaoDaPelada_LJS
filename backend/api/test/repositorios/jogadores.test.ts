@@ -400,3 +400,128 @@ async function esperarAlguemTravadoPor(por: number): Promise<void> {
   }
   throw new Error(`ninguém chegou a esperar o backend ${por}`);
 }
+
+const EDICAO = { apelido: 'Toninho', anoNascimento: 1991, posicao: 'atacante', telefone: '11912345678' } as const;
+
+/** Partida no grupo, gravada pelo owner, com a presença do jogador. */
+async function gravarPresenca(c: Cenario, jogador: string, data: string, situacao = 'presente'): Promise<void> {
+  const { rows } = await b.owner.query<{ id: string }>(
+    `INSERT INTO partidas (grupo_id, data, criada_por, criada_em, alterada_por, alterada_em)
+     VALUES ($1, $2, $3, now(), $3, now()) RETURNING id`,
+    [c.grupo, data, c.conta],
+  );
+  await b.owner.query('INSERT INTO presencas (partida_id, jogador_id, grupo_id, situacao) VALUES ($1, $2, $3, $4)', [
+    rows[0]!.id,
+    jogador,
+    c.grupo,
+    situacao,
+  ]);
+}
+
+describe('jogadores.editar (T35; GEL-41 a GEL-44)', () => {
+  it('grava os dados novos; mudar a pontuação audita anterior e novo; não mexe em início nem períodos', async () => {
+    const c = await novoCenario();
+    const id = await criado(c, { ...NOVO, pontuacaoInicial: 10, dataEntrada: '2026-02-01' });
+    expect(await como(c.conta, (db) => jogadores.editar(db, c.grupo, id, { ...EDICAO, pontuacaoInicial: 25 }))).toEqual(
+      { ok: true },
+    );
+    expect(await linhaDe(id)).toEqual({
+      apelido: 'Toninho',
+      ano_nascimento: 1991,
+      posicao: 'atacante',
+      telefone: '11912345678',
+      pontuacao_inicial: 25,
+      inicio_pontuacao: '2026-02-01',
+    });
+    expect(await periodosDe(id)).toEqual([{ inicio: '2026-02-01', fim: null }]);
+    expect(await auditoriaDe(c.grupo, 'jogador_pontuacao_inicial_alterada')).toEqual([
+      { autor_conta_id: c.conta, entidade_id: id, resumo: { anterior: 10, novo: 25 } },
+    ]);
+  });
+
+  it('pontuação omitida mantém a atual e não audita; a mesma pontuação também não audita', async () => {
+    const c = await novoCenario();
+    const id = await criado(c, { ...NOVO, pontuacaoInicial: 33 });
+    expect(await como(c.conta, (db) => jogadores.editar(db, c.grupo, id, EDICAO))).toEqual({ ok: true });
+    expect(await como(c.conta, (db) => jogadores.editar(db, c.grupo, id, { ...EDICAO, pontuacaoInicial: 33 }))).toEqual(
+      { ok: true },
+    );
+    expect(await linhaDe(id)).toMatchObject({ pontuacao_inicial: 33, posicao: 'atacante' });
+    expect(await auditoriaDe(c.grupo, 'jogador_pontuacao_inicial_alterada')).toEqual([]);
+  });
+
+  it('apelido de outro jogador (outra caixa) é recusado e nada muda; trocar só a caixa do próprio passa', async () => {
+    const c = await novoCenario();
+    await criado(c, { ...NOVO, apelido: 'Beto' });
+    const id = await criado(c, NOVO);
+    const r = await como(c.conta, (db) => jogadores.editar(db, c.grupo, id, { ...EDICAO, apelido: 'BETO' }));
+    expect(r).toEqual({ ok: false, campo: 'apelido', mensagem: 'Já existe um jogador com esse apelido neste grupo.' });
+    expect(await linhaDe(id)).toMatchObject({ apelido: 'Toninho', posicao: 'meia' });
+    expect(await como(c.conta, (db) => jogadores.editar(db, c.grupo, id, { ...EDICAO, apelido: 'TONINHO' }))).toEqual({
+      ok: true,
+    });
+    expect(await linhaDe(id)).toMatchObject({ apelido: 'TONINHO' });
+  });
+
+  it('jogador de outro grupo: nulo e nada muda', async () => {
+    const a = await novoCenario();
+    const outro = await novoCenario();
+    const alheio = await criado(outro, NOVO);
+    expect(await como(a.conta, (db) => jogadores.editar(db, a.grupo, alheio, EDICAO))).toBeNull();
+    expect(await como(a.conta, (db) => jogadores.editar(db, outro.grupo, alheio, EDICAO))).toBeNull();
+    expect(await linhaDe(alheio)).toMatchObject({ posicao: 'meia', ano_nascimento: 1990 });
+  });
+});
+
+describe('jogadores.excluir (T35; GEL-84, GEL-85)', () => {
+  it('sem histórico: apaga o jogador e os períodos e audita jogador_excluido só com o id', async () => {
+    const c = await novoCenario();
+    const id = await gravarJogador(c, 'Engano', [
+      ['2026-01-01', '2026-02-01'],
+      ['2026-03-01', null],
+    ]);
+    expect(await como(c.conta, (db) => jogadores.excluir(db, c.grupo, id))).toEqual({ ok: true });
+    expect(await linhaDe(id)).toBeUndefined();
+    expect(await periodosDe(id)).toEqual([]);
+    expect(await auditoriaDe(c.grupo, 'jogador_excluido')).toEqual([
+      { autor_conta_id: c.conta, entidade_id: id, resumo: {} },
+    ]);
+  });
+
+  it.each([
+    ['presença', (c: Cenario, id: string) => gravarPresenca(c, id, '2026-07-02', 'lesionado')],
+    ['nota', (c: Cenario, id: string) => darNotas(c, id, [7])],
+    [
+      'pagamento mensal',
+      (c: Cenario, id: string) =>
+        b.owner
+          .query(
+            `INSERT INTO pagamentos_mes (grupo_id, jogador_id, mes, marcado_por, marcado_em)
+             VALUES ($1, $2, '2026-07', $3, now())`,
+            [c.grupo, id, c.conta],
+          )
+          .then(() => undefined),
+    ],
+  ])('com %s: jogador_com_historico com o apelido e nada apagado', async (_tipo, gravarHistorico) => {
+    const c = await novoCenario();
+    const id = await criado(c, NOVO);
+    await gravarHistorico(c, id);
+    expect(await como(c.conta, (db) => jogadores.excluir(db, c.grupo, id))).toEqual({
+      ok: false,
+      codigo: 'jogador_com_historico',
+      apelido: 'Toninho',
+    });
+    expect(await linhaDe(id)).toMatchObject({ apelido: 'Toninho' });
+    expect(await periodosDe(id)).toEqual([{ inicio: HOJE, fim: null }]);
+    expect(await auditoriaDe(c.grupo, 'jogador_excluido')).toEqual([]);
+  });
+
+  it('jogador de outro grupo: nulo e nada apagado', async () => {
+    const a = await novoCenario();
+    const outro = await novoCenario();
+    const alheio = await criado(outro, NOVO);
+    expect(await como(a.conta, (db) => jogadores.excluir(db, a.grupo, alheio))).toBeNull();
+    expect(await como(a.conta, (db) => jogadores.excluir(db, outro.grupo, alheio))).toBeNull();
+    expect(await linhaDe(alheio)).toMatchObject({ apelido: 'Toninho' });
+  });
+});

@@ -1106,11 +1106,11 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Mudar a pontuação grava `jogador_pontuacao_inicial_alterada` com valor anterior e novo; omitir mantém; editar não mexe em `inicio_pontuacao` nem em períodos
-- [ ] Excluir jogador sem histórico apaga jogador e períodos e audita `jogador_excluido`
-- [ ] Excluir com presença, com nota ou com pagamento mensal → erro `jogador_com_historico` e nada apagado (um teste por tipo de histórico)
-- [ ] Jogador de outro grupo → nulo (404 na rota)
-- [ ] Gate full passa
+- [x] Mudar a pontuação grava `jogador_pontuacao_inicial_alterada` com valor anterior e novo; omitir mantém; editar não mexe em `inicio_pontuacao` nem em períodos
+- [x] Excluir jogador sem histórico apaga jogador e períodos e audita `jogador_excluido`
+- [x] Excluir com presença, com nota ou com pagamento mensal → erro `jogador_com_historico` e nada apagado (um teste por tipo de histórico)
+- [x] Jogador de outro grupo → nulo (404 na rota)
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
