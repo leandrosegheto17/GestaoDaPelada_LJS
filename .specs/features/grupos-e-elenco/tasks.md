@@ -1191,10 +1191,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Inativar jogador ativo com data válida fecha o período nessa data; sem data usa `hoje`; já inativo → erro `ja_inativo` sem alterar
-- [ ] Presença em 01/10 e saída em 30/09 → 422 com a mensagem do GEL-68 e a data mínima 02/10 (presença criada direto no banco pelo teste)
-- [ ] Auditoria `jogador_inativado` na mesma transação: se a auditoria falha, o período não muda
-- [ ] Gate full passa
+- [x] Inativar jogador ativo com data válida fecha o período nessa data; sem data usa `hoje`; já inativo → erro `ja_inativo` sem alterar
+- [x] Presença em 01/10 e saída em 30/09 → 422 com a mensagem do GEL-68 e a data mínima 02/10 (presença criada direto no banco pelo teste)
+- [x] Auditoria `jogador_inativado` na mesma transação: se a auditoria falha, o período não muda
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full

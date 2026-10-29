@@ -525,3 +525,123 @@ describe('jogadores.excluir (T35; GEL-84, GEL-85)', () => {
     expect(await linhaDe(alheio)).toMatchObject({ apelido: 'Toninho' });
   });
 });
+
+const HOJE_P = '2026-10-29';
+
+/** Jogador criado pelo repositório com entrada em `entrada` (período aberto desde ela). */
+async function jogadorDesde(c: Cenario, entrada: string, apelido = `J ${randomUUID().slice(0, 6)}`): Promise<string> {
+  return criado(c, { ...NOVO, apelido, dataEntrada: entrada }, HOJE_P);
+}
+
+describe('jogadores.inativar (T38; GEL-51 a GEL-53, GEL-58, GEL-68, GEL-109)', () => {
+  it('jogador ativo com data válida: fecha o período aberto nessa data e audita jogador_inativado', async () => {
+    const c = await novoCenario();
+    const id = await jogadorDesde(c, '2026-09-01');
+    expect(await como(c.conta, (db) => jogadores.inativar(db, c.grupo, id, '2026-10-05', HOJE_P))).toEqual({
+      ok: true,
+    });
+    expect(await periodosDe(id)).toEqual([{ inicio: '2026-09-01', fim: '2026-10-05' }]);
+    const auditado = await auditoriaDe(c.grupo, 'jogador_inativado');
+    expect(auditado).toEqual([
+      { autor_conta_id: c.conta, entidade_id: id, resumo: { periodo: expect.any(String), saida: '2026-10-05' } },
+    ]);
+  });
+
+  it('sem data: usa hoje (do parâmetro)', async () => {
+    const c = await novoCenario();
+    const id = await jogadorDesde(c, '2026-09-01');
+    expect(await como(c.conta, (db) => jogadores.inativar(db, c.grupo, id, undefined, HOJE_P))).toEqual({ ok: true });
+    expect(await periodosDe(id)).toEqual([{ inicio: '2026-09-01', fim: HOJE_P }]);
+  });
+
+  it('já inativo: ja_inativo, sem alterar nada nem auditar', async () => {
+    const c = await novoCenario();
+    const id = await jogadorDesde(c, '2026-09-01');
+    await como(c.conta, (db) => jogadores.inativar(db, c.grupo, id, '2026-10-05', HOJE_P));
+    expect(await como(c.conta, (db) => jogadores.inativar(db, c.grupo, id, '2026-10-20', HOJE_P))).toEqual({
+      ok: false,
+      codigo: 'ja_inativo',
+    });
+    expect(await periodosDe(id)).toEqual([{ inicio: '2026-09-01', fim: '2026-10-05' }]);
+    expect(await auditoriaDe(c.grupo, 'jogador_inativado')).toHaveLength(1);
+  });
+
+  it('presença em 01/10 e saída em 30/09: recusa com a mensagem do GEL-68 e a data mínima 02/10', async () => {
+    const c = await novoCenario();
+    const id = await jogadorDesde(c, '2026-09-01');
+    await gravarPresenca(c, id, '2026-10-01');
+    expect(await como(c.conta, (db) => jogadores.inativar(db, c.grupo, id, '2026-09-30', HOJE_P))).toEqual({
+      ok: false,
+      campo: 'saida',
+      mensagem:
+        'Há presença do jogador em 01/10/2026. A saída precisa ser em 02/10/2026 ou depois. Para usar uma data anterior, remova a presença em Editar partida.',
+    });
+    expect(await periodosDe(id)).toEqual([{ inicio: '2026-09-01', fim: null }]);
+    // Na data mínima, passa.
+    expect(await como(c.conta, (db) => jogadores.inativar(db, c.grupo, id, '2026-10-02', HOJE_P))).toEqual({
+      ok: true,
+    });
+  });
+
+  it.each([
+    ['data inválida', '2026-02-30', 'Informe uma data válida.'],
+    ['data futura', '2026-10-30', 'A data não pode ser no futuro.'],
+    ['antes do início do período', '2026-08-31', 'A saída não pode ser antes do início deste período (01/09/2026).'],
+  ])('%s: recusa com a regra do domínio e nada muda (GEL-58)', async (_caso, data, mensagem) => {
+    const c = await novoCenario();
+    const id = await jogadorDesde(c, '2026-09-01');
+    expect(await como(c.conta, (db) => jogadores.inativar(db, c.grupo, id, data, HOJE_P))).toEqual({
+      ok: false,
+      campo: 'saida',
+      mensagem,
+    });
+    expect(await periodosDe(id)).toEqual([{ inicio: '2026-09-01', fim: null }]);
+  });
+
+  it('auditoria na mesma transação: se ela falha, o período não muda', async () => {
+    const c = await novoCenario();
+    const id = await jogadorDesde(c, '2026-09-01');
+    await b.owner.query(`
+      CREATE FUNCTION auditoria_falha_teste() RETURNS trigger LANGUAGE plpgsql AS
+      $$ BEGIN RAISE EXCEPTION 'auditoria fora do ar'; END $$;
+      CREATE TRIGGER auditoria_falha_teste BEFORE INSERT ON auditoria
+        FOR EACH ROW WHEN (NEW.acao = 'jogador_inativado') EXECUTE FUNCTION auditoria_falha_teste();
+    `);
+    try {
+      await expect(como(c.conta, (db) => jogadores.inativar(db, c.grupo, id, '2026-10-05', HOJE_P))).rejects.toThrow(
+        'auditoria fora do ar',
+      );
+    } finally {
+      await b.owner.query('DROP TRIGGER auditoria_falha_teste ON auditoria; DROP FUNCTION auditoria_falha_teste();');
+    }
+    expect(await periodosDe(id)).toEqual([{ inicio: '2026-09-01', fim: null }]);
+  });
+
+  it('trava a linha do jogador antes de ler (FOR UPDATE): outra transação que trava o jogador espera', async () => {
+    const c = await novoCenario();
+    const id = await jogadorDesde(c, '2026-09-01');
+    const outra = new pg.Client({ connectionString: b.banco.url });
+    await outra.connect();
+    try {
+      const pid = (await outra.query<{ pid: number }>('SELECT pg_backend_pid() AS pid')).rows[0]!.pid;
+      await outra.query('BEGIN');
+      await outra.query('SELECT 1 FROM jogadores WHERE id = $1 FOR UPDATE', [id]);
+      const pedido = como(c.conta, (db) => jogadores.inativar(db, c.grupo, id, '2026-10-05', HOJE_P));
+      await esperarAlguemTravadoPor(pid);
+      // Enquanto espera, a outra transação fecha o período: o pedido é avaliado sobre isso (já inativo).
+      await outra.query("UPDATE periodos_ativos SET fim = '2026-10-01' WHERE jogador_id = $1", [id]);
+      await outra.query('COMMIT');
+      expect(await pedido).toEqual({ ok: false, codigo: 'ja_inativo' });
+    } finally {
+      await outra.end();
+    }
+  });
+
+  it('jogador de outro grupo: nulo e nada muda', async () => {
+    const a = await novoCenario();
+    const outro = await novoCenario();
+    const alheio = await jogadorDesde(outro, '2026-09-01');
+    expect(await como(a.conta, (db) => jogadores.inativar(db, a.grupo, alheio, '2026-10-05', HOJE_P))).toBeNull();
+    expect(await periodosDe(alheio)).toEqual([{ inicio: '2026-09-01', fim: null }]);
+  });
+});

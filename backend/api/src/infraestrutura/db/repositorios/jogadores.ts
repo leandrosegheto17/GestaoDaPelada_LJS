@@ -1,4 +1,10 @@
-import { calcularNivel, compararApelido } from '@pelada/dominio';
+import {
+  avaliarPeriodos,
+  calcularNivel,
+  compararApelido,
+  type CampoPeriodo,
+  type PresencaJogador,
+} from '@pelada/dominio';
 import { sql } from 'kysely';
 import type { Db } from '../index.ts';
 import type { Posicao } from '../tipos.ts';
@@ -342,5 +348,88 @@ export async function excluir(db: Db, grupoId: string, jogadorId: string): Promi
   if (historico.presenca || historico.nota || historico.pagamento) return comHistorico;
   await db.deleteFrom('jogadores').where('grupo_id', '=', grupoId).where('id', '=', jogadorId).execute();
   await auditoria.registrar(db, grupoId, 'jogador_excluido', 'jogador', jogadorId);
+  return { ok: true };
+}
+
+/** Recusa de uma regra de período, no campo do domínio (`saida`, `retorno` ou `data`, GEL-58, GEL-62 a GEL-69). */
+export type RecusaPeriodo = Recusa<CampoPeriodo | 'data'>;
+
+/** Jogador travado e o que as regras de período leem: períodos, presenças e início da pontuação. */
+interface Travado {
+  apelido: string;
+  periodos: PeriodoLido[];
+  presencas: PresencaJogador[];
+  inicioPontuacao: string;
+  inicioPontuacaoGravado: string | null;
+}
+
+/**
+ * Trava o jogador (`FOR UPDATE`) e só então lê os períodos e as presenças (data da partida e situação) (GEL-109):
+ * uma segunda escrita de período do mesmo jogador espera a trava e é avaliada sobre o que a primeira gravou
+ * (GEL-110). De outro grupo, nulo.
+ */
+async function travarParaPeriodo(db: Db, grupoId: string, jogadorId: string, hoje: string): Promise<Travado | null> {
+  const j = await travar(db, grupoId, jogadorId);
+  if (!j) return null;
+  const periodos = await db
+    .selectFrom('periodos_ativos')
+    .select(['id', 'inicio', 'fim'])
+    .where('grupo_id', '=', grupoId)
+    .where('jogador_id', '=', jogadorId)
+    .orderBy('inicio')
+    .execute();
+  const presencas = await db
+    .selectFrom('presencas as pr')
+    .innerJoin('partidas as pa', (jn) =>
+      jn.onRef('pa.id', '=', 'pr.partida_id').onRef('pa.grupo_id', '=', 'pr.grupo_id'),
+    )
+    .select(['pa.data', 'pr.situacao'])
+    .where('pr.grupo_id', '=', grupoId)
+    .where('pr.jogador_id', '=', jogadorId)
+    .execute();
+  return {
+    apelido: j.apelido,
+    periodos,
+    presencas,
+    // Nula em dado antigo = início do primeiro período; sem período nenhum, a regra que a usa não se aplica.
+    inicioPontuacao: j.inicio_pontuacao ?? periodos[0]?.inicio ?? hoje,
+    inicioPontuacaoGravado: j.inicio_pontuacao,
+  };
+}
+
+export type ResultadoInativar = { ok: true } | { ok: false; codigo: 'ja_inativo' } | RecusaPeriodo | null;
+
+/**
+ * Inativa o jogador ativo (GEL-51 a GEL-53, GEL-58, GEL-109): com a linha travada, avalia a saída (sem data, `hoje`)
+ * pelas regras de período do domínio, encerra o período aberto nessa data e audita `jogador_inativado` na mesma
+ * transação. Já inativo: `ja_inativo`, sem alterar nada. De outro grupo: nulo.
+ */
+export async function inativar(
+  db: Db,
+  grupoId: string,
+  jogadorId: string,
+  data: string | undefined,
+  hoje: string,
+): Promise<ResultadoInativar> {
+  const j = await travarParaPeriodo(db, grupoId, jogadorId, hoje);
+  if (!j) return null;
+  const aberto = j.periodos.find((p) => p.fim === null);
+  if (!aberto) return { ok: false, codigo: 'ja_inativo' };
+  const saida = data ?? hoje;
+  const avaliacao = avaliarPeriodos({
+    periodos: j.periodos,
+    operacao: { tipo: 'inativar', data: saida },
+    hoje,
+    inicioPontuacao: j.inicioPontuacao,
+    presencas: j.presencas,
+  });
+  if (!avaliacao.ok) return { ok: false, campo: avaliacao.campo, mensagem: avaliacao.mensagem };
+  await db
+    .updateTable('periodos_ativos')
+    .set({ fim: saida })
+    .where('grupo_id', '=', grupoId)
+    .where('id', '=', aberto.id)
+    .execute();
+  await auditoria.registrar(db, grupoId, 'jogador_inativado', 'jogador', jogadorId, { periodo: aberto.id, saida });
   return { ok: true };
 }
