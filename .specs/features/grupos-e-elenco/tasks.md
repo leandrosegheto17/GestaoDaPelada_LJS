@@ -557,9 +557,9 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Nome de 1 e 31 caracteres recusado com "O nome precisa ter de 2 a 30 caracteres."
-- [ ] Nota 0, 11, 5,5 e texto recusadas no campo `nota`; 1, 10 e `null` aceitas
-- [ ] Gate quick passa: `pnpm --filter @pelada/contrato test`
+- [x] Nome de 1 e 31 caracteres recusado com "O nome precisa ter de 2 a 30 caracteres."
+- [x] Nota 0, 11, 5,5 e texto recusadas no campo `nota`; 1, 10 e `null` aceitas
+- [x] Gate quick passa: `pnpm --filter @pelada/contrato test`
 
 **Tests**: unit
 **Gate**: quick
