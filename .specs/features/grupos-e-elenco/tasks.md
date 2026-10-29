@@ -227,10 +227,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] 8, 7, 6, 7, 8, 5 → 683; sem nota → `{ nivel: 550, semNota: true }`
-- [ ] Meio para cima: média 6,845 → 685 (caso de arredondamento testado)
-- [ ] Uma única nota (10 → 1000) e todas iguais
-- [ ] Gate quick passa: `pnpm --filter @pelada/dominio test`
+- [x] 8, 7, 6, 7, 8, 5 → 683; sem nota → `{ nivel: 550, semNota: true }`
+- [x] Meio para cima: média 6,845 → 685 (caso de arredondamento testado)
+- [x] Uma única nota (10 → 1000) e todas iguais
+- [x] Gate quick passa: `pnpm --filter @pelada/dominio test`
 
 **Tests**: unit
 **Gate**: quick
