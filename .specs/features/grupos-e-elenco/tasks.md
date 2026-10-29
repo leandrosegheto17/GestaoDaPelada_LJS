@@ -473,11 +473,11 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Nome de 2 e 61 caracteres recusado com "O nome precisa ter de 3 a 60 caracteres."; espaços das pontas não contam
-- [ ] Dia, frequência e horário inválidos recusados no campo certo; "Informe o horário." (ausente) e "Horário inválido." (fora de HH:MM, inclusive 24:00 e 12:60)
-- [ ] Corpo com `slug` ou `urlPublica` é recusado (strict)
-- [ ] `arquivarCorpo` exige `nomeConfirmacao` string; o texto da divergência (GEL-23) fica na rota
-- [ ] Gate quick passa: `pnpm --filter @pelada/contrato test`
+- [x] Nome de 2 e 61 caracteres recusado com "O nome precisa ter de 3 a 60 caracteres."; espaços das pontas não contam
+- [x] Dia, frequência e horário inválidos recusados no campo certo; "Informe o horário." (ausente) e "Horário inválido." (fora de HH:MM, inclusive 24:00 e 12:60)
+- [x] Corpo com `slug` ou `urlPublica` é recusado (strict)
+- [x] `arquivarCorpo` exige `nomeConfirmacao` string; o texto da divergência (GEL-23) fica na rota
+- [x] Gate quick passa: `pnpm --filter @pelada/contrato test`
 
 **Tests**: unit
 **Gate**: quick
