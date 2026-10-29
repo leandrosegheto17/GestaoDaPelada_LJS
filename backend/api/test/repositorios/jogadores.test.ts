@@ -883,3 +883,88 @@ describe('jogadores.corrigirPeriodo (T40; GEL-71 a GEL-75)', () => {
     }
   });
 });
+
+describe('jogadores.alterarInicio (T41; GEL-77 a GEL-83)', () => {
+  /** Entrou em 05/02, saiu em 01/03 e voltou em 01/04. */
+  const comDoisPeriodos = (c: Cenario) =>
+    gravarJogador(
+      c,
+      `Inicio ${randomUUID().slice(0, 6)}`,
+      [
+        ['2026-02-05', '2026-03-01'],
+        ['2026-04-01', null],
+      ],
+      { inicio: '2026-02-05' },
+    );
+
+  it('recuar de 05/02 para 01/02 move o início do primeiro período, deixa o resto e audita anterior e nova', async () => {
+    const c = await novoCenario();
+    const id = await comDoisPeriodos(c);
+    expect(await como(c.conta, (db) => jogadores.alterarInicio(db, c.grupo, id, '2026-02-01', HOJE_P))).toEqual({
+      ok: true,
+      alterado: true,
+    });
+    expect(await linhaDe(id)).toMatchObject({ inicio_pontuacao: '2026-02-01' });
+    expect(await periodosDe(id)).toEqual([
+      { inicio: '2026-02-01', fim: '2026-03-01' },
+      { inicio: '2026-04-01', fim: null },
+    ]);
+    expect(await auditoriaDe(c.grupo, 'jogador_inicio_alterado')).toEqual([
+      { autor_conta_id: c.conta, entidade_id: id, resumo: { anterior: '2026-02-05', nova: '2026-02-01' } },
+    ]);
+  });
+
+  it('avançar dentro do primeiro período muda só o início da pontuação', async () => {
+    const c = await novoCenario();
+    const id = await comDoisPeriodos(c);
+    expect(await como(c.conta, (db) => jogadores.alterarInicio(db, c.grupo, id, '2026-02-20', HOJE_P))).toEqual({
+      ok: true,
+      alterado: true,
+    });
+    expect(await linhaDe(id)).toMatchObject({ inicio_pontuacao: '2026-02-20' });
+    expect(await periodosDe(id)).toEqual([
+      { inicio: '2026-02-05', fim: '2026-03-01' },
+      { inicio: '2026-04-01', fim: null },
+    ]);
+  });
+
+  it('data igual à atual: sem gravar e sem auditar (GEL-82)', async () => {
+    const c = await novoCenario();
+    const id = await comDoisPeriodos(c);
+    const antes = (await b.owner.query('SELECT alterado_em FROM jogadores WHERE id = $1', [id])).rows;
+    expect(await como(c.conta, (db) => jogadores.alterarInicio(db, c.grupo, id, '2026-02-05', HOJE_P))).toEqual({
+      ok: true,
+      alterado: false,
+    });
+    expect((await b.owner.query('SELECT alterado_em FROM jogadores WHERE id = $1', [id])).rows).toEqual(antes);
+    expect(await auditoriaDe(c.grupo, 'jogador_inicio_alterado')).toEqual([]);
+  });
+
+  it.each([
+    [
+      'depois da saída do primeiro período',
+      '2026-03-02',
+      'A data de início não pode ficar depois da saída do primeiro período (01/03/2026). Corrija antes a data de saída do primeiro período.',
+    ],
+    ['antes de 01/01/2000', '1999-12-31', 'A data de início não pode ser anterior a 01/01/2000.'],
+    ['no futuro', '2026-10-30', 'A data não pode ser no futuro.'],
+  ])('%s: recusa no campo data e nada muda', async (_caso, data, mensagem) => {
+    const c = await novoCenario();
+    const id = await comDoisPeriodos(c);
+    expect(await como(c.conta, (db) => jogadores.alterarInicio(db, c.grupo, id, data, HOJE_P))).toEqual({
+      ok: false,
+      campo: 'data',
+      mensagem,
+    });
+    expect(await linhaDe(id)).toMatchObject({ inicio_pontuacao: '2026-02-05' });
+    expect(await auditoriaDe(c.grupo, 'jogador_inicio_alterado')).toEqual([]);
+  });
+
+  it('jogador de outro grupo: nulo e nada muda', async () => {
+    const a = await novoCenario();
+    const outro = await novoCenario();
+    const alheio = await comDoisPeriodos(outro);
+    expect(await como(a.conta, (db) => jogadores.alterarInicio(db, a.grupo, alheio, '2026-02-01', HOJE_P))).toBeNull();
+    expect(await linhaDe(alheio)).toMatchObject({ inicio_pontuacao: '2026-02-05' });
+  });
+});

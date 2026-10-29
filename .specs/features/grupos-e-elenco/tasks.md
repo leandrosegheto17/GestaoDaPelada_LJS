@@ -1272,10 +1272,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Recuar de 05/02 para 01/02 move o início do primeiro período e deixa os encerrados; audita `jogador_inicio_alterado` com anterior e nova
-- [ ] Data igual à atual → 200 sem gravar e sem auditar
-- [ ] Data depois da saída do primeiro período → 422 com a mensagem do GEL-80
-- [ ] Gate full passa
+- [x] Recuar de 05/02 para 01/02 move o início do primeiro período e deixa os encerrados; audita `jogador_inicio_alterado` com anterior e nova
+- [x] Data igual à atual → 200 sem gravar e sem auditar
+- [x] Data depois da saída do primeiro período → 422 com a mensagem do GEL-80
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full

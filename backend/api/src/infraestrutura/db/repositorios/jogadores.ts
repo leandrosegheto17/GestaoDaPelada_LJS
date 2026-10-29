@@ -1,4 +1,5 @@
 import {
+  avaliarInicio,
   avaliarPeriodos,
   calcularNivel,
   compararApelido,
@@ -524,4 +525,46 @@ export async function corrigirPeriodo(
     .map((p) => (p.id === periodoId ? { ...p, ...depois } : p))
     .sort((a, b) => (a.inicio < b.inicio ? -1 : a.inicio > b.inicio ? 1 : 0));
   return { ok: true, alterado: true, periodos };
+}
+
+export type ResultadoInicio = { ok: true; alterado: boolean } | Recusa<'data'> | null;
+
+/**
+ * Altera a data de início da pontuação (GEL-77 a GEL-82): único escritor de `inicio_pontuacao` além do cadastro
+ * (GEL-83). Com a linha travada, avalia pelo domínio; data anterior ao início do primeiro período o recua, sem mudar
+ * os períodos encerrados (GEL-81). Audita `jogador_inicio_alterado` com a anterior e a nova. Igual à atual: sem gravar
+ * nem auditar (GEL-82). De outro grupo: nulo.
+ */
+export async function alterarInicio(
+  db: Db,
+  grupoId: string,
+  jogadorId: string,
+  data: string,
+  hoje: string,
+): Promise<ResultadoInicio> {
+  const j = await travarParaPeriodo(db, grupoId, jogadorId, hoje);
+  if (!j) return null;
+  const avaliacao = avaliarInicio({ data, periodos: j.periodos, inicioAtual: j.inicioPontuacao, hoje });
+  if (!avaliacao.ok) return { ok: false, campo: 'data', mensagem: avaliacao.mensagem };
+  if (!avaliacao.alterado) return { ok: true, alterado: false };
+  await db
+    .updateTable('jogadores')
+    .set({ inicio_pontuacao: data, alterado_por: sql<string>`app_conta_id()`, alterado_em: sql<Date>`now()` })
+    .where('grupo_id', '=', grupoId)
+    .where('id', '=', jogadorId)
+    .execute();
+  const primeiro = j.periodos[0];
+  if (avaliacao.recuarPrimeiroPeriodo && primeiro) {
+    await db
+      .updateTable('periodos_ativos')
+      .set({ inicio: data })
+      .where('grupo_id', '=', grupoId)
+      .where('id', '=', primeiro.id)
+      .execute();
+  }
+  await auditoria.registrar(db, grupoId, 'jogador_inicio_alterado', 'jogador', jogadorId, {
+    anterior: j.inicioPontuacao,
+    nova: data,
+  });
+  return { ok: true, alterado: true };
 }
