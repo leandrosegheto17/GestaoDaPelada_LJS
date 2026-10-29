@@ -12,15 +12,8 @@ const RAIZ = process.argv[2] ?? process.cwd();
 
 const REPOSITORIO = 'backend/api/src/infraestrutura/db/repositorios/jogadores.ts';
 const MIGRACOES = 'backend/api/src/infraestrutura/db/migracoes/';
-// SPEC_DEVIATION: o design (C7) só libera o repositório de jogadores e as migrations. O seed local grava períodos
-// direto como owner, só no banco de desenvolvimento; fica como exceção com motivo até a T52 refazer o seed.
-/** Exceções com motivo: o arquivo inteiro. */
-const EXCECOES = [
-  {
-    arquivo: 'backend/api/src/infraestrutura/db/repositorios/seed-local.ts',
-    motivo: 'Seed só do banco local (`pnpm seed`), como owner; grava dados de exemplo, nunca roda na API.',
-  },
-];
+/** Exceções com motivo: o arquivo inteiro. Nenhuma: o seed local grava períodos pelo repositório de jogadores (T52). */
+const EXCECOES = [];
 
 const CODIGO = /\.(ts|tsx|mts|cts|js|jsx|mjs|cjs|sql)$/i;
 const TESTE = /(^|\/)(test|tests|e2e|__tests__)\/|\.(test|spec)\.[a-z]+$/i;

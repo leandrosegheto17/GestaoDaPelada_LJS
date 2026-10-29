@@ -1572,10 +1572,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] `pnpm seed` num banco migrado cria o grupo, 4 jogadores (1 inativo com dois períodos) e notas
-- [ ] Rodar o seed duas vezes não duplica nada
-- [ ] Teste do seed verde (`backend/scripts/test`)
-- [ ] Gate full passa
+- [x] `pnpm seed` num banco migrado cria o grupo, 4 jogadores (1 inativo com dois períodos) e notas
+- [x] Rodar o seed duas vezes não duplica nada
+- [x] Teste do seed verde (`backend/scripts/test`)
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
