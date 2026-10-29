@@ -1545,10 +1545,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Conta admin do grupo A, ids do grupo B: 404 em jogador (GET, PATCH, DELETE, inativar, reativar, inicio, notas), período (PATCH) e habilidade (PATCH, DELETE, notas) e nada do grupo B muda
-- [ ] Uma asserção de estado do grupo B por rota (linha continua igual)
-- [ ] Teste roda como `pelada_app`
-- [ ] Gate full passa
+- [x] Conta admin do grupo A, ids do grupo B: 404 em jogador (GET, PATCH, DELETE, inativar, reativar, inicio, notas), período (PATCH) e habilidade (PATCH, DELETE, notas) e nada do grupo B muda
+- [x] Uma asserção de estado do grupo B por rota (linha continua igual)
+- [x] Teste roda como `pelada_app`
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
