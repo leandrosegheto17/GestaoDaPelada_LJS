@@ -19,6 +19,7 @@ import { rotaAdmins } from './rotas/admins.ts';
 import { rotaDevEmails } from './rotas/dev-emails.ts';
 import { rotaGrupos } from './rotas/grupos.ts';
 import { rotaJogadores } from './rotas/jogadores.ts';
+import { rotaPeriodos } from './rotas/periodos.ts';
 import { rotaConvites } from './rotas/convites.ts';
 import { rotaContaMinha } from './rotas/conta-minha.ts';
 import { rotaContaCadastro } from './rotas/conta-cadastro.ts';
@@ -125,6 +126,7 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<AppEnv> {
   app.route('/', rotaAdmins);
   app.route('/', rotaGrupos);
   app.route('/', rotaJogadores);
+  app.route('/', rotaPeriodos);
   app.route('/', rotaDevEmails);
 
   app.notFound((c) => naoEncontrado(c));

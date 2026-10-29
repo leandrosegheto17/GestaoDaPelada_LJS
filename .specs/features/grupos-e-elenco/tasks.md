@@ -1299,11 +1299,11 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Inativar → 200; segunda vez → 409 "O jogador já está inativo."; reativar ativo → 409 "O jogador já está ativo."
-- [ ] Data inválida, futura e de ordem → 422 com as mensagens do domínio no campo `data`; hoje vem do `Relogio`
-- [ ] Jogador de outro grupo → 404; grupo arquivado → 409 `grupo_arquivado`
-- [ ] Casos `grupo` das duas rotas em `casos.ts`
-- [ ] Gate full passa
+- [x] Inativar → 200; segunda vez → 409 "O jogador já está inativo."; reativar ativo → 409 "O jogador já está ativo."
+- [x] Data inválida, futura e de ordem → 422 com as mensagens do domínio no campo `data`; hoje vem do `Relogio`
+- [x] Jogador de outro grupo → 404; grupo arquivado → 409 `grupo_arquivado`
+- [x] Casos `grupo` das duas rotas em `casos.ts`
+- [x] Gate full passa
 
 **Tests**: e2e
 **Gate**: full

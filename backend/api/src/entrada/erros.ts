@@ -27,6 +27,9 @@ export const CODIGOS_ERRO = {
   soQuemCriou: 'so_quem_criou',
   // grupos-e-elenco (GEL-85): excluir jogador com histórico; a sugestão é inativar.
   jogadorComHistorico: 'jogador_com_historico',
+  // grupos-e-elenco (GEL-53, GEL-56): inativar quem já está inativo, reativar quem já está ativo.
+  jaInativo: 'ja_inativo',
+  jaAtivo: 'ja_ativo',
 } as const;
 
 /** Erro padrão da API: `{ erro: { codigo, mensagem, campos? } }`. */
