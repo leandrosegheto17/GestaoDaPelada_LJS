@@ -1,4 +1,4 @@
-import { criarGrupoResposta, gruposResposta } from '@pelada/contrato';
+import { criarGrupoResposta, grupoDetalhe, gruposResposta } from '@pelada/contrato';
 import { env } from 'cloudflare:test';
 import { sql } from 'kysely';
 import { describe, expect, it } from 'vitest';
@@ -177,5 +177,133 @@ describe('a API cria o grupo como pelada_app (GEL-112)', () => {
       return rows;
     });
     expect(papel).toEqual([{ usuario: 'pelada_app', ignora: false }]);
+  });
+});
+
+describe('GET /api/grupos/:grupoId (GEL-20, GEL-21)', () => {
+  it('devolve dados, link público, contagens e souCriador (verdadeiro só para a criadora)', async () => {
+    const criadora = await criarSessao();
+    const criado = (await pedir('POST', '/api/grupos', valido('Detalhe do Grupo'), { cookie: criadora.cookie }))
+      .corpo as Criado;
+    const r = await pedir('GET', `/api/grupos/${criado.id}`, undefined, { cookie: criadora.cookie });
+    expect(r.status).toBe(200);
+    expect(grupoDetalhe.safeParse(r.corpo).success).toBe(true);
+    expect(r.corpo).toEqual({
+      id: criado.id,
+      nome: 'Detalhe do Grupo',
+      slug: criado.slug,
+      linkPublico: `${env.URL_PUBLICA}/g/${criado.slug}`,
+      diaSemana: 'quinta',
+      frequencia: 'semanal',
+      horario: '20:30',
+      jogadoresAtivos: 0,
+      habilidades: 6,
+      admins: 1,
+      souCriador: true,
+    });
+
+    // Outra admin, por convite: souCriador falso e dois admins.
+    const outra = await criarSessao({
+      conta: criadora.contaId,
+      grupo: criado.id,
+      slug: criado.slug,
+      jogador: '',
+      habilidade: '',
+      partida: '',
+      lancamento: '',
+    });
+    const visto = await pedir('GET', `/api/grupos/${criado.id}`, undefined, { cookie: outra.cookie });
+    expect(visto.corpo).toMatchObject({ souCriador: false, admins: 2 });
+  });
+
+  it('conta jogadores ativos (com período aberto) e não os inativos', async () => {
+    const s = await criarSessao();
+    const criado = (await pedir('POST', '/api/grupos', valido(), { cookie: s.cookie })).corpo as Criado;
+    await noBanco(s.contaId, async (db) => {
+      for (const [apelido, fim] of [
+        ['Ativo Um', null],
+        ['Ativo Dois', null],
+        ['Saiu', '2026-02-01'],
+      ] as const) {
+        const j = await db
+          .insertInto('jogadores')
+          .values({
+            grupo_id: criado.id,
+            apelido,
+            criado_por: s.contaId,
+            criado_em: sql<Date>`now()`,
+            alterado_por: s.contaId,
+            alterado_em: sql<Date>`now()`,
+          })
+          .returning('id')
+          .executeTakeFirstOrThrow();
+        await db
+          .insertInto('periodos_ativos')
+          .values({ grupo_id: criado.id, jogador_id: j.id, inicio: '2026-01-01', fim })
+          .execute();
+      }
+    });
+    const r = await pedir('GET', `/api/grupos/${criado.id}`, undefined, { cookie: s.cookie });
+    expect(r.corpo).toMatchObject({ jogadoresAtivos: 2 });
+  });
+
+  it('conta sem vínculo: 404 no GET e no PATCH, e nada muda (GEL-21)', async () => {
+    const dona = await criarSessao();
+    const criado = (await pedir('POST', '/api/grupos', valido('Grupo Alheio'), { cookie: dona.cookie }))
+      .corpo as Criado;
+    const estranha = await criarSessao();
+    const get = await pedir('GET', `/api/grupos/${criado.id}`, undefined, { cookie: estranha.cookie });
+    const patch = await pedir('PATCH', `/api/grupos/${criado.id}`, valido('Invadido'), { cookie: estranha.cookie });
+    expect([get.status, patch.status]).toEqual([404, 404]);
+    expect(await comoOwner('SELECT nome FROM grupos WHERE id = $1', [criado.id])).toEqual([{ nome: 'Grupo Alheio' }]);
+  });
+});
+
+describe('PATCH /api/grupos/:grupoId (GEL-16, GEL-18, GEL-19)', () => {
+  it('válido: 200 com os dados novos e slug e link público inalterados', async () => {
+    const s = await criarSessao();
+    const criado = (await pedir('POST', '/api/grupos', valido('Antes da Edicao'), { cookie: s.cookie }))
+      .corpo as Criado;
+    const r = await pedir(
+      'PATCH',
+      `/api/grupos/${criado.id}`,
+      { nome: '  Depois da Edicao  ', diaSemana: 'sabado', frequencia: 'quinzenal', horario: '09:15' },
+      { cookie: s.cookie },
+    );
+    expect(r.status).toBe(200);
+    expect(r.corpo).toMatchObject({
+      id: criado.id,
+      nome: 'Depois da Edicao',
+      diaSemana: 'sabado',
+      frequencia: 'quinzenal',
+      horario: '09:15',
+      slug: criado.slug,
+      linkPublico: criado.linkPublico,
+    });
+  });
+
+  it('slug no corpo: 422 e o grupo não muda (GEL-07, GEL-16)', async () => {
+    const s = await criarSessao();
+    const criado = (await pedir('POST', '/api/grupos', valido('Slug Fixo'), { cookie: s.cookie })).corpo as Criado;
+    const r = await pedir(
+      'PATCH',
+      `/api/grupos/${criado.id}`,
+      { ...valido('Slug Fixo 2'), slug: 'novo' },
+      {
+        cookie: s.cookie,
+      },
+    );
+    expect(r.status).toBe(422);
+    expect(await comoOwner('SELECT nome, slug FROM grupos WHERE id = $1', [criado.id])).toEqual([
+      { nome: 'Slug Fixo', slug: criado.slug },
+    ]);
+  });
+
+  it('campo inválido: 422 com a mesma mensagem da criação (GEL-19)', async () => {
+    const s = await criarSessao();
+    const criado = (await pedir('POST', '/api/grupos', valido(), { cookie: s.cookie })).corpo as Criado;
+    const r = await pedir('PATCH', `/api/grupos/${criado.id}`, { ...valido(), nome: 'AB' }, { cookie: s.cookie });
+    expect(r.status).toBe(422);
+    expect(r.corpo).toMatchObject({ erro: { campos: { nome: 'O nome precisa ter de 3 a 60 caracteres.' } } });
   });
 });

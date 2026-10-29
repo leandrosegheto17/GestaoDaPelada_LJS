@@ -967,10 +967,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] `PATCH` válido → 200 com slug e link públicos inalterados; `slug` no corpo → 422
-- [ ] `GET` devolve contagens e `souCriador`; conta sem vínculo → 404 nas duas rotas
-- [ ] Casos `grupo` das duas rotas em `casos.ts`
-- [ ] Gate full passa
+- [x] `PATCH` válido → 200 com slug e link públicos inalterados; `slug` no corpo → 422
+- [x] `GET` devolve contagens e `souCriador`; conta sem vínculo → 404 nas duas rotas
+- [x] Casos `grupo` das duas rotas em `casos.ts`
+- [x] Gate full passa
 
 **Tests**: e2e
 **Gate**: full
