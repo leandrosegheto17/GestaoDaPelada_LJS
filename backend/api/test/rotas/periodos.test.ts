@@ -156,3 +156,179 @@ describe('POST …/jogadores/:id/inativar e …/reativar (GEL-51 a GEL-56)', () 
     expect(await periodosDe(id)).toEqual([{ inicio: '2026-09-01', fim: null }]);
   });
 });
+
+/** Saiu em 05/10 e voltou em 12/10, pelas rotas; devolve os ids dos dois períodos. */
+async function saiuEVoltou(g: Grupo): Promise<{ id: string; primeiro: string; segundo: string }> {
+  const id = await jogador(g);
+  await pedir('POST', rota(g, id, 'inativar'), { data: '2026-10-05' }, comRelogio(g));
+  await pedir('POST', rota(g, id, 'reativar'), { data: '2026-10-12' }, comRelogio(g));
+  const ids = await comoOwner<{ id: string }>('SELECT id FROM periodos_ativos WHERE jogador_id = $1 ORDER BY inicio', [
+    id,
+  ]);
+  return { id, primeiro: ids[0]!.id, segundo: ids[1]!.id };
+}
+
+const auditoria = (g: Grupo, acao: string) =>
+  comoOwner<{ resumo: unknown }>('SELECT resumo FROM auditoria WHERE grupo_id = $1 AND acao = $2', [g.id, acao]);
+
+describe('PATCH …/jogadores/:id/periodos/:periodoId (GEL-71 a GEL-75)', () => {
+  it('válido: 200 com alterado e os períodos; a auditoria tem as datas antes e depois', async () => {
+    const g = await grupoNovo();
+    const { id, primeiro, segundo } = await saiuEVoltou(g);
+    const r = await pedir('PATCH', `${rota(g, id, 'periodos')}/${primeiro}`, { saida: '2026-10-03' }, comRelogio(g));
+    expect(r.status).toBe(200);
+    expect(r.corpo).toEqual({
+      alterado: true,
+      periodos: [
+        { id: primeiro, inicio: '2026-09-01', fim: '2026-10-03' },
+        { id: segundo, inicio: '2026-10-12', fim: null },
+      ],
+    });
+    expect(await auditoria(g, 'jogador_periodo_corrigido')).toEqual([
+      {
+        resumo: {
+          periodo: primeiro,
+          saidaAnterior: '2026-10-05',
+          saidaNova: '2026-10-03',
+          retornoAnterior: '2026-09-01',
+          retornoNovo: '2026-09-01',
+        },
+      },
+    ]);
+  });
+
+  it('datas iguais às atuais: 200 com alterado false e "Nada a alterar.", sem auditoria', async () => {
+    const g = await grupoNovo();
+    const { id, primeiro } = await saiuEVoltou(g);
+    const r = await pedir('PATCH', `${rota(g, id, 'periodos')}/${primeiro}`, { saida: '2026-10-05' }, comRelogio(g));
+    expect(r.status).toBe(200);
+    expect(r.corpo).toMatchObject({ alterado: false, mensagem: 'Nada a alterar.' });
+    expect(await auditoria(g, 'jogador_periodo_corrigido')).toEqual([]);
+  });
+
+  it.each([
+    ['saída de período aberto', 'segundo', { saida: '2026-10-20' }, 'saida', 'Este período não tem data de saída.'],
+    [
+      'início do primeiro período',
+      'primeiro',
+      { retorno: '2026-08-20' },
+      'retorno',
+      'O início do primeiro período é a data de início da pontuação; use Alterar data de início.',
+    ],
+  ] as const)('%s: 422 com a mensagem no campo (GEL-72, GEL-73)', async (_caso, qual, datas, campo, mensagem) => {
+    const g = await grupoNovo();
+    const p = await saiuEVoltou(g);
+    const r = await pedir('PATCH', `${rota(g, p.id, 'periodos')}/${p[qual]}`, datas, comRelogio(g));
+    expect(r.status).toBe(422);
+    expect(r.corpo).toMatchObject({ erro: { codigo: 'dados_invalidos', campos: { [campo]: mensagem } } });
+  });
+
+  it('sem saída nem retorno: 422', async () => {
+    const g = await grupoNovo();
+    const { id, primeiro } = await saiuEVoltou(g);
+    const r = await pedir('PATCH', `${rota(g, id, 'periodos')}/${primeiro}`, {}, comRelogio(g));
+    expect(r.status).toBe(422);
+  });
+
+  it('período de outro jogador, inexistente, id inválido ou jogador de outro grupo: 404 e nada muda', async () => {
+    const g = await grupoNovo();
+    const um = await saiuEVoltou(g);
+    const dois = await saiuEVoltou(g);
+    const outro = await grupoNovo();
+    const alheio = await saiuEVoltou(outro);
+    const corpo = { saida: '2026-10-03' };
+    for (const caminho of [
+      `${rota(g, um.id, 'periodos')}/${dois.primeiro}`,
+      `${rota(g, um.id, 'periodos')}/${crypto.randomUUID()}`,
+      `${rota(g, um.id, 'periodos')}/nao-e-uuid`,
+      `${rota(g, alheio.id, 'periodos')}/${alheio.primeiro}`,
+    ]) {
+      const r = await pedir('PATCH', caminho, corpo, comRelogio(g));
+      expect(r.status).toBe(404);
+    }
+    for (const j of [um, dois, alheio]) {
+      expect(await periodosDe(j.id)).toEqual([
+        { inicio: '2026-09-01', fim: '2026-10-05' },
+        { inicio: '2026-10-12', fim: null },
+      ]);
+    }
+  });
+});
+
+describe('PUT …/jogadores/:id/inicio (GEL-77 a GEL-82)', () => {
+  it('recuar a data: 200 com a ficha; o primeiro período acompanha e a troca fica auditada', async () => {
+    const g = await grupoNovo();
+    const id = await jogador(g, '2026-02-05');
+    const r = await pedir('PUT', rota(g, id, 'inicio'), { data: '2026-02-01' }, comRelogio(g));
+    expect(r.status).toBe(200);
+    expect(r.corpo).toMatchObject({ inicioPontuacao: '2026-02-01', periodos: [{ inicio: '2026-02-01', fim: null }] });
+    expect(await auditoria(g, 'jogador_inicio_alterado')).toEqual([
+      { resumo: { anterior: '2026-02-05', nova: '2026-02-01' } },
+    ]);
+  });
+
+  it('igual à atual: 200 sem auditoria (GEL-82)', async () => {
+    const g = await grupoNovo();
+    const id = await jogador(g, '2026-02-05');
+    const r = await pedir('PUT', rota(g, id, 'inicio'), { data: '2026-02-05' }, comRelogio(g));
+    expect(r.status).toBe(200);
+    expect(r.corpo).toMatchObject({ inicioPontuacao: '2026-02-05' });
+    expect(await auditoria(g, 'jogador_inicio_alterado')).toEqual([]);
+  });
+
+  it.each([
+    ['31/12/1999', '1999-12-31', 'A data de início não pode ser anterior a 01/01/2000.'],
+    ['01/01/2027 (futuro em São Paulo, já hoje em UTC)', '2027-01-01', 'A data não pode ser no futuro.'],
+    ['data que não existe', '2026-02-30', 'Informe uma data válida.'],
+  ])('%s: 422 no campo data e nada muda (GEL-78, GEL-79)', async (_caso, data, mensagem) => {
+    const g = await grupoNovo();
+    const id = await jogador(g, '2026-02-05');
+    const r = await pedir('PUT', rota(g, id, 'inicio'), { data }, comRelogio(g));
+    expect(r.status).toBe(422);
+    expect(r.corpo).toMatchObject({ erro: { codigo: 'dados_invalidos', campos: { data: mensagem } } });
+    expect(await periodosDe(id)).toEqual([{ inicio: '2026-02-05', fim: null }]);
+    expect(await auditoria(g, 'jogador_inicio_alterado')).toEqual([]);
+  });
+
+  it('depois da saída do primeiro período: 422 com a mensagem do GEL-80', async () => {
+    const g = await grupoNovo();
+    const { id } = await saiuEVoltou(g);
+    const r = await pedir('PUT', rota(g, id, 'inicio'), { data: '2026-10-06' }, comRelogio(g));
+    expect(r.status).toBe(422);
+    expect(r.corpo).toMatchObject({
+      erro: {
+        campos: {
+          data: 'A data de início não pode ficar depois da saída do primeiro período (05/10/2026). Corrija antes a data de saída do primeiro período.',
+        },
+      },
+    });
+  });
+
+  it('sem data no corpo: 422; jogador de outro grupo: 404 e nada muda', async () => {
+    const g = await grupoNovo();
+    const id = await jogador(g, '2026-02-05');
+    expect((await pedir('PUT', rota(g, id, 'inicio'), {}, comRelogio(g))).status).toBe(422);
+    const outro = await grupoNovo();
+    const alheio = await jogador(outro, '2026-02-05');
+    const r = await pedir('PUT', rota(g, alheio, 'inicio'), { data: '2026-02-01' }, comRelogio(g));
+    expect(r.status).toBe(404);
+    expect(await periodosDe(alheio)).toEqual([{ inicio: '2026-02-05', fim: null }]);
+  });
+
+  it('grupo arquivado: PATCH de período e PUT de início dão 409 grupo_arquivado', async () => {
+    const g = await grupoNovo();
+    const { id, primeiro } = await saiuEVoltou(g);
+    await comoOwner('UPDATE grupos SET arquivado_em = now() WHERE id = $1', [g.id]);
+    const patch = await pedir(
+      'PATCH',
+      `${rota(g, id, 'periodos')}/${primeiro}`,
+      { saida: '2026-10-03' },
+      comRelogio(g),
+    );
+    const put = await pedir('PUT', rota(g, id, 'inicio'), { data: '2026-08-01' }, comRelogio(g));
+    for (const r of [patch, put]) {
+      expect(r.status).toBe(409);
+      expect(r.corpo).toMatchObject({ erro: { codigo: 'grupo_arquivado' } });
+    }
+  });
+});

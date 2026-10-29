@@ -1327,10 +1327,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] `PATCH` válido → 200; datas iguais → 200 com `alterado: false` e "Nada a alterar."; período de outro jogador → 404
-- [ ] `PUT` com 31/12/1999 → 422 do GEL-78; data futura → GEL-79; igual à atual → 200 sem auditoria
-- [ ] Casos `grupo` das duas rotas em `casos.ts`
-- [ ] Gate full passa
+- [x] `PATCH` válido → 200; datas iguais → 200 com `alterado: false` e "Nada a alterar."; período de outro jogador → 404
+- [x] `PUT` com 31/12/1999 → 422 do GEL-78; data futura → GEL-79; igual à atual → 200 sem auditoria
+- [x] Casos `grupo` das duas rotas em `casos.ts`
+- [x] Gate full passa
 
 **Tests**: e2e
 **Gate**: full

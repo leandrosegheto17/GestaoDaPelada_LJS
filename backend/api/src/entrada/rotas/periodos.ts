@@ -1,4 +1,4 @@
-import { dataCorpo } from '@pelada/contrato';
+import { corrigirPeriodoCorpo, dataCorpo, inicioCorpo, type CorrigirPeriodoResposta } from '@pelada/contrato';
 import { Hono, type Context } from 'hono';
 import * as jogadores from '../../infraestrutura/db/repositorios/jogadores.ts';
 import type { AppEnv } from '../app.ts';
@@ -51,5 +51,38 @@ export const rotaPeriodos = new Hono<AppEnv>()
       if ('codigo' in r) return erroComStatus(c, 409, CODIGOS_ERRO.jaAtivo, 'O jogador já está ativo.');
       return recusaDeCampo(c, 'data', r.mensagem);
     }
+    return responderFicha(c, grupoId, id);
+  })
+  .patch('/api/grupos/:grupoId/jogadores/:id/periodos/:periodoId', async (c) => {
+    const id = c.req.param('id');
+    const periodoId = c.req.param('periodoId');
+    if (!UUID.test(id) || !UUID.test(periodoId)) return naoEncontrado(c);
+    const corpo = await lerCorpo(c, corrigirPeriodoCorpo);
+    if (!corpo.ok) return corpo.resposta;
+    const r = await jogadores.corrigirPeriodo(
+      c.var.db,
+      c.req.param('grupoId'),
+      id,
+      periodoId,
+      corpo.dado,
+      c.var.relogio.hoje(),
+    );
+    if (!r) return naoEncontrado(c);
+    // A recusa vai no campo do pedido (saida ou retorno) que a regra apontou (GEL-72, GEL-73).
+    if (!r.ok) return recusaDeCampo(c, r.campo, r.mensagem);
+    const resposta: CorrigirPeriodoResposta = r.alterado
+      ? { alterado: true, periodos: r.periodos }
+      : { alterado: false, mensagem: 'Nada a alterar.', periodos: r.periodos };
+    return c.json(resposta);
+  })
+  .put('/api/grupos/:grupoId/jogadores/:id/inicio', async (c) => {
+    const id = c.req.param('id');
+    if (!UUID.test(id)) return naoEncontrado(c);
+    const corpo = await lerCorpo(c, inicioCorpo);
+    if (!corpo.ok) return corpo.resposta;
+    const grupoId = c.req.param('grupoId');
+    const r = await jogadores.alterarInicio(c.var.db, grupoId, id, corpo.dado.data, c.var.relogio.hoje());
+    if (!r) return naoEncontrado(c);
+    if (!r.ok) return recusaDeCampo(c, r.campo, r.mensagem);
     return responderFicha(c, grupoId, id);
   });
