@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup de grupos e elenco</title>
+<link rel="stylesheet" href="../../../mockup/fontes/fontes.css">
+<link rel="stylesheet" href="../../../mockup/tokens.css">
+<link rel="stylesheet" href="../../../mockup/base.css">
+<style>
+/* Só a moldura da galeria; as telas usam tokens.css e base.css do projeto. */
+.galeria{max-width:1600px;margin:0 auto;padding:var(--esp-4) var(--esp-4) var(--esp-12)}
+.amostra{display:flex;flex-wrap:wrap;gap:var(--esp-6);align-items:flex-start;margin:var(--esp-3) 0 var(--esp-6)}
+.amostra figure{margin:0;max-width:100%;overflow-x:auto}
+.amostra figcaption{font-size:var(--texto-sm);color:var(--cor-texto-sec);margin-bottom:var(--esp-1)}
+.cel{width:390px;height:844px;border:var(--esp-2) solid var(--cor-texto);border-radius:var(--raio);overflow:hidden;background:var(--cor-superficie)}
+.cel--atual{border-color:var(--cor-contorno);border-style:dashed}
+.cel iframe{width:374px;height:828px;border:0;display:block}
+.pc{width:720px;height:450px;border:1px solid var(--cor-linha);border-radius:var(--raio);overflow:hidden;background:var(--cor-superficie)}
+.pc iframe{width:1440px;height:900px;border:0;transform:scale(.5);transform-origin:0 0;display:block}
+.estado{font-size:var(--texto-lg);margin:var(--esp-6) 0 0}
+.estados a{display:inline-block;margin:0 var(--esp-1) var(--esp-1) 0;padding:2px var(--esp-2);border:1px solid var(--cor-contorno);border-radius:var(--raio-pilula);color:var(--cor-texto);text-decoration:none;font-size:var(--texto-sm)}
+</style>
+</head>
+<body>
+<main class="galeria">
+  <h1 class="titulo-pagina">Grupos e elenco: telas do módulo</h1>
+  <p class="paragrafo">Mockup do módulo (feature 3, fase 7), aguardando aprovação. As telas usam só os tokens e as classes do guia do projeto, partindo das telas atuais de <code>.specs/mockup/telas/</code>; nenhum token novo. Em cada estado, a moldura tracejada é a tela atual do projeto e as outras duas são a nova, em celular (390) e PC (1440, em 50%). Dados: grupo “Pelada de Quinta” (<code>pelada-de-quinta</code>, toda quinta às 20:00), hoje = 22/10/2026, jogadores Toninho, Beto e Gil.</p>
+  <p class="paragrafo"><strong>O que muda:</strong> qualquer conta cria grupo pela lista de grupos (t08 e t27, sem “Primeiro admin”); quem criou arquiva pelos dados do grupo (t20) e reativa pela seção “Arquivados” da t08; a ficha do jogador (t16) perde as prévias e o texto da exclusão passa a citar pagamentos. <strong>Fica de fora:</strong> pesos de pontuação (t18, C6); prévias de acumulado, posição e rodadas e o aviso “vale 0 ponto” (C7); ranking público e “Grupo indisponível”; a área do dono (t26, t28). <strong>Não mudam:</strong> t15 e t17 seguem as telas atuais; a t09 só esconde o item “Pontuação”.</p>
+  <p class="paragrafo texto-sec"><strong>Ajuste visual pendente, à parte:</strong> na t20 e na t27, a legenda “Frequência” encosta na borda do seletor, como já acontece na t20 atual (vem do <code>base.css</code> do projeto). Fica como está neste mockup.</p>
+  <p class="paragrafo">Na integração, a pasta <code>telas/</code> é promovida para <code>.specs/mockup/telas/</code> (os caminhos <code>../../../../mockup/</code> viram <code>../</code>), substituindo os estados de mesmo nome. As variantes de prévia da t16 continuam no projeto, porque voltam na feature partidas-e-ranking; t27-novo-grupo--senha deixa de valer.</p>
+  <section class="secao" aria-label="T08 Seus grupos">
+    <h2 class="subtitulo sem-topo">T08 Seus grupos</h2>
+    <p class="paragrafo">Muda: recorrência em cada grupo, botão “Criar grupo” para qualquer conta, seção “Arquivados” (só os grupos arquivados que a conta criou, com Reativar) e o vazio com a ação “Criar grupo”. GEL-27, GEL-28, GEL-114, GEL-117.</p>
+    <p class="estados"><a href="telas/t08-grupos--sucesso.html">sucesso</a><a href="telas/t08-grupos--vazio.html">vazio</a><a href="telas/t08-grupos--carregando.html">carregando</a><a href="telas/t08-grupos--erro.html">erro</a><a href="telas/t08-grupos--reativar.html">reativar</a><a href="telas/t08-grupos--arquivado.html">arquivado</a><a href="telas/t08-grupos--reativado.html">reativado</a></p>
+    <h3 class="estado">t08-grupos--sucesso <span class="texto-sec">· Ativos, “Criar grupo” e Arquivados.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t08-grupos--sucesso, celular · <a href="../../../mockup/telas/t08-grupos--sucesso.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t08-grupos--sucesso.html" title="Atual: t08-grupos--sucesso, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: sucesso, celular · <a href="telas/t08-grupos--sucesso.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t08-grupos--sucesso.html" title="Nova: sucesso, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: sucesso, PC (50%) · <a href="telas/t08-grupos--sucesso.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t08-grupos--sucesso.html" title="Nova: sucesso, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t08-grupos--vazio <span class="texto-sec">· Conta sem grupo: “Criar grupo”.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t08-grupos--vazio, celular · <a href="../../../mockup/telas/t08-grupos--vazio.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t08-grupos--vazio.html" title="Atual: t08-grupos--vazio, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: vazio, celular · <a href="telas/t08-grupos--vazio.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t08-grupos--vazio.html" title="Nova: vazio, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: vazio, PC (50%) · <a href="telas/t08-grupos--vazio.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t08-grupos--vazio.html" title="Nova: vazio, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t08-grupos--carregando <span class="texto-sec">· Padrão das listas.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: padrao--carregando-lista, celular · <a href="../../../mockup/telas/padrao--carregando-lista.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/padrao--carregando-lista.html" title="Atual: padrao--carregando-lista, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: carregando, celular · <a href="telas/t08-grupos--carregando.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t08-grupos--carregando.html" title="Nova: carregando, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: carregando, PC (50%) · <a href="telas/t08-grupos--carregando.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t08-grupos--carregando.html" title="Nova: carregando, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t08-grupos--erro <span class="texto-sec">· Padrão de erro de rede.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: padrao--erro-rede, celular · <a href="../../../mockup/telas/padrao--erro-rede.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/padrao--erro-rede.html" title="Atual: padrao--erro-rede, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: erro, celular · <a href="telas/t08-grupos--erro.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t08-grupos--erro.html" title="Nova: erro, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: erro, PC (50%) · <a href="telas/t08-grupos--erro.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t08-grupos--erro.html" title="Nova: erro, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t08-grupos--reativar <span class="texto-sec">· Confirmação de reativar o grupo arquivado.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Nova: reativar, celular · <a href="telas/t08-grupos--reativar.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t08-grupos--reativar.html" title="Nova: reativar, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: reativar, PC (50%) · <a href="telas/t08-grupos--reativar.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t08-grupos--reativar.html" title="Nova: reativar, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t08-grupos--arquivado <span class="texto-sec">· Depois de arquivar pela t20: “Grupo arquivado.”</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Nova: arquivado, celular · <a href="telas/t08-grupos--arquivado.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t08-grupos--arquivado.html" title="Nova: arquivado, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: arquivado, PC (50%) · <a href="telas/t08-grupos--arquivado.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t08-grupos--arquivado.html" title="Nova: arquivado, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t08-grupos--reativado <span class="texto-sec">· Depois de reativar: “Grupo reativado.”</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Nova: reativado, celular · <a href="telas/t08-grupos--reativado.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t08-grupos--reativado.html" title="Nova: reativado, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: reativado, PC (50%) · <a href="telas/t08-grupos--reativado.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t08-grupos--reativado.html" title="Nova: reativado, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+  </section>
+  <section class="secao" aria-label="T09 Início do grupo">
+    <h2 class="subtitulo sem-topo">T09 Início do grupo</h2>
+    <p class="paragrafo">Muda só uma coisa: o item “Pontuação” (t18) fica escondido até a feature partidas-e-ranking (C6). As telas do módulo que voltam ao início apontam para esta t09.</p>
+    <p class="estados"><a href="telas/t09-inicio--sucesso.html">sucesso</a><a href="telas/t09-inicio--sem-jogadores.html">sem jogadores</a></p>
+    <h3 class="estado">t09-inicio--sucesso <span class="texto-sec">· Sem o item Pontuação.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t09-inicio--sucesso, celular · <a href="../../../mockup/telas/t09-inicio--sucesso.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t09-inicio--sucesso.html" title="Atual: t09-inicio--sucesso, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: sucesso, celular · <a href="telas/t09-inicio--sucesso.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t09-inicio--sucesso.html" title="Nova: sucesso, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: sucesso, PC (50%) · <a href="telas/t09-inicio--sucesso.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t09-inicio--sucesso.html" title="Nova: sucesso, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t09-inicio--sem-jogadores <span class="texto-sec">· Grupo recém-criado, sem o item Pontuação.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t09-inicio--sem-jogadores, celular · <a href="../../../mockup/telas/t09-inicio--sem-jogadores.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t09-inicio--sem-jogadores.html" title="Atual: t09-inicio--sem-jogadores, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: sem jogadores, celular · <a href="telas/t09-inicio--sem-jogadores.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t09-inicio--sem-jogadores.html" title="Nova: sem jogadores, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: sem jogadores, PC (50%) · <a href="telas/t09-inicio--sem-jogadores.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t09-inicio--sem-jogadores.html" title="Nova: sem jogadores, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+  </section>
+  <section class="secao" aria-label="T27 Novo grupo">
+    <h2 class="subtitulo sem-topo">T27 Novo grupo</h2>
+    <p class="paragrafo">Muda: sai da área do dono e vale para qualquer conta; sem o bloco “Primeiro admin” e sem o diálogo de senha (t27-novo-grupo--senha deixa de existir). O rótulo “Nome do grupo” vira “Nome”, como na t20. Voltar leva a Seus grupos; criar abre o início do grupo novo. GEL-01 a GEL-07, GEL-118.</p>
+    <p class="estados"><a href="telas/t27-novo-grupo--vazio.html">vazio</a><a href="telas/t27-novo-grupo--erro.html">erro</a><a href="telas/t27-novo-grupo--carregando.html">carregando</a></p>
+    <h3 class="estado">t27-novo-grupo--vazio <span class="texto-sec">· Nome, dia, frequência e horário.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t27-novo-grupo--vazio, celular · <a href="../../../mockup/telas/t27-novo-grupo--vazio.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t27-novo-grupo--vazio.html" title="Atual: t27-novo-grupo--vazio, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: vazio, celular · <a href="telas/t27-novo-grupo--vazio.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t27-novo-grupo--vazio.html" title="Nova: vazio, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: vazio, PC (50%) · <a href="telas/t27-novo-grupo--vazio.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t27-novo-grupo--vazio.html" title="Nova: vazio, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t27-novo-grupo--erro <span class="texto-sec">· 422: “Corrija 2 campos: Nome, Horário”.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t27-novo-grupo--erro, celular · <a href="../../../mockup/telas/t27-novo-grupo--erro.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t27-novo-grupo--erro.html" title="Atual: t27-novo-grupo--erro, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: erro, celular · <a href="telas/t27-novo-grupo--erro.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t27-novo-grupo--erro.html" title="Nova: erro, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: erro, PC (50%) · <a href="telas/t27-novo-grupo--erro.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t27-novo-grupo--erro.html" title="Nova: erro, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t27-novo-grupo--carregando <span class="texto-sec">· Enviando: “Criando grupo…”.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Nova: carregando, celular · <a href="telas/t27-novo-grupo--carregando.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t27-novo-grupo--carregando.html" title="Nova: carregando, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: carregando, PC (50%) · <a href="telas/t27-novo-grupo--carregando.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t27-novo-grupo--carregando.html" title="Nova: carregando, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+  </section>
+  <section class="secao" aria-label="T20 Dados do grupo">
+    <h2 class="subtitulo sem-topo">T20 Dados do grupo</h2>
+    <p class="paragrafo">Muda: a zona “Arquivar grupo” da t28 entra no fim da t20, só para a conta que criou o grupo; o diálogo de arquivar deixa o botão habilitado e a API confere o nome (GEL-22, GEL-23, GEL-24). O resto fica igual. Sem “Pesos de pontuação” (C6).</p>
+    <p class="estados"><a href="telas/t20-grupo--sucesso.html">sucesso (quem criou)</a><a href="telas/t20-grupo--nao-criador.html">admin que não criou</a><a href="telas/t20-grupo--arquivar.html">arquivar</a><a href="telas/t20-grupo--arquivar-erro.html">arquivar: nome não confere</a><a href="telas/t20-grupo--erro.html">erro</a><a href="telas/t20-grupo--salvo.html">salvo</a><a href="telas/t20-grupo--carregando.html">carregando</a></p>
+    <h3 class="estado">t20-grupo--sucesso <span class="texto-sec">· Dados, link e “Arquivar grupo”.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t20-grupo--sucesso, celular · <a href="../../../mockup/telas/t20-grupo--sucesso.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t20-grupo--sucesso.html" title="Atual: t20-grupo--sucesso, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: sucesso (quem criou), celular · <a href="telas/t20-grupo--sucesso.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t20-grupo--sucesso.html" title="Nova: sucesso (quem criou), celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: sucesso (quem criou), PC (50%) · <a href="telas/t20-grupo--sucesso.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t20-grupo--sucesso.html" title="Nova: sucesso (quem criou), PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t20-grupo--nao-criador <span class="texto-sec">· Sem a zona de arquivar.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t20-grupo--sucesso, celular · <a href="../../../mockup/telas/t20-grupo--sucesso.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t20-grupo--sucesso.html" title="Atual: t20-grupo--sucesso, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: admin que não criou, celular · <a href="telas/t20-grupo--nao-criador.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t20-grupo--nao-criador.html" title="Nova: admin que não criou, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: admin que não criou, PC (50%) · <a href="telas/t20-grupo--nao-criador.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t20-grupo--nao-criador.html" title="Nova: admin que não criou, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t20-grupo--arquivar <span class="texto-sec">· Confirmação pelo nome do grupo.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t28-grupo-dono--arquivar, celular · <a href="../../../mockup/telas/t28-grupo-dono--arquivar.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t28-grupo-dono--arquivar.html" title="Atual: t28-grupo-dono--arquivar, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: arquivar, celular · <a href="telas/t20-grupo--arquivar.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t20-grupo--arquivar.html" title="Nova: arquivar, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: arquivar, PC (50%) · <a href="telas/t20-grupo--arquivar.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t20-grupo--arquivar.html" title="Nova: arquivar, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t20-grupo--arquivar-erro <span class="texto-sec">· GEL-23.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Nova: arquivar: nome não confere, celular · <a href="telas/t20-grupo--arquivar-erro.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t20-grupo--arquivar-erro.html" title="Nova: arquivar: nome não confere, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: arquivar: nome não confere, PC (50%) · <a href="telas/t20-grupo--arquivar-erro.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t20-grupo--arquivar-erro.html" title="Nova: arquivar: nome não confere, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t20-grupo--erro <span class="texto-sec">· 422 de campo com o resumo.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t20-grupo--erro, celular · <a href="../../../mockup/telas/t20-grupo--erro.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t20-grupo--erro.html" title="Atual: t20-grupo--erro, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: erro, celular · <a href="telas/t20-grupo--erro.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t20-grupo--erro.html" title="Nova: erro, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: erro, PC (50%) · <a href="telas/t20-grupo--erro.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t20-grupo--erro.html" title="Nova: erro, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t20-grupo--salvo <span class="texto-sec">· “Dados salvos.”</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t20-grupo--salvo, celular · <a href="../../../mockup/telas/t20-grupo--salvo.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t20-grupo--salvo.html" title="Atual: t20-grupo--salvo, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: salvo, celular · <a href="telas/t20-grupo--salvo.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t20-grupo--salvo.html" title="Nova: salvo, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: salvo, PC (50%) · <a href="telas/t20-grupo--salvo.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t20-grupo--salvo.html" title="Nova: salvo, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t20-grupo--carregando <span class="texto-sec">· Padrão dos formulários.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: padrao--carregando-formulario, celular · <a href="../../../mockup/telas/padrao--carregando-formulario.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/padrao--carregando-formulario.html" title="Atual: padrao--carregando-formulario, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: carregando, celular · <a href="telas/t20-grupo--carregando.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t20-grupo--carregando.html" title="Nova: carregando, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: carregando, PC (50%) · <a href="telas/t20-grupo--carregando.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t20-grupo--carregando.html" title="Nova: carregando, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+  </section>
+  <section class="secao" aria-label="T16 Ficha do jogador">
+    <h2 class="subtitulo sem-topo">T16 Ficha do jogador</h2>
+    <p class="paragrafo">Muda: saem as prévias de acumulado, posição no ranking e rodadas, e a faixa “vale 0 ponto até lançar a presença” (C7); os diálogos de reativar, corrigir datas e data de início confirmam direto. O texto da exclusão passa a citar pagamentos (GEL-87). O resto fica igual. Jogadores: Toninho (ativo, notas, nível 6,8), Beto (inativo desde 05/10/2026, sem nota) e Gil (dois períodos).</p>
+    <p class="estados"><a href="telas/t16-jogador--novo.html">novo</a><a href="telas/t16-jogador--edicao.html">edição</a><a href="telas/t16-jogador--carregando.html">carregando</a><a href="telas/t16-jogador--erro.html">erro</a><a href="telas/t16-jogador--inativar.html">inativar</a><a href="telas/t16-jogador--inativo.html">inativo</a><a href="telas/t16-jogador--reativar.html">reativar</a><a href="telas/t16-jogador--reativar-erro.html">reativar: erro</a><a href="telas/t16-jogador--reativado.html">reativado</a><a href="telas/t16-jogador--corrigir.html">corrigir datas</a><a href="telas/t16-jogador--corrigir-erro.html">corrigir: erro</a><a href="telas/t16-jogador--corrigido.html">corrigido</a><a href="telas/t16-jogador--inicio.html">data de início</a><a href="telas/t16-jogador--inicio-erro.html">data de início: erro</a><a href="telas/t16-jogador--excluir.html">excluir</a><a href="telas/t16-jogador--exclusao-recusada.html">exclusão recusada</a></p>
+    <h3 class="estado">t16-jogador--novo <span class="texto-sec">· Cadastro.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t16-jogador--novo, celular · <a href="../../../mockup/telas/t16-jogador--novo.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t16-jogador--novo.html" title="Atual: t16-jogador--novo, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: novo, celular · <a href="telas/t16-jogador--novo.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--novo.html" title="Nova: novo, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: novo, PC (50%) · <a href="telas/t16-jogador--novo.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t16-jogador--novo.html" title="Nova: novo, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t16-jogador--edicao <span class="texto-sec">· Dados, notas, nível e períodos.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t16-jogador--edicao, celular · <a href="../../../mockup/telas/t16-jogador--edicao.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t16-jogador--edicao.html" title="Atual: t16-jogador--edicao, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: edição, celular · <a href="telas/t16-jogador--edicao.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--edicao.html" title="Nova: edição, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: edição, PC (50%) · <a href="telas/t16-jogador--edicao.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t16-jogador--edicao.html" title="Nova: edição, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t16-jogador--carregando <span class="texto-sec">· Padrão dos formulários.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: padrao--carregando-formulario, celular · <a href="../../../mockup/telas/padrao--carregando-formulario.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/padrao--carregando-formulario.html" title="Atual: padrao--carregando-formulario, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: carregando, celular · <a href="telas/t16-jogador--carregando.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--carregando.html" title="Nova: carregando, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: carregando, PC (50%) · <a href="telas/t16-jogador--carregando.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t16-jogador--carregando.html" title="Nova: carregando, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t16-jogador--erro <span class="texto-sec">· 422: apelido repetido e ano.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t16-jogador--erro, celular · <a href="../../../mockup/telas/t16-jogador--erro.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t16-jogador--erro.html" title="Atual: t16-jogador--erro, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: erro, celular · <a href="telas/t16-jogador--erro.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--erro.html" title="Nova: erro, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: erro, PC (50%) · <a href="telas/t16-jogador--erro.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t16-jogador--erro.html" title="Nova: erro, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t16-jogador--inativar <span class="texto-sec">· Texto do GEL-59.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t16-jogador--inativar, celular · <a href="../../../mockup/telas/t16-jogador--inativar.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t16-jogador--inativar.html" title="Atual: t16-jogador--inativar, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: inativar, celular · <a href="telas/t16-jogador--inativar.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--inativar.html" title="Nova: inativar, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: inativar, PC (50%) · <a href="telas/t16-jogador--inativar.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t16-jogador--inativar.html" title="Nova: inativar, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t16-jogador--inativo <span class="texto-sec">· Beto, “Sem nota”.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t16-jogador--inativo, celular · <a href="../../../mockup/telas/t16-jogador--inativo.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t16-jogador--inativo.html" title="Atual: t16-jogador--inativo, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: inativo, celular · <a href="telas/t16-jogador--inativo.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--inativo.html" title="Nova: inativo, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: inativo, PC (50%) · <a href="telas/t16-jogador--inativo.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t16-jogador--inativo.html" title="Nova: inativo, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t16-jogador--reativar <span class="texto-sec">· Sem prévia.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t16-jogador--reativar-previa, celular · <a href="../../../mockup/telas/t16-jogador--reativar-previa.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t16-jogador--reativar-previa.html" title="Atual: t16-jogador--reativar-previa, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: reativar, celular · <a href="telas/t16-jogador--reativar.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--reativar.html" title="Nova: reativar, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: reativar, PC (50%) · <a href="telas/t16-jogador--reativar.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t16-jogador--reativar.html" title="Nova: reativar, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t16-jogador--reativar-erro <span class="texto-sec">· GEL-66.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t16-jogador--reativar-erro, celular · <a href="../../../mockup/telas/t16-jogador--reativar-erro.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t16-jogador--reativar-erro.html" title="Atual: t16-jogador--reativar-erro, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: reativar: erro, celular · <a href="telas/t16-jogador--reativar-erro.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--reativar-erro.html" title="Nova: reativar: erro, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: reativar: erro, PC (50%) · <a href="telas/t16-jogador--reativar-erro.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t16-jogador--reativar-erro.html" title="Nova: reativar: erro, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t16-jogador--reativado <span class="texto-sec">· Sem a faixa de rodadas.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t16-jogador--reativado, celular · <a href="../../../mockup/telas/t16-jogador--reativado.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t16-jogador--reativado.html" title="Atual: t16-jogador--reativado, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: reativado, celular · <a href="telas/t16-jogador--reativado.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--reativado.html" title="Nova: reativado, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: reativado, PC (50%) · <a href="telas/t16-jogador--reativado.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t16-jogador--reativado.html" title="Nova: reativado, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t16-jogador--corrigir <span class="texto-sec">· Sem prévia.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t16-jogador--corrigir-previa, celular · <a href="../../../mockup/telas/t16-jogador--corrigir-previa.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t16-jogador--corrigir-previa.html" title="Atual: t16-jogador--corrigir-previa, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: corrigir datas, celular · <a href="telas/t16-jogador--corrigir.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--corrigir.html" title="Nova: corrigir datas, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: corrigir datas, PC (50%) · <a href="telas/t16-jogador--corrigir.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t16-jogador--corrigir.html" title="Nova: corrigir datas, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t16-jogador--corrigir-erro <span class="texto-sec">· GEL-68 (presença).</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t16-jogador--corrigir-erro, celular · <a href="../../../mockup/telas/t16-jogador--corrigir-erro.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t16-jogador--corrigir-erro.html" title="Atual: t16-jogador--corrigir-erro, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: corrigir: erro, celular · <a href="telas/t16-jogador--corrigir-erro.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--corrigir-erro.html" title="Nova: corrigir: erro, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: corrigir: erro, PC (50%) · <a href="telas/t16-jogador--corrigir-erro.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t16-jogador--corrigir-erro.html" title="Nova: corrigir: erro, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t16-jogador--corrigido <span class="texto-sec">· “Datas corrigidas.”</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t16-jogador--corrigido, celular · <a href="../../../mockup/telas/t16-jogador--corrigido.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t16-jogador--corrigido.html" title="Atual: t16-jogador--corrigido, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: corrigido, celular · <a href="telas/t16-jogador--corrigido.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--corrigido.html" title="Nova: corrigido, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: corrigido, PC (50%) · <a href="telas/t16-jogador--corrigido.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t16-jogador--corrigido.html" title="Nova: corrigido, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t16-jogador--inicio <span class="texto-sec">· Sem prévia.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t16-jogador--inicio-recuar, celular · <a href="../../../mockup/telas/t16-jogador--inicio-recuar.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t16-jogador--inicio-recuar.html" title="Atual: t16-jogador--inicio-recuar, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: data de início, celular · <a href="telas/t16-jogador--inicio.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--inicio.html" title="Nova: data de início, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: data de início, PC (50%) · <a href="telas/t16-jogador--inicio.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t16-jogador--inicio.html" title="Nova: data de início, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t16-jogador--inicio-erro <span class="texto-sec">· GEL-80.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t16-jogador--inicio-erro-saida, celular · <a href="../../../mockup/telas/t16-jogador--inicio-erro-saida.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t16-jogador--inicio-erro-saida.html" title="Atual: t16-jogador--inicio-erro-saida, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: data de início: erro, celular · <a href="telas/t16-jogador--inicio-erro.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--inicio-erro.html" title="Nova: data de início: erro, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: data de início: erro, PC (50%) · <a href="telas/t16-jogador--inicio-erro.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t16-jogador--inicio-erro.html" title="Nova: data de início: erro, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t16-jogador--excluir <span class="texto-sec">· Texto do GEL-87.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t16-jogador--excluir, celular · <a href="../../../mockup/telas/t16-jogador--excluir.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t16-jogador--excluir.html" title="Atual: t16-jogador--excluir, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: excluir, celular · <a href="telas/t16-jogador--excluir.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--excluir.html" title="Nova: excluir, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: excluir, PC (50%) · <a href="telas/t16-jogador--excluir.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t16-jogador--excluir.html" title="Nova: excluir, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t16-jogador--exclusao-recusada <span class="texto-sec">· GEL-85, GEL-86.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t16-jogador--exclusao-recusada, celular · <a href="../../../mockup/telas/t16-jogador--exclusao-recusada.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t16-jogador--exclusao-recusada.html" title="Atual: t16-jogador--exclusao-recusada, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: exclusão recusada, celular · <a href="telas/t16-jogador--exclusao-recusada.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--exclusao-recusada.html" title="Nova: exclusão recusada, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: exclusão recusada, PC (50%) · <a href="telas/t16-jogador--exclusao-recusada.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t16-jogador--exclusao-recusada.html" title="Nova: exclusão recusada, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+  </section>
+</main>
+</body>
+</html>

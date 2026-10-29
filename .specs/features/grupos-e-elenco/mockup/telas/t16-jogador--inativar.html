@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Inativar jogador</title>
+<link rel="stylesheet" href="../../../../mockup/fontes/fontes.css">
+<link rel="stylesheet" href="../../../../mockup/tokens.css">
+<link rel="stylesheet" href="../../../../mockup/base.css">
+</head>
+<body>
+<!-- GEL-59: texto exato do aviso, com Cancelar e Inativar. A data de saída vem com hoje (GEL-52). Recorte em .dialogo. -->
+<header class="barra barra--admin" aria-hidden="true"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span></div></header>
+<div class="veu">
+  <section class="dialogo" role="dialog" aria-modal="true" aria-labelledby="in-t">
+    <h2 id="in-t" class="dialogo__titulo">Inativar Toninho</h2>
+    <p class="dialogo__texto">Ele sai do ranking, do lançamento, do simulador e do financeiro a partir da data de saída. O histórico e os pontos ficam guardados.</p>
+    <div class="campo"><label class="campo__rotulo" for="saida">Data de saída</label><input class="campo__entrada" id="saida" type="date" max="2026-10-22" value="2026-10-22"></div>
+    <div class="dialogo__acoes"><a class="botao botao--secundario" href="t16-jogador--edicao.html">Cancelar</a><button class="botao botao--principal" type="button">Inativar</button></div>
+  </section>
+</div>
+</body>
+</html>

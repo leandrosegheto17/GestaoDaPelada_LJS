@@ -2,9 +2,12 @@
 
 **Spec**: `.specs/features/grupos-e-elenco/spec.md` (e `context.md`)
 **Status**: Approved (usuário, 2026-10-29)
-**Mockup**: a fazer (fase 7, `mockup-visual` em modo módulo): t08 com "Criar grupo" e "Arquivados", t27 sem
-"Primeiro admin", t20 com a zona de arquivar da t28 só para quem criou, t16 sem as prévias e com o texto novo da
-exclusão. As outras telas da feature (t09, t15, t17) já estão no mockup do projeto.
+**Mockup**: aprovado em 2026-10-29, `.specs/features/grupos-e-elenco/mockup/` (34 telas; galeria
+https://claude.ai/artifact/7RrxLj5uGBvKBuVQb2GR3L): t08 com "Criar grupo", "Arquivados", arquivado e reativado; t09
+sem o item "Pontuação" até a `partidas-e-ranking` (escolha do usuário); t27 sem "Primeiro admin"; t20 com a zona de
+arquivar só para quem criou; t16 sem as prévias e com o texto novo da exclusão. t15 e t17 seguem o mockup do projeto.
+Ajuste visual pendente, à parte: a legenda "Frequência" encosta na borda do seletor (vem do `base.css`, como na t20
+atual).
 **Abordagem escolhida pelo usuário (2026-10-29)**: o grupo arquivado some para os outros admins **no banco**, pela
 `grupos_visiveis()`, e não num filtro da aplicação. Alternativa recusada: o `exigirVinculo` ler `arquivado_em` e
 `criado_por`, o que obrigaria cada consulta fora do middleware (sessão, listas, features seguintes) a lembrar do filtro.

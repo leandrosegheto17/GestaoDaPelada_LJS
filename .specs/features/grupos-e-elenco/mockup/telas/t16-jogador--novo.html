@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Novo jogador</title>
+<link rel="stylesheet" href="../../../../mockup/fontes/fontes.css">
+<link rel="stylesheet" href="../../../../mockup/tokens.css">
+<link rel="stylesheet" href="../../../../mockup/base.css">
+</head>
+<body>
+<!-- Igual à tela atual (GEL-31 a GEL-40). A data de entrada vem com hoje e não aceita data futura (GEL-32, GEL-33). -->
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+<header class="barra barra--admin"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span><a class="barra__link" href="t08-grupos--sucesso.html">Trocar grupo</a></div></header>
+<main id="conteudo" class="conteudo conteudo--admin conteudo--estreito">
+  <a class="voltar" href="../../../../mockup/telas/t15-jogadores--sucesso.html"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 18 9 12 15 6"/></svg>Jogadores</a>
+  <h1 class="titulo-pagina">Novo jogador</h1>
+  <form class="formulario" novalidate>
+    <div class="campo"><label class="campo__rotulo" for="apelido">Apelido</label><input class="campo__entrada" id="apelido" maxlength="30" aria-describedby="apelido-ajuda"><p class="campo__ajuda" id="apelido-ajuda">De 2 a 30 caracteres. É o nome que aparece no ranking.</p></div>
+    <div class="duas-colunas">
+      <div class="campo"><label class="campo__rotulo" for="ano">Ano de nascimento</label><input class="campo__entrada" id="ano" type="number" inputmode="numeric" min="1940" max="2016"></div>
+      <div class="campo"><label class="campo__rotulo" for="pos">Posição</label><select class="campo__entrada" id="pos" aria-describedby="pos-ajuda"><option value="">Escolha</option><option>Zagueiro</option><option>Lateral</option><option>Volante</option><option>Meia</option><option>Atacante</option><option>Centroavante</option><option>Goleiro</option></select><p class="campo__ajuda" id="pos-ajuda">Só para cadastro.</p></div>
+    </div>
+    <div class="duas-colunas">
+      <div class="campo"><label class="campo__rotulo" for="tel">Telefone (opcional)</label><input class="campo__entrada" id="tel" type="tel" inputmode="tel" placeholder="(DD) 9XXXX-XXXX"></div>
+      <div class="campo"><label class="campo__rotulo" for="entrada">Data de entrada</label><input class="campo__entrada" id="entrada" type="date" max="2026-10-22" value="2026-10-22"></div>
+      <div class="campo"><label class="campo__rotulo" for="inicial">Pontuação inicial</label><input class="campo__entrada" id="inicial" type="number" inputmode="numeric" min="0" max="9999" step="1" value="0" aria-describedby="inicial-ajuda"><p class="campo__ajuda" id="inicial-ajuda">Pontos de antes da 1ª partida no app (0 a 9999).</p></div>
+    </div>
+    <div class="barra-acao"><button class="botao botao--principal" type="submit">Salvar</button></div>
+  </form>
+</main>
+</body>
+</html>

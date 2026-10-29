@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Arquivar grupo</title>
+<link rel="stylesheet" href="../../../../mockup/fontes/fontes.css">
+<link rel="stylesheet" href="../../../../mockup/tokens.css">
+<link rel="stylesheet" href="../../../../mockup/base.css">
+</head>
+<body>
+<!-- GEL-22: confirmação por digitação do nome. Diferente da t28: o botão fica habilitado e a API compara o nome exato (caixa e espaços contam); confirmado, abre t08-grupos--arquivado. Recorte em .dialogo. -->
+<header class="barra barra--admin" aria-hidden="true"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span></div></header>
+<div class="veu">
+  <section class="dialogo" role="alertdialog" aria-modal="true" aria-labelledby="d2-t" aria-describedby="d2-x">
+    <h2 id="d2-t" class="dialogo__titulo">Arquivar “Pelada de Quinta”?</h2>
+    <p id="d2-x" class="dialogo__texto">Os outros admins perdem o acesso e o grupo não pode ser alterado enquanto estiver arquivado. Os dados ficam guardados e você pode reativar em Seus grupos.</p>
+    <div class="campo"><label class="campo__rotulo" for="conf">Digite o nome do grupo para confirmar</label><input class="campo__entrada" id="conf" autocomplete="off" value="Pelada de Quinta"></div>
+    <div class="dialogo__acoes"><a class="botao botao--secundario" href="t20-grupo--sucesso.html">Cancelar</a><a class="botao botao--destrutivo" href="t08-grupos--arquivado.html">Arquivar grupo</a></div>
+  </section>
+</div>
+</body>
+</html>

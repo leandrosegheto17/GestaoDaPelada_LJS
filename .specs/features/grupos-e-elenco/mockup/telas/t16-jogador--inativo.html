@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Beto (inativo)</title>
+<link rel="stylesheet" href="../../../../mockup/fontes/fontes.css">
+<link rel="stylesheet" href="../../../../mockup/tokens.css">
+<link rel="stylesheet" href="../../../../mockup/base.css">
+</head>
+<body>
+<!-- Beto, inativo desde 05/10/2026 e sem nenhuma nota ("Sem nota", GEL-102, GEL-103, como em t16-jogador--sem-habilidades). Muda em relação à tela atual: a data de início fica como na edição (texto e "Alterar data de início"), não como campo de data de entrada (GEL-41 ignora a data de entrada na edição). -->
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+<header class="barra barra--admin"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span><a class="barra__link" href="t08-grupos--sucesso.html">Trocar grupo</a></div></header>
+<main id="conteudo" class="conteudo conteudo--admin conteudo--estreito">
+  <a class="voltar" href="../../../../mockup/telas/t15-jogadores--sucesso.html"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 18 9 12 15 6"/></svg>Jogadores</a>
+  <h1 class="titulo-pagina">Beto</h1>
+  <section aria-labelledby="s-dados">
+    <h2 id="s-dados" class="subtitulo">Dados</h2>
+    <form class="formulario" novalidate>
+      <div class="campo"><label class="campo__rotulo" for="apelido">Apelido</label><input class="campo__entrada" id="apelido" value="Beto" maxlength="30" aria-describedby="apelido-ajuda"><p class="campo__ajuda" id="apelido-ajuda">De 2 a 30 caracteres. É o nome que aparece no ranking.</p></div>
+      <div class="duas-colunas">
+        <div class="campo"><label class="campo__rotulo" for="ano">Ano de nascimento</label><input class="campo__entrada" id="ano" type="number" inputmode="numeric" min="1940" max="2016" value="1985"></div>
+        <div class="campo"><label class="campo__rotulo" for="pos">Posição</label><select class="campo__entrada" id="pos" aria-describedby="pos-ajuda"><option>Zagueiro</option><option>Lateral</option><option selected>Volante</option><option>Meia</option><option>Atacante</option><option>Centroavante</option><option>Goleiro</option></select><p class="campo__ajuda" id="pos-ajuda">Só para cadastro.</p></div>
+      </div>
+      <div class="duas-colunas">
+        <div class="campo"><label class="campo__rotulo" for="tel">Telefone (opcional)</label><input class="campo__entrada" id="tel" type="tel" inputmode="tel" value="(11) 99123-4567"></div>
+        <div class="campo"><span class="campo__rotulo">Data de início</span><p class="paragrafo" id="inicio-valor">05/02/2026</p><div><a class="botao botao--secundario" href="t16-jogador--inicio.html" aria-describedby="inicio-valor">Alterar data de início</a></div></div>
+        <div class="campo"><label class="campo__rotulo" for="inicial">Pontuação inicial</label><input class="campo__entrada" id="inicial" type="number" inputmode="numeric" min="0" max="9999" step="1" value="12" aria-describedby="inicial-ajuda"><p class="campo__ajuda" id="inicial-ajuda">Pontos de antes da 1ª partida no app (0 a 9999).</p></div>
+      </div>
+      <div><button class="botao botao--principal" type="submit">Salvar</button></div>
+    </form>
+  </section>
+  <section class="secao" aria-labelledby="s-hab">
+    <h2 id="s-hab" class="subtitulo">Habilidades e nível</h2>
+    <p class="paragrafo" aria-live="polite"><span class="selo selo--atencao">Sem nota</span> Usa 5,5 no simulador.</p>
+    <ul class="lista">
+      <li class="item"><label class="item__principal" for="h1">Visão de Jogo</label><select class="campo__entrada campo__entrada--nota" id="h1"><option value="" selected>–</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></li>
+      <li class="item"><label class="item__principal" for="h2">Passe</label><select class="campo__entrada campo__entrada--nota" id="h2"><option value="" selected>–</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></li>
+      <li class="item"><label class="item__principal" for="h3">Preparo Físico</label><select class="campo__entrada campo__entrada--nota" id="h3"><option value="" selected>–</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></li>
+      <li class="item"><label class="item__principal" for="h4">Drible</label><select class="campo__entrada campo__entrada--nota" id="h4"><option value="" selected>–</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></li>
+      <li class="item"><label class="item__principal" for="h5">Chute</label><select class="campo__entrada campo__entrada--nota" id="h5"><option value="" selected>–</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></li>
+      <li class="item"><label class="item__principal" for="h6">Desarme</label><select class="campo__entrada campo__entrada--nota" id="h6"><option value="" selected>–</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option></select></li>
+    </ul>
+  </section>
+  <section class="secao" aria-labelledby="s-sit">
+    <h2 id="s-sit" class="subtitulo">Situação</h2>
+    <div class="formulario">
+      <p class="paragrafo">Inativo desde 05/10/2026.</p>
+      <div class="campo">
+        <span class="campo__rotulo" id="s-per">Períodos de atividade</span>
+        <ul class="lista" aria-labelledby="s-per">
+          <li class="item item--quebra">
+            <div class="item__principal"><span class="item__titulo" id="p1-t">05/02/2026 <span aria-hidden="true">→</span><span class="sr">até</span> 05/10/2026</span><span class="item__meta">Entrada</span></div>
+            <div class="item__lado"><button class="botao botao--secundario" type="button" aria-describedby="p1-t">Corrigir datas</button></div>
+          </li>
+        </ul>
+      </div>
+      <p class="paragrafo">Volta a aparecer no ranking e nas partidas; a data de início e os pontos não mudam.</p>
+      <div class="grupo-botoes"><a class="botao botao--secundario" href="t16-jogador--reativar.html">Reativar</a><a class="botao botao--texto botao--texto-destrutivo" href="t16-jogador--excluir.html">Excluir jogador</a></div>
+    </div>
+  </section>
+</main>
+</body>
+</html>
