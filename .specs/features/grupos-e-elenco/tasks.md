@@ -939,11 +939,11 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] 201 com `linkPublico` = `<URL_PUBLICA>/g/<slug>`; sem sessão → 401 e nada criado; corpo com `slug` → 422
-- [ ] Cada 422 com a mensagem do GEL no campo certo; nome "Pelada de Quinta" duas vezes → `pelada-de-quinta` e `pelada-de-quinta-2`; renomear depois não muda o slug
-- [ ] Rodando como `pelada_app` (não como owner): a criação funciona sob a RLS
-- [ ] Rota nova com `nao_se_aplica` e motivo em `casos.ts` para os dois métodos; `meta.test.ts` verde
-- [ ] Gate full passa
+- [x] 201 com `linkPublico` = `<URL_PUBLICA>/g/<slug>`; sem sessão → 401 e nada criado; corpo com `slug` → 422
+- [x] Cada 422 com a mensagem do GEL no campo certo; nome "Pelada de Quinta" duas vezes → `pelada-de-quinta` e `pelada-de-quinta-2`; renomear depois não muda o slug
+- [x] Rodando como `pelada_app` (não como owner): a criação funciona sob a RLS
+- [x] Rota nova com `nao_se_aplica` e motivo em `casos.ts` para os dois métodos; `meta.test.ts` verde
+- [x] Gate full passa
 
 **Tests**: e2e
 **Gate**: full

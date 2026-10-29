@@ -244,4 +244,13 @@ export const CASOS_ROTAS: Record<string, CasoRota> = {
     motivo: 'Só com EMAIL_DEV=1 (desenvolvimento local): lista a caixa de e-mails em memória; sem banco.',
   },
   'POST /api/sessao/sair': { tipo: 'nao_se_aplica', motivo: 'Apaga a sessão da própria conta (RLS por conta).' },
+  // grupos-e-elenco (GEL-106): criar e listar não têm :grupoId; a função grupo_criar e a RLS decidem.
+  'POST /api/grupos': {
+    tipo: 'nao_se_aplica',
+    motivo: 'Cria o grupo pela função grupo_criar, com a conta da sessão como criadora; ainda não há grupo na rota.',
+  },
+  'GET /api/grupos': {
+    tipo: 'nao_se_aplica',
+    motivo: 'Lista os grupos da conta da sessão; a RLS (grupos_visiveis) decide o que aparece, inclusive o arquivado.',
+  },
 };
