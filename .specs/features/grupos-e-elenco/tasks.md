@@ -1051,10 +1051,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Jogador com período aberto é `ativo` com `desde` = início do período; sem período aberto é `inativo` com `desde` = última saída
-- [ ] Nível e `semNota` vêm do domínio; a lista usa 2 consultas (não N+1), conferido por contagem de consultas no teste
-- [ ] `ler` de jogador de outro grupo → nulo
-- [ ] Gate full passa
+- [x] Jogador com período aberto é `ativo` com `desde` = início do período; sem período aberto é `inativo` com `desde` = última saída
+- [x] Nível e `semNota` vêm do domínio; a lista usa 2 consultas (não N+1), conferido por contagem de consultas no teste
+- [x] `ler` de jogador de outro grupo → nulo
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
