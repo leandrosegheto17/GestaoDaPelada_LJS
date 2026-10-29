@@ -668,9 +668,9 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Duas conexões `pelada_app` (contas diferentes) chamam `grupo_criar` com o mesmo `slug_base` ao mesmo tempo, repetido 20 vezes: sempre dois slugs distintos e nenhuma falha
-- [ ] Com a base já ocupada até `-3`, a terceira tentativa esgotada devolve erro (não cria grupo parcial)
-- [ ] Gate full passa
+- [x] Duas conexões `pelada_app` (contas diferentes) chamam `grupo_criar` com o mesmo `slug_base` ao mesmo tempo, repetido 20 vezes: sempre dois slugs distintos e nenhuma falha
+- [x] Com a base já ocupada até `-3`, a terceira tentativa esgotada devolve erro (não cria grupo parcial)
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
