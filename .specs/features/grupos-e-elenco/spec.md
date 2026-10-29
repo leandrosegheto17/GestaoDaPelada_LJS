@@ -415,126 +415,126 @@ Convenções que valem para todas as histórias:
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----------- | ------ | ------- |
-| GEL-01 | P1: Criar grupo | Design | Pending |
-| GEL-02 | P1: Criar grupo | Design | Pending |
-| GEL-03 | P1: Criar grupo | Design | Pending |
-| GEL-04 | P1: Criar grupo | Design | Pending |
-| GEL-05 | P1: Criar grupo | Design | Pending |
-| GEL-06 | P1: Criar grupo | Design | Pending |
-| GEL-07 | P1: Criar grupo | Design | Pending |
-| GEL-08 | P1: Criar grupo | Design | Pending |
-| GEL-09 | P1: Criar grupo | Design | Pending |
-| GEL-10 | P1: Criar grupo | Design | Pending |
-| GEL-11 | P1: Slug do grupo | Design | Pending |
-| GEL-12 | P1: Slug do grupo | Design | Pending |
-| GEL-13 | P1: Slug do grupo | Design | Pending |
-| GEL-14 | P1: Slug do grupo | Design | Pending |
-| GEL-15 | P1: Slug do grupo | Design | Pending |
-| GEL-16 | P1: Slug do grupo | Design | Pending |
-| GEL-17 | P1: Slug do grupo | Design | Pending |
-| GEL-18 | P1: Editar os dados do grupo | Design | Pending |
-| GEL-19 | P1: Editar os dados do grupo | Design | Pending |
-| GEL-20 | P1: Editar os dados do grupo | Design | Pending |
-| GEL-21 | P1: Editar os dados do grupo | Design | Pending |
-| GEL-22 | P1: Arquivar e reativar o grupo | Design | Pending |
-| GEL-23 | P1: Arquivar e reativar o grupo | Design | Pending |
-| GEL-24 | P1: Arquivar e reativar o grupo | Design | Pending |
-| GEL-25 | P1: Arquivar e reativar o grupo | Design | Pending |
-| GEL-26 | P1: Arquivar e reativar o grupo | Design | Pending |
-| GEL-27 | P1: Arquivar e reativar o grupo | Design | Pending |
-| GEL-28 | P1: Arquivar e reativar o grupo | Design | Pending |
-| GEL-29 | P1: Arquivar e reativar o grupo | Design | Pending |
-| GEL-30 | P1: Arquivar e reativar o grupo | Design | Pending |
-| GEL-31 | P1: Cadastrar e editar jogador | Design | Pending |
-| GEL-32 | P1: Cadastrar e editar jogador | Design | Pending |
-| GEL-33 | P1: Cadastrar e editar jogador | Design | Pending |
-| GEL-34 | P1: Cadastrar e editar jogador | Design | Pending |
-| GEL-35 | P1: Cadastrar e editar jogador | Design | Pending |
-| GEL-36 | P1: Cadastrar e editar jogador | Design | Pending |
-| GEL-37 | P1: Cadastrar e editar jogador | Design | Pending |
-| GEL-38 | P1: Cadastrar e editar jogador | Design | Pending |
-| GEL-39 | P1: Cadastrar e editar jogador | Design | Pending |
-| GEL-40 | P1: Cadastrar e editar jogador | Design | Pending |
-| GEL-41 | P1: Cadastrar e editar jogador | Design | Pending |
-| GEL-42 | P1: Cadastrar e editar jogador | Design | Pending |
-| GEL-43 | P1: Cadastrar e editar jogador | Design | Pending |
-| GEL-44 | P1: Cadastrar e editar jogador | Design | Pending |
-| GEL-45 | P1: Cadastrar e editar jogador | Design | Pending |
-| GEL-46 | P1: Lista de jogadores | Design | Pending |
-| GEL-47 | P1: Lista de jogadores | Design | Pending |
-| GEL-48 | P1: Lista de jogadores | Design | Pending |
-| GEL-49 | P1: Lista de jogadores | Design | Pending |
-| GEL-50 | P1: Lista de jogadores | Design | Pending |
-| GEL-51 | P1: Inativar e reativar jogador | Design | Pending |
-| GEL-52 | P1: Inativar e reativar jogador | Design | Pending |
-| GEL-53 | P1: Inativar e reativar jogador | Design | Pending |
-| GEL-54 | P1: Inativar e reativar jogador | Design | Pending |
-| GEL-55 | P1: Inativar e reativar jogador | Design | Pending |
-| GEL-56 | P1: Inativar e reativar jogador | Design | Pending |
-| GEL-57 | P1: Inativar e reativar jogador | Design | Pending |
-| GEL-58 | P1: Inativar e reativar jogador | Design | Pending |
-| GEL-59 | P1: Inativar e reativar jogador | Design | Pending |
-| GEL-60 | P1: Inativar e reativar jogador | Design | Pending |
-| GEL-61 | P1: Regras dos períodos de atividade | Design | Pending |
-| GEL-62 | P1: Regras dos períodos de atividade | Design | Pending |
-| GEL-63 | P1: Regras dos períodos de atividade | Design | Pending |
-| GEL-64 | P1: Regras dos períodos de atividade | Design | Pending |
-| GEL-65 | P1: Regras dos períodos de atividade | Design | Pending |
-| GEL-66 | P1: Regras dos períodos de atividade | Design | Pending |
-| GEL-67 | P1: Regras dos períodos de atividade | Design | Pending |
-| GEL-68 | P1: Regras dos períodos de atividade | Design | Pending |
-| GEL-69 | P1: Regras dos períodos de atividade | Design | Pending |
-| GEL-70 | P1: Regras dos períodos de atividade | Design | Pending |
-| GEL-71 | P1: Corrigir datas de períodos | Design | Pending |
-| GEL-72 | P1: Corrigir datas de períodos | Design | Pending |
-| GEL-73 | P1: Corrigir datas de períodos | Design | Pending |
-| GEL-74 | P1: Corrigir datas de períodos | Design | Pending |
-| GEL-75 | P1: Corrigir datas de períodos | Design | Pending |
-| GEL-76 | P1: Corrigir datas de períodos | Design | Pending |
-| GEL-77 | P1: Alterar a data de início da pontuação | Design | Pending |
-| GEL-78 | P1: Alterar a data de início da pontuação | Design | Pending |
-| GEL-79 | P1: Alterar a data de início da pontuação | Design | Pending |
-| GEL-80 | P1: Alterar a data de início da pontuação | Design | Pending |
-| GEL-81 | P1: Alterar a data de início da pontuação | Design | Pending |
-| GEL-82 | P1: Alterar a data de início da pontuação | Design | Pending |
-| GEL-83 | P1: Alterar a data de início da pontuação | Design | Pending |
-| GEL-84 | P1: Excluir jogador | Design | Pending |
-| GEL-85 | P1: Excluir jogador | Design | Pending |
-| GEL-86 | P1: Excluir jogador | Design | Pending |
-| GEL-87 | P1: Excluir jogador | Design | Pending |
-| GEL-88 | P1: Habilidades do grupo | Design | Pending |
-| GEL-89 | P1: Habilidades do grupo | Design | Pending |
-| GEL-90 | P1: Habilidades do grupo | Design | Pending |
-| GEL-91 | P1: Habilidades do grupo | Design | Pending |
-| GEL-92 | P1: Habilidades do grupo | Design | Pending |
-| GEL-93 | P1: Habilidades do grupo | Design | Pending |
-| GEL-94 | P1: Habilidades do grupo | Design | Pending |
-| GEL-95 | P1: Habilidades do grupo | Design | Pending |
-| GEL-96 | P1: Habilidades do grupo | Design | Pending |
-| GEL-97 | P1: Notas e nível do jogador | Design | Pending |
-| GEL-98 | P1: Notas e nível do jogador | Design | Pending |
-| GEL-99 | P1: Notas e nível do jogador | Design | Pending |
-| GEL-100 | P1: Notas e nível do jogador | Design | Pending |
-| GEL-101 | P1: Notas e nível do jogador | Design | Pending |
-| GEL-102 | P1: Notas e nível do jogador | Design | Pending |
-| GEL-103 | P1: Notas e nível do jogador | Design | Pending |
-| GEL-104 | P1: Notas e nível do jogador | Design | Pending |
-| GEL-105 | P1: Notas e nível do jogador | Design | Pending |
-| GEL-106 | P1: Isolamento, transação e auditoria | Design | Pending |
-| GEL-107 | P1: Isolamento, transação e auditoria | Design | Pending |
-| GEL-108 | P1: Isolamento, transação e auditoria | Design | Pending |
-| GEL-109 | P1: Isolamento, transação e auditoria | Design | Pending |
-| GEL-110 | P1: Isolamento, transação e auditoria | Design | Pending |
-| GEL-111 | P1: Isolamento, transação e auditoria | Design | Pending |
-| GEL-112 | P1: Isolamento, transação e auditoria | Design | Pending |
-| GEL-113 | P1: Isolamento, transação e auditoria | Design | Pending |
-| GEL-114 | P1: Telas do grupo e do elenco no visual do legado | Design | Pending |
-| GEL-115 | P1: Telas do grupo e do elenco no visual do legado | Design | Pending |
-| GEL-116 | P1: Telas do grupo e do elenco no visual do legado | Design | Pending |
-| GEL-117 | P1: Telas do grupo e do elenco no visual do legado | Design | Pending |
-| GEL-118 | P1: Telas do grupo e do elenco no visual do legado | Design | Pending |
+| GEL-01 | P1: Criar grupo | Tasks (T18, T27, T29, T52, T58, T70) | Pending |
+| GEL-02 | P1: Criar grupo | Tasks (T4, T18) | Pending |
+| GEL-03 | P1: Criar grupo | Tasks (T12, T29, T58) | Pending |
+| GEL-04 | P1: Criar grupo | Tasks (T12, T29) | Pending |
+| GEL-05 | P1: Criar grupo | Tasks (T12, T29) | Pending |
+| GEL-06 | P1: Criar grupo | Tasks (T12, T29, T58) | Pending |
+| GEL-07 | P1: Criar grupo | Tasks (T12, T29) | Pending |
+| GEL-08 | P1: Criar grupo | Tasks (T29) | Pending |
+| GEL-09 | P1: Criar grupo | Tasks (T18, T29) | Pending |
+| GEL-10 | P1: Criar grupo | Tasks (T18, T29) | Pending |
+| GEL-11 | P1: Slug do grupo | Tasks (T1) | Pending |
+| GEL-12 | P1: Slug do grupo | Tasks (T1) | Pending |
+| GEL-13 | P1: Slug do grupo | Tasks (T1) | Pending |
+| GEL-14 | P1: Slug do grupo | Tasks (T18) | Pending |
+| GEL-15 | P1: Slug do grupo | Tasks (T19) | Pending |
+| GEL-16 | P1: Slug do grupo | Tasks (T20, T30) | Pending |
+| GEL-17 | P1: Slug do grupo | Tasks (T29) | Pending |
+| GEL-18 | P1: Editar os dados do grupo | Tasks (T28, T30, T60) | Pending |
+| GEL-19 | P1: Editar os dados do grupo | Tasks (T12, T30, T60) | Pending |
+| GEL-20 | P1: Editar os dados do grupo | Tasks (T27, T30, T59) | Pending |
+| GEL-21 | P1: Editar os dados do grupo | Tasks (T30) | Pending |
+| GEL-22 | P1: Arquivar e reativar o grupo | Tasks (T28, T31, T60) | Pending |
+| GEL-23 | P1: Arquivar e reativar o grupo | Tasks (T12, T28, T31, T60) | Pending |
+| GEL-24 | P1: Arquivar e reativar o grupo | Tasks (T28, T31) | Pending |
+| GEL-25 | P1: Arquivar e reativar o grupo | Tasks (T17, T24, T31, T32) | Pending |
+| GEL-26 | P1: Arquivar e reativar o grupo | Tasks (T25, T26, T31) | Pending |
+| GEL-27 | P1: Arquivar e reativar o grupo | Tasks (T27, T32, T53, T57) | Pending |
+| GEL-28 | P1: Arquivar e reativar o grupo | Tasks (T28) | Pending |
+| GEL-29 | P1: Arquivar e reativar o grupo | Tasks (T28, T31) | Pending |
+| GEL-30 | P1: Arquivar e reativar o grupo | Tasks (T28) | Pending |
+| GEL-31 | P1: Cadastrar e editar jogador | Tasks (T34, T36, T62, T70) | Pending |
+| GEL-32 | P1: Cadastrar e editar jogador | Tasks (T34) | Pending |
+| GEL-33 | P1: Cadastrar e editar jogador | Tasks (T36, T62) | Pending |
+| GEL-34 | P1: Cadastrar e editar jogador | Tasks (T13, T36, T62) | Pending |
+| GEL-35 | P1: Cadastrar e editar jogador | Tasks (T34) | Pending |
+| GEL-36 | P1: Cadastrar e editar jogador | Tasks (T5, T13, T36, T62) | Pending |
+| GEL-37 | P1: Cadastrar e editar jogador | Tasks (T13, T36) | Pending |
+| GEL-38 | P1: Cadastrar e editar jogador | Tasks (T13, T34) | Pending |
+| GEL-39 | P1: Cadastrar e editar jogador | Tasks (T13, T36, T62) | Pending |
+| GEL-40 | P1: Cadastrar e editar jogador | Tasks (T13, T36) | Pending |
+| GEL-41 | P1: Cadastrar e editar jogador | Tasks (T35, T37, T63) | Pending |
+| GEL-42 | P1: Cadastrar e editar jogador | Tasks (T35) | Pending |
+| GEL-43 | P1: Cadastrar e editar jogador | Tasks (T13, T35) | Pending |
+| GEL-44 | P1: Cadastrar e editar jogador | Tasks (T35, T37) | Pending |
+| GEL-45 | P1: Cadastrar e editar jogador | Tasks (T34, T37) | Pending |
+| GEL-46 | P1: Lista de jogadores | Tasks (T33, T36, T52, T54, T61) | Pending |
+| GEL-47 | P1: Lista de jogadores | Tasks (T2, T61) | Pending |
+| GEL-48 | P1: Lista de jogadores | Tasks (T2, T61) | Pending |
+| GEL-49 | P1: Lista de jogadores | Tasks (T61) | Pending |
+| GEL-50 | P1: Lista de jogadores | Tasks (T33) | Pending |
+| GEL-51 | P1: Inativar e reativar jogador | Tasks (T38, T42) | Pending |
+| GEL-52 | P1: Inativar e reativar jogador | Tasks (T14, T38, T42) | Pending |
+| GEL-53 | P1: Inativar e reativar jogador | Tasks (T38, T42) | Pending |
+| GEL-54 | P1: Inativar e reativar jogador | Tasks (T39, T42) | Pending |
+| GEL-55 | P1: Inativar e reativar jogador | Tasks (T14, T39, T42) | Pending |
+| GEL-56 | P1: Inativar e reativar jogador | Tasks (T39, T42) | Pending |
+| GEL-57 | P1: Inativar e reativar jogador | Tasks (T39) | Pending |
+| GEL-58 | P1: Inativar e reativar jogador | Tasks (T9, T38, T42) | Pending |
+| GEL-59 | P1: Inativar e reativar jogador | Tasks (T64) | Pending |
+| GEL-60 | P1: Inativar e reativar jogador | Tasks (T64) | Pending |
+| GEL-61 | P1: Regras dos períodos de atividade | Tasks (T6) | Pending |
+| GEL-62 | P1: Regras dos períodos de atividade | Tasks (T9) | Pending |
+| GEL-63 | P1: Regras dos períodos de atividade | Tasks (T7) | Pending |
+| GEL-64 | P1: Regras dos períodos de atividade | Tasks (T7) | Pending |
+| GEL-65 | P1: Regras dos períodos de atividade | Tasks (T7) | Pending |
+| GEL-66 | P1: Regras dos períodos de atividade | Tasks (T7) | Pending |
+| GEL-67 | P1: Regras dos períodos de atividade | Tasks (T7) | Pending |
+| GEL-68 | P1: Regras dos períodos de atividade | Tasks (T8) | Pending |
+| GEL-69 | P1: Regras dos períodos de atividade | Tasks (T9) | Pending |
+| GEL-70 | P1: Regras dos períodos de atividade | Tasks (T9, T11) | Pending |
+| GEL-71 | P1: Corrigir datas de períodos | Tasks (T14, T40, T43) | Pending |
+| GEL-72 | P1: Corrigir datas de períodos | Tasks (T9, T40, T43) | Pending |
+| GEL-73 | P1: Corrigir datas de períodos | Tasks (T9, T40, T43) | Pending |
+| GEL-74 | P1: Corrigir datas de períodos | Tasks (T14, T40, T43) | Pending |
+| GEL-75 | P1: Corrigir datas de períodos | Tasks (T40, T43) | Pending |
+| GEL-76 | P1: Corrigir datas de períodos | Tasks (T65) | Pending |
+| GEL-77 | P1: Alterar a data de início da pontuação | Tasks (T14, T41, T43, T65) | Pending |
+| GEL-78 | P1: Alterar a data de início da pontuação | Tasks (T10, T43) | Pending |
+| GEL-79 | P1: Alterar a data de início da pontuação | Tasks (T10, T43) | Pending |
+| GEL-80 | P1: Alterar a data de início da pontuação | Tasks (T10, T43) | Pending |
+| GEL-81 | P1: Alterar a data de início da pontuação | Tasks (T10, T41) | Pending |
+| GEL-82 | P1: Alterar a data de início da pontuação | Tasks (T41, T43) | Pending |
+| GEL-83 | P1: Alterar a data de início da pontuação | Tasks (T41, T45) | Pending |
+| GEL-84 | P1: Excluir jogador | Tasks (T35, T37) | Pending |
+| GEL-85 | P1: Excluir jogador | Tasks (T35, T37) | Pending |
+| GEL-86 | P1: Excluir jogador | Tasks (T66) | Pending |
+| GEL-87 | P1: Excluir jogador | Tasks (T66) | Pending |
+| GEL-88 | P1: Habilidades do grupo | Tasks (T46, T47, T55) | Pending |
+| GEL-89 | P1: Habilidades do grupo | Tasks (T46, T47) | Pending |
+| GEL-90 | P1: Habilidades do grupo | Tasks (T15, T47) | Pending |
+| GEL-91 | P1: Habilidades do grupo | Tasks (T46, T47) | Pending |
+| GEL-92 | P1: Habilidades do grupo | Tasks (T46, T47) | Pending |
+| GEL-93 | P1: Habilidades do grupo | Tasks (T46, T47) | Pending |
+| GEL-94 | P1: Habilidades do grupo | Tasks (T67) | Pending |
+| GEL-95 | P1: Habilidades do grupo | Tasks (T67) | Pending |
+| GEL-96 | P1: Habilidades do grupo | Tasks (T46, T47) | Pending |
+| GEL-97 | P1: Notas e nível do jogador | Tasks (T48, T49, T56, T63) | Pending |
+| GEL-98 | P1: Notas e nível do jogador | Tasks (T48, T49) | Pending |
+| GEL-99 | P1: Notas e nível do jogador | Tasks (T15, T49) | Pending |
+| GEL-100 | P1: Notas e nível do jogador | Tasks (T49) | Pending |
+| GEL-101 | P1: Notas e nível do jogador | Tasks (T3) | Pending |
+| GEL-102 | P1: Notas e nível do jogador | Tasks (T3, T48) | Pending |
+| GEL-103 | P1: Notas e nível do jogador | Tasks (T56, T63) | Pending |
+| GEL-104 | P1: Notas e nível do jogador | Tasks (T3, T11) | Pending |
+| GEL-105 | P1: Notas e nível do jogador | Tasks (T48, T49) | Pending |
+| GEL-106 | P1: Isolamento, transação e auditoria | Tasks (T29, T30, T31, T36, T37, T42, T43, T47, T49) | Pending |
+| GEL-107 | P1: Isolamento, transação e auditoria | Tasks (T17, T32, T51) | Pending |
+| GEL-108 | P1: Isolamento, transação e auditoria | Tasks (T51) | Pending |
+| GEL-109 | P1: Isolamento, transação e auditoria | Tasks (T38, T44) | Pending |
+| GEL-110 | P1: Isolamento, transação e auditoria | Tasks (T44) | Pending |
+| GEL-111 | P1: Isolamento, transação e auditoria | Tasks (T45) | Pending |
+| GEL-112 | P1: Isolamento, transação e auditoria | Tasks (T17, T20, T29) | Pending |
+| GEL-113 | P1: Isolamento, transação e auditoria | Tasks (T50) | Pending |
+| GEL-114 | P1: Telas do grupo e do elenco no visual do legado | Tasks (T57, T58, T59, T60, T61, T62, T63, T64, T65, T66, T67, T68, T70) | Pending |
+| GEL-115 | P1: Telas do grupo e do elenco no visual do legado | Tasks (T69) | Pending |
+| GEL-116 | P1: Telas do grupo e do elenco no visual do legado | Tasks (T69) | Pending |
+| GEL-117 | P1: Telas do grupo e do elenco no visual do legado | Tasks (T57) | Pending |
+| GEL-118 | P1: Telas do grupo e do elenco no visual do legado | Tasks (T53, T54, T58, T60, T62, T64, T65) | Pending |
 
-**Coverage:** 118 total, 0 mapped to tasks, 118 unmapped ⚠️ (o mapeamento acontece na fase de tarefas)
+**Coverage:** 118 total, 118 mapped to tasks, 0 unmapped ✅
 
 ---
 
