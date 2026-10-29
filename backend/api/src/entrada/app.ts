@@ -9,6 +9,7 @@ import { corpoGrande, erroInterno, naoEncontrado } from './erros.ts';
 import { semCache } from './middlewares/cache.ts';
 import { comBanco } from './middlewares/com-banco.ts';
 import { exigirCabecalhoPelada } from './middlewares/csrf.ts';
+import { exigirGrupoAtivo } from './middlewares/grupo-ativo.ts';
 import { limiteEmailsOrigem } from './middlewares/limite-emails-origem.ts';
 import { criarLimiteTaxa, type Limitador } from './middlewares/limite-taxa.ts';
 import { semSniff } from './middlewares/sem-sniff.ts';
@@ -107,8 +108,9 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<AppEnv> {
   });
   app.use('/api/*', carregarSessao);
   app.use('/api/*', comBanco);
-  // Toda rota de dado de grupo: sessão e vínculo com o grupo (G-03, ACE-41).
-  app.use('/api/grupos/:grupoId/*', exigirSessao, exigirVinculo);
+  // Toda rota de dado de grupo: sessão e vínculo com o grupo (G-03, ACE-41); no grupo arquivado, só leitura e
+  // reativar (GEL-26).
+  app.use('/api/grupos/:grupoId/*', exigirSessao, exigirVinculo, exigirGrupoAtivo);
   // Teto de e-mails por origem, antes de a rota reservar a cota do dia (ACE-73).
   for (const caminho of ROTAS_TETO_EMAILS_ORIGEM) app.use(caminho, limiteEmailsOrigem);
 

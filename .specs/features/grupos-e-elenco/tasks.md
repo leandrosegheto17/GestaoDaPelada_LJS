@@ -856,9 +856,9 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Em grupo arquivado, `POST /api/grupos/:id/admins/convites` (e demais escritas das rotas existentes) responde 409; `GET` das mesmas responde como antes
-- [ ] `admins.test.ts`, `convites.test.ts` e `vinculo-middleware.test.ts` verdes
-- [ ] Gate full passa
+- [x] Em grupo arquivado, `POST /api/grupos/:id/admins/convites` (e demais escritas das rotas existentes) responde 409; `GET` das mesmas responde como antes
+- [x] `admins.test.ts`, `convites.test.ts` e `vinculo-middleware.test.ts` verdes
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
