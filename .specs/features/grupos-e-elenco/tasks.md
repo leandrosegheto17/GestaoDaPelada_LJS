@@ -1627,9 +1627,9 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Cada mutação chama a rota certa e invalida a lista e a ficha
-- [ ] 409 `jogador_com_historico` chega com a sugestão `inativar`
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Cada mutação chama a rota certa e invalida a lista e a ficha
+- [x] 409 `jogador_com_historico` chega com a sugestão `inativar`
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
