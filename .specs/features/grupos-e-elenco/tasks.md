@@ -1354,10 +1354,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Duas conexões `pelada_app` inativam o mesmo jogador ao mesmo tempo: uma conclui e a outra recebe `ja_inativo` (validada sobre o resultado da primeira)
-- [ ] Inativar e corrigir saída em paralelo: o resultado final respeita as regras de ordem, sem períodos sobrepostos
-- [ ] Repetido 20 vezes sem resultado inconsistente
-- [ ] Gate full passa
+- [x] Duas conexões `pelada_app` inativam o mesmo jogador ao mesmo tempo: uma conclui e a outra recebe `ja_inativo` (validada sobre o resultado da primeira)
+- [x] Inativar e corrigir saída em paralelo: o resultado final respeita as regras de ordem, sem períodos sobrepostos
+- [x] Repetido 20 vezes sem resultado inconsistente
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
