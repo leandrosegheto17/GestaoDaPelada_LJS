@@ -1410,11 +1410,11 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Habilidade nova vai ao fim da ordem; renomear mantém notas e posição
-- [ ] "Drible" e "drible" colidem (422 com a mensagem do GEL-91); corrida cai no índice único e vira o mesmo 422
-- [ ] Excluir apaga as notas de todos os jogadores nessa habilidade e audita `habilidade_excluida`
-- [ ] Habilidade de outro grupo → nulo (404)
-- [ ] Gate full passa
+- [x] Habilidade nova vai ao fim da ordem; renomear mantém notas e posição
+- [x] "Drible" e "drible" colidem (422 com a mensagem do GEL-91); corrida cai no índice único e vira o mesmo 422
+- [x] Excluir apaga as notas de todos os jogadores nessa habilidade e audita `habilidade_excluida`
+- [x] Habilidade de outro grupo → nulo (404)
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
