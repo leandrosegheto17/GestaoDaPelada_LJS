@@ -828,11 +828,11 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Grupo arquivado: `PATCH`, `POST`, `PUT` e `DELETE` → 409 com o código `grupo_arquivado`; `GET` → passa
-- [ ] `POST /api/grupos/:grupoId/reativar` passa mesmo arquivado
-- [ ] Grupo ativo: nenhum método é barrado
-- [ ] Código `grupo_arquivado` registrado em `entrada/erros.ts`
-- [ ] Gate full passa
+- [x] Grupo arquivado: `PATCH`, `POST`, `PUT` e `DELETE` → 409 com o código `grupo_arquivado`; `GET` → passa
+- [x] `POST /api/grupos/:grupoId/reativar` passa mesmo arquivado
+- [x] Grupo ativo: nenhum método é barrado
+- [x] Código `grupo_arquivado` registrado em `entrada/erros.ts`
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full

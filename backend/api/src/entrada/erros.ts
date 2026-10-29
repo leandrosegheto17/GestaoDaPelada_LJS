@@ -21,6 +21,8 @@ export const CODIGOS_ERRO = {
   contaExistente: 'conta_existente',
   jaEAdmin: 'ja_e_admin',
   ultimoAdmin: 'ultimo_admin',
+  // grupos-e-elenco (GEL-26): escrita em grupo arquivado.
+  grupoArquivado: 'grupo_arquivado',
 } as const;
 
 /** Erro padrão da API: `{ erro: { codigo, mensagem, campos? } }`. */
