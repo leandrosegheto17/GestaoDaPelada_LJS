@@ -51,10 +51,17 @@ interface Props {
   valores: ValoresGrupo;
   erros: ErrosDeCampos;
   aoMudar: (valores: ValoresGrupo) => void;
+  /** Ajuda do nome; padrão: a do grupo novo (t27). */
+  ajudaNome?: string;
 }
 
 /** Nome, dia, horário e frequência do grupo, com a mensagem da regra ao lado de cada campo. */
-export function CamposDoGrupo({ valores, erros, aoMudar }: Props) {
+export function CamposDoGrupo({
+  valores,
+  erros,
+  aoMudar,
+  ajudaNome = 'O link do ranking será criado a partir do nome e não muda depois.',
+}: Props) {
   const mudar = <C extends keyof ValoresGrupo>(campo: C, valor: ValoresGrupo[C]) =>
     aoMudar({ ...valores, [campo]: valor });
   return (
@@ -63,7 +70,7 @@ export function CamposDoGrupo({ valores, erros, aoMudar }: Props) {
         id="nome"
         rotulo="Nome"
         maxLength={LIMITES.nomeGrupo.max}
-        ajuda="O link do ranking será criado a partir do nome e não muda depois."
+        ajuda={ajudaNome}
         erro={erros['nome']}
         valor={valores.nome}
         aoMudar={(v) => mudar('nome', v)}

@@ -1785,10 +1785,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Estados t20: sucesso, salvo ("Dados salvos"), erro, carregando, nao-criador (sem a zona de arquivar), arquivar e arquivar-erro
-- [ ] Arquivar só habilita com o nome exato; 422 do nome aparece no campo; o link é copiado sem URL fixa no código
-- [ ] axe sem violação; só tokens
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Estados t20: sucesso, salvo ("Dados salvos"), erro, carregando, nao-criador (sem a zona de arquivar), arquivar e arquivar-erro
+- [x] Arquivar só habilita com o nome exato; 422 do nome aparece no campo; o link é copiado sem URL fixa no código
+- [x] axe sem violação; só tokens
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
