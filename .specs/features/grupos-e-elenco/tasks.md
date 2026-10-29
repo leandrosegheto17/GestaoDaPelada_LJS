@@ -1438,10 +1438,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] 200, 201, 200 e 204 nos caminhos felizes; nome de 1 e 31 caracteres → 422 do GEL-90; repetido → 422 do GEL-91
-- [ ] Id de outro grupo → 404; sem vínculo → 404; grupo arquivado → 409 nas escritas
-- [ ] Casos `grupo` dos quatro métodos em `casos.ts`
-- [ ] Gate full passa
+- [x] 200, 201, 200 e 204 nos caminhos felizes; nome de 1 e 31 caracteres → 422 do GEL-90; repetido → 422 do GEL-91
+- [x] Id de outro grupo → 404; sem vínculo → 404; grupo arquivado → 409 nas escritas
+- [x] Casos `grupo` dos quatro métodos em `casos.ts`
+- [x] Gate full passa
 
 **Tests**: e2e
 **Gate**: full

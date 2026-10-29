@@ -18,6 +18,7 @@ import { exigirVinculo } from './middlewares/vinculo.ts';
 import { rotaAdmins } from './rotas/admins.ts';
 import { rotaDevEmails } from './rotas/dev-emails.ts';
 import { rotaGrupos } from './rotas/grupos.ts';
+import { rotaHabilidades } from './rotas/habilidades.ts';
 import { rotaJogadores } from './rotas/jogadores.ts';
 import { rotaPeriodos } from './rotas/periodos.ts';
 import { rotaConvites } from './rotas/convites.ts';
@@ -127,6 +128,7 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<AppEnv> {
   app.route('/', rotaGrupos);
   app.route('/', rotaJogadores);
   app.route('/', rotaPeriodos);
+  app.route('/', rotaHabilidades);
   app.route('/', rotaDevEmails);
 
   app.notFound((c) => naoEncontrado(c));
