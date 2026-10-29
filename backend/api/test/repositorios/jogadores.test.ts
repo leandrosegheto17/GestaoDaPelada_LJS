@@ -741,3 +741,145 @@ describe('jogadores.reativar (T39; GEL-54 a GEL-57)', () => {
     expect(await periodosDe(alheio)).toEqual([{ inicio: '2026-09-01', fim: '2026-10-05' }]);
   });
 });
+
+/** Ids dos períodos do jogador, em ordem de início. */
+const idsDosPeriodos = async (jogador: string) =>
+  (
+    await b.owner.query<{ id: string }>('SELECT id FROM periodos_ativos WHERE jogador_id = $1 ORDER BY inicio', [
+      jogador,
+    ])
+  ).rows.map((r) => r.id);
+
+describe('jogadores.corrigirPeriodo (T40; GEL-71 a GEL-75)', () => {
+  /** Saiu em 05/10 e voltou em 12/10. */
+  async function saiuEVoltou(c: Cenario): Promise<{ id: string; primeiro: string; segundo: string }> {
+    const id = await gravarJogador(c, `Corrige ${randomUUID().slice(0, 6)}`, [
+      ['2026-09-01', '2026-10-05'],
+      ['2026-10-12', null],
+    ]);
+    const [primeiro, segundo] = await idsDosPeriodos(id);
+    return { id, primeiro: primeiro!, segundo: segundo! };
+  }
+
+  it('saída de 05/10 para 03/10: grava e audita jogador_periodo_corrigido com as datas antes e depois', async () => {
+    const c = await novoCenario();
+    const { id, primeiro, segundo } = await saiuEVoltou(c);
+    const r = await como(c.conta, (db) =>
+      jogadores.corrigirPeriodo(db, c.grupo, id, primeiro, { saida: '2026-10-03' }, HOJE_P),
+    );
+    expect(r).toEqual({
+      ok: true,
+      alterado: true,
+      periodos: [
+        { id: primeiro, inicio: '2026-09-01', fim: '2026-10-03' },
+        { id: segundo, inicio: '2026-10-12', fim: null },
+      ],
+    });
+    expect(await periodosDe(id)).toEqual([
+      { inicio: '2026-09-01', fim: '2026-10-03' },
+      { inicio: '2026-10-12', fim: null },
+    ]);
+    expect(await auditoriaDe(c.grupo, 'jogador_periodo_corrigido')).toEqual([
+      {
+        autor_conta_id: c.conta,
+        entidade_id: id,
+        resumo: {
+          periodo: primeiro,
+          saidaAnterior: '2026-10-05',
+          saidaNova: '2026-10-03',
+          retornoAnterior: '2026-09-01',
+          retornoNovo: '2026-09-01',
+        },
+      },
+    ]);
+  });
+
+  it('retorno do segundo período de 12/10 para 10/10: grava só o início dele', async () => {
+    const c = await novoCenario();
+    const { id, segundo } = await saiuEVoltou(c);
+    const r = await como(c.conta, (db) =>
+      jogadores.corrigirPeriodo(db, c.grupo, id, segundo, { retorno: '2026-10-10' }, HOJE_P),
+    );
+    expect(r).toMatchObject({ ok: true, alterado: true });
+    expect(await periodosDe(id)).toEqual([
+      { inicio: '2026-09-01', fim: '2026-10-05' },
+      { inicio: '2026-10-10', fim: null },
+    ]);
+  });
+
+  it('datas iguais às atuais: alterado false, sem escrita e sem auditoria (GEL-74)', async () => {
+    const c = await novoCenario();
+    const { id, primeiro, segundo } = await saiuEVoltou(c);
+    const r = await como(c.conta, (db) =>
+      jogadores.corrigirPeriodo(db, c.grupo, id, segundo, { retorno: '2026-10-12' }, HOJE_P),
+    );
+    expect(r).toEqual({
+      ok: true,
+      alterado: false,
+      periodos: [
+        { id: primeiro, inicio: '2026-09-01', fim: '2026-10-05' },
+        { id: segundo, inicio: '2026-10-12', fim: null },
+      ],
+    });
+    expect(await auditoriaDe(c.grupo, 'jogador_periodo_corrigido')).toEqual([]);
+  });
+
+  it.each([
+    ['saída de período aberto', 'segundo', { saida: '2026-10-20' }, 'saida', 'Este período não tem data de saída.'],
+    [
+      'início do primeiro período',
+      'primeiro',
+      { retorno: '2026-08-20' },
+      'retorno',
+      'O início do primeiro período é a data de início da pontuação; use Alterar data de início.',
+    ],
+    [
+      'saída depois do próximo retorno',
+      'primeiro',
+      { saida: '2026-10-13' },
+      'saida',
+      'A saída não pode ser depois do próximo retorno (12/10/2026).',
+    ],
+  ] as const)('%s: recusa com a mensagem do domínio e nada muda', async (_caso, qual, datas, campo, mensagem) => {
+    const c = await novoCenario();
+    const periodos = await saiuEVoltou(c);
+    const r = await como(c.conta, (db) =>
+      jogadores.corrigirPeriodo(db, c.grupo, periodos.id, periodos[qual], datas, HOJE_P),
+    );
+    expect(r).toEqual({ ok: false, campo, mensagem });
+    expect(await periodosDe(periodos.id)).toEqual([
+      { inicio: '2026-09-01', fim: '2026-10-05' },
+      { inicio: '2026-10-12', fim: null },
+    ]);
+    expect(await auditoriaDe(c.grupo, 'jogador_periodo_corrigido')).toEqual([]);
+  });
+
+  it('período de outro jogador do grupo, inexistente ou jogador de outro grupo: nulo e nada muda', async () => {
+    const c = await novoCenario();
+    const um = await saiuEVoltou(c);
+    const outroJogador = await saiuEVoltou(c);
+    const saida = { saida: '2026-10-03' };
+    expect(
+      await como(c.conta, (db) => jogadores.corrigirPeriodo(db, c.grupo, um.id, outroJogador.primeiro, saida, HOJE_P)),
+    ).toBeNull();
+    expect(
+      await como(c.conta, (db) => jogadores.corrigirPeriodo(db, c.grupo, um.id, randomUUID(), saida, HOJE_P)),
+    ).toBeNull();
+    const outro = await novoCenario();
+    const alheio = await saiuEVoltou(outro);
+    expect(
+      await como(c.conta, (db) =>
+        jogadores.corrigirPeriodo(db, outro.grupo, alheio.id, alheio.primeiro, saida, HOJE_P),
+      ),
+    ).toBeNull();
+    expect(
+      await como(c.conta, (db) => jogadores.corrigirPeriodo(db, c.grupo, alheio.id, alheio.primeiro, saida, HOJE_P)),
+    ).toBeNull();
+    for (const j of [um, outroJogador, alheio]) {
+      expect(await periodosDe(j.id)).toEqual([
+        { inicio: '2026-09-01', fim: '2026-10-05' },
+        { inicio: '2026-10-12', fim: null },
+      ]);
+    }
+  });
+});

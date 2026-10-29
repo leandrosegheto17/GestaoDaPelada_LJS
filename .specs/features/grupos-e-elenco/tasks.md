@@ -1245,10 +1245,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Saída corrigida de 05/10 para 03/10 grava e audita `jogador_periodo_corrigido` com as datas antes e depois
-- [ ] Datas iguais → `alterado: false` sem escrita e sem auditoria
-- [ ] Saída de período aberto e início do primeiro período → as mensagens dos GEL-72 e GEL-73; período de outro jogador ou grupo → nulo (404)
-- [ ] Gate full passa
+- [x] Saída corrigida de 05/10 para 03/10 grava e audita `jogador_periodo_corrigido` com as datas antes e depois
+- [x] Datas iguais → `alterado: false` sem escrita e sem auditoria
+- [x] Saída de período aberto e início do primeiro período → as mensagens dos GEL-72 e GEL-73; período de outro jogador ou grupo → nulo (404)
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full

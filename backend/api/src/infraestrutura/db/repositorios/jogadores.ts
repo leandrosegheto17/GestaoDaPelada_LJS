@@ -471,3 +471,57 @@ export async function reativar(
   });
   return { ok: true };
 }
+
+export type ResultadoCorrigir = { ok: true; alterado: boolean; periodos: PeriodoLido[] } | RecusaPeriodo | null;
+
+/**
+ * Corrige a saída e/ou o retorno de um período (GEL-71 a GEL-75): com a linha travada, avalia pelas regras de período
+ * (inclusive o campo corrigível, GEL-72 e GEL-73), grava e audita `jogador_periodo_corrigido` com as datas antes e
+ * depois. Datas iguais às atuais: `alterado: false`, sem gravar nem auditar (GEL-74). Período que não é do jogador
+ * do grupo, ou jogador de outro grupo: nulo (GEL-75).
+ */
+export async function corrigirPeriodo(
+  db: Db,
+  grupoId: string,
+  jogadorId: string,
+  periodoId: string,
+  datas: { saida?: string | undefined; retorno?: string | undefined },
+  hoje: string,
+): Promise<ResultadoCorrigir> {
+  const j = await travarParaPeriodo(db, grupoId, jogadorId, hoje);
+  if (!j) return null;
+  const antes = j.periodos.find((p) => p.id === periodoId);
+  if (!antes) return null;
+  const avaliacao = avaliarPeriodos({
+    periodos: j.periodos,
+    operacao: {
+      tipo: 'corrigir',
+      periodoId,
+      ...(datas.saida !== undefined ? { saida: datas.saida } : {}),
+      ...(datas.retorno !== undefined ? { retorno: datas.retorno } : {}),
+    },
+    hoje,
+    inicioPontuacao: j.inicioPontuacao,
+    presencas: j.presencas,
+  });
+  if (!avaliacao.ok) return { ok: false, campo: avaliacao.campo, mensagem: avaliacao.mensagem };
+  if (!avaliacao.alterado) return { ok: true, alterado: false, periodos: j.periodos };
+  const depois = { inicio: datas.retorno ?? antes.inicio, fim: datas.saida ?? antes.fim };
+  await db
+    .updateTable('periodos_ativos')
+    .set(depois)
+    .where('grupo_id', '=', grupoId)
+    .where('id', '=', periodoId)
+    .execute();
+  await auditoria.registrar(db, grupoId, 'jogador_periodo_corrigido', 'jogador', jogadorId, {
+    periodo: periodoId,
+    saidaAnterior: antes.fim,
+    saidaNova: depois.fim,
+    retornoAnterior: antes.inicio,
+    retornoNovo: depois.inicio,
+  });
+  const periodos = j.periodos
+    .map((p) => (p.id === periodoId ? { ...p, ...depois } : p))
+    .sort((a, b) => (a.inicio < b.inicio ? -1 : a.inicio > b.inicio ? 1 : 0));
+  return { ok: true, alterado: true, periodos };
+}
