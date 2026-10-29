@@ -266,6 +266,7 @@ export const CASOS_ROTAS: Record<string, CasoRota> = {
   'POST /api/grupos/:grupoId/habilidades': { tipo: 'grupo' },
   'PATCH /api/grupos/:grupoId/habilidades/:id': { tipo: 'grupo' },
   'DELETE /api/grupos/:grupoId/habilidades/:id': { tipo: 'grupo' },
+  'PUT /api/grupos/:grupoId/jogadores/:id/notas/:habilidadeId': { tipo: 'grupo' },
   'GET /api/grupos': {
     tipo: 'nao_se_aplica',
     motivo: 'Lista os grupos da conta da sessão; a RLS (grupos_visiveis) decide o que aparece, inclusive o arquivado.',

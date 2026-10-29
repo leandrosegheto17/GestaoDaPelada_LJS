@@ -1492,10 +1492,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Nota 8 → 200 com `{ nivel, semNota }`; `null` → 200; nota 0, 11, 5,5 → 422 no campo `nota`
-- [ ] Jogador ou habilidade de outro grupo → 404; jogador inativo → 200
-- [ ] Caso `grupo` em `casos.ts`
-- [ ] Gate full passa
+- [x] Nota 8 → 200 com `{ nivel, semNota }`; `null` → 200; nota 0, 11, 5,5 → 422 no campo `nota`
+- [x] Jogador ou habilidade de outro grupo → 404; jogador inativo → 200
+- [x] Caso `grupo` em `casos.ts`
+- [x] Gate full passa
 
 **Tests**: e2e
 **Gate**: full
