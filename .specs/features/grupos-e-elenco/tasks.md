@@ -775,9 +775,9 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] `pnpm typecheck` passa com os tipos novos contra o esquema (`esquema.ts`)
-- [ ] Colunas e nulabilidade conferem com `linha-de-base.esquema.txt`
-- [ ] Gate build passa
+- [x] `pnpm typecheck` passa com os tipos novos contra o esquema (`esquema.ts`)
+- [x] Colunas e nulabilidade conferem com `linha-de-base.esquema.txt`
+- [x] Gate build passa
 
 **Tests**: none
 **Gate**: build
