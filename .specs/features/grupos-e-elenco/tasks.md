@@ -1704,10 +1704,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Estados do mockup t08: carregando, erro, vazio, sucesso, arquivado, reativar e reativado, cada um com teste
-- [ ] Arquivados só aparecem para quem tem a lista `arquivados`; Reativar chama a mutação
-- [ ] axe sem violação; só tokens (`checar-tokens.py` passa)
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Estados do mockup t08: carregando, erro, vazio, sucesso, arquivado, reativar e reativado, cada um com teste
+- [x] Arquivados só aparecem para quem tem a lista `arquivados`; Reativar chama a mutação
+- [x] axe sem violação; só tokens (`checar-tokens.py` passa)
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
