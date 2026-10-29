@@ -640,11 +640,11 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Como `pelada_app`: devolve `(id, slug)`; o grupo tem `criado_por` = conta, vínculo com `acessa_financeiro` verdadeiro, 6 habilidades na ordem de GEL-02 e uma linha `grupo_criado` na auditoria com a conta como autora
-- [ ] Slug `pelada-de-quinta` ocupado (inclusive por grupo arquivado) → `pelada-de-quinta-2`, depois `-3`
-- [ ] Sem `app_conta_id()` a função falha; falha no meio (habilidade inválida) desfaz grupo e vínculo (GEL-09)
-- [ ] `EXECUTE` só para `pelada_app`; `search_path` fixo; `funcoes-definer.test.ts` verde com a função nova
-- [ ] Gate full passa
+- [x] Como `pelada_app`: devolve `(id, slug)`; o grupo tem `criado_por` = conta, vínculo com `acessa_financeiro` verdadeiro, 6 habilidades na ordem de GEL-02 e uma linha `grupo_criado` na auditoria com a conta como autora
+- [x] Slug `pelada-de-quinta` ocupado (inclusive por grupo arquivado) → `pelada-de-quinta-2`, depois `-3`
+- [x] Sem `app_conta_id()` a função falha; falha no meio (habilidade inválida) desfaz grupo e vínculo (GEL-09)
+- [x] `EXECUTE` só para `pelada_app`; `search_path` fixo; `funcoes-definer.test.ts` verde com a função nova
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full

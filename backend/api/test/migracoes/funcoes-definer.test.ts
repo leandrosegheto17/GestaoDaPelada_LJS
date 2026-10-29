@@ -71,6 +71,8 @@ describe('funções SECURITY DEFINER (AD-008)', () => {
       'email_cota_reservar',
       // email_origem_registrar entrou na T66 (teto de e-mails por origem, ACE-73).
       'email_origem_registrar',
+      // grupo_criar entrou na T18 da grupos-e-elenco (criação de grupo com vínculo e habilidades, GEL-01).
+      'grupo_criar',
       'grupos_visiveis',
       'link_confirmar',
       'link_nova_senha',
