@@ -723,9 +723,9 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] `hoje()` às 22h de São Paulo (01h UTC do dia seguinte) devolve o dia de São Paulo
-- [ ] Relógio fixo para testes (`relogioFixo(data)`)
-- [ ] Gate full passa
+- [x] `hoje()` às 22h de São Paulo (01h UTC do dia seguinte) devolve o dia de São Paulo
+- [x] Relógio fixo para testes (`relogioFixo(data)`)
+- [x] Gate full passa
 
 **Tests**: unit
 **Gate**: full

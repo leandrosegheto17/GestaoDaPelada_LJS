@@ -178,6 +178,13 @@ export default tseslint.config(
     },
   },
   {
+    // G-06: o relógio da API é o único lugar que lê a data do sistema (AD-015; T21 da grupos-e-elenco).
+    files: ['backend/api/src/infraestrutura/relogio/**'],
+    rules: {
+      'no-restricted-syntax': sintaxe(dinamicos([...PROIBIDAS_GLOBAL, ...BANCO]), semAsUnknownAs),
+    },
+  },
+  {
     files: ['backend/api/src/infraestrutura/db/**'],
     rules: {
       'no-restricted-imports': ['error', restritos(PROIBIDAS_GLOBAL)],
