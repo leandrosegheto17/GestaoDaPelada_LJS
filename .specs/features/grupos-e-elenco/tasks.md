@@ -173,10 +173,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] "Pelada de Quinta" → `pelada-de-quinta`; "!!!" e "AB" → `grupo`; "Admin" → `admin-grupo`; as 9 reservadas testadas
-- [ ] Corte em 40 caracteres sem hífen final; acento, cedilha e emoji removidos
-- [ ] `slugBase` exportada de `@pelada/dominio`
-- [ ] Gate quick passa: `pnpm --filter @pelada/dominio test`; testes ligados a GEL-11 a GEL-13 (AD-002)
+- [x] "Pelada de Quinta" → `pelada-de-quinta`; "!!!" e "AB" → `grupo`; "Admin" → `admin-grupo`; as 9 reservadas testadas
+- [x] Corte em 40 caracteres sem hífen final; acento, cedilha e emoji removidos
+- [x] `slugBase` exportada de `@pelada/dominio`
+- [x] Gate quick passa: `pnpm --filter @pelada/dominio test`; testes ligados a GEL-11 a GEL-13 (AD-002)
 
 **Tests**: unit
 **Gate**: quick
