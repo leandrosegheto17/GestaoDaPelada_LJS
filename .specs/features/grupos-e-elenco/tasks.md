@@ -200,10 +200,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] "José" e "jose" têm a mesma `chaveBusca`; a ordenação põe "Álvaro" antes de "Beto"
-- [ ] `chaveBusca("")` não quebra e devolve vazio
-- [ ] Exportadas de `@pelada/dominio`
-- [ ] Gate quick passa: `pnpm --filter @pelada/dominio test`
+- [x] "José" e "jose" têm a mesma `chaveBusca`; a ordenação põe "Álvaro" antes de "Beto"
+- [x] `chaveBusca("")` não quebra e devolve vazio
+- [x] Exportadas de `@pelada/dominio`
+- [x] Gate quick passa: `pnpm --filter @pelada/dominio test`
 
 **Tests**: unit
 **Gate**: quick
