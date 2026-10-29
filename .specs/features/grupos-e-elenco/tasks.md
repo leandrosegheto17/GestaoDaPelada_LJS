@@ -1653,8 +1653,8 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Cada mutação chama a rota certa e invalida a lista de habilidades e a de jogadores (o nível pode mudar na exclusão)
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Cada mutação chama a rota certa e invalida a lista de habilidades e a de jogadores (o nível pode mudar na exclusão)
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
