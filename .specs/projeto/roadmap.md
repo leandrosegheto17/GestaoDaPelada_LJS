@@ -6,7 +6,7 @@ As 8 features do MVP (AD-001), na ordem de construção. A **Situação** usa o 
 |---|---|---|---|
 | 1 | `fundacao` | Concluída | Liberada em 2026-10-26 |
 | 2 | `conta-e-acesso` | Concluída | Liberada em 2026-10-28 |
-| 3 | `grupos-e-elenco` | Não começada |  |
+| 3 | `grupos-e-elenco` | Em andamento | Spec aprovada em 2026-10-29 |
 | 4 | `partidas-e-ranking` | Não começada |  |
 | 5 | `simulador` | Não começada |  |
 | 6 | `financeiro` | Não começada |  |

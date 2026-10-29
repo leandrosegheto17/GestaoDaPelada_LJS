@@ -119,8 +119,8 @@
 
 - **Fluxo**: 1, Projeto novo para vender — skill `projeto-novo`
 - **Item**: `.specs/features/grupos-e-elenco/` (feature 3 de 8, AD-001). A spec e o `context.md` estão na `main` (merge `d04f201`). Trabalhar no checkout principal; para a construção, abrir worktree novo a partir da `main`.
-- **Fase aprovada**: nenhuma desta feature. A fase 6 (Specify) produziu `spec.md` (GEL-01 a GEL-118, `validate_spec.py` sem erros) e `context.md` (decisões C1 a C10), **sem aprovação**: em 2026-10-28 o usuário escolheu **parar** na pergunta de aprovação da spec.
-- **Próximo passo**: retomar na fase 6, mostrar o resumo da spec e repetir a pergunta seguir / ajustar / parar. Aprovada, a fase 7 é o Design e o mockup do módulo. Modelo indicado: Opus.
+- **Fase aprovada**: 6 (Specify), aprovada pelo usuário em 2026-10-29: `spec.md` (GEL-01 a GEL-118, `validate_spec.py` sem erros) e `context.md` (decisões C1 a C10).
+- **Próximo passo**: fase 7, Design (`tlc-spec-driven`) e depois o mockup do módulo (`mockup-visual`, modo módulo). Modelo indicado: Opus.
 - **Progresso**: Plano: Faltam 6 de 8 features: 25% concluído. A feature atual ainda não tem tarefas.
 - **Combinado na conversa e não registrado em artefato**:
   - Padronização do Neon (ADR-030 a ADR-034) liberada em 2026-10-29 (`.specs/liberacao.md`). Abertos: teste de fumaça do usuário; `neondb_owner` ainda administra a `pelada_app` e o database `neondb` antigo continua no Neon; revogar a `NEON_API_KEY` no console do Neon.

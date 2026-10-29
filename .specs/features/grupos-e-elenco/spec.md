@@ -1,6 +1,6 @@
 # Grupos e elenco — Especificação
 
-> Feature 3 de 8 (AD-001). Entrada: `.specs/produto/decisao.md` (entrada do MVP), `.specs/produto/analise-legado.md`
+> Feature 3 de 8 (AD-001). **Spec aprovada pelo usuário em 2026-10-29.** Entrada: `.specs/produto/decisao.md` (entrada do MVP), `.specs/produto/analise-legado.md`
 > (§2 e §8, D1, D2 e D6), `.md/PRD.md` (RA-01, RA-03, RA-07, RA-16), `.md/PRD-TECNICO.md` (RF-19 a RF-22, RF-35 a
 > RF-37, RF-75 a RF-82), `.md/GUARDRAILS.md` (G-03, G-04, G-25, G-26, G-27), ADR-016 e ADR-023. Regras de domínio
 > portadas do legado (`C:\Leandro\Projetos\GestaoDaPelada`, `backend/dominio/src/{grupos,elenco,atividade}`).
