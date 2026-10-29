@@ -1465,10 +1465,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Salvar nota cria; salvar de novo substitui (uma linha só); `null` apaga e não falha se não existir
-- [ ] Depois de 6 notas 8, 7, 6, 7, 8, 5 o nível devolvido é 683; apagando todas, 550 e `semNota`
-- [ ] Jogador inativo recebe nota; jogador ou habilidade de outro grupo → nulo
-- [ ] Gate full passa
+- [x] Salvar nota cria; salvar de novo substitui (uma linha só); `null` apaga e não falha se não existir
+- [x] Depois de 6 notas 8, 7, 6, 7, 8, 5 o nível devolvido é 683; apagando todas, 550 e `semNota`
+- [x] Jogador inativo recebe nota; jogador ou habilidade de outro grupo → nulo
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
