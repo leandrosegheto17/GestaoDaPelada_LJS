@@ -12,6 +12,8 @@ import { lerYaml, linhaDe, percorrerMapas } from './yaml-estrutura.mjs';
 // `docker run` é tratada como opção com valor, então a imagem nunca é pulada sem ser conferida (falha fechado).
 // SEC-010: vale também para `docker container run`, `docker create`, `docker container create`, `podman run` e com
 // opções globais antes do subcomando (`docker --context x run`).
+// ADR-034 (decisão do usuário): a imagem oficial `postgres:18` é aceita pela tag exata, a mesma nos três projetos;
+// nenhuma outra (nem `postgres:18-alpine`, `postgres:latest` ou `postgres` sem tag) passa sem digest.
 const RAIZ = process.argv[2] ?? process.cwd();
 const CAMINHO_ACAO = /^\.github\/(workflows\/[^/]+\.ya?ml|actions\/[^/]+\/action\.ya?ml)$/i;
 const PNPM = 'pnpm-workspace.yaml';
@@ -24,6 +26,7 @@ const semCredencial = (passo) =>
 
 const SCRIPT_GITHUB = /^\.github\/.+\.sh$/i;
 const IMAGEM_FIXADA = /@sha256:[0-9a-f]{64}$/;
+const IMAGENS_POR_TAG = new Set(['postgres:18']);
 const OPCOES_SEM_VALOR = new Set([
   '--rm',
   '-i',
@@ -58,7 +61,7 @@ function conferirPolitica(caminho, documento) {
 }
 
 function conferirImagem(caminho, texto, imagem, origem) {
-  if (typeof imagem !== 'string' || !IMAGEM_FIXADA.test(imagem)) {
+  if (typeof imagem !== 'string' || !(IMAGEM_FIXADA.test(imagem) || IMAGENS_POR_TAG.has(imagem))) {
     achados.push(`${caminho}:${linhaDe(texto, String(imagem))}: ${String(imagem)} (${origem} sem digest sha256)`);
   }
 }

@@ -10,7 +10,7 @@ const RAIZ = resolve(import.meta.dirname, '../../../..');
 // As roles são do servidor: usa as senhas do .env local quando existem, para não trocar a senha do ambiente de dev.
 const SENHAS = {
   app: process.env['PELADA_APP_SENHA'] || randomBytes(12).toString('hex'),
-  backup: process.env['PELADA_BACKUP_SENHA'] || randomBytes(12).toString('hex'),
+  backup: process.env['PELADA_BACKUP_RO_SENHA'] || randomBytes(12).toString('hex'),
 };
 
 const SENHA_ADMIN = 'senha-do-seed-1';
@@ -20,7 +20,7 @@ function rodarSeed(url: string, extra: NodeJS.ProcessEnv = {}, args: string[] = 
     ...process.env,
     DATABASE_URL: url,
     PELADA_APP_SENHA: SENHAS.app,
-    PELADA_BACKUP_SENHA: SENHAS.backup,
+    PELADA_BACKUP_RO_SENHA: SENHAS.backup,
     SEED_SENHA_ADMIN: SENHA_ADMIN,
     ...extra,
   };
@@ -102,7 +102,7 @@ describe('pnpm seed (FUN-05)', () => {
       await app.end();
     }
     const total = await contar(
-      comoLogin(banco.url, 'pelada_backup', SENHAS.backup),
+      comoLogin(banco.url, 'pelada_backup_ro', SENHAS.backup),
       'SELECT count(*) AS n FROM jogadores',
     );
     expect(total).toBe(20);
@@ -148,7 +148,7 @@ describe('pnpm seed (FUN-05)', () => {
       await migrar(vazio.url);
       const r = rodarSeed(vazio.url, { PELADA_APP_SENHA: '' });
       expect(r.status).toBe(1);
-      expect(r.stderr).toContain('Defina PELADA_APP_SENHA e PELADA_BACKUP_SENHA');
+      expect(r.stderr).toContain('Defina PELADA_APP_SENHA e PELADA_BACKUP_RO_SENHA');
       expect(await contar(vazio.url, 'SELECT count(*) AS n FROM grupos')).toBe(0);
     } finally {
       await vazio.remover();
@@ -156,10 +156,10 @@ describe('pnpm seed (FUN-05)', () => {
   });
 
   it.each([
-    ['URL do Neon', 'postgres://u:segredo@ep-x.sa-east-1.aws.neon.tech/neondb', {}, []],
+    ['URL do Neon', 'postgres://u:segredo@ep-x.sa-east-1.aws.neon.tech/pelada', {}, []],
     [
       'URL do Neon mesmo com --alvo producao e CI=true',
-      'postgres://u:segredo@ep-x.aws.neon.tech/neondb',
+      'postgres://u:segredo@ep-x.aws.neon.tech/pelada',
       { CI: 'true' },
       ['--alvo', 'producao'],
     ],

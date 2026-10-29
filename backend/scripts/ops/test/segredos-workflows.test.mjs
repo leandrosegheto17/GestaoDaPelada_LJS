@@ -57,7 +57,7 @@ describe('segredos só em environment protegido (SEC-001)', () => {
   });
 
   it('os segredos de deploy só aparecem no job do environment producao', () => {
-    const DEPLOY = ['NEON_URL_MIGRACAO', 'NEON_API_KEY', 'NEON_PROJECT_ID', 'CLOUDFLARE_API_TOKEN'];
+    const DEPLOY = ['NEON_URL_MIGRACAO', 'CLOUDFLARE_API_TOKEN'];
     const fora = jobs
       .filter(({ job }) => ambienteDo(job) !== 'producao')
       .flatMap(({ nome, id, job }) =>
@@ -84,17 +84,20 @@ describe('reconhece toda forma de uso de secret (SEC-010)', () => {
     ['índice com aspas duplas', { steps: [{ run: 'x', env: { U: '${{ secrets["NEON_URL_BACKUP"] }}' } }] }],
     ['toJSON(secrets)', { steps: [{ run: 'echo "${{ toJSON(secrets) }}"' }] }],
     ['índice calculado', { steps: [{ run: 'x', env: { U: "${{ secrets[format('NEON_{0}', 'URL')] }}" } }] }],
-    ['com espaços antes do ponto', { steps: [{ with: { t: '${{ secrets .NEON_API_KEY }}' } }] }],
+    ['com espaços antes do ponto', { steps: [{ with: { t: '${{ secrets .NEON_URL_MIGRACAO }}' } }] }],
     ['secrets: inherit', { uses: './.github/workflows/x.yml', secrets: 'inherit' }],
-    ['secrets explícitos de workflow reutilizável', { uses: './x.yml', secrets: { k: '${{ secrets.NEON_API_KEY }}' } }],
+    [
+      'secrets explícitos de workflow reutilizável',
+      { uses: './x.yml', secrets: { k: '${{ secrets.NEON_URL_MIGRACAO }}' } },
+    ],
   ])('job sem environment usando secret por %s é acusado', (_nome, job) => {
     expect(semAmbiente(job)).toBe(true);
     expect(semAmbiente({ ...job, environment: 'producao' })).toBe(false);
   });
 
   it('o nome do secret por índice é reconhecido como o de secrets.NOME', () => {
-    const job = { steps: [{ env: { a: "${{ secrets['NEON_API_KEY'] }}", b: '${{ secrets.BACKUP_CHAVE }}' } }] };
-    expect(segredosDoJob(job).sort()).toEqual(['BACKUP_CHAVE', 'NEON_API_KEY']);
+    const job = { steps: [{ env: { a: "${{ secrets['NEON_URL_MIGRACAO'] }}", b: '${{ secrets.BACKUP_CHAVE }}' } }] };
+    expect(segredosDoJob(job).sort()).toEqual(['BACKUP_CHAVE', 'NEON_URL_MIGRACAO']);
   });
 
   it.each([

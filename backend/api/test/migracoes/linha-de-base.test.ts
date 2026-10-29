@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { lerEsquema } from '../../src/infraestrutura/db/migracoes/esquema.ts';
 import { aplicarMigracoes, PASTA_MIGRACOES } from '../../src/infraestrutura/db/migracoes/executar.ts';
+import { esquemaDaLinhaDeBase } from '../../src/infraestrutura/db/migracoes/migrar.ts';
 import { comCliente, criarBancoTemporario, type BancoTemporario } from '../apoio/banco.ts';
 import { aplicarComoLegado, lerMigracoesLegado } from '../apoio/runner-legado.ts';
 
@@ -93,6 +94,15 @@ describe('linha de base (FUN-07, FUN-08)', () => {
     expect(tabelas).toEqual(TABELAS_LEGADO);
     expect(esquemaNovo).toContainEqual(expect.stringMatching(/^trigger grupos\.grupos_slug_imutavel /));
     expect(esquemaNovo).toContainEqual(expect.stringMatching(/^restricao jogadores\.jogadores_posicao_check /));
+  });
+
+  // ADR-031: o PostgreSQL 18 guarda o NOT NULL também em pg_constraint; a impressão digital não pode mudar por isso.
+  it('o schema da linha de base bate com linha-de-base.esquema.txt, sem NOT NULL como restrição', async () => {
+    const banco = await novoBanco();
+    await aplicarMigracoes({ url: banco.url, quantas: 1 });
+    const esquema = await comCliente(banco.url, lerEsquema);
+    expect(esquema.filter((l) => /^restricao \S+ NOT NULL /.test(l))).toEqual([]);
+    expect(esquema).toEqual(esquemaDaLinhaDeBase());
   });
 
   it('deixa o pgcrypto instalado e funcionando (FUN-03)', async () => {

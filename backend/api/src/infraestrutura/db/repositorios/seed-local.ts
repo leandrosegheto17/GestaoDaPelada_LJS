@@ -34,7 +34,7 @@ export interface ResumoDoSeed {
 /**
  * Semeia o banco local (já migrado) numa transação só, como o owner:
  * apaga o que o seed gravou antes, cria a conta admin, o grupo com vínculo, os jogadores, as partidas e
- * as presenças, e define a senha de login de pelada_app e pelada_backup. Quem chama passa antes pela trava de host.
+ * as presenças, e define a senha de login de pelada_app e pelada_backup_ro. Quem chama passa antes pela trava de host.
  */
 export async function semearBancoLocal(url: string, dados: DadosDoSeed, senhas: SenhasDasRoles): Promise<ResumoDoSeed> {
   const c = new pg.Client({ connectionString: url });
@@ -98,7 +98,7 @@ export async function semearBancoLocal(url: string, dados: DadosDoSeed, senhas: 
     }
 
     await c.query(`ALTER ROLE pelada_app LOGIN PASSWORD ${c.escapeLiteral(senhas.app)}`);
-    await c.query(`ALTER ROLE pelada_backup LOGIN PASSWORD ${c.escapeLiteral(senhas.backup)}`);
+    await c.query(`ALTER ROLE pelada_backup_ro LOGIN PASSWORD ${c.escapeLiteral(senhas.backup)}`);
     await c.query('COMMIT');
     return { grupos: 1, contas: 1, jogadores: jogadores.length, partidas: dados.partidas.length, presencas };
   } catch (erro) {

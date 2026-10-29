@@ -1,6 +1,6 @@
 # ADR-028: Host próprio gestaodapelada.ljssoftware.com.br, Worker novo e sem homologação
 
-- **Status:** Accepted (design da fundação, FUN-27)
+- **Status:** Accepted (design da fundação, FUN-27); a branch de restauração da decisão 3 Superseded by ADR-030.
 - **Data:** 2026-10-25
 - **Decisores:** usuário
 - **Requisitos:** FUN-22, FUN-27, FUN-45

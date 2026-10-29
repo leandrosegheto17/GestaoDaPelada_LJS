@@ -9,8 +9,9 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { restaurar, type OpcoesRestaurar } from '../restaurar.ts';
 
 const script = fileURLToPath(new URL('../restaurar-cli.ts', import.meta.url));
-const REMOTO = 'postgres://dono:segredo@ep-nova-123.sa-east-1.aws.neon.tech/neondb?sslmode=require';
-const PRODUCAO = 'postgres://dono:outra@ep-producao-9.sa-east-1.aws.neon.tech/neondb?sslmode=require';
+// Motivo da mudança (ADR-032): o destino remoto aceito passa a ser a conexão direta do owner no Neon (pelada_owner).
+const REMOTO = 'postgres://pelada_owner:segredo@ep-nova-123.sa-east-1.aws.neon.tech/pelada?sslmode=require';
+const PRODUCAO = 'postgres://dono:outra@ep-producao-9.sa-east-1.aws.neon.tech/pelada?sslmode=require';
 const LOCAL = 'postgres://postgres:senha-local@localhost:5432/restaurado';
 
 let pasta: string;
@@ -72,7 +73,7 @@ describe('restaurar: trava de host antes do pg_restore (SEC-009)', () => {
     await expect(restaurar(recusa.base)).rejects.toThrow(/confirmação ausente ou diferente/);
     expect(recusa.chamadas).toEqual([]);
 
-    // Reteste de SEC-009: destino remoto exige URL_ORIGEM, então o caso aceito a informa.
+    // Reteste de SEC-009: destino remoto exige NEON_URL_ORIGEM, então o caso aceito a informa.
     const aceita = opcoes({
       url: REMOTO,
       alvo: 'teste',
@@ -81,6 +82,19 @@ describe('restaurar: trava de host antes do pg_restore (SEC-009)', () => {
     });
     await expect(restaurar(aceita.base)).resolves.toBe(0);
     expect(aceita.chamadas).toHaveLength(1);
+  });
+
+  // ADR-032: com --alvo teste confirmado e NEON_URL_ORIGEM, o destino ainda passa pela validação única do Neon.
+  it.each([
+    ['pooler', REMOTO.replace('ep-nova-123.', 'ep-nova-123-pooler.')],
+    ['sem TLS', REMOTO.replace('?sslmode=require', '')],
+    ['outra role', REMOTO.replace('pelada_owner', 'pelada_app')],
+    ['fora de .neon.tech', REMOTO.replace('neon.tech', 'exemplo.com')],
+  ])('destino remoto recusado pela validação do Neon: %s', async (_nome, url) => {
+    const host = new URL(url).hostname;
+    const { base, chamadas } = opcoes({ url, alvo: 'teste', urlOrigem: PRODUCAO, confirmar: () => host });
+    await expect(restaurar(base)).rejects.toThrow();
+    expect(chamadas).toEqual([]);
   });
 
   it('--alvo producao é sempre recusado, mesmo com CI=true e confirmação certa', async () => {
@@ -94,7 +108,7 @@ describe('restaurar: trava de host antes do pg_restore (SEC-009)', () => {
     expect(chamadas).toEqual([]);
   });
 
-  it('destino com o mesmo host da origem (URL_ORIGEM, produção) é recusado mesmo com --alvo teste confirmado', async () => {
+  it('destino com o mesmo host da origem (NEON_URL_ORIGEM, produção) é recusado mesmo com --alvo teste confirmado', async () => {
     const { base, chamadas } = opcoes({
       url: PRODUCAO,
       alvo: 'teste',
@@ -108,15 +122,15 @@ describe('restaurar: trava de host antes do pg_restore (SEC-009)', () => {
   describe('reteste de SEC-009: produção reconhecida pelo endpoint do Neon', () => {
     const HOST_PRODUCAO = 'ep-producao-9.sa-east-1.aws.neon.tech';
 
-    it('destino remoto sem URL_ORIGEM é recusado, mesmo com --alvo teste confirmado', async () => {
+    it('destino remoto sem NEON_URL_ORIGEM é recusado, mesmo com --alvo teste confirmado', async () => {
       for (const urlOrigem of [undefined, '']) {
         const { base, chamadas } = opcoes({ url: PRODUCAO, alvo: 'teste', urlOrigem, confirmar: () => HOST_PRODUCAO });
-        await expect(restaurar(base)).rejects.toThrow(/URL_ORIGEM/);
+        await expect(restaurar(base)).rejects.toThrow(/NEON_URL_ORIGEM/);
         expect(chamadas).toEqual([]);
       }
     });
 
-    it('destino local continua sem exigir URL_ORIGEM', async () => {
+    it('destino local continua sem exigir NEON_URL_ORIGEM', async () => {
       const { base, chamadas } = opcoes();
       await expect(restaurar(base)).resolves.toBe(0);
       expect(chamadas).toHaveLength(1);
@@ -129,7 +143,7 @@ describe('restaurar: trava de host antes do pg_restore (SEC-009)', () => {
       ['pelo pooler num host com outro segmento de região', 'ep-producao-9-pooler.c-2.sa-east-1.aws.neon.tech'],
     ])('destino no endpoint de produção %s é recusado', async (_nome, host) => {
       const { base, chamadas } = opcoes({
-        url: `postgres://dono:outra@${host}/neondb?sslmode=require`,
+        url: `postgres://dono:outra@${host}/pelada?sslmode=require`,
         alvo: 'teste',
         urlOrigem: PRODUCAO,
         confirmar: () => host.toLowerCase(),
@@ -142,7 +156,7 @@ describe('restaurar: trava de host antes do pg_restore (SEC-009)', () => {
       const { base, chamadas } = opcoes({
         url: PRODUCAO,
         alvo: 'teste',
-        urlOrigem: 'postgres://dono:x@ep-producao-9-pooler.sa-east-1.aws.neon.tech./neondb',
+        urlOrigem: 'postgres://dono:x@ep-producao-9-pooler.sa-east-1.aws.neon.tech./pelada',
         confirmar: () => HOST_PRODUCAO,
       });
       await expect(restaurar(base)).rejects.toThrow(/mesmo endpoint/);
@@ -257,6 +271,21 @@ describe('restaurar-cli', () => {
     const r = spawnSync(process.execPath, [script, '--arquivo', dump], { env, encoding: 'utf8', timeout: 60_000 });
     expect(r.status).toBe(1);
     expect(r.stderr).toContain('informe --alvo producao ou --alvo teste');
+    expect(r.stderr).not.toContain('segredo');
+  });
+
+  // ADR-032: com --alvo teste o destino é NEON_URL_DEV (branch dev); DATABASE_URL vale só para o banco local.
+  it('com --alvo teste lê NEON_URL_DEV e ignora DATABASE_URL', () => {
+    const env: NodeJS.ProcessEnv = { ...process.env, DATABASE_URL: REMOTO, PATH: '' };
+    delete env['CI'];
+    delete env['NEON_URL_DEV'];
+    const r = spawnSync(process.execPath, [script, '--arquivo', dump, '--alvo', 'teste'], {
+      env,
+      encoding: 'utf8',
+      timeout: 60_000,
+    });
+    expect(r.status).toBe(1);
+    expect(r.stderr).toContain('Defina NEON_URL_DEV');
     expect(r.stderr).not.toContain('segredo');
   });
 });

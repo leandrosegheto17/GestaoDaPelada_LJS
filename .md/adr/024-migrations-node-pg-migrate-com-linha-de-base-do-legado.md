@@ -1,6 +1,6 @@
 # ADR-024: Migrations com node-pg-migrate e linha de base copiada do legado
 
-- **Status:** Accepted (decisão AD-003 da fundação)
+- **Status:** Accepted (decisão AD-003 da fundação); a branch de restauração da decisão 6 Superseded by ADR-030; a versão do Postgres da decisão 4 Superseded by ADR-031.
 - **Data:** 2026-10-25
 - **Decisores:** usuário e Coordenador
 - **Requisitos:** FUN-07 a FUN-10, FUN-54

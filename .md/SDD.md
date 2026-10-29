@@ -31,7 +31,7 @@ de negócio não mudaram. O que mudou:
 | Verificação do PWA | Lighthouse PWA | Teste de instalabilidade com Playwright; sem Lighthouse | ADR-026 |
 | Testes da API | `@cloudflare/vitest-pool-workers`, `compatibility_date` 2026-08-15 | `@cloudflare/vitest-plugin`, `compatibility_date` 2026-10-19 | ADR-027 (substitui o 018) |
 | Runtime de scripts e CI | Node 22 | Node 24, pnpm 11 | `.nvmrc`, `engines` |
-| Postgres | 16 ou 17 | 16 (a impressão digital do schema e o `pg_dump` fixam a versão) | ADR-024 |
+| Postgres | 16 ou 17 | 18 em todo ambiente (Neon, `docker compose`, CI e `pg_dump`) | ADR-031 (supera o trecho de versão do ADR-024) |
 | Deploy | `deploy.yml` com `/api/saude` | `deploy.yml` com `URL_PUBLICA` conferida, `VERSAO` = SHA e `GET /api/health` | `docs/runbook.md` |
 | Documentos | `.md/` com revisões e relatórios de rodadas | PRD, PRD-TECNICO, SDD, GUARDRAILS e THREAT-MODEL aqui; operação em `docs/runbook.md` | ADR-024 a 028 |
 
@@ -68,8 +68,8 @@ As regras de negócio (ranking, pontuação, atividade, simulador e saldos) mora
 
 | Ambiente | Worker | Hyperdrive | Banco |
 |---|---|---|---|
-| **Produção** (`https://gestaodapelada.ljssoftware.com.br`, ADR-028) | `gestaodapelada` | o Hyperdrive existente, origem `pelada_app`, cache desligado | branch `production` do Neon |
-| **Local** | `pnpm dev` (`wrangler dev` em workerd e Vite) | `localConnectionString` (montada do `.env`, role `pelada_app`) | Postgres 16 do `docker compose` |
+| **Produção** (`https://gestaodapelada.ljssoftware.com.br`, ADR-028) | `gestaodapelada` | o Hyperdrive existente, origem `pelada_app`, cache desligado | branch `main` do Neon (ADR-030) |
+| **Local** | `pnpm dev` (`wrangler dev` em workerd e Vite) | `localConnectionString` (montada do `.env`, role `pelada_app`) | Postgres 18 do `docker compose` |
 
 **Princípios que valem para todo o projeto:**
 
@@ -378,14 +378,14 @@ entrada (worker.ts, rotas Hono, middlewares) ─▶ aplicacao (casos de uso) ─
 | Migrações | **`node-pg-migrate`** com linha de base = as 13 migrations do legado; `pnpm migrar` detecta o estado do banco (vazio, legado, atual, parcial); conexão direta ao Neon, uma transação por migração | Troca de schema atômica (§6); produção entra sem DDL (ADR-024) | Runner próprio do projeto anterior | Duas tabelas de controle convivem (`migracoes_aplicadas` e `pgmigrations`) |
 | Hash de senha | **bcrypt (custo 12) via `pgcrypto`** no Postgres | RNF-05 sem estourar os 10 ms de CPU | PBKDF2 da WebCrypto (fraco para caber); Workers Paid | A senha trafega até o banco (TLS); cada login gasta CPU do Neon (ADR-015) |
 | Validação | **zod** (`@pelada/contrato`) | Limites definidos uma vez (CONVENCOES §8) | valibot | Bundle um pouco maior; o Worker gratuito aceita até 3 MB comprimido |
-| Banco | **PostgreSQL 16 no Neon Free** (`aws-sa-east-1`), com **RLS `FORCE`** por `grupo_id` (ADR-025) | Integridade, RNF-07, RNF-09; isolamento em duas camadas; o usuário já tem conta | D1 (SQLite), Supabase | Suspende após 5 minutos (cerca de 0,5 a 1 s para acordar); histórico de 6 h (ADR-011). A versão 16 é fixada pela impressão digital do schema e pelo `pg_dump` |
+| Banco | **PostgreSQL 18 no Neon Free** (`aws-sa-east-1`), com **RLS `FORCE`** por `grupo_id` (ADR-025) | Integridade, RNF-07, RNF-09; isolamento em duas camadas; o usuário já tem conta | D1 (SQLite), Supabase | Suspende após 5 minutos (cerca de 0,5 a 1 s para acordar); histórico de 6 h (ADR-011). A versão 18 é a de todo ambiente: Neon, `docker compose`, CI e `pg_dump` (ADR-031) |
 | Tela | **React 19 + Vite + React Router** | RNF-01, familiaridade | Preact, SvelteKit | Bundle maior; divisão de código por rota |
 | Dados na tela | **TanStack Query** | Estados uniformes, *stale-while-revalidate* | SWR | Uma dependência a mais |
 | Estilo | **CSS Modules + `tokens.css`** do mockup | O mockup é a fonte da aparência | Tailwind | Um pouco mais de CSS escrito |
 | PWA | **vite-plugin-pwa** (Workbox) | RF-53, RF-54, RNF-11 | SW escrito à mão | Configuração declarativa |
 | PDF | **jsPDF** sob demanda + fonte do mockup | RF-49 a RF-52; fora da CPU do Worker | Servidor (estouraria 10 ms) | Desenho em coordenadas é verboso |
-| Testes | **Vitest** (domínio; API com `@cloudflare/vitest-plugin` e Postgres 16 do Docker ou do serviço do CI), **Playwright** (instalabilidade do PWA, cabeçalhos e `comparar-visual.mjs`), axe nos componentes | CONVENCOES §7; comparação visual; ADR-026 e ADR-027 | Jest, Cypress, Lighthouse | O plugin roda em workerd, mais fiel que o Node |
-| Deploy | **Wrangler** pelo **GitHub Actions** | Um deploy, volta atrás com `wrangler rollback` | Integração Git da Cloudflare | O workflow garante a ordem: dump, branch, migração e só então o deploy |
+| Testes | **Vitest** (domínio; API com `@cloudflare/vitest-plugin` e Postgres 18 do Docker ou do serviço do CI), **Playwright** (instalabilidade do PWA, cabeçalhos e `comparar-visual.mjs`), axe nos componentes | CONVENCOES §7; comparação visual; ADR-026 e ADR-027 | Jest, Cypress, Lighthouse | O plugin roda em workerd, mais fiel que o Node |
+| Deploy | **Wrangler** pelo **GitHub Actions** | Um deploy, volta atrás com `wrangler rollback` | Integração Git da Cloudflare | O workflow garante a ordem: dump cifrado, migração e só então o deploy (sem branch por deploy, ADR-030) |
 | TWA | **Bubblewrap CLI** | RF-55 | PWABuilder | — |
 
 **Escolhas já feitas pelo usuário:**
@@ -396,9 +396,9 @@ entrada (worker.ts, rotas Hono, middlewares) ─▶ aplicacao (casos de uso) ─
 
 | # | Pré-requisito | Quem | Observação |
 |---|---|---|---|
-| PI-1 | **Projeto no Neon**, região **`aws-sa-east-1` (São Paulo)**, plano grátis, **PostgreSQL 16**, com a extensão `pgcrypto`, a branch `production`, as roles `pelada_app` (runtime) e `pelada_backup` (leitura) e a conexão direta do owner para a migração | Usuário | A região é fixa por projeto. Sem branch de homologação (ADR-020). Senhas de login das roles conforme o runbook |
+| PI-1 | **Projeto no Neon**, região **`aws-sa-east-1` (São Paulo)**, plano grátis, **PostgreSQL 18**, com a extensão `pgcrypto`, as branches `main` (produção) e `dev` (ADR-030), as roles `pelada_owner` (owner, migração), `pelada_app` (runtime) e `pelada_backup_ro` (leitura) (ADR-032) e a conexão direta do owner para a migração | Usuário | A região é fixa por projeto. Nenhuma outra branch: nada de branch por PR, por deploy ou de restauração (ADR-020, ADR-030). Senhas de login das roles conforme o runbook |
 | PI-2 | Zona `ljssoftware.com.br` na Cloudflare e rota `custom_domain` `gestaodapelada.ljssoftware.com.br` no `wrangler.jsonc`; remoção do Worker antigo `pelada` antes do primeiro deploy (FUN-45) | Usuário | ADR-028; runbook, seções 1 e 6 |
-| PI-3 | Configuração do Hyperdrive `pelada-prod`, **com cache desligado**, apontando para a string **direta** do Neon do branch `production` | Executor, com credenciais do usuário | ADR-014 |
+| PI-3 | Configuração do Hyperdrive `pelada-prod`, **com cache desligado**, apontando para a string **direta** do Neon da branch `main` | Executor, com credenciais do usuário | ADR-014 |
 | PI-4 | Secrets do GitHub: `CLOUDFLARE_API_TOKEN` (escopo mínimo), as strings diretas do Neon (migração e backup só de leitura) e a chave do backup (também no gerenciador de senhas) | Usuário | ADR-011, ADR-014 |
 | PI-5 | App na Play Console com o nome de pacote **`com.gestaodapelada.app`** e Play App Signing ativado (só no I1-TWA) | Usuário | ADR-009, ADR-020 |
 | PI-6 | **Só se o ADR-017 for acionado:** hostname com TLS na Lightsail, Caddy, firewall só com a 443 e o segredo HMAC | Usuário + Executor | Não é feito agora |
@@ -428,7 +428,7 @@ entrada (worker.ts, rotas Hono, middlewares) ─▶ aplicacao (casos de uso) ─
 
 | Serviço | Imagem / build | Porta | Papel |
 |---|---|---|---|
-| `db` | `postgres:16` (`docker compose up -d`) | 5432 | Banco descartável. `pnpm migrar` aplica o schema; `pnpm seed` cria dados fictícios |
+| `db` | `postgres:18` (`docker compose up -d`) | 5432 | Banco descartável. `pnpm migrar` aplica o schema; `pnpm seed` cria dados fictícios |
 | Worker (`pnpm dev`) | `wrangler dev` em Node 24 (workerd) | 8787 | O mesmo Worker da produção. O Hyperdrive usa `localConnectionString` montada do `.env`, como `pelada_app` |
 | App (`pnpm dev`) | Vite em Node 24 | 5173 | Tela, com proxy de `/api` para `localhost:8787` (mesma origem, como em produção) |
 
@@ -438,9 +438,9 @@ O workerd local **não impõe o limite de 10 ms de CPU**. O orçamento é verifi
 
 | Workflow | Gatilho | Passos |
 |---|---|---|
-| `ci.yml` | push e PR | `base`: lint, tokens, formato, tipos, testes, checagens (ids de tarefa, URLs absolutas, migração aditiva, `wrangler deploy` único, ações fixadas) e gitleaks; `banco`: migrations do zero, isolamento e testes da API num PostgreSQL 16 de serviço; `checagens`; `e2e` (instalabilidade do PWA e cabeçalhos, depois do build do web); `visual` (comparação visual). Sem Lighthouse (ADR-026) |
-| `deploy.yml` | disparo manual na `main` (`gh workflow run deploy.yml --ref main`; o push não dispara deploy), só produção, environment `producao`, `concurrency` sem cancelamento; sem homologação | 1) `URL_PUBLICA` conferida; 2) build do web; 3) branch de restauração no Neon (mantém 2); 4) dump cifrado; 5) `pnpm migrar --alvo producao` com a role owner; 6) cache do Hyperdrive conferido como desligado; 7) `wrangler deploy --var URL_PUBLICA --var VERSAO`; 8) `GET /api/health` com a versão igual ao SHA. Falha depois da migração: `wrangler rollback` + instrução de restauração (`docs/runbook.md`) |
-| `backup.yml` | cron diário às 07:00 UTC (04:00 de São Paulo) + manual | `pg_dump -Fc --enable-row-security` (cliente PostgreSQL 16) pela role `pelada_backup`, cifrado com `age`, artefato por 30 dias, sem artefato parcial em falha (ADR-011) |
+| `ci.yml` | push e PR | `base`: lint, tokens, formato, tipos, testes, checagens (ids de tarefa, URLs absolutas, migração aditiva, `wrangler deploy` único, ações fixadas) e gitleaks; `banco`: migrations do zero, isolamento e testes da API num PostgreSQL 18 de serviço; `checagens`; `e2e` (instalabilidade do PWA e cabeçalhos, depois do build do web); `visual` (comparação visual). Sem Lighthouse (ADR-026) |
+| `deploy.yml` | disparo manual na `main` (`gh workflow run deploy.yml --ref main`; o push não dispara deploy), só produção, environment `producao`, `concurrency` sem cancelamento; sem homologação | 1) `URL_PUBLICA` conferida; 2) build do web; 3) dump cifrado (único ponto de retorno, ADR-030); 4) `pnpm migrar --alvo producao` com a role owner; 5) cache do Hyperdrive conferido como desligado; 6) `wrangler deploy --var URL_PUBLICA --var VERSAO`; 7) `GET /api/health` com a versão igual ao SHA. Falha depois da migração: `wrangler rollback` + instrução de restauração (`docs/runbook.md`) |
+| `backup.yml` | cron diário às 07:00 UTC (04:00 de São Paulo) + manual | `pg_dump -Fc --enable-row-security` (cliente PostgreSQL 18) pela role `pelada_backup_ro`, cifrado com `age`, artefato por 30 dias, sem artefato parcial em falha (ADR-011) |
 
 ---
 
@@ -585,7 +585,7 @@ A dívida da rodada 1, "Vercel Hobby não comercial", **foi eliminada** pela mud
 
 | Fluxo que substitui dados | Janela de inconsistência | Como fica atômico | Como volta atrás |
 |---|---|---|---|
-| **Migração de schema** (`deploy.yml` → `migrar.ts` → `wrangler deploy`) | Entre a migração e o novo Worker, o código antigo roda contra o schema novo | Uma **transação** por migração (DDL transacional). Migrações **aditivas** (expandir → publicar → contrair num deploy seguinte; o projeto só tem produção, sem staging, e toda contração pendente tem tarefa dona, hoje a RTP-0180 para o CHECK de posição) | Antes: **branch do Neon** + dump (ADR-011). Volta atrás = `wrangler rollback` para a versão anterior + restaurar o branch (segundos) |
+| **Migração de schema** (`deploy.yml` → `migrar.ts` → `wrangler deploy`) | Entre a migração e o novo Worker, o código antigo roda contra o schema novo | Uma **transação** por migração (DDL transacional). Migrações **aditivas** (expandir → publicar → contrair num deploy seguinte; o projeto só tem produção, sem staging, e toda contração pendente tem tarefa dona, hoje a RTP-0180 para o CHECK de posição) | Antes: dump cifrado (ADR-011, ADR-030). Volta atrás = `wrangler rollback` para a versão anterior + restaurar o dump (minutos) |
 | **Recalcular o ranking** depois de editar partida, peso ou cadastro | **Não se aplica:** sem projeção materializada (ADR-006). O cache do Hyperdrive está **desligado**, para não servir leitura velha | — | — |
 | **Confirmar escalação** (substitui a da mesma data) | Nenhuma | Transação única (`upsert` por (grupo, data) + evento) | Confirmar de novo |
 | **Salvar ou editar partida** (presenças substituídas) | Nenhuma | Transação única (partida + presenças + auditoria + evento) | Editar de novo; histórico do Neon para erro grave |
@@ -593,12 +593,12 @@ A dívida da rodada 1, "Vercel Hobby não comercial", **foi eliminada** pela mud
 | **Remover admin / redefinir senha** | Nenhuma: vínculo e sessões lidos a cada requisição | Transação única (com RN-13) | Readicionar / nova senha temporária |
 | **Excluir habilidade** (apaga as notas) | Nenhuma | Transação única (cascata) | Histórico do Neon (6 h) ou dump diário |
 | **Anonimização manual de jogador** (script, só sob pedido LGPD antes da Fase 2) | Nenhuma | Transação única no script, com auditoria | Irreversível por natureza; o dump anterior é mantido pela retenção normal |
-| **Importação do histórico legado** (script, uma vez; demanda "Adequação ao legado", ADR-021) | Nenhuma para o público: o grupo ainda não tem partidas, e a carga é uma transação | Transação única; recusa grupo com partida ou apelido repetido; exige backup confirmado e a etapa 1 em produção | Falha: nada é gravado, repete-se. Depois de gravada: restaurar o backup/branch do Neon confirmado antes da execução |
-| **Migração da etapa 1** (posições, pontuação inicial, 6 pesos) | Entre a migração e o novo Worker, o código antigo lê o schema novo | Aditiva e em uma transação: colunas novas com padrão; `expulso_com_chuva` copiado de `expulso`; o CHECK de posição passa a aceitar as 7 novas **e** as antigas, e as linhas existentes são convertidas por `UPDATE`; o código antigo ignora as colunas novas. O CHECK só com as 7 novas fica para uma migração de contração num deploy seguinte (expandir → publicar → contrair) | `wrangler rollback` + restaurar o branch (ADR-011) |
+| **Importação do histórico legado** (script, uma vez; demanda "Adequação ao legado", ADR-021) | Nenhuma para o público: o grupo ainda não tem partidas, e a carga é uma transação | Transação única; recusa grupo com partida ou apelido repetido; exige backup confirmado e a etapa 1 em produção | Falha: nada é gravado, repete-se. Depois de gravada: restaurar o backup confirmado antes da execução |
+| **Migração da etapa 1** (posições, pontuação inicial, 6 pesos) | Entre a migração e o novo Worker, o código antigo lê o schema novo | Aditiva e em uma transação: colunas novas com padrão; `expulso_com_chuva` copiado de `expulso`; o CHECK de posição passa a aceitar as 7 novas **e** as antigas, e as linhas existentes são convertidas por `UPDATE`; o código antigo ignora as colunas novas. O CHECK só com as 7 novas fica para uma migração de contração num deploy seguinte (expandir → publicar → contrair) | `wrangler rollback` + restaurar o dump (ADR-011, ADR-030) |
 | **Editar a data de início do jogador** (RF-69 a RF-72, ADR-023) | Nenhuma: o ranking é calculado na leitura (ADR-006) | Transação única: S + ajuste do início do 1º período (se recuou) + auditoria | Editar a data de novo (recuar devolve; nada é apagado) |
-| **Corrigir saída/retorno de um período e reativar com retorno retroativo** (RF-75 a RF-82, reabertura 4.4) | Nenhuma: o ranking é calculado na leitura (ADR-006) e o cache do Hyperdrive está desligado | Transação única com o jogador travado: validação (RF-79) + UPDATE/INSERT do período + auditoria. Sem migração | Corrigir de novo, com as datas anteriores lidas da auditoria; nada é apagado e nenhum ponto muda (RN-31). Deploy: só `wrangler rollback`, sem restaurar branch |
-| **Implantação da regra de início** (migração + `verificar-inicio.ts`, RNF-13) | Entre a migração e o novo Worker o código antigo ignora a coluna nova | Migração aditiva em uma transação; backfill de S = `LEAST(1º período, 1ª presença)` e, só para quem tinha presença anterior ao 1º período, alinhamento do início do período; nenhum acumulado muda. `verificar-inicio.ts` (somente leitura) roda antes (dry-run) e depois; diferença bloqueia o uso até decisão do usuário | `wrangler rollback` + restaurar o branch (ADR-011) |
-| **Restauração de backup** (manual) | O app fica com dados antigos até terminar | Restaura num **branch novo** do Neon; a origem do Hyperdrive é trocada para ele no fim (troca de ponteiro) | Voltar a origem do Hyperdrive para o branch anterior |
+| **Corrigir saída/retorno de um período e reativar com retorno retroativo** (RF-75 a RF-82, reabertura 4.4) | Nenhuma: o ranking é calculado na leitura (ADR-006) e o cache do Hyperdrive está desligado | Transação única com o jogador travado: validação (RF-79) + UPDATE/INSERT do período + auditoria. Sem migração | Corrigir de novo, com as datas anteriores lidas da auditoria; nada é apagado e nenhum ponto muda (RN-31). Deploy: só `wrangler rollback`, sem restaurar o banco |
+| **Implantação da regra de início** (migração + `verificar-inicio.ts`, RNF-13) | Entre a migração e o novo Worker o código antigo ignora a coluna nova | Migração aditiva em uma transação; backfill de S = `LEAST(1º período, 1ª presença)` e, só para quem tinha presença anterior ao 1º período, alinhamento do início do período; nenhum acumulado muda. `verificar-inicio.ts` (somente leitura) roda antes (dry-run) e depois; diferença bloqueia o uso até decisão do usuário | `wrangler rollback` + restaurar o dump (ADR-011, ADR-030) |
+| **Restauração de backup** (manual) | O app fica com dados antigos até terminar | Restaura na branch **`dev`** do Neon (ADR-030); em emergência, a origem do Hyperdrive é trocada para ela no fim (troca de ponteiro) | Voltar a origem do Hyperdrive para a `main` |
 
 ---
 

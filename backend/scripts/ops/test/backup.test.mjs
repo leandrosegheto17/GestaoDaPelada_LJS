@@ -54,20 +54,21 @@ function rodar({
 }
 
 describe('dump-cifrado.sh (FUN-46, FUN-47)', () => {
-  it('gera o dump com pg_dump -Fc e --enable-row-security no cliente do PostgreSQL 16', () => {
+  it('gera o dump com pg_dump -Fc e --enable-row-security no cliente do PostgreSQL 18 (ADR-031)', () => {
     const r = rodar();
     expect(r.status).toBe(0);
     const chamada = readFileSync(join(pasta, 'docker.log'), 'utf8');
-    expect(chamada).toContain('postgres:16');
+    expect(chamada).toContain('postgres:18');
     expect(chamada).toContain('--format=custom');
     expect(chamada).toContain('--enable-row-security');
     expect(readFileSync(r.saida, 'utf8')).toContain('DUMP-BINARIO');
   });
 
-  it('o cliente postgres:16 vai fixado por digest sha256, nunca só pela tag (SEC-004)', () => {
+  // Motivo da mudança (ADR-034, aprovado pelo usuário): a imagem vai pela tag oficial postgres:18, sem digest.
+  it('o cliente é a imagem oficial pela tag exata postgres:18 (ADR-034)', () => {
     expect(rodar().status).toBe(0);
     const chamada = readFileSync(join(pasta, 'docker.log'), 'utf8');
-    expect(chamada).toMatch(/(^|\s)postgres:16@sha256:[0-9a-f]{64}\s/);
+    expect(chamada).toMatch(/(^|\s)postgres:18\s/);
   });
 
   it('falha de pg_dump falha o job e não deixa artefato, nem parcial', () => {
@@ -130,6 +131,29 @@ describe('backup.yml e a action (FUN-46)', () => {
     expect(JSON.stringify(documento)).not.toContain('continue-on-error');
     expect(JSON.stringify(lerYaml('.github/actions/dump-cifrado/action.yml'))).not.toContain('continue-on-error');
     expect(passos.every((p) => p.if === undefined)).toBe(true);
+  });
+
+  // ADR-032: a URL do Neon passa pela validação única antes de qualquer conexão do pg_dump.
+  it('a action confere a URL do Neon antes do dump, com o papel recebido', () => {
+    const acao = lerYaml('.github/actions/dump-cifrado/action.yml');
+    expect(acao.inputs.papel.required).toBe(true);
+    const passosAcao = acao.runs.steps;
+    const conferir = passosAcao.findIndex((p) => p.run?.includes('conferir-url-neon-cli.ts'));
+    const dump = passosAcao.findIndex((p) => p.run?.includes('dump-cifrado.sh'));
+    expect(conferir).toBeGreaterThanOrEqual(0);
+    expect(conferir).toBeLessThan(dump);
+    const passo = passosAcao[conferir];
+    expect(passo.env.PG_URL).toBe('${{ inputs.url }}');
+    expect(passo.run).toContain('--papel "$PAPEL" --executar');
+    expect(passo.run).not.toContain('inputs.url');
+    expect(passosAcao.slice(0, conferir).some((p) => p.uses?.startsWith('actions/setup-node@'))).toBe(true);
+  });
+
+  it('o backup usa o papel backup e o deploy o papel owner', () => {
+    const dump = passos.find((p) => p.uses === './.github/actions/dump-cifrado');
+    expect(dump.with.papel).toBe('backup');
+    const deploy = lerYaml('.github/workflows/deploy.yml').jobs.deploy.steps;
+    expect(deploy.find((p) => p.uses === './.github/actions/dump-cifrado').with.papel).toBe('owner');
   });
 
   it('não corre em paralelo consigo mesmo nem cancela o anterior', () => {

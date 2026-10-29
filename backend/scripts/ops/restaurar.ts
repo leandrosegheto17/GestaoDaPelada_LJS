@@ -5,14 +5,15 @@ import {
   hostELocal,
   HostRecusado,
 } from '../../api/src/infraestrutura/seguranca/trava-host.ts';
+import { conferirUrlNeon } from '../../api/src/infraestrutura/seguranca/url-neon.ts';
 
 /**
  * Restauração de um dump (`docs/runbook.md`, seção 4, passo 5) com a trava de host antes de qualquer escrita (SEC-009,
  * G-16). `pg_restore --clean` apaga tabelas, então:
  * - a trava de host vale como no `pnpm migrar`: host local passa; host remoto exige `--alvo teste` e a confirmação
  *   digitada do host (ou `CI=true`);
- * - `--alvo producao` é sempre recusado: a restauração vai para uma branch nova ou um banco local, nunca para produção;
- * - destino remoto exige `URL_ORIGEM` (a origem de produção, a mesma do passo 6 do runbook), e destino no mesmo
+ * - `--alvo producao` é sempre recusado: a restauração vai para a branch `dev` do Neon ou um banco local, nunca para produção;
+ * - destino remoto exige `NEON_URL_ORIGEM` (a origem de produção, a mesma do passo 6 do runbook), e destino no mesmo
  *   endpoint do Neon é recusado. A comparação é pelo identificador do endpoint (o primeiro rótulo do host, sem o
  *   sufixo `-pooler`, em minúsculas e sem ponto final), então o pooler e o host com ponto final contam como o mesmo.
  * A senha sai da URL e vai em `PGPASSWORD`, fora da linha de comando. Nenhuma mensagem traz a URL.
@@ -22,20 +23,20 @@ import {
  * `PG*` herdada (`PGHOSTADDR`, `PGSERVICE`...) chega a ele, só o `PGPASSWORD` e o mínimo para o processo rodar.
  */
 export interface OpcoesRestaurar {
-  /** URL do banco de destino (`DATABASE_URL`). */
+  /** URL do banco de destino (`DATABASE_URL` local ou `NEON_URL_DEV` com `--alvo teste`). */
   url: string | undefined;
   /** Dump já decifrado (`pg_dump -Fc`). */
   arquivo: string | undefined;
   alvo?: string | undefined;
   ci?: string | undefined;
-  /** URL da origem de produção (`URL_ORIGEM`), obrigatória quando o destino é remoto. */
+  /** URL da origem de produção (`NEON_URL_ORIGEM`), obrigatória quando o destino é remoto. */
   urlOrigem?: string | undefined;
   confirmar?: () => string | Promise<string>;
   /** Roda o comando com exatamente o ambiente recebido (já limpo) e devolve o código de saída. */
   executar: (comando: string, args: string[], env: Record<string, string>) => number | Promise<number>;
   /** Ambiente de onde sai o mínimo repassado ao `pg_restore`. Padrão: `process.env`. */
   ambiente?: Record<string, string | undefined> | undefined;
-  /** Binário do `pg_restore` (PostgreSQL 16). Padrão: `pg_restore` do PATH. */
+  /** Binário do `pg_restore` (PostgreSQL 18). Padrão: `pg_restore` do PATH. */
   comando?: string | undefined;
 }
 
@@ -93,7 +94,7 @@ export function endpointDoHost(host: string): string {
 
 export async function restaurar(opcoes: OpcoesRestaurar): Promise<number> {
   if (opcoes.alvo === 'producao') {
-    throw new HostRecusado('Nunca restaure em produção: use uma branch nova do Neon (--alvo teste) ou o banco local.');
+    throw new HostRecusado('Nunca restaure em produção: use a branch dev do Neon (--alvo teste) ou o banco local.');
   }
   exigirParametrosPermitidos(opcoes.url);
   const host = await exigirHostPermitido({
@@ -105,15 +106,17 @@ export async function restaurar(opcoes: OpcoesRestaurar): Promise<number> {
   if (!hostELocal(host)) {
     if (!opcoes.urlOrigem) {
       throw new HostRecusado(
-        'Destino remoto: informe URL_ORIGEM (a origem de produção) para a trava conferir o endpoint.',
+        'Destino remoto: informe NEON_URL_ORIGEM (a origem de produção) para a trava conferir o endpoint.',
       );
     }
     const endpoint = endpointDoHost(host);
     if (endpointDoHost(hostDaUrl(opcoes.urlOrigem)) === endpoint) {
       throw new HostRecusado(
-        `Destino no mesmo host da origem (mesmo endpoint ${endpoint}): restaure numa branch nova ou no banco local.`,
+        `Destino no mesmo host da origem (mesmo endpoint ${endpoint}): restaure na branch dev ou no banco local.`,
       );
     }
+    // ADR-032: destino remoto é a branch dev do Neon, pela conexão direta do owner, com TLS.
+    conferirUrlNeon(opcoes.url, 'owner');
   }
   if (!opcoes.arquivo || !existsSync(opcoes.arquivo)) {
     throw new Error('Informe --arquivo com o dump decifrado (dump.pgdump).');

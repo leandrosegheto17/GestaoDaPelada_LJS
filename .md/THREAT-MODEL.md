@@ -11,8 +11,8 @@ Mudanças em relação à última auditoria do projeto anterior (2026-10-22). Ev
 
 | Tema | Mudança | Efeito no risco |
 |---|---|---|
-| Isolamento entre grupos | RLS com `FORCE` por `grupo_id`, runtime na role `pelada_app` sem bypass, contexto por transação (ADR-025). O owner do Neon tem `bypassrls` e nunca é origem do Hyperdrive | Reduz o vazamento entre grupos por filtro esquecido; novo risco: contexto vazar entre requisições pelo Hyperdrive (spike S1; testado) |
-| Backup | Dump com `--enable-row-security` pela role `pelada_backup`, com policy de leitura; a contagem restaurada é conferida contra a origem | Sem a policy, o dump com `FORCE` sai vazio com exit 0; o teste e o runbook cobrem |
+| Isolamento entre grupos | RLS com `FORCE` por `grupo_id`, runtime na role `pelada_app` sem bypass, contexto por transação (ADR-025). O owner do Neon (`pelada_owner`) tem `bypassrls` e nunca é origem do Hyperdrive | Reduz o vazamento entre grupos por filtro esquecido; novo risco: contexto vazar entre requisições pelo Hyperdrive (spike S1; testado) |
+| Backup | Dump com `--enable-row-security` pela role `pelada_backup_ro`, com policy de leitura; a contagem restaurada é conferida contra a origem | Sem a policy, o dump com `FORCE` sai vazio com exit 0; o teste e o runbook cobrem |
 | Host | Domínio próprio `gestaodapelada.ljssoftware.com.br` (ADR-028); HSTS de 1 ano nos assets | T-18 cai para baixa |
 | Cabeçalhos | CSP, `nosniff`, `Referrer-Policy` e HSTS nos assets conferidos por e2e; nas respostas de `/api/*` só `nosniff` | Aceito: `/api/*` devolve só JSON, então CSP, Referrer-Policy e HSTS ficam nos assets (decisão de 2026-10-25) |
 | Deploy | `deploy.yml` com `concurrency` sem cancelamento, `URL_PUBLICA` obrigatória, `wrangler deploy` único, rollback que não engole erro | Reduz deploy parcial |
@@ -32,7 +32,7 @@ Mudanças em relação à última auditoria do projeto anterior (2026-10-22). Ev
 ## Fronteiras de confiança
 
 Navegador (sem confiança) -> Worker Cloudflare (`/api/*` primeiro, assets estáticos) -> Hyperdrive (TLS) -> Neon.
-Operador (máquina local, `DATABASE_URL` própria) -> Neon por script. GitHub Actions (ambiente `producao`) -> Cloudflare e Neon.
+Operador (máquina local, `NEON_URL_MIGRACAO` ou `NEON_URL_DEV` próprias, ADR-032) -> Neon por script. GitHub Actions (ambiente `producao`) -> Cloudflare e Neon.
 
 ## STRIDE por superfície
 
@@ -90,7 +90,7 @@ Entra com a feature `conta-e-acesso` (2026-10-27). As funções que acham uma co
 
 | Ameaça | Controle |
 |---|---|
-| T: gravar no banco errado | `exigirHostPermitido` (G-21), `DATABASE_URL` só do ambiente do operador, confirmação de backup digitada |
+| T: gravar no banco errado | `exigirHostPermitido` (G-21) e a validação única da URL do Neon (ADR-032), `NEON_URL_*` só do ambiente do operador, confirmação de backup digitada |
 | I: dado pessoal do legado no repositório ou no log | Telefone nunca lido; só o ano de nascimento; log só com contagens; arquivo de entrada fora do repositório (ver débito: `.gitignore` não cobre o arquivo do legado) |
 | T: carga parcial ou repetida | Transação única; recusa se o grupo já tem partida ou apelido repetido |
 | E: uso por agente em produção | A execução em produção é do usuário (ADR-021 item 6) |
@@ -110,8 +110,8 @@ Entra com a feature `conta-e-acesso` (2026-10-27). As funções que acham uma co
 | I: credencial do banco no Worker | Só o binding `HYPERDRIVE`; `localConnectionString` do `wrangler.jsonc` é só a de desenvolvimento local |
 | I: cache de resposta com dado de outro grupo | Cache do Hyperdrive desligado (G-17), conferido no `deploy.yml` antes de publicar |
 | T/I: Neon exposto | Não exposto ao navegador; TLS |
-| R: perda de dado na migração | Branch de restauração + dump cifrado antes de migrar |
-| T/R: migração que contrai o esquema (`202610210000_contrai_posicao`: converte `defensor`/`meio_campo` e recria o CHECK de posição) | Roda depois do branch + dump do `deploy.yml`; `UPDATE` antes do `DROP/ADD CONSTRAINT` na mesma migração; `checar-migracao-aditiva` aceita a contração prevista em `QUEBRAS.md`. Conferido no banco de desenvolvimento: CHECK com as 7 posições e 0 linhas com posição antiga |
+| R: perda de dado na migração | Dump cifrado antes de migrar (ADR-030) |
+| T/R: migração que contrai o esquema (`202610210000_contrai_posicao`: converte `defensor`/`meio_campo` e recria o CHECK de posição) | Roda depois do dump cifrado do `deploy.yml`; `UPDATE` antes do `DROP/ADD CONSTRAINT` na mesma migração; `checar-migracao-aditiva` aceita a contração prevista em `QUEBRAS.md`. Conferido no banco de desenvolvimento: CHECK com as 7 posições e 0 linhas com posição antiga |
 
 ### 7. `deploy.yml` e CI
 

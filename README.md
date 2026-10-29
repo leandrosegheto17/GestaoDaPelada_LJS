@@ -8,7 +8,7 @@ o CI, o deploy e o backup. As regras de negócio chegam nas features seguintes (
 
 - Front: React 19, Vite 8, PWA (service worker em `frontend/web/src/pwa`).
 - API: Hono num Cloudflare Worker (`backend/api`), Postgres pelo Hyperdrive, Kysely.
-- Banco: PostgreSQL 16 (Neon em produção, Docker no seu computador), migrations com `node-pg-migrate`, isolamento por RLS.
+- Banco: PostgreSQL 18 (Neon em produção, Docker no seu computador), migrations com `node-pg-migrate`, isolamento por RLS.
 - Pacotes: `backend/contrato` (schemas), `backend/dominio` (regras puras), `backend/scripts` (dev, migração, seed, checagens).
 
 ## Pré-requisitos
@@ -32,7 +32,7 @@ Abra o `.env` e preencha cinco variáveis (as outras ficam vazias no uso local):
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/pelada
 DATABASE_URL_TESTE=postgres://postgres:postgres@localhost:5432/pelada_teste
 PELADA_APP_SENHA=troque-por-um-texto-sem-espacos-com-24-ou-mais-caracteres
-PELADA_BACKUP_SENHA=troque-por-outro-texto-do-mesmo-tipo
+PELADA_BACKUP_RO_SENHA=troque-por-outro-texto-do-mesmo-tipo
 SEED_SENHA_ADMIN=troque-por-uma-senha-de-8-a-72-caracteres
 ```
 
@@ -43,7 +43,7 @@ No `.env.example` as cinco variáveis vêm em branco.
 A senha do `postgres` (`postgres`) é a fictícia do `docker-compose.yml`; vale só para a sua máquina.
 
 ```bash
-docker compose up -d      # Postgres 16 local, porta 5432 (espere ficar healthy: docker compose ps)
+docker compose up -d      # Postgres 18 local, porta 5432 (espere ficar healthy: docker compose ps)
 pnpm migrar               # aplica as migrations (linha de base, roles, RLS)
 pnpm seed                 # dados de exemplo e senha das roles locais
 pnpm --filter @pelada/web build   # gera frontend/web/dist, que o Worker exige para subir
@@ -98,8 +98,9 @@ Os testes de banco usam `DATABASE_URL_TESTE` e criam o que precisam nesse servid
 
 O deploy só roda pelo workflow `deploy.yml`, disparado à mão na `main` (Actions, Run workflow, ou
 `gh workflow run deploy.yml --ref main`). A ordem é fixa e para no primeiro erro: conferir `URL_PUBLICA`, build do
-web, branch de restauração no Neon (mantém as 2 mais recentes), dump cifrado, migração, conferência do cache do
-Hyperdrive desligado, `wrangler deploy` e `GET /api/health` com o SHA publicado. Se algo falhar depois da migração, o
+web, dump cifrado (o único ponto de retorno antes de migrar), migração, conferência do cache do Hyperdrive
+desligado, `wrangler deploy` e `GET /api/health` com o SHA publicado. O Neon tem só duas branches permanentes, `main`
+(produção) e `dev` (ADR-030); o deploy não cria branch. Se algo falhar depois da migração, o
 workflow desfaz o deploy (`wrangler rollback`) e diz como restaurar o banco.
 
 Nenhum outro arquivo pode chamar `wrangler deploy` (`node backend/scripts/checagens/checar-wrangler-deploy.mjs`).

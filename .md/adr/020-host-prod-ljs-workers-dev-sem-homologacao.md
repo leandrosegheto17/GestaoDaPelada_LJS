@@ -1,6 +1,6 @@
 # ADR-020: Host de produção em pelada.prod-ljs.workers.dev, sem ambiente de homologação
 
-- **Status:** Accepted (decisão do usuário, BK-0008 e BK-0009)
+- **Status:** Accepted (decisão do usuário, BK-0008 e BK-0009); a branch de restauração como proteção Superseded by ADR-030.
 - **Data:** 2026-10-17
 - **Decisores:** usuário (subdomínio da conta e fim da homologação); Coordenador (ajuste dos artefatos)
 - **Requisitos:** RF-29, RF-34, RF-53, RF-55, RNF-08, RNF-11; ADR-003, ADR-009, ADR-014, ADR-016

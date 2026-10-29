@@ -33,5 +33,6 @@ jobs:
         with:
           url: ${{ secrets.NEON_URL_BACKUP }}
           chave: ${{ secrets.BACKUP_CHAVE }}
+          papel: backup
           nome-artefato: backup-${{ steps.data.outputs.dia }}-${{ github.run_id }}
           retencao: '30'
