@@ -801,10 +801,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Conta criadora com um grupo arquivado e um ativo: a sessão devolve só o ativo
-- [ ] Conta com vínculo em grupo ativo continua vendo o grupo
-- [ ] `sessao.test.ts` verde; teste novo com grupo arquivado
-- [ ] Gate full passa
+- [x] Conta criadora com um grupo arquivado e um ativo: a sessão devolve só o ativo
+- [x] Conta com vínculo em grupo ativo continua vendo o grupo
+- [x] `sessao.test.ts` verde; teste novo com grupo arquivado
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
