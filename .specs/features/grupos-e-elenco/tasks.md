@@ -911,11 +911,11 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Arquivar pelo criador grava `arquivado_em` e `grupo_arquivado` na auditoria; nada é apagado (jogadores, habilidades e notas intactos, GEL-30)
-- [ ] Arquivar por admin não criador → erro `so_quem_criou`; criador removido do grupo → sem linha (404)
-- [ ] Arquivar arquivado e reativar ativo → sucesso sem mudar nada e sem nova linha de auditoria
-- [ ] Nome de confirmação com caixa ou espaço diferente → erro de nome; reativar apaga `arquivado_em` e audita `grupo_reativado`
-- [ ] Gate full passa
+- [x] Arquivar pelo criador grava `arquivado_em` e `grupo_arquivado` na auditoria; nada é apagado (jogadores, habilidades e notas intactos, GEL-30)
+- [x] Arquivar por admin não criador → erro `so_quem_criou`; criador removido do grupo → sem linha (404)
+- [x] Arquivar arquivado e reativar ativo → sucesso sem mudar nada e sem nova linha de auditoria
+- [x] Nome de confirmação com caixa ou espaço diferente → erro de nome; reativar apaga `arquivado_em` e audita `grupo_reativado`
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full

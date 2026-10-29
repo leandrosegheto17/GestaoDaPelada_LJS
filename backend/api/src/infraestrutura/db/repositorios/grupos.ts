@@ -2,6 +2,7 @@ import { HABILIDADES_INICIAIS } from '@pelada/dominio';
 import { sql } from 'kysely';
 import type { Db } from '../index.ts';
 import type { DiaSemana, Frequencia } from '../tipos.ts';
+import * as auditoria from './auditoria.ts';
 
 // Grupos (grupos-e-elenco, design C5; GEL-01, GEL-18 a GEL-30). A conta da requisição e a RLS decidem o que se vê:
 // com a grupos_visiveis() da T17, o grupo arquivado só é visível à conta criadora que ainda é admin (GEL-25).
@@ -124,4 +125,73 @@ export async function ler(db: Db, grupoId: string): Promise<GrupoLido | null> {
     admins: Number(g.admins ?? 0),
     souCriador: g.sou_criador,
   };
+}
+
+/** Grava os dados editáveis (GEL-18). O slug não muda (GEL-16). `false` se o grupo não é visível. */
+export async function editar(db: Db, grupoId: string, dados: DadosGrupo): Promise<boolean> {
+  const r = await db
+    .updateTable('grupos')
+    .set({ nome: dados.nome, dia_semana: dados.diaSemana, frequencia: dados.frequencia, horario: dados.horario })
+    .where('id', '=', grupoId)
+    .executeTakeFirst();
+  return r.numUpdatedRows > 0n;
+}
+
+export type ResultadoArquivamento = 'ok' | 'sem_mudanca' | 'nao_encontrado' | 'so_quem_criou' | 'nome_nao_confere';
+
+/**
+ * Trava a linha do grupo (`FOR UPDATE`) e o vínculo da própria conta (`FOR KEY SHARE`: uma remoção simultânea do
+ * vínculo espera, e a criadora removida antes não passa, GEL-24). Sem grupo visível ou sem vínculo, `nao_encontrado`.
+ */
+async function travarParaArquivamento(
+  db: Db,
+  grupoId: string,
+): Promise<{ nome: string; arquivado: boolean; souCriador: boolean } | null> {
+  const g = await db
+    .selectFrom('grupos')
+    .select(['nome', 'arquivado_em'])
+    .select(sql<boolean>`criado_por = app_conta_id()`.as('sou_criador'))
+    .where('id', '=', grupoId)
+    .forUpdate()
+    .executeTakeFirst();
+  if (!g) return null;
+  const vinculo = await db
+    .selectFrom('vinculos_admin')
+    .select('conta_id')
+    .where('grupo_id', '=', grupoId)
+    .where('conta_id', '=', sql<string>`app_conta_id()`)
+    .forKeyShare()
+    .executeTakeFirst();
+  if (!vinculo) return null;
+  return { nome: g.nome, arquivado: g.arquivado_em !== null, souCriador: g.sou_criador };
+}
+
+/**
+ * Arquiva o grupo (GEL-22 a GEL-24, GEL-29, GEL-30): só a criadora, ainda admin, com o nome atual digitado exatamente
+ * (caixa e espaços). Já arquivado: `sem_mudanca`, sem auditoria. Só marca `arquivado_em`: nada é apagado.
+ */
+export async function arquivar(db: Db, grupoId: string, nomeConfirmacao: string): Promise<ResultadoArquivamento> {
+  const g = await travarParaArquivamento(db, grupoId);
+  if (!g) return 'nao_encontrado';
+  if (!g.souCriador) return 'so_quem_criou';
+  if (g.arquivado) return 'sem_mudanca';
+  if (nomeConfirmacao !== g.nome) return 'nome_nao_confere';
+  await db
+    .updateTable('grupos')
+    .set({ arquivado_em: sql<Date>`now()` })
+    .where('id', '=', grupoId)
+    .execute();
+  await auditoria.registrar(db, grupoId, 'grupo_arquivado', 'grupo', grupoId);
+  return 'ok';
+}
+
+/** Reativa o grupo arquivado (GEL-24, GEL-28, GEL-29): só a criadora, ainda admin. Já ativo: `sem_mudanca`. */
+export async function reativar(db: Db, grupoId: string): Promise<Exclude<ResultadoArquivamento, 'nome_nao_confere'>> {
+  const g = await travarParaArquivamento(db, grupoId);
+  if (!g) return 'nao_encontrado';
+  if (!g.souCriador) return 'so_quem_criou';
+  if (!g.arquivado) return 'sem_mudanca';
+  await db.updateTable('grupos').set({ arquivado_em: null }).where('id', '=', grupoId).execute();
+  await auditoria.registrar(db, grupoId, 'grupo_reativado', 'grupo', grupoId);
+  return 'ok';
 }

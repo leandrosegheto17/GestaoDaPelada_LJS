@@ -40,6 +40,14 @@ async function adicionarAdmin(grupoId: string, conta: string): Promise<void> {
   );
 }
 
+const auditoriaDe = async (grupoId: string, acao: string) =>
+  (
+    await b.owner.query<{ autor_conta_id: string }>(
+      'SELECT autor_conta_id FROM auditoria WHERE grupo_id = $1 AND acao = $2',
+      [grupoId, acao],
+    )
+  ).rows;
+
 describe('grupos.criar (GEL-01)', () => {
   it('como pelada_app devolve id e slug e cria o grupo com as 6 habilidades iniciais em ordem', async () => {
     const conta = await novaConta();
@@ -133,5 +141,139 @@ describe('grupos.ler (GEL-20)', () => {
   it('sem vínculo: nulo', async () => {
     const g = await criarGrupo(await novaConta());
     expect(await como(await novaConta(), (db) => grupos.ler(db, g.id))).toBeNull();
+  });
+});
+
+describe('grupos.editar (GEL-18)', () => {
+  it('grava os dados novos e mantém o slug; sem vínculo, false e nada muda', async () => {
+    const conta = await novaConta();
+    const g = await criarGrupo(conta, 'Antes');
+    const novos = { nome: 'Depois', diaSemana: 'sabado', frequencia: 'mensal', horario: '08:05' } as const;
+    expect(await como(conta, (db) => grupos.editar(db, g.id, novos))).toBe(true);
+    const lido = await como(conta, (db) => grupos.ler(db, g.id));
+    expect(lido).toMatchObject({ ...novos, slug: g.slug });
+    expect(await como(await novaConta(), (db) => grupos.editar(db, g.id, { ...novos, nome: 'Hack' }))).toBe(false);
+    expect((await b.owner.query('SELECT nome FROM grupos WHERE id = $1', [g.id])).rows).toEqual([{ nome: 'Depois' }]);
+  });
+});
+
+describe('grupos.arquivar (GEL-22 a GEL-24, GEL-29, GEL-30)', () => {
+  it('pela criadora com o nome exato: grava arquivado_em, audita grupo_arquivado e não apaga nada', async () => {
+    const conta = await novaConta();
+    const g = await criarGrupo(conta, 'Pelada Para Arquivar');
+    const { rows: jog } = await b.owner.query<{ id: string }>(
+      `INSERT INTO jogadores (grupo_id, apelido, criado_por, criado_em, alterado_por, alterado_em)
+       VALUES ($1, 'Fica', $2, now(), $2, now()) RETURNING id`,
+      [g.id, conta],
+    );
+    const habilidade = await b.owner.query<{ id: string }>('SELECT id FROM habilidades WHERE grupo_id = $1 LIMIT 1', [
+      g.id,
+    ]);
+    await b.owner.query('INSERT INTO notas (grupo_id, jogador_id, habilidade_id, valor) VALUES ($1, $2, $3, 8)', [
+      g.id,
+      jog[0]?.id,
+      habilidade.rows[0]?.id,
+    ]);
+    const contar = async () =>
+      (
+        await b.owner.query(
+          `SELECT (SELECT count(*) FROM jogadores WHERE grupo_id = $1) AS j,
+                  (SELECT count(*) FROM habilidades WHERE grupo_id = $1) AS h,
+                  (SELECT count(*) FROM notas WHERE grupo_id = $1) AS n,
+                  (SELECT count(*) FROM vinculos_admin WHERE grupo_id = $1) AS v`,
+          [g.id],
+        )
+      ).rows[0];
+    const antes = await contar();
+
+    expect(await como(conta, (db) => grupos.arquivar(db, g.id, 'Pelada Para Arquivar'))).toBe('ok');
+    const { rows } = await b.owner.query<{ arquivado: boolean }>(
+      'SELECT arquivado_em IS NOT NULL AS arquivado FROM grupos WHERE id = $1',
+      [g.id],
+    );
+    expect(rows).toEqual([{ arquivado: true }]);
+    expect(await auditoriaDe(g.id, 'grupo_arquivado')).toEqual([{ autor_conta_id: conta }]);
+    expect(await contar()).toEqual(antes);
+  });
+
+  it.each([
+    ['caixa diferente', 'pelada exata'],
+    ['espaço a mais', 'Pelada Exata '],
+    ['espaço a menos', 'PeladaExata'],
+  ])('nome com %s: nome_nao_confere e nada muda', async (_caso, digitado) => {
+    const conta = await novaConta();
+    const g = await criarGrupo(conta, 'Pelada Exata');
+    expect(await como(conta, (db) => grupos.arquivar(db, g.id, digitado))).toBe('nome_nao_confere');
+    const { rows } = await b.owner.query('SELECT arquivado_em FROM grupos WHERE id = $1', [g.id]);
+    expect(rows).toEqual([{ arquivado_em: null }]);
+    expect(await auditoriaDe(g.id, 'grupo_arquivado')).toEqual([]);
+  });
+
+  it('admin que não criou: so_quem_criou e nada muda', async () => {
+    const criadora = await novaConta();
+    const outra = await novaConta();
+    const g = await criarGrupo(criadora, 'Nao Sou Eu');
+    await adicionarAdmin(g.id, outra);
+    expect(await como(outra, (db) => grupos.arquivar(db, g.id, 'Nao Sou Eu'))).toBe('so_quem_criou');
+    expect((await b.owner.query('SELECT arquivado_em FROM grupos WHERE id = $1', [g.id])).rows).toEqual([
+      { arquivado_em: null },
+    ]);
+  });
+
+  it('criadora removida do grupo: nao_encontrado (sem linha) e nada muda', async () => {
+    const criadora = await novaConta();
+    const outra = await novaConta();
+    const g = await criarGrupo(criadora, 'Removida');
+    await adicionarAdmin(g.id, outra);
+    await b.owner.query('DELETE FROM vinculos_admin WHERE grupo_id = $1 AND conta_id = $2', [g.id, criadora]);
+    expect(await como(criadora, (db) => grupos.arquivar(db, g.id, 'Removida'))).toBe('nao_encontrado');
+    expect(await como(criadora, (db) => grupos.reativar(db, g.id))).toBe('nao_encontrado');
+  });
+
+  it('arquivar um arquivado: sem_mudanca, sem nova auditoria e arquivado_em igual', async () => {
+    const conta = await novaConta();
+    const g = await criarGrupo(conta, 'Duas Vezes');
+    await como(conta, (db) => grupos.arquivar(db, g.id, 'Duas Vezes'));
+    const antes = (await b.owner.query('SELECT arquivado_em FROM grupos WHERE id = $1', [g.id])).rows;
+    expect(await como(conta, (db) => grupos.arquivar(db, g.id, 'Duas Vezes'))).toBe('sem_mudanca');
+    expect((await b.owner.query('SELECT arquivado_em FROM grupos WHERE id = $1', [g.id])).rows).toEqual(antes);
+    expect(await auditoriaDe(g.id, 'grupo_arquivado')).toHaveLength(1);
+  });
+});
+
+describe('grupos.reativar (GEL-24, GEL-28, GEL-29)', () => {
+  it('pela criadora: apaga arquivado_em e audita grupo_reativado; o slug continua', async () => {
+    const conta = await novaConta();
+    const g = await criarGrupo(conta, 'Volta');
+    await como(conta, (db) => grupos.arquivar(db, g.id, 'Volta'));
+    expect(await como(conta, (db) => grupos.reativar(db, g.id))).toBe('ok');
+    expect((await b.owner.query('SELECT arquivado_em, slug FROM grupos WHERE id = $1', [g.id])).rows).toEqual([
+      { arquivado_em: null, slug: g.slug },
+    ]);
+    expect(await auditoriaDe(g.id, 'grupo_reativado')).toEqual([{ autor_conta_id: conta }]);
+  });
+
+  it('reativar um ativo: sem_mudanca e sem auditoria', async () => {
+    const conta = await novaConta();
+    const g = await criarGrupo(conta, 'Ja Ativo');
+    expect(await como(conta, (db) => grupos.reativar(db, g.id))).toBe('sem_mudanca');
+    expect(await auditoriaDe(g.id, 'grupo_reativado')).toEqual([]);
+  });
+
+  it('admin que não criou: o arquivado nem é visível a ela (nao_encontrado)', async () => {
+    const criadora = await novaConta();
+    const outra = await novaConta();
+    const g = await criarGrupo(criadora, 'Escondido');
+    await adicionarAdmin(g.id, outra);
+    await como(criadora, (db) => grupos.arquivar(db, g.id, 'Escondido'));
+    expect(await como(outra, (db) => grupos.reativar(db, g.id))).toBe('nao_encontrado');
+  });
+
+  it('admin que não criou, num grupo ativo: so_quem_criou', async () => {
+    const criadora = await novaConta();
+    const outra = await novaConta();
+    const g = await criarGrupo(criadora, 'Ativo Alheio');
+    await adicionarAdmin(g.id, outra);
+    expect(await como(outra, (db) => grupos.reativar(db, g.id))).toBe('so_quem_criou');
   });
 });
