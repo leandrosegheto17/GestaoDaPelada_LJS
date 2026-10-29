@@ -1519,9 +1519,9 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Cadastrar jogador com telefone e ano de nascimento, editar a pontuação, inativar, reativar, corrigir e alterar o início: nenhum `resumo` contém o telefone nem o ano
-- [ ] Os nomes de evento da spec existem (grupo_criado, grupo_arquivado, grupo_reativado, jogador_criado, jogador_excluido, jogador_pontuacao_inicial_alterada, jogador_inativado, jogador_reativado, jogador_periodo_corrigido, jogador_inicio_alterado, habilidade_excluida)
-- [ ] Gate full passa
+- [x] Cadastrar jogador com telefone e ano de nascimento, editar a pontuação, inativar, reativar, corrigir e alterar o início: nenhum `resumo` contém o telefone nem o ano
+- [x] Os nomes de evento da spec existem (grupo_criado, grupo_arquivado, grupo_reativado, jogador_criado, jogador_excluido, jogador_pontuacao_inicial_alterada, jogador_inativado, jogador_reativado, jogador_periodo_corrigido, jogador_inicio_alterado, habilidade_excluida)
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
