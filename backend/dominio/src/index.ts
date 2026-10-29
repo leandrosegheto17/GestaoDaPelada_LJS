@@ -6,3 +6,4 @@ export * from './elenco/idade.ts';
 export * from './datas.ts';
 export * from './atividade/atividade.ts';
 export * from './atividade/validar-periodos.ts';
+export * from './atividade/cobertura-periodos.ts';

@@ -363,10 +363,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Presença em 01/10 e saída proposta em 30/09 → falha com data mínima 02/10 (dia seguinte à última presença retirada)
-- [ ] Retorno depois da primeira presença → falha com data máxima igual ao dia dela
-- [ ] Presença que já estava fora de período não bloqueia; situação ausente não conta
-- [ ] Gate quick passa: `pnpm --filter @pelada/dominio test`
+- [x] Presença em 01/10 e saída proposta em 30/09 → falha com data mínima 02/10 (dia seguinte à última presença retirada)
+- [x] Retorno depois da primeira presença → falha com data máxima igual ao dia dela
+- [x] Presença que já estava fora de período não bloqueia; situação ausente não conta
+- [x] Gate quick passa: `pnpm --filter @pelada/dominio test`
 
 **Tests**: unit
 **Gate**: quick
