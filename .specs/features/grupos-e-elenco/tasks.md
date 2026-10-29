@@ -1022,10 +1022,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Em todas as tabelas com `grupo_id` (jogadores, habilidades, notas, períodos): o criador lê, o outro admin lê zero linhas
-- [ ] `GET /api/grupos` do outro admin não lista o grupo arquivado; o do criador lista em `arquivados`
-- [ ] O ramo do slug público de `grupos_visiveis()` não mudou
-- [ ] Gate full passa
+- [x] Em todas as tabelas com `grupo_id` (jogadores, habilidades, notas, períodos): o criador lê, o outro admin lê zero linhas
+- [x] `GET /api/grupos` do outro admin não lista o grupo arquivado; o do criador lista em `arquivados`
+- [x] O ramo do slug público de `grupos_visiveis()` não mudou
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
