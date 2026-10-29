@@ -749,9 +749,9 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Uma rota de teste lê `c.get('relogio').hoje()` e devolve a data fixa passada em `criarApp({ relogio })`
-- [ ] Sem a opção, usa o relógio real (data no formato AAAA-MM-DD)
-- [ ] Gate full passa
+- [x] Uma rota de teste lê `c.get('relogio').hoje()` e devolve a data fixa passada em `criarApp({ relogio })`
+- [x] Sem a opção, usa o relógio real (data no formato AAAA-MM-DD)
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full

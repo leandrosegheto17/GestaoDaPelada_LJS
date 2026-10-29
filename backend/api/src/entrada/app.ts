@@ -3,6 +3,7 @@ import { bodyLimit } from 'hono/body-limit';
 import type { Db } from '../infraestrutura/db/index.ts';
 import { remetenteDoAmbiente } from '../infraestrutura/email/ambiente.ts';
 import type { Remetente } from '../infraestrutura/email/remetente.ts';
+import { criarRelogio, type Relogio } from '../infraestrutura/relogio/index.ts';
 import type { Env } from './env.ts';
 import { corpoGrande, erroInterno, naoEncontrado } from './erros.ts';
 import { semCache } from './middlewares/cache.ts';
@@ -65,6 +66,8 @@ export interface Variaveis {
   tokenHash?: Uint8Array;
   /** Quem envia os e-mails de conta: o do ambiente, ou o de teste. */
   remetente: Remetente;
+  /** Único relógio da API: "hoje" de São Paulo (AD-015). O real, ou o fixo dos testes. */
+  relogio: Relogio;
 }
 
 export type AppEnv = { Bindings: Env; Variables: Variaveis };
@@ -74,6 +77,8 @@ export interface OpcoesApp {
   limitadores?: { entrar?: Limitador; publico?: Limitador };
   /** Substitui o remetente de e-mail do ambiente (testes). */
   remetente?: Remetente;
+  /** Substitui o relógio real (testes): `relogioFixo(data)`. */
+  relogio?: Relogio;
 }
 
 /** Monta o app Hono. É uma fábrica: nada é guardado entre requisições. */
@@ -94,8 +99,10 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<AppEnv> {
   );
   app.use('/api/*', bodyLimit({ maxSize: LIMITE_CORPO_BYTES, onError: (c) => corpoGrande(c) }));
   // A sessão é resolvida numa transação curta própria antes da transação da rota (AD-007, ACE-47).
+  const relogio = opcoes.relogio ?? criarRelogio();
   app.use('/api/*', async (c, proximo) => {
     c.set('remetente', opcoes.remetente ?? remetenteDoAmbiente(c.env));
+    c.set('relogio', relogio);
     await proximo();
   });
   app.use('/api/*', carregarSessao);
