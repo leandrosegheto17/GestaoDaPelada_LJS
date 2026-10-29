@@ -1601,9 +1601,9 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Cada mutação chama a rota certa com o corpo do contrato e invalida `grupos` e `grupo`
-- [ ] 422 com `campos` chega à tela no formato do `ResumoErros`
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Cada mutação chama a rota certa com o corpo do contrato e invalida `grupos` e `grupo`
+- [x] 422 com `campos` chega à tela no formato do `ResumoErros`
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
