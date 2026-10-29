@@ -1731,10 +1731,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Estados do mockup t27: vazio, carregando e erro; "Corrija N campos: …" com a mensagem ao lado de cada campo
-- [ ] Envio válido chama a mutação e navega para `/app/grupos/:id`
-- [ ] axe sem violação; só tokens
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Estados do mockup t27: vazio, carregando e erro; "Corrija N campos: …" com a mensagem ao lado de cada campo
+- [x] Envio válido chama a mutação e navega para `/app/grupos/:id`
+- [x] axe sem violação; só tokens
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick

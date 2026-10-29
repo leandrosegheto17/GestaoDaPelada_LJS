@@ -23,3 +23,19 @@ export function paraResumo(
 ): ErroDeCampo[] {
   return ordem.filter((c) => erros[c] && rotulos[c]).map((c) => ({ idCampo: `${prefixo}${c}`, rotulo: rotulos[c]! }));
 }
+
+/** Resultado de `safeParse` de um schema do contrato (só o que precisamos dele). */
+export type ResultadoValidacao =
+  | { success: true }
+  | { success: false; error: { issues: readonly { path: readonly PropertyKey[]; message: string }[] } };
+
+/** Erros por campo a partir das issues do schema; vale a primeira mensagem de cada campo (cópia do legado). */
+export function deValidacao(resultado: ResultadoValidacao): ErrosDeCampos {
+  const erros: ErrosDeCampos = {};
+  if (resultado.success) return erros;
+  for (const { path, message } of resultado.error.issues) {
+    const campo = String(path[0] ?? '');
+    if (campo && !(campo in erros)) erros[campo] = message;
+  }
+  return erros;
+}
