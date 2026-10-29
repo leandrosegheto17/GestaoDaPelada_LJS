@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@pelada/contrato": "workspace:*",
+    "@pelada/dominio": "workspace:*",
     "@sentry/cloudflare": "^11.9.0",
     "@sentry/hono": "^11.9.0",
     "hono": "^4.13.13",

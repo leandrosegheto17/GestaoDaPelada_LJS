@@ -884,10 +884,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Criar como `pelada_app` devolve id e slug e cria 6 habilidades; `listarDaConta` separa ativos de arquivados e só mostra arquivado ao criador
-- [ ] `ler` devolve jogadores ativos, habilidades, admins e `souCriador` (verdadeiro só para o criador)
-- [ ] Primeiro parâmetro `grupoId` onde couber (`checar-grupo-id` verde)
-- [ ] Gate full passa
+- [x] Criar como `pelada_app` devolve id e slug e cria 6 habilidades; `listarDaConta` separa ativos de arquivados e só mostra arquivado ao criador
+- [x] `ler` devolve jogadores ativos, habilidades, admins e `souCriador` (verdadeiro só para o criador)
+- [x] Primeiro parâmetro `grupoId` onde couber (`checar-grupo-id` verde)
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
