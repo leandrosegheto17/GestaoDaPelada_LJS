@@ -336,10 +336,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Uma asserção por mensagem: "Informe uma data válida.", "A data não pode ser no futuro.", as quatro de ordem com a data em dd/mm/aaaa, "Os períodos não podem se sobrepor."
-- [ ] `2026-02-30` e `2026-13-01` são datas inválidas; 29/02 em ano bissexto é válido
-- [ ] Devolve só a primeira falha, na ordem do GEL-62
-- [ ] Gate quick passa: `pnpm --filter @pelada/dominio test`
+- [x] Uma asserção por mensagem: "Informe uma data válida.", "A data não pode ser no futuro.", as quatro de ordem com a data em dd/mm/aaaa, "Os períodos não podem se sobrepor."
+- [x] `2026-02-30` e `2026-13-01` são datas inválidas; 29/02 em ano bissexto é válido
+- [x] Devolve só a primeira falha, na ordem do GEL-62
+- [x] Gate quick passa: `pnpm --filter @pelada/dominio test`
 
 **Tests**: unit
 **Gate**: quick
