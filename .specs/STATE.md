@@ -118,16 +118,17 @@
 ## Retomada
 
 - **Fluxo**: 1, Projeto novo para vender — skill `projeto-novo`
-- **Item**: `.specs/features/grupos-e-elenco/` (feature 3 de 8, AD-001), na branch `feat/grupos-e-elenco`, criada da `main` `67a700a` no worktree `.worktrees/conta-e-acesso-seguranca` (o nome da pasta é da feature anterior). Abra a sessão nova **dentro desse worktree**.
-- **Fase aprovada**: nenhuma desta feature. A fase 6 (Specify) produziu `spec.md` (GEL-01 a GEL-118, `validate_spec.py` sem erros) e `context.md` (decisões C1 a C10 do usuário), **sem aprovação**: em 2026-10-28 o usuário escolheu **parar** na pergunta de aprovação da spec, sem dizer o motivo.
-- **Próximo passo**: retomar na fase 6, mostrar o resumo da spec e repetir a pergunta seguir / ajustar / parar. Aprovada, a fase 7 é o Design (`design.md`) e o mockup do módulo (t08 com "Criar grupo" e "Arquivados", t27 sem "Primeiro admin", arquivar em t20/t28, texto novo da exclusão em t16). Modelo indicado: Opus.
+- **Item**: `.specs/features/grupos-e-elenco/` (feature 3 de 8, AD-001). A spec e o `context.md` estão na `main` (merge `d04f201`). Trabalhar no checkout principal; para a construção, abrir worktree novo a partir da `main`.
+- **Fase aprovada**: nenhuma desta feature. A fase 6 (Specify) produziu `spec.md` (GEL-01 a GEL-118, `validate_spec.py` sem erros) e `context.md` (decisões C1 a C10), **sem aprovação**: em 2026-10-28 o usuário escolheu **parar** na pergunta de aprovação da spec.
+- **Próximo passo**: retomar na fase 6, mostrar o resumo da spec e repetir a pergunta seguir / ajustar / parar. Aprovada, a fase 7 é o Design e o mockup do módulo. Modelo indicado: Opus.
 - **Progresso**: Plano: Faltam 6 de 8 features: 25% concluído. A feature atual ainda não tem tarefas.
 - **Combinado na conversa e não registrado em artefato**:
-  - A `conta-e-acesso` está fechada: a `main` local está em `67a700a` (merge fast-forward feito pelo usuário), com o commit docs da liberação, o `hookTimeout` de 60 s no `test:checagens` (`16fd9ea`, corrige a queda do `dono.test.ts`) e a correção da trava de merge para ler os verdes do worktree da branch (`67a700a`). Falta o push da `main` (pede confirmação). A correção do `trava-testes.py` precisa ser levada ao Rascunho (`C:\Leandro\Projetos\Rascunho\.claude`) e registrada no `.rascunho/DECISOES.md` de lá.
-  - Limpezas pendentes: branches `fix/conta-e-acesso-seguranca` e `feat/conta-e-acesso`; pendências do usuário: monitor de uptime (runbook §7), alerta manual da cota de e-mail aos 50%, apagar a branch Neon `spike-descartavel` e o Hyperdrive `spike-s1`, conferir o backup agendado.
-  - Resíduos de segurança aceitos da `conta-e-acesso` continuam como registrados em `seguranca.md` e no THREAT-MODEL.
-  - Banco local: contêiner `conta-e-acesso-seguranca-db-1` (porta 5432), migrado até `1792844160000`, com seed. Não mexer em `controleemcasa_ljs-banco-1` (55432) nem em `evolucao-segura-postgres` (5433).
-- **Gravada em**: 2026-10-28 (parada na aprovação da spec de `grupos-e-elenco`)
+  - Padronização do Neon (ADR-030 a ADR-034) liberada em 2026-10-29 (`.specs/liberacao.md`). Abertos: teste de fumaça do usuário; `neondb_owner` ainda administra a `pelada_app` e o database `neondb` antigo continua no Neon; revogar a `NEON_API_KEY` no console do Neon.
+  - Fragilidade nova: `test/lint-dominio.test.ts` falhou uma vez na trava da `main` e não repetiu. Investigar em tarefa à parte.
+  - A correção do `trava-testes.py` (`67a700a`) precisa ser levada ao Rascunho (`C:\Leandro\Projetos\Rascunho\.claude`) e registrada no `.rascunho/DECISOES.md` de lá.
+  - Limpezas pendentes (pedem confirmação): branches `padronizar-neon`, `feat/grupos-e-elenco` (local e remota), `fix/conta-e-acesso-seguranca`, `feat/fundacao`, `fix/g18-deploy-yml`; worktrees `.worktrees/conta-e-acesso-seguranca` e `.worktrees/fundacao`; contêineres parados `conta-e-acesso-seguranca-db-1` e `conta-e-acesso-db-1`. Pendências do usuário: monitor de uptime (runbook §7), alerta manual da cota de e-mail aos 50%, apagar a branch Neon `spike-descartavel` e o Hyperdrive `spike-s1`.
+  - Banco local: `gestaodapelada_ljs-db-1` (PostgreSQL 18, porta 5432), migrado até `1792844220000`, com seed. O `.env` local ganhou `PELADA_BACKUP_RO_SENHA`. Não mexer em `controleemcasa_ljs-banco-1` (55432) nem em `evolucao-segura-postgres` (5433).
+- **Gravada em**: 2026-10-29 (depois da liberação da padronização do Neon)
 
 ## Modelo
 
