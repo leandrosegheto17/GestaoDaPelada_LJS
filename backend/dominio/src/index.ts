@@ -8,3 +8,4 @@ export * from './atividade/atividade.ts';
 export * from './atividade/validar-periodos.ts';
 export * from './atividade/cobertura-periodos.ts';
 export * from './atividade/avaliar-periodos.ts';
+export * from './atividade/alterar-inicio.ts';

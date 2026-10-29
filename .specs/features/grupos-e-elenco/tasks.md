@@ -418,10 +418,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] 31/12/1999 → "A data de início não pode ser anterior a 01/01/2000."; 01/01/2000 passa
-- [ ] Data depois da saída do primeiro período → mensagem do GEL-80 com a data da saída
-- [ ] Data anterior ao início do primeiro período → `recuarPrimeiroPeriodo: true`; períodos encerrados não mudam
-- [ ] Gate quick passa: `pnpm --filter @pelada/dominio test`
+- [x] 31/12/1999 → "A data de início não pode ser anterior a 01/01/2000."; 01/01/2000 passa
+- [x] Data depois da saída do primeiro período → mensagem do GEL-80 com a data da saída
+- [x] Data anterior ao início do primeiro período → `recuarPrimeiroPeriodo: true`; períodos encerrados não mudam
+- [x] Gate quick passa: `pnpm --filter @pelada/dominio test`
 
 **Tests**: unit
 **Gate**: quick
