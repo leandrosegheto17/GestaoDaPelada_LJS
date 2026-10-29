@@ -583,9 +583,9 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] `compatibilidade.test.ts` passa com o snapshot atualizado e falharia sem ele (provado removendo um campo)
-- [ ] `sem-eval.test.ts` continua verde: os arquivos novos importam o `z` de `zod.ts`
-- [ ] Gate quick passa: `pnpm --filter @pelada/contrato test`
+- [x] `compatibilidade.test.ts` passa com o snapshot atualizado e falharia sem ele (provado removendo um campo)
+- [x] `sem-eval.test.ts` continua verde: os arquivos novos importam o `z` de `zod.ts`
+- [x] Gate quick passa: `pnpm --filter @pelada/contrato test`
 
 **Tests**: unit
 **Gate**: quick

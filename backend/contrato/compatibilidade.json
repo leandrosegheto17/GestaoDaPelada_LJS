@@ -49,6 +49,22 @@
       "obrigatorio": true
     }
   },
+  "apelido": {
+    "": {
+      "tipo": "string",
+      "obrigatorio": true
+    }
+  },
+  "arquivarCorpo": {
+    "": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "nomeConfirmacao": {
+      "tipo": "string",
+      "obrigatorio": true
+    }
+  },
   "cadastroCorpo": {
     "": {
       "tipo": "object",
@@ -103,6 +119,154 @@
       "obrigatorio": true
     }
   },
+  "corrigirPeriodoCorpo": {
+    "": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "saida": {
+      "tipo": "string",
+      "obrigatorio": false
+    },
+    "retorno": {
+      "tipo": "string",
+      "obrigatorio": false
+    }
+  },
+  "corrigirPeriodoResposta": {
+    "": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "alterado": {
+      "tipo": "boolean",
+      "obrigatorio": true
+    },
+    "mensagem": {
+      "tipo": "string",
+      "obrigatorio": false
+    },
+    "periodos": {
+      "tipo": "array",
+      "obrigatorio": true
+    },
+    "periodos[]": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "periodos[].id": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "periodos[].inicio": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "periodos[].fim": {
+      "tipo": "outro",
+      "obrigatorio": true
+    }
+  },
+  "criarGrupoCorpo": {
+    "": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "nome": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "diaSemana": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "frequencia": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "horario": {
+      "tipo": "string",
+      "obrigatorio": true
+    }
+  },
+  "criarGrupoResposta": {
+    "": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "id": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "slug": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "linkPublico": {
+      "tipo": "string",
+      "obrigatorio": true
+    }
+  },
+  "dadosGrupo": {
+    "": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "nome": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "diaSemana": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "frequencia": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "horario": {
+      "tipo": "string",
+      "obrigatorio": true
+    }
+  },
+  "dataCorpo": {
+    "": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "data": {
+      "tipo": "string",
+      "obrigatorio": false
+    }
+  },
+  "diaSemana": {
+    "": {
+      "tipo": "string",
+      "obrigatorio": true
+    }
+  },
+  "editarGrupoCorpo": {
+    "": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "nome": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "diaSemana": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "frequencia": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "horario": {
+      "tipo": "string",
+      "obrigatorio": true
+    }
+  },
   "email": {
     "": {
       "tipo": "string",
@@ -143,9 +307,429 @@
       "obrigatorio": true
     }
   },
+  "frequencia": {
+    "": {
+      "tipo": "string",
+      "obrigatorio": true
+    }
+  },
+  "grupoDetalhe": {
+    "": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "id": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "nome": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "slug": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "linkPublico": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "diaSemana": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "frequencia": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "horario": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "jogadoresAtivos": {
+      "tipo": "integer",
+      "obrigatorio": true
+    },
+    "habilidades": {
+      "tipo": "integer",
+      "obrigatorio": true
+    },
+    "admins": {
+      "tipo": "integer",
+      "obrigatorio": true
+    },
+    "souCriador": {
+      "tipo": "boolean",
+      "obrigatorio": true
+    }
+  },
+  "grupoItem": {
+    "": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "id": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "nome": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "slug": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "diaSemana": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "frequencia": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "horario": {
+      "tipo": "string",
+      "obrigatorio": true
+    }
+  },
+  "gruposResposta": {
+    "": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "ativos": {
+      "tipo": "array",
+      "obrigatorio": true
+    },
+    "ativos[]": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "ativos[].id": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "ativos[].nome": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "ativos[].slug": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "ativos[].diaSemana": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "ativos[].frequencia": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "ativos[].horario": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "arquivados": {
+      "tipo": "array",
+      "obrigatorio": true
+    },
+    "arquivados[]": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "arquivados[].id": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "arquivados[].nome": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "arquivados[].slug": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "arquivados[].diaSemana": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "arquivados[].frequencia": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "arquivados[].horario": {
+      "tipo": "string",
+      "obrigatorio": true
+    }
+  },
+  "habilidadeCorpo": {
+    "": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "nome": {
+      "tipo": "string",
+      "obrigatorio": true
+    }
+  },
+  "habilidadeItem": {
+    "": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "id": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "nome": {
+      "tipo": "string",
+      "obrigatorio": true
+    }
+  },
+  "horario": {
+    "": {
+      "tipo": "string",
+      "obrigatorio": true
+    }
+  },
+  "inicioCorpo": {
+    "": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "data": {
+      "tipo": "string",
+      "obrigatorio": true
+    }
+  },
+  "jogadorDetalhe": {
+    "": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "id": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "apelido": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "posicao": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "situacao": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "desde": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "nivel": {
+      "tipo": "integer",
+      "obrigatorio": true
+    },
+    "semNota": {
+      "tipo": "boolean",
+      "obrigatorio": true
+    },
+    "anoNascimento": {
+      "tipo": "outro",
+      "obrigatorio": true
+    },
+    "telefone": {
+      "tipo": "outro",
+      "obrigatorio": true
+    },
+    "pontuacaoInicial": {
+      "tipo": "integer",
+      "obrigatorio": true
+    },
+    "inicioPontuacao": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "periodos": {
+      "tipo": "array",
+      "obrigatorio": true
+    },
+    "periodos[]": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "periodos[].id": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "periodos[].inicio": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "periodos[].fim": {
+      "tipo": "outro",
+      "obrigatorio": true
+    },
+    "notas": {
+      "tipo": "array",
+      "obrigatorio": true
+    },
+    "notas[]": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "notas[].habilidadeId": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "notas[].habilidade": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "notas[].nota": {
+      "tipo": "outro",
+      "obrigatorio": true
+    }
+  },
+  "jogadorItem": {
+    "": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "id": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "apelido": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "posicao": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "situacao": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "desde": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "nivel": {
+      "tipo": "integer",
+      "obrigatorio": true
+    },
+    "semNota": {
+      "tipo": "boolean",
+      "obrigatorio": true
+    }
+  },
+  "listaHabilidades": {
+    "": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "habilidades": {
+      "tipo": "array",
+      "obrigatorio": true
+    },
+    "habilidades[]": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "habilidades[].id": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "habilidades[].nome": {
+      "tipo": "string",
+      "obrigatorio": true
+    }
+  },
+  "listaJogadores": {
+    "": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "jogadores": {
+      "tipo": "array",
+      "obrigatorio": true
+    },
+    "jogadores[]": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "jogadores[].id": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "jogadores[].apelido": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "jogadores[].posicao": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "jogadores[].situacao": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "jogadores[].desde": {
+      "tipo": "string",
+      "obrigatorio": true
+    },
+    "jogadores[].nivel": {
+      "tipo": "integer",
+      "obrigatorio": true
+    },
+    "jogadores[].semNota": {
+      "tipo": "boolean",
+      "obrigatorio": true
+    }
+  },
   "nomeConta": {
     "": {
       "tipo": "string",
+      "obrigatorio": true
+    }
+  },
+  "nomeGrupo": {
+    "": {
+      "tipo": "string",
+      "obrigatorio": true
+    }
+  },
+  "nomeHabilidade": {
+    "": {
+      "tipo": "string",
+      "obrigatorio": true
+    }
+  },
+  "notaCorpo": {
+    "": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "nota": {
+      "tipo": "outro",
+      "obrigatorio": true
+    }
+  },
+  "notaResposta": {
+    "": {
+      "tipo": "object",
+      "obrigatorio": true
+    },
+    "nivel": {
+      "tipo": "integer",
+      "obrigatorio": true
+    },
+    "semNota": {
+      "tipo": "boolean",
       "obrigatorio": true
     }
   },
@@ -159,6 +743,18 @@
       "obrigatorio": true
     },
     "senha": {
+      "tipo": "string",
+      "obrigatorio": true
+    }
+  },
+  "pontuacaoInicial": {
+    "": {
+      "tipo": "integer",
+      "obrigatorio": true
+    }
+  },
+  "posicao": {
+    "": {
       "tipo": "string",
       "obrigatorio": true
     }
@@ -208,6 +804,12 @@
     },
     "grupos[].acessaFinanceiro": {
       "tipo": "boolean",
+      "obrigatorio": true
+    }
+  },
+  "telefone": {
+    "": {
+      "tipo": "string|null",
       "obrigatorio": true
     }
   },
