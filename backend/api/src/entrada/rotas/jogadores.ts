@@ -1,15 +1,23 @@
-import { jogadorCorpo, type JogadorDetalhe, type JogadorItem, type Posicao } from '@pelada/contrato';
+import {
+  editarJogadorCorpo,
+  jogadorCorpo,
+  type JogadorDetalhe,
+  type JogadorItem,
+  type Posicao,
+} from '@pelada/contrato';
 import { Hono } from 'hono';
 import * as jogadores from '../../infraestrutura/db/repositorios/jogadores.ts';
 import type { AppEnv } from '../app.ts';
 import { lerCorpo } from '../corpo.ts';
-import { CODIGOS_ERRO, erroComStatus, naoEncontrado } from '../erros.ts';
+import { CODIGOS_ERRO, corpoErro, erroComStatus, naoEncontrado } from '../erros.ts';
 
 /**
  * Posição de quem foi anonimizado (LGPD): a coluna aceita nulo, o contrato exige uma posição. Mesma escolha do legado
  * (`POSICAO_PADRAO` em `aplicacao/elenco/listar.ts`, AD-002). O cadastro novo sempre grava a posição (GEL-37).
  */
 const POSICAO_PADRAO: Posicao = 'meia';
+
+export const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export function item(j: jogadores.JogadorResumo): JogadorItem {
   return {
@@ -60,4 +68,40 @@ export const rotaJogadores = new Hono<AppEnv>()
     const lido = await jogadores.ler(c.var.db, grupoId, criado.id);
     if (!lido) return naoEncontrado(c);
     return c.json(detalhe(lido), 201);
+  })
+  .get('/api/grupos/:grupoId/jogadores/:id', async (c) => {
+    const id = c.req.param('id');
+    if (!UUID.test(id)) return naoEncontrado(c);
+    const lido = await jogadores.ler(c.var.db, c.req.param('grupoId'), id);
+    if (!lido) return naoEncontrado(c);
+    return c.json(detalhe(lido));
+  })
+  .patch('/api/grupos/:grupoId/jogadores/:id', async (c) => {
+    const id = c.req.param('id');
+    if (!UUID.test(id)) return naoEncontrado(c);
+    // Sem data de entrada: o contrato recusa o campo (422); o início só muda pela rota de início (GEL-41, GEL-83).
+    const corpo = await lerCorpo(c, editarJogadorCorpo(c.var.relogio.hoje()));
+    if (!corpo.ok) return corpo.resposta;
+    const grupoId = c.req.param('grupoId');
+    const editado = await jogadores.editar(c.var.db, grupoId, id, corpo.dado);
+    if (!editado) return naoEncontrado(c);
+    if (!editado.ok) return recusaDeCampo(c, editado.campo, editado.mensagem);
+    const lido = await jogadores.ler(c.var.db, grupoId, id);
+    if (!lido) return naoEncontrado(c);
+    return c.json(detalhe(lido));
+  })
+  .delete('/api/grupos/:grupoId/jogadores/:id', async (c) => {
+    const id = c.req.param('id');
+    if (!UUID.test(id)) return naoEncontrado(c);
+    const excluido = await jogadores.excluir(c.var.db, c.req.param('grupoId'), id);
+    if (!excluido) return naoEncontrado(c);
+    if (!excluido.ok) {
+      // GEL-85: com histórico, 409 sugerindo inativar; nada é apagado.
+      const { erro } = corpoErro(
+        CODIGOS_ERRO.jogadorComHistorico,
+        `${excluido.apelido} tem histórico de partidas e não pode ser excluído.`,
+      );
+      return c.json({ erro: { ...erro, sugestao: 'inativar' } }, 409);
+    }
+    return c.body(null, 204);
   });

@@ -1162,10 +1162,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] `PATCH` válido → 200; `dataEntrada` no corpo → 422; id de jogador de outro grupo → 404
-- [ ] `DELETE` sem histórico → 204; com histórico → 409 com `jogador_com_historico`, a mensagem "<apelido> tem histórico de partidas e não pode ser excluído." e a sugestão `inativar`
-- [ ] Casos `grupo` dos três métodos em `casos.ts`
-- [ ] Gate full passa
+- [x] `PATCH` válido → 200; `dataEntrada` no corpo → 422; id de jogador de outro grupo → 404
+- [x] `DELETE` sem histórico → 204; com histórico → 409 com `jogador_com_historico`, a mensagem "<apelido> tem histórico de partidas e não pode ser excluído." e a sugestão `inativar`
+- [x] Casos `grupo` dos três métodos em `casos.ts`
+- [x] Gate full passa
 
 **Tests**: e2e
 **Gate**: full

@@ -25,6 +25,8 @@ export const CODIGOS_ERRO = {
   grupoArquivado: 'grupo_arquivado',
   // grupos-e-elenco (GEL-24): arquivar e reativar só por quem criou o grupo.
   soQuemCriou: 'so_quem_criou',
+  // grupos-e-elenco (GEL-85): excluir jogador com histórico; a sugestão é inativar.
+  jogadorComHistorico: 'jogador_com_historico',
 } as const;
 
 /** Erro padrão da API: `{ erro: { codigo, mensagem, campos? } }`. */

@@ -229,3 +229,160 @@ describe('jogadores: sessão, vínculo e grupo arquivado (GEL-08, GEL-21, GEL-26
     expect(await jogadoresDoGrupo(g.id)).toEqual([]);
   });
 });
+
+const EDICAO = { apelido: 'Toninho Editado', anoNascimento: 1991, posicao: 'atacante', telefone: '11912345678' };
+
+describe('GET /api/grupos/:grupoId/jogadores/:id (GEL-44)', () => {
+  it('200 com a ficha; jogador de outro grupo, inexistente ou id inválido: 404', async () => {
+    const g = await grupoNovo();
+    const j = await cadastrar(g);
+    const r = await pedir('GET', `/api/grupos/${g.id}/jogadores/${j.id}`, undefined, comRelogio(g));
+    expect(r.status).toBe(200);
+    expect(jogadorDetalhe.safeParse(r.corpo).success).toBe(true);
+    expect(r.corpo).toMatchObject({ id: j.id, apelido: 'Toninho' });
+
+    const outro = await grupoNovo();
+    const alheio = await cadastrar(outro);
+    for (const id of [alheio.id, crypto.randomUUID(), 'nao-e-uuid']) {
+      const x = await pedir('GET', `/api/grupos/${g.id}/jogadores/${id}`, undefined, comRelogio(g));
+      expect(x.status).toBe(404);
+      expect(x.corpo).toMatchObject({ erro: { codigo: 'nao_encontrado' } });
+    }
+  });
+});
+
+describe('PATCH /api/grupos/:grupoId/jogadores/:id (GEL-41 a GEL-44)', () => {
+  it('válido: 200 com a ficha nova; início e períodos não mudam', async () => {
+    const g = await grupoNovo();
+    const j = await cadastrar(g, { ...JOGADOR, pontuacaoInicial: 5, dataEntrada: '2026-02-01' });
+    const r = await pedir(
+      'PATCH',
+      `/api/grupos/${g.id}/jogadores/${j.id}`,
+      { ...EDICAO, pontuacaoInicial: 40 },
+      comRelogio(g),
+    );
+    expect(r.status).toBe(200);
+    expect(r.corpo).toMatchObject({
+      id: j.id,
+      apelido: 'Toninho Editado',
+      anoNascimento: 1991,
+      posicao: 'atacante',
+      telefone: '11912345678',
+      pontuacaoInicial: 40,
+      inicioPontuacao: '2026-02-01',
+      periodos: [{ inicio: '2026-02-01', fim: null }],
+    });
+    expect(
+      await comoOwner<{ resumo: unknown }>(
+        "SELECT resumo FROM auditoria WHERE grupo_id = $1 AND acao = 'jogador_pontuacao_inicial_alterada'",
+        [g.id],
+      ),
+    ).toEqual([{ resumo: { anterior: 5, novo: 40 } }]);
+  });
+
+  it('dataEntrada no corpo: 422 e nada muda', async () => {
+    const g = await grupoNovo();
+    const j = await cadastrar(g, { ...JOGADOR, dataEntrada: '2026-02-01' });
+    const r = await pedir(
+      'PATCH',
+      `/api/grupos/${g.id}/jogadores/${j.id}`,
+      { ...EDICAO, dataEntrada: '2026-01-01' },
+      comRelogio(g),
+    );
+    expect(r.status).toBe(422);
+    expect(r.corpo).toMatchObject({ erro: { codigo: 'dados_invalidos' } });
+    expect(await jogadoresDoGrupo(g.id)).toEqual([{ apelido: 'Toninho' }]);
+  });
+
+  it('campo inválido: 422 com a mesma mensagem do cadastro; apelido de outro jogador: 422 do GEL-35', async () => {
+    const g = await grupoNovo();
+    await cadastrar(g, { ...JOGADOR, apelido: 'Beto' });
+    const j = await cadastrar(g);
+    const ano = await pedir(
+      'PATCH',
+      `/api/grupos/${g.id}/jogadores/${j.id}`,
+      { ...EDICAO, anoNascimento: 2017 },
+      comRelogio(g),
+    );
+    expect(ano.status).toBe(422);
+    expect(ano.corpo).toMatchObject({ erro: { campos: { anoNascimento: 'O ano precisa estar entre 1940 e 2016.' } } });
+    const repetido = await pedir(
+      'PATCH',
+      `/api/grupos/${g.id}/jogadores/${j.id}`,
+      { ...EDICAO, apelido: 'beto' },
+      comRelogio(g),
+    );
+    expect(repetido.status).toBe(422);
+    expect(repetido.corpo).toMatchObject({
+      erro: { campos: { apelido: 'Já existe um jogador com esse apelido neste grupo.' } },
+    });
+    expect(await jogadoresDoGrupo(g.id)).toEqual([{ apelido: 'Beto' }, { apelido: 'Toninho' }]);
+  });
+
+  it('jogador de outro grupo: 404 e nada muda', async () => {
+    const g = await grupoNovo();
+    const outro = await grupoNovo();
+    const alheio = await cadastrar(outro);
+    const r = await pedir('PATCH', `/api/grupos/${g.id}/jogadores/${alheio.id}`, EDICAO, comRelogio(g));
+    expect(r.status).toBe(404);
+    expect(await jogadoresDoGrupo(outro.id)).toEqual([{ apelido: 'Toninho' }]);
+  });
+});
+
+describe('DELETE /api/grupos/:grupoId/jogadores/:id (GEL-45, GEL-84, GEL-85)', () => {
+  it('sem histórico: 204, jogador e períodos apagados e jogador_excluido auditado', async () => {
+    const g = await grupoNovo();
+    const j = await cadastrar(g);
+    const r = await pedir('DELETE', `/api/grupos/${g.id}/jogadores/${j.id}`, undefined, comRelogio(g));
+    expect(r.status).toBe(204);
+    expect(r.texto).toBe('');
+    expect(await jogadoresDoGrupo(g.id)).toEqual([]);
+    expect(await comoOwner('SELECT 1 FROM periodos_ativos WHERE jogador_id = $1', [j.id])).toEqual([]);
+    expect(
+      await comoOwner("SELECT entidade_id FROM auditoria WHERE grupo_id = $1 AND acao = 'jogador_excluido'", [g.id]),
+    ).toEqual([{ entidade_id: j.id }]);
+  });
+
+  it('com histórico (nota): 409 jogador_com_historico, a mensagem com o apelido e a sugestão inativar; nada apagado', async () => {
+    const g = await grupoNovo();
+    const j = await cadastrar(g);
+    await comoOwner(
+      `INSERT INTO notas (grupo_id, jogador_id, habilidade_id, valor)
+       SELECT $1, $2, id, 6 FROM habilidades WHERE grupo_id = $1 ORDER BY ordem LIMIT 1`,
+      [g.id, j.id],
+    );
+    const r = await pedir('DELETE', `/api/grupos/${g.id}/jogadores/${j.id}`, undefined, comRelogio(g));
+    expect(r.status).toBe(409);
+    expect(r.corpo).toEqual({
+      erro: {
+        codigo: 'jogador_com_historico',
+        mensagem: 'Toninho tem histórico de partidas e não pode ser excluído.',
+        sugestao: 'inativar',
+      },
+    });
+    expect(await jogadoresDoGrupo(g.id)).toEqual([{ apelido: 'Toninho' }]);
+  });
+
+  it('jogador de outro grupo: 404 e nada apagado', async () => {
+    const g = await grupoNovo();
+    const outro = await grupoNovo();
+    const alheio = await cadastrar(outro);
+    const r = await pedir('DELETE', `/api/grupos/${g.id}/jogadores/${alheio.id}`, undefined, comRelogio(g));
+    expect(r.status).toBe(404);
+    expect(await jogadoresDoGrupo(outro.id)).toEqual([{ apelido: 'Toninho' }]);
+  });
+
+  it('grupo arquivado: PATCH e DELETE 409 grupo_arquivado; GET da ficha continua 200', async () => {
+    const g = await grupoNovo();
+    const j = await cadastrar(g);
+    await comoOwner('UPDATE grupos SET arquivado_em = now() WHERE id = $1', [g.id]);
+    const patch = await pedir('PATCH', `/api/grupos/${g.id}/jogadores/${j.id}`, EDICAO, comRelogio(g));
+    const del = await pedir('DELETE', `/api/grupos/${g.id}/jogadores/${j.id}`, undefined, comRelogio(g));
+    for (const r of [patch, del]) {
+      expect(r.status).toBe(409);
+      expect(r.corpo).toMatchObject({ erro: { codigo: 'grupo_arquivado' } });
+    }
+    expect((await pedir('GET', `/api/grupos/${g.id}/jogadores/${j.id}`, undefined, comRelogio(g))).status).toBe(200);
+    expect(await jogadoresDoGrupo(g.id)).toEqual([{ apelido: 'Toninho' }]);
+  });
+});
