@@ -2060,10 +2060,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Conta sem grupos cria "Pelada de Quinta" e cadastra "Toninho" no viewport de celular em menos de 2 minutos de interação (sem esperas fixas)
-- [ ] O grupo aparece em "Seus grupos" e o início mostra "6 habilidades" e "1 admin"
-- [ ] Arquivar com o nome digitado leva o grupo a "Arquivados"; Reativar o devolve
-- [ ] Gate build passa
+- [x] Conta sem grupos cria "Pelada de Quinta" e cadastra "Toninho" no viewport de celular em menos de 2 minutos de interação (sem esperas fixas)
+- [x] O grupo aparece em "Seus grupos" e o início mostra "6 habilidades" e "1 admin"
+- [x] Arquivar com o nome digitado leva o grupo a "Arquivados"; Reativar o devolve
+- [x] Gate build passa
 
 **Tests**: e2e
 **Gate**: build
