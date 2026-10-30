@@ -1,15 +1,12 @@
 import { z } from './zod.ts';
 import { DIAS_DA_SEMANA } from './dias.ts';
 import { LIMITES } from './limites.ts';
+import { textoVisivel } from './texto.ts';
 
 const MENSAGEM_NOME = `O nome precisa ter de ${LIMITES.nomeGrupo.min} a ${LIMITES.nomeGrupo.max} caracteres.`;
 
-/** Nome do grupo: de 3 a 60 caracteres sem os espaços das pontas (GEL-03). */
-export const nomeGrupo = z
-  .string({ error: MENSAGEM_NOME })
-  .trim()
-  .min(LIMITES.nomeGrupo.min, MENSAGEM_NOME)
-  .max(LIMITES.nomeGrupo.max, MENSAGEM_NOME);
+/** Nome do grupo: de 3 a 60 caracteres sem os espaços das pontas (GEL-03), em NFC e sem invisíveis (SEC-005). */
+export const nomeGrupo = textoVisivel(LIMITES.nomeGrupo.min, LIMITES.nomeGrupo.max, MENSAGEM_NOME);
 
 export const FREQUENCIAS = ['semanal', 'quinzenal', 'mensal'] as const;
 export type Frequencia = (typeof FREQUENCIAS)[number];

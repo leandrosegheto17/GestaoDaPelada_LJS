@@ -1,16 +1,16 @@
 import { z } from './zod.ts';
 import { LIMITES } from './limites.ts';
+import { textoVisivel } from './texto.ts';
 
 const MENSAGEM_NOME = `O nome precisa ter de ${LIMITES.habilidade.min} a ${LIMITES.habilidade.max} caracteres.`;
 /** GEL-99. A spec pede só o erro no campo; o texto diz a faixa. */
 const MENSAGEM_NOTA = `A nota precisa ser um número inteiro de ${LIMITES.nota.min} a ${LIMITES.nota.max}.`;
 
-/** Nome da habilidade: de 2 a 30 caracteres sem os espaços das pontas (GEL-90). A unicidade é do repositório. */
-export const nomeHabilidade = z
-  .string({ error: MENSAGEM_NOME })
-  .trim()
-  .min(LIMITES.habilidade.min, MENSAGEM_NOME)
-  .max(LIMITES.habilidade.max, MENSAGEM_NOME);
+/**
+ * Nome da habilidade: de 2 a 30 caracteres sem os espaços das pontas (GEL-90), em NFC e sem invisíveis (SEC-005). A
+ * unicidade é do repositório.
+ */
+export const nomeHabilidade = textoVisivel(LIMITES.habilidade.min, LIMITES.habilidade.max, MENSAGEM_NOME);
 
 /** O mesmo corpo serve a criar (POST) e a renomear (PATCH). */
 export const habilidadeCorpo = z.strictObject({ nome: nomeHabilidade });

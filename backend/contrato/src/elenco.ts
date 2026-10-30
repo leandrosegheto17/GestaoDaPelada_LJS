@@ -1,5 +1,6 @@
 import { z } from './zod.ts';
 import { LIMITES } from './limites.ts';
+import { textoVisivel } from './texto.ts';
 
 /** As 7 posições do CHECK da linha de base (C10), na ordem da spec. */
 export const POSICOES = ['goleiro', 'zagueiro', 'lateral', 'volante', 'meia', 'atacante', 'centroavante'] as const;
@@ -21,12 +22,11 @@ const MENSAGEM_FUTURO = 'A data não pode ser no futuro.';
 const PISO_INICIO = '2000-01-01';
 const MENSAGEM_PISO = 'A data de início não pode ser anterior a 01/01/2000.';
 
-/** Apelido de 2 a 30 caracteres sem os espaços das pontas (GEL-34). A unicidade no grupo é do repositório. */
-export const apelido = z
-  .string({ error: MENSAGEM_APELIDO })
-  .trim()
-  .min(LIMITES.apelido.min, MENSAGEM_APELIDO)
-  .max(LIMITES.apelido.max, MENSAGEM_APELIDO);
+/**
+ * Apelido de 2 a 30 caracteres sem os espaços das pontas (GEL-34), em NFC e sem invisíveis (SEC-005). A unicidade no
+ * grupo é do repositório, sobre o texto já normalizado.
+ */
+export const apelido = textoVisivel(LIMITES.apelido.min, LIMITES.apelido.max, MENSAGEM_APELIDO);
 
 /** Caracteres de máscara que saem antes de contar os dígitos (GEL-39). */
 const MASCARA = /[\s()-]/g;

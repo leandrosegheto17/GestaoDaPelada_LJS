@@ -2274,11 +2274,11 @@ T76 → T77 → T78 → T79 → T80 → T81 → T82 → T83
 
 **Done when**:
 
-- [ ] NUL no nome do grupo ou no apelido responde 422 (não 500)
-- [ ] Espaço de largura zero e U+202E são recusados; "Beto" e "Beto"+U+200B deixam de ser dois apelidos diferentes
-- [ ] Texto acentuado normal continua aceito e é guardado em NFC
-- [ ] Teste por campo (grupo, apelido, habilidade) falha sem a regra
-- [ ] Gate full passa
+- [x] NUL no nome do grupo ou no apelido responde 422 (não 500)
+- [x] Espaço de largura zero e U+202E são recusados; "Beto" e "Beto"+U+200B deixam de ser dois apelidos diferentes
+- [x] Texto acentuado normal continua aceito e é guardado em NFC
+- [x] Teste por campo (grupo, apelido, habilidade) falha sem a regra
+- [x] Gate full passa
 
 **Tests**: unit + e2e (pool workerd)
 **Gate**: full
