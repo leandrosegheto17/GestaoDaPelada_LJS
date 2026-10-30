@@ -1,18 +1,19 @@
 # Grupos e elenco — Validação
 
-**Date**: 2026-10-30
+**Date**: 2026-10-30 (reverificação das T71 a T83 no mesmo dia da validação parcial)
 **Spec**: `.specs/features/grupos-e-elenco/spec.md`
-**Diff range**: `eb1fb60..7989f05` (`main`..`feat/grupos-e-elenco-2`; 71 commits, 178 arquivos)
-**Verifier**: subagente independente (autor ≠ verificador)
+**Diff range**: `eb1fb60..3f11ad2` (`main`..`feat/grupos-e-elenco-2`); validação parcial sobre `eb1fb60..7989f05` (T1 a T70) e reverificação sobre `618ed0d..3f11ad2` (T71 a T83, 13 commits, 51 arquivos)
+**Verifier**: subagentes independentes (autor ≠ verificador): um para T1 a T70, outro, de contexto novo, para T71 a T83
 
-**Validation: PASS ✅ (com um ponto a decidir pelo usuário: GEL-116 e a tela t09; ver "Pontos a decidir")**
+**Validation: PASS ✅** (117 de 118 critérios GEL com resultado conforme a spec e GEL-116 parcial por decisão do usuário; SEC-001 a SEC-009 corrigidos e provados; 51 de 51 mutações mortas; gate completo verde. Pontos a decidir e observações no fim.)
 
 ---
 
 ## Task Completion
 
-As 70 tarefas (T1 a T70) estão concluídas: `tasks.md` tem 280 critérios "Done when" marcados `[x]` e 0 `[ ]`; há um commit por tarefa
-(`git log eb1fb60..HEAD` traz T1 a T70, sem lacuna); o caminho `Where` de cada uma das 70 tarefas existe no worktree.
+As 83 tarefas (T1 a T83) estão concluídas. Na validação parcial: T1 a T70, 280 critérios "Done when" `[x]`, um commit por tarefa. Na reverificação: `grep -c '^- \[ \]'` em
+`tasks.md` dá 0, os `Done when` das T71 a T83 estão todos `[x]` e há um commit por tarefa (`git log 618ed0d..HEAD`: `d812d91` T71, `a6ce56e` T72, `51687f9` T73, `04a01cf` T74, `10bc439` T75, `99c9c67` T76,
+`58d01dd` T77, `9001de8` T78, `3cc2259` T79, `57536ab` T80, `a901803` T81, `061eaaf` T82, `3f11ad2` T83, sem lacuna).
 
 | Phase | Tarefas | Status | Notas |
 | ----- | ------- | ------ | ----- |
@@ -28,6 +29,8 @@ As 70 tarefas (T1 a T70) estão concluídas: `tasks.md` tem 280 critérios "Done
 | 10 Front: dados e telas do grupo | T53 a T60 | ✅ Done | |
 | 11 Front: elenco e habilidades | T61 a T67 | ✅ Done | |
 | 12 Front: rotas, visual e fluxo | T68 a T70 | ✅ Done | T69 deixa a t09 fora da comparação visual por decisão do usuário (STATE.md, Retomada) |
+| 13 Endurecimento: achados médios | T71 a T75 | ✅ Done | SEC-001 (T71, T72), SEC-002 (T73), SEC-003 (T74, T75); ver "Reverificação das T71 a T83" |
+| 14 Endurecimento: achados baixos | T76 a T83 | ✅ Done | SEC-004 a SEC-009 (T76 a T82) e reteste (T83) |
 
 Observação de rastreio: os commits T33 a T45 e T47 a T56 (23 commits) têm `Co-Authored-By: Claude Opus 5.5`; os demais (48), `Claude Sonnet 5.5`.
 O pedido citava só T47 a T56; o intervalo T33 a T45 também está nessa situação (a decisão pendente cobre os dois).
@@ -232,16 +235,163 @@ e falhou sem efeito). Mutantes aplicados com `python` (substituição exata, fal
 
 ---
 
+## Reverificação das T71 a T83 (Phases 13 e 14, endurecimento da auditoria)
+
+A fonte da verdade desta parte são os "Done when" das T71 a T83 (`tasks.md`) e os achados SEC-001 a SEC-009 de `seguranca.md`, com as decisões do usuário de 2026-10-30
+(`STATE.md`, Retomada: a criadora pode se remover; só outra admin removendo a criadora dá 409; GEL-29 mantida; auditoria só com ids e nomes de campo, GEL-113).
+Caminhos relativos a `backend/` ou `frontend/web/`. Os pacotes de teste rodaram um por vez (restrição de memória).
+
+### Critérios por tarefa
+
+| Tarefa / critério (Done when) | Resultado esperado | `arquivo:linha` + asserção | Result |
+| ----------------------------- | ------------------ | -------------------------- | ------ |
+| T71 admin convidada remove a criadora | 409 `criadora_nao_removivel`; criadora segue admin e com acesso; nada na auditoria | `api/test/rotas/admins.test.ts:204` `expect(r.status).toBe(409)`, `:205` `toMatchObject({ erro: { codigo: 'criadora_nao_removivel' } })`, `:207-213` criadora ainda na lista, `souCriador: true`, `auditoriaDe(...)` `[]`; `api/test/repositorios/admins.test.ts:138` (`toBe('criadora_nao_removivel')`, `vinculosDe` intacto, `auditoriaDe` `[]`) | ✅ PASS |
+| T71 criadora remove outra admin; admin sai de si mesma (204) | 204 como antes | `api/test/rotas/admins.test.ts:216` (criadora remove a outra, 204), `:226` (criadora sai de si com outra admin, 204), `:185-194` (convidada sai de si, 204; criadora última admin → 409 `ultimo_admin`); `api/test/repositorios/admins.test.ts:147` (regra pelo `criado_por`: `toBe('ok')`) | ✅ PASS |
+| T71 teste de rota e de repositório falham sem a regra | | mutações 12 a 15 (abaixo) | ✅ PASS |
+| T72 linha da criadora sem Remover; as demais mantêm | sem botão só para a criadora | `web/src/telas/admins/PaginaAdmins.test.tsx:319` `expect(screen.queryByRole('button', { name: 'Remover Rosa' })).toBeNull()`, `:320` Remover Marquinhos visível, `:321` `toHaveLength(1)` | ✅ PASS |
+| T72 409 mostra mensagem em português sem quebrar a tela | faixa com o texto; diálogo fecha; lista mantida | `PaginaAdmins.test.tsx:336-338` `toHaveTextContent('A pessoa que criou o grupo não pode ser removida por outra admin.')`, `:339` `queryByRole('alertdialog')` nulo, `:340-341` Rosa e Leandro visíveis | ✅ PASS |
+| T72 axe sem violação | | `PaginaAdmins.test.tsx:322` e `:343` `expect(await violacoes(container)).toEqual([])` | ✅ PASS |
+| T72 (desvio) `GET …/admins` traz `criadoraId` | campo opcional no contrato | `api/test/rotas/admins.test.ts:94` `toMatchObject({ criadoraId: criadora.contaId })` e `adminsResposta.safeParse(...).success` verdadeiro; `contrato/test/acesso.test.ts`; snapshot `contrato/compatibilidade.json` | ✅ PASS |
+| T73 `dataEntrada` `0000-01-01` e `1999-12-31` | 422 (não 500) com "A data de início não pode ser anterior a 01/01/2000."; nada gravado | `api/test/rotas/jogadores.test.ts:96-110` (`it.each` de `0000-01-01`, `0001-01-01`, `1999-12-31`): `:101` `expect(r.status).toBe(422)`, `campos: { dataEntrada: 'A data de início não pode ser anterior a 01/01/2000.' }`, `jogadoresDoGrupo` `[]`; `contrato/test/elenco.test.ts:124-130` | ✅ PASS |
+| T73 `2000-01-01` continua aceita | 201, início e período em 2000-01-01 | `api/test/rotas/jogadores.test.ts:112-118` `toBe(201)`, `:117` `toMatchObject({ inicioPontuacao: '2000-01-01', periodos: [{ inicio: '2000-01-01', fim: null }] })`; `contrato/test/elenco.test.ts:132` | ✅ PASS |
+| T74 chave do limite é a conta; valor no `wrangler.jsonc` | chave = `contaId`; 60 por 60 s | `api/test/rotas/limite-escrita.test.ts:74` `toEqual([ana.contaId, ana.contaId, bia.contaId])`, `:75` `not.toContain(IP)`; `api/test/config/wrangler.test.ts:86` `toEqual({ limit: 60, period: 60 })` | ✅ PASS |
+| T74 excedido: 429 com `Retry-After`, sem criar nada; GET não conta | 429, `Retry-After: 60`, 2 grupos ao final; GET sem chamar o limitador | `limite-escrita.test.ts:60` `toBe(429)`, `:62` `Retry-After` `'60'`, `:64` `toHaveLength(2)`; `:87` `expect(escrita.chaves).toHaveLength(chavesAntes)`; `:90-101` POST, PUT, PATCH e DELETE barrados; `:116-117` sem sessão: 401 e `chaves` `[]` | ✅ PASS |
+| T74 outra conta não é afetada | 201 para a segunda conta | `limite-escrita.test.ts:73` `status` `toBe(201)` para `bia`; `:128-138` com o binding real do `wrangler.jsonc`: a 61ª dá 429 (`:136`) e `bia` segue 422 (`:138`) | ✅ PASS |
+| T74 casos de `casos.ts` seguem verdes | meta-teste | `api/test/isolamento/meta.test.ts:90-94`; rodado no gate (API: 82 arquivos verdes); nenhuma rota nova nas T71 a T83 | ✅ PASS |
+| T75 README e runbook descrevem o `LIMITE_ESCRITA` | valor e como mudar | `README.md:77-81`, `docs/runbook.md:368-379` (lidos) | ✅ PASS |
+| T75 checagem falha numa fixture sem o binding e passa no repositório | | `scripts/checagens/test/checar-limitadores.test.mjs:43` (passa no repositório), `:53` (falha sem `LIMITE_ESCRITA` e diz qual falta), `:83` (Retry-After diferente do período); `node backend/scripts/checagens/checar-limitadores.mjs` sem achado; no CI (`.github/workflows/ci.yml:41`) | ✅ PASS |
+| T76 grupo arquivado: `convites/ler` e `aceitar` | 410 `link_invalido`, nenhum vínculo | `api/test/rotas/convites.test.ts:204` `toBe(410)`, `:207` `toBe(410)`, `:210` `vinculosDe` `toEqual([criadora.contaId])`; `api/test/migracoes/convites-grupo-arquivado.test.ts:144,153,166` (`ler` sem linha; `aceitar` e `cadastrar` → `link_invalido`) | ✅ PASS |
+| T76 `DELETE` do convite pendente de grupo arquivado | 204 para a criadora; ele não volta ao reativar | `convites.test.ts:225` e `:232` `expect(r.status).toBe(204)`; `api/test/rotas/grupo-arquivado-rotas-existentes.test.ts:61` `toBe(204)`; convidar e remover seguem 409 (mesmo arquivo, `:54-57`) | ✅ PASS |
+| T76 reativado, o convite volta a valer | ler 200 e aceitar 200 | `convites.test.ts:263-275` `toEqual({ email, grupoNome: 'Grupo Convite Arquivado', contaExiste: true })` e `aceito.corpo` `toEqual({ grupoId: grupo })`; `convites-grupo-arquivado.test.ts:179,195` | ✅ PASS |
+| T76 migration roda do zero e sobre o banco atual; teste falha sem ela | | `convites-grupo-arquivado.test.ts:244-257` (`aplicarMigracoes` parcial: antes `ler` devolve 1 linha, depois `[]` e `link_invalido`); mutações 26 a 29 | ✅ PASS |
+| T77 NUL no nome do grupo ou no apelido | 422 (não 500) com `MENSAGEM_TEXTO_INVISIVEL` | `api/test/rotas/texto-visivel.test.ts:37` `recusado(r, 'nome')` (`toBe(422)` e `campos: { nome: MENSAGEM_TEXTO_INVISIVEL }`), `:70` apelido; nada gravado (`:38`, `:71`) | ✅ PASS |
+| T77 U+200B e U+202E recusados; "Beto" e "Beto"+U+200B | segundo apelido recusado | `texto-visivel.test.ts:74-80` (`recusado(..., 'apelido')` e banco `[{ apelido: 'Beto' }]`); `contrato/test/texto-visivel.test.ts:52` (14 caracteres × 5 campos) | ✅ PASS |
+| T77 texto acentuado aceito e guardado em NFC | NFC no banco | `contrato/test/texto-visivel.test.ts:55,59,66`; `api/test/rotas/texto-visivel.test.ts:55` `toEqual([{ nome: 'Pelada da Conceição' }])` (o literal de entrada está em NFD, conferido nos bytes do fonte) | ✅ PASS |
+| T77 teste por campo falha sem a regra | grupo (criar e editar), apelido (criar e editar), habilidade | `contrato/test/texto-visivel.test.ts:24-30`; mutações 30 a 33 | ✅ PASS |
+| T78 nome com URL, quebra de linha ou HTML | sem link, sem linha injetada, até 60 caracteres | `api/test/infraestrutura/email.test.ts:194-208` (URL, `www.`, domínio e e-mail: `not.toContain` em assunto, texto e html; `<a ` uma vez só), `:213` e `:217` (quebra de linha), `:220-225` (HTML escapado), `:227-233` (corte em 60 com reticências) | ✅ PASS |
+| T78 nome normal sai igual | `toEqual` com assunto, texto e html de antes | `email.test.ts:181-191` | ✅ PASS |
+| T79 leitura trava a linha; arquivar durante escrita | o arquivar espera a escrita em curso | `api/test/repositorios/grupo-ativo-concorrencia.test.ts:120` `expect(arquivou).toBe(false)` (com a escrita pendente), `:123-130` escrita 200 e `arquivar` `'ok'` só depois, `:177` `toEqual([200, 200])` (sem deadlock) | ✅ PASS (⚠️ SPEC_DEVIATION `FOR KEY SHARE`, aprovada; ver "Desvios") |
+| T79 testes existentes do middleware seguem verdes sem alteração | | `git diff 618ed0d..HEAD --stat` não lista `grupo-ativo-middleware.test.ts`; suíte da API verde | ✅ PASS |
+| T80 cada edição grava evento com os nomes dos campos | `jogador_editado`, `resumo: { campos: [...] }` | `api/test/repositorios/jogadores.test.ts:999-1001` `toEqual([{ autor_conta_id, entidade: 'jogador', entidade_id: id, resumo: { campos: [...campos] } }])` em 7 casos (`:983-994`) | ✅ PASS |
+| T80 edição que falha não deixa evento | | `jogadores.test.ts:1034-1041` (apelido repetido → `ok:false`; jogador alheio → `null`; `editados` `[]` nos dois grupos), `:1044` (auditoria falha → posição segue `'meia'`) | ✅ PASS |
+| T80 nenhum evento contém telefone nem ano | | `jogadores.test.ts:1015` `expect(JSON.stringify(rows)).not.toContain(valor)` para 21987654321, 11912345678, 1983 e 1999 | ✅ PASS |
+| T81 renomear grupo, criar e renomear habilidade gravam um evento cada | `grupo_editado` `{ campos: ['nome'] }`; `habilidade_criada` `{}`; `habilidade_renomeada` `{ campos: ['nome'] }` | `api/test/repositorios/grupos.test.ts:294-296` `toEqual([{ ..., resumo: { campos: ['nome'] } }])`; `habilidades.test.ts:302` (`resumo: {}`), `:313` | ✅ PASS (⚠️ SPEC_DEVIATION: a tarefa dizia "nome antigo e novo"; o usuário manteve a GEL-113, sem texto de nome no evento; `grupos.test.ts:298` e `habilidades.test.ts:316` provam que o nome não aparece) |
+| T81 operação que falha não deixa evento | | `grupos.test.ts:321-322` (sem vínculo → `false` e `[]`), `:325` (auditoria falha → nome intacto); `habilidades.test.ts:331-339` (repetido e outro grupo → `[]`), `:342-350` (auditoria falha → `INICIAIS`) | ✅ PASS |
+| T82 `UPDATE … arquivado_em` por admin que não criou, como `pelada_app` | falha no banco (`42501`), nada muda | `api/test/migracoes/grupos-arquivar-so-criadora.test.ts:55` `expect(codigo).toBe(SEM_PRIVILEGIO)` (`'42501'`) e `:56` `arquivadoEm` nulo; `:59-64` junto de outras colunas | ✅ PASS |
+| T82 a criadora arquiva e reativa normalmente | 1 linha em cada | `grupos-arquivar-so-criadora.test.ts:89` `expect(r).toEqual([1, 1])`; fluxo da API e e2e verdes no gate | ✅ PASS |
+| T82 migration roda do zero e sobre o banco atual | | `grupos-arquivar-so-criadora.test.ts:33-101` (do zero) e `:103-141` (antes `toBeNull`, `aplicarMigracoes`, depois `42501` em `:138`) | ✅ PASS |
+| T83 SEC-001 a SEC-009 "corrigido" com `arquivo:linha` do teste | | `seguranca.md:155-166` (tabela do reteste): as referências de teste foram conferidas uma a uma contra o código (todas existem na linha citada e afirmam o que a tabela diz) | ✅ PASS |
+| T83 SEC-010, I-1, I-3 como débito com dono | THREAT-MODEL itens 4 a 6 | `.md/THREAT-MODEL.md:138-140` (itens 4, 5 e 6, dono `partidas-e-ranking`); `.specs/projeto/roadmap.md` (linha 4); `.md/GUARDRAILS.md` G-26 reescrita sem prometer lint ativo | ✅ PASS |
+| T83 gate build completo passa | | ver "Gate Check" | ✅ PASS |
+
+**Status**: ✅ todos os critérios das T71 a T83 com evidência `arquivo:linha` e resultado conforme a spec/tarefa. Nenhum critério sem cobertura.
+Lacuna de precisão: a `spec.md` não ganhou critérios para as regras novas (criadora não removível, piso na `dataEntrada`, limite de escrita, texto visível, novos eventos de auditoria): elas
+vivem em `tasks.md` e `seguranca.md`. Os testes miram o resultado definido nesses documentos; nada na spec contradiz as regras novas (ver "Observações").
+
+### Conferência do reteste da T83 (`seguranca.md`) contra código e testes
+
+| Achado | O reteste diz | Conferido | Result |
+| ------ | ------------- | --------- | ------ |
+| SEC-001 | 409 `criadora_nao_removivel` (T71), tela sem a ação (T72) | `repositorios/admins.ts:52-58` (compara `criado_por` com `app_conta_id()` na mesma transação, depois da trava `FOR UPDATE`), `rotas/admins.ts` (409 + `criadoraId`), `PaginaAdmins.tsx`; teste `admins.test.ts:204-205` | ✅ confere |
+| SEC-002 | piso 01/01/2000 na `dataEntrada` | `contrato/src/elenco.ts` (`PISO_INICIO` e `refine`); `jogadores.test.ts:101`, `elenco.test.ts:124` | ✅ confere |
+| SEC-003 | `LIMITE_ESCRITA` 60/60 s por conta; documentado e checado | `app.ts` (`ehEscritaDeGrupo`, `chave: c.var.contaId`), `wrangler.jsonc`, `limite-taxa.ts`; `limite-escrita.test.ts:60`; `checar-limitadores` no CI | ✅ confere |
+| SEC-004 | migration `1792844460000` e exceção do cancelar convite | SQL lido (as 3 funções com `g.arquivado_em IS NULL`), `grupo-ativo.ts` (`CANCELAR_CONVITE`); `convites.test.ts:204,207,232`; `convites-grupo-arquivado.test.ts:160,255` | ✅ confere |
+| SEC-005 | `textoVisivel` (NFC, sem `Cc` e `Cf`) | `contrato/src/texto.ts`; `texto-visivel.test.ts:52` (contrato), `:37,:70` (rotas) | ✅ confere |
+| SEC-006 | `nomeDoGrupoNoEmail` | `email/modelos.ts` (função e uso no assunto e no corpo); `email.test.ts:202,213` | ✅ confere |
+| SEC-007 | `FOR KEY SHARE` (desvio de `FOR SHARE`) | `grupo-ativo.ts` (`.forKeyShare()` e comentário do desvio); `grupo-ativo-concorrencia.test.ts:120,177`; a mutação 39 prova que `FOR SHARE` faz o teste falhar (deadlock) | ✅ confere |
+| SEC-008 | `jogador_editado`, `grupo_editado`, `habilidade_criada`, `habilidade_renomeada` | `jogadores.ts` (`camposEditados`), `grupos.ts`, `habilidades.ts`; testes `jogadores.test.ts:1000,1015`, `grupos.test.ts:295`, `habilidades.test.ts:302,313` | ✅ confere |
+| SEC-009 | trigger `BEFORE UPDATE OF arquivado_em` | SQL `1792844520000_grupos-arquivar-so-criadora.sql`; `grupos-arquivar-so-criadora.test.ts:55,89,138` | ✅ confere |
+| SEC-010, I-1, I-3 | débitos 4, 5 e 6 no THREAT-MODEL | `.md/THREAT-MODEL.md` (diff `618ed0d..HEAD`: +3 linhas, itens 4 a 6, com dono) | ✅ confere |
+
+Nenhuma divergência entre o reteste e o código ou os testes. O item I-3 (filtro de arquivado no ramo público de `grupos_visiveis()`) segue aberto de propósito, como débito 6 do
+THREAT-MODEL com dono na `partidas-e-ranking`; não há rota pública hoje.
+
+### Desvios (SPEC_DEVIATION) das T71 a T83, todos já aprovados e registrados em `STATE.md`
+
+T72 (`GET …/admins` devolve `criadoraId`), T73 (o contrato repete o piso por G-01), T79 (`FOR KEY SHARE` no lugar de `FOR SHARE`), T81 (evento sem nome antigo e novo; `grupo_editado`
+só quando o nome muda). Cada um está comentado no código, tem teste e não contradiz a spec.
+
+### Integridade dos testes (T71 a T83)
+
+- Nenhum arquivo de teste removido (`git diff --diff-filter=D 618ed0d..HEAD` vazio); nenhum `skip`, `todo` ou `xit` adicionado.
+- Três testes antigos tiveram linhas removidas, cada um com comentário de motivo e decisão do usuário registrada em `STATE.md` (lotes 6 e 7): `api/test/rotas/admins.test.ts`
+  (ACE-40: a fundadora do grupo isolado é a criadora e a convidada não pode mais removê-la; o cenário passou a "a convidada sai, a criadora, última admin, recebe 409 `ultimo_admin`",
+  com a mesma asserção de `ultimo_admin` e do vínculo mantido), `api/test/config/wrangler.test.ts` (3 → 4 limitadores; as conferências antigas continuam) e
+  `api/test/rotas/grupo-arquivado-rotas-existentes.test.ts` (cancelar convite no arquivado passa de 409 para 204; convidar e remover seguem 409). Nenhum enfraquecimento: o que saiu foi
+  trocado por asserções do mesmo alcance.
+- Testes sem critério (órfãos): nenhum nas T71 a T83. Todo `it` novo cita o SEC ou a tarefa.
+
+### Discrimination Sensor das T71 a T83
+
+Cópia isolada: `git worktree add --detach` em pasta do scratchpad, com `node_modules` ligados por junção. Para a mutação do contrato valer também nos testes da API (o
+`node_modules/@pelada/*` apontava para a árvore real), o `node_modules` da API foi refeito na cópia com `@pelada/contrato` e `@pelada/dominio` apontando para a própria cópia. Mutantes
+aplicados por script (substituição exata, falha se o trecho não aparece uma vez), revertidos com `git checkout` na cópia depois de cada rodada. Vitest direto, sem `pnpm`, só nos
+arquivos que cobrem o trecho.
+
+| # | Arquivo | Mutação | Testes que mataram | Killed? |
+| - | ------- | ------- | ------------------ | ------- |
+| 12 | `api/src/infraestrutura/db/repositorios/admins.ts:52-58` (SEC-001) | removido `if (criadora?.por_outra) return 'criadora_nao_removivel'` | `admins.test.ts:138` (repositório) e `rotas/admins.test.ts:199` | ✅ Killed (2 falhas) |
+| 13 | `repositorios/admins.ts` | `<> app_conta_id()` → `= app_conta_id()` (inverte quem é barrado) | 6 falhas: remoção de si mesma, criadora sai de si, `criadora_nao_removivel` e `ultimo_admin` (rota e repositório) | ✅ Killed |
+| 14 | `rotas/admins.ts` | resposta 409 da criadora desligada | `rotas/admins.test.ts:199` | ✅ Killed |
+| 15 | `rotas/admins.ts` | `criadoraId` devolvido sempre `null` | `rotas/admins.test.ts:94` | ✅ Killed |
+| 16 | `web/src/telas/admins/PaginaAdmins.tsx` | botão Remover volta para a criadora | `PaginaAdmins.test.tsx:315` | ✅ Killed |
+| 17 | `PaginaAdmins.tsx` | `recusaDe` ignora `criadora_nao_removivel` | `PaginaAdmins.test.tsx:325` | ✅ Killed |
+| 18 | `contrato/src/elenco.ts` (SEC-002) | `valor >= PISO_INICIO` → `>` (o próprio piso recusado) | `contrato/test/elenco.test.ts:132` | ✅ Killed |
+| 19 | `contrato/src/elenco.ts` | piso removido (testado pela API) | `rotas/jogadores.test.ts:96` (3 falhas: `0000`, `0001`, `1999`) | ✅ Killed |
+| 20 | `api/src/entrada/app.ts` (SEC-003) | chave do limitador passa a ser o IP | 7 falhas em `limite-escrita.test.ts` (inclui "a chave é a conta" e o binding real) | ✅ Killed |
+| 21 | `app.ts` | `DELETE` sai de `METODOS_ESCRITA` | `limite-escrita.test.ts:90` ("DELETE … conta e é barrado") | ✅ Killed |
+| 22 | `middlewares/limite-taxa.ts` | `Retry-After` do 429 removido | 6 falhas em `limite-escrita.test.ts` | ✅ Killed |
+| 23 | `wrangler.jsonc` | `LIMITE_ESCRITA` com limite 61 | `wrangler.test.ts:86` e `limite-escrita.test.ts:128` | ✅ Killed |
+| 24 | `scripts/checagens/checar-limitadores.mjs` (T75) | `LIMITE_ESCRITA` tirado de `OBRIGATORIOS` | `checar-limitadores.test.mjs:53` | ✅ Killed |
+| 25 | `checar-limitadores.mjs` | comparação do período com `PERIODO_LIMITE_ESCRITA_S` desligada | `checar-limitadores.test.mjs:83` | ✅ Killed |
+| 26 | `migracoes/1792844460000_convites-grupo-arquivado.sql` (SEC-004) | `convite_aceitar` sem `g.arquivado_em IS NULL` | 3 falhas (`convites-grupo-arquivado.test.ts:153,244`; `convites.test.ts:199`) | ✅ Killed |
+| 27 | idem | `convite_cadastrar` sem o filtro | 2 falhas (`convites-grupo-arquivado.test.ts:166`; `convites.test.ts:215`) | ✅ Killed |
+| 28 | idem | `convite_ler` sem o filtro | 4 falhas (`:144`, `:179`, `:244`; `convites.test.ts:199`) | ✅ Killed |
+| 29 | `middlewares/grupo-ativo.ts` | exceção `CANCELAR_CONVITE` removida | 3 falhas (`convites.test.ts:225`, `grupo-arquivado-rotas-existentes.test.ts:61`) | ✅ Killed |
+| 30 | `contrato/src/texto.ts` (SEC-005) | regex sem `\p{Cf}` (U+200B e U+202E passam) | 40 falhas em `contrato/test/texto-visivel.test.ts` | ✅ Killed |
+| 31 | `texto.ts` | regex sem `\p{Cc}` (NUL volta a dar 500) | `rotas/texto-visivel.test.ts:34,60,118` | ✅ Killed |
+| 32 | `texto.ts` | `.normalize('NFC')` removido | 10 falhas no contrato e 3 nas rotas (`:50,:82,:128`) | ✅ Killed |
+| 33 | `contrato/src/habilidades.ts` | habilidade volta ao `z.string()` sem `textoVisivel` | 16 falhas em `contrato/test/texto-visivel.test.ts` | ✅ Killed |
+| 34 | `api/src/infraestrutura/email/modelos.ts` (SEC-006) | assunto usa `d.grupoNome` cru | 6 falhas em `email.test.ts` | ✅ Killed |
+| 35 | `modelos.ts` | `MAX_NOME_NO_EMAIL` 60 → 61 | `email.test.ts:227` | ✅ Killed |
+| 36 | `modelos.ts` | separadores de link não aplicados | 5 falhas em `email.test.ts` | ✅ Killed |
+| 37 | `modelos.ts` | quebras e invisíveis não viram espaço | `email.test.ts:210` | ✅ Killed |
+| 38 | `grupo-ativo.ts` (SEC-007) | `.forKeyShare()` removido | `grupo-ativo-concorrencia.test.ts:94` | ✅ Killed |
+| 39 | `grupo-ativo.ts` | `.forKeyShare()` → `.forShare()` (o deadlock que o desvio evitou) | `grupo-ativo-concorrencia.test.ts:160` | ✅ Killed |
+| 40 | `repositorios/jogadores.ts` (SEC-008) | auditoria `jogador_editado` removida | 9 falhas em `jogadores.test.ts` | ✅ Killed |
+| 41 | `jogadores.ts` | telefone fora da comparação dos campos | 3 falhas (`telefone`, `telefone apagado`, `os quatro`) | ✅ Killed |
+| 42 | `jogadores.ts` | evento passa a levar o telefone | 8 falhas (formato do `resumo`) | ✅ Killed |
+| 43 | `repositorios/grupos.ts` | auditoria `grupo_editado` removida | 3 falhas em `grupos.test.ts` | ✅ Killed |
+| 44 | `grupos.ts` | `grupo_editado` gravado mesmo sem trocar o nome | `grupos.test.ts:308` | ✅ Killed |
+| 45 | `repositorios/habilidades.ts` | `habilidade_criada` removida | 2 falhas (`:297`, `:342`) | ✅ Killed |
+| 46 | `habilidades.ts` | `habilidade_renomeada` removida | 3 falhas (`:306`, `:319`, `:342`) | ✅ Killed |
+| 47 | `habilidades.ts` | renomear audita mesmo sem mudar o nome | `habilidades.test.ts:319` | ✅ Killed |
+| 48 | `migracoes/1792844520000_grupos-arquivar-so-criadora.sql` (SEC-009) | trigger nunca barra (`IF false`) | 3 falhas (`grupos-arquivar-so-criadora.test.ts:51,59,126`) | ✅ Killed |
+| 49 | idem | condição invertida (barra a criadora) | 4 falhas, incluindo `:83` | ✅ Killed |
+| 50 | idem | `WHEN` removido (barra até atribuição sem mudança) | `grupos-arquivar-so-criadora.test.ts:76` | ✅ Killed |
+| 51 | idem | `current_user = 'pelada_app'` removido (barra o owner) | `grupos-arquivar-so-criadora.test.ts:92` | ✅ Killed |
+
+(As mutações 1 a 11 são as da validação parcial, acima. Total: 51 mutações injetadas, 51 mortas.)
+
+**Sensor depth**: completo manual para caminho crítico (≥ 5 mutações por área: autorização da criadora, limite de taxa, convite, sanitização de texto, concorrência, auditoria e trigger no banco)
+**Result**: 51/51 killed — PASS ✅. Nenhuma mutação sobreviveu.
+
+**Isolamento da execução**: `git status --porcelain` da árvore real vazio antes e depois (igual ao baseline gravado); as junções foram removidas antes de `git worktree remove --force`;
+`node_modules` da árvore real intacto (API com as mesmas 9 entradas); `git worktree list` sem a cópia; `git stash list` vazio. Nada foi aplicado no banco de dev local (`pnpm migrar` e `pnpm seed` não
+rodaram; os testes de migration usam bancos temporários próprios).
+
+---
+
 ## Code Quality
 
 | Princípio | Status |
 | --------- | ------ |
 | Mínimo de código / sem escopo extra | ✅ (SPEC_DEVIATIONs registrados em comentário e STATE.md) |
-| Mudanças cirúrgicas | ✅ nos arquivos antigos: só 5 testes existentes tiveram linhas removidas (ver abaixo) |
+| Mudanças cirúrgicas | ✅ nos arquivos antigos: 5 testes existentes tiveram linhas removidas na validação parcial e mais 3 nas T71 a T83, todos com motivo e decisão do usuário (ver abaixo e "Integridade dos testes (T71 a T83)") |
 | Segue os padrões do projeto | ✅ (repositórios, `casos.ts`, `emTransacao`, Zod via `zod.ts`) |
 | Valor asserido = resultado da spec | ✅ (tabelas acima) |
 | Cobertura por camada (domínio 1:1; rotas feliz + borda + erro) | ✅ |
-| Todo teste mapeia a critério, caso limite ou Done-when | ✅ (sem teste órfão encontrado nas leituras; um `expect(campo).toBeTruthy()` em `api/test/rotas/grupos.test.ts:91` é inócuo, sem prejuízo) |
+| Todo teste mapeia a critério, caso limite ou Done-when | ✅ (sem teste órfão encontrado nas leituras, T71 a T83 incluídas; um `expect(campo).toBeTruthy()` em `api/test/rotas/grupos.test.ts:91` é inócuo, sem prejuízo) |
 | Diretrizes documentadas | `.md/GUARDRAILS.md` (G-01, G-03, G-04, G-25, G-26, G-27), `CLAUDE.md` da raiz (gate, tokens, sem URL absoluta) ✅ |
 
 **Integridade de testes**: nenhum arquivo de teste removido (`git diff --diff-filter=D` vazio); nenhum `skip`/`todo` na execução (0 testes ignorados). Testes antigos com linhas removidas: `api/test/apoio/acesso.ts`,
@@ -265,34 +415,48 @@ de alterações aprovadas**: ver "Pontos a decidir").
 
 ## Gate Check
 
-- **Gate command** (`tasks.md`, nível Build / `.specs/projeto/testes.json`), rodado por pacote por restrição de memória:
+- **Gate command** (`tasks.md`, nível Build / `.specs/projeto/testes.json`), rodado por pacote por restrição de memória (validação parcial em `7989f05`; reverificação em `3f11ad2`):
   `pnpm lint` ✅ · `pnpm format:check` ✅ · `pnpm typecheck` ✅ · `pnpm exec vitest run --dir test` ✅ · `pnpm -r --workspace-concurrency=1 test` ✅ · `pnpm test:checagens` ✅ · `pnpm --filter @pelada/web build` ✅ · `pnpm --filter @pelada/web e2e` ✅ · `pnpm --filter @pelada/web visual` ✅ · `python .claude/scripts/checar-tokens.py frontend/web/src` ✅
-- **Result**: 2.698 testes passaram, 0 falharam, 0 ignorados (raiz 20; contrato 205; domínio 170; API 1.204; web 640; checagens 459) + 16 e2e Playwright + 160 comparações visuais OK (0 DIVERGE)
-- **Test count before feature**: não medido (a base `eb1fb60` não foi executada); nenhum teste removido (ver Integridade)
+- **Result (reverificação, HEAD `3f11ad2`)**: 2.892 testes passaram, 0 falharam, 0 ignorados (raiz 20; contrato 299; domínio 170; API 1.286 em 82 arquivos; web 642 em 69 arquivos; checagens 475 em 24 arquivos) + 16 e2e Playwright + 160 comparações visuais `OK` (0 `DIVERGE`) + as 9 checagens do CI que rodam como script (`checar-ids-tarefa`, `checar-urls-absolutas`, `checar-migracao-aditiva`, `checar-wrangler-deploy`, `checar-acoes-fixadas`, `checar-crypt`, `checar-grupo-id`, `checar-escritores-periodo`, `checar-limitadores`) sem achado.
+- **Primeira rodada do web**: 1 falha, `src/app/rotas.test.tsx > /termos abre sem sessão e sem consultar a sessão` (`Unable to find role="main"`, 1.168 ms, estourando o `findBy` padrão de 1.000 ms logo depois da suíte da API). Intermitente por tempo: o arquivo passou isolado (35/35) e a suíte web inteira passou na repetição (642/642). Nenhum arquivo da tela tocado pelas T71 a T83. Registrado em "Observações".
+- **Test count (validação parcial, `7989f05`)**: 2.698. **Depois das T71 a T83 (`3f11ad2`)**: 2.892. **Delta**: +194 testes (contrato +94, API +82, web +2, checagens +16, raiz e domínio 0), nenhum removido.
 - **Skipped tests**: nenhum
-- **Failures**: nenhuma
-- Não foram rodados `pnpm migrar` nem `pnpm seed`; o Postgres local já estava migrado.
+- **Failures**: nenhuma na repetição (ver acima a falha intermitente da primeira rodada)
+- Não foram rodados `pnpm migrar` nem `pnpm seed`; o banco de dev local não foi tocado (os testes criam bancos temporários próprios).
 
 ---
 
 ## Pontos a decidir pelo usuário (não são FAIL automático)
 
-1. **GEL-116 e a t09 (início do grupo)**: a comparação visual cobre 33 das 35 telas do mockup do módulo, em PC e celular, com 0% de divergência acima do limite; a t09 (2 estados) fica fora até as features que ela
-   mostra (Partidas, Uso do app, Financeiro) existirem. Decisão já registrada no STATE.md; falta decidir se a feature pode ser integrada com esse ressalva e se o critério GEL-116 / o Success Criteria "comparação visual sem divergência" passa a ser reescrito.
-2. **Critério de sucesso "Nenhum achado crítico ou alto do `auditor-seguranca` em aberto"**: não há auditoria desta feature em `.specs/seguranca/` (nenhum relatório desta feature). Fora do escopo do verificador; é pré-requisito da integração.
-3. **Co-Authored-By Opus 5.5**: 23 commits (T33 a T45 e T47 a T56, não só T47 a T56) em vez de Sonnet 5.5. Apenas registrado.
-4. **`web/e2e/telas-ativas.test.mjs` alterado** (2 linhas de fatia + novo `describe`) sem estar na lista de testes aprovados; mudança equivalente e com motivo no comentário. Pede a aprovação formal exigida pela regra de testes.
+Estado depois da reverificação das T71 a T83:
+
+1. **GEL-116 e a t09 (início do grupo)**: decidido pelo usuário em 2026-10-30 (integrar assim; a t09 entra na comparação quando Partidas, Uso do app e Financeiro existirem; anotado no
+   roadmap, feature 4). A comparação visual cobre 33 das 35 telas do mockup do módulo, PC e celular, 160 comparações `OK` e 0 `DIVERGE` na reverificação. Não é falha.
+2. **Critério de sucesso "Nenhum achado crítico ou alto do `auditor-seguranca` em aberto"**: atendido. `seguranca.md` (auditoria de 2026-10-30) tem 0 críticos e 0 altos; os 3 médios e os baixos SEC-004 a SEC-009
+   estão corrigidos e conferidos nesta reverificação; SEC-010, I-1 e I-3 são débitos registrados no THREAT-MODEL (itens 4 a 6), por decisão do usuário.
+3. **Co-Authored-By Opus 5.5**: 23 commits (T33 a T45 e T47 a T56) em vez de Sonnet 5.5; as T71 a T83 trazem Sonnet 5.5. Apenas registrado.
+4. **`web/e2e/telas-ativas.test.mjs` alterado**: alteração aprovada pelo usuário em 2026-10-30 (ver "Decisões do usuário").
+5. **Testes antigos alterados nas T71 a T83** (`api/test/rotas/admins.test.ts`, `api/test/config/wrangler.test.ts`, `api/test/rotas/grupo-arquivado-rotas-existentes.test.ts`): cada um com comentário de motivo no teste e decisão
+   registrada em `STATE.md` (lotes 6 e 7). A regra de testes pede aprovação do usuário para mudar teste existente; a Retomada do `STATE.md` registra as três decisões como do usuário.
 
 ## Observações
 
-- A regra ESLint `pelada/sem-escrita-periodo` existe em `eslint/plugin-pelada.mjs:128` mas não está ligada em `eslint.config.mjs`; o `GUARDRAILS.md` (G-26) a descreve como "ativa". A proteção efetiva vem do script `checar-escritores-periodo` (GEL-111), com teste e no CI.
-- SPEC_DEVIATIONs presentes no código (T25, T45, T52, T57, T59, T60, T66, `jogadorCorpo(hoje)`, duplicação de `compararApelido`/limite do ano no web por G-01): já aprovados.
+- A regra ESLint `pelada/sem-escrita-periodo` existe em `eslint/plugin-pelada.mjs:128` mas não está ligada em `eslint.config.mjs`. A proteção efetiva vem do script `checar-escritores-periodo` (GEL-111), com teste e no CI.
+  Depois da T83, o `GUARDRAILS.md` (G-26) deixou de dizer "regra de lint ativa" e o THREAT-MODEL registra o débito 5 (dono `partidas-e-ranking`).
+- SPEC_DEVIATIONs presentes no código (T25, T45, T52, T57, T59, T60, T66, T72, T73, T79, T81, `jogadorCorpo(hoje)`, duplicação de `compararApelido`/limite do ano/piso de data no web e no contrato por G-01): já aprovados.
+- `spec.md` não foi atualizada com as regras das T71 a T83 (SEC-001 a SEC-009 vivem em `tasks.md` e `seguranca.md`); nada nela as contradiz. Sugestão, não bloqueio: ao integrar, acrescentar à spec uma nota
+  remetendo a `seguranca.md` ou critérios curtos para a criadora não removível, o piso da `dataEntrada` e os novos eventos de auditoria, para a rastreabilidade futura (a `partidas-e-ranking` herda estas regras).
+- Falha intermitente de tempo em `web/src/app/rotas.test.tsx` ("/termos abre sem sessão...", `findByRole('main')` com timeout de 1.000 ms) na primeira rodada do pacote web, logo depois da suíte da API; passou isolada e na repetição da suíte web.
+  A trava de testes do CI ou da integração pode esbarrar nela. Não ligada às T71 a T83; candidata a uma tarefa de estabilização (timeout do `findBy` ou pré-carga da rota).
+- Limite de escrita (`LIMITE_ESCRITA`, 60 por 60 s por conta, `PUT` de nota incluído): o valor está fixado por decisão do usuário (T74). Lançar notas em lote de um elenco grande, num minuto só, pode encostar nele; a tela não trata o 429
+  de forma específica. Não é critério da spec; vale acompanhar no uso real.
+- Inspeção de qualidade nas T71 a T83: sem funcionalidade além do pedido, mudanças confinadas aos arquivos listados no `Where` das tarefas, padrões do projeto mantidos (Kysely parametrizado, `auditoria.registrar` na mesma transação, contrato via `zod.ts`).
 
 ---
 
 ## Fix Plans
 
-Nenhum item bloqueante. Se o usuário decidir que a t09 deve entrar na comparação agora, a correção é uma tarefa nova (ativar as entradas da t09 em `telas-ativas.txt` quando houver dados para Partidas/Financeiro).
+Nenhum item bloqueante. Se o usuário decidir que a t09 deve entrar na comparação agora, a correção é uma tarefa nova (ativar as entradas da t09 em `telas-ativas.txt` quando houver dados para Partidas/Financeiro). Nenhuma mutação sobreviveu e nenhum critério ficou sem cobertura nas T71 a T83, então não há fix task da reverificação.
 
 ---
 
@@ -301,23 +465,27 @@ Nenhum item bloqueante. Se o usuário decidir que a t09 deve entrar na comparaç
 | Requirement | Previous Status | New Status |
 | ----------- | --------------- | ---------- |
 | GEL-01 a GEL-115, GEL-117, GEL-118 | Pending | ✅ Verified |
-| GEL-116 | Pending | ⚠️ Verified em 33 de 35 telas; t09 pendente de decisão |
+| GEL-116 | Pending | ⚠️ Verified em 33 de 35 telas; t09 fora por decisão do usuário (2026-10-30) |
+| SEC-001 a SEC-009 (T71 a T83) | Implementing | ✅ Verified (teste que falha sem a correção, mutações mortas) |
+| SEC-010, I-1, I-3 | Aberto | Débito registrado no THREAT-MODEL (itens 4 a 6), dono `partidas-e-ranking` |
 
 ---
 
 ## Summary
 
-**Overall**: ✅ Ready (com os pontos a decidir acima)
+**Overall**: ✅ Ready
 
-**Spec-anchored check**: 117/118 critérios conforme a spec; 1 parcial (GEL-116/t09); 4 lacunas de precisão de spec (GEL-04, GEL-05, GEL-37, GEL-99)
-**Sensor**: 11/11 mutações mortas
-**Gate**: 2.698 testes + 16 e2e + 160 comparações visuais verdes; lint, format, typecheck, build e checagens verdes
+**Spec-anchored check**: 117/118 critérios GEL conforme a spec; 1 parcial (GEL-116/t09, decisão do usuário); 4 lacunas de precisão de spec (GEL-04, GEL-05, GEL-37, GEL-99). T71 a T83: 100% dos "Done when" com `arquivo:linha`; SEC-001 a SEC-009 provados e o reteste da T83 confere com o código e os testes.
+**Sensor**: 51/51 mutações mortas (11 na validação parcial e 40 nas T71 a T83), 0 sobreviventes
+**Gate**: 2.892 testes (0 falha, 0 ignorado) + 16 e2e + 160 comparações visuais `OK`; lint, format, typecheck, build, checagens do CI e tokens verdes (uma falha intermitente de tempo no web na primeira rodada, verde na repetição)
 
-**What works**: criação e arquivamento de grupo com slug estável e concorrência; elenco com todas as regras de período (mensagens e ordem do legado), escrita de período transacional, travada e auditada; habilidades e notas com nível; isolamento por grupo como `pelada_app`; telas fiéis ao mockup.
+**What works**: criação e arquivamento de grupo com slug estável e concorrência; elenco com todas as regras de período, escrita de período transacional, travada e auditada; habilidades e notas com nível; isolamento por grupo como `pelada_app`;
+telas fiéis ao mockup; endurecimento da auditoria: criadora não removível por outra admin, piso de 01/01/2000 na data de entrada, limite de escrita por conta, convite de grupo arquivado inválido, nomes sem caracteres de controle ou invisíveis,
+nome do grupo como texto puro no e-mail, trava de leitura contra a corrida com o arquivamento, auditoria das edições, e a regra "só a criadora muda `arquivado_em`" também no banco.
 
-**Issues found**: nenhum bloqueante; ver "Pontos a decidir" e "Observações".
+**Issues found**: nenhum bloqueante; ver "Observações" (spec sem as regras novas, falha intermitente de tempo no web, limite de escrita a acompanhar).
 
-**Next steps**: decidir os 4 pontos; rodar o `auditor-seguranca`; integrar (fase 11) com a suíte completa via `python .claude/scripts/trava-testes.py --rodar`.
+**Next steps**: aceite visual do usuário; checagem final `python .claude/scripts/trava-testes.py --rodar` com tudo commitado; `finishing-a-development-branch` (integrar na `main`; push, PR e deploy pedem confirmação específica).
 
 ---
 
@@ -326,3 +494,4 @@ Nenhum item bloqueante. Se o usuário decidir que a t09 deve entrar na comparaç
 - **GEL-116 / t09**: integrar assim. A t09 entra na comparação visual quando Partidas, Uso do app e Financeiro existirem; anotado no roadmap (feature 4 em diante).
 - **`frontend/web/e2e/telas-ativas.test.mjs`**: alteração aprovada (`slice(39)` para `slice(39,42)`, `slice(3)` para `slice(3,42)` e `describe` novo; mudança equivalente, motivo em comentário no teste).
 - **Auditoria de segurança**: executada antes da integração (ver `seguranca.md`).
+- **Reverificação das T71 a T83**: SEC-001 a SEC-009 corrigidos nas Phases 13 e 14 por decisão do usuário; SEC-010, I-1 e I-3 como débitos no THREAT-MODEL (itens 4 a 6). Nenhuma decisão nova pendente.

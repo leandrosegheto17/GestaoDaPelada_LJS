@@ -538,6 +538,15 @@ Convenções que valem para todas as histórias:
 
 ---
 
+## Regras acrescentadas na construção (auditoria, 2026-10-30)
+
+Decididas com o usuário após a auditoria de segurança; os critérios e testes vivem em `tasks.md` (T71 a T83) e em `seguranca.md`:
+
+- Outra admin não remove a criadora do grupo: 409 `criadora_nao_removivel` (SEC-001). A criadora pode sair de si mesma.
+- `dataEntrada` do jogador tem piso em 01/01/2000, com a mensagem da GEL-78 (SEC-002).
+- Escritas em `/api/grupos*` têm `LIMITE_ESCRITA` de 60 por 60 s por conta, com 429 (SEC-003).
+- Novos eventos de auditoria: renomear grupo e criar ou renomear habilidade, só com ids e nomes de campo (SEC-004 a SEC-009).
+
 ## Success Criteria
 
 - [ ] Uma conta nova cria o grupo e cadastra o primeiro jogador em menos de 2 minutos, no celular.
