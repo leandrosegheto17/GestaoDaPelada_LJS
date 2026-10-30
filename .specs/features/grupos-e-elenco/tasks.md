@@ -1949,10 +1949,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Estados t16: excluir e exclusao-recusada
-- [ ] Texto exato "O cadastro é apagado. Só é possível excluir quem não tem partidas, notas nem pagamentos."
-- [ ] Recusa 409 mostra a mensagem e o botão que abre o diálogo de inativar; axe sem violação; só tokens
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Estados t16: excluir e exclusao-recusada
+- [x] Texto exato "O cadastro é apagado. Só é possível excluir quem não tem partidas, notas nem pagamentos."
+- [x] Recusa 409 mostra a mensagem e o botão que abre o diálogo de inativar; axe sem violação; só tokens
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick

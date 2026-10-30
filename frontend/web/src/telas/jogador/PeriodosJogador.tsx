@@ -10,6 +10,7 @@ import { useInativarJogador, useReativarJogador } from '../../dados/elenco';
 import { deErroApi } from '../../dados/errosDeCampos';
 import { dataCompleta, hojeEmSaoPaulo } from '../../formatacao';
 import { CorrigirDatas } from './CorrigirDatas';
+import { ExcluirJogador } from './ExcluirJogador';
 import estilos from './PeriodosJogador.module.css';
 
 const AVISO_INATIVAR =
@@ -131,19 +132,25 @@ function DialogoReativar({ grupoId, jogador, aoFechar, aoReativado }: PropsReati
   );
 }
 
+export type DialogoDaSituacao = 'inativar' | 'reativar' | null;
+
 interface Props {
   grupoId: string;
   jogador: JogadorDetalhe;
   /** Aviso de sucesso para a ficha mostrar (ex.: "Beto reativado desde 07/10/2026."). */
   aoAvisar: (texto: string) => void;
+  /** Diálogo aberto; a ficha o controla para a recusa de exclusão poder abrir o de inativar (GEL-85). */
+  dialogo: DialogoDaSituacao;
+  aoMudarDialogo: (dialogo: DialogoDaSituacao) => void;
+  /** Recusa da exclusão por histórico (409): a ficha mostra a mensagem com "Inativar em vez disso". */
+  aoRecusarExclusao: (mensagem: string) => void;
 }
 
 /**
  * Situação do jogador (t16 inativo e períodos): desde quando está ativo ou inativo, os períodos de atividade e as
  * ações Inativar ou Reativar (GEL-59, GEL-60). Sem as prévias de acumulado (C7).
  */
-export function PeriodosJogador({ grupoId, jogador, aoAvisar }: Props) {
-  const [dialogo, setDialogo] = useState<'inativar' | 'reativar' | null>(null);
+export function PeriodosJogador({ grupoId, jogador, aoAvisar, dialogo, aoMudarDialogo, aoRecusarExclusao }: Props) {
   const ativo = jogador.situacao === 'ativo';
   return (
     <section className="secao" aria-labelledby="s-sit">
@@ -186,21 +193,27 @@ export function PeriodosJogador({ grupoId, jogador, aoAvisar }: Props) {
         {ativo ? null : <p className="paragrafo">{TEXTO_REATIVAR}</p>}
         <div className={estilos.botoes}>
           {ativo ? (
-            <Botao variante="secundario" onClick={() => setDialogo('inativar')}>
+            <Botao variante="secundario" onClick={() => aoMudarDialogo('inativar')}>
               Inativar
             </Botao>
           ) : (
-            <Botao variante="secundario" onClick={() => setDialogo('reativar')}>
+            <Botao variante="secundario" onClick={() => aoMudarDialogo('reativar')}>
               Reativar
             </Botao>
           )}
+          <ExcluirJogador grupoId={grupoId} jogador={jogador} aoRecusar={aoRecusarExclusao} />
         </div>
       </div>
       {dialogo === 'inativar' ? (
-        <DialogoInativar grupoId={grupoId} jogador={jogador} aoFechar={() => setDialogo(null)} />
+        <DialogoInativar grupoId={grupoId} jogador={jogador} aoFechar={() => aoMudarDialogo(null)} />
       ) : null}
       {dialogo === 'reativar' ? (
-        <DialogoReativar grupoId={grupoId} jogador={jogador} aoFechar={() => setDialogo(null)} aoReativado={aoAvisar} />
+        <DialogoReativar
+          grupoId={grupoId}
+          jogador={jogador}
+          aoFechar={() => aoMudarDialogo(null)}
+          aoReativado={aoAvisar}
+        />
       ) : null}
     </section>
   );

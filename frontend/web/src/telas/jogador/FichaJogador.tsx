@@ -23,7 +23,7 @@ import {
 } from './CamposDoJogador';
 import { DataDeInicio } from './CorrigirDatas';
 import { NotasDoJogador } from './NotasDoJogador';
-import { PeriodosJogador } from './PeriodosJogador';
+import { PeriodosJogador, type DialogoDaSituacao } from './PeriodosJogador';
 
 function Dados({
   grupoId,
@@ -89,7 +89,8 @@ function Dados({
 
 /**
  * `/app/grupos/:grupoId/jogadores/:jogadorId` (t16 edição): dados do jogador (GEL-41) e, abaixo, as notas por
- * habilidade com o nível (GEL-97, GEL-103). Os blocos de situação, períodos e exclusão entram nas tarefas seguintes.
+ * habilidade com o nível (GEL-97, GEL-103), a situação com períodos, inativar, reativar, corrigir datas e data de
+ * início (GEL-59, GEL-60, GEL-71, GEL-77) e a exclusão (GEL-86, GEL-87).
  */
 export function FichaJogador() {
   const { grupoId = '', jogadorId = '' } = useParams();
@@ -97,6 +98,8 @@ export function FichaJogador() {
   const ficha = useJogador(grupoId, jogadorId);
   const j = ficha.data;
   const [aviso, setAviso] = useState<string | null>(null);
+  const [recusa, setRecusa] = useState<string | null>(null);
+  const [dialogo, setDialogo] = useState<DialogoDaSituacao>(null);
   return (
     <PaginaInterna
       titulo={j?.apelido ?? 'Jogador'}
@@ -118,9 +121,34 @@ export function FichaJogador() {
       {j ? (
         <>
           {aviso ? <Faixa tipo="sucesso">{aviso}</Faixa> : null}
+          {recusa ? (
+            <Faixa
+              tipo="erro"
+              acao={
+                <Botao
+                  variante="texto"
+                  onClick={() => {
+                    setRecusa(null);
+                    setDialogo('inativar');
+                  }}
+                >
+                  Inativar em vez disso
+                </Botao>
+              }
+            >
+              {recusa}
+            </Faixa>
+          ) : null}
           <Dados key={`${j.id}-dados`} grupoId={grupoId} jogador={j} aoAvisar={setAviso} />
           <NotasDoJogador key={`${j.id}-notas`} grupoId={grupoId} jogador={j} />
-          <PeriodosJogador grupoId={grupoId} jogador={j} aoAvisar={setAviso} />
+          <PeriodosJogador
+            grupoId={grupoId}
+            jogador={j}
+            aoAvisar={setAviso}
+            dialogo={dialogo}
+            aoMudarDialogo={setDialogo}
+            aoRecusarExclusao={setRecusa}
+          />
         </>
       ) : null}
     </PaginaInterna>
