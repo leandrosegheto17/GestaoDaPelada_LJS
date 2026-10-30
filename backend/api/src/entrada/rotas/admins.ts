@@ -57,5 +57,9 @@ export const rotaAdmins = new Hono<AppEnv>()
     if (resultado === 'ultimo_admin') {
       return erroComStatus(c, 409, CODIGOS_ERRO.ultimoAdmin, 'O grupo precisa de pelo menos uma pessoa admin.');
     }
+    if (resultado === 'criadora_nao_removivel') {
+      const mensagem = 'Quem criou o grupo não pode ser removida por outra pessoa admin.';
+      return erroComStatus(c, 409, CODIGOS_ERRO.criadoraNaoRemovivel, mensagem);
+    }
     return c.body(null, 204);
   });

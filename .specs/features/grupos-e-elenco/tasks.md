@@ -2109,10 +2109,10 @@ T76 → T77 → T78 → T79 → T80 → T81 → T82 → T83
 
 **Done when**:
 
-- [ ] Admin convidada que remove a criadora recebe 409 `criadora_nao_removivel`, e a criadora continua admin e com acesso ao grupo
-- [ ] A criadora removendo outra admin, e a admin saindo de si mesma, seguem como antes (204)
-- [ ] Teste de rota e de repositório falham sem a regra
-- [ ] Gate full passa
+- [x] Admin convidada que remove a criadora recebe 409 `criadora_nao_removivel`, e a criadora continua admin e com acesso ao grupo
+- [x] A criadora removendo outra admin, e a admin saindo de si mesma, seguem como antes (204)
+- [x] Teste de rota e de repositório falham sem a regra
+- [x] Gate full passa
 
 **Tests**: integration + e2e (pool workerd)
 **Gate**: full

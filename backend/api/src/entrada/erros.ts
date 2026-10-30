@@ -25,6 +25,8 @@ export const CODIGOS_ERRO = {
   grupoArquivado: 'grupo_arquivado',
   // grupos-e-elenco (GEL-24): arquivar e reativar só por quem criou o grupo.
   soQuemCriou: 'so_quem_criou',
+  // grupos-e-elenco (SEC-001): outra admin não remove a conta que criou o grupo.
+  criadoraNaoRemovivel: 'criadora_nao_removivel',
   // grupos-e-elenco (GEL-85): excluir jogador com histórico; a sugestão é inativar.
   jogadorComHistorico: 'jogador_com_historico',
   // grupos-e-elenco (GEL-53, GEL-56): inativar quem já está inativo, reativar quem já está ativo.
