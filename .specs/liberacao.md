@@ -31,3 +31,14 @@
 - **Reversão**: `wrangler rollback` (não disparado). Banco: dump `dump-predeploy-40867539833` (runbook §3 e §4), restaurado na `dev` ou em banco local.
 - **Dados**: migração `1792844220000_roles-padronizadas` aplicada no `pelada` (renomeou `pelada_backup` → `pelada_backup_ro`, com senha, grants e policies), com dump cifrado antes.
 - **Resultado**: liberada
+
+## 2026-10-30 — grupos-e-elenco: grupos, elenco, períodos, habilidades, admins e convites (`6b339d1`)
+
+- **Suíte**: verde no commit `6b339d1` (`trava-testes.py --rodar`: lint, format, typecheck, `pnpm test` com 2.892 testes, `pnpm test:checagens`, build do web, e2e e visual) · **Segurança**: `verificador` PASS (51 de 51 mutações mortas); auditoria com SEC-001 a SEC-009 corrigidos e retestados, SEC-010, I-1 e I-3 como débitos no THREAT-MODEL. **CI do GitHub vermelho** no job `checagens` (`dono.test.ts` sem Postgres no job, `ECONNREFUSED`), já vermelho desde antes desta feature; fica como dívida à parte.
+- **Estratégia**: janela única, tudo de uma vez (`deploy.yml`, run 41120055226, 1m49s, todas as etapas verdes, confirmado pelo usuário) · **Staging**: não (runbook §2).
+- **Alcance**: 100% em 2026-10-30, sem usuários reais além do dono. As rotas de `/api/grupos*` e `/app/grupos` passam a existir.
+- **Monitoramento**: `GET /api/health` = 200 com `versao` = `6b339d1…`; `GET /api/grupos` sem sessão = 401. **Abertos**: teste de fumaça do usuário (criar grupo, cadastrar jogador, inativar e reativar); sem monitor de uptime nem Sentry (runbook §7); `LIMITE_ESCRITA` (60 por 60 s por conta) pode ser atingido ao lançar notas em lote (runbook §11).
+- **Reversão**: `wrangler rollback`, que o `deploy.yml` roda sozinho se a migração passou e o deploy ou a saúde falhou (não disparado). Banco: dump `dump-predeploy-41120055226` (runbook §3 e §4).
+- **Dados**: migrações aditivas da feature (incluindo as das T76 e T82) aplicadas no banco de produção, com dump cifrado antes.
+- **Resultado**: liberada
+
