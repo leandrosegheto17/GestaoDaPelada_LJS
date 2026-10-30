@@ -2329,10 +2329,10 @@ T76 → T77 → T78 → T79 → T80 → T81 → T82 → T83
 
 **Done when**:
 
-- [ ] A leitura do estado do grupo trava a linha até o fim da transação da escrita
-- [ ] Teste de concorrência: arquivar durante uma escrita não deixa a escrita gravar no grupo já arquivado
-- [ ] Os testes existentes do middleware seguem verdes sem alteração
-- [ ] Gate full passa
+- [x] A leitura do estado do grupo trava a linha até o fim da transação da escrita
+- [x] Teste de concorrência: arquivar durante uma escrita não deixa a escrita gravar no grupo já arquivado
+- [x] Os testes existentes do middleware seguem verdes sem alteração
+- [x] Gate full passa
 
 **Tests**: integration (concorrência)
 **Gate**: full

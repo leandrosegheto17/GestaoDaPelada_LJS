@@ -21,7 +21,8 @@ const CANCELAR_CONVITE = /^admins\/convites\/[^/]+$/;
  * HEAD recebe 409 `grupo_arquivado` se o grupo está arquivado, também para a conta criadora. As exceções são
  * `POST /api/grupos/:grupoId/reativar` e `POST /api/grupos/:grupoId/arquivar` (ver `ESCRITAS_NO_ARQUIVADO`) e
  * `DELETE /api/grupos/:grupoId/admins/convites/:id` (ver `CANCELAR_CONVITE`). Vem depois do `exigirVinculo`: o grupo é visível (com a nova
- * `grupos_visiveis()`, o arquivado só é visível à criadora). Só lê `arquivado_em`, na transação da rota.
+ * `grupos_visiveis()`, o arquivado só é visível à criadora). Só lê `arquivado_em`, na transação da rota,
+ * com `FOR KEY SHARE` (SEC-007).
  */
 export const exigirGrupoAtivo: MiddlewareHandler<AppEnv> = async (c, proximo) => {
   if (LEITURAS.has(c.req.method)) return proximo();
@@ -34,6 +35,12 @@ export const exigirGrupoAtivo: MiddlewareHandler<AppEnv> = async (c, proximo) =>
     .selectFrom('grupos')
     .select('arquivado_em')
     .where('id', '=', grupoId ?? '')
+    // SEC-007 (T79): trava a linha do grupo até o fim da transação da escrita. O arquivar (FOR UPDATE) espera a escrita
+    // em curso confirmar; uma escrita que chega depois do arquivar espera ele e já lê o grupo arquivado.
+    // SPEC_DEVIATION: a T79 pede FOR SHARE; usa-se FOR KEY SHARE, que o FOR UPDATE do arquivar também espera, mas que
+    // não conflita com o UPDATE do próprio grupo (FOR NO KEY UPDATE): com FOR SHARE, dois PATCH simultâneos do mesmo
+    // grupo entravam em deadlock (500), como prova o teste grupo-ativo-concorrencia.test.ts.
+    .forKeyShare()
     .executeTakeFirst();
   if (grupo?.arquivado_em) {
     return erroComStatus(c, 409, CODIGOS_ERRO.grupoArquivado, 'Este grupo está arquivado. Reative-o para alterar.');
