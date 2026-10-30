@@ -1,0 +1,6 @@
+/* Botões da situação do jogador (mockup t16, `.grupo-botoes`). */
+.botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2);
+}

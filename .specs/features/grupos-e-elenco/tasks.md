@@ -1895,10 +1895,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Estados t16: inativar, inativo, reativar, reativar-erro, reativado
-- [ ] O aviso "Ele sai do ranking, do lançamento, do simulador e do financeiro…" aparece antes de confirmar, com Cancelar e Inativar
-- [ ] 422 de período aparece no campo da data; axe sem violação; só tokens
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Estados t16: inativar, inativo, reativar, reativar-erro, reativado
+- [x] O aviso "Ele sai do ranking, do lançamento, do simulador e do financeiro…" aparece antes de confirmar, com Cancelar e Inativar
+- [x] 422 de período aparece no campo da data; axe sem violação; só tokens
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick

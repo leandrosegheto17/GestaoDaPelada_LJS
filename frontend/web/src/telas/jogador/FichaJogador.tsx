@@ -22,6 +22,7 @@ import {
   type ValoresJogador,
 } from './CamposDoJogador';
 import { NotasDoJogador } from './NotasDoJogador';
+import { PeriodosJogador } from './PeriodosJogador';
 
 function Dados({ grupoId, jogador }: { grupoId: string; jogador: JogadorDetalhe }) {
   const [hoje] = useState(hojeEmSaoPaulo);
@@ -77,6 +78,7 @@ export function FichaJogador() {
   const grupo = useGrupo(grupoId);
   const ficha = useJogador(grupoId, jogadorId);
   const j = ficha.data;
+  const [aviso, setAviso] = useState<string | null>(null);
   return (
     <PaginaInterna
       titulo={j?.apelido ?? 'Jogador'}
@@ -97,8 +99,10 @@ export function FichaJogador() {
       {ficha.isError ? <ErroRede aoTentar={() => void ficha.refetch()} /> : null}
       {j ? (
         <>
+          {aviso ? <Faixa tipo="sucesso">{aviso}</Faixa> : null}
           <Dados key={`${j.id}-dados`} grupoId={grupoId} jogador={j} />
           <NotasDoJogador key={`${j.id}-notas`} grupoId={grupoId} jogador={j} />
+          <PeriodosJogador grupoId={grupoId} jogador={j} aoAvisar={setAviso} />
         </>
       ) : null}
     </PaginaInterna>
