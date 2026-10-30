@@ -10,7 +10,7 @@ Implemente estas tarefas com a skill `tlc-spec-driven`: **acione-a pelo nome e s
 
 **Design**: `.specs/features/grupos-e-elenco/design.md` (mockup aprovado em `mockup/`)
 **Spec**: `.specs/features/grupos-e-elenco/spec.md` (decisões C1 a C10 em `context.md`)
-**Status**: Approved (usuário, 2026-10-29; execução por subagentes, um lote por vez; ferramentas como estão)
+**Status**: Approved (usuário, 2026-10-29; execução por subagentes, um lote por vez; ferramentas como estão). Phases 13 e 14 (endurecimento pela auditoria de segurança) acrescentadas em 2026-10-30, aguardando aprovação.
 
 > Premissas desta lista:
 > - Caminhos `legado:` são relativos a `C:\Leandro\Projetos\GestaoDaPelada`, somente leitura (AD-002). Teste copiado do legado só entra ligado a um `GEL-NN`.
@@ -148,6 +148,26 @@ Ligação das telas, comparação com o mockup e o teste de ponta a ponta.
 
 ```
 T68 → T69 → T70
+```
+
+---
+
+### Phase 13: Endurecimento: achados médios da auditoria
+
+Correção dos achados SEC-001 a SEC-003 de `seguranca.md` (decisão do usuário, 2026-10-30).
+
+```
+T71 → T72 → T73 → T74 → T75
+```
+
+---
+
+### Phase 14: Endurecimento: achados baixos da auditoria
+
+Correção dos achados SEC-004 a SEC-009 e fechamento (decisão do usuário, 2026-10-30).
+
+```
+T76 → T77 → T78 → T79 → T80 → T81 → T82 → T83
 ```
 
 ---
@@ -2070,10 +2090,365 @@ T68 → T69 → T70
 
 ---
 
+### Phase 13: Endurecimento: achados médios da auditoria
+
+### T71: Não remover a criadora do grupo (SEC-001)
+
+**What**: `DELETE /api/grupos/:id/admins/:contaId` recusa a conta de `criado_por` com 409 `criadora_nao_removivel`; o repositório confere na mesma transação.
+**Estimativa**: 1,5h
+**Risco**: alto
+**Where**: `backend/api/src/entrada/rotas/admins.ts`, `backend/api/src/infraestrutura/db/repositorios/admins.ts`, `backend/contrato/src/` (código de erro), `backend/api/test/rotas/admins.test.ts`, `backend/api/test/repositorios/admins.test.ts`
+**Depends on**: T70
+**Reuses**: Padrão de erro 409 das rotas de admins
+**Requirement**: SEC-001 (médio)
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] Admin convidada que remove a criadora recebe 409 `criadora_nao_removivel`, e a criadora continua admin e com acesso ao grupo
+- [ ] A criadora removendo outra admin, e a admin saindo de si mesma, seguem como antes (204)
+- [ ] Teste de rota e de repositório falham sem a regra
+- [ ] Gate full passa
+
+**Tests**: integration + e2e (pool workerd)
+**Gate**: full
+
+---
+
+### T72: Tela de admins sem remover a criadora (SEC-001)
+
+**What**: A tela de admins não oferece "Remover" para a criadora e mostra a mensagem do 409 se a API recusar.
+**Estimativa**: 1h
+**Risco**: baixo
+**Where**: `frontend/web/src/` (tela de admins e seu teste)
+**Depends on**: T71
+**Reuses**: Mensagens de erro da tela de admins
+**Requirement**: SEC-001 (médio)
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] A linha da criadora não tem botão de remover; as demais mantêm
+- [ ] Resposta 409 `criadora_nao_removivel` mostra mensagem em português sem quebrar a tela
+- [ ] axe sem violação
+- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+
+**Tests**: unit (jsdom)
+**Gate**: quick
+
+---
+
+### T73: Piso de 01/01/2000 na data de entrada do jogador (SEC-002)
+
+**What**: `dataEntrada` do cadastro de jogador usa o mesmo piso e a mesma mensagem da GEL-78 ("A data de início não pode ser anterior a 01/01/2000."), em vez de 500 ou 201 com data antiga.
+**Estimativa**: 1,5h
+**Risco**: alto
+**Where**: `backend/contrato/src/elenco.ts`, `backend/contrato/test/`, `backend/api/test/rotas/jogadores.test.ts`
+**Depends on**: T72
+**Reuses**: Piso da GEL-78 já aplicado no início do jogador
+**Requirement**: SEC-002 (médio), GEL-78
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] `POST …/jogadores` com `dataEntrada` `0000-01-01` responde 422 (não 500) e com `1999-12-31` responde 422 com a mensagem da GEL-78
+- [ ] `2000-01-01` continua aceita (201)
+- [ ] Teste de contrato e de rota falham sem o piso
+- [ ] Gate full passa
+
+**Tests**: unit + e2e (pool workerd)
+**Gate**: full
+
+---
+
+### T74: Limite de taxa por conta nas escritas com sessão (SEC-003)
+
+**What**: Binding `LIMITE_ESCRITA` e middleware que limita por conta os `POST`, `PUT`, `PATCH` e `DELETE` de `/api/grupos*` (429 com `Retry-After`), reutilizando `limite-taxa.ts`.
+**Estimativa**: 2h
+**Risco**: alto
+**Where**: `wrangler.jsonc`, `backend/api/src/entrada/middlewares/limite-taxa.ts`, `backend/api/src/entrada/app.ts`, `backend/api/src/entrada/env.ts`, `backend/api/test/rotas/`
+**Depends on**: T73
+**Reuses**: `limite-taxa.ts` e os bindings `LIMITE_*`
+**Requirement**: SEC-003 (médio)
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] A chave do limite é a conta da sessão (não o IP) e o valor do limite fica registrado no `wrangler.jsonc` (período de 10 ou 60 s)
+- [ ] Excedido o limite, a resposta é 429 com `Retry-After`, sem criar nada; leituras (GET) não contam
+- [ ] Teste cria grupos em sequência e vê o 429; outra conta não é afetada
+- [ ] Os casos de `casos.ts` seguem verdes (meta-teste)
+- [ ] Gate full passa
+
+**Tests**: e2e (pool workerd)
+**Gate**: full
+
+---
+
+### T75: Documentar e checar o limite de escrita (SEC-003)
+
+**What**: README e runbook citam o `LIMITE_ESCRITA`; a checagem de bindings do repositório conhece o nome novo.
+**Estimativa**: 1,5h
+**Risco**: baixo
+**Where**: `README.md`, `docs/runbook.md`, `backend/scripts/checagens/`
+**Depends on**: T74
+**Reuses**: Texto dos `LIMITE_*` já documentados
+**Requirement**: SEC-003 (médio)
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] README e runbook descrevem o `LIMITE_ESCRITA`, o valor e como mudá-lo
+- [ ] A checagem falha numa fixture sem o binding e passa no repositório
+- [ ] Gate full passa
+
+**Tests**: unit com fixtures
+**Gate**: full
+
+---
+
+### Phase 14: Endurecimento: achados baixos da auditoria
+
+### T76: Convite de grupo arquivado (SEC-004)
+
+**What**: Migration nova (aditiva) em que `convites/ler` e `convites/aceitar` recusam convite de grupo arquivado e a criadora consegue cancelar o convite pendente.
+**Estimativa**: 2h
+**Risco**: alto
+**Where**: `backend/api/src/infraestrutura/db/migracoes/` (arquivo novo), `backend/api/test/migracoes/`, `backend/api/test/rotas/convites.test.ts`
+**Depends on**: T75
+**Reuses**: Padrão das funções SQL de `conta-convites.sql` (sem editar a migration aplicada)
+**Requirement**: SEC-004 (baixo)
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] Com o grupo arquivado, `convites/ler` e `convites/aceitar` não criam vínculo (resposta de convite indisponível)
+- [ ] `DELETE` do convite pendente de grupo arquivado responde 204 para a criadora
+- [ ] Reativado o grupo, o convite volta a valer
+- [ ] Migration nova roda do zero e sobre o banco atual; teste falha sem ela
+- [ ] Gate full passa
+
+**Tests**: integration (Postgres real) + e2e
+**Gate**: full
+
+---
+
+### T77: Recusar caracteres de controle e invisíveis em nomes (SEC-005)
+
+**What**: Nome de grupo, apelido e habilidade recusam NUL, controle e formatação (inclui U+200B e U+202E) e são normalizados em NFC no contrato; mensagem em português.
+**Estimativa**: 2h
+**Risco**: alto
+**Where**: `backend/contrato/src/grupo.ts`, `backend/contrato/src/elenco.ts`, `backend/contrato/src/habilidades.ts`, testes do contrato e das rotas
+**Depends on**: T76
+**Reuses**: Schemas de nome atuais
+**Requirement**: SEC-005 (baixo)
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] NUL no nome do grupo ou no apelido responde 422 (não 500)
+- [ ] Espaço de largura zero e U+202E são recusados; "Beto" e "Beto"+U+200B deixam de ser dois apelidos diferentes
+- [ ] Texto acentuado normal continua aceito e é guardado em NFC
+- [ ] Teste por campo (grupo, apelido, habilidade) falha sem a regra
+- [ ] Gate full passa
+
+**Tests**: unit + e2e (pool workerd)
+**Gate**: full
+
+---
+
+### T78: Nome do grupo seguro no e-mail de convite (SEC-006)
+
+**What**: O modelo do e-mail de convite mostra o nome do grupo como texto puro: sem quebra de linha, sem URL ou link ativo, com tamanho máximo.
+**Estimativa**: 1h
+**Risco**: alto
+**Where**: `backend/api/src/infraestrutura/email/modelos.ts`, teste do modelo
+**Depends on**: T77
+**Reuses**: Modelos de e-mail atuais
+**Requirement**: SEC-006 (baixo)
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] Nome de grupo com URL, quebra de linha ou HTML não vira link nem injeta linha no texto e no HTML do e-mail
+- [ ] Nome normal sai igual ao de hoje
+- [ ] Teste do modelo falha sem a regra
+- [ ] Gate full passa
+
+**Tests**: unit
+**Gate**: full
+
+---
+
+### T79: Trava de leitura no middleware de grupo ativo (SEC-007)
+
+**What**: `exigirGrupoAtivo` lê `arquivado_em` com `FOR SHARE` (mesma transação da escrita), fechando a corrida com o arquivamento.
+**Estimativa**: 2h
+**Risco**: alto
+**Where**: `backend/api/src/entrada/middlewares/grupo-ativo.ts`, `backend/api/test/rotas/grupo-ativo-middleware.test.ts`
+**Depends on**: T78
+**Reuses**: Padrão de `FOR UPDATE` das rotas de período
+**Requirement**: SEC-007 (baixo)
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] A leitura do estado do grupo trava a linha até o fim da transação da escrita
+- [ ] Teste de concorrência: arquivar durante uma escrita não deixa a escrita gravar no grupo já arquivado
+- [ ] Os testes existentes do middleware seguem verdes sem alteração
+- [ ] Gate full passa
+
+**Tests**: integration (concorrência)
+**Gate**: full
+
+---
+
+### T80: Auditar edições do jogador (SEC-008)
+
+**What**: Editar apelido, posição, telefone ou ano de nascimento grava evento de auditoria na mesma transação, sem telefone nem ano nos dados do evento.
+**Estimativa**: 1,5h
+**Risco**: alto
+**Where**: `backend/api/src/infraestrutura/db/repositorios/jogadores.ts`, `backend/api/test/repositorios/jogadores.test.ts`
+**Depends on**: T79
+**Reuses**: Auditoria de inativar e reativar
+**Requirement**: SEC-008 (baixo)
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] Cada edição grava um evento com quais campos mudaram (nomes dos campos, nunca os valores de telefone e ano)
+- [ ] Edição que falha não deixa evento
+- [ ] Teste confere que nenhum evento contém telefone nem ano
+- [ ] Gate full passa
+
+**Tests**: integration
+**Gate**: full
+
+---
+
+### T81: Auditar grupo e habilidades (SEC-008)
+
+**What**: Renomear o grupo e criar ou renomear habilidade gravam evento de auditoria na mesma transação.
+**Estimativa**: 1,5h
+**Risco**: alto
+**Where**: `backend/api/src/infraestrutura/db/repositorios/grupos.ts`, `backend/api/src/infraestrutura/db/repositorios/habilidades.ts`, testes dos repositórios
+**Depends on**: T80
+**Reuses**: Auditoria da T80
+**Requirement**: SEC-008 (baixo)
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] Renomear grupo, criar habilidade e renomear habilidade gravam um evento cada, com nome antigo e novo
+- [ ] Operação que falha não deixa evento
+- [ ] Gate full passa
+
+**Tests**: integration
+**Gate**: full
+
+---
+
+### T82: Só quem criou muda `arquivado_em` também no banco (SEC-009)
+
+**What**: Migration nova (aditiva) com trigger ou função que confira `criado_por` ao alterar `arquivado_em`, para o `pelada_app` não burlar a regra pelo grant de coluna.
+**Estimativa**: 2h
+**Risco**: alto
+**Where**: `backend/api/src/infraestrutura/db/migracoes/` (arquivo novo), `backend/api/test/migracoes/`, `backend/api/test/isolamento/`
+**Depends on**: T81
+**Reuses**: `grupos-grants-coluna.sql` e policy `grupos_alterar` (sem editá-los)
+**Requirement**: SEC-009 (baixo)
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] `UPDATE grupos SET arquivado_em` por admin que não criou o grupo falha no banco, como `pelada_app`
+- [ ] A criadora arquiva e reativa normalmente (fluxo da API e o e2e seguem verdes)
+- [ ] Migration nova roda do zero e sobre o banco atual
+- [ ] Gate full passa
+
+**Tests**: integration (Postgres real)
+**Gate**: full
+
+---
+
+### T83: Fechar o endurecimento: reteste e registros
+
+**What**: Reteste de cada SEC no `seguranca.md` (situação e evidência), débitos no THREAT-MODEL (SEC-010 `deepmerge`, I-1 regra ESLint não ligada contra a G-26, I-3 filtro de arquivado nas partidas) e nota no roteiro.
+**Estimativa**: 1,5h
+**Risco**: baixo
+**Where**: `.specs/features/grupos-e-elenco/seguranca.md`, `.md/THREAT-MODEL.md`, `.md/GUARDRAILS.md` (só texto da G-26, se precisar)
+**Depends on**: T82
+**Reuses**: —
+**Requirement**: SEC-001 a SEC-010
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [ ] Cada achado SEC-001 a SEC-009 está "corrigido" no `seguranca.md`, com `arquivo:linha` do teste que o prova
+- [ ] SEC-010, I-1 e I-3 estão registrados como débito com dono (feature seguinte) no THREAT-MODEL
+- [ ] Gate build completo passa: `pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:checagens && pnpm --filter @pelada/web build && pnpm --filter @pelada/web e2e && pnpm --filter @pelada/web visual`
+
+**Tests**: none (documentação) + gate
+**Gate**: build
+
+---
+
 ## Phase Execution Map
 
 ```
-Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5 → Phase 6 → Phase 7 → Phase 8 → Phase 9 → Phase 10 → Phase 11 → Phase 12
+Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5 → Phase 6 → Phase 7 → Phase 8 → Phase 9 → Phase 10 → Phase 11 → Phase 12 → Phase 13 → Phase 14
 
 Phase 1:  T1 → T2 → T3 → T4 → T5
 Phase 2:  T6 → T7 → T8 → T9 → T10 → T11
@@ -2087,6 +2462,8 @@ Phase 9:  T46 → T47 → T48 → T49 → T50 → T51 → T52
 Phase 10:  T53 → T54 → T55 → T56 → T57 → T58 → T59 → T60
 Phase 11:  T61 → T62 → T63 → T64 → T65 → T66 → T67
 Phase 12:  T68 → T69 → T70
+Phase 13:  T71 → T72 → T73 → T74 → T75
+Phase 14:  T76 → T77 → T78 → T79 → T80 → T81 → T82 → T83
 ```
 
 Execução estritamente sequencial, sem paralelismo dentro da fase. Os lotes (até 14h de Estimativa, fases inteiras) saem de `python .claude/scripts/progresso.py --lote`.
