@@ -14,6 +14,13 @@ const MENSAGEM_PONTUACAO = `Informe um número inteiro de ${LIMITES.pontuacaoIni
 const MENSAGEM_DATA = 'Informe uma data válida.';
 const MENSAGEM_FUTURO = 'A data não pode ser no futuro.';
 
+/**
+ * Piso da data de início da pontuação (GEL-78), valendo também para a data de entrada do cadastro (SEC-002). O domínio
+ * tem o mesmo valor em `PISO_INICIO`; o contrato não importa o domínio (G-01), então repete o valor e a mensagem.
+ */
+const PISO_INICIO = '2000-01-01';
+const MENSAGEM_PISO = 'A data de início não pode ser anterior a 01/01/2000.';
+
 /** Apelido de 2 a 30 caracteres sem os espaços das pontas (GEL-34). A unicidade no grupo é do repositório. */
 export const apelido = z
   .string({ error: MENSAGEM_APELIDO })
@@ -85,7 +92,9 @@ export function jogadorCorpo(hoje: string) {
     posicao,
     telefone,
     pontuacaoInicial: pontuacaoInicial.default(LIMITES.pontuacaoInicial.min),
-    dataEntrada: dataAteHoje(hoje).optional(),
+    dataEntrada: dataAteHoje(hoje)
+      .refine((valor) => valor >= PISO_INICIO, { error: MENSAGEM_PISO, abort: true })
+      .optional(),
   });
 }
 

@@ -121,6 +121,18 @@ describe('jogadorCorpo: cadastro', () => {
     });
   });
 
+  it('data de entrada antes de 01/01/2000 → a mensagem do piso da GEL-78 (SEC-002)', () => {
+    for (const dataEntrada of ['0000-01-01', '0001-01-01', '1899-12-31', '1999-12-31']) {
+      expect(camposDe(cadastro, { ...valido, dataEntrada })).toEqual({
+        dataEntrada: 'A data de início não pode ser anterior a 01/01/2000.',
+      });
+    }
+  });
+
+  it('01/01/2000, o próprio piso, passa (SEC-002, GEL-78)', () => {
+    expect(cadastro.parse({ ...valido, dataEntrada: '2000-01-01' }).dataEntrada).toBe('2000-01-01');
+  });
+
   it('data de entrada que não é data real → "Informe uma data válida."', () => {
     for (const dataEntrada of ['2026-02-30', '30/10/2026', '', null]) {
       expect(camposDe(cadastro, { ...valido, dataEntrada })).toEqual({ dataEntrada: 'Informe uma data válida.' });

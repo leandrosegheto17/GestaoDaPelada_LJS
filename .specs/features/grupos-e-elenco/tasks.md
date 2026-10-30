@@ -2163,10 +2163,10 @@ T76 → T77 → T78 → T79 → T80 → T81 → T82 → T83
 
 **Done when**:
 
-- [ ] `POST …/jogadores` com `dataEntrada` `0000-01-01` responde 422 (não 500) e com `1999-12-31` responde 422 com a mensagem da GEL-78
-- [ ] `2000-01-01` continua aceita (201)
-- [ ] Teste de contrato e de rota falham sem o piso
-- [ ] Gate full passa
+- [x] `POST …/jogadores` com `dataEntrada` `0000-01-01` responde 422 (não 500) e com `1999-12-31` responde 422 com a mensagem da GEL-78
+- [x] `2000-01-01` continua aceita (201)
+- [x] Teste de contrato e de rota falham sem o piso
+- [x] Gate full passa
 
 **Tests**: unit + e2e (pool workerd)
 **Gate**: full

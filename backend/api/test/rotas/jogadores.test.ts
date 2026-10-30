@@ -93,6 +93,30 @@ describe('POST /api/grupos/:grupoId/jogadores (GEL-31 a GEL-40)', () => {
     expect(await jogadoresDoGrupo(g.id)).toEqual([]);
   });
 
+  it.each(['0000-01-01', '0001-01-01', '1999-12-31'])(
+    'data de entrada %s, antes do piso de 01/01/2000: 422 com a mensagem da GEL-78, não 500, e nada é gravado (SEC-002)',
+    async (dataEntrada) => {
+      const g = await grupoNovo();
+      const r = await pedir('POST', `/api/grupos/${g.id}/jogadores`, { ...JOGADOR, dataEntrada }, comRelogio(g));
+      expect(r.status).toBe(422);
+      expect(r.corpo).toMatchObject({
+        erro: {
+          codigo: 'dados_invalidos',
+          campos: { dataEntrada: 'A data de início não pode ser anterior a 01/01/2000.' },
+        },
+      });
+      expect(await jogadoresDoGrupo(g.id)).toEqual([]);
+    },
+  );
+
+  it('data de entrada 01/01/2000, o próprio piso: 201 com início e período nela (SEC-002, GEL-78)', async () => {
+    const g = await grupoNovo();
+    const corpo = { ...JOGADOR, dataEntrada: '2000-01-01' };
+    const r = await pedir('POST', `/api/grupos/${g.id}/jogadores`, corpo, comRelogio(g));
+    expect(r.status).toBe(201);
+    expect(r.corpo).toMatchObject({ inicioPontuacao: '2000-01-01', periodos: [{ inicio: '2000-01-01', fim: null }] });
+  });
+
   const APELIDO = 'O apelido precisa ter de 2 a 30 caracteres.';
   const ANO = 'O ano precisa estar entre 1940 e 2016.';
   const TELEFONE = 'Informe o telefone como (DD) 9XXXX-XXXX.';
