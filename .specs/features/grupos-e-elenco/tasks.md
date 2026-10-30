@@ -1841,10 +1841,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Estado t16 novo: erros por campo com as mensagens da spec e "Corrija N campos: …"
-- [ ] Envio válido navega para a lista e o jogador aparece em Ativos "desde <hoje>"
-- [ ] axe sem violação; só tokens
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Estado t16 novo: erros por campo com as mensagens da spec e "Corrija N campos: …"
+- [x] Envio válido navega para a lista e o jogador aparece em Ativos "desde <hoje>"
+- [x] axe sem violação; só tokens
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
