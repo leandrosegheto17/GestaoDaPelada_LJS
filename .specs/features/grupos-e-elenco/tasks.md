@@ -1814,10 +1814,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Com 3 jogadores (1 inativo): "Ativos (2) Inativos (1)"; buscar "jose" acha "José"
-- [ ] Listas ordenadas por apelido sem acento e sem caixa; vazio de ativos mostra a ação "Novo jogador" e o de inativos "Nenhum jogador inativo."
-- [ ] axe sem violação; só tokens
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Com 3 jogadores (1 inativo): "Ativos (2) Inativos (1)"; buscar "jose" acha "José"
+- [x] Listas ordenadas por apelido sem acento e sem caixa; vazio de ativos mostra a ação "Novo jogador" e o de inativos "Nenhum jogador inativo."
+- [x] axe sem violação; só tokens
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick

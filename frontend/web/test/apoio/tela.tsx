@@ -40,3 +40,20 @@ export function montarTela(elemento: ReactElement, caminho: string, destinos: st
   );
   return { roteador, ...retorno };
 }
+
+/**
+ * Como `montarTela`, mas a rota da tela tem parâmetros (ex.: `/app/grupos/:grupoId/jogadores`) e a navegação começa
+ * num endereço concreto. `destinos` são rotas simples que a tela pode abrir.
+ */
+export function montarTelaEm(elemento: ReactElement, padrao: string, caminho: string, destinos: string[] = []) {
+  const roteador = createMemoryRouter(
+    [{ path: padrao, element: elemento }, ...destinos.map((d) => ({ path: d, element: <p>Destino {d}</p> }))],
+    { initialEntries: [caminho] },
+  );
+  const retorno = render(
+    <QueryClientProvider client={criarClienteConsultas({ aoSessaoExpirada: () => undefined })}>
+      <RouterProvider router={roteador} />
+    </QueryClientProvider>,
+  );
+  return { roteador, ...retorno };
+}
