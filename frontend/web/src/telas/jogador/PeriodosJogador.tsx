@@ -9,6 +9,7 @@ import { Lista } from '../../componentes/listas/Lista';
 import { useInativarJogador, useReativarJogador } from '../../dados/elenco';
 import { deErroApi } from '../../dados/errosDeCampos';
 import { dataCompleta, hojeEmSaoPaulo } from '../../formatacao';
+import { CorrigirDatas } from './CorrigirDatas';
 import estilos from './PeriodosJogador.module.css';
 
 const AVISO_INATIVAR =
@@ -153,8 +154,8 @@ export function PeriodosJogador({ grupoId, jogador, aoAvisar }: Props) {
         <p className="paragrafo">
           {ativo ? 'Ativo' : 'Inativo'} desde {dataCompleta(jogador.desde)}.
         </p>
-        <div className="campo">
-          <span className="campo__rotulo" id="s-per">
+        <div className={estilos.campo}>
+          <span className={estilos.rotulo} id="s-per">
             Períodos de atividade
           </span>
           <Lista rotuladaPor="s-per">
@@ -169,6 +170,15 @@ export function PeriodosJogador({ grupoId, jogador, aoAvisar }: Props) {
                   </>
                 }
                 meta={i === 0 ? 'Entrada' : 'Retorno'}
+                acoes={
+                  <CorrigirDatas
+                    grupoId={grupoId}
+                    jogador={jogador}
+                    periodo={p}
+                    indice={i}
+                    aoCorrigido={() => aoAvisar('Datas corrigidas.')}
+                  />
+                }
               />
             ))}
           </Lista>

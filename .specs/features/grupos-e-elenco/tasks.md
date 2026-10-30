@@ -1922,10 +1922,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Estados t16: corrigir, corrigir-erro, corrigido ("Datas corrigidas."), inicio, inicio-erro
-- [ ] Início do primeiro período não é editável pela correção (mostra o caminho "Alterar data de início")
-- [ ] axe sem violação; só tokens
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Estados t16: corrigir, corrigir-erro, corrigido ("Datas corrigidas."), inicio, inicio-erro
+- [x] Início do primeiro período não é editável pela correção (mostra o caminho "Alterar data de início")
+- [x] axe sem violação; só tokens
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick

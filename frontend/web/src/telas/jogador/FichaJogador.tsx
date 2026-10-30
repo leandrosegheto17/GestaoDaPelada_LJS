@@ -21,10 +21,19 @@ import {
   valoresDoDetalhe,
   type ValoresJogador,
 } from './CamposDoJogador';
+import { DataDeInicio } from './CorrigirDatas';
 import { NotasDoJogador } from './NotasDoJogador';
 import { PeriodosJogador } from './PeriodosJogador';
 
-function Dados({ grupoId, jogador }: { grupoId: string; jogador: JogadorDetalhe }) {
+function Dados({
+  grupoId,
+  jogador,
+  aoAvisar,
+}: {
+  grupoId: string;
+  jogador: JogadorDetalhe;
+  aoAvisar: (texto: string) => void;
+}) {
   const [hoje] = useState(hojeEmSaoPaulo);
   const [valores, setValores] = useState<ValoresJogador>(() => valoresDoDetalhe(jogador));
   const [erros, setErros] = useState<ErrosDeCampos>({});
@@ -58,7 +67,16 @@ function Dados({ grupoId, jogador }: { grupoId: string; jogador: JogadorDetalhe 
       <Formulario aoEnviar={salvar} enviando={editar.isPending}>
         <ResumoErros erros={resumoDoJogador(erros)} />
         {falhaDeEnvio ? <ErroEnvio /> : null}
-        <CamposDoJogador valores={valores} erros={erros} aoMudar={setValores} comDataEntrada={false} hoje={hoje} />
+        <CamposDoJogador
+          valores={valores}
+          erros={erros}
+          aoMudar={setValores}
+          comDataEntrada={false}
+          hoje={hoje}
+          inicio={
+            <DataDeInicio grupoId={grupoId} jogador={jogador} aoAlterado={() => aoAvisar('Data de início alterada.')} />
+          }
+        />
         <div>
           <Botao type="submit" carregando={editar.isPending} rotuloCarregando="Salvando…">
             Salvar
@@ -100,7 +118,7 @@ export function FichaJogador() {
       {j ? (
         <>
           {aviso ? <Faixa tipo="sucesso">{aviso}</Faixa> : null}
-          <Dados key={`${j.id}-dados`} grupoId={grupoId} jogador={j} />
+          <Dados key={`${j.id}-dados`} grupoId={grupoId} jogador={j} aoAvisar={setAviso} />
           <NotasDoJogador key={`${j.id}-notas`} grupoId={grupoId} jogador={j} />
           <PeriodosJogador grupoId={grupoId} jogador={j} aoAvisar={setAviso} />
         </>

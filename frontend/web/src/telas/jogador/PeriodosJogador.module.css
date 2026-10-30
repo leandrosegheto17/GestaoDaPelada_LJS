@@ -4,3 +4,12 @@
   flex-wrap: wrap;
   gap: var(--esp-2);
 }
+
+/* Bloco "rótulo + valor + ação" que não é uma entrada (mockup t16, `.campo` com `.campo__rotulo`). */
+.campo {
+  display: grid;
+  gap: var(--esp-1);
+}
+.rotulo {
+  font-weight: var(--peso-semi);
+}
