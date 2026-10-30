@@ -2409,10 +2409,10 @@ T76 → T77 → T78 → T79 → T80 → T81 → T82 → T83
 
 **Done when**:
 
-- [ ] `UPDATE grupos SET arquivado_em` por admin que não criou o grupo falha no banco, como `pelada_app`
-- [ ] A criadora arquiva e reativa normalmente (fluxo da API e o e2e seguem verdes)
-- [ ] Migration nova roda do zero e sobre o banco atual
-- [ ] Gate full passa
+- [x] `UPDATE grupos SET arquivado_em` por admin que não criou o grupo falha no banco, como `pelada_app`
+- [x] A criadora arquiva e reativa normalmente (fluxo da API e o e2e seguem verdes)
+- [x] Migration nova roda do zero e sobre o banco atual
+- [x] Gate full passa
 
 **Tests**: integration (Postgres real)
 **Gate**: full
