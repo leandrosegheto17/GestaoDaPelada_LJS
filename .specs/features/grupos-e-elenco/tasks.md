@@ -2436,9 +2436,9 @@ T76 → T77 → T78 → T79 → T80 → T81 → T82 → T83
 
 **Done when**:
 
-- [ ] Cada achado SEC-001 a SEC-009 está "corrigido" no `seguranca.md`, com `arquivo:linha` do teste que o prova
-- [ ] SEC-010, I-1 e I-3 estão registrados como débito com dono (feature seguinte) no THREAT-MODEL
-- [ ] Gate build completo passa: `pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:checagens && pnpm --filter @pelada/web build && pnpm --filter @pelada/web e2e && pnpm --filter @pelada/web visual`
+- [x] Cada achado SEC-001 a SEC-009 está "corrigido" no `seguranca.md`, com `arquivo:linha` do teste que o prova
+- [x] SEC-010, I-1 e I-3 estão registrados como débito com dono (feature seguinte) no THREAT-MODEL
+- [x] Gate build completo passa: `pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:checagens && pnpm --filter @pelada/web build && pnpm --filter @pelada/web e2e && pnpm --filter @pelada/web visual`
 
 **Tests**: none (documentação) + gate
 **Gate**: build
