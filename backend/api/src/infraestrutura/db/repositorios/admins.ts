@@ -62,6 +62,12 @@ export async function remover(db: Db, grupoId: string, contaId: string): Promise
   return 'ok';
 }
 
+/** Conta que criou o grupo (`criado_por`), se a conta da requisição vê o grupo (SEC-001). */
+export async function criadoraDoGrupo(db: Db, grupoId: string): Promise<string | null> {
+  const grupo = await db.selectFrom('grupos').select('criado_por').where('id', '=', grupoId).executeTakeFirst();
+  return grupo?.criado_por ?? null;
+}
+
 /** Nome do grupo visível à conta da requisição (vínculo, pela RLS); nulo se não vê o grupo. */
 export async function nomeDoGrupo(db: Db, grupoId: string): Promise<string | null> {
   const grupo = await db.selectFrom('grupos').select('nome').where('id', '=', grupoId).executeTakeFirst();

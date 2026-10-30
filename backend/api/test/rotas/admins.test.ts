@@ -91,6 +91,15 @@ describe('GET /api/grupos/:grupoId/admins', () => {
     });
   });
 
+  it('traz o id da criadora do grupo, igual para a criadora e para a convidada (SEC-001)', async () => {
+    const { criadora, outra, criado } = await grupoComDuasAdmins();
+    for (const quem of [criadora, outra]) {
+      const r = await pedir('GET', raiz({ grupo: criado.id }), undefined, { cookie: quem.cookie });
+      expect(adminsResposta.safeParse(r.corpo).success).toBe(true);
+      expect(r.corpo).toMatchObject({ criadoraId: criadora.contaId });
+    }
+  });
+
   it('conta de outro grupo, sem vínculo: 404, igual a um grupo que não existe (ACE-41)', async () => {
     const s = await criarSessao(GRUPO_B);
     const semVinculo = await pedir('GET', raiz(GRUPO_A), undefined, { cookie: s.cookie });

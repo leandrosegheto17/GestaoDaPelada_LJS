@@ -54,5 +54,10 @@ export const adminsResposta = z.strictObject({
     }),
   ),
   convites: z.array(z.strictObject({ id: z.string().min(1), email: z.string(), expiraEm: z.iso.datetime() })),
+  /**
+   * Conta que criou o grupo (SEC-001): a tela não oferece removê-la. Opcional para não quebrar cliente (G-20); a API
+   * sempre manda, `null` só se o grupo não estiver visível.
+   */
+  criadoraId: z.string().min(1).nullable().optional(),
 });
 export type AdminsResposta = z.infer<typeof adminsResposta>;

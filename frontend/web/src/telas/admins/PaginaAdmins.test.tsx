@@ -307,3 +307,39 @@ describe('PaginaAdmins: remover (ACE-39, ACE-40, t19 remover)', () => {
     expect(screen.getByRole('alertdialog')).toBeVisible();
   });
 });
+
+// Critério: SEC-001 (T72). A conta da sessão (c1) é convidada; a criadora é c0.
+describe('PaginaAdmins: a criadora não é removível (SEC-001)', () => {
+  const ROSA = { id: 'c0', nome: 'Rosa', email: 'rosa@exemplo.com.br', acessaFinanceiro: true };
+
+  it('a linha da criadora não tem Remover; as outras mantêm', async () => {
+    api({ admins: [ROSA, LEANDRO, MARQUINHOS], convites: [], criadoraId: 'c0' } as Estado);
+    const { container } = abrir();
+    expect(await screen.findByText('Rosa')).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Remover Rosa' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Remover Marquinhos' })).toBeVisible();
+    expect(screen.getAllByRole('button', { name: /^Remover/ })).toHaveLength(1);
+    expect(await violacoes(container)).toEqual([]);
+  });
+
+  it('409 criadora_nao_removivel fecha o diálogo, explica em português e mantém a lista', async () => {
+    // Lista sem criadoraId (resposta antiga): o botão aparece e a API recusa.
+    api({ admins: [ROSA, LEANDRO], convites: [] }, (url, init) =>
+      termina(url, '/grupos/g1/admins/c0') && init?.method === 'DELETE'
+        ? erroApi(409, 'criadora_nao_removivel')
+        : undefined,
+    );
+    const { container } = abrir();
+    const u = userEvent.setup();
+    await u.click(await screen.findByRole('button', { name: 'Remover Rosa' }));
+    await u.click(screen.getByRole('button', { name: 'Remover do grupo' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'A pessoa que criou o grupo não pode ser removida por outra admin.',
+    );
+    expect(screen.queryByRole('alertdialog')).toBeNull();
+    expect(screen.getByText('Rosa')).toBeVisible();
+    expect(screen.getByText('Leandro (você)')).toBeVisible();
+    expect(screen.queryByText('Não foi possível enviar. Verifique a conexão.')).toBeNull();
+    expect(await violacoes(container)).toEqual([]);
+  });
+});

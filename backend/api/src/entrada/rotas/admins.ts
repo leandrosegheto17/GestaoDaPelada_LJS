@@ -17,10 +17,14 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
  */
 export const rotaAdmins = new Hono<AppEnv>()
   .get('/api/grupos/:grupoId/admins', async (c) => {
-    const lista = await admins.listar(c.var.db, c.req.param('grupoId'));
+    const grupoId = c.req.param('grupoId');
+    const lista = await admins.listar(c.var.db, grupoId);
     return c.json({
       admins: lista.admins,
       convites: lista.convites.map((v) => ({ id: v.id, email: v.email, expiraEm: v.expiraEm.toISOString() })),
+      // SPEC_DEVIATION (T72): a tarefa previa só o web, mas a tela não tinha como saber quem criou o grupo; a lista
+      // passa a trazer `criadoraId` (campo opcional no contrato, G-20) para não oferecer remover a criadora (SEC-001).
+      criadoraId: await admins.criadoraDoGrupo(c.var.db, grupoId),
     });
   })
   .post('/api/grupos/:grupoId/admins/convites', async (c) => {

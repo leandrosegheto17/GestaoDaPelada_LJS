@@ -47,6 +47,10 @@
     "convites[].expiraEm": {
       "tipo": "string",
       "obrigatorio": true
+    },
+    "criadoraId": {
+      "tipo": "outro",
+      "obrigatorio": false
     }
   },
   "apelido": {

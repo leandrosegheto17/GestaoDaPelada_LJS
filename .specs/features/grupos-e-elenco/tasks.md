@@ -2136,10 +2136,10 @@ T76 → T77 → T78 → T79 → T80 → T81 → T82 → T83
 
 **Done when**:
 
-- [ ] A linha da criadora não tem botão de remover; as demais mantêm
-- [ ] Resposta 409 `criadora_nao_removivel` mostra mensagem em português sem quebrar a tela
-- [ ] axe sem violação
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] A linha da criadora não tem botão de remover; as demais mantêm
+- [x] Resposta 409 `criadora_nao_removivel` mostra mensagem em português sem quebrar a tela
+- [x] axe sem violação
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit (jsdom)
 **Gate**: quick
