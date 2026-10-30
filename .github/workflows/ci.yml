@@ -37,6 +37,8 @@ jobs:
       - run: node backend/scripts/checagens/checar-grupo-id.mjs
       # GEL-111: só o repositório de jogadores escreve períodos e inicio_pontuacao.
       - run: node backend/scripts/checagens/checar-escritores-periodo.mjs
+      # FUN-26, SEC-003: os limitadores de taxa (inclusive o LIMITE_ESCRITA) declarados no wrangler.jsonc.
+      - run: node backend/scripts/checagens/checar-limitadores.mjs
       - uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2.3.9
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

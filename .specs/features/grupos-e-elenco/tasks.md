@@ -2218,9 +2218,9 @@ T76 → T77 → T78 → T79 → T80 → T81 → T82 → T83
 
 **Done when**:
 
-- [ ] README e runbook descrevem o `LIMITE_ESCRITA`, o valor e como mudá-lo
-- [ ] A checagem falha numa fixture sem o binding e passa no repositório
-- [ ] Gate full passa
+- [x] README e runbook descrevem o `LIMITE_ESCRITA`, o valor e como mudá-lo
+- [x] A checagem falha numa fixture sem o binding e passa no repositório
+- [x] Gate full passa
 
 **Tests**: unit com fixtures
 **Gate**: full
