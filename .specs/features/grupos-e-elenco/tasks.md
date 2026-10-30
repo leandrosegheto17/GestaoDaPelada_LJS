@@ -1976,10 +1976,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Estados do mockup t17 do projeto: vazio ("Nenhuma habilidade", "O simulador vai usar nível 5,5 para todos."), sucesso, erro, carregando
-- [ ] Exclusão confirma com "Excluir “<nome>”?" e "…apaga as notas de todos os jogadores nessa habilidade."
-- [ ] axe sem violação; só tokens
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Estados do mockup t17 do projeto: vazio ("Nenhuma habilidade", "O simulador vai usar nível 5,5 para todos."), sucesso, erro, carregando
+- [x] Exclusão confirma com "Excluir “<nome>”?" e "…apaga as notas de todos os jogadores nessa habilidade."
+- [x] axe sem violação; só tokens
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick

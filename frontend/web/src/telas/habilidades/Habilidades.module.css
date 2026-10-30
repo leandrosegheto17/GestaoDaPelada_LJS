@@ -1,0 +1,24 @@
+/* Nome da habilidade editável na própria linha (mockup t17, `.campo__entrada.item__principal`). */
+.nome {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--alvo-toque);
+  padding: 0 var(--esp-3);
+  border: 2px solid var(--cor-contorno);
+  border-radius: var(--raio-sm);
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+.comErro {
+  border-color: var(--cor-erro-texto);
+}
+.erro {
+  display: block;
+  margin-top: var(--esp-1);
+  font-size: var(--texto-sm);
+  font-weight: var(--peso-semi);
+  color: var(--cor-erro-texto);
+}
