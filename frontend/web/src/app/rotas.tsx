@@ -46,6 +46,11 @@ export function criarRotas(extras: RouteObject[] = rotasVitrine): RouteObject[] 
               path: '/app/conta/senha',
               lazy: async () => ({ Component: (await import('../telas/minha-senha/MinhaSenha')).MinhaSenha }),
             },
+            // grupos-e-elenco: o início do grupo (t09), para onde a lista de grupos leva; ligado antes da T68.
+            {
+              path: '/app/grupos/:grupoId',
+              lazy: async () => ({ Component: (await import('../telas/grupo/InicioDoGrupo')).InicioDoGrupo }),
+            },
             {
               path: '/app/grupos/:grupoId/admins',
               lazy: async () => ({ Component: (await import('../telas/admins/PaginaAdmins')).PaginaAdmins }),

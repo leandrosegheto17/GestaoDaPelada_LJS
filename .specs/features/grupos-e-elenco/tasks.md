@@ -2003,6 +2003,8 @@ T68 → T69 → T70
 - MCP: NONE
 - Skill: NONE
 
+> Nota (2026-10-29, decisão do usuário no lote 4): a rota `/app/grupos/:grupoId` (t09) já foi ligada antes desta tarefa, para o e2e do ACE-33 seguir verde depois da T57. Os critérios abaixo continuam valendo.
+
 **Done when**:
 
 - [ ] Cada rota da spec abre a tela certa; sem sessão cai em entrar

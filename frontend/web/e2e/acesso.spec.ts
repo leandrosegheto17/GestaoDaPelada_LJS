@@ -157,7 +157,10 @@ test('convite entre duas contas: enviar, aceitar, ver o grupo e remover', async 
   const emailB = await criarContaConfirmada(request, 'convidada');
 
   await entrarPelaTela(page, EMAIL_ADMIN, senhaDoAdmin());
+  // Motivo da mudança (grupos-e-elenco, aprovada pelo usuário): o grupo agora abre o início conforme o mockup
+  // aprovado; ACE-33 continua coberto. Do início, o atalho "Admins" leva à tela de admins.
   await page.getByRole('link', { name: /Pelada de Quinta/ }).click();
+  await page.getByRole('link', { name: /Admins/ }).click();
   await expect(page.getByRole('heading', { name: 'Admins' })).toBeVisible();
   await page.getByLabel('E-mail').fill(emailB);
   await page.getByRole('button', { name: 'Enviar convite' }).click();
