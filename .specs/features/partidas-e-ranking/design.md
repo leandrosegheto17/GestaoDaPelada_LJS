@@ -1,8 +1,10 @@
 # Partidas e ranking — Desenho
 
 **Spec**: `.specs/features/partidas-e-ranking/spec.md` (PAR-01 a PAR-161) e `context.md` (P1 a P12)
-**Status**: Approved (usuário, 2026-10-30); mockup do módulo a seguir
-**Mockup**: a fazer no modo módulo, em `.specs/features/partidas-e-ranking/mockup/` (ver "Mockup do módulo").
+**Status**: Approved (usuário, 2026-10-30)
+**Mockup**: aprovado pelo usuário em 2026-10-30, `.specs/features/partidas-e-ranking/mockup/` (18 telas: t09 `sucesso` e
+`sem-jogadores`, t11 `nova`, t16 com 15 estados de prévia e o texto novo P6; galeria local, sem Artifact). No `sem-jogadores`
+da t09 fica "Cadastrar jogadores", como na tela atual.
 
 Conforma com AD-001 a AD-015. Decisões do usuário nesta fase (2026-10-30): eventos públicos por função
 `SECURITY DEFINER` (D1) e cálculo no domínio puro, na leitura (D2). Também (D3 a D6): o `grupo_criar` antigo delega ao novo

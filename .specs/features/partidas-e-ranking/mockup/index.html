@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup de partidas e ranking</title>
+<link rel="stylesheet" href="../../../mockup/fontes/fontes.css">
+<link rel="stylesheet" href="../../../mockup/tokens.css">
+<link rel="stylesheet" href="../../../mockup/base.css">
+<style>
+/* Só a moldura da galeria; as telas usam tokens.css e base.css do projeto. */
+.galeria{max-width:1600px;margin:0 auto;padding:var(--esp-4) var(--esp-4) var(--esp-12)}
+.amostra{display:flex;flex-wrap:wrap;gap:var(--esp-6);align-items:flex-start;margin:var(--esp-3) 0 var(--esp-6)}
+.amostra figure{margin:0;max-width:100%;overflow-x:auto}
+.amostra figcaption{font-size:var(--texto-sm);color:var(--cor-texto-sec);margin-bottom:var(--esp-1)}
+.cel{width:390px;height:844px;border:var(--esp-2) solid var(--cor-texto);border-radius:var(--raio);overflow:hidden;background:var(--cor-superficie)}
+.cel--atual{border-color:var(--cor-contorno);border-style:dashed}
+.cel iframe{width:374px;height:828px;border:0;display:block}
+.pc{width:720px;height:450px;border:1px solid var(--cor-linha);border-radius:var(--raio);overflow:hidden;background:var(--cor-superficie)}
+.pc iframe{width:1440px;height:900px;border:0;transform:scale(.5);transform-origin:0 0;display:block}
+.estado{font-size:var(--texto-lg);margin:var(--esp-6) 0 0}
+.estados a{display:inline-block;margin:0 var(--esp-1) var(--esp-1) 0;padding:2px var(--esp-2);border:1px solid var(--cor-contorno);border-radius:var(--raio-pilula);color:var(--cor-texto);text-decoration:none;font-size:var(--texto-sm)}
+</style>
+</head>
+<body>
+<main class="galeria">
+  <h1 class="titulo-pagina">Partidas e ranking: telas do módulo</h1>
+  <p class="paragrafo">Mockup do módulo, aguardando aprovação. As telas usam só os tokens e as classes do guia do projeto; nenhum token novo. Em cada estado, a moldura tracejada é a tela atual e as outras duas são a nova, em celular (390) e PC (1440, em 50%). Dados: grupo “Pelada de Quinta”, hoje = 22/10/2026. <strong>O que muda:</strong> a t09 ganha “Dia de jogo”, Partidas, Pontuação e Uso do app, sem Simulador e Financeiro (P9); a t11 <code>nova</code> perde o aviso de pré-marcação pela escalação; a ficha do jogador (t16) volta com as prévias de reativar, correção de períodos e data de início, com o texto novo do diálogo de reativar (P6, PAR-159).</p>
+  <p class="paragrafo"><strong>Seguem o mockup do projeto sem mudança:</strong> <a href="../../../mockup/telas/t01-ranking--sucesso.html">t01</a> (todos os estados; o atalho Financeiro fica mascarado na comparação), <a href="../../../mockup/telas/t03-indisponivel--erro.html">t03</a>, <a href="../../../mockup/telas/t10-partidas--sucesso.html">t10</a>, os outros estados da <a href="../../../mockup/telas/t11-partida--edicao.html">t11</a>, <a href="../../../mockup/telas/t18-pontuacao--sucesso.html">t18</a>, <a href="../../../mockup/telas/t21-uso--sucesso.html">t21</a> e <a href="../../../mockup/telas/p01-pdf--sucesso.html">P01</a>.</p>
+  <p class="paragrafo">Na integração, a pasta <code>telas/</code> é promovida para <code>.specs/mockup/telas/</code> (os caminhos <code>../../../../mockup/</code> e <code>../../../grupos-e-elenco/mockup/telas/</code> viram <code>../</code> e <code>./</code>), substituindo os estados de mesmo nome, inclusive as t09 da grupos-e-elenco, e a galeria do projeto recebe as telas.</p>
+  <section class="secao" aria-label="T09 Início do grupo">
+    <h2 class="subtitulo sem-topo">T09 Início do grupo</h2>
+    <p class="paragrafo">Muda: o bloco “Dia de jogo” com “Lançar partida de qui, 22/10”, “Partidas” (“3 em outubro” / “Nenhuma em outubro”), “Pontuação” (“Vigente desde 01/09/2026” ou “Pesos padrão”, abre a t18) e “Uso do app” (“Esta semana: 12 aparelhos” ou “Sem uso registrado”, abre a t21). Sem o botão “Simulador” e sem o item “Financeiro”, por decisão P9; o ícone do ranking no cabeçalho abre a t01. Substitui as t09 do mockup da grupos-e-elenco. A moldura tracejada é a t09 vigente (a da grupos-e-elenco). Sem jogadores, a tela mantém o pedido de cadastro da t09 atual do projeto. Cobre PAR-132 a PAR-136 e PAR-160.</p>
+    <p class="estados"><a href="telas/t09-inicio--sucesso.html">sucesso</a><a href="telas/t09-inicio--sem-jogadores.html">sem jogadores</a></p>
+    <h3 class="estado">t09-inicio--sucesso <span class="texto-sec">· Dia de jogo, Partidas, Pontuação e Uso do app.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t09-inicio--sucesso, celular · <a href="../../grupos-e-elenco/mockup/telas/t09-inicio--sucesso.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../grupos-e-elenco/mockup/telas/t09-inicio--sucesso.html" title="Atual: t09-inicio--sucesso, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: sucesso, celular · <a href="telas/t09-inicio--sucesso.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t09-inicio--sucesso.html" title="Nova: sucesso, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: sucesso, PC (50%) · <a href="telas/t09-inicio--sucesso.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t09-inicio--sucesso.html" title="Nova: sucesso, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t09-inicio--sem-jogadores <span class="texto-sec">· Grupo recém-criado: “Cadastrar jogadores”, “Nenhuma em outubro”, “Pesos padrão”, “Sem uso registrado”.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t09-inicio--sem-jogadores, celular · <a href="../../grupos-e-elenco/mockup/telas/t09-inicio--sem-jogadores.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../grupos-e-elenco/mockup/telas/t09-inicio--sem-jogadores.html" title="Atual: t09-inicio--sem-jogadores, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: sem jogadores, celular · <a href="telas/t09-inicio--sem-jogadores.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t09-inicio--sem-jogadores.html" title="Nova: sem jogadores, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: sem jogadores, PC (50%) · <a href="telas/t09-inicio--sem-jogadores.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t09-inicio--sem-jogadores.html" title="Nova: sem jogadores, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+  </section>
+  <section class="secao" aria-label="T11 Lançar partida">
+    <h2 class="subtitulo sem-topo">T11 Lançar partida</h2>
+    <p class="paragrafo">Muda só uma coisa: sai o aviso “Pré-marcado pela escalação”, porque a pré-marcação (RF-26) é da feature simulador. Todo o resto é a t11 atual do projeto. Os outros estados (edição, carregando, vazio, data futura, duplicada, erro ao salvar, excluir) seguem sem mudança.</p>
+    <p class="estados"><a href="telas/t11-partida--nova.html">nova</a></p>
+    <h3 class="estado">t11-partida--nova <span class="texto-sec">· Lançamento na data de hoje, sem o aviso de escalação.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t11-partida--nova, celular · <a href="../../../mockup/telas/t11-partida--nova.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t11-partida--nova.html" title="Atual: t11-partida--nova, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: nova, celular · <a href="telas/t11-partida--nova.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t11-partida--nova.html" title="Nova: nova, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: nova, PC (50%) · <a href="telas/t11-partida--nova.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t11-partida--nova.html" title="Nova: nova, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+  </section>
+  <section class="secao" aria-label="T16 Ficha do jogador">
+    <h2 class="subtitulo sem-topo">T16 Ficha do jogador, com as prévias</h2>
+    <p class="paragrafo">Parte da t16 do legado, que já tem as prévias, mais o que a grupos-e-elenco mudou na ficha (data de início em texto, “Sem nota”). Em todos os estados vale o texto novo do diálogo de reativar (P6): “Volta a aparecer no ranking e nas partidas; a data de início não muda.” Onde a tela vigente da grupos-e-elenco existe para o estado, a moldura tracejada é ela; senão, é a do projeto. Os textos das prévias foram conferidos contra PAR-116 a PAR-121 e batem; o único texto que muda é o de PAR-159. Revisão manual. Cobre PAR-109 a PAR-121 e PAR-159.</p>
+    <p class="estados"><a href="telas/t16-jogador--inativo.html">inativo</a><a href="telas/t16-jogador--reativar.html">reativar</a><a href="telas/t16-jogador--reativar-previa.html">reativar: previa</a><a href="telas/t16-jogador--reativar-calculando.html">reativar: calculando</a><a href="telas/t16-jogador--reativar-erro.html">reativar: erro</a><a href="telas/t16-jogador--reativar-erro-rede.html">reativar: erro-rede</a><a href="telas/t16-jogador--reativado.html">reativado</a><a href="telas/t16-jogador--corrigir-previa.html">corrigir: previa</a><a href="telas/t16-jogador--corrigir-calculando.html">corrigir: calculando</a><a href="telas/t16-jogador--corrigir-erro-rede.html">corrigir: erro-rede</a><a href="telas/t16-jogador--corrigido.html">corrigido</a><a href="telas/t16-jogador--inicio-recuar.html">inicio: recuar</a><a href="telas/t16-jogador--inicio-avancar.html">inicio: avancar</a><a href="telas/t16-jogador--inicio-calculando.html">inicio: calculando</a><a href="telas/t16-jogador--inicio-erro-rede.html">inicio: erro-rede</a></p>
+    <h3 class="estado">t16-jogador--inativo <span class="texto-sec">· Beto inativo: data de início em texto com “Alterar data de início”, “Sem nota”, “Reativar”. Parte da ficha vigente da grupos-e-elenco.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t16-jogador--inativo, celular · <a href="../../grupos-e-elenco/mockup/telas/t16-jogador--inativo.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../grupos-e-elenco/mockup/telas/t16-jogador--inativo.html" title="Atual: t16-jogador--inativo, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: inativo, celular · <a href="telas/t16-jogador--inativo.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--inativo.html" title="Nova: inativo, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: inativo, PC (50%) · <a href="telas/t16-jogador--inativo.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t16-jogador--inativo.html" title="Nova: inativo, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t16-jogador--reativar <span class="texto-sec">· Diálogo de reativar, retorno de hoje, sem prévia. Texto novo (P6, PAR-159): “a data de início não muda.”</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t16-jogador--reativar, celular · <a href="../../grupos-e-elenco/mockup/telas/t16-jogador--reativar.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../grupos-e-elenco/mockup/telas/t16-jogador--reativar.html" title="Atual: t16-jogador--reativar, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: reativar, celular · <a href="telas/t16-jogador--reativar.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--reativar.html" title="Nova: reativar, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: reativar, PC (50%) · <a href="telas/t16-jogador--reativar.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t16-jogador--reativar.html" title="Nova: reativar, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t16-jogador--reativar-previa <span class="texto-sec">· Retorno retroativo (07/10) com a prévia pronta: acumulado, posição, rodadas e aviso (PAR-109, PAR-116 a PAR-118).</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t16-jogador--reativar-previa, celular · <a href="../../../mockup/telas/t16-jogador--reativar-previa.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t16-jogador--reativar-previa.html" title="Atual: t16-jogador--reativar-previa, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: reativar: previa, celular · <a href="telas/t16-jogador--reativar-previa.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--reativar-previa.html" title="Nova: reativar: previa, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: reativar: previa, PC (50%) · <a href="telas/t16-jogador--reativar-previa.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t16-jogador--reativar-previa.html" title="Nova: reativar: previa, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t16-jogador--reativar-calculando <span class="texto-sec">· “Calculando…” e “Reativar” desabilitado (PAR-120).</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t16-jogador--reativar-calculando, celular · <a href="../../../mockup/telas/t16-jogador--reativar-calculando.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t16-jogador--reativar-calculando.html" title="Atual: t16-jogador--reativar-calculando, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: reativar: calculando, celular · <a href="telas/t16-jogador--reativar-calculando.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--reativar-calculando.html" title="Nova: reativar: calculando, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: reativar: calculando, PC (50%) · <a href="telas/t16-jogador--reativar-calculando.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t16-jogador--reativar-calculando.html" title="Nova: reativar: calculando, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t16-jogador--reativar-erro <span class="texto-sec">· 422: retorno antes da saída anterior (PAR-112).</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t16-jogador--reativar-erro, celular · <a href="../../grupos-e-elenco/mockup/telas/t16-jogador--reativar-erro.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../grupos-e-elenco/mockup/telas/t16-jogador--reativar-erro.html" title="Atual: t16-jogador--reativar-erro, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: reativar: erro, celular · <a href="telas/t16-jogador--reativar-erro.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--reativar-erro.html" title="Nova: reativar: erro, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: reativar: erro, PC (50%) · <a href="telas/t16-jogador--reativar-erro.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t16-jogador--reativar-erro.html" title="Nova: reativar: erro, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t16-jogador--reativar-erro-rede <span class="texto-sec">· Falha de rede na prévia ou na gravação, com “Tentar de novo”.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t16-jogador--reativar-erro-rede, celular · <a href="../../../mockup/telas/t16-jogador--reativar-erro-rede.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t16-jogador--reativar-erro-rede.html" title="Atual: t16-jogador--reativar-erro-rede, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: reativar: erro-rede, celular · <a href="telas/t16-jogador--reativar-erro-rede.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--reativar-erro-rede.html" title="Nova: reativar: erro-rede, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: reativar: erro-rede, PC (50%) · <a href="telas/t16-jogador--reativar-erro-rede.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t16-jogador--reativar-erro-rede.html" title="Nova: reativar: erro-rede, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t16-jogador--reativado <span class="texto-sec">· “Beto reativado desde 07/10/2026.” e a faixa “2 rodadas passaram a constar: 08/10 e 15/10. Elas valem 0 ponto até você lançar a presença em Editar partida.” (PAR-121). A grupos-e-elenco tirou essa faixa; volta aqui.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t16-jogador--reativado, celular · <a href="../../grupos-e-elenco/mockup/telas/t16-jogador--reativado.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../grupos-e-elenco/mockup/telas/t16-jogador--reativado.html" title="Atual: t16-jogador--reativado, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: reativado, celular · <a href="telas/t16-jogador--reativado.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--reativado.html" title="Nova: reativado, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: reativado, PC (50%) · <a href="telas/t16-jogador--reativado.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t16-jogador--reativado.html" title="Nova: reativado, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t16-jogador--corrigir-previa <span class="texto-sec">· Corrigir o retorno de Gil (20/10 para 12/10), prévia pronta (PAR-110, PAR-117, PAR-118).</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t16-jogador--corrigir-previa, celular · <a href="../../../mockup/telas/t16-jogador--corrigir-previa.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t16-jogador--corrigir-previa.html" title="Atual: t16-jogador--corrigir-previa, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: corrigir: previa, celular · <a href="telas/t16-jogador--corrigir-previa.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--corrigir-previa.html" title="Nova: corrigir: previa, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: corrigir: previa, PC (50%) · <a href="telas/t16-jogador--corrigir-previa.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t16-jogador--corrigir-previa.html" title="Nova: corrigir: previa, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t16-jogador--corrigir-calculando <span class="texto-sec">· “Calculando…” e “Confirmar novas datas” desabilitado (PAR-120).</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t16-jogador--corrigir-calculando, celular · <a href="../../../mockup/telas/t16-jogador--corrigir-calculando.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t16-jogador--corrigir-calculando.html" title="Atual: t16-jogador--corrigir-calculando, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: corrigir: calculando, celular · <a href="telas/t16-jogador--corrigir-calculando.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--corrigir-calculando.html" title="Nova: corrigir: calculando, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: corrigir: calculando, PC (50%) · <a href="telas/t16-jogador--corrigir-calculando.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t16-jogador--corrigir-calculando.html" title="Nova: corrigir: calculando, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t16-jogador--corrigir-erro-rede <span class="texto-sec">· Falha de rede na prévia ou na gravação.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t16-jogador--corrigir-erro-rede, celular · <a href="../../../mockup/telas/t16-jogador--corrigir-erro-rede.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t16-jogador--corrigir-erro-rede.html" title="Atual: t16-jogador--corrigir-erro-rede, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: corrigir: erro-rede, celular · <a href="telas/t16-jogador--corrigir-erro-rede.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--corrigir-erro-rede.html" title="Nova: corrigir: erro-rede, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: corrigir: erro-rede, PC (50%) · <a href="telas/t16-jogador--corrigir-erro-rede.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t16-jogador--corrigir-erro-rede.html" title="Nova: corrigir: erro-rede, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t16-jogador--corrigido <span class="texto-sec">· “Datas corrigidas.” e a faixa “1 rodada passou a constar: 15/10. Ela vale 0 ponto até você lançar a presença em Editar partida.” (PAR-121). A grupos-e-elenco tirou a faixa; volta aqui.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t16-jogador--corrigido, celular · <a href="../../grupos-e-elenco/mockup/telas/t16-jogador--corrigido.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../grupos-e-elenco/mockup/telas/t16-jogador--corrigido.html" title="Atual: t16-jogador--corrigido, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: corrigido, celular · <a href="telas/t16-jogador--corrigido.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--corrigido.html" title="Nova: corrigido, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: corrigido, PC (50%) · <a href="telas/t16-jogador--corrigido.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t16-jogador--corrigido.html" title="Nova: corrigido, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t16-jogador--inicio-recuar <span class="texto-sec">· Alterar data de início, recuando: “Acumulado de 18 pontos passa a 24; posição de 5 para 3. 2 rodadas passam a constar.” (PAR-119).</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t16-jogador--inicio, celular · <a href="../../grupos-e-elenco/mockup/telas/t16-jogador--inicio.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../grupos-e-elenco/mockup/telas/t16-jogador--inicio.html" title="Atual: t16-jogador--inicio, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: inicio: recuar, celular · <a href="telas/t16-jogador--inicio-recuar.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--inicio-recuar.html" title="Nova: inicio: recuar, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: inicio: recuar, PC (50%) · <a href="telas/t16-jogador--inicio-recuar.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t16-jogador--inicio-recuar.html" title="Nova: inicio: recuar, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t16-jogador--inicio-avancar <span class="texto-sec">· Alterar data de início, avançando: “Acumulado de 18 pontos passa a 11; posição de 5 para 7.”</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t16-jogador--inicio-avancar, celular · <a href="../../../mockup/telas/t16-jogador--inicio-avancar.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t16-jogador--inicio-avancar.html" title="Atual: t16-jogador--inicio-avancar, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: inicio: avancar, celular · <a href="telas/t16-jogador--inicio-avancar.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--inicio-avancar.html" title="Nova: inicio: avancar, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: inicio: avancar, PC (50%) · <a href="telas/t16-jogador--inicio-avancar.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t16-jogador--inicio-avancar.html" title="Nova: inicio: avancar, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t16-jogador--inicio-calculando <span class="texto-sec">· “Calculando…” e “Confirmar nova data” desabilitado.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t16-jogador--inicio-calculando, celular · <a href="../../../mockup/telas/t16-jogador--inicio-calculando.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t16-jogador--inicio-calculando.html" title="Atual: t16-jogador--inicio-calculando, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: inicio: calculando, celular · <a href="telas/t16-jogador--inicio-calculando.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--inicio-calculando.html" title="Nova: inicio: calculando, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: inicio: calculando, PC (50%) · <a href="telas/t16-jogador--inicio-calculando.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t16-jogador--inicio-calculando.html" title="Nova: inicio: calculando, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+    <h3 class="estado">t16-jogador--inicio-erro-rede <span class="texto-sec">· Falha de rede na prévia da data de início.</span></h3>
+    <div class="amostra">
+      <figure><figcaption>Atual: t16-jogador--inicio-erro-rede, celular · <a href="../../../mockup/telas/t16-jogador--inicio-erro-rede.html">abrir</a></figcaption><div class="cel cel--atual"><iframe src="../../../mockup/telas/t16-jogador--inicio-erro-rede.html" title="Atual: t16-jogador--inicio-erro-rede, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: inicio: erro-rede, celular · <a href="telas/t16-jogador--inicio-erro-rede.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--inicio-erro-rede.html" title="Nova: inicio: erro-rede, celular" loading="lazy"></iframe></div></figure>
+      <figure><figcaption>Nova: inicio: erro-rede, PC (50%) · <a href="telas/t16-jogador--inicio-erro-rede.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t16-jogador--inicio-erro-rede.html" title="Nova: inicio: erro-rede, PC (50%)" loading="lazy"></iframe></div></figure>
+    </div>
+  </section>
+</main>
+</body>
+</html>
