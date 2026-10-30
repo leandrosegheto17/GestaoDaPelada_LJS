@@ -277,3 +277,76 @@ describe('habilidades.ler (GEL-96)', () => {
     expect(await como(c.conta, (db) => habilidades.ler(db, c.grupo, outro.habilidades[1]!))).toBeNull();
   });
 });
+
+describe('auditoria de criar e renomear habilidade (T81; SEC-008)', () => {
+  /** Troca a auditoria da ação por uma que falha, roda `acao` e desfaz a troca. */
+  async function comAuditoriaFalhando(acaoAuditada: string, acao: () => Promise<unknown>): Promise<void> {
+    await b.owner.query(`
+      CREATE FUNCTION auditoria_falha_hab() RETURNS trigger LANGUAGE plpgsql AS
+      $$ BEGIN RAISE EXCEPTION 'auditoria fora do ar'; END $$;
+      CREATE TRIGGER auditoria_falha_hab BEFORE INSERT ON auditoria
+        FOR EACH ROW WHEN (NEW.acao = '${acaoAuditada}') EXECUTE FUNCTION auditoria_falha_hab();
+    `);
+    try {
+      await expect(acao()).rejects.toThrow('auditoria fora do ar');
+    } finally {
+      await b.owner.query('DROP TRIGGER auditoria_falha_hab ON auditoria; DROP FUNCTION auditoria_falha_hab();');
+    }
+  }
+
+  it('criar grava habilidade_criada com o id da nova, sem o nome', async () => {
+    const c = await novoCenario();
+    const r = await como(c.conta, (db) => habilidades.criar(db, c.grupo, 'Cabeceio Secreto'));
+    if (!r.ok) throw new Error('criar recusou');
+    expect(await auditoriaDe(c.grupo, 'habilidade_criada')).toEqual([
+      { autor_conta_id: c.conta, entidade: 'habilidade', entidade_id: r.id, resumo: {} },
+    ]);
+  });
+
+  it('renomear grava habilidade_renomeada com o id e a indicação de nome alterado, sem o nome antigo nem o novo', async () => {
+    const c = await novoCenario();
+    const drible = c.habilidades[3]!;
+    expect(await como(c.conta, (db) => habilidades.renomear(db, c.grupo, drible, 'Drible Secreto'))).toEqual({
+      ok: true,
+    });
+    expect(await auditoriaDe(c.grupo, 'habilidade_renomeada')).toEqual([
+      { autor_conta_id: c.conta, entidade: 'habilidade', entidade_id: drible, resumo: { campos: ['nome'] } },
+    ]);
+    const { rows } = await b.owner.query('SELECT resumo FROM auditoria WHERE grupo_id = $1', [c.grupo]);
+    expect(JSON.stringify(rows)).not.toContain('Drible');
+  });
+
+  it('renomear para o mesmo nome não grava evento; trocar só a caixa grava', async () => {
+    const c = await novoCenario();
+    const passe = c.habilidades[1]!;
+    await como(c.conta, (db) => habilidades.renomear(db, c.grupo, passe, 'Passe'));
+    expect(await auditoriaDe(c.grupo, 'habilidade_renomeada')).toEqual([]);
+    await como(c.conta, (db) => habilidades.renomear(db, c.grupo, passe, 'PASSE'));
+    expect(await auditoriaDe(c.grupo, 'habilidade_renomeada')).toHaveLength(1);
+  });
+
+  it('criar ou renomear recusado (nome repetido) ou de outro grupo não deixa evento', async () => {
+    const c = await novoCenario();
+    const outro = await novoCenario();
+    expect(await como(c.conta, (db) => habilidades.criar(db, c.grupo, 'drible'))).toEqual(REPETIDO);
+    expect(await como(c.conta, (db) => habilidades.renomear(db, c.grupo, c.habilidades[0]!, 'CHUTE'))).toEqual(
+      REPETIDO,
+    );
+    expect(await como(c.conta, (db) => habilidades.renomear(db, c.grupo, outro.habilidades[0]!, 'Hack'))).toBeNull();
+    for (const g of [c.grupo, outro.grupo]) {
+      expect(await auditoriaDe(g, 'habilidade_criada')).toEqual([]);
+      expect(await auditoriaDe(g, 'habilidade_renomeada')).toEqual([]);
+    }
+  });
+
+  it('auditoria na mesma transação: se ela falha, a habilidade não é criada nem renomeada', async () => {
+    const c = await novoCenario();
+    await comAuditoriaFalhando('habilidade_criada', () =>
+      como(c.conta, (db) => habilidades.criar(db, c.grupo, 'Cabeceio')),
+    );
+    await comAuditoriaFalhando('habilidade_renomeada', () =>
+      como(c.conta, (db) => habilidades.renomear(db, c.grupo, c.habilidades[0]!, 'Visão')),
+    );
+    expect(await nomesNoBanco(c.grupo)).toEqual(INICIAIS);
+  });
+});

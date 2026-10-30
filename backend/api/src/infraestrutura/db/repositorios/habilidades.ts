@@ -50,26 +50,32 @@ export async function ler(db: Db, grupoId: string, habilidadeId: string): Promis
 
 /**
  * Cria a habilidade no fim da ordem (GEL-89). Nome repetido sem caixa é recusado pela consulta e, na corrida que
- * passar dela, pelo índice único (23505), com a mesma recusa (GEL-91).
+ * passar dela, pelo índice único (23505), com a mesma recusa (GEL-91). Audita `habilidade_criada` só com o id
+ * (SEC-008, GEL-113; SPEC_DEVIATION da T81: sem o nome, por decisão do usuário de 2026-10-30).
  */
 export async function criar(db: Db, grupoId: string, nome: string): Promise<{ ok: true; id: string } | Recusa<'nome'>> {
   if (await nomeEmUso(db, grupoId, nome)) return nomeRepetido;
+  let id: string;
   try {
     const linha = await db
       .insertInto('habilidades')
       .values({ grupo_id: grupoId, nome })
       .returning('id')
       .executeTakeFirstOrThrow();
-    return { ok: true, id: linha.id };
+    id = linha.id;
   } catch (erro) {
     if (violouNome(erro)) return nomeRepetido;
     throw erro;
   }
+  await auditoria.registrar(db, grupoId, 'habilidade_criada', 'habilidade', id);
+  return { ok: true, id };
 }
 
 /**
  * Renomeia a habilidade (GEL-92): só o nome muda; as notas e a posição na ordem continuam. A própria habilidade não
- * conta como repetida (trocar só a caixa é aceito). De outro grupo: nulo (GEL-96).
+ * conta como repetida (trocar só a caixa é aceito). De outro grupo: nulo (GEL-96). Nome diferente (inclusive só na
+ * caixa) audita `habilidade_renomeada` com `{ campos: ['nome'] }`, sem o nome antigo nem o novo (SEC-008, GEL-113;
+ * SPEC_DEVIATION da T81, por decisão do usuário de 2026-10-30).
  */
 export async function renomear(
   db: Db,
@@ -77,7 +83,8 @@ export async function renomear(
   habilidadeId: string,
   nome: string,
 ): Promise<{ ok: true } | Recusa<'nome'> | null> {
-  if (!(await ler(db, grupoId, habilidadeId))) return null;
+  const atual = await ler(db, grupoId, habilidadeId);
+  if (!atual) return null;
   if (await nomeEmUso(db, grupoId, nome, habilidadeId)) return nomeRepetido;
   try {
     await db
@@ -89,6 +96,9 @@ export async function renomear(
   } catch (erro) {
     if (violouNome(erro)) return nomeRepetido;
     throw erro;
+  }
+  if (nome !== atual.nome) {
+    await auditoria.registrar(db, grupoId, 'habilidade_renomeada', 'habilidade', habilidadeId, { campos: ['nome'] });
   }
   return { ok: true };
 }

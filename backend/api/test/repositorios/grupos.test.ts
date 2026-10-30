@@ -277,3 +277,69 @@ describe('grupos.reativar (GEL-24, GEL-28, GEL-29)', () => {
     expect(await como(outra, (db) => grupos.reativar(db, g.id))).toBe('so_quem_criou');
   });
 });
+
+describe('grupos.editar audita grupo_editado (T81; SEC-008)', () => {
+  const editados = async (grupoId: string) =>
+    (
+      await b.owner.query<{ autor_conta_id: string; entidade: string; entidade_id: string; resumo: unknown }>(
+        "SELECT autor_conta_id, entidade, entidade_id, resumo FROM auditoria WHERE grupo_id = $1 AND acao = 'grupo_editado'",
+        [grupoId],
+      )
+    ).rows;
+
+  it('renomear grava um evento com o id e a indicação de nome alterado, sem o nome antigo nem o novo', async () => {
+    const conta = await novaConta();
+    const g = await criarGrupo(conta, 'Nome Antigo Secreto');
+    expect(await como(conta, (db) => grupos.editar(db, g.id, { ...DADOS, nome: 'Nome Novo Secreto' }))).toBe(true);
+    expect(await editados(g.id)).toEqual([
+      { autor_conta_id: conta, entidade: 'grupo', entidade_id: g.id, resumo: { campos: ['nome'] } },
+    ]);
+    const { rows } = await b.owner.query('SELECT resumo FROM auditoria WHERE grupo_id = $1', [g.id]);
+    expect(JSON.stringify(rows)).not.toContain('Secreto');
+  });
+
+  it('trocar só a caixa do nome também conta como renomear', async () => {
+    const conta = await novaConta();
+    const g = await criarGrupo(conta, 'Pelada Caixa');
+    expect(await como(conta, (db) => grupos.editar(db, g.id, { ...DADOS, nome: 'PELADA CAIXA' }))).toBe(true);
+    expect(await editados(g.id)).toHaveLength(1);
+  });
+
+  it('editar sem trocar o nome (só dia, frequência ou horário, ou nada) não grava grupo_editado', async () => {
+    const conta = await novaConta();
+    const g = await criarGrupo(conta, 'Pelada Fixa');
+    await como(conta, (db) => grupos.editar(db, g.id, { ...DADOS, nome: 'Pelada Fixa' }));
+    await como(conta, (db) =>
+      grupos.editar(db, g.id, { nome: 'Pelada Fixa', diaSemana: 'sabado', frequencia: 'mensal', horario: '08:00' }),
+    );
+    expect(await editados(g.id)).toEqual([]);
+  });
+
+  it('sem vínculo: false e nenhum evento', async () => {
+    const conta = await novaConta();
+    const g = await criarGrupo(conta, 'Pelada Alheia');
+    expect(await como(await novaConta(), (db) => grupos.editar(db, g.id, { ...DADOS, nome: 'Hack' }))).toBe(false);
+    expect(await editados(g.id)).toEqual([]);
+  });
+
+  it('auditoria na mesma transação: se ela falha, o nome não muda', async () => {
+    const conta = await novaConta();
+    const g = await criarGrupo(conta, 'Pelada Firme');
+    await b.owner.query(`
+      CREATE FUNCTION auditoria_falha_grupo() RETURNS trigger LANGUAGE plpgsql AS
+      $$ BEGIN RAISE EXCEPTION 'auditoria fora do ar'; END $$;
+      CREATE TRIGGER auditoria_falha_grupo BEFORE INSERT ON auditoria
+        FOR EACH ROW WHEN (NEW.acao = 'grupo_editado') EXECUTE FUNCTION auditoria_falha_grupo();
+    `);
+    try {
+      await expect(como(conta, (db) => grupos.editar(db, g.id, { ...DADOS, nome: 'Pelada Mole' }))).rejects.toThrow(
+        'auditoria fora do ar',
+      );
+    } finally {
+      await b.owner.query('DROP TRIGGER auditoria_falha_grupo ON auditoria; DROP FUNCTION auditoria_falha_grupo();');
+    }
+    expect((await b.owner.query('SELECT nome FROM grupos WHERE id = $1', [g.id])).rows).toEqual([
+      { nome: 'Pelada Firme' },
+    ]);
+  });
+});

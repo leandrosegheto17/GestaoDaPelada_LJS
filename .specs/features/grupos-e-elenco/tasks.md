@@ -2383,9 +2383,9 @@ T76 → T77 → T78 → T79 → T80 → T81 → T82 → T83
 
 **Done when**:
 
-- [ ] Renomear grupo, criar habilidade e renomear habilidade gravam um evento cada, com nome antigo e novo
-- [ ] Operação que falha não deixa evento
-- [ ] Gate full passa
+- [x] Renomear grupo, criar habilidade e renomear habilidade gravam um evento cada, com nome antigo e novo
+- [x] Operação que falha não deixa evento
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full

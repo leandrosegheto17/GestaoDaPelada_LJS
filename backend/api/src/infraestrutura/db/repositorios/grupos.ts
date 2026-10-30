@@ -127,14 +127,31 @@ export async function ler(db: Db, grupoId: string): Promise<GrupoLido | null> {
   };
 }
 
-/** Grava os dados editáveis (GEL-18). O slug não muda (GEL-16). `false` se o grupo não é visível. */
+/**
+ * Grava os dados editáveis (GEL-18). O slug não muda (GEL-16). `false` se o grupo não é visível. Renomear (inclusive
+ * trocar só a caixa) audita `grupo_editado` na mesma transação, com `{ campos: ['nome'] }` e sem o nome antigo nem o
+ * novo (SEC-008, GEL-113). SPEC_DEVIATION: a T81 pede o nome antigo e o novo no evento; o usuário decidiu
+ * (2026-10-30) manter a GEL-113 (só ids e nomes de campo fixos na auditoria).
+ * A leitura do nome atual trava a linha com FOR NO KEY UPDATE, que não conflita com o FOR KEY SHARE do exigirGrupoAtivo.
+ */
 export async function editar(db: Db, grupoId: string, dados: DadosGrupo): Promise<boolean> {
+  const atual = await db
+    .selectFrom('grupos')
+    .select('nome')
+    .where('id', '=', grupoId)
+    .forNoKeyUpdate()
+    .executeTakeFirst();
+  if (!atual) return false;
   const r = await db
     .updateTable('grupos')
     .set({ nome: dados.nome, dia_semana: dados.diaSemana, frequencia: dados.frequencia, horario: dados.horario })
     .where('id', '=', grupoId)
     .executeTakeFirst();
-  return r.numUpdatedRows > 0n;
+  if (r.numUpdatedRows === 0n) return false;
+  if (dados.nome !== atual.nome) {
+    await auditoria.registrar(db, grupoId, 'grupo_editado', 'grupo', grupoId, { campos: ['nome'] });
+  }
+  return true;
 }
 
 export type ResultadoArquivamento = 'ok' | 'sem_mudanca' | 'nao_encontrado' | 'so_quem_criou' | 'nome_nao_confere';
