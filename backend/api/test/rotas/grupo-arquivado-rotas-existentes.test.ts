@@ -45,23 +45,26 @@ async function grupoArquivado(): Promise<{ s: SessaoDeTeste; grupo: string; outr
 }
 
 describe('rotas de admins e convites no grupo arquivado (GEL-26)', () => {
-  it('escritas → 409 grupo_arquivado e nada muda; GET responde como antes', async () => {
+  // Alterado com aprovação do usuário em 2026-10-30 por causa do SEC-004 (T76): cancelar o convite pendente deixou de
+  // ser barrado no grupo arquivado (204, e o convite sai da lista); convidar e remover admin continuam 409.
+  it('escritas → 409 grupo_arquivado e nada muda, menos cancelar convite (204); GET responde como antes', async () => {
     const { s, grupo, outra, convite } = await grupoArquivado();
     const raiz = `/api/grupos/${grupo}/admins`;
 
     const convidar = await pedir('POST', `${raiz}/convites`, { email: 'novo@exemplo.com' }, { cookie: s.cookie });
-    const cancelar = await pedir('DELETE', `${raiz}/convites/${convite}`, undefined, { cookie: s.cookie });
     const remover = await pedir('DELETE', `${raiz}/${outra.contaId}`, undefined, { cookie: s.cookie });
-    for (const r of [convidar, cancelar, remover]) {
+    for (const r of [convidar, remover]) {
       expect(r.status).toBe(409);
       expect(r.corpo).toMatchObject({ erro: { codigo: 'grupo_arquivado' } });
     }
+    const cancelar = await pedir('DELETE', `${raiz}/convites/${convite}`, undefined, { cookie: s.cookie });
+    expect(cancelar.status).toBe(204);
 
     const lista = await pedir('GET', raiz, undefined, { cookie: s.cookie });
     expect(lista.status).toBe(200);
     const corpo = lista.corpo as { admins: { id: string }[]; convites: { id: string }[] };
     expect(corpo.admins.map((a) => a.id).sort()).toEqual([s.contaId, outra.contaId].sort());
-    expect(corpo.convites.map((c) => c.id)).toEqual([convite]);
+    expect(corpo.convites.map((c) => c.id)).toEqual([]);
     expect(
       await comoOwner("SELECT 1 FROM convites_admin WHERE grupo_id = $1 AND email = 'novo@exemplo.com'", [grupo]),
     ).toEqual([]);

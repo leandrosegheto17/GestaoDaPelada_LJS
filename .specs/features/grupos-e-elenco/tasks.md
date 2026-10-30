@@ -2246,11 +2246,11 @@ T76 → T77 → T78 → T79 → T80 → T81 → T82 → T83
 
 **Done when**:
 
-- [ ] Com o grupo arquivado, `convites/ler` e `convites/aceitar` não criam vínculo (resposta de convite indisponível)
-- [ ] `DELETE` do convite pendente de grupo arquivado responde 204 para a criadora
-- [ ] Reativado o grupo, o convite volta a valer
-- [ ] Migration nova roda do zero e sobre o banco atual; teste falha sem ela
-- [ ] Gate full passa
+- [x] Com o grupo arquivado, `convites/ler` e `convites/aceitar` não criam vínculo (resposta de convite indisponível)
+- [x] `DELETE` do convite pendente de grupo arquivado responde 204 para a criadora
+- [x] Reativado o grupo, o convite volta a valer
+- [x] Migration nova roda do zero e sobre o banco atual; teste falha sem ela
+- [x] Gate full passa
 
 **Tests**: integration (Postgres real) + e2e
 **Gate**: full

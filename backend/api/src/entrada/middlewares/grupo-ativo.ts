@@ -9,11 +9,18 @@ const LEITURAS = new Set(['GET', 'HEAD']);
  * (2026-10-29) que vale a GEL-29: a rota de arquivar é idempotente e não altera o grupo já arquivado.
  */
 const ESCRITAS_NO_ARQUIVADO = new Set(['reativar', 'arquivar']);
+/**
+ * Cancelar convite pendente (`DELETE admins/convites/:id`) também passa no grupo arquivado (T76; SEC-004): a criadora
+ * precisa revogar um convite enquanto o grupo está arquivado. Só um segmento depois de `convites/`; qualquer outro
+ * formato cai na checagem (falha fechada).
+ */
+const CANCELAR_CONVITE = /^admins\/convites\/[^/]+$/;
 
 /**
  * Barra a escrita no grupo arquivado (GEL-26, design C6): em `/api/grupos/:grupoId/*`, todo método que não é GET nem
  * HEAD recebe 409 `grupo_arquivado` se o grupo está arquivado, também para a conta criadora. As exceções são
- * `POST /api/grupos/:grupoId/reativar` e `POST /api/grupos/:grupoId/arquivar` (ver `ESCRITAS_NO_ARQUIVADO`). Vem depois do `exigirVinculo`: o grupo é visível (com a nova
+ * `POST /api/grupos/:grupoId/reativar` e `POST /api/grupos/:grupoId/arquivar` (ver `ESCRITAS_NO_ARQUIVADO`) e
+ * `DELETE /api/grupos/:grupoId/admins/convites/:id` (ver `CANCELAR_CONVITE`). Vem depois do `exigirVinculo`: o grupo é visível (com a nova
  * `grupos_visiveis()`, o arquivado só é visível à criadora). Só lê `arquivado_em`, na transação da rota.
  */
 export const exigirGrupoAtivo: MiddlewareHandler<AppEnv> = async (c, proximo) => {
@@ -22,6 +29,7 @@ export const exigirGrupoAtivo: MiddlewareHandler<AppEnv> = async (c, proximo) =>
   const prefixo = `/api/grupos/${grupoId}/`;
   const acao = c.req.path.startsWith(prefixo) ? c.req.path.slice(prefixo.length) : '';
   if (c.req.method === 'POST' && ESCRITAS_NO_ARQUIVADO.has(acao)) return proximo();
+  if (c.req.method === 'DELETE' && CANCELAR_CONVITE.test(acao)) return proximo();
   const grupo = await c.var.db
     .selectFrom('grupos')
     .select('arquivado_em')
