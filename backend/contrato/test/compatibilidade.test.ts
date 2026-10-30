@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
+import * as contrato from '../src/index.ts';
 import { comparar, formaDe, lerQuebras } from '../scripts/checar-compatibilidade';
 
 const RAIZ = resolve(import.meta.dirname, '..');
@@ -67,5 +68,40 @@ describe('script', () => {
     const r = rodar('--snapshot', arquivo);
     expect(r.status).not.toBe(0);
     expect(r.stderr).toContain('sessaoEu.telefone');
+  });
+});
+
+// Critério: AD-009 e G-20 na grupos-e-elenco: os schemas novos entram no snapshot, e perder um campo deles quebra.
+describe('snapshot da grupos-e-elenco', () => {
+  const lerSnapshot = () =>
+    JSON.parse(readFileSync(join(RAIZ, 'compatibilidade.json'), 'utf8')) as Record<string, Record<string, unknown>>;
+
+  it('todo schema exportado pelo contrato está no snapshot gravado', () => {
+    const snapshot = lerSnapshot();
+    expect(Object.keys(formaDe(contrato)).filter((nome) => !(nome in snapshot))).toEqual([]);
+  });
+
+  it.each([
+    ['grupoDetalhe', 'linkPublico'],
+    ['gruposResposta', 'arquivados[].horario'],
+    ['jogadorItem', 'semNota'],
+    ['jogadorDetalhe', 'periodos[].fim'],
+    ['corrigirPeriodoResposta', 'alterado'],
+    ['notaResposta', 'nivel'],
+  ])('o snapshot guarda %s.%s', (schema, campo) => {
+    expect(lerSnapshot()[schema]).toHaveProperty([campo]);
+  });
+
+  it('remover um campo de um schema novo faz o script falhar', () => {
+    const snapshot = lerSnapshot();
+    snapshot['jogadorItem']!['telefone'] = { tipo: 'string', obrigatorio: true };
+    const arquivo = join(mkdtempSync(join(tmpdir(), 'compat-')), 'snapshot.json');
+    writeFileSync(arquivo, JSON.stringify(snapshot));
+    const r = spawnSync(process.execPath, ['scripts/checar-compatibilidade.ts', '--snapshot', arquivo], {
+      cwd: RAIZ,
+      encoding: 'utf8',
+    });
+    expect(r.status).not.toBe(0);
+    expect(r.stderr).toContain('jogadorItem.telefone');
   });
 });

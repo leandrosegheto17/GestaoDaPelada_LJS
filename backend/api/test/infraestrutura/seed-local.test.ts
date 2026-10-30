@@ -172,3 +172,113 @@ describe('pnpm seed (FUN-05)', () => {
     expect(r.stdout).toBe('');
   });
 });
+
+describe('pnpm seed: grupo, elenco e notas da grupos-e-elenco (T52; GEL-01, GEL-46)', () => {
+  const doSeed = "grupo_id = (SELECT id FROM grupos WHERE slug = 'pelada-de-quinta')";
+
+  it('o grupo nasce pela grupo_criar: criado pela conta admin, com as 6 habilidades iniciais e grupo_criado', async () => {
+    expect(rodarSeed(banco.url).status).toBe(0);
+    const linhas = await comCliente(banco.url, async (c) => {
+      const grupo = await c.query<{ criadora: boolean; frequencia: string }>(
+        `SELECT g.criado_por = (SELECT id FROM contas WHERE email = 'admin@exemplo.com.br') AS criadora, g.frequencia
+           FROM grupos g WHERE g.slug = 'pelada-de-quinta'`,
+      );
+      const habilidades = await c.query<{ nome: string }>(
+        `SELECT nome FROM habilidades WHERE ${doSeed} ORDER BY ordem`,
+      );
+      const auditoria = await c.query<{ acao: string }>(
+        `SELECT acao FROM auditoria WHERE ${doSeed} AND acao = 'grupo_criado'`,
+      );
+      return { grupo: grupo.rows, habilidades: habilidades.rows.map((h) => h.nome), auditoria: auditoria.rows };
+    });
+    expect(linhas.grupo).toEqual([{ criadora: true, frequencia: 'semanal' }]);
+    expect(linhas.habilidades).toEqual(['Visão de Jogo', 'Passe', 'Preparo Físico', 'Drible', 'Chute', 'Desarme']);
+    expect(linhas.auditoria).toEqual([{ acao: 'grupo_criado' }]);
+  });
+
+  it('um jogador inativo com dois períodos encerrados; os outros ativos, cada um com um período aberto', async () => {
+    expect(rodarSeed(banco.url).status).toBe(0);
+    const porJogador = await comCliente(banco.url, async (c) => {
+      const { rows } = await c.query<{ apelido: string; abertos: string; encerrados: string; inicio: string | null }>(
+        `SELECT j.apelido, j.inicio_pontuacao::text AS inicio,
+                count(*) FILTER (WHERE p.fim IS NULL) AS abertos, count(*) FILTER (WHERE p.fim IS NOT NULL) AS encerrados
+           FROM jogadores j JOIN periodos_ativos p ON p.jogador_id = j.id
+          WHERE j.${doSeed}
+          GROUP BY j.apelido, j.inicio_pontuacao`,
+      );
+      return rows;
+    });
+    const inativos = porJogador.filter((j) => Number(j.abertos) === 0);
+    expect(inativos).toEqual([{ apelido: 'Zé Carlos', abertos: '0', encerrados: '2', inicio: '2026-10-01' }]);
+    const ativos = porJogador.filter((j) => Number(j.abertos) === 1);
+    expect(ativos).toHaveLength(19);
+    expect(ativos.every((j) => j.encerrados === '0' && j.inicio === '2026-10-01')).toBe(true);
+  });
+
+  it('notas: os 10 primeiros e o inativo têm nota em todas as habilidades; os outros ficam sem nota', async () => {
+    expect(rodarSeed(banco.url).status).toBe(0);
+    const { rows } = await comCliente(banco.url, (c) =>
+      c.query<{ apelido: string; n: string }>(
+        `SELECT j.apelido, count(n.valor) AS n FROM jogadores j LEFT JOIN notas n ON n.jogador_id = j.id
+          WHERE j.${doSeed} GROUP BY j.apelido`,
+      ),
+    );
+    const comNota = rows.filter((r) => r.n === '6').map((r) => r.apelido);
+    expect(comNota).toHaveLength(11);
+    expect(comNota).toContain('Zé Carlos');
+    expect(rows.filter((r) => r.n === '0')).toHaveLength(9);
+  });
+
+  it('o inativo não tem presença (nenhuma presença fora de um período)', async () => {
+    expect(rodarSeed(banco.url).status).toBe(0);
+    expect(
+      await contar(
+        banco.url,
+        `SELECT count(*) AS n FROM presencas pr JOIN partidas pa ON pa.id = pr.partida_id
+          WHERE NOT EXISTS (SELECT 1 FROM periodos_ativos p WHERE p.jogador_id = pr.jogador_id
+                              AND p.inicio <= pa.data AND (p.fim IS NULL OR pa.data < p.fim))`,
+      ),
+    ).toBe(0);
+    expect(
+      await contar(
+        banco.url,
+        "SELECT count(*) AS n FROM presencas pr JOIN jogadores j ON j.id = pr.jogador_id WHERE j.apelido = 'Zé Carlos'",
+      ),
+    ).toBe(0);
+  });
+
+  it('roda de novo depois de a conta admin entrar (com sessão aberta), sem sobrar a conta antiga', async () => {
+    expect(rodarSeed(banco.url).status).toBe(0);
+    const entrou = await comCliente(banco.url, async (c) => {
+      const { rows } = await c.query<{ resultado: string }>('SELECT resultado FROM conta_entrar($1, $2, $3, $4)', [
+        'admin@exemplo.com.br',
+        SENHA_ADMIN,
+        randomBytes(32),
+        randomBytes(32),
+      ]);
+      return rows[0]?.resultado;
+    });
+    expect(entrou).toBe('ok');
+    expect(await contar(banco.url, 'SELECT count(*) AS n FROM sessoes')).toBeGreaterThan(0);
+    const r = rodarSeed(banco.url);
+    expect(r.stderr).toBe('');
+    expect(r.status).toBe(0);
+    expect(await contar(banco.url, "SELECT count(*) AS n FROM contas WHERE email = 'admin@exemplo.com.br'")).toBe(1);
+  });
+
+  it('rodar duas vezes não duplica habilidades, notas, períodos, vínculos nem auditoria', async () => {
+    expect(rodarSeed(banco.url).status).toBe(0);
+    const contagens = () =>
+      Promise.all(
+        ['habilidades', 'notas', 'periodos_ativos', 'vinculos_admin', 'auditoria', 'presencas'].map((t) =>
+          contar(banco.url, `SELECT count(*) AS n FROM ${t}`),
+        ),
+      );
+    const antes = await contagens();
+    expect(rodarSeed(banco.url).status).toBe(0);
+    expect(await contagens()).toEqual(antes);
+    expect(antes[0]).toBe(6);
+    expect(antes[1]).toBe(66);
+    expect(antes[2]).toBe(21);
+  });
+});

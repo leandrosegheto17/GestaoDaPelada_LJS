@@ -1,0 +1,5 @@
+/* No mockup t16 exclusao-recusada a ação da faixa é um link (`a.botao--texto`, linha de 1,5); o botão herda a linha
+   normal do navegador e o texto sobe 1 px. A linha do corpo devolve a mesma posição ao texto. */
+.acaoDaFaixa button {
+  line-height: var(--altura-linha);
+}

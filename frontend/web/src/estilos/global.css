@@ -76,6 +76,10 @@ p {
   margin: 0 auto;
   padding: var(--esp-3) var(--esp-2) 112px;
 }
+.conteudo--admin {
+  padding-left: var(--esp-4);
+  padding-right: var(--esp-4);
+}
 .conteudo--estreito {
   max-width: var(--largura-formulario);
   padding-left: var(--esp-4);

@@ -135,6 +135,24 @@ describe('admins.remover', () => {
     expect(await auditoriaDe(g)).toHaveLength(1);
   });
 
+  it('outra admin removendo a criadora: "criadora_nao_removivel", o vínculo fica e nada vai para a auditoria (SEC-001)', async () => {
+    const ana = await conta('Ana Criadora');
+    const bia = await conta('Bia Convidada');
+    const g = await grupo([ana.id, bia.id]);
+    expect(await como(bia.id, (db) => admins.remover(db, g, ana.id))).toBe('criadora_nao_removivel');
+    expect(await vinculosDe(g)).toEqual([ana.id, bia.id].sort());
+    expect(await auditoriaDe(g)).toEqual([]);
+  });
+
+  it('a regra da criadora vale pelo criado_por do grupo, não pela ordem dos vínculos (SEC-001)', async () => {
+    const ana = await conta('Ana Admin');
+    const bia = await conta('Bia Criadora');
+    const g = await grupo([ana.id, bia.id]);
+    await b.owner.query('UPDATE grupos SET criado_por = $1 WHERE id = $2', [bia.id, g]);
+    expect(await como(bia.id, (db) => admins.remover(db, g, ana.id))).toBe('ok');
+    expect(await vinculosDe(g)).toEqual([bia.id]);
+  });
+
   it('último admin: "ultimo_admin", o vínculo fica e nada vai para a auditoria (ACE-40)', async () => {
     const ana = await conta('Ana Admin');
     const g = await grupo([ana.id]);

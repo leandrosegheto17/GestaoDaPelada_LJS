@@ -154,6 +154,15 @@ describe('contas.eu', () => {
   it('sem conta na requisição: nulo', async () => {
     expect(await semConta((db) => contas.eu(db))).toBeNull();
   });
+  it('só grupos ativos: o arquivado que a conta criou fica de fora da sessão (GEL-25)', async () => {
+    const a = await contaConfirmada();
+    const ativo = await grupoCom([a.id], 'Grupo Ativo da Sessão');
+    const arquivado = await grupoCom([a.id], 'Grupo Arquivado da Sessão');
+    await b.owner.query('UPDATE grupos SET arquivado_em = now() WHERE id = $1', [arquivado]);
+
+    const eu = await comoConta(a.id, (db) => contas.eu(db));
+    expect(eu?.grupos.map((g) => g.id)).toEqual([ativo]);
+  });
 });
 
 describe('contas.trocarSenha', () => {

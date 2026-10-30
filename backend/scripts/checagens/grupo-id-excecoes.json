@@ -22,6 +22,16 @@
     "motivo": "Parte só do token: o grupo vem do convite, dentro da função do banco."
   },
   {
+    "arquivo": "grupos.ts",
+    "funcao": "criar",
+    "motivo": "Cria o grupo: ainda não existe grupoId; a função grupo_criar usa a conta da sessão (GEL-01)."
+  },
+  {
+    "arquivo": "grupos.ts",
+    "funcao": "listarDaConta",
+    "motivo": "Lista os grupos da conta da sessão (GEL-27): não é dado de um grupo; a RLS decide o que se vê."
+  },
+  {
     "arquivo": "convites.ts",
     "funcao": "cadastrar",
     "motivo": "Parte só do token: o grupo vem do convite, dentro da função do banco."

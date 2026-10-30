@@ -1,0 +1,184 @@
+{
+  "jogadores": [
+    {
+      "id": "j-alemao",
+      "apelido": "Alemão",
+      "posicao": "zagueiro",
+      "situacao": "ativo",
+      "desde": "2026-02-05",
+      "nivel": 610,
+      "semNota": false
+    },
+    {
+      "id": "j-bigode",
+      "apelido": "Bigode",
+      "posicao": "zagueiro",
+      "situacao": "ativo",
+      "desde": "2026-02-05",
+      "nivel": 690,
+      "semNota": false
+    },
+    {
+      "id": "j-cabeca",
+      "apelido": "Cabeça",
+      "posicao": "atacante",
+      "situacao": "ativo",
+      "desde": "2026-02-05",
+      "nivel": 580,
+      "semNota": false
+    },
+    {
+      "id": "j-careca",
+      "apelido": "Careca",
+      "posicao": "meia",
+      "situacao": "ativo",
+      "desde": "2026-02-05",
+      "nivel": 640,
+      "semNota": false
+    },
+    {
+      "id": "j-dudu",
+      "apelido": "Dudu",
+      "posicao": "atacante",
+      "situacao": "ativo",
+      "desde": "2026-02-05",
+      "nivel": 600,
+      "semNota": false
+    },
+    {
+      "id": "j-fumaca",
+      "apelido": "Fumaça",
+      "posicao": "zagueiro",
+      "situacao": "ativo",
+      "desde": "2026-02-05",
+      "nivel": 520,
+      "semNota": false
+    },
+    {
+      "id": "j-gordo",
+      "apelido": "Gordo",
+      "posicao": "goleiro",
+      "situacao": "ativo",
+      "desde": "2026-02-05",
+      "nivel": 560,
+      "semNota": false
+    },
+    {
+      "id": "j-japa",
+      "apelido": "Japa",
+      "posicao": "meia",
+      "situacao": "ativo",
+      "desde": "2026-02-05",
+      "nivel": 630,
+      "semNota": false
+    },
+    {
+      "id": "j-juninho",
+      "apelido": "Juninho",
+      "posicao": "meia",
+      "situacao": "ativo",
+      "desde": "2026-02-05",
+      "nivel": 720,
+      "semNota": false
+    },
+    {
+      "id": "j-leo",
+      "apelido": "Léo Baiano",
+      "posicao": "meia",
+      "situacao": "ativo",
+      "desde": "2026-02-05",
+      "nivel": 550,
+      "semNota": true
+    },
+    {
+      "id": "j-marcao",
+      "apelido": "Marcão",
+      "posicao": "zagueiro",
+      "situacao": "ativo",
+      "desde": "2026-02-05",
+      "nivel": 660,
+      "semNota": false
+    },
+    {
+      "id": "j-nenem",
+      "apelido": "Neném",
+      "posicao": "atacante",
+      "situacao": "ativo",
+      "desde": "2026-02-05",
+      "nivel": 590,
+      "semNota": false
+    },
+    {
+      "id": "j-paulinho",
+      "apelido": "Paulinho",
+      "posicao": "goleiro",
+      "situacao": "ativo",
+      "desde": "2026-02-05",
+      "nivel": 650,
+      "semNota": false
+    },
+    {
+      "id": "j-pedrao",
+      "apelido": "Pedrão",
+      "posicao": "zagueiro",
+      "situacao": "ativo",
+      "desde": "2026-02-05",
+      "nivel": 570,
+      "semNota": false
+    },
+    {
+      "id": "j-rafinha",
+      "apelido": "Rafinha",
+      "posicao": "meia",
+      "situacao": "ativo",
+      "desde": "2026-02-05",
+      "nivel": 700,
+      "semNota": false
+    },
+    {
+      "id": "j-serginho",
+      "apelido": "Serginho",
+      "posicao": "atacante",
+      "situacao": "ativo",
+      "desde": "2026-02-05",
+      "nivel": 550,
+      "semNota": true
+    },
+    {
+      "id": "j-tiago",
+      "apelido": "Tiago",
+      "posicao": "meia",
+      "situacao": "ativo",
+      "desde": "2026-02-05",
+      "nivel": 620,
+      "semNota": false
+    },
+    {
+      "id": "j-toninho",
+      "apelido": "Toninho",
+      "posicao": "atacante",
+      "situacao": "ativo",
+      "desde": "2026-02-05",
+      "nivel": 683,
+      "semNota": false
+    },
+    {
+      "id": "j-vini",
+      "apelido": "Vini",
+      "posicao": "atacante",
+      "situacao": "ativo",
+      "desde": "2026-02-05",
+      "nivel": 670,
+      "semNota": false
+    },
+    {
+      "id": "j-ze",
+      "apelido": "Zé Carlos",
+      "posicao": "zagueiro",
+      "situacao": "ativo",
+      "desde": "2026-02-05",
+      "nivel": 600,
+      "semNota": false
+    }
+  ]
+}

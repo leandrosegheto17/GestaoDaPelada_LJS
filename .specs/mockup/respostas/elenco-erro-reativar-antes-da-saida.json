@@ -1,0 +1,9 @@
+{
+  "erro": {
+    "codigo": "dados_invalidos",
+    "mensagem": "Corrija os campos indicados.",
+    "campos": {
+      "data": "O retorno não pode ser antes da saída anterior (05/10/2026)."
+    }
+  }
+}

@@ -2,7 +2,6 @@ import { adminsResposta } from '@pelada/contrato';
 import { describe, expect, it } from 'vitest';
 import { cenarioDeAcesso } from '../apoio/acesso.ts';
 import { GRUPO_A, GRUPO_B } from '../apoio/cenario-dois-grupos.ts';
-import { GRUPO_ISOLADO } from '../apoio/grupo-isolado.ts';
 import { comoOwner } from '../apoio/owner-worker.ts';
 import { criarSessao } from '../apoio/sessao-worker.ts';
 
@@ -92,6 +91,15 @@ describe('GET /api/grupos/:grupoId/admins', () => {
     });
   });
 
+  it('traz o id da criadora do grupo, igual para a criadora e para a convidada (SEC-001)', async () => {
+    const { criadora, outra, criado } = await grupoComDuasAdmins();
+    for (const quem of [criadora, outra]) {
+      const r = await pedir('GET', raiz({ grupo: criado.id }), undefined, { cookie: quem.cookie });
+      expect(adminsResposta.safeParse(r.corpo).success).toBe(true);
+      expect(r.corpo).toMatchObject({ criadoraId: criadora.contaId });
+    }
+  });
+
   it('conta de outro grupo, sem vínculo: 404, igual a um grupo que não existe (ACE-41)', async () => {
     const s = await criarSessao(GRUPO_B);
     const semVinculo = await pedir('GET', raiz(GRUPO_A), undefined, { cookie: s.cookie });
@@ -170,18 +178,59 @@ describe('DELETE /api/grupos/:grupoId/admins/:contaId', () => {
   });
 
   it('o último admin não sai: 409 ultimo_admin e o vínculo fica (ACE-40)', async () => {
-    // O grupo isolado só tem a conta fundadora; a conta convidada vira a segunda e remove a fundadora, ficando só.
-    const s = await criarSessao(GRUPO_ISOLADO);
-    const removeFundadora = await pedir('DELETE', `${raiz(GRUPO_ISOLADO)}/${GRUPO_ISOLADO.conta}`, undefined, {
-      cookie: s.cookie,
+    // Cenário alterado com aprovação do usuário em 2026-10-30 por causa da regra SEC-001 (T71): antes, a convidada
+    // removia a fundadora (que é a criadora) para ficar só; agora isso dá 409. A convidada sai de si mesma e a
+    // criadora, última admin, tenta sair.
+    const { criadora, outra, criado } = await grupoComDuasAdmins();
+    const saiConvidada = await pedir('DELETE', `${raiz({ grupo: criado.id })}/${outra.contaId}`, undefined, {
+      cookie: outra.cookie,
     });
-    expect(removeFundadora.status).toBe(204);
+    expect(saiConvidada.status).toBe(204);
 
-    const r = await pedir('DELETE', `${raiz(GRUPO_ISOLADO)}/${s.contaId}`, undefined, { cookie: s.cookie });
+    const r = await pedir('DELETE', `${raiz({ grupo: criado.id })}/${criadora.contaId}`, undefined, {
+      cookie: criadora.cookie,
+    });
     expect(r.status).toBe(409);
     expect(r.corpo).toMatchObject({ erro: { codigo: 'ultimo_admin' } });
-    const eu = await pedir('GET', '/api/sessao', undefined, { cookie: s.cookie });
-    expect(eu.corpo).toMatchObject({ grupos: [{ id: GRUPO_ISOLADO.grupo }] });
+    const eu = await pedir('GET', '/api/sessao', undefined, { cookie: criadora.cookie });
+    expect(eu.corpo).toMatchObject({ grupos: [{ id: criado.id }] });
+  });
+
+  it('admin convidada não remove a criadora: 409 criadora_nao_removivel e a criadora segue admin e com acesso (SEC-001)', async () => {
+    const { criadora, outra, criado } = await grupoComDuasAdmins();
+    const r = await pedir('DELETE', `${raiz({ grupo: criado.id })}/${criadora.contaId}`, undefined, {
+      cookie: outra.cookie,
+    });
+    expect(r.status).toBe(409);
+    expect(r.corpo).toMatchObject({ erro: { codigo: 'criadora_nao_removivel' } });
+
+    const lista = await pedir('GET', raiz({ grupo: criado.id }), undefined, { cookie: criadora.cookie });
+    expect(lista.status).toBe(200);
+    expect((lista.corpo as { admins: { id: string }[] }).admins.map((a) => a.id)).toContain(criadora.contaId);
+    const grupo = await pedir('GET', `/api/grupos/${criado.id}`, undefined, { cookie: criadora.cookie });
+    expect(grupo.status).toBe(200);
+    expect(grupo.corpo).toMatchObject({ souCriador: true });
+    expect(await auditoriaDe(criado.id, 'remover_admin', criadora.contaId)).toEqual([]);
+  });
+
+  it('a criadora remove outra admin: 204 (SEC-001 não muda isso)', async () => {
+    const { criadora, outra, criado } = await grupoComDuasAdmins();
+    const r = await pedir('DELETE', `${raiz({ grupo: criado.id })}/${outra.contaId}`, undefined, {
+      cookie: criadora.cookie,
+    });
+    expect(r.status).toBe(204);
+    const eu = await pedir('GET', '/api/sessao', undefined, { cookie: outra.cookie });
+    expect(eu.corpo).toMatchObject({ grupos: [] });
+  });
+
+  it('a criadora sai de si mesma quando há outra admin: 204 (SEC-001 só barra a remoção por outra admin)', async () => {
+    const { criadora, outra, criado } = await grupoComDuasAdmins();
+    const r = await pedir('DELETE', `${raiz({ grupo: criado.id })}/${criadora.contaId}`, undefined, {
+      cookie: criadora.cookie,
+    });
+    expect(r.status).toBe(204);
+    const lista = await pedir('GET', raiz({ grupo: criado.id }), undefined, { cookie: outra.cookie });
+    expect((lista.corpo as { admins: { id: string }[] }).admins.map((a) => a.id)).toEqual([outra.contaId]);
   });
 
   it('conta que não é admin do grupo ou id mal formado: 404', async () => {
@@ -192,3 +241,28 @@ describe('DELETE /api/grupos/:grupoId/admins/:contaId', () => {
     }
   });
 });
+
+/** Grupo criado pela criadora pela rota, com uma segunda admin (a convidada) por convite. */
+async function grupoComDuasAdmins() {
+  const criadora = await criarSessao();
+  const corpo = {
+    nome: `Admins ${crypto.randomUUID().slice(0, 8)}`,
+    diaSemana: 'quinta',
+    frequencia: 'semanal',
+    horario: '20:30',
+  };
+  const criado = (await pedir('POST', '/api/grupos', corpo, { cookie: criadora.cookie })).corpo as {
+    id: string;
+    slug: string;
+  };
+  const outra = await criarSessao({
+    conta: criadora.contaId,
+    grupo: criado.id,
+    slug: criado.slug,
+    jogador: '',
+    habilidade: '',
+    partida: '',
+    lancamento: '',
+  });
+  return { criadora, outra, criado };
+}

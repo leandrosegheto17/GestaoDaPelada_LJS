@@ -70,7 +70,10 @@ export interface Eu {
   grupos: { id: string; nome: string; slug: string; acessaFinanceiro: boolean }[];
 }
 
-/** A conta da requisição e os grupos em que ela tem vínculo (ACE-18). Sem conta na requisição, nulo. */
+/**
+ * A conta da requisição e os grupos ativos em que ela tem vínculo (ACE-18). O grupo arquivado fica de fora, mesmo para
+ * a criadora: a lista completa, com os arquivados, é a de `GET /api/grupos` (GEL-25, GEL-27). Sem conta, nulo.
+ */
 export async function eu(db: Db): Promise<Eu | null> {
   const conta = await db
     .selectFrom('contas')
@@ -83,6 +86,7 @@ export async function eu(db: Db): Promise<Eu | null> {
     .innerJoin('grupos as g', 'g.id', 'v.grupo_id')
     .select(['g.id', 'g.nome', 'g.slug', 'v.acessa_financeiro'])
     .where('v.conta_id', '=', conta.id)
+    .where('g.arquivado_em', 'is', null)
     .orderBy('g.nome')
     .orderBy('g.id')
     .execute();

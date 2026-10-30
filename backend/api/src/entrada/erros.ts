@@ -21,6 +21,17 @@ export const CODIGOS_ERRO = {
   contaExistente: 'conta_existente',
   jaEAdmin: 'ja_e_admin',
   ultimoAdmin: 'ultimo_admin',
+  // grupos-e-elenco (GEL-26): escrita em grupo arquivado.
+  grupoArquivado: 'grupo_arquivado',
+  // grupos-e-elenco (GEL-24): arquivar e reativar só por quem criou o grupo.
+  soQuemCriou: 'so_quem_criou',
+  // grupos-e-elenco (SEC-001): outra admin não remove a conta que criou o grupo.
+  criadoraNaoRemovivel: 'criadora_nao_removivel',
+  // grupos-e-elenco (GEL-85): excluir jogador com histórico; a sugestão é inativar.
+  jogadorComHistorico: 'jogador_com_historico',
+  // grupos-e-elenco (GEL-53, GEL-56): inativar quem já está inativo, reativar quem já está ativo.
+  jaInativo: 'ja_inativo',
+  jaAtivo: 'ja_ativo',
 } as const;
 
 /** Erro padrão da API: `{ erro: { codigo, mensagem, campos? } }`. */

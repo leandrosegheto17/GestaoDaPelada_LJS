@@ -92,6 +92,13 @@ describe('respostas', () => {
     expect(adminsResposta.parse(r)).toEqual(r);
     expect(adminsResposta.safeParse({ admins: r.admins }).success).toBe(false);
   });
+  it('adminsResposta traz o id da criadora do grupo, para a tela não oferecer remover a criadora (SEC-001)', () => {
+    const r = { admins: [], convites: [], criadoraId: '1' };
+    expect(adminsResposta.parse(r)).toEqual(r);
+    expect(adminsResposta.parse({ ...r, criadoraId: null })).toEqual({ ...r, criadoraId: null });
+    expect(adminsResposta.safeParse({ ...r, criadoraId: '' }).success).toBe(false);
+    expect(adminsResposta.safeParse({ ...r, criadoraId: 1 }).success).toBe(false);
+  });
 });
 
 describe('TERMOS_VERSAO', () => {

@@ -1,3 +1,4 @@
+import { sql } from 'kysely';
 import { describe, expect, it } from 'vitest';
 import * as contas from '../../src/infraestrutura/db/repositorios/contas.ts';
 import { gerarToken, sha256 } from '../../src/infraestrutura/sessao/token.ts';
@@ -151,6 +152,30 @@ describe('GET /api/sessao', () => {
       grupos: [{ id: GRUPO_A.grupo, nome: 'Grupo grupo-a', slug: 'grupo-a', acessaFinanceiro: false }],
     });
     expect(r.headers.get('Cache-Control')).toBe('no-store');
+  });
+
+  it('grupo arquivado que a conta criou não entra na sessão; o ativo continua (GEL-25)', async () => {
+    const s = await criarSessao();
+    const criar = (nome: string) =>
+      noBanco(s.contaId, async (db) => {
+        const { rows } = await sql<{ id: string }>`
+          SELECT id FROM grupo_criar(${nome}, 'quarta', 'semanal', '20:00', ${`sessao-${crypto.randomUUID()}`},
+                                     ARRAY['Passe']::text[])
+        `.execute(db);
+        return rows[0]?.id as string;
+      });
+    const ativo = await criar('Sessão Ativo');
+    const arquivado = await criar('Sessão Arquivado');
+    await noBanco(s.contaId, (db) =>
+      db
+        .updateTable('grupos')
+        .set({ arquivado_em: sql<Date>`now()` })
+        .where('id', '=', arquivado)
+        .execute(),
+    );
+    const r = await pedir('GET', '/api/sessao', undefined, { cookie: s.cookie });
+    expect(r.status).toBe(200);
+    expect((r.corpo as { grupos: { id: string }[] }).grupos.map((g) => g.id)).toEqual([ativo]);
   });
 
   it('conta sem vínculo: lista vazia', async () => {

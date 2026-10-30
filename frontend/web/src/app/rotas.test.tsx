@@ -100,3 +100,140 @@ describe('rota inexistente', () => {
     expect(await violacoes(document.body)).toEqual([]);
   });
 });
+
+describe('início do grupo (t09; ligado antes da T68)', () => {
+  const GRUPO = {
+    id: 'g1',
+    nome: 'Pelada de Quinta',
+    slug: 'pelada-de-quinta',
+    linkPublico: 'https://app.invalid/g/pelada-de-quinta',
+    diaSemana: 'quinta',
+    frequencia: 'semanal',
+    horario: '20:00',
+    jogadoresAtivos: 0,
+    habilidades: 6,
+    admins: 1,
+    souCriador: true,
+  };
+
+  it('sem sessão, /app/grupos/g1 vai a /entrar com a volta', async () => {
+    simularApi(semSessao);
+    const roteador = abrir('/app/grupos/g1');
+    await waitFor(() => expect(roteador.state.location.pathname).toBe('/entrar'));
+    expect(new URLSearchParams(roteador.state.location.search).get('volta')).toBe('/app/grupos/g1');
+  });
+
+  it('com sessão, /app/grupos/g1 abre o início do grupo, com o atalho para Admins', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn<typeof fetch>((entrada) => {
+        const url = String(entrada);
+        if (url.endsWith('/api/grupos/g1')) return Promise.resolve(json(GRUPO));
+        if (url.endsWith('/api/grupos/g1/jogadores')) return Promise.resolve(json({ jogadores: [] }));
+        return Promise.resolve(json(EU));
+      }),
+    );
+    const roteador = abrir('/app/grupos/g1');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Início do admin: Pelada de Quinta' }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Admins/ })).toHaveAttribute('href', '/app/grupos/g1/admins');
+    expect(roteador.state.location.pathname).toBe('/app/grupos/g1');
+  });
+});
+
+describe('rotas do grupo e do elenco (T68, GEL-114)', () => {
+  const GRUPO = {
+    id: 'g1',
+    nome: 'Pelada de Quinta',
+    slug: 'pelada-de-quinta',
+    linkPublico: 'https://app.invalid/g/pelada-de-quinta',
+    diaSemana: 'quinta',
+    frequencia: 'semanal',
+    horario: '20:00',
+    jogadoresAtivos: 1,
+    habilidades: 6,
+    admins: 1,
+    souCriador: true,
+  };
+  const JOGADOR = {
+    id: 'j1',
+    apelido: 'Toninho',
+    posicao: 'atacante',
+    situacao: 'ativo',
+    desde: '2026-02-05',
+    nivel: 550,
+    semNota: true,
+    anoNascimento: 1978,
+    telefone: null,
+    pontuacaoInicial: 0,
+    inicioPontuacao: '2026-02-05',
+    periodos: [{ id: 'p1', inicio: '2026-02-05', fim: null }],
+    notas: [],
+  };
+
+  /** Servidor de mentira: cada URL da API devolve o formato do contrato. */
+  function comSessao() {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn<typeof fetch>((entrada) => {
+        const url = new URL(String(entrada), 'http://localhost').pathname;
+        if (url === '/api/grupos') return Promise.resolve(json({ ativos: [], arquivados: [] }));
+        if (url === '/api/grupos/g1') return Promise.resolve(json(GRUPO));
+        if (url === '/api/grupos/g1/jogadores') return Promise.resolve(json({ jogadores: [] }));
+        if (url === '/api/grupos/g1/jogadores/j1') return Promise.resolve(json(JOGADOR));
+        if (url === '/api/grupos/g1/habilidades') return Promise.resolve(json({ habilidades: [] }));
+        return Promise.resolve(json(EU));
+      }),
+    );
+  }
+
+  it.each([
+    ['/app/grupos/novo', 'Novo grupo'],
+    ['/app/grupos/g1/dados', 'Dados do grupo'],
+    ['/app/grupos/g1/jogadores', 'Jogadores'],
+    ['/app/grupos/g1/jogadores/novo', 'Novo jogador'],
+    ['/app/grupos/g1/jogadores/j1', 'Toninho'],
+    ['/app/grupos/g1/habilidades', 'Habilidades'],
+  ])('com sessão, %s abre a tela "%s"', async (caminho, titulo) => {
+    comSessao();
+    const roteador = abrir(caminho);
+    expect(await screen.findByRole('heading', { level: 1, name: titulo })).toBeInTheDocument();
+    expect(roteador.state.location.pathname).toBe(caminho);
+  });
+
+  it.each([
+    '/app/grupos/novo',
+    '/app/grupos/g1',
+    '/app/grupos/g1/dados',
+    '/app/grupos/g1/jogadores',
+    '/app/grupos/g1/jogadores/novo',
+    '/app/grupos/g1/jogadores/j1',
+    '/app/grupos/g1/habilidades',
+  ])('sem sessão, %s vai a /entrar com a volta', async (caminho) => {
+    simularApi(semSessao);
+    const roteador = abrir(caminho);
+    await waitFor(() => expect(roteador.state.location.pathname).toBe('/entrar'));
+    expect(new URLSearchParams(roteador.state.location.search).get('volta')).toBe(caminho);
+  });
+
+  it('/app/grupos/novo abre o formulário de novo grupo, não o início de um grupo chamado "novo"', async () => {
+    comSessao();
+    abrir('/app/grupos/novo');
+    expect(await screen.findByRole('button', { name: 'Criar grupo' })).toBeInTheDocument();
+  });
+
+  it('/app/grupos/g1/jogadores/novo abre o cadastro, não a ficha de um jogador chamado "novo"', async () => {
+    comSessao();
+    abrir('/app/grupos/g1/jogadores/novo');
+    expect(await screen.findByLabelText('Apelido')).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Habilidades e nível' })).toBeNull();
+  });
+
+  it('/app/grupos/g1/admins continua abrindo a tela de admins', async () => {
+    comSessao();
+    const roteador = abrir('/app/grupos/g1/admins');
+    expect(await screen.findByRole('main')).toBeVisible();
+    expect(roteador.state.location.pathname).toBe('/app/grupos/g1/admins');
+  });
+});

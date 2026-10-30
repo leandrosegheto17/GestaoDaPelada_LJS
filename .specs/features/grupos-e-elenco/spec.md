@@ -142,7 +142,7 @@ Convenções que valem para todas as histórias:
 2. IF `nomeConfirmacao` difere do nome do grupo THEN o sistema SHALL responder 422 com "O nome digitado não confere com o nome do grupo." no campo `nomeConfirmacao` e não arquivar. [GEL-23]
 3. IF quem pede para arquivar ou reativar é admin do grupo mas não é a conta criadora THEN o sistema SHALL responder 403 com o código `so_quem_criou` e não alterar o grupo. [GEL-24]
 4. WHILE o grupo está arquivado o sistema SHALL responder 404 a toda rota do grupo para qualquer admin que não seja a conta criadora, e não listar o grupo para essas contas. [GEL-25]
-5. WHILE o grupo está arquivado o sistema SHALL recusar, também para a conta criadora, toda rota de escrita do grupo que não seja reativar, com 409 e o código `grupo_arquivado`. [GEL-26]
+5. WHILE o grupo está arquivado o sistema SHALL recusar, também para a conta criadora, toda rota de escrita do grupo que não seja reativar, com 409 e o código `grupo_arquivado`. [GEL-26] Nota (2026-10-29, decisão do usuário na construção, T31): arquivar também passa no grupo arquivado, para valer a GEL-29 (arquivar de novo responde 200 sem mudar nada); a GEL-26 continua valendo para todas as outras escritas.
 6. WHEN a conta criadora lista os seus grupos THEN o sistema SHALL mostrar os grupos arquivados que ela criou numa seção "Arquivados", separados dos ativos, cada um com a ação Reativar. [GEL-27]
 7. WHEN a conta criadora envia `POST /api/grupos/:grupoId/reativar` para um grupo arquivado THEN o sistema SHALL apagar `arquivado_em`, registrar `grupo_reativado` na auditoria e responder 200; vínculos, jogadores, habilidades, notas e slug continuam como estavam. [GEL-28]
 8. IF o grupo já está no estado pedido (arquivar um arquivado ou reativar um ativo) THEN o sistema SHALL responder 200 sem alterar nada e sem registrar auditoria. [GEL-29]
@@ -537,6 +537,15 @@ Convenções que valem para todas as histórias:
 **Coverage:** 118 total, 118 mapped to tasks, 0 unmapped ✅
 
 ---
+
+## Regras acrescentadas na construção (auditoria, 2026-10-30)
+
+Decididas com o usuário após a auditoria de segurança; os critérios e testes vivem em `tasks.md` (T71 a T83) e em `seguranca.md`:
+
+- Outra admin não remove a criadora do grupo: 409 `criadora_nao_removivel` (SEC-001). A criadora pode sair de si mesma.
+- `dataEntrada` do jogador tem piso em 01/01/2000, com a mensagem da GEL-78 (SEC-002).
+- Escritas em `/api/grupos*` têm `LIMITE_ESCRITA` de 60 por 60 s por conta, com 429 (SEC-003).
+- Novos eventos de auditoria: renomear grupo e criar ou renomear habilidade, só com ids e nomes de campo (SEC-004 a SEC-009).
 
 ## Success Criteria
 

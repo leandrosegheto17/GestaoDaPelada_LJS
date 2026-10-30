@@ -22,13 +22,18 @@ import { PaginaInterna } from '../compartilhado/PaginaInterna';
 
 const TEXTO_JA_E_ADMIN = 'Essa pessoa já é admin do grupo.';
 const TEXTO_ULTIMO_ADMIN = 'O grupo precisa de pelo menos uma pessoa admin.';
+const TEXTO_CRIADORA = 'A pessoa que criou o grupo não pode ser removida por outra admin.';
 
 type Admin = AdminsResposta['admins'][number];
 
 const chaveAdmins = (grupoId: string) => ['grupo', grupoId, 'admins'] as const;
 
-function ehUltimoAdmin(erro: unknown): boolean {
-  return erro instanceof ErroApi && erro.status === 409 && erro.codigo === 'ultimo_admin';
+/** Recusas de remoção que a tela explica numa faixa (ACE-40, SEC-001). */
+type Recusa = 'ultimo_admin' | 'criadora_nao_removivel';
+
+function recusaDe(erro: unknown): Recusa | null {
+  if (!(erro instanceof ErroApi) || erro.status !== 409) return null;
+  return erro.codigo === 'ultimo_admin' || erro.codigo === 'criadora_nao_removivel' ? erro.codigo : null;
 }
 
 /** `2026-10-30T15:00:00Z` → `30/10/2026`, no fuso de São Paulo. */
@@ -39,11 +44,11 @@ interface PropsRemover {
   admin: Admin;
   aoFechar: () => void;
   aoRemovido: () => void;
-  aoUltimoAdmin: () => void;
+  aoRecusa: (recusa: Recusa) => void;
 }
 
 /** Confirmação de remoção (t19 remover, ACE-39). Destrutivo: Esc não fecha e o foco começa em Cancelar. */
-function DialogoRemover({ grupoId, admin, aoFechar, aoRemovido, aoUltimoAdmin }: PropsRemover) {
+function DialogoRemover({ grupoId, admin, aoFechar, aoRemovido, aoRecusa }: PropsRemover) {
   const refCancelar = useRef<HTMLButtonElement>(null);
   const [enviando, setEnviando] = useState(false);
   const [falhou, setFalhou] = useState(false);
@@ -56,7 +61,8 @@ function DialogoRemover({ grupoId, admin, aoFechar, aoRemovido, aoUltimoAdmin }:
       aoRemovido();
     } catch (erro) {
       setEnviando(false);
-      if (ehUltimoAdmin(erro)) aoUltimoAdmin();
+      const recusa = recusaDe(erro);
+      if (recusa) aoRecusa(recusa);
       else if (erro instanceof ErroApi && erro.status === 404) aoRemovido();
       else setFalhou(true);
     }
@@ -173,7 +179,7 @@ export function PaginaAdmins() {
     enabled: grupoId !== '',
   });
   const [removendo, setRemovendo] = useState<Admin | null>(null);
-  const [avisoUltimo, setAvisoUltimo] = useState(false);
+  const [recusa, setRecusa] = useState<Recusa | null>(null);
   const [convidado, setConvidado] = useState<string | null>(null);
   const [falhaCancelar, setFalhaCancelar] = useState(false);
   const [cancelando, setCancelando] = useState<string | null>(null);
@@ -215,13 +221,14 @@ export function PaginaAdmins() {
         </>
       ) : null}
       {lista.isError ? <ErroRede aoTentar={() => void lista.refetch()} /> : null}
-      {avisoUltimo ? <Faixa tipo="erro">{TEXTO_ULTIMO_ADMIN}</Faixa> : null}
+      {recusa ? <Faixa tipo="erro">{recusa === 'ultimo_admin' ? TEXTO_ULTIMO_ADMIN : TEXTO_CRIADORA}</Faixa> : null}
       {convidado ? <Faixa tipo="sucesso">Convite enviado para {convidado}. Vale por 7 dias.</Faixa> : null}
       {dados ? (
         <>
           <Lista>
             {dados.admins.map((admin) => {
               const voce = admin.id === sessao.data?.id;
+              const criadora = admin.id === dados.criadoraId;
               return (
                 <Item
                   key={admin.id}
@@ -231,12 +238,12 @@ export function PaginaAdmins() {
                   acoes={
                     <>
                       {admin.acessaFinanceiro ? <Selo>Financeiro</Selo> : null}
-                      {voce || soEu ? null : (
+                      {voce || soEu || criadora ? null : (
                         <Botao
                           variante="textoDestrutivo"
                           aria-label={`Remover ${admin.nome}`}
                           onClick={() => {
-                            setAvisoUltimo(false);
+                            setRecusa(null);
                             setRemovendo(admin);
                           }}
                         >
@@ -299,9 +306,9 @@ export function PaginaAdmins() {
             setRemovendo(null);
             atualizar();
           }}
-          aoUltimoAdmin={() => {
+          aoRecusa={(motivo) => {
             setRemovendo(null);
-            setAvisoUltimo(true);
+            setRecusa(motivo);
           }}
         />
       ) : null}

@@ -1,0 +1,15 @@
+/* "Dia de jogo" do início do grupo (mockup t09, `.dia-de-jogo`). */
+.diaDeJogo {
+  background: var(--cor-superficie);
+  border: 2px solid var(--cor-verde);
+  border-radius: var(--raio);
+  padding: var(--esp-4);
+  display: grid;
+  gap: var(--esp-3);
+}
+
+.titulo {
+  font-size: var(--texto-xl);
+  text-transform: uppercase;
+  color: var(--cor-verde);
+}

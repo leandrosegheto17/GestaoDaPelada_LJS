@@ -364,3 +364,24 @@ voltar a **Verified**; 3) se for suspensão da conta, abra o chamado com o supor
 dia, avalie outro provedor, o que pede `escolha-tecnologia` e ADR novo; 4) enquanto isso, quem já tem conta continua entrando, e quem perdeu a senha fica sem recuperação até o envio
 voltar. Confirme com um cadastro de teste
 quando voltar.
+
+## 11. Limite de escrita por conta (`LIMITE_ESCRITA`)
+
+Cada conta faz no máximo **60 escritas por 60 s** (`POST`, `PUT`, `PATCH` e `DELETE` em `/api/grupos*`: criar grupo,
+editar, jogadores, períodos, habilidades, notas e admins). A chave é a conta da sessão, não o IP; leituras não contam.
+Acima disso a API responde 429 `muitas_requisicoes` com `Retry-After: 60`, antes da rota, sem gravar nada (SEC-003).
+O limite protege a cota gratuita do Neon e do Worker contra uma conta automatizada.
+
+**Sintoma de limite apertado.** Uma admin legítima relata "Muitas requisições" ao dar notas ou cadastrar o elenco em
+sequência. Ela só precisa esperar um minuto; nada se perdeu. Se acontecer com frequência, suba o limite.
+
+**Como mudar o valor.** Edite `simple.limit` (ou `simple.period`, só 10 ou 60) do `LIMITE_ESCRITA` em `ratelimits` no
+`wrangler.jsonc`. Se mudar o período, mude também `PERIODO_LIMITE_ESCRITA_S` em `backend/api/src/entrada/app.ts` (vai no
+`Retry-After`) e o valor esperado em `backend/api/test/config/wrangler.test.ts`. Rode
+`node backend/scripts/checagens/checar-limitadores.mjs` (também no CI) e a suíte; o valor novo vale em produção no
+próximo deploy (seção 2). O limitador da Cloudflare conta por local de borda e é aproximado: trate o número como ordem
+de grandeza, não como cota exata.
+
+**Binding ausente.** Sem o binding no Worker publicado, a API não limita e registra `limitador ausente` uma vez no log;
+se o limitador falhar, a escrita passa e o log registra `limitador indisponível`. Nos dois casos, confira o
+`wrangler.jsonc` publicado e refaça o deploy.

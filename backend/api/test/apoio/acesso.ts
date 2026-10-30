@@ -1,5 +1,6 @@
 import { remetenteMemoria } from '../../src/infraestrutura/email/memoria.ts';
 import type { Remetente } from '../../src/infraestrutura/email/remetente.ts';
+import type { Relogio } from '../../src/infraestrutura/relogio/index.ts';
 import { chamar, type RespostaTeste } from './cliente.ts';
 
 /** Remetente que sempre falha, como o Resend fora do ar ou com a cota diária esgotada (ACE-52). */
@@ -13,6 +14,8 @@ export interface Extras {
   remetente?: Remetente;
   /** Ambiente do Worker no lugar do padrão do teste (ex.: outro `LIMITE_EMAILS_DIA`, T63). */
   env?: Cloudflare.Env;
+  /** Relógio fixo da requisição (`relogioFixo`), para as regras de data (AD-015). */
+  relogio?: Relogio;
 }
 
 /** Chamadas JSON às rotas de acesso, com um remetente em memória que guarda os e-mails do teste. */
@@ -27,7 +30,7 @@ export function cenarioDeAcesso() {
     const init: RequestInit = { method: metodo, headers };
     if (corpo !== undefined) init.body = JSON.stringify(corpo);
     return chamar(caminho, init, {
-      app: { remetente: extras.remetente ?? remetente },
+      app: { remetente: extras.remetente ?? remetente, ...(extras.relogio ? { relogio: extras.relogio } : {}) },
       ...(extras.env ? { env: extras.env } : {}),
     });
   }

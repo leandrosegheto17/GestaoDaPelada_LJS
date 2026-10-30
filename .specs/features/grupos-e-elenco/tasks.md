@@ -10,7 +10,7 @@ Implemente estas tarefas com a skill `tlc-spec-driven`: **acione-a pelo nome e s
 
 **Design**: `.specs/features/grupos-e-elenco/design.md` (mockup aprovado em `mockup/`)
 **Spec**: `.specs/features/grupos-e-elenco/spec.md` (decisões C1 a C10 em `context.md`)
-**Status**: Approved (usuário, 2026-10-29; execução por subagentes, um lote por vez; ferramentas como estão)
+**Status**: Approved (usuário, 2026-10-29; execução por subagentes, um lote por vez; ferramentas como estão). Phases 13 e 14 (endurecimento pela auditoria de segurança) acrescentadas em 2026-10-30, aguardando aprovação.
 
 > Premissas desta lista:
 > - Caminhos `legado:` são relativos a `C:\Leandro\Projetos\GestaoDaPelada`, somente leitura (AD-002). Teste copiado do legado só entra ligado a um `GEL-NN`.
@@ -152,6 +152,26 @@ T68 → T69 → T70
 
 ---
 
+### Phase 13: Endurecimento: achados médios da auditoria
+
+Correção dos achados SEC-001 a SEC-003 de `seguranca.md` (decisão do usuário, 2026-10-30).
+
+```
+T71 → T72 → T73 → T74 → T75
+```
+
+---
+
+### Phase 14: Endurecimento: achados baixos da auditoria
+
+Correção dos achados SEC-004 a SEC-009 e fechamento (decisão do usuário, 2026-10-30).
+
+```
+T76 → T77 → T78 → T79 → T80 → T81 → T82 → T83
+```
+
+---
+
 ## Task Breakdown
 
 ### Phase 1: Domínio: slug e elenco
@@ -173,10 +193,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] "Pelada de Quinta" → `pelada-de-quinta`; "!!!" e "AB" → `grupo`; "Admin" → `admin-grupo`; as 9 reservadas testadas
-- [ ] Corte em 40 caracteres sem hífen final; acento, cedilha e emoji removidos
-- [ ] `slugBase` exportada de `@pelada/dominio`
-- [ ] Gate quick passa: `pnpm --filter @pelada/dominio test`; testes ligados a GEL-11 a GEL-13 (AD-002)
+- [x] "Pelada de Quinta" → `pelada-de-quinta`; "!!!" e "AB" → `grupo`; "Admin" → `admin-grupo`; as 9 reservadas testadas
+- [x] Corte em 40 caracteres sem hífen final; acento, cedilha e emoji removidos
+- [x] `slugBase` exportada de `@pelada/dominio`
+- [x] Gate quick passa: `pnpm --filter @pelada/dominio test`; testes ligados a GEL-11 a GEL-13 (AD-002)
 
 **Tests**: unit
 **Gate**: quick
@@ -200,10 +220,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] "José" e "jose" têm a mesma `chaveBusca`; a ordenação põe "Álvaro" antes de "Beto"
-- [ ] `chaveBusca("")` não quebra e devolve vazio
-- [ ] Exportadas de `@pelada/dominio`
-- [ ] Gate quick passa: `pnpm --filter @pelada/dominio test`
+- [x] "José" e "jose" têm a mesma `chaveBusca`; a ordenação põe "Álvaro" antes de "Beto"
+- [x] `chaveBusca("")` não quebra e devolve vazio
+- [x] Exportadas de `@pelada/dominio`
+- [x] Gate quick passa: `pnpm --filter @pelada/dominio test`
 
 **Tests**: unit
 **Gate**: quick
@@ -227,10 +247,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] 8, 7, 6, 7, 8, 5 → 683; sem nota → `{ nivel: 550, semNota: true }`
-- [ ] Meio para cima: média 6,845 → 685 (caso de arredondamento testado)
-- [ ] Uma única nota (10 → 1000) e todas iguais
-- [ ] Gate quick passa: `pnpm --filter @pelada/dominio test`
+- [x] 8, 7, 6, 7, 8, 5 → 683; sem nota → `{ nivel: 550, semNota: true }`
+- [x] Meio para cima: média 6,845 → 685 (caso de arredondamento testado)
+- [x] Uma única nota (10 → 1000) e todas iguais
+- [x] Gate quick passa: `pnpm --filter @pelada/dominio test`
 
 **Tests**: unit
 **Gate**: quick
@@ -254,9 +274,9 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Lista exata: Visão de Jogo, Passe, Preparo Físico, Drible, Chute, Desarme, nessa ordem
-- [ ] Exportada de `@pelada/dominio`
-- [ ] Gate quick passa: `pnpm --filter @pelada/dominio test`
+- [x] Lista exata: Visão de Jogo, Passe, Preparo Físico, Drible, Chute, Desarme, nessa ordem
+- [x] Exportada de `@pelada/dominio`
+- [x] Gate quick passa: `pnpm --filter @pelada/dominio test`
 
 **Tests**: unit
 **Gate**: quick
@@ -280,10 +300,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] `2026-10-29` → 2016; `2027-01-01` → 2017 (o limite acompanha a virada do ano)
-- [ ] Data inválida é recusada com erro claro
-- [ ] Exportada de `@pelada/dominio`
-- [ ] Gate quick passa: `pnpm --filter @pelada/dominio test`
+- [x] `2026-10-29` → 2016; `2027-01-01` → 2017 (o limite acompanha a virada do ano)
+- [x] Data inválida é recusada com erro claro
+- [x] Exportada de `@pelada/dominio`
+- [x] Gate quick passa: `pnpm --filter @pelada/dominio test`
 
 **Tests**: unit
 **Gate**: quick
@@ -309,10 +329,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Sair e voltar no mesmo dia não sobrepõe: [01/10, 05/10) e [05/10, ∞)
-- [ ] Períodos que se tocam por um dia sobrepõem
-- [ ] `formatarData("2026-10-05")` → `05/10/2026`
-- [ ] Gate quick passa: `pnpm --filter @pelada/dominio test`
+- [x] Sair e voltar no mesmo dia não sobrepõe: [01/10, 05/10) e [05/10, ∞)
+- [x] Períodos que se tocam por um dia sobrepõem
+- [x] `formatarData("2026-10-05")` → `05/10/2026`
+- [x] Gate quick passa: `pnpm --filter @pelada/dominio test`
 
 **Tests**: unit
 **Gate**: quick
@@ -336,10 +356,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Uma asserção por mensagem: "Informe uma data válida.", "A data não pode ser no futuro.", as quatro de ordem com a data em dd/mm/aaaa, "Os períodos não podem se sobrepor."
-- [ ] `2026-02-30` e `2026-13-01` são datas inválidas; 29/02 em ano bissexto é válido
-- [ ] Devolve só a primeira falha, na ordem do GEL-62
-- [ ] Gate quick passa: `pnpm --filter @pelada/dominio test`
+- [x] Uma asserção por mensagem: "Informe uma data válida.", "A data não pode ser no futuro.", as quatro de ordem com a data em dd/mm/aaaa, "Os períodos não podem se sobrepor."
+- [x] `2026-02-30` e `2026-13-01` são datas inválidas; 29/02 em ano bissexto é válido
+- [x] Devolve só a primeira falha, na ordem do GEL-62
+- [x] Gate quick passa: `pnpm --filter @pelada/dominio test`
 
 **Tests**: unit
 **Gate**: quick
@@ -363,10 +383,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Presença em 01/10 e saída proposta em 30/09 → falha com data mínima 02/10 (dia seguinte à última presença retirada)
-- [ ] Retorno depois da primeira presença → falha com data máxima igual ao dia dela
-- [ ] Presença que já estava fora de período não bloqueia; situação ausente não conta
-- [ ] Gate quick passa: `pnpm --filter @pelada/dominio test`
+- [x] Presença em 01/10 e saída proposta em 30/09 → falha com data mínima 02/10 (dia seguinte à última presença retirada)
+- [x] Retorno depois da primeira presença → falha com data máxima igual ao dia dela
+- [x] Presença que já estava fora de período não bloqueia; situação ausente não conta
+- [x] Gate quick passa: `pnpm --filter @pelada/dominio test`
 
 **Tests**: unit
 **Gate**: quick
@@ -390,11 +410,11 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Corrigir saída de período aberto → "Este período não tem data de saída."; corrigir o início do primeiro → mensagem do GEL-73
-- [ ] Saída do primeiro período antes do início da pontuação → mensagem do GEL-69
-- [ ] Com duas falhas ao mesmo tempo, vence a primeira na ordem do GEL-62 (teste dedicado)
-- [ ] A função não lê relógio: `hoje` entra por parâmetro; `pnpm lint` confirma a regra `DOMINIO_PROIBIDAS`
-- [ ] Gate quick passa: `pnpm --filter @pelada/dominio test`
+- [x] Corrigir saída de período aberto → "Este período não tem data de saída."; corrigir o início do primeiro → mensagem do GEL-73
+- [x] Saída do primeiro período antes do início da pontuação → mensagem do GEL-69
+- [x] Com duas falhas ao mesmo tempo, vence a primeira na ordem do GEL-62 (teste dedicado)
+- [x] A função não lê relógio: `hoje` entra por parâmetro; `pnpm lint` confirma a regra `DOMINIO_PROIBIDAS`
+- [x] Gate quick passa: `pnpm --filter @pelada/dominio test`
 
 **Tests**: unit
 **Gate**: quick
@@ -418,10 +438,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] 31/12/1999 → "A data de início não pode ser anterior a 01/01/2000."; 01/01/2000 passa
-- [ ] Data depois da saída do primeiro período → mensagem do GEL-80 com a data da saída
-- [ ] Data anterior ao início do primeiro período → `recuarPrimeiroPeriodo: true`; períodos encerrados não mudam
-- [ ] Gate quick passa: `pnpm --filter @pelada/dominio test`
+- [x] 31/12/1999 → "A data de início não pode ser anterior a 01/01/2000."; 01/01/2000 passa
+- [x] Data depois da saída do primeiro período → mensagem do GEL-80 com a data da saída
+- [x] Data anterior ao início do primeiro período → `recuarPrimeiroPeriodo: true`; períodos encerrados não mudam
+- [x] Gate quick passa: `pnpm --filter @pelada/dominio test`
 
 **Tests**: unit
 **Gate**: quick
@@ -445,9 +465,9 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Teste de pacote lista as exportações novas (`slugBase`, `compararApelido`, `chaveBusca`, `calcularNivel`, `HABILIDADES_INICIAIS`, `anoNascimentoMaximo`, `avaliarPeriodos`, `avaliarInicio`, `formatarData`)
-- [ ] `pnpm lint` passa: nenhum arquivo do domínio importa I/O, relógio ou zod
-- [ ] Gate quick passa: `pnpm --filter @pelada/dominio test`
+- [x] Teste de pacote lista as exportações novas (`slugBase`, `compararApelido`, `chaveBusca`, `calcularNivel`, `HABILIDADES_INICIAIS`, `anoNascimentoMaximo`, `avaliarPeriodos`, `avaliarInicio`, `formatarData`)
+- [x] `pnpm lint` passa: nenhum arquivo do domínio importa I/O, relógio ou zod
+- [x] Gate quick passa: `pnpm --filter @pelada/dominio test`
 
 **Tests**: unit
 **Gate**: quick
@@ -473,11 +493,11 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Nome de 2 e 61 caracteres recusado com "O nome precisa ter de 3 a 60 caracteres."; espaços das pontas não contam
-- [ ] Dia, frequência e horário inválidos recusados no campo certo; "Informe o horário." (ausente) e "Horário inválido." (fora de HH:MM, inclusive 24:00 e 12:60)
-- [ ] Corpo com `slug` ou `urlPublica` é recusado (strict)
-- [ ] `arquivarCorpo` exige `nomeConfirmacao` string; o texto da divergência (GEL-23) fica na rota
-- [ ] Gate quick passa: `pnpm --filter @pelada/contrato test`
+- [x] Nome de 2 e 61 caracteres recusado com "O nome precisa ter de 3 a 60 caracteres."; espaços das pontas não contam
+- [x] Dia, frequência e horário inválidos recusados no campo certo; "Informe o horário." (ausente) e "Horário inválido." (fora de HH:MM, inclusive 24:00 e 12:60)
+- [x] Corpo com `slug` ou `urlPublica` é recusado (strict)
+- [x] `arquivarCorpo` exige `nomeConfirmacao` string; o texto da divergência (GEL-23) fica na rota
+- [x] Gate quick passa: `pnpm --filter @pelada/contrato test`
 
 **Tests**: unit
 **Gate**: quick
@@ -501,12 +521,12 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Apelido de 1 e 31 caracteres recusado com "O apelido precisa ter de 2 a 30 caracteres."
-- [ ] Ano 1939 e `hoje − 9` recusados com "O ano precisa estar entre 1940 e 2016." (em 2026); ausente e não inteiro também
-- [ ] Telefone com máscara vira 11 dígitos; vazio e nulo viram ausente; 10 dígitos, DDD com zero e sem o 9 são recusados com "Informe o telefone como (DD) 9XXXX-XXXX."
-- [ ] Pontuação -1, 10000 e 1,5 recusadas; omitida no cadastro vale 0 e na edição mantém o valor (campo ausente no resultado)
-- [ ] Posição fora das 7 recusada; `dataEntrada` opcional no cadastro e inexistente na edição (strict)
-- [ ] Gate quick passa: `pnpm --filter @pelada/contrato test`
+- [x] Apelido de 1 e 31 caracteres recusado com "O apelido precisa ter de 2 a 30 caracteres."
+- [x] Ano 1939 e `hoje − 9` recusados com "O ano precisa estar entre 1940 e 2016." (em 2026); ausente e não inteiro também
+- [x] Telefone com máscara vira 11 dígitos; vazio e nulo viram ausente; 10 dígitos, DDD com zero e sem o 9 são recusados com "Informe o telefone como (DD) 9XXXX-XXXX."
+- [x] Pontuação -1, 10000 e 1,5 recusadas; omitida no cadastro vale 0 e na edição mantém o valor (campo ausente no resultado)
+- [x] Posição fora das 7 recusada; `dataEntrada` opcional no cadastro e inexistente na edição (strict)
+- [x] Gate quick passa: `pnpm --filter @pelada/contrato test`
 
 **Tests**: unit
 **Gate**: quick
@@ -530,10 +550,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] `dataCorpo` aceita corpo sem data (usa hoje na rota) e recusa campo extra
-- [ ] `corrigirPeriodoCorpo` aceita só `saida`, só `retorno` ou os dois; recusa corpo vazio de campos
-- [ ] `inicioCorpo` exige `data`; as datas são só texto AAAA-MM-DD (a validade é do domínio)
-- [ ] Gate quick passa: `pnpm --filter @pelada/contrato test`
+- [x] `dataCorpo` aceita corpo sem data (usa hoje na rota) e recusa campo extra
+- [x] `corrigirPeriodoCorpo` aceita só `saida`, só `retorno` ou os dois; recusa corpo vazio de campos
+- [x] `inicioCorpo` exige `data`; as datas são só texto AAAA-MM-DD (a validade é do domínio)
+- [x] Gate quick passa: `pnpm --filter @pelada/contrato test`
 
 **Tests**: unit
 **Gate**: quick
@@ -557,9 +577,9 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Nome de 1 e 31 caracteres recusado com "O nome precisa ter de 2 a 30 caracteres."
-- [ ] Nota 0, 11, 5,5 e texto recusadas no campo `nota`; 1, 10 e `null` aceitas
-- [ ] Gate quick passa: `pnpm --filter @pelada/contrato test`
+- [x] Nome de 1 e 31 caracteres recusado com "O nome precisa ter de 2 a 30 caracteres."
+- [x] Nota 0, 11, 5,5 e texto recusadas no campo `nota`; 1, 10 e `null` aceitas
+- [x] Gate quick passa: `pnpm --filter @pelada/contrato test`
 
 **Tests**: unit
 **Gate**: quick
@@ -583,9 +603,9 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] `compatibilidade.test.ts` passa com o snapshot atualizado e falharia sem ele (provado removendo um campo)
-- [ ] `sem-eval.test.ts` continua verde: os arquivos novos importam o `z` de `zod.ts`
-- [ ] Gate quick passa: `pnpm --filter @pelada/contrato test`
+- [x] `compatibilidade.test.ts` passa com o snapshot atualizado e falharia sem ele (provado removendo um campo)
+- [x] `sem-eval.test.ts` continua verde: os arquivos novos importam o `z` de `zod.ts`
+- [x] Gate quick passa: `pnpm --filter @pelada/contrato test`
 
 **Tests**: unit
 **Gate**: quick
@@ -611,12 +631,12 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Como `pelada_app` com a conta criadora: vê o grupo arquivado; com outro admin do mesmo grupo: não vê (zero linhas em `grupos` e em `jogadores`)
-- [ ] Grupo ativo continua visível aos dois admins; o ramo do slug público não mudou (grupo arquivado por slug segue a regra anterior)
-- [ ] Mesmos `SECURITY DEFINER`, `search_path` fixo e grants da função anterior; `funcoes-definer.test.ts` verde
-- [ ] Suíte de isolamento e `rls.test.ts` inteiros verdes depois da troca
-- [ ] `checar-migracao-aditiva` passa: migration nova, nenhuma editada
-- [ ] Gate full passa
+- [x] Como `pelada_app` com a conta criadora: vê o grupo arquivado; com outro admin do mesmo grupo: não vê (zero linhas em `grupos` e em `jogadores`)
+- [x] Grupo ativo continua visível aos dois admins; o ramo do slug público não mudou (grupo arquivado por slug segue a regra anterior)
+- [x] Mesmos `SECURITY DEFINER`, `search_path` fixo e grants da função anterior; `funcoes-definer.test.ts` verde
+- [x] Suíte de isolamento e `rls.test.ts` inteiros verdes depois da troca
+- [x] `checar-migracao-aditiva` passa: migration nova, nenhuma editada
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
@@ -640,11 +660,11 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Como `pelada_app`: devolve `(id, slug)`; o grupo tem `criado_por` = conta, vínculo com `acessa_financeiro` verdadeiro, 6 habilidades na ordem de GEL-02 e uma linha `grupo_criado` na auditoria com a conta como autora
-- [ ] Slug `pelada-de-quinta` ocupado (inclusive por grupo arquivado) → `pelada-de-quinta-2`, depois `-3`
-- [ ] Sem `app_conta_id()` a função falha; falha no meio (habilidade inválida) desfaz grupo e vínculo (GEL-09)
-- [ ] `EXECUTE` só para `pelada_app`; `search_path` fixo; `funcoes-definer.test.ts` verde com a função nova
-- [ ] Gate full passa
+- [x] Como `pelada_app`: devolve `(id, slug)`; o grupo tem `criado_por` = conta, vínculo com `acessa_financeiro` verdadeiro, 6 habilidades na ordem de GEL-02 e uma linha `grupo_criado` na auditoria com a conta como autora
+- [x] Slug `pelada-de-quinta` ocupado (inclusive por grupo arquivado) → `pelada-de-quinta-2`, depois `-3`
+- [x] Sem `app_conta_id()` a função falha; falha no meio (habilidade inválida) desfaz grupo e vínculo (GEL-09)
+- [x] `EXECUTE` só para `pelada_app`; `search_path` fixo; `funcoes-definer.test.ts` verde com a função nova
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
@@ -668,9 +688,9 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Duas conexões `pelada_app` (contas diferentes) chamam `grupo_criar` com o mesmo `slug_base` ao mesmo tempo, repetido 20 vezes: sempre dois slugs distintos e nenhuma falha
-- [ ] Com a base já ocupada até `-3`, a terceira tentativa esgotada devolve erro (não cria grupo parcial)
-- [ ] Gate full passa
+- [x] Duas conexões `pelada_app` (contas diferentes) chamam `grupo_criar` com o mesmo `slug_base` ao mesmo tempo, repetido 20 vezes: sempre dois slugs distintos e nenhuma falha
+- [x] Com a base já ocupada até `-3`, a terceira tentativa esgotada devolve erro (não cria grupo parcial)
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
@@ -694,10 +714,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] `UPDATE grupos SET criado_por = ...` como `pelada_app` falha com permissão negada; o mesmo para `situacao_comercial`, `trial_inicio` e `slug`
-- [ ] `UPDATE` de `nome` e `arquivado_em` continua funcionando; a trigger de slug imutável continua barrando
-- [ ] `roles.test.ts` verde (sem asserção removida: a lista de colunas escrevíveis ganha o caso novo)
-- [ ] Gate full passa
+- [x] `UPDATE grupos SET criado_por = ...` como `pelada_app` falha com permissão negada; o mesmo para `situacao_comercial`, `trial_inicio` e `slug`
+- [x] `UPDATE` de `nome` e `arquivado_em` continua funcionando; a trigger de slug imutável continua barrando
+- [x] `roles.test.ts` verde (sem asserção removida: a lista de colunas escrevíveis ganha o caso novo)
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
@@ -723,9 +743,9 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] `hoje()` às 22h de São Paulo (01h UTC do dia seguinte) devolve o dia de São Paulo
-- [ ] Relógio fixo para testes (`relogioFixo(data)`)
-- [ ] Gate full passa
+- [x] `hoje()` às 22h de São Paulo (01h UTC do dia seguinte) devolve o dia de São Paulo
+- [x] Relógio fixo para testes (`relogioFixo(data)`)
+- [x] Gate full passa
 
 **Tests**: unit
 **Gate**: full
@@ -749,9 +769,9 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Uma rota de teste lê `c.get('relogio').hoje()` e devolve a data fixa passada em `criarApp({ relogio })`
-- [ ] Sem a opção, usa o relógio real (data no formato AAAA-MM-DD)
-- [ ] Gate full passa
+- [x] Uma rota de teste lê `c.get('relogio').hoje()` e devolve a data fixa passada em `criarApp({ relogio })`
+- [x] Sem a opção, usa o relógio real (data no formato AAAA-MM-DD)
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
@@ -775,9 +795,9 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] `pnpm typecheck` passa com os tipos novos contra o esquema (`esquema.ts`)
-- [ ] Colunas e nulabilidade conferem com `linha-de-base.esquema.txt`
-- [ ] Gate build passa
+- [x] `pnpm typecheck` passa com os tipos novos contra o esquema (`esquema.ts`)
+- [x] Colunas e nulabilidade conferem com `linha-de-base.esquema.txt`
+- [x] Gate build passa
 
 **Tests**: none
 **Gate**: build
@@ -801,10 +821,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Conta criadora com um grupo arquivado e um ativo: a sessão devolve só o ativo
-- [ ] Conta com vínculo em grupo ativo continua vendo o grupo
-- [ ] `sessao.test.ts` verde; teste novo com grupo arquivado
-- [ ] Gate full passa
+- [x] Conta criadora com um grupo arquivado e um ativo: a sessão devolve só o ativo
+- [x] Conta com vínculo em grupo ativo continua vendo o grupo
+- [x] `sessao.test.ts` verde; teste novo com grupo arquivado
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
@@ -828,11 +848,11 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Grupo arquivado: `PATCH`, `POST`, `PUT` e `DELETE` → 409 com o código `grupo_arquivado`; `GET` → passa
-- [ ] `POST /api/grupos/:grupoId/reativar` passa mesmo arquivado
-- [ ] Grupo ativo: nenhum método é barrado
-- [ ] Código `grupo_arquivado` registrado em `entrada/erros.ts`
-- [ ] Gate full passa
+- [x] Grupo arquivado: `PATCH`, `POST`, `PUT` e `DELETE` → 409 com o código `grupo_arquivado`; `GET` → passa
+- [x] `POST /api/grupos/:grupoId/reativar` passa mesmo arquivado
+- [x] Grupo ativo: nenhum método é barrado
+- [x] Código `grupo_arquivado` registrado em `entrada/erros.ts`
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
@@ -856,9 +876,9 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Em grupo arquivado, `POST /api/grupos/:id/admins/convites` (e demais escritas das rotas existentes) responde 409; `GET` das mesmas responde como antes
-- [ ] `admins.test.ts`, `convites.test.ts` e `vinculo-middleware.test.ts` verdes
-- [ ] Gate full passa
+- [x] Em grupo arquivado, `POST /api/grupos/:id/admins/convites` (e demais escritas das rotas existentes) responde 409; `GET` das mesmas responde como antes
+- [x] `admins.test.ts`, `convites.test.ts` e `vinculo-middleware.test.ts` verdes
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
@@ -884,10 +904,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Criar como `pelada_app` devolve id e slug e cria 6 habilidades; `listarDaConta` separa ativos de arquivados e só mostra arquivado ao criador
-- [ ] `ler` devolve jogadores ativos, habilidades, admins e `souCriador` (verdadeiro só para o criador)
-- [ ] Primeiro parâmetro `grupoId` onde couber (`checar-grupo-id` verde)
-- [ ] Gate full passa
+- [x] Criar como `pelada_app` devolve id e slug e cria 6 habilidades; `listarDaConta` separa ativos de arquivados e só mostra arquivado ao criador
+- [x] `ler` devolve jogadores ativos, habilidades, admins e `souCriador` (verdadeiro só para o criador)
+- [x] Primeiro parâmetro `grupoId` onde couber (`checar-grupo-id` verde)
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
@@ -911,11 +931,11 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Arquivar pelo criador grava `arquivado_em` e `grupo_arquivado` na auditoria; nada é apagado (jogadores, habilidades e notas intactos, GEL-30)
-- [ ] Arquivar por admin não criador → erro `so_quem_criou`; criador removido do grupo → sem linha (404)
-- [ ] Arquivar arquivado e reativar ativo → sucesso sem mudar nada e sem nova linha de auditoria
-- [ ] Nome de confirmação com caixa ou espaço diferente → erro de nome; reativar apaga `arquivado_em` e audita `grupo_reativado`
-- [ ] Gate full passa
+- [x] Arquivar pelo criador grava `arquivado_em` e `grupo_arquivado` na auditoria; nada é apagado (jogadores, habilidades e notas intactos, GEL-30)
+- [x] Arquivar por admin não criador → erro `so_quem_criou`; criador removido do grupo → sem linha (404)
+- [x] Arquivar arquivado e reativar ativo → sucesso sem mudar nada e sem nova linha de auditoria
+- [x] Nome de confirmação com caixa ou espaço diferente → erro de nome; reativar apaga `arquivado_em` e audita `grupo_reativado`
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
@@ -939,11 +959,11 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] 201 com `linkPublico` = `<URL_PUBLICA>/g/<slug>`; sem sessão → 401 e nada criado; corpo com `slug` → 422
-- [ ] Cada 422 com a mensagem do GEL no campo certo; nome "Pelada de Quinta" duas vezes → `pelada-de-quinta` e `pelada-de-quinta-2`; renomear depois não muda o slug
-- [ ] Rodando como `pelada_app` (não como owner): a criação funciona sob a RLS
-- [ ] Rota nova com `nao_se_aplica` e motivo em `casos.ts` para os dois métodos; `meta.test.ts` verde
-- [ ] Gate full passa
+- [x] 201 com `linkPublico` = `<URL_PUBLICA>/g/<slug>`; sem sessão → 401 e nada criado; corpo com `slug` → 422
+- [x] Cada 422 com a mensagem do GEL no campo certo; nome "Pelada de Quinta" duas vezes → `pelada-de-quinta` e `pelada-de-quinta-2`; renomear depois não muda o slug
+- [x] Rodando como `pelada_app` (não como owner): a criação funciona sob a RLS
+- [x] Rota nova com `nao_se_aplica` e motivo em `casos.ts` para os dois métodos; `meta.test.ts` verde
+- [x] Gate full passa
 
 **Tests**: e2e
 **Gate**: full
@@ -967,10 +987,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] `PATCH` válido → 200 com slug e link públicos inalterados; `slug` no corpo → 422
-- [ ] `GET` devolve contagens e `souCriador`; conta sem vínculo → 404 nas duas rotas
-- [ ] Casos `grupo` das duas rotas em `casos.ts`
-- [ ] Gate full passa
+- [x] `PATCH` válido → 200 com slug e link públicos inalterados; `slug` no corpo → 422
+- [x] `GET` devolve contagens e `souCriador`; conta sem vínculo → 404 nas duas rotas
+- [x] Casos `grupo` das duas rotas em `casos.ts`
+- [x] Gate full passa
 
 **Tests**: e2e
 **Gate**: full
@@ -994,11 +1014,11 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Duas contas admin: a não criadora recebe 403 `so_quem_criou`; a criadora arquiva com o nome exato; nome errado → 422 "O nome digitado não confere com o nome do grupo." no campo `nomeConfirmacao`
-- [ ] Depois de arquivar, a outra conta recebe 404 em `GET /api/grupos/:id`; o criador recebe 409 `grupo_arquivado` em `PATCH` e consegue `reativar`
-- [ ] Repetir arquivar ou reativar → 200 sem auditoria nova
-- [ ] Casos `grupo` das duas rotas em `casos.ts`
-- [ ] Gate full passa
+- [x] Duas contas admin: a não criadora recebe 403 `so_quem_criou`; a criadora arquiva com o nome exato; nome errado → 422 "O nome digitado não confere com o nome do grupo." no campo `nomeConfirmacao`
+- [x] Depois de arquivar, a outra conta recebe 404 em `GET /api/grupos/:id`; o criador recebe 409 `grupo_arquivado` em `PATCH` e consegue `reativar`
+- [x] Repetir arquivar ou reativar → 200 sem auditoria nova
+- [x] Casos `grupo` das duas rotas em `casos.ts`
+- [x] Gate full passa
 
 **Tests**: e2e
 **Gate**: full
@@ -1022,10 +1042,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Em todas as tabelas com `grupo_id` (jogadores, habilidades, notas, períodos): o criador lê, o outro admin lê zero linhas
-- [ ] `GET /api/grupos` do outro admin não lista o grupo arquivado; o do criador lista em `arquivados`
-- [ ] O ramo do slug público de `grupos_visiveis()` não mudou
-- [ ] Gate full passa
+- [x] Em todas as tabelas com `grupo_id` (jogadores, habilidades, notas, períodos): o criador lê, o outro admin lê zero linhas
+- [x] `GET /api/grupos` do outro admin não lista o grupo arquivado; o do criador lista em `arquivados`
+- [x] O ramo do slug público de `grupos_visiveis()` não mudou
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
@@ -1051,10 +1071,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Jogador com período aberto é `ativo` com `desde` = início do período; sem período aberto é `inativo` com `desde` = última saída
-- [ ] Nível e `semNota` vêm do domínio; a lista usa 2 consultas (não N+1), conferido por contagem de consultas no teste
-- [ ] `ler` de jogador de outro grupo → nulo
-- [ ] Gate full passa
+- [x] Jogador com período aberto é `ativo` com `desde` = início do período; sem período aberto é `inativo` com `desde` = última saída
+- [x] Nível e `semNota` vêm do domínio; a lista usa 2 consultas (não N+1), conferido por contagem de consultas no teste
+- [x] `ler` de jogador de outro grupo → nulo
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
@@ -1078,11 +1098,11 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Criar sem data de entrada usa `hoje`; o período aberto e o `inicio_pontuacao` têm a data de entrada
-- [ ] "Toninho" e "toninho" colidem (422 com a mensagem do GEL-35); "José" e "Jose" coexistem
-- [ ] Corrida de dois INSERTs com o mesmo apelido: o segundo cai no índice único e vira o mesmo 422 (23505 traduzido pelo nome da constraint)
-- [ ] Telefone ausente grava nulo; auditoria `jogador_criado` sem telefone nem ano
-- [ ] Gate full passa
+- [x] Criar sem data de entrada usa `hoje`; o período aberto e o `inicio_pontuacao` têm a data de entrada
+- [x] "Toninho" e "toninho" colidem (422 com a mensagem do GEL-35); "José" e "Jose" coexistem
+- [x] Corrida de dois INSERTs com o mesmo apelido: o segundo cai no índice único e vira o mesmo 422 (23505 traduzido pelo nome da constraint)
+- [x] Telefone ausente grava nulo; auditoria `jogador_criado` sem telefone nem ano
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
@@ -1106,11 +1126,11 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Mudar a pontuação grava `jogador_pontuacao_inicial_alterada` com valor anterior e novo; omitir mantém; editar não mexe em `inicio_pontuacao` nem em períodos
-- [ ] Excluir jogador sem histórico apaga jogador e períodos e audita `jogador_excluido`
-- [ ] Excluir com presença, com nota ou com pagamento mensal → erro `jogador_com_historico` e nada apagado (um teste por tipo de histórico)
-- [ ] Jogador de outro grupo → nulo (404 na rota)
-- [ ] Gate full passa
+- [x] Mudar a pontuação grava `jogador_pontuacao_inicial_alterada` com valor anterior e novo; omitir mantém; editar não mexe em `inicio_pontuacao` nem em períodos
+- [x] Excluir jogador sem histórico apaga jogador e períodos e audita `jogador_excluido`
+- [x] Excluir com presença, com nota ou com pagamento mensal → erro `jogador_com_historico` e nada apagado (um teste por tipo de histórico)
+- [x] Jogador de outro grupo → nulo (404 na rota)
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
@@ -1134,11 +1154,11 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Cadastro válido → 201; `dataEntrada` no futuro → 422 "A data não pode ser no futuro." no campo `dataEntrada` (hoje do `Relogio`, às 22h de São Paulo)
-- [ ] Cada 422 da spec com a mensagem e o campo certos (apelido, ano, posição, telefone, pontuação); campo desconhecido → 422
-- [ ] `GET` devolve ativos e inativos com nível; sem sessão → 401; outro grupo → 404
-- [ ] Casos `grupo` dos dois métodos em `casos.ts`
-- [ ] Gate full passa
+- [x] Cadastro válido → 201; `dataEntrada` no futuro → 422 "A data não pode ser no futuro." no campo `dataEntrada` (hoje do `Relogio`, às 22h de São Paulo)
+- [x] Cada 422 da spec com a mensagem e o campo certos (apelido, ano, posição, telefone, pontuação); campo desconhecido → 422
+- [x] `GET` devolve ativos e inativos com nível; sem sessão → 401; outro grupo → 404
+- [x] Casos `grupo` dos dois métodos em `casos.ts`
+- [x] Gate full passa
 
 **Tests**: e2e
 **Gate**: full
@@ -1162,10 +1182,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] `PATCH` válido → 200; `dataEntrada` no corpo → 422; id de jogador de outro grupo → 404
-- [ ] `DELETE` sem histórico → 204; com histórico → 409 com `jogador_com_historico`, a mensagem "<apelido> tem histórico de partidas e não pode ser excluído." e a sugestão `inativar`
-- [ ] Casos `grupo` dos três métodos em `casos.ts`
-- [ ] Gate full passa
+- [x] `PATCH` válido → 200; `dataEntrada` no corpo → 422; id de jogador de outro grupo → 404
+- [x] `DELETE` sem histórico → 204; com histórico → 409 com `jogador_com_historico`, a mensagem "<apelido> tem histórico de partidas e não pode ser excluído." e a sugestão `inativar`
+- [x] Casos `grupo` dos três métodos em `casos.ts`
+- [x] Gate full passa
 
 **Tests**: e2e
 **Gate**: full
@@ -1191,10 +1211,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Inativar jogador ativo com data válida fecha o período nessa data; sem data usa `hoje`; já inativo → erro `ja_inativo` sem alterar
-- [ ] Presença em 01/10 e saída em 30/09 → 422 com a mensagem do GEL-68 e a data mínima 02/10 (presença criada direto no banco pelo teste)
-- [ ] Auditoria `jogador_inativado` na mesma transação: se a auditoria falha, o período não muda
-- [ ] Gate full passa
+- [x] Inativar jogador ativo com data válida fecha o período nessa data; sem data usa `hoje`; já inativo → erro `ja_inativo` sem alterar
+- [x] Presença em 01/10 e saída em 30/09 → 422 com a mensagem do GEL-68 e a data mínima 02/10 (presença criada direto no banco pelo teste)
+- [x] Auditoria `jogador_inativado` na mesma transação: se a auditoria falha, o período não muda
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
@@ -1218,10 +1238,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Retorno em 12/10 depois de saída em 05/10 cria o período [12/10, ∞); `inicio_pontuacao` igual ao anterior
-- [ ] Retorno antes da saída anterior → 422 "O retorno não pode ser antes da saída anterior (05/10/2026)."; sair e voltar no mesmo dia aceita
-- [ ] Já ativo → erro `ja_ativo`; auditoria `jogador_reativado` com as duas datas
-- [ ] Gate full passa
+- [x] Retorno em 12/10 depois de saída em 05/10 cria o período [12/10, ∞); `inicio_pontuacao` igual ao anterior
+- [x] Retorno antes da saída anterior → 422 "O retorno não pode ser antes da saída anterior (05/10/2026)."; sair e voltar no mesmo dia aceita
+- [x] Já ativo → erro `ja_ativo`; auditoria `jogador_reativado` com as duas datas
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
@@ -1245,10 +1265,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Saída corrigida de 05/10 para 03/10 grava e audita `jogador_periodo_corrigido` com as datas antes e depois
-- [ ] Datas iguais → `alterado: false` sem escrita e sem auditoria
-- [ ] Saída de período aberto e início do primeiro período → as mensagens dos GEL-72 e GEL-73; período de outro jogador ou grupo → nulo (404)
-- [ ] Gate full passa
+- [x] Saída corrigida de 05/10 para 03/10 grava e audita `jogador_periodo_corrigido` com as datas antes e depois
+- [x] Datas iguais → `alterado: false` sem escrita e sem auditoria
+- [x] Saída de período aberto e início do primeiro período → as mensagens dos GEL-72 e GEL-73; período de outro jogador ou grupo → nulo (404)
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
@@ -1272,10 +1292,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Recuar de 05/02 para 01/02 move o início do primeiro período e deixa os encerrados; audita `jogador_inicio_alterado` com anterior e nova
-- [ ] Data igual à atual → 200 sem gravar e sem auditar
-- [ ] Data depois da saída do primeiro período → 422 com a mensagem do GEL-80
-- [ ] Gate full passa
+- [x] Recuar de 05/02 para 01/02 move o início do primeiro período e deixa os encerrados; audita `jogador_inicio_alterado` com anterior e nova
+- [x] Data igual à atual → 200 sem gravar e sem auditar
+- [x] Data depois da saída do primeiro período → 422 com a mensagem do GEL-80
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
@@ -1299,11 +1319,11 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Inativar → 200; segunda vez → 409 "O jogador já está inativo."; reativar ativo → 409 "O jogador já está ativo."
-- [ ] Data inválida, futura e de ordem → 422 com as mensagens do domínio no campo `data`; hoje vem do `Relogio`
-- [ ] Jogador de outro grupo → 404; grupo arquivado → 409 `grupo_arquivado`
-- [ ] Casos `grupo` das duas rotas em `casos.ts`
-- [ ] Gate full passa
+- [x] Inativar → 200; segunda vez → 409 "O jogador já está inativo."; reativar ativo → 409 "O jogador já está ativo."
+- [x] Data inválida, futura e de ordem → 422 com as mensagens do domínio no campo `data`; hoje vem do `Relogio`
+- [x] Jogador de outro grupo → 404; grupo arquivado → 409 `grupo_arquivado`
+- [x] Casos `grupo` das duas rotas em `casos.ts`
+- [x] Gate full passa
 
 **Tests**: e2e
 **Gate**: full
@@ -1327,10 +1347,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] `PATCH` válido → 200; datas iguais → 200 com `alterado: false` e "Nada a alterar."; período de outro jogador → 404
-- [ ] `PUT` com 31/12/1999 → 422 do GEL-78; data futura → GEL-79; igual à atual → 200 sem auditoria
-- [ ] Casos `grupo` das duas rotas em `casos.ts`
-- [ ] Gate full passa
+- [x] `PATCH` válido → 200; datas iguais → 200 com `alterado: false` e "Nada a alterar."; período de outro jogador → 404
+- [x] `PUT` com 31/12/1999 → 422 do GEL-78; data futura → GEL-79; igual à atual → 200 sem auditoria
+- [x] Casos `grupo` das duas rotas em `casos.ts`
+- [x] Gate full passa
 
 **Tests**: e2e
 **Gate**: full
@@ -1354,10 +1374,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Duas conexões `pelada_app` inativam o mesmo jogador ao mesmo tempo: uma conclui e a outra recebe `ja_inativo` (validada sobre o resultado da primeira)
-- [ ] Inativar e corrigir saída em paralelo: o resultado final respeita as regras de ordem, sem períodos sobrepostos
-- [ ] Repetido 20 vezes sem resultado inconsistente
-- [ ] Gate full passa
+- [x] Duas conexões `pelada_app` inativam o mesmo jogador ao mesmo tempo: uma conclui e a outra recebe `ja_inativo` (validada sobre o resultado da primeira)
+- [x] Inativar e corrigir saída em paralelo: o resultado final respeita as regras de ordem, sem períodos sobrepostos
+- [x] Repetido 20 vezes sem resultado inconsistente
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
@@ -1381,10 +1401,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Fixture com `insertInto('periodos_ativos')` num arquivo fora do repositório → a checagem sai com erro; o mesmo para `updateTable`, `deleteFrom`, SQL cru e `inicio_pontuacao`
-- [ ] O repositório real e as migrations passam; o repositório atual do app passa
-- [ ] Entra no `pnpm test:checagens` e no job `base` do CI (`.github/workflows/ci.yml`)
-- [ ] Gate full passa
+- [x] Fixture com `insertInto('periodos_ativos')` num arquivo fora do repositório → a checagem sai com erro; o mesmo para `updateTable`, `deleteFrom`, SQL cru e `inicio_pontuacao`
+- [x] O repositório real e as migrations passam; o repositório atual do app passa
+- [x] Entra no `pnpm test:checagens` e no job `base` do CI (`.github/workflows/ci.yml`)
+- [x] Gate full passa
 
 **Tests**: unit
 **Gate**: full
@@ -1410,11 +1430,11 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Habilidade nova vai ao fim da ordem; renomear mantém notas e posição
-- [ ] "Drible" e "drible" colidem (422 com a mensagem do GEL-91); corrida cai no índice único e vira o mesmo 422
-- [ ] Excluir apaga as notas de todos os jogadores nessa habilidade e audita `habilidade_excluida`
-- [ ] Habilidade de outro grupo → nulo (404)
-- [ ] Gate full passa
+- [x] Habilidade nova vai ao fim da ordem; renomear mantém notas e posição
+- [x] "Drible" e "drible" colidem (422 com a mensagem do GEL-91); corrida cai no índice único e vira o mesmo 422
+- [x] Excluir apaga as notas de todos os jogadores nessa habilidade e audita `habilidade_excluida`
+- [x] Habilidade de outro grupo → nulo (404)
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
@@ -1438,10 +1458,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] 200, 201, 200 e 204 nos caminhos felizes; nome de 1 e 31 caracteres → 422 do GEL-90; repetido → 422 do GEL-91
-- [ ] Id de outro grupo → 404; sem vínculo → 404; grupo arquivado → 409 nas escritas
-- [ ] Casos `grupo` dos quatro métodos em `casos.ts`
-- [ ] Gate full passa
+- [x] 200, 201, 200 e 204 nos caminhos felizes; nome de 1 e 31 caracteres → 422 do GEL-90; repetido → 422 do GEL-91
+- [x] Id de outro grupo → 404; sem vínculo → 404; grupo arquivado → 409 nas escritas
+- [x] Casos `grupo` dos quatro métodos em `casos.ts`
+- [x] Gate full passa
 
 **Tests**: e2e
 **Gate**: full
@@ -1465,10 +1485,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Salvar nota cria; salvar de novo substitui (uma linha só); `null` apaga e não falha se não existir
-- [ ] Depois de 6 notas 8, 7, 6, 7, 8, 5 o nível devolvido é 683; apagando todas, 550 e `semNota`
-- [ ] Jogador inativo recebe nota; jogador ou habilidade de outro grupo → nulo
-- [ ] Gate full passa
+- [x] Salvar nota cria; salvar de novo substitui (uma linha só); `null` apaga e não falha se não existir
+- [x] Depois de 6 notas 8, 7, 6, 7, 8, 5 o nível devolvido é 683; apagando todas, 550 e `semNota`
+- [x] Jogador inativo recebe nota; jogador ou habilidade de outro grupo → nulo
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
@@ -1492,10 +1512,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Nota 8 → 200 com `{ nivel, semNota }`; `null` → 200; nota 0, 11, 5,5 → 422 no campo `nota`
-- [ ] Jogador ou habilidade de outro grupo → 404; jogador inativo → 200
-- [ ] Caso `grupo` em `casos.ts`
-- [ ] Gate full passa
+- [x] Nota 8 → 200 com `{ nivel, semNota }`; `null` → 200; nota 0, 11, 5,5 → 422 no campo `nota`
+- [x] Jogador ou habilidade de outro grupo → 404; jogador inativo → 200
+- [x] Caso `grupo` em `casos.ts`
+- [x] Gate full passa
 
 **Tests**: e2e
 **Gate**: full
@@ -1519,9 +1539,9 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Cadastrar jogador com telefone e ano de nascimento, editar a pontuação, inativar, reativar, corrigir e alterar o início: nenhum `resumo` contém o telefone nem o ano
-- [ ] Os nomes de evento da spec existem (grupo_criado, grupo_arquivado, grupo_reativado, jogador_criado, jogador_excluido, jogador_pontuacao_inicial_alterada, jogador_inativado, jogador_reativado, jogador_periodo_corrigido, jogador_inicio_alterado, habilidade_excluida)
-- [ ] Gate full passa
+- [x] Cadastrar jogador com telefone e ano de nascimento, editar a pontuação, inativar, reativar, corrigir e alterar o início: nenhum `resumo` contém o telefone nem o ano
+- [x] Os nomes de evento da spec existem (grupo_criado, grupo_arquivado, grupo_reativado, jogador_criado, jogador_excluido, jogador_pontuacao_inicial_alterada, jogador_inativado, jogador_reativado, jogador_periodo_corrigido, jogador_inicio_alterado, habilidade_excluida)
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
@@ -1545,10 +1565,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Conta admin do grupo A, ids do grupo B: 404 em jogador (GET, PATCH, DELETE, inativar, reativar, inicio, notas), período (PATCH) e habilidade (PATCH, DELETE, notas) e nada do grupo B muda
-- [ ] Uma asserção de estado do grupo B por rota (linha continua igual)
-- [ ] Teste roda como `pelada_app`
-- [ ] Gate full passa
+- [x] Conta admin do grupo A, ids do grupo B: 404 em jogador (GET, PATCH, DELETE, inativar, reativar, inicio, notas), período (PATCH) e habilidade (PATCH, DELETE, notas) e nada do grupo B muda
+- [x] Uma asserção de estado do grupo B por rota (linha continua igual)
+- [x] Teste roda como `pelada_app`
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
@@ -1572,10 +1592,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] `pnpm seed` num banco migrado cria o grupo, 4 jogadores (1 inativo com dois períodos) e notas
-- [ ] Rodar o seed duas vezes não duplica nada
-- [ ] Teste do seed verde (`backend/scripts/test`)
-- [ ] Gate full passa
+- [x] `pnpm seed` num banco migrado cria o grupo, 4 jogadores (1 inativo com dois períodos) e notas
+- [x] Rodar o seed duas vezes não duplica nada
+- [x] Teste do seed verde (`backend/scripts/test`)
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
@@ -1601,9 +1621,9 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Cada mutação chama a rota certa com o corpo do contrato e invalida `grupos` e `grupo`
-- [ ] 422 com `campos` chega à tela no formato do `ResumoErros`
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Cada mutação chama a rota certa com o corpo do contrato e invalida `grupos` e `grupo`
+- [x] 422 com `campos` chega à tela no formato do `ResumoErros`
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
@@ -1627,9 +1647,9 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Cada mutação chama a rota certa e invalida a lista e a ficha
-- [ ] 409 `jogador_com_historico` chega com a sugestão `inativar`
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Cada mutação chama a rota certa e invalida a lista e a ficha
+- [x] 409 `jogador_com_historico` chega com a sugestão `inativar`
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
@@ -1653,8 +1673,8 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Cada mutação chama a rota certa e invalida a lista de habilidades e a de jogadores (o nível pode mudar na exclusão)
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Cada mutação chama a rota certa e invalida a lista de habilidades e a de jogadores (o nível pode mudar na exclusão)
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
@@ -1678,9 +1698,9 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] `formatarNivel(683)` → "6,8"; 685 → "6,9"; `semNota` → "sem nota"
-- [ ] A mutação invalida a ficha e a lista
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] `formatarNivel(683)` → "6,8"; 685 → "6,9"; `semNota` → "sem nota"
+- [x] A mutação invalida a ficha e a lista
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
@@ -1704,10 +1724,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Estados do mockup t08: carregando, erro, vazio, sucesso, arquivado, reativar e reativado, cada um com teste
-- [ ] Arquivados só aparecem para quem tem a lista `arquivados`; Reativar chama a mutação
-- [ ] axe sem violação; só tokens (`checar-tokens.py` passa)
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Estados do mockup t08: carregando, erro, vazio, sucesso, arquivado, reativar e reativado, cada um com teste
+- [x] Arquivados só aparecem para quem tem a lista `arquivados`; Reativar chama a mutação
+- [x] axe sem violação; só tokens (`checar-tokens.py` passa)
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
@@ -1731,10 +1751,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Estados do mockup t27: vazio, carregando e erro; "Corrija N campos: …" com a mensagem ao lado de cada campo
-- [ ] Envio válido chama a mutação e navega para `/app/grupos/:id`
-- [ ] axe sem violação; só tokens
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Estados do mockup t27: vazio, carregando e erro; "Corrija N campos: …" com a mensagem ao lado de cada campo
+- [x] Envio válido chama a mutação e navega para `/app/grupos/:id`
+- [x] axe sem violação; só tokens
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
@@ -1758,10 +1778,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Estados t09: sem jogadores e sucesso ("6 habilidades", "1 admin")
-- [ ] Sem item "Pontuação"; links para jogadores, habilidades, admins e dados do grupo
-- [ ] axe sem violação; só tokens
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Estados t09: sem jogadores e sucesso ("6 habilidades", "1 admin")
+- [x] Sem item "Pontuação"; links para jogadores, habilidades, admins e dados do grupo
+- [x] axe sem violação; só tokens
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
@@ -1785,10 +1805,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Estados t20: sucesso, salvo ("Dados salvos"), erro, carregando, nao-criador (sem a zona de arquivar), arquivar e arquivar-erro
-- [ ] Arquivar só habilita com o nome exato; 422 do nome aparece no campo; o link é copiado sem URL fixa no código
-- [ ] axe sem violação; só tokens
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Estados t20: sucesso, salvo ("Dados salvos"), erro, carregando, nao-criador (sem a zona de arquivar), arquivar e arquivar-erro
+- [x] Arquivar só habilita com o nome exato; 422 do nome aparece no campo; o link é copiado sem URL fixa no código
+- [x] axe sem violação; só tokens
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
@@ -1814,10 +1834,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Com 3 jogadores (1 inativo): "Ativos (2) Inativos (1)"; buscar "jose" acha "José"
-- [ ] Listas ordenadas por apelido sem acento e sem caixa; vazio de ativos mostra a ação "Novo jogador" e o de inativos "Nenhum jogador inativo."
-- [ ] axe sem violação; só tokens
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Com 3 jogadores (1 inativo): "Ativos (2) Inativos (1)"; buscar "jose" acha "José"
+- [x] Listas ordenadas por apelido sem acento e sem caixa; vazio de ativos mostra a ação "Novo jogador" e o de inativos "Nenhum jogador inativo."
+- [x] axe sem violação; só tokens
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
@@ -1841,10 +1861,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Estado t16 novo: erros por campo com as mensagens da spec e "Corrija N campos: …"
-- [ ] Envio válido navega para a lista e o jogador aparece em Ativos "desde <hoje>"
-- [ ] axe sem violação; só tokens
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Estado t16 novo: erros por campo com as mensagens da spec e "Corrija N campos: …"
+- [x] Envio válido navega para a lista e o jogador aparece em Ativos "desde <hoje>"
+- [x] axe sem violação; só tokens
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
@@ -1868,10 +1888,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Estados t16: edicao, carregando, erro
-- [ ] Dar 8, 7, 6, 7, 8 e 5 mostra "Nível 6,8"; apagar todas mostra "sem nota"; jogador inativo ainda edita notas
-- [ ] axe sem violação; só tokens
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Estados t16: edicao, carregando, erro
+- [x] Dar 8, 7, 6, 7, 8 e 5 mostra "Nível 6,8"; apagar todas mostra "sem nota"; jogador inativo ainda edita notas
+- [x] axe sem violação; só tokens
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
@@ -1895,10 +1915,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Estados t16: inativar, inativo, reativar, reativar-erro, reativado
-- [ ] O aviso "Ele sai do ranking, do lançamento, do simulador e do financeiro…" aparece antes de confirmar, com Cancelar e Inativar
-- [ ] 422 de período aparece no campo da data; axe sem violação; só tokens
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Estados t16: inativar, inativo, reativar, reativar-erro, reativado
+- [x] O aviso "Ele sai do ranking, do lançamento, do simulador e do financeiro…" aparece antes de confirmar, com Cancelar e Inativar
+- [x] 422 de período aparece no campo da data; axe sem violação; só tokens
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
@@ -1922,10 +1942,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Estados t16: corrigir, corrigir-erro, corrigido ("Datas corrigidas."), inicio, inicio-erro
-- [ ] Início do primeiro período não é editável pela correção (mostra o caminho "Alterar data de início")
-- [ ] axe sem violação; só tokens
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Estados t16: corrigir, corrigir-erro, corrigido ("Datas corrigidas."), inicio, inicio-erro
+- [x] Início do primeiro período não é editável pela correção (mostra o caminho "Alterar data de início")
+- [x] axe sem violação; só tokens
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
@@ -1949,10 +1969,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Estados t16: excluir e exclusao-recusada
-- [ ] Texto exato "O cadastro é apagado. Só é possível excluir quem não tem partidas, notas nem pagamentos."
-- [ ] Recusa 409 mostra a mensagem e o botão que abre o diálogo de inativar; axe sem violação; só tokens
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Estados t16: excluir e exclusao-recusada
+- [x] Texto exato "O cadastro é apagado. Só é possível excluir quem não tem partidas, notas nem pagamentos."
+- [x] Recusa 409 mostra a mensagem e o botão que abre o diálogo de inativar; axe sem violação; só tokens
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
@@ -1976,10 +1996,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Estados do mockup t17 do projeto: vazio ("Nenhuma habilidade", "O simulador vai usar nível 5,5 para todos."), sucesso, erro, carregando
-- [ ] Exclusão confirma com "Excluir “<nome>”?" e "…apaga as notas de todos os jogadores nessa habilidade."
-- [ ] axe sem violação; só tokens
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Estados do mockup t17 do projeto: vazio ("Nenhuma habilidade", "O simulador vai usar nível 5,5 para todos."), sucesso, erro, carregando
+- [x] Exclusão confirma com "Excluir “<nome>”?" e "…apaga as notas de todos os jogadores nessa habilidade."
+- [x] axe sem violação; só tokens
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
@@ -2003,11 +2023,13 @@ T68 → T69 → T70
 - MCP: NONE
 - Skill: NONE
 
+> Nota (2026-10-29, decisão do usuário no lote 4): a rota `/app/grupos/:grupoId` (t09) já foi ligada antes desta tarefa, para o e2e do ACE-33 seguir verde depois da T57. Os critérios abaixo continuam valendo.
+
 **Done when**:
 
-- [ ] Cada rota da spec abre a tela certa; sem sessão cai em entrar
-- [ ] `/app/grupos/:grupoId/admins` e as demais rotas da conta continuam funcionando (`rotas.test.tsx` verde)
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Cada rota da spec abre a tela certa; sem sessão cai em entrar
+- [x] `/app/grupos/:grupoId/admins` e as demais rotas da conta continuam funcionando (`rotas.test.tsx` verde)
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
@@ -2031,10 +2053,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] `pnpm --filter @pelada/web visual` sem divergência acima do limite (1%) nas 34 telas do módulo e nas t09, t15, t17, t27 em PC e celular
-- [ ] `python .claude/scripts/checar-tokens.py frontend/web/src` passa
-- [ ] `telas-ativas.test.mjs` atualizado só com o acréscimo das telas novas (nenhuma asserção removida)
-- [ ] Gate build passa
+- [x] `pnpm --filter @pelada/web visual` sem divergência acima do limite (1%) nas 34 telas do módulo e nas t09, t15, t17, t27 em PC e celular
+- [x] `python .claude/scripts/checar-tokens.py frontend/web/src` passa
+- [x] `telas-ativas.test.mjs` atualizado só com o acréscimo das telas novas (nenhuma asserção removida)
+- [x] Gate build passa
 
 **Tests**: e2e
 **Gate**: build
@@ -2058,12 +2080,367 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Conta sem grupos cria "Pelada de Quinta" e cadastra "Toninho" no viewport de celular em menos de 2 minutos de interação (sem esperas fixas)
-- [ ] O grupo aparece em "Seus grupos" e o início mostra "6 habilidades" e "1 admin"
-- [ ] Arquivar com o nome digitado leva o grupo a "Arquivados"; Reativar o devolve
-- [ ] Gate build passa
+- [x] Conta sem grupos cria "Pelada de Quinta" e cadastra "Toninho" no viewport de celular em menos de 2 minutos de interação (sem esperas fixas)
+- [x] O grupo aparece em "Seus grupos" e o início mostra "6 habilidades" e "1 admin"
+- [x] Arquivar com o nome digitado leva o grupo a "Arquivados"; Reativar o devolve
+- [x] Gate build passa
 
 **Tests**: e2e
+**Gate**: build
+
+---
+
+### Phase 13: Endurecimento: achados médios da auditoria
+
+### T71: Não remover a criadora do grupo (SEC-001)
+
+**What**: `DELETE /api/grupos/:id/admins/:contaId` recusa a conta de `criado_por` com 409 `criadora_nao_removivel`; o repositório confere na mesma transação.
+**Estimativa**: 1,5h
+**Risco**: alto
+**Where**: `backend/api/src/entrada/rotas/admins.ts`, `backend/api/src/infraestrutura/db/repositorios/admins.ts`, `backend/contrato/src/` (código de erro), `backend/api/test/rotas/admins.test.ts`, `backend/api/test/repositorios/admins.test.ts`
+**Depends on**: T70
+**Reuses**: Padrão de erro 409 das rotas de admins
+**Requirement**: SEC-001 (médio)
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [x] Admin convidada que remove a criadora recebe 409 `criadora_nao_removivel`, e a criadora continua admin e com acesso ao grupo
+- [x] A criadora removendo outra admin, e a admin saindo de si mesma, seguem como antes (204)
+- [x] Teste de rota e de repositório falham sem a regra
+- [x] Gate full passa
+
+**Tests**: integration + e2e (pool workerd)
+**Gate**: full
+
+---
+
+### T72: Tela de admins sem remover a criadora (SEC-001)
+
+**What**: A tela de admins não oferece "Remover" para a criadora e mostra a mensagem do 409 se a API recusar.
+**Estimativa**: 1h
+**Risco**: baixo
+**Where**: `frontend/web/src/` (tela de admins e seu teste)
+**Depends on**: T71
+**Reuses**: Mensagens de erro da tela de admins
+**Requirement**: SEC-001 (médio)
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [x] A linha da criadora não tem botão de remover; as demais mantêm
+- [x] Resposta 409 `criadora_nao_removivel` mostra mensagem em português sem quebrar a tela
+- [x] axe sem violação
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
+
+**Tests**: unit (jsdom)
+**Gate**: quick
+
+---
+
+### T73: Piso de 01/01/2000 na data de entrada do jogador (SEC-002)
+
+**What**: `dataEntrada` do cadastro de jogador usa o mesmo piso e a mesma mensagem da GEL-78 ("A data de início não pode ser anterior a 01/01/2000."), em vez de 500 ou 201 com data antiga.
+**Estimativa**: 1,5h
+**Risco**: alto
+**Where**: `backend/contrato/src/elenco.ts`, `backend/contrato/test/`, `backend/api/test/rotas/jogadores.test.ts`
+**Depends on**: T72
+**Reuses**: Piso da GEL-78 já aplicado no início do jogador
+**Requirement**: SEC-002 (médio), GEL-78
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [x] `POST …/jogadores` com `dataEntrada` `0000-01-01` responde 422 (não 500) e com `1999-12-31` responde 422 com a mensagem da GEL-78
+- [x] `2000-01-01` continua aceita (201)
+- [x] Teste de contrato e de rota falham sem o piso
+- [x] Gate full passa
+
+**Tests**: unit + e2e (pool workerd)
+**Gate**: full
+
+---
+
+### T74: Limite de taxa por conta nas escritas com sessão (SEC-003)
+
+**What**: Binding `LIMITE_ESCRITA` e middleware que limita por conta os `POST`, `PUT`, `PATCH` e `DELETE` de `/api/grupos*` (429 com `Retry-After`), reutilizando `limite-taxa.ts`.
+**Estimativa**: 2h
+**Risco**: alto
+**Where**: `wrangler.jsonc`, `backend/api/src/entrada/middlewares/limite-taxa.ts`, `backend/api/src/entrada/app.ts`, `backend/api/src/entrada/env.ts`, `backend/api/test/rotas/`
+**Depends on**: T73
+**Reuses**: `limite-taxa.ts` e os bindings `LIMITE_*`
+**Requirement**: SEC-003 (médio)
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [x] A chave do limite é a conta da sessão (não o IP) e o valor do limite fica registrado no `wrangler.jsonc` (período de 10 ou 60 s)
+- [x] Excedido o limite, a resposta é 429 com `Retry-After`, sem criar nada; leituras (GET) não contam
+- [x] Teste cria grupos em sequência e vê o 429; outra conta não é afetada
+- [x] Os casos de `casos.ts` seguem verdes (meta-teste)
+- [x] Gate full passa
+
+**Tests**: e2e (pool workerd)
+**Gate**: full
+
+---
+
+### T75: Documentar e checar o limite de escrita (SEC-003)
+
+**What**: README e runbook citam o `LIMITE_ESCRITA`; a checagem de bindings do repositório conhece o nome novo.
+**Estimativa**: 1,5h
+**Risco**: baixo
+**Where**: `README.md`, `docs/runbook.md`, `backend/scripts/checagens/`
+**Depends on**: T74
+**Reuses**: Texto dos `LIMITE_*` já documentados
+**Requirement**: SEC-003 (médio)
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [x] README e runbook descrevem o `LIMITE_ESCRITA`, o valor e como mudá-lo
+- [x] A checagem falha numa fixture sem o binding e passa no repositório
+- [x] Gate full passa
+
+**Tests**: unit com fixtures
+**Gate**: full
+
+---
+
+### Phase 14: Endurecimento: achados baixos da auditoria
+
+### T76: Convite de grupo arquivado (SEC-004)
+
+**What**: Migration nova (aditiva) em que `convites/ler` e `convites/aceitar` recusam convite de grupo arquivado e a criadora consegue cancelar o convite pendente.
+**Estimativa**: 2h
+**Risco**: alto
+**Where**: `backend/api/src/infraestrutura/db/migracoes/` (arquivo novo), `backend/api/test/migracoes/`, `backend/api/test/rotas/convites.test.ts`
+**Depends on**: T75
+**Reuses**: Padrão das funções SQL de `conta-convites.sql` (sem editar a migration aplicada)
+**Requirement**: SEC-004 (baixo)
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [x] Com o grupo arquivado, `convites/ler` e `convites/aceitar` não criam vínculo (resposta de convite indisponível)
+- [x] `DELETE` do convite pendente de grupo arquivado responde 204 para a criadora
+- [x] Reativado o grupo, o convite volta a valer
+- [x] Migration nova roda do zero e sobre o banco atual; teste falha sem ela
+- [x] Gate full passa
+
+**Tests**: integration (Postgres real) + e2e
+**Gate**: full
+
+---
+
+### T77: Recusar caracteres de controle e invisíveis em nomes (SEC-005)
+
+**What**: Nome de grupo, apelido e habilidade recusam NUL, controle e formatação (inclui U+200B e U+202E) e são normalizados em NFC no contrato; mensagem em português.
+**Estimativa**: 2h
+**Risco**: alto
+**Where**: `backend/contrato/src/grupo.ts`, `backend/contrato/src/elenco.ts`, `backend/contrato/src/habilidades.ts`, testes do contrato e das rotas
+**Depends on**: T76
+**Reuses**: Schemas de nome atuais
+**Requirement**: SEC-005 (baixo)
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [x] NUL no nome do grupo ou no apelido responde 422 (não 500)
+- [x] Espaço de largura zero e U+202E são recusados; "Beto" e "Beto"+U+200B deixam de ser dois apelidos diferentes
+- [x] Texto acentuado normal continua aceito e é guardado em NFC
+- [x] Teste por campo (grupo, apelido, habilidade) falha sem a regra
+- [x] Gate full passa
+
+**Tests**: unit + e2e (pool workerd)
+**Gate**: full
+
+---
+
+### T78: Nome do grupo seguro no e-mail de convite (SEC-006)
+
+**What**: O modelo do e-mail de convite mostra o nome do grupo como texto puro: sem quebra de linha, sem URL ou link ativo, com tamanho máximo.
+**Estimativa**: 1h
+**Risco**: alto
+**Where**: `backend/api/src/infraestrutura/email/modelos.ts`, teste do modelo
+**Depends on**: T77
+**Reuses**: Modelos de e-mail atuais
+**Requirement**: SEC-006 (baixo)
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [x] Nome de grupo com URL, quebra de linha ou HTML não vira link nem injeta linha no texto e no HTML do e-mail
+- [x] Nome normal sai igual ao de hoje
+- [x] Teste do modelo falha sem a regra
+- [x] Gate full passa
+
+**Tests**: unit
+**Gate**: full
+
+---
+
+### T79: Trava de leitura no middleware de grupo ativo (SEC-007)
+
+**What**: `exigirGrupoAtivo` lê `arquivado_em` com `FOR SHARE` (mesma transação da escrita), fechando a corrida com o arquivamento.
+**Estimativa**: 2h
+**Risco**: alto
+**Where**: `backend/api/src/entrada/middlewares/grupo-ativo.ts`, `backend/api/test/rotas/grupo-ativo-middleware.test.ts`
+**Depends on**: T78
+**Reuses**: Padrão de `FOR UPDATE` das rotas de período
+**Requirement**: SEC-007 (baixo)
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [x] A leitura do estado do grupo trava a linha até o fim da transação da escrita
+- [x] Teste de concorrência: arquivar durante uma escrita não deixa a escrita gravar no grupo já arquivado
+- [x] Os testes existentes do middleware seguem verdes sem alteração
+- [x] Gate full passa
+
+**Tests**: integration (concorrência)
+**Gate**: full
+
+---
+
+### T80: Auditar edições do jogador (SEC-008)
+
+**What**: Editar apelido, posição, telefone ou ano de nascimento grava evento de auditoria na mesma transação, sem telefone nem ano nos dados do evento.
+**Estimativa**: 1,5h
+**Risco**: alto
+**Where**: `backend/api/src/infraestrutura/db/repositorios/jogadores.ts`, `backend/api/test/repositorios/jogadores.test.ts`
+**Depends on**: T79
+**Reuses**: Auditoria de inativar e reativar
+**Requirement**: SEC-008 (baixo)
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [x] Cada edição grava um evento com quais campos mudaram (nomes dos campos, nunca os valores de telefone e ano)
+- [x] Edição que falha não deixa evento
+- [x] Teste confere que nenhum evento contém telefone nem ano
+- [x] Gate full passa
+
+**Tests**: integration
+**Gate**: full
+
+---
+
+### T81: Auditar grupo e habilidades (SEC-008)
+
+**What**: Renomear o grupo e criar ou renomear habilidade gravam evento de auditoria na mesma transação.
+**Estimativa**: 1,5h
+**Risco**: alto
+**Where**: `backend/api/src/infraestrutura/db/repositorios/grupos.ts`, `backend/api/src/infraestrutura/db/repositorios/habilidades.ts`, testes dos repositórios
+**Depends on**: T80
+**Reuses**: Auditoria da T80
+**Requirement**: SEC-008 (baixo)
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [x] Renomear grupo, criar habilidade e renomear habilidade gravam um evento cada, com nome antigo e novo
+- [x] Operação que falha não deixa evento
+- [x] Gate full passa
+
+**Tests**: integration
+**Gate**: full
+
+---
+
+### T82: Só quem criou muda `arquivado_em` também no banco (SEC-009)
+
+**What**: Migration nova (aditiva) com trigger ou função que confira `criado_por` ao alterar `arquivado_em`, para o `pelada_app` não burlar a regra pelo grant de coluna.
+**Estimativa**: 2h
+**Risco**: alto
+**Where**: `backend/api/src/infraestrutura/db/migracoes/` (arquivo novo), `backend/api/test/migracoes/`, `backend/api/test/isolamento/`
+**Depends on**: T81
+**Reuses**: `grupos-grants-coluna.sql` e policy `grupos_alterar` (sem editá-los)
+**Requirement**: SEC-009 (baixo)
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [x] `UPDATE grupos SET arquivado_em` por admin que não criou o grupo falha no banco, como `pelada_app`
+- [x] A criadora arquiva e reativa normalmente (fluxo da API e o e2e seguem verdes)
+- [x] Migration nova roda do zero e sobre o banco atual
+- [x] Gate full passa
+
+**Tests**: integration (Postgres real)
+**Gate**: full
+
+---
+
+### T83: Fechar o endurecimento: reteste e registros
+
+**What**: Reteste de cada SEC no `seguranca.md` (situação e evidência), débitos no THREAT-MODEL (SEC-010 `deepmerge`, I-1 regra ESLint não ligada contra a G-26, I-3 filtro de arquivado nas partidas) e nota no roteiro.
+**Estimativa**: 1,5h
+**Risco**: baixo
+**Where**: `.specs/features/grupos-e-elenco/seguranca.md`, `.md/THREAT-MODEL.md`, `.md/GUARDRAILS.md` (só texto da G-26, se precisar)
+**Depends on**: T82
+**Reuses**: —
+**Requirement**: SEC-001 a SEC-010
+
+**Tools**:
+
+- MCP: NONE
+- Skill: NONE
+
+**Done when**:
+
+- [x] Cada achado SEC-001 a SEC-009 está "corrigido" no `seguranca.md`, com `arquivo:linha` do teste que o prova
+- [x] SEC-010, I-1 e I-3 estão registrados como débito com dono (feature seguinte) no THREAT-MODEL
+- [x] Gate build completo passa: `pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:checagens && pnpm --filter @pelada/web build && pnpm --filter @pelada/web e2e && pnpm --filter @pelada/web visual`
+
+**Tests**: none (documentação) + gate
 **Gate**: build
 
 ---
@@ -2071,7 +2448,7 @@ T68 → T69 → T70
 ## Phase Execution Map
 
 ```
-Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5 → Phase 6 → Phase 7 → Phase 8 → Phase 9 → Phase 10 → Phase 11 → Phase 12
+Phase 1 → Phase 2 → Phase 3 → Phase 4 → Phase 5 → Phase 6 → Phase 7 → Phase 8 → Phase 9 → Phase 10 → Phase 11 → Phase 12 → Phase 13 → Phase 14
 
 Phase 1:  T1 → T2 → T3 → T4 → T5
 Phase 2:  T6 → T7 → T8 → T9 → T10 → T11
@@ -2085,6 +2462,8 @@ Phase 9:  T46 → T47 → T48 → T49 → T50 → T51 → T52
 Phase 10:  T53 → T54 → T55 → T56 → T57 → T58 → T59 → T60
 Phase 11:  T61 → T62 → T63 → T64 → T65 → T66 → T67
 Phase 12:  T68 → T69 → T70
+Phase 13:  T71 → T72 → T73 → T74 → T75
+Phase 14:  T76 → T77 → T78 → T79 → T80 → T81 → T82 → T83
 ```
 
 Execução estritamente sequencial, sem paralelismo dentro da fase. Os lotes (até 14h de Estimativa, fases inteiras) saem de `python .claude/scripts/progresso.py --lote`.

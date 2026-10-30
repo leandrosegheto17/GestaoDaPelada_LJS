@@ -64,6 +64,25 @@ dia no plano gratuito), a API responde 503 `email_indisponivel` (ACE-52). `LIMIT
 pedidos de e-mail por hora por IPv4 ou /48 de IPv6 (429 acima disso); sem o cabeçalho `CF-Connecting-IP`, como no
 `pnpm dev`, todos os pedidos dividem a chave `sem-ip`, então suba o valor no `.dev.vars` se testar muitos envios.
 
+### Limites de taxa
+
+A API usa quatro limitadores do Rate Limiting do Workers, declarados em `ratelimits` no `wrangler.jsonc` (cada um com o
+próprio `namespace_id`; o período só pode ser 10 ou 60 s). Acima do limite a resposta é 429 `muitas_requisicoes`.
+
+| Binding          | Chave           | Valor       | Onde                                                                                                                               |
+| ---------------- | --------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `LIMITE_ENTRAR`  | IP              | 10 por 60 s | cadastro, confirmação e reenvio, entrar, recuperação de senha, leitura e cadastro pelo convite, troca de senha e exclusão de conta |
+| `LIMITE_PUBLICO` | IP              | 60 por 60 s | `/api/publico/*`                                                                                                                   |
+| `LIMITE_WEBHOOK` | IP              | 60 por 60 s | reservado para os webhooks (nenhuma rota o usa ainda)                                                                              |
+| `LIMITE_ESCRITA` | conta da sessão | 60 por 60 s | `POST`, `PUT`, `PATCH` e `DELETE` em `/api/grupos*` (SEC-003); o 429 traz `Retry-After: 60`                                        |
+
+O `LIMITE_ESCRITA` não conta leituras nem pedidos sem sessão (esses recebem 401). Para mudar um valor, edite o
+`simple.limit` ou o `simple.period` do binding no `wrangler.jsonc`. O período do `LIMITE_ESCRITA` tem de ser o mesmo de
+`PERIODO_LIMITE_ESCRITA_S` em `backend/api/src/entrada/app.ts`, que vai no `Retry-After`. A checagem
+`node backend/scripts/checagens/checar-limitadores.mjs` (no CI) confere os quatro bindings, os valores e esse período, e o
+teste `backend/api/test/config/wrangler.test.ts` fixa os valores. No `pnpm dev` e nos testes, o wrangler simula os
+limitadores com os mesmos valores. A mudança vale em produção no próximo deploy.
+
 Para a conta do dono: `pnpm dono -- --email <e-mail>` (pede a senha sem eco e usa o banco local; em produção, só com
 `--alvo producao` e a confirmação do runbook).
 

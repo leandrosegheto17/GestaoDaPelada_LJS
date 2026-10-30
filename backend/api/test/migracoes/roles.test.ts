@@ -43,6 +43,10 @@ const DE_CONTA: Record<string, string[]> = {
   convites_admin: ['SELECT', 'INSERT', 'UPDATE'],
   sessoes: ['SELECT', 'DELETE'],
 };
+// Tabelas de negócio com UPDATE só por coluna (grupos-e-elenco, T20; GEL-16, GEL-112): sem UPDATE de tabela.
+const UPDATE_POR_COLUNA: Record<string, string[]> = {
+  grupos: ['arquivado_em', 'dia_semana', 'frequencia', 'horario', 'nome'],
+};
 // Colunas de `contas` que pelada_app lê (todas menos senha_hash) e a única que altera.
 const CONTAS_LEGIVEIS = [
   'aviso_privacidade_visto_em',
@@ -230,16 +234,19 @@ describe('roles (FUN-11)', () => {
   });
 
   // Motivo da mudança (conta-e-acesso, T7): as tabelas de conta ganham os grants do design C1 (DE_CONTA).
+  // Motivo da mudança (grupos-e-elenco, T20): `grupos` perde o UPDATE de tabela e fica com UPDATE por coluna
+  // (UPDATE_POR_COLUNA, conferido no teste seguinte).
   it('pelada_app: SELECT, INSERT e UPDATE nas tabelas de negócio, DELETE só nas listadas, os de conta, nada nas demais', async () => {
     const esperado: Record<string, string[]> = {};
     for (const tabela of todasAsTabelas) {
-      esperado[tabela] = DE_CONTA[tabela]
+      const base = DE_CONTA[tabela]
         ? DE_CONTA[tabela]
         : !NEGOCIO.includes(tabela)
           ? []
           : COM_DELETE.includes(tabela)
             ? ['SELECT', 'INSERT', 'UPDATE', 'DELETE']
             : ['SELECT', 'INSERT', 'UPDATE'];
+      esperado[tabela] = UPDATE_POR_COLUNA[tabela] ? base.filter((p) => p !== 'UPDATE') : base;
     }
     expect(await privilegios('pelada_app')).toEqual(esperado);
     expect(todasAsTabelas).toEqual(expect.arrayContaining([...NEGOCIO, 'contas', 'sessoes', 'pgmigrations']));
@@ -291,6 +298,23 @@ describe('roles (FUN-11)', () => {
       expect(await codigoDoErro(cliente, `DELETE FROM ${tabela}`)).toBe(SEM_PRIVILEGIO);
     });
   });
+
+  it.each(Object.entries(UPDATE_POR_COLUNA))(
+    'pelada_app altera em %s só as colunas listadas e lê todas (GEL-16)',
+    async (tabela, colunas) => {
+      const { rows } = await cliente.query<{ coluna: string; ler: boolean; alterar: boolean }>(
+        `SELECT a.attname AS coluna,
+                has_column_privilege('pelada_app', a.attrelid, a.attname, 'SELECT') AS ler,
+                has_column_privilege('pelada_app', a.attrelid, a.attname, 'UPDATE') AS alterar
+           FROM pg_attribute a
+          WHERE a.attrelid = $1::regclass AND a.attnum > 0 AND NOT a.attisdropped
+          ORDER BY 1`,
+        [`public.${tabela}`],
+      );
+      expect(rows.filter((r) => r.alterar).map((r) => r.coluna)).toEqual(colunas);
+      expect(rows.filter((r) => !r.ler)).toEqual([]);
+    },
+  );
 
   it('pelada_app lê em contas todas as colunas menos senha_hash e altera só nome (ACE-43, ACE-44)', async () => {
     const { rows } = await cliente.query<{ coluna: string; ler: boolean; alterar: boolean; inserir: boolean }>(

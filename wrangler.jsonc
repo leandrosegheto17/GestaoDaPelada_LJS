@@ -27,7 +27,9 @@
   "ratelimits": [
     { "name": "LIMITE_ENTRAR", "namespace_id": "1001", "simple": { "limit": 10, "period": 60 } },
     { "name": "LIMITE_PUBLICO", "namespace_id": "1002", "simple": { "limit": 60, "period": 60 } },
-    { "name": "LIMITE_WEBHOOK", "namespace_id": "1003", "simple": { "limit": 60, "period": 60 } }
+    { "name": "LIMITE_WEBHOOK", "namespace_id": "1003", "simple": { "limit": 60, "period": 60 } },
+    // SEC-003: escritas com sessão em /api/grupos*, por conta. O período vai no Retry-After (PERIODO_LIMITE_ESCRITA_S).
+    { "name": "LIMITE_ESCRITA", "namespace_id": "1004", "simple": { "limit": 60, "period": 60 } }
   ],
   // FUN-27: domínio próprio do Worker.
   "routes": [{ "pattern": "gestaodapelada.ljssoftware.com.br", "custom_domain": true }],

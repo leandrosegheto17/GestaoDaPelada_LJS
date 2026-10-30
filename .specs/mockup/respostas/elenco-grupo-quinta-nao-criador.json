@@ -1,0 +1,13 @@
+{
+  "id": "g-quinta",
+  "nome": "Pelada de Quinta",
+  "slug": "pelada-de-quinta",
+  "diaSemana": "quinta",
+  "frequencia": "semanal",
+  "horario": "20:00",
+  "linkPublico": "https://gestaodapelada.ljssoftware.com.br/g/pelada-de-quinta",
+  "jogadoresAtivos": 20,
+  "habilidades": 6,
+  "admins": 2,
+  "souCriador": false
+}

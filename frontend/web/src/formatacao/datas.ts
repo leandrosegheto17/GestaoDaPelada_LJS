@@ -108,3 +108,10 @@ export function dataHoraCompleta(iso: string): string {
 export function siglaMes(mes: string): string {
   return nomeMes(mes).slice(0, 3);
 }
+
+/** Hoje no fuso de São Paulo, `AAAA-MM-DD` (ADR-012). */
+export function hojeEmSaoPaulo(): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: FUSO, year: 'numeric', month: '2-digit', day: '2-digit' }).format(
+    new Date(),
+  );
+}

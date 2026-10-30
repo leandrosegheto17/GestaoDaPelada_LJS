@@ -1,4 +1,5 @@
 import { TERMOS_VERSAO } from '@pelada/contrato';
+import { sql } from 'kysely';
 import { describe, expect, it } from 'vitest';
 import * as convites from '../../src/infraestrutura/db/repositorios/convites.ts';
 import { gerarToken } from '../../src/infraestrutura/sessao/token.ts';
@@ -165,5 +166,112 @@ describe('POST /api/convites/cadastrar', () => {
     );
     expect(log).not.toContain(token);
     expect(log).not.toContain('senha-vazada-do-convite');
+  });
+});
+
+describe('convite de grupo arquivado (T76; SEC-004)', () => {
+  /** Grupo criado pela conta de uma sessão nova, com um convite pendente ao e-mail dado; arquivado no fim. */
+  async function grupoArquivadoComConvite(email: string) {
+    const criadora = await criarSessao();
+    const grupo = await noBanco(criadora.contaId, async (db) => {
+      const { rows } = await sql<{ id: string }>`
+        SELECT id FROM grupo_criar('Grupo Convite Arquivado', 'quarta', 'semanal', '20:00',
+                                   ${`conv-arq-${crypto.randomUUID()}`}, ARRAY['Passe']::text[])
+      `.execute(db);
+      return rows[0]?.id as string;
+    });
+    const link = await gerarToken();
+    const criado = await noBanco(criadora.contaId, (db) => convites.criar(db, grupo, email, link.hash));
+    expect(criado.resultado).toBe('ok');
+    await noBanco(criadora.contaId, (db) =>
+      db
+        .updateTable('grupos')
+        .set({ arquivado_em: sql<Date>`now()` })
+        .where('id', '=', grupo)
+        .execute(),
+    );
+    return { criadora, grupo, token: link.token, id: criado.conviteId as string };
+  }
+
+  const vinculosDe = (grupo: string) =>
+    comoOwner<{ conta_id: string }>('SELECT conta_id FROM vinculos_admin WHERE grupo_id = $1', [grupo]);
+
+  it('ler e aceitar: 410 link_invalido e nenhum vínculo novo', async () => {
+    const convidada = await criarSessao();
+    const { criadora, grupo, token } = await grupoArquivadoComConvite(convidada.email);
+
+    const lido = await pedir('POST', '/api/convites/ler', { token });
+    expect(lido.status).toBe(410);
+    expect(lido.corpo).toMatchObject({ erro: { codigo: 'link_invalido' } });
+    const aceito = await pedir('POST', '/api/convites/aceitar', { token }, { cookie: convidada.cookie });
+    expect(aceito.status).toBe(410);
+    expect(aceito.corpo).toMatchObject({ erro: { codigo: 'link_invalido' } });
+
+    expect((await vinculosDe(grupo)).map((v) => v.conta_id)).toEqual([criadora.contaId]);
+    const eu = await pedir('GET', '/api/sessao', undefined, { cookie: convidada.cookie });
+    expect(eu.corpo).toMatchObject({ grupos: [] });
+  });
+
+  it('cadastrar: 410 link_invalido, sem conta e sem sessão', async () => {
+    const email = emailNovo();
+    const { grupo, token } = await grupoArquivadoComConvite(email);
+    const r = await pedir('POST', '/api/convites/cadastrar', { token, nome: 'Pessoa', senha: SENHA, termos: true });
+    expect(r.status).toBe(410);
+    expect(r.headers.get('Set-Cookie')).toBeNull();
+    expect(await comoOwner('SELECT 1 FROM contas WHERE email = $1', [email])).toEqual([]);
+    expect(await vinculosDe(grupo)).toHaveLength(1);
+  });
+
+  it('a criadora cancela o convite pendente do grupo arquivado: 204, e ele não volta ao reativar', async () => {
+    const convidada = await criarSessao();
+    const { criadora, grupo, token, id } = await grupoArquivadoComConvite(convidada.email);
+
+    const r = await pedir('DELETE', `/api/grupos/${grupo}/admins/convites/${id}`, undefined, {
+      cookie: criadora.cookie,
+    });
+    expect(r.status).toBe(204);
+    expect(
+      await comoOwner('SELECT 1 FROM convites_admin WHERE id = $1 AND cancelado_em IS NOT NULL', [id]),
+    ).toHaveLength(1);
+
+    expect((await pedir('POST', `/api/grupos/${grupo}/reativar`, undefined, { cookie: criadora.cookie })).status).toBe(
+      200,
+    );
+    expect((await pedir('POST', '/api/convites/ler', { token })).status).toBe(410);
+  });
+
+  it('cancelar de novo, ou um convite que não existe, no grupo arquivado: 404', async () => {
+    const { criadora, grupo, id } = await grupoArquivadoComConvite(emailNovo());
+    const url = (c: string) => `/api/grupos/${grupo}/admins/convites/${c}`;
+    expect((await pedir('DELETE', url(id), undefined, { cookie: criadora.cookie })).status).toBe(204);
+    expect((await pedir('DELETE', url(id), undefined, { cookie: criadora.cookie })).status).toBe(404);
+    expect((await pedir('DELETE', url(crypto.randomUUID()), undefined, { cookie: criadora.cookie })).status).toBe(404);
+  });
+
+  it('as outras escritas de admins continuam 409 no grupo arquivado', async () => {
+    const { criadora, grupo } = await grupoArquivadoComConvite(emailNovo());
+    const convidar = await pedir(
+      'POST',
+      `/api/grupos/${grupo}/admins/convites`,
+      { email: emailNovo() },
+      { cookie: criadora.cookie },
+    );
+    expect(convidar.status).toBe(409);
+    expect(convidar.corpo).toMatchObject({ erro: { codigo: 'grupo_arquivado' } });
+  });
+
+  it('reativado o grupo, o convite volta a valer: lê e aceita', async () => {
+    const convidada = await criarSessao();
+    const { criadora, grupo, token } = await grupoArquivadoComConvite(convidada.email);
+    expect((await pedir('POST', `/api/grupos/${grupo}/reativar`, undefined, { cookie: criadora.cookie })).status).toBe(
+      200,
+    );
+
+    const lido = await pedir('POST', '/api/convites/ler', { token });
+    expect(lido.status).toBe(200);
+    expect(lido.corpo).toEqual({ email: convidada.email, grupoNome: 'Grupo Convite Arquivado', contaExiste: true });
+    const aceito = await pedir('POST', '/api/convites/aceitar', { token }, { cookie: convidada.cookie });
+    expect(aceito.status).toBe(200);
+    expect(aceito.corpo).toEqual({ grupoId: grupo });
   });
 });

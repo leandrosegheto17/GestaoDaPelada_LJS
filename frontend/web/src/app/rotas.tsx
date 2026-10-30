@@ -46,6 +46,35 @@ export function criarRotas(extras: RouteObject[] = rotasVitrine): RouteObject[] 
               path: '/app/conta/senha',
               lazy: async () => ({ Component: (await import('../telas/minha-senha/MinhaSenha')).MinhaSenha }),
             },
+            // grupos-e-elenco (GEL-114): as telas do grupo e do elenco. A rota do início (t09) foi ligada antes da T68.
+            {
+              path: '/app/grupos/novo',
+              lazy: async () => ({ Component: (await import('../telas/novo-grupo/NovoGrupo')).NovoGrupo }),
+            },
+            {
+              path: '/app/grupos/:grupoId',
+              lazy: async () => ({ Component: (await import('../telas/grupo/InicioDoGrupo')).InicioDoGrupo }),
+            },
+            {
+              path: '/app/grupos/:grupoId/dados',
+              lazy: async () => ({ Component: (await import('../telas/dados-grupo/DadosDoGrupo')).DadosDoGrupo }),
+            },
+            {
+              path: '/app/grupos/:grupoId/jogadores',
+              lazy: async () => ({ Component: (await import('../telas/jogadores/Jogadores')).Jogadores }),
+            },
+            {
+              path: '/app/grupos/:grupoId/jogadores/novo',
+              lazy: async () => ({ Component: (await import('../telas/jogador/NovoJogador')).NovoJogador }),
+            },
+            {
+              path: '/app/grupos/:grupoId/jogadores/:jogadorId',
+              lazy: async () => ({ Component: (await import('../telas/jogador/FichaJogador')).FichaJogador }),
+            },
+            {
+              path: '/app/grupos/:grupoId/habilidades',
+              lazy: async () => ({ Component: (await import('../telas/habilidades/Habilidades')).Habilidades }),
+            },
             {
               path: '/app/grupos/:grupoId/admins',
               lazy: async () => ({ Component: (await import('../telas/admins/PaginaAdmins')).PaginaAdmins }),

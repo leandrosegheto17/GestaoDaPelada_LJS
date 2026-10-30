@@ -47,11 +47,11 @@ describe('telas ativas da fundação', () => {
   // entra na comparação; as asserções acima seguem valendo para as 36 do módulo, e esta fixa as acrescentadas.
   it('a tela Minha senha (t25) também é comparada, nos três estados', () => {
     const ativas = lerTelasAtivas(arquivo, nomesValidos(mapaDoMockup));
-    expect(ativas.slice(39)).toEqual(['t25-senha--vazio', 't25-senha--erro', 't25-senha--sucesso']);
+    expect(ativas.slice(39, 42)).toEqual(['t25-senha--vazio', 't25-senha--erro', 't25-senha--sucesso']);
   });
 
   it('as telas de acesso usam a rota real do app, com respostas de API, sem rota de vitrine', () => {
-    const ativas = lerTelasAtivas(arquivo, nomesValidos(mapaDoMockup)).slice(3);
+    const ativas = lerTelasAtivas(arquivo, nomesValidos(mapaDoMockup)).slice(3, 42);
     const mapa = montarMapa(mapaDoMockup, ativas, MOCKUP, join(import.meta.dirname, 'resultado'));
     expect(mapa.telas).toHaveLength(39);
     for (const tela of mapa.telas) {
@@ -59,6 +59,48 @@ describe('telas ativas da fundação', () => {
       expect(tela.rota).not.toMatch(/^\/vitrine\//);
       expect(tela.rota).toMatch(/^\//);
     }
+  });
+
+  // Motivo (T69, grupos-e-elenco, GEL-115, GEL-116): a feature acrescenta as telas do grupo e do elenco a
+  // `telas-ativas.txt`; as asserções acima seguem valendo (só o fim das fatias passa a ser explícito).
+  describe('telas de grupos-e-elenco', () => {
+    const MOCKUP_FEATURE = join(MOCKUP, '../features/grupos-e-elenco/mockup/telas');
+    const doModulo = readdirSync(MOCKUP_FEATURE)
+      .map((f) => f.replace(/\.html$/, ''))
+      .sort();
+    const ativas = lerTelasAtivas(arquivo, nomesValidos(mapaDoMockup));
+
+    it('são todas as telas do mockup do módulo, menos o início do grupo (t09, que depende de features seguintes)', () => {
+      expect(doModulo).toHaveLength(35);
+      const semT09 = doModulo.filter((n) => !n.startsWith('t09-'));
+      for (const nome of semT09) expect(ativas, nome).toContain(nome);
+      expect(semT09).toHaveLength(33);
+    });
+
+    it('a lista de jogadores (t15) e as habilidades (t17) também são comparadas, nos estados do mockup', () => {
+      for (const nome of [
+        't15-jogadores--sucesso',
+        't15-jogadores--vazio',
+        't15-jogadores--vazio-inativos',
+        't17-habilidades--sucesso',
+        't17-habilidades--vazio',
+        't17-habilidades--erro',
+        't17-habilidades--excluir',
+      ]) {
+        expect(ativas, nome).toContain(nome);
+      }
+    });
+
+    it('usam a rota real do app e comparam em PC e celular', () => {
+      const nomes = ativas.slice(42);
+      expect(nomes).toHaveLength(38);
+      const mapa = montarMapa(mapaDoMockup, nomes, MOCKUP, join(import.meta.dirname, 'resultado'));
+      for (const tela of mapa.telas) {
+        expect(tela.viewports, tela.id).toEqual(['pc', 'celular']);
+        expect(tela.rota, tela.id).toMatch(/^\/app/);
+        expect(tela.respostas?.length, tela.id).toBeGreaterThan(0);
+      }
+    });
   });
 
   it('o mapa derivado usa 1280×800 e 390×844, as rotas de vitrine e nenhuma resposta de API', () => {

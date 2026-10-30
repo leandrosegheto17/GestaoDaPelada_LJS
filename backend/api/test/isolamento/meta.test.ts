@@ -56,6 +56,11 @@ describe('a suíte de isolamento cobre toda tabela com grupo_id (FUN-17)', () =>
 });
 
 const PREFIXO_GRUPO = '/api/grupos/:grupoId/';
+// Motivo da mudança (grupos-e-elenco, T30): a rota do próprio grupo (`GET` e `PATCH /api/grupos/:grupoId`) também é
+// de grupo e passa pelo mesmo `exigirVinculo` (o middleware de `/api/grupos/:grupoId/*` casa com ela). O conceito de
+// "rota de grupo" passa a incluí-la; o caso novo do último teste prova que ela não pode ser marcada "não se aplica".
+const ROTA_DO_GRUPO = '/api/grupos/:grupoId';
+const ehDeGrupo = (caminho: string) => caminho === ROTA_DO_GRUPO || caminho.startsWith(PREFIXO_GRUPO);
 
 /** Rotas registradas no app (sem os middlewares), como `MÉTODO /caminho`. */
 function rotasDoApp(app: Hono<AppEnv>): string[] {
@@ -75,10 +80,8 @@ function problemasDasRotas(rotas: string[], casos: Record<string, CasoRota>): st
   for (const [rota, caso] of Object.entries(casos)) {
     const caminho = rota.slice(rota.indexOf(' ') + 1);
     if (!rotas.includes(rota)) problemas.push(`${rota}: caso sem rota`);
-    if (caso.tipo === 'grupo' && !caminho.startsWith(PREFIXO_GRUPO))
-      problemas.push(`${rota}: grupo fora de ${PREFIXO_GRUPO}`);
-    if (caso.tipo === 'nao_se_aplica' && caminho.startsWith(PREFIXO_GRUPO))
-      problemas.push(`${rota}: rota de grupo sem caso de grupo`);
+    if (caso.tipo === 'grupo' && !ehDeGrupo(caminho)) problemas.push(`${rota}: grupo fora de ${PREFIXO_GRUPO}`);
+    if (caso.tipo === 'nao_se_aplica' && ehDeGrupo(caminho)) problemas.push(`${rota}: rota de grupo sem caso de grupo`);
     if (caso.tipo === 'nao_se_aplica' && !caso.motivo.trim()) problemas.push(`${rota}: "não se aplica" sem motivo`);
   }
   return problemas;
@@ -102,14 +105,20 @@ describe('a suíte de isolamento cobre toda rota registrada no Hono (G-04, ACE-4
     app.get('/api/grupos/:grupoId/coisa', (c) => c.json({ ok: true }));
     app.get('/api/fora', (c) => c.json({ ok: true }));
     app.get('/api/sem-motivo', (c) => c.json({ ok: true }));
+    app.delete('/api/grupos/:grupoId', (c) => c.json({ ok: true }));
+    app.get('/api/grupos/:grupoIdx', (c) => c.json({ ok: true }));
     const casos: Record<string, CasoRota> = {
       ...CASOS_ROTAS,
       'GET /api/grupos/:grupoId/coisa': { tipo: 'nao_se_aplica', motivo: 'errado' },
+      'DELETE /api/grupos/:grupoId': { tipo: 'nao_se_aplica', motivo: 'errado' },
+      'GET /api/grupos/:grupoIdx': { tipo: 'grupo' },
       'GET /api/fora': { tipo: 'grupo' },
       'GET /api/sem-motivo': { tipo: 'nao_se_aplica', motivo: ' ' },
     };
     expect(problemasDasRotas(rotasDoApp(app), casos)).toEqual([
       'GET /api/grupos/:grupoId/coisa: rota de grupo sem caso de grupo',
+      'DELETE /api/grupos/:grupoId: rota de grupo sem caso de grupo',
+      'GET /api/grupos/:grupoIdx: grupo fora de /api/grupos/:grupoId/',
       'GET /api/fora: grupo fora de /api/grupos/:grupoId/',
       'GET /api/sem-motivo: "não se aplica" sem motivo',
     ]);

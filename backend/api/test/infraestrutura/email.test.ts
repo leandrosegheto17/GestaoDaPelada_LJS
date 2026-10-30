@@ -170,4 +170,66 @@ describe('modelos', () => {
     expect(m.texto).toContain(`${urlPublica}/entrar`);
     expect(m.texto).not.toContain('#t=');
   });
+
+  describe('nome do grupo no convite como texto puro (T78; SEC-006)', () => {
+    const convite = (grupoNome: string) => modeloConvite({ urlPublica, grupoNome, token: TOKEN });
+    /** Assunto, texto e html: o que o cliente de e-mail mostra. */
+    const partes = (m: { assunto: string; texto: string; html: string }) => [m.assunto, m.texto, m.html];
+    /** Algum dos caracteres aparece no texto (sem regex de controle, que o lint recusa). */
+    const contemAlgum = (texto: string, caracteres: string) => [...caracteres].some((c) => texto.includes(c));
+
+    it('nome normal sai igual ao de hoje', () => {
+      expect(convite('Pelada de Quinta')).toEqual({
+        assunto: 'Convite para administrar Pelada de Quinta',
+        texto:
+          'Você foi convidado para administrar o grupo Pelada de Quinta no Gestão da Pelada.\n\n' +
+          `O convite vale por 7 dias.\n\nAceitar convite: ${urlPublica}/convite#t=${TOKEN}\n`,
+        html:
+          '<p>Você foi convidado para administrar o grupo Pelada de Quinta no Gestão da Pelada.</p>' +
+          `<p>O convite vale por 7 dias.</p><p><a href="${urlPublica}/convite#t=${TOKEN}">Aceitar convite</a></p>`,
+      });
+      expect(convite('Pelada F.C. do Zé').assunto).toBe('Convite para administrar Pelada F.C. do Zé');
+    });
+
+    it.each([
+      ['URL com esquema', 'Confirme seu Pix em https://golpe.com', ['https://golpe', 'golpe.com', '://golpe']],
+      ['www', 'Pix: www.golpe.com.br', ['www.', 'golpe.com']],
+      ['domínio solto', 'Acesse golpe.net agora', ['golpe.net']],
+      ['e-mail', 'Mande para pix@golpe.io', ['pix@golpe', 'golpe.io']],
+    ])('%s não vira link no assunto, no texto nem no html', (_caso, nome, proibidos) => {
+      const m = convite(nome);
+      for (const parte of partes(m)) {
+        for (const p of proibidos) expect(parte).not.toContain(p);
+      }
+      // O único link do e-mail é o do convite.
+      expect(m.texto.match(/:\/\//g)).toHaveLength(1);
+      expect(m.html.match(/<a /g)).toHaveLength(1);
+      expect(m.html.match(/href=/g)).toHaveLength(1);
+    });
+
+    it('quebra de linha e controle no nome não injetam linha no assunto, no texto nem no html', () => {
+      const normal = convite('Pelada de Quinta');
+      const m = convite('Pelada\r\nBcc: alguem\nX-Outro: 1\u0000\u2028fim');
+      expect(contemAlgum(m.assunto, '\r\n\u0000\u2028')).toBe(false);
+      expect(m.texto.split('\n')).toHaveLength(normal.texto.split('\n').length);
+      expect(contemAlgum(m.texto, '\r\u0000\u2028')).toBe(false);
+      expect(contemAlgum(m.html, '\r\n\u0000\u2028')).toBe(false);
+      expect(m.assunto).toBe('Convite para administrar Pelada Bcc: alguem X-Outro: 1 fim');
+    });
+
+    it('HTML no nome continua escapado e não vira link', () => {
+      const m = convite('<a href="https://golpe.com">Pix</a>');
+      expect(m.html).not.toContain('<a href="https://golpe');
+      expect(m.html).not.toContain('golpe.com');
+      expect(m.html.match(/<a /g)).toHaveLength(1);
+    });
+
+    it('nome longo é cortado em 60 caracteres, com reticências', () => {
+      const m = convite('a'.repeat(200));
+      expect(m.assunto).toBe(`Convite para administrar ${'a'.repeat(59)}…`);
+      expect(m.texto).not.toContain('a'.repeat(60));
+      expect(m.html).not.toContain('a'.repeat(60));
+      expect(convite('b'.repeat(60)).assunto).toBe(`Convite para administrar ${'b'.repeat(60)}`);
+    });
+  });
 });
