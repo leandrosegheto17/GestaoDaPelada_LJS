@@ -175,17 +175,17 @@
 
 - **Fluxo**: 1, Projeto novo para vender — skill `projeto-novo`
 - **Item**: `.specs/features/partidas-e-ranking/` (feature 4 de 8, AD-001), na `main`, sem branch nem worktree ainda
-- **Fase aprovada**: 7 (Desenho) em 2026-10-30. Spec aprovada (fase 6, `541f134` e `fe802b6`, PAR-01 a PAR-161, `context.md` P1 a P12); desenho aprovado (`c7c10b2`, AD-016 a AD-020 e ADR-036); mockup do módulo aprovado (`439113c`, t09, t11 `nova`, t16 com prévias)
-- **Próxima fase**: 8 (Preparação: `tasks.md` pelo `tlc-spec-driven`, fase Tasks) — modelo indicado: sonnet. Tarefas de até 2h com **Estimativa** e **Risco**; o design lista os componentes C1 a C9 e a seção "Mockup do módulo"
-- **Progresso**: Produto: Faltam 5 de 8 features: 38% concluído (em andamento: 4 partidas-e-ranking); Feature atual: sem tarefas ainda; Projeto: Faltam 2 de 205 tarefas: 99% concluído; conferida em 2026-10-30
+- **Fase aprovada**: 8 (Preparação) em 2026-10-30. `tasks.md` aprovado e comitado (`a70cd42`): 66 tarefas em 17 Phases, mapeando PAR-01 a PAR-161; `validate_tasks.py` com exit 0 (0 erros, 5 avisos esperados — `Tests: none` confirmado contra a matriz em T45, T57, T63, T64, T66)
+- **Próxima fase**: 9 (Construção: Execute do `tlc-spec-driven`) — modelo indicado: sonnet
+- **Construção**: lote 1 de 7 a começar (Phase 1: Domínio — datas, pesos e acumulado; T1 a T5, ~14h30 estimadas); sem branch nem worktree ainda — abrir com `using-git-worktrees` antes do lote 1; trabalhador: `implementador-dominio` (lote com tarefa de Risco alto)
+- **Progresso**: Produto: Faltam 5 de 8 features: 38% concluído (em andamento: 4 partidas-e-ranking); Feature atual: Faltam 66 de 66 tarefas: 0% concluído; Projeto: Faltam 68 de 271 tarefas: 75% concluído; conferida em 2026-10-30
 - **Combinado na conversa e não registrado em artefato**:
-  - Mudar testes existentes, já aprovado pelo usuário (motivo no teste e no commit): `frontend/web/src/telas/jogador/PeriodosJogador.test.tsx:136`, pelo texto novo do reativar (P6, PAR-159), e o mockup t16 do projeto na promoção.
-  - Na promoção do mockup (integração), os links das telas do módulo apontam também para `../../../grupos-e-elenco/mockup/telas/`; a galeria registra como reescrevê-los. A galeria não foi publicada como Artifact (exigiria ler 28 arquivos do mockup do projeto); a revisão foi local.
-  - Lição de ferramenta: no Git Bash desta máquina, `sed -i` com texto acentuado não casa e falha calado; editar artefatos com Python em UTF-8 (`newline=''`).
+  - Decisões de granularidade do `tasks.md` (fora do arquivo, só explicadas na aprovação): migrations do C1 cada uma com tarefa própria (T16–T21), como na `grupos-e-elenco`; a mudança do `comBanco` para `READ ONLY` em `/previa` (AD-017) é tarefa própria (T34) antes das rotas de prévia; lint `I-1`/`G-25` e o débito `SEC-010` (T43–T45) ficam depois das rotas existirem (Phase 10), porque a regra precisa do código novo para confirmar zero achados antes de ligar; a tela t16 (T53) é tarefa própria por mudar um teste existente (`PeriodosJogador.test.tsx:136`) com motivo já aprovado em `context.md`.
   - Pendências de antes, ainda abertas: teste de fumaça do usuário em produção (Neon e `grupos-e-elenco`); CI vermelho do job `checagens` (`dono.test.ts` sem Postgres no job); revogar a `NEON_API_KEY`; `neondb_owner` ainda administra a `pelada_app` e o database `neondb` antigo continua no Neon; monitor de uptime; alerta da cota de e-mail; apagar a branch Neon `spike-descartavel` e o Hyperdrive `spike-s1`; branch remota `feat/grupos-e-elenco` e contêineres parados `conta-e-acesso-seguranca-db-1` e `conta-e-acesso-db-1` (limpezas pedem confirmação); a correção do `trava-testes.py` (`67a700a`) ainda precisa ir ao Rascunho; `test/lint-dominio.test.ts` falhou uma vez e não repetiu; decisão pendente sobre emendar a atribuição `Claude Opus 5.5` dos commits T33 a T56 da `grupos-e-elenco`.
   - Gate: rodar um pacote por vez por falta de memória (`vitest run --dir test && pnpm -r --workspace-concurrency=1 test && pnpm test:checagens`).
-  - Banco local: `gestaodapelada_ljs-db-1` (PostgreSQL 18, porta 5432), migrado até `1792844220000`, com seed; sem as migrations da `grupos-e-elenco` (não rodar `pnpm migrar` nem `pnpm seed` nele sem avisar). Não mexer em `controleemcasa_ljs-banco-1` (55432) nem em `evolucao-segura-postgres` (5433).
-- **Gravada em**: 2026-10-30 (fim da fase 7 da `partidas-e-ranking`)
+  - Banco local: `gestaodapelada_ljs-db-1` (PostgreSQL 18, porta 5432), migrado até `1792844220000`, com seed; sem as migrations da `grupos-e-elenco` nem da `partidas-e-ranking` (não rodar `pnpm migrar` nem `pnpm seed` nele sem avisar). Não mexer em `controleemcasa_ljs-banco-1` (55432) nem em `evolucao-segura-postgres` (5433).
+  - Lição de ferramenta: no Git Bash desta máquina, `sed -i` com texto acentuado não casa e falha calado; editar artefatos com Python em UTF-8 (`newline=''`).
+- **Gravada em**: 2026-10-30 (fim da fase 8 da `partidas-e-ranking`)
 
 ## Modelo
 
