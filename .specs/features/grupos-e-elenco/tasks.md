@@ -2007,9 +2007,9 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Cada rota da spec abre a tela certa; sem sessão cai em entrar
-- [ ] `/app/grupos/:grupoId/admins` e as demais rotas da conta continuam funcionando (`rotas.test.tsx` verde)
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Cada rota da spec abre a tela certa; sem sessão cai em entrar
+- [x] `/app/grupos/:grupoId/admins` e as demais rotas da conta continuam funcionando (`rotas.test.tsx` verde)
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
