@@ -1,4 +1,5 @@
 import { editarJogadorCorpo, jogadorCorpo, LIMITES, type JogadorDetalhe } from '@pelada/contrato';
+import type { ReactNode } from 'react';
 import { Campo } from '../../componentes/campos/Campo';
 import { CampoData } from '../../componentes/campos/CampoData';
 import { CampoSeletor } from '../../componentes/campos/CampoSeletor';
@@ -117,10 +118,12 @@ interface Props {
   /** Cadastro: mostra a data de entrada. Edição: ela só muda pela rota de início (GEL-41). */
   comDataEntrada: boolean;
   hoje: string;
+  /** Na edição, no lugar da data de entrada: a data de início e o caminho para alterá-la (t16, GEL-77). */
+  inicio?: ReactNode;
 }
 
 /** Apelido, ano, posição, telefone com máscara, pontuação inicial e (no cadastro) data de entrada. */
-export function CamposDoJogador({ valores, erros, aoMudar, comDataEntrada, hoje }: Props) {
+export function CamposDoJogador({ valores, erros, aoMudar, comDataEntrada, hoje, inicio }: Props) {
   const mudar = <C extends keyof ValoresJogador>(campo: C, valor: ValoresJogador[C]) =>
     aoMudar({ ...valores, [campo]: valor });
   const anoMax = Number(hoje.slice(0, 4)) - LIMITES.idadeMinima;
@@ -152,6 +155,7 @@ export function CamposDoJogador({ valores, erros, aoMudar, comDataEntrada, hoje 
         <CampoSeletor
           id="pos"
           rotulo="Posição"
+          ajuda="Só para cadastro."
           opcoes={valores.posicao === '' ? OPCOES_POSICAO : OPCOES_POSICAO.slice(1)}
           erro={erros['posicao']}
           valor={valores.posicao}
@@ -180,7 +184,9 @@ export function CamposDoJogador({ valores, erros, aoMudar, comDataEntrada, hoje 
             valor={valores.dataEntrada}
             aoMudar={(v) => mudar('dataEntrada', v)}
           />
-        ) : null}
+        ) : (
+          inicio
+        )}
         <Campo
           id="inicial"
           rotulo="Pontuação inicial"

@@ -1868,10 +1868,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] Estados t16: edicao, carregando, erro
-- [ ] Dar 8, 7, 6, 7, 8 e 5 mostra "Nível 6,8"; apagar todas mostra "sem nota"; jogador inativo ainda edita notas
-- [ ] axe sem violação; só tokens
-- [ ] Gate quick passa: `pnpm --filter @pelada/web test`
+- [x] Estados t16: edicao, carregando, erro
+- [x] Dar 8, 7, 6, 7, 8 e 5 mostra "Nível 6,8"; apagar todas mostra "sem nota"; jogador inativo ainda edita notas
+- [x] axe sem violação; só tokens
+- [x] Gate quick passa: `pnpm --filter @pelada/web test`
 
 **Tests**: unit
 **Gate**: quick
