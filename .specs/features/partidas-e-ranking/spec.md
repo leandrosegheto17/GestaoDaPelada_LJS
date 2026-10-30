@@ -1,6 +1,6 @@
 # Partidas e ranking — Especificação
 
-> Feature 4 de 8 (AD-001). **Rascunho para aprovação do usuário (2026-10-30).** Entrada: `context.md` (P1 a P12),
+> Feature 4 de 8 (AD-001). **Spec aprovada pelo usuário em 2026-10-30.** Entrada: `context.md` (P1 a P12),
 > `.specs/features/grupos-e-elenco/spec.md` (Out of Scope e Assumptions: C6, C7, débitos I-1, I-3 e SEC-010),
 > `.md/PRD.md` (RA-03 a RA-06, RA-09, RA-11, RA-18, RA-19; P-08, P-19, P-23, P-26, P-30, P-43 a P-45),
 > `.md/PRD-TECNICO.md` (RF-23 a RF-25, RF-27 a RF-33, RF-49 a RF-52, RF-54, RF-56 a RF-58, RF-70, RF-71, RF-73, RF-78,
@@ -345,7 +345,7 @@ Convenções que valem para todas as histórias:
 
 **Acceptance Criteria**:
 
-1. WHEN um admin envia `POST /api/grupos/:grupoId/jogadores/:id/reativar/previa` com `dataRetorno` para um jogador inativo THEN o sistema SHALL responder 200 com `acumuladoAntes`, `acumuladoDepois`, `posicaoAntes`, `posicaoDepois`, `rodadasQuePassamAConstar` (`data`, `situacao`), `rodadasQueDeixamDeConstar` (`data`) e `aviso`, sem gravar nada. [PAR-109]
+1. WHEN um admin envia `POST /api/grupos/:grupoId/jogadores/:id/reativar/previa` com `data` (o mesmo corpo da gravação; decisão do usuário em 2026-10-30) para um jogador inativo THEN o sistema SHALL responder 200 com `acumuladoAntes`, `acumuladoDepois`, `posicaoAntes`, `posicaoDepois`, `rodadasQuePassamAConstar` (`data`, `situacao`), `rodadasQueDeixamDeConstar` (`data`) e `aviso`, sem gravar nada. [PAR-109]
 2. WHEN um admin envia `POST /api/grupos/:grupoId/jogadores/:id/periodos/:periodoId/previa` com `saida` e/ou `retorno` THEN o sistema SHALL responder 200 com os campos de PAR-109, sem gravar nada. [PAR-110]
 3. WHEN um admin envia `POST /api/grupos/:grupoId/jogadores/:id/inicio/previa` com `data` THEN o sistema SHALL responder 200 com `acumuladoAntes`, `acumuladoDepois`, `posicaoAntes`, `posicaoDepois` e o número de rodadas que passam a constar, sem gravar nada. [PAR-111]
 4. The prévia SHALL aplicar a mesma validação da gravação correspondente e devolver a mesma recusa (422 com o mesmo campo e mensagem das GEL-63 a GEL-69 e GEL-78 a GEL-80, 409 "O jogador já está ativo." no reativar, 404 fora do grupo). [PAR-112]
