@@ -968,3 +968,95 @@ describe('jogadores.alterarInicio (T41; GEL-77 a GEL-83)', () => {
     expect(await linhaDe(alheio)).toMatchObject({ inicio_pontuacao: '2026-02-05' });
   });
 });
+
+describe('jogadores.editar audita jogador_editado (T80; SEC-008)', () => {
+  const editados = async (grupo: string) =>
+    (
+      await b.owner.query<{ autor_conta_id: string; entidade: string; entidade_id: string; resumo: unknown }>(
+        `SELECT autor_conta_id, entidade, entidade_id, resumo FROM auditoria
+          WHERE grupo_id = $1 AND acao = 'jogador_editado' ORDER BY momento, id`,
+        [grupo],
+      )
+    ).rows;
+  const BASE = { apelido: 'Fulano', anoNascimento: 1983, posicao: 'meia', telefone: '21987654321' } as const;
+
+  it.each([
+    ['apelido', { apelido: 'Ciclano' }, ['apelido']],
+    ['posição', { posicao: 'goleiro' }, ['posicao']],
+    ['telefone', { telefone: '11912345678' }, ['telefone']],
+    ['telefone apagado', { telefone: null }, ['telefone']],
+    ['ano de nascimento', { anoNascimento: 1984 }, ['anoNascimento']],
+    ['só a caixa do apelido', { apelido: 'FULANO' }, ['apelido']],
+    [
+      'os quatro',
+      { apelido: 'Beltrano', posicao: 'zagueiro', telefone: '11912345678', anoNascimento: 1999 },
+      ['apelido', 'posicao', 'telefone', 'anoNascimento'],
+    ],
+  ] as const)('mudar %s grava um evento com os nomes dos campos, na conta da requisição', async (_c, troca, campos) => {
+    const c = await novoCenario();
+    const id = await criado(c, { ...BASE, pontuacaoInicial: 0 });
+    expect(await como(c.conta, (db) => jogadores.editar(db, c.grupo, id, { ...BASE, ...troca }))).toEqual({ ok: true });
+    expect(await editados(c.grupo)).toEqual([
+      { autor_conta_id: c.conta, entidade: 'jogador', entidade_id: id, resumo: { campos: [...campos] } },
+    ]);
+  });
+
+  it('nenhum evento leva o telefone nem o ano, antigos ou novos', async () => {
+    const c = await novoCenario();
+    const id = await criado(c, { ...BASE, pontuacaoInicial: 0 });
+    const novo = { apelido: 'Beltrano', posicao: 'zagueiro', telefone: '11912345678', anoNascimento: 1999 } as const;
+    await como(c.conta, (db) => jogadores.editar(db, c.grupo, id, novo));
+    const { rows } = await b.owner.query<{ acao: string; resumo: unknown }>(
+      'SELECT acao, resumo FROM auditoria WHERE grupo_id = $1',
+      [c.grupo],
+    );
+    expect(rows.map((r) => r.acao)).toContain('jogador_editado');
+    for (const valor of ['21987654321', '11912345678', '1983', '1999']) {
+      expect(JSON.stringify(rows)).not.toContain(valor);
+    }
+  });
+
+  it('edição sem mudança nos quatro campos (só a pontuação, ou nada) não grava jogador_editado', async () => {
+    const c = await novoCenario();
+    const id = await criado(c, { ...BASE, pontuacaoInicial: 0 });
+    await como(c.conta, (db) => jogadores.editar(db, c.grupo, id, BASE));
+    await como(c.conta, (db) => jogadores.editar(db, c.grupo, id, { ...BASE, pontuacaoInicial: 10 }));
+    expect(await editados(c.grupo)).toEqual([]);
+  });
+
+  it('edição recusada (apelido repetido) ou de jogador de outro grupo não deixa evento', async () => {
+    const c = await novoCenario();
+    await criado(c, { ...BASE, apelido: 'Beto', pontuacaoInicial: 0 });
+    const id = await criado(c, { ...BASE, pontuacaoInicial: 0 });
+    const r = await como(c.conta, (db) =>
+      jogadores.editar(db, c.grupo, id, { ...BASE, apelido: 'BETO', posicao: 'goleiro' }),
+    );
+    expect(r).toMatchObject({ ok: false, campo: 'apelido' });
+    const outro = await novoCenario();
+    const alheio = await criado(outro, { ...BASE, pontuacaoInicial: 0 });
+    expect(
+      await como(c.conta, (db) => jogadores.editar(db, c.grupo, alheio, { ...BASE, posicao: 'goleiro' })),
+    ).toBeNull();
+    expect(await editados(c.grupo)).toEqual([]);
+    expect(await editados(outro.grupo)).toEqual([]);
+  });
+
+  it('auditoria na mesma transação: se ela falha, a edição não fica gravada', async () => {
+    const c = await novoCenario();
+    const id = await criado(c, { ...BASE, pontuacaoInicial: 0 });
+    await b.owner.query(`
+      CREATE FUNCTION auditoria_falha_editar() RETURNS trigger LANGUAGE plpgsql AS
+      $$ BEGIN RAISE EXCEPTION 'auditoria fora do ar'; END $$;
+      CREATE TRIGGER auditoria_falha_editar BEFORE INSERT ON auditoria
+        FOR EACH ROW WHEN (NEW.acao = 'jogador_editado') EXECUTE FUNCTION auditoria_falha_editar();
+    `);
+    try {
+      await expect(
+        como(c.conta, (db) => jogadores.editar(db, c.grupo, id, { ...BASE, posicao: 'goleiro' })),
+      ).rejects.toThrow('auditoria fora do ar');
+    } finally {
+      await b.owner.query('DROP TRIGGER auditoria_falha_editar ON auditoria; DROP FUNCTION auditoria_falha_editar();');
+    }
+    expect(await linhaDe(id)).toMatchObject({ posicao: 'meia' });
+  });
+});

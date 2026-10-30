@@ -250,17 +250,38 @@ export async function criar(
 function travar(db: Db, grupoId: string, jogadorId: string) {
   return db
     .selectFrom('jogadores')
-    .select(['id', 'apelido', 'pontuacao_inicial', 'inicio_pontuacao'])
+    .select(['id', 'apelido', 'pontuacao_inicial', 'inicio_pontuacao', 'ano_nascimento', 'posicao', 'telefone'])
     .where('grupo_id', '=', grupoId)
     .where('id', '=', jogadorId)
     .forUpdate()
     .executeTakeFirst();
 }
 
+/** Campos cadastrais cuja mudança a edição audita (SEC-008), na ordem em que aparecem no evento. */
+type CampoEditado = 'apelido' | 'posicao' | 'telefone' | 'anoNascimento';
+
+/**
+ * Nomes dos campos que a edição muda, entre apelido, posição, telefone e ano de nascimento (SEC-008). Só os nomes vão
+ * para a auditoria, nunca os valores (GEL-113). Trocar só a caixa do apelido conta como mudança.
+ */
+function camposEditados(
+  atual: { apelido: string; posicao: string | null; telefone: string | null; ano_nascimento: number | null },
+  dados: Omit<DadosJogador, 'pontuacaoInicial'>,
+): CampoEditado[] {
+  const mudou: [CampoEditado, boolean][] = [
+    ['apelido', dados.apelido !== atual.apelido],
+    ['posicao', dados.posicao !== atual.posicao],
+    ['telefone', (dados.telefone ?? null) !== atual.telefone],
+    ['anoNascimento', dados.anoNascimento !== atual.ano_nascimento],
+  ];
+  return mudou.filter(([, sim]) => sim).map(([campo]) => campo);
+}
+
 /**
  * Edita os dados cadastrais (GEL-41): apelido, ano, posição, telefone e pontuação inicial. Pontuação omitida mantém a
  * atual (GEL-43); mudada, audita `jogador_pontuacao_inicial_alterada` com o valor anterior e o novo (GEL-42). Não mexe
- * em `inicio_pontuacao` nem nos períodos. Jogador de outro grupo: nulo (GEL-44).
+ * em `inicio_pontuacao` nem nos períodos. Mudar apelido, posição, telefone ou ano audita `jogador_editado` com os nomes
+ * dos campos (SEC-008). Jogador de outro grupo: nulo (GEL-44).
  */
 export async function editar(
   db: Db,
@@ -296,6 +317,10 @@ export async function editar(
       anterior: atual.pontuacao_inicial,
       novo: pontuacao,
     });
+  }
+  const campos = camposEditados(atual, dados);
+  if (campos.length > 0) {
+    await auditoria.registrar(db, grupoId, 'jogador_editado', 'jogador', jogadorId, { campos });
   }
   return { ok: true };
 }

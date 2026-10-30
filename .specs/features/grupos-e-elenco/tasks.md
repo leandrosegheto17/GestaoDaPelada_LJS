@@ -2356,10 +2356,10 @@ T76 → T77 → T78 → T79 → T80 → T81 → T82 → T83
 
 **Done when**:
 
-- [ ] Cada edição grava um evento com quais campos mudaram (nomes dos campos, nunca os valores de telefone e ano)
-- [ ] Edição que falha não deixa evento
-- [ ] Teste confere que nenhum evento contém telefone nem ano
-- [ ] Gate full passa
+- [x] Cada edição grava um evento com quais campos mudaram (nomes dos campos, nunca os valores de telefone e ano)
+- [x] Edição que falha não deixa evento
+- [x] Teste confere que nenhum evento contém telefone nem ano
+- [x] Gate full passa
 
 **Tests**: integration
 **Gate**: full
