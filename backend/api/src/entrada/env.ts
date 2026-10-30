@@ -6,6 +6,8 @@ export interface Env {
   LIMITE_ENTRAR?: RateLimit;
   LIMITE_PUBLICO?: RateLimit;
   LIMITE_WEBHOOK?: RateLimit;
+  /** Escritas com sessão em `/api/grupos*`, por conta (SEC-003). */
+  LIMITE_ESCRITA?: RateLimit;
   /** Única fonte do endereço público do app (FUN-22). */
   URL_PUBLICA: string;
   /** SHA do commit publicado, injetado no deploy por `--var VERSAO:<sha>` (FUN-20). */

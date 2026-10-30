@@ -59,6 +59,16 @@ export const ROTAS_TETO_EMAILS_ORIGEM = [
   '/api/grupos/:grupoId/admins/convites',
 ] as const;
 
+/** Período do `LIMITE_ESCRITA` no `wrangler.jsonc`, em segundos: vai no `Retry-After` do 429 (SEC-003). */
+export const PERIODO_LIMITE_ESCRITA_S = 60;
+
+const METODOS_ESCRITA = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
+
+/** Escrita em `/api/grupos` ou abaixo dele (não `/api/gruposx`): a que o `LIMITE_ESCRITA` conta (SEC-003). */
+function ehEscritaDeGrupo(metodo: string, caminho: string): boolean {
+  return METODOS_ESCRITA.has(metodo) && (caminho === '/api/grupos' || caminho.startsWith('/api/grupos/'));
+}
+
 export interface Variaveis {
   /** Banco da requisição, sempre dentro da transação do `comBanco`; só conecta na primeira consulta. */
   db: Db;
@@ -80,7 +90,7 @@ export type AppEnv = { Bindings: Env; Variables: Variaveis };
 
 export interface OpcoesApp {
   /** Substitui os limitadores de taxa do ambiente (testes). */
-  limitadores?: { entrar?: Limitador; publico?: Limitador };
+  limitadores?: { entrar?: Limitador; publico?: Limitador; escrita?: Limitador };
   /** Substitui o remetente de e-mail do ambiente (testes). */
   remetente?: Remetente;
   /** Substitui o relógio real (testes): `relogioFixo(data)`. */
@@ -112,6 +122,15 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<AppEnv> {
     await proximo();
   });
   app.use('/api/*', carregarSessao);
+  // Escritas com sessão em /api/grupos*, por conta (SEC-003): depois da sessão (a chave é a conta) e antes da rota,
+  // para o 429 não gravar nada. Sem sessão não conta: a rota responde 401.
+  app.use(
+    '/api/*',
+    criarLimiteTaxa((c) => opcoes.limitadores?.escrita ?? c.env?.LIMITE_ESCRITA, {
+      chave: (c) => (ehEscritaDeGrupo(c.req.method, c.req.path) ? c.var.contaId : undefined),
+      retryAfterSegundos: PERIODO_LIMITE_ESCRITA_S,
+    }),
+  );
   app.use('/api/*', comBanco);
   // Toda rota de dado de grupo: sessão e vínculo com o grupo (G-03, ACE-41); no grupo arquivado, só leitura e
   // reativar (GEL-26).

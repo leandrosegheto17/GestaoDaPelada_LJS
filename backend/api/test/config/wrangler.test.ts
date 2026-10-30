@@ -75,15 +75,18 @@ describe('wrangler.jsonc', () => {
     expect(config.compatibility_flags).toContain('nodejs_compat');
   });
 
-  it('declara LIMITE_ENTRAR 10/min, LIMITE_PUBLICO 60/min e LIMITE_WEBHOOK (FUN-26)', () => {
+  // Alterado com aprovação do usuário em 2026-10-30 por causa do binding LIMITE_ESCRITA (T74, SEC-003): o título, a
+  // conferência do LIMITE_ESCRITA e as contagens de 3 para 4.
+  it('declara LIMITE_ENTRAR 10/min, LIMITE_PUBLICO 60/min, LIMITE_WEBHOOK e LIMITE_ESCRITA 60/min (FUN-26, SEC-003)', () => {
     const porNome = new Map(config.ratelimits.map((l) => [l.name, l]));
     expect(porNome.get('LIMITE_ENTRAR')?.simple).toEqual({ limit: 10, period: 60 });
     expect(porNome.get('LIMITE_PUBLICO')?.simple).toEqual({ limit: 60, period: 60 });
     expect(porNome.get('LIMITE_WEBHOOK')?.simple.period).toBe(60);
     expect(porNome.get('LIMITE_WEBHOOK')?.simple.limit).toBeGreaterThan(0);
-    expect(config.ratelimits).toHaveLength(3);
+    expect(porNome.get('LIMITE_ESCRITA')?.simple).toEqual({ limit: 60, period: 60 });
+    expect(config.ratelimits).toHaveLength(4);
     // Cada limitador tem o próprio contador.
-    expect(new Set(config.ratelimits.map((l) => l.namespace_id)).size).toBe(3);
+    expect(new Set(config.ratelimits.map((l) => l.namespace_id)).size).toBe(4);
   });
 
   it('publica a rota gestaodapelada.ljssoftware.com.br como domínio próprio (FUN-27)', () => {

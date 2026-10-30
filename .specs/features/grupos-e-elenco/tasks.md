@@ -2190,11 +2190,11 @@ T76 → T77 → T78 → T79 → T80 → T81 → T82 → T83
 
 **Done when**:
 
-- [ ] A chave do limite é a conta da sessão (não o IP) e o valor do limite fica registrado no `wrangler.jsonc` (período de 10 ou 60 s)
-- [ ] Excedido o limite, a resposta é 429 com `Retry-After`, sem criar nada; leituras (GET) não contam
-- [ ] Teste cria grupos em sequência e vê o 429; outra conta não é afetada
-- [ ] Os casos de `casos.ts` seguem verdes (meta-teste)
-- [ ] Gate full passa
+- [x] A chave do limite é a conta da sessão (não o IP) e o valor do limite fica registrado no `wrangler.jsonc` (período de 10 ou 60 s)
+- [x] Excedido o limite, a resposta é 429 com `Retry-After`, sem criar nada; leituras (GET) não contam
+- [x] Teste cria grupos em sequência e vê o 429; outra conta não é afetada
+- [x] Os casos de `casos.ts` seguem verdes (meta-teste)
+- [x] Gate full passa
 
 **Tests**: e2e (pool workerd)
 **Gate**: full
