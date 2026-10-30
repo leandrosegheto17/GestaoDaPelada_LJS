@@ -17,6 +17,7 @@ import { formatarNivel } from '../../dados/notas';
 import { chaveBusca, compararApelido } from '../../formatacao';
 import { ROTULO_POSICAO } from '../../rotulos';
 import { PaginaInterna } from '../compartilhado/PaginaInterna';
+import estilos from './Jogadores.module.css';
 
 type Filtro = 'ativo' | 'inativo';
 
@@ -51,6 +52,7 @@ export function Jogadores() {
       destinoTrocarGrupo="/app"
       voltarPara={base}
       voltarRotulo="Início"
+      largo
       ocupado={jogadores.isPending}
     >
       {jogadores.isPending ? (
@@ -73,17 +75,23 @@ export function Jogadores() {
             valor={filtro}
             aoMudar={setFiltro}
           />
-          {totalDoFiltro > 0 ? <CampoBusca rotulo="Buscar jogador" valor={busca} aoMudar={setBusca} /> : null}
+          {totalDoFiltro > 0 ? (
+            <div className={estilos.ferramentas}>
+              <CampoBusca rotulo="Buscar jogador" valor={busca} aoMudar={setBusca} />
+            </div>
+          ) : null}
           {totalDoFiltro === 0 ? (
-            filtro === 'ativo' ? (
-              <EstadoVazio
-                icone={null}
-                titulo="Nenhum jogador cadastrado."
-                acao={<BotaoLink to={`${base}/jogadores/novo`}>Novo jogador</BotaoLink>}
-              />
-            ) : (
-              <EstadoVazio icone={null} titulo="Nenhum jogador inativo." />
-            )
+            <div className="acima-4">
+              {filtro === 'ativo' ? (
+                <EstadoVazio
+                  icone={null}
+                  titulo="Nenhum jogador cadastrado."
+                  acao={<BotaoLink to={`${base}/jogadores/novo`}>Novo jogador</BotaoLink>}
+                />
+              ) : (
+                <EstadoVazio icone={null} titulo="Nenhum jogador inativo." />
+              )}
+            </div>
           ) : (
             <Lista>
               {visiveis.map((j) => (

@@ -14,6 +14,15 @@ type Periodo = JogadorDetalhe['periodos'][number];
 
 const NADA_A_ALTERAR = 'Nada a alterar.';
 
+/** Ids que ligam o botão "Corrigir datas" ao título e à explicação do período na lista (t16 edição). */
+export const idTituloPeriodo = (p: Periodo) => `p-${p.id}-t`;
+export const idExplicacaoPeriodo = (p: Periodo) => `p-${p.id}-expl`;
+
+/** O primeiro período ainda aberto não tem nada a corrigir: a entrada é a data de início da pontuação. */
+export const nadaACorrigir = (indice: number, p: Periodo) => indice === 0 && p.fim === null;
+export const EXPLICACAO_NADA_A_CORRIGIR =
+  'Nada a corrigir: a data de entrada é a data de início da pontuação (use Alterar data de início).';
+
 const intervalo = (p: Periodo) => (
   <>
     {dataCompleta(p.inicio)} <span aria-hidden="true">→</span>
@@ -148,26 +157,22 @@ interface PropsBotao {
  */
 export function CorrigirDatas({ grupoId, jogador, periodo, indice, aoCorrigido }: PropsBotao) {
   const [aberto, setAberto] = useState(false);
-  const nadaACorrigir = indice === 0 && periodo.fim === null;
-  const idExplicacao = `expl-${periodo.id}`;
+  const semNadaACorrigir = nadaACorrigir(indice, periodo);
+  const idTitulo = idTituloPeriodo(periodo);
+  const idExplicacao = idExplicacaoPeriodo(periodo);
   return (
     <>
-      {nadaACorrigir ? (
-        <>
-          <button
-            type="button"
-            className={classesBotao({ variante: 'secundario' })}
-            aria-disabled="true"
-            aria-describedby={idExplicacao}
-          >
-            Corrigir datas
-          </button>
-          <span className="sr" id={idExplicacao}>
-            Nada a corrigir: a data de entrada é a data de início da pontuação (use Alterar data de início).
-          </span>
-        </>
+      {semNadaACorrigir ? (
+        <button
+          type="button"
+          className={classesBotao({ variante: 'secundario' })}
+          aria-disabled="true"
+          aria-describedby={`${idTitulo} ${idExplicacao}`}
+        >
+          Corrigir datas
+        </button>
       ) : (
-        <Botao variante="secundario" onClick={() => setAberto(true)}>
+        <Botao variante="secundario" aria-describedby={idTitulo} onClick={() => setAberto(true)}>
           Corrigir datas
         </Botao>
       )}
@@ -201,6 +206,7 @@ function DialogoInicio({ grupoId, jogador, aoFechar, aoAlterado }: PropsInicio &
   return (
     <Dialogo
       titulo="Alterar data de início"
+      descricao={`Data de início atual de ${jogador.apelido}: ${dataCompleta(jogador.inicioPontuacao)}.`}
       aoFechar={aoFechar}
       acoes={
         <>

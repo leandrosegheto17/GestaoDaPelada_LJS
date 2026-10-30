@@ -73,7 +73,13 @@ export function NotasDoJogador({ grupoId, jogador }: Props) {
         </>
       ) : (
         <>
-          <ValorDestaque>{nivel.semNota ? 'sem nota' : `Nível ${formatarNivel(nivel.nivel)}`}</ValorDestaque>
+          {nivel.semNota ? (
+            <p className="paragrafo" aria-live="polite">
+              <Selo tom="atencao">sem nota</Selo> Usa 5,5 no simulador.
+            </p>
+          ) : (
+            <ValorDestaque>{`Nível ${formatarNivel(nivel.nivel)}`}</ValorDestaque>
+          )}
           <Lista>
             {jogador.notas.map((n) => {
               const id = `nota-${n.habilidadeId}`;

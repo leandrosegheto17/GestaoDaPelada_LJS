@@ -1,6 +1,6 @@
 /* Nome da habilidade editável na própria linha (mockup t17, `.campo__entrada.item__principal`). */
 .nome {
-  flex: 1;
+  width: 100%;
   min-width: 0;
   min-height: var(--alvo-toque);
   padding: 0 var(--esp-3);

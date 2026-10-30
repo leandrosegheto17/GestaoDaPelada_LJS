@@ -21,6 +21,11 @@ export function FormaEsqueleto({ variante = 'bloco', quantidade = 1 }: Props) {
   );
 }
 
+/** Esqueleto do título (`h1`) de uma tela cujo nome ainda não chegou (t16 carregando); decorativo, em linha. */
+export function EsqueletoTitulo() {
+  return <span aria-hidden="true" className={juntar(estilos.esqueleto, estilos.titulo)} />;
+}
+
 /** Só aparece depois de 300 ms; decorativo para leitores de tela. */
 export function Esqueleto(props: Props) {
   const visivel = usarAtraso(300);

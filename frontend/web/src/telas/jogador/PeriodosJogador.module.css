@@ -13,3 +13,7 @@
 .rotulo {
   font-weight: var(--peso-semi);
 }
+
+.metaLinha {
+  display: block;
+}

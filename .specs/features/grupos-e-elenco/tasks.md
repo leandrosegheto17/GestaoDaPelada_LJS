@@ -2033,10 +2033,10 @@ T68 → T69 → T70
 
 **Done when**:
 
-- [ ] `pnpm --filter @pelada/web visual` sem divergência acima do limite (1%) nas 34 telas do módulo e nas t09, t15, t17, t27 em PC e celular
-- [ ] `python .claude/scripts/checar-tokens.py frontend/web/src` passa
-- [ ] `telas-ativas.test.mjs` atualizado só com o acréscimo das telas novas (nenhuma asserção removida)
-- [ ] Gate build passa
+- [x] `pnpm --filter @pelada/web visual` sem divergência acima do limite (1%) nas 34 telas do módulo e nas t09, t15, t17, t27 em PC e celular
+- [x] `python .claude/scripts/checar-tokens.py frontend/web/src` passa
+- [x] `telas-ativas.test.mjs` atualizado só com o acréscimo das telas novas (nenhuma asserção removida)
+- [x] Gate build passa
 
 **Tests**: e2e
 **Gate**: build

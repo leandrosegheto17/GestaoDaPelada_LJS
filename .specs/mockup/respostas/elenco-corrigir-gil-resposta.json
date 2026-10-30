@@ -1,0 +1,15 @@
+{
+  "alterado": true,
+  "periodos": [
+    {
+      "id": "p-gil-1",
+      "inicio": "2026-02-05",
+      "fim": "2026-10-05"
+    },
+    {
+      "id": "p-gil-2",
+      "inicio": "2026-10-12",
+      "fim": null
+    }
+  ]
+}

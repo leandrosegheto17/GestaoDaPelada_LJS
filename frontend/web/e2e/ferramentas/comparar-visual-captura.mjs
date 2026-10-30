@@ -47,6 +47,11 @@ async function executarPassos(pagina, passos) {
         .locator(passo.preencher)
         .nth(passo.indice ?? 0)
         .fill(String(passo.valor ?? ''), { timeout: 15000 });
+    } else if (passo.selecionar !== undefined) {
+      await pagina
+        .locator(passo.selecionar)
+        .nth(passo.indice ?? 0)
+        .selectOption(String(passo.valor ?? ''), { timeout: 15000 });
     } else if (passo.esperar !== undefined) {
       await pagina.locator(passo.esperar).first().waitFor({ state: 'visible', timeout: 15000 });
     } else if (passo.aguardarMs !== undefined) {

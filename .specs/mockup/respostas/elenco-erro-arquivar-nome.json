@@ -1,0 +1,9 @@
+{
+  "erro": {
+    "codigo": "dados_invalidos",
+    "mensagem": "Corrija os campos indicados.",
+    "campos": {
+      "nomeConfirmacao": "O nome digitado não confere com o nome do grupo."
+    }
+  }
+}

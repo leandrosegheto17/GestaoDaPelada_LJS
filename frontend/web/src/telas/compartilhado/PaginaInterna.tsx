@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router';
 import { BarraAdmin } from '../../componentes/barras/BarraAdmin';
 import { PularConteudo } from '../../componentes/barras/PularConteudo';
+import { EsqueletoTitulo } from '../../componentes/basicos/Esqueleto';
 import { Voltar } from '../../componentes/basicos/Voltar';
 import { Folha, ListaFolha } from '../../componentes/dialogos/Folha';
 import { OpcaoFolha } from '../../componentes/dialogos/OpcaoFolha';
@@ -50,6 +51,8 @@ interface Props {
   /** Mostra o botão do menu da conta na barra (t08 e t32). */
   comMenu?: boolean;
   ocupado?: boolean;
+  /** O título ainda não chegou: fica só para leitores de tela e um esqueleto o substitui na vista. */
+  tituloEmEsqueleto?: boolean;
   children: ReactNode;
 }
 
@@ -66,6 +69,7 @@ export function PaginaInterna({
   voltarRotulo,
   comMenu,
   ocupado,
+  tituloEmEsqueleto,
   children,
 }: Props) {
   const [menuAberto, setMenuAberto] = useState(false);
@@ -82,11 +86,20 @@ export function PaginaInterna({
       <main
         id="conteudo"
         tabIndex={-1}
-        className={largo ? 'conteudo' : 'conteudo conteudo--estreito'}
+        className={largo ? 'conteudo conteudo--admin' : 'conteudo conteudo--estreito'}
         aria-busy={ocupado || undefined}
       >
         {voltarPara && voltarRotulo ? <Voltar para={voltarPara} rotulo={voltarRotulo} /> : null}
-        <h1 className={tituloOculto ? 'sr' : 'titulo'}>{titulo}</h1>
+        <h1 className={tituloOculto ? 'sr' : 'titulo'}>
+          {tituloEmEsqueleto ? (
+            <>
+              <span className="sr">{titulo}</span>
+              <EsqueletoTitulo />
+            </>
+          ) : (
+            titulo
+          )}
+        </h1>
         {children}
       </main>
       {menuAberto ? <MenuConta aoFechar={() => setMenuAberto(false)} /> : null}

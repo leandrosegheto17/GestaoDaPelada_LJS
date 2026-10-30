@@ -146,6 +146,7 @@
   - A correção do `trava-testes.py` (`67a700a`) precisa ser levada ao Rascunho (`C:\Leandro\Projetos\Rascunho\.claude`) e registrada no `.rascunho/DECISOES.md` de lá.
   - Limpezas pendentes (pedem confirmação): branches `padronizar-neon`, `feat/grupos-e-elenco` (local e remota), `fix/conta-e-acesso-seguranca`, `feat/fundacao`, `fix/g18-deploy-yml`; worktrees `.worktrees/conta-e-acesso-seguranca` e `.worktrees/fundacao`; contêineres parados `conta-e-acesso-seguranca-db-1` e `conta-e-acesso-db-1`. Pendências do usuário: monitor de uptime (runbook §7), alerta manual da cota de e-mail aos 50%, apagar a branch Neon `spike-descartavel` e o Hyperdrive `spike-s1`.
   - Banco local: `gestaodapelada_ljs-db-1` (PostgreSQL 18, porta 5432), migrado até `1792844220000`, com seed. O `.env` local ganhou `PELADA_BACKUP_RO_SENHA`. Não mexer em `controleemcasa_ljs-banco-1` (55432) nem em `evolucao-segura-postgres` (5433).
+  - T69 (decisão do usuário, 2026-10-30): a t09 (início do grupo) fica fora de `telas-ativas.txt` por ora, porque o mockup traz Partidas, Uso do app e Financeiro (SPEC_DEVIATION no `InicioDoGrupo`); entra na comparação visual quando essas features existirem. As entradas da t09 já estão mapeadas em `telas.json`.
 - **Gravada em**: 2026-10-29 (fim da fase 8 da `grupos-e-elenco`)
 
 ## Modelo

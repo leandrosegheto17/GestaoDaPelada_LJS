@@ -54,6 +54,7 @@
 // depois do carregamento e antes do print (estados que exigem toque, digitação ou diálogo). Cada passo:
 //   { "clicar": "<seletor Playwright>", "indice": 0 }            (ex.: "role=button[name='Reativar']")
 //   { "preencher": "<seletor>", "valor": "2026-10-07", "indice": 0 }
+//   { "selecionar": "<seletor>", "valor": "meia", "indice": 0 }   (escolhe a opção de um <select>)
 //   { "esperar": "<seletor>" }                                    (espera ficar visível)
 //   { "aguardarMs": 300 }
 // Uma resposta com "pendente": true nunca responde; com "abortar": true a chamada falha como

@@ -9,7 +9,13 @@ import { Lista } from '../../componentes/listas/Lista';
 import { useInativarJogador, useReativarJogador } from '../../dados/elenco';
 import { deErroApi } from '../../dados/errosDeCampos';
 import { dataCompleta, hojeEmSaoPaulo } from '../../formatacao';
-import { CorrigirDatas } from './CorrigirDatas';
+import {
+  CorrigirDatas,
+  EXPLICACAO_NADA_A_CORRIGIR,
+  idExplicacaoPeriodo,
+  idTituloPeriodo,
+  nadaACorrigir,
+} from './CorrigirDatas';
 import { ExcluirJogador } from './ExcluirJogador';
 import estilos from './PeriodosJogador.module.css';
 
@@ -171,12 +177,25 @@ export function PeriodosJogador({ grupoId, jogador, aoAvisar, dialogo, aoMudarDi
                 key={p.id}
                 quebra
                 titulo={
-                  <>
+                  <span id={idTituloPeriodo(p)}>
                     {dataCompleta(p.inicio)} <span aria-hidden="true">→</span>
                     <span className="sr">até</span> {p.fim ? dataCompleta(p.fim) : 'atual'}
-                  </>
+                  </span>
                 }
-                meta={i === 0 ? 'Entrada' : 'Retorno'}
+                meta={
+                  nadaACorrigir(i, p) ? (
+                    <>
+                      <span className={estilos.metaLinha}>Entrada</span>
+                      <span className={estilos.metaLinha} id={idExplicacaoPeriodo(p)}>
+                        {EXPLICACAO_NADA_A_CORRIGIR}
+                      </span>
+                    </>
+                  ) : i === 0 ? (
+                    'Entrada'
+                  ) : (
+                    'Retorno'
+                  )
+                }
                 acoes={
                   <CorrigirDatas
                     grupoId={grupoId}

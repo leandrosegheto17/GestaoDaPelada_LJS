@@ -1,0 +1,52 @@
+{
+  "id": "j-beto",
+  "apelido": "Beto",
+  "posicao": "volante",
+  "situacao": "inativo",
+  "desde": "2026-10-05",
+  "nivel": 550,
+  "semNota": true,
+  "anoNascimento": 1985,
+  "telefone": "11991234567",
+  "pontuacaoInicial": 12,
+  "inicioPontuacao": "2026-02-05",
+  "periodos": [
+    {
+      "id": "p-beto-1",
+      "inicio": "2026-02-05",
+      "fim": "2026-10-05"
+    }
+  ],
+  "notas": [
+    {
+      "habilidadeId": "h-visao",
+      "habilidade": "Visão de Jogo",
+      "nota": null
+    },
+    {
+      "habilidadeId": "h-passe",
+      "habilidade": "Passe",
+      "nota": null
+    },
+    {
+      "habilidadeId": "h-preparo",
+      "habilidade": "Preparo Físico",
+      "nota": null
+    },
+    {
+      "habilidadeId": "h-drible",
+      "habilidade": "Drible",
+      "nota": null
+    },
+    {
+      "habilidadeId": "h-chute",
+      "habilidade": "Chute",
+      "nota": null
+    },
+    {
+      "habilidadeId": "h-desarme",
+      "habilidade": "Desarme",
+      "nota": null
+    }
+  ]
+}

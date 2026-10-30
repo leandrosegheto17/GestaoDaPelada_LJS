@@ -22,6 +22,7 @@ import {
   type ValoresJogador,
 } from './CamposDoJogador';
 import { DataDeInicio } from './CorrigirDatas';
+import estilos from './FichaJogador.module.css';
 import { NotasDoJogador } from './NotasDoJogador';
 import { PeriodosJogador, type DialogoDaSituacao } from './PeriodosJogador';
 
@@ -108,13 +109,14 @@ export function FichaJogador() {
       voltarPara={`/app/grupos/${grupoId}/jogadores`}
       voltarRotulo="Jogadores"
       ocupado={ficha.isPending}
+      tituloEmEsqueleto={ficha.isPending}
     >
       {ficha.isPending ? (
         <>
           <p className="sr" role="status">
             Carregando…
           </p>
-          <FormaEsqueleto variante="linha" quantidade={4} />
+          <FormaEsqueleto variante="linha" quantidade={3} />
         </>
       ) : null}
       {ficha.isError ? <ErroRede aoTentar={() => void ficha.refetch()} /> : null}
@@ -125,15 +127,17 @@ export function FichaJogador() {
             <Faixa
               tipo="erro"
               acao={
-                <Botao
-                  variante="texto"
-                  onClick={() => {
-                    setRecusa(null);
-                    setDialogo('inativar');
-                  }}
-                >
-                  Inativar em vez disso
-                </Botao>
+                <span className={estilos.acaoDaFaixa}>
+                  <Botao
+                    variante="texto"
+                    onClick={() => {
+                      setRecusa(null);
+                      setDialogo('inativar');
+                    }}
+                  >
+                    Inativar em vez disso
+                  </Botao>
+                </span>
               }
             >
               {recusa}
