@@ -122,6 +122,46 @@
 - **Date**: 2026-10-29
 - **Status**: active
 
+### AD-016
+- **Decision**: Toda rota `/api/publico/:slug/*` passa pelo middleware `contextoPublico`, que apaga a conta e põe o slug: slug malformado, inexistente ou de grupo arquivado responde o mesmo 404. A única escrita pública é a função `evento_publico_registrar` (`SECURITY DEFINER`, `search_path` fixo, `EXECUTE` para o `pelada_app`); a RLS segue sem escrita no contexto do slug, e `eventos_uso` só é lida com conta. ADR-036.
+- **Reason**: Escolha do usuário no Design da `partidas-e-ranking`. Com a conta no contexto, o admin logado cairia no ramo com conta de `grupos_visiveis()` e perderia o ranking de outro grupo.
+- **Trade-off**: Mais SQL; o contexto público ignora a sessão mesmo de quem é admin daquele grupo.
+- **Scope**: API e banco, rotas públicas de todas as features. Complementa o AD-004
+- **Date**: 2026-10-30
+- **Status**: active
+
+### AD-017
+- **Decision**: Ranking, PDF, prévias e auditoria de período leem o grupo por um carregador único (`historico.carregar`) e calculam só pelo domínio, na leitura. As prévias são POST em transação `READ ONLY` (sufixo `/previa`). A CPU (G-12) é medida por bench do domínio no CI e pelo p50/p99 do painel do Worker depois do deploy.
+- **Reason**: Escolha do usuário no Design (ADR-006, G-05, G-25): uma única função de acumulado, com os testes do legado portados.
+- **Trade-off**: O custo cresce com o histórico do grupo; não há cache de pontos. A leitura da CPU no painel é PREMISSA até o deploy.
+- **Scope**: API e domínio, inclusive `simulador` e `financeiro`
+- **Date**: 2026-10-30
+- **Status**: active
+
+### AD-018
+- **Decision**: O nome de outra conta (autor de pesos, partidas e o que vier) sai só da função `contas_nomes_do_grupo` (`SECURITY DEFINER`), para quem tem vínculo e só de contas que aparecem como autoras no grupo, sem e-mail.
+- **Reason**: A RLS de `contas` só mostra a própria linha (ACE-43); mesmo padrão do AD-008.
+- **Trade-off**: Mais uma consulta nas telas que mostram autor.
+- **Scope**: Banco e repositórios
+- **Date**: 2026-10-30
+- **Status**: active
+
+### AD-019
+- **Decision**: Função do banco muda de assinatura por expandir e contrair: a nova nasce ao lado da antiga, que delega a ela até uma migration `-- contrair:` da feature seguinte. Na do `grupo_criar`, a delegação lê a data com `now()` em São Paulo, exceção temporária e única ao AD-015, com teste que falha se outra função usar `now()` para data.
+- **Reason**: Escolha do usuário no Design: o `deploy.yml` desfaz o deploy do Worker sem desfazer a migration, e o Worker anterior precisa continuar criando grupo com pesos.
+- **Trade-off**: Duas versões da função por um ciclo de feature.
+- **Scope**: Migrations
+- **Date**: 2026-10-30
+- **Status**: active
+
+### AD-020
+- **Decision**: Ordem fixa de travas nas escritas: grupo (`FOR KEY SHARE`), depois partida (`FOR UPDATE`), depois jogadores em ordem crescente de id (`FOR UPDATE`, uma consulta). Nenhuma escrita trava jogador antes de partida.
+- **Reason**: G-26: impede corrida e deadlock entre lançar, editar ou excluir partida e corrigir período.
+- **Trade-off**: Edições do mesmo jogador em paralelo esperam umas pelas outras.
+- **Scope**: API, inclusive `simulador` (escalação) e `financeiro`
+- **Date**: 2026-10-30
+- **Status**: active
+
 ## Handoff
 
 - **Feature**: `conta-e-acesso` (fase 9, Execute do `tlc-spec-driven`)
