@@ -40,10 +40,42 @@ export function modeloRecuperacao(d: { urlPublica: string; nome: string; token: 
   );
 }
 
+/** Tamanho máximo do nome do grupo no e-mail: o mesmo teto do nome (GEL-03). Acima disso, corta com reticências. */
+const MAX_NOME_NO_EMAIL = 60;
+/** Quebras de linha, controles, invisíveis e espaços em sequência viram um espaço só. */
+const QUEBRAS_E_INVISIVEIS = /[\p{Cc}\p{Cf}\p{Zl}\p{Zp}\s]+/gu;
+/**
+ * O que os clientes de e-mail costumam transformar em link: esquema seguido de duas barras, `www.`, domínio
+ * (letra, ponto e duas letras) e e-mail.
+ */
+const PARECE_LINK = /[a-z][a-z0-9+.-]*:\/\/|www\.|[\p{L}\p{N}_-]\.\p{L}{2,}|@/iu;
+/** Separadores de URL que, cercados de espaço, deixam de formar um endereço. */
+const SEPARADORES_DE_LINK = /\s*([.:/@])\s*/g;
+
+/**
+ * Nome do grupo como texto puro no convite (SEC-006): o nome é texto livre de quem criou o grupo e vai, pelo remetente
+ * do app, a qualquer e-mail convidado. Numa linha só (sem quebra que injete linha no texto ou no assunto), com até 60
+ * caracteres e, se tiver cara de link, com `.`, `:`, `/` e `@` separados por espaços, para nenhum cliente o transformar
+ * em link. Nome normal sai igual. No HTML, o resultado ainda passa pelo `escapar`.
+ */
+export function nomeDoGrupoNoEmail(nome: string): string {
+  const umaLinha = nome.replace(QUEBRAS_E_INVISIVEIS, ' ').trim();
+  const caracteres = [...umaLinha];
+  const curto =
+    caracteres.length > MAX_NOME_NO_EMAIL
+      ? `${caracteres
+          .slice(0, MAX_NOME_NO_EMAIL - 1)
+          .join('')
+          .trimEnd()}…`
+      : umaLinha;
+  return PARECE_LINK.test(curto) ? curto.replace(SEPARADORES_DE_LINK, ' $1 ').trim() : curto;
+}
+
 export function modeloConvite(d: { urlPublica: string; grupoNome: string; token: string }): Modelo {
+  const grupo = nomeDoGrupoNoEmail(d.grupoNome);
   return montar(
-    `Convite para administrar ${d.grupoNome}`,
-    [`Você foi convidado para administrar o grupo ${d.grupoNome} no Gestão da Pelada.`, 'O convite vale por 7 dias.'],
+    `Convite para administrar ${grupo}`,
+    [`Você foi convidado para administrar o grupo ${grupo} no Gestão da Pelada.`, 'O convite vale por 7 dias.'],
     linkComToken(d.urlPublica, '/convite', d.token),
     'Aceitar convite',
   );

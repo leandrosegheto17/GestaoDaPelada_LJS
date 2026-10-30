@@ -2302,10 +2302,10 @@ T76 → T77 → T78 → T79 → T80 → T81 → T82 → T83
 
 **Done when**:
 
-- [ ] Nome de grupo com URL, quebra de linha ou HTML não vira link nem injeta linha no texto e no HTML do e-mail
-- [ ] Nome normal sai igual ao de hoje
-- [ ] Teste do modelo falha sem a regra
-- [ ] Gate full passa
+- [x] Nome de grupo com URL, quebra de linha ou HTML não vira link nem injeta linha no texto e no HTML do e-mail
+- [x] Nome normal sai igual ao de hoje
+- [x] Teste do modelo falha sem a regra
+- [x] Gate full passa
 
 **Tests**: unit
 **Gate**: full
