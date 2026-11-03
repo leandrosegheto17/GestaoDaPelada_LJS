@@ -39,6 +39,22 @@ export async function contarLinhas(url: string): Promise<Record<string, number>>
   }
 }
 
+/** Roles que os dumps citam em policies e grants; o pg_restore roda com --no-owner --no-acl e não as cria. */
+const ROLES_DO_APP = ['pelada_app', 'pelada_backup_ro', 'pelada_owner'];
+
+async function garantirRoles(url: string): Promise<void> {
+  const cliente = await conectar(url);
+  try {
+    for (const role of ROLES_DO_APP) {
+      const { rowCount } = await cliente.query('select 1 from pg_roles where rolname = $1', [role]);
+      if (rowCount === 0)
+        await cliente.query(`create role ${cliente.escapeIdentifier(role)} nologin`);
+    }
+  } finally {
+    await cliente.end();
+  }
+}
+
 function docker(args: string[], timeout: number) {
   return spawnSync('docker', args, { encoding: 'utf8', timeout });
 }
@@ -53,6 +69,8 @@ export async function restaurarBackup(opcoes: OpcoesRestauracao): Promise<Record
   if (Object.keys(existentes).length > 0) {
     throw new Error('O banco de destino já tem tabelas: restaure só num banco vazio');
   }
+
+  await garantirRoles(opcoes.url);
 
   const imagem = docker(
     [

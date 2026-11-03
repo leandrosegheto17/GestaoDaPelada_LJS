@@ -46,7 +46,20 @@ async function comCliente<T>(url: string, fn: (c: pg.Client) => Promise<T>): Pro
   }
 }
 
-beforeAll(() => {
+const ROLES = ['pelada_app', 'pelada_backup_ro', 'pelada_owner'];
+let rolesPreexistentes: string[] = [];
+
+beforeAll(async () => {
+  rolesPreexistentes = await bancoDeTeste((url) =>
+    comCliente(url, async (c) => {
+      const r = await c.query<{ rolname: string }>(
+        'select rolname from pg_roles where rolname = any($1)',
+        [ROLES],
+      );
+      return r.rows.map((l) => l.rolname);
+    }),
+  );
+
   const r = spawnSync(
     'docker',
     [
@@ -63,7 +76,16 @@ beforeAll(() => {
   expect(r.status, r.stderr).toBe(0);
 }, 300_000);
 
-afterAll(() => rmSync(saida, { recursive: true, force: true }));
+afterAll(async () => {
+  rmSync(saida, { recursive: true, force: true });
+  // a restauração cria roles que faltam no cluster; o teste devolve o cluster como estava
+  await bancoDeTeste((url) =>
+    comCliente(url, async (c) => {
+      for (const role of ROLES.filter((r) => !rolesPreexistentes.includes(r)))
+        await c.query(`drop role if exists ${c.escapeIdentifier(role)}`);
+    }),
+  );
+});
 
 test('FUN-50: dump cifrado restaurado em banco vazio dá a mesma contagem de linhas por tabela', async () => {
   await bancoDeTeste(async (origem) => {
@@ -90,6 +112,50 @@ test('FUN-50: dump cifrado restaurado em banco vazio dá a mesma contagem de lin
       expect(contagem).toEqual({ grupos: 2, jogadores: 3 });
       expect(contagem).toEqual(await contarLinhas(origem));
     });
+  });
+}, 180_000);
+
+test('FUN-50: restaura dump cujas policies citam roles que o destino ainda não tem', async () => {
+  await bancoDeTeste(async (origem) => {
+    const existia = await comCliente(origem, async (c) => {
+      const r = await c.query("select 1 from pg_roles where rolname = 'pelada_app'");
+      if (r.rowCount === 0) await c.query('create role pelada_app nologin');
+      return (r.rowCount ?? 0) > 0;
+    });
+    try {
+      await comCliente(origem, async (c) => {
+        await c.query('create table grupos (id int primary key)');
+        await c.query('alter table grupos enable row level security');
+        await c.query('create policy ler on grupos for select to pelada_app using (true)');
+        await c.query('insert into grupos values (1)');
+      });
+      const dump = dockerRun(`
+        set -euo pipefail
+        age-keygen -o /out/chave2.txt 2>/dev/null
+        DUMP_URL='${origem.replace('127.0.0.1', 'host.docker.internal')}' BACKUP_CHAVE="$(age-keygen -y /out/chave2.txt)"           SAIDA=/out/backup2.dump.age bash /repo/.github/actions/dump-cifrado/dump-cifrado.sh
+      `);
+      expect(dump.status, dump.stderr).toBe(0);
+      if (!existia) {
+        await comCliente(origem, async (c) => {
+          await c.query('drop owned by pelada_app');
+          await c.query('drop role pelada_app');
+        });
+      }
+      await bancoDeTeste(async (destino) => {
+        const contagem = await restaurarBackup({
+          arquivo: resolve(saida, 'backup2.dump.age'),
+          chavePrivada: resolve(saida, 'chave2.txt'),
+          url: destino,
+        });
+        expect(contagem).toEqual({ grupos: 1 });
+      });
+    } finally {
+      if (!existia) {
+        await comCliente(origem, async (c) => {
+          await c.query('drop role if exists pelada_app');
+        }).catch(() => undefined);
+      }
+    }
   });
 }, 180_000);
 
