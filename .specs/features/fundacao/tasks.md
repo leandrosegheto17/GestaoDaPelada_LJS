@@ -562,7 +562,7 @@ Gate: pnpm typecheck && pnpm test @ b9cbb7817727a6c841025c3f417df95651995349 = t
 
 ### T12: Workflow backup.yml
 
-**What**: Criar `.github/workflows/backup.yml`: `schedule` `0 7 * * *` e `workflow_dispatch`, `environment: producao`, `permissions: contents: read`, instala `postgresql-client-18` e `age`, usa `NEON_URL_BACKUP` e `BACKUP_CHAVE`, e envia o artefato com `retention-days: 30` e `if-no-files-found: error`. Actions fixadas por SHA.
+**What**: Criar `.github/workflows/backup.yml`: `schedule` `0 7 * * *` e `workflow_dispatch`, `environment: backup` (AD-013), `permissions: contents: read`, instala `postgresql-client-18` e `age`, usa `NEON_URL_BACKUP` e `BACKUP_CHAVE`, e envia o artefato com `retention-days: 30` e `if-no-files-found: error`. Actions fixadas por SHA.
 **Estimativa**: 1,5h
 **Risco**: alto
 **Domínio**: não
@@ -574,7 +574,7 @@ Gate: pnpm typecheck && pnpm test @ b9cbb7817727a6c841025c3f417df95651995349 = t
 
 **Done when**:
 
-- [x] Teste `FUN-47` lê o YAML: cron `0 7 * * *`, `workflow_dispatch`, `environment: producao`, `retention-days: 30`
+- [x] Teste `FUN-47` lê o YAML: cron `0 7 * * *`, `workflow_dispatch`, `environment: backup` (AD-013), `retention-days: 30`
 - [x] Teste `FUN-49`: o passo do dump não usa `continue-on-error` nem `|| true`, e o upload tem `if-no-files-found: error`
 - [x] Teste: todo `uses:` está fixado por SHA de 40 caracteres
 - [x] Nenhum segredo literal no arquivo (gitleaks local limpo)
@@ -615,19 +615,19 @@ Gate: pnpm typecheck && pnpm test @ 47f2dba59d339e208d4585a0cb33d302906e4c1e = t
 
 ### T14: Ação do usuário: conferir secrets de backup
 
-**What**: Conferir no GitHub que o environment `producao` tem `NEON_URL_BACKUP` (role `pelada_backup_ro`) e `BACKUP_CHAVE` (chave pública `age`), e que a chave privada correspondente está guardada fora do GitHub.
+**What**: Conferir no GitHub que o environment `backup` (AD-013) tem `NEON_URL_BACKUP` (role `pelada_backup_ro`) e `BACKUP_CHAVE` (chave pública `age`), e que a chave privada correspondente está guardada fora do GitHub.
 **Estimativa**: 20 min
 **Risco**: alto
 **Domínio**: não
 **Criticidade**: crítica
-**Where**: `GitHub: environment producao (sem arquivo)`
+**Where**: `GitHub: environment backup (sem arquivo)`
 **Depends on**: T13
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-48
 
 **Done when**:
 
-- [ ] Os dois secrets existem no environment `producao` (conferido na tela do GitHub, sem ler os valores)
+- [ ] Os dois secrets existem no environment `backup` (conferido na tela do GitHub, sem ler os valores)
 - [ ] A chave privada está guardada fora do GitHub (o usuário confirma)
 - [ ] O usuário confirma qual é o `age` público em uso, para o runbook
 - [ ] Gate passa, sem teste removido ou enfraquecido

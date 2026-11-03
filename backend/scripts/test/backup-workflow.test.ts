@@ -8,10 +8,10 @@ const texto = readFileSync(caminho, 'utf8');
 const wf = parse(texto);
 const job = Object.values<{ steps: Record<string, unknown>[] }>(wf.jobs)[0]!;
 
-test('FUN-47: cron 07:00 UTC, disparo manual, environment producao e retenção de 30 dias', () => {
+test('FUN-47: cron 07:00 UTC, disparo manual, environment backup (AD-013) e retenção de 30 dias', () => {
   expect(wf.on.schedule).toEqual([{ cron: '0 7 * * *' }]);
   expect(wf.on).toHaveProperty('workflow_dispatch');
-  expect(Object.values<{ environment: string }>(wf.jobs)[0]!.environment).toBe('producao');
+  expect(Object.values<{ environment: string }>(wf.jobs)[0]!.environment).toBe('backup');
   const upload = job.steps.find((s) => String(s.uses ?? '').startsWith('actions/upload-artifact'));
   expect((upload!.with as Record<string, unknown>)['retention-days']).toBe(30);
 });

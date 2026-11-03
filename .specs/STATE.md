@@ -14,6 +14,7 @@
 - **AD-010** (2026-11-03): o dump pré-deploy da `dev` usa `pelada_backup_ro` (secret `NEON_URL_DEV_BACKUP`), não a role de migração, porque a `FORCE` RLS deixa o dump vazio para quem não tem a policy `USING (true)` (spike S2 do LJS). Corrige o design C7, que usava a URL de migração.
 - **AD-011** (2026-11-03): FUN-48 reescrito. Pede a primeira execução manual do `backup.yml` no dia em que ele chega à `main`, em vez de exigi-lo no mesmo push da troca (consequência da AD-008).
 - **AD-012** (2026-11-03): a v2 usa **Node 26** (`engines` `>=26 <27`, `.nvmrc` 26), por decisão do usuário, já que a máquina tem Node 26.13. Substitui o Node 24 do LJS em FUN-01 e na necessidade. Descartada: instalar o Node 24.
+- **AD-013** (2026-11-03): a spec e o design mandam `environment: producao` no `backup.yml`; os secrets de backup moram no environment `backup`; vale `backup`. Motivo: é onde `NEON_URL_BACKUP` e `BACKUP_CHAVE` existem (conferido com `gh secret list --env`); o `producao` só tem `BACKUP_CHAVE`. Autoriza a mudança do teste `FUN-47` de `backup-workflow.test.ts` (mesma força, só o nome do environment).
 
 ## Retomada
 

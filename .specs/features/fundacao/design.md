@@ -21,7 +21,7 @@ graph TD
     T -->|pelada_app, cache desligado| HD[Hyperdrive gestaodapelada-v2-dev] --> ND[(Neon dev)]
     GA[GitHub Actions, main = v2] -->|ci.yml| CI[lint, format, typecheck, testes, gitleaks, build, migrar do zero, impressão digital, isolamento, visual, instalabilidade]
     GA -->|deploy.yml, environment previa| D[build, restauração da dev, dump, migrar como pelada_owner, wrangler deploy, health]
-    GA -->|backup.yml 07:00 UTC, environment producao| B[pg_dump da main como pelada_backup_ro + age]
+    GA -->|backup.yml 07:00 UTC, environment backup, AD-013| B[pg_dump da main como pelada_backup_ro + age]
     B -.somente leitura.-> NM[(Neon main: produção, usada pelo Worker gestaodapelada do LJS)]
 ```
 
@@ -44,7 +44,7 @@ graph TD
 
 | System | Integration Method |
 | --- | --- |
-| Neon `main` (produção) | Só o `backup.yml` lê, com `NEON_URL_BACKUP` (`pelada_backup_ro`) do environment `producao`, que já existe no repo. Nada da v2 escreve nela antes da paridade (FUN-28) |
+| Neon `main` (produção) | Só o `backup.yml` lê, com `NEON_URL_BACKUP` (`pelada_backup_ro`) do environment `backup` (AD-013), que já existe no repo. Nada da v2 escreve nela antes da paridade (FUN-28) |
 | Neon `dev` | Alvo da prévia. Migração com `pelada_owner`, runtime com `pelada_app` via um Hyperdrive novo, `gestaodapelada-v2-dev`, criado pelo usuário pelo runbook |
 | Cloudflare | Worker novo `gestaodapelada-v2` em `workers.dev`. O Worker `gestaodapelada` do LJS não é tocado (FUN-28) |
 | GitHub | O mesmo repo `GestaoDaPelada_LJS`. A branch `legado` recebe a main atual, e a `main` passa a ser a v2 (AD-005). Há um environment novo, `previa`, com os secrets da `dev` e da Cloudflare |
@@ -133,8 +133,8 @@ graph TD
   - `ci.yml` (push e PR): jobs `qualidade` (lint, format, typecheck, gitleaks, checagens), `testes` (unitários e Worker), `banco` (serviço `postgres:18`: migrar do zero, impressão digital, isolamento, FUN-09 e FUN-10), `web` (build, instalabilidade, comparação visual). Actions fixadas por SHA.
   - `deploy.yml`: só `workflow_dispatch`, com `if: github.ref == 'refs/heads/main'`, `environment: previa` e `concurrency: { group: deploy-previa, cancel-in-progress: false }`. Passos de FUN-42, com o dump cifrado da `dev` feito por `pelada_backup_ro` (AD-010). O alvo vem fixo do `wrangler.jsonc` (`gestaodapelada-v2`), e um teste falha se o `wrangler.jsonc` ou o `deploy.yml` citarem `gestaodapelada` sem `-v2`, `routes` ou o environment `producao` (FUN-28).
   - Branch de restauração: `backend/scripts/ops/restauracao-neon.ts`, pela API do Neon (`NEON_API_KEY`, `NEON_PROJECT_ID` no environment `previa`), com a `dev` como pai, mantendo as 2 mais recentes.
-  - `backup.yml`: `schedule: '0 7 * * *'` e `workflow_dispatch`, `environment: producao`, `pg_dump -Fc --enable-row-security` com `NEON_URL_BACKUP`, `age -r "$BACKUP_CHAVE"` e `actions/upload-artifact` com `retention-days: 30`. Com `set -euo pipefail`, só publica se dump e cifragem terminarem (FUN-49). O cliente `pg_dump` é da versão 18, igual à do servidor.
-- **Secrets novos (usuário, runbook)**: no environment `previa`, `NEON_URL_DEV_MIGRACAO`, `NEON_API_KEY`, `NEON_PROJECT_ID`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` e `URL_PUBLICA`. O environment `producao` já tem `NEON_URL_BACKUP` e `BACKUP_CHAVE` (`ljs:.specs/liberacao.md:28`).
+  - `backup.yml`: `schedule: '0 7 * * *'` e `workflow_dispatch`, `environment: backup` (AD-013), `pg_dump -Fc --enable-row-security` com `NEON_URL_BACKUP`, `age -r "$BACKUP_CHAVE"` e `actions/upload-artifact` com `retention-days: 30`. Com `set -euo pipefail`, só publica se dump e cifragem terminarem (FUN-49). O cliente `pg_dump` é da versão 18, igual à do servidor.
+- **Secrets novos (usuário, runbook)**: no environment `previa`, `NEON_URL_DEV_MIGRACAO`, `NEON_API_KEY`, `NEON_PROJECT_ID`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` e `URL_PUBLICA`. O environment `backup` (AD-013) já tem `NEON_URL_BACKUP` e `BACKUP_CHAVE` (`ljs:.specs/liberacao.md:28`).
 
 ### C8. Troca da `main` do repositório
 
