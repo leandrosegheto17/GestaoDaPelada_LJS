@@ -10,7 +10,7 @@
     "lint": "pnpm -r lint",
     "format:check": "prettier --check .",
     "typecheck": "pnpm -r typecheck",
-    "test": "pnpm -r test && vitest run",
+    "test": "pnpm -r --workspace-concurrency=1 test && vitest run",
     "migrar": "pnpm --filter @pelada/scripts migrar",
     "esquema:gerar": "pnpm --filter @pelada/scripts esquema:gerar"
   },
