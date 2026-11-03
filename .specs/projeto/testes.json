@@ -1,1 +1,1 @@
-{"comando": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test"}
+{"comando": "docker compose up -d --wait && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test"}
