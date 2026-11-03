@@ -171,7 +171,7 @@ A v2 reimplementa do zero o Gestão da Pelada sobre o **mesmo banco Neon** do LJ
 **Acceptance Criteria**:
 
 1. The `backup.yml` da v2 SHALL rodar todo dia às 07:00 UTC e manualmente, fazendo `pg_dump -Fc` da branch `main` do Neon (produção) com a role `pelada_backup_ro`, cifrando com `age` (chave pública em secret) e guardando o artefato por 30 dias. [FUN-47]
-2. WHEN a `main` passa a ser a v2 THEN o `backup.yml` SHALL já estar nela no mesmo push, e uma execução manual SHALL ser feita e conferida no mesmo dia, sem dia sem backup. [FUN-48]
+2. WHEN o `backup.yml` da v2 chega à `main` THEN uma execução manual dele SHALL ser feita e o artefato conferido no mesmo dia. A `main` foi trocada antes de ele existir (AD-008, AD-011), então o backup agendado da produção fica parado até esse dia. [FUN-48]
 3. IF o dump ou a cifragem falha THEN o `backup.yml` SHALL falhar visivelmente (job vermelho) e não publicar artefato parcial. [FUN-49]
 4. The runbook SHALL ter o procedimento de restauração (baixar o artefato, decifrar com a chave privada guardada fora do GitHub, `pg_restore` no Postgres local a partir de um banco limpo), executado uma vez e registrado com data e contagem de linhas por tabela conferida contra a produção. [FUN-50]
 

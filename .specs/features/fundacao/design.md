@@ -131,7 +131,7 @@ graph TD
 - **Location**: `.github/workflows/{ci,deploy,backup}.yml`, `.github/actions/{preparar-node,dump-cifrado}/`, `backend/scripts/ops/`.
 - **Interfaces**:
   - `ci.yml` (push e PR): jobs `qualidade` (lint, format, typecheck, gitleaks, checagens), `testes` (unitários e Worker), `banco` (serviço `postgres:18`: migrar do zero, impressão digital, isolamento, FUN-09 e FUN-10), `web` (build, instalabilidade, comparação visual). Actions fixadas por SHA.
-  - `deploy.yml`: só `workflow_dispatch`, com `if: github.ref == 'refs/heads/main'`, `environment: previa` e `concurrency: { group: deploy-previa, cancel-in-progress: false }`. Passos de FUN-42. O alvo vem fixo do `wrangler.jsonc` (`gestaodapelada-v2`), e um teste falha se o `wrangler.jsonc` ou o `deploy.yml` citarem `gestaodapelada` sem `-v2`, `routes` ou o environment `producao` (FUN-28).
+  - `deploy.yml`: só `workflow_dispatch`, com `if: github.ref == 'refs/heads/main'`, `environment: previa` e `concurrency: { group: deploy-previa, cancel-in-progress: false }`. Passos de FUN-42, com o dump cifrado da `dev` feito por `pelada_backup_ro` (AD-010). O alvo vem fixo do `wrangler.jsonc` (`gestaodapelada-v2`), e um teste falha se o `wrangler.jsonc` ou o `deploy.yml` citarem `gestaodapelada` sem `-v2`, `routes` ou o environment `producao` (FUN-28).
   - Branch de restauração: `backend/scripts/ops/restauracao-neon.ts`, pela API do Neon (`NEON_API_KEY`, `NEON_PROJECT_ID` no environment `previa`), com a `dev` como pai, mantendo as 2 mais recentes.
   - `backup.yml`: `schedule: '0 7 * * *'` e `workflow_dispatch`, `environment: producao`, `pg_dump -Fc --enable-row-security` com `NEON_URL_BACKUP`, `age -r "$BACKUP_CHAVE"` e `actions/upload-artifact` com `retention-days: 30`. Com `set -euo pipefail`, só publica se dump e cifragem terminarem (FUN-49). O cliente `pg_dump` é da versão 18, igual à do servidor.
 - **Secrets novos (usuário, runbook)**: no environment `previa`, `NEON_URL_DEV_MIGRACAO`, `NEON_API_KEY`, `NEON_PROJECT_ID`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` e `URL_PUBLICA`. O environment `producao` já tem `NEON_URL_BACKUP` e `BACKUP_CHAVE` (`ljs:.specs/liberacao.md:28`).
@@ -143,7 +143,7 @@ graph TD
   1. `git push origin e557292:refs/heads/legado` (a partir do clone do LJS), e conferir com `git ls-remote`.
   2. Na v2: `git remote add origin <repo LJS>` e `git push --force-with-lease=main:<sha da main remota> origin main`. É uma reescrita da `main` remota, autorizada pela AD-005. A branch `legado` preserva o histórico.
   3. No mesmo dia: `gh workflow run backup.yml` e conferir o artefato (FUN-48).
-- **Ordem na construção**: a troca acontece quando o `backup.yml` da v2 está pronto e testado localmente. É a última tarefa antes do primeiro `deploy.yml`.
+- **Ordem real (AD-008, AD-011)**: o usuário trocou a `main` antes de o `backup.yml` existir, e `legado` foi conferida no remoto antes do push. O `backup.yml` da v2 vira a primeira entrega de infraestrutura (Phases 3 e 4 do `tasks.md`).
 
 ### C9. Documentação e contexto
 

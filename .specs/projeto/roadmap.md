@@ -4,7 +4,7 @@ Roteiro aprovado em 2026-11-03 (decisão AD-001 em `.specs/STATE.md`). Entrada: 
 
 | # | Feature | Situação | Tamanho | Depende de | Requisitos | Entrega (o que o usuário vê) |
 |---|---|---|---|---|---|---|
-| 1 | `fundacao` | Em andamento | M | n/a | FUN-* | App no ar local e na branch `dev` do Neon sobre o schema atual do banco (linha de base da main do LJS), CI verde, backup cifrado e restauração testados, `/api/health` respondendo |
+| 1 | `fundacao` | Em andamento | G | n/a | FUN-* | App no ar local e na branch `dev` do Neon sobre o schema atual do banco (linha de base da main do LJS), CI verde, backup cifrado e restauração testados, `/api/health` respondendo |
 | 2 | `conta-e-acesso` | Não começada | G | 1 | ACE-* | Cadastro com confirmação por e-mail, entrar, sair, recuperar e trocar senha, convite de admin, exclusão de conta, landing, termos e privacidade, entrando com a conta que já existe no banco |
 | 3 | `grupos-e-elenco` | Não começada | G | 2 | GRU-* | Criar e arquivar grupo, admins, jogadores com períodos, habilidades e notas, painel do dono, vendo o grupo de teste que já existe |
 | 4 | `partidas-e-ranking` | Não começada | G | 3 | PAR-* | Lançar partida com presença e chuva, pesos com vigência, ranking com desempate, ranking público `/g/:slug` e PDF |
