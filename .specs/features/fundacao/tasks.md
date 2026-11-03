@@ -627,10 +627,10 @@ Gate: pnpm typecheck && pnpm test @ 47f2dba59d339e208d4585a0cb33d302906e4c1e = t
 
 **Done when**:
 
-- [ ] Os dois secrets existem no environment `backup` (conferido na tela do GitHub, sem ler os valores)
-- [ ] A chave privada está guardada fora do GitHub (o usuário confirma)
-- [ ] O usuário confirma qual é o `age` público em uso, para o runbook
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Os dois secrets existem no environment `backup` (conferido na tela do GitHub, sem ler os valores)
+- [x] A chave privada está guardada fora do GitHub (o usuário confirma)
+- [x] O usuário confirma qual é o `age` público em uso, para o runbook
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
@@ -651,11 +651,13 @@ Gate: pnpm typecheck && pnpm test @ 47f2dba59d339e208d4585a0cb33d302906e4c1e = t
 
 **Done when**:
 
-- [ ] `git ls-remote origin legado` mostra `e5572928703779787b93c8ca1d83457e6b452e17` (FUN-39)
-- [ ] A execução manual do `backup.yml` termina verde e gera o artefato `.age` (FUN-48)
-- [ ] O artefato decifrado e restaurado num banco local vazio tem contagem de linhas por tabela, registrada em `docs/restauracao-registro.md` com data (FUN-50)
+- [x] `git ls-remote origin legado` mostra `e5572928703779787b93c8ca1d83457e6b452e17` (FUN-39)
+- [x] A execução manual do `backup.yml` termina verde e gera o artefato `.age` (FUN-48)
+- [x] O artefato decifrado e restaurado num banco local vazio tem contagem de linhas por tabela, registrada em `docs/restauracao-registro.md` com data (FUN-50)
 - [ ] A próxima execução agendada das 07:00 UTC aparece no histórico do GitHub (conferida no dia seguinte)
 - [ ] Gate passa, sem teste removido ou enfraquecido
+
+> Pendências: (1) a próxima execução agendada (07:00 UTC) só se confere em 2026-11-04; (2) contagem toda zero e sem policy de leitura para `pelada_backup_ro`: conferir contra a produção (ver `docs/restauracao-registro.md`). T15 não fecha.
 
 **Tests**: none
 **Gate**: build
