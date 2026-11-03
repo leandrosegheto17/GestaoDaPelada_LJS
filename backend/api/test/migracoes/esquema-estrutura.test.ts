@@ -1,7 +1,11 @@
 import pg from 'pg';
 import { expect, test } from 'vitest';
-import { lerEsquema } from '../../src/infraestrutura/db/esquema.ts';
+import { lerEsquema as lerTudo } from '../../src/infraestrutura/db/esquema.ts';
 import { bancoDeTeste } from '../apoio/banco.ts';
+
+/** Só as categorias estruturais: roles e extensões são do cluster e mudam com testes em paralelo. */
+const lerEsquema = async (c: pg.Client) =>
+  (await lerTudo(c)).filter((l) => /^(tabela|coluna|restricao|indice|trigger) /.test(l));
 
 const MINI = `
   create table a (id int primary key, nome text not null default 'x');
@@ -47,9 +51,7 @@ const ESPERADO = [
 
 test('FUN-08: um mini schema (2 tabelas, FK, índice, trigger) gera a lista esperada, escrita à mão', async () => {
   const linhas = await comMini(MINI, (c) => lerEsquema(c));
-  // As categorias de segurança (T20) têm teste próprio; roles e extensões dependem do cluster.
-  const estrutura = linhas.filter((l) => /^(tabela|coluna|restricao|indice|trigger) /.test(l));
-  expect(estrutura).toEqual(ESPERADO);
+  expect(linhas).toEqual(ESPERADO);
 });
 
 test('FUN-08: duas leituras seguidas dão a mesma lista', async () => {

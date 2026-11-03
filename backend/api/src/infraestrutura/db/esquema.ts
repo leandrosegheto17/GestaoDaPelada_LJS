@@ -91,7 +91,7 @@ export async function lerEsquema(db: ClientBase): Promise<string[]> {
            from pg_class c
            cross join lateral aclexplode(c.relacl) x
            left join pg_roles r on r.oid = x.grantee
-          where ${TABELAS} and x.grantee <> c.relowner and (x.grantee = 0 or r.rolname like 'pelada\_%')
+          where ${TABELAS} and x.grantee <> c.relowner and (x.grantee = 0 or starts_with(r.rolname, 'pelada_'))
           group by c.relname, x.grantee, r.rolname`,
       ),
     () =>
@@ -102,7 +102,7 @@ export async function lerEsquema(db: ClientBase): Promise<string[]> {
            join pg_attribute a on a.attrelid = c.oid and a.attacl is not null and not a.attisdropped
            cross join lateral aclexplode(a.attacl) x
            left join pg_roles r on r.oid = x.grantee
-          where ${TABELAS} and x.grantee <> c.relowner and (x.grantee = 0 or r.rolname like 'pelada\_%')
+          where ${TABELAS} and x.grantee <> c.relowner and (x.grantee = 0 or starts_with(r.rolname, 'pelada_'))
           group by c.relname, a.attname, x.grantee, r.rolname`,
       ),
     () =>
@@ -112,7 +112,7 @@ export async function lerEsquema(db: ClientBase): Promise<string[]> {
            from pg_proc p
            cross join lateral aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) x
            left join pg_roles r on r.oid = x.grantee
-          where ${FUNCOES} and x.grantee <> p.proowner and (x.grantee = 0 or r.rolname like 'pelada\_%')
+          where ${FUNCOES} and x.grantee <> p.proowner and (x.grantee = 0 or starts_with(r.rolname, 'pelada_'))
           group by p.oid, p.proname, x.grantee, r.rolname`,
       ),
     () =>
@@ -120,7 +120,7 @@ export async function lerEsquema(db: ClientBase): Promise<string[]> {
         db,
         `select format('role %s login=%s bypassrls=%s superuser=%s createdb=%s createrole=%s replication=%s',
             rolname, rolcanlogin::text, rolbypassrls::text, rolsuper::text, rolcreatedb::text, rolcreaterole::text, rolreplication::text) as linha
-           from pg_roles where rolname like 'pelada\_%'`,
+           from pg_roles where starts_with(rolname, 'pelada_')`,
       ),
     () => linhas(db, `select 'extensao ' || extname as linha from pg_extension`),
   ];

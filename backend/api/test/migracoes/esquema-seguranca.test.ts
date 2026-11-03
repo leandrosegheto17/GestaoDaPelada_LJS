@@ -1,12 +1,21 @@
 import { createHash, randomBytes } from 'node:crypto';
 import pg from 'pg';
 import { expect, test } from 'vitest';
-import { lerEsquema } from '../../src/infraestrutura/db/esquema.ts';
+import { lerEsquema as lerTudo } from '../../src/infraestrutura/db/esquema.ts';
 import { bancoDeTeste } from '../apoio/banco.ts';
+
+let roleDoTeste = '';
+/** Roles são do cluster e os arquivos de teste rodam em paralelo: só vale a role deste teste. */
+async function lerEsquema(c: pg.Client): Promise<string[]> {
+  return (await lerTudo(c)).filter(
+    (l) => !l.startsWith('role ') || l.startsWith(`role ${roleDoTeste} `),
+  );
+}
 
 /* Cada teste cria uma role pelada_t_<aleatório> (roles são do cluster) e a remove no finally. */
 async function comMini<T>(fn: (c: pg.Client, role: string) => Promise<T>): Promise<T> {
   const role = `pelada_t_${randomBytes(4).toString('hex')}`;
+  roleDoTeste = role;
   return bancoDeTeste(async (url) => {
     const c = new pg.Client({ connectionString: url });
     await c.connect();
