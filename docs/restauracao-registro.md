@@ -17,7 +17,9 @@ Contagem de linhas por tabela (schema `public`):
 
 ## Estado do backup: NÃO confiável (AD-014)
 
-A contagem 0 **não está conferida contra a produção**. A produção tem dados, então o backup diário deve ser tratado como **não confiável** (provavelmente vazio) até o usuário conferir, no Neon, a role `pelada_backup_ro` e a contagem real. Depois da conferência, uma tarefa nova fará o `backup.yml` falhar quando o dump vier sem linhas.
+A contagem 0 **não está conferida contra a produção**. A produção tem dados, então o backup diário deve ser tratado como **não confiável** (provavelmente vazio) até a revalidação.
+
+Decisão do usuário (2026-11-03): a conferência fica **adiada para o fim do projeto** e a T15 permanece aberta de propósito (AD-014). Revalidar no fim do projeto: conferir a role `pelada_backup_ro` e as policies no Neon, rodar o `backup.yml` de novo, restaurar e comparar a contagem com dados do grupo de teste do usuário. Depois disso, criar a tarefa para o `backup.yml` falhar com dump sem linhas.
 
 ## Pendências e alerta
 
