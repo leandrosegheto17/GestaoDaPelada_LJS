@@ -37,7 +37,7 @@ A v2 reimplementa do zero o Gestão da Pelada sobre o **mesmo banco Neon** do LJ
 | Quando a v2 vai para a produção | Na paridade, no fim da `grupos-e-elenco`. Até lá, só a prévia `gestaodapelada-v2` sobre a branch `dev` do Neon | Decisão do usuário em 2026-11-03. Sem regressão para o grupo de teste | y |
 | Linha de base do schema | O schema da produção na main do LJS (`e557292`, 23 migrações, com roles, RLS e funções). O mecanismo (copiar as 23 migrações ou uma linha de base única marcada como aplicada) fica no Design | `necessidade.md` §5 | y |
 | Documentação e decisões | Fluxo do Rascunho: AD-NNN em `.specs/STATE.md`, ADR em `.specs/decisoes/` para o que é difícil de desfazer, README, `docs/runbook.md` e `CLAUDE.md` da raiz | Decisão do usuário em 2026-11-03 | y |
-| Stack | A do LJS: monorepo pnpm 11, Node 24, TypeScript estrito, Hono no Worker, Kysely + `pg`, Zod, React + Vite, CSS Modules, Vitest e Playwright, Postgres 18 | `necessidade.md` §4 | y |
+| Stack | A do LJS: monorepo pnpm 11, Node 26, TypeScript estrito, Hono no Worker, Kysely + `pg`, Zod, React + Vite, CSS Modules, Vitest e Playwright, Postgres 18 | `necessidade.md` §4 | y |
 | Mockup de referência | `GestaoDaPelada_LJS/.specs/mockup/` copiado para `.specs/mockup/` da v2. A pergunta sobre mockup da fase 4 decide se algo novo é desenhado | `necessidade.md` §4 | y |
 | Reuso de código do LJS | **Do zero total** (decisão do usuário em 2026-11-03). Só as 23 migrações da main do LJS são copiadas sem alteração, porque precisam bater com a `pgmigrations` da produção. Componentes, API, scripts, workflows e testes são escritos a partir desta spec e do mockup. O LJS serve só como consulta | "Implementação do zero" pedida pelo usuário | y |
 | Ativos visuais | `tokens.css`, fontes e ícones vêm de `.specs/mockup/`, que é o objeto de mockup que o usuário liberou para reaproveitar | Decisão do usuário | y |
@@ -59,7 +59,7 @@ A v2 reimplementa do zero o Gestão da Pelada sobre o **mesmo banco Neon** do LJ
 
 **Acceptance Criteria**:
 
-1. The repositório SHALL ser um monorepo pnpm 11 com Node 24 (`engines` e `.nvmrc`), `type: module` e TypeScript estrito nos pacotes `backend/contrato`, `backend/dominio`, `backend/api`, `backend/scripts` e `frontend/web`. [FUN-01]
+1. The repositório SHALL ser um monorepo pnpm 11 com Node 26 (`engines` `>=26 <27` e `.nvmrc`), `type: module` e TypeScript estrito nos pacotes `backend/contrato`, `backend/dominio`, `backend/api`, `backend/scripts` e `frontend/web`. [FUN-01]
 2. WHEN o desenvolvedor roda `pnpm lint`, `pnpm typecheck` ou `pnpm test` na raiz THEN o repositório SHALL executar o comando em todos os pacotes e sair com código 0 na base limpa. [FUN-02]
 3. WHEN o desenvolvedor roda `docker compose up -d` THEN o compose SHALL subir só um Postgres 18 com `pgcrypto`, escutando apenas em `127.0.0.1`. [FUN-03]
 4. WHEN o desenvolvedor roda `pnpm dev` THEN o repositório SHALL subir o `wrangler dev`, com o Hyperdrive apontando por `localConnectionString` para o Postgres local, e o Vite com proxy de `/api` para o Worker. [FUN-04]

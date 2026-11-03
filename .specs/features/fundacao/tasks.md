@@ -11,7 +11,7 @@ Implemente estas tarefas com a skill `tlc-spec-driven`: **acione-a pelo nome e s
 **Design**: `.specs/features/fundacao/design.md`
 **Spec**: `.specs/features/fundacao/spec.md`
 **Reuso**: `.specs/features/fundacao/reuso.md`
-**Status**: Draft (aguardando aprovação)
+**Status**: Approved (usuário, 2026-11-03)
 **Tamanho**: 82 tarefas em 25 Phases, 110,7h de trabalho humano estimado
 
 > Premissas desta lista:
@@ -34,7 +34,7 @@ Pontos em que a spec manda uma coisa e o design ou a realidade do banco faz outr
 | 2 | FUN-42: dump cifrado antes da migração | O design usa a URL de migração (owner) | O dump da `dev` usa `pelada_backup_ro` (`NEON_URL_DEV_BACKUP`), porque a `FORCE` RLS esvazia o dump de quem não tem a policy `USING (true)` | AD-010; T70 |
 | 3 | FUN-48: o `backup.yml` já está na `main` no mesmo push da troca | A `main` foi trocada antes de o `backup.yml` existir | FUN-48 pede a primeira execução manual no dia em que ele chega à `main` | AD-008, AD-011; T15 |
 | 4 | FUN-05: o seed cria conta, grupo e jogadores | `pelada_app` não tem grant nas tabelas de conta e não faz login | O seed roda como a role de migração e define `LOGIN PASSWORD` de `pelada_app` e `pelada_backup_ro` a partir do `.env` | AD-009; T32 |
-| 5 | FUN-01: Node 24 | A máquina está com Node 26.13 | Decisão do usuário na aprovação: manter Node 24 (instalar) ou trocar FUN-01 para Node 26 | T1 |
+| 5 | FUN-01: Node 24 | A máquina está com Node 26.13 | Decisão do usuário (2026-11-03): usar Node 26. FUN-01, `engines` e `.nvmrc` mudam para 26 | AD-012; T1, T2 |
 
 ---
 
@@ -287,9 +287,9 @@ T81 → T82
 
 #### Phase 1: Monorepo e ferramentas
 
-### T1: Ação do usuário: Node 24, pnpm 11 e Docker prontos
+### T1: Ação do usuário: Node 26, pnpm 11 e Docker prontos
 
-**What**: Deixar a máquina com Node 24, pnpm 11 e Docker funcionando (hoje: Node 26.13 e pnpm quebrado pelo corepack). Ação do usuário, com pausa.
+**What**: Deixar a máquina com o Node 26 atual, o pnpm 11 e o Docker funcionando (hoje: Node 26.13 instalado e pnpm quebrado pelo corepack). Ação do usuário, com pausa.
 **Estimativa**: 30 min
 **Risco**: baixo
 **Domínio**: não
@@ -301,9 +301,9 @@ T81 → T82
 
 **Done when**:
 
-- [ ] `node -v` imprime v24.x e `pnpm -v` imprime 11.x num terminal novo
+- [ ] `node -v` imprime v26.x e `pnpm -v` imprime 11.x num terminal novo (o pnpm funciona fora do corepack quebrado)
 - [ ] `docker compose version` e `gh auth status` respondem sem erro
-- [ ] Se o usuário preferir manter o Node 26, a decisão vira ajuste de FUN-01 e AD nova antes da T2
+- [ ] `python .claude/scripts/preparar-ambiente.py` imprime "Ambiente pronto" depois da T2
 - [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
@@ -313,7 +313,7 @@ T81 → T82
 
 ### T2: Raiz do monorepo
 
-**What**: Criar o `package.json` da raiz (private, `type: module`, `engines` Node `>=24 <25`, `packageManager` pnpm 11, scripts `lint`, `format:check`, `typecheck` e `test` com `pnpm -r`), `pnpm-workspace.yaml` (`backend/*`, `frontend/*`), `.nvmrc` (24) e `.gitattributes` (`* text=auto eol=lf`).
+**What**: Criar o `package.json` da raiz (private, `type: module`, `engines` Node `>=26 <27`, `packageManager` pnpm 11, scripts `lint`, `format:check`, `typecheck` e `test` com `pnpm -r`), `pnpm-workspace.yaml` (`backend/*`, `frontend/*`), `.nvmrc` (26) e `.gitattributes` (`* text=auto eol=lf`).
 **Estimativa**: 1h
 **Risco**: baixo
 **Domínio**: não
@@ -2399,7 +2399,7 @@ O diagrama de cada Phase tem só a cadeia sequencial. As dependências entre Pha
 
 | Tarefa | Camada | A matriz exige | A tarefa diz | Status |
 |---|---|---|---|---|
-| T1: Ação do usuário: Node 24, pnpm 11 e Docker prontos | Config, docs e ações externas | none | none | ✅ |
+| T1: Ação do usuário: Node 26, pnpm 11 e Docker prontos | Config, docs e ações externas | none | none | ✅ |
 | T2: Raiz do monorepo | Config, docs e ações externas | none | none | ✅ |
 | T3: Cinco pacotes com TypeScript estrito e teste de estrutura | Scripts, checagens, ops e workflows | unit | unit | ✅ |
 | T4: ESLint, Prettier e scripts de qualidade | Config, docs e ações externas | none | none | ✅ |

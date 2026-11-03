@@ -58,7 +58,7 @@ graph TD
 - **Purpose**: estrutura, scripts e qualidade (FUN-01, FUN-02, FUN-06, FUN-32).
 - **Location**: raiz (`package.json`, `pnpm-workspace.yaml`, `tsconfig.base.json`, `.nvmrc`, `.gitattributes` com `* text=auto eol=lf`, `eslint.config.mjs`, `.prettierrc.json`, `.gitleaks.toml`), um `package.json` por pacote.
 - **Interfaces**: `pnpm lint | format:check | typecheck | test | migrar | seed | dev` na raiz, com `pnpm -r`.
-- **Dependencies**: Node 24, pnpm 11.23, TypeScript 5.9, ESLint (regra `no-restricted-imports` em `backend/dominio` para FUN-06), Prettier, Vitest 4, Stylelint (FUN-32).
+- **Dependencies**: Node 26, pnpm 11.23, TypeScript 5.9, ESLint (regra `no-restricted-imports` em `backend/dominio` para FUN-06), Prettier, Vitest 4, Stylelint (FUN-32).
 - **Reuses**: nada do LJS. As versões são as do LJS (`ljs:package.json:6,35`), ainda atuais, conferidas na instalação.
 
 ### C2. Migrações, `migrar` e impressão digital

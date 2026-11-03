@@ -13,20 +13,21 @@
 - **AD-009** (2026-11-03): roles no ambiente local e no CI. As migrações rodam como o superusuário `postgres`, que passa a ser o dono das tabelas. `pelada_owner` não é criada por nenhuma das 23 migrações e só existe no Neon, então é conferida apenas na paridade com a `dev`. FUN-11 é provada em `pelada_app` e `pelada_backup_ro`. O `seed` roda como a role de migração e define `LOGIN PASSWORD` das duas roles a partir do `.env`.
 - **AD-010** (2026-11-03): o dump pré-deploy da `dev` usa `pelada_backup_ro` (secret `NEON_URL_DEV_BACKUP`), não a role de migração, porque a `FORCE` RLS deixa o dump vazio para quem não tem a policy `USING (true)` (spike S2 do LJS). Corrige o design C7, que usava a URL de migração.
 - **AD-011** (2026-11-03): FUN-48 reescrito. Pede a primeira execução manual do `backup.yml` no dia em que ele chega à `main`, em vez de exigi-lo no mesmo push da troca (consequência da AD-008).
+- **AD-012** (2026-11-03): a v2 usa **Node 26** (`engines` `>=26 <27`, `.nvmrc` 26), por decisão do usuário, já que a máquina tem Node 26.13. Substitui o Node 24 do LJS em FUN-01 e na necessidade. Descartada: instalar o Node 24.
 
 ## Retomada
 
 - **Fluxo**: 2, uso próprio — skill `uso-proprio`
 - **Item**: `.specs/features/fundacao/` (feature 1 de 8 do roteiro)
-- **Fase aprovada**: 4, desenho enxuto (spec, design e mapa de reuso da `fundacao`) em 2026-11-03
-- **Próxima fase**: 5, preparação — `tasks.md` da `fundacao` escrito (82 tarefas, 25 Phases, 23 lotes) e aguardando aprovação; depois, fase 6, construção — modelo indicado: sonnet
-- **Construção**: não iniciada
+- **Fase aprovada**: 4, desenho enxuto (spec, design, reuso e `tasks.md` da `fundacao`: 82 tarefas, 25 Phases, 23 lotes) em 2026-11-03
+- **Próxima fase**: 5 e 6, preparação e construção — `tlc-spec-driven`, Execute, começando pela T1 (ação do usuário: ambiente) — modelo indicado: sonnet
+- **Construção**: não iniciada. Próximo: lote 1 de 23 (comum), Phase 1. Rodar `python .claude/scripts/preparar-ambiente.py` antes do primeiro lote e despachar o agente `executor` por marco de 6 lotes
 - **Verificador do marco**: n/a
 - **Serviços no ar**: nenhum
-- **Progresso**: "Produto: Faltam 8 de 8 features: 0% concluído", "Em andamento: 1 fundacao", "Projeto: Sem tarefas ainda", conferida em 2026-11-03
+- **Progresso**: "Produto: Faltam 8 de 8 features: 0% concluído", "Feature atual: Faltam 82 de 82 tarefas: 0% concluído", conferida em 2026-11-03
 - **Combinado na conversa e não registrado em artefato**:
-  - Ações externas exigem confirmação específica na hora: push da branch `legado`, troca da `main` remota do repo `leandrosegheto17/GestaoDaPelada_LJS` (`--force-with-lease`), criação do Hyperdrive `gestaodapelada-v2-dev`, do environment `previa` e dos secrets, e o primeiro `deploy.yml`.
-  - Os passos que só o usuário faz (console do Neon: recriar a `dev` a partir da `main` e gerar a `NEON_API_KEY`; Cloudflare: token; GitHub: environment `previa`) entram como tarefas de runbook com pausa para o usuário.
-  - O `.gitattributes` com `* text=auto eol=lf` entra na primeira tarefa (no Windows, `core.autocrlf=true` quebraria FUN-30).
-  - A pasta `.claude/` e o `.gitignore` foram commitados em `824455f`. O repositório ainda não tem remoto: a troca da `main` do repo do LJS (AD-005) é uma tarefa da construção.
+  - Ações externas exigem confirmação específica na hora: `git push`, execução remota de workflow (`backup.yml`, `deploy.yml`), Hyperdrive, environment e secrets, primeiro deploy. Já feito antes, com confirmação: push da `main` da v2 e branch `legado` no remoto (`e557292`).
+  - O repositório tem o remoto `origin` = `leandrosegheto17/GestaoDaPelada_LJS`, com a `main` em `23fb52f` mais os commits locais seguintes ainda sem push. O push da T15 (publicar o `backup.yml`) é o próximo.
+  - O backup diário agendado da produção está parado desde a troca da `main` (AD-008): as Phases 3 e 4 o devolvem.
+  - Passos do usuário (T1 ambiente, T14 secrets de backup, T77 branch `dev` do Neon, T78 Hyperdrive, token e environment `previa`) são pausas: a sessão para e espera a confirmação.
 - **Gravada em**: 2026-11-03
