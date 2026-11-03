@@ -24,5 +24,5 @@
   - Ações externas exigem confirmação específica na hora: push da branch `legado`, troca da `main` remota do repo `leandrosegheto17/GestaoDaPelada_LJS` (`--force-with-lease`), criação do Hyperdrive `gestaodapelada-v2-dev`, do environment `previa` e dos secrets, e o primeiro `deploy.yml`.
   - Os passos que só o usuário faz (console do Neon: recriar a `dev` a partir da `main` e gerar a `NEON_API_KEY`; Cloudflare: token; GitHub: environment `previa`) entram como tarefas de runbook com pausa para o usuário.
   - O `.gitattributes` com `* text=auto eol=lf` entra na primeira tarefa (no Windows, `core.autocrlf=true` quebraria FUN-30).
-  - A pasta `.claude/` e o `.gitignore` ainda não foram commitados: entram no primeiro commit de código.
+  - A pasta `.claude/` e o `.gitignore` foram commitados em `824455f`. O repositório ainda não tem remoto: a troca da `main` do repo do LJS (AD-005) é uma tarefa da construção.
 - **Gravada em**: 2026-11-03
