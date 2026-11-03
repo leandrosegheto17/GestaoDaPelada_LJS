@@ -549,11 +549,11 @@ Gate: pnpm typecheck && pnpm test @ b9cbb7817727a6c841025c3f417df95651995349 = t
 
 **Done when**:
 
-- [ ] Teste `FUN-47`: dump de um banco de teste com 2 grupos, decifrado com a chave privada de teste, passa em `pg_restore --list`
-- [ ] Teste `FUN-49`: URL inválida faz o script sair com código diferente de 0 e não deixa nenhum `.age`
-- [ ] Teste `FUN-49`: chave pública inválida faz o script sair com código diferente de 0 e não deixa arquivo parcial
-- [ ] O teste roda dentro de um container `postgres:18` com `age` instalado; o comando fica documentado no teste
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-47`: dump de um banco de teste com 2 grupos, decifrado com a chave privada de teste, passa em `pg_restore --list`
+- [x] Teste `FUN-49`: URL inválida faz o script sair com código diferente de 0 e não deixa nenhum `.age`
+- [x] Teste `FUN-49`: chave pública inválida faz o script sair com código diferente de 0 e não deixa arquivo parcial
+- [x] O teste roda dentro de um container `postgres:18` com `age` instalado; o comando fica documentado no teste
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -574,11 +574,11 @@ Gate: pnpm typecheck && pnpm test @ b9cbb7817727a6c841025c3f417df95651995349 = t
 
 **Done when**:
 
-- [ ] Teste `FUN-47` lê o YAML: cron `0 7 * * *`, `workflow_dispatch`, `environment: producao`, `retention-days: 30`
-- [ ] Teste `FUN-49`: o passo do dump não usa `continue-on-error` nem `|| true`, e o upload tem `if-no-files-found: error`
-- [ ] Teste: todo `uses:` está fixado por SHA de 40 caracteres
-- [ ] Nenhum segredo literal no arquivo (gitleaks local limpo)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-47` lê o YAML: cron `0 7 * * *`, `workflow_dispatch`, `environment: producao`, `retention-days: 30`
+- [x] Teste `FUN-49`: o passo do dump não usa `continue-on-error` nem `|| true`, e o upload tem `if-no-files-found: error`
+- [x] Teste: todo `uses:` está fixado por SHA de 40 caracteres
+- [x] Nenhum segredo literal no arquivo (gitleaks local limpo)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -599,13 +599,15 @@ Gate: pnpm typecheck && pnpm test @ b9cbb7817727a6c841025c3f417df95651995349 = t
 
 **Done when**:
 
-- [ ] Teste `FUN-50`: dump cifrado de um banco de teste, restaurado num banco vazio, dá contagem de linhas igual por tabela
-- [ ] Teste `FUN-50`: recusa restaurar num host fora da lista de permitidos (trava de host)
-- [ ] Teste `FUN-50`: recusa restaurar num banco que já tem tabelas
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-50`: dump cifrado de um banco de teste, restaurado num banco vazio, dá contagem de linhas igual por tabela
+- [x] Teste `FUN-50`: recusa restaurar num host fora da lista de permitidos (trava de host)
+- [x] Teste `FUN-50`: recusa restaurar num banco que já tem tabelas
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
+
+Gate: pnpm typecheck && pnpm test @ 47f2dba59d339e208d4585a0cb33d302906e4c1e = typecheck verde, 48 testes passaram, 0 falharam (Postgres 18 e Docker no ar)
 
 ---
 
