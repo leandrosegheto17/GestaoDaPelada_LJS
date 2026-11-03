@@ -757,10 +757,10 @@ Gate: pnpm typecheck && pnpm test @ 44affa23e5bed0d80899d97c61532f644019ca60 = t
 
 **Done when**:
 
-- [ ] Teste `FUN-08` cria um mini schema à mão (2 tabelas, FK, índice, trigger) e compara com a lista esperada, escrita no teste
-- [ ] Teste `FUN-08`: mudar o tipo de uma coluna ou apagar um índice muda a saída
-- [ ] A saída é estável: duas leituras seguidas dão a mesma lista
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-08` cria um mini schema à mão (2 tabelas, FK, índice, trigger) e compara com a lista esperada, escrita no teste
+- [x] Teste `FUN-08`: mudar o tipo de uma coluna ou apagar um índice muda a saída
+- [x] A saída é estável: duas leituras seguidas dão a mesma lista
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -781,10 +781,10 @@ Gate: pnpm typecheck && pnpm test @ 44affa23e5bed0d80899d97c61532f644019ca60 = t
 
 **Done when**:
 
-- [ ] Teste `FUN-08` num mini schema: mudar o corpo de uma função, o `search_path`, uma policy, um `GRANT` ou o `FORCE` muda a saída
-- [ ] Teste `FUN-08`: mudar um atributo de role (`BYPASSRLS`, `LOGIN`) muda a saída; mudar só a senha da role não muda
-- [ ] Cada categoria nova tem um teste que a prova de forma independente
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-08` num mini schema: mudar o corpo de uma função, o `search_path`, uma policy, um `GRANT` ou o `FORCE` muda a saída
+- [x] Teste `FUN-08`: mudar um atributo de role (`BYPASSRLS`, `LOGIN`) muda a saída; mudar só a senha da role não muda
+- [x] Cada categoria nova tem um teste que a prova de forma independente
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -805,15 +805,17 @@ Gate: pnpm typecheck && pnpm test @ 44affa23e5bed0d80899d97c61532f644019ca60 = t
 
 **Done when**:
 
-- [ ] Teste `FUN-08`: banco vazio migrado tem `lerEsquema` igual ao arquivo `esquema-producao.txt` versionado
-- [ ] O arquivo cobre as 25 tabelas com `FORCE` e as funções `SECURITY DEFINER` herdadas (conferência por contagem no teste)
-- [ ] O arquivo é uma referência de uma fonte: a comparação com o banco real (`dev`) está na tarefa de paridade (FUN-08, FUN-09)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-08`: banco vazio migrado tem `lerEsquema` igual ao arquivo `esquema-producao.txt` versionado
+- [x] O arquivo cobre as 25 tabelas com `FORCE` e as funções `SECURITY DEFINER` herdadas (conferência por contagem no teste)
+- [x] O arquivo é uma referência de uma fonte: a comparação com o banco real (`dev`) está na tarefa de paridade (FUN-08, FUN-09)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
 
 ---
+
+Gate: pnpm typecheck && pnpm test @ ffef83d77ce93c8d3aa68e386145b8918483b2bf = typecheck verde, 77 testes passaram, 0 falharam (Postgres 18 no ar)
 
 #### Phase 7: Estado do banco e migrar sobre a produção
 
