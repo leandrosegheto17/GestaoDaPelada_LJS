@@ -118,10 +118,13 @@ def main(argv=None):
     p.add_argument("--tabela")
     p.add_argument("--json", action="store_true")
     a = p.parse_args(argv)
-    if hasattr(sys.stdout, "reconfigure"):
-        sys.stdout.reconfigure(encoding="utf-8")
+    for fluxo in (sys.stdout, sys.stderr):
+        if hasattr(fluxo, "reconfigure"):
+            fluxo.reconfigure(encoding="utf-8")
 
     raiz = Path(a.pasta) if a.pasta else Path.home() / ".claude" / "projects" / (a.projeto or pasta_do_projeto(Path.cwd()))
+    if not raiz.is_dir() and raiz.parent.is_dir():  # o Claude Code grava o drive em minúscula (c--...)
+        raiz = next((d for d in raiz.parent.iterdir() if d.name.lower() == raiz.name.lower()), raiz)
     if not raiz.is_dir():
         print(f"Sem transcrições em {raiz}", file=sys.stderr)
         return 2

@@ -16,6 +16,8 @@ Liste `.specs/features/`. Features **em andamento** são as que não têm `integ
 - Nenhuma em andamento: é uma feature nova; siga para a fase 1.
 - Uma ou mais: pergunte via `AskUserQuestion` qual retomar, com a opção **Feature nova**.
 
+**Entrada pronta (modo enxuto).** Feature nova com `plano.md` na pasta do épico ou com critérios de aceite escritos: pergunte uma vez, via `AskUserQuestion` e junto com a trava de modelo, **modo enxuto (Recomendado)** ou **modo completo**. Enxuto segue a seção **Modo enxuto** do `CLAUDE.md`: o agente `planejador` grava só o `tasks.md` (sem spec, reconhecimento nem proteção separados), há uma aprovação, e a sessão fica em Sonnet. Dúvida sobre a entrada estar atual: completo.
+
 **Chamada por outro fluxo:** `spec.md` com **Chamado por** `integração <slug>` (skill `integracao-terceiros`) segue estas fases com os acréscimos de [composicao.md](../integracao-terceiros/references/composicao.md) (critérios de falha, reaproveitar resiliência, auditoria restrita no lugar do `auditor-seguranca` avulso). Com **Chamado por** `automação <slug>` (skill `automacao`), os acréscimos são os de [composicao.md](../automacao/references/composicao.md) (critérios `AUT-NN`, casos iguais ao manual, entrada inerte). Ao gravar `integracao.md`, volte ao chamador.
 
 **Vinda de uma demanda** (sugestão, solicitação ou suporte): o Specify parte de `.specs/demandas/DEM-NNN-<slug>/encaminhamento.md` (problema, critérios de aceite, fora de escopo) e o `spec.md` leva no topo **Origem**: `demanda DEM-NNN`. Ao gravar `integracao.md`, avise que a demanda pode ir ao fechamento com o autor (skill `demandas`, conferir ligações). Se for **solicitação** (skill `solicitacao`), os `CA-NN` já foram confirmados por escrito: o Specify os traduz em EARS citando o `CA-NN` de origem e pergunta só o técnico; dúvida que mudaria um `CA-NN`, o escopo ou o prazo volta à `solicitacao` antes de seguir. Ao fechar cada fase, se o **Próximo marco** de `solicitacao.md` for essa fase, lembre a atualização ao solicitante (fase 7 dela).
@@ -26,6 +28,7 @@ A **primeira linha que se aplica** define a fase:
 
 | Situação em `.specs/features/<feature>/` | Fase atual |
 |---|---|
+| `tasks.md` com `**Modo**: enxuto` | tarefas em aberto: 5 Implementação; todas concluídas, sem `validation.md` com PASS: 6 Verificação; PASS, sem `integracao.md`: 7 Integração |
 | sem `spec.md` | 1 Pedido |
 | `spec.md`, sem `reconhecimento.md` | 2 Reconhecimento |
 | `reconhecimento.md` com **Mockup** `pendente` | 2b Mockup |
@@ -42,17 +45,20 @@ Uma linha: "**Feature <nome>, fase N de 7, <fase>.**" Avise a troca de modelo:
 - fases 1, 2b e 3: "Esta fase rende melhor em Opus: use `/model opus`."
 - demais: "Esta fase pode seguir em Sonnet: use `/model sonnet`."
 
+No **modo enxuto**, diga "**Feature <nome>, modo enxuto.**" e não avise troca de modelo por fase: a sessão fica em Sonnet e o `planejador` já roda com o modelo da regra **Modelo pela entrada** do `CLAUDE.md`.
+
 ## 4. Acionar a peça da fase
 
 | Fase | Acione | Observações |
 |---|---|---|
+| Enxuto: planejamento | agente `planejador`, passando a Base (plano ou critérios), a pasta `.specs/features/<feature>/` e a branch | Ele grava só o `tasks.md` e devolve divergências em "Perguntas para o usuário". Mostre o resumo (delta, tarefas, lotes, modelo, gate) e faça a **única** aprovação (`AskUserQuestion`: seguir / ajustar / parar); "seguir" cria a branch `feature/<nome>` e despacha o primeiro lote. Mockup só se o delta disser que há tela **nova**. |
 | 1 Pedido | `tlc-spec-driven`, fase **Specify** | Critérios de aceite testáveis e o que fica de fora. Deixe o tlc dimensionar (Small, Medium, Large). Se o pedido for grande demais para uma feature (vários fluxos de valor que não se validam nem se liberam juntos), acione antes a skill `roteiro`. |
 | 2 Reconhecimento | skill `inventario` (cria ou atualiza `.specs/projeto/inventario.md`), depois skill `reconhecimento` | O reconhecimento decide, para cada necessidade, reaproveitar / estender / criar. Se ele escalar (mudança grande de arquitetura), siga a decisão do usuário. Com `plano.md` pronto na pasta do épico, vale a seção **Plano pronto** do `CLAUDE.md`: conferência do delta, não nova investigação. |
 | 2b Mockup | pergunte via `AskUserQuestion`: **fazer o mockup das telas (Recomendado)** ou **dispensar** (motivo). Fazer: skill `mockup-visual` em **modo módulo**, pasta `.specs/features/<feature>/mockup/` | Só quando o reconhecimento diz que a feature cria ou muda telas. Aprovado: **Mockup** `aprovado` no `reconhecimento.md`; dispensado: `dispensado — <motivo>`. |
 | 3 Plano | `tlc-spec-driven`, fases **Design** e **Tasks** (ele pula o que não precisa) | Passe o `reconhecimento.md` (e o mockup aprovado: as telas seguem ele): o plano segue a tabela de reaproveitamento, o modelo a seguir e as convenções. Peça nova fora da tabela precisa de justificativa. Toda tarefa tem teste. Cada tarefa é a menor possível, com **Estimativa** de até 2h de trabalho humano (regra de Tarefas do `CLAUDE.md`). Aprovado, grave a data em **Plano aprovado em** no `reconhecimento.md`. |
 | 4 Rede de proteção | crie a branch `feature/<nome>` (ou worktree, com `using-git-worktrees`); depois a skill `rede-de-protecao` | |
 | 5 Implementação | `tlc-spec-driven`, fase **Execute**, na branch | Um lote por vez, sempre por subagente (`implementador` ou `implementador-dominio`), com a linha V2 ao fim de cada tarefa (seção Execução do `CLAUDE.md`). A suíte inteira roda no fim de cada lote: nenhuma falha nova além das preexistentes de `protecao.md`. |
-| 6 Verificação | verificador do `tlc-spec-driven` (agente `verificador`); com PASS, a skill `revisao-codigo` em modo curto (grave `.specs/revisoes/<feature>/revisao.md` com `spec.md` como pedido, **Fases** 4, 7 e 8, **Devolver após** `análise`), que aciona o `code-review` no diff da branch | Se a feature toca login, permissões, pagamento ou dados pessoais, despache também o `auditor-seguranca`. Com **Mockup** `aprovado`, compare as telas do módulo (etapa 3 da `mockup-visual`). Achado bloqueante vira tarefa e volta à fase 5. |
+| 6 Verificação | verificador do `tlc-spec-driven` (agente `verificador`, com a **Verificação proporcional** do `CLAUDE.md`); com PASS e **só se alguma tarefa for de `**Risco**: alto`**, a skill `revisao-codigo` em modo curto (grave `.specs/revisoes/<feature>/revisao.md` com `spec.md` como pedido, **Fases** 4, 7 e 8, **Devolver após** `análise`), que aciona o `code-review` no diff da branch | Se a feature toca login, permissões, pagamento ou dados pessoais, despache também o `auditor-seguranca`. Com **Mockup** `aprovado`, compare as telas do módulo (etapa 3 da `mockup-visual`). Achado bloqueante vira tarefa e volta à fase 5. |
 | 7 Integração | veja abaixo | |
 
 ### Integração (fase 7)
@@ -65,7 +71,7 @@ Uma linha: "**Feature <nome>, fase N de 7, <fase>.**" Avise a troca de modelo:
 
 ## 5. Fechar a fase
 
-Apresente o que foi produzido (caminho e 3 a 5 linhas) e o critério de passagem, e pergunte via `AskUserQuestion`: **seguir / ajustar / parar**. Antes de declarar uma fase concluída, aplique `verification-before-completion`.
+Apresente o que foi produzido (caminho e 3 a 5 linhas) e o critério de passagem, e pergunte via `AskUserQuestion`: **seguir / ajustar / parar**. No modo enxuto só há duas aprovações: a do planejamento e a da integração. Antes de declarar uma fase concluída, aplique `verification-before-completion`.
 
 ## Regras
 

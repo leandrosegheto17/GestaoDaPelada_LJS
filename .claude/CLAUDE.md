@@ -65,6 +65,20 @@ Vale quando a pasta do épico ou da feature já traz um `plano.md` (ou equivalen
 - **Continua obrigatório** o que o plano não cobre: histórico do git e raio de impacto dos pontos de entrada que ele não cita, costuras novas, ambiente que roda, e a **rede de proteção** (a conferência não a dispensa).
 - Registre no topo de cada artefato `Base: plano pronto <arquivo>, conferido em <data>`. Dúvida sobre o plano estar atual: não use este modo e siga a profundidade normal.
 - Épico com várias features: a conferência de cada feature olha só os trechos do plano dela; não refaça a leitura do que as anteriores já conferiram.
+- Com plano pronto ou critérios escritos, o trabalho todo pode seguir o **Modo enxuto** (seção abaixo), que também reduz os artefatos.
+
+## Modo enxuto
+
+Vale quando a entrada já responde o que o pedido, o reconhecimento e o plano produziriam: um `plano.md` (seção **Plano pronto**) **ou** critérios de aceite escritos antes da feature (arquivo do pedido, `relato.md` ou o que o fluxo aceitar como critério). Uma única pergunta, no início (junto com a do modelo), oferece **modo enxuto (Recomendado)** ou **modo completo**. Dúvida sobre a entrada estar atual: modo completo.
+
+- **Um agente, uma passada.** O agente `planejador` lê a entrada, confere no código atual (HEAD) cada arquivo, linha e molde que ela cita e grava **só** o `tasks.md`. Não há `spec.md`, `reconhecimento.md`, `arqueologia.md`, `design.md` nem `protecao.md` separados, nem a skill `inventario`.
+- **`tasks.md` enxuto:** leva no topo `**Modo**: enxuto` e `**Base**: <arquivo(s)>, conferido em <data>`; depois `## Delta` (até 10 linhas: o que mudou desde a entrada, o que não existe mais, o que ela não viu, decisão nova), `## Critérios` (cada ID com um resumo de uma linha e a tarefa que o cobre; o texto completo fica na Base), `## Linha de base` (comando da suíte, resultado e falhas preexistentes) e as seções que o `validate_tasks.py` exige. Ficam de fora as seções de conferência do modelo do tlc (Execution Protocol, Granularity Check, Diagram-Definition Cross-Check, Test Co-location Validation), que o validador não cobra. Estimativa, Risco e Domínio continuam em toda tarefa, e o lote segue a regra de Execução.
+- **Tarefa T0, rede de proteção:** quando a mudança toca comportamento existente sem teste, a primeira tarefa o caracteriza (método da skill `rede-de-protecao`), com a evidência no próprio `tasks.md`. A conferência não dispensa a rede de proteção.
+- **O campo Reuses nomeia a decisão.** O que a Base ou a conferência decidiu ("estender o elemento X", "usar a classe Y", "o método Z") entra na tarefa literalmente, com `arquivo:linha`; o trabalhador não reinterpreta.
+- **Uma aprovação**, via `AskUserQuestion` (**seguir / ajustar / parar**), com delta, tarefas, lotes, modelo e gate; "seguir" já despacha o primeiro lote. Sem aprovação por fase até a verificação: só se para em falha, bloqueio, decisão que mude escopo, contrato ou dinheiro, e na integração.
+- **Marcos de troca de sessão:** só a cada 3 lotes.
+- **Meta de planejamento:** até ~10 min; passou disso, diga o motivo ao usuário.
+- **Divergência relevante** (muda uma decisão ou o escopo da Base): o `planejador` para e devolve em "Perguntas para o usuário"; a sessão decide com o usuário se refaz esse trecho em Opus ou segue em modo completo.
 
 ## Execução
 
@@ -75,6 +89,9 @@ Vale na construção de qualquer fluxo e tem precedência sobre o `sub-agents.md
 - **Depois de cada tarefa**, o trabalhador roda `python .claude/scripts/progresso.py --tarefa` e guarda a linha como saiu (tempo gasto, tempo estimado, Phase e feature). O retorno do lote traz **uma linha V2 por tarefa**, na ordem. O subagente só devolve texto ao terminar, então o usuário as lê no fim do lote; quem quiser ver ao vivo roda `/progresso` em outro terminal. O tempo vem do `git log` do `tasks.md`: é o commit da tarefa, com o status marcado, que o registra.
 - **Depois de cada lote**, a sessão principal copia as linhas V2 das tarefas para o usuário e roda `--lote`, mostrando a linha do lote. Tarefa que falhou ou bloqueou não gera linha: o trabalhador para, sem commit dela, e devolve as linhas das tarefas já concluídas e o motivo; a sessão principal decide antes de despachar outro lote.
 - **Quando se para:** só em falha, bloqueio, marco de troca de sessão ou fim de fase. Entre lotes não há aprovação.
+- **Antes de editar, vizinhança:** o trabalhador acha 1 ou 2 usos vizinhos do mesmo padrão (mesma classe ou camada, mesmo componente, mesma classe de estilo) e segue o molde, registrando `Molde: <arquivo:linha>` no corpo do commit. Divergir do molde exige motivo. Decisão nomeada na tarefa ("estender X") vale literalmente.
+- **Prova de tela (tarefa de interface):** o gate de cada tarefa é o build ou o lint; o teste de tela (E2E) é escrito na tarefa e **roda uma vez ao fim do lote** que toca interface (`git diff --name-only` nos arquivos de interface), só o spec novo e só no front principal; a réplica do front vale por build. A rodada sem a mudança (teste vermelho) continua sendo a prova de que o teste falharia sem ela. O ambiente do teste de tela é preparado pela sessão principal **antes** de despachar (comando do projeto, ver o contexto do projeto), e o trabalhador não o depura. **Teto: 2 tentativas de 5 min**, em segundo plano e sem laço de `sleep`; passou disso, para e relata `E2E não executado: <motivo>`, que entra no que não foi validado. Critério com palavra de posição ou aparência ("ao lado", "abaixo", "alinhado", cor) exige asserção espacial ou visual (posição relativa dos elementos, ou captura de tela); só o texto não o prova.
+- **Registro do gate:** depois de cada gate, o trabalhador grava no `tasks.md` `Gate: <comando> @ <árvore> = <resultado>`, com a árvore de `git rev-parse HEAD^{tree}`. O verificador reaproveita.
 - **Revisão por risco** (substitui o passo 6.4 do `implement.md`; o gate roda sempre, em toda tarefa):
   - **Baixo:** gate verde e uma linha por critério de pronto: `critério → arquivo:linha`.
   - **Alto:** uma linha por critério e por caso limite da spec, com a expressão da asserção (`critério → arquivo:linha: expect(...)`), a conferência de que nenhum teste passaria com uma implementação errada plausível e a linha `Órfãos:` (teste sem critério, ou `nenhum`).
@@ -82,17 +99,28 @@ Vale na construção de qualquer fluxo e tem precedência sobre o `sub-agents.md
   - As linhas de adequação ficam no trabalho do trabalhador; o retorno do lote só traz o que reprovou na revisão. O `verificador` continua conferindo **todas** as tarefas por inteiro (passos A a D) no fim da feature: é ele que cobre o que a autorrevisão de risco baixo não listou. Isto não relaxa a regra de Testes (abaixo).
 - **Mensagem de commit:** o hook `commit-msg` instalado pelo `instalar.py` valida os commits do Claude Code. Em projeto sem o hook, rode `check_commit.py --message` antes de commitar.
 
+## Verificação proporcional
+
+Vale na verificação de qualquer fluxo que usa o `verificador` e tem precedência sobre a quantidade que o `validate.md` do tlc pede:
+
+- **Gate reaproveitado:** o verificador só repete um gate se a árvore do commit (`git rev-parse HEAD^{tree}`) difere da registrada no `tasks.md`; gates independentes rodam em paralelo, em segundo plano.
+- **Sensor por risco:** até **3** mutações, nos critérios de maior risco. Todas as mutações cabíveis só quando há tarefa de `**Risco**: alto` que toque dinheiro, contrato entre serviços, migração, autorização ou dado pessoal.
+- **Relatório compacto:** `validation.md` com a tabela critério → `arquivo:linha` e asserção → resultado, o gate, o sensor e as lacunas (meta: até ~40 linhas), sem recontar o que o `tasks.md` já mostra. O veredito e a evidência de `arquivo:linha` que o `validate_state.py` exige continuam.
+- **Decisões da Base:** o verificador confere no diff que cada decisão nomeada em **Reuses** ou no **Delta** ("estender X") foi seguida; desvio sem `SPEC_DEVIATION` é lacuna. Critério com palavra de posição provado só por texto é lacuna de precisão.
+- **Revisão de código:** a skill `revisao-codigo` em modo curto (com o `code-review`) roda só quando alguma tarefa é de `**Risco**: alto`; sem ela, a revisão é a do PR do projeto. O `auditor-seguranca` segue a regra de cada fluxo. Quando ambos se aplicam, rodam em paralelo com o verificador (só leitura).
+
 ## Aprovação
 
 - Cada fase termina com um resumo curto e a pergunta de aprovação (via `AskUserQuestion`) com as opções **seguir / ajustar / parar**. Nada avança para a fase seguinte sem aprovação explícita.
 - Parar é um resultado válido e fica registrado.
 - **Progresso no resumo:** antes da pergunta de aprovação, rode `python .claude/scripts/progresso.py` e ponha no resumo as linhas que ele mostra (ex.: "Faltam 45 de 180 tarefas: 75% concluído"). Antes da fase de tarefas ainda não há tarefas: diga só em que fase do fluxo o trabalho está. Projeto com `.specs/projeto/roadmap.md` (uma linha por etapa ou feature, com a Situação) traz também a linha **Produto**; ao aprovar uma etapa ou integrar uma feature, troque a Situação dela no roadmap no mesmo commit. Detalhes na skill `progresso` (`/progresso` mostra a qualquer momento).
 - Nos marcos de troca de sessão (seção abaixo), a pergunta ganha a opção **seguir numa sessão nova**.
+- **Modo enxuto:** uma só aprovação, depois do `tasks.md` (seção Modo enxuto); não há "seguir / ajustar / parar" por fase.
 - Ação externa ou difícil de desfazer (push, deploy, banco de produção, apagar dados, publicar) exige confirmação específica para aquela ação, mesmo com a fase aprovada.
 
 ## Marcos de troca de sessão
 
-A sessão principal acumula conversa e relatórios; trabalho longo a deixa cara e perto do limite. Ao fechar uma fase aprovada que seja um **marco** (a próxima fase pede outro modelo; antes da construção; a cada 2 ou 3 lotes da construção; antes da verificação e da integração ou liberação; ou a conversa já passou por 3 fases), ofereça **seguir numa sessão nova (Recomendado)**: grave a seção `## Retomada` de `.specs/STATE.md` e oriente `/clear` e `/fluxo`, que retoma pelos arquivos. Procedimento em `.claude/skills/fluxo/references/marcos.md`. Nenhuma fase pode depender da memória da conversa: toda aprovação fica gravada em arquivo.
+A sessão principal acumula conversa e relatórios; trabalho longo a deixa cara e perto do limite. Ao fechar uma fase aprovada que seja um **marco** (a próxima fase pede outro modelo; antes da construção; a cada 2 ou 3 lotes da construção; antes da verificação e da integração ou liberação; ou a conversa já passou por 3 fases; no modo enxuto, só a cada 3 lotes), ofereça **seguir numa sessão nova (Recomendado)**: grave a seção `## Retomada` de `.specs/STATE.md` e oriente `/clear` e `/fluxo`, que retoma pelos arquivos. Procedimento em `.claude/skills/fluxo/references/marcos.md`. Nenhuma fase pode depender da memória da conversa: toda aprovação fica gravada em arquivo.
 
 ## Testes (inegociável)
 
@@ -115,17 +143,19 @@ A conversa usa o modelo da sessão (padrão: Sonnet). O trabalho pesado roda em 
 | Planejamento (projeto novo: 1 a 7; uso próprio: 1 a 4) | **Opus**: avise o usuário para usar `/model opus` ao entrar nelas |
 | Da preparação em diante | **Sonnet**: avise para voltar com `/model sonnet` |
 
-- **Trava de modelo**: ao entrar numa fase (ou retomá-la pelo `/fluxo`), compare o modelo em que você está rodando (nome do modelo nas suas instruções de sistema) com o que a fase pede, conforme a tabela acima e a skill do fluxo. Se forem diferentes, **antes de qualquer trabalho da fase** (nenhuma leitura ampla, agente ou artefato), pergunte via `AskUserQuestion`: "Esta fase pede <Opus | Sonnet>, e a sessão está em <modelo atual>. Seguir assim?", com **Vou trocar para <modelo indicado> (Recomendado)** (pare e diga: digite `/model <modelo>` e depois "continuar") e **Seguir com <modelo atual>**. Fase que pede Opus rodando em Sonnet perde qualidade; fase que pede Sonnet rodando em Opus só custa mais: diga o motivo na descrição da opção. Escolha de seguir assim vale para a fase inteira e fica registrada em `.specs/STATE.md`, seção `## Modelo` (data, fluxo, item, fase, indicado, usado). Fases sem modelo indicado não checam. Subagentes têm modelo fixo e não checam.
+- **Trava de modelo**: ao entrar numa fase (ou retomá-la pelo `/fluxo`), compare o modelo em que você está rodando (nome do modelo nas suas instruções de sistema) com o que a fase pede, conforme a tabela acima e a skill do fluxo. Se forem diferentes, **antes de qualquer trabalho da fase** (nenhuma leitura ampla, agente ou artefato), pergunte via `AskUserQuestion`: "Esta fase pede <Opus | Sonnet>, e a sessão está em <modelo atual>. Seguir assim?", com **Vou trocar para <modelo indicado> (Recomendado)** (pare e diga: digite `/model <modelo>` e depois "continuar") e **Seguir com <modelo atual>**. Fase que pede Opus rodando em Sonnet perde qualidade; fase que pede Sonnet rodando em Opus só custa mais: diga o motivo na descrição da opção. Escolha de seguir assim vale até o fim do planejamento do item (todas as fases que pedem esse modelo), sem nova pergunta por fase, e fica registrada em `.specs/STATE.md`, seção `## Modelo` (data, fluxo, item, fase, indicado, usado). Fases sem modelo indicado não checam. Subagentes têm modelo fixo e não checam.
 
 | Agente | Modelo | Uso |
 |---|---|---|
 | `pesquisador` | Sonnet | Pesquisa web, concorrentes, preços, documentação técnica |
 | `leitor-codigo` | Haiku | Achar arquivos, padrões e dependências |
+| `planejador` | Sonnet | Planejamento enxuto: confere a entrada e grava o `tasks.md` (Opus só por decisão da sessão, ver abaixo) |
 | `implementador` | Sonnet | Tarefa mecânica, spike |
 | `implementador-dominio` | Opus | Tarefa com regra de negócio difícil ou ambígua |
 | `verificador` | Sonnet | Verificação independente (quem escreve não verifica) |
 | `auditor-seguranca` | Opus | Auditoria de segurança |
 
+- **Modelo pela entrada** (feature e correção em projeto existente): o planejamento é **Opus** quando não há plano nem critérios escritos, há ambiguidade (`[A ESCLARECER]`), contrato novo, evento, migração ou regra de dinheiro. Com plano pronto ou critérios escritos e nenhum desses, é **Sonnet**, no modo enxuto: a sessão continua em Sonnet e o `planejador` roda como subagente de modelo fixo, sem troca manual de `/model`. A execução é sempre Sonnet; Opus só em lote com tarefa `**Domínio**: sim`.
 - Ao despachar trabalhadores do `tlc-spec-driven` (um por lote, um lote por vez, seção Execução), use `implementador` (lote sem `**Domínio**: sim`) ou `implementador-dominio` (lote com alguma tarefa `**Domínio**: sim`, regra difícil ou ambígua). O verificador dele é o agente `verificador`.
 - Leitura ampla de código: delegue ao `leitor-codigo` e trabalhe com o resumo.
 

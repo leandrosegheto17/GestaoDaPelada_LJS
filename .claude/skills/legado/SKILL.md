@@ -13,6 +13,8 @@ Princípio: **mexer sem entender tudo e sem quebrar o que funciona há anos.** O
 
 Liste `.specs/features/`. Em andamento são as que não têm `integracao.md`. Nenhuma: feature nova. Uma ou mais: pergunte via `AskUserQuestion` qual retomar, com a opção **Feature nova**.
 
+**Entrada pronta (modo enxuto).** Feature nova com `plano.md` ou critérios escritos: pergunte uma vez, via `AskUserQuestion` e junto com a trava de modelo, **modo enxuto (Recomendado)** ou **modo completo**. Enxuto segue a seção **Modo enxuto** do `CLAUDE.md`, mantendo o que a arqueologia tem de obrigatório em legado: o `## Delta` do `tasks.md` ganha `Costura` (ponto único de integração), `Raio de impacto` e `Ambiente` (roda ou não), e o T0 caracteriza **todo** o raio de impacto. Ambiente que não roda ou impacto alto: modo completo.
+
 **Chamada por outro fluxo:** `spec.md` com **Chamado por** `integração <slug>` (skill `integracao-terceiros`) segue estas fases com os acréscimos de [composicao.md](../integracao-terceiros/references/composicao.md); na fase 8, leve à `liberacao` os itens de liberação do chamador. Com **Chamado por** `automação <slug>` (skill `automacao`), siga os acréscimos de [composicao.md](../automacao/references/composicao.md) e pare depois da integração da branch, sem a `liberacao`: ligar é a fase 8 do chamador. Ao gravar `integracao.md`, volte ao chamador.
 
 **Vinda de uma demanda** (sugestão, solicitação ou suporte): o Specify parte de `.specs/demandas/DEM-NNN-<slug>/encaminhamento.md` e o `spec.md` leva no topo **Origem**: `demanda DEM-NNN`. Ao gravar `integracao.md`, avise que a demanda pode ir ao fechamento com o autor (skill `demandas`, conferir ligações). Se for **solicitação** (skill `solicitacao`), os `CA-NN` já foram confirmados por escrito: o Specify os traduz em EARS citando o `CA-NN` de origem e pergunta só o técnico; dúvida que mudaria um `CA-NN`, o escopo ou o prazo volta à `solicitacao` antes de seguir. Ao fechar cada fase, se o **Próximo marco** de `solicitacao.md` for essa fase, lembre a atualização ao solicitante (fase 7 dela). Na fase 8, a liberação para todos espera o aceite da solicitação (demonstração com flag ligada só para o solicitante, ou em staging).
@@ -21,6 +23,7 @@ Liste `.specs/features/`. Em andamento são as que não têm `integracao.md`. Ne
 
 | Situação em `.specs/features/<feature>/` | Fase atual |
 |---|---|
+| `tasks.md` com `**Modo**: enxuto` | tarefas em aberto: 6 Implementação; todas concluídas, sem `validation.md` com PASS: 7 Verificação; PASS, sem `integracao.md`: 7 (revisão e segurança), 8 Liberação e 9 Registro |
 | sem `spec.md` | 1 Pedido |
 | `spec.md`, sem `arqueologia.md` | 2 e 3 Arqueologia, fronteira e risco |
 | `arqueologia.md`, com **Mockup** `pendente` no `reconhecimento.md` | 3b Mockup |
@@ -37,17 +40,20 @@ Liste `.specs/features/`. Em andamento são as que não têm `integracao.md`. Ne
 - fases 1, 2-3, 3b e 5: "Esta fase rende melhor em Opus: use `/model opus`."
 - demais: "Esta fase pode seguir em Sonnet: use `/model sonnet`."
 
+No **modo enxuto**, diga "**Feature <nome> (legado), modo enxuto.**" e não avise troca de modelo por fase (regra **Modelo pela entrada** do `CLAUDE.md`).
+
 ## 4. Acionar a peça da fase
 
 | Fase | Acione | Observações |
 |---|---|---|
+| Enxuto: planejamento | agente `planejador`, passando a Base, a pasta `.specs/features/<feature>/` e a branch | Grava só o `tasks.md`. Uma aprovação (`AskUserQuestion`), que já despacha o primeiro lote; costura e raio de impacto sem resposta viram "Perguntas para o usuário". |
 | 1 Pedido | `tlc-spec-driven`, fase **Specify** | Se o pedido for grande demais para uma feature (vários fluxos de valor que não se validam nem se liberam juntos), acione antes a skill `roteiro`. |
 | 2-3 Arqueologia | skills `inventario`, `reconhecimento` e `arqueologia`, nesta ordem | A arqueologia pode escalar (impacto alto): siga a decisão do usuário. Com `plano.md` pronto na pasta do épico, vale a seção **Plano pronto** do `CLAUDE.md`: conferência do delta, não nova investigação. |
 | 3b Mockup | pergunte via `AskUserQuestion`: **fazer o mockup das telas (Recomendado)** ou **dispensar** (motivo). Fazer: skill `mockup-visual` em **modo módulo**, pasta `.specs/features/<feature>/mockup/` | Só quando o reconhecimento diz que a feature cria ou muda telas; sem guia no projeto, o guia mínimo reproduz a aparência atual do legado. Registre `aprovado` ou `dispensado — <motivo>` no `reconhecimento.md`. |
 | 4 Rede de proteção | crie a branch `feature/<nome>`; skill `rede-de-protecao` | Se o ambiente não roda (`arqueologia.md`), fazê-lo rodar vem antes. Caracterize **todo** comportamento do raio de impacto, não só o trecho alterado. |
 | 5 Plano | `tlc-spec-driven`, **Design** e **Tasks** | Cada tarefa é a menor possível, com **Estimativa** de até 2h de trabalho humano (regra de Tarefas do `CLAUDE.md`). Código novo **ao lado** do antigo, pelo ponto único de integração de `arqueologia.md`; mudança mínima no código antigo; feature flag quando possível; plano de volta. Refatoração não entra. Aprovado, grave a data em **Plano aprovado em** no `reconhecimento.md`. |
 | 6 Implementação | `tlc-spec-driven`, **Execute**, na branch | Suíte inteira ao fim de cada lote: nenhuma falha nova, e os testes de caracterização continuam passando. |
-| 7 Verificação | agente `verificador`; com PASS, `revisao-codigo` em modo curto (fases 4, 7 e 8; aciona o `code-review`) no diff; `auditor-seguranca` se tocar login, permissões, pagamento ou dados pessoais | Teste manual dos fluxos vizinhos listados no raio de impacto. Com **Mockup** `aprovado`, compare as telas do módulo (etapa 3 da `mockup-visual`). |
+| 7 Verificação | agente `verificador` (com a **Verificação proporcional** do `CLAUDE.md`); com PASS, `revisao-codigo` em modo curto (fases 4, 7 e 8; aciona o `code-review`) no diff, **sempre em legado**; `auditor-seguranca` se tocar login, permissões, pagamento ou dados pessoais | Teste manual dos fluxos vizinhos listados no raio de impacto. Com **Mockup** `aprovado`, compare as telas do módulo (etapa 3 da `mockup-visual`). |
 | 8 Liberação | checagem final (`trava-testes.py --rodar`), integração da branch (merge local ou PR, perguntado via `AskUserQuestion`, com `finishing-a-development-branch`), depois skill `liberacao` | Usa staging e flag conforme `arqueologia.md`. |
 | 9 Registro | veja abaixo | |
 

@@ -83,6 +83,17 @@ class TestCusto(unittest.TestCase):
         r = subprocess.run(base, capture_output=True, text=True, encoding="utf-8")
         self.assertIn("TOTAL: saída 10", r.stdout)
 
+    def test_sem_argumentos_acha_a_pasta_mesmo_com_o_drive_em_minuscula(self):
+        projetos = Path(self._tmp.name) / "home" / ".claude" / "projects"
+        destino = projetos / "c--proj-x"
+        destino.mkdir(parents=True)
+        (destino / "s.jsonl").write_text(resposta("a", "claude-sonnet-5-5", 7, 0, "2026-11-02T10:00:00Z"), encoding="utf-8")
+        r = subprocess.run([sys.executable, str(SCRIPT), "--projeto", "C--proj-x", "--json"], capture_output=True,
+                           text=True, encoding="utf-8", env={**__import__("os").environ, "HOME": str(projetos.parents[1]),
+                                                              "USERPROFILE": str(projetos.parents[1])})
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertEqual(json.loads(r.stdout)["total"]["saida"], 7)
+
     def test_cli_recusa_agrupamento_invalido_e_pasta_inexistente(self):
         r = subprocess.run([sys.executable, str(SCRIPT), "--pasta", str(self.raiz), "--por", "fase"],
                            capture_output=True, text=True, encoding="utf-8")

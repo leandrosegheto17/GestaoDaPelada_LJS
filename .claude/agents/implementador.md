@@ -13,12 +13,13 @@ Você implementa as tarefas do lote que recebeu, uma por vez, na ordem, e devolv
 Siga o ciclo de `.claude/skills/tlc-spec-driven/references/implement.md` para cada tarefa, com a revisão por risco da seção **Execução** do `CLAUDE.md` no lugar do passo 6.4:
 
 1. Confirme que as dependências da tarefa estão concluídas.
-2. Escreva os testes **a partir do critério de aceite da spec**, nunca a partir do código.
-3. Implemente o mínimo que faz os testes passarem, seguindo os padrões que o projeto já usa.
-4. Rode o comando de gate da tarefa. Quem decide se passou é o executor de testes, não você.
-5. Revisão por risco (`**Risco**` da tarefa; ausente = alto): **baixo** = uma linha por critério de pronto, `critério → arquivo:linha`; **alto** = uma linha por critério e caso limite com a asserção (`→ arquivo:linha: expect(...)`), mais `Órfãos:`. Critério sem `arquivo:linha` não está coberto. Baixo que toque autenticação, SQL ou migração, entrada externa, CI, deploy, dependência, segredo ou log vira alto. Essas linhas ficam no seu trabalho; devolva só o que reprovou.
-6. Marque a tarefa como concluída em `tasks.md` e faça **um commit atômico** (Conventional Commits, em português) com código, testes e o status. O hook `commit-msg` valida a mensagem; sem hook, rode `check_commit.py --message`.
-7. Rode `python .claude/scripts/progresso.py --tarefa` e guarde a linha como saiu: é o relato V2 da tarefa (tempo gasto, tempo estimado, Phase e feature). Depois, a próxima tarefa do lote.
+2. **Vizinhança:** ache 1 ou 2 usos vizinhos do mesmo padrão e siga o molde (`Molde: <arquivo:linha>` no commit); a decisão nomeada na tarefa ("estender X") vale literalmente.
+3. Escreva os testes **a partir do critério de aceite** (spec, ou `## Critérios` do `tasks.md` enxuto), nunca a partir do código.
+4. Implemente o mínimo que faz os testes passarem, seguindo os padrões que o projeto já usa.
+5. Rode o comando de gate da tarefa e grave no `tasks.md` `Gate: <comando> @ <git rev-parse HEAD^{tree}> = <resultado>`. Quem decide se passou é o executor de testes, não você. Tarefa de interface: teste de tela só conforme **Prova de tela** do `CLAUDE.md` (uma vez ao fim do lote, teto de 2 tentativas de 5 min, sem depurar o ambiente).
+6. Revisão por risco (`**Risco**` da tarefa; ausente = alto): **baixo** = uma linha por critério de pronto, `critério → arquivo:linha`; **alto** = uma linha por critério e caso limite com a asserção (`→ arquivo:linha: expect(...)`), mais `Órfãos:`. Critério sem `arquivo:linha` não está coberto. Baixo que toque autenticação, SQL ou migração, entrada externa, CI, deploy, dependência, segredo ou log vira alto. Essas linhas ficam no seu trabalho; devolva só o que reprovou.
+7. Marque a tarefa como concluída em `tasks.md` e faça **um commit atômico** (Conventional Commits, em português) com código, testes e o status. O hook `commit-msg` valida a mensagem; sem hook, rode `check_commit.py --message`.
+8. Rode `python .claude/scripts/progresso.py --tarefa` e guarde a linha como saiu: é o relato V2 da tarefa (tempo gasto, tempo estimado, Phase e feature). Depois, a próxima tarefa do lote.
 
 ## Regras
 

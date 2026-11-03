@@ -207,6 +207,73 @@ class TestSkills(unittest.TestCase):
         self.assertIn("trava de modelo", (SKILLS / "fluxo" / "SKILL.md").read_text(encoding="utf-8"))
         self.assertIn("trava de modelo", (SKILLS / "fluxo" / "references" / "marcos.md").read_text(encoding="utf-8"))
 
+    def test_modo_enxuto_com_entrada_pronta(self):
+        """Plano ou critérios prontos: um agente grava só o tasks.md, uma aprovação, sessão em Sonnet."""
+        claude_md = (CLAUDE / "CLAUDE.md").read_text(encoding="utf-8")
+        for trecho in ("## Modo enxuto", "`planejador`", "**Modo**: enxuto", "`## Delta`", "`## Linha de base`",
+                       "Tarefa T0, rede de proteção", "O campo Reuses nomeia a decisão", "**Uma aprovação**",
+                       "só a cada 3 lotes", "**Modelo pela entrada**", "sem troca manual de `/model`"):
+            with self.subTest(trecho=trecho):
+                self.assertIn(trecho, claude_md)
+        for nome in ("feature", "legado"):
+            with self.subTest(skill=nome):
+                texto = (SKILLS / nome / "SKILL.md").read_text(encoding="utf-8")
+                for trecho in ("modo enxuto", "`planejador`", "`**Modo**: enxuto`"):
+                    self.assertIn(trecho, texto)
+        agente = (CLAUDE / "agents" / "planejador.md").read_text(encoding="utf-8")
+        cabecalho = agente.split("---")[1]
+        self.assertIn("model: sonnet", cabecalho)
+        tools = re.search(r"^tools:\s*(.*)$", cabecalho, re.MULTILINE).group(1)
+        self.assertNotIn("Edit", tools)  # só grava o tasks.md; não altera código
+        self.assertLessEqual(len(agente.splitlines()), 60)
+
+    def test_tasks_enxuto_passa_no_validador_do_tlc(self):
+        """As seções de conferência do modelo do tlc podem sair: o validate_tasks.py só exige quatro."""
+        from apoio import carregar
+        import tempfile
+        validador = carregar("../skills/tlc-spec-driven/scripts/validate_tasks.py")
+        enxuto = "\n".join([
+            "# Entrega N: Tasks", "", "**Modo**: enxuto", "**Base**: criterios.md, conferido em 2026-11-02", "",
+            "## Delta", "- sem mudança desde o plano", "", "## Critérios", "- EN-01: vínculo no detalhe (T1)", "",
+            "## Linha de base", "- suíte: 204 passam", "", "## Test Coverage Matrix", "| Camada | Teste |", "", "## Gate Check Commands",
+            "- unit: dotnet test", "", "## Execution Plan", "### Phase 1: Back", "```", "T1 → T2", "```", "",
+            "## Task Breakdown", "### T1: Ler o vínculo", "**Estimativa**: 1h", "**Risco**: alto", "**Domínio**: não",
+            "**Depends on**: None", "**Tests**: unit", "**Gate**: unit", "", "### T2: Expor no detalhe", "**Estimativa**: 1h",
+            "**Risco**: alto", "**Domínio**: não", "**Depends on**: T1", "**Tests**: unit", "**Gate**: unit", ""])
+        with tempfile.TemporaryDirectory() as pasta:
+            arquivo = Path(pasta) / "tasks.md"
+            arquivo.write_text(enxuto, encoding="utf-8")
+            erros, _ = validador.check(str(arquivo))
+        self.assertEqual(erros, [])
+
+    def test_prova_de_tela_vizinhanca_e_gate_registrado(self):
+        """Teste de tela uma vez ao fim do lote, com teto; molde vizinho; gate registrado por árvore do commit."""
+        claude_md = (CLAUDE / "CLAUDE.md").read_text(encoding="utf-8")
+        for trecho in ("**Antes de editar, vizinhança:**", "**Prova de tela (tarefa de interface):**",
+                       "roda uma vez ao fim do lote", "**Teto: 2 tentativas de 5 min**", "E2E não executado: <motivo>",
+                       "asserção espacial ou visual", "**Registro do gate:**", "HEAD^{tree}"):
+            with self.subTest(trecho=trecho):
+                self.assertIn(trecho, claude_md)
+        for nome in ("implementador", "implementador-dominio"):
+            with self.subTest(agente=nome):
+                texto = (CLAUDE / "agents" / f"{nome}.md").read_text(encoding="utf-8")
+                for trecho in ("Vizinhança", "Molde:", "Prova de tela", "HEAD^{tree}"):
+                    self.assertIn(trecho, texto)
+
+    def test_verificacao_proporcional_ao_risco(self):
+        """Gate reaproveitado, até 3 mutações, relatório compacto e revisão de código só em risco alto."""
+        claude_md = (CLAUDE / "CLAUDE.md").read_text(encoding="utf-8")
+        for trecho in ("## Verificação proporcional", "**Gate reaproveitado:**", "até **3** mutações",
+                       "**Relatório compacto:**", "**Decisões da Base:**", "só quando alguma tarefa é de `**Risco**: alto`"):
+            with self.subTest(trecho=trecho):
+                self.assertIn(trecho, claude_md)
+        verificador = (CLAUDE / "agents" / "verificador.md").read_text(encoding="utf-8")
+        for trecho in ("reaproveitando", "até 3 mutações", "lacuna de precisão", "**Base**", "compacto"):
+            with self.subTest(verificador=trecho):
+                self.assertIn(trecho, verificador)
+        self.assertIn("só se alguma tarefa for de", (SKILLS / "feature" / "SKILL.md").read_text(encoding="utf-8"))
+        self.assertIn("sempre em legado", (SKILLS / "legado" / "SKILL.md").read_text(encoding="utf-8"))
+
     def test_fluxo_pronto_aponta_para_skill_existente(self):
         menu = (SKILLS / "fluxo" / "SKILL.md").read_text(encoding="utf-8")
         prontos = [linha for linha in menu.splitlines() if linha.startswith("|") and "**Pronto**" in linha]
