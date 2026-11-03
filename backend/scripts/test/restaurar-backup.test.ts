@@ -82,7 +82,7 @@ afterAll(async () => {
   await bancoDeTeste((url) =>
     comCliente(url, async (c) => {
       for (const role of ROLES.filter((r) => !rolesPreexistentes.includes(r)))
-        await c.query(`drop role if exists ${c.escapeIdentifier(role)}`);
+        await c.query(`drop role if exists ${c.escapeIdentifier(role)}`).catch(() => undefined); // role em uso por outro banco de teste: fica
     }),
   );
 });
