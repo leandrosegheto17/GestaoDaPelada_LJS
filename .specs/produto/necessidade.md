@@ -4,7 +4,7 @@
 - **Veredito**: construir
 - **Motivo de construir**: outro — estudo. Reimplementar do zero o produto já definido no `GestaoDaPelada_LJS` para exercitar o novo fluxo do Rascunho. As duas versões anteriores (`GestaodaPelada` e `GestaoDaPelada_LJS`) são estudos sem usuários reais; só existe o grupo de teste do usuário.
 - **Aprovação**: aprovado pelo usuário em 2026-11-03 (seguir para a fase 3b, roteiro)
-- **Mockup**: [pendente — decidido na fase 4; a interface é a do `GestaoDaPelada_LJS`]
+- **Mockup**: aprovado — reaproveitado do `GestaoDaPelada_LJS` (decisão do usuário em 2026-11-03). `.specs/mockup/` copiado de `GestaoDaPelada_LJS@e557292`, com `tokens.css` idêntico. Os mockups de módulo do LJS (`.specs/features/{conta-e-acesso,grupos-e-elenco,partidas-e-ranking}/mockup/`) entram na feature correspondente. As telas que o LJS não desenhou são feitas em modo módulo no mesmo estilo.
 
 ## 1. Necessidade
 
