@@ -15,6 +15,10 @@ Contagem de linhas por tabela (schema `public`):
 | auditoria, config_financeira, config_pesos, contas, convites_admin, envios_email, envios_email_dia, escalacoes, eventos_uso, falhas_senha_atual, grupos, habilidades, jogadores, lancamentos, links_conta, notas, pagamentos_mes, partidas, pedidos_email_origem, pedidos_reset, periodos_ativos, presencas, sessoes, tentativas_login, vinculos_admin | 0 cada (25 tabelas) |
 | pgmigrations                                                                                                                                                                                                                                                                                                                                           | 23                  |
 
+## Estado do backup: NÃO confiável (AD-014)
+
+A contagem 0 **não está conferida contra a produção**. A produção tem dados, então o backup diário deve ser tratado como **não confiável** (provavelmente vazio) até o usuário conferir, no Neon, a role `pelada_backup_ro` e a contagem real. Depois da conferência, uma tarefa nova fará o `backup.yml` falhar quando o dump vier sem linhas.
+
 ## Pendências e alerta
 
 - **A contagem não foi conferida contra a produção** (exigência de FUN-50): a sessão não tem acesso de leitura ao Neon. Todas as tabelas de negócio vieram com 0 linhas.
