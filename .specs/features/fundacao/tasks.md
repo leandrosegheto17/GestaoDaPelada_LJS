@@ -301,10 +301,10 @@ T81 → T82
 
 **Done when**:
 
-- [ ] `node -v` imprime v26.x e `pnpm -v` imprime 11.x num terminal novo (o pnpm funciona fora do corepack quebrado)
-- [ ] `docker compose version` e `gh auth status` respondem sem erro
-- [ ] `python .claude/scripts/preparar-ambiente.py` imprime "Ambiente pronto" depois da T2
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] `node -v` imprime v26.x e `pnpm -v` imprime 11.x num terminal novo (o pnpm funciona fora do corepack quebrado)
+- [x] `docker compose version` e `gh auth status` respondem sem erro
+- [x] `python .claude/scripts/preparar-ambiente.py` imprime "Ambiente pronto" depois da T2
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
@@ -325,10 +325,10 @@ T81 → T82
 
 **Done when**:
 
-- [ ] `pnpm install` termina sem erro
-- [ ] `git add --renormalize .` não deixa diferença e o git não avisa mais sobre CRLF
-- [ ] Commit com o `pnpm-lock.yaml`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] `pnpm install` termina sem erro
+- [x] `git add --renormalize .` não deixa diferença e o git não avisa mais sobre CRLF
+- [x] Commit com o `pnpm-lock.yaml`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
@@ -349,10 +349,10 @@ T81 → T82
 
 **Done when**:
 
-- [ ] `test/estrutura.test.ts` (nomes citam FUN-01 e FUN-02) confere nos cinco pacotes: `type: module`, `engines`, `strict: true` e os scripts `lint`, `typecheck` e `test`
-- [ ] O teste falha quando se remove `strict` de um `tsconfig` (conferido uma vez e revertido)
-- [ ] `pnpm typecheck` e `pnpm test` na raiz saem com código 0, com 5 testes de fumaça mais o de estrutura
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] `test/estrutura.test.ts` (nomes citam FUN-01 e FUN-02) confere nos cinco pacotes: `type: module`, `engines`, `strict: true` e os scripts `lint`, `typecheck` e `test`
+- [x] O teste falha quando se remove `strict` de um `tsconfig` (conferido uma vez e revertido)
+- [x] `pnpm typecheck` e `pnpm test` na raiz saem com código 0, com 5 testes de fumaça mais o de estrutura
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -373,9 +373,9 @@ T81 → T82
 
 **Done when**:
 
-- [ ] `pnpm lint` e `pnpm format:check` saem com código 0 na base limpa
-- [ ] Uma linha com `var` no pacote `dominio` faz o lint falhar (conferido uma vez e revertido)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] `pnpm lint` e `pnpm format:check` saem com código 0 na base limpa
+- [x] Uma linha com `var` no pacote `dominio` faz o lint falhar (conferido uma vez e revertido)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
@@ -396,10 +396,10 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-06` com um arquivo de exemplo que importa `node:fs`: o ESLint reporta o erro
-- [ ] Teste `FUN-06` com um arquivo sem I/O: o ESLint não reporta nada
-- [ ] `pnpm --filter @pelada/dominio test` passa com 2 testes novos
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-06` com um arquivo de exemplo que importa `node:fs`: o ESLint reporta o erro
+- [x] Teste `FUN-06` com um arquivo sem I/O: o ESLint não reporta nada
+- [x] `pnpm --filter @pelada/dominio test` passa com 2 testes novos
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -420,15 +420,17 @@ T81 → T82
 
 **Done when**:
 
-- [ ] `testes.json` traz o comando `pnpm lint && pnpm format:check && pnpm typecheck && pnpm test`, sem `dispensado`
-- [ ] `python .claude/scripts/trava-testes.py --rodar` termina com SUÍTE VERDE e o commit fica registrado
-- [ ] Este comando cresce nas tarefas que criam `test:checagens`, build, e2e e visual: cada uma o atualiza (tabela de evolução na seção Gate Check Commands)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] `testes.json` traz o comando `pnpm lint && pnpm format:check && pnpm typecheck && pnpm test`, sem `dispensado`
+- [x] `python .claude/scripts/trava-testes.py --rodar` termina com SUÍTE VERDE e o commit fica registrado
+- [x] Este comando cresce nas tarefas que criam `test:checagens`, build, e2e e visual: cada uma o atualiza (tabela de evolução na seção Gate Check Commands)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
 
 ---
+
+Gate: pnpm typecheck && pnpm test @ 7d47f8e471fa2b3b73a18e50f479ca3b61473d2a = typecheck verde, 22 testes passaram, 0 falharam
 
 #### Phase 2: Banco local e guardas
 
