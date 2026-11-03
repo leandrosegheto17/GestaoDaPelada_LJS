@@ -1,0 +1,13 @@
+{
+  "name": "gestaodapelada-v2",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=26 <27" },
+  "packageManager": "pnpm@11.23.0",
+  "scripts": {
+    "lint": "pnpm -r lint",
+    "format:check": "prettier --check .",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test && vitest run"
+  }
+}
