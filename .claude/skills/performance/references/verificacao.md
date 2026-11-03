@@ -16,7 +16,7 @@ O que ele confere, nesta ordem:
 1. **Testes intactos:** `git diff <base>..<ponta> -- <arquivos de teste>` só acrescenta. Teste existente alterado, pulado ou apagado é **FAIL**, salvo motivo registrado e aprovado pelo usuário.
 2. **Suíte inteira** verde, sem falha nova além das preexistentes de `protecao.md`.
 3. **Comportamento:** cada mudança mantida não altera nada observável além do aprovado em `opcoes.md` (retorno, ordem, erro, efeito, formato). Mudança aprovada tem teste do critério de aceite. Mudança não aprovada é FAIL, com `arquivo:linha`.
-4. **Sensor de discriminação** numa cópia isolada: falhas pequenas no código otimizado (inverter condição, trocar a chave do cache, remover a invalidação, devolver a lista sem o filtro). A caracterização e os testes das tarefas têm de pegá-las; sobrevivente é lacuna da rede.
+4. **Sensor de discriminação** numa cópia isolada: falhas pequenas no código otimizado (inverter condição, trocar a chave do cache, remover a invalidação, devolver a lista sem o filtro), até 3 mutações, nos critérios de maior risco (todas só com tarefa de `**Risco**: alto` que toque dinheiro, contrato entre serviços, migração, autorização ou dado pessoal). A caracterização e os testes das tarefas têm de pegá-las; sobrevivente é lacuna da rede.
 5. **Commits revertidos** de fato revertidos: a ponta não contém as mudanças marcadas **revertida** em `medicoes.md`.
 6. **Medição independente:** o roteiro de `carga/` com o mesmo comando, ambiente, dados, aquecimento e número de repetições da linha de base. Mediana e faixa da métrica da meta e das guardas, lado a lado com a linha de base. Também **custo e recursos** (CPU, memória, conexões, custo mensal estimado se mudou infraestrutura).
 7. **Meta:** atingida se a mediana alcança o alvo **e** o critério de ganho confirmado de `medicao.md` vale contra a linha de base. Diferença grande entre a medição dele e a da sessão na fase 6 é achado (ambiente instável ou medição errada).
@@ -26,7 +26,7 @@ Grave `validation-rodada-<N>.md` com PASS ou FAIL, a tabela de números e a evid
 
 ## 2. Revisão em modo curto
 
-Com PASS, grave `.specs/revisoes/performance-<slug>-rodada-<N>/revisao.md` no formato da skill `revisao-codigo` (`revisao-codigo/references/admissao.md`):
+Com PASS e só se alguma tarefa for de `**Risco**: alto` (sem isso, a revisão é a do PR do projeto), grave `.specs/revisoes/performance-<slug>-rodada-<N>/revisao.md` no formato da skill `revisao-codigo` (`revisao-codigo/references/admissao.md`):
 
 - **Modo** `curto` · **Chamado por** `fluxo 5 <slug> rodada <N>` · **Usar em** `.specs/performance/<slug>/validation-rodada-<N>.md` · **Devolver após** `análise` · **Fases** 4, 7 e 8;
 - **Pedido**: origem `performance.md` e `opcoes.md`; critérios de aceite: (1) cada mudança mantida é a da sua tarefa; (2) nada observável muda além do aprovado; (3) sem risco novo de concorrência, vazamento de memória, cache servindo dado de outro usuário ou consulta que piora com mais dados.

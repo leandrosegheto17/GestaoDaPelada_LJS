@@ -227,6 +227,25 @@ class TestSkills(unittest.TestCase):
         self.assertNotIn("Edit", tools)  # só grava o tasks.md; não altera código
         self.assertLessEqual(len(agente.splitlines()), 60)
 
+    def test_fluxos_de_construcao_seguem_execucao_e_revisao_por_risco(self):
+        """Fluxos que constroem herdam a Execução do CLAUDE.md e só chamam a revisão curta com risco alto."""
+        risco = "só se alguma tarefa for de `**Risco**: alto`"
+        for caminho in ("refatoracao/SKILL.md", "performance/SKILL.md", "redesign/SKILL.md",
+                        "integracao-terceiros/SKILL.md"):
+            with self.subTest(arquivo=caminho):
+                self.assertIn(risco, (SKILLS / caminho).read_text(encoding="utf-8"))
+        for caminho in ("refatoracao/references/verificacao.md", "performance/references/verificacao.md",
+                        "redesign/references/verificacao.md"):
+            with self.subTest(arquivo=caminho):
+                texto = (SKILLS / caminho).read_text(encoding="utf-8")
+                self.assertIn(risco, texto)
+                self.assertIn("até 3 mutações", texto)
+        bug = (SKILLS / "bug" / "SKILL.md").read_text(encoding="utf-8")
+        self.assertNotIn("A sessão corrige", bug)
+        self.assertIn("lote de uma tarefa", bug)
+        construcao = (SKILLS / "redesign" / "references" / "construcao.md").read_text(encoding="utf-8")
+        self.assertIn("Teste de tela (E2E)", construcao)
+
     def test_tasks_enxuto_passa_no_validador_do_tlc(self):
         """As seções de conferência do modelo do tlc podem sair: o validate_tasks.py só exige quatro."""
         from apoio import carregar

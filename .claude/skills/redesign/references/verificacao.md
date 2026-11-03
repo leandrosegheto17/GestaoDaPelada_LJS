@@ -16,7 +16,7 @@ O que ele confere, nesta ordem:
 2. **Suíte inteira** verde com a flag **desligada e ligada**, sem falha nova além das preexistentes.
 3. **Regras iguais**: cada parte do diff nas telas da etapa sem mudança de regra — mesmos campos enviados, mesmas chamadas e parâmetros, mesmas validações e mensagens de regra, mesmas permissões e navegação (salvo a navegação que `redesign.md` pôs no escopo). Mudança é FAIL, com `arquivo:linha`.
 4. **Antiga intacta**: arquivos da interface antiga só mudam na costura da flag.
-5. **Sensor de discriminação** numa cópia isolada, na tela nova: remover um campo, inverter uma validação, trocar o destino de uma ação, esconder a mensagem de erro. Os testes de comportamento com a flag ligada têm de pegar; sobrevivente é lacuna da rede, que vira tarefa de teste antes de integrar.
+5. **Sensor de discriminação** numa cópia isolada, na tela nova: remover um campo, inverter uma validação, trocar o destino de uma ação, esconder a mensagem de erro, até 3 mutações, nos critérios de maior risco (todas só com tarefa de `**Risco**: alto` que toque dinheiro, contrato entre serviços, migração, autorização ou dado pessoal). Os testes de comportamento com a flag ligada têm de pegar; sobrevivente é lacuna da rede, que vira tarefa de teste antes de integrar.
 6. **Tokens**: `checar-tokens.py` nos caminhos do código novo, limpo.
 7. **Visual**: `comparar-visual.mjs` das telas da etapa, rodado de novo por ele (subindo o app localmente com `--iniciar`, nunca contra produção), comparado com o limite de cada tela e com as diferenças aceitas em `migracao.md`.
 8. **Acessibilidade automática**, se o projeto tem a ferramenta: zero violação crítica.
@@ -32,7 +32,7 @@ Grave `validation-etapa-<N>.md` com PASS ou FAIL e a evidência de cada item. O 
 
 ## 3. Revisão em modo curto
 
-Com PASS, grave `.specs/revisoes/redesign-<slug>-etapa-<N>/revisao.md` no formato da skill `revisao-codigo` (`revisao-codigo/references/admissao.md`):
+Com PASS e só se alguma tarefa for de `**Risco**: alto` (sem isso, a revisão é a do PR do projeto), grave `.specs/revisoes/redesign-<slug>-etapa-<N>/revisao.md` no formato da skill `revisao-codigo` (`revisao-codigo/references/admissao.md`):
 
 - **Modo** `curto` · **Chamado por** `fluxo 7 <slug> etapa <N>` · **Usar em** `.specs/redesign/<slug>/validation-etapa-<N>.md` · **Devolver após** `análise` · **Fases** 4, 7 e 8;
 - **Pedido**: origem `redesign.md` e `migracao.md`; critérios: (1) a tela reproduz o mockup aprovado com os componentes do guia; (2) nenhuma regra de negócio muda; (3) só tokens no código novo; (4) a interface antiga muda só na costura; (5) a flag desligada mostra a interface de hoje.

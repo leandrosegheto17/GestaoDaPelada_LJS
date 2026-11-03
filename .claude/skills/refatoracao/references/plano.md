@@ -45,7 +45,7 @@ Mudança de dados em produção é ação difícil de desfazer: backup antes, mi
 
 ## Fase 6: execução
 
-`tlc-spec-driven`, fase Execute, na branch da etapa, com `implementador` (passo mecânico) ou `implementador-dominio` (trecho com regra de negócio difícil). Passe aos trabalhadores, junto com o lote: `refatoracao.md` (alvo, fora do escopo), a lista de contratos e `protecao.md`.
+`tlc-spec-driven`, fase Execute, na branch da etapa, com `implementador` (passo mecânico) ou `implementador-dominio` (trecho com regra de negócio difícil). Passe aos trabalhadores, junto com o lote: `refatoracao.md` (alvo, fora do escopo), a lista de contratos e `protecao.md`. Lote, relato V2 por tarefa, gate e commit seguem a seção **Execução** do `CLAUDE.md`: a sessão orquestra e nunca implementa.
 
 **Ciclo de cada passo:**
 

@@ -5,7 +5,7 @@ Responde: **a tela reproduz o mockup sem mudar o que ela faz?**
 ## Preparar
 
 - Branch `redesign/<slug>-etapa-<N>` a partir da principal atualizada (ou worktree, com `using-git-worktrees`). A etapa 1 já tem a caracterização da fase 7.
-- `tlc-spec-driven`, fase **Execute**, com as tarefas da etapa em `tasks.md`. Lotes com o agente `implementador` (reproduzir o mockup com os componentes do guia é trabalho mecânico); `implementador-dominio` só para estado de tela difícil (formulário com muitas dependências, tempo real).
+- `tlc-spec-driven`, fase **Execute**, com as tarefas da etapa em `tasks.md`. Lotes (seção **Execução** do `CLAUDE.md`: a sessão não implementa) com o agente `implementador` (reproduzir o mockup com os componentes do guia é trabalho mecânico); `implementador-dominio` só para estado de tela difícil (formulário com muitas dependências, tempo real).
 - Passe ao implementador: a tela do mockup e seus estados (`mockup/telas/<tela>--*.html`), `guia.html`, `tokens.css`, `sistema.md` (mapa de componentes), os requisitos de `acessibilidade.md`, a tela antiga (arquivo e captura) e as regras abaixo.
 
 ## Regras da construção
@@ -25,7 +25,8 @@ Responde: **a tela reproduz o mockup sem mudar o que ela faz?**
    `node .claude/scripts/comparar-visual.mjs --base-url <url> --config .specs/redesign/<slug>/mockup/telas.json --tela <ids> [--pacote <pasta>]`
    O resultado vai para `mockup/comparacao/<data>/`. `DIVERGE`: abra o `--diff.png`; corrija o código, ou leve ao usuário (via `AskUserQuestion`: **corrigir o código** (Recomendado), **aceitar a diferença** com o motivo registrado em `migracao.md`, **ajustar o mockup** e voltar à fase 6 nessa tela).
    Sem Playwright: prints lado a lado na galeria (etapa 3 da `mockup-visual`), aceite do usuário.
-4. Teste falhou de forma inesperada: `systematic-debugging`.
+4. **Teste de tela (E2E)**: escrito na tarefa e rodado **uma vez ao fim do lote**, só o spec novo e só no front principal (teto de 2 tentativas de 5 min; passou disso, registre `E2E não executado: <motivo>`). Critério de posição ou aparência exige asserção espacial ou captura.
+5. Teste falhou de forma inesperada: `systematic-debugging`.
 
 ## Fechar a etapa
 
