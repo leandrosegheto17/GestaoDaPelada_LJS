@@ -10,7 +10,8 @@
     "lint": "pnpm -r lint",
     "format:check": "prettier --check .",
     "typecheck": "pnpm -r typecheck",
-    "test": "pnpm -r test && vitest run"
+    "test": "pnpm -r test && vitest run",
+    "migrar": "pnpm --filter @pelada/scripts migrar"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

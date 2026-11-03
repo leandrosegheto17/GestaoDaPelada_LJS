@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "restaurar": "node ops/restaurar-backup.ts"
+    "restaurar": "node ops/restaurar-backup.ts",
+    "migrar": "node --env-file-if-exists=../../.env src/migrar.ts"
   },
   "dependencies": {
     "pg": "^8.23.1",
