@@ -39,7 +39,8 @@ A v2 reimplementa do zero o Gestão da Pelada sobre o **mesmo banco Neon** do LJ
 | Documentação e decisões | Fluxo do Rascunho: AD-NNN em `.specs/STATE.md`, ADR em `.specs/decisoes/` para o que é difícil de desfazer, README, `docs/runbook.md` e `CLAUDE.md` da raiz | Decisão do usuário em 2026-11-03 | y |
 | Stack | A do LJS: monorepo pnpm 11, Node 24, TypeScript estrito, Hono no Worker, Kysely + `pg`, Zod, React + Vite, CSS Modules, Vitest e Playwright, Postgres 18 | `necessidade.md` §4 | y |
 | Mockup de referência | `GestaoDaPelada_LJS/.specs/mockup/` copiado para `.specs/mockup/` da v2. A pergunta sobre mockup da fase 4 decide se algo novo é desenhado | `necessidade.md` §4 | y |
-| Componentes base do front | Copiados do `frontend/web` do LJS (que já os copiou do legado), com mapa de reuso (`reuso.md`) | Interface do LJS, regra "Reuso de origem externa" | y |
+| Reuso de código do LJS | **Do zero total** (decisão do usuário em 2026-11-03). Só as 23 migrações da main do LJS são copiadas sem alteração, porque precisam bater com a `pgmigrations` da produção. Componentes, API, scripts, workflows e testes são escritos a partir desta spec e do mockup. O LJS serve só como consulta | "Implementação do zero" pedida pelo usuário | y |
+| Ativos visuais | `tokens.css`, fontes e ícones vêm de `.specs/mockup/`, que é o objeto de mockup que o usuário liberou para reaproveitar | Decisão do usuário | y |
 | Testes e banco | Os testes só conectam ao Postgres local (Docker) ou ao do CI, nunca ao Neon | Risco "escrita de teste no banco de produção" de `necessidade.md` §6 | y |
 | Sentry e UptimeRobot | Opcionais, como no LJS: o Sentry só liga com `SENTRY_DSN`, e o monitor é um passo do runbook | Custo zero e contas não criadas | y |
 | Rate Limiting binding no plano Free | Disponível (PREMISSA da pesquisa de 2026-11-03), conferido no Design | O LJS já usa os 4 bindings em produção | n |
@@ -126,13 +127,13 @@ A v2 reimplementa do zero o Gestão da Pelada sobre o **mesmo banco Neon** do LJ
 
 **Acceptance Criteria**:
 
-1. The front SHALL usar `tokens.css`, `global.css`, fontes (Barlow e Barlow Condensed) e ícones idênticos byte a byte aos do LJS, e um teste SHALL falhar se `frontend/web/src/estilos/tokens.css` divergir de `.specs/mockup/tokens.css`. [FUN-30]
-2. The front SHALL ter os componentes base do LJS (`basicos/`, `barras/`, `campos/`, `escolhas/`, `dialogos/`, `listas/`) com o mesmo HTML e o mesmo CSS Module, cada um com teste de renderização e de acessibilidade (axe sem violações). [FUN-31]
+1. The front SHALL usar `tokens.css`, fontes (Barlow e Barlow Condensed) e ícones idênticos byte a byte aos de `.specs/mockup/`, e um teste SHALL falhar se `frontend/web/src/estilos/tokens.css` ou algum desses arquivos divergir da cópia do mockup. [FUN-30]
+2. The front SHALL ter os componentes base usados pelas telas da fundação, escritos do zero a partir do HTML e do CSS de `.specs/mockup/` (sem copiar código do `frontend/web` do LJS), cada um com teste de renderização e de acessibilidade (axe sem violações). [FUN-31]
 3. The Stylelint SHALL recusar cor, fonte e sombra literais fora de `tokens.css`. [FUN-32]
 4. The build SHALL gerar um manifest com nome "Gestão da Pelada", `display: standalone`, `lang: pt-BR` e ícones 192 e 512, um deles `maskable`. [FUN-33]
 5. The service worker SHALL fazer precache do shell e registrar os handlers dos eventos `push` e `notificationclick`, vazios até a feature `notificacoes`. [FUN-34]
-6. IF o usuário abre o app sem conexão numa rota fora do cache THEN o service worker SHALL mostrar a página offline no visual do LJS. [FUN-35]
-7. WHEN o app é aberto no Safari do iOS fora do modo standalone THEN o front SHALL mostrar a instrução de instalação do LJS. [FUN-36]
+6. IF o usuário abre o app sem conexão numa rota fora do cache THEN o service worker SHALL mostrar a página offline no visual do mockup. [FUN-35]
+7. WHEN o app é aberto no Safari do iOS fora do modo standalone THEN o front SHALL mostrar a instrução de instalação do mockup. [FUN-36]
 8. WHEN o CI roda o teste de instalabilidade (Playwright contra o build) THEN ele SHALL confirmar o manifest válido (FUN-33), o service worker controlando a página, os ícones 192 e 512 acessíveis e a página offline servida sem rede. [FUN-37]
 9. The comparação visual (limite de 1% de pixels, viewports de 1280×800 e 390×844) SHALL rodar no CI e falhar se uma tela ativa divergir de `.specs/mockup/telas.json`. Na fundação, as telas ativas são as 3 de vitrine do mockup (erro de rede, carregando em lista e grupo indisponível); a página provisória não é comparada. [FUN-38]
 
