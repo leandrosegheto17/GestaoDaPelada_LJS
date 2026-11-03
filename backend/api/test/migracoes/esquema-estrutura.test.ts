@@ -47,7 +47,9 @@ const ESPERADO = [
 
 test('FUN-08: um mini schema (2 tabelas, FK, índice, trigger) gera a lista esperada, escrita à mão', async () => {
   const linhas = await comMini(MINI, (c) => lerEsquema(c));
-  expect(linhas).toEqual(ESPERADO);
+  // As categorias de segurança (T20) têm teste próprio; roles e extensões dependem do cluster.
+  const estrutura = linhas.filter((l) => /^(tabela|coluna|restricao|indice|trigger) /.test(l));
+  expect(estrutura).toEqual(ESPERADO);
 });
 
 test('FUN-08: duas leituras seguidas dão a mesma lista', async () => {
