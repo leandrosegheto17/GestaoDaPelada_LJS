@@ -9,5 +9,12 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
+  },
+  "dependencies": {
+    "pg": "^8.23.1"
+  },
+  "devDependencies": {
+    "@pelada/scripts": "workspace:*",
+    "@types/pg": "^8.23.1"
   }
 }
