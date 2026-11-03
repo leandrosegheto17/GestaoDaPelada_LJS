@@ -14,11 +14,15 @@ pr = carregar("progresso.py")
 pr_caminho = Path(__file__).resolve().parents[1] / "progresso.py"
 
 
-def tarefa(numero, caixas, status=None, estimativa=None, depende=None):
+def tarefa(numero, caixas, status=None, estimativa=None, depende=None, criticidade=None, dominio=None):
     """Bloco de tarefa no formato do tasks.md do tlc-spec-driven; caixas = lista de True/False."""
     linhas = [f"### T{numero}: Tarefa {numero}", "", "**What**: algo", "**Where**: `src/a.py`"]
     if estimativa:
         linhas.append(f"**Estimativa**: {estimativa}")
+    if dominio:
+        linhas.append(f"**Domínio**: {dominio}")
+    if criticidade:
+        linhas.append(f"**Criticidade**: {criticidade}")
     if depende:
         linhas.append(f"**Depends on**: {depende}")
     linhas.append("")
@@ -391,8 +395,8 @@ def tasks_fases(*fases):
     for n, tarefas in enumerate(fases, 1):
         plano += [f"### Phase {n}: Fase {n}", "", "```", " -> ".join(f"T{t[0]}" for t in tarefas), "```", ""]
         for t in tarefas:
-            extra = list(t[2:]) + [None] * (2 - len(t[2:]))
-            corpo.append(tarefa(t[0], t[1], estimativa=extra[0], depende=extra[1]))
+            extra = list(t[2:]) + [None] * (4 - len(t[2:]))
+            corpo.append(tarefa(t[0], t[1], estimativa=extra[0], depende=extra[1], criticidade=extra[2], dominio=extra[3]))
     return "# Tasks\n\n" + "\n".join(plano) + "\n" + "\n".join(corpo)
 
 
@@ -459,10 +463,15 @@ class TestLotes(unittest.TestCase):
         return [(primeira + i, [False], estimativa) for i in range(quantas)]
 
     def test_junta_phases_inteiras_ate_a_capacidade(self):
-        # 6h = capacidade: duas Phases de 4h fecham o lote 1 (8h); a terceira abre o lote 2
-        lotes = self.lotes(self.fase(1, 2), self.fase(3, 2), self.fase(5, 2), self.fase(7, 2))
-        self.assertEqual([(l["fases"], len(l["tarefas"])) for l in lotes], [([1, 2], 4), ([3, 4], 4)])
+        # 6h = teto: Phases de 2h, 4h, 2h e 4h formam os lotes [2h+4h] e [2h+4h]; nenhum passa de 6h
+        lotes = self.lotes(self.fase(1, 1), self.fase(2, 2), self.fase(4, 1), self.fase(5, 2))
+        self.assertEqual([(l["fases"], len(l["tarefas"]), l["horas"]) for l in lotes], [([1, 2], 3, 6.0), ([3, 4], 3, 6.0)])
         self.assertEqual([l["numero"] for l in lotes], [1, 2])
+
+    def test_phase_que_nao_cabe_abre_o_proximo_lote(self):
+        # duas Phases de 4h somariam 8h: cada uma fica no seu lote
+        lotes = self.lotes(self.fase(1, 2), self.fase(3, 2), self.fase(5, 3))
+        self.assertEqual([(l["fases"], l["horas"]) for l in lotes], [([1], 4.0), ([2], 4.0), ([3], 6.0)])
 
     def test_nunca_parte_uma_phase(self):
         lotes = self.lotes(self.fase(1, 10), self.fase(11, 3))  # 20h na Phase 1: passa da capacidade, mas fica inteira
@@ -486,6 +495,52 @@ class TestLotes(unittest.TestCase):
         tarefas, fs = pr.tarefas_de(tasks_md(*[tarefa(i, [False], estimativa="2h") for i in range(1, 17)]))
         lotes = pr.lotes_de(tarefas, fs)
         self.assertEqual([len(l["tarefas"]) for l in lotes], [3, 3, 3, 3, 4])  # 3×2h = 6h; cauda de 1 foi absorvida
+
+
+class TestCriticidade(unittest.TestCase):
+    def lotes(self, *fases):
+        tarefas, fs = pr.tarefas_de(tasks_fases(*fases))
+        return pr.lotes_de(tarefas, fs)
+
+    def fase(self, primeira, quantas, criticidade=None, dominio=None, estimativa="2h"):
+        return [(primeira + i, [False], estimativa, None, criticidade, dominio) for i in range(quantas)]
+
+    def test_ausente_e_critica_e_so_comum_tira_do_ciclo_critico(self):
+        tarefas, _ = pr.tarefas_de(tasks_fases(self.fase(1, 1) + self.fase(2, 1, "comum") + self.fase(3, 1, "crítica")))
+        self.assertEqual([t["criticidade"] for t in tarefas], ["crítica", "comum", "crítica"])
+
+    def test_lote_e_critico_se_alguma_tarefa_e_critica(self):
+        lotes = self.lotes(self.fase(1, 1, "comum") + self.fase(2, 1, "crítica"))
+        self.assertEqual(lotes[0]["criticidade"], "crítico")
+
+    def test_lote_so_de_tarefas_comuns_e_comum(self):
+        lotes = self.lotes(self.fase(1, 2, "comum"))
+        self.assertEqual(lotes[0]["criticidade"], "comum")
+
+    def test_fecha_o_lote_ao_mudar_a_criticidade_com_2h_ou_mais(self):
+        # Phase 1 comum (4h) e Phase 2 crítica (2h): somariam 6h, mas não se misturam
+        lotes = self.lotes(self.fase(1, 2, "comum"), self.fase(3, 1, "crítica"), self.fase(4, 2, "crítica"))
+        self.assertEqual([(l["fases"], l["criticidade"]) for l in lotes], [([1], "comum"), ([2, 3], "crítico")])
+
+    def test_lote_pequeno_nao_fecha_so_por_mudar_a_criticidade(self):
+        # 1h comum + crítica: abaixo de 2h, o lote segue misturado (e vira crítico)
+        lotes = self.lotes([(1, [False], "1h", None, "comum", None)], self.fase(2, 2, "crítica"))
+        self.assertEqual([(l["fases"], l["criticidade"]) for l in lotes], [([1, 2], "crítico")])
+
+    def test_dominio_marca_o_lote(self):
+        lotes = self.lotes(self.fase(1, 1, "crítica", "sim"), self.fase(2, 1, "crítica", "não"))
+        self.assertTrue(lotes[0]["dominio"])
+
+    def test_v2_do_lote_mostra_a_criticidade_so_quando_o_tasks_usa_o_campo(self):
+        det_com = {"tarefas": [], "usa_criticidade": True}
+        tarefas, fs = pr.tarefas_de(tasks_fases(self.fase(1, 2, "crítica", "sim")))
+        det = {"tarefas": tarefas, "fases": fs, "lotes": pr.lotes_de(tarefas, fs), "ritmo": None, "usa_criticidade": True}
+        for t in det["tarefas"]:
+            t.update(quando=None, segundos=None)
+        rel = {"detalhe": det, "item": {"feitas": 0, "total": 2}}
+        self.assertIn("Lote 1 de 1 (crítico, Domínio: Opus) em andamento", pr.linha_lote(rel))
+        det["usa_criticidade"] = False
+        self.assertIn("Lote 1 de 1 em andamento", pr.linha_lote(rel))
 
 
 def _git(pasta, *args, quando=None):

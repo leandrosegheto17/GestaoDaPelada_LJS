@@ -155,22 +155,38 @@ class TestSkills(unittest.TestCase):
             with self.subTest(skill=nome):
                 self.assertIn("Estimativa", (SKILLS / nome / "SKILL.md").read_text(encoding="utf-8"))
 
-    def test_execucao_por_lote_com_v2_por_tarefa(self):
-        """Sempre por subagente, um lote por vez; o trabalhador relata o V2 de cada tarefa; a revisão segue o risco."""
+    def test_execucao_na_sessao_com_ciclo_pela_criticidade(self):
+        """Sessão única com teste primeiro; o ciclo segue a criticidade do lote; só o lote de Domínio sai da sessão."""
         claude_md = (CLAUDE / "CLAUDE.md").read_text(encoding="utf-8")
-        for trecho in ("## Execução", "Sempre por subagente, um lote por vez", "Não há execução inline",
-                       "progresso.py --tarefa", "progresso.py --lote", "`**Risco**: alto|baixo`", "**6h**",
-                       "substitui o passo 6.4", "uma linha V2 por tarefa"):
+        for trecho in ("## Execução", "Sessão única, teste primeiro.", "**Ciclo do lote comum**",
+                       "**Ciclo do lote crítico**", "**Pré-voo, uma vez antes do primeiro lote:**",
+                       "**Gate completo no marco e ao fim:**", "**Sem mutação no lote.**", "**Commit por grupo de tarefas",
+                       "progresso.py --lote", "`**Risco**: alto|baixo`", "**6h**", "**Serviços de apoio de pé.**",
+                       "a cada 6 lotes", "`**Criticidade**: crítica|comum`"):
             with self.subTest(trecho=trecho):
                 self.assertIn(trecho, claude_md)
-        self.assertNotIn("**Subagentes**", claude_md)  # não há mais oferta nem escolha de subagentes
-        for nome in ("implementador", "implementador-dominio"):
-            with self.subTest(agente=nome):
-                texto = (CLAUDE / "agents" / f"{nome}.md").read_text(encoding="utf-8")
-                self.assertIn("Lote (fases", texto)
-                self.assertIn("progresso.py --tarefa", texto)  # o trabalhador relata o V2 depois de cada tarefa
-                self.assertIn("revisão por risco", texto.lower())
-                self.assertNotIn("Tarefa <ID> concluída", texto)
+        for velho in ("Sempre por subagente, um lote por vez", "Não há execução inline", "uma linha V2 por tarefa",
+                      "**Subagentes**"):
+            with self.subTest(velho=velho):
+                self.assertNotIn(velho, claude_md)
+        dominio = (CLAUDE / "agents" / "implementador-dominio.md").read_text(encoding="utf-8")
+        for trecho in ("Lote (fases", "progresso.py --lote", "Vermelho", "Teste primeiro", "Fechamento"):
+            with self.subTest(dominio=trecho):
+                self.assertIn(trecho, dominio)
+        implementador = (CLAUDE / "agents" / "implementador.md").read_text(encoding="utf-8")
+        self.assertIn("progresso.py --tarefa", implementador)
+        self.assertNotIn("Tarefa <ID> concluída", implementador + dominio)
+        progresso = (SKILLS / "progresso" / "SKILL.md").read_text(encoding="utf-8")
+        for trecho in ("--tarefa", "--lote", "Feature atual", "Phase atual", "Criticidade"):
+            with self.subTest(progresso=trecho):
+                self.assertIn(trecho, progresso)
+        self.assertTrue((SKILLS / "progresso" / "references" / "medicao.md").exists())
+        marcos = (SKILLS / "fluxo" / "references" / "marcos.md").read_text(encoding="utf-8")
+        self.assertIn("Feature atual", marcos)
+        self.assertIn("**Serviços no ar**", marcos)
+        self.assertIn("A cada 6 lotes", marcos)
+        self.assertIn("commit-msg", (CLAUDE / "scripts" / "instalar.py").read_text(encoding="utf-8"))
+        self.assertTrue((CLAUDE / "scripts" / "preparar-ambiente.py").exists())
         progresso = (SKILLS / "progresso" / "SKILL.md").read_text(encoding="utf-8")
         for trecho in ("--tarefa", "--lote", "Feature atual", "Phase atual"):
             with self.subTest(progresso=trecho):
@@ -182,7 +198,8 @@ class TestSkills(unittest.TestCase):
     def test_modelo_do_trabalhador_vem_do_dominio_nao_do_risco(self):
         """Opus só em lote com tarefa de domínio; o risco muda a revisão, não o modelo."""
         claude_md = (CLAUDE / "CLAUDE.md").read_text(encoding="utf-8")
-        for trecho in ("`**Domínio**: sim|não`", "`**Risco**` não escolhe o modelo", "(lote sem `**Domínio**: sim`"):
+        for trecho in ("`**Domínio**: sim|não`", "`**Risco**` não escolhe o modelo nem o ciclo",
+                       "Lote sem `**Domínio**: sim` a sessão implementa"):
             with self.subTest(trecho=trecho):
                 self.assertIn(trecho, claude_md)
         self.assertNotIn("alguma tarefa de `**Risco**: alto`", claude_md)
@@ -212,7 +229,7 @@ class TestSkills(unittest.TestCase):
         claude_md = (CLAUDE / "CLAUDE.md").read_text(encoding="utf-8")
         for trecho in ("## Modo enxuto", "`planejador`", "**Modo**: enxuto", "`## Delta`", "`## Linha de base`",
                        "Tarefa T0, rede de proteção", "O campo Reuses nomeia a decisão", "**Uma aprovação**",
-                       "só a cada 3 lotes", "**Modelo pela entrada**", "sem troca manual de `/model`"):
+                       "a cada 6 lotes", "**Modelo pela entrada**", "sem troca manual de `/model`"):
             with self.subTest(trecho=trecho):
                 self.assertIn(trecho, claude_md)
         for nome in ("feature", "legado"):
@@ -273,25 +290,44 @@ class TestSkills(unittest.TestCase):
                        "asserção espacial ou visual", "**Registro do gate:**", "HEAD^{tree}"):
             with self.subTest(trecho=trecho):
                 self.assertIn(trecho, claude_md)
-        for nome in ("implementador", "implementador-dominio"):
+        for nome, esperado in (("implementador", ("Vizinhança", "Molde:", "Prova de tela", "HEAD^{tree}")),
+                               ("implementador-dominio", ("Vizinhança", "Molde:", "HEAD^{tree}"))):
             with self.subTest(agente=nome):
                 texto = (CLAUDE / "agents" / f"{nome}.md").read_text(encoding="utf-8")
-                for trecho in ("Vizinhança", "Molde:", "Prova de tela", "HEAD^{tree}"):
+                for trecho in esperado:
                     self.assertIn(trecho, texto)
 
     def test_verificacao_proporcional_ao_risco(self):
         """Gate reaproveitado, até 3 mutações, relatório compacto e revisão de código só em risco alto."""
         claude_md = (CLAUDE / "CLAUDE.md").read_text(encoding="utf-8")
-        for trecho in ("## Verificação proporcional", "**Gate reaproveitado:**", "até **3** mutações",
+        for trecho in ("## Verificação proporcional", "**Gate reaproveitado:**", "Até **3** nos critérios de maior risco",
+                       "Quem constrói não recebe a lista de mutações", "**Checagens de processo:**",
                        "**Relatório compacto:**", "**Decisões da Base:**", "só quando alguma tarefa é de `**Risco**: alto`"):
             with self.subTest(trecho=trecho):
                 self.assertIn(trecho, claude_md)
         verificador = (CLAUDE / "agents" / "verificador.md").read_text(encoding="utf-8")
-        for trecho in ("reaproveitando", "até 3 mutações", "lacuna de precisão", "**Base**", "compacto"):
+        for trecho in ("reaproveitando", "até 3", "derive você", "sem lista recebida", "Checagens de processo",
+                       "lacuna de precisão", "**Base**", "compacto"):
             with self.subTest(verificador=trecho):
                 self.assertIn(trecho, verificador)
         self.assertIn("só se alguma tarefa for de", (SKILLS / "feature" / "SKILL.md").read_text(encoding="utf-8"))
         self.assertIn("sempre em legado", (SKILLS / "legado" / "SKILL.md").read_text(encoding="utf-8"))
+
+    def test_criticidade_e_reuso_de_origem_externa(self):
+        """O lote tem criticidade marcada no tasks.md; a leitura da origem de reuso é do planejamento."""
+        claude_md = (CLAUDE / "CLAUDE.md").read_text(encoding="utf-8")
+        for trecho in ("## Reuso de origem externa", "`reuso.md`", "linha do mapa", "comando de adaptação",
+                       "Quem planeja marca a criticidade na quebra dos lotes", "`## Autorizações`"):
+            with self.subTest(trecho=trecho):
+                self.assertIn(trecho, claude_md)
+        planejador = (CLAUDE / "agents" / "planejador.md").read_text(encoding="utf-8")
+        for trecho in ("**Criticidade**", "reuso.md"):
+            with self.subTest(planejador=trecho):
+                self.assertIn(trecho, planejador)
+        for nome in ("feature", "projeto-novo", "uso-proprio"):
+            with self.subTest(skill=nome):
+                texto = (SKILLS / nome / "SKILL.md").read_text(encoding="utf-8")
+                self.assertNotIn("sempre por subagente", texto.lower())
 
     def test_fluxo_pronto_aponta_para_skill_existente(self):
         menu = (SKILLS / "fluxo" / "SKILL.md").read_text(encoding="utf-8")

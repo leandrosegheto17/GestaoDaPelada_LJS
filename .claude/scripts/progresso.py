@@ -29,7 +29,7 @@ intervalo acima de PAUSA_MIN conta como pausa e a tarefa fica sem tempo medido. 
 some e o resto continua.
 
 Lote: Phases inteiras seguidas que somam até LOTE_HORAS de `**Estimativa**` (tarefa sem
-estimativa conta 1h). Serve para o resumo, os marcos de troca de sessão e o V2 do lote.
+estimativa conta 1h; a Phase que faria passar do limite abre o lote seguinte). Serve para o resumo, os marcos de troca de sessão e o V2 do lote.
 
 Avisos: tarefa com `**Estimativa**` acima de 2h (LIMITE_HORAS) e, em tasks.md que já usa o campo,
 tarefa sem estimativa. Não há limite de quantidade de tarefas; o limite é o tamanho de cada uma.
@@ -60,12 +60,15 @@ ROADMAP = ".specs/projeto/roadmap.md"
 LIMITE_HORAS = 2.0  # tarefa acima disso é grande demais: avise e peça para dividir (não há limite de quantidade)
 LOTE_HORAS = 6.0  # lote = Phases inteiras somando até isso (3 tarefas de 2h): lote menor mantém o contexto do trabalhador pequeno
 HORAS_SEM_ESTIMATIVA = 1.0  # peso da tarefa sem Estimativa ao montar o lote
+HORAS_QUEBRA_CRITICIDADE = 2.0  # o lote só fecha ao mudar a criticidade se já tem isso ou mais
 PAUSA_MIN = 90  # intervalo maior entre duas conclusões é pausa, não tempo de trabalho
 JANELA_RITMO = 10  # o ritmo e o fator de calibração usam as últimas tarefas com tempo medido
 LIMITE_COMMITS = 80  # quantos commits do tasks.md o git log lê
 PASTAS_FORA = {"node_modules", "evidencias", "codigo", ".git", "__pycache__"}
 TITULO_TAREFA = re.compile(r"^(#{2,4})\s+(T\d+)\s*:", re.IGNORECASE)
 ESTIMATIVA = re.compile(r"^\s*\*\*Estimativa\*\*\s*:\s*(.*?)\s*$", re.IGNORECASE)
+CRITICIDADE = re.compile(r"^\s*\*\*Criticidade\*\*\s*:\s*(.*?)\s*$", re.IGNORECASE)
+DOMINIO = re.compile(r"^\s*\*\*Dom[ií]nio\*\*\s*:\s*(.*?)\s*$", re.IGNORECASE)
 DURACAO = re.compile(r"(\d+(?:[.,]\d+)?)\s*(h(?:oras?)?|min(?:utos?)?)\b", re.IGNORECASE)
 TITULO = re.compile(r"^(#{1,6})\s")
 CAIXA = re.compile(r"^\s*[-*]\s+\[([ xX])\]")
@@ -199,8 +202,21 @@ def tarefas_de(texto: str) -> tuple[list[dict], list[dict]]:
                 deps = [d.upper() for d in ID_TAREFA.findall(achou.group(1))]
                 break
         fase = fase_de.get(id_)
+        declarada = None
+        dominio = False
+        for linha in linhas:
+            achou = CRITICIDADE.match(linha)
+            if achou and declarada is None:
+                declarada = achou.group(1)
+            achou = DOMINIO.match(linha)
+            if achou and achou.group(1).lower().startswith("sim"):
+                dominio = True
+        # ausente = crítica; só "comum" tira a tarefa do ciclo do lote crítico
+        comum = declarada is not None and declarada.lower().startswith("comum")
         tarefas.append({"id": id_, "titulo": titulos.get(id_, ""), "fase": fase["numero"] if fase else None,
-                        "est": estimadas.get(id_), "feita": _tarefa_feita(linhas), "deps": deps})
+                        "est": estimadas.get(id_), "feita": _tarefa_feita(linhas), "deps": deps,
+                        "criticidade": "comum" if comum else "crítica", "criticidade_declarada": declarada is not None,
+                        "dominio": dominio})
     return tarefas, [f for f in fases if f["ids"]]
 
 
@@ -208,6 +224,9 @@ def lotes_de(tarefas: list[dict], fases: list[dict]) -> list[dict]:
     """Lotes: Phases inteiras seguidas somando até LOTE_HORAS (sem Estimativa, a tarefa conta 1h).
 
     Sem Phases, cada tarefa é uma unidade. Um lote final com até 2 tarefas vira parte do anterior.
+    Criticidade: a do lote é a mais alta das tarefas (crítico se alguma é crítica; ausente = crítica).
+    Quando a próxima unidade tem outra criticidade que a do lote e o lote já tem
+    HORAS_QUEBRA_CRITICIDADE ou mais, o lote fecha antes dela, para não misturar os dois ciclos.
     """
     por_id = {t["id"]: t for t in tarefas}
     unidades = []
@@ -223,18 +242,26 @@ def lotes_de(tarefas: list[dict], fases: list[dict]) -> list[dict]:
     def peso(ids: list[str]) -> float:
         return sum(por_id[i]["est"] if por_id[i]["est"] is not None else HORAS_SEM_ESTIMATIVA for i in ids)
 
+    def critica(ids: list[str]) -> bool:
+        return any(por_id[i]["criticidade"] == "crítica" for i in ids)
+
     lotes: list[dict] = []
     atual: dict | None = None
-    for posicao, (numero, ids) in enumerate(unidades):
+    for numero, ids in unidades:
+        horas = peso(ids)
+        if atual is not None and atual["horas"] + horas > LOTE_HORAS:
+            lotes.append(atual)  # a Phase não cabe: abre o lote seguinte, em vez de passar de LOTE_HORAS
+            atual = None
+        elif atual is not None and atual["horas"] >= HORAS_QUEBRA_CRITICIDADE and atual["critico"] != critica(ids):
+            lotes.append(atual)  # outra criticidade: o lote já tem o bastante, não mistura os dois ciclos
+            atual = None
         if atual is None:
-            atual = {"fases": [], "tarefas": [], "horas": 0.0}
+            atual = {"fases": [], "tarefas": [], "horas": 0.0, "critico": False}
+        atual["critico"] = atual["critico"] or critica(ids)
         if numero is not None:
             atual["fases"].append(numero)
         atual["tarefas"] += ids
-        atual["horas"] += peso(ids)
-        if atual["horas"] >= LOTE_HORAS and posicao < len(unidades) - 1:
-            lotes.append(atual)
-            atual = None
+        atual["horas"] += horas
     if atual is not None:
         lotes.append(atual)
     if len(lotes) > 1 and len(lotes[-1]["tarefas"]) <= 2:
@@ -242,8 +269,11 @@ def lotes_de(tarefas: list[dict], fases: list[dict]) -> list[dict]:
         lotes[-1]["fases"] += ultimo["fases"]
         lotes[-1]["tarefas"] += ultimo["tarefas"]
         lotes[-1]["horas"] += ultimo["horas"]
+        lotes[-1]["critico"] = lotes[-1]["critico"] or ultimo["critico"]
     for numero, lote in enumerate(lotes, 1):
         lote["numero"] = numero
+        lote["criticidade"] = "crítico" if lote["critico"] else "comum"
+        lote["dominio"] = any(por_id[i]["dominio"] for i in lote["tarefas"])
     return lotes
 
 
@@ -338,7 +368,8 @@ def detalhar(arquivo: Path) -> dict:
         medida = medidas.get(t["id"]) if t["feita"] else None
         t["quando"] = medida["quando"] if medida else None
         t["segundos"] = medida["segundos"] if medida else None
-    return {"tarefas": tarefas, "fases": fases, "lotes": lotes_de(tarefas, fases), "ritmo": ritmo_de(tarefas)}
+    return {"tarefas": tarefas, "fases": fases, "lotes": lotes_de(tarefas, fases), "ritmo": ritmo_de(tarefas),
+            "usa_criticidade": any(t["criticidade_declarada"] for t in tarefas)}
 
 
 def _dur(horas: float) -> str:
@@ -630,7 +661,10 @@ def linha_lote(rel: dict, numero: int | None = None) -> str | None:
         corpo += f"; tempo medido em {len(medidas)} de {len(feitas)}"
     item = rel["item"]
     pct = min(99, round(item["feitas"] * 100 / item["total"])) if item["feitas"] < item["total"] else 100
-    return (f"Lote {lote['numero']} de {len(det['lotes'])} {corpo} · "
+    marca = ""
+    if det.get("usa_criticidade"):
+        marca = f" ({lote['criticidade']}{', Domínio: Opus' if lote['dominio'] else ''})"
+    return (f"Lote {lote['numero']} de {len(det['lotes'])}{marca} {corpo} · "
             f"Feature: {item['feitas']} de {item['total']} tarefas ({pct}%)")
 
 

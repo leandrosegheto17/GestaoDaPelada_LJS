@@ -61,7 +61,7 @@ Grave `opcoes.md` e marque **Plano aprovado** com a aprovação.
 
 ## Fase 6: otimização
 
-`tlc-spec-driven`, fase **Execute**, na branch `performance/<slug>`, **uma tarefa por vez** (sem lotes paralelos: duas mudanças juntas tornam a medição inútil). `implementador` para a mudança mecânica (índice, consulta em lote); `implementador-dominio` quando há regra difícil (cache com invalidação, concorrência). Passe ao trabalhador `performance.md`, a tarefa, `protecao.md` e a regra: não otimizar nada fora da tarefa. Lote, relato V2 por tarefa, gate e commit seguem a seção **Execução** do `CLAUDE.md`: a sessão orquestra e nunca implementa.
+`tlc-spec-driven`, fase **Execute**, na branch `performance/<slug>`, **uma tarefa por vez** (sem lotes paralelos: duas mudanças juntas tornam a medição inútil). A sessão principal faz a mudança mecânica (índice, consulta em lote); o `implementador-dominio` entra quando há regra difícil (cache com invalidação, concorrência). Tenha à mão `performance.md`, a tarefa, `protecao.md` e a regra: não otimizar nada fora da tarefa. Lote, linha V2, gate e commit seguem a seção **Execução** do `CLAUDE.md`.
 
 **Ciclo de cada mudança:**
 

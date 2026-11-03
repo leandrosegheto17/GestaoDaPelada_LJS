@@ -5,8 +5,8 @@ Responde: **a tela reproduz o mockup sem mudar o que ela faz?**
 ## Preparar
 
 - Branch `redesign/<slug>-etapa-<N>` a partir da principal atualizada (ou worktree, com `using-git-worktrees`). A etapa 1 já tem a caracterização da fase 7.
-- `tlc-spec-driven`, fase **Execute**, com as tarefas da etapa em `tasks.md`. Lotes (seção **Execução** do `CLAUDE.md`: a sessão não implementa) com o agente `implementador` (reproduzir o mockup com os componentes do guia é trabalho mecânico); `implementador-dominio` só para estado de tela difícil (formulário com muitas dependências, tempo real).
-- Passe ao implementador: a tela do mockup e seus estados (`mockup/telas/<tela>--*.html`), `guia.html`, `tokens.css`, `sistema.md` (mapa de componentes), os requisitos de `acessibilidade.md`, a tela antiga (arquivo e captura) e as regras abaixo.
+- `tlc-spec-driven`, fase **Execute**, com as tarefas da etapa em `tasks.md`. Lotes comuns (seção **Execução** do `CLAUDE.md`), feitos na sessão principal: reproduzir o mockup com os componentes do guia é trabalho mecânico. O `implementador-dominio` só para estado de tela difícil (formulário com muitas dependências, tempo real).
+- Tenha à mão: a tela do mockup e seus estados (`mockup/telas/<tela>--*.html`), `guia.html`, `tokens.css`, `sistema.md` (mapa de componentes), os requisitos de `acessibilidade.md`, a tela antiga (arquivo e captura) e as regras abaixo.
 
 ## Regras da construção
 

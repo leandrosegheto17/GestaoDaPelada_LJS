@@ -1,6 +1,6 @@
 ---
 name: planejador
-description: Planeja no modo enxuto — com plano.md pronto ou critérios de aceite escritos, confere no código atual cada arquivo, linha e molde da entrada e grava só o tasks.md (Delta, Critérios, Linha de base, tarefas com Estimativa, Risco e Domínio). Use no início de feature, correção ou refatoração quando a seção Modo enxuto do CLAUDE.md se aplica. Sem plano nem critérios, ou com ambiguidade, o planejamento é do fluxo completo.
+description: Planeja no modo enxuto — com plano.md pronto ou critérios de aceite escritos, confere no código atual cada arquivo, linha e molde da entrada e grava só o tasks.md (Delta, Critérios, Linha de base, tarefas com Estimativa, Risco, Domínio e Criticidade, e o reuso.md quando há origem externa). Use no início de feature, correção ou refatoração quando a seção Modo enxuto do CLAUDE.md se aplica. Sem plano nem critérios, ou com ambiguidade, o planejamento é do fluxo completo.
 tools: Read, Grep, Glob, Bash, Write
 model: sonnet
 effort: medium
@@ -18,7 +18,8 @@ Você planeja em **uma passada**, no **modo enxuto** da seção de mesmo nome do
    - topo: `**Modo**: enxuto` e `**Base**: <arquivo(s)>, conferido em <data>`;
    - `## Delta` (até 10 linhas), `## Critérios` (ID, resumo de uma linha, tarefa), `## Linha de base`;
    - as seções exigidas pelo validador (Test Coverage Matrix, Gate Check Commands, Execution Plan, Task Breakdown), sem as de conferência do modelo;
-   - em toda tarefa: **Estimativa** (até 2h), **Risco** e **Domínio**, e a regra de tamanho do `CLAUDE.md`.
+   - em toda tarefa: **Estimativa** (até 2h), **Risco**, **Domínio** e **Criticidade**, e a regra de tamanho do `CLAUDE.md`. Marque a criticidade na quebra dos lotes e evite misturar Phase crítica e comum.
+   - com origem externa de código (seção **Reuso de origem externa**): grave também o `reuso.md` (uma linha por arquivo de origem, com a mudança da adaptação e o `FUN-NN`) e cite a linha dele em **Reuses**; origem sem linha no mapa não passa.
 6. Rode `python .claude/skills/tlc-spec-driven/scripts/validate_tasks.py <feature>` e corrija até ficar sem erro.
 
 ## Regras
@@ -41,6 +42,8 @@ Planejamento enxuto: <feature> — <N tarefas, M lotes, estimativa total>
 - Base: <arquivo(s)>
 - Delta: <3 linhas no máximo>
 - Linha de base: <suíte, resultado, falhas preexistentes>
+- Lotes: <quantos, quantos críticos e quantos com Domínio>
+- Reuso: <reuso.md com N linhas | sem origem externa>
 - Modelo sugerido: <Sonnet | Opus, e por quê>
 - Validador: <sem erro | erros>
 Perguntas para o usuário: <nenhuma | lista>

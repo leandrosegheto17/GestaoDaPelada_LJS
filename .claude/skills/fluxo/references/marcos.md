@@ -10,7 +10,7 @@ Ao fechar uma fase aprovada, nestes marcos:
 |---|---|
 | A próxima fase pede **outro modelo** | planejamento em Opus → construção em Sonnet |
 | **Antes da construção** (Execute do `tlc-spec-driven`, ou a fase que escreve o código) | é a fase que mais enche a sessão principal |
-| **A cada 2 ou 3 lotes** dentro da construção | o tlc grava o `## Handoff` do `STATE.md` e os commits ficam no git |
+| **A cada 6 lotes** dentro da construção | antes de gravar, roda o gate completo e o verificador dos lotes do intervalo; o tlc grava o `## Handoff` do `STATE.md` e os commits ficam no git |
 | **Antes da verificação** e **antes da integração ou liberação** | o verificador é independente; a integração só precisa dos arquivos |
 | A conversa já passou por **3 fases ou mais** | em qualquer fluxo |
 
@@ -37,7 +37,8 @@ Na pergunta de fim de fase (via `AskUserQuestion`), as opções passam a ser:
    - **Item**: `<pasta do trabalho>` (ex.: `.specs/features/importar-extrato/`)
    - **Fase aprovada**: <N, nome> em <AAAA-MM-DD>
    - **Próxima fase**: <N, nome> — modelo indicado: <opus | sonnet>
-   - **Construção** (se no meio): lote <x> de <y> concluído; o tlc retoma pelo `## Handoff`
+   - **Construção** (se no meio): lote <x> de <y> concluído (criticidade do próximo: <crítico | comum>); o tlc retoma pelo `## Handoff`
+   - **Serviços no ar** (se há): <container e porta do banco, comando de subida | nenhum>; seguem no ar através da troca e só caem ao fim da implementação
    - **Progresso**: <linhas "Produto: ..." e "Feature atual: ..." (e "Projeto: ...", se houver) de `python .claude/scripts/progresso.py`, ou "sem tarefas ainda">, conferida em <AAAA-MM-DD>
    - **Combinado na conversa e não registrado em artefato**: <itens | nenhum>
    - **Gravada em**: <AAAA-MM-DD HH:MM>
