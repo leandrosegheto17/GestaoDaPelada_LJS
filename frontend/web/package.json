@@ -2,7 +2,9 @@
   "name": "@pelada/web",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=26 <27" },
+  "engines": {
+    "node": ">=26 <27"
+  },
   "scripts": {
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
