@@ -9,6 +9,7 @@
 - **AD-005** (2026-11-03): o repositório é o mesmo `GestaoDaPelada_LJS`. A main atual vai para a branch `legado` (nunca apagada), e a `main` passa a ser a v2 por push com `--force-with-lease` e confirmação específica. O `backup.yml` da v2 vai no mesmo push. Decisão do usuário.
 - **AD-006** (2026-11-03): a documentação segue o fluxo do Rascunho. Decisões em AD-NNN neste arquivo, ADR em `.specs/decisoes/` para o que é difícil de desfazer, e README, `docs/runbook.md` e `CLAUDE.md` da raiz. Sem `.md/`, PRD, SDD nem THREAT-MODEL consolidados. Decisão do usuário.
 - **AD-007** (2026-11-03): a página offline e a página provisória usam a casca de `t03-indisponivel--erro` do mockup, com texto próprio, porque o mockup não tem tela offline.
+- **AD-008** (2026-11-03): a `main` do repo foi trocada pela v2 **antes** do `backup.yml` da v2 existir, por decisão do usuário. Isso substitui, só no momento da troca, a ordem da AD-005 e de FUN-48. Consequência aceita: o backup diário agendado da produção (o `backup.yml` do LJS, que só roda na branch padrão) fica parado até o `backup.yml` da v2 chegar à `main`. O último backup é o do LJS antes da troca. A branch `legado` (= `e557292`) foi criada pelo usuário e conferida por `git ls-remote` antes do push. Mitigação: a tarefa do `backup.yml` sobe de prioridade na fundação, e FUN-48 passa a exigir a primeira execução manual no dia em que ele chegar à `main`.
 
 ## Retomada
 
