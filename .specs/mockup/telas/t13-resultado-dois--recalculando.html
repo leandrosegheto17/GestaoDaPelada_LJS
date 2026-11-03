@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Times sugeridos (recalculando)</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<!-- Depois de um ajuste manual (D3): o movimento já aparece nos cartões (Japa agora no Time B, destacado) e os números esperam a resposta de simulador/avaliar. "Confirmar" fica desabilitado. Recorte em .comparativo e .barra-acao; cartões reduzidos ao trecho que mudou. -->
+<header class="barra barra--admin"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span><a class="barra__link" href="t08-grupos--sucesso.html">Trocar grupo</a></div></header>
+<main class="conteudo conteudo--admin">
+  <h1 class="titulo-pagina">Times sugeridos</h1>
+  <p class="sr" role="status">Recalculando os indicadores…</p>
+  <table class="comparativo" aria-busy="true">
+    <caption class="sr">Comparação entre os times</caption>
+    <thead><tr><td></td><th scope="col">Time A</th><th scope="col">Time B</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Nível no 1º tempo (soma · média)</th><td class="recalculando">recalculando…</td><td class="recalculando">recalculando…</td></tr>
+      <tr><th scope="row">Nível no 2º tempo (soma · média)</th><td class="recalculando">recalculando…</td><td class="recalculando">recalculando…</td></tr>
+      <tr><th scope="row">Idade média</th><td class="recalculando">recalculando…</td><td class="recalculando">recalculando…</td></tr>
+      <tr><th scope="row">Substituições</th><td class="recalculando">recalculando…</td><td class="recalculando">recalculando…</td></tr>
+    </tbody>
+  </table>
+  <div class="times times--dois">
+    <section class="cartao-time" aria-labelledby="ta"><h2 id="ta" class="cartao-time__titulo">Time A</h2><h3 class="cartao-time__grupo">Entram no 2º tempo</h3><ul class="jogadores-time"><li><button class="jogador-time" type="button"><span>Cabeça</span></button></li></ul></section>
+    <section class="cartao-time cartao-time--b" aria-labelledby="tb"><h2 id="tb" class="cartao-time__titulo">Time B</h2><h3 class="cartao-time__grupo">Entram no 2º tempo</h3><ul class="jogadores-time"><li><button class="jogador-time" type="button"><span>Vini</span></button></li><li><button class="jogador-time" type="button"><span>Léo Baiano</span></button></li><li><button class="jogador-time jogador-time--movido" type="button"><span>Japa</span><span class="jogador-time__selos"><span class="selo selo--info">movido</span></span></button></li></ul></section>
+  </div>
+  <div class="barra-acao"><div class="grupo-botoes"><button class="botao botao--principal" type="button" disabled>Confirmar escalação</button><button class="botao botao--secundario" type="button">Refazer sugestão</button><button class="botao botao--texto" type="button">Editar entradas</button></div></div>
+</main>
+</body>
+</html>

@@ -1,0 +1,57 @@
+{
+  "id": "j-gil",
+  "apelido": "Gil",
+  "posicao": "meia",
+  "situacao": "ativo",
+  "desde": "2026-10-20",
+  "nivel": 620,
+  "semNota": false,
+  "anoNascimento": 1980,
+  "telefone": null,
+  "pontuacaoInicial": 0,
+  "inicioPontuacao": "2026-02-05",
+  "periodos": [
+    {
+      "id": "p-gil-1",
+      "inicio": "2026-02-05",
+      "fim": "2026-10-05"
+    },
+    {
+      "id": "p-gil-2",
+      "inicio": "2026-10-20",
+      "fim": null
+    }
+  ],
+  "notas": [
+    {
+      "habilidadeId": "h-visao",
+      "habilidade": "Visão de Jogo",
+      "nota": 6
+    },
+    {
+      "habilidadeId": "h-passe",
+      "habilidade": "Passe",
+      "nota": 6
+    },
+    {
+      "habilidadeId": "h-preparo",
+      "habilidade": "Preparo Físico",
+      "nota": 7
+    },
+    {
+      "habilidadeId": "h-drible",
+      "habilidade": "Drible",
+      "nota": 6
+    },
+    {
+      "habilidadeId": "h-chute",
+      "habilidade": "Chute",
+      "nota": 6
+    },
+    {
+      "habilidadeId": "h-desarme",
+      "habilidade": "Desarme",
+      "nota": 6
+    }
+  ]
+}

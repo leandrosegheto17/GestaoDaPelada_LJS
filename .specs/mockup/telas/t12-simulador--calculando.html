@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Simulador: prévia calculando</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<!-- Variação de t12-simulador--dois-times: entre um toque e a resposta de simulador/previa (debounce de 300 ms). Recorte em .cartao (prévia). Lista reduzida. -->
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+<header class="barra barra--admin"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span><a class="barra__link" href="t08-grupos--sucesso.html">Trocar grupo</a></div></header>
+<main id="conteudo" class="conteudo conteudo--admin">
+  <a class="voltar" href="t09-inicio--sucesso.html"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 18 9 12 15 6"/></svg>Início</a>
+  <h1 class="titulo-pagina">Simulador</h1>
+  <form novalidate class="lado-a-lado">
+    <div class="formulario">
+      <div class="campo"><label class="campo__rotulo" for="data">Data da partida</label><input class="campo__entrada" id="data" type="date" value="2026-10-22"></div>
+      <fieldset class="segmentado"><legend class="sr">Formato</legend><label><input type="radio" name="formato" value="dois" checked><span>2 times (1º e 2º tempo)</span></label><label><input type="radio" name="formato" value="varios"><span>3 ou mais times</span></label></fieldset>
+      <div class="campo"><label class="campo__rotulo" for="n">Jogadores por time</label><div class="campo-numero"><button class="campo-numero__botao" type="button" aria-label="Diminuir jogadores por time">−</button><input class="campo__entrada" id="n" type="number" min="2" max="11" value="8" inputmode="numeric"><button class="campo-numero__botao" type="button" aria-label="Aumentar jogadores por time">+</button></div></div>
+      <div class="cartao" aria-live="polite" aria-busy="true"><p class="campo__ajuda">Prévia</p><p class="previa recalculando">calculando…</p></div>
+    </div>
+    <div>
+      <h2 class="subtitulo">Aptos (19)</h2>
+      <ul class="lista lista-aptos">
+        <li class="item"><label class="caixa item__principal"><input type="checkbox" checked><span>Alemão</span></label><span class="item__lado texto-sec">nível 6,1</span></li>
+        <li class="item"><label class="caixa item__principal"><input type="checkbox" checked><span>Bigode</span></label><span class="item__lado texto-sec">nível 6,9</span></li>
+      </ul>
+    </div>
+    <div class="barra-acao"><button class="botao botao--principal" type="button" disabled>Sugerir times</button></div>
+  </form>
+</main>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pontuação (peso fora da faixa)</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<!-- Recorte no formulário "Nova configuração". -->
+<header class="barra barra--admin"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span><a class="barra__link" href="t08-grupos--sucesso.html">Trocar grupo</a></div></header>
+<main class="conteudo conteudo--admin conteudo--estreito">
+  <h1 class="titulo-pagina">Pontuação</h1>
+  <section aria-labelledby="nova">
+    <h2 id="nova" class="subtitulo">Nova configuração (vale a partir de hoje)</h2>
+    <form class="formulario" novalidate>
+      <div class="duas-colunas">
+        <div class="campo"><label class="campo__rotulo" for="p1">Presença sem chuva</label><input class="campo__entrada" id="p1" type="number" value="1"></div>
+        <div class="campo campo--erro"><label class="campo__rotulo" for="p2">Presença com chuva</label><input class="campo__entrada" id="p2" type="number" value="12" aria-invalid="true" aria-describedby="p2-erro"><p class="campo__erro" id="p2-erro" role="alert"><svg class="icone" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>Use um número inteiro de −10 a 10.</p></div>
+        <div class="campo"><label class="campo__rotulo" for="p3">Lesionado sem chuva</label><input class="campo__entrada" id="p3" type="number" value="1"></div>
+        <div class="campo"><label class="campo__rotulo" for="p4">Lesionado com chuva</label><input class="campo__entrada" id="p4" type="number" value="1"></div>
+        <div class="campo"><label class="campo__rotulo" for="p5">Expulso sem chuva</label><input class="campo__entrada" id="p5" type="number" value="-1"></div>
+        <div class="campo"><label class="campo__rotulo" for="p6">Expulso com chuva</label><input class="campo__entrada" id="p6" type="number" value="-1"></div>
+      </div>
+      <p class="campo__ajuda">Inteiros de −10 a 10. Partidas anteriores a hoje não mudam.</p>
+      <div><button class="botao botao--principal" type="submit">Salvar nova configuração</button></div>
+    </form>
+  </section>
+</main>
+</body>
+</html>

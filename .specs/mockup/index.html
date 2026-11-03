@@ -1,0 +1,161 @@
+<title>Pelada: mockup completo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="fontes/fontes.css">
+<link rel="stylesheet" href="tokens.css">
+<style>
+/* Galeria do mockup: tema claro fixo de propósito (o app tem um só tema). Cores vêm de tokens.css. */
+:root{color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cor-fundo);color:var(--cor-texto);font-family:var(--fonte-texto);font-size:16px;line-height:1.5}
+header.topo{background:var(--cor-verde);color:var(--cor-sobre-verde);padding-block:28px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.topo a{color:inherit}
+header.topo h1{margin:0 0 6px;font-family:var(--fonte-titulo);font-size:34px;text-transform:uppercase;text-wrap:balance}
+header.topo p{margin:4px 0;max-width:1000px;color:var(--cor-sobre-verde-sec)}
+main{max-width:1440px;margin:0 auto;padding-block:16px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+table{display:block;overflow-x:auto}
+figure{max-width:100%;overflow-x:auto}
+h2{font-family:var(--fonte-titulo);font-size:28px;text-transform:uppercase;margin:40px 0 8px;border-bottom:3px solid var(--cor-verde);padding-bottom:4px}
+h3{font-family:var(--fonte-titulo);font-size:20px;margin:20px 0 6px}
+.nota{color:var(--cor-texto-sec);font-size:14px;max-width:1000px}
+.amostra{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start;margin:12px 0}
+figure{margin:0}
+@media (min-width:700px){table{display:table}}
+figcaption{font-size:13px;color:var(--cor-texto-sec);margin-bottom:4px}
+.cel{width:390px;height:844px;border:10px solid var(--cor-texto);border-radius:36px;overflow:hidden;background:var(--cor-superficie)}
+.cel iframe{width:370px;height:824px;border:0;display:block}
+.pc{width:640px;height:400px;border:1px solid var(--cor-linha);border-radius:8px;overflow:hidden;background:var(--cor-superficie)}
+.pc iframe{width:1280px;height:800px;border:0;transform:scale(.5);transform-origin:0 0;display:block}
+table{border-collapse:collapse;width:100%;font-size:14px;background:var(--cor-superficie)}
+th,td{border-bottom:1px solid var(--cor-linha);padding:6px 8px;text-align:left;vertical-align:top}
+th{font-weight:700;color:var(--cor-texto-sec)}
+td.num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.estados a{display:inline-block;margin:0 6px 4px 0;padding:2px 8px;border:1px solid var(--cor-contorno);border-radius:999px;color:var(--cor-texto);text-decoration:none;font-size:13px}
+.estados a.manual{border-style:dashed}
+.chip{display:inline-block;width:14px;height:14px;border:1px solid var(--cor-contorno);vertical-align:-2px;margin-right:4px}
+.aviso{background:var(--cor-atencao-fundo);color:var(--cor-atencao-texto);padding:12px 16px;border-radius:10px;max-width:1000px}
+</style>
+<header class="topo">
+  <h1>Mockup completo: Gestão da Pelada</h1>
+  <p>Etapa B3 do Loop B. Direção A, “Gramado”. São 29 telas (T00 a T28), mais o PDF (P01), os diálogos D1 a D5 e 3 páginas de padrão global, em 118 páginas no total. Cada página se adapta ao tamanho da tela: abrir no PC mostra o layout de PC, e no celular, o de celular.</p>
+  <p>Dados fictícios coerentes entre todas as telas: “hoje” = 22/10/2026, grupo “Pelada de Quinta”, 20 jogadores (veja <a href="dados.json" style="color:inherit">dados.json</a>). Proposta de ícone do app: <a href="icones/index.html" style="color:inherit">prévia dos ícones</a>.</p>
+</header>
+<main>
+  <p class="aviso"><strong>Como ler.</strong> Os rótulos de estado com borda <strong>contínua</strong> são comparados pixel a pixel com o app (rota + respostas da API, <code>telas.json</code> → <code>telas</code>). Os de borda <strong>tracejada</strong> precisam de um toque ou de um envio (diálogos, erros de envio, faixas de retorno) e são conferidos à mão contra o mockup (<code>telas.json</code> → <code>revisaoManual</code>). Algumas variações mostram a tabela ou a lista reduzidas; nesses casos a comparação usa recorte só no elemento que muda, e o comentário no topo da página explica.</p>
+
+  <h2>1. Público: ranking (tela-chave)</h2>
+  <div class="amostra">
+    <figure><figcaption>T01 sucesso, celular · <a href="telas/t01-ranking--sucesso.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t01-ranking--sucesso.html" title="T01 ranking, celular" loading="lazy"></iframe></div></figure>
+    <figure><figcaption>T01 sucesso, PC (50%) · <a href="telas/t01-ranking--sucesso.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t01-ranking--sucesso.html" title="T01 ranking, PC" loading="lazy"></iframe></div></figure>
+  </div>
+  <table>
+    <thead><tr><th>Tela</th><th>Estados</th><th>Requisitos cobertos</th></tr></thead>
+    <tbody>
+      <tr><td>T00 Entrada</td><td class="estados">só redireciona (sem página): leva a T01 ou T02</td><td>RF-34</td></tr>
+      <tr><td>T01 Ranking público</td><td class="estados"><a href="telas/t01-ranking--sucesso.html">sucesso</a><a href="telas/t01-ranking--vazio.html">vazio</a><a href="telas/t01-ranking--vazio-mes.html">vazio-mês</a><a href="telas/t01-ranking--carregando.html">carregando</a><a href="telas/t01-ranking--erro.html">erro</a><a href="telas/t01-ranking--instalar-iphone.html">instalar no iPhone</a><a href="telas/t01-ranking--endereco-novo.html">endereço novo</a><a class="manual" href="telas/t01-ranking--carregando-cache.html">atualizando (cache)</a><a class="manual" href="telas/t01-ranking--sem-conexao.html">sem conexão</a><a class="manual" href="telas/t01-ranking--sem-conexao-admin.html">sem conexão + engrenagem</a><a class="manual" href="telas/t01-ranking--pdf-preparando.html">PDF preparando</a><a class="manual" href="telas/t01-ranking--pdf-compartilhar.html">D4 compartilhar/baixar</a><a class="manual" href="telas/t01-ranking--pdf-erro.html">PDF erro</a><a class="manual" href="telas/t01-ranking--pdf-baixado.html">PDF baixado</a></td><td>RF-29 a RF-34 (colunas Pts inicial · rodadas · Pts final), RF-49, RF-52, RF-53, RF-54, RF-56/57, RF-64 (link), RNF-10, ADR-010</td></tr>
+      <tr><td>T02 Sem grupo</td><td class="estados"><a href="telas/t02-sem-grupo--sucesso.html">único</a></td><td>F1 (sem link)</td></tr>
+      <tr><td>T03 Grupo indisponível</td><td class="estados"><a href="telas/t03-indisponivel--erro.html">único</a></td><td>RF-03, RF-09, ADR-016</td></tr>
+      <tr><td>T04 Entrar</td><td class="estados"><a href="telas/t04-entrar--vazio.html">vazio</a><a class="manual" href="telas/t04-entrar--carregando.html">entrando</a><a class="manual" href="telas/t04-entrar--erro.html">erro</a><a class="manual" href="telas/t04-entrar--bloqueado.html">bloqueado</a></td><td>RF-11, ADR-003/004</td></tr>
+      <tr><td>T05 Esqueci a senha</td><td class="estados"><a href="telas/t05-esqueci--vazio.html">vazio</a><a class="manual" href="telas/t05-esqueci--sucesso.html">pedido enviado</a></td><td>RF-12</td></tr>
+      <tr><td>T06 Nova senha</td><td class="estados"><a href="telas/t06-nova-senha--vazio.html">vazio</a><a class="manual" href="telas/t06-nova-senha--erro.html">erro</a></td><td>RF-14, ADR-015 (8 a 72)</td></tr>
+      <tr><td>T07 Privacidade</td><td class="estados"><a href="telas/t07-privacidade--pagina.html">página</a><a href="telas/t07-privacidade--dialogo.html">diálogo 1º acesso</a></td><td>RF-64</td></tr>
+    </tbody>
+  </table>
+
+  <h2>2. Admin: dia de jogo</h2>
+  <div class="amostra">
+    <figure><figcaption>T11 lançar partida, celular · <a href="telas/t11-partida--nova.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t11-partida--nova.html" title="T11 lançar partida, celular" loading="lazy"></iframe></div></figure>
+    <figure><figcaption>T13 times sugeridos, PC (50%) · <a href="telas/t13-resultado-dois--sucesso.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t13-resultado-dois--sucesso.html" title="T13 resultado, PC" loading="lazy"></iframe></div></figure>
+  </div>
+  <table>
+    <thead><tr><th>Tela</th><th>Estados</th><th>Requisitos cobertos</th></tr></thead>
+    <tbody>
+      <tr><td>T09 Início do admin</td><td class="estados"><a href="telas/t09-inicio--sucesso.html">sucesso</a><a href="telas/t09-inicio--sem-jogadores.html">sem jogadores</a><a href="telas/t09-inicio--sem-financeiro.html">sem financeiro</a><a href="telas/t09-inicio--endereco-novo.html">endereço novo</a><a class="manual" href="telas/t09-inicio--salvo.html">partida salva</a><a class="manual" href="telas/t09-inicio--menu-conta.html">menu da conta</a></td><td>RF-10, RF-17, RF-18, RF-25 (data sugerida), RF-48 (status)</td></tr>
+      <tr><td>T10 Partidas</td><td class="estados"><a href="telas/t10-partidas--sucesso.html">sucesso</a><a href="telas/t10-partidas--vazio.html">vazio</a></td><td>RF-28</td></tr>
+      <tr><td>T11 Lançar / editar partida</td><td class="estados"><a href="telas/t11-partida--nova.html">nova (pré-marcada)</a><a href="telas/t11-partida--edicao.html">edição</a><a href="telas/t11-partida--carregando.html">carregando</a><a href="telas/t11-partida--vazio.html">ninguém ativo</a><a href="telas/t11-partida--data-futura.html">data futura</a><a href="telas/t11-partida--duplicada.html">data já lançada</a><a class="manual" href="telas/t11-partida--erro-salvar.html">erro ao salvar</a><a class="manual" href="telas/t11-partida--excluir.html">D2 excluir</a></td><td>RF-25 a RF-28, RN-02, RN-14, RNF-04 (G1), RNF-12</td></tr>
+      <tr><td>T12 Simulador: entradas</td><td class="estados"><a class="manual" href="telas/t12-simulador--dois-times.html">2 times</a><a class="manual" href="telas/t12-simulador--tres-times.html">3+ times</a><a class="manual" href="telas/t12-simulador--insuficiente.html">aptos insuficientes</a><a class="manual" href="telas/t12-simulador--calculando.html">prévia calculando</a><a href="telas/t12-simulador--vazio.html">sem jogadores</a></td><td>RF-38 a RF-40, RF-37</td></tr>
+      <tr><td>T13 Resultado 2 times</td><td class="estados"><a class="manual" href="telas/t13-resultado-dois--sucesso.html">sucesso</a><a class="manual" href="telas/t13-resultado-dois--carregando.html">montando</a><a class="manual" href="telas/t13-resultado-dois--recalculando.html">recalculando</a><a class="manual" href="telas/t13-resultado-dois--erro-recalcular.html">erro ao recalcular</a><a class="manual" href="telas/t13-resultado-dois--erro-confirmar.html">erro ao confirmar</a><a class="manual" href="telas/t13-resultado-dois--trocar.html">D3 trocar com</a><a class="manual" href="telas/t13-resultado-dois--mover.html">D3 mover</a><a class="manual" href="telas/t13-resultado-dois--refazer.html">refazer (D2)</a></td><td>RF-41 a RF-48, RN-09A, RN-10A, RN-19</td></tr>
+      <tr><td>T14 Resultado 3+ times</td><td class="estados"><a class="manual" href="telas/t14-resultado-varios--sucesso.html">sucesso</a><a class="manual" href="telas/t14-resultado-varios--mover.html">D3 mover</a> (montando, erro e refazer: os mesmos de T13)</td><td>RF-42, RF-44 a RF-48, RN-09B, RN-10B</td></tr>
+    </tbody>
+  </table>
+
+  <h2>3. Admin: cadastros e uso</h2>
+  <div class="amostra">
+    <figure><figcaption>T16 ficha do jogador, celular · <a href="telas/t16-jogador--edicao.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t16-jogador--edicao.html" title="T16 ficha, celular" loading="lazy"></iframe></div></figure>
+    <figure><figcaption>T15 jogadores, PC (50%) · <a href="telas/t15-jogadores--sucesso.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t15-jogadores--sucesso.html" title="T15 jogadores, PC" loading="lazy"></iframe></div></figure>
+  </div>
+  <table>
+    <thead><tr><th>Tela</th><th>Estados</th><th>Requisitos cobertos</th></tr></thead>
+    <tbody>
+      <tr><td>T15 Jogadores</td><td class="estados"><a href="telas/t15-jogadores--sucesso.html">sucesso</a><a href="telas/t15-jogadores--vazio.html">vazio</a><a href="telas/t15-jogadores--vazio-inativos.html">sem inativos</a></td><td>RF-19 a RF-21, RF-37</td></tr>
+      <tr><td>T16 Ficha do jogador</td><td class="estados"><a href="telas/t16-jogador--edicao.html">edição</a><a href="telas/t16-jogador--novo.html">novo</a><a href="telas/t16-jogador--sem-habilidades.html">sem habilidades</a><a class="manual" href="telas/t16-jogador--erro.html">erro</a><a class="manual" href="telas/t16-jogador--exclusao-recusada.html">exclusão recusada</a><a class="manual" href="telas/t16-jogador--salvo.html">salvo</a><a class="manual" href="telas/t16-jogador--inativar.html">inativar</a><a class="manual" href="telas/t16-jogador--excluir.html">D2 excluir</a><a class="manual" href="telas/t16-jogador--inativo.html">inativo</a><a href="telas/t16-jogador--periodos.html">períodos</a><a class="manual" href="telas/t16-jogador--reativar.html">reativar</a><a class="manual" href="telas/t16-jogador--reativar-previa.html">reativar: prévia</a><a class="manual" href="telas/t16-jogador--reativar-calculando.html">reativar: calculando</a><a class="manual" href="telas/t16-jogador--reativar-erro.html">reativar: erro</a><a class="manual" href="telas/t16-jogador--reativar-erro-rede.html">reativar: sem conexão</a><a class="manual" href="telas/t16-jogador--reativado.html">reativado</a><a class="manual" href="telas/t16-jogador--corrigir.html">corrigir datas</a><a class="manual" href="telas/t16-jogador--corrigir-previa.html">corrigir: prévia</a><a class="manual" href="telas/t16-jogador--corrigir-saida.html">corrigir: 1º período</a><a class="manual" href="telas/t16-jogador--corrigir-calculando.html">corrigir: calculando</a><a class="manual" href="telas/t16-jogador--corrigir-erro.html">corrigir: erro</a><a class="manual" href="telas/t16-jogador--corrigir-erro-rede.html">corrigir: sem conexão</a><a class="manual" href="telas/t16-jogador--corrigido.html">corrigido</a><a class="manual" href="telas/t16-jogador--inicio-erro-saida.html">data de início: erro na saída</a></td><td>RF-19 a RF-22, RF-36, RF-37, RN-11, RF-69 a RF-72, RF-75 a RF-82</td></tr>
+      <tr><td>T17 Habilidades</td><td class="estados"><a href="telas/t17-habilidades--sucesso.html">sucesso</a><a href="telas/t17-habilidades--vazio.html">vazio</a><a class="manual" href="telas/t17-habilidades--erro.html">erro</a><a class="manual" href="telas/t17-habilidades--excluir.html">D2 excluir</a></td><td>RF-35</td></tr>
+      <tr><td>T18 Pontuação</td><td class="estados"><a href="telas/t18-pontuacao--sucesso.html">sucesso</a><a class="manual" href="telas/t18-pontuacao--erro.html">erro</a><a class="manual" href="telas/t18-pontuacao--salvo.html">salvo</a></td><td>RF-23, RF-24, RN-04</td></tr>
+      <tr><td>T19 Admins</td><td class="estados"><a href="telas/t19-admins--sucesso.html">sucesso</a><a href="telas/t19-admins--ultimo-admin.html">único admin</a><a class="manual" href="telas/t19-admins--senha.html">D1 senha</a><a class="manual" href="telas/t19-admins--vinculo.html">vínculo</a><a class="manual" href="telas/t19-admins--remover.html">D2 remover</a><a class="manual" href="telas/t19-admins--erro.html">erro</a></td><td>RF-13, RF-15, RF-16, RF-18, RN-13</td></tr>
+      <tr><td>T20 Dados do grupo</td><td class="estados"><a href="telas/t20-grupo--sucesso.html">sucesso</a><a class="manual" href="telas/t20-grupo--erro.html">erro</a><a class="manual" href="telas/t20-grupo--salvo.html">salvo</a><a class="manual" href="telas/t20-grupo--link-copiado.html">link copiado</a></td><td>RF-08, ADR-016</td></tr>
+      <tr><td>T21 Uso do app</td><td class="estados"><a href="telas/t21-uso--sucesso.html">sucesso</a><a href="telas/t21-uso--vazio.html">vazio</a></td><td>RF-58</td></tr>
+    </tbody>
+  </table>
+
+  <h2>4. Financeiro</h2>
+  <div class="amostra">
+    <figure><figcaption>T22 financeiro, celular · <a href="telas/t22-financeiro--sucesso.html">abrir</a></figcaption><div class="cel"><iframe src="telas/t22-financeiro--sucesso.html" title="T22 financeiro, celular" loading="lazy"></iframe></div></figure>
+  </div>
+  <table>
+    <thead><tr><th>Tela</th><th>Estados</th><th>Requisitos cobertos</th></tr></thead>
+    <tbody>
+      <tr><td>T22 Financeiro: mês</td><td class="estados"><a href="telas/t22-financeiro--sucesso.html">sucesso</a><a href="telas/t22-financeiro--vazio-config.html">sem configuração</a><a href="telas/t22-financeiro--vazio-mes.html">mês sem lançamentos</a><a href="telas/t22-financeiro--sem-permissao.html">sem permissão</a><a class="manual" href="telas/t22-financeiro--desmarcar.html">D2 desmarcar</a><a class="manual" href="telas/t22-financeiro--erro-pagamento.html">erro ao marcar</a></td><td>RF-18, RF-60 a RF-63, RN-15</td></tr>
+      <tr><td>T23 Lançamento</td><td class="estados"><a href="telas/t23-lancamento--novo.html">novo</a><a href="telas/t23-lancamento--edicao.html">edição</a><a class="manual" href="telas/t23-lancamento--erro.html">erro</a><a class="manual" href="telas/t23-lancamento--excluir.html">D2 excluir</a></td><td>RF-62, RNF-12</td></tr>
+      <tr><td>T24 Configurar caixa</td><td class="estados"><a href="telas/t24-config--vazio.html">vazio</a><a class="manual" href="telas/t24-config--erro.html">erro</a></td><td>RF-59</td></tr>
+    </tbody>
+  </table>
+
+  <h2>5. Conta, grupos e dono</h2>
+  <div class="amostra">
+    <figure><figcaption>T26 área do dono, PC (50%) · <a href="telas/t26-dono--sucesso.html">abrir</a></figcaption><div class="pc"><iframe src="telas/t26-dono--sucesso.html" title="T26 área do dono, PC" loading="lazy"></iframe></div></figure>
+  </div>
+  <table>
+    <thead><tr><th>Tela</th><th>Estados</th><th>Requisitos cobertos</th></tr></thead>
+    <tbody>
+      <tr><td>T08 Escolher grupo</td><td class="estados"><a href="telas/t08-grupos--sucesso.html">sucesso</a><a href="telas/t08-grupos--nao-admin.html">não é admin do link</a><a href="telas/t08-grupos--vazio.html">nenhum grupo</a></td><td>RF-10, RF-11</td></tr>
+      <tr><td>T25 Minha senha</td><td class="estados"><a href="telas/t25-senha--vazio.html">vazio</a><a class="manual" href="telas/t25-senha--erro.html">erro</a><a class="manual" href="telas/t25-senha--sucesso.html">trocada</a></td><td>RF-17</td></tr>
+      <tr><td>T26 Área do dono</td><td class="estados"><a href="telas/t26-dono--sucesso.html">sucesso</a><a href="telas/t26-dono--vazio.html">vazio</a><a class="manual" href="telas/t26-dono--senha.html">D1 senha</a></td><td>RF-05 a RF-07, RN-20</td></tr>
+      <tr><td>T27 Novo grupo</td><td class="estados"><a href="telas/t27-novo-grupo--vazio.html">vazio</a><a class="manual" href="telas/t27-novo-grupo--erro.html">erro</a><a class="manual" href="telas/t27-novo-grupo--senha.html">D1 senha</a></td><td>RF-02, ADR-016</td></tr>
+      <tr><td>T28 Grupo (dono)</td><td class="estados"><a href="telas/t28-grupo-dono--sucesso.html">sucesso</a><a class="manual" href="telas/t28-grupo-dono--vinculo.html">vínculo</a><a class="manual" href="telas/t28-grupo-dono--arquivar.html">D2 arquivar</a><a class="manual" href="telas/t28-grupo-dono--arquivado.html">arquivado</a></td><td>RF-03 a RF-05, RF-07</td></tr>
+    </tbody>
+  </table>
+
+  <h2>6. PDF do ranking (P01)</h2>
+  <p class="nota">A4 retrato, 1 página para 20 jogadores × 12 colunas, fonte mínima de 7 pt. Mesmas colunas e mesma lógica da T01: Pts inicial (antes da 1ª coluna) + rodadas = Pts final.</p>
+  <p class="estados"><a href="telas/p01-pdf--sucesso.html">outubro de 2026</a><a href="telas/p01-pdf--mes-vazio.html">julho de 2026 (mês sem partidas)</a></p>
+
+  <h2>7. Padrões globais</h2>
+  <p class="estados"><a href="telas/padrao--carregando-lista.html">carregando (listas)</a><a href="telas/padrao--carregando-formulario.html">carregando (formulários)</a><a href="telas/padrao--erro-rede.html">erro de rede</a></p>
+
+  <h2>8. Contraste (WCAG 2.1 AA)</h2>
+  <table>
+    <thead><tr><th>Par (texto / fundo)</th><th>Uso</th><th>Razão</th></tr></thead>
+    <tbody>
+      <tr><td><span class="chip" style="background:#14201A"></span>--cor-texto / --cor-fundo · superfície · zebra</td><td>Texto principal</td><td class="num">16,1 · 16,8 · 15,6</td></tr>
+      <tr><td>--cor-texto-sec / fundo · zebra</td><td>Texto secundário, ajudas</td><td class="num">7,0 · 6,8</td></tr>
+      <tr><td>--cor-contorno / superfície</td><td>Borda de campo, interruptor (≥ 3:1)</td><td class="num">4,5</td></tr>
+      <tr><td>--cor-sobre-verde / --cor-verde · --cor-verde-faixa</td><td>Barra superior</td><td class="num">6,6 · 5,4</td></tr>
+      <tr><td>--cor-sobre-verde-sec / --cor-verde-faixa</td><td>Subtítulo da barra (pior caso)</td><td class="num">4,9</td></tr>
+      <tr><td>--cor-verde / superfície</td><td>Título “Dia de jogo”, posições 1 a 3</td><td class="num">6,6</td></tr>
+      <tr><td>--cor-sobre-amarelo / --cor-amarelo</td><td>Botão principal</td><td class="num">11,6</td></tr>
+      <tr><td>--cor-p-texto / --cor-p-fundo</td><td>Marca presente (número)</td><td class="num">8,3</td></tr>
+      <tr><td>--cor-l-texto / --cor-l-fundo</td><td>Marca lesionado (número + “L”)</td><td class="num">7,1</td></tr>
+      <tr><td>--cor-e-texto / --cor-e-fundo</td><td>Marca expulso (número + “E”)</td><td class="num">7,3</td></tr>
+      <tr><td>--cor-f-texto / --cor-f-fundo</td><td>Marca falta (0, contorno tracejado); selo neutro</td><td class="num">6,3</td></tr>
+      <tr><td>--cor-chuva · --cor-sol / superfície</td><td>Ícones de tempo (≥ 3:1)</td><td class="num">6,8 · 5,9</td></tr>
+      <tr><td>--cor-info · sucesso · atenção · erro (texto / fundo)</td><td>Faixas e selos</td><td class="num">8,6 · 8,3 · 7,1 · 7,3</td></tr>
+      <tr><td>--cor-erro-texto / superfície</td><td>Mensagem de erro de campo</td><td class="num">9,6</td></tr>
+      <tr><td>--cor-sobre-destrutivo / --cor-destrutivo</td><td>Botão destrutivo</td><td class="num">9,6</td></tr>
+      <tr><td>--cor-foco / superfície · --cor-foco-sobre-verde / faixa clara</td><td>Anel de foco (≥ 3:1)</td><td class="num">16,8 · 3,8</td></tr>
+      <tr><td>--cor-desabilitado-texto / --cor-desabilitado-fundo</td><td>Controle desabilitado (isento)</td><td class="num">3,9</td></tr>
+    </tbody>
+  </table>
+  <p class="nota">Nenhuma informação depende só de cor: as marcas trazem número + pista de forma (presente: cheio; lesionado e expulso: letra no canto; falta: contorno tracejado; “–” fora do grupo). Sol e chuva são ícones com texto para leitor de tela (“, sem chuva” / “, com chuva”). Alvos de toque ≥ 44 px.</p>
+
+  <h2>9. Arquivos</h2>
+  <p class="nota"><a href="tokens.css">tokens.css</a> (copiar sem alterar) · <a href="base.css">base.css</a> (componentes do mockup) · <a href="fontes/fontes.css">fontes/fontes.css</a> (Barlow e Barlow Condensed; para auto-hospedar, rode <code>node .md/mockup/fontes/baixar-fontes.mjs</code>) · <a href="icones/index.html">ícone do app (proposta)</a> · <a href="icones/index.html">ícone do app (proposta)</a> · <a href="telas.json">telas.json</a> · <a href="dados.json">dados.json</a> · respostas/*.json (formato do contrato).</p>
+</main>

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lançar partida (data futura)</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<!-- Data inválida: a lista não é mostrada enquanto a data não for válida (RF-27). -->
+<header class="barra barra--admin"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span><a class="barra__link" href="t08-grupos--sucesso.html">Trocar grupo</a></div></header>
+<main class="conteudo conteudo--admin">
+  <a class="voltar" href="t09-inicio--sucesso.html"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 18 9 12 15 6"/></svg>Início</a>
+  <h1 class="titulo-pagina">Lançar partida</h1>
+  <div class="duas-colunas">
+    <div class="campo campo--erro"><label class="campo__rotulo" for="data">Data</label><input class="campo__entrada" id="data" type="date" value="2026-10-29" aria-invalid="true" aria-describedby="data-erro"><p class="campo__erro" id="data-erro" role="alert"><svg class="icone" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>A data não pode ser no futuro.</p></div>
+    <label class="interruptor"><span>Choveu?</span><input type="checkbox" role="switch"><span class="interruptor__trilho" aria-hidden="true"></span><span class="interruptor__estado" aria-hidden="true">Não</span></label>
+  </div>
+  <div class="barra-acao"><button class="botao botao--principal" type="button" disabled>Salvar partida</button></div>
+</main>
+</body>
+</html>

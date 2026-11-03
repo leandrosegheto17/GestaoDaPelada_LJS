@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jogador: Beto (reativado)</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<!-- Depois de reativar Beto com retorno em 07/10/2026: faixa de sucesso, faixa de atenção que fica na tela e a lista com o novo período. Ficha reduzida; recorte em .faixa--sucesso, .faixa--atencao e na seção Situação. -->
+<header class="barra barra--admin"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span><a class="barra__link" href="t08-grupos--sucesso.html">Trocar grupo</a></div></header>
+<main class="conteudo conteudo--admin conteudo--estreito">
+  <a class="voltar" href="t15-jogadores--sucesso.html"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 18 9 12 15 6"/></svg>Jogadores</a>
+  <h1 class="titulo-pagina">Beto</h1>
+  <div class="faixa faixa--sucesso" role="status"><svg class="icone" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 6 9 17l-5-5"/></svg><p class="faixa__texto">Beto reativado desde 07/10/2026.</p></div>
+  <div class="faixa faixa--atencao"><svg class="icone" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><p class="faixa__texto">2 rodadas passaram a constar: 08/10 e 15/10. Elas valem 0 ponto até você lançar a presença em Editar partida.</p><a class="botao botao--texto" href="t10-partidas--sucesso.html">Abrir partidas</a></div>
+  <section class="secao" aria-labelledby="s-sit">
+    <h2 id="s-sit" class="subtitulo">Situação</h2>
+    <div class="formulario">
+      <p class="paragrafo">Ativo desde 07/10/2026.</p>
+      <div class="campo">
+        <span class="campo__rotulo" id="s-per">Períodos de atividade</span>
+        <ul class="lista" aria-labelledby="s-per">
+          <li class="item item--quebra">
+            <div class="item__principal"><span class="item__titulo" id="p1-t">05/02/2026 <span aria-hidden="true">→</span><span class="sr">até</span> 05/10/2026</span><span class="item__meta">Entrada</span></div>
+            <div class="item__lado"><a class="botao botao--secundario" href="t16-jogador--corrigir-saida.html" aria-describedby="p1-t">Corrigir datas</a></div>
+          </li>
+          <li class="item item--quebra">
+            <div class="item__principal"><span class="item__titulo" id="p2-t">07/10/2026 <span aria-hidden="true">→</span><span class="sr">até</span> atual</span><span class="item__meta">Retorno</span></div>
+            <div class="item__lado"><a class="botao botao--secundario" href="t16-jogador--corrigir.html" aria-describedby="p2-t">Corrigir datas</a></div>
+          </li>
+        </ul>
+      </div>
+      <div class="grupo-botoes"><a class="botao botao--secundario" href="t16-jogador--inativar.html">Inativar</a><a class="botao botao--texto botao--texto-destrutivo" href="t16-jogador--excluir.html">Excluir jogador</a></div>
+    </div>
+  </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,1 @@
+{ "erro": { "codigo": "validacao", "mensagem": "Corrija os campos indicados.", "campos": { "apelido": "Já existe um jogador com esse apelido neste grupo.", "anoNascimento": "O ano precisa estar entre 1940 e 2016." } } }

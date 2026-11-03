@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mover jogador: Vini</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<!-- D3 no formato 3 ou mais times: só destinos de time e "Trocar com…" (sem só 1º tempo). Recorte em .folha. -->
+<header class="barra barra--admin" aria-hidden="true"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span></div></header>
+<main class="conteudo conteudo--admin" aria-hidden="true"><p class="titulo-pagina">Times sugeridos</p></main>
+<div class="veu veu--folha">
+  <section class="folha" role="dialog" aria-modal="true" aria-labelledby="d3-t">
+    <h2 id="d3-t" class="folha__titulo">Vini</h2>
+    <ul class="folha__opcoes">
+      <li><button class="folha__opcao" type="button" aria-current="true">Time 1 <span class="selo selo--neutro">atual</span></button></li>
+      <li><button class="folha__opcao" type="button">Mover para Time 2</button></li>
+      <li><button class="folha__opcao" type="button">Mover para Time 3</button></li>
+      <li><button class="folha__opcao" type="button">Mover para Time 4</button></li>
+      <li><button class="folha__opcao" type="button">Mover para Time 5</button></li>
+      <li><button class="folha__opcao" type="button">Trocar com…</button></li>
+    </ul>
+  </section>
+</div>
+</body>
+</html>

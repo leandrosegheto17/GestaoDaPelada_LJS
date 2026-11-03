@@ -1,0 +1,9 @@
+{
+  "acumuladoAntes": 18,
+  "acumuladoDepois": 18,
+  "posicaoAntes": null,
+  "posicaoDepois": 15,
+  "rodadasQuePassamAConstar": [ { "data": "2026-10-08", "situacao": "falta" }, { "data": "2026-10-15", "situacao": "falta" } ],
+  "rodadasQueDeixamDeConstar": [],
+  "aviso": "Elas valem 0 ponto até você lançar a presença em Editar partida."
+}

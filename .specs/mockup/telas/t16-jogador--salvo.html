@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jogador: Toninho (salvo)</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<!-- Faixa "Jogador salvo." e confirmação discreta "salvo" ao lado de uma nota alterada (Chute 8 → 9; nível passa a 7,0). Recorte em .faixa--sucesso e na seção de habilidades. -->
+<header class="barra barra--admin"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span><a class="barra__link" href="t08-grupos--sucesso.html">Trocar grupo</a></div></header>
+<main class="conteudo conteudo--admin conteudo--estreito">
+  <a class="voltar" href="t15-jogadores--sucesso.html"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 18 9 12 15 6"/></svg>Jogadores</a>
+  <h1 class="titulo-pagina">Toninho</h1>
+  <div class="faixa faixa--sucesso" role="status"><svg class="icone" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 6 9 17l-5-5"/></svg><p class="faixa__texto">Jogador salvo.</p></div>
+  <section class="secao" aria-labelledby="s-hab">
+    <h2 id="s-hab" class="subtitulo">Habilidades e nível</h2>
+    <p class="saldos__valor" aria-live="polite">Nível 7,0</p>
+    <ul class="lista">
+      <li class="item"><label class="item__principal" for="h4">Drible</label><select class="campo__entrada campo__entrada--nota" id="h4"><option value="">–</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option selected>7</option><option>8</option><option>9</option><option>10</option></select></li>
+      <li class="item"><label class="item__principal" for="h5">Chute</label><span class="selo selo--sucesso" role="status">salvo</span><select class="campo__entrada campo__entrada--nota" id="h5"><option value="">–</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option selected>9</option><option>10</option></select></li>
+    </ul>
+  </section>
+</main>
+</body>
+</html>

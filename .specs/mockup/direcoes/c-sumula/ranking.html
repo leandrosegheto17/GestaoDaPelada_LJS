@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ranking: Pelada de Quinta (Direção C, Súmula)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Direção C, "Súmula": papel de súmula de jogo, tinta e carimbo vermelho. A tela e o PDF ficam com a mesma cara. Pré-tokens: na B3 viram tokens.css. */
+:root{
+  --fundo:#F6F1E6;            /* papel */
+  --superficie:#FBF8F1;
+  --texto:#1B1F2A;            /* tinta; 15,5:1 sobre a superfície; 14,6:1 sobre o papel */
+  --texto-sec:#5A5648;        /* 6,9:1 sobre a superfície; 6,5:1 sobre o papel */
+  --linha:#D9CFB8;            /* pauta, decorativa */
+  --linha-forte:#1B1F2A;
+  --barra-fundo:#1B1F2A;
+  --barra-texto:#F6F1E6;      /* 14,6:1 */
+  --barra-sub:#CFC6B0;        /* 9,7:1 */
+  --carimbo:#B3261E;          /* vermelho; texto claro sobre ele 6,2:1; como texto sobre o papel 5,8:1 */
+  --acao-fundo:#B3261E;
+  --acao-texto:#FBF8F1;       /* 6,2:1 */
+  --foco:#1B1F2A;
+  --foco-na-barra:#F6F1E6;
+  --chuva:#1F4E8C;            /* ícone; 7,4:1 */
+  --raio:2px;
+  --fonte-titulo:"Zilla Slab", Georgia, serif;
+  --fonte-texto:"Source Sans 3", "Segoe UI", sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--fundo);color:var(--texto);font-family:var(--fonte-texto);font-size:16px;line-height:1.4}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.pular{position:absolute;left:8px;top:-80px;background:var(--acao-fundo);color:var(--acao-texto);padding:12px 16px;font-weight:700;z-index:10}
+.pular:focus{top:8px}
+:focus-visible{outline:3px solid var(--foco);outline-offset:2px}
+
+.barra{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;background:var(--barra-fundo);color:var(--barra-texto);border-bottom:6px double var(--carimbo)}
+.barra :focus-visible{outline-color:var(--foco-na-barra)}
+.barra__titulo{margin:0;font-family:var(--fonte-titulo);font-weight:700;font-size:27px;line-height:1.05}
+.barra__sub{margin:4px 0 0;font-size:14px;color:var(--barra-sub);font-style:italic}
+.barra__acoes{display:flex;gap:8px;flex-shrink:0}
+.botao-icone{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:var(--raio);border:2px solid var(--barra-texto);color:var(--barra-texto);text-decoration:none;font-family:var(--fonte-titulo);font-size:24px;font-weight:700;background:transparent}
+
+.conteudo{max-width:960px;margin:0 auto;padding:12px 8px 104px}
+.ferramentas{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 4px}
+.mes{display:flex;align-items:center;gap:2px}
+.mes__botao{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border:2px solid var(--linha-forte);border-radius:50%;background:transparent;color:var(--texto);cursor:pointer}
+.mes__botao:disabled{color:var(--linha);border-color:var(--linha);cursor:default}
+.mes__rotulo{margin:0;min-width:172px;text-align:center;font-family:var(--fonte-titulo);font-size:23px;font-weight:600}
+.mes__rotulo::first-letter{text-transform:uppercase}
+.resumo-mes{margin:4px 12px 12px;font-size:14px;color:var(--texto-sec)}
+.resumo-mes strong{color:var(--texto)}
+
+.botao-principal{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 22px;border:0;border-radius:var(--raio);background:var(--acao-fundo);color:var(--acao-texto);font-family:var(--fonte-titulo);font-size:19px;font-weight:700;cursor:pointer}
+.botao-principal--topo{display:none}
+
+.tabela-rolagem{overflow-x:auto;background:var(--superficie);border:2px solid var(--linha-forte)}
+.ranking{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.ranking th,.ranking td{padding:0 4px;height:44px;text-align:center;border-bottom:1px solid var(--linha);border-right:1px solid var(--linha);background:var(--superficie)}
+.ranking tr > *:last-child{border-right:0}
+.ranking tbody tr:last-child > *{border-bottom:0}
+.ranking thead th{height:42px;font-family:var(--fonte-titulo);font-size:15px;font-weight:700;color:var(--texto);white-space:nowrap;border-bottom:2px solid var(--linha-forte)}
+.ranking abbr{text-decoration:none}
+.c-pos{width:34px;position:sticky;left:0;z-index:1;font-family:var(--fonte-titulo);font-size:18px;font-weight:600;color:var(--texto-sec)}
+.c-nome{position:sticky;left:34px;z-index:1;min-width:104px;max-width:132px;text-align:left!important;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-right:2px solid var(--linha-forte)!important}
+.c-num{width:30px;color:var(--texto-sec)}
+.c-pts{width:46px;font-family:var(--fonte-titulo);font-size:21px;font-weight:700;color:var(--texto)}
+.c-partida{width:46px}
+.c-chuva .icone-chuva{display:block;margin:2px auto 0;color:var(--chuva)}
+.ranking tbody tr:nth-child(3) > *{border-bottom:2px solid var(--linha-forte)}
+
+.marca{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;font-family:var(--fonte-titulo);font-weight:700;font-size:15px}
+.marca--p{background:var(--texto);color:var(--superficie)}
+.marca--l{border:2px solid var(--texto);color:var(--texto)}
+.marca--e{background:var(--carimbo);color:var(--acao-texto);border-radius:var(--raio);transform:rotate(-8deg)}
+.marca--f{color:var(--texto-sec);border:1px dashed var(--texto-sec)}
+.marca--x{color:var(--texto-sec)}
+
+.legenda{margin:16px 4px 0}
+.legenda__titulo{margin:0 0 8px;font-family:var(--fonte-titulo);font-size:18px;font-weight:700}
+.legenda ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;font-size:14px}
+.legenda li{display:flex;align-items:center;gap:8px}
+.legenda .marca{width:26px;height:26px;font-size:14px;flex-shrink:0}
+.legenda .icone-chuva{color:var(--chuva);flex-shrink:0;margin:0 5px}
+
+.rodape{margin-top:24px;text-align:center;font-size:14px;color:var(--texto-sec)}
+.rodape a{color:var(--texto);font-weight:600}
+
+.barra-acao{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:var(--fundo);border-top:2px solid var(--linha-forte)}
+.barra-acao .botao-principal{width:100%;max-width:440px}
+
+@media (min-width:600px){
+  .barra{padding:20px 32px}
+  .barra__titulo{font-size:40px}
+  .conteudo{padding:24px 24px 48px}
+  .botao-principal--topo{display:inline-flex}
+  .barra-acao{display:none}
+  .c-nome{min-width:200px;max-width:none}
+  .c-num{width:56px}
+  .c-pts{width:72px}
+  .c-partida{width:72px}
+  .legenda ul{grid-template-columns:repeat(3,auto);justify-content:start}
+}
+</style>
+</head>
+<body>
+<a class="pular" href="#conteudo">Pular para o ranking</a>
+<header class="barra">
+  <div>
+    <h1 class="barra__titulo">Pelada de Quinta</h1>
+    <p class="barra__sub">Toda quinta · 20:00</p>
+  </div>
+  <nav class="barra__acoes" aria-label="Acesso dos admins">
+    <a class="botao-icone" href="#" aria-label="Área do admin"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></a>
+    <a class="botao-icone" href="#" aria-label="Financeiro"><span aria-hidden="true">$</span></a>
+  </nav>
+</header>
+
+<main id="conteudo" class="conteudo">
+  <div class="ferramentas">
+    <nav class="mes" aria-label="Mês exibido">
+      <button class="mes__botao" type="button" aria-label="Mês anterior, setembro de 2026"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 18 9 12 15 6"/></svg></button>
+      <h2 class="mes__rotulo" aria-live="polite">outubro de 2026</h2>
+      <button class="mes__botao" type="button" aria-label="Mês seguinte" disabled><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"/></svg></button>
+    </nav>
+    <button class="botao-principal botao-principal--topo" type="button"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Exportar PDF</button>
+  </div>
+  <p class="resumo-mes"><strong>3 partidas</strong> no mês, 1 com chuva. Ordem pelos pontos acumulados desde a 1ª partida.</p>
+
+  <div class="tabela-rolagem" role="region" aria-label="Tabela do ranking (role para o lado para ver as partidas)" tabindex="0">
+    <table class="ranking">
+      <caption class="sr">Ranking geral da Pelada de Quinta, com as partidas de outubro de 2026</caption>
+      <thead>
+        <tr>
+          <th scope="col" class="c-pos"><abbr title="Posição">#</abbr></th>
+          <th scope="col" class="c-nome">Jogador</th>
+          <th scope="col" class="c-pts"><abbr title="Pontos acumulados">Pts</abbr></th>
+          <th scope="col" class="c-num"><abbr title="Presenças no mês">P</abbr></th>
+          <th scope="col" class="c-num"><abbr title="Faltas no mês">F</abbr></th>
+          <th scope="col" class="c-partida">01/10</th>
+          <th scope="col" class="c-partida c-chuva">08/10<svg class="icone-chuva" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/><line x1="8" y1="19" x2="8" y2="21"/><line x1="8" y1="13" x2="8" y2="15"/><line x1="16" y1="19" x2="16" y2="21"/><line x1="16" y1="13" x2="16" y2="15"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="12" y1="15" x2="12" y2="17"/></svg><span class="sr">, com chuva</span></th>
+          <th scope="col" class="c-partida">15/10</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="c-pos">1</td><th scope="row" class="c-nome">Toninho</th><td class="c-pts">31</td><td class="c-num">3</td><td class="c-num">0</td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td></tr>
+        <tr><td class="c-pos">2</td><th scope="row" class="c-nome">Bigode</th><td class="c-pts">30</td><td class="c-num">3</td><td class="c-num">0</td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td></tr>
+        <tr><td class="c-pos">3</td><th scope="row" class="c-nome">Careca</th><td class="c-pts">30</td><td class="c-num">3</td><td class="c-num">0</td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td><td class="c-partida"><span class="marca marca--l" aria-hidden="true">L</span><span class="sr">Lesionado</span></td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td></tr>
+        <tr><td class="c-pos">4</td><th scope="row" class="c-nome">Juninho</th><td class="c-pts">29</td><td class="c-num">2</td><td class="c-num">1</td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td><td class="c-partida"><span class="marca marca--f" aria-hidden="true">F</span><span class="sr">Falta</span></td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td></tr>
+        <tr><td class="c-pos">5</td><th scope="row" class="c-nome">Marcão</th><td class="c-pts">28</td><td class="c-num">3</td><td class="c-num">0</td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td><td class="c-partida"><span class="marca marca--e" aria-hidden="true">E</span><span class="sr">Expulso</span></td></tr>
+        <tr><td class="c-pos">6</td><th scope="row" class="c-nome">Paulinho</th><td class="c-pts">27</td><td class="c-num">2</td><td class="c-num">1</td><td class="c-partida"><span class="marca marca--f" aria-hidden="true">F</span><span class="sr">Falta</span></td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td></tr>
+        <tr><td class="c-pos">7</td><th scope="row" class="c-nome">Zé Carlos</th><td class="c-pts">27</td><td class="c-num">2</td><td class="c-num">1</td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td><td class="c-partida"><span class="marca marca--f" aria-hidden="true">F</span><span class="sr">Falta</span></td></tr>
+        <tr><td class="c-pos">8</td><th scope="row" class="c-nome">Dudu</th><td class="c-pts">26</td><td class="c-num">3</td><td class="c-num">0</td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td></tr>
+        <tr><td class="c-pos">9</td><th scope="row" class="c-nome">Gordo</th><td class="c-pts">24</td><td class="c-num">3</td><td class="c-num">0</td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td></tr>
+        <tr><td class="c-pos">10</td><th scope="row" class="c-nome">Tiago</th><td class="c-pts">24</td><td class="c-num">3</td><td class="c-num">0</td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td></tr>
+        <tr><td class="c-pos">11</td><th scope="row" class="c-nome">Neném</th><td class="c-pts">23</td><td class="c-num">1</td><td class="c-num">2</td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td><td class="c-partida"><span class="marca marca--f" aria-hidden="true">F</span><span class="sr">Falta</span></td><td class="c-partida"><span class="marca marca--f" aria-hidden="true">F</span><span class="sr">Falta</span></td></tr>
+        <tr><td class="c-pos">12</td><th scope="row" class="c-nome">Rafinha</th><td class="c-pts">22</td><td class="c-num">2</td><td class="c-num">1</td><td class="c-partida"><span class="marca marca--f" aria-hidden="true">F</span><span class="sr">Falta</span></td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td></tr>
+        <tr><td class="c-pos">13</td><th scope="row" class="c-nome">Alemão</th><td class="c-pts">21</td><td class="c-num">2</td><td class="c-num">1</td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td><td class="c-partida"><span class="marca marca--f" aria-hidden="true">F</span><span class="sr">Falta</span></td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td></tr>
+        <tr><td class="c-pos">14</td><th scope="row" class="c-nome">Pedrão</th><td class="c-pts">19</td><td class="c-num">2</td><td class="c-num">1</td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td><td class="c-partida"><span class="marca marca--f" aria-hidden="true">F</span><span class="sr">Falta</span></td></tr>
+        <tr><td class="c-pos">15</td><th scope="row" class="c-nome">Cabeça</th><td class="c-pts">18</td><td class="c-num">1</td><td class="c-num">2</td><td class="c-partida"><span class="marca marca--f" aria-hidden="true">F</span><span class="sr">Falta</span></td><td class="c-partida"><span class="marca marca--f" aria-hidden="true">F</span><span class="sr">Falta</span></td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td></tr>
+        <tr><td class="c-pos">16</td><th scope="row" class="c-nome">Vini</th><td class="c-pts">17</td><td class="c-num">2</td><td class="c-num">1</td><td class="c-partida"><span class="marca marca--f" aria-hidden="true">F</span><span class="sr">Falta</span></td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td></tr>
+        <tr><td class="c-pos">17</td><th scope="row" class="c-nome">Japa</th><td class="c-pts">15</td><td class="c-num">1</td><td class="c-num">2</td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td><td class="c-partida"><span class="marca marca--f" aria-hidden="true">F</span><span class="sr">Falta</span></td><td class="c-partida"><span class="marca marca--f" aria-hidden="true">F</span><span class="sr">Falta</span></td></tr>
+        <tr><td class="c-pos">18</td><th scope="row" class="c-nome">Fumaça</th><td class="c-pts">12</td><td class="c-num">1</td><td class="c-num">2</td><td class="c-partida"><span class="marca marca--f" aria-hidden="true">F</span><span class="sr">Falta</span></td><td class="c-partida"><span class="marca marca--f" aria-hidden="true">F</span><span class="sr">Falta</span></td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td></tr>
+        <tr><td class="c-pos">19</td><th scope="row" class="c-nome">Léo Baiano</th><td class="c-pts">2</td><td class="c-num">2</td><td class="c-num">0</td><td class="c-partida"><span class="marca marca--x" aria-hidden="true">–</span><span class="sr">Ainda não fazia parte do grupo</span></td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td></tr>
+        <tr><td class="c-pos">20</td><th scope="row" class="c-nome">Serginho</th><td class="c-pts">1</td><td class="c-num">1</td><td class="c-num">0</td><td class="c-partida"><span class="marca marca--x" aria-hidden="true">–</span><span class="sr">Ainda não fazia parte do grupo</span></td><td class="c-partida"><span class="marca marca--x" aria-hidden="true">–</span><span class="sr">Ainda não fazia parte do grupo</span></td><td class="c-partida"><span class="marca marca--p" aria-hidden="true">P</span><span class="sr">Presente</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <section class="legenda" aria-labelledby="titulo-legenda">
+    <h2 id="titulo-legenda" class="legenda__titulo">Legenda</h2>
+    <ul>
+      <li><span class="marca marca--p" aria-hidden="true">P</span>Presente</li>
+      <li><span class="marca marca--l" aria-hidden="true">L</span>Lesionado (foi e não jogou)</li>
+      <li><span class="marca marca--e" aria-hidden="true">E</span>Expulso</li>
+      <li><span class="marca marca--f" aria-hidden="true">F</span>Falta</li>
+      <li><span class="marca marca--x" aria-hidden="true">–</span>Ainda não fazia parte do grupo</li>
+      <li><svg class="icone-chuva" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/><line x1="8" y1="19" x2="8" y2="21"/><line x1="8" y1="13" x2="8" y2="15"/><line x1="16" y1="19" x2="16" y2="21"/><line x1="16" y1="13" x2="16" y2="15"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="12" y1="15" x2="12" y2="17"/></svg>Jogo com chuva</li>
+    </ul>
+  </section>
+
+  <footer class="rodape"><a href="#">Privacidade</a> · Gestão da Pelada</footer>
+</main>
+
+<div class="barra-acao">
+  <button class="botao-principal" type="button"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Exportar PDF</button>
+</div>
+</body>
+</html>

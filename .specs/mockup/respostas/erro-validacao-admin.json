@@ -1,0 +1,1 @@
+{ "erro": { "codigo": "validacao", "mensagem": "Corrija os campos indicados.", "campos": { "email": "Informe um e-mail válido." } } }

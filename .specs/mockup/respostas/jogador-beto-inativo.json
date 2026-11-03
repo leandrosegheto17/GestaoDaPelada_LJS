@@ -1,0 +1,13 @@
+{
+  "id": "j-beto",
+  "apelido": "Beto",
+  "anoNascimento": 1983,
+  "posicao": "zagueiro",
+  "telefone": null,
+  "pontuacaoInicial": 0,
+  "situacao": { "ativo": false, "desde": "2026-10-05" },
+  "inicioPontuacao": "2026-02-05",
+  "nivel": 5.5,
+  "semNota": true,
+  "notas": []
+}

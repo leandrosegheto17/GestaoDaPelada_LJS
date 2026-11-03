@@ -1,0 +1,18 @@
+{
+  "grupo": { "id": "g-quinta", "nome": "Pelada de Quinta", "slug": "pelada-de-quinta", "urlPublica": "https://pelada.gestaodapelada.workers.dev/g/pelada-de-quinta", "diaSemana": "quinta", "frequencia": "semanal", "horario": "20:00" },
+  "permissoes": { "acessaFinanceiro": false },
+  "hoje": "2026-10-22",
+  "inicio": {
+    "dataSugeridaPartida": "2026-10-22",
+    "partidaNaDataSugerida": false,
+    "proximoDiaDeJogo": "2026-10-22",
+    "escalacaoConfirmadaPara": "2026-10-22",
+    "partidasNoMes": 3,
+    "jogadoresAtivos": 20,
+    "habilidades": 6,
+    "pesosVigentesDesde": "2026-09-01",
+    "admins": 2,
+    "aparelhosNaSemana": 9,
+    "saldoAtualCentavos": null
+  }
+}

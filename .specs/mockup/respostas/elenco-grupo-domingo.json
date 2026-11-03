@@ -1,0 +1,13 @@
+{
+  "id": "g-domingo",
+  "nome": "Racha de Domingo",
+  "slug": "racha-de-domingo",
+  "diaSemana": "domingo",
+  "frequencia": "quinzenal",
+  "horario": "09:00",
+  "linkPublico": "https://gestaodapelada.ljssoftware.com.br/g/racha-de-domingo",
+  "jogadoresAtivos": 0,
+  "habilidades": 6,
+  "admins": 2,
+  "souCriador": false
+}

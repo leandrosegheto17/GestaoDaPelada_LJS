@@ -1,0 +1,1 @@
+{ "erro": { "codigo": "validacao", "mensagem": "Corrija os campos indicados.", "campos": { "presencaComChuva": "Use um número inteiro de −10 a 10." } } }

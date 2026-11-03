@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lançar partida (não salvou)</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<!-- Variação de t11-partida--nova: falha de rede ao salvar; as marcações continuam na tela. Recorte em .faixa--erro. Lista reduzida às 4 primeiras linhas (no app, a lista inteira continua como estava). -->
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+<header class="barra barra--admin"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span><a class="barra__link" href="t08-grupos--sucesso.html">Trocar grupo</a></div></header>
+<main id="conteudo" class="conteudo conteudo--admin">
+  <a class="voltar" href="t09-inicio--sucesso.html"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 18 9 12 15 6"/></svg>Início</a>
+  <h1 class="titulo-pagina">Lançar partida</h1>
+  <div class="faixa faixa--erro" role="alert"><svg class="icone" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><p class="faixa__texto">Não salvou. Suas marcações continuam aqui.</p><button class="botao botao--texto" type="button">Tentar de novo</button></div>
+  <form novalidate>
+    <div class="duas-colunas">
+      <div class="campo"><label class="campo__rotulo" for="data">Data</label><input class="campo__entrada" id="data" type="date" value="2026-10-22" max="2026-10-22"></div>
+      <label class="interruptor"><span>Choveu?</span><input type="checkbox" role="switch"><span class="interruptor__trilho" aria-hidden="true"></span><span class="interruptor__estado" aria-hidden="true">Não</span></label>
+    </div>
+    <p class="contagem-fixa" aria-live="polite">Presentes 19 · Lesionados 0 · Expulsos 0 · Ausentes 1</p>
+    <ul class="lista-situacao">
+      <li class="linha-jogador"><span class="linha-jogador__nome" aria-hidden="true">Alemão</span><fieldset class="seletor-situacao"><legend class="sr">Situação de Alemão</legend><label class="op-a"><input type="radio" name="s01" value="ausente"><span><i aria-hidden="true">A</i><small>Ausente</small></span></label><label class="op-p"><input type="radio" name="s01" value="presente" checked><span><i aria-hidden="true">P</i><small>Presente</small></span></label><label class="op-l"><input type="radio" name="s01" value="lesionado"><span><i aria-hidden="true">L</i><small>Lesionado</small></span></label><label class="op-e"><input type="radio" name="s01" value="expulso"><span><i aria-hidden="true">E</i><small>Expulso</small></span></label></fieldset></li>
+      <li class="linha-jogador"><span class="linha-jogador__nome" aria-hidden="true">Bigode</span><fieldset class="seletor-situacao"><legend class="sr">Situação de Bigode</legend><label class="op-a"><input type="radio" name="s02" value="ausente"><span><i aria-hidden="true">A</i><small>Ausente</small></span></label><label class="op-p"><input type="radio" name="s02" value="presente" checked><span><i aria-hidden="true">P</i><small>Presente</small></span></label><label class="op-l"><input type="radio" name="s02" value="lesionado"><span><i aria-hidden="true">L</i><small>Lesionado</small></span></label><label class="op-e"><input type="radio" name="s02" value="expulso"><span><i aria-hidden="true">E</i><small>Expulso</small></span></label></fieldset></li>
+      <li class="linha-jogador"><span class="linha-jogador__nome" aria-hidden="true">Cabeça</span><fieldset class="seletor-situacao"><legend class="sr">Situação de Cabeça</legend><label class="op-a"><input type="radio" name="s03" value="ausente"><span><i aria-hidden="true">A</i><small>Ausente</small></span></label><label class="op-p"><input type="radio" name="s03" value="presente" checked><span><i aria-hidden="true">P</i><small>Presente</small></span></label><label class="op-l"><input type="radio" name="s03" value="lesionado"><span><i aria-hidden="true">L</i><small>Lesionado</small></span></label><label class="op-e"><input type="radio" name="s03" value="expulso"><span><i aria-hidden="true">E</i><small>Expulso</small></span></label></fieldset></li>
+      <li class="linha-jogador"><span class="linha-jogador__nome" aria-hidden="true">Careca</span><fieldset class="seletor-situacao"><legend class="sr">Situação de Careca</legend><label class="op-a"><input type="radio" name="s04" value="ausente"><span><i aria-hidden="true">A</i><small>Ausente</small></span></label><label class="op-p"><input type="radio" name="s04" value="presente" checked><span><i aria-hidden="true">P</i><small>Presente</small></span></label><label class="op-l"><input type="radio" name="s04" value="lesionado"><span><i aria-hidden="true">L</i><small>Lesionado</small></span></label><label class="op-e"><input type="radio" name="s04" value="expulso"><span><i aria-hidden="true">E</i><small>Expulso</small></span></label></fieldset></li>
+    </ul>
+    <div class="barra-acao"><button class="botao botao--principal" type="submit">Salvar partida (19 presentes)</button></div>
+  </form>
+</main>
+</body>
+</html>

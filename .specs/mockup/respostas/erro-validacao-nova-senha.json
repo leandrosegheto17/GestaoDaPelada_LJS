@@ -1,0 +1,1 @@
+{ "erro": { "codigo": "validacao", "mensagem": "Corrija os campos indicados.", "campos": { "novaSenha": "A nova senha precisa ser diferente da temporária.", "confirmacao": "As senhas não conferem." } } }

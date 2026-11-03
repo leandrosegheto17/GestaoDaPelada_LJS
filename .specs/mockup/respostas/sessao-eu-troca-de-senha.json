@@ -1,0 +1,7 @@
+{
+  "conta": { "id": "c-rodrigo", "nome": "Rodrigo", "email": "rodrigo@exemplo.com.br", "eDono": false },
+  "escopo": "troca_de_senha",
+  "avisoPrivacidadeVisto": false,
+  "enderecoNovo": null,
+  "grupos": []
+}

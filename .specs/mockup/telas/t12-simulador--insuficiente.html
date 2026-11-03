@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Simulador: aptos insuficientes</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<!-- Variação de t12-simulador--dois-times com N = 11: a prévia vira erro e bloqueia "Sugerir times" (RF-40). Recorte em .previa-erro e .barra-acao. Lista de aptos igual à de dois-times (aqui reduzida às 3 primeiras). -->
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+<header class="barra barra--admin"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span><a class="barra__link" href="t08-grupos--sucesso.html">Trocar grupo</a></div></header>
+<main id="conteudo" class="conteudo conteudo--admin">
+  <a class="voltar" href="t09-inicio--sucesso.html"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 18 9 12 15 6"/></svg>Início</a>
+  <h1 class="titulo-pagina">Simulador</h1>
+  <form novalidate class="lado-a-lado">
+    <div class="formulario">
+      <div class="campo"><label class="campo__rotulo" for="data">Data da partida</label><input class="campo__entrada" id="data" type="date" value="2026-10-22"></div>
+      <fieldset class="segmentado"><legend class="sr">Formato</legend><label><input type="radio" name="formato" value="dois" checked><span>2 times (1º e 2º tempo)</span></label><label><input type="radio" name="formato" value="varios"><span>3 ou mais times</span></label></fieldset>
+      <div class="campo"><label class="campo__rotulo" for="n">Jogadores por time</label><div class="campo-numero"><button class="campo-numero__botao" type="button" aria-label="Diminuir jogadores por time">−</button><input class="campo__entrada" id="n" type="number" min="2" max="11" value="11" inputmode="numeric"><button class="campo-numero__botao" type="button" aria-label="Aumentar jogadores por time">+</button></div></div>
+      <div class="campo"><label class="campo__rotulo" for="k">Limite de substituições por time</label><div class="campo-numero"><button class="campo-numero__botao" type="button" aria-label="Diminuir limite">−</button><input class="campo__entrada" id="k" type="number" min="0" max="20" value="2" inputmode="numeric"><button class="campo-numero__botao" type="button" aria-label="Aumentar limite">+</button><label class="caixa"><input type="checkbox"><span>Ilimitado</span></label></div></div>
+      <div class="faixa faixa--erro previa-erro" id="previa-erro" role="alert"><svg class="icone" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><p class="faixa__texto">Faltam aptos para 2 times de 11. Maior N possível: 9.</p></div>
+    </div>
+    <div>
+      <h2 class="subtitulo">Aptos (19)</h2>
+      <ul class="lista lista-aptos">
+        <li class="item"><label class="caixa item__principal"><input type="checkbox" checked><span>Alemão</span></label><span class="item__lado"><span class="texto-sec">nível 6,1</span><label class="interruptor"><input type="checkbox" role="switch" aria-label="Só 1º tempo: Alemão"><span class="interruptor__trilho" aria-hidden="true"></span><span class="interruptor__estado" aria-hidden="true">Só 1º</span></label></span></li>
+        <li class="item"><label class="caixa item__principal"><input type="checkbox" checked><span>Bigode</span></label><span class="item__lado"><span class="texto-sec">nível 6,9</span><label class="interruptor"><input type="checkbox" role="switch" aria-label="Só 1º tempo: Bigode"><span class="interruptor__trilho" aria-hidden="true"></span><span class="interruptor__estado" aria-hidden="true">Só 1º</span></label></span></li>
+        <li class="item"><label class="caixa item__principal"><input type="checkbox" checked><span>Cabeça</span></label><span class="item__lado"><span class="texto-sec">nível 5,8</span><label class="interruptor"><input type="checkbox" role="switch" aria-label="Só 1º tempo: Cabeça"><span class="interruptor__trilho" aria-hidden="true"></span><span class="interruptor__estado" aria-hidden="true">Só 1º</span></label></span></li>
+      </ul>
+    </div>
+    <div class="barra-acao"><button class="botao botao--principal" type="button" disabled aria-describedby="previa-erro">Sugerir times</button></div>
+  </form>
+</main>
+</body>
+</html>

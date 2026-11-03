@@ -1,0 +1,10 @@
+{
+  "mes": "2026-10",
+  "hoje": "2026-10-22",
+  "navegacao": { "mesAnterior": "2026-09", "mesSeguinte": null },
+  "partidas": [
+    { "data": "2026-10-15", "choveu": false, "contagem": { "presentes": 15, "lesionados": 0, "expulsos": 1 } },
+    { "data": "2026-10-08", "choveu": true, "contagem": { "presentes": 12, "lesionados": 1, "expulsos": 0 } },
+    { "data": "2026-10-01", "choveu": false, "contagem": { "presentes": 13, "lesionados": 0, "expulsos": 0 } }
+  ]
+}

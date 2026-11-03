@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Senha temporária</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<!-- D1: senha exibida uma única vez (admin novo ou redefinição). Mesmo diálogo em T26, T27 e T28. Recorte em .dialogo. -->
+<header class="barra barra--admin" aria-hidden="true"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span></div></header>
+<div class="veu">
+  <section class="dialogo" role="dialog" aria-modal="true" aria-labelledby="d1-t" aria-describedby="d1-x">
+    <button class="dialogo__fechar" type="button" aria-label="Fechar"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    <h2 id="d1-t" class="dialogo__titulo">Senha temporária de Rodrigo</h2>
+    <div class="senha-exibida"><span id="senha">Hx7nRq4tWp2m</span><button class="botao botao--secundario" type="button" aria-describedby="senha" autofocus>Copiar</button></div>
+    <p id="d1-x" class="dialogo__texto acima-3">Esta senha não será mostrada de novo. Envie para a pessoa por um canal privado. Ela terá de trocar no primeiro acesso.</p>
+    <p class="sr" role="status"></p>
+    <!-- Fechar pelo X ou Esc abre D2: "Fechar sem copiar?" / "A senha não será mostrada de novo." / Voltar (foco) e Fechar. Cópia negada anuncia: "Não foi possível copiar. Selecione a senha e copie." -->
+    <div class="dialogo__acoes"><button class="botao botao--principal" type="button">Já copiei</button></div>
+  </section>
+</div>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Alterar data de início de Toninho</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<!-- Diálogo "Alterar data de início" (prévia em andamento). Recorte em .dialogo. -->
+<header class="barra barra--admin" aria-hidden="true"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span></div></header>
+<div class="veu">
+  <section class="dialogo" role="dialog" aria-modal="true" aria-labelledby="ini-t">
+    <h2 id="ini-t" class="dialogo__titulo">Alterar data de início</h2>
+    <div class="campo"><label class="campo__rotulo" for="inicio">Data de início</label><input class="campo__entrada" id="inicio" type="date" max="2026-10-22" value="2026-10-01" aria-describedby="ini-ajuda"><p class="campo__ajuda" id="ini-ajuda">A pontuação do jogador conta a partir desta data. Nada é apagado: voltar a data devolve os pontos.</p></div>
+    <div aria-live="polite"><p class="paragrafo">Calculando…</p></div>
+    <div class="dialogo__acoes"><button class="botao botao--secundario" type="button">Cancelar</button><button class="botao botao--principal" type="button" disabled>Confirmar nova data</button></div>
+  </section>
+</div>
+</body>
+</html>

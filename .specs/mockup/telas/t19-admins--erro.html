@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Admins (e-mail inválido)</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<!-- Recorte no formulário "Adicionar admin". -->
+<header class="barra barra--admin"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span><a class="barra__link" href="t08-grupos--sucesso.html">Trocar grupo</a></div></header>
+<main class="conteudo conteudo--admin conteudo--estreito">
+  <h1 class="titulo-pagina">Admins</h1>
+  <section aria-labelledby="add">
+    <h2 id="add" class="subtitulo">Adicionar admin</h2>
+    <form class="formulario" novalidate>
+      <div class="campo"><label class="campo__rotulo" for="nome">Nome</label><input class="campo__entrada" id="nome" value="Rodrigo"></div>
+      <div class="campo campo--erro"><label class="campo__rotulo" for="email">E-mail</label><input class="campo__entrada" id="email" type="email" value="rodrigo@" aria-invalid="true" aria-describedby="email-erro"><p class="campo__erro" id="email-erro" role="alert"><svg class="icone" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>Informe um e-mail válido.</p></div>
+      <div><button class="botao botao--principal" type="submit">Adicionar admin</button></div>
+    </form>
+  </section>
+</main>
+</body>
+</html>

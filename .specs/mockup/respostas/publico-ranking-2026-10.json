@@ -1,0 +1,36 @@
+{
+  "grupo": { "nome": "Pelada de Quinta", "slug": "pelada-de-quinta", "diaSemana": "quinta", "frequencia": "semanal", "horario": "20:00" },
+  "mes": "2026-10",
+  "hoje": "2026-10-22",
+  "geradoEm": "2026-10-22T21:40:00Z",
+  "enderecoNovo": null,
+  "navegacao": { "mesAnterior": "2026-09", "mesSeguinte": null },
+  "resumoMes": { "partidas": 3, "comChuva": 1 },
+  "partidas": [
+    { "data": "2026-10-01", "choveu": false },
+    { "data": "2026-10-08", "choveu": true },
+    { "data": "2026-10-15", "choveu": false }
+  ],
+  "linhas": [
+    { "posicao": 1, "apelido": "Toninho", "ptsInicial": 27, "ptsFinal": 31, "rodadas": [{ "situacao": "presente", "pontos": 1 }, { "situacao": "presente", "pontos": 2 }, { "situacao": "presente", "pontos": 1 }] },
+    { "posicao": 2, "apelido": "Bigode", "ptsInicial": 26, "ptsFinal": 30, "rodadas": [{ "situacao": "presente", "pontos": 1 }, { "situacao": "presente", "pontos": 2 }, { "situacao": "presente", "pontos": 1 }] },
+    { "posicao": 3, "apelido": "Careca", "ptsInicial": 27, "ptsFinal": 30, "rodadas": [{ "situacao": "presente", "pontos": 1 }, { "situacao": "lesionado", "pontos": 1 }, { "situacao": "presente", "pontos": 1 }] },
+    { "posicao": 4, "apelido": "Juninho", "ptsInicial": 27, "ptsFinal": 29, "rodadas": [{ "situacao": "presente", "pontos": 1 }, { "situacao": "falta", "pontos": 0 }, { "situacao": "presente", "pontos": 1 }] },
+    { "posicao": 5, "apelido": "Marcão", "ptsInicial": 26, "ptsFinal": 28, "rodadas": [{ "situacao": "presente", "pontos": 1 }, { "situacao": "presente", "pontos": 2 }, { "situacao": "expulso", "pontos": -1 }] },
+    { "posicao": 6, "apelido": "Paulinho", "ptsInicial": 24, "ptsFinal": 27, "rodadas": [{ "situacao": "falta", "pontos": 0 }, { "situacao": "presente", "pontos": 2 }, { "situacao": "presente", "pontos": 1 }] },
+    { "posicao": 7, "apelido": "Zé Carlos", "ptsInicial": 24, "ptsFinal": 27, "rodadas": [{ "situacao": "presente", "pontos": 1 }, { "situacao": "presente", "pontos": 2 }, { "situacao": "falta", "pontos": 0 }] },
+    { "posicao": 8, "apelido": "Dudu", "ptsInicial": 22, "ptsFinal": 26, "rodadas": [{ "situacao": "presente", "pontos": 1 }, { "situacao": "presente", "pontos": 2 }, { "situacao": "presente", "pontos": 1 }] },
+    { "posicao": 9, "apelido": "Gordo", "ptsInicial": 20, "ptsFinal": 24, "rodadas": [{ "situacao": "presente", "pontos": 1 }, { "situacao": "presente", "pontos": 2 }, { "situacao": "presente", "pontos": 1 }] },
+    { "posicao": 10, "apelido": "Tiago", "ptsInicial": 20, "ptsFinal": 24, "rodadas": [{ "situacao": "presente", "pontos": 1 }, { "situacao": "presente", "pontos": 2 }, { "situacao": "presente", "pontos": 1 }] },
+    { "posicao": 11, "apelido": "Neném", "ptsInicial": 22, "ptsFinal": 23, "rodadas": [{ "situacao": "presente", "pontos": 1 }, { "situacao": "falta", "pontos": 0 }, { "situacao": "falta", "pontos": 0 }] },
+    { "posicao": 12, "apelido": "Rafinha", "ptsInicial": 19, "ptsFinal": 22, "rodadas": [{ "situacao": "falta", "pontos": 0 }, { "situacao": "presente", "pontos": 2 }, { "situacao": "presente", "pontos": 1 }] },
+    { "posicao": 13, "apelido": "Alemão", "ptsInicial": 19, "ptsFinal": 21, "rodadas": [{ "situacao": "presente", "pontos": 1 }, { "situacao": "falta", "pontos": 0 }, { "situacao": "presente", "pontos": 1 }] },
+    { "posicao": 14, "apelido": "Pedrão", "ptsInicial": 16, "ptsFinal": 19, "rodadas": [{ "situacao": "presente", "pontos": 1 }, { "situacao": "presente", "pontos": 2 }, { "situacao": "falta", "pontos": 0 }] },
+    { "posicao": 15, "apelido": "Cabeça", "ptsInicial": 17, "ptsFinal": 18, "rodadas": [{ "situacao": "falta", "pontos": 0 }, { "situacao": "falta", "pontos": 0 }, { "situacao": "presente", "pontos": 1 }] },
+    { "posicao": 16, "apelido": "Vini", "ptsInicial": 14, "ptsFinal": 17, "rodadas": [{ "situacao": "falta", "pontos": 0 }, { "situacao": "presente", "pontos": 2 }, { "situacao": "presente", "pontos": 1 }] },
+    { "posicao": 17, "apelido": "Japa", "ptsInicial": 14, "ptsFinal": 15, "rodadas": [{ "situacao": "presente", "pontos": 1 }, { "situacao": "falta", "pontos": 0 }, { "situacao": "falta", "pontos": 0 }] },
+    { "posicao": 18, "apelido": "Fumaça", "ptsInicial": 11, "ptsFinal": 12, "rodadas": [{ "situacao": "falta", "pontos": 0 }, { "situacao": "falta", "pontos": 0 }, { "situacao": "presente", "pontos": 1 }] },
+    { "posicao": 19, "apelido": "Léo Baiano", "ptsInicial": 0, "ptsFinal": 3, "rodadas": [{ "situacao": "fora", "pontos": null }, { "situacao": "presente", "pontos": 2 }, { "situacao": "presente", "pontos": 1 }] },
+    { "posicao": 20, "apelido": "Serginho", "ptsInicial": 0, "ptsFinal": 1, "rodadas": [{ "situacao": "fora", "pontos": null }, { "situacao": "fora", "pontos": null }, { "situacao": "presente", "pontos": 1 }] }
+  ]
+}

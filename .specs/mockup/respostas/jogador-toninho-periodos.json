@@ -1,0 +1,5 @@
+{
+  "periodos": [
+    { "id": "p-toninho-1", "tipo": "entrada", "inicio": "2026-02-05", "fim": null, "corrigivel": { "saida": false, "retorno": false } }
+  ]
+}

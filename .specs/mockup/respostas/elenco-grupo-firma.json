@@ -1,0 +1,13 @@
+{
+  "id": "g-firma",
+  "nome": "Futebol da Firma",
+  "slug": "futebol-da-firma",
+  "diaSemana": "terca",
+  "frequencia": "semanal",
+  "horario": "19:00",
+  "linkPublico": "https://gestaodapelada.ljssoftware.com.br/g/futebol-da-firma",
+  "jogadoresAtivos": 12,
+  "habilidades": 6,
+  "admins": 1,
+  "souCriador": true
+}

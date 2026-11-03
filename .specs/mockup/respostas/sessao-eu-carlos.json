@@ -1,0 +1,9 @@
+{
+  "conta": { "id": "c-carlos", "nome": "Carlos", "email": "carlos.racha@exemplo.com.br", "eDono": false },
+  "escopo": "completo",
+  "avisoPrivacidadeVisto": true,
+  "enderecoNovo": null,
+  "grupos": [
+    { "id": "g-sabado", "nome": "Racha de Sábado", "slug": "racha-de-sabado", "diaSemana": "sabado", "frequencia": "semanal", "horario": "16:00", "acessaFinanceiro": true }
+  ]
+}

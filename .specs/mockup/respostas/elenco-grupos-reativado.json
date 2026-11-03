@@ -1,0 +1,29 @@
+{
+  "ativos": [
+    {
+      "id": "g-firma",
+      "nome": "Futebol da Firma",
+      "slug": "futebol-da-firma",
+      "diaSemana": "terca",
+      "frequencia": "semanal",
+      "horario": "19:00"
+    },
+    {
+      "id": "g-quinta",
+      "nome": "Pelada de Quinta",
+      "slug": "pelada-de-quinta",
+      "diaSemana": "quinta",
+      "frequencia": "semanal",
+      "horario": "20:00"
+    },
+    {
+      "id": "g-domingo",
+      "nome": "Racha de Domingo",
+      "slug": "racha-de-domingo",
+      "diaSemana": "domingo",
+      "frequencia": "quinzenal",
+      "horario": "09:00"
+    }
+  ],
+  "arquivados": []
+}

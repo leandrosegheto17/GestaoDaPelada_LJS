@@ -1,0 +1,46 @@
+{
+  "_leia": "Dados de exemplo do mockup (fictícios). Todas as telas e respostas/*.json usam estes valores. 'hoje' = 2026-10-22 (quinta, depois do jogo). Pesos: até 31/08 todos 1 (expulso −1); desde 01/09 presença com chuva = 2. Ordem do ranking sempre pelo acumulado de hoje (P-26).",
+  "hoje": "2026-10-22",
+  "grupos": [
+    { "id": "g-quinta", "nome": "Pelada de Quinta", "slug": "pelada-de-quinta", "dia": "quinta", "frequencia": "semanal", "horario": "20:00", "criadoEm": "2026-02-05", "admins": ["Leandro (financeiro)", "Marquinhos"] },
+    { "id": "g-domingo", "nome": "Racha de Domingo", "slug": "racha-de-domingo", "dia": "domingo", "frequencia": "quinzenal", "horario": "09:00", "criadoEm": "2026-06-14", "admins": ["Carlos", "Leandro (sem financeiro)"], "jogadores": 0 },
+    { "id": "g-sabado", "nome": "Racha de Sábado", "slug": "racha-de-sabado", "admins": ["Carlos"], "criadoNoMockup": true },
+    { "id": "g-firma", "nome": "Futebol da Firma", "slug": "futebol-da-firma", "arquivadoEm": "2026-10-22" }
+  ],
+  "contas": [
+    { "nome": "Leandro", "email": "leandro@exemplo.com.br", "dono": true },
+    { "nome": "Marquinhos", "email": "marquinhos@exemplo.com.br" },
+    { "nome": "Carlos", "email": "carlos.racha@exemplo.com.br" },
+    { "nome": "Rodrigo", "email": "rodrigo@exemplo.com.br", "senhaTemporaria": "Hx7nRq4tWp2m" },
+    { "nome": "Paulo", "email": "paulo@exemplo.com.br" }
+  ],
+  "partidas": [
+    { "data": "2026-10-01", "choveu": false, "presentes": 13, "lesionados": 0, "expulsos": 0 },
+    { "data": "2026-10-08", "choveu": true, "presentes": 12, "lesionados": 1, "expulsos": 0 },
+    { "data": "2026-10-15", "choveu": false, "presentes": 15, "lesionados": 0, "expulsos": 1 },
+    { "data": "2026-10-22", "lancada": false, "escalacaoConfirmada": true }
+  ],
+  "jogadores": [
+    { "apelido": "Toninho", "ano": 1978, "posicao": "Atacante", "nivel": 6.8, "ptsInicialOut": 27, "ptsHoje": 31, "entrada": "2026-02-05" },
+    { "apelido": "Bigode", "ano": 1974, "posicao": "Zagueiro", "nivel": 6.9, "ptsInicialOut": 26, "ptsHoje": 30 },
+    { "apelido": "Careca", "ano": 1979, "posicao": "Meia", "nivel": 6.4, "ptsInicialOut": 27, "ptsHoje": 30 },
+    { "apelido": "Juninho", "ano": 1992, "posicao": "Meia", "nivel": 7.2, "ptsInicialOut": 27, "ptsHoje": 29 },
+    { "apelido": "Marcão", "ano": 1981, "posicao": "Zagueiro", "nivel": 6.6, "ptsInicialOut": 26, "ptsHoje": 28 },
+    { "apelido": "Paulinho", "ano": 1969, "posicao": "Goleiro", "nivel": 6.5, "ptsInicialOut": 24, "ptsHoje": 27 },
+    { "apelido": "Zé Carlos", "ano": 1988, "posicao": "Zagueiro", "nivel": 6.0, "ptsInicialOut": 24, "ptsHoje": 27 },
+    { "apelido": "Dudu", "ano": 1995, "posicao": "Atacante", "nivel": 6.0, "ptsInicialOut": 22, "ptsHoje": 26 },
+    { "apelido": "Gordo", "ano": 1983, "posicao": "Goleiro", "nivel": 5.6, "ptsInicialOut": 20, "ptsHoje": 24 },
+    { "apelido": "Tiago", "ano": 1990, "posicao": "Meia", "nivel": 6.2, "ptsInicialOut": 20, "ptsHoje": 24 },
+    { "apelido": "Neném", "ano": 1986, "posicao": "Atacante", "nivel": 5.9, "ptsInicialOut": 22, "ptsHoje": 23 },
+    { "apelido": "Rafinha", "ano": 1997, "posicao": "Meia", "nivel": 7.0, "ptsInicialOut": 19, "ptsHoje": 22 },
+    { "apelido": "Alemão", "ano": 1984, "posicao": "Zagueiro", "nivel": 6.1, "ptsInicialOut": 19, "ptsHoje": 21 },
+    { "apelido": "Pedrão", "ano": 1980, "posicao": "Zagueiro", "nivel": 5.7, "ptsInicialOut": 16, "ptsHoje": 19 },
+    { "apelido": "Cabeça", "ano": 1989, "posicao": "Atacante", "nivel": 5.8, "ptsInicialOut": 17, "ptsHoje": 18 },
+    { "apelido": "Vini", "ano": 1999, "posicao": "Atacante", "nivel": 6.7, "ptsInicialOut": 14, "ptsHoje": 17 },
+    { "apelido": "Japa", "ano": 1993, "posicao": "Meia", "nivel": 6.3, "ptsInicialOut": 14, "ptsHoje": 15 },
+    { "apelido": "Fumaça", "ano": 1987, "posicao": "Zagueiro", "nivel": 5.2, "ptsInicialOut": 11, "ptsHoje": 12 },
+    { "apelido": "Léo Baiano", "ano": 1991, "posicao": "Meia", "nivel": null, "semNota": true, "ptsInicialOut": 0, "ptsHoje": 3, "entrada": "2026-10-05" },
+    { "apelido": "Serginho", "ano": 2001, "posicao": "Atacante", "nivel": null, "semNota": true, "ptsInicialOut": 0, "ptsHoje": 1, "entrada": "2026-10-12" }
+  ],
+  "financeiro": { "mensalidade": "R$ 75,00", "saldoAtual": "R$ 1.245,50", "outubro": { "entradas": "R$ 1.200,00", "saidas": "R$ 900,00", "resultado": "R$ 300,00", "naoPagaram": ["Fumaça", "Japa", "Neném", "Serginho"] } }
+}

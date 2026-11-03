@@ -1,0 +1,19 @@
+{
+  "grupo": { "id": "g-domingo", "nome": "Racha de Domingo", "slug": "racha-de-domingo", "urlPublica": "https://pelada.gestaodapelada.workers.dev/g/racha-de-domingo", "diaSemana": "domingo", "frequencia": "quinzenal", "horario": "09:00" },
+  "permissoes": { "acessaFinanceiro": false },
+  "hoje": "2026-10-22",
+  "inicio": {
+    "dataSugeridaPartida": "2026-10-18",
+    "partidaNaDataSugerida": false,
+    "proximoDiaDeJogo": "2026-10-25",
+    "escalacaoConfirmadaPara": null,
+    "partidasNoMes": 0,
+    "jogadoresAtivos": 0,
+    "habilidades": 6,
+    "pesosVigentesDesde": "2026-06-14",
+    "pesosPadrao": true,
+    "admins": 2,
+    "aparelhosNaSemana": 0,
+    "saldoAtualCentavos": null
+  }
+}

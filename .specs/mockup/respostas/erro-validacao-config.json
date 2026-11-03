@@ -1,0 +1,1 @@
+{ "erro": { "codigo": "validacao", "mensagem": "Corrija os campos indicados.", "campos": { "saldoInicialCentavos": "Informe um valor em reais, ex.: 350,00." } } }

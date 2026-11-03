@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Corrigir datas de Gil (prévia)</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<!-- Diálogo "Corrigir datas" do período aberto: retorno de 20/10 para 12/10, prévia pronta (respostas/periodo-previa-retorno.json). Recorte em .dialogo. -->
+<header class="barra barra--admin" aria-hidden="true"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span></div></header>
+<div class="veu">
+  <section class="dialogo" role="dialog" aria-modal="true" aria-labelledby="co-t">
+    <h2 id="co-t" class="dialogo__titulo">Corrigir datas</h2>
+    <p class="dialogo__texto">Retorno de Gil: 20/10/2026 <span aria-hidden="true">→</span><span class="sr">até</span> atual.</p>
+    <div class="campo"><label class="campo__rotulo" for="retorno">Data de retorno</label><input class="campo__entrada" id="retorno" type="date" max="2026-10-22" value="2026-10-12" aria-describedby="co-ajuda"><p class="campo__ajuda" id="co-ajuda">Ele volta a aparecer nas partidas a partir desta data. Não pode ser antes da saída anterior (05/10/2026).</p></div>
+    <div aria-live="polite">
+      <p class="paragrafo">Acumulado de 18 pontos não muda. Posição 15, não muda.</p>
+      <p class="paragrafo">1 rodada passa a constar: 15/10.</p>
+      <div class="faixa faixa--atencao"><svg class="icone" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><p class="faixa__texto">Ela vale 0 ponto até você lançar a presença em Editar partida.</p></div>
+    </div>
+    <div class="dialogo__acoes"><button class="botao botao--secundario" type="button">Cancelar</button><button class="botao botao--principal" type="button">Confirmar novas datas</button></div>
+  </section>
+</div>
+</body>
+</html>

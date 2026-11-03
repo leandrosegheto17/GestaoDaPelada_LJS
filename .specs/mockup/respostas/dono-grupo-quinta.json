@@ -1,0 +1,6 @@
+{
+  "id": "g-quinta", "nome": "Pelada de Quinta", "slug": "pelada-de-quinta", "urlPublica": "https://pelada.gestaodapelada.workers.dev/g/pelada-de-quinta",
+  "diaSemana": "quinta", "frequencia": "semanal", "horario": "20:00",
+  "situacaoComercial": "uso_proprio", "inicioTrial": null, "criadoEm": "2026-02-05", "arquivadoEm": null,
+  "admins": [ { "contaId": "c-leandro", "nome": "Leandro", "email": "leandro@exemplo.com.br" }, { "contaId": "c-marquinhos", "nome": "Marquinhos", "email": "marquinhos@exemplo.com.br" } ]
+}

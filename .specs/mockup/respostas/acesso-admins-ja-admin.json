@@ -1,0 +1,23 @@
+{
+  "admins": [
+    {
+      "id": "c-leandro",
+      "nome": "Leandro",
+      "email": "leandro@exemplo.com.br",
+      "acessaFinanceiro": true
+    },
+    {
+      "id": "c-marq",
+      "nome": "Marquinhos",
+      "email": "marquinhos@exemplo.com.br",
+      "acessaFinanceiro": false
+    }
+  ],
+  "convites": [
+    {
+      "id": "cv-rodrigo",
+      "email": "rodrigo@exemplo.com.br",
+      "expiraEm": "2026-11-03T12:00:00.000Z"
+    }
+  ]
+}

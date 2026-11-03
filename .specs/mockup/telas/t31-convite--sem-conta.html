@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Convite (criar conta)</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<!-- ACE-34: e-mail travado; a conta nasce confirmada e com o vínculo. -->
+<header class="barra"><p class="barra__titulo">Gestão da Pelada</p></header>
+<main class="conteudo conteudo--estreito">
+  <h1 class="titulo-pagina">Convite</h1>
+  <p class="paragrafo">Você foi convidado para administrar o grupo <strong>Pelada de Quinta</strong>.</p>
+  <p class="paragrafo">Crie sua conta para aceitar. O e-mail já está confirmado pelo convite.</p>
+  <form class="formulario" novalidate>
+    <div class="campo"><label class="campo__rotulo" for="nome">Seu nome</label><input class="campo__entrada" id="nome" autocomplete="name"></div>
+    <div class="campo"><label class="campo__rotulo" for="email">E-mail</label><input class="campo__entrada" id="email" type="email" autocomplete="username" inputmode="email" value="rodrigo@exemplo.com.br" aria-describedby="email-ajuda" readonly aria-readonly="true"><p class="campo__ajuda" id="email-ajuda">O convite foi enviado para este e-mail.</p></div>
+    <div class="campo"><label class="campo__rotulo" for="senha">Senha</label><input class="campo__entrada" id="senha" type="password" autocomplete="new-password" aria-describedby="senha-ajuda"><p class="campo__ajuda" id="senha-ajuda">De 8 a 72 caracteres.</p></div>
+    <div class="campo"><label class="caixa"><input type="checkbox" id="termos"><span>Li e aceito os <a href="t33-termos--pagina.html">termos de uso</a> e a <a href="t07-privacidade--pagina.html">política de privacidade</a></span></label></div>
+    <button class="botao botao--principal botao--bloco" type="submit">Criar conta e aceitar</button>
+  </form>
+  <p class="paragrafo acima-4">Já tem conta com este e-mail? <a href="t04-entrar--vazio.html">Entrar</a></p>
+</main>
+</body>
+</html>

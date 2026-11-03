@@ -1,0 +1,6 @@
+{
+  "periodos": [
+    { "id": "p-beto-1", "tipo": "entrada", "inicio": "2026-02-05", "fim": "2026-10-05", "corrigivel": { "saida": true, "retorno": false } },
+    { "id": "p-beto-2", "tipo": "retorno", "inicio": "2026-10-07", "fim": null, "corrigivel": { "saida": false, "retorno": true } }
+  ]
+}

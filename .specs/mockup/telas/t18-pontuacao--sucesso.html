@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pontuação</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+<header class="barra barra--admin"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span><a class="barra__link" href="t08-grupos--sucesso.html">Trocar grupo</a></div></header>
+<main id="conteudo" class="conteudo conteudo--admin conteudo--estreito">
+  <a class="voltar" href="t09-inicio--sucesso.html"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 18 9 12 15 6"/></svg>Início</a>
+  <h1 class="titulo-pagina">Pontuação</h1>
+  <section class="cartao" aria-labelledby="vig">
+    <h2 id="vig" class="subtitulo sem-topo">Vigente desde 01/09/2026</h2>
+    <table class="tabela-simples"><caption class="sr">Pesos vigentes</caption><thead><tr><th scope="col">Situação</th><th scope="col">Pontos</th></tr></thead><tbody>
+      <tr><th scope="row">Presença sem chuva</th><td>1</td></tr>
+      <tr><th scope="row">Presença com chuva</th><td>2</td></tr>
+      <tr><th scope="row">Lesionado sem chuva</th><td>1</td></tr>
+      <tr><th scope="row">Lesionado com chuva</th><td>1</td></tr>
+      <tr><th scope="row">Expulso sem chuva</th><td>−1</td></tr>
+      <tr><th scope="row">Expulso com chuva</th><td>−1</td></tr>
+    </tbody></table>
+  </section>
+  <section class="secao" aria-labelledby="nova">
+    <h2 id="nova" class="subtitulo">Nova configuração (vale a partir de hoje)</h2>
+    <form class="formulario" novalidate>
+      <div class="duas-colunas">
+        <div class="campo"><label class="campo__rotulo" for="p1">Presença sem chuva</label><input class="campo__entrada" id="p1" type="number" min="-10" max="10" step="1" value="1" inputmode="numeric"></div>
+        <div class="campo"><label class="campo__rotulo" for="p2">Presença com chuva</label><input class="campo__entrada" id="p2" type="number" min="-10" max="10" step="1" value="2" inputmode="numeric"></div>
+        <div class="campo"><label class="campo__rotulo" for="p3">Lesionado sem chuva</label><input class="campo__entrada" id="p3" type="number" min="-10" max="10" step="1" value="1" inputmode="numeric"></div>
+        <div class="campo"><label class="campo__rotulo" for="p4">Lesionado com chuva</label><input class="campo__entrada" id="p4" type="number" min="-10" max="10" step="1" value="1" inputmode="numeric"></div>
+        <div class="campo"><label class="campo__rotulo" for="p5">Expulso sem chuva</label><input class="campo__entrada" id="p5" type="number" min="-10" max="10" step="1" value="-1" inputmode="numeric"></div>
+        <div class="campo"><label class="campo__rotulo" for="p6">Expulso com chuva</label><input class="campo__entrada" id="p6" type="number" min="-10" max="10" step="1" value="-1" inputmode="numeric"></div>
+      </div>
+      <p class="campo__ajuda">Inteiros de −10 a 10. Partidas anteriores a hoje não mudam.</p>
+      <div><button class="botao botao--principal" type="submit">Salvar nova configuração</button></div>
+    </form>
+  </section>
+  <section class="secao" aria-labelledby="hist">
+    <h2 id="hist" class="subtitulo">Histórico</h2>
+    <ul class="lista"><li class="item"><span class="item__principal"><span class="item__titulo">De 05/02/2026 a 31/08/2026</span><span class="item__meta">1 · 1 · 1 · 1 · −1 · −1 · registrado por Leandro</span></span></li></ul>
+  </section>
+</main>
+</body>
+</html>

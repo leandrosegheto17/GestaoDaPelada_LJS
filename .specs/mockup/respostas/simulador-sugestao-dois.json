@@ -1,0 +1,47 @@
+{
+  "formato": "dois_times",
+  "data": "2026-10-22",
+  "n": 7,
+  "k": 2,
+  "avisos": [ { "tipo": "sem_nota", "texto": "Léo Baiano e Serginho não têm nota: usamos nível 5,5." } ],
+  "ordemPrioridade": ["Toninho", "Bigode", "Careca", "Juninho", "Marcão", "Paulinho", "Zé Carlos", "Dudu", "Gordo", "Tiago", "Neném", "Rafinha", "Alemão", "Pedrão", "Cabeça", "Vini", "Japa", "Léo Baiano", "Serginho"],
+  "times": [
+    {
+      "nome": "Time A",
+      "titulares": [
+        { "id": "j-toninho", "apelido": "Toninho", "so1oTempo": false, "saiNoIntervalo": false, "semNota": false },
+        { "id": "j-careca", "apelido": "Careca", "so1oTempo": false, "saiNoIntervalo": false, "semNota": false },
+        { "id": "j-marcao", "apelido": "Marcão", "so1oTempo": false, "saiNoIntervalo": false, "semNota": false },
+        { "id": "j-ze", "apelido": "Zé Carlos", "so1oTempo": false, "saiNoIntervalo": false, "semNota": false },
+        { "id": "j-gordo", "apelido": "Gordo", "so1oTempo": false, "saiNoIntervalo": false, "semNota": false },
+        { "id": "j-rafinha", "apelido": "Rafinha", "so1oTempo": false, "saiNoIntervalo": true, "semNota": false },
+        { "id": "j-pedrao", "apelido": "Pedrão", "so1oTempo": false, "saiNoIntervalo": true, "semNota": false }
+      ],
+      "entramNo2oTempo": [
+        { "id": "j-cabeca", "apelido": "Cabeça", "so1oTempo": false, "semNota": false },
+        { "id": "j-japa", "apelido": "Japa", "so1oTempo": false, "semNota": false }
+      ],
+      "trocas": [ { "sai": "Pedrão", "entra": "Cabeça" }, { "sai": "Rafinha", "entra": "Japa" } ],
+      "indicadores": { "nivelSoma1oTempo": 44.1, "nivelMedio1oTempo": 6.3, "nivelSoma2oTempo": 43.5, "nivelMedio2oTempo": 6.2, "idadeMedia": 42.3, "substituicoes": 2 }
+    },
+    {
+      "nome": "Time B",
+      "titulares": [
+        { "id": "j-bigode", "apelido": "Bigode", "so1oTempo": false, "saiNoIntervalo": false, "semNota": false },
+        { "id": "j-juninho", "apelido": "Juninho", "so1oTempo": true, "saiNoIntervalo": true, "semNota": false },
+        { "id": "j-paulinho", "apelido": "Paulinho", "so1oTempo": false, "saiNoIntervalo": false, "semNota": false },
+        { "id": "j-dudu", "apelido": "Dudu", "so1oTempo": false, "saiNoIntervalo": false, "semNota": false },
+        { "id": "j-tiago", "apelido": "Tiago", "so1oTempo": false, "saiNoIntervalo": false, "semNota": false },
+        { "id": "j-nenem", "apelido": "Neném", "so1oTempo": false, "saiNoIntervalo": false, "semNota": false },
+        { "id": "j-alemao", "apelido": "Alemão", "so1oTempo": false, "saiNoIntervalo": true, "semNota": false }
+      ],
+      "entramNo2oTempo": [
+        { "id": "j-vini", "apelido": "Vini", "so1oTempo": false, "semNota": false },
+        { "id": "j-leo", "apelido": "Léo Baiano", "so1oTempo": false, "semNota": true }
+      ],
+      "trocas": [ { "sai": "Juninho", "entra": "Vini" }, { "sai": "Alemão", "entra": "Léo Baiano" } ],
+      "indicadores": { "nivelSoma1oTempo": 44.8, "nivelMedio1oTempo": 6.4, "nivelSoma2oTempo": 43.7, "nivelMedio2oTempo": 6.2, "idadeMedia": 41.7, "substituicoes": 2 }
+    }
+  ],
+  "naoEntra": [ { "id": "j-serginho", "apelido": "Serginho", "semNota": true } ]
+}

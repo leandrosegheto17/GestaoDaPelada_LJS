@@ -1,0 +1,1 @@
+{ "erro": { "codigo": "validacao", "mensagem": "Corrija os campos indicados.", "campos": { "nome": "O nome precisa ter de 3 a 60 caracteres.", "horario": "Informe o horário.", "adminEmail": "Informe um e-mail válido." } } }

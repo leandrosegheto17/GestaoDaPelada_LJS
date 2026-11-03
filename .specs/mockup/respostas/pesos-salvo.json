@@ -1,0 +1,8 @@
+{
+  "hoje": "2026-10-22",
+  "vigente": { "vigenteDesde": "2026-10-22", "registradoPor": "Leandro", "presencaSemChuva": 1, "presencaComChuva": 2, "lesionadoSemChuva": 1, "lesionadoComChuva": 2, "expulsoSemChuva": -1, "expulsoComChuva": -1 },
+  "historico": [
+    { "vigenteDesde": "2026-09-01", "vigenteAte": "2026-10-21", "registradoPor": "Leandro", "presencaSemChuva": 1, "presencaComChuva": 2, "lesionadoSemChuva": 1, "lesionadoComChuva": 1, "expulsoSemChuva": -1, "expulsoComChuva": -1 },
+    { "vigenteDesde": "2026-02-05", "vigenteAte": "2026-08-31", "registradoPor": "Leandro", "presencaSemChuva": 1, "presencaComChuva": 1, "lesionadoSemChuva": 1, "lesionadoComChuva": 1, "expulsoSemChuva": -1, "expulsoComChuva": -1 }
+  ]
+}

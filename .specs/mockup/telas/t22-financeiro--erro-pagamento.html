@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Financeiro (falha ao marcar pagamento)</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<!-- O interruptor de Fumaça voltou para "Não pagou" e a faixa explica. Recorte em .faixa--erro. Lista reduzida. -->
+<header class="barra barra--admin"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span><a class="barra__link" href="t08-grupos--sucesso.html">Trocar grupo</a></div></header>
+<main class="conteudo conteudo--admin">
+  <h1 class="titulo-pagina">Financeiro</h1>
+  <div class="faixa faixa--erro" role="alert"><svg class="icone" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><p class="faixa__texto">Não foi possível marcar o pagamento de Fumaça. Tente de novo.</p></div>
+  <ul class="lista">
+    <li class="item"><span class="item__principal item__titulo">Dudu</span><label class="interruptor"><input type="checkbox" role="switch" checked aria-label="Pagou: Dudu"><span class="interruptor__trilho" aria-hidden="true"></span><span class="interruptor__estado" aria-hidden="true">Pagou</span></label></li>
+    <li class="item"><span class="item__principal item__titulo">Fumaça</span><label class="interruptor"><input type="checkbox" role="switch" aria-label="Pagou: Fumaça"><span class="interruptor__trilho" aria-hidden="true"></span><span class="interruptor__estado" aria-hidden="true">Não pagou</span></label></li>
+    <li class="item"><span class="item__principal item__titulo">Gordo</span><label class="interruptor"><input type="checkbox" role="switch" checked aria-label="Pagou: Gordo"><span class="interruptor__trilho" aria-hidden="true"></span><span class="interruptor__estado" aria-hidden="true">Pagou</span></label></li>
+  </ul>
+</main>
+</body>
+</html>

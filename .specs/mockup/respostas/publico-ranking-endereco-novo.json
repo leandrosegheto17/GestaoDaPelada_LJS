@@ -1,0 +1,21 @@
+{
+  "grupo": { "nome": "Pelada de Quinta", "slug": "pelada-de-quinta", "diaSemana": "quinta", "frequencia": "semanal", "horario": "20:00" },
+  "mes": "2026-10",
+  "hoje": "2026-10-22",
+  "geradoEm": "2026-10-22T21:40:00Z",
+  "enderecoNovo": "https://gestaodapelada.com.br",
+  "navegacao": { "mesAnterior": "2026-09", "mesSeguinte": null },
+  "resumoMes": { "partidas": 3, "comChuva": 1 },
+  "partidas": [
+    { "data": "2026-10-01", "choveu": false },
+    { "data": "2026-10-08", "choveu": true },
+    { "data": "2026-10-15", "choveu": false }
+  ],
+  "linhas": [
+    { "posicao": 1, "apelido": "Toninho", "ptsInicial": 27, "ptsFinal": 31, "rodadas": [{ "situacao": "presente", "pontos": 1 }, { "situacao": "presente", "pontos": 2 }, { "situacao": "presente", "pontos": 1 }] },
+    { "posicao": 2, "apelido": "Bigode", "ptsInicial": 26, "ptsFinal": 30, "rodadas": [{ "situacao": "presente", "pontos": 1 }, { "situacao": "presente", "pontos": 2 }, { "situacao": "presente", "pontos": 1 }] },
+    { "posicao": 3, "apelido": "Careca", "ptsInicial": 27, "ptsFinal": 30, "rodadas": [{ "situacao": "presente", "pontos": 1 }, { "situacao": "lesionado", "pontos": 1 }, { "situacao": "presente", "pontos": 1 }] },
+    { "posicao": 4, "apelido": "Juninho", "ptsInicial": 27, "ptsFinal": 29, "rodadas": [{ "situacao": "presente", "pontos": 1 }, { "situacao": "falta", "pontos": 0 }, { "situacao": "presente", "pontos": 1 }] },
+    { "posicao": 5, "apelido": "Marcão", "ptsInicial": 26, "ptsFinal": 28, "rodadas": [{ "situacao": "presente", "pontos": 1 }, { "situacao": "presente", "pontos": 2 }, { "situacao": "expulso", "pontos": -1 }] }
+  ]
+}

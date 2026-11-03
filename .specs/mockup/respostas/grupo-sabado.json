@@ -1,0 +1,19 @@
+{
+  "grupo": { "id": "g-sabado", "nome": "Racha de Sábado", "slug": "racha-de-sabado", "urlPublica": "https://pelada.gestaodapelada.workers.dev/g/racha-de-sabado", "diaSemana": "sabado", "frequencia": "semanal", "horario": "16:00" },
+  "permissoes": { "acessaFinanceiro": true },
+  "hoje": "2026-10-22",
+  "inicio": {
+    "dataSugeridaPartida": "2026-10-24",
+    "partidaNaDataSugerida": false,
+    "proximoDiaDeJogo": "2026-10-24",
+    "escalacaoConfirmadaPara": null,
+    "partidasNoMes": 0,
+    "jogadoresAtivos": 0,
+    "habilidades": 6,
+    "pesosVigentesDesde": "2026-06-14",
+    "pesosPadrao": true,
+    "admins": 1,
+    "aparelhosNaSemana": 0,
+    "saldoAtualCentavos": null
+  }
+}

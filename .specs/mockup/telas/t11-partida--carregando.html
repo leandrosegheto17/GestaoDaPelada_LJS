@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lançar partida (carregando jogadores da data)</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<!-- Ao trocar a data, a lista de ativos na data é recarregada pela API. -->
+<header class="barra barra--admin"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span><a class="barra__link" href="t08-grupos--sucesso.html">Trocar grupo</a></div></header>
+<main class="conteudo conteudo--admin">
+  <a class="voltar" href="t09-inicio--sucesso.html"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 18 9 12 15 6"/></svg>Início</a>
+  <h1 class="titulo-pagina">Lançar partida</h1>
+  <div class="duas-colunas">
+    <div class="campo"><label class="campo__rotulo" for="data">Data</label><input class="campo__entrada" id="data" type="date" value="2026-09-24" max="2026-10-22"></div>
+    <label class="interruptor"><span>Choveu?</span><input type="checkbox" role="switch"><span class="interruptor__trilho" aria-hidden="true"></span><span class="interruptor__estado" aria-hidden="true">Não</span></label>
+  </div>
+  <p class="sr" role="status">Carregando os jogadores ativos em 24/09…</p>
+  <div class="lista-situacao" aria-hidden="true"><span class="esqueleto esqueleto--bloco"></span><span class="esqueleto esqueleto--bloco"></span><span class="esqueleto esqueleto--bloco"></span><span class="esqueleto esqueleto--bloco"></span><span class="esqueleto esqueleto--bloco"></span><span class="esqueleto esqueleto--bloco"></span></div>
+  <div class="barra-acao"><button class="botao botao--principal" type="button" disabled>Salvar partida</button></div>
+</main>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "conta": { "id": "c-marquinhos", "nome": "Marquinhos", "email": "marquinhos@exemplo.com.br", "eDono": false },
+  "escopo": "completo",
+  "avisoPrivacidadeVisto": false,
+  "enderecoNovo": null,
+  "grupos": [
+    { "id": "g-quinta", "nome": "Pelada de Quinta", "slug": "pelada-de-quinta", "diaSemana": "quinta", "frequencia": "semanal", "horario": "20:00", "acessaFinanceiro": false }
+  ]
+}

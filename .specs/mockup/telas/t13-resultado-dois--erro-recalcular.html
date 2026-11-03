@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Times sugeridos (falha ao recalcular)</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+</head>
+<body>
+<!-- Falha em simulador/avaliar depois de um ajuste: o movimento fica; os indicadores dão lugar ao erro. Recorte em .faixa--erro. -->
+<header class="barra barra--admin"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span><a class="barra__link" href="t08-grupos--sucesso.html">Trocar grupo</a></div></header>
+<main class="conteudo conteudo--admin">
+  <h1 class="titulo-pagina">Times sugeridos</h1>
+  <div class="faixa faixa--erro" role="alert"><svg class="icone" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg><p class="faixa__texto">Não foi possível recalcular.</p><button class="botao botao--texto" type="button">Tentar de novo</button></div>
+  <div class="times times--dois">
+    <section class="cartao-time" aria-labelledby="ta"><h2 id="ta" class="cartao-time__titulo">Time A</h2><h3 class="cartao-time__grupo">Entram no 2º tempo</h3><ul class="jogadores-time"><li><button class="jogador-time" type="button"><span>Cabeça</span></button></li></ul></section>
+    <section class="cartao-time cartao-time--b" aria-labelledby="tb"><h2 id="tb" class="cartao-time__titulo">Time B</h2><h3 class="cartao-time__grupo">Entram no 2º tempo</h3><ul class="jogadores-time"><li><button class="jogador-time" type="button"><span>Vini</span></button></li><li><button class="jogador-time" type="button"><span>Léo Baiano</span></button></li><li><button class="jogador-time jogador-time--movido" type="button"><span>Japa</span><span class="jogador-time__selos"><span class="selo selo--info">movido</span></span></button></li></ul></section>
+  </div>
+  <div class="barra-acao"><div class="grupo-botoes"><button class="botao botao--principal" type="button" disabled>Confirmar escalação</button><button class="botao botao--secundario" type="button">Refazer sugestão</button><button class="botao botao--texto" type="button">Editar entradas</button></div></div>
+</main>
+</body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "conta": { "id": "c-leandro", "nome": "Leandro", "email": "leandro@exemplo.com.br", "eDono": true },
+  "escopo": "completo",
+  "avisoPrivacidadeVisto": true,
+  "enderecoNovo": null,
+  "grupos": [
+    { "id": "g-quinta", "nome": "Pelada de Quinta", "slug": "pelada-de-quinta", "diaSemana": "quinta", "frequencia": "semanal", "horario": "20:00", "acessaFinanceiro": true },
+    { "id": "g-domingo", "nome": "Racha de Domingo", "slug": "racha-de-domingo", "diaSemana": "domingo", "frequencia": "quinzenal", "horario": "09:00", "acessaFinanceiro": false }
+  ]
+}
