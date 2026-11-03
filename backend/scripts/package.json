@@ -11,7 +11,9 @@
     "test": "vitest run",
     "restaurar": "node ops/restaurar-backup.ts",
     "migrar": "node --env-file-if-exists=../../.env src/migrar.ts",
-    "esquema:gerar": "node --env-file-if-exists=../../.env src/esquema-gerar.ts"
+    "esquema:gerar": "node --env-file-if-exists=../../.env src/esquema-gerar.ts",
+    "test:checagens": "vitest run checagens",
+    "checar:migracoes": "node checagens/migracao-aditiva.ts"
   },
   "dependencies": {
     "pg": "^8.23.1",
