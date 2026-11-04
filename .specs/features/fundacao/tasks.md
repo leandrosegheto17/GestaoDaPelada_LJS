@@ -1793,10 +1793,10 @@ Gate: python .claude/scripts/trava-testes.py --rodar (typecheck, vitest, checage
 
 **Done when**:
 
-- [ ] Teste `FUN-38`: duas imagens idênticas dão 0% de diferença e passam
-- [ ] Teste `FUN-38`: diferença de 2% reprova e de 0,5% passa
-- [ ] Teste `FUN-38`: imagens de tamanhos diferentes reprovam com mensagem clara
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-38`: duas imagens idênticas dão 0% de diferença e passam
+- [x] Teste `FUN-38`: diferença de 2% reprova e de 0,5% passa
+- [x] Teste `FUN-38`: imagens de tamanhos diferentes reprovam com mensagem clara
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1817,10 +1817,10 @@ Gate: python .claude/scripts/trava-testes.py --rodar (typecheck, vitest, checage
 
 **Done when**:
 
-- [ ] Teste `FUN-38`: as 3 telas × 2 viewports ficam em até 1% de pixels diferentes
-- [ ] Um componente deformado de propósito faz a comparação falhar (conferido uma vez e revertido)
-- [ ] `testes.json` atualizado e `trava-testes.py --rodar` verde
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-38`: as 3 telas × 2 viewports ficam em até 1% de pixels diferentes
+- [x] Um componente deformado de propósito faz a comparação falhar (conferido uma vez e revertido)
+- [x] `testes.json` atualizado e `trava-testes.py --rodar` verde
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1841,15 +1841,17 @@ Gate: python .claude/scripts/trava-testes.py --rodar (typecheck, vitest, checage
 
 **Done when**:
 
-- [ ] Teste e2e `FUN-04`: com `pnpm dev` no ar, `GET http://localhost:5173/api/health` responde 200 pelo proxy
-- [ ] Teste `FUN-04`: com o Postgres parado, `pnpm dev` sai com a mensagem de `docker compose up -d` (FUN-55)
-- [ ] `localConnectionString` não contém senha no arquivo versionado: vem do `.env`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste e2e `FUN-04`: com `pnpm dev` no ar, `GET http://localhost:5173/api/health` responde 200 pelo proxy
+- [x] Teste `FUN-04`: com o Postgres parado, `pnpm dev` sai com a mensagem de `docker compose up -d` (FUN-55)
+- [x] `localConnectionString` não contém senha no arquivo versionado: vem do `.env`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
 
 ---
+
+Gate: python .claude/scripts/trava-testes.py --rodar (typecheck, vitest, checagens, build, playwright e visual) @ 5678fbd61f0dc168a8b89a35baeeffabb7cdf708 = SUÍTE VERDE, e2e 9 testes, visual 6 comparações até 0,26%
 
 #### Phase 19: Checagens e segredos
 
