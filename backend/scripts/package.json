@@ -13,7 +13,8 @@
     "migrar": "node --env-file-if-exists=../../.env src/migrar.ts",
     "esquema:gerar": "node --env-file-if-exists=../../.env src/esquema-gerar.ts",
     "test:checagens": "vitest run checagens && node checagens/migracao-aditiva.ts",
-    "migracao:nova": "node src/migracao-nova.ts"
+    "migracao:nova": "node src/migracao-nova.ts",
+    "seed": "node --env-file-if-exists=../../.env src/seed.ts"
   },
   "dependencies": {
     "pg": "^8.23.1",
