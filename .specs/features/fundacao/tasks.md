@@ -1200,10 +1200,10 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-16`: requisição que não consulta o banco não abre conexão
-- [ ] Teste `FUN-16`: depois da resposta, a conexão fecha (`pg_stat_activity` sem a sessão)
-- [ ] Teste `FUN-16`: erro de conexão vira 503 sem vazar a URL
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-16`: requisição que não consulta o banco não abre conexão
+- [x] Teste `FUN-16`: depois da resposta, a conexão fecha (`pg_stat_activity` sem a sessão)
+- [x] Teste `FUN-16`: erro de conexão vira 503 sem vazar a URL
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1224,11 +1224,11 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Casos limite e estados listados antes do código: GET e HEAD somente leitura; POST commit; status 4xx e 5xx rollback; exceção rollback; duas requisições simultâneas de contas diferentes; requisição sem contexto
-- [ ] Teste `FUN-16`: o `SET LOCAL` ocorre antes da primeira consulta da rota
-- [ ] Teste `FUN-16`: duas requisições concorrentes (conta A e conta B) nunca enxergam o contexto uma da outra, em 100 repetições
-- [ ] Teste `FUN-16`: escrita numa rota GET falha; erro 500 desfaz a escrita
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados antes do código: GET e HEAD somente leitura; POST commit; status 4xx e 5xx rollback; exceção rollback; duas requisições simultâneas de contas diferentes; requisição sem contexto
+- [x] Teste `FUN-16`: o `SET LOCAL` ocorre antes da primeira consulta da rota
+- [x] Teste `FUN-16`: duas requisições concorrentes (conta A e conta B) nunca enxergam o contexto uma da outra, em 100 repetições
+- [x] Teste `FUN-16`: escrita numa rota GET falha; erro 500 desfaz a escrita
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1249,9 +1249,9 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-18`: JSON com `caching.disabled: true` passa; ausente ou `false` reprova com mensagem clara
-- [ ] Teste `FUN-18`: JSON inválido reprova, sem lançar erro sem tratamento
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-18`: JSON com `caching.disabled: true` passa; ausente ou `false` reprova com mensagem clara
+- [x] Teste `FUN-18`: JSON inválido reprova, sem lançar erro sem tratamento
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1272,13 +1272,14 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-23`: arquivo de exemplo com `ljssoftware.com.br` reprova; em `docs/` passa
-- [ ] Teste `FUN-23`: um `workers.dev` em um `.ts` reprova
-- [ ] A checagem roda na base atual e passa
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-23`: arquivo de exemplo com `ljssoftware.com.br` reprova; em `docs/` passa
+- [x] Teste `FUN-23`: um `workers.dev` em um `.ts` reprova
+- [x] A checagem roda na base atual e passa
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
+**Gate (Lote 10)**: docker compose up -d --wait && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:checagens @ 04985b7693b5ab6f762314d1fb78d74a5de780f3 = verde
 
 ---
 
