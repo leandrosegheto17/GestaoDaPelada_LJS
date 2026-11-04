@@ -1448,10 +1448,10 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-31`: renderiza com e sem título e entrega a landmark `main`
-- [ ] Teste `FUN-31`: axe sem violações
-- [ ] CSS Module sem cor, fonte nem sombra literal (Stylelint verde)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-31`: renderiza com e sem título e entrega a landmark `main`
+- [x] Teste `FUN-31`: axe sem violações
+- [x] CSS Module sem cor, fonte nem sombra literal (Stylelint verde)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1472,10 +1472,10 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-31`: cada variante renderiza com a classe esperada e o clique dispara `onClick`
-- [ ] Teste `FUN-31`: `disabled` e `carregando` não disparam o clique
-- [ ] Teste `FUN-31`: axe sem violações
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-31`: cada variante renderiza com a classe esperada e o clique dispara `onClick`
+- [x] Teste `FUN-31`: `disabled` e `carregando` não disparam o clique
+- [x] Teste `FUN-31`: axe sem violações
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1496,10 +1496,10 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-31`: mostra o texto da mensagem e chama `aoTentarDeNovo` ao clicar
-- [ ] Teste `FUN-31`: foco inicial no título ou no botão, conforme o mockup, e axe sem violações
-- [ ] A marcação segue as classes do mockup, conferida lendo `.specs/mockup/telas/padrao--erro-rede.html`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-31`: mostra o texto da mensagem e chama `aoTentarDeNovo` ao clicar
+- [x] Teste `FUN-31`: foco inicial no título ou no botão, conforme o mockup, e axe sem violações
+- [x] A marcação segue as classes do mockup, conferida lendo `.specs/mockup/telas/padrao--erro-rede.html`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1522,9 +1522,9 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-31`: renderiza o número de linhas pedido e `aria-busy="true"`
-- [ ] Teste `FUN-31`: axe sem violações
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-31`: renderiza o número de linhas pedido e `aria-busy="true"`
+- [x] Teste `FUN-31`: axe sem violações
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1545,10 +1545,10 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-36`: com user agent de iPhone e `standalone` falso, o aviso aparece
-- [ ] Teste `FUN-36`: em `standalone`, em Android e no desktop, o aviso não aparece
-- [ ] Teste `FUN-36`: dispensar o aviso grava a escolha e ele não volta; axe sem violações
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-36`: com user agent de iPhone e `standalone` falso, o aviso aparece
+- [x] Teste `FUN-36`: em `standalone`, em Android e no desktop, o aviso não aparece
+- [x] Teste `FUN-36`: dispensar o aviso grava a escolha e ele não volta; axe sem violações
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1569,13 +1569,14 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste: `/` mostra a página provisória e `/qualquer` mostra o 404
-- [ ] Teste `FUN-38`: com `VITE_VITRINE=1`, `/_vitrine/erro-rede`, `/_vitrine/carregando-lista` e `/_vitrine/indisponivel` renderizam; sem a variável, caem no 404
-- [ ] O build de produção não contém as rotas de vitrine (busca no `dist`)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste: `/` mostra a página provisória e `/qualquer` mostra o 404
+- [x] Teste `FUN-38`: com `VITE_VITRINE=1`, `/_vitrine/erro-rede`, `/_vitrine/carregando-lista` e `/_vitrine/indisponivel` renderizam; sem a variável, caem no 404
+- [x] O build de produção não contém as rotas de vitrine (busca no `dist`)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
+**Gate (Lote 13)**: docker compose up -d --wait && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:checagens @ e8f8b1ba27714d6e534859946115ae22386337aa = verde
 
 ---
 
