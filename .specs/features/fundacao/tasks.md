@@ -2100,10 +2100,10 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ 19b860394665c048cbc161d58
 
 **Done when**:
 
-- [ ] Cada procedimento tem comandos exatos e o resultado esperado
-- [ ] Um agente sem contexto consegue seguir o procedimento de restauração (conferido na validação da fase 7)
-- [ ] `pnpm format:check` passa
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Cada procedimento tem comandos exatos e o resultado esperado
+- [x] Um agente sem contexto consegue seguir o procedimento de restauração (conferido na validação da fase 7)
+- [x] `pnpm format:check` passa
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
@@ -2124,10 +2124,10 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ 19b860394665c048cbc161d58
 
 **Done when**:
 
-- [ ] Lista cada secret do environment `previa` e do `producao`, sem valores
-- [ ] O passo de produção traz: desligar o Worker do LJS, dump cifrado e branch de restauração da `main` antes, domínio, Hyperdrive de produção
-- [ ] Descreve o monitor do UptimeRobot em `GET /api/health`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Lista cada secret do environment `previa` e do `producao`, sem valores
+- [x] O passo de produção traz: desligar o Worker do LJS, dump cifrado e branch de restauração da `main` antes, domínio, Hyperdrive de produção
+- [x] Descreve o monitor do UptimeRobot em `GET /api/health`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
@@ -2150,10 +2150,10 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ 19b860394665c048cbc161d58
 
 **Done when**:
 
-- [ ] Os comandos do README levam do clone ao app em `http://localhost:5173` (conferido seguindo-o na validação)
-- [ ] Cada variável do `.env.example` é citada
-- [ ] `pnpm format:check` passa
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Os comandos do README levam do clone ao app em `http://localhost:5173` (conferido seguindo-o na validação)
+- [x] Cada variável do `.env.example` é citada
+- [x] `pnpm format:check` passa
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
@@ -2174,14 +2174,16 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ 19b860394665c048cbc161d58
 
 **Done when**:
 
-- [ ] Descreve stack, comandos, estrutura de pastas, regras de banco (migrações aditivas) e onde ficam as ADs
-- [ ] Não duplica o conteúdo de `.claude/CLAUDE.md`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Descreve stack, comandos, estrutura de pastas, regras de banco (migrações aditivas) e onde ficam as ADs
+- [x] Não duplica o conteúdo de `.claude/CLAUDE.md`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
 
 ---
+
+Gate: python .claude/scripts/trava-testes.py --rodar @ 27be2bb46c018b91ec4296490ef13b7da7dab49c = SUÍTE VERDE; conferências "na validação" (T73 restauração seguida por agente sem contexto; T75 clone ao app) ficam para o /validar
 
 #### Phase 24: Passos do usuário e paridade com a dev
 
