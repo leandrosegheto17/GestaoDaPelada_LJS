@@ -447,10 +447,10 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-03` lê o YAML: um serviço só, imagem `postgres:18`, porta presa em `127.0.0.1`, sem outro serviço
-- [ ] `docker compose up -d --wait` sobe e `psql` consegue `CREATE EXTENSION pgcrypto`
-- [ ] `pnpm --filter @pelada/scripts test` passa
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-03` lê o YAML: um serviço só, imagem `postgres:18`, porta presa em `127.0.0.1`, sem outro serviço
+- [x] `docker compose up -d --wait` sobe e `psql` consegue `CREATE EXTENSION pgcrypto`
+- [x] `pnpm --filter @pelada/scripts test` passa
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -471,10 +471,10 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-19`: `localhost`, `127.0.0.1` e `postgres` passam; um host `*.neon.tech` lança erro sem abrir socket
-- [ ] Teste `FUN-19`: URL malformada lança erro; usuário e senha da URL nunca aparecem na mensagem
-- [ ] `.env.example` lista `DATABASE_URL`, `DATABASE_URL_TESTE`, `DATABASE_URL_MIGRACAO`, `PELADA_APP_SENHA` e `PELADA_BACKUP_RO_SENHA`, sem valores reais
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-19`: `localhost`, `127.0.0.1` e `postgres` passam; um host `*.neon.tech` lança erro sem abrir socket
+- [x] Teste `FUN-19`: URL malformada lança erro; usuário e senha da URL nunca aparecem na mensagem
+- [x] `.env.example` lista `DATABASE_URL`, `DATABASE_URL_TESTE`, `DATABASE_URL_MIGRACAO`, `PELADA_APP_SENHA` e `PELADA_BACKUP_RO_SENHA`, sem valores reais
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -495,10 +495,10 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-55` aponta para uma porta fechada: sai com código 1 e a mensagem cita `docker compose up -d`
-- [ ] Teste `FUN-55` com o Postgres de pé: conecta e fecha sem deixar conexão aberta
-- [ ] `pnpm --filter @pelada/scripts test` passa
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-55` aponta para uma porta fechada: sai com código 1 e a mensagem cita `docker compose up -d`
+- [x] Teste `FUN-55` com o Postgres de pé: conecta e fecha sem deixar conexão aberta
+- [x] `pnpm --filter @pelada/scripts test` passa
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -519,14 +519,15 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-19`: com `DATABASE_URL_TESTE` apontando para um host remoto, `bancoDeTeste()` lança erro e não abre conexão
-- [ ] Teste: cria o banco, grava uma linha, remove, e `pg_database` não tem `teste_*` órfão, mesmo quando o corpo do teste lança erro
-- [ ] `DATABASE_URL_TESTE` tem padrão local no `vitest.config.ts` e está documentada no `.env.example`
-- [ ] `testes.json` atualizado e `trava-testes.py --rodar` verde
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-19`: com `DATABASE_URL_TESTE` apontando para um host remoto, `bancoDeTeste()` lança erro e não abre conexão
+- [x] Teste: cria o banco, grava uma linha, remove, e `pg_database` não tem `teste_*` órfão, mesmo quando o corpo do teste lança erro
+- [x] `DATABASE_URL_TESTE` tem padrão local no `vitest.config.ts` e está documentada no `.env.example`
+- [x] `testes.json` atualizado e `trava-testes.py --rodar` verde
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
+**Gate (Lote 2)**: docker compose up -d --wait && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test @ ad7490985196ecd5a1e5a87a8a7b55fc12dcef78 = verde
 
 ---
 
