@@ -2201,10 +2201,10 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ 27be2bb46c018b91ec4296490
 
 **Done when**:
 
-- [ ] A branch `dev` existe, criada da `main` depois da data de hoje
-- [ ] As três URLs funcionam com `psql -c 'select 1'` (o usuário confirma, sem colar valores)
-- [ ] A chave de API tem o menor escopo possível
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] A branch `dev` existe, criada da `main` depois da data de hoje
+- [x] As três URLs funcionam com `psql -c 'select 1'` (o usuário confirma, sem colar valores)
+- [x] A chave de API tem o menor escopo possível
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
