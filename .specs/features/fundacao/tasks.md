@@ -1997,10 +1997,10 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ f3ca76d7eb120bfe55201204f
 
 **Done when**:
 
-- [ ] Teste `FUN-42` com `fetch` simulado: cria a branch com o pai `main` e o nome do `run_id`
-- [ ] Teste `FUN-42`: com 4 branches de restauração, apaga as 2 mais antigas e nunca apaga `main`, `dev` nem outra que não seja de restauração
-- [ ] Teste `FUN-42`: erro da API interrompe com código diferente de 0
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-42` com `fetch` simulado: cria a branch com o pai `main` e o nome do `run_id`
+- [x] Teste `FUN-42`: com 4 branches de restauração, apaga as 2 mais antigas e nunca apaga `main`, `dev` nem outra que não seja de restauração
+- [x] Teste `FUN-42`: erro da API interrompe com código diferente de 0
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -2021,13 +2021,13 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ f3ca76d7eb120bfe55201204f
 
 **Done when**:
 
-- [ ] Teste `FUN-41`: só `workflow_dispatch`, condição de `main`, `environment: producao` (AD-119)
-- [ ] Teste `FUN-57`: `concurrency` com `cancel-in-progress: false`
-- [ ] Teste `FUN-42`: a ordem dos passos é build, restauração, dump, migração, deploy, saúde
-- [ ] Teste `FUN-43`: o build vem antes de qualquer passo que use secrets do Neon ou da Cloudflare
-- [ ] Teste `FUN-44`: o `wrangler deploy` depende do passo de migração (sem `continue-on-error`)
-- [ ] Teste `FUN-58`: `URL_PUBLICA` vazia faz um passo anterior ao deploy falhar
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-41`: só `workflow_dispatch`, condição de `main`, `environment: producao` (AD-119)
+- [x] Teste `FUN-57`: `concurrency` com `cancel-in-progress: false`
+- [x] Teste `FUN-42`: a ordem dos passos é build, restauração, dump, migração, deploy, saúde
+- [x] Teste `FUN-43`: o build vem antes de qualquer passo que use secrets do Neon ou da Cloudflare
+- [x] Teste `FUN-44`: o `wrangler deploy` depende do passo de migração (sem `continue-on-error`)
+- [x] Teste `FUN-58`: `URL_PUBLICA` vazia faz um passo anterior ao deploy falhar
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -2048,10 +2048,10 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ f3ca76d7eb120bfe55201204f
 
 **Done when**:
 
-- [ ] Teste `FUN-28`: `name: gestaodapelada` reprova; `gestaodapelada-v2` passa
-- [ ] Teste `FUN-28`: `routes` e `custom_domain` no `wrangler.jsonc` e no `deploy.yml` reprovam, e `environment: producao` passa (AD-119)
-- [ ] A checagem passa nos arquivos reais
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-28`: `name: gestaodapelada` reprova; `gestaodapelada-v2` passa
+- [x] Teste `FUN-28`: `routes` e `custom_domain` no `wrangler.jsonc` e no `deploy.yml` reprovam, e `environment: producao` passa (AD-119)
+- [x] A checagem passa nos arquivos reais
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -2072,15 +2072,17 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ f3ca76d7eb120bfe55201204f
 
 **Done when**:
 
-- [ ] Teste `FUN-42` com um servidor local: `versao` igual ao SHA passa
-- [ ] Teste `FUN-42`: `versao` diferente ou resposta 500 depois das tentativas reprova
-- [ ] Teste `FUN-42`: servidor que responde na 3ª tentativa passa
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-42` com um servidor local: `versao` igual ao SHA passa
+- [x] Teste `FUN-42`: `versao` diferente ou resposta 500 depois das tentativas reprova
+- [x] Teste `FUN-42`: servidor que responde na 3ª tentativa passa
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
 
 ---
+
+Gate: python .claude/scripts/trava-testes.py --rodar @ 19b860394665c048cbc161d58dd7921b5406b630 = SUÍTE VERDE; o deploy.yml não rodou (sem push nem disparo, T80 e T82; AD-119)
 
 #### Phase 22: Runbook
 
