@@ -1985,7 +1985,7 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ f3ca76d7eb120bfe55201204f
 
 ### T69: Branch de restauração no Neon
 
-**What**: Escrever `restauracao-neon.ts`: cria a branch de restauração a partir da `dev` pela API do Neon e mantém só as 2 mais recentes.
+**What**: Escrever `restauracao-neon.ts`: cria a branch de restauração a partir da `main` pela API do Neon (AD-119) e mantém só as 2 mais recentes.
 **Estimativa**: 2h
 **Risco**: alto
 **Domínio**: não
@@ -1997,7 +1997,7 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ f3ca76d7eb120bfe55201204f
 
 **Done when**:
 
-- [ ] Teste `FUN-42` com `fetch` simulado: cria a branch com o pai `dev` e o nome do `run_id`
+- [ ] Teste `FUN-42` com `fetch` simulado: cria a branch com o pai `main` e o nome do `run_id`
 - [ ] Teste `FUN-42`: com 4 branches de restauração, apaga as 2 mais antigas e nunca apaga `main`, `dev` nem outra que não seja de restauração
 - [ ] Teste `FUN-42`: erro da API interrompe com código diferente de 0
 - [ ] Gate passa, sem teste removido ou enfraquecido
@@ -2009,7 +2009,7 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ f3ca76d7eb120bfe55201204f
 
 ### T70: Workflow deploy.yml
 
-**What**: Criar `.github/workflows/deploy.yml`: só `workflow_dispatch`, `if` na `main`, `environment: previa`, `concurrency` sem cancelamento, e os passos na ordem da spec (build, branch de restauração, dump cifrado da `dev`, migração, `wrangler deploy` com `URL_PUBLICA` e `VERSAO`, saúde). O dump da `dev` usa `pelada_backup_ro` (AD-010).
+**What**: Criar `.github/workflows/deploy.yml`: só `workflow_dispatch`, `if` na `main`, `environment: producao` (AD-119), `concurrency` sem cancelamento, e os passos na ordem da spec (build, branch de restauração da `main`, dump cifrado da `main`, migração, `wrangler deploy` com `URL_PUBLICA` e `VERSAO`, saúde). O dump usa `pelada_backup_ro` (AD-010, secret `NEON_URL_BACKUP`).
 **Estimativa**: 2h
 **Risco**: alto
 **Domínio**: não
@@ -2021,7 +2021,7 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ f3ca76d7eb120bfe55201204f
 
 **Done when**:
 
-- [ ] Teste `FUN-41`: só `workflow_dispatch`, condição de `main`, `environment: previa`
+- [ ] Teste `FUN-41`: só `workflow_dispatch`, condição de `main`, `environment: producao` (AD-119)
 - [ ] Teste `FUN-57`: `concurrency` com `cancel-in-progress: false`
 - [ ] Teste `FUN-42`: a ordem dos passos é build, restauração, dump, migração, deploy, saúde
 - [ ] Teste `FUN-43`: o build vem antes de qualquer passo que use secrets do Neon ou da Cloudflare
@@ -2036,7 +2036,7 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ f3ca76d7eb120bfe55201204f
 
 ### T71: Guarda: só a prévia
 
-**What**: Escrever a checagem que reprova qualquer menção a `gestaodapelada` sem `-v2`, a `routes` ou `custom_domain` no `wrangler.jsonc` e no `deploy.yml`, e ao environment `producao` no `deploy.yml`.
+**What**: Escrever a checagem que reprova qualquer menção a `gestaodapelada` sem `-v2`, e `routes` ou `custom_domain`, no `wrangler.jsonc` e no `deploy.yml` (AD-119: o environment `producao` deixa de ser reprovado).
 **Estimativa**: 1h
 **Risco**: alto
 **Domínio**: não
@@ -2049,7 +2049,7 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ f3ca76d7eb120bfe55201204f
 **Done when**:
 
 - [ ] Teste `FUN-28`: `name: gestaodapelada` reprova; `gestaodapelada-v2` passa
-- [ ] Teste `FUN-28`: `routes`, `custom_domain` e `environment: producao` no `deploy.yml` reprovam
+- [ ] Teste `FUN-28`: `routes` e `custom_domain` no `wrangler.jsonc` e no `deploy.yml` reprovam, e `environment: producao` passa (AD-119)
 - [ ] A checagem passa nos arquivos reais
 - [ ] Gate passa, sem teste removido ou enfraquecido
 
