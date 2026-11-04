@@ -86,7 +86,7 @@ As migrações (SQL) ficam em `backend/api/src/infraestrutura/db/migracoes/` e r
 
 ## Deploy da prévia
 
-Só o workflow manual `deploy` (Actions > `deploy` > Run workflow, na `main`) publica. Ele faz o build, cria um ponto de volta no Neon, gera um dump cifrado, migra e publica o Worker `gestaodapelada-v2` em `workers.dev`, conferindo `GET /api/health`. Detalhes, falhas e restauração: [`docs/runbook.md`](docs/runbook.md).
+Só o workflow manual `deploy` (Actions > `deploy` > Run workflow, na `main`) publica. Ele faz o build, cria um ponto de volta no Neon, gera um dump cifrado, migra e publica o Worker `gestaodapelada-v2` no endereço padrão da Cloudflare (sem domínio próprio), conferindo `GET /api/health`. Detalhes, falhas e restauração: [`docs/runbook.md`](docs/runbook.md).
 
 ## Backup
 

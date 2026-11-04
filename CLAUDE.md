@@ -49,7 +49,7 @@ Aplicativo para organizar a pelada (grupos, elenco, partidas, ranking, financeir
 Cada decisão é uma **AD-NNN** em `.specs/STATE.md` (a mais recente por último). As que mais pesam no dia a dia:
 
 - AD-002: reuso do zero; só migrações e ativos do mockup vêm da versão anterior
-- AD-004, AD-032, AD-119: o único alvo publicado é a prévia `gestaodapelada-v2` (workers.dev) sobre a `main` do Neon, com o `deploy.yml` no environment `producao`
+- AD-004, AD-032, AD-119: o único alvo publicado é a prévia `gestaodapelada-v2` (endereço padrão da Cloudflare, sem domínio próprio) sobre a `main` do Neon, com o `deploy.yml` no environment `producao`
 - AD-013: o `backup.yml` usa o environment `backup`
 - AD-014: o backup da produção não é confiável até a revalidação do fim do projeto
 - AD-030: a paridade (domínio e produção) é passo do `/preparar` Nível 2, com confirmação para cada ação externa
