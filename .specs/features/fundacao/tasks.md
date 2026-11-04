@@ -1946,10 +1946,10 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ f96c8b78b1dc89083a1f6b8f1
 
 **Done when**:
 
-- [ ] Teste `FUN-40` lê o YAML: gatilhos `push` e `pull_request`, serviço `postgres:18`, e os passos de lint, format, typecheck, checagens, gitleaks, testes e migrar do zero
-- [ ] Teste `FUN-40`: nenhum passo usa `continue-on-error`
-- [ ] Passa na checagem de SHA (T64)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-40` lê o YAML: gatilhos `push` e `pull_request`, serviço `postgres:18`, e os passos de lint, format, typecheck, checagens, gitleaks, testes e migrar do zero
+- [x] Teste `FUN-40`: nenhum passo usa `continue-on-error`
+- [x] Passa na checagem de SHA (T64)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1970,14 +1970,16 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ f96c8b78b1dc89083a1f6b8f1
 
 **Done when**:
 
-- [ ] Teste `FUN-40`: o job `web` tem build, e2e e visual, e envia o relatório do Playwright em caso de falha
-- [ ] Teste `FUN-40`: o workflow completo passa nas checagens de SHA e de `wrangler deploy` único
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-40`: o job `web` tem build, e2e e visual, e envia o relatório do Playwright em caso de falha
+- [x] Teste `FUN-40`: o workflow completo passa nas checagens de SHA e de `wrangler deploy` único
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
 
 ---
+
+Gate: python .claude/scripts/trava-testes.py --rodar @ f3ca76d7eb120bfe55201204f960d38e58351e26 = SUÍTE VERDE; o ci.yml ainda não rodou no GitHub (sem push, T80 e T82)
 
 #### Phase 21: Deploy da prévia
 
