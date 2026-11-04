@@ -2,7 +2,7 @@ import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
 import pg from 'pg';
 import { describe, expect, test } from 'vitest';
-import { comBancoDeTeste } from '../../api/test/apoio/banco.ts';
+import { comBancoDeTeste, comTravaDeMigracao } from '../../api/test/apoio/banco.ts';
 
 const cli = join(import.meta.dirname, '..', 'src', 'migrar.ts');
 
@@ -40,7 +40,7 @@ describe('pnpm migrar', () => {
 
   test('FUN-07: num banco local vazio aplica as 23 migrações', async () => {
     await comBancoDeTeste(async (url) => {
-      const r = rodar({ DATABASE_URL_MIGRACAO: url });
+      const r = await comTravaDeMigracao(async () => rodar({ DATABASE_URL_MIGRACAO: url }));
       expect(r.status, r.erro).toBe(0);
       const c = new pg.Client({ connectionString: url });
       await c.connect();

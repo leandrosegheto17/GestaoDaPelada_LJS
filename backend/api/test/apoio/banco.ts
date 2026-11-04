@@ -49,3 +49,25 @@ export async function comBancoDeTeste<T>(corpo: (url: string) => Promise<T>): Pr
     await banco.remover();
   }
 }
+
+const CHAVE_TRAVA_MIGRACAO = 7364001;
+
+/**
+ * As migrações criam roles (`pelada_app`, `pelada_backup`), que são globais ao cluster: duas
+ * migrações simultâneas em bancos diferentes disputam o `CREATE ROLE`. Os testes que migram
+ * as 23 de verdade passam por esta trava, que serializa entre arquivos e pacotes.
+ */
+export async function comTravaDeMigracao<T>(corpo: () => Promise<T>): Promise<T> {
+  const base = process.env.DATABASE_URL_TESTE ?? URL_ADMIN_PADRAO;
+  exigirHostPermitido(base, HOSTS_LOCAIS);
+  const admin = new URL(base);
+  admin.pathname = '/postgres';
+  const c = new pg.Client({ connectionString: admin.toString() });
+  await c.connect();
+  try {
+    await c.query('select pg_advisory_lock($1)', [CHAVE_TRAVA_MIGRACAO]);
+    return await corpo();
+  } finally {
+    await c.end(); // fechar a sessão libera o lock
+  }
+}

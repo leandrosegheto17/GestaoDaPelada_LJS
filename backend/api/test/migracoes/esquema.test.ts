@@ -7,7 +7,7 @@ import {
   ROLES_DA_APLICACAO,
 } from '../../src/infraestrutura/db/esquema.ts';
 import { migrar } from '../../src/infraestrutura/db/migrar.ts';
-import { comBancoDeTeste } from '../apoio/banco.ts';
+import { comBancoDeTeste, comTravaDeMigracao } from '../apoio/banco.ts';
 
 const DEFINER_ESPERADAS = 19;
 
@@ -18,7 +18,7 @@ const referencia = () =>
 
 test('FUN-08: banco vazio migrado tem lerEsquema igual ao esquema-producao.txt versionado', async () => {
   await comBancoDeTeste(async (url) => {
-    await migrar(url);
+    await comTravaDeMigracao(() => migrar(url));
     const c = new pg.Client({ connectionString: url });
     await c.connect();
     try {

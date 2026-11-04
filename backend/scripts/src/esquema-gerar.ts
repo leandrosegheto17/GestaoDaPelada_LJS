@@ -1,6 +1,6 @@
 import { writeFileSync } from 'node:fs';
 import pg from 'pg';
-import { comBancoDeTeste } from '../../api/test/apoio/banco.ts';
+import { comBancoDeTeste, comTravaDeMigracao } from '../../api/test/apoio/banco.ts';
 import {
   ARQUIVO_ESQUEMA_PRODUCAO,
   lerEsquema,
@@ -11,7 +11,7 @@ import { migrar } from '../../api/src/infraestrutura/db/migrar.ts';
 /** Migra um banco vazio descartável só com as 23 migrações e grava a referência do schema (FUN-08). */
 export async function gerarReferencia(): Promise<number> {
   return comBancoDeTeste(async (url) => {
-    await migrar(url);
+    await comTravaDeMigracao(() => migrar(url));
     const c = new pg.Client({ connectionString: url });
     await c.connect();
     try {

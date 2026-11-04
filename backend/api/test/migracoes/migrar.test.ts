@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import pg from 'pg';
 import { describe, expect, test } from 'vitest';
 import { migrar } from '../../src/infraestrutura/db/migrar.ts';
-import { comBancoDeTeste } from '../apoio/banco.ts';
+import { comBancoDeTeste, comTravaDeMigracao } from '../apoio/banco.ts';
 import { PASTA } from './pasta.ts';
 
 async function consulta<T extends pg.QueryResultRow>(url: string, sql: string) {
@@ -26,7 +26,7 @@ function pastaCom(arquivos: Record<string, string>) {
 describe('migrar', () => {
   test('FUN-07: banco vazio, depois migrar: pgmigrations tem os 23 nomes na ordem dos arquivos', async () => {
     await comBancoDeTeste(async (url) => {
-      await migrar(url);
+      await comTravaDeMigracao(() => migrar(url));
       const esperado = readdirSync(PASTA)
         .filter((n) => n.endsWith('.sql'))
         .sort()
@@ -82,7 +82,7 @@ describe('migrar', () => {
 
   test('AD-009: as migrações rodam como superusuário postgres num banco local vazio', async () => {
     await comBancoDeTeste(async (url) => {
-      await migrar(url);
+      await comTravaDeMigracao(() => migrar(url));
       const [dono] = await consulta<{ dono: string }>(
         url,
         "select tableowner as dono from pg_tables where tablename = 'pgmigrations'",
