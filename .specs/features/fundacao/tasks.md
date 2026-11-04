@@ -2274,16 +2274,18 @@ Gate: pnpm --filter @pelada/api exec vitest run test/config/wrangler.test.ts + h
 
 **Done when**:
 
-- [ ] Teste `FUN-08` do comparador com dois bancos locais: igual dá 0 diferenças, e uma diferença é listada
-- [ ] Execução na `dev`: as diferenças da `dev` contra a referência são zero, ou a lista é registrada em `STATE.md` e decidida
-- [ ] Execução na `dev`: `migrar` com zero DDL e contagem de linhas por tabela idêntica antes e depois (FUN-09)
-- [ ] `pelada_owner` existe na `dev` e é conferida (AD-009), e `pelada_app` e `pelada_backup_ro` batem com FUN-11
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-08` do comparador com dois bancos locais: igual dá 0 diferenças, e uma diferença é listada
+- [x] Execução na `dev`: as diferenças da `dev` contra a referência são zero, ou a lista é registrada em `STATE.md` e decidida
+- [x] Execução na `dev`: `migrar` com zero DDL e contagem de linhas por tabela idêntica antes e depois (FUN-09)
+- [ ] `pelada_owner` existe na `dev` e é conferida (AD-009), e `pelada_app` e `pelada_backup_ro` batem com FUN-11 (pelada_owner existe e pelada_app confere; pelada_backup_ro NÃO confere: sem SELECT e sem policies na dev, AD-120)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
 
 ---
+
+Gate: python .claude/scripts/trava-testes.py --rodar @ f4b22ce3ecf7456e090aaac9bb5adcf8cb13dcca = SUÍTE VERDE; `esquema:comparar --alvo dev --migrar`: 0 migrações, 0 DDL, contagem igual; 52 faltando e 3 sobrando registrados na AD-120
 
 #### Phase 25: CI verde e primeiro deploy
 
