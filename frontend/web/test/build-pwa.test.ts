@@ -26,6 +26,7 @@ describe('build do PWA', () => {
     expect(gerado.theme_color).toBe(manifesto.theme_color);
     expect(gerado.icons.map((i) => i.src).sort()).toEqual(manifesto.icons.map((i) => i.src).sort());
     expect(existsSync(join(outDir, 'offline.html'))).toBe(true);
+    expect(existsSync(join(outDir, '_headers'))).toBe(true);
     const sw = readFileSync(join(outDir, 'sw.js'), 'utf8');
     expect(sw).toContain('offline.html');
     expect(sw).toContain('index.html');
