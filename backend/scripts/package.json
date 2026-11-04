@@ -12,6 +12,7 @@
     "test": "vitest run",
     "migrar": "node --env-file-if-exists=../../.env src/migrar.ts",
     "esquema:gerar": "node --env-file-if-exists=../../.env src/esquema-gerar.ts",
+    "esquema:comparar": "node --env-file-if-exists=../../.env src/esquema-comparar.ts",
     "test:checagens": "vitest run checagens && node checagens/migracao-aditiva.ts && node checagens/sem-url-absoluta.ts && node checagens/actions-por-sha.ts && node checagens/wrangler-unico.ts && node checagens/env-exemplo.ts && node checagens/so-previa.ts",
     "migracao:nova": "node src/migracao-nova.ts",
     "seed": "node --env-file-if-exists=../../.env src/seed.ts"

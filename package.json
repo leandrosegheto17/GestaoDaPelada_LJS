@@ -13,6 +13,7 @@
     "test": "vitest run && pnpm -r test",
     "migrar": "pnpm --filter @pelada/scripts migrar",
     "esquema:gerar": "pnpm --filter @pelada/scripts esquema:gerar",
+    "esquema:comparar": "pnpm --filter @pelada/scripts esquema:comparar",
     "test:checagens": "pnpm --filter @pelada/scripts test:checagens",
     "migracao:nova": "pnpm --filter @pelada/scripts migracao:nova",
     "seed": "pnpm --filter @pelada/scripts seed",
