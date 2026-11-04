@@ -11,7 +11,8 @@ export default defineConfig({
   testMatch: '**/*.spec.ts',
   fullyParallel: false,
   workers: 1,
-  reporter: 'list',
+  // No CI o relatório HTML vira artefato quando algo falha.
+  reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
   use: { baseURL: `http://127.0.0.1:${PORTA}`, serviceWorkers: 'allow' },
   projects: [{ name: 'chromium', use: { browserName: 'chromium' } }],
   webServer: [

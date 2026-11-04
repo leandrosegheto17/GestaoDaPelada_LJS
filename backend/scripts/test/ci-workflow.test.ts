@@ -96,3 +96,37 @@ describe('ci.yml: qualidade, testes e banco', () => {
     expect(usados.filter((s) => s !== 'GITHUB_TOKEN')).toEqual([]);
   });
 });
+
+describe('ci.yml: job web', () => {
+  test('FUN-40: web tem build, e2e e comparação visual, com o Playwright instalado', () => {
+    expect(wf.jobs).toHaveProperty('web');
+    expect(wf.jobs.web?.services?.postgres?.image).toBe('postgres:18');
+    expect(algumComando('web', 'playwright install')).toBe(true);
+    const cmds = comandos('web');
+    const build = cmds.findIndex((c) => c.includes('@pelada/web build'));
+    const e2e = cmds.findIndex((c) => c.includes('@pelada/web e2e'));
+    const visual = cmds.findIndex((c) => c.includes('@pelada/web visual'));
+    expect(build).toBeGreaterThanOrEqual(0);
+    expect(e2e).toBeGreaterThan(build);
+    expect(visual).toBeGreaterThan(build);
+  });
+
+  test('FUN-40: web envia o relatório do Playwright e os prints da comparação em caso de falha', () => {
+    const envio = passosDe('web').find((p) =>
+      (p.uses ?? '').startsWith('actions/upload-artifact@'),
+    );
+    expect(envio).toBeDefined();
+    expect(envio?.if).toContain('failure()');
+    const caminhos = String(envio?.with?.path ?? '');
+    expect(caminhos).toContain('frontend/web/playwright-report');
+    expect(caminhos).toContain('frontend/web/test-results');
+  });
+
+  test('FUN-40: o envio do artefato não passa em silêncio quando não há arquivo', () => {
+    const envio = passosDe('web').find((p) =>
+      (p.uses ?? '').startsWith('actions/upload-artifact@'),
+    );
+    expect(envio?.with?.['if-no-files-found']).toBe('warn');
+    expect(envio?.with?.['retention-days']).toBeLessThanOrEqual(14);
+  });
+});
