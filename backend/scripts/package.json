@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json",
     "test": "vitest run",
-    "migrar": "node --env-file-if-exists=../../.env src/migrar.ts"
+    "migrar": "node --env-file-if-exists=../../.env src/migrar.ts",
+    "esquema:gerar": "node --env-file-if-exists=../../.env src/esquema-gerar.ts"
   },
   "dependencies": {
     "pg": "^8.23.1",

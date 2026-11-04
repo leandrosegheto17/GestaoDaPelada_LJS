@@ -1,6 +1,17 @@
+import { join } from 'node:path';
 import type pg from 'pg';
 
 const SCHEMA = 'public';
+
+/** Roles da aplicação conferidas na referência (`pelada_owner` só existe no Neon, AD-009). */
+export const ROLES_DA_APLICACAO = ['pelada_app', 'pelada_backup_ro', 'pelada_owner'] as const;
+
+/** Referência do schema de produção, gerada por `pnpm esquema:gerar` (FUN-08). */
+export const ARQUIVO_ESQUEMA_PRODUCAO = join(
+  import.meta.dirname,
+  'migracoes',
+  'esquema-producao.txt',
+);
 
 /**
  * Impressão digital do schema (FUN-08): uma linha ordenada por item, lida do `pg_catalog`.
