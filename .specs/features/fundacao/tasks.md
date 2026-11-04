@@ -807,7 +807,7 @@ T81 → T82
 
 **Tests**: integration
 **Gate**: full
-**Gate (Lote 5)**: docker compose up -d --wait && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test @ c7442193b07429be9bc748093ec58762fe357e46 = verde
+**Gate (Lote 5)**: docker compose up -d --wait && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test @ 6e73c99d23e516102ca375934815f299c5e74575 = verde
 
 ---
 
