@@ -9,7 +9,8 @@
   "scripts": {
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json",
-    "test": "vitest run"
+    "test": "vitest run",
+    "migrar": "node --env-file-if-exists=../../.env src/migrar.ts"
   },
   "dependencies": {
     "pg": "^8.23.1",
