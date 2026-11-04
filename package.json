@@ -13,7 +13,8 @@
     "test": "vitest run && pnpm -r test",
     "migrar": "pnpm --filter @pelada/scripts migrar",
     "esquema:gerar": "pnpm --filter @pelada/scripts esquema:gerar",
-    "test:checagens": "pnpm --filter @pelada/scripts test:checagens"
+    "test:checagens": "pnpm --filter @pelada/scripts test:checagens",
+    "migracao:nova": "pnpm --filter @pelada/scripts migracao:nova"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
