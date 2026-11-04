@@ -21,6 +21,7 @@ const PERMITIDOS: RegExp[] = [
   /^\.rascunho\//,
   /^backend\/scripts\/checagens\/(test\/)?wrangler-unico(\.test)?\.ts$/,
   /^backend\/scripts\/checagens\/test\/apoio\.ts$/,
+  /^backend\/scripts\/test\/deploy-workflow\.test\.ts$/,
 ];
 
 const PASTAS_IGNORADAS = new Set([

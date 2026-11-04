@@ -1,0 +1,90 @@
+name: deploy
+
+# Só a prévia (FUN-28, AD-119): Worker gestaodapelada-v2 no endereço padrão da Cloudflare, sem domínio próprio.
+# Só por disparo manual, na main, com os secrets do environment producao (AD-032).
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Dois deploys juntos esperam um ao outro; nenhum é cancelado no meio de uma migração (FUN-57).
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: producao
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 26
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # Sem URL_PUBLICA o app publicaria links quebrados: para antes de tocar no banco ou no Worker (FUN-58).
+      - name: Conferir URL_PUBLICA
+        env:
+          URL_PUBLICA: ${{ secrets.URL_PUBLICA }}
+        run: |
+          if [ -z "$URL_PUBLICA" ]; then
+            echo "URL_PUBLICA ausente no environment producao." >&2
+            exit 1
+          fi
+      # 1. O build vem antes de qualquer passo que use o Neon ou a Cloudflare (FUN-43).
+      - name: Build do web
+        run: pnpm --filter @pelada/web build
+      # 2. Ponto de volta: branch de restauração da main, mantendo só as 2 mais recentes (FUN-42).
+      - name: Branch de restauração no Neon
+        env:
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+          NEON_PROJECT_ID: ${{ secrets.NEON_PROJECT_ID }}
+        run: node backend/scripts/ops/restauracao-neon.ts
+      # 3. Dump cifrado com a role somente leitura (AD-010).
+      - name: Instalar cliente PostgreSQL 18 e age
+        run: |
+          set -euo pipefail
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-client-18 age
+      - name: Dump cifrado
+        env:
+          DATABASE_URL: ${{ secrets.NEON_URL_BACKUP }}
+          BACKUP_CHAVE: ${{ secrets.BACKUP_CHAVE }}
+          SAIDA: ${{ runner.temp }}/pre-deploy.dump.age
+        run: .github/actions/dump-cifrado/dump-cifrado.sh
+      - name: Guardar o dump
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: pre-deploy-${{ github.run_id }}
+          path: ${{ runner.temp }}/pre-deploy.dump.age
+          retention-days: 30
+          if-no-files-found: error
+      # 4. Migração com a role dona das tabelas. Falhou: o deploy abaixo não roda (FUN-44).
+      - name: Migrar
+        env:
+          DATABASE_URL_MIGRACAO: ${{ secrets.NEON_URL_MIGRACAO }}
+          PELADA_PERMITIR_HOST_REMOTO: '1'
+        run: pnpm migrar
+      # 5. Publica o Worker gestaodapelada-v2, com a URL do app e o SHA como versão (FUN-42).
+      - name: Deploy do Worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          URL_PUBLICA: ${{ secrets.URL_PUBLICA }}
+          VERSAO: ${{ github.sha }}
+        run: >-
+          pnpm --filter @pelada/api exec wrangler deploy --config ../../wrangler.jsonc
+          --var URL_PUBLICA:"$URL_PUBLICA" --var VERSAO:"$VERSAO"
+      # 6. O Worker no ar tem de responder com o SHA que acabou de ser publicado.
+      - name: Verificar a saúde
+        env:
+          URL_PUBLICA: ${{ secrets.URL_PUBLICA }}
+          VERSAO: ${{ github.sha }}
+        run: node backend/scripts/ops/verificar-saude.mjs "$URL_PUBLICA" "$VERSAO"
