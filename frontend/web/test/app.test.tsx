@@ -4,5 +4,5 @@ import { App } from '../src/App.tsx';
 
 test('FUN-31: o App renderiza sem erro no jsdom', () => {
   render(<App />);
-  expect(screen.getByRole('heading', { name: 'Gestão da Pelada' })).toBeInTheDocument();
+  expect(screen.getByText('Gestão da Pelada')).toBeInTheDocument();
 });

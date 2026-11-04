@@ -1,8 +1,16 @@
-/** Raiz do app. As rotas e a casca entram nas tarefas seguintes. */
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter } from 'react-router';
+import { Rotas } from './app/rotas.tsx';
+
+const clienteDeConsultas = new QueryClient();
+
+/** Raiz do app: consultas, roteador e rotas. */
 export function App() {
   return (
-    <main>
-      <h1>Gestão da Pelada</h1>
-    </main>
+    <QueryClientProvider client={clienteDeConsultas}>
+      <BrowserRouter>
+        <Rotas />
+      </BrowserRouter>
+    </QueryClientProvider>
   );
 }
