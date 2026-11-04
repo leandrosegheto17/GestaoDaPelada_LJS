@@ -12,8 +12,11 @@
     "test": "vitest run"
   },
   "devDependencies": {
-    "@types/pg": "^8.23.1",
-    "pg": "^8.23.1",
-    "@pelada/scripts": "workspace:*"
+    "@pelada/scripts": "workspace:*",
+    "@types/pg": "^8.23.1"
+  },
+  "dependencies": {
+    "node-pg-migrate": "^9.0.0",
+    "pg": "^8.23.1"
   }
 }

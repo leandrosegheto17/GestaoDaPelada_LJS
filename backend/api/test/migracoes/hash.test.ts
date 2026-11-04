@@ -2,16 +2,7 @@ import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, expect, test } from 'vitest';
-
-export const PASTA = join(
-  import.meta.dirname,
-  '..',
-  '..',
-  'src',
-  'infraestrutura',
-  'db',
-  'migracoes',
-);
+import { PASTA } from './pasta.ts';
 
 function hashes(): Record<string, string> {
   const lista = readFileSync(join(PASTA, 'migracoes.sha256'), 'utf8')
