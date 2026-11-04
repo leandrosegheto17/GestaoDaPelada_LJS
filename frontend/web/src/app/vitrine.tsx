@@ -11,19 +11,19 @@ export default function Vitrine() {
   switch (id) {
     case 'erro-rede':
       return (
-        <Casca titulo="Partidas">
+        <Casca variante="admin" grupo="Pelada de Quinta" titulo="Partidas">
           <EstadoErro aoTentarDeNovo={() => undefined} />
         </Casca>
       );
     case 'carregando-lista':
       return (
-        <Casca titulo="Jogadores">
+        <Casca variante="admin" grupo="Pelada de Quinta" titulo="Jogadores">
           <EsqueletoLista />
         </Casca>
       );
     case 'indisponivel':
       return (
-        <Casca>
+        <Casca moldura={false}>
           <TelaMensagem
             titulo="Grupo indisponível"
             texto="Este grupo não está disponível no momento. Fale com o admin do seu grupo."

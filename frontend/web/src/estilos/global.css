@@ -19,7 +19,23 @@ body {
   background: var(--cor-fundo);
   color: var(--cor-texto);
   font-family: var(--fonte-texto);
+  font-size: var(--texto-md);
+  line-height: var(--altura-linha);
   -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-family: var(--fonte-titulo);
+  font-weight: var(--peso-forte);
+  line-height: var(--altura-linha-titulo);
+}
+
+p {
+  margin: 0;
 }
 
 img,

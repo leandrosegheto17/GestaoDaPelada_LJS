@@ -27,6 +27,19 @@ describe('Casca e Marca', () => {
     expect(screen.queryByRole('heading', { level: 1 })).toBeNull();
   });
 
+  it('FUN-31: a variante admin mostra o grupo e o link Trocar grupo, sem a marca', async () => {
+    const { container } = render(
+      <Casca variante="admin" grupo="Pelada de Quinta" titulo="Partidas">
+        <p>conteúdo</p>
+      </Casca>,
+    );
+    const barra = screen.getByRole('banner');
+    expect(barra).toHaveTextContent('Pelada de Quinta');
+    expect(screen.getByRole('link', { name: 'Trocar grupo' })).toHaveAttribute('href', '/grupos');
+    expect(barra).not.toHaveTextContent('Gestão da Pelada');
+    expect(await axe(container)).toHaveNoViolations();
+  });
+
   it('FUN-31: a marca mostra o nome do produto', () => {
     render(<Marca />);
     expect(screen.getByText('Gestão da Pelada')).toBeInTheDocument();
