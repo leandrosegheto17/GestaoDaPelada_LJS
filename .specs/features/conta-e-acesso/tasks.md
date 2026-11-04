@@ -1656,19 +1656,19 @@ T57 → T58
 
 ### T56: Comparação visual das telas com sessão
 
-**What**: Ativar na comparação as entradas T08, T19, T25 e T32 do `telas.json` (com `recorte` da faixa em `/?aviso=conta-excluida`) e ajustar até 1% nos dois viewports; os estados de `revisaoManual` são conferidos à mão contra o mockup e registrados aqui.
+**What**: Ativar na comparação as entradas T09 `menu-conta`, T19, T25 e T32 do `telas.json` (a T08 `sucesso` e a `vazio`, `telas.json:164-165`, usam o mockup do módulo da `grupos-e-elenco` e passam para a T71 de lá, AD-031 proposta) (com `recorte` da faixa em `/?aviso=conta-excluida`) e ajustar até 1% nos dois viewports; os estados de `revisaoManual` são conferidos à mão contra o mockup e registrados aqui.
 **Estimativa**: 2h
 **Risco**: baixo
 **Domínio**: não
 **Criticidade**: comum
 **Where**: `frontend/web/e2e/telas-ativas.json`
 **Depends on**: T55
-**Reuses**: entradas de `telas.json:137-139`, `telas.json:183-187` e as de T08 e T19; runner de T54
+**Reuses**: entradas de `telas.json:137-139`, `telas.json:166` (T09 `menu-conta`), `telas.json:183-187` e as de T19; runner de T54
 **Requirement**: ACE-54, ACE-55
 
 **Done when**:
 
-- [ ] Teste `ACE-54`: T08, T19 e T25 × 2 viewports em até 1%
+- [ ] Teste `ACE-54`: T09 `menu-conta`, T19 e T25 × 2 viewports em até 1% (sem as T08 `sucesso` e `vazio`, AD-031 proposta)
 - [ ] Teste `ACE-55`: T32 (5 estados) × 2 viewports em até 1%
 - [ ] Estados de `revisaoManual` das telas de acesso conferidos e listados nesta tarefa
 - [ ] Gate passa, sem teste removido ou enfraquecido
