@@ -11,7 +11,8 @@
     "build": "vite build",
     "lint": "eslint . && stylelint \"src/**/*.css\"",
     "typecheck": "tsc -p tsconfig.json",
-    "test": "vitest run"
+    "test": "vitest run",
+    "e2e": "playwright test"
   },
   "dependencies": {
     "@pelada/contrato": "workspace:*",
@@ -22,6 +23,7 @@
     "react-router": "^7.18.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@testing-library/jest-dom": "^7.0.1",
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.8",

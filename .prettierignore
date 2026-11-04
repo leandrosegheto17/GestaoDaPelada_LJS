@@ -8,3 +8,6 @@ coverage
 **/fixtures-lint
 frontend/web/src/estilos/tokens.css
 frontend/web/public
+.wrangler
+test-results
+playwright-report
