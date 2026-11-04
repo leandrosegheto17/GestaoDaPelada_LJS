@@ -12,7 +12,8 @@
     "typecheck": "pnpm -r typecheck",
     "test": "vitest run && pnpm -r test",
     "migrar": "pnpm --filter @pelada/scripts migrar",
-    "esquema:gerar": "pnpm --filter @pelada/scripts esquema:gerar"
+    "esquema:gerar": "pnpm --filter @pelada/scripts esquema:gerar",
+    "test:checagens": "pnpm --filter @pelada/scripts test:checagens"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
