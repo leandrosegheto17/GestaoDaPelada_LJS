@@ -1299,10 +1299,10 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-24`: evento com corpo, cookie, `authorization` e um e-mail na mensagem sai sem nenhum deles
-- [ ] Teste `FUN-24`: o evento sem esses campos não muda
-- [ ] Teste `FUN-24`: e-mail dentro de breadcrumb e de `extra` também é removido
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-24`: evento com corpo, cookie, `authorization` e um e-mail na mensagem sai sem nenhum deles
+- [x] Teste `FUN-24`: o evento sem esses campos não muda
+- [x] Teste `FUN-24`: e-mail dentro de breadcrumb e de `extra` também é removido
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1323,12 +1323,13 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-25`: sem `SENTRY_DSN`, o Worker responde normalmente e nenhuma chamada de rede sai (fetch espiado)
-- [ ] Teste `FUN-24`: com DSN falso, a configuração tem `release` igual a `VERSAO` e o `beforeSend` é o de `limparEvento`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-25`: sem `SENTRY_DSN`, o Worker responde normalmente e nenhuma chamada de rede sai (fetch espiado)
+- [x] Teste `FUN-24`: com DSN falso, a configuração tem `release` igual a `VERSAO` e o `beforeSend` é o de `limparEvento`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
+**Gate (Lote 11)**: docker compose up -d --wait && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:checagens @ 10a26f4701c918f4834f8f556f4c0e0a024a2948 = verde
 
 ---
 
