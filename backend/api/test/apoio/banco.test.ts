@@ -21,7 +21,6 @@ test('FUN-19: DATABASE_URL_TESTE em host remoto lança erro e não abre conexão
 });
 
 test('FUN-19: cria o banco, grava uma linha e o remove, sem teste_* órfão', async () => {
-  const antes = await bancosOrfaos();
   let nome = '';
   await comBancoDeTeste(async (url) => {
     nome = new URL(url).pathname.slice(1);
@@ -33,16 +32,18 @@ test('FUN-19: cria o banco, grava uma linha e o remove, sem teste_* órfão', as
     expect((await c.query('select n from t')).rows).toEqual([{ n: 1 }]);
     await c.end();
   });
-  expect(await bancosOrfaos()).toEqual(antes);
-  expect(antes).not.toContain(nome);
+  expect(nome).not.toBe('');
+  expect(await bancosOrfaos()).not.toContain(nome);
 });
 
 test('FUN-19: o corpo do teste lança erro e o banco é removido mesmo assim', async () => {
-  const antes = await bancosOrfaos();
+  let nome = '';
   await expect(
-    comBancoDeTeste(async () => {
+    comBancoDeTeste(async (url) => {
+      nome = new URL(url).pathname.slice(1);
       throw new Error('falha do corpo');
     }),
   ).rejects.toThrow('falha do corpo');
-  expect(await bancosOrfaos()).toEqual(antes);
+  expect(nome).toMatch(/^teste_/);
+  expect(await bancosOrfaos()).not.toContain(nome);
 });
