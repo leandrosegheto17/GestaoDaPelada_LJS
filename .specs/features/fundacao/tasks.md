@@ -676,10 +676,10 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-08` calcula o SHA-256 dos 23 arquivos e compara com o `migracoes.sha256`; passa
-- [ ] Teste `FUN-08`: alterar um byte de uma migração faz o teste falhar (conferido uma vez e revertido)
-- [ ] São exatamente 23 arquivos `.sql` e nenhum a mais
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-08` calcula o SHA-256 dos 23 arquivos e compara com o `migracoes.sha256`; passa
+- [x] Teste `FUN-08`: alterar um byte de uma migração faz o teste falhar (conferido uma vez e revertido)
+- [x] São exatamente 23 arquivos `.sql` e nenhum a mais
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -700,11 +700,11 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-07`: banco vazio, depois `migrar`: `pgmigrations` tem os 23 nomes na ordem dos arquivos
-- [ ] Teste `FUN-07`: uma migração de exemplo com um comando que falha no meio não deixa DDL parcial dessa migração
-- [ ] Teste `FUN-07`: duas execuções simultâneas de `migrar` terminam com cada migração aplicada uma vez
-- [ ] Num banco vazio local, as migrações rodam como superusuário `postgres` (AD-009)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-07`: banco vazio, depois `migrar`: `pgmigrations` tem os 23 nomes na ordem dos arquivos
+- [x] Teste `FUN-07`: uma migração de exemplo com um comando que falha no meio não deixa DDL parcial dessa migração
+- [x] Teste `FUN-07`: duas execuções simultâneas de `migrar` terminam com cada migração aplicada uma vez
+- [x] Num banco vazio local, as migrações rodam como superusuário `postgres` (AD-009)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -725,13 +725,14 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-19`: com host remoto e sem a variável de permissão do deploy, `pnpm migrar` aborta antes de conectar
-- [ ] Teste `FUN-55`: com o Postgres parado, sai com código 1 e a mensagem pede `docker compose up -d`
-- [ ] `pnpm migrar` num banco local vazio aplica as 23 migrações
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-19`: com host remoto e sem a variável de permissão do deploy, `pnpm migrar` aborta antes de conectar
+- [x] Teste `FUN-55`: com o Postgres parado, sai com código 1 e a mensagem pede `docker compose up -d`
+- [x] `pnpm migrar` num banco local vazio aplica as 23 migrações
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
+**Gate (Lote 4)**: docker compose up -d --wait && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test @ f563a9322b4cb6c0a5deb74289e4dc6702215bc3 = verde. T15 segue aberta de propósito (AD-014).
 
 ---
 
