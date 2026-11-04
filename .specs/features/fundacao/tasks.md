@@ -827,10 +827,10 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Casos limite e estados listados antes do código: vazio; 23 aplicadas; 20 aplicadas (prefixo); nome desconhecido; ordem trocada; tabelas sem `pgmigrations`; `pgmigrations` vazia com tabelas
-- [ ] Teste `FUN-10`: cada caso divergente aborta com a lista de diferenças e o esquema e as contagens ficam idênticos
-- [ ] Teste `FUN-10`: vazio e prefixo seguem para a execução
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados antes do código: vazio; 23 aplicadas; 20 aplicadas (prefixo); nome desconhecido; ordem trocada; tabelas sem `pgmigrations`; `pgmigrations` vazia com tabelas
+- [x] Teste `FUN-10`: cada caso divergente aborta com a lista de diferenças e o esquema e as contagens ficam idênticos
+- [x] Teste `FUN-10`: vazio e prefixo seguem para a execução
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -851,10 +851,10 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-09`: um event trigger `ddl_command_start` conta zero DDL na segunda execução de `migrar`
-- [ ] Teste `FUN-09`: contagem de linhas por tabela e `pgmigrations` iguais antes e depois
-- [ ] Teste `FUN-09`: com uma migração nova de exemplo, só ela executa
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-09`: um event trigger `ddl_command_start` conta zero DDL na segunda execução de `migrar`
+- [x] Teste `FUN-09`: contagem de linhas por tabela e `pgmigrations` iguais antes e depois
+- [x] Teste `FUN-09`: com uma migração nova de exemplo, só ela executa
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -875,11 +875,11 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-56`: cada comando destrutivo reprova numa migração de exemplo
-- [ ] Teste `FUN-56`: com a linha de exceção e uma AD existente em `STATE.md`, passa
-- [ ] Teste `FUN-56`: as 23 copiadas passam pela lista fechada; um 24º arquivo com `DROP` reprova
-- [ ] Cria o script `test:checagens` na raiz e o acrescenta ao `testes.json`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-56`: cada comando destrutivo reprova numa migração de exemplo
+- [x] Teste `FUN-56`: com a linha de exceção e uma AD existente em `STATE.md`, passa
+- [x] Teste `FUN-56`: as 23 copiadas passam pela lista fechada; um 24º arquivo com `DROP` reprova
+- [x] Cria o script `test:checagens` na raiz e o acrescenta ao `testes.json`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -900,13 +900,14 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-07`: o arquivo novo tem timestamp maior que `1792844520000` e maior que o último arquivo existente
-- [ ] Teste `FUN-07`: o nome é normalizado (minúsculas, hifens) e o cabeçalho `-- Up Migration` é criado
-- [ ] Teste `FUN-07`: dois geradores no mesmo milissegundo não colidem
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-07`: o arquivo novo tem timestamp maior que `1792844520000` e maior que o último arquivo existente
+- [x] Teste `FUN-07`: o nome é normalizado (minúsculas, hifens) e o cabeçalho `-- Up Migration` é criado
+- [x] Teste `FUN-07`: dois geradores no mesmo milissegundo não colidem
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
+**Gate (Lote 6)**: docker compose up -d --wait && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:checagens @ 892aa85653a409d635bc35cacc23e75193bc9e8a = verde
 
 ---
 
