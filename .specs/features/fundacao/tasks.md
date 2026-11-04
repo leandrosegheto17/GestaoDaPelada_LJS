@@ -2249,14 +2249,16 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ 27be2bb46c018b91ec4296490
 
 **Done when**:
 
-- [ ] Teste `FUN-27`: o `id` do Hyperdrive é um hex de 32 caracteres, não o marcador
-- [ ] `wrangler.jsonc` sem outra mudança
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-27`: o `id` do Hyperdrive é um hex de 32 caracteres, não o marcador
+- [x] `wrangler.jsonc` sem outra mudança
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
 
 ---
+
+Gate: pnpm --filter @pelada/api exec vitest run test/config/wrangler.test.ts + hyperdrive.test.ts + format:check + typecheck @ 7cd73ffd611a9a88a8c1421b3b22b728d4459831 = verde; ID e cache desligado conferidos na tela do painel da Cloudflare (AD-032, AD-119)
 
 ### T80: Paridade e zero DDL na dev
 
