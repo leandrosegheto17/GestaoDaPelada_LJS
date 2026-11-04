@@ -3,6 +3,9 @@ import { describe, expect, test } from 'vitest';
 import { lerEsquema } from '../../src/infraestrutura/db/esquema.ts';
 import { comBancoDeTeste } from '../apoio/banco.ts';
 
+// roles são globais ao cluster: os testes de estrutura não as leem, para não depender de outros testes em paralelo
+const SEM_ROLES = { roles: [] } as const;
+
 const MINI = `
   create table pai (id int primary key, nome text not null default 'x');
   create table filho (id int generated always as identity primary key, pai_id int not null references pai(id));
@@ -28,7 +31,7 @@ async function comMini<T>(sql: string, corpo: (c: pg.Client) => Promise<T>): Pro
 describe('lerEsquema: estrutura', () => {
   test('FUN-08: mini schema (2 tabelas, FK, índice, trigger) dá a lista esperada', async () => {
     await comMini(MINI, async (c) => {
-      const linhas = (await lerEsquema(c)).filter((l) =>
+      const linhas = (await lerEsquema(c, SEM_ROLES)).filter((l) =>
         /^(tabela|coluna|restricao|indice|trigger) /.test(l),
       );
       expect(linhas).toEqual([
@@ -51,24 +54,24 @@ describe('lerEsquema: estrutura', () => {
 
   test('FUN-08: ignora a tabela pgmigrations', async () => {
     await comMini(MINI, async (c) => {
-      expect((await lerEsquema(c)).some((l) => l.includes('pgmigrations'))).toBe(false);
+      expect((await lerEsquema(c, SEM_ROLES)).some((l) => l.includes('pgmigrations'))).toBe(false);
     });
   }, 30_000);
 
   test('FUN-08: mudar o tipo de uma coluna ou apagar um índice muda a saída', async () => {
     await comMini(MINI, async (c) => {
-      const base = await lerEsquema(c);
+      const base = await lerEsquema(c, SEM_ROLES);
       await c.query('alter table pai alter column nome type varchar(10)');
-      const mudouTipo = await lerEsquema(c);
+      const mudouTipo = await lerEsquema(c, SEM_ROLES);
       expect(mudouTipo).not.toEqual(base);
       await c.query('drop index filho_pai_idx');
-      expect(await lerEsquema(c)).not.toEqual(mudouTipo);
+      expect(await lerEsquema(c, SEM_ROLES)).not.toEqual(mudouTipo);
     });
   }, 30_000);
 
   test('FUN-08: a saída é estável entre duas leituras seguidas', async () => {
     await comMini(MINI, async (c) => {
-      expect(await lerEsquema(c)).toEqual(await lerEsquema(c));
+      expect(await lerEsquema(c, SEM_ROLES)).toEqual(await lerEsquema(c, SEM_ROLES));
     });
   }, 30_000);
 });
