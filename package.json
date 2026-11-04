@@ -15,7 +15,8 @@
     "esquema:gerar": "pnpm --filter @pelada/scripts esquema:gerar",
     "test:checagens": "pnpm --filter @pelada/scripts test:checagens",
     "migracao:nova": "pnpm --filter @pelada/scripts migracao:nova",
-    "seed": "pnpm --filter @pelada/scripts seed"
+    "seed": "pnpm --filter @pelada/scripts seed",
+    "dev": "node --env-file-if-exists=.env scripts/dev.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",

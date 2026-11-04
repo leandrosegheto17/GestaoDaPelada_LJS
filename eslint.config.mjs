@@ -19,8 +19,8 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
   { rules: { 'no-var': 'error', 'prefer-const': 'error' } },
   {
-    // Scripts .mjs do e2e: rodam no Node e usam `document` só dentro de page.evaluate.
-    files: ['frontend/web/e2e/**/*.mjs'],
+    // Scripts .mjs (e2e e raiz): rodam no Node e usam `document` só dentro de page.evaluate.
+    files: ['frontend/web/e2e/**/*.mjs', 'scripts/**/*.mjs'],
     languageOptions: {
       globals: { process: 'readonly', console: 'readonly', document: 'readonly' },
     },

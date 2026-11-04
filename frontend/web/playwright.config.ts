@@ -14,16 +14,28 @@ export default defineConfig({
   reporter: 'list',
   use: { baseURL: `http://127.0.0.1:${PORTA}`, serviceWorkers: 'allow' },
   projects: [{ name: 'chromium', use: { browserName: 'chromium' } }],
-  webServer: {
-    command: `pnpm --filter @pelada/web build && pnpm --filter @pelada/api exec wrangler dev --config ../../wrangler.jsonc --ip 127.0.0.1 --port ${PORTA}`,
-    cwd: '../..',
-    url: `http://127.0.0.1:${PORTA}/api/health`,
-    // O wrangler exige senha na string do Hyperdrive local; as rotas deste e2e não consultam o banco (a senha é fictícia).
-    env: {
-      CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE:
-        'postgres://pelada_app:e2e-sem-banco@127.0.0.1:5432/pelada',
+  webServer: [
+    {
+      command: `pnpm --filter @pelada/web build && pnpm --filter @pelada/api exec wrangler dev --config ../../wrangler.jsonc --ip 127.0.0.1 --port ${PORTA}`,
+      cwd: '../..',
+      url: `http://127.0.0.1:${PORTA}/api/health`,
+      // O wrangler exige senha na string do Hyperdrive local; as rotas deste e2e não consultam o banco (a senha é fictícia).
+      env: {
+        CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE:
+          'postgres://pelada_app:e2e-sem-banco@127.0.0.1:5432/pelada',
+      },
+      reuseExistingServer: true,
+      timeout: 180_000,
     },
-    reuseExistingServer: true,
-    timeout: 180_000,
-  },
+    {
+      // `pnpm dev` de verdade (FUN-04): o Vite em 5173 encaminha /api para o wrangler dev em 8788. A senha é fictícia:
+      // o /api/health não consulta o banco, e o script só confere que o Postgres local está de pé.
+      command: 'pnpm dev',
+      cwd: '../..',
+      url: 'http://127.0.0.1:5173/api/health',
+      reuseExistingServer: true,
+      timeout: 180_000,
+      env: { PELADA_APP_SENHA: 'e2e-sem-banco', PELADA_DEV_PORTA_API: '8788' },
+    },
+  ],
 });
