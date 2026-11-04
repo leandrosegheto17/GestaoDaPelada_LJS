@@ -1,0 +1,41 @@
+/* A partir de .lista, .esqueleto e .esqueleto--bloco do base.css do mockup (padrao--carregando-lista). */
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-linha);
+  border-radius: var(--raio);
+}
+
+.linha {
+  display: block;
+  height: 60px;
+  margin: 0 0 1px;
+  background: var(--cor-esqueleto);
+  animation: pulsar 1.4s ease-in-out infinite;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@keyframes pulsar {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .linha {
+    animation: none;
+  }
+}

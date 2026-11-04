@@ -6,6 +6,8 @@ export default defineConfig({
   build: { outDir: 'dist', sourcemap: true },
   test: {
     environment: 'jsdom',
+    // CSS Modules sem hash nos testes: a classe é o nome escrito no arquivo.
+    css: { include: [/\.module\.css$/], modules: { classNameStrategy: 'non-scoped' } },
     setupFiles: ['./test/setup.ts'],
     include: ['src/**/*.test.{ts,tsx}', 'test/**/*.test.{ts,tsx}'],
   },
