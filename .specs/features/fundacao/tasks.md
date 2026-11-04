@@ -1694,10 +1694,10 @@ Gate: pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test
 
 **Done when**:
 
-- [ ] Teste `FUN-29` lê o arquivo: cada cabeçalho presente com o valor esperado
-- [ ] Teste `FUN-29`: a CSP não contém `unsafe-inline` nem `unsafe-eval` em `script-src`
-- [ ] O build copia o arquivo para o `dist`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-29` lê o arquivo: cada cabeçalho presente com o valor esperado
+- [x] Teste `FUN-29`: a CSP não contém `unsafe-inline` nem `unsafe-eval` em `script-src`
+- [x] O build copia o arquivo para o `dist`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1718,10 +1718,10 @@ Gate: pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test
 
 **Done when**:
 
-- [ ] Teste e2e: `/` mostra a página provisória e `/api/health` responde 200 pelo mesmo servidor
-- [ ] `pnpm --filter @pelada/web e2e` passa em máquina limpa com `docker compose up -d` e `playwright install`
-- [ ] `testes.json` atualizado e `trava-testes.py --rodar` verde
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste e2e: `/` mostra a página provisória e `/api/health` responde 200 pelo mesmo servidor
+- [x] `pnpm --filter @pelada/web e2e` passa em máquina limpa com `docker compose up -d` e `playwright install`
+- [x] `testes.json` atualizado e `trava-testes.py --rodar` verde
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1742,9 +1742,9 @@ Gate: pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test
 
 **Done when**:
 
-- [ ] Teste `FUN-29`: `GET /` traz CSP, `nosniff`, `Referrer-Policy` e `Strict-Transport-Security`
-- [ ] Teste `FUN-22`: `GET /api/health` traz `no-store` e `nosniff`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-29`: `GET /` traz CSP, `nosniff`, `Referrer-Policy` e `Strict-Transport-Security`
+- [x] Teste `FUN-22`: `GET /api/health` traz `no-store` e `nosniff`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1765,15 +1765,17 @@ Gate: pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test
 
 **Done when**:
 
-- [ ] Teste `FUN-37`: o manifest parseado tem os campos de FUN-33
-- [ ] Teste `FUN-37`: depois do registro, `navigator.serviceWorker.controller` existe na página
-- [ ] Teste `FUN-37`: com `context.setOffline(true)`, uma rota fora do cache mostra o conteúdo da página offline
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-37`: o manifest parseado tem os campos de FUN-33
+- [x] Teste `FUN-37`: depois do registro, `navigator.serviceWorker.controller` existe na página
+- [x] Teste `FUN-37`: com `context.setOffline(true)`, uma rota fora do cache mostra o conteúdo da página offline
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
 
 ---
+
+Gate: python .claude/scripts/trava-testes.py --rodar (typecheck, vitest, checagens, build e playwright) @ e461fe0d65d13429d096919f06940db4398cab00 = SUÍTE VERDE, e2e 7 testes
 
 #### Phase 18: Comparação visual e pnpm dev
 
