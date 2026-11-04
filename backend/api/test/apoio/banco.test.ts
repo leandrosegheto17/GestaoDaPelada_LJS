@@ -8,7 +8,7 @@ async function bancosOrfaos() {
   const c = new pg.Client({ connectionString: URL_ADMIN_PADRAO });
   await c.connect();
   try {
-    const r = await c.query("select datname from pg_database where datname like 'teste\_%'");
+    const r = await c.query("select datname from pg_database where left(datname, 6) = 'teste_'");
     return r.rows.map((l) => l.datname as string);
   } finally {
     await c.end();
