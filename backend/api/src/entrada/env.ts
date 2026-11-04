@@ -2,6 +2,8 @@
 export interface Env {
   VERSAO: string;
   URL_PUBLICA: string;
+  /** Segredo opcional: sem ele o Sentry fica desligado (FUN-25). */
+  SENTRY_DSN?: string;
   HYPERDRIVE: Hyperdrive;
   LIMITE_ENTRAR: RateLimit;
   LIMITE_PUBLICO: RateLimit;

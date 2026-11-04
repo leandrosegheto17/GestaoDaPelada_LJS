@@ -20,6 +20,8 @@
     "wrangler": "^4.157.0"
   },
   "dependencies": {
+    "@pelada/contrato": "workspace:*",
+    "@sentry/cloudflare": "^11.10.0",
     "hono": "^4.13.16",
     "kysely": "^0.29.8",
     "node-pg-migrate": "^9.0.0",
