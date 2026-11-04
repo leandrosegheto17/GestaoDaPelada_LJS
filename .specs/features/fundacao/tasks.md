@@ -2213,7 +2213,7 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ 27be2bb46c018b91ec4296490
 
 ### T78: Ação do usuário: Hyperdrive, token e environment previa
 
-**What**: Criar o Hyperdrive `gestaodapelada-v2-dev` com `--caching-disabled` apontando para a `dev` com `pelada_app`, o token da Cloudflare e o environment `previa` no GitHub com os secrets do runbook.
+**What**: Seguindo a AD-119: usar o Hyperdrive existente `e06363bd…` (cache desligado, `main` do Neon, `pelada_app`), ter o token da Cloudflare e completar o environment `producao` no GitHub com os secrets do runbook.
 **Estimativa**: 40 min
 **Risco**: alto
 **Domínio**: não
@@ -2225,8 +2225,8 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ 27be2bb46c018b91ec4296490
 
 **Done when**:
 
-- [ ] O Hyperdrive existe e `wrangler hyperdrive get` mostra o cache desligado
-- [ ] O environment `previa` tem `NEON_URL_DEV_MIGRACAO`, `NEON_URL_DEV_BACKUP`, `NEON_API_KEY`, `NEON_PROJECT_ID`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` e `URL_PUBLICA`
+- [ ] O Hyperdrive existe e `wrangler hyperdrive get` mostra o cache desligado (AD-119)
+- [ ] O environment `producao` tem `NEON_URL_MIGRACAO`, `NEON_URL_BACKUP`, `BACKUP_CHAVE`, `NEON_API_KEY`, `NEON_PROJECT_ID`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` e `URL_PUBLICA` (AD-119)
 - [ ] O usuário informa o ID do Hyperdrive (não é segredo)
 - [ ] Gate passa, sem teste removido ou enfraquecido
 
