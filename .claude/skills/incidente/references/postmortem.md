@@ -2,7 +2,7 @@
 
 Adaptado do wshobson `postmortem-writing` e `incident-runbook-templates` (atribuição em `ATRIBUICAO.md`).
 
-## Prevenção (fase 7)
+## Prevenção (pós-incidente, depois do `/finalizar`)
 
 Para cada causa e fator contribuinte de `causa-raiz.md`, uma ação, de um destes tipos:
 
@@ -70,7 +70,7 @@ Regras:
 | Suspeita de vazamento | <encarregado de dados> | <canal> |
 ```
 
-## Post-mortem (fase 8)
+## Post-mortem (pós-incidente)
 
 **Sem culpa:**
 

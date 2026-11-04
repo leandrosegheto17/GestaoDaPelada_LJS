@@ -69,6 +69,7 @@ TITULO_TAREFA = re.compile(r"^(#{2,4})\s+(T\d+)\s*:", re.IGNORECASE)
 ESTIMATIVA = re.compile(r"^\s*\*\*Estimativa\*\*\s*:\s*(.*?)\s*$", re.IGNORECASE)
 CRITICIDADE = re.compile(r"^\s*\*\*Criticidade\*\*\s*:\s*(.*?)\s*$", re.IGNORECASE)
 DOMINIO = re.compile(r"^\s*\*\*Dom[ií]nio\*\*\s*:\s*(.*?)\s*$", re.IGNORECASE)
+RETRABALHO = re.compile(r"retrabalho", re.IGNORECASE)
 DURACAO = re.compile(r"(\d+(?:[.,]\d+)?)\s*(h(?:oras?)?|min(?:utos?)?)\b", re.IGNORECASE)
 TITULO = re.compile(r"^(#{1,6})\s")
 CAIXA = re.compile(r"^\s*[-*]\s+\[([ xX])\]")
@@ -245,10 +246,19 @@ def lotes_de(tarefas: list[dict], fases: list[dict]) -> list[dict]:
     def critica(ids: list[str]) -> bool:
         return any(por_id[i]["criticidade"] == "crítica" for i in ids)
 
+    # Phase de retrabalho (gerada pelo /validar) é lote próprio: não junta com o anterior nem é engolida pela cauda
+    retrabalho = {f["numero"] for f in fases if RETRABALHO.search(f.get("nome", ""))}
     lotes: list[dict] = []
     atual: dict | None = None
     for numero, ids in unidades:
         horas = peso(ids)
+        if numero in retrabalho:
+            if atual is not None:
+                lotes.append(atual)
+                atual = None
+            lotes.append({"fases": [numero], "tarefas": list(ids), "horas": horas, "critico": critica(ids),
+                          "retrabalho": True})
+            continue
         if atual is not None and atual["horas"] + horas > LOTE_HORAS:
             lotes.append(atual)  # a Phase não cabe: abre o lote seguinte, em vez de passar de LOTE_HORAS
             atual = None
@@ -256,7 +266,7 @@ def lotes_de(tarefas: list[dict], fases: list[dict]) -> list[dict]:
             lotes.append(atual)  # outra criticidade: o lote já tem o bastante, não mistura os dois ciclos
             atual = None
         if atual is None:
-            atual = {"fases": [], "tarefas": [], "horas": 0.0, "critico": False}
+            atual = {"fases": [], "tarefas": [], "horas": 0.0, "critico": False, "retrabalho": False}
         atual["critico"] = atual["critico"] or critica(ids)
         if numero is not None:
             atual["fases"].append(numero)
@@ -264,14 +274,18 @@ def lotes_de(tarefas: list[dict], fases: list[dict]) -> list[dict]:
         atual["horas"] += horas
     if atual is not None:
         lotes.append(atual)
-    if len(lotes) > 1 and len(lotes[-1]["tarefas"]) <= 2:
+    if len(lotes) > 1 and len(lotes[-1]["tarefas"]) <= 2 and not lotes[-1]["retrabalho"] and not lotes[-2]["retrabalho"]:
         ultimo = lotes.pop()
         lotes[-1]["fases"] += ultimo["fases"]
         lotes[-1]["tarefas"] += ultimo["tarefas"]
         lotes[-1]["horas"] += ultimo["horas"]
         lotes[-1]["critico"] = lotes[-1]["critico"] or ultimo["critico"]
+    contador = 0
     for numero, lote in enumerate(lotes, 1):
         lote["numero"] = numero
+        if lote["retrabalho"]:
+            contador += 1
+            lote["rotulo"] = f"R{contador}"
         lote["criticidade"] = "crítico" if lote["critico"] else "comum"
         lote["dominio"] = any(por_id[i]["dominio"] for i in lote["tarefas"])
     return lotes
@@ -664,7 +678,9 @@ def linha_lote(rel: dict, numero: int | None = None) -> str | None:
     marca = ""
     if det.get("usa_criticidade"):
         marca = f" ({lote['criticidade']}{', Domínio' if lote['dominio'] else ''})"
-    return (f"Lote {lote['numero']} de {len(det['lotes'])}{marca} {corpo} · "
+    normais = sum(1 for l in det["lotes"] if not l["retrabalho"])
+    nome = f"Lote {lote['rotulo']} (retrabalho)" if lote["retrabalho"] else f"Lote {lote['numero']} de {normais}"
+    return (f"{nome}{marca} {corpo} · "
             f"Feature: {item['feitas']} de {item['total']} tarefas ({pct}%)")
 
 

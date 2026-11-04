@@ -49,7 +49,7 @@ Siga as fases 1 a 3 do `systematic-debugging` (investigação, padrão, hipótes
 - **Segurança**: incidente de segurança leva também o `auditor-seguranca` (vetor de entrada, alcance, o que mais está exposto).
 - **Mesma causa antes?** Procure em `.specs/incidentes/*/causa-raiz.md` e `.specs/bugs/*/causa.md`.
 
-Defeito de código confirmado aqui ainda será **reproduzido com teste** pela skill `bug` na fase 6; esta fase confirma pela evidência de produção.
+Defeito de código confirmado aqui ainda será **reproduzido com teste** no plano da correção (fase 6, skill `bug`) e na execução; esta fase confirma pela evidência de produção.
 
 ### Modelo de `causa-raiz.md`
 

@@ -52,10 +52,7 @@ Ao fim, proponha as fases que se dispensam (ex.: fase 2 com fornecedor imposto; 
 | 3 | Contrato | pendente |
 | 4 | Segurança e legal | pendente |
 | 5 | Desenho | pendente |
-| 6 | Implementação | pendente |
-| 7 | Verificação | pendente |
-| 8 | Liberação | pendente |
-| 9 | Monitoramento | pendente |
+| 6 a 9 | Implementação, verificação, liberação e monitoramento | fora do fluxo: `/executar`, `/validar` e `/finalizar` |
 
 ## Voltas à escolha
 

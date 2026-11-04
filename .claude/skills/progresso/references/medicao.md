@@ -17,10 +17,10 @@ Em `lotes.md` (local, fora do git, ou na pasta que o usuário indicar), uma linh
 | Gate | comandos do lote |
 | Commits e fechamento | commits de grupo, marcação e `Gate:` |
 
-No marco e ao fim, some o **gate completo** e o **verificador** em linhas próprias (são tempo de relógio do processo, mas não do lote).
+No `/validar` e ao fim, some o **gate completo** e o **verificador** em linhas próprias (são tempo de relógio do processo, mas não do lote).
 
 ## Métricas finais (`metricas.md`)
 
 Tempo ativo total e por lote; modelo e tipo por lote; nº de commits; linhas de código e de teste (fora lock, `.specs` e a pasta de resultados); testes por suíte; se o último commit de cada lote fecha verde; achados do verificador por gravidade; mutações (derivadas pelo verificador, **nunca passadas a quem constrói**): mortas, sobreviventes, equivalentes; tokens e `/cost` como o Claude Code mostrou (sem estimar).
 
-`medir-lotes.py` mede cada agente despachado: o `executor` dos lotes, o `executor` de cada correção, o `verificador` de cada rodada. Ele não separa lote por lote dentro de um despacho de 6; para isso use o `lotes.md` e o `git log`.
+`medir-lotes.py` mede só os subagentes (o `verificador` e o `auditor-seguranca` do `/validar`). O `/executar` roda na sessão principal e não tem subagente: o contexto ao fechar cada lote vem do `contexto.py`, e o tempo, do `lotes.md` e do `git log`.

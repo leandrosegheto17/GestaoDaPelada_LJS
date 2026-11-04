@@ -22,7 +22,7 @@ Acione o `tlc-spec-driven` (Tasks; e Design antes, no modo grande) passando `ref
 
 ### Etapas
 
-Etapas são as fases do `tasks.md`. Cada etapa é **integrável sozinha** (fase 8) e deixa o sistema melhor que antes, mesmo que as seguintes nunca aconteçam. Modo pequeno: uma etapa. Modo grande: etapas de até ~8 tarefas, na ordem do mapeamento (começa pelo que tem menos dependentes; o que todos usam vai por último).
+Etapas são as fases do `tasks.md`. Cada etapa é **integrável sozinha** (`/validar` e `/finalizar`) e deixa o sistema melhor que antes, mesmo que as seguintes nunca aconteçam. Modo pequeno: uma etapa. Modo grande: etapas de até ~8 tarefas, na ordem do mapeamento (começa pelo que tem menos dependentes; o que todos usam vai por último).
 
 ### Modo grande: novo ao lado do antigo
 
@@ -39,13 +39,13 @@ Escolha o padrão pelo caso e registre em `design.md`, com a costura (`arquivo:l
 
 Na dúvida dentro do mesmo deploy, ramificar por abstração. Sem testes possíveis no antigo (saída de emergência): **execução paralela**, em que o novo roda junto com o antigo, o resultado do antigo é o que vale, e as diferenças são registradas até a taxa combinada no `design.md`; só então o novo assume.
 
-Quando a troca passa por usuários de verdade, as etapas seguem a sequência **preparar → sombra (0%, comparando) → canário (5 a 10%) → ampliar → 100% → limpeza (apagar o antigo)**, cada uma com critério para avançar e gatilho para voltar **uma** etapa. Isso é feito pela skill `liberacao` na fase 8; a limpeza não tem volta e exige confirmação específica.
+Quando a troca passa por usuários de verdade, as etapas seguem a sequência **preparar → sombra (0%, comparando) → canário (5 a 10%) → ampliar → 100% → limpeza (apagar o antigo)**, cada uma com critério para avançar e gatilho para voltar **uma** etapa. Isso é feito pela skill `liberacao` no `/finalizar`; a limpeza não tem volta e exige confirmação específica.
 
 Mudança de dados em produção é ação difícil de desfazer: backup antes, migração reversível testada e confirmação específica.
 
 ## Fase 6: execução
 
-`tlc-spec-driven`, fase Execute, na branch da etapa, pelo agente `executor`. Tenha à mão, junto com o lote: `refatoracao.md` (alvo, fora do escopo), a lista de contratos e `protecao.md`. Lote, linha V2 do lote, gate e commit seguem a seção **Execução** do `CLAUDE.md`; aqui a suíte inteira roda a cada passo, porque comportamento inalterado é a meta.
+Execução pelo `/executar`, na worktree da etapa. Tenha à mão, junto com o lote: `refatoracao.md` (alvo, fora do escopo), a lista de contratos e `protecao.md`. Lote, linha V2 do lote, gate e commit seguem a seção **Execução** do `CLAUDE.md`; aqui a suíte inteira roda a cada passo, porque comportamento inalterado é a meta.
 
 **Ciclo de cada passo:**
 

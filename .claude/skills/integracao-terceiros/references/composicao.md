@@ -1,5 +1,7 @@
 # Skills chamadas (fases 2, 3, 5 a 8)
 
+> **Execução v5.** As skills `feature` e `legado` terminam no planejamento (o `tasks.md`). As linhas abaixo de implementação, verificação, integração e liberação valem para quem executa: o `/executar` (sem skills nem subagentes), o `/validar` (verificador, `revisao-codigo` e `auditor-seguranca`) e o `/finalizar` (liberação e operação). Os acréscimos desta integração entram como tarefas e critérios do `tasks.md` e como itens que o `/validar` confere.
+
 A integração não refaz o que outra skill já faz: grava o **contrato de entrada** dela, aciona, e traz o resultado de volta para `.specs/integracoes/<slug>/`. Ao voltar de cada uma, confira os **itens próprios** da fase antes da aprovação.
 
 ## Fase 2: escolha do fornecedor (skill `escolha-tecnologia`)

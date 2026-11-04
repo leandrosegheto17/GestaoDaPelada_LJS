@@ -1,11 +1,13 @@
 ---
 name: projeto-novo
-description: Orquestra o fluxo de projeto novo (construir um software para vender), da ideia à validação — descobre em que fase o projeto está pelos artefatos em .specs/, avisa a troca de modelo, aciona a skill certa (descoberta, viabilidade-tecnica, plano-comercial, decisao, tlc-spec-driven) e pede aprovação ao fim de cada fase. Use quando o usuário quiser começar ou retomar um projeto novo, ou via /fluxo. Não use para feature em projeto existente, bug ou outros fluxos.
+description: Orquestra o fluxo de projeto novo (construir um software para vender), da ideia ao plano de tarefas e lotes — descobre em que fase o projeto está pelos artefatos em .specs/, avisa a troca de modelo, aciona a skill certa (descoberta, viabilidade-tecnica, plano-comercial, decisao, tlc-spec-driven) e pede aprovação ao fim de cada fase de planejamento. Termina no tasks.md pronto: infraestrutura, construção, validação e lançamento são dos comandos /preparar, /executar, /validar e /finalizar. Use quando o usuário quiser começar ou retomar um projeto novo, ou via /fluxo. Não use para feature em projeto existente, bug ou outros fluxos.
 ---
 
 # Projeto novo (fluxo 1)
 
-Você é o **orquestrador**: decide a fase, aciona a peça certa e controla as aprovações. O trabalho de cada fase está nas skills e agentes que você aciona. As 12 fases, suas perguntas e critérios de passagem estão em [references/fases.md](references/fases.md); leia-o na primeira vez que acionar esta skill na sessão.
+Você é o **orquestrador**: decide a fase, aciona a peça certa e controla as aprovações. O trabalho de cada fase está nas skills e agentes que você aciona. As 8 fases do fluxo, suas perguntas e critérios de passagem estão em [references/fases.md](references/fases.md); leia-o na primeira vez que acionar esta skill na sessão.
+
+**O fluxo termina no planejamento.** Pronto o `tasks.md` (tarefas e lotes) e o `jornadas.md`, nada mais é feito aqui: a infraestrutura é do `/preparar`, a construção do `/executar`, a validação do `/validar` e o lançamento, a operação e o aprendizado do `/finalizar` (seção Fim do planejamento do `CLAUDE.md`).
 
 ## 1. Descobrir onde estamos
 
@@ -24,25 +26,19 @@ Liste `.specs/produto/` e `.specs/features/`. A **primeira linha que se aplica**
 | `spec.md` de escopo grande (mais de uma feature), sem `.specs/projeto/roadmap.md` | 6b Roteiro (a skill pula se o escopo cabe em uma feature) |
 | `spec.md`, sem `design.md` e sem `tasks.md` | 7 Desenho (o tlc pode pular, se a feature for simples) |
 | `design.md`, projeto com interface, sem `.specs/mockup/tokens.css` | 7 Desenho: mockup visual |
-| `design.md` (e mockup, se houver interface) ou spec simples, sem `tasks.md` | 8 Preparação |
-| `tasks.md` com tarefas em aberto | 9 Construção |
-| todas as tarefas concluídas, sem `validation.md` com PASS | 10 Validação |
-| `validation.md` com PASS, sem `seguranca.md` | 10 Validação: auditoria de segurança |
-| `seguranca.md` sem achado crítico ou alto em aberto, sem `.specs/liberacao.md` | 11 Lançamento |
-| `.specs/liberacao.md` com a primeira liberação concluída | 12 Operação e aprendizado |
+| `design.md` (e mockup, se houver interface) ou spec simples, sem `tasks.md` | 8 Quebra em tarefas e lotes |
+| `tasks.md`, sem `.specs/projeto/jornadas.md` | 8 Quebra em tarefas e lotes (faltam as jornadas) |
+| `tasks.md` e `jornadas.md` | **Planejamento concluído**: diga só "O plano está disponível para execução." e encerre |
 
-Para retomar uma construção interrompida, o `tlc-spec-driven` reconcilia `.specs/STATE.md` com o git; deixe que ele faça isso.
+Para retomar um trabalho já executado, use `/executar`, `/validar` ou `/finalizar`; este fluxo não os conduz.
 
 ## 2. Situar o usuário
 
-Uma linha: "**Fase N de 12, <nome>.** Anterior: <fase>, aprovada."
+Uma linha: "**Fase N de 8, <nome>.** Anterior: <fase>, aprovada."
 
-**Validações pendentes** (tabela em `decisao.md`): se houver alguma `pendente`, acrescente uma linha: "Validações pendentes: N (V1 entrevistas, V3 advogado...)". Antes de entrar na fase 9, confira as marcadas como condição para **construção**; antes da fase 11, as marcadas para **lançamento**. Com alguma condição em aberto, **não entre na fase**: mostre quais faltam e pergunte (via `AskUserQuestion`) se o usuário quer registrar o resultado de alguma, mudar a condição ou parar. Quando o usuário trouxer o resultado de uma validação, atualize a linha da tabela (situação, data, resultado). Se `decisao.md` com "seguir" listar pendências só em texto, sem a tabela, ofereça montá-la.
+**Validações pendentes** (tabela em `decisao.md`): se houver alguma `pendente`, acrescente uma linha: "Validações pendentes: N (V1 entrevistas, V3 advogado...)". Antes de dar o plano como disponível (fim da fase 8), confira as marcadas como condição para **construção**. Com alguma em aberto, **não conclua o planejamento**: mostre quais faltam e pergunte (via `AskUserQuestion`) se o usuário quer registrar o resultado de alguma, mudar a condição ou parar. As marcadas como condição para **lançamento** continuam registradas em `decisao.md` para a hora do lançamento. Quando o usuário trouxer o resultado de uma validação, atualize a linha da tabela (situação, data, resultado). Se `decisao.md` com "seguir" listar pendências só em texto, sem a tabela, ofereça montá-la.
 
-Se a fase pede outro modelo, avise:
-
-- fases 1 a 7: "Esta fase rende melhor em Opus: use `/model opus`."
-- fases 8 a 12: "Esta fase pode seguir em Sonnet: use `/model sonnet`."
+Todas as fases deste fluxo rendem melhor em Opus: "Esta fase rende melhor em Opus: use `/model opus`." (a trava de modelo do `CLAUDE.md` vale).
 
 ## 3. Acionar a peça da fase
 
@@ -53,23 +49,22 @@ Se a fase pede outro modelo, avise:
 | 5 | pergunte: "Quer fazer o plano comercial agora? (opcional)" → sim: skill `plano-comercial`; não: siga para a decisão | |
 | Decisão | skill `decisao` | Com `seguir`, ela prepara a entrada do MVP. |
 | 6 | skill `tlc-spec-driven`, fase **Specify** | Entrada: seção "Se seguir: entrada do MVP" de `decisao.md`. Projeto novo costuma ser de tamanho Complex. |
-| 6b | skill `roteiro` | Quebra o MVP em features ordenadas e grava `.specs/projeto/roadmap.md`. Pula sozinha se o escopo cabe em uma feature. Depois dela, as fases 7 a 11 valem para **uma feature por vez**, começando pela primeira do roteiro. |
+| 6b | skill `roteiro` | Quebra o MVP em features ordenadas e grava `.specs/projeto/roadmap.md`. Pula sozinha se o escopo cabe em uma feature. Depois dela, as fases 7 e 8 valem para **uma feature por vez**, começando pela primeira do roteiro; a próxima volta ao fluxo (fase 7) depois que a anterior estiver integrada pelo `/validar`. |
 | 7 | `tlc-spec-driven`, fase **Design**; depois, se houver interface, skill `mockup-visual` (etapas 1 e 2) | O desenho define telas e fluxos; o mockup define a aparência (direção, guia de estilo, 2 a 3 telas-chave). A fase só fecha com os dois aprovados. Use `leitor-codigo` se já houver código. Escolha de stack difícil de reverter (linguagem, banco, hospedagem) com alternativas reais: skill `escolha-tecnologia`, com `escolha.md` gravado a partir da stack candidata de `viabilidade-tecnica.md`; o Design referencia o `AD-NNN` que ela registra. |
-| 8 | `tlc-spec-driven`, fase **Tasks** | Cada tarefa é a menor possível, com **Estimativa** de até 2h de trabalho humano (regra de Tarefas do `CLAUDE.md`). Peça que as **primeiras tarefas** sejam: repositório e estrutura, ambiente local reproduzível, esqueleto que roda ponta a ponta e CI com os testes. Com interface, inclua: copiar `.specs/mockup/tokens.css` sem alterar, criar os componentes do guia antes das telas, e rodar `python .claude/scripts/checar-tokens.py <pasta da interface>` no CI. |
-| 9 | `tlc-spec-driven`, fase **Execute** | Os lotes vão ao agente `executor`, 6 por marco, com teste primeiro; o lote com tarefa de domínio lista os casos limite antes de codar. O ciclo segue a **criticidade** do lote (comum ou crítico), com pré-voo de ambiente antes do primeiro lote, marco a cada 6 lotes e verificador no marco (seção Execução do `CLAUDE.md`). Isole com `using-git-worktrees`. |
-| 10 | verificador do `tlc-spec-driven` (agente `verificador`) | Com PASS, despache o `auditor-seguranca` sobre a feature. Com interface, rode a etapa 3 do `mockup-visual` (prints do app ao lado do mockup + checagem de tokens) e peça o aceite visual ao usuário. Achado crítico ou alto de segurança, ou diferença visual rejeitada, vira tarefa de correção e volta à fase 9. Antes de fechar, a checagem final de testes do `CLAUDE.md` (suíte inteira, resultado mostrado). Ao final, `finishing-a-development-branch`. |
-| 11 | skill `liberacao` | Confere antes as validações pendentes marcadas como condição para lançamento. |
-| 12 | **ainda sem peça** | Diga que esta fase ainda não foi construída e ofereça conduzi-la manualmente seguindo `references/fases.md` (métricas do MVP, feedback, decisão de persistir, pivotar ou encerrar). |
+| 8 | `tlc-spec-driven`, fase **Tasks** | **Só a quebra em tarefas e lotes**, em Opus: o `tasks.md` aceito pelo `validate_tasks.py`, com tarefas da menor medida possível (**Estimativa** de até 2h, **Risco**, **Domínio**, **Criticidade**; regra de Tarefas do `CLAUDE.md`) e lotes. **Sem tarefa de infraestrutura** (repositório, ambiente local, esqueleto, CI, staging, produção): isso é do `/preparar`. Com interface, inclua: copiar `.specs/mockup/tokens.css` sem alterar e criar os componentes do guia antes das telas; a checagem `checar-tokens.py` no CI fica com o `/preparar`. Grave também `.specs/projeto/jornadas.md`, com as jornadas ponta a ponta do E2E geral (formato em [references/fases.md](references/fases.md)), derivadas da spec e do roteiro. |
+| depois da 8 | **nenhuma peça** | Com o `tasks.md` e o `jornadas.md` prontos, o planejamento está concluído: diga só "O plano está disponível para execução." e encerre. Sem pergunta de próxima fase, sem iniciar lote. |
 
 ## 4. Fechar a fase
 
-Quando a peça terminar, apresente:
+Nas fases **1 a 7**, quando a peça terminar, apresente:
 
 - o que foi produzido (caminho do arquivo) e 3 a 5 linhas com o essencial;
 - o critério de passagem da fase (de `references/fases.md`) e se foi atendido;
 - as opções **seguir / ajustar / parar**, e qual é a próxima fase.
 
 Não avance sem aprovação explícita. Ajuste fica na mesma fase. Voltar a uma fase anterior só se a decisão dela mudar.
+
+Na **fase 8** não há aprovação: pronto o `tasks.md` e o `jornadas.md`, a única mensagem é "O plano está disponível para execução." O usuário ajusta pedindo, e o `/executar` é a aprovação.
 
 Antes de declarar uma fase concluída, aplique `verification-before-completion`: o que a fase promete precisa estar no arquivo, não só na conversa.
 

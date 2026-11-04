@@ -1,18 +1,17 @@
 # Marcos de troca de sessão
 
-A sessão principal só orquestra, mas acumula a conversa, os resumos dos agentes e os relatórios de cada fase. Em trabalho longo, ela fica cara (cada mensagem reenvia o histórico) e chega perto do limite. Os fluxos descobrem a fase pelos arquivos em `.specs/`, então trocar de sessão não perde nada, desde que o que foi combinado esteja escrito.
+A sessão principal acumula a conversa, os resumos dos agentes e os relatórios de cada fase. Em trabalho longo, ela fica cara (cada mensagem reenvia o histórico) e chega perto do limite. Os fluxos descobrem a fase pelos arquivos em `.specs/`, então trocar de sessão não perde nada, desde que o que foi combinado esteja escrito.
 
 ## Quando oferecer
 
-Ao fechar uma fase aprovada, nestes marcos:
+**No planejamento**, ao fechar uma fase aprovada, nestes marcos:
 
 | Marco | Exemplo |
 |---|---|
-| A próxima fase pede **outro modelo** | planejamento em Opus → construção em Sonnet |
-| **Antes da construção** (Execute do `tlc-spec-driven`, ou a fase que escreve o código) | é a fase que mais enche a sessão principal |
-| **A cada 6 lotes** dentro da construção | antes de gravar, fecha o ciclo do marco (executor, gate completo, verificador, correções e nova verificação); o tlc grava o `## Handoff` do `STATE.md` e os commits ficam no git |
-| **Antes da verificação** e **antes da integração ou liberação** | o verificador é independente; a integração só precisa dos arquivos |
+| A próxima fase pede **outro modelo** | conversa em Sonnet → planejamento em Opus |
 | A conversa já passou por **3 fases ou mais** | em qualquer fluxo |
+
+**Nos comandos de execução**, o marco não é uma fase aprovada, é o **contexto**: o `/executar` mede o contexto ao fechar cada lote (`python .claude/scripts/contexto.py`) e, acima de 300k, para e pede `/clear` e `/executar`. `/preparar`, `/validar` e `/finalizar` fazem o mesmo quando o contexto passa do limite. A retomada é pelos arquivos (`tasks.md`, `Gate:`, `preparacao.md`, relatórios) e pelo git; a seção `## Retomada` só é necessária para o que não cabe neles.
 
 Fora dos marcos, não ofereça: trocar de sessão a cada pergunta custa a releitura dos artefatos.
 
@@ -37,9 +36,8 @@ Na pergunta de fim de fase (via `AskUserQuestion`), as opções passam a ser:
    - **Item**: `<pasta do trabalho>` (ex.: `.specs/features/importar-extrato/`)
    - **Fase aprovada**: <N, nome> em <AAAA-MM-DD>
    - **Próxima fase**: <N, nome> — modelo indicado: <opus | sonnet>
-   - **Construção** (se no meio): lote <x> de <y> concluído (criticidade do próximo: <crítico | comum>); o tlc retoma pelo `## Handoff`
-   - **Verificador do marco**: <achados em `<caminho>`: N críticos e N não críticos abertos | zero abertos>; o marco só fecha com zero abertos, e a sessão nova confere antes do próximo lote
-   - **Serviços no ar** (se há): <container e porta do banco, comando de subida | nenhum>; seguem no ar através da troca e só caem ao fim da implementação
+   - **Execução** (se no meio): worktree `<caminho>`, branch `feature/<slug>`, lote <x> de <y> concluído (criticidade do próximo: <crítico | comum>); o `/executar` retoma pelo `tasks.md` e pelo `Gate:`
+   - **Serviços no ar** (se há): <container e porta do banco, comando de subida | nenhum>; seguem no ar através da troca e só caem ao fim da feature
    - **Progresso**: <linhas "Produto: ..." e "Feature atual: ..." (e "Projeto: ...", se houver) de `python .claude/scripts/progresso.py`, ou "sem tarefas ainda">, conferida em <AAAA-MM-DD>
    - **Combinado na conversa e não registrado em artefato**: <itens | nenhum>
    - **Gravada em**: <AAAA-MM-DD HH:MM>

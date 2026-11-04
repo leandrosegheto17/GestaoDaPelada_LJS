@@ -16,7 +16,7 @@ Você planeja em **uma passada**, no **modo enxuto** da seção de mesmo nome do
 4. **Rode a suíte afetada uma vez** para a `## Linha de base` (comando, resultado, falhas preexistentes). Se a mudança toca comportamento existente sem teste, a primeira tarefa (T0) o caracteriza, conforme a skill `rede-de-protecao`.
 4b. **Conferência spec × design** (seção do `CLAUDE.md`): liste as divergências entre spec e design; as que o usuário já decidiu viram AD em `.specs/STATE.md` citada na tarefa, e as sem decisão vão em `Perguntas para o usuário`.
 5. **Grave só o `tasks.md`** na pasta indicada, no formato de `.claude/skills/tlc-spec-driven/references/tasks.md` (Tests, Gate, Depends on, Reuses, Requirement), com:
-   - topo: `**Modo**: enxuto` e `**Base**: <arquivo(s)>, conferido em <data>`;
+   - topo: `**Modo**: enxuto`, `**Base**: <arquivo(s)>, conferido em <data>` e `**Branch pai**: <nome>` (a branch atual, onde o `/validar` integra a feature; padrão `main`);
    - `## Delta` (até 10 linhas), `## Critérios` (ID, resumo de uma linha, tarefa), `## Linha de base`;
    - as seções exigidas pelo validador (Test Coverage Matrix, Gate Check Commands, Execution Plan, Task Breakdown), sem as de conferência do modelo;
    - em toda tarefa: **Estimativa** (até 2h), **Risco**, **Domínio** e **Criticidade**, e a regra de tamanho do `CLAUDE.md`. Marque a criticidade na quebra dos lotes e evite misturar Phase crítica e comum.
@@ -25,7 +25,7 @@ Você planeja em **uma passada**, no **modo enxuto** da seção de mesmo nome do
 
 ## Regras
 
-- Não escreva `spec.md`, `reconhecimento.md`, `arqueologia.md`, `design.md` nem `protecao.md`.
+- Não escreva `spec.md`, `reconhecimento.md`, `arqueologia.md`, `design.md` nem `protecao.md`. Quem executa é o `/executar`, depois do seu retorno: você só planeja.
 - Não altere código nem testes; a única escrita é o `tasks.md`.
 - Decisão nova que a entrada não tomou entra no Delta com o motivo; se mudar escopo, contrato ou dinheiro, é pergunta.
 - **Divergência relevante** (a entrada decidiu A, o código atual pede B): pare e devolva em `Perguntas para o usuário`, sem escolher sozinho.

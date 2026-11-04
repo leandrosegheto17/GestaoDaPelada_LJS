@@ -486,6 +486,20 @@ class TestLotes(unittest.TestCase):
         lotes = self.lotes(self.fase(1, 8), self.fase(9, 3))
         self.assertEqual([l["fases"] for l in lotes], [[1], [2]])
 
+    def test_phase_de_retrabalho_e_lote_proprio_e_nao_entra_na_cauda(self):
+        texto = tasks_fases(self.fase(1, 8), self.fase(9, 1)).replace("### Phase 2: Fase 2", "### Phase 2: Retrabalho R1")
+        tarefas, fs = pr.tarefas_de(texto)
+        lotes = pr.lotes_de(tarefas, fs)
+        self.assertEqual([(l["fases"], l["retrabalho"]) for l in lotes], [([1], False), ([2], True)])
+        self.assertEqual(lotes[1].get("rotulo"), "R1")
+        self.assertNotIn("rotulo", lotes[0])
+
+    def test_dois_retrabalhos_seguidos_sao_dois_lotes(self):
+        texto = tasks_fases(self.fase(1, 3), self.fase(4, 1), self.fase(5, 1))
+        texto = texto.replace("### Phase 2: Fase 2", "### Phase 2: Retrabalho R1").replace("### Phase 3: Fase 3", "### Phase 3: Retrabalho R2")
+        tarefas, fs = pr.tarefas_de(texto)
+        self.assertEqual([l.get("rotulo") for l in pr.lotes_de(tarefas, fs)], [None, "R1", "R2"])
+
     def test_sem_estimativa_cada_tarefa_conta_1h(self):
         lotes = self.lotes(self.fase(1, 3, None), self.fase(4, 3, None), self.fase(7, 3, None))
         self.assertEqual([l["fases"] for l in lotes], [[1, 2], [3]])

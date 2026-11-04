@@ -1,4 +1,4 @@
-# Fechamento (fase 9)
+# Fechamento (depois de liberar, com o `/finalizar`)
 
 Grave também quando o bug para antes: não é bug, duplicado, inválido, não reproduzido, parado pelo usuário ou devolvido ao fluxo chamador.
 

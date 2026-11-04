@@ -1,4 +1,4 @@
-# Comunicação (fase 9, e avisos durante o incidente)
+# Comunicação (pós-incidente, e avisos durante o incidente)
 
 Quem precisa saber, o quê e quando. **Toda mensagem é redigida aqui e enviada só com confirmação específica** (para quem, por qual canal, texto final). Nada de culpa nem de nome de pessoa nas mensagens.
 
@@ -25,7 +25,7 @@ O que você precisa fazer: <nada | ação>
 Próximos passos: análise da causa e prevenção em andamento.
 ```
 
-## Fase 9: quem precisa saber
+## Pós-incidente: quem precisa saber
 
 | Público | O que dizer | Quando |
 |---|---|---|
@@ -78,4 +78,4 @@ Mensagem aos titulares: linguagem simples; o que aconteceu, quais dados, riscos,
 - **Registro do incidente guardado em**: <onde>
 ```
 
-Ao concluir, marque `Encerrado: sim` no `incidente.md`. Com a LGPD ainda em avaliação, o incidente não se encerra: fica na fase 9 com o prazo registrado.
+Ao concluir, marque `Encerrado: sim` no `incidente.md`. Com a LGPD ainda em avaliação, o incidente não se encerra: fica aberto na comunicação, com o prazo registrado.

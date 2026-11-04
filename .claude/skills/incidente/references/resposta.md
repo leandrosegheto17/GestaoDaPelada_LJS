@@ -56,7 +56,7 @@ Para cada ação, **antes**, uma confirmação via `AskUserQuestion` com: o que 
 
 ## Restauração (fase 3)
 
-- Reverter, reiniciar, aplicar a configuração anterior. **Código novo** só pela skill `bug` (relato pronto, urgência agora, caminho de hotfix), porque a regra de testes vale também na emergência.
+- Reverter, reiniciar, aplicar a configuração anterior. **Código novo** só pela skill `bug` (relato pronto, urgência agora, caminho de hotfix; planejado pelo fluxo e executado pelo `/executar`), porque a regra de testes vale também na emergência.
 - **Estável por métrica**: o sinal que mostrou o problema (taxa de erro, latência, fila, métrica de negócio) de volta ao normal, observado pelo período combinado com o usuário (sugestão: 15 a 30 minutos). Teste de fumaça do fluxo principal.
 - Ação que pede escalonamento (outra equipe, fornecedor): registre quem e quando.
 

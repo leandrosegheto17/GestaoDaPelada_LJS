@@ -1,6 +1,8 @@
-# As 9 fases do uso próprio
+# As 5 fases do uso próprio
 
 Princípio: **isso vale o meu tempo e funciona na minha infraestrutura, com custo zero?** Toda fase pode terminar em "parar", e isso é válido.
+
+O fluxo vai até o planejamento. O que vem depois (infraestrutura, construção, validação, implantação, manutenção) é dos comandos `/preparar`, `/executar`, `/validar` e `/finalizar`; ver "Depois do fluxo".
 
 | # | Fase | Pergunta | Saída | Critério de passagem | Modelo |
 |---|---|---|---|---|---|
@@ -9,15 +11,21 @@ Princípio: **isso vale o meu tempo e funciona na minha infraestrutura, com cust
 | 3 | Restrições e viabilidade | Onde roda, quanto custa, e os dados? | `necessidade.md` §4 a §6, veredito | Cabe no ambiente e no custo zero; backup definido; veredito `construir` | Opus |
 | 3b | Roteiro (só se o escopo não cabe em uma feature) | Quais features, em que ordem? | `.specs/projeto/roadmap.md` | Features fatiadas na vertical e aprovadas; só a primeira segue | Opus |
 | 4 | Desenho enxuto | Qual a estrutura mais simples que serve? | `features/<app>/spec.md` (e `design.md`, se precisar) | Spec aprovada, com backup, restauração e (se na internet) autenticação e HTTPS como critérios | Opus |
-| 5 | Preparação | Como vou trabalhar? | ambiente Docker, esqueleto, scripts de backup e restauração | Esqueleto rodando no destino | Sonnet |
-| 6 | Construção | Cada fatia já é usável? | código, testes, commits | Tarefas concluídas com o gate passando | Sonnet |
-| 7 | Validação | Funciona, é seguro e os dados estão a salvo? | `validation.md` (PASS); `seguranca.md` se exposta pela internet | PASS, restauração testada, sem achado crítico ou alto | Sonnet |
-| 8 | Implantação | Como coloco no ar com pouco esforço? | `.specs/implantacao.md`, script único | No ar, teste de fumaça e backup conferidos | Sonnet |
-| 9 | Uso e manutenção | Continua útil e funcionando? | revisões periódicas registradas em `implantacao.md` | Decisão manter / evoluir / aposentar | Sonnet |
+| 5 | Quebra em tarefas e lotes | Como o trabalho se divide em passos pequenos e verificáveis? | `tasks.md` (tarefas e lotes); `.specs/projeto/jornadas.md` | Tarefas aceitas pelo `validate_tasks.py`; jornadas derivadas da spec. **Sem aprovação**: termina com "O plano está disponível para execução." | Opus |
 
-## Checklist da revisão periódica (fase 9)
+## Depois do fluxo
 
-Sugira fazer a cada 1 a 3 meses, ou quando o usuário voltar ao projeto:
+| Antes (desenho antigo) | Agora |
+|---|---|
+| 5 Preparação: ambiente Docker, esqueleto, scripts de backup e restauração | `/preparar` (Nível 1, necessário antes do `/executar`; backup e restauração testada no Nível 2) |
+| 6 Construção | `/executar` (uma worktree por feature, sem subagentes) |
+| 7 Validação (verificador, restauração a partir de cópia limpa, segurança se na internet) | `/validar` (por feature, com lote de retrabalho) |
+| 8 Implantação | `/finalizar` (antes dele, o E2E geral das jornadas; publicar na nuvem exige confirmação específica) |
+| 9 Uso e manutenção | `/finalizar` abre a operação; a revisão periódica segue o checklist abaixo |
+
+## Checklist da revisão periódica
+
+Sugira fazer a cada 1 a 3 meses, ou quando o usuário voltar ao projeto (o `/finalizar` registra a primeira revisão em `.specs/operacao.md`):
 
 - [ ] **Ainda uso?** Se não usou no último período, considerar aposentar.
 - [ ] **Backup:** rodou dentro do esperado? Restaurar um backup recente numa cópia limpa.
@@ -26,10 +34,10 @@ Sugira fazer a cada 1 a 3 meses, ou quando o usuário voltar ao projeto:
 - [ ] **Exposição:** continua só na rede local, ou passou a ser acessada pela internet?
 - [ ] **Decisão:** manter, evoluir (vira feature, fluxo 3, ou volta à fase 4) ou aposentar.
 
-**Aposentar:** exportar os dados num formato aberto, parar e remover o serviço, registrar em `implantacao.md` onde ficou a exportação.
+**Aposentar:** exportar os dados num formato aberto, parar e remover o serviço, registrar em `.specs/operacao.md` onde ficou a exportação.
 
 ## Laços comuns
 
 - Algo pronto resolve → encerrar com veredito `adaptar algo pronto`.
 - Restrição de infraestrutura impede (plano gratuito pequeno demais) → rever escopo (fase 2) ou destino (fase 3).
-- Restauração do backup falhou → correção na fase 6; não implantar.
+- Restauração do backup falhou na validação → o `/validar` gera o lote de retrabalho para o `/executar`; não implantar.

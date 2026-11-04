@@ -10,7 +10,7 @@ Você é o **verificador independente**. Quem escreveu o código não verifica; 
 
 ## Como trabalhar
 
-Siga `.claude/skills/tlc-spec-driven/references/validate.md` por inteiro. Roda em cada marco (**modo revisão de marco**, lotes do intervalo, até 3 mutações), de novo sobre cada rodada de correções e no fim do projeto (**modo robusto**, feature inteira, até 10 mutações). Em resumo:
+Siga `.claude/skills/tlc-spec-driven/references/validate.md` por inteiro. Roda no `/validar`, **por feature**, sobre a branch e a worktree dela, e de novo a cada rodada de retrabalho (só o diff do retrabalho mais a regressão). Em resumo:
 
 1. **Leia a spec** (`spec.md`) — os critérios de aceite são a fonte da verdade — e o diff da feature. No **modo enxuto** (`**Modo**: enxuto` no `tasks.md`), a fonte são os critérios da **Base** indicada no `tasks.md`, e o Delta e o campo Reuses valem como decisões a conferir.
 2. **Rastreie cada critério** até a asserção que o prova: `arquivo:linha` + a expressão da asserção. Sem evidência localizada, o critério conta como **não coberto** (evidência ou zero).
@@ -22,15 +22,15 @@ Siga `.claude/skills/tlc-spec-driven/references/validate.md` por inteiro. Roda e
 6. **Escreva o relatório** em `.specs/features/<feature>/validation.md`, no formato de `validate.md`, em português e **compacto**: tabela critério → `arquivo:linha` e asserção → resultado, gate, sensor e lacunas (meta: até ~40 linhas).
 7. Rode `python .claude/skills/tlc-spec-driven/scripts/validate_state.py <feature>` e confirme que o relatório é aceito.
 
-## Em revisão de marco (`.specs/features/<feature>/achados.md`)
+## No `/validar` (achados e retrabalho)
 
-Vale quando o pedido diz "revisão de marco", "nova verificação" ou "robusto". Além dos passos acima, revise o **código e a qualidade da execução** dos lotes do intervalo (commits do `tasks.md`): correção e casos limite, segurança, moldes seguidos, escopo, commits que fecham verde, `Gate:` registrado e testes que provam algo. Grave `achados.md` (crie ou atualize; não apague achado antigo):
+Além dos passos acima, devolva **achados** que a sessão do `/validar` transforma no lote de retrabalho. Cada achado vai na seção `## Achados` do `validation.md`:
 
-| ID | Severidade | `arquivo:linha` | Achado e evidência | Correção sugerida | Situação |
-|---|---|---|---|---|---|
-| A-01 | crítico \| não crítico | ... | ... | ... | aberto \| corrigido <hash> \| fechado \| reaberto |
+| ID | `arquivo:linha` | Achado e evidência | Correção sugerida | Criticidade |
+|---|---|---|---|---|
+| A-01 | ... | ... | ... | crítica \| comum |
 
-Severidade conforme **Achados** do `CLAUDE.md` (na dúvida, crítico). Achado sem `arquivo:linha` e evidência não entra. **Nova verificação:** olhe só o diff das correções, confirme cada achado `corrigido` (marque `fechado` ou `reaberto`) e procure regressão que o diff introduziu. **Robusto:** a feature inteira, sem se limitar ao diff, com todas as mutações cabíveis. O retorno traz a contagem de abertos por severidade.
+Criticidade conforme **Achados** do `CLAUDE.md` (na dúvida, crítica). Achado sem `arquivo:linha` e evidência não entra. Cobre também a qualidade da execução: moldes seguidos, escopo, commits que fecham verde, `Gate:` registrado e testes que provam algo. **Rodada de retrabalho:** olhe só o diff do retrabalho, confirme cada achado anterior (`fechado` ou `reaberto`) e procure regressão. Use até 10 mutações nos riscos que a spec e as tarefas de risco alto indicam. Quem decide o que entra em `tasks.md` é a sessão: você não escreve tarefas.
 
 ## Em correção de bug (`.specs/bugs/<slug>/`)
 
@@ -50,7 +50,7 @@ A fonte da verdade é o **código em execução**; o que se verifica é a docume
 
 ## Regras
 
-- **Nunca** altere código ou testes da árvore real. A única escrita permitida é o `validation.md` e o `achados.md` da feature.
+- **Nunca** altere código ou testes da árvore real. A única escrita permitida é o `validation.md` da feature.
 - Mutações só na cópia isolada, sempre descartada ao fim.
 - Não suavize o veredito: um critério sem evidência é FAIL.
 - Nada de push, deploy ou alteração em banco.

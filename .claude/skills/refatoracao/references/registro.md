@@ -8,7 +8,7 @@
 1. **Forma de integrar:** pergunte via `AskUserQuestion`: **merge local** na branch principal, **PR no GitHub** (push e abertura do PR são ações externas, com confirmação específica) ou **manter a branch**. Use `finishing-a-development-branch`. A descrição do PR diz que é refatoração sem mudança de comportamento, a meta, a métrica antes e depois e como reverter.
 2. **Trecho crítico** (pagamento, login, dados, alto tráfego, ou `arqueologia.md` indica risco, ou modo grande com troca por flag): skill `liberacao`, com a estratégia mais reversível (flag ou gradual, a sequência sombra → canário → ampliar do `plano.md`). Sem produção (biblioteca, uso local): a integração basta. Ferramenta pessoal: skill `implantacao`.
 3. Acrescente a entrada da etapa em `integracao.md`.
-4. Há próxima etapa: crie a branch `refatoracao/<slug>-etapa-<N+1>` a partir da principal atualizada e volte à fase 6.
+4. Há próxima etapa: ela é executada pelo `/executar` na worktree dela, a partir da principal atualizada, e verificada pelo `/validar`.
 
 ### Modelo de `integracao.md`
 

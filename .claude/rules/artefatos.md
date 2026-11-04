@@ -11,6 +11,10 @@ paths:
   - Em projeto existente, cada feature ganha também `reconhecimento.md`, `protecao.md` e `integracao.md` (e `arqueologia.md`, no legado) na sua pasta de `.specs/features/<feature>/`, mais `mockup/` quando a feature cria ou muda telas e o mockup foi feito (skill `mockup-visual`, modo módulo; promovido para `.specs/mockup/` na integração).
   - `.specs/projeto/roadmap.md`: roteiro do projeto, uma linha por etapa ou feature com a **Situação** (`Concluída`, `Em andamento`, `Não começada`); é o roteiro do produto (skill `roteiro`, `references/modelo.md`) e alimenta a linha **Produto** do `/progresso` (skill `progresso`, `references/roadmap.md`). Quem aprova a unidade troca a Situação no mesmo commit.
   - `.specs/projeto/testes.json`: comando da suíte, usado pela checagem final e pela trava de testes.
+  - `.specs/preparacao.md`: estado do `/preparar` em dois níveis (Nível 1 síncrono, necessário ao `/executar`; Nível 2 assíncrono), lido por `.claude/scripts/preparacao.py` (modelo em `preparar/references/modelo.md`).
+  - `.specs/projeto/jornadas.md`: jornadas ponta a ponta do E2E geral, escritas no planejamento do projeto novo e do uso próprio; `.specs/e2e-geral.md` guarda o resultado do `/finalizar`; `.specs/operacao.md`, a operação e o aprendizado.
+  - `.specs/projeto/execucao.json`: opcional, `{"limite_contexto": 300000}`, lido pelo `contexto.py` do `/executar`.
+  - Em todo `tasks.md`: `**Branch pai**` no topo (onde o `/validar` integra) e, depois de uma validação com achados, a Phase `Retrabalho R<n>` (lote próprio, ver `validar/references/relatorio.md`). O `/validar` grava o relatório (`validation.md`) e, com PASS, o `integracao.md` do item.
   - `.specs/liberacao.md`: histórico de liberações em produção (skill `liberacao`), uma entrada por liberação.
   - `.specs/implantacao.md`: destino, comandos de implantar e voltar, backup e histórico (skill `implantacao`).
   - `.specs/bugs/<slug>/`: correção de bug (skill `bug`): `relato.md`, `reconhecimento.md`, `causa.md`, `protecao.md`, `validation.md`, `fechamento.md`. Em andamento = sem `fechamento.md`.

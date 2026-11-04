@@ -10,7 +10,7 @@ Argumento recebido: `$ARGUMENTS`
 
 ## 0. Retomada
 
-Antes de tudo, sem texto antes, procure a seção `## Retomada` em `.specs/STATE.md` (gravada num marco de troca de sessão; procedimento em [references/marcos.md](references/marcos.md)). Se existir e o item ainda estiver em andamento (a skill do fluxo diz pelos arquivos), e o argumento não pedir outro fluxo, a primeira pergunta (via `AskUserQuestion`) é: **Retomar <fluxo> <item> na fase <N> (Recomendado)** ou **Outro trabalho** (segue para os passos 1 e 2). Ao retomar, acione a skill do fluxo, rode `python .claude/scripts/progresso.py` e mostre as linhas dele (o campo **Progresso** da retomada é só a foto do marco; vale o número de agora), diga em uma linha o que estava combinado na conversa (campo da retomada) e aplique a trava de modelo do `CLAUDE.md` com o modelo indicado para a fase.
+Antes de tudo, sem texto antes, procure a seção `## Retomada` em `.specs/STATE.md` (gravada num marco de troca de sessão do planejamento; procedimento em [references/marcos.md](references/marcos.md)). Se existir e o item ainda estiver em andamento (a skill do fluxo diz pelos arquivos), e o argumento não pedir outro fluxo, a primeira pergunta (via `AskUserQuestion`) é: **Retomar <fluxo> <item> na fase <N> (Recomendado)** ou **Outro trabalho** (segue para os passos 1 e 2). Ao retomar, acione a skill do fluxo, rode `python .claude/scripts/progresso.py` e mostre as linhas dele (o campo **Progresso** da retomada é só a foto do marco; vale o número de agora), diga em uma linha o que estava combinado na conversa (campo da retomada) e aplique a trava de modelo do `CLAUDE.md` com o modelo indicado para a fase.
 
 ## 1. Com argumento: atalho
 
@@ -41,6 +41,8 @@ Se o usuário descreveu o que quer em texto livre (ex.: "o login quebrou"), esco
 | Avaliar ou decidir | 24 Revisão de código · 16 Auditoria de segurança · 25 Escolha de tecnologia · 27 Avaliar terceiros | — |
 
 ## 3. Acionar o fluxo escolhido
+
+Todo fluxo **termina no planejamento**: ao fim, a única mensagem é "O plano está disponível para execução." O que vem depois é de quatro comandos, que o usuário chama quando quiser: `/preparar` (infraestrutura, em dois níveis; pode rodar em paralelo), `/executar` (executa o `tasks.md` numa worktree, sem skills nem subagentes), `/validar` (valida uma feature e gera o lote de retrabalho; com PASS, integra) e `/finalizar` (E2E geral, lançamento, operação e aprendizado). Se o usuário perguntar o que vem depois de um plano, explique essa ordem em poucas linhas.
 
 - **Pronto:** acione a skill indicada na tabela e deixe que ela conduza.
 - **Em preparação:** diga em uma linha que ainda não foi construído e pergunte (via `AskUserQuestion`):
