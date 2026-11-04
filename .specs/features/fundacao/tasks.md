@@ -624,13 +624,14 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Os dois secrets existem no environment `backup` (conferido na tela do GitHub, sem ler os valores)
-- [ ] A chave privada está guardada fora do GitHub (o usuário confirma)
-- [ ] O usuário confirma qual é o `age` público em uso, para o runbook
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Os dois secrets existem no environment `backup` (conferido na tela do GitHub, sem ler os valores)
+- [x] A chave privada está guardada fora do GitHub (o usuário confirma)
+- [x] O usuário confirma qual é o `age` público em uso, para o runbook
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
+**Registro (2026-11-04)**: secrets conferidos com `gh secret list --env backup` (sem ler valores); o usuário confirmou a chave privada guardada fora do GitHub. Chave pública age em uso: `age13ggkr74x7k05da33zff37knwsqfnrn5lw9y4cdn3ln7cy9jc74uqyn62dc`.
 
 ---
 
