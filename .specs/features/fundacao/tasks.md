@@ -1349,10 +1349,10 @@ T81 → T82
 
 **Done when**:
 
-- [ ] `pnpm --filter @pelada/web build` gera `dist/index.html`
-- [ ] Teste: o `App` renderiza sem erro no jsdom
-- [ ] `pnpm --filter @pelada/web typecheck` passa
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] `pnpm --filter @pelada/web build` gera `dist/index.html`
+- [x] Teste: o `App` renderiza sem erro no jsdom
+- [x] `pnpm --filter @pelada/web typecheck` passa
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1373,10 +1373,10 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-30`: `tokens.css`, cada fonte e cada ícone do front têm SHA-256 igual ao do arquivo em `.specs/mockup/`
-- [ ] Teste `FUN-30`: alterar um byte do `tokens.css` do front faz o teste falhar (conferido uma vez e revertido)
-- [ ] O manifest ainda não existe: só os arquivos entram
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-30`: `tokens.css`, cada fonte e cada ícone do front têm SHA-256 igual ao do arquivo em `.specs/mockup/`
+- [x] Teste `FUN-30`: alterar um byte do `tokens.css` do front faz o teste falhar (conferido uma vez e revertido)
+- [x] O manifest ainda não existe: só os arquivos entram
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1397,10 +1397,10 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-32`: um CSS de exemplo com `#fff`, `rgb(...)`, `font-family: Arial` e `box-shadow: 0 0 4px #000` reprova
-- [ ] Teste `FUN-32`: um CSS com `var(--...)` passa; o próprio `tokens.css` passa
-- [ ] `pnpm lint` na raiz inclui o Stylelint
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-32`: um CSS de exemplo com `#fff`, `rgb(...)`, `font-family: Arial` e `box-shadow: 0 0 4px #000` reprova
+- [x] Teste `FUN-32`: um CSS com `var(--...)` passa; o próprio `tokens.css` passa
+- [x] `pnpm lint` na raiz inclui o Stylelint
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1421,13 +1421,14 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Passa no Stylelint de FUN-32 sem exceção
-- [ ] O build embute as fontes locais e nenhuma requisição externa de fonte é feita
-- [ ] `pnpm --filter @pelada/web build` passa
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Passa no Stylelint de FUN-32 sem exceção
+- [x] O build embute as fontes locais e nenhuma requisição externa de fonte é feita
+- [x] `pnpm --filter @pelada/web build` passa
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
+**Gate (Lote 12)**: docker compose up -d --wait && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:checagens @ c59a3df05820ae0f672f86fe1bab53cc47eb9b2b = verde
 
 ---
 
