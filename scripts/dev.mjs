@@ -9,7 +9,7 @@ const HOST_BANCO = '127.0.0.1';
 const BASE = 'postgres://pelada_app';
 
 export function portaDoBanco(env) {
-  return Number(env.PELADA_DEV_BANCO_PORTA ?? 5432);
+  return Number(env.PELADA_DEV_BANCO_PORTA || 5432);
 }
 
 /** String do Hyperdrive local. Falha, sem imprimir segredo, se a senha não estiver no ambiente. */
@@ -67,8 +67,8 @@ async function main() {
     process.exit(1);
   }
 
-  const portaApi = env.PELADA_DEV_PORTA_API ?? '8787';
-  const portaWeb = env.PELADA_DEV_PORTA_WEB ?? '5173';
+  const portaApi = env.PELADA_DEV_PORTA_API || '8787';
+  const portaWeb = env.PELADA_DEV_PORTA_WEB || '5173';
   const worker = iniciar(
     'pnpm',
     [

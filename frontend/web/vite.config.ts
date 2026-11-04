@@ -38,7 +38,7 @@ export default defineConfig({
   ],
   // `pnpm dev`: o Worker (wrangler dev) serve /api/*; o Vite encaminha para ele (FUN-04).
   server: {
-    proxy: { '/api': `http://127.0.0.1:${process.env.PELADA_DEV_PORTA_API ?? '8787'}` },
+    proxy: { '/api': `http://127.0.0.1:${process.env.PELADA_DEV_PORTA_API || '8787'}` },
   },
   build: { outDir: 'dist', sourcemap: true },
   test: {
