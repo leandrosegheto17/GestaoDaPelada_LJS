@@ -6,3 +6,5 @@ pnpm-lock.yaml
 dist
 coverage
 **/fixtures-lint
+frontend/web/src/estilos/tokens.css
+frontend/web/public
