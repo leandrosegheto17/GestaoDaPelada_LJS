@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { BancoIndisponivel } from '../infraestrutura/db/cliente.ts';
 import type { Env } from './env.ts';
 import { semCache, semSniff } from './middlewares/cabecalhos.ts';
 import { health } from './rotas/health.ts';
@@ -19,7 +20,11 @@ export function criarApp(preparar?: (app: Hono<AppEnv>) => void): Hono<AppEnv> {
   preparar?.(app);
 
   app.notFound((c) => c.json({ erro: 'nao_encontrado' }, 404));
-  app.onError((_erro, c) => c.json({ erro: 'erro_interno' }, 500));
+  app.onError((erro, c) => {
+    // A resposta nunca carrega a mensagem do erro: ela pode trazer endereço de banco ou dado de quem pediu.
+    if (erro instanceof BancoIndisponivel) return c.json({ erro: 'banco_indisponivel' }, 503);
+    return c.json({ erro: 'erro_interno' }, 500);
+  });
 
   return app;
 }
