@@ -1596,10 +1596,10 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-33` lê o objeto do manifest: nome, `display`, `lang`, `start_url` e `theme_color` do token
-- [ ] Teste `FUN-33`: os ícones 192 e 512 existem em `public/icones` e um é `maskable`
-- [ ] O build gera `manifest.webmanifest` com os mesmos valores
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-33` lê o objeto do manifest: nome, `display`, `lang`, `start_url` e `theme_color` do token
+- [x] Teste `FUN-33`: os ícones 192 e 512 existem em `public/icones` e um é `maskable`
+- [x] O build gera `manifest.webmanifest` com os mesmos valores
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1620,10 +1620,10 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-34`: o SW registra listeners de `push` e `notificationclick`, que não lançam erro com evento vazio
-- [ ] Teste `FUN-35`: navegação sem rede numa rota fora do cache responde `offline.html`
-- [ ] Teste `FUN-34`: a lista de precache inclui o shell e `offline.html`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-34`: o SW registra listeners de `push` e `notificationclick`, que não lançam erro com evento vazio
+- [x] Teste `FUN-35`: navegação sem rede numa rota fora do cache responde `offline.html`
+- [x] Teste `FUN-34`: a lista de precache inclui o shell e `offline.html`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1644,9 +1644,9 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-35`: o HTML não referencia nenhuma URL externa e só usa `var(--...)` de tokens ou o CSS do build
-- [ ] Teste `FUN-35`: tem `lang="pt-BR"`, título e uma landmark `main`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-35`: o HTML não referencia nenhuma URL externa e só usa `var(--...)` de tokens ou o CSS do build
+- [x] Teste `FUN-35`: tem `lang="pt-BR"`, título e uma landmark `main`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1667,14 +1667,16 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-25`: sem DSN, nada é inicializado e nenhuma requisição sai
-- [ ] Teste `FUN-24`: com DSN falso, a configuração usa `release` e `limparEvento`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-25`: sem DSN, nada é inicializado e nenhuma requisição sai
+- [x] Teste `FUN-24`: com DSN falso, a configuração usa `release` e `limparEvento`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
 
 ---
+
+Gate: pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:checagens @ 443c70107b4cf970eed32e9d5dd58efa77a52bab = verde (frontend/web 87 testes, scripts 68, contrato 6, dominio 3, api 15; 0 falharam)
 
 #### Phase 17: Cabeçalhos e e2e
 
