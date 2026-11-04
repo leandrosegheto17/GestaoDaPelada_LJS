@@ -42,7 +42,7 @@ describe('wrangler.jsonc da prévia', () => {
     expect(new Set(ids).size).toBe(4);
   });
 
-  it('FUN-27: Worker gestaodapelada-v2 em workers.dev, sem rota nem domínio próprio', () => {
+  it('FUN-27: Worker gestaodapelada-v2 na prévia, sem rota nem domínio próprio', () => {
     expect(config.name).toBe('gestaodapelada-v2');
     expect(config.workers_dev).toBe(true);
     expect(config).not.toHaveProperty('routes');
