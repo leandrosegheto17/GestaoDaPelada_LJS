@@ -50,10 +50,10 @@ describe('wrangler.jsonc da prévia', () => {
     expect(texto).not.toContain('custom_domain');
   });
 
-  it('FUN-27: Hyperdrive HYPERDRIVE com marcador PREENCHER até o ID real e vars VERSAO e URL_PUBLICA', () => {
+  it('FUN-27: Hyperdrive HYPERDRIVE com ID real (hex de 32 caracteres, não o marcador) e vars VERSAO e URL_PUBLICA', () => {
     expect(config.hyperdrive).toHaveLength(1);
     expect(config.hyperdrive?.[0]?.binding).toBe('HYPERDRIVE');
-    expect(config.hyperdrive?.[0]?.id).toBe('PREENCHER');
+    expect(config.hyperdrive?.[0]?.id).toMatch(/^[0-9a-f]{32}$/);
     expect(config.hyperdrive?.[0]?.localConnectionString).toBeTruthy();
     expect(Object.keys(config.vars ?? {}).sort()).toEqual(['URL_PUBLICA', 'VERSAO']);
   });
