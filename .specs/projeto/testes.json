@@ -1,1 +1,3 @@
-{"dispensado": true, "motivo": "Dispensa temporária aprovada pelo usuário em 2026-11-03: repositório só com documentação e fluxos, sem código. A T6 da fundação (`testes-json`) substitui esta dispensa pelo comando real da suíte (FUN-54)."}
+{
+  "comando": "docker compose up -d --wait && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:checagens && pnpm --filter @pelada/web build && pnpm --filter @pelada/web e2e && pnpm --filter @pelada/web visual"
+}

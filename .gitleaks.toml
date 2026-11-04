@@ -1,0 +1,18 @@
+# Varredura de segredos (FUN-46): as regras padrão do gitleaks, mais as exceções abaixo.
+title = "Gestão da Pelada"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Valores de desenvolvimento local e documentação, sem segredo real."
+paths = [
+  '''pnpm-lock\.yaml''',
+  '''\.specs/''',
+  '''\.claude/''',
+  '''\.rascunho/''',
+]
+# O usuário e a senha do Postgres do docker compose local (postgres:postgres) não são segredo.
+regexes = [
+  '''postgres://postgres:postgres@127\.0\.0\.1''',
+]

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <title>Gestão da Pelada</title>
+  <!-- Icone maskable: fundo de borda a borda; o motivo cabe no circulo central de raio 204 (area segura de 80%).
+       Cores só de tokens.css: #0B6B34 e o token cor-verde, #0E7A3C e cor-verde-faixa,
+       #FEFFFD e cor-sobre-verde, #14201A e cor-texto. Sem texto, sem filtro, sem recurso externo. -->
+  <rect width="512" height="512" fill="#0B6B34"/>
+  <g fill="#0E7A3C">
+    <rect x="64" width="64" height="512"/>
+    <rect x="192" width="64" height="512"/>
+    <rect x="320" width="64" height="512"/>
+    <rect x="448" width="64" height="512"/>
+  </g>
+  <circle cx="256" cy="256" r="120" fill="#FEFFFD" stroke="#14201A" stroke-width="12"/>
+  <polygon points="256,212 297.8,242.4 281.8,291.6 230.2,291.6 214.2,242.4" fill="#14201A"/>
+  <g stroke="#14201A" stroke-width="12" stroke-linecap="round">
+    <line x1="256" y1="212" x2="256" y2="138"/>
+    <line x1="297.8" y1="242.4" x2="368.2" y2="219.5"/>
+    <line x1="281.8" y1="291.6" x2="325.4" y2="351.5"/>
+    <line x1="230.2" y1="291.6" x2="186.6" y2="351.5"/>
+    <line x1="214.2" y1="242.4" x2="143.8" y2="219.5"/>
+  </g>
+</svg>

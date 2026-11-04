@@ -1,0 +1,29 @@
+/* A partir de .faixa, .faixa--info, .faixa--topo e .faixa__fechar do base.css do mockup (t01-ranking--instalar-iphone). */
+.faixa {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--esp-3);
+  padding: var(--esp-3) var(--esp-4);
+  margin: 0;
+  font-size: var(--texto-md);
+  background: var(--cor-info-fundo);
+  color: var(--cor-info-texto);
+}
+
+.texto {
+  flex: 1;
+  margin: 0;
+}
+
+.fechar {
+  margin: -10px -10px -10px 0;
+  width: var(--alvo-toque);
+  height: var(--alvo-toque);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
