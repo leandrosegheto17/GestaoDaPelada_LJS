@@ -20,9 +20,15 @@ export default tseslint.config(
   { rules: { 'no-var': 'error', 'prefer-const': 'error' } },
   {
     // Scripts .mjs (e2e e raiz): rodam no Node e usam `document` só dentro de page.evaluate.
-    files: ['frontend/web/e2e/**/*.mjs', 'scripts/**/*.mjs'],
+    files: ['frontend/web/e2e/**/*.mjs', 'scripts/**/*.mjs', 'backend/scripts/ops/**/*.mjs'],
     languageOptions: {
-      globals: { process: 'readonly', console: 'readonly', document: 'readonly' },
+      globals: {
+        process: 'readonly',
+        console: 'readonly',
+        document: 'readonly',
+        fetch: 'readonly',
+        setTimeout: 'readonly',
+      },
     },
   },
   {
