@@ -106,7 +106,7 @@ function valorPorTipo(tipo: string, nome: string): string {
 }
 
 /** Insere uma linha mínima na tabela, para o grupo dado, a partir do catálogo (colunas obrigatórias). */
-async function inserirLinha(
+export async function inserirLinha(
   c: pg.ClientBase,
   tabela: string,
   coluna: string,
