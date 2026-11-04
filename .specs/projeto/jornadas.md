@@ -136,3 +136,89 @@
 - **Passos**: 1. num grupo novo, ver "Sem uso registrado" no início · 2. abrir o ranking público num aparelho · 3. lançar uma partida · 4. abrir "Uso do app"
 - **Resultado esperado**: o início passa a "Esta semana: 1 aparelho"; a t21 mostra a semana de segunda a domingo com 1 aparelho, 0 PDFs, "1 (1)" e "0 / 1"; nenhum evento guarda IP nem conta
 - **Requisitos que atravessa**: PAR-123, PAR-124, PAR-127, PAR-129, PAR-132, PAR-136, PAR-144, PAR-155, PAR-156, PAR-157, PAR-158
+
+## Feature 5: simulador
+
+## J-22 — Montar os times e confirmar a escalação (2 times)
+- **Quem**: admin do grupo
+- **Passos**: 1. no início do grupo, tocar em "Simulador: qui, dd/mm" · 2. desmarcar um ausente e marcar um "Só 1º", escolher N = 7 e K = 2 · 3. tocar em "Sugerir times", mover um jogador do Time A para o Time B · 4. tocar em "Confirmar escalação"
+- **Resultado esperado**: a prévia mostra "2 times de 7 · R reservas"; os números recalculam depois da troca; volta ao início com a faixa "Escalação de dd/mm confirmada." e, abaixo do item Simulador, "Escalação de dd/mm confirmada"; "Refazer" devolve a mesma sugestão
+- **Requisitos que atravessa**: SIM-01, SIM-08, SIM-17, SIM-47, SIM-74, SIM-77
+
+## J-23 — Dividir em 3 ou mais times
+- **Quem**: admin do grupo
+- **Passos**: 1. com 22 aptos, escolher "3 ou mais times" e N = 4 · 2. sugerir · 3. confirmar
+- **Resultado esperado**: "5 times de 4 + 1 time incompleto de 2"; 6 cartões, o último "Incompleto (2 de 4)"; a escalação fica gravada e o painel "Uso do app" conta 1 escalação na semana
+- **Requisitos que atravessa**: SIM-20, SIM-30, SIM-47, SIM-61
+
+## J-24 — Lançar a partida pré-marcada pela escalação
+- **Quem**: admin do grupo
+- **Passos**: 1. depois da J-22, abrir "Lançar partida de qui, dd/mm" · 2. trocar um jogador para ausente · 3. salvar
+- **Resultado esperado**: a faixa "Pré-marcado pela escalação de dd/mm (inclui quem ficou como “não entra”)." com todos da escalação presentes; a partida é gravada com as marcações finais e o ranking a mostra
+- **Requisitos que atravessa**: SIM-77, PAR-17, PAR-22
+
+## Feature 6: financeiro
+
+## J-25 — Caixa do mês da pelada
+- **Quem**: organizadora (criadora do grupo, com acesso ao financeiro)
+- **Passos**: 1. abrir Financeiro no início do grupo e tocar "Configurar caixa" · 2. informar mensalidade R$ 75,00, saldo inicial R$ 350,00 e a data · 3. marcar o pagamento de Toninho no mês · 4. lançar a saída "Aluguel da quadra outubro" de R$ 800,00 · 5. desmarcar o pagamento de Toninho
+- **Resultado esperado**: depois do passo 3 aparece a entrada "Mensalidade Toninho MM/AAAA" de R$ 75,00 com a data de hoje e o saldo sobe R$ 75,00; a saída reduz o saldo em R$ 800,00; "Não pagaram" conta só os ativos no mês; desmarcar remove a entrada e o saldo volta; o cartão do início mostra o saldo atual
+- **Requisitos que atravessa**: FIN-01, FIN-07, FIN-10, FIN-11, FIN-15, FIN-16, FIN-22, FIN-25, FIN-34
+
+## J-26 — Permissão do financeiro
+- **Quem**: admin convidado e a criadora do grupo
+- **Passos**: 1. o convidado abre o início e o Financeiro do grupo · 2. a criadora abre Admins e liga "Acessa financeiro" do convidado · 3. o convidado abre de novo e tenta desligar o próprio acesso
+- **Resultado esperado**: no passo 1 o início não mostra saldo e o Financeiro mostra "Sem acesso" (403 `sem_permissao_financeiro`); depois do passo 2 ele vê o saldo e o caixa; no passo 3 o próprio interruptor está desabilitado e a API responde 409 `acao_na_propria_conta`
+- **Requisitos que atravessa**: FIN-33, FIN-34, FIN-35, FIN-36, FIN-51
+
+## Feature 7: planos-e-cobranca
+
+## J-27 — Assinar o Pro e virar Pro pelo pagamento
+- **Quem**: criadora do grupo
+- **Passos**: 1. abrir Meu plano com o grupo em trial · 2. assinar com nome e CPF · 3. abrir a fatura · 4. o Asaas (sandbox) confirma o pagamento pelo webhook · 5. reabrir Meu plano
+- **Resultado esperado**: "Aguardando a confirmação do pagamento" e depois "Pro", com a data de `pagoAte`; o CPF não fica gravado em lugar nenhum
+- **Requisitos que atravessa**: PLA-29, PLA-30, PLA-31, PLA-35, PLA-44, PLA-52, PLA-53, PLA-54
+
+## J-28 — Trial vence e o grupo cai para o Free sem perder nada
+- **Quem**: organizador de um grupo com 21 jogadores ativos
+- **Passos**: 1. chega o 15º dia (fuso de São Paulo) · 2. abrir o grupo e tentar lançar partida · 3. inativar um jogador · 4. lançar de novo
+- **Resultado esperado**: faixa de somente leitura e 403 no lançamento; inativar funciona; depois disso a partida é aceita; o ranking público segue aberto o tempo todo
+- **Requisitos que atravessa**: PLA-03, PLA-15, PLA-18, PLA-19, PLA-20, PLA-22
+
+## J-29 — Recursos Pro travados no Free
+- **Quem**: admin de um grupo Free
+- **Passos**: 1. abrir o simulador e o financeiro · 2. abrir o ranking público
+- **Resultado esperado**: aviso de recurso Pro com "R$ 9,90/mês"; o financeiro mostra os dados mas não deixa escrever; o ranking público aparece sem "Exportar PDF"
+- **Requisitos que atravessa**: PLA-23, PLA-24, PLA-25, PLA-26, PLA-27
+
+## J-30 — Admin convidada vê o plano sem os botões
+- **Quem**: admin convidada
+- **Passos**: 1. abrir Meu plano
+- **Resultado esperado**: o plano aparece com "Só quem criou o grupo pode assinar ou cancelar" e sem os botões de assinar e cancelar
+- **Requisitos que atravessa**: PLA-57, PLA-59
+
+## J-31 — Cancelar a assinatura
+- **Quem**: criadora do grupo
+- **Passos**: 1. cancelar em Meu plano e confirmar · 2. com o Asaas fora do ar, tentar de novo
+- **Resultado esperado**: o grupo segue Pro até `pagoAte` e depois vira Free; com o Asaas fora, a resposta é 502 e o grupo continua `ativo`
+- **Requisitos que atravessa**: PLA-04, PLA-55, PLA-56
+
+## J-32 — Visitante conhece os planos
+- **Quem**: visitante sem conta
+- **Passos**: 1. abrir `/` · 2. abrir `/?aviso=conta-excluida` · 3. com sessão, abrir `/`
+- **Resultado esperado**: os planos lado a lado com os preços; a faixa "Sua conta foi excluída"; com sessão, vai para `/app`
+- **Requisitos que atravessa**: PLA-61, PLA-62, PLA-63, PLA-64, PLA-65
+
+## J-33 — Cortesia do grupo de teste
+- **Quem**: dono do app
+- **Passos**: 1. rodar o ensaio da migração sobre um dump da produção (AD-033)
+- **Resultado esperado**: o grupo de teste continua em cortesia, os demais grupos passam a trial e a contagem de linhas não muda
+- **Requisitos que atravessa**: PLA-11, PLA-12
+
+## Feature 8: notificacoes
+
+## J-34 — Assinar o ranking, receber o aviso e cancelar
+- **Quem**: jogador sem conta, no celular, e admin do grupo
+- **Passos**: 1. abrir `/g/:slug` de um grupo Pro ou em trial · 2. tocar em "Receber avisos do ranking" e conceder a permissão · 3. o admin lança a partida do dia · 4. tocar na notificação "Ranking atualizado" · 5. tocar em "Parar de receber avisos"
+- **Resultado esperado**: estado "assinado"; até 1 min depois do lançamento chega "<grupo>: partida de dd/mm", sem dado de jogador; o toque abre `/g/<slug>?mes=AAAA-MM`; depois de cancelar, a assinatura some do banco e a tela volta a "Receber avisos do ranking" (no E2E, o push é simulado por um serviço de push falso)
+- **Requisitos que atravessa**: NOT-02, NOT-05, NOT-13, NOT-16, NOT-17, NOT-20, NOT-25, NOT-26, NOT-27, NOT-35, NOT-37, NOT-64
