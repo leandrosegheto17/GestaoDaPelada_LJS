@@ -1,7 +1,3 @@
 .claude/.cache/
 __pycache__/
-node_modules/
-dist/
-.env
-.wrangler/
-coverage/
+node_modules

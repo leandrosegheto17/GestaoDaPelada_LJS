@@ -1,8 +1,0 @@
-node_modules
-dist
-pnpm-lock.yaml
-.specs
-.claude
-.rascunho
-.wrangler
-coverage

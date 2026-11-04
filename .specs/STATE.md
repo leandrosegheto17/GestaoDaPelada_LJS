@@ -23,6 +23,7 @@
 - **Item**: `.specs/features/fundacao/` (feature 1 de 8 do roteiro)
 - **Fase aprovada**: 4, desenho enxuto (spec, design, reuso e `tasks.md` da `fundacao`: 82 tarefas, 25 Phases, 23 lotes) em 2026-11-03
 - **Próxima fase**: 5 e 6, preparação e construção — `tlc-spec-driven`, Execute, começando pela T1 (ação do usuário: ambiente) — modelo indicado: sonnet
+- **Reversão (2026-11-03)**: a implementação dos lotes 1 a 5 (e parte do 6) foi revertida a pedido do usuário; ficam só o planejamento, as AD-013 e AD-014 e o `tasks.md` sem marcações. O histórico do git guarda o código revertido. O `backup.yml` e a `main` continuam publicados no remoto (`a9fbbce`); o container, o volume e a imagem Docker da v2 não foram removidos. A T15 volta a ser tarefa futura: a revalidação do backup fica para o fim do projeto (AD-014), e a ordem dispensada na AD-014 deixa de ter efeito.
 - **Construção**: não iniciada. Próximo: lote 1 de 23 (comum), Phase 1. Rodar `python .claude/scripts/preparar-ambiente.py` antes do primeiro lote e despachar o agente `executor` por marco de 6 lotes
 - **Verificador do marco**: n/a
 - **Serviços no ar**: nenhum
