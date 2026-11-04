@@ -21,8 +21,14 @@ function hashes(): Record<string, string> {
   return Object.fromEntries(lista.map(([h, n]) => [n.replace(/^\*/, ''), h]));
 }
 
-const sqls = () => readdirSync(PASTA).filter((n) => n.endsWith('.sql')).sort();
-const sha = (n: string) => createHash('sha256').update(readFileSync(join(PASTA, n))).digest('hex');
+const sqls = () =>
+  readdirSync(PASTA)
+    .filter((n) => n.endsWith('.sql'))
+    .sort();
+const sha = (n: string) =>
+  createHash('sha256')
+    .update(readFileSync(join(PASTA, n)))
+    .digest('hex');
 
 let restaurar: (() => void) | undefined;
 afterEach(() => restaurar?.());
