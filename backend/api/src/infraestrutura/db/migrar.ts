@@ -21,10 +21,10 @@ export async function migrar(url: string, opcoes: OpcoesMigrar = {}): Promise<st
     migrationsTable: 'pgmigrations',
     singleTransaction: false,
     checkOrder: true,
-    // a segunda execução espera o lock e depois não tem nada pendente (cada migração roda uma vez)
+    // a segunda execuÃ§Ã£o espera o lock e depois nÃ£o tem nada pendente (cada migraÃ§Ã£o roda uma vez)
     advisoryLockMode: 'wait',
     // sÃ³ os arquivos .sql entram; qualquer outro (hash, texto) Ã© ignorado
-    ignorePattern: '^(?!.*\.sql$).*',
+    ignorePattern: '^(?!.*[.]sql$).*',
     log: () => undefined,
   });
   return aplicadas.map((m) => m.name);
