@@ -1,8 +1,41 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vitest/config';
+import { VitePWA } from 'vite-plugin-pwa';
+import { defineConfig, type Plugin } from 'vitest/config';
+import { manifesto } from './src/config/manifesto.ts';
+
+/** Publica `tokens.css` na raiz do build para a página offline (estática) usar as mesmas variáveis do app. */
+function publicarTokens(): Plugin {
+  return {
+    name: 'pelada:publicar-tokens',
+    generateBundle() {
+      this.emitFile({
+        type: 'asset',
+        fileName: 'tokens.css',
+        source: readFileSync(join(import.meta.dirname, 'src', 'estilos', 'tokens.css'), 'utf8'),
+      });
+    },
+  };
+}
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    publicarTokens(),
+    VitePWA({
+      strategies: 'injectManifest',
+      srcDir: 'src/pwa',
+      filename: 'sw.ts',
+      registerType: 'autoUpdate',
+      manifest: manifesto,
+      manifestFilename: 'manifest.webmanifest',
+      injectManifest: {
+        globPatterns: ['**/*.{js,css,html,png,svg,woff2,webmanifest}'],
+        globIgnores: ['**/*.map'],
+      },
+    }),
+  ],
   build: { outDir: 'dist', sourcemap: true },
   test: {
     environment: 'jsdom',
