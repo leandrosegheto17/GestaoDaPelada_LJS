@@ -1869,10 +1869,10 @@ Gate: python .claude/scripts/trava-testes.py --rodar (typecheck, vitest, checage
 
 **Done when**:
 
-- [ ] Teste `FUN-40`: `uses: actions/checkout@v4` reprova; com SHA de 40 caracteres passa
-- [ ] Teste `FUN-40`: `uses: ./.github/actions/x` (local) passa
-- [ ] A checagem roda nos workflows existentes (`backup.yml`) e passa
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-40`: `uses: actions/checkout@v4` reprova; com SHA de 40 caracteres passa
+- [x] Teste `FUN-40`: `uses: ./.github/actions/x` (local) passa
+- [x] A checagem roda nos workflows existentes (`backup.yml`) e passa
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1893,10 +1893,10 @@ Gate: python .claude/scripts/trava-testes.py --rodar (typecheck, vitest, checage
 
 **Done when**:
 
-- [ ] Teste `FUN-45`: `wrangler deploy` em `package.json`, num script `.mjs` ou em outro workflow reprova
-- [ ] Teste `FUN-45`: o único lugar permitido é o `deploy.yml`
-- [ ] Menção em documentação (`docs/`, `README.md`) não reprova
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-45`: `wrangler deploy` em `package.json`, num script `.mjs` ou em outro workflow reprova
+- [x] Teste `FUN-45`: o único lugar permitido é o `deploy.yml`
+- [x] Menção em documentação (`docs/`, `README.md`) não reprova
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1917,16 +1917,18 @@ Gate: python .claude/scripts/trava-testes.py --rodar (typecheck, vitest, checage
 
 **Done when**:
 
-- [ ] Teste `FUN-46`: variável usada e ausente do `.env.example` reprova
-- [ ] Teste `FUN-46`: variável sem a marcação de obrigatoriedade, formato ou segredo reprova
-- [ ] `gitleaks detect` local na base atual não encontra segredo
-- [ ] Nenhum valor real no `.env.example`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-46`: variável usada e ausente do `.env.example` reprova
+- [x] Teste `FUN-46`: variável sem a marcação de obrigatoriedade, formato ou segredo reprova
+- [x] `gitleaks detect` local na base atual não encontra segredo
+- [x] Nenhum valor real no `.env.example`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
 
 ---
+
+Gate: python .claude/scripts/trava-testes.py --rodar @ f96c8b78b1dc89083a1f6b8f16d4bdb3ff668be9 = SUÍTE VERDE; gitleaks detect local sem segredo (130 commits)
 
 #### Phase 20: Workflow de CI
 
