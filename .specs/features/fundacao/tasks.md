@@ -1026,10 +1026,10 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-17`, por tabela e comando: a conta B afeta zero linhas do grupo A ou recebe erro; o conteúdo do grupo A fica idêntico
-- [ ] Teste `FUN-17`: `UPDATE` e `DELETE` sem `WHERE` da conta B não alteram nenhuma linha do grupo A
-- [ ] Um `WITH CHECK` removido de propósito faz o teste falhar (conferido uma vez e revertido)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-17`, por tabela e comando: a conta B afeta zero linhas do grupo A ou recebe erro; o conteúdo do grupo A fica idêntico
+- [x] Teste `FUN-17`: `UPDATE` e `DELETE` sem `WHERE` da conta B não alteram nenhuma linha do grupo A
+- [x] Um `WITH CHECK` removido de propósito faz o teste falhar (conferido uma vez e revertido)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1050,10 +1050,10 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-14`: com `app.slug_publico` do grupo A e sem conta, `SELECT` devolve só linhas do grupo A
-- [ ] Teste `FUN-14`: `INSERT`, `UPDATE` e `DELETE` com só o slug são recusados ou afetam zero linhas
-- [ ] Teste `FUN-15`: sem nenhum contexto, toda tabela de negócio devolve zero linhas
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-14`: com `app.slug_publico` do grupo A e sem conta, `SELECT` devolve só linhas do grupo A
+- [x] Teste `FUN-14`: `INSERT`, `UPDATE` e `DELETE` com só o slug são recusados ou afetam zero linhas
+- [x] Teste `FUN-15`: sem nenhum contexto, toda tabela de negócio devolve zero linhas
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1074,13 +1074,14 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-05`: num banco migrado, cria 1 conta, 1 grupo com vínculo e jogadores, e `comoApp` com essa conta enxerga o grupo
-- [ ] Teste `FUN-05`: com host remoto, sai antes de conectar
-- [ ] Teste `FUN-05`: rodar duas vezes não duplica nem falha
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-05`: num banco migrado, cria 1 conta, 1 grupo com vínculo e jogadores, e `comoApp` com essa conta enxerga o grupo
+- [x] Teste `FUN-05`: com host remoto, sai antes de conectar
+- [x] Teste `FUN-05`: rodar duas vezes não duplica nem falha
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
+**Gate (Lote 8)**: docker compose up -d --wait && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:checagens @ a267c413ea98c6abd0c4da48641534f0173265fc = verde
 
 ---
 
