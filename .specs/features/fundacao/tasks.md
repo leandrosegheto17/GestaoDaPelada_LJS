@@ -1101,11 +1101,11 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-20`: assets, `not_found_handling` e `run_worker_first` conforme a spec
-- [ ] Teste `FUN-26`: os 4 bindings com os limites de 10, 60, 60 e 60 por minuto
-- [ ] Teste `FUN-27`: nome `gestaodapelada-v2`, `workers_dev` verdadeiro, nenhuma chave `routes` nem `custom_domain`
-- [ ] O `id` do Hyperdrive fica com o marcador `PREENCHER` até a tarefa de ID real (o teste de ID real é dela)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-20`: assets, `not_found_handling` e `run_worker_first` conforme a spec
+- [x] Teste `FUN-26`: os 4 bindings com os limites de 10, 60, 60 e 60 por minuto
+- [x] Teste `FUN-27`: nome `gestaodapelada-v2`, `workers_dev` verdadeiro, nenhuma chave `routes` nem `custom_domain`
+- [x] O `id` do Hyperdrive fica com o marcador `PREENCHER` até a tarefa de ID real (o teste de ID real é dela)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1126,10 +1126,10 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-21`: `GET /api/health` responde 200 com `status` `ok` e `versao` igual à variável do teste
-- [ ] Teste `FUN-21`: a rota funciona com o banco parado (sem `HYPERDRIVE` alcançável)
-- [ ] Teste `FUN-20`: `GET /` entrega o `index.html` do build e `GET /rota-qualquer` cai na SPA
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-21`: `GET /api/health` responde 200 com `status` `ok` e `versao` igual à variável do teste
+- [x] Teste `FUN-21`: a rota funciona com o banco parado (sem `HYPERDRIVE` alcançável)
+- [x] Teste `FUN-20`: `GET /` entrega o `index.html` do build e `GET /rota-qualquer` cai na SPA
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1150,9 +1150,9 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-22`: respostas 200, 404 e 500 de `/api/*` têm `Cache-Control: no-store` e `X-Content-Type-Options: nosniff`
-- [ ] Teste `FUN-22`: a rota de saúde também
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-22`: respostas 200, 404 e 500 de `/api/*` têm `Cache-Control: no-store` e `X-Content-Type-Options: nosniff`
+- [x] Teste `FUN-22`: a rota de saúde também
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1173,13 +1173,14 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-26`: binding que nega gera 429 com `Retry-After` e corpo sem detalhe interno
-- [ ] Teste `FUN-26`: binding que permite deixa a requisição passar
-- [ ] Teste `FUN-26`: a chave do limite é o IP do cabeçalho `cf-connecting-ip`; sem ele, usa um valor fixo
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-26`: binding que nega gera 429 com `Retry-After` e corpo sem detalhe interno
+- [x] Teste `FUN-26`: binding que permite deixa a requisição passar
+- [x] Teste `FUN-26`: a chave do limite é o IP do cabeçalho `cf-connecting-ip`; sem ele, usa um valor fixo
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
+**Gate (Lote 9)**: docker compose up -d --wait && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:checagens @ 5d5018295e87c881d28d460faa5a8568b90b487a = verde
 
 ---
 
