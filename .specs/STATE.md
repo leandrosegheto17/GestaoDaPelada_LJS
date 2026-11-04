@@ -135,9 +135,9 @@
 - **Fase aprovada**: 4, desenho enxuto (spec, design, reuso e `tasks.md` da `fundacao`: 82 tarefas, 25 Phases, 23 lotes) em 2026-11-03
 - **Próxima fase**: 5 e 6, preparação e construção — `tlc-spec-driven`, Execute, começando pela T1 (ação do usuário: ambiente) — modelo indicado: sonnet
 - **Reversão (2026-11-03)**: a implementação dos lotes 1 a 5 (e parte do 6) foi revertida a pedido do usuário; ficam só o planejamento, as AD-013 e AD-014 e o `tasks.md` sem marcações. O histórico do git guarda o código revertido. O `backup.yml` e a `main` continuam publicados no remoto (`a9fbbce`); o container, o volume e a imagem Docker da v2 não foram removidos. A T15 volta a ser tarefa futura: a revalidação do backup fica para o fim do projeto (AD-014), e a ordem dispensada na AD-014 deixa de ter efeito.
-- **Construção**: não iniciada. Próximo: lote 1 de 23 (comum), Phase 1. Rodar `python .claude/scripts/preparar-ambiente.py` antes do primeiro lote e despachar o agente `executor` por marco de 6 lotes
+- **Construção (2026-11-04, /executar)**: lotes 1 a 8 de 23 fechados na worktree `../GestaoDaPelada_v2-fundacao` (branch `feature/fundacao`, pai `main`); T15 aberta de propósito (AD-014). Próximo: lote 9, Phase 10 (T33, wrangler). Antes: construção não iniciada; lote 1 de 23 (comum), Phase 1. Rodar `python .claude/scripts/preparar-ambiente.py` antes do primeiro lote e despachar o agente `executor` por marco de 6 lotes
 - **Verificador do marco**: n/a
-- **Serviços no ar**: nenhum
+- **Serviços no ar**: container `gestaodapelada_v2-postgres-1` (postgres:18, `127.0.0.1:5432`, volume `gestaodapelada_v2_pelada_pgdata`), subido com `docker compose up -d --wait` na worktree; cai só ao fim da feature
 - **Progresso**: "Produto: Faltam 8 de 8 features: 0% concluído", "Feature atual: Faltam 82 de 82 tarefas: 0% concluído", conferida em 2026-11-03
 - **Combinado na conversa e não registrado em artefato**:
   - Ações externas exigem confirmação específica na hora: `git push`, execução remota de workflow (`backup.yml`, `deploy.yml`), Hyperdrive, environment e secrets, primeiro deploy. Já feito antes, com confirmação: push da `main` da v2 e branch `legado` no remoto (`e557292`).
