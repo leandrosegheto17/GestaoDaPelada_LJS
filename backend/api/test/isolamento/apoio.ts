@@ -44,9 +44,19 @@ export async function comoApp<T>(
   ctx: Contexto,
   fn: () => Promise<T>,
 ): Promise<T> {
+  return comoRole(c, 'pelada_app', ctx, fn);
+}
+
+/** Como `comoApp`, para outra role da aplicação (ex.: `pelada_backup_ro`). */
+export async function comoRole<T>(
+  c: pg.ClientBase,
+  role: 'pelada_app' | 'pelada_backup_ro',
+  ctx: Contexto,
+  fn: () => Promise<T>,
+): Promise<T> {
   await c.query('begin');
   try {
-    await c.query('set local role pelada_app');
+    await c.query(`set local role ${role}`);
     await c.query(
       "select set_config('app.conta_id', $1, true), set_config('app.slug_publico', $2, true)",
       [ctx.contaId ?? '', ctx.slug ?? ''],
