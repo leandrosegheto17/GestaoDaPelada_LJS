@@ -927,10 +927,10 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste: `comoApp` com conta A enxerga o grupo de A e não o de B em `grupos`
-- [ ] Teste: o cenário cria ao menos uma linha por tabela com `grupo_id` do catálogo (incluindo as de conta, ex. `convites_admin`), conferido por contagem
-- [ ] Teste: o banco de teste é removido no `finally`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste: `comoApp` com conta A enxerga o grupo de A e não o de B em `grupos`
+- [x] Teste: o cenário cria ao menos uma linha por tabela com `grupo_id` do catálogo (incluindo as de conta, ex. `convites_admin`), conferido por contagem
+- [x] Teste: o banco de teste é removido no `finally`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -951,10 +951,10 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-11`: `pelada_app` tentando `TRUNCATE`, `CREATE TABLE` e `DROP TABLE` recebe erro de permissão
-- [ ] Teste `FUN-11`: `rolbypassrls` é falso para `pelada_app`; `pelada_backup_ro` não tem `INSERT`, `UPDATE` nem `DELETE` em nenhuma tabela
-- [ ] Teste `FUN-11`: `pelada_backup_ro` enxerga todas as linhas de todas as tabelas de negócio (policy `USING (true)`)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-11`: `pelada_app` tentando `TRUNCATE`, `CREATE TABLE` e `DROP TABLE` recebe erro de permissão
+- [x] Teste `FUN-11`: `rolbypassrls` é falso para `pelada_app`; `pelada_backup_ro` não tem `INSERT`, `UPDATE` nem `DELETE` em nenhuma tabela
+- [x] Teste `FUN-11`: `pelada_backup_ro` enxerga todas as linhas de todas as tabelas de negócio (policy `USING (true)`)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -975,10 +975,10 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-12`: todas as tabelas com `grupo_id` do catálogo têm `relforcerowsecurity`
-- [ ] Teste `FUN-12`: criar uma tabela de exemplo com `grupo_id` sem RLS ou sem caso na matriz faz o meta-teste falhar (conferido num banco descartável)
-- [ ] O meta-teste lê a lista de casos da matriz, para o teste de leitura e o de escrita usarem a mesma fonte
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-12`: todas as tabelas com `grupo_id` do catálogo têm `relforcerowsecurity`
+- [x] Teste `FUN-12`: criar uma tabela de exemplo com `grupo_id` sem RLS ou sem caso na matriz faz o meta-teste falhar (conferido num banco descartável)
+- [x] O meta-teste lê a lista de casos da matriz, para o teste de leitura e o de escrita usarem a mesma fonte
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -999,13 +999,14 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-13`, por tabela: a conta A lê só as linhas do grupo A; a conta B lê só as do grupo B; a conta sem vínculo lê zero linhas
-- [ ] Tabela sem `GRANT SELECT` para `pelada_app` (ex. `eventos_uso`): o caso espera erro de permissão e o teste confere o motivo
-- [ ] Um `USING (true)` colocado de propósito numa policy faz o teste falhar (conferido uma vez e revertido)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-13`, por tabela: a conta A lê só as linhas do grupo A; a conta B lê só as do grupo B; a conta sem vínculo lê zero linhas
+- [x] Tabela sem `GRANT SELECT` para `pelada_app` (ex. `eventos_uso`): o caso espera erro de permissão e o teste confere o motivo
+- [x] Um `USING (true)` colocado de propósito numa policy faz o teste falhar (conferido uma vez e revertido)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
+**Gate (Lote 7)**: docker compose up -d --wait && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:checagens @ df2df803bfba88948ba8eb97e12c158e56598229 = verde
 
 ---
 
