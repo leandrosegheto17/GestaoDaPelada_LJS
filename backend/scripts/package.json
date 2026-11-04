@@ -10,5 +10,15 @@
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json",
     "test": "vitest run"
+  },
+  "dependencies": {
+    "pg": "^8.23.1",
+    "yaml": "^2.9.1"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.23.1"
+  },
+  "exports": {
+    "./host": "./src/host.ts"
   }
 }
