@@ -6,15 +6,20 @@
     "node": ">=26 <27"
   },
   "exports": {
-    "./host": "./src/host.ts"
+    "./host": "./src/host.ts",
+    "./conectar": "./src/conectar.ts"
   },
   "scripts": {
     "lint": "eslint .",
     "typecheck": "tsc --noEmit -p .",
     "test": "vitest run"
   },
+  "dependencies": {
+    "pg": "^8.23.1"
+  },
   "devDependencies": {
     "@types/node": "^26.0.0",
+    "@types/pg": "^8.23.1",
     "eslint": "^10.12.0",
     "typescript": "^5.9.3",
     "vitest": "^4.1.12",
