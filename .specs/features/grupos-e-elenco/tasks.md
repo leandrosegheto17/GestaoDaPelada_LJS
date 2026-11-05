@@ -2212,6 +2212,8 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T70
 **Reuses**: runner da CA (`CA:1609`, T54) e a lista de telas ativas (`CA:1657`, T56); entradas de `telas.json:164-165` e `:188-227`; mockup copiado em T52
 **Requirement**: GEL-115, GEL-116
+**Status**: rascunhada
+**Lacunas**: (1) o teste ACE-54/ACE-55 da CA em `frontend/web/test/ferramentas/telas-reais.test.ts:95` exige zero entradas T08 e passa a falhar com a AD-031; mudar teste existente pede aprovação, o rascunho não o tocou (a regra nova está em `test/ferramentas/telas-grupos-elenco.test.ts`). (2) Rodar a comparação, ajustar CSS até 1% e a deformação de propósito ficam para o `/executar`. (3) Estados de `revisaoManual` do módulo a conferir à mão: T16 `salvo` (nota salva), T20 `link-copiado`; T27 `senha` não se aplica (sem "Primeiro admin", GEL-114).
 
 **Done when**:
 
