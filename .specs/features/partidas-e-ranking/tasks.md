@@ -1668,6 +1668,8 @@ T78 → T79
 **Depends on**: T44
 **Reuses**: T11, T12, T19, T27, T37; `BD:240`
 **Requirement**: PAR-64, PAR-65, PAR-66, PAR-76, PAR-77, PAR-90, PAR-93
+**Status**: rascunhada
+**Nota do rascunho**: `rotasPublico()` em `rotas/publico.ts`, registrada em `criarApp`. A leitura do grupo pelo slug ficou num repositório novo, `repositorios/grupo-publico.ts` (`lerPeloSlug`), para a rota não ter SQL; a T46 o reusa, com `grupoDoSlug` e `linhaPublicaDe` (a linha sem `jogadorId`). O mês fora do histórico, antes da primeira partida ou depois do de hoje, usa `mesNoHistorico` sobre os `limites` do `calcularRanking`. O teste do PAR-76 usa o cenário de grupos (o mesmo elenco do seed das rotas), em `backend/api/test/rotas/publico-ranking.test.ts`.
 
 **Done when**:
 
