@@ -2121,6 +2121,8 @@ T81 → T82
 **Depends on**: T69
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-41, FUN-42, FUN-43, FUN-44, FUN-57, FUN-58
+**Status**: rascunhada
+**Nota do rascunho**: segue a AD-119 (environment `producao`, restauração, dump e migração na `main` do Neon). Um job só, para a ordem e a parada no primeiro erro valerem; o passo "Conferir URL_PUBLICA" fica logo depois do build e também recusa URL sem `https://` (o teste roda o script do passo no bash). O dump de antes do deploy sobe como artefato por 30 dias. A saúde lê o SHA do `GITHUB_SHA` do job (nenhuma variável nova). Secrets que o environment `producao` precisa ter além dos da AD-119: `BACKUP_CHAVE` (chave pública age do dump) e, opcional, `VITE_SENTRY_DSN`; T77/T78 conferem. O `verificar-saude.mjs` citado no último passo nasce na T72.
 
 **Done when**:
 

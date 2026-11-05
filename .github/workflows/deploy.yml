@@ -1,0 +1,107 @@
+# Deploy da prévia (FUN-41 a FUN-44, FUN-57, FUN-58; AD-004, AD-119): o único lugar que publica o
+# Worker gestaodapelada-v2. Só à mão, só na main, no environment producao, um por vez e sem
+# cancelar o que está rodando. Os passos seguem a ordem da spec e param no primeiro erro:
+# build, branch de restauração, dump cifrado, migração, deploy e saúde.
+name: deploy
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-previa
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: producao
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - name: Instalar dependências
+        run: pnpm install --frozen-lockfile
+
+      # FUN-43: o build vem antes de qualquer passo com secret do Neon ou da Cloudflare.
+      - name: Build do web
+        run: pnpm --filter @pelada/web build
+        env:
+          VITE_VERSAO: ${{ github.sha }}
+          VITE_SENTRY_DSN: ${{ secrets.VITE_SENTRY_DSN }}
+
+      # FUN-58: sem URL_PUBLICA o deploy não acontece.
+      - name: Conferir URL_PUBLICA
+        run: |
+          set -euo pipefail
+          if [ -z "${URL_PUBLICA:-}" ]; then
+            echo "URL_PUBLICA vazia no environment producao: o deploy para aqui (FUN-58)." >&2
+            exit 1
+          fi
+          case "$URL_PUBLICA" in
+            https://*) ;;
+            *) echo "URL_PUBLICA precisa começar com https:// (FUN-58)." >&2; exit 1 ;;
+          esac
+        env:
+          URL_PUBLICA: ${{ secrets.URL_PUBLICA }}
+
+      - name: Instalar pg_dump 18 e age
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y postgresql-common
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install -y postgresql-client-18 age
+          echo /usr/lib/postgresql/18/bin >> "$GITHUB_PATH"
+
+      - name: Branch de restauração da main
+        run: node backend/scripts/ops/restauracao-neon.ts
+        env:
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+          NEON_PROJECT_ID: ${{ secrets.NEON_PROJECT_ID }}
+
+      - name: Dump cifrado da main
+        uses: ./.github/actions/dump-cifrado
+        with:
+          url: ${{ secrets.NEON_URL_BACKUP }}
+          chave-publica: ${{ secrets.BACKUP_CHAVE }}
+          saida: ${{ runner.temp }}/antes-do-deploy.age
+
+      - name: Guardar o dump de antes do deploy
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: antes-do-deploy-${{ github.run_id }}
+          path: ${{ runner.temp }}/antes-do-deploy.age
+          retention-days: 30
+          if-no-files-found: error
+
+      # FUN-44: se a migração falhar, o job para aqui e o deploy não roda.
+      - name: Migração
+        run: pnpm migrar
+        env:
+          DATABASE_URL_MIGRACAO: ${{ secrets.NEON_URL_MIGRACAO }}
+          PELADA_PERMITIR_HOST_REMOTO: '1'
+
+      - name: Deploy do Worker
+        run: >-
+          pnpm --filter @pelada/api exec wrangler deploy --config ../../wrangler.jsonc
+          --var "VERSAO:${{ github.sha }}" --var "URL_PUBLICA:$URL_PUBLICA"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          URL_PUBLICA: ${{ secrets.URL_PUBLICA }}
+
+      # O SHA esperado é o GITHUB_SHA do próprio job, o mesmo que entrou em VERSAO.
+      - name: Saúde depois do deploy
+        run: node backend/scripts/ops/verificar-saude.mjs
+        env:
+          URL_PUBLICA: ${{ secrets.URL_PUBLICA }}
