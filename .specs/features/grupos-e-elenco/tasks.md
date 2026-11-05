@@ -1654,6 +1654,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T48
 **Reuses**: colunas de `auditoria` em `M:1792843200000_linha-de-base.sql:50`; rotas de T28 a T48
 **Requirement**: GEL-113
+**Status**: rascunhada
 
 **Done when**:
 
