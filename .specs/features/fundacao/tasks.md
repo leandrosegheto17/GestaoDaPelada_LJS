@@ -2013,6 +2013,8 @@ T81 → T82
 **Depends on**: T65
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-46
+**Status**: rascunhada
+**Nota do rascunho**: a checagem fica em `backend/scripts/checagens/env-example.ts`; lê toda forma `env.NOME` e `env["NOME"]` no código (cobre `process.env`, `import.meta.env` e o parâmetro `env`) e `secrets.`/`vars.` nos workflows, e ignora as variáveis do ambiente de execução (CI, `GITHUB_*`, `RUNNER_*`, Node, Vite) e os bindings do `wrangler.jsonc`. Faltava `DATABASE_URL_RESTAURACAO` (lida pelo `restaurar-backup.ts`): entrou no `.env.example`. O `.gitleaks.toml` já existia (T11/T12): não foi recriado. O `gitleaks detect` local (terceiro critério) é do `/executar`.
 
 **Done when**:
 
