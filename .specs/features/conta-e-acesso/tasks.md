@@ -1732,6 +1732,8 @@ T57 → T58
 **Depends on**: T53
 **Reuses**: estender `visual.mjs` (`F:1788`) e o comparador (`F:1764`); formato do `telas.json:1-12` e `telas.json:187` (exemplo com `recorte`); AD-021 proposta
 **Requirement**: ACE-54, ACE-55
+**Status**: rascunhada
+**Nota do rascunho**: as funções ficam em `e2e/ferramentas/telas-reais.mjs` (com `.d.mts`): `entradasAtivas`, `aplicarRespostas` (globais do `telas.json` e depois as da entrada; o resto de `/api/**` responde 404 `nao_encontrado`, porque o `vite preview` devolveria o `index.html` com 200), `executarPassos`, `printTela` (`load` e `networkidle` com teto de 3 s, por causa das respostas `pendente`) e `recorteDe`. Os JSONs do mockup trazem o erro no formato antigo (`{ erro: { codigo, mensagem } }`): `adaptarCorpo` converte no `corpoErro` do contrato e troca `nao_autenticado` por `sem_sessao`. O build da comparação (`VITE_VITRINE=1`) nomeia as classes de CSS Module como `<classe>--m-<hash>` (`vite.config.ts`) e `seletorDoApp` reescreve `.classe` do lado do app, para o `recorte` (`.faixa--erro`, `.dialogo`) achar o elemento. A lista do que entra é `e2e/telas-ativas.json` (nasce vazia; T55 e T56 a preenchem).
 
 **Done when**:
 

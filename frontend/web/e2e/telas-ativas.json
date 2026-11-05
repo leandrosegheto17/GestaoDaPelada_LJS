@@ -1,0 +1,4 @@
+{
+  "_leia": "Telas reais do .specs/mockup/telas.json (entradas com real: true) que entram na comparação visual (T54, AD-021): uma linha { id, estado } por estado. O runner é o e2e/visual.mjs.",
+  "telas": []
+}
