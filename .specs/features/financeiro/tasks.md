@@ -1143,6 +1143,8 @@ T47 → T48
 **Depends on**: T31
 **Reuses**: T24; lista de rotas do roteador (T31)
 **Requirement**: FIN-45, FIN-50
+**Status**: rascunhada
+**Nota do rascunho**: o retrato antes e depois traz as contagens de `config_financeira`, `lancamentos`, `pagamentos_mes` e `auditoria` de G, os valores da configuração, a soma dos lançamentos e o acesso de O. A lista das 8 escritas é fixa no teste; a cobertura "toda rota do financeiro" pelo roteador fica no T31.
 
 **Done when**:
 
