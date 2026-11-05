@@ -1075,6 +1075,7 @@ T56 → T57
 **Depends on**: T29
 **Reuses**: `remetenteMemoria()` (`CA:647`); `webServer` do Playwright (`F:1691`)
 **Requirement**: PLA-36, PLA-53
+**Status**: rascunhada
 
 **Done when**:
 
