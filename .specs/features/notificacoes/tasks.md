@@ -429,6 +429,9 @@ T39 → T40 → T41
 **Depends on**: T5
 **Reuses**: T2, T3, T5; `limparEvento` e Sentry (`F:1277`, `F:1301`); log sem conteúdo do remetente (`CA:647`)
 **Requirement**: NOT-27, NOT-28, NOT-29, NOT-30, NOT-31, NOT-32, NOT-33, NOT-63
+**Status**: rascunhada
+**Lacunas**: (1) status fora dos citados pela spec (200, 202, 3xx, 401, outros 4xx) viram `erro` reportado e mantêm a assinatura; (2) `fetch` que lança ou passa de 10 s vira `tentarDeNovo` sem atraso (mesmo teto do 5xx). Confirmar com o usuário antes do verde.
+**Nota do rascunho**: o serviço de push falso (`servicoPushFalso`) mora no próprio `enviar.ts`, ao lado do remetente em memória do molde (`resend.ts`). Os relatos vão por `reportar` (padrão: `Sentry.captureMessage` só com host, status e motivo).
 
 **Done when**:
 
