@@ -295,6 +295,8 @@ T39 → T40 → T41
 **Depends on**: T0
 **Reuses**: primitivos zod (`CA:550`); AD-066 e AD-109
 **Requirement**: NOT-06, NOT-67
+**Status**: rascunhada
+**Nota do rascunho**: rascunhada antes da T0 (decisão do usuário: só o que não depende da feature 7). O teto de 1024 fica no `endpointPushAceito`, sem `.max` no zod, para o campo ter uma só mensagem.
 
 **Done when**:
 

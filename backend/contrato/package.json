@@ -12,7 +12,8 @@
     "./acesso": "./src/acesso.ts",
     "./grupo": "./src/grupo.ts",
     "./elenco": "./src/elenco.ts",
-    "./periodos": "./src/periodos.ts"
+    "./periodos": "./src/periodos.ts",
+    "./push": "./src/push.ts"
   },
   "scripts": {
     "lint": "eslint .",
