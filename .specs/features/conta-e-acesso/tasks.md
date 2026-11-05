@@ -1354,6 +1354,8 @@ T57 → T58
 **Depends on**: T39
 **Reuses**: molde de `Campo` (T39); marcação de `.specs/mockup/telas/t29-cadastro--erro.html`
 **Requirement**: ACE-56, ACE-59
+**Status**: rascunhada
+**Nota do rascunho**: `ResumoErros` em arquivo próprio (`src/componentes/ResumoErros.tsx`), com a faixa de erro no próprio CSS Module; o foco vai ao resumo quando a lista muda e cada link foca o campo sem mudar a URL. `CaixaSelecao` reaproveita as classes de `Campo.module.css` para o erro.
 
 **Done when**:
 

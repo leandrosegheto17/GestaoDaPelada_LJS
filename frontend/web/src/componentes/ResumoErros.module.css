@@ -1,0 +1,37 @@
+/* Resumo de erros (ACE-56), de .specs/mockup/base.css:68,72-75,93-94. */
+
+.faixa {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--esp-3);
+  padding: var(--esp-3) var(--esp-4);
+  border-radius: var(--raio);
+  margin: 0 0 var(--esp-3);
+  font-size: var(--texto-md);
+}
+
+.faixa--erro {
+  background: var(--cor-erro-fundo);
+  color: var(--cor-erro-texto);
+}
+
+.faixa a {
+  color: inherit;
+}
+
+.faixa__texto {
+  flex: 1;
+}
+
+.faixa__texto strong {
+  display: block;
+}
+
+.resumo-erros {
+  border: 2px solid var(--cor-erro-texto);
+}
+
+.resumo-erros ul {
+  margin: var(--esp-1) 0 0;
+  padding-left: var(--esp-5);
+}
