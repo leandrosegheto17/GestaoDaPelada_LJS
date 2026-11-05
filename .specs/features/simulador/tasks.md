@@ -1383,6 +1383,8 @@ T53 → T54
 **Depends on**: T38
 **Reuses**: Rota de `GE:1080` ampliada em `PR:1538` (T43); T31
 **Requirement**: SIM-08
+**Status**: rascunhada
+**Nota do rascunho**: a rota passa os 2 campos de `grupos.ler` (T31). O teste existente `grupo-inicio.test.ts` troca o schema sem os 2 campos pelo contrato inteiro (autorizado); casos novos com relógio na terça (10/03 → 12/03) e na sexta (13/03 → 19/03).
 
 **Done when**:
 

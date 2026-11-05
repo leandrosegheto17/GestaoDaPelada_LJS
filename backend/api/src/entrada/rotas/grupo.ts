@@ -20,9 +20,8 @@ import { linkPublico } from './grupos.ts';
  * e o grant por coluna não deixa a `pelada_app` gravá-lo.
  */
 
-/** Forma do GET até a rota da simulador (T43): o contrato sem os 2 campos do simulador, com o saldo opcional. */
-type DetalheDoGet = Omit<GrupoDetalheComPartidas, 'proximoDiaDeJogo' | 'escalacaoNoProximoDia'> &
-  Pick<GrupoDetalheComSaldo, 'saldoFinanceiroCentavos'>;
+/** Forma do GET (simulador T39): o contrato com os 2 campos do simulador e o saldo opcional (FIN-34). */
+type DetalheDoGet = GrupoDetalheComPartidas & Pick<GrupoDetalheComSaldo, 'saldoFinanceiroCentavos'>;
 
 /** O detalhe do contrato (GEL-20), com o link de `URL_PUBLICA` (GEL-17). */
 export function detalheDoGrupo(urlPublica: string, g: DetalheGrupo): GrupoDetalhe {
@@ -47,9 +46,8 @@ export function rotasGrupo(): Hono<Ambiente> {
 
   /**
    * GET com o início do grupo (partidas-e-ranking T43; PAR-132, `BC:28`): `grupos.ler` recebe o hoje do relógio da
-   * requisição e devolve os 6 campos de `DadosDoInicio`, que entram na resposta ao lado do detalhe (e do saldo, FIN-34).
-   * Os 2 campos do simulador (`proximoDiaDeJogo`, `escalacaoNoProximoDia`, SIM-08) já estão no contrato do GET, mas são
-   * da rota da simulador, que vem depois no roteiro: até lá a resposta é o contrato sem eles.
+   * requisição e devolve os campos de `DadosDoInicio`, que entram na resposta ao lado do detalhe (e do saldo, FIN-34).
+   * Simulador T39 (SIM-08): também `proximoDiaDeJogo` (hoje incluso, AD-086) e `escalacaoNoProximoDia`.
    */
   rotas.get('/grupos/:grupoId', async (c) => {
     const grupoId = c.req.param('grupoId');
@@ -64,6 +62,8 @@ export function rotasGrupo(): Hono<Ambiente> {
       pesosVigentesDesde: g.pesosVigentesDesde,
       pesosPadrao: g.pesosPadrao,
       aparelhosNaSemana: g.aparelhosNaSemana,
+      proximoDiaDeJogo: g.proximoDiaDeJogo,
+      escalacaoNoProximoDia: g.escalacaoNoProximoDia,
     };
     // Saldo do caixa só para quem tem acesso ao financeiro; sem acesso, a chave não vai (FIN-34, AD-079).
     const saldo = await financeiroMes.saldoDoGrupo(c.var.db, grupoId, hoje);
