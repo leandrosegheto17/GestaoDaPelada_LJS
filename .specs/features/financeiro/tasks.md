@@ -515,7 +515,7 @@ T47 → T48
 **Reuses**: Gerador e checagem aditiva (`F:883`, `F:858`); molde de função de visibilidade `grupos_visiveis()` (`M:1792844280000_grupos-visiveis-arquivado.sql:9-22`); laço das policies herdadas (`M:1792843320000_rls.sql:32-61`); AD-052
 **Requirement**: FIN-38, FIN-39, FIN-42
 **Status**: rascunhada
-**Nota do rascunho**: migração `1792845300000_financeiro-rls.sql`, com folga para as migrações das features 4 e 5 (ainda não escritas): o /executar confere que o timestamp é maior que a última delas. Testes em `backend/api/test/banco/financeiro-rls-migracao.test.ts` e `backend/scripts/checagens/test/migracao-aditiva-financeiro.test.ts` (este já cita a migração da T10).
+**Nota do rascunho**: migração `1792845300000_financeiro-rls.sql`, com folga para as migrações das features 4 e 5 (ainda não escritas): o /executar confere que o timestamp é maior que a última delas. Testes em `backend/api/test/banco/financeiro-rls-migracao.test.ts` e `backend/scripts/checagens/test/migracao-aditiva-financeiro.test.ts` (este já cita a migração da T10). O código entrou no commit `b65363b` de outra sessão (índice do git compartilhado).
 
 **Done when**:
 
@@ -541,6 +541,8 @@ T47 → T48
 **Depends on**: T9
 **Reuses**: `app_acessa_financeiro` (T9); `contas_nomes_do_grupo` vigente (`PR:1063`, AD-036); funções `SECURITY DEFINER` de convite e de criar grupo que inserem vínculo (`M:1792844460000_convites-grupo-arquivado.sql:49`, `:90`; `M:1792844340000_grupo-criar.sql:60`), que não podem quebrar
 **Requirement**: FIN-41, FIN-42, FIN-32
+**Status**: rascunhada
+**Nota do rascunho**: migração `1792845360000_financeiro-trava-acesso.sql`. O corpo de `contas_nomes_do_grupo` foi escrito sem a migração da feature 4 (ainda não existe no repositório): o /executar confere que ele repete o dela e só acrescenta as autoras de lançamentos. Testes em `backend/api/test/banco/financeiro-trava-acesso.test.ts`; o item (d) da T0 foi invertido em `financeiro-rede.test.ts`. Teste de `convite_aceitar` fica para o /executar (os testes da CA já o cobrem; só `grupo_criar` foi provado aqui).
 
 **Done when**:
 

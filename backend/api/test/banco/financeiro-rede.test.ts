@@ -183,8 +183,10 @@ describe('rede do financeiro: SEC-003 fechado pela T9 (c)', () => {
   });
 });
 
-describe('rede do financeiro: acessa_financeiro da própria conta (d)', () => {
-  it('FIN-41 (antes; T10 inverte): O muda a própria acessa_financeiro para verdadeiro', async () => {
+// Item (d) invertido pela T10 (`1792845360000_financeiro-trava-acesso.sql`): mesma conta, mesmo UPDATE; a asserção
+// passa de "1 linha" para "zero linhas", tão estrita quanto antes.
+describe('rede do financeiro: acessa_financeiro da própria conta fechado pela T10 (d)', () => {
+  it('FIN-41 (depois da T10): O não muda a própria acessa_financeiro para verdadeiro (zero linhas)', async () => {
     const { db, cenario } = aberto;
     const r = await comoConta(db, cenario.contaO, (d) =>
       d.query('UPDATE vinculos_admin SET acessa_financeiro = true WHERE conta_id = $1 AND grupo_id = $2', [
@@ -192,7 +194,7 @@ describe('rede do financeiro: acessa_financeiro da própria conta (d)', () => {
         cenario.grupoG,
       ]),
     );
-    expect(r.rowCount).toBe(1);
+    expect(r.rowCount).toBe(0);
   });
 });
 
