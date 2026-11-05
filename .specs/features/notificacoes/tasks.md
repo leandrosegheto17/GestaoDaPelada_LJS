@@ -626,6 +626,8 @@ T39 → T40 → T41
 **Depends on**: T12
 **Reuses**: matriz de backup da conta (`CA:313`); script de dump (`F:534`); AD-010, AD-016
 **Requirement**: NOT-58
+**Status**: rascunhada
+**Nota do rascunho**: o dump real roda `pg_dump` do PATH com um login temporário que herda de `pelada_backup_ro` (removido no `finally`); sem o cliente no PATH o teste falha dizendo isso, sem pular, e o `/executar` ajusta o pré-voo se preciso. A T7 ganhou `GRANT SELECT` nas duas sequences identity para a role de backup (o `pg_dump` lê o valor delas).
 
 **Done when**:
 

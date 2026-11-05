@@ -62,3 +62,6 @@ CREATE POLICY push_ranking_backup ON push_ranking FOR SELECT TO pelada_backup_ro
 CREATE POLICY push_conta_backup ON push_conta FOR SELECT TO pelada_backup_ro USING (true);
 CREATE POLICY avisos_cobranca_backup ON avisos_cobranca FOR SELECT TO pelada_backup_ro USING (true);
 GRANT SELECT ON push_ranking, push_conta, avisos_cobranca TO pelada_backup_ro;
+-- O `pg_dump` lê o valor das sequences das colunas identity: o `GRANT SELECT ON ALL SEQUENCES` de `1792843260000_roles.sql:36`
+-- só valeu para as de então.
+GRANT SELECT ON SEQUENCE push_ranking_id_seq, push_conta_id_seq TO pelada_backup_ro;
