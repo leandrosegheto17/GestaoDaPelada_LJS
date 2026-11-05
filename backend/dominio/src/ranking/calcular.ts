@@ -86,6 +86,24 @@ export function agruparPresencasPorJogador(
   partidas: readonly PartidaDoRanking[],
   presencas: readonly PresencaDoRanking[],
 ): Map<string, PresencaComPartida[]> {
+  // O ranking e o PDF do mesmo cálculo agrupam as mesmas listas: o resultado é guardado pela identidade delas (PAR-63).
+  const porPartidas = AGRUPADAS.get(presencas);
+  const guardado = porPartidas?.get(partidas);
+  if (guardado) return guardado;
+  const resultado = agruparSemGuardar(partidas, presencas);
+  AGRUPADAS.set(presencas, (porPartidas ?? new WeakMap()).set(partidas, resultado));
+  return resultado;
+}
+
+const AGRUPADAS = new WeakMap<
+  readonly PresencaDoRanking[],
+  WeakMap<readonly PartidaDoRanking[], Map<string, PresencaComPartida[]>>
+>();
+
+function agruparSemGuardar(
+  partidas: readonly PartidaDoRanking[],
+  presencas: readonly PresencaDoRanking[],
+): Map<string, PresencaComPartida[]> {
   const porId = new Map(partidas.map((p) => [p.id, p]));
   const resultado = new Map<string, PresencaComPartida[]>();
   for (const pr of presencas) {
@@ -114,6 +132,20 @@ export function ativosHoje<T extends { periodos: readonly Periodo[] }>(
 export const emOrdemDeData = <P extends { data: Data }>(partidas: readonly P[]): P[] =>
   [...partidas].sort((a, b) => compararDatas(a.data, b.data));
 
+const SITUACOES = new WeakMap<readonly PresencaComPartida[], Map<string, SituacaoGravada>>();
+
+/** Situação por id de partida, guardada pela identidade da lista (o ranking e o PDF a pedem para os mesmos jogadores). */
+function situacoesPorPartida(
+  presencas: readonly PresencaComPartida[],
+): Map<string, SituacaoGravada> {
+  let mapa = SITUACOES.get(presencas);
+  if (!mapa) {
+    mapa = new Map(presencas.map((p) => [p.partidaId, p.situacao]));
+    SITUACOES.set(presencas, mapa);
+  }
+  return mapa;
+}
+
 /** Rodadas de um jogador nas partidas dadas, cortadas no início da contagem do mês exibido. */
 export function rodadasNoMes(
   jogador: JogadorDoRanking,
@@ -125,7 +157,7 @@ export function rodadasNoMes(
   return rodadasDoJogador(
     {
       periodos: jogador.periodos,
-      situacaoPorPartida: new Map(presencas.map((p) => [p.partidaId, p.situacao])),
+      situacaoPorPartida: situacoesPorPartida(presencas),
     },
     partidas,
     inicioDaContagem(jogador.inicioPontuacao, jogador.periodos, periodoEm),
