@@ -83,8 +83,11 @@ describe('tipos do plano (PLA-30)', () => {
     expectTypeOf<Banco['eventos_asaas']>().toEqualTypeOf<TabelaEventosAsaas>();
     expectTypeOf<Selectable<TabelaAssinaturas>['valor_centavos']>().toEqualTypeOf<number>();
     expectTypeOf<Selectable<TabelaAssinaturas>['pago_ate']>().toEqualTypeOf<string | null>();
-    expectTypeOf<Insertable<TabelaAssinaturas>>().toEqualTypeOf<{}>();
-    expectTypeOf<Updateable<TabelaAssinaturas>>().toEqualTypeOf<{}>();
-    expectTypeOf<Insertable<TabelaEventosAsaas>>().toEqualTypeOf<{}>();
+    // O tipo vazio é o que o Kysely dá a uma tabela sem coluna gravável: é ele que a asserção compara.
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+    type SemColunaGravavel = {};
+    expectTypeOf<Insertable<TabelaAssinaturas>>().toEqualTypeOf<SemColunaGravavel>();
+    expectTypeOf<Updateable<TabelaAssinaturas>>().toEqualTypeOf<SemColunaGravavel>();
+    expectTypeOf<Insertable<TabelaEventosAsaas>>().toEqualTypeOf<SemColunaGravavel>();
   });
 });

@@ -193,7 +193,7 @@ export function clienteDaPrevia(amb: Ambiente): Pedir {
       ...(corpo !== undefined ? { body: JSON.stringify(corpo) } : {}),
     });
     const texto = await r.text();
-    let json: unknown = null;
+    let json: unknown;
     try {
       json = texto ? JSON.parse(texto) : null;
     } catch {

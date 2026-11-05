@@ -3,7 +3,6 @@ import { comoApp, tabelasComGrupo, type Banco, type OpcoesComoApp } from './apoi
 import {
   abrirCenarioConta,
   comCenarioConta,
-  completarCenarioConta,
   type CenarioConta,
   type CenarioContaAberto,
 } from './cenario-conta.ts';
