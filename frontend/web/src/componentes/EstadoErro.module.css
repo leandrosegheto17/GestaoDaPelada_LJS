@@ -1,0 +1,50 @@
+/* Estado de erro (FUN-31), de .specs/mockup/base.css:23,68-74,227-232. */
+
+.icone {
+  flex-shrink: 0;
+}
+
+.faixa {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--esp-3);
+  padding: var(--esp-3) var(--esp-4);
+  border-radius: var(--raio);
+  margin: 0 0 var(--esp-3);
+  font-size: var(--texto-md);
+}
+
+.faixa--erro {
+  background: var(--cor-erro-fundo);
+  color: var(--cor-erro-texto);
+}
+
+/* .faixa .botao--texto { color: inherit } do mockup. */
+.faixa .acao button {
+  color: inherit;
+}
+
+.faixa__texto {
+  flex: 1;
+}
+
+.vazio__icone {
+  color: var(--cor-verde);
+  margin-bottom: var(--esp-3);
+}
+
+.vazio__titulo {
+  font-size: var(--texto-2xl);
+  text-transform: uppercase;
+  margin-bottom: var(--esp-2);
+}
+
+.vazio__titulo:focus {
+  outline: none;
+}
+
+.vazio__texto {
+  color: var(--cor-texto-sec);
+  max-width: 420px;
+  margin: 0 auto var(--esp-6);
+}

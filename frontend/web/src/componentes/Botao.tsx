@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, MouseEvent } from 'react';
+import type { ButtonHTMLAttributes, MouseEvent, Ref } from 'react';
 import estilos from './Botao.module.css';
 
 /**
@@ -13,6 +13,8 @@ export interface PropsBotao extends Omit<ButtonHTMLAttributes<HTMLButtonElement>
   /** Ocupa a largura toda (`botao--bloco`). */
   bloco?: boolean;
   carregando?: boolean;
+  /** React 19: `ref` é uma prop comum; vai para o `<button>` (o EstadoErro foca o botão). */
+  ref?: Ref<HTMLButtonElement>;
 }
 
 export function Botao({
@@ -23,6 +25,7 @@ export function Botao({
   type = 'button',
   onClick,
   children,
+  ref,
   ...resto
 }: PropsBotao) {
   const classes = [
@@ -41,6 +44,7 @@ export function Botao({
   return (
     <button
       {...resto}
+      ref={ref}
       type={type}
       className={classes}
       disabled={inativo}

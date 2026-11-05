@@ -1563,6 +1563,9 @@ T81 → T82
 **Depends on**: T48
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-31
+**Status**: rascunhada
+**Lacunas**: o mockup é estático e não diz onde fica o foco inicial. O rascunho põe o foco no botão "Tentar de novo" no formato `faixa` (`padrao--erro-rede`) e no título no formato `tela` (`t03-indisponivel--erro`); o `/executar` confirma com o usuário.
+**Nota do rascunho**: o `Botao` passou a repassar a `ref` (prop comum no React 19) para o `<button>`, para o foco.
 
 **Done when**:
 
