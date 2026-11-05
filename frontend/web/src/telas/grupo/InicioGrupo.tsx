@@ -1,4 +1,4 @@
-import { Link, useParams } from 'react-router';
+import { Link, useLocation, useParams } from 'react-router';
 import { Casca, NOME_DO_APP } from '../../componentes/Casca.tsx';
 import estilosCasca from '../../componentes/Casca.module.css';
 import { EsqueletoLista } from '../../componentes/EsqueletoLista.tsx';
@@ -62,6 +62,7 @@ export function textoSaldo(centavos: number | null): string {
 export function InicioGrupo() {
   const { grupoId = '' } = useParams();
   const grupo = useGrupo(grupoId);
+  const local = useLocation();
   const base = rotaDoGrupo(grupoId);
   const nome = grupo.data?.nome ?? NOME_DO_APP;
 
@@ -101,6 +102,10 @@ export function InicioGrupo() {
     );
   }
 
+  // "Partida de dd/mm salva." (partidas-e-ranking T60; PAR-36): o aviso que a tela de lançar manda na navegação.
+  const estado = local.state as { aviso?: unknown } | null;
+  const avisoDaNavegacao = typeof estado?.aviso === 'string' ? estado.aviso : null;
+
   // "Ver ranking" (partidas-e-ranking T58; PAR-83): abre o ranking público `/g/:slug`, de `t09-inicio--sucesso.html:13`.
   const verRanking = grupo.data ? (
     <Link
@@ -117,6 +122,7 @@ export function InicioGrupo() {
   return (
     <Casca grupo={{ nome, trocarHref: '/app' }} ocupada={grupo.isPending} acoes={verRanking}>
       <h1 className="sr">{`Início do admin: ${nome}`}</h1>
+      {avisoDaNavegacao ? <Faixa tipo="sucesso">{avisoDaNavegacao}</Faixa> : null}
       {conteudo()}
     </Casca>
   );

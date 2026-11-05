@@ -1,0 +1,145 @@
+/* Lançar e editar partida (t11; PAR-31), de .specs/mockup/base.css:123-141, 357-358. */
+
+.contagem-fixa {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--cor-fundo);
+  padding: var(--esp-2) 0;
+  margin: 0 0 var(--esp-2);
+  font-weight: var(--peso-semi);
+  font-variant-numeric: tabular-nums;
+  border-bottom: 1px solid var(--cor-linha);
+}
+
+.ferramentas-lista {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2);
+  align-items: center;
+  margin: var(--esp-3) 0;
+}
+
+.ferramentas-lista > :first-child {
+  flex: 1;
+  min-width: 180px;
+}
+
+.lista-situacao {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-linha);
+  border-radius: var(--raio);
+}
+
+.linha-jogador {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-2);
+  padding: var(--esp-2) var(--esp-2) var(--esp-2) var(--esp-3);
+  border-bottom: 1px solid var(--cor-linha);
+}
+
+.linha-jogador:last-child {
+  border-bottom: 0;
+}
+
+.linha-jogador__nome {
+  font-weight: var(--peso-semi);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.seletor-situacao {
+  display: flex;
+  gap: var(--esp-1);
+  flex-shrink: 0;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.seletor-situacao label {
+  display: flex;
+}
+
+.seletor-situacao input {
+  position: absolute;
+  opacity: 0;
+}
+
+.seletor-situacao span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  min-height: var(--alvo-toque);
+  padding: var(--esp-1) 0;
+  border: 2px solid var(--cor-linha);
+  border-radius: var(--raio-sm);
+  font-family: var(--fonte-titulo);
+  font-size: var(--texto-lg);
+  font-weight: var(--peso-forte);
+  cursor: pointer;
+}
+
+.seletor-situacao i {
+  font-style: normal;
+}
+
+.seletor-situacao small {
+  font-family: var(--fonte-texto);
+  font-size: var(--texto-xs);
+  font-weight: var(--peso-semi);
+  margin-top: 2px;
+}
+
+.seletor-situacao input:checked + span {
+  border-color: currentColor;
+}
+
+.op-a input:checked + span {
+  background: var(--cor-f-fundo);
+  color: var(--cor-f-texto);
+}
+
+.op-p input:checked + span {
+  background: var(--cor-p-fundo);
+  color: var(--cor-p-texto);
+}
+
+.op-l input:checked + span {
+  background: var(--cor-l-fundo);
+  color: var(--cor-l-texto);
+}
+
+.op-e input:checked + span {
+  background: var(--cor-e-fundo);
+  color: var(--cor-e-texto);
+}
+
+.seletor-situacao input:focus-visible + span {
+  outline: var(--foco-largura) solid var(--cor-foco);
+  outline-offset: var(--foco-afastamento);
+}
+
+.acima-4 {
+  margin-top: var(--esp-4);
+}
+
+@media (min-width: 1024px) {
+  .lista-situacao--duas {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .lista-situacao--duas .linha-jogador:nth-last-child(2) {
+    border-bottom: 0;
+  }
+}

@@ -2,6 +2,7 @@ import type { RouteObject } from 'react-router';
 import { NaoEncontrada, PaginaProvisoria } from '../paginas/Mensagens.tsx';
 import { PaginaRanking } from '../telas/ranking/PaginaRanking.tsx';
 import { PaginaPartidas } from '../telas/partidas/PaginaPartidas.tsx';
+import { PaginaNovaPartida } from '../telas/partida/PaginaNovaPartida.tsx';
 import { Landing } from '../telas/landing/Landing.tsx';
 import { Admins } from '../telas/admins/Admins.tsx';
 import { MinhaSenha } from '../telas/minha-senha/MinhaSenha.tsx';
@@ -97,7 +98,7 @@ export function criarRotas(): RouteObject[] {
         { path: 'grupos/:grupoId/financeiro/config', element: <ConfigCaixa />, handle: { tela: 'config-caixa' } },
         // Partidas e ranking (T58; PAR-143): as telas nascem nas T59 a T63, que trocam a `PaginaProvisoria` de cada rota.
         { path: 'grupos/:grupoId/partidas', element: <PaginaPartidas />, handle: { tela: 'partidas' } },
-        { path: 'grupos/:grupoId/partidas/nova', element: <PaginaProvisoria />, handle: { tela: 'nova-partida' } },
+        { path: 'grupos/:grupoId/partidas/nova', element: <PaginaNovaPartida />, handle: { tela: 'nova-partida' } },
         { path: 'grupos/:grupoId/partidas/:data', element: <PaginaProvisoria />, handle: { tela: 'partida' } },
         { path: 'grupos/:grupoId/pontuacao', element: <PaginaProvisoria />, handle: { tela: 'pontuacao' } },
         { path: 'grupos/:grupoId/uso', element: <PaginaProvisoria />, handle: { tela: 'uso' } },

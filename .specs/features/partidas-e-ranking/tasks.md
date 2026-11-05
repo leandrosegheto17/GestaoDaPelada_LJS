@@ -2086,6 +2086,8 @@ T78 → T79
 **Depends on**: T59
 **Reuses**: Mockup do módulo `t11-partida--nova.html` (R-04) e `.specs/mockup/telas/t11-partida--{carregando,vazio,data-futura,duplicada,erro-salvar}.html`; `ResumoErros` (`CA:1263`); `CampoData` (`GE:1751`)
 **Requirement**: PAR-31, PAR-32, PAR-33, PAR-34, PAR-35, PAR-36, PAR-147
+**Status**: rascunhada
+**Nota do rascunho**: o formulário (contagem, busca, A/P/L/E, salvar) ficou em `telas/partida/FormularioPartida.tsx`, para a T61 reaproveitar; o "Partida de dd/mm salva." (PAR-36) chega ao `InicioGrupo` pelo `state.aviso` da navegação, e a T64 o mantém. Erros 422 de marcação (campo `marcacoes.N.jogadorId`) aparecem numa faixa, sem resumo por jogador.
 
 **Done when**:
 
