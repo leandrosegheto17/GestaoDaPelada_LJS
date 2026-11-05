@@ -8,6 +8,7 @@ import { Dialogo } from '../../componentes/Dialogo.tsx';
 import { EsqueletoLista } from '../../componentes/EsqueletoLista.tsx';
 import { EstadoErro } from '../../componentes/EstadoErro.tsx';
 import { Faixa } from '../../componentes/Faixa.tsx';
+import { FaixaSomenteLeitura, TrechoSomenteLeitura } from '../../componentes/FaixaSomenteLeitura.tsx';
 import { LinkVoltar } from '../../componentes/LinkVoltar.tsx';
 import { ResumoErros, type ErroDoResumo } from '../../componentes/ResumoErros.tsx';
 import { ErroApi } from '../../dados/cliente.ts';
@@ -28,7 +29,9 @@ import { avisoPartidaSalva, diaMes, TEXTO_FALHA_SALVAR } from './PaginaNovaParti
  *   "Excluir partida" (PAR-53); a exclusão vai às partidas do mês com "Partida de dd/mm excluída.", e a falha mostra
  *   "Não foi possível excluir a partida. Tente de novo." (PAR-54);
  * - salvar a edição também volta às partidas do mês, com "Partida de dd/mm salva.".
- *   [LACUNA] a spec não diz o destino da edição salva; segue o da exclusão.
+ *   [LACUNA] a spec não diz o destino da edição salva; segue o da exclusão;
+ * - somente leitura (planos-e-cobranca T49; PLA-22): a faixa no topo e o formulário desabilitado, com salvar e
+ *   "Excluir partida".
  */
 
 export const TEXTO_RECALCULO =
@@ -154,6 +157,7 @@ function Edicao({
       ) : null}
       <ResumoErros erros={resumo} />
       {outras.length > 0 ? <Faixa tipo="erro">{outras.join(' ')}</Faixa> : null}
+      <TrechoSomenteLeitura grupoId={grupoId}>
       <FormularioPartida
         campoData={
           <CampoData
@@ -181,6 +185,7 @@ function Edicao({
           </Botao>
         }
       />
+      </TrechoSomenteLeitura>
       {confirmando ? (
         <DialogoExcluir
           grupoId={grupoId}
@@ -223,6 +228,7 @@ export function PaginaEditarPartida() {
       titulo="Editar partida"
     >
       <LinkVoltar para={partidasDoMes(base, data)}>Partidas</LinkVoltar>
+      <FaixaSomenteLeitura grupoId={grupoId} />
       {conteudo()}
     </Casca>
   );

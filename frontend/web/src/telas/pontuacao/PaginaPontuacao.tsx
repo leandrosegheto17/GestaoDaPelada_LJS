@@ -14,6 +14,7 @@ import { Casca, NOME_DO_APP } from '../../componentes/Casca.tsx';
 import { EsqueletoLista } from '../../componentes/EsqueletoLista.tsx';
 import { EstadoErro } from '../../componentes/EstadoErro.tsx';
 import { Faixa } from '../../componentes/Faixa.tsx';
+import { FaixaSomenteLeitura, TrechoSomenteLeitura } from '../../componentes/FaixaSomenteLeitura.tsx';
 import { LinkVoltar } from '../../componentes/LinkVoltar.tsx';
 import { ItemLista, Lista } from '../../componentes/Lista.tsx';
 import { ResumoErros, type ErroDoResumo } from '../../componentes/ResumoErros.tsx';
@@ -36,7 +37,9 @@ import tabela from '../tabela-simples.module.css';
  *   (PAR-12); 422 da API: "Corrija N campos: …" e a mensagem em cada campo (PAR-147);
  * - salvo: "Nova configuração vale a partir de hoje." (PAR-11), com o painel novo;
  * - "Histórico": uma linha por configuração anterior, mais recente primeiro, "De … a …" e
- *   "p · p · p · p · p · p · registrado por <nome>" (PAR-10).
+ *   "p · p · p · p · p · p · registrado por <nome>" (PAR-10);
+ * - somente leitura (planos-e-cobranca T49; PLA-22): a faixa no topo e os campos e "Salvar nova configuração"
+ *   desabilitados; os pesos vigentes e o histórico continuam.
  *
  * Números negativos aparecem com o sinal de menos tipográfico ("−1"), como no mockup.
  * [LACUNA] a mensagem local usa "−10" (sinal de menos, como a spec e o mockup); o `MENSAGEM_PESO` do contrato, que a
@@ -172,6 +175,7 @@ function Painel({ grupoId, painel }: { grupoId: string; painel: PesosPainel }) {
           Nova configuração (vale a partir de hoje)
         </h2>
         <form className={estilos.formulario} noValidate onSubmit={enviar}>
+          <TrechoSomenteLeitura grupoId={grupoId}>
           <div className={modulo['duas-colunas']}>
             {CAMPOS_PESO.map((c) => (
               <Campo
@@ -195,6 +199,7 @@ function Painel({ grupoId, painel }: { grupoId: string; painel: PesosPainel }) {
               Salvar nova configuração
             </Botao>
           </div>
+          </TrechoSomenteLeitura>
         </form>
       </section>
       <section className={estilos.secao} aria-labelledby="hist">
@@ -242,6 +247,7 @@ export function PaginaPontuacao() {
       estreita
     >
       <LinkVoltar para={base}>Início</LinkVoltar>
+      <FaixaSomenteLeitura grupoId={grupoId} />
       {conteudo()}
     </Casca>
   );

@@ -9,6 +9,7 @@ import { CampoData } from '../../componentes/CampoData.tsx';
 import { EsqueletoLista } from '../../componentes/EsqueletoLista.tsx';
 import { EstadoErro } from '../../componentes/EstadoErro.tsx';
 import { Faixa } from '../../componentes/Faixa.tsx';
+import { FaixaSomenteLeitura, TrechoSomenteLeitura } from '../../componentes/FaixaSomenteLeitura.tsx';
 import { LinkBotao } from '../../componentes/LinkBotao.tsx';
 import { LinkVoltar } from '../../componentes/LinkVoltar.tsx';
 import { ResumoErros, type ErroDoResumo } from '../../componentes/ResumoErros.tsx';
@@ -35,7 +36,9 @@ import pagina from './partida.module.css';
  * - 422 com campos: "Corrija N campos: …" e a mensagem em cada campo (PAR-147);
  * - rede ou servidor: "Não salvou. Suas marcações continuam aqui." com "Tentar de novo", sem perder as marcações
  *   (PAR-35);
- * - sucesso: volta ao início do grupo com "Partida de dd/mm salva." (PAR-36), pelo `state.aviso` da navegação.
+ * - sucesso: volta ao início do grupo com "Partida de dd/mm salva." (PAR-36), pelo `state.aviso` da navegação;
+ * - somente leitura (planos-e-cobranca T49; PLA-22): a faixa no topo e o formulário inteiro desabilitado (data,
+ *   "Choveu?", marcações e salvar).
  */
 
 export const TEXTO_FALHA_SALVAR = 'Não salvou. Suas marcações continuam aqui.';
@@ -224,16 +227,18 @@ export function PaginaNovaPartida() {
         ) : null}
         <ResumoErros erros={resumo} />
         {outrasMensagens.length > 0 ? <Faixa tipo="erro">{outrasMensagens.join(' ')}</Faixa> : null}
-        <FormularioPartida
-          key={`${dataAtual}-${jogadores ? 'lista' : 'sem-lista'}`}
-          campoData={campoData}
-          choveuInicial={consulta.data?.choveu ?? false}
-          jogadores={jogadores}
-          semLista={semLista}
-          avisoAposData={avisoPreMarcada}
-          salvando={lancar.isPending}
-          aoSalvar={({ choveu, marcacoes }) => enviar({ data: dataAtual, choveu, marcacoes })}
-        />
+        <TrechoSomenteLeitura grupoId={grupoId}>
+          <FormularioPartida
+            key={`${dataAtual}-${jogadores ? 'lista' : 'sem-lista'}`}
+            campoData={campoData}
+            choveuInicial={consulta.data?.choveu ?? false}
+            jogadores={jogadores}
+            semLista={semLista}
+            avisoAposData={avisoPreMarcada}
+            salvando={lancar.isPending}
+            aoSalvar={({ choveu, marcacoes }) => enviar({ data: dataAtual, choveu, marcacoes })}
+          />
+        </TrechoSomenteLeitura>
       </>
     );
   }
@@ -244,6 +249,7 @@ export function PaginaNovaPartida() {
       titulo="Lançar partida"
     >
       <LinkVoltar para={base}>Início</LinkVoltar>
+      <FaixaSomenteLeitura grupoId={grupoId} />
       {conteudo()}
     </Casca>
   );

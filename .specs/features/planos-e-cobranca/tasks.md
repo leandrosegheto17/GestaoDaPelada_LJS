@@ -1628,6 +1628,8 @@ T56 → T57
 **Depends on**: T48
 **Reuses**: telas de `PR:1951`, `PR:1974`, `PR:1999`, `PR:2025`; T43
 **Requirement**: PLA-22
+**Status**: rascunhada
+**Nota do rascunho**: os rótulos reais das telas são "Nova partida" (o "Lançar partida" do critério) e "Salvar nova configuração" (o "Salvar pesos"); o teste usa esses. Lançar e Editar partida ficam inteiros no `TrechoSomenteLeitura` (T48), com "Excluir partida". Teste em `frontend/web/test/telas/somente-leitura-partidas.test.tsx`.
 
 **Done when**:
 

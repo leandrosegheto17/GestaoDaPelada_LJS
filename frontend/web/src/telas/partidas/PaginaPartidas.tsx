@@ -7,12 +7,14 @@ import { ROTULOS_DIA_SEMANA } from '../../componentes/CampoSeletor.tsx';
 import { EsqueletoLista } from '../../componentes/EsqueletoLista.tsx';
 import { EstadoErro } from '../../componentes/EstadoErro.tsx';
 import { Faixa } from '../../componentes/Faixa.tsx';
+import { FaixaSomenteLeitura } from '../../componentes/FaixaSomenteLeitura.tsx';
 import { LinkBotao } from '../../componentes/LinkBotao.tsx';
 import { LinkVoltar } from '../../componentes/LinkVoltar.tsx';
 import { ItemLista, Lista } from '../../componentes/Lista.tsx';
 import { ErroApi } from '../../dados/cliente.ts';
 import { useGrupo } from '../../dados/grupos.ts';
 import { usePartidasDoMes } from '../../dados/partidas.ts';
+import { useEmSomenteLeitura } from '../../dados/somente-leitura.ts';
 import estilos from '../acesso.module.css';
 import { nomeDoMes } from '../financeiro/FinanceiroMes.tsx';
 import modulo from '../grupos-elenco.module.css';
@@ -26,7 +28,9 @@ import navegacao from '../ranking/ranking.module.css';
  *   API devolve nulo), que troca o `?mes=`;
  * - uma linha por partida, da mais recente para a mais antiga: "Quinta, 15/10/2026" e "15 P · 0 L · 1 E", com o
  *   ícone e "chuva · " antes quando choveu (PAR-42); cada linha abre a edição (`…/partidas/:data`);
- * - mês vazio: "Nenhuma partida neste mês." (PAR-43); "Nova partida" sempre.
+ * - mês vazio: "Nenhuma partida neste mês." (PAR-43); "Nova partida" sempre;
+ * - somente leitura (planos-e-cobranca T49; PLA-22): a faixa no topo e "Nova partida" desabilitado; o mês e as
+ *   partidas continuam visíveis (PLA-18).
  */
 
 export const TEXTO_SEM_PARTIDAS = 'Nenhuma partida neste mês.';
@@ -158,6 +162,7 @@ export function PaginaPartidas() {
   const grupo = useGrupo(grupoId);
   const consulta = usePartidasDoMes(grupoId, mes);
   const base = rotaDoGrupo(grupoId);
+  const somenteLeitura = useEmSomenteLeitura(grupoId);
   // "Partida de dd/mm excluída." e "… salva." (T61; PAR-54): o aviso que a edição manda na navegação.
   const estado = useLocation().state as { aviso?: unknown } | null;
   const aviso = typeof estado?.aviso === 'string' ? estado.aviso : null;
@@ -191,11 +196,16 @@ export function PaginaPartidas() {
       ocupada={consulta.isPending}
     >
       <LinkVoltar para={base}>Início</LinkVoltar>
+      <FaixaSomenteLeitura grupoId={grupoId} />
       {aviso ? <Faixa tipo="sucesso">{aviso}</Faixa> : null}
       {conteudo()}
       <div className={modulo['reserva-barra']} aria-hidden="true" />
       <div className={modulo['barra-acao']}>
-        <LinkBotao para={`${base}/partidas/nova`} variante="principal">
+        <LinkBotao
+          para={`${base}/partidas/nova`}
+          variante="principal"
+          desabilitado={somenteLeitura}
+        >
           Nova partida
         </LinkBotao>
       </div>
