@@ -15,6 +15,7 @@ import { rotasGrupos } from './rotas/grupos.ts';
 import { rotasHabilidades } from './rotas/habilidades.ts';
 import { rotasJogador } from './rotas/jogador.ts';
 import { rotasJogadores } from './rotas/jogadores.ts';
+import { rotasNotas } from './rotas/notas.ts';
 import { rotasPeriodos } from './rotas/periodos.ts';
 import { rotasPeriodosCorrecao } from './rotas/periodos-correcao.ts';
 import { devEmails } from './rotas/dev-emails.ts';
@@ -85,6 +86,7 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
   api.route('/', rotasPeriodos());
   api.route('/', rotasPeriodosCorrecao());
   api.route('/', rotasHabilidades());
+  api.route('/', rotasNotas());
   opcoes.registrarExtras?.(api);
 
   api.notFound((c) => c.json({ erro: 'Rota não encontrada.' }, 404));
