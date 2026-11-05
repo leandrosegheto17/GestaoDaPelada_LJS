@@ -1933,6 +1933,7 @@ T78 → T79
 **Depends on**: T53
 **Reuses**: Cliente HTTP (`CA:1169`); TanStack Query (`F:1326`)
 **Requirement**: PAR-89, PAR-65
+**Status**: rascunhada
 
 **Done when**:
 
