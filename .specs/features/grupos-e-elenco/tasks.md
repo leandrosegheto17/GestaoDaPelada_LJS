@@ -2135,6 +2135,8 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T67
 **Reuses**: `.specs/mockup/telas/t17-habilidades--*.html` (4 estados, `telas.json:198-201`); dados de T55
 **Requirement**: GEL-94, GEL-95, GEL-114
+**Status**: rascunhada
+**Lacunas**: o mockup não diz quando o renomear grava; a tela grava ao sair do campo ou com Enter, só quando o nome mudou (`Habilidades.tsx`).
 
 **Done when**:
 
