@@ -352,6 +352,7 @@ T81 → T82
 **Depends on**: T2
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-01, FUN-02
+**Status**: rascunhada
 
 **Done when**:
 

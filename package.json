@@ -9,8 +9,8 @@
   "scripts": {
     "lint": "pnpm -r lint",
     "format:check": "prettier --check .",
-    "typecheck": "pnpm -r typecheck",
-    "test": "pnpm -r test"
+    "typecheck": "pnpm -r typecheck && tsc --noEmit -p .",
+    "test": "vitest run --dir test && pnpm -r test"
   },
   "devDependencies": {
     "@types/node": "^26.0.0",
