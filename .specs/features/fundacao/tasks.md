@@ -2204,6 +2204,8 @@ T81 → T82
 **Depends on**: T72
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-52, FUN-44, FUN-50
+**Status**: rascunhada
+**Nota do rascunho**: o `docs/` não existia na `main`: o runbook nasce aqui. Segue a AD-119 (environment `producao`, restauração na `main` do Neon). A restauração pela branch usa a API do Neon (`POST /projects/{id}/branches/{main}/restore` com `source_branch_id` e `preserve_under_name`) ou a tela; conferir na documentação atual do Neon antes do primeiro uso. A âncora `#restaurar-um-backup` é a que o `README.md` já cita. O `docs/restauracao-registro.md` é da T15 (números reais) e ainda não existe: o link fica quebrado até lá. O `/executar` roda o `pnpm format:check` (o Prettier pode reformatar as listas).
 
 **Done when**:
 
