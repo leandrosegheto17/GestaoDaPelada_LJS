@@ -436,6 +436,8 @@ T57 → T58
 **Depends on**: T5
 **Reuses**: `M:1792843500000_conta-entrar-e-sessao.sql:78` (`sessao_tocar`); `M:1792844040000_conta-entrar-teto-conta.sql:21`
 **Requirement**: ACE-15, ACE-16, ACE-74
+**Status**: rascunhada
+**Nota do rascunho**: casos limite listados no topo do teste; sem lacuna.
 
 **Done when**:
 
