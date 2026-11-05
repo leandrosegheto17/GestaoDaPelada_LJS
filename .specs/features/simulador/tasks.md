@@ -919,6 +919,8 @@ T53 → T54
 **Depends on**: T21
 **Reuses**: `L:backend/contrato/src/simulador/entrada.ts` e `resultado.ts`; `S:186`, `S:226`, `S:232`, `S:313`
 **Requirement**: SIM-33, SIM-47, SIM-53, SIM-55, SIM-62, SIM-82
+**Status**: rascunhada
+**Nota do rascunho**: as composições (`composicaoDois`, `composicaoVarios`), `Escalada` e `idsDaComposicao` nascem aqui, no `simulador.ts`, porque o `avaliarCorpo` precisa delas antes da T23; a T23 as reusa. `ordemPrioridade` da resposta vai em ids; `saiNoIntervalo`, `saiSemPar` e `entraSemPar` são marcações da troca, não dado do jogador.
 
 **Done when**:
 
