@@ -16,6 +16,7 @@ import { rotaDoGrupo } from '../grupos/Grupos.tsx';
 import { corpoDaPrevia, corpoDoSugerir, EntradasSimulador, entradasIniciais, type Entradas } from './EntradasSimulador.tsx';
 import { ID_PREVIA_ERRO, podeSugerir, PreviaSimulador, previaInvalida } from './PreviaSimulador.tsx';
 import { MontandoTimes, ResultadoDoisTimes, TEXTO_MONTANDO } from './ResultadoDoisTimes.tsx';
+import { ResultadoVariosTimes } from './ResultadoVariosTimes.tsx';
 import estilos from './simulador.module.css';
 
 /**
@@ -27,7 +28,7 @@ import estilos from './simulador.module.css';
  * - a prévia (T46; SIM-14, SIM-15) é pedida à API com debounce a cada mudança de formato, N, K ou aptos; "Sugerir
  *   times" só fica ativo com ela válida;
  * - "Sugerir times" (T47; SIM-47, SIM-86) chama `sugerir` com as entradas e a data; pendente, "Montando os times…";
- *   com a resposta, "Times sugeridos" com o resultado de 2 times (t13); o de 3 ou mais é da T48;
+ *   com a resposta, "Times sugeridos" com o resultado de 2 times (t13) ou de 3 ou mais (t14, T48);
  * - o ajuste manual (T49) e as ações do resultado (T50) entram nas tarefas seguintes.
  */
 
@@ -93,8 +94,7 @@ export function PaginaSimulador() {
       return <EstadoErro aoTentarDeNovo={pedirSugestao} />;
     }
     if (sugestao.formato === 'dois_times') return <ResultadoDoisTimes resultado={sugestao} />;
-    // O resultado de 3 ou mais times é da T48.
-    return null;
+    return <ResultadoVariosTimes resultado={sugestao} />;
   }
 
   function conteudo() {

@@ -1628,6 +1628,8 @@ T53 → T54
 **Depends on**: T47
 **Reuses**: `.specs/mockup/telas/t14-resultado-varios--sucesso.html`; `respostas/simulador-sugestao-varios.json` (T44); T47
 **Requirement**: SIM-38, SIM-74
+**Status**: rascunhada
+**Nota do rascunho**: `ResultadoVariosTimes` (reusa `ListaJogadores`, `diaAbreviado` e `umaCasa` da T47) e a página mostra ele no formato 3+. Teste em `test/telas/simulador-resultado-varios.test.tsx`.
 
 **Done when**:
 
