@@ -1016,6 +1016,8 @@ Lacunas: o teste da CA `ACE-18: a criadora ainda vê o próprio grupo arquivado`
 **Depends on**: T24
 **Reuses**: `exigirGrupoAtivo` (T22); evidência do LJS em `GSEG:163` (só consulta); `bancoDeTeste()` (`F:507`)
 **Requirement**: SEC-007
+**Status**: rascunhada
+Lacunas: o lado do arquivar no teste trava a linha com `FOR UPDATE` antes do `UPDATE`, como `GD:150` manda para o `grupos.arquivar`; um `UPDATE` sozinho pega `FOR NO KEY UPDATE`, que não espera o `FOR KEY SHARE`. A T27 precisa seguir a mesma trava, ou o SEC-007 não vale na rota real.
 
 **Done when**:
 
