@@ -41,8 +41,16 @@ const MENSAGEM_INESPERADA = 'Algo deu errado. Tente de novo.';
 
 export type Metodo = 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
+export interface OpcoesRequisicao {
+  /**
+   * Não limpa o cache nem navega no 401 `sessao_expirada`: a consulta da sessão (T37) usa,
+   * para a guarda decidir sem laço de navegação no `/entrar`.
+   */
+  semTratarExpiracao?: boolean;
+}
+
 export interface ClienteApi {
-  requisitar<T>(metodo: Metodo, caminho: string, corpo?: unknown): Promise<T>;
+  requisitar<T>(metodo: Metodo, caminho: string, corpo?: unknown, opcoes?: OpcoesRequisicao): Promise<T>;
   get<T>(caminho: string): Promise<T>;
   post<T>(caminho: string, corpo?: unknown): Promise<T>;
   put<T>(caminho: string, corpo?: unknown): Promise<T>;
@@ -85,7 +93,7 @@ function corpoDeErro(valor: unknown): Partial<CorpoErro> | undefined {
 }
 
 export function criarCliente({ consultas, navegar, fetch: buscar = globalThis.fetch.bind(globalThis) }: DependenciasCliente): ClienteApi {
-  async function requisitar<T>(metodo: Metodo, caminho: string, corpo?: unknown): Promise<T> {
+  async function requisitar<T>(metodo: Metodo, caminho: string, corpo?: unknown, opcoes: OpcoesRequisicao = {}): Promise<T> {
     const cabecalhos: Record<string, string> = { Accept: 'application/json' };
     if (!METODOS_LEITURA.has(metodo)) cabecalhos[CABECALHO_PELADA] = '1';
     if (corpo !== undefined) cabecalhos['Content-Type'] = 'application/json';
@@ -106,7 +114,7 @@ export function criarCliente({ consultas, navegar, fetch: buscar = globalThis.fe
     if (resposta.ok) return dados as T;
 
     const erro = corpoDeErro(dados);
-    if (resposta.status === 401 && erro?.codigo === 'sessao_expirada') {
+    if (resposta.status === 401 && erro?.codigo === 'sessao_expirada' && !opcoes.semTratarExpiracao) {
       consultas.clear();
       navegar(DESTINO_SESSAO_EXPIRADA);
     }

@@ -69,6 +69,17 @@ describe('cliente HTTP', () => {
     expect(DESTINO_SESSAO_EXPIRADA).toBe('/entrar?aviso=sessao-expirada');
   });
 
+  it('ACE-20: com semTratarExpiracao, o 401 sessao_expirada só vira ErroApi (a guarda decide)', async () => {
+    const { cliente, consultas, navegar } = montar(json(401, { erro: 'x', codigo: 'sessao_expirada' }));
+    consultas.setQueryData(['outra'], 1);
+    await expect(cliente.requisitar('GET', '/api/sessao', undefined, { semTratarExpiracao: true })).rejects.toMatchObject({
+      status: 401,
+      codigo: 'sessao_expirada',
+    });
+    expect(consultas.getQueryData(['outra'])).toBe(1);
+    expect(navegar).not.toHaveBeenCalled();
+  });
+
   it('ACE-20: 401 sem_sessao não limpa o cache nem navega (a guarda decide)', async () => {
     const { cliente, consultas, navegar } = montar(json(401, { erro: 'Entre para continuar.', codigo: 'sem_sessao' }));
     consultas.setQueryData(['outra'], 1);

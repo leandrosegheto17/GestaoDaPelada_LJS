@@ -1277,6 +1277,8 @@ T57 → T58
 **Depends on**: T36
 **Reuses**: roteador da fundação (`F:1545`)
 **Requirement**: ACE-19, ACE-65
+**Status**: rascunhada
+**Nota do rascunho**: `useSessao()` devolve `ativa`, `ausente` ou `expirada` (401 não é erro de tela) e chama o cliente com `semTratarExpiracao` (opção nova do T36), para não haver laço de navegação no `/entrar`. `GuardaApp` manda a `/entrar?volta=<rota>` (com `aviso=sessao-expirada` quando expirou); `GuardaPublica` manda a `destinoSeguro(volta)`, que só aceita `/app`, `/app/...`, `/app?...`. O login volta à rota pedida porque a tela Entrar só invalida a consulta `sessao` e a `GuardaPublica` redireciona. As rotas reais ligam as guardas na T42.
 
 **Done when**:
 
