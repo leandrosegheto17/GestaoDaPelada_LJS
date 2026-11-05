@@ -1472,6 +1472,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T41
 **Reuses**: `jogadores.inativar` e `reativar` (T38, T39); tabela de `GD:174`
 **Requirement**: GEL-51, GEL-52, GEL-53, GEL-54, GEL-55, GEL-56
+**Status**: rascunhada
 
 **Done when**:
 
