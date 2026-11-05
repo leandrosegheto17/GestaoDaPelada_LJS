@@ -2284,6 +2284,8 @@ T81 → T82
 **Depends on**: T75
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-53
+**Status**: rascunhada
+**Nota do rascunho**: o `CLAUDE.md` da raiz já existia na `main` (commits `fd7e23a` e `ef2d0e3`) e cobre stack, comandos, estrutura, regras de banco (migrações aditivas, RLS forçada) e onde ficam as ADs, sem repetir o `.claude/CLAUDE.md`. Nada a escrever no rascunho; o `/executar` só confere se os comandos novos (`pnpm dev`, `e2e`, `visual`) continuam batendo com a tabela.
 
 **Done when**:
 
