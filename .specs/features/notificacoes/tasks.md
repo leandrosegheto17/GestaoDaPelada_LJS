@@ -321,6 +321,8 @@ T39 → T40 → T41
 **Depends on**: T1
 **Reuses**: RFC 8291 §3 e Apêndice A, RFC 8188 §2 (texto dos RFCs, `S:240`); `base64url` (T1)
 **Requirement**: NOT-26
+**Status**: rascunhada
+**Nota do rascunho**: o vetor do Apêndice A foi transcrito de memória do RFC; se o teste do vetor falhar, confira cada valor contra o texto do RFC antes de mexer na cifra. Os testes de `test/infraestrutura/push/` passam a rodar no projeto `worker` do `vitest.config.ts` (AD-100); a T20 tem parte em Node (bench) e precisa de arquivo fora dessa pasta ou de um terceiro projeto.
 
 **Done when**:
 
