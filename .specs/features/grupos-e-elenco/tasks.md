@@ -570,6 +570,8 @@ T73 → T74 → T75
 **Depends on**: T7
 **Reuses**: regras de `GS:104-106` e lista de reservadas de `GS:106`; interface de `GD:116` (`gerarSlug` com sufixo fica de fora: o sufixo é do banco, `GD:213`)
 **Requirement**: GEL-11, GEL-12, GEL-13
+**Status**: rascunhada
+**Nota do rascunho**: a reservada `g` tem 1 caractere e, pela ordem da spec (GEL-12 antes de GEL-13, `GS:105-106`), vira `grupo`; o teste das reservadas cobre as 8 com 3 ou mais caracteres e o caso `g` à parte.
 
 **Done when**:
 
