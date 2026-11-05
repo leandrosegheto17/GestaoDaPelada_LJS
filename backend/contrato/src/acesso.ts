@@ -36,6 +36,8 @@ export const CODIGOS_ERRO = [
   'ja_inativo',
   'ja_ativo',
   'criadora_nao_removivel',
+  // partidas-e-ranking (T39; PAR-21, PAR-30)
+  'partida_ja_existe',
 ] as const;
 
 export type CodigoErro = (typeof CODIGOS_ERRO)[number];
@@ -65,6 +67,8 @@ export const MENSAGENS_ERRO: Readonly<Record<CodigoErro, string>> = {
   ja_inativo: 'O jogador já está inativo.',
   ja_ativo: 'O jogador já está ativo.',
   criadora_nao_removivel: 'Quem criou o grupo não pode ser removida por outra admin.',
+  // A rota troca pelo texto com a data (`mensagemPartidaJaExiste`, PAR-21); este é só o padrão do código.
+  partida_ja_existe: 'Já existe uma partida nesta data.',
 };
 
 /** Mensagem geral do 422 de validação das rotas de grupo (GS:70, GEL-118). */
@@ -86,6 +90,11 @@ export const corpoErro = z
     sugestao: z.literal('inativar').optional(),
     /** Grupos em que a conta é a única admin (409 `unico_admin`). */
     grupos: z.array(z.object({ id: z.string(), nome: z.string() }).strict()).optional(),
+    /** Data `AAAA-MM-DD` da partida que já existe (409 `partida_ja_existe`, PAR-21). */
+    dataExistente: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/)
+      .optional(),
   })
   .strict();
 export type CorpoErro = z.infer<typeof corpoErro>;

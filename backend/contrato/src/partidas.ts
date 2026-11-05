@@ -24,6 +24,12 @@ export const MENSAGEM_MES_FUTURO = 'O mês não pode ser futuro.';
 export const MENSAGEM_DATA_ALTERADA = 'A data da partida não pode ser alterada.';
 export const MENSAGEM_CHUVA = 'Informe se choveu.';
 
+/** "Já existe uma partida em dd/mm/aaaa." (PAR-21, PAR-34), de uma data `AAAA-MM-DD` já validada. */
+export function mensagemPartidaJaExiste(data: string): string {
+  const [ano, mes, dia] = data.split('-');
+  return `Já existe uma partida em ${dia}/${mes}/${ano}.`;
+}
+
 /** `AAAA-MM` com mês de 01 a 12. */
 export const FORMATO_MES = /^\d{4}-(0[1-9]|1[0-2])$/;
 

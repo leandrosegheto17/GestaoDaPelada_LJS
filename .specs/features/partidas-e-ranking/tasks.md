@@ -1507,6 +1507,8 @@ T78 → T79
 **Depends on**: T38
 **Reuses**: `Relogio` (`GE:831`; mês por `mesDe(relogio.hoje())`); T7, T12, T32; `BD:229-230`, `BD:244-245`
 **Requirement**: PAR-17, PAR-18, PAR-19, PAR-20, PAR-21, PAR-37, PAR-38, PAR-39, PAR-40, PAR-41
+**Status**: rascunhada
+**Nota do rascunho**: `rotasPartidas()` em `rotas/partidas.ts`, registrada em `criarApp`. O contrato não tinha o 409 do PAR-21: entraram o código `partida_ja_existe` e o campo `dataExistente` em `corpoErro` (`contrato/src/acesso.ts`) e `mensagemPartidaJaExiste` (`contrato/src/partidas.ts`), com teste em `backend/contrato/test/partida-ja-existe.test.ts`. A data sugerida já lançada também dá 409 (PAR-21 vale "na consulta"). `preMarcadaPelaEscalacao` (contrato da simulador) vai `false`: a pré-marcação é da simulador. Testes em `backend/api/test/rotas/partidas-leitura.test.ts`.
 
 **Done when**:
 
