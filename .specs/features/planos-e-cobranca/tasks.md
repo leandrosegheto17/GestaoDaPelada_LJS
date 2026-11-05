@@ -796,6 +796,8 @@ T56 → T57
 **Depends on**: T17
 **Reuses**: estender o ensaio de `PR:1684` (T81); `lerEsquema` e a referência (`F:736`, `F:784`); migrar sobre banco migrado (`F:834`); AD-033, AD-073
 **Requirement**: PLA-11, PLA-12
+**Status**: rascunhada
+**Nota do rascunho**: o `ensaiar` ganha o passo 8 (situação de cada grupo antes e depois, só id e slug, e a regra da cortesia); o slug vem da constante da `planos-cortesia` na pasta ou de `slugGrupoTeste`. Teste em `backend/scripts/test/ensaio-migracao-planos.test.ts` com dump simulado até antes da `planos-tabelas`. O ensaio com o backup real (pausa do usuário) e a `Evidência` são do /executar.
 
 **Done when**:
 

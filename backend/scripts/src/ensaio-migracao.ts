@@ -1,6 +1,8 @@
 import { randomBytes } from 'node:crypto';
+import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { OPCOES_REFERENCIA, TABELAS_IGNORADAS, lerEsquema, lerReferencia } from '@pelada/api/esquema';
-import { migrar } from '@pelada/api/migrar';
+import { migrar, PASTA_MIGRACOES } from '@pelada/api/migrar';
 import type pg from 'pg';
 import { contarLinhas, restaurarBackup } from '../ops/restaurar-backup.ts';
 import { comConexao, executarCli } from './conectar.ts';
@@ -28,6 +30,10 @@ import { exigirHostPermitido, HOSTS_LOCAIS } from './host.ts';
  * 7. mudança do schema do dump (simulador T42; SIM-67, AD-037, AD-048, AD-073): o schema lido antes de migrar contra o
  *    de depois, para a evidência mostrar o que as migrações em ensaio tiraram e puseram (com a `grupo-criar-contrair`,
  *    só a `grupo_criar` de 6 parâmetros sai). Só informa: quem reprova é a referência do passo 3.
+ * 8. situação comercial (planos-e-cobranca T18; PLA-11, PLA-12; AD-057, AD-113): a situação de cada grupo antes e
+ *    depois, sem nome (só id e slug). Quando a `planos-cortesia` é aplicada no ensaio, dos grupos que eram
+ *    `uso_proprio` só o do slug do grupo de teste continua `uso_proprio`; os demais ficam `trial` com a data do ensaio
+ *    (São Paulo); quem já tinha outra situação não muda. Nenhuma tabela muda de contagem (passo 2).
  */
 
 export class ErroEnsaio extends Error {
@@ -43,6 +49,29 @@ export interface OpcoesEnsaio {
   referencia?: readonly string[];
   /** Tabelas que as migrações em ensaio podem encher de propósito (só crescem), além de `config_pesos`. */
   podeGanhar?: readonly string[];
+  /** Slug do grupo de teste (T9); padrão: o da constante `SLUG_GRUPO_TESTE` da `planos-cortesia`. */
+  slugGrupoTeste?: string;
+}
+
+/** Sufixo da migração da cortesia (planos-e-cobranca T17). */
+const MIGRACAO_CORTESIA = '_planos-cortesia';
+
+export interface SituacaoNoEnsaio {
+  grupoId: string;
+  slug: string;
+  antes: string;
+  depois: string;
+  trialInicioDepois: string | null;
+}
+
+export interface PlanosNoEnsaio {
+  /** O slug que a conferência usou (nulo quando a cortesia não foi aplicada no ensaio). */
+  slugGrupoTeste: string | null;
+  /** Data de São Paulo do ensaio. */
+  hoje: string;
+  grupos: SituacaoNoEnsaio[];
+  /** O que destoa da regra do passo 8; vazio = ok. */
+  problemas: string[];
 }
 
 /** Tabelas que as migrações da v2 enchem de propósito: os pesos padrão (partidas T21). */
@@ -87,7 +116,66 @@ export interface RelatorioEnsaio {
   amostra: AmostraAcesso | null;
   pesos: PesosNoEnsaio;
   mudancaDoEsquema: MudancaDoEsquema;
+  planos: PlanosNoEnsaio;
   ok: boolean;
+}
+
+async function situacoesDosGrupos(url: string): Promise<Map<string, { slug: string; s: string; t: string | null }>> {
+  return comConexao(url, async (c) => {
+    const r = await c.query<{ id: string; slug: string; s: string; t: string | null }>(
+      'SELECT id, slug, situacao_comercial AS s, trial_inicio::text AS t FROM grupos ORDER BY id',
+    );
+    return new Map(r.rows.map((l) => [l.id, { slug: l.slug, s: l.s, t: l.t }]));
+  });
+}
+
+async function hojeEmSaoPaulo(url: string): Promise<string> {
+  return comConexao(url, async (c) => {
+    const r = await c.query<{ hoje: string }>(`SELECT (now() AT TIME ZONE 'America/Sao_Paulo')::date::text AS hoje`);
+    return r.rows[0]?.hoje ?? '';
+  });
+}
+
+/** A regra do passo 8 sobre as situações de antes e de depois. */
+export function conferirPlanos(
+  antes: Map<string, { slug: string; s: string; t: string | null }>,
+  depois: Map<string, { slug: string; s: string; t: string | null }>,
+  slugGrupoTeste: string | null,
+  hoje: string,
+): PlanosNoEnsaio {
+  const grupos: SituacaoNoEnsaio[] = [];
+  const problemas: string[] = [];
+  for (const [grupoId, a] of antes) {
+    const d = depois.get(grupoId);
+    if (!d) {
+      problemas.push(`${grupoId}: sumiu`);
+      continue;
+    }
+    grupos.push({ grupoId, slug: a.slug, antes: a.s, depois: d.s, trialInicioDepois: d.t });
+    if (slugGrupoTeste === null) {
+      if (a.s !== d.s || a.t !== d.t) problemas.push(`${grupoId}: mudou de ${a.s} para ${d.s} sem a cortesia no ensaio`);
+      continue;
+    }
+    if (a.s !== 'uso_proprio') {
+      if (a.s !== d.s || a.t !== d.t) problemas.push(`${grupoId}: ${a.s} mudou para ${d.s}`);
+    } else if (a.slug === slugGrupoTeste) {
+      if (d.s !== 'uso_proprio' || d.t !== null) problemas.push(`${grupoId}: o grupo de teste deixou a cortesia (${d.s})`);
+    } else if (d.s !== 'trial' || d.t !== hoje) {
+      problemas.push(`${grupoId}: uso_proprio virou ${d.s} com trial_inicio ${d.t ?? 'nulo'}, esperado trial em ${hoje}`);
+    }
+  }
+  if (slugGrupoTeste !== null && ![...antes.values()].some((a) => a.slug === slugGrupoTeste)) {
+    problemas.push(`nenhum grupo com o slug do grupo de teste (${slugGrupoTeste})`);
+  }
+  return { slugGrupoTeste, hoje, grupos, problemas };
+}
+
+/** O slug da constante `SLUG_GRUPO_TESTE` da migração da cortesia na pasta, ou nulo sem a migração. */
+export function slugDaCortesia(pasta: string): string | null {
+  const nome = readdirSync(pasta).find((n) => n.replace(/\.sql$/, '').endsWith(MIGRACAO_CORTESIA));
+  if (!nome) return null;
+  const valor = /SLUG_GRUPO_TESTE constant text := '([^']*)';/.exec(readFileSync(join(pasta, nome), 'utf8'))?.[1];
+  return valor ?? null;
 }
 
 async function esquemaDe(url: string): Promise<string[]> {
@@ -201,9 +289,13 @@ export async function ensaiar(url: string, opcoes: OpcoesEnsaio = {}): Promise<R
   }
   const semConfigAntes = await gruposSemConfig(url);
   const esquemaAntes = await esquemaDe(url);
+  const situacoesAntes = await situacoesDosGrupos(url);
 
   const aplicadas = await migrar(url, { pasta: opcoes.pasta });
   const depois = semIgnoradas(await contarLinhas(url));
+  const comCortesia = aplicadas.some((n) => n.replace(/\.sql$/, '').endsWith(MIGRACAO_CORTESIA));
+  const slugGrupoTeste = comCortesia ? (opcoes.slugGrupoTeste ?? slugDaCortesia(opcoes.pasta ?? PASTA_MIGRACOES)) : null;
+  const planos = conferirPlanos(situacoesAntes, await situacoesDosGrupos(url), slugGrupoTeste, await hojeEmSaoPaulo(url));
   const pesos: PesosNoEnsaio = {
     semConfigAntes,
     semConfigDepois: await gruposSemConfig(url),
@@ -224,8 +316,21 @@ export async function ensaiar(url: string, opcoes: OpcoesEnsaio = {}): Promise<R
     esquema.sobrando.length === 0 &&
     segundaExecucao.length === 0 &&
     amostraOk(amostra) &&
-    pesosOk(pesos, aplicadas);
-  return { aplicadas, antes, depois, tabelasAlteradas, esquema, segundaExecucao, amostra, pesos, mudancaDoEsquema: mudanca, ok };
+    pesosOk(pesos, aplicadas) &&
+    planos.problemas.length === 0;
+  return {
+    aplicadas,
+    antes,
+    depois,
+    tabelasAlteradas,
+    esquema,
+    segundaExecucao,
+    amostra,
+    pesos,
+    mudancaDoEsquema: mudanca,
+    planos,
+    ok,
+  };
 }
 
 export const URL_BASE_ENSAIO = process.env.DATABASE_URL_TESTE ?? 'postgres://postgres:postgres@127.0.0.1:5432/pelada';
@@ -279,6 +384,15 @@ function imprimir(r: RelatorioEnsaio): void {
   console.log(
     `Pesos padrão: ${p.semConfigAntes} grupos sem configuração antes, ${p.semConfigDepois} depois; config_pesos ganhou ${p.linhasNovas}`,
   );
+  const pl = r.planos;
+  console.log(
+    pl.slugGrupoTeste === null
+      ? 'Situação comercial: a cortesia não foi aplicada neste ensaio'
+      : `Situação comercial (grupo de teste ${pl.slugGrupoTeste}, data do ensaio ${pl.hoje}):`,
+  );
+  // Só id e situação: o ensaio não imprime nome de grupo nem de pessoa.
+  for (const g of pl.grupos) console.log(`  ${g.grupoId}: ${g.antes} → ${g.depois}${g.trialInicioDepois ? ` (${g.trialInicioDepois})` : ''}`);
+  for (const problema of pl.problemas) console.log(`  ! ${problema}`);
   console.log(r.ok ? 'Ensaio ok.' : 'Ensaio com problemas: não faça o deploy da prévia.');
 }
 
