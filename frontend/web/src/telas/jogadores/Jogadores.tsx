@@ -8,6 +8,7 @@ import { Casca, NOME_DO_APP } from '../../componentes/Casca.tsx';
 import { EsqueletoLista } from '../../componentes/EsqueletoLista.tsx';
 import { EstadoErro } from '../../componentes/EstadoErro.tsx';
 import { Faixa } from '../../componentes/Faixa.tsx';
+import { FaixaSomenteLeitura } from '../../componentes/FaixaSomenteLeitura.tsx';
 import { LinkBotao } from '../../componentes/LinkBotao.tsx';
 import { LinkVoltar } from '../../componentes/LinkVoltar.tsx';
 import { ItemLista, Lista } from '../../componentes/Lista.tsx';
@@ -15,6 +16,7 @@ import { ErroApi } from '../../dados/cliente.ts';
 import { useJogadores } from '../../dados/elenco.ts';
 import { useGrupo } from '../../dados/grupos.ts';
 import { exibirNivel, TEXTO_SEM_NOTA } from '../../dados/habilidades.ts';
+import { useEmSomenteLeitura } from '../../dados/somente-leitura.ts';
 import estilos from '../acesso.module.css';
 import modulo from '../grupos-elenco.module.css';
 import { rotaDoGrupo } from '../grupos/Grupos.tsx';
@@ -30,7 +32,9 @@ import { ROTULOS_POSICAO } from './posicoes.ts';
  * - cada jogador com a posição e o nível ("Atacante · nível 6,8"); sem nota, o selo "sem nota"
  *   (GEL-103);
  * - ativos vazios: "Nenhum jogador cadastrado." com "Novo jogador"; inativos vazios: "Nenhum
- *   jogador inativo." (GEL-49). "Novo jogador" fica na barra de ação quando há ativos.
+ *   jogador inativo." (GEL-49). "Novo jogador" fica na barra de ação quando há ativos;
+ * - somente leitura (planos-e-cobranca T48; PLA-22): a faixa no topo e "Novo jogador" desabilitado; a lista e a busca
+ *   continuam (nada é escondido, PLA-18).
  */
 
 export const TEXTO_SEM_ATIVOS = 'Nenhum jogador cadastrado.';
@@ -60,6 +64,7 @@ export function Jogadores() {
   const [busca, setBusca] = useState('');
   const base = rotaDoGrupo(grupoId);
   const novo = `${base}/jogadores/novo`;
+  const somenteLeitura = useEmSomenteLeitura(grupoId);
 
   function conteudo() {
     if (lista.isPending) return <EsqueletoLista />;
@@ -96,7 +101,7 @@ export function Jogadores() {
                 {aba === 'ativos' ? TEXTO_SEM_ATIVOS : TEXTO_SEM_INATIVOS}
               </h2>
               {aba === 'ativos' ? (
-                <LinkBotao para={novo} variante="principal">
+                <LinkBotao para={novo} variante="principal" desabilitado={somenteLeitura}>
                   Novo jogador
                 </LinkBotao>
               ) : null}
@@ -137,7 +142,7 @@ export function Jogadores() {
           <>
             <div className={modulo['reserva-barra']} aria-hidden="true" />
             <div className={modulo['barra-acao']}>
-              <LinkBotao para={novo} variante="principal">
+              <LinkBotao para={novo} variante="principal" desabilitado={somenteLeitura}>
                 Novo jogador
               </LinkBotao>
             </div>
@@ -154,6 +159,7 @@ export function Jogadores() {
     >
       <LinkVoltar para={base}>Início</LinkVoltar>
       <h1 className={estilos['titulo-pagina']}>Jogadores</h1>
+      <FaixaSomenteLeitura grupoId={grupoId} />
       {conteudo()}
     </Casca>
   );

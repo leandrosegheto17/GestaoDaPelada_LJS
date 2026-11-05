@@ -7,6 +7,7 @@ import { CampoNota } from '../../componentes/CampoNota.tsx';
 import { Casca, NOME_DO_APP } from '../../componentes/Casca.tsx';
 import { EstadoErro } from '../../componentes/EstadoErro.tsx';
 import { Faixa } from '../../componentes/Faixa.tsx';
+import { FaixaSomenteLeitura, TrechoSomenteLeitura } from '../../componentes/FaixaSomenteLeitura.tsx';
 import { LinkVoltar } from '../../componentes/LinkVoltar.tsx';
 import { ResumoErros } from '../../componentes/ResumoErros.tsx';
 import { ErroApi, MENSAGEM_REDE } from '../../dados/cliente.ts';
@@ -43,7 +44,9 @@ import { AcoesSituacao } from './PeriodosJogador.tsx';
  *   com Inativar ou Reativar (`AcoesSituacao`, T65) e "Corrigir datas" em cada período
  *   (`CorrigirPeriodo`, T66) e "Excluir jogador" (`ExcluirJogador`, T67); "Alterar data de
  *   início" fica nos dados (`AlterarInicio`, T66). O aviso de sucesso e a recusa da exclusão
- *   ficam no topo da ficha.
+ *   ficam no topo da ficha;
+ * - somente leitura (planos-e-cobranca T48; PLA-22): a faixa no topo; dados, data de início, notas, "Corrigir datas",
+ *   "Reativar" e "Excluir jogador" desabilitados. "Inativar" continua: é a saída do excedente (PLA-15, PLA-20).
  */
 
 export const TEXTO_DADOS_SALVOS = 'Dados salvos.';
@@ -135,27 +138,29 @@ function Dados({
       >
         <ResumoErros erros={resumoDoJogador(erros)} />
         {falha ? <Faixa tipo="erro">{falha}</Faixa> : null}
-        <CamposJogador
-          dados={dados}
-          erros={erros}
-          mudar={mudar}
-          hoje={hoje}
-          comDataEntrada={false}
-        />
-        <div>
-          <span className={estilos.ajuda}>Data de início</span>
-          <p className={estilos.paragrafo} id="inicio-valor">
-            {formatarData(ficha.inicioPontuacao)}
-          </p>
+        <TrechoSomenteLeitura grupoId={grupoId}>
+          <CamposJogador
+            dados={dados}
+            erros={erros}
+            mudar={mudar}
+            hoje={hoje}
+            comDataEntrada={false}
+          />
           <div>
-            <AlterarInicio grupoId={grupoId} ficha={ficha} avisar={avisar} />
+            <span className={estilos.ajuda}>Data de início</span>
+            <p className={estilos.paragrafo} id="inicio-valor">
+              {formatarData(ficha.inicioPontuacao)}
+            </p>
+            <div>
+              <AlterarInicio grupoId={grupoId} ficha={ficha} avisar={avisar} />
+            </div>
           </div>
-        </div>
-        <div>
-          <Botao type="submit" carregando={editar.isPending}>
-            {editar.isPending ? 'Salvando…' : 'Salvar'}
-          </Botao>
-        </div>
+          <div>
+            <Botao type="submit" carregando={editar.isPending}>
+              {editar.isPending ? 'Salvando…' : 'Salvar'}
+            </Botao>
+          </div>
+        </TrechoSomenteLeitura>
       </form>
     </section>
   );
@@ -193,19 +198,21 @@ function Notas({ grupoId, ficha }: { grupoId: string; ficha: JogadorDetalhe }) {
       {ficha.notas.length === 0 ? (
         <p className={estilos.paragrafo}>O grupo não tem habilidades.</p>
       ) : (
-        <ul className={listas.lista} aria-labelledby="s-hab">
-          {ficha.notas.map((n, i) => (
-            <li key={n.habilidadeId} className={listas.item}>
-              <CampoNota
-                id={`h${i + 1}`}
-                rotulo={n.habilidade}
-                valor={n.nota}
-                erro={falhas[n.habilidadeId]}
-                aoMudar={(nota) => mudar(n.habilidadeId, nota)}
-              />
-            </li>
-          ))}
-        </ul>
+        <TrechoSomenteLeitura grupoId={grupoId}>
+          <ul className={listas.lista} aria-labelledby="s-hab">
+            {ficha.notas.map((n, i) => (
+              <li key={n.habilidadeId} className={listas.item}>
+                <CampoNota
+                  id={`h${i + 1}`}
+                  rotulo={n.habilidade}
+                  valor={n.nota}
+                  erro={falhas[n.habilidadeId]}
+                  aoMudar={(nota) => mudar(n.habilidadeId, nota)}
+                />
+              </li>
+            ))}
+          </ul>
+        </TrechoSomenteLeitura>
       )}
     </section>
   );
@@ -244,13 +251,15 @@ function Situacao({
                   <span className={listas['item__meta']}>{i === 0 ? 'Entrada' : 'Retorno'}</span>
                 </div>
                 <div className={modulo['item-lado']}>
-                  <CorrigirPeriodo
-                    grupoId={grupoId}
-                    ficha={ficha}
-                    periodo={p}
-                    indice={i}
-                    avisar={avisar}
-                  />
+                  <TrechoSomenteLeitura grupoId={grupoId}>
+                    <CorrigirPeriodo
+                      grupoId={grupoId}
+                      ficha={ficha}
+                      periodo={p}
+                      indice={i}
+                      avisar={avisar}
+                    />
+                  </TrechoSomenteLeitura>
                 </div>
               </li>
             ))}
@@ -320,6 +329,7 @@ export function FichaJogador() {
     return (
       <>
         <h1 className={estilos['titulo-pagina']}>{f.apelido}</h1>
+        <FaixaSomenteLeitura grupoId={grupoId} />
         {aviso ? <Faixa tipo="sucesso">{aviso}</Faixa> : null}
         {alerta}
         <Dados key={`dados-${f.id}`} grupoId={grupoId} ficha={f} avisar={setAviso} />

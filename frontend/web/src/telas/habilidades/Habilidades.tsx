@@ -9,6 +9,7 @@ import { Dialogo } from '../../componentes/Dialogo.tsx';
 import { EsqueletoLista } from '../../componentes/EsqueletoLista.tsx';
 import { EstadoErro } from '../../componentes/EstadoErro.tsx';
 import { Faixa } from '../../componentes/Faixa.tsx';
+import { FaixaSomenteLeitura, TrechoSomenteLeitura } from '../../componentes/FaixaSomenteLeitura.tsx';
 import { LinkVoltar } from '../../componentes/LinkVoltar.tsx';
 import listas from '../../componentes/Lista.module.css';
 import estilosCampo from '../../componentes/Campo.module.css';
@@ -33,7 +34,8 @@ import { rotaDoGrupo } from '../grupos/Grupos.tsx';
  * - "Nova habilidade" com "Adicionar" (`POST`, GEL-89); 422 (nome curto ou repetido, GEL-90,
  *   GEL-91) mostra a mensagem no campo (`t17-habilidades--erro`);
  * - sem habilidades, "Nenhuma habilidade" e "O simulador vai usar nível 5,5 para todos." (GEL-95);
- * - carregando e erro com "Tentar de novo".
+ * - carregando e erro com "Tentar de novo";
+ * - somente leitura (planos-e-cobranca T48; PLA-22): a faixa no topo; renomear, "Excluir" e "Adicionar" desabilitados.
  */
 
 export const TITULO_SEM_HABILIDADES = 'Nenhuma habilidade';
@@ -191,7 +193,7 @@ export function Habilidades() {
     }
     const { habilidades } = lista.data;
     return (
-      <>
+      <TrechoSomenteLeitura grupoId={grupoId}>
         {habilidades.length === 0 ? (
           <div className={estilos.vazio}>
             <h2 className={estilos['vazio__titulo']}>{TITULO_SEM_HABILIDADES}</h2>
@@ -231,7 +233,7 @@ export function Habilidades() {
             }
           />
         </form>
-      </>
+      </TrechoSomenteLeitura>
     );
   }
 
@@ -243,6 +245,7 @@ export function Habilidades() {
     >
       <LinkVoltar para={rotaDoGrupo(grupoId)}>Início</LinkVoltar>
       <h1 className={estilos['titulo-pagina']}>Habilidades</h1>
+      <FaixaSomenteLeitura grupoId={grupoId} />
       {conteudo()}
       {excluir ? (
         <DialogoExcluir grupoId={grupoId} habilidade={excluir} aoFechar={() => setExcluir(null)} />

@@ -6,6 +6,7 @@ import { Dialogo } from '../../componentes/Dialogo.tsx';
 import { Faixa } from '../../componentes/Faixa.tsx';
 import { ErroApi, MENSAGEM_REDE } from '../../dados/cliente.ts';
 import { useExcluirJogador } from '../../dados/elenco.ts';
+import { useEmSomenteLeitura } from '../../dados/somente-leitura.ts';
 import { rotaDoGrupo } from '../grupos/Grupos.tsx';
 
 /**
@@ -37,6 +38,8 @@ export function ExcluirJogador({
 }) {
   const navegar = useNavigate();
   const excluir = useExcluirJogador(grupoId, ficha.id);
+  // Somente leitura (planos-e-cobranca T48; PLA-22): excluir é escrita na trava (AD-092).
+  const somenteLeitura = useEmSomenteLeitura(grupoId);
   const [aberto, setAberto] = useState(false);
 
   function confirmar() {
@@ -77,7 +80,11 @@ export function ExcluirJogador({
 
   return (
     <>
-      <Botao variante="texto-destrutivo" onClick={() => setAberto(true)}>
+      <Botao
+        variante="texto-destrutivo"
+        disabled={somenteLeitura}
+        onClick={() => setAberto(true)}
+      >
         Excluir jogador
       </Botao>
       {aberto ? (

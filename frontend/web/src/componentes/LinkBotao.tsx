@@ -14,6 +14,11 @@ export interface PropsLinkBotao {
   bloco?: boolean | undefined;
   /** Classe extra de layout (ex.: `acima-3`). */
   classe?: string | undefined;
+  /**
+   * Desabilitado (planos-e-cobranca T48; PLA-22): um link não tem `disabled`, então vira um `<button disabled>` com as
+   * mesmas classes, fora da ordem de navegação e anunciado como indisponível.
+   */
+  desabilitado?: boolean | undefined;
   children: ReactNode;
 }
 
@@ -22,6 +27,7 @@ export function LinkBotao({
   variante = 'texto',
   bloco = false,
   classe,
+  desabilitado = false,
   children,
 }: PropsLinkBotao) {
   const classes = [
@@ -32,6 +38,13 @@ export function LinkBotao({
   ]
     .filter(Boolean)
     .join(' ');
+  if (desabilitado) {
+    return (
+      <button type="button" className={classes} disabled>
+        {children}
+      </button>
+    );
+  }
   return (
     <Link className={classes} to={para}>
       {children}

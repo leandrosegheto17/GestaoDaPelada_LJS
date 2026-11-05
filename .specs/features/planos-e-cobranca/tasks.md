@@ -1604,6 +1604,8 @@ T56 → T57
 **Depends on**: T47
 **Reuses**: telas de `GE:1870`, `GE:1896`, `GE:1920`, `GE:1944`, `GE:1970`, `GE:2042`; T43
 **Requirement**: PLA-22
+**Status**: rascunhada
+**Nota do rascunho**: `TrechoSomenteLeitura` (`componentes/FaixaSomenteLeitura.tsx`) é um `fieldset` sem borda que desabilita de uma vez os controles de dentro; `LinkBotao` ganhou `desabilitado` (vira `<button disabled>`); `useEmSomenteLeitura` em `dados/somente-leitura.ts`. Na ficha, dados, notas, "Corrigir datas", "Reativar" e "Excluir jogador" travam; "Inativar" não. Em Dados do grupo, "Arquivar grupo" e o link do ranking seguem habilitados (fora da trava, AD-092). Teste em `frontend/web/test/telas/somente-leitura-elenco.test.tsx`.
 
 **Done when**:
 

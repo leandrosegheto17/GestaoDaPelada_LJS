@@ -1,0 +1,7 @@
+/* Trecho de escrita em somente leitura (planos-e-cobranca T48): o `fieldset` só agrupa, sem borda nem espaço. */
+.trecho {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-inline-size: 0;
+}

@@ -1,8 +1,14 @@
 import { LIMITE_JOGADORES_FREE } from '@pelada/dominio';
+import type { ReactNode } from 'react';
 import { Link } from 'react-router';
-import { useSomenteLeitura, type MotivoSomenteLeitura } from '../dados/somente-leitura.ts';
+import {
+  useEmSomenteLeitura,
+  useSomenteLeitura,
+  type MotivoSomenteLeitura,
+} from '../dados/somente-leitura.ts';
 import { caminhoMeuPlano } from './AvisoRecursoPro.tsx';
 import { Faixa } from './Faixa.tsx';
+import estilos from './SomenteLeitura.module.css';
 
 /**
  * Faixa de somente leitura (planos-e-cobranca T43; PLA-22, AD-064): no topo das telas do grupo quando o plano diz que
@@ -33,5 +39,26 @@ export function FaixaSomenteLeitura({ grupoId }: PropsFaixaSomenteLeitura) {
     >
       <p>{textoDoMotivo(motivo)}</p>
     </Faixa>
+  );
+}
+
+/**
+ * Trecho de escrita (planos-e-cobranca T48, T49; PLA-22): um `fieldset` sem borda que, em somente leitura, desabilita
+ * de uma vez os campos e botões de dentro (o `disabled` do `fieldset` vale para todo controle descendente). O
+ * `fieldset` fica sempre no lugar, para mudar o plano não remontar o formulário e perder o que foi digitado. Links não
+ * são controles: os que levam a uma escrita usam o `desabilitado` do `LinkBotao`.
+ */
+export function TrechoSomenteLeitura({
+  grupoId,
+  children,
+}: {
+  grupoId: string;
+  children: ReactNode;
+}) {
+  const bloqueado = useEmSomenteLeitura(grupoId);
+  return (
+    <fieldset className={estilos.trecho} disabled={bloqueado}>
+      {children}
+    </fieldset>
   );
 }

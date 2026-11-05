@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router';
 import { Botao } from '../../componentes/Botao.tsx';
 import { Casca, NOME_DO_APP } from '../../componentes/Casca.tsx';
 import { Faixa } from '../../componentes/Faixa.tsx';
+import { FaixaSomenteLeitura, TrechoSomenteLeitura } from '../../componentes/FaixaSomenteLeitura.tsx';
 import { LinkVoltar } from '../../componentes/LinkVoltar.tsx';
 import { ResumoErros } from '../../componentes/ResumoErros.tsx';
 import { ErroApi, MENSAGEM_REDE } from '../../dados/cliente.ts';
@@ -28,7 +29,8 @@ import {
  * - apelido, ano, posição, telefone com máscara, data de entrada (hoje, sem futuro no seletor) e
  *   pontuação inicial (0);
  * - "Salvar" envia `POST …/jogadores` (`useCadastrarJogador`, T54); 201 leva à ficha do jogador;
- * - 422 marca cada campo com a mensagem da API e preenche o resumo (GEL-118).
+ * - 422 marca cada campo com a mensagem da API e preenche o resumo (GEL-118);
+ * - somente leitura (planos-e-cobranca T48; PLA-22): a faixa no topo e os campos e "Salvar" desabilitados.
  */
 
 export function corpoDoJogador(dados: FormularioJogador): Record<string, unknown> {
@@ -89,6 +91,7 @@ export function NovoJogador() {
     <Casca grupo={{ nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' }} estreita>
       <LinkVoltar para={`${base}/jogadores`}>Jogadores</LinkVoltar>
       <h1 className={estilos['titulo-pagina']}>Novo jogador</h1>
+      <FaixaSomenteLeitura grupoId={grupoId} />
       <form
         className={estilos.formulario}
         noValidate
@@ -97,13 +100,15 @@ export function NovoJogador() {
       >
         <ResumoErros erros={resumoDoJogador(erros)} />
         {falha ? <Faixa tipo="erro">{falha}</Faixa> : null}
-        <CamposJogador dados={dados} erros={erros} mudar={mudar} hoje={hoje} comDataEntrada />
-        <div className={modulo['reserva-barra']} aria-hidden="true" />
-        <div className={modulo['barra-acao']}>
-          <Botao type="submit" carregando={cadastrar.isPending}>
-            {cadastrar.isPending ? 'Salvando…' : 'Salvar'}
-          </Botao>
-        </div>
+        <TrechoSomenteLeitura grupoId={grupoId}>
+          <CamposJogador dados={dados} erros={erros} mudar={mudar} hoje={hoje} comDataEntrada />
+          <div className={modulo['reserva-barra']} aria-hidden="true" />
+          <div className={modulo['barra-acao']}>
+            <Botao type="submit" carregando={cadastrar.isPending}>
+              {cadastrar.isPending ? 'Salvando…' : 'Salvar'}
+            </Botao>
+          </div>
+        </TrechoSomenteLeitura>
       </form>
     </Casca>
   );

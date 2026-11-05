@@ -17,3 +17,8 @@ export function useSomenteLeitura(grupoId: string): MotivoSomenteLeitura | null 
   const plano = usePlano(grupoId);
   return plano.data?.somenteLeitura?.motivo ?? null;
 }
+
+/** Verdadeiro quando o grupo está somente leitura (T48, T49): desabilita os botões de escrita das telas. */
+export function useEmSomenteLeitura(grupoId: string): boolean {
+  return useSomenteLeitura(grupoId) !== null;
+}

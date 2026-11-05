@@ -8,6 +8,7 @@ import { Dialogo } from '../../componentes/Dialogo.tsx';
 import { EsqueletoLista } from '../../componentes/EsqueletoLista.tsx';
 import { EstadoErro } from '../../componentes/EstadoErro.tsx';
 import { Faixa } from '../../componentes/Faixa.tsx';
+import { FaixaSomenteLeitura, TrechoSomenteLeitura } from '../../componentes/FaixaSomenteLeitura.tsx';
 import { LinkVoltar } from '../../componentes/LinkVoltar.tsx';
 import { ResumoErros } from '../../componentes/ResumoErros.tsx';
 import { ErroApi, MENSAGEM_REDE } from '../../dados/cliente.ts';
@@ -35,7 +36,9 @@ import {
  *   diálogo pede o nome digitado; a API compara o nome exato (GEL-22) e, arquivado, a tela leva
  *   a `/app` com "Grupo arquivado." (T58); 422 mostra a mensagem no campo
  *   (`t20-grupo--arquivar-erro`, GEL-23);
- * - carregando e erro com "Tentar de novo" (`t20-grupo--carregando`, `t20-grupo--erro`).
+ * - carregando e erro com "Tentar de novo" (`t20-grupo--carregando`, `t20-grupo--erro`);
+ * - somente leitura (planos-e-cobranca T48; PLA-22): a faixa no topo e os campos e "Salvar" desabilitados. O link do
+ *   ranking e "Arquivar grupo" continuam: arquivar fica fora da trava (AD-092, `ESCRITAS_FORA_DA_TRAVA`).
  */
 
 export const TEXTO_DADOS_SALVOS = 'Dados salvos.';
@@ -202,12 +205,14 @@ function Formulario({ grupo }: { grupo: GrupoDetalhe }) {
       >
         <ResumoErros erros={resumoDoGrupo(erros)} />
         {falha ? <Faixa tipo="erro">{falha}</Faixa> : null}
-        <CamposGrupo dados={dados} erros={erros} mudar={mudar} />
-        <div>
-          <Botao type="submit" carregando={editar.isPending}>
-            {editar.isPending ? 'Salvando…' : 'Salvar'}
-          </Botao>
-        </div>
+        <TrechoSomenteLeitura grupoId={grupo.id}>
+          <CamposGrupo dados={dados} erros={erros} mudar={mudar} />
+          <div>
+            <Botao type="submit" carregando={editar.isPending}>
+              {editar.isPending ? 'Salvando…' : 'Salvar'}
+            </Botao>
+          </div>
+        </TrechoSomenteLeitura>
       </form>
       <CartaoLink link={grupo.linkPublico} />
       {grupo.souCriador ? (
@@ -247,6 +252,7 @@ export function DadosGrupo() {
     <Casca grupo={{ nome, trocarHref: '/app' }} estreita ocupada={grupo.isPending}>
       <LinkVoltar para={rotaDoGrupo(grupoId)}>Início</LinkVoltar>
       <h1 className={estilos['titulo-pagina']}>Dados do grupo</h1>
+      <FaixaSomenteLeitura grupoId={grupoId} />
       {conteudo()}
     </Casca>
   );

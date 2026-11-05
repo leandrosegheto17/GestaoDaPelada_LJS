@@ -10,6 +10,7 @@ import { LinkBotao } from '../../componentes/LinkBotao.tsx';
 import { PreviaPeriodos, textoRodadas } from '../../componentes/PreviaPeriodos.tsx';
 import { ErroApi, MENSAGEM_REDE } from '../../dados/cliente.ts';
 import { useInativarJogador, useReativarJogador } from '../../dados/elenco.ts';
+import { useEmSomenteLeitura } from '../../dados/somente-leitura.ts';
 import { mensagensDosCampos } from '../../dados/erros-campo.ts';
 import { hojeEmSaoPaulo } from '../../dados/hoje.ts';
 import {
@@ -222,6 +223,8 @@ export function AcoesSituacao({
   const inativar = useInativarJogador(grupoId, ficha.id);
   const reativar = useReativarJogador(grupoId, ficha.id);
   const previas = usePedirPrevias(grupoId, ficha.id);
+  // Somente leitura (planos-e-cobranca T48; PLA-22): reativar trava (PLA-16); inativar nunca (PLA-15).
+  const somenteLeitura = useEmSomenteLeitura(grupoId);
   const [rodadas, setRodadas] = useState<string | null>(null);
   const [aberto, setAberto] = useState<'inativar' | 'reativar' | null>(null);
   const [erroCampo, setErroCampo] = useState<string | undefined>(undefined);
@@ -289,7 +292,11 @@ export function AcoesSituacao({
             Inativar
           </Botao>
         ) : (
-          <Botao variante="secundario" onClick={() => abrir('reativar')}>
+          <Botao
+            variante="secundario"
+            disabled={somenteLeitura}
+            onClick={() => abrir('reativar')}
+          >
             Reativar
           </Botao>
         )}
