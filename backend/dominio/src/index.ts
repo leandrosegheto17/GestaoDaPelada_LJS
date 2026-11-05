@@ -155,3 +155,13 @@ export {
   type MotivoSomenteLeitura,
   type OperacaoDeEscrita,
 } from './plano/excedente.ts';
+export {
+  calcularRanking,
+  type EntradaRanking,
+  type JogadorDoRanking,
+  type LinhaRanking,
+  type PartidaDoMes,
+  type PartidaDoRanking,
+  type PresencaDoRanking,
+  type ResultadoRanking,
+} from './ranking/calcular.ts';

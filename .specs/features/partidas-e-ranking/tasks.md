@@ -730,6 +730,7 @@ T78 → T79
 **Depends on**: T10
 **Reuses**: `B:254`, `B:257`, `B:261-262` (PAR-67, PAR-70, PAR-74, PAR-75), `B:286-287`; casos `B:493-495`
 **Requirement**: PAR-67, PAR-70, PAR-74, PAR-75, PAR-86, PAR-87
+**Status**: rascunhada
 
 **Done when**:
 
