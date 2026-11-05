@@ -1,7 +1,13 @@
 import { Hono } from 'hono';
-import { corpoDoErro, excluirCorpo, trocarSenhaCorpo } from '@pelada/contrato';
+import {
+  corpoDoErro,
+  excluirCorpo,
+  mensagemCanceleAntesDeExcluir,
+  trocarSenhaCorpo,
+} from '@pelada/contrato';
 import type { Ambiente } from '../ambiente.ts';
 import { exigirSessao } from '../middlewares/sessao.ts';
+import { assinaturaBloqueia } from '../../aplicacao/plano/assinatura-bloqueia.ts';
 import { contas } from '../../infraestrutura/db/repositorios/contas.ts';
 import { transacaoCurta } from '../../infraestrutura/db/transacao-curta.ts';
 import { vencerCookieSessao } from '../../infraestrutura/sessao/cookie.ts';
@@ -15,6 +21,9 @@ import { comFabrica, lerCorpo, type OpcoesRotas } from './apoio-acesso.ts';
  * responde 401: por isso as duas rodam em `transacaoCurta`, confirmada mesmo com o erro (o
  * `comBanco` desfaria a falha). Bloqueado: 429 `bloqueado_temporariamente`, a mesma resposta
  * para a senha certa e para a errada (a função nem confere a senha).
+ *
+ * Excluir a conta que criou grupo com assinatura pendente ou ativa: 409 `assinatura_ativa` com o nome do grupo
+ * (planos-e-cobranca T38; PLA-68).
  */
 
 export function rotasMinhaConta(opcoes: OpcoesRotas = {}): Hono<Ambiente> {
@@ -48,12 +57,24 @@ export function rotasMinhaConta(opcoes: OpcoesRotas = {}): Hono<Ambiente> {
 
     const r = await transacaoCurta(
       c.env.HYPERDRIVE.connectionString,
-      (db) => contas.excluir(db, corpo.dados.senha),
+      async (db) => {
+        // Criadora de grupo com assinatura pendente ou ativa: recusa antes de tudo, nada apagado (planos-e-cobranca
+        // T38; PLA-68, AD-115). Antes da senha, para não gravar falha de senha por um motivo que não é a senha.
+        const bloqueio = await assinaturaBloqueia.grupoQueBloqueiaExcluir(db);
+        if (bloqueio !== null) return { resultado: 'assinatura_ativa' as const, grupo: bloqueio };
+        return contas.excluir(db, corpo.dados.senha);
+      },
       {
         ...comFabrica(opcoes),
         conta: c.var.contaId ?? null,
       },
     );
+    if (r.resultado === 'assinatura_ativa') {
+      return c.json(
+        { erro: 'assinatura_ativa', mensagem: mensagemCanceleAntesDeExcluir(r.grupo) },
+        409,
+      );
+    }
     switch (r.resultado) {
       case 'ok':
         // Sessões, vínculos e links apagados e a conta anonimizada (ACE-28): o cookie vence.

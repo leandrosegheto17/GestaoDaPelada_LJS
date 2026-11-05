@@ -158,6 +158,14 @@ export const erroAssinaturaAtiva = z
   })
   .strict();
 
+/** 409 `assinatura_ativa` de arquivar o grupo com assinatura pendente ou ativa (PLA-69, AD-115, T38). */
+export const MENSAGEM_CANCELE_ANTES_DE_ARQUIVAR = 'Cancele a assinatura antes de arquivar o grupo';
+
+/** 409 `assinatura_ativa` de excluir a conta criadora de grupo com assinatura pendente ou ativa (PLA-68, T38). */
+export function mensagemCanceleAntesDeExcluir(nomeDoGrupo: string): string {
+  return `Cancele a assinatura do grupo ${nomeDoGrupo} antes de excluir a conta`;
+}
+
 /** 409 de cancelar sem assinatura ativa nem pendente (PLA-55, T34). */
 export const erroSemAssinatura = z
   .object({

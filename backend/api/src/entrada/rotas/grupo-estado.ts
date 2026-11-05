@@ -1,8 +1,9 @@
 import type { Context } from 'hono';
 import { Hono } from 'hono';
-import { arquivarCorpo, corpoDoErro } from '@pelada/contrato';
+import { arquivarCorpo, corpoDoErro, MENSAGEM_CANCELE_ANTES_DE_ARQUIVAR } from '@pelada/contrato';
 import type { Ambiente } from '../ambiente.ts';
 import { lerCorpoDoGrupo, respostaDeCampo } from '../corpo.ts';
+import { assinaturaBloqueia } from '../../aplicacao/plano/assinatura-bloqueia.ts';
 import { grupos } from '../../infraestrutura/db/repositorios/grupos.ts';
 import {
   gruposEstado,
@@ -48,6 +49,11 @@ export function rotasGrupoEstado(): Hono<Ambiente> {
     const corpo = await lerCorpoDoGrupo(c, arquivarCorpo);
     if (!corpo.ok) return corpo.resposta;
     const grupoId = c.req.param('grupoId');
+    // Assinatura pendente ou ativa: 409, sem arquivar (planos-e-cobranca T38; PLA-69, AD-115).
+    const conta = c.var.contaId;
+    if (conta !== undefined && (await assinaturaBloqueia.bloqueiaArquivar(c.var.db, grupoId, conta))) {
+      return c.json({ erro: 'assinatura_ativa', mensagem: MENSAGEM_CANCELE_ANTES_DE_ARQUIVAR }, 409);
+    }
     return responder(
       c,
       grupoId,

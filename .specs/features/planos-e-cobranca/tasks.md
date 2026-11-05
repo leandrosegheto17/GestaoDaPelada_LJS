@@ -1343,6 +1343,8 @@ T56 → T57
 **Depends on**: T37
 **Reuses**: `grupos.arquivar` (`GE:1027`, T27) e rota `GE:1105` (T30); `POST /api/conta/excluir` (`CA:971`, T28); AD-115
 **Requirement**: PLA-68, PLA-69
+**Status**: rascunhada
+**Nota do rascunho**: arquivar confere a assinatura depois da trava de assinatura do grupo (AD-097) e só para a criadora (a admin que não criou segue recebendo 403 `so_quem_criou`, GEL-24); excluir confere antes da senha, para não gravar falha de senha por outro motivo. Resposta 409 `{ erro: 'assinatura_ativa', mensagem }` (cabe no `erroAssinaturaAtiva`); as mensagens estão no contrato (`MENSAGEM_CANCELE_ANTES_DE_ARQUIVAR`, `mensagemCanceleAntesDeExcluir`). Teste em `backend/api/test/rotas/assinatura-bloqueia.test.ts`.
 
 **Done when**:
 
