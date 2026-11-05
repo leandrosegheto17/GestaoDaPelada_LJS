@@ -700,6 +700,7 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T12
 **Reuses**: regra e mensagem de `GS:239`; interface de `GD:121` (`coberturaRetirada`)
 **Requirement**: GEL-68
+**Status**: rascunhada
 
 **Done when**:
 
