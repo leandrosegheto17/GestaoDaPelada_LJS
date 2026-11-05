@@ -53,3 +53,22 @@ export {
   type RegraInicio,
   type ResultadoInicio,
 } from './atividade/avaliar-inicio.ts';
+
+// partidas-e-ranking (PAR-61, PAR-62): pontos, ranking, PDF e prévias, sem relógio nem I/O.
+export {
+  compararDatas,
+  compararMeses,
+  diaDaSemana,
+  ehDataReal,
+  ehMes,
+  mesAnterior,
+  mesDe,
+  mesSeguinte,
+  NUMERO_DO_DIA,
+  primeiroDia,
+  ultimoDia,
+  vespera,
+  type DiaDaSemana,
+  type Mes,
+  type NomeDiaDaSemana,
+} from './datas.ts';

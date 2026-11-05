@@ -467,6 +467,7 @@ T78 → T79
 **Depends on**: None
 **Reuses**: Regra de domínio sem I/O (`F:385`); convenção de datas de `B:98-100`; reusar `ehDataReal` e o intervalo [início, fim) de `backend/dominio/src/atividade/datas.ts` (`GE:626`), sem duplicar
 **Requirement**: PAR-19, PAR-39, PAR-65, PAR-84, PAR-85
+**Status**: rascunhada
 
 **Done when**:
 
