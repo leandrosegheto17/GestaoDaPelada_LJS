@@ -1013,6 +1013,8 @@ T56 → T57
 **Depends on**: T25
 **Reuses**: rotas de `PR:1611` (T46) e `PR:1634` (T47); `recursoLiberado` no contexto do slug (T21, T12)
 **Requirement**: PLA-19, PLA-25, PLA-26
+**Status**: rascunhada
+**Nota do rascunho**: a trava do PDF entra depois do 404 do slug e antes da validação do mês contra o histórico (o 422 do formato do mês continua antes); `pdf_exportado` lê o grupo do slug só nesse tipo e chama o ponto único com `pdf`; `ranking_aberto` não muda.
 
 **Done when**:
 

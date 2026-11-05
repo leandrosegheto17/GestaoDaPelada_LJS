@@ -17,6 +17,7 @@ import { eventos } from '../../infraestrutura/db/repositorios/eventos.ts';
 import { grupoPublico, type GrupoPublico } from '../../infraestrutura/db/repositorios/grupo-publico.ts';
 import { historico } from '../../infraestrutura/db/repositorios/historico.ts';
 import { linkPublico } from './grupos.ts';
+import { MENSAGEM_PLANO_PRO } from '../middlewares/recurso.ts';
 
 /** 413 do corpo do evento acima de 1 KB (PAR-128). */
 export const MENSAGEM_CORPO_GRANDE = 'O corpo da requisição é grande demais.';
@@ -50,6 +51,11 @@ export function linhaPublicaDe(l: LinhaRanking): LinhaPublica {
     rodadas: l.rodadas.map((r) => ({ situacao: r.situacao, pontos: r.pontos })),
     ptsFinal: l.ptsFinal,
   };
+}
+
+/** 403 `plano_pro` do recurso `pdf` na forma da AD-091 (planos-e-cobranca T26; PLA-25, PLA-26). */
+function respostaPlanoProPdf(c: Context<Ambiente>): Response {
+  return c.json({ erro: 'plano_pro', recurso: 'pdf', mensagem: MENSAGEM_PLANO_PRO }, 403);
 }
 
 export function rotasPublico(): Hono<Ambiente> {
@@ -91,6 +97,8 @@ export function rotasPublico(): Hono<Ambiente> {
     if (!consulta.success) return c.json(erroDeCampos(mensagensDoZod(consulta.error)), 422);
     const grupo = await grupoDoSlug(c);
     if (grupo instanceof Response) return grupo;
+    // Recurso `pdf` pelo ponto único, no contexto do slug (planos-e-cobranca T26; PLA-25): Free responde 403.
+    if (!(await c.var.recursoLiberado(c.var.db, grupo.id, 'pdf'))) return respostaPlanoProPdf(c);
 
     const hoje = c.var.relogio.hoje();
     const mes = consulta.data.mes ?? mesDe(hoje);
@@ -128,6 +136,13 @@ export function rotasPublico(): Hono<Ambiente> {
     async (c) => {
       const corpo = await lerCorpoDoGrupo(c, eventoPublicoCorpo);
       if (!corpo.ok) return corpo.resposta;
+      if (corpo.dados.tipo === 'pdf_exportado') {
+        // Sem o recurso `pdf`, `pdf_exportado` não é gravado (planos-e-cobranca T26; PLA-26). `ranking_aberto` segue em
+        // qualquer plano (PLA-19).
+        const grupo = await grupoDoSlug(c);
+        if (grupo instanceof Response) return grupo;
+        if (!(await c.var.recursoLiberado(c.var.db, grupo.id, 'pdf'))) return respostaPlanoProPdf(c);
+      }
       const gravou = await eventos.registrarPublico(c.var.db, c.var.slugPublico ?? '', corpo.dados, c.var.relogio.agoraIso());
       if (!gravou) return c.json(corpoDoErro('nao_encontrado'), 404);
       return c.body(null, 204);
