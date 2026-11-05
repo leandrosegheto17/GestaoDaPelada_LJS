@@ -16,3 +16,11 @@ paths = [
 regexes = [
   '''postgres://postgres:postgres@127\.0\.0\.1''',
 ]
+
+# Chave da API do Asaas (planos-e-cobranca T40; PLA-37): o prefixo seguido do texto da chave. A mesma regra é a
+# checagem chave-asaas.
+[[rules]]
+id = "asaas-api-key"
+description = "Chave da API do Asaas"
+regex = '''\$aact_[A-Za-z0-9+/=_-]{40,}'''
+keywords = ["aact_"]

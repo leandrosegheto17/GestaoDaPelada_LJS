@@ -1331,6 +1331,7 @@ T56 → T57
 **Depends on**: T39
 **Reuses**: checagem do `.env.example` e `.gitleaks.toml` (`F:1886`, T66); estender `so-previa.ts` (`F:2013`, T71); molde de `CA:697` (T17)
 **Requirement**: PLA-37, PLA-38
+**Status**: rascunhada
 
 **Done when**:
 
