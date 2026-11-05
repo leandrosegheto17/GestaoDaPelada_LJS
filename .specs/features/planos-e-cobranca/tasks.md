@@ -1143,6 +1143,8 @@ T56 → T57
 **Depends on**: T30
 **Reuses**: T14; molde de repositório de `PR:1289`
 **Requirement**: PLA-30, PLA-33
+**Status**: rascunhada
+**Nota do rascunho**: os erros das funções da T14 viram resultado dentro de um `SAVEPOINT` (42501 `so_quem_criou`, 55000 `grupo_arquivado`, 23505 `assinatura_vigente`, P0002 `sem_assinatura`); `travarGrupo` usa a chave `assinatura:<grupo>`. `clienteDaConta` lê pela RLS de `assinaturas` (a conta vê as assinaturas dos grupos que criou, inclusive arquivados).
 
 **Done when**:
 
