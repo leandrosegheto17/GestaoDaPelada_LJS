@@ -2238,6 +2238,8 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T71
 **Reuses**: Playwright da fundação (`F:1691`); interceptação de respostas do runner da CA (`CA:1609`); `.specs/mockup/respostas/erro-validacao-novo-grupo.json` e `elenco-erro-novo-jogador.json`
 **Requirement**: GEL-118
+**Status**: rascunhada
+**Lacunas**: as respostas do mockup estão no formato antigo (`erro.campos` como objeto, e o `adaptarCorpo` da CA descarta esse objeto); o spec converte para o `corpoErro` com `mensagens` e ignora `adminEmail` (campo que a t27 não tem mais). O vermelho (mensagem movida para o fim do formulário) fica para o `/executar`.
 
 **Done when**:
 
