@@ -7,9 +7,9 @@
 -- - `avisos_cobranca`: o registro de "uma vez por evento" (NOT-39, AD-105): chave (id da cobrança no Asaas, tipo).
 --   Só id externo, tipo, grupo e momento (NOT-57); apagada em 90 dias (NOT-56).
 -- Acesso só por funções `SECURITY DEFINER` (AD-101): `pelada_app` não tem grant nenhum nas três, e sem policy para ela
--- nada passaria mesmo com grant. `pelada_backup` (o grupo de `pelada_backup_ro`) lê as três: o `GRANT SELECT ON ALL
--- TABLES` de `1792843260000_roles.sql:35` só valeu para as tabelas de então, e sem a policy o `pg_dump` com FORCE sai
--- vazio e com exit 0 (AD-010).
+-- nada passaria mesmo com grant. `pelada_backup_ro` lê as três: o `GRANT SELECT ON ALL TABLES` de `1792843260000_roles.sql:35`
+-- só valeu para as tabelas de então, e sem a policy o `pg_dump` com FORCE sai vazio e com exit 0 (AD-010). A role
+-- `pelada_backup` não existe mais depois de `1792844220000_roles-padronizadas.sql` (RENAME para `pelada_backup_ro`).
 -- SPEC_DEVIATION: o timestamp (1792846200000) deixa folga depois da última migração da `planos-e-cobranca` (as funções
 -- dela ainda nascem); o /executar confere a ordem com `pnpm migracao:nova` e renomeia se preciso (NOT-49).
 
@@ -58,7 +58,7 @@ ALTER TABLE avisos_cobranca FORCE ROW LEVEL SECURITY;
 REVOKE ALL ON push_ranking, push_conta, avisos_cobranca FROM PUBLIC;
 REVOKE ALL ON push_ranking, push_conta, avisos_cobranca FROM pelada_app;
 
-CREATE POLICY push_ranking_backup ON push_ranking FOR SELECT TO pelada_backup USING (true);
-CREATE POLICY push_conta_backup ON push_conta FOR SELECT TO pelada_backup USING (true);
-CREATE POLICY avisos_cobranca_backup ON avisos_cobranca FOR SELECT TO pelada_backup USING (true);
-GRANT SELECT ON push_ranking, push_conta, avisos_cobranca TO pelada_backup;
+CREATE POLICY push_ranking_backup ON push_ranking FOR SELECT TO pelada_backup_ro USING (true);
+CREATE POLICY push_conta_backup ON push_conta FOR SELECT TO pelada_backup_ro USING (true);
+CREATE POLICY avisos_cobranca_backup ON avisos_cobranca FOR SELECT TO pelada_backup_ro USING (true);
+GRANT SELECT ON push_ranking, push_conta, avisos_cobranca TO pelada_backup_ro;

@@ -225,7 +225,7 @@ describe('RLS e grants das três tabelas', () => {
       [TABELAS],
     );
     expect(r.rows.map((l) => l.tabela).sort()).toEqual([...TABELAS].sort());
-    for (const l of r.rows) expect(l.roles, l.tabela).toEqual(['pelada_backup']);
+    for (const l of r.rows) expect(l.roles, l.tabela).toEqual(['pelada_backup_ro']);
   });
 });
 
