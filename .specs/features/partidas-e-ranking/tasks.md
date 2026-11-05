@@ -1091,17 +1091,17 @@ Gate (T21 a T80): vitest dos testes de banco da feature (pesos-padrao, grupo-cri
 **Depends on**: T22
 **Reuses**: Molde de função `admins_listar` (`M:1792843680000_conta-admins-listar.sql:8-21`); tabela `M:1792843200000_linha-de-base.sql:194-207`; policies `M:1792843320000_rls.sql:48-56`; `BD:130-137`; AD-034
 **Requirement**: PAR-127, PAR-129, PAR-130, PAR-131
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: migração `1792844700000_eventos-uso.sql`; testes em `backend/api/test/banco/eventos-uso.test.ts`. Tipo fora de `ranking_aberto`/`pdf_exportado`, dispositivo e mês trocados ou momento nulo levantam `22023`; conta na sessão, `42501`. O teste (c) "nenhum grant em eventos_uso" da T0 passou a exigir exatamente SELECT e INSERT, como a T0 previa.
 **Lacunas**: a matriz de isolamento da fundação descreve `eventos_uso` como sem grant (`backend/api/test/isolamento/matriz.ts:28`, `leitura: 'sem-grant'`; `backend/api/test/isolamento/casos-escrita.ts:86`, `insere: false`). Depois desta migração, a conta lê e insere no próprio grupo e o slug não lê: os testes de leitura e escrita da matriz vão falhar. Trocar isso (um modo de leitura "só com conta" e `insere: true`) muda teste existente fora das Autorizações: o `/executar` pergunta antes. Não alterado no rascunho.
 
 **Done when**:
 
-- [ ] Teste `PAR-130`: `pelada_app` tem só SELECT e INSERT em `eventos_uso`; UPDATE, DELETE e TRUNCATE recusados
-- [ ] Teste `PAR-131`: no contexto do slug, a função grava e um INSERT direto em `eventos_uso` ou em outra tabela é recusado
-- [ ] Teste `PAR-127`: slug de grupo arquivado ou outro slug que não o do contexto devolve `false` sem gravar; com conta, a função recusa
-- [ ] Teste `PAR-129`: a linha gravada só tem grupo, tipo, momento e `dispositivo_id` ou `mes_exportado`; o contexto do slug não lê `eventos_uso`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PAR-130`: `pelada_app` tem só SELECT e INSERT em `eventos_uso`; UPDATE, DELETE e TRUNCATE recusados
+- [x] Teste `PAR-131`: no contexto do slug, a função grava e um INSERT direto em `eventos_uso` ou em outra tabela é recusado
+- [x] Teste `PAR-127`: slug de grupo arquivado ou outro slug que não o do contexto devolve `false` sem gravar; com conta, a função recusa
+- [x] Teste `PAR-129`: a linha gravada só tem grupo, tipo, momento e `dispositivo_id` ou `mes_exportado`; o contexto do slug não lê `eventos_uso`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1119,14 +1119,14 @@ Gate (T21 a T80): vitest dos testes de banco da feature (pesos-padrao, grupo-cri
 **Depends on**: T23
 **Reuses**: Molde `M:1792843680000_conta-admins-listar.sql:8-21`; `BD:138-140`; filtro por `grupos_visiveis()` (`BC:25`, P13); AD-036
 **Requirement**: PAR-01, PAR-44, PAR-52
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: migração `1792844760000_contas-nomes-do-grupo.sql`; testes em `backend/api/test/banco/contas-nomes-do-grupo.test.ts`, com cada autoria (pesos, criação e alteração de partida) e o grupo arquivado para a admin que não o criou.
 
 **Done when**:
 
-- [ ] Teste `PAR-01`: admin do grupo A recebe o nome da outra admin autora; não recebe conta que não é autora
-- [ ] Teste `PAR-01`: com o id do grupo B, zero linhas; sem conta, zero linhas; a função não devolve coluna de e-mail
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PAR-01`: admin do grupo A recebe o nome da outra admin autora; não recebe conta que não é autora
+- [x] Teste `PAR-01`: com o id do grupo B, zero linhas; sem conta, zero linhas; a função não devolve coluna de e-mail
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1144,14 +1144,14 @@ Gate (T21 a T80): vitest dos testes de banco da feature (pesos-padrao, grupo-cri
 **Depends on**: T24
 **Reuses**: Grants atuais `M:1792843260000_roles.sql:22-31`; `BD:141-143`; matriz desta lista
 **Requirement**: PAR-09
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: migração `1792844820000_grants-partidas-pesos.sql`; testes em `backend/api/test/banco/grants-partidas-pesos.test.ts`. O teste (c) "pelada_app tem UPDATE em partidas e config_pesos" da T0 passou a exigir a lista exata dos privilégios de tabela, sem UPDATE, como a T0 previa.
 
 **Done when**:
 
-- [ ] Teste `PAR-09`: UPDATE de `partidas.data` e de `config_pesos.vigente_desde` recusado como `pelada_app`
-- [ ] Teste `PAR-09`: DELETE em `config_pesos` recusado (sem grant); UPDATE de `choveu` do grupo B afeta 0 linhas
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PAR-09`: UPDATE de `partidas.data` e de `config_pesos.vigente_desde` recusado como `pelada_app`
+- [x] Teste `PAR-09`: DELETE em `config_pesos` recusado (sem grant); UPDATE de `choveu` do grupo B afeta 0 linhas
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1169,21 +1169,23 @@ Gate (T21 a T80): vitest dos testes de banco da feature (pesos-padrao, grupo-cri
 **Depends on**: T25
 **Reuses**: Função atual `M:1792844280000_grupos-visiveis-arquivado.sql:9-22`; `BD:144-145`; mudança de teste pela Pergunta 1
 **Requirement**: PAR-91, PAR-92, PAR-93
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: migração `1792844880000_grupos-visiveis-publico-ativo.sql`; testes em `backend/api/test/banco/grupos-visiveis-publico.test.ts`. Invertidos, com a mesma força (lista exata), o item (d) de `partidas-rede.test.ts` e o "ramo do slug não muda" de `backend/api/test/isolamento/grupos-arquivado.test.ts:184` (Autorizações de 2026-11-04).
 
 **Done when**:
 
-- [ ] Teste `PAR-92`: no contexto do slug de grupo arquivado, zero linhas em `grupos`, `jogadores`, `periodos_ativos`, `partidas`, `presencas`, `config_pesos` e `eventos_uso`
-- [ ] Teste `PAR-93`: reativado, o slug volta a ler o grupo
-- [ ] Teste `PAR-91`: os testes do ramo com conta de T0 continuam verdes
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PAR-92`: no contexto do slug de grupo arquivado, zero linhas em `grupos`, `jogadores`, `periodos_ativos`, `partidas`, `presencas`, `config_pesos` e `eventos_uso`
+- [x] Teste `PAR-93`: reativado, o slug volta a ler o grupo
+- [x] Teste `PAR-91`: os testes do ramo com conta de T0 continuam verdes
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
 
 ---
 
+
+Gate (T23 a T26): vitest dos testes de banco da feature (pesos-padrao, grupo-criar-*, partidas-*, eventos-uso, contas-nomes, grants, grupos-visiveis) verdes; test/migracoes da fundação (hash, migrar, estado, esquema*) vermelhos por fixarem 23 migrações e esquema-producao.txt, falha preexistente da fundação aceita pelo usuário @ 5b1d6ac545505be854c26dad517201ee886d976b
 #### Phase 11: Repositórios: histórico, pesos e jogadores
 
 ### T27: historico.carregar
