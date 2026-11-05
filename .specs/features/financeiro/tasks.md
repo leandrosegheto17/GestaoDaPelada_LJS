@@ -1035,6 +1035,8 @@ T47 → T48
 **Depends on**: T27
 **Reuses**: T20, T21; molde de `GET, PUT e DELETE partidas/:data` (`PR:1487`)
 **Requirement**: FIN-25, FIN-26, FIN-27, FIN-28, FIN-29, FIN-30, FIN-31
+**Status**: rascunhada
+**Nota do rascunho**: `rotasFinanceiroLancamentos()` ligada no `app.ts`. A resposta omite o `vinculo` do repositório (contrato `.strict()`). No PUT, o id malformado dá 404 antes de ler o corpo.
 
 **Done when**:
 

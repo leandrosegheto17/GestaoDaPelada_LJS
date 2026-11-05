@@ -26,6 +26,7 @@ import { rotasSimulador } from './rotas/simulador.ts';
 import { rotasFinanceiroConfig } from './rotas/financeiro-config.ts';
 import { rotasFinanceiroMes } from './rotas/financeiro-mes.ts';
 import { rotasFinanceiroPagamentos } from './rotas/financeiro-pagamentos.ts';
+import { rotasFinanceiroLancamentos } from './rotas/financeiro-lancamentos.ts';
 import { devEmails } from './rotas/dev-emails.ts';
 import { health } from './rotas/health.ts';
 import { rotasMinhaConta } from './rotas/minha-conta.ts';
@@ -114,6 +115,7 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
   api.route('/', rotasFinanceiroConfig());
   api.route('/', rotasFinanceiroMes());
   api.route('/', rotasFinanceiroPagamentos());
+  api.route('/', rotasFinanceiroLancamentos());
   opcoes.registrarExtras?.(api);
 
   api.notFound((c) => c.json({ erro: 'Rota não encontrada.' }, 404));
