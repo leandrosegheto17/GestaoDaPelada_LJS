@@ -515,6 +515,8 @@ T39 → T40 → T41
 **Depends on**: T8
 **Reuses**: T8; molde de trigger (`M:1792844520000_grupos-arquivar-so-criadora.sql:8-25`); `conta_excluir` (`M:1792843800000_conta-senha-bloqueio.sql:143-149`); S-06
 **Requirement**: NOT-45, NOT-53, NOT-55
+**Status**: rascunhada
+**Nota do rascunho**: a trigger roda como `SECURITY DEFINER` e dispara só na passagem de `excluida_em` de nulo a preenchido (`WHEN`), então nenhuma exclusão posterior reapaga. O teste de `conta_excluir` usa o cenário de conta e a senha de A, com a conta sem vínculo como segunda admin do grupo A.
 
 **Done when**:
 
