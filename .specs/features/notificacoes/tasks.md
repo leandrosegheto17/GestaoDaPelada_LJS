@@ -1083,6 +1083,8 @@ T39 → T40 → T41
 **Depends on**: T29
 **Reuses**: T29; T8
 **Requirement**: NOT-16, NOT-17, NOT-18, NOT-67
+**Status**: rascunhada
+**Nota do rascunho**: o `DELETE` não confere VAPID nem plano (cancelar nunca depende do push estar ligado) e responde 204 também para slug inexistente, sem enumerar. Testes em `backend/api/test/rotas/push-publico-cancelar.test.ts`.
 
 **Done when**:
 

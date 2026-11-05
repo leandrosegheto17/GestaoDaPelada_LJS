@@ -115,6 +115,24 @@ export function rotasPublicoPush(): Hono<Ambiente> {
     }
   });
 
+  /**
+   * `DELETE …/push` (T30; NOT-16, NOT-17, NOT-18, NOT-67): `endpoint` e `chaves.auth`; 413 e 422 do corpo como no
+   * `POST`; depois `push_ranking_cancelar` e 204 sempre: sem linha que coincida, com `auth` errado (não apaga), em grupo
+   * arquivado ou Free (apaga, NOT-18), e sem VAPID (cancelar nunca depende do push estar ligado). Slug inexistente
+   * também 204: a função não diz se havia linha e a rota não enumera.
+   */
+  rotas.delete('/publico/:slug/push', limiteCorpoPush(), async (c) => {
+    const corpo = await lerCorpoDoGrupo(c, criarCancelarPushCorpo(hostsExtras(c)));
+    if (!corpo.ok) return corpo.resposta;
+    await push.cancelarRanking(
+      c.var.db,
+      c.var.slugPublico ?? '',
+      corpo.dados.endpoint,
+      corpo.dados.chaves.auth,
+    );
+    return c.body(null, 204);
+  });
+
   rotas.post('/publico/:slug/push/estado', limiteCorpoPush(), async (c) => {
     const corpo = await lerCorpoDoGrupo(c, criarCancelarPushCorpo(hostsExtras(c)));
     if (!corpo.ok) return corpo.resposta;
