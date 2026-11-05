@@ -69,7 +69,7 @@ export type ResultadoPeriodo =
   | { resultado: 'nao_encontrado' | 'ja_inativo' | 'ja_ativo' }
   | { resultado: 'invalido'; regra: RegraPeriodo; campo: CampoPeriodo; mensagem: string };
 
-interface EstadoDoJogador {
+export interface EstadoDoJogador {
   inicioPontuacao: string | null;
   /** Em ordem de início, cada um com `id`. */
   periodos: Array<Periodo & { id: string }>;
@@ -82,10 +82,22 @@ interface EstadoDoJogador {
  * (`GD:152`, GEL-110). Nulo quando o jogador não é do grupo (GEL-44).
  */
 async function travarParaPeriodo(db: Db, grupoId: string, id: string): Promise<EstadoDoJogador | null> {
+  return lerEstado(db, grupoId, id, true);
+}
+
+/**
+ * A mesma leitura do `travarParaPeriodo`, sem trava (T29 da partidas-e-ranking; `BD:208-209`): as prévias rodam em
+ * transação `READ ONLY` (AD-035) e não podem travar nem esperar a trava de uma escrita. Nulo fora do grupo.
+ */
+async function lerParaPrevia(db: Db, grupoId: string, id: string): Promise<EstadoDoJogador | null> {
+  return lerEstado(db, grupoId, id, false);
+}
+
+async function lerEstado(db: Db, grupoId: string, id: string, travar: boolean): Promise<EstadoDoJogador | null> {
   const j = await sql<{ inicio_pontuacao: string | null }>`
     SELECT inicio_pontuacao::text AS inicio_pontuacao FROM jogadores
      WHERE grupo_id = ${grupoId} AND id = ${id}
-       FOR UPDATE`.execute(db);
+       ${travar ? sql`FOR UPDATE` : sql``}`.execute(db);
   const linha = j.rows[0];
   if (!linha) return null;
   const periodos = await sql<Periodo & { id: string }>`
@@ -290,4 +302,60 @@ async function alterarInicio(
   return { resultado: 'ok', alterado: true };
 }
 
-export const jogadores = { criar, inativar, reativar, corrigirPeriodo, alterarInicio };
+// ---------------------------------------------------------------- partidas (T29 da partidas-e-ranking)
+
+/**
+ * Trava os jogadores do grupo com os ids dados (`FOR UPDATE`), numa consulta e sempre em ordem crescente de id
+ * (PAR-29, AD-038): dois lançamentos ou edições que marcam os mesmos jogadores em ordens diferentes travam na mesma
+ * ordem e não fazem deadlock. Devolve os ids travados, em ordem crescente; id de outro grupo, inexistente ou que a
+ * conta não vê não é travado nem devolvido (a validação das marcações o recusa depois, PAR-24).
+ *
+ * Casos limite (Domínio: sim), listados antes do código:
+ * - lista vazia: nenhuma consulta, nenhuma trava;
+ * - id repetido: travado uma vez, devolvido uma vez (o domínio aponta a repetição, PAR-25);
+ * - id de outro grupo: fora da trava e do resultado;
+ * - duas conexões com [B, A] e [A, B]: a segunda espera a primeira, sem deadlock.
+ */
+async function travarVarios(db: Db, grupoId: string, ids: readonly string[]): Promise<string[]> {
+  const unicos = [...new Set(ids)];
+  if (unicos.length === 0) return [];
+  const r = await sql<{ id: string }>`
+    SELECT id FROM jogadores
+     WHERE grupo_id = ${grupoId} AND id = ANY (${unicos}::uuid[])
+     ORDER BY id
+       FOR UPDATE`.execute(db);
+  return r.rows.map((l) => l.id);
+}
+
+export interface JogadorAtivoNaData {
+  id: string;
+  apelido: string;
+}
+
+/**
+ * Jogadores do grupo ativos na data (PAR-27): algum período [início, fim) a contém, isto é, `inicio <= data` e `fim`
+ * nulo ou depois da data. No dia da saída o jogador já não está ativo. Só leitura de `periodos_ativos`: não é escrita
+ * de período (a checagem da T45 da grupos-e-elenco só olha escritas). Em ordem de apelido.
+ */
+async function ativosNaData(db: Db, grupoId: string, data: string): Promise<JogadorAtivoNaData[]> {
+  const r = await sql<JogadorAtivoNaData>`
+    SELECT j.id, j.apelido
+      FROM jogadores j
+     WHERE j.grupo_id = ${grupoId}
+       AND EXISTS (SELECT 1 FROM periodos_ativos p
+                    WHERE p.grupo_id = j.grupo_id AND p.jogador_id = j.id
+                      AND p.inicio <= ${data}::date AND (p.fim IS NULL OR p.fim > ${data}::date))
+     ORDER BY j.apelido, j.id`.execute(db);
+  return r.rows;
+}
+
+export const jogadores = {
+  criar,
+  inativar,
+  reativar,
+  corrigirPeriodo,
+  alterarInicio,
+  travarVarios,
+  ativosNaData,
+  lerParaPrevia,
+};
