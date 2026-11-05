@@ -766,6 +766,9 @@ T56 → T57
 **Depends on**: T16, T9
 **Reuses**: slug da T9; S:37-38; AD-057; AD-113; contagem de linhas de `F:2233`
 **Requirement**: PLA-11
+**Status**: rascunhada
+**Lacunas**: o valor de `SLUG_GRUPO_TESTE` só sai da pausa da T9; a migração leva o marcador `__SLUG_GRUPO_TESTE__`, que o /executar troca antes do primeiro `pnpm migrar`. Com o marcador, todo banco com grupos aborta nela: o banco local com seed e os ensaios das features anteriores que migram um dump simulado com grupos (`backend/scripts/test/ensaio-migracao*.test.ts`) precisam do slug real ou de um grupo com o slug no dump simulado
+**Nota do rascunho**: o teste roda o corpo da migração de novo sobre o cenário, numa transação desfeita, trocando a constante pelo slug de cada caso (a linha `SLUG_GRUPO_TESTE constant text := ...`).
 
 **Done when**:
 
