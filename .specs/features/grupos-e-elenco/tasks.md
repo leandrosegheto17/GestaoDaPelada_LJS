@@ -1575,6 +1575,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T45
 **Reuses**: interface de `GD:153`; tradutor do 23505 (T20); eventos de `GSEG:164`
 **Requirement**: GEL-88, GEL-89, GEL-91, GEL-92, GEL-93, GEL-96, SEC-008
+**Status**: rascunhada
 
 **Done when**:
 
