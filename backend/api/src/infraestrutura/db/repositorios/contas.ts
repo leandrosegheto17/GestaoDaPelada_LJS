@@ -120,7 +120,12 @@ export interface Eu {
 
 /**
  * A conta da sessão e os grupos dela, sob a RLS (ACE-18): `contas` só mostra a própria linha e
- * `grupos` só os de `grupos_visiveis()` (arquivado só para a criadora). Sem conta, nulo.
+ * `grupos` só os de `grupos_visiveis()`. Sem conta, nulo.
+ *
+ * Só grupos ativos (grupos-e-elenco T24; GEL-25, GEL-27): o arquivado some da sessão também para
+ * a criadora, que o vê só em `GET /api/grupos`, na seção "Arquivados" (`GD:91`, `GD:286`).
+ * [LACUNA] o teste `ACE-18: a criadora ainda vê o próprio grupo arquivado`
+ * (`test/repositorios/contas.test.ts:57`) afirma o contrário; mudar teste existente pede aprovação.
  */
 async function eu(db: Db): Promise<Eu | null> {
   const conta = await sql<{ id: string; nome: string; email: string }>`
@@ -131,6 +136,7 @@ async function eu(db: Db): Promise<Eu | null> {
     SELECT g.id, g.nome, g.slug, v.acessa_financeiro
       FROM grupos g
       JOIN vinculos_admin v ON v.grupo_id = g.id AND v.conta_id = app_conta_id()
+     WHERE g.arquivado_em IS NULL
      ORDER BY g.nome, g.id`.execute(db);
   return { id: linha.id, nome: linha.nome, email: linha.email, grupos: grupos.rows };
 }

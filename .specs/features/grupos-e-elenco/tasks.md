@@ -990,6 +990,8 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T23
 **Reuses**: estender `contas.eu` (`CA:820`, T22); decisão de `GD:91` e `GD:286`
 **Requirement**: GEL-25, GEL-27
+**Status**: rascunhada
+Lacunas: o teste da CA `ACE-18: a criadora ainda vê o próprio grupo arquivado` (`backend/api/test/repositorios/contas.test.ts:57`) contradiz o GEL-27 (a sessão da criadora não traz o arquivado); o rascunho não o alterou, porque mudar teste existente pede aprovação. O `/executar` pergunta antes de levar ao verde.
 
 **Done when**:
 
