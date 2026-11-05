@@ -531,6 +531,8 @@ T81 → T82
 **Depends on**: T9
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-19
+**Status**: rascunhada
+**Nota do rascunho**: `@pelada/api` usa `@pelada/scripts` como devDependency (trava de host); a T18 faz o inverso. Se o pnpm reclamar do ciclo, o /executar decide.
 
 **Done when**:
 
