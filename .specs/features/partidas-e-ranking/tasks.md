@@ -768,14 +768,14 @@ Gate (T9 a T11): pnpm --filter @pelada/dominio test (tarefas do lote verdes) + t
 **Depends on**: T11
 **Reuses**: `B:253` (PAR-66), `B:284-286` (PAR-84 a PAR-86), `B:189` (PAR-41), `B:65`
 **Requirement**: PAR-41, PAR-66, PAR-84, PAR-85, PAR-86
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-66`: mês anterior à primeira partida, futuro, ou outro que não o de hoje sem partidas: fora do histórico
-- [ ] Teste `PAR-84`: no mês da primeira partida, `mesAnterior` nulo; `PAR-85`: no mês de hoje, `mesSeguinte` nulo
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-66`: mês anterior à primeira partida, futuro, ou outro que não o de hoje sem partidas: fora do histórico
+- [x] Teste `PAR-84`: no mês da primeira partida, `mesAnterior` nulo; `PAR-85`: no mês de hoje, `mesSeguinte` nulo
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -793,22 +793,24 @@ Gate (T9 a T11): pnpm --filter @pelada/dominio test (tarefas do lote verdes) + t
 **Depends on**: T12
 **Reuses**: `B:322-325` (PAR-96 a PAR-99), `B:63-64`, casos `B:498-499`
 **Requirement**: PAR-96, PAR-97, PAR-98, PAR-99
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-96`: mês com 14 partidas fica com as 12 mais recentes e o PTS INICIAL absorve as 2 primeiras
-- [ ] Teste `PAR-96`: janeiro completa as colunas com dezembro do ano anterior
-- [ ] Teste `PAR-99`: soma das rodadas + `ptsInicial` fecha o `ptsFinal` do ranking em toda linha
-- [ ] Teste `PAR-97`: mês sem partida marca `semPartidasNoMes` com colunas só de meses anteriores
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-96`: mês com 14 partidas fica com as 12 mais recentes e o PTS INICIAL absorve as 2 primeiras
+- [x] Teste `PAR-96`: janeiro completa as colunas com dezembro do ano anterior
+- [x] Teste `PAR-99`: soma das rodadas + `ptsInicial` fecha o `ptsFinal` do ranking em toda linha
+- [x] Teste `PAR-97`: mês sem partida marca `semPartidasNoMes` com colunas só de meses anteriores
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
 
 ---
 
+
+Gate (T12 a T13): pnpm --filter @pelada/dominio test (tarefas do lote verdes) + tsc dominio @ fc1fdba6a35b2bf499ee1e7b60ca13f91e72e059
 #### Phase 7: Domínio: prévias e desempenho
 
 ### T14: compararCenarios: acumulado e posição antes e depois
