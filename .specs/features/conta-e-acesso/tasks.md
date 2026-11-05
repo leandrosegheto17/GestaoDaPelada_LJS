@@ -585,15 +585,15 @@ T57 → T58
 **Depends on**: None
 **Reuses**: pacote `@pelada/contrato` da fundação (`F:338`, nomes em `F:18`); limites de `ljs:.specs/features/conta-e-acesso/spec.md:50` e `:76`
 **Requirement**: ACE-03, ACE-05, ACE-68
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: o `pnpm-lock.yaml` com o zod nasce no `pnpm install` do /executar.
 
 **Done when**:
 
-- [ ] Testes `ACE-03`: 1, 2, 60 e 61 caracteres de nome; 7, 8, 72 e 73 de senha; 254 e 255 de e-mail
-- [ ] Teste `ACE-05`: `"  Ana@Ex.COM "` vira `ana@ex.com`
-- [ ] Teste `ACE-68`: senha de 30 emojis (menos de 72 caracteres e mais de 72 bytes) é recusada
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Testes `ACE-03`: 1, 2, 60 e 61 caracteres de nome; 7, 8, 72 e 73 de senha; 254 e 255 de e-mail
+- [x] Teste `ACE-05`: `"  Ana@Ex.COM "` vira `ana@ex.com`
+- [x] Teste `ACE-68`: senha de 30 emojis (menos de 72 caracteres e mais de 72 bytes) é recusada
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -611,15 +611,15 @@ T57 → T58
 **Depends on**: T11
 **Reuses**: formas de `ljs:.specs/features/conta-e-acesso/design.md:192` e `:215-228` (só consulta, AD-002)
 **Requirement**: ACE-02, ACE-58
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: corpo de erro `{ erro, codigo, campos?, grupos? }`; `TERMOS_VERSAO` = 2026-11-05, a data do rascunho dos textos (T48).
 
 **Done when**:
 
-- [ ] Teste `ACE-02`: `cadastroCorpo` sem `termos: true` falha com o código `termos_obrigatorios`
-- [ ] Teste `ACE-58`: `TERMOS_VERSAO` casa `^\d{4}-\d{2}-\d{2}$`
-- [ ] Teste: campo a mais em qualquer corpo é recusado (`.strict()`)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `ACE-02`: `cadastroCorpo` sem `termos: true` falha com o código `termos_obrigatorios`
+- [x] Teste `ACE-58`: `TERMOS_VERSAO` casa `^\d{4}-\d{2}-\d{2}$`
+- [x] Teste: campo a mais em qualquer corpo é recusado (`.strict()`)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -637,15 +637,15 @@ T57 → T58
 **Depends on**: T12
 **Reuses**: decisão de `ljs:.specs/features/conta-e-acesso/design.md:141-142` (token e hash do IP); escrito do zero
 **Requirement**: ACE-10, ACE-71, ACE-73
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: o hash é o SHA-256 do texto do token (UTF-8); valor que não é IP também vira `sem-ip`.
 
 **Done when**:
 
-- [ ] Teste `ACE-10`: o hash tem 32 bytes e não contém o token; dois tokens seguidos diferem
-- [ ] Testes `ACE-71`: `2001:db8:1:2:aaaa::1` e `2001:db8:1:2:bbbb::9` dão a mesma chave /64; IPv4 inteiro; IPv6 abreviado e com `::ffff:` normalizados; sem IP, `sem-ip`
-- [ ] Teste `ACE-73`: `2001:db8:1:2::1` e `2001:db8:1:ff::1` dão a mesma chave /48
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `ACE-10`: o hash tem 32 bytes e não contém o token; dois tokens seguidos diferem
+- [x] Testes `ACE-71`: `2001:db8:1:2:aaaa::1` e `2001:db8:1:2:bbbb::9` dão a mesma chave /64; IPv4 inteiro; IPv6 abreviado e com `::ffff:` normalizados; sem IP, `sem-ip`
+- [x] Teste `ACE-73`: `2001:db8:1:2::1` e `2001:db8:1:ff::1` dão a mesma chave /48
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -663,19 +663,21 @@ T57 → T58
 **Depends on**: T13
 **Reuses**: app Hono da fundação (`F:1106`); atributos de `ljs:.specs/features/conta-e-acesso/spec.md:48` e `:99`
 **Requirement**: ACE-09, ACE-17
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: o cookie leva `Max-Age` das 12 h da sessão; o vencido leva também `Expires` em 1970.
 
 **Done when**:
 
-- [ ] Teste `ACE-09`: o `Set-Cookie` tem os 4 atributos e não tem `Domain`
-- [ ] Teste `ACE-17`: o cookie vencido tem `Max-Age=0` e o mesmo nome e caminho
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `ACE-09`: o `Set-Cookie` tem os 4 atributos e não tem `Domain`
+- [x] Teste `ACE-17`: o cookie vencido tem `Max-Age=0` e o mesmo nome e caminho
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
 
 ---
+
+**Gate**: `typecheck` de contrato e api (api só com o erro preexistente `test/rotas/apoio-push.ts(99,40)`) e `vitest run` de T11 a T14 @ fce9ca7f919042fa4653c5769a283728c101e525 = 77 testes verdes. Vermelho por sabotagem do código (2026-11-05), restaurado em seguida: limite de bytes da senha (ACE-68, 2 testes), código `termos_obrigatorios` (ACE-02, 4), prefixo /48 do IP (ACE-73, 1), `HttpOnly` do cookie (ACE-09 e ACE-17, 2)
 
 #### Phase 5: E-mail
 
