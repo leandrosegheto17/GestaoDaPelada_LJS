@@ -20,8 +20,8 @@ export const MENSAGEM_MES_INVALIDO = 'Mês inválido.';
 const MENSAGEM_DATA_INVALIDA = 'Informe uma data válida.';
 const MENSAGEM_VALOR = 'Informe um valor inteiro em centavos dentro do limite.';
 
-/** Inteiro seguro na faixa, em centavos. */
-const centavos = (min: number, max: number) =>
+/** Inteiro seguro na faixa, em centavos (também usado pelo contrato dos lançamentos, T8). */
+export const centavos =(min: number, max: number) =>
   z
     .number({ error: MENSAGEM_VALOR })
     .int(MENSAGEM_VALOR)

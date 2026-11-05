@@ -484,6 +484,8 @@ T47 → T48
 **Depends on**: T7
 **Reuses**: Códigos de erro da GE (`GE:854`); primitivos (`CA:550`)
 **Requirement**: FIN-25, FIN-26, FIN-35, FIN-36
+**Status**: rascunhada
+**Nota do rascunho**: `centavos` passou a ser exportado de `financeiro.ts` (T7); `plano_pro` repete o código e o texto de `plano.ts` (feature 7) para não depender dela; falta `./financeiro-lancamentos` no `exports` do `package.json` e no `index.ts` do contrato (outra sessão edita esses arquivos).
 
 **Done when**:
 
