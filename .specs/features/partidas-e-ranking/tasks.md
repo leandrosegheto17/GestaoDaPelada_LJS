@@ -686,14 +686,14 @@ Gate (T7 a T8): pnpm --filter @pelada/dominio test (tarefas do lote verdes) + ts
 **Depends on**: T5
 **Reuses**: `B:255-256` (PAR-68, PAR-69), `B:66` (sem ano no fim), caso limite `B:492`; ordem do apelido sem acento nem caixa de `GE:575`
 **Requirement**: PAR-68, PAR-69
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-69`: "José", "Jose" e "Jôse" empatados em tudo ficam na mesma posição e o seguinte é o 4
-- [ ] Teste `PAR-68`: sem ano de nascimento vai depois de todos com ano, no mesmo acumulado
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-69`: "José", "Jose" e "Jôse" empatados em tudo ficam na mesma posição e o seguinte é o 4
+- [x] Teste `PAR-68`: sem ano de nascimento vai depois de todos com ano, no mesmo acumulado
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -711,15 +711,15 @@ Gate (T7 a T8): pnpm --filter @pelada/dominio test (tarefas do lote verdes) + ts
 **Depends on**: T9
 **Reuses**: `B:258-260` (PAR-71 a PAR-73), `B:62` (presença fora de período conta), casos `B:486`, `B:497`
 **Requirement**: PAR-71, PAR-72, PAR-73, PAR-60
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-73`: rodada anterior ao início da contagem é `fora` mesmo com presença gravada
-- [ ] Teste `PAR-72`: ativo sem presença é `falta` com 0
-- [ ] Teste `PAR-60`: presença fora de período e depois do início da contagem aparece com a situação
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-73`: rodada anterior ao início da contagem é `fora` mesmo com presença gravada
+- [x] Teste `PAR-72`: ativo sem presença é `falta` com 0
+- [x] Teste `PAR-60`: presença fora de período e depois do início da contagem aparece com a situação
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -737,22 +737,24 @@ Gate (T7 a T8): pnpm --filter @pelada/dominio test (tarefas do lote verdes) + ts
 **Depends on**: T10
 **Reuses**: `B:254`, `B:257`, `B:261-262` (PAR-67, PAR-70, PAR-74, PAR-75), `B:286-287`; casos `B:493-495`
 **Requirement**: PAR-67, PAR-70, PAR-74, PAR-75, PAR-86, PAR-87
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-74`: mês corrente toma o período em hoje e PTS FINAL = acumulado de hoje
-- [ ] Teste `PAR-67`: inativo hoje com partidas no mês sai das linhas, sem perder histórico
-- [ ] Teste `PAR-87`: mês sem partidas dá PTS INICIAL = PTS FINAL e a mesma ordem de outubro
-- [ ] Teste `PAR-86`: grupo sem partidas dá PTS INICIAL = PTS FINAL = acumulado
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-74`: mês corrente toma o período em hoje e PTS FINAL = acumulado de hoje
+- [x] Teste `PAR-67`: inativo hoje com partidas no mês sai das linhas, sem perder histórico
+- [x] Teste `PAR-87`: mês sem partidas dá PTS INICIAL = PTS FINAL e a mesma ordem de outubro
+- [x] Teste `PAR-86`: grupo sem partidas dá PTS INICIAL = PTS FINAL = acumulado
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
 
 ---
 
+
+Gate (T9 a T11): pnpm --filter @pelada/dominio test (tarefas do lote verdes) + tsc dominio @ 8da33f4947afd2d55fdb860de4e523f58690126a
 #### Phase 6: Domínio: meses e PDF
 
 ### T12: Mês no histórico e navegação
