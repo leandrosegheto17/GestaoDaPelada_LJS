@@ -346,6 +346,8 @@ T47 → T48
 **Depends on**: T2
 **Reuses**: `somarCentavos` (T1); regra de `L:backend/dominio/src/caixa/saldos.ts:34-40`; AD-055 (data futura só conta quando chega)
 **Requirement**: FIN-10, FIN-13, FIN-49
+**Status**: rascunhada
+**Nota do rascunho**: fora da ordem, a pedido do usuário. O código entrou por engano no commit `7137e7d` de outra sessão. Datas comparadas como texto `AAAA-MM-DD`, sem os tipos da feature 3.
 
 **Done when**:
 
@@ -373,6 +375,8 @@ T47 → T48
 **Depends on**: T3
 **Reuses**: T1 e T2; regra de `L:backend/dominio/src/caixa/saldos.ts:42-79`
 **Requirement**: FIN-11, FIN-12, FIN-13
+**Status**: rascunhada
+**Nota do rascunho**: fora da ordem, sem a T2: `resumoDoMes` recebe os ativos já filtrados e ordenados por `ativosNoMes` e só remove repetidos. O código entrou no commit `7137e7d` de outra sessão.
 
 **Done when**:
 
@@ -423,6 +427,8 @@ T47 → T48
 **Depends on**: T5
 **Reuses**: regra de `L:backend/dominio/src/caixa/mensalidade.ts:10-28`
 **Requirement**: FIN-16, FIN-17
+**Status**: rascunhada
+**Nota do rascunho**: fora da ordem, sem a T5. O código entrou no commit `7137e7d` de outra sessão.
 
 **Done when**:
 
@@ -449,6 +455,8 @@ T47 → T48
 **Depends on**: T6
 **Reuses**: Primitivos `.strict()` e inteiros da CA (`CA:550`); molde do contrato de pesos (`PR:865`); limites de `L:backend/contrato/src/limites.ts:17-19` e `L:backend/contrato/src/financeiro.ts:8-103`
 **Requirement**: FIN-01, FIN-03, FIN-07, FIN-13
+**Status**: rascunhada
+**Nota do rascunho**: fora da ordem, sem os primitivos da GE: `centavos`, a data real (`z.iso.date()`) e a mensagem "Informe uma data válida." ficam locais em `financeiro.ts`; falta `./financeiro` no `exports` do `package.json` e no `index.ts` do contrato (outra sessão edita esses arquivos). O código entrou no commit `7137e7d` de outra sessão.
 
 **Done when**:
 
