@@ -1331,6 +1331,8 @@ T39 → T40 → T41
 **Depends on**: T38
 **Reuses**: páginas de termos e privacidade (`CA:1458`); `.specs/mockup/telas/t07-privacidade--pagina.html:21`; `TERMOS_VERSAO` (`CA:574`); nova versão com a data da mudança, sem novo aceite (AD-116)
 **Requirement**: NOT-59
+**Status**: rascunhada
+**Nota do rascunho**: o texto do push entra em "O que guardamos" (como o da cobrança na planos-e-cobranca T54), porque o ACE-58 confere a lista exata das 4 seções. A `TERMOS_VERSAO` (`backend/contrato/src/acesso.ts:11`) já é `2026-11-05`, a data desta mudança (a planos-e-cobranca T54 a trocou hoje), então não mudou; se o `/executar` levar a mudança ao ar em outra data, troca para a data dele (AD-116). Testes em `frontend/web/test/telas/privacidade-push.test.tsx`.
 
 **Done when**:
 

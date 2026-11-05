@@ -40,6 +40,18 @@ export const TEXTO_CANCELAMENTO =
 export const TEXTO_PAGAMENTO =
   'Pagamentos: a cobrança do Pro é feita pelo Asaas, que atua como operador dos dados de pagamento. Para assinar, quem criou o grupo informa nome e CPF, que enviamos ao Asaas junto com o e-mail da conta; o app não guarda o CPF nem dado de cartão (a forma de pagamento é escolhida na fatura do Asaas) e guarda só o id do cliente no Asaas e a situação da assinatura.';
 
+/**
+ * Avisos no celular (notificacoes T39; NOT-59; AD-116), também RASCUNHO para revisão, em "O que guardamos" pelo mesmo
+ * motivo da cobrança (o ACE-58 confere a lista de seções). Os 4 pontos: só o endereço técnico do aparelho, por grupo;
+ * sem nome; como cancelar; apagado depois de 180 dias sem envio.
+ */
+export const TEXTO_PUSH =
+  'Avisos no celular: quem pede para receber os avisos do ranking de um grupo nos deixa guardar só o endereço técnico do aparelho que o navegador cria para isso, separado por grupo e sem nome, telefone nem e-mail. Para parar, toque em "Parar de receber avisos" na página do ranking ou desligue as notificações do site no navegador. O endereço é apagado depois de 180 dias sem nenhum aviso entregue.';
+
+/** A frase dos e-mails (NOT-59): a anterior não citava os avisos de cobrança. */
+export const TEXTO_EMAILS =
+  'Enviamos e-mails só para confirmar a conta, recuperar a senha, entregar convites de admin e avisar quem criou o grupo sobre a cobrança do Pro (cobrança gerada, pagamento confirmado e pagamento em atraso).';
+
 export const TEXTO_EM_RASCUNHO = true;
 export const SELO_RASCUNHO = 'Rascunho para revisão';
 
@@ -69,12 +81,13 @@ export const SECOES_PRIVACIDADE: readonly Secao[] = [
     titulo: 'O que guardamos',
     texto:
       'Do jogador: apelido, ano de nascimento, posição, telefone (opcional), data de entrada no grupo, presenças e as notas de habilidade dadas pelos admins. Dos admins: nome, e-mail, a senha guardada de um jeito que ninguém consegue ler, e a data em que aceitou estes termos. Do uso do app: contagens anônimas, sem nome, telefone nem localização. ' +
-      TEXTO_PAGAMENTO,
+      TEXTO_PAGAMENTO +
+      ' ' +
+      TEXTO_PUSH,
   },
   {
     titulo: 'E-mails',
-    texto:
-      'Enviamos e-mails só para confirmar a conta, recuperar a senha e entregar convites de admin.',
+    texto: TEXTO_EMAILS,
   },
   {
     titulo: 'Quem vê',
