@@ -1222,6 +1222,8 @@ T47 → T48
 **Depends on**: T34
 **Reuses**: Molde de utilitário de exibição (`GE:1726`); regra de `L:backend/contrato/src/primitivos.ts:35-42`
 **Requirement**: FIN-15, FIN-48
+**Status**: rascunhada
+**Nota do rascunho**: `SPEC_DEVIATION`: o negativo sai "− R$ 900,00" (U+2212 e um espaço), como o mockup (`t22-financeiro--sucesso.html:52`), não "−R$ 900,00" do texto da tarefa ("conforme o mockup"). `lerReais` devolve `{ ok, centavos }` ou `{ ok: false, mensagem }` e aceita o sinal de menos (saldo inicial negativo, FIN-03). Teste em `frontend/web/test/dados/dinheiro.test.ts`, onde o projeto põe os testes do front (a matriz diz `src/**`).
 
 **Done when**:
 
