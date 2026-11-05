@@ -1459,6 +1459,8 @@ T57 → T58
 **Depends on**: T43
 **Reuses**: `.specs/mockup/telas/t29-cadastro--*.html` (4 estados); `CaixaSelecao` e `ResumoErros` (T40)
 **Requirement**: ACE-01, ACE-03, ACE-56, ACE-59
+**Status**: rascunhada
+**Nota do rascunho**: valida antes de enviar com os primitivos do contrato (o estado de erro do `telas.json` não tem resposta da API) e também marca os campos do 422. Textos de erro de e-mail, senha curta e aceite são os do mockup; o do nome é PREMISSA (o mockup não o mostra). "Enviar outro link" da tela de sucesso leva a `/confirmar`, que sem token mostra o pedido de novo link (T45).
 
 **Done when**:
 

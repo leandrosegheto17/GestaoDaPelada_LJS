@@ -10,7 +10,6 @@ function Pendente({ titulo }: { titulo: string }) {
   return <Casca titulo={titulo} />;
 }
 
-export const Cadastro = () => <Pendente titulo="Criar conta" />;
 export const Confirmar = () => <Pendente titulo="Confirmar e-mail" />;
 export const Esqueci = () => <Pendente titulo="Esqueci a senha" />;
 export const NovaSenha = () => <Pendente titulo="Nova senha" />;

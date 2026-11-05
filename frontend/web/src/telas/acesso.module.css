@@ -1,5 +1,14 @@
 /* Layout comum das telas de acesso (ACE-56), de .specs/mockup/base.css:17-19,45,48,80,218-223. */
 
+/* O mesmo título da Casca, para as telas que põem algo antes dele (o link "Voltar"). */
+.titulo-pagina {
+  font-size: var(--texto-3xl);
+  font-weight: var(--peso-extra);
+  text-transform: uppercase;
+  letter-spacing: var(--espacamento-caixa-alta);
+  margin: var(--esp-1) 0 var(--esp-4);
+}
+
 .formulario {
   display: grid;
   gap: var(--esp-4);
