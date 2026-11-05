@@ -1405,6 +1405,8 @@ T81 → T82
 **Depends on**: T42
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-31
+**Status**: rascunhada
+**Nota do rascunho**: versões no `package.json` sem instalação (Vite 8 do design, `@vitejs/plugin-react` 5, React 19, React Router 7, TanStack Query 5, jsdom); o `/executar` instala e confere as atuais. O Vitest fica no `vite.config.ts`.
 
 **Done when**:
 
