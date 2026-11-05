@@ -493,6 +493,7 @@ T57 → T58
 **Depends on**: T7
 **Reuses**: `M:1792843800000_conta-senha-bloqueio.sql:92` (`conta_excluir` vigente)
 **Requirement**: ACE-28, ACE-29, ACE-30, ACE-69
+**Status**: rascunhada
 
 **Done when**:
 
