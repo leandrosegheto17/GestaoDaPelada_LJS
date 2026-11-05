@@ -1325,6 +1325,8 @@ T81 → T82
 **Depends on**: T39
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-23
+**Status**: rascunhada
+**Nota do rascunho**: `SPEC_DEVIATION`: `test/wrangler.test.ts` entrou na lista permitida, porque o nome de um caso da T33 cita o endereço padrão da Cloudflare. O `/executar` decide (`AskUserQuestion`) entre manter a linha ou renomear o caso, que é mudança de teste existente e pede aprovação. A checagem lê os arquivos do `git ls-files` e roda no `pnpm test:checagens`.
 
 **Done when**:
 
