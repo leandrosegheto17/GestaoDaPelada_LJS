@@ -13,7 +13,10 @@ export interface PropsEsqueletoLista {
   rotulo?: string;
 }
 
-export function EsqueletoLista({ linhas = LINHAS_PADRAO, rotulo = 'Carregando…' }: PropsEsqueletoLista) {
+export function EsqueletoLista({
+  linhas = LINHAS_PADRAO,
+  rotulo = 'Carregando…',
+}: PropsEsqueletoLista) {
   const total = Math.max(0, Math.floor(linhas));
   return (
     <div aria-busy="true">

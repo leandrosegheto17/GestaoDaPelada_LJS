@@ -24,19 +24,34 @@ describe('lerReais (FIN-48)', () => {
     expect(lerReais(texto)).toEqual({ ok: true, centavos });
   });
 
-  it.each(['12,345', 'abc', '1,2,3', '35,0,0', '', '   ', '1.24,50', '12.3456,00', '1,', ',50', '350.00', '1e3', 'R$', '--1'])(
-    'FIN-48: "%s" é recusado com a mensagem',
-    (texto) => {
-      expect(lerReais(texto)).toEqual({ ok: false, mensagem: MENSAGEM_VALOR_REAIS });
-    },
-  );
+  it.each([
+    '12,345',
+    'abc',
+    '1,2,3',
+    '35,0,0',
+    '',
+    '   ',
+    '1.24,50',
+    '12.3456,00',
+    '1,',
+    ',50',
+    '350.00',
+    '1e3',
+    'R$',
+    '--1',
+  ])('FIN-48: "%s" é recusado com a mensagem', (texto) => {
+    expect(lerReais(texto)).toEqual({ ok: false, mensagem: MENSAGEM_VALOR_REAIS });
+  });
 
   it('FIN-48: a mensagem é a da spec', () => {
     expect(MENSAGEM_VALOR_REAIS).toBe('Informe um valor em reais, ex.: 350,00.');
   });
 
   it('FIN-48: valor além do inteiro seguro é recusado', () => {
-    expect(lerReais('999999999999999999,00')).toEqual({ ok: false, mensagem: MENSAGEM_VALOR_REAIS });
+    expect(lerReais('999999999999999999,00')).toEqual({
+      ok: false,
+      mensagem: MENSAGEM_VALOR_REAIS,
+    });
   });
 
   it('FIN-48: o arquivo não usa parseFloat nem toFixed (checagem por texto)', () => {

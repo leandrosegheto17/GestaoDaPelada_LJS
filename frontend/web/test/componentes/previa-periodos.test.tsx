@@ -16,7 +16,15 @@ afterEach(() => {
   cleanup();
 });
 
-const DATAS_7 = ['2026-09-03', '2026-09-10', '2026-09-17', '2026-09-24', '2026-10-01', '2026-10-08', '2026-10-15'];
+const DATAS_7 = [
+  '2026-09-03',
+  '2026-09-10',
+  '2026-09-17',
+  '2026-09-24',
+  '2026-10-01',
+  '2026-10-08',
+  '2026-10-15',
+];
 
 describe('PAR-117: acumulado e posição', () => {
   it('PAR-117: acumulado que muda e que não muda', () => {
@@ -39,8 +47,12 @@ describe('PAR-117: acumulado e posição', () => {
 describe('PAR-118: rodadas', () => {
   it('PAR-118: singular, plural e "deixam de constar"', () => {
     expect(textoRodadas(['2026-10-15'], 'passam')).toBe('1 rodada passa a constar: 15/10.');
-    expect(textoRodadas(['2026-10-08', '2026-10-15'], 'passam')).toBe('2 rodadas passam a constar: 08/10 e 15/10.');
-    expect(textoRodadas(['2026-10-08', '2026-10-15'], 'deixam')).toBe('2 rodadas deixam de constar: 08/10 e 15/10.');
+    expect(textoRodadas(['2026-10-08', '2026-10-15'], 'passam')).toBe(
+      '2 rodadas passam a constar: 08/10 e 15/10.',
+    );
+    expect(textoRodadas(['2026-10-08', '2026-10-15'], 'deixam')).toBe(
+      '2 rodadas deixam de constar: 08/10 e 15/10.',
+    );
     expect(textoRodadas(['2026-10-15'], 'passaram')).toBe('1 rodada passou a constar: 15/10.');
     expect(textoRodadas([], 'passam')).toBe('');
   });
@@ -49,7 +61,9 @@ describe('PAR-118: rodadas', () => {
     expect(listaDeDatas(DATAS_7)).toBe('03/09, 10/09, 17/09, 24/09, 01/10 e mais 2');
     expect(listaDeDatas(DATAS_7.slice(0, 5))).toBe('03/09, 10/09, 17/09, 24/09 e 01/10');
     expect(listaDeDatas(DATAS_7.slice(0, 3))).toBe('03/09, 10/09 e 17/09');
-    expect(textoRodadas(DATAS_7, 'passam')).toBe('7 rodadas passam a constar: 03/09, 10/09, 17/09, 24/09, 01/10 e mais 2.');
+    expect(textoRodadas(DATAS_7, 'passam')).toBe(
+      '7 rodadas passam a constar: 03/09, 10/09, 17/09, 24/09, 01/10 e mais 2.',
+    );
   });
 
   it('PAR-118: o aviso fica dentro do elemento .faixa--atencao; sem aviso, nenhuma faixa', async () => {
@@ -70,7 +84,11 @@ describe('PAR-118: rodadas', () => {
         }}
       />,
     );
-    expect(screen.getByText('Acumulado de 18 pontos não muda. Passa a aparecer no ranking, na posição 15.')).toBeDefined();
+    expect(
+      screen.getByText(
+        'Acumulado de 18 pontos não muda. Passa a aparecer no ranking, na posição 15.',
+      ),
+    ).toBeDefined();
     expect(screen.getByText('2 rodadas passam a constar: 08/10 e 15/10.')).toBeDefined();
     const faixa = container.querySelector('.faixa--atencao');
     expect(faixa).not.toBeNull();
@@ -98,27 +116,57 @@ describe('PAR-118: rodadas', () => {
 
 describe('PAR-119: prévia de início', () => {
   it('PAR-119: com tudo, a frase inteira', () => {
-    expect(textoPreviaInicio({ acumuladoAntes: 18, acumuladoDepois: 24, posicaoAntes: 5, posicaoDepois: 3, rodadasQuePassamAConstar: 2 })).toBe(
-      'Acumulado de 18 pontos passa a 24; posição de 5 para 3. 2 rodadas passam a constar.',
-    );
+    expect(
+      textoPreviaInicio({
+        acumuladoAntes: 18,
+        acumuladoDepois: 24,
+        posicaoAntes: 5,
+        posicaoDepois: 3,
+        rodadasQuePassamAConstar: 2,
+      }),
+    ).toBe('Acumulado de 18 pontos passa a 24; posição de 5 para 3. 2 rodadas passam a constar.');
   });
 
   it('PAR-119: prévia de início omite as partes que não se aplicam', () => {
     // Sem rodadas (avançar a data).
-    expect(textoPreviaInicio({ acumuladoAntes: 18, acumuladoDepois: 11, posicaoAntes: 5, posicaoDepois: 7, rodadasQuePassamAConstar: 0 })).toBe(
-      'Acumulado de 18 pontos passa a 11; posição de 5 para 7.',
-    );
+    expect(
+      textoPreviaInicio({
+        acumuladoAntes: 18,
+        acumuladoDepois: 11,
+        posicaoAntes: 5,
+        posicaoDepois: 7,
+        rodadasQuePassamAConstar: 0,
+      }),
+    ).toBe('Acumulado de 18 pontos passa a 11; posição de 5 para 7.');
     // Posição igual.
-    expect(textoPreviaInicio({ acumuladoAntes: 18, acumuladoDepois: 19, posicaoAntes: 5, posicaoDepois: 5, rodadasQuePassamAConstar: 1 })).toBe(
-      'Acumulado de 18 pontos passa a 19. 1 rodada passa a constar.',
-    );
+    expect(
+      textoPreviaInicio({
+        acumuladoAntes: 18,
+        acumuladoDepois: 19,
+        posicaoAntes: 5,
+        posicaoDepois: 5,
+        rodadasQuePassamAConstar: 1,
+      }),
+    ).toBe('Acumulado de 18 pontos passa a 19. 1 rodada passa a constar.');
     // Só as rodadas (recuo sem presença lançada, PAR-111).
-    expect(textoPreviaInicio({ acumuladoAntes: 18, acumuladoDepois: 18, posicaoAntes: 5, posicaoDepois: 5, rodadasQuePassamAConstar: 3 })).toBe(
-      '3 rodadas passam a constar.',
-    );
+    expect(
+      textoPreviaInicio({
+        acumuladoAntes: 18,
+        acumuladoDepois: 18,
+        posicaoAntes: 5,
+        posicaoDepois: 5,
+        rodadasQuePassamAConstar: 3,
+      }),
+    ).toBe('3 rodadas passam a constar.');
     // Só a posição.
-    expect(textoPreviaInicio({ acumuladoAntes: 18, acumuladoDepois: 18, posicaoAntes: 5, posicaoDepois: 4, rodadasQuePassamAConstar: 0 })).toBe(
-      'Posição de 5 para 4.',
-    );
+    expect(
+      textoPreviaInicio({
+        acumuladoAntes: 18,
+        acumuladoDepois: 18,
+        posicaoAntes: 5,
+        posicaoDepois: 4,
+        rodadasQuePassamAConstar: 0,
+      }),
+    ).toBe('Posição de 5 para 4.');
   });
 });

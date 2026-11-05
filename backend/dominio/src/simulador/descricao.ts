@@ -12,7 +12,9 @@ export function descreverPrevia(previa: Previa): string {
   if (previa.formato === 'dois_times') {
     if (previa.valida) {
       const base = `2 times de ${previa.n}`;
-      return previa.reservas > 0 ? `${base} · ${contar(previa.reservas, 'reserva', 'reservas')}` : base;
+      return previa.reservas > 0
+        ? `${base} · ${contar(previa.reservas, 'reserva', 'reservas')}`
+        : base;
     }
     return previa.maiorNPossivel === null
       ? 'Faltam aptos para 2 times.'
@@ -20,7 +22,9 @@ export function descreverPrevia(previa: Previa): string {
   }
   if (previa.valida) {
     const completos = `${contar(previa.timesCompletos, 'time', 'times')} de ${previa.n}`;
-    return previa.tamanhoIncompleto > 0 ? `${completos} + 1 time incompleto de ${previa.tamanhoIncompleto}` : completos;
+    return previa.tamanhoIncompleto > 0
+      ? `${completos} + 1 time incompleto de ${previa.tamanhoIncompleto}`
+      : completos;
   }
   const base = `Com ${previa.aptos} aptos e N = ${previa.n} não há 3 times.`;
   const nMenor = previa.nSugerido !== null;

@@ -2,7 +2,12 @@ import { Buffer } from 'node:buffer';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { gerarToken } from '../../src/infraestrutura/sessao/token.ts';
 import { cliente } from '../acesso/apoio.ts';
-import { abrirCenarioGrupos, arquivar, reativar, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  arquivar,
+  reativar,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * `GET /api/sessao` lista só os grupos ativos (T24; GEL-25, GEL-27), contra o cenário de grupos: C é a criadora de

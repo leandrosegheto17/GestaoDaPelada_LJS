@@ -73,13 +73,18 @@ export async function iniciarAsaasFalso(opcoes = {}) {
 
     if (req.method === 'GET' && caminho.startsWith('/fatura/')) {
       res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' });
-      res.end('<!doctype html><html lang="pt-BR"><body><h1>Fatura de teste do Asaas</h1></body></html>');
+      res.end(
+        '<!doctype html><html lang="pt-BR"><body><h1>Fatura de teste do Asaas</h1></body></html>',
+      );
       return;
     }
 
     if (caminho.startsWith('/teste/')) {
       if (req.method === 'GET' && caminho === '/teste/estado') {
-        responder(res, 200, { clientes: [...clientes.values()], assinaturas: [...assinaturas.values()] });
+        responder(res, 200, {
+          clientes: [...clientes.values()],
+          assinaturas: [...assinaturas.values()],
+        });
         return;
       }
       const corpo = await lerJson(req);
@@ -90,7 +95,8 @@ export async function iniciarAsaasFalso(opcoes = {}) {
       }
       if (req.method === 'POST' && caminho === '/teste/webhook') {
         const a = assinaturas.get(String(corpo.subscription));
-        if (!a || !opcoes.urlWebhook || !opcoes.tokenWebhook) return responder(res, 404, { erro: 'assinatura' });
+        if (!a || !opcoes.urlWebhook || !opcoes.tokenWebhook)
+          return responder(res, 404, { erro: 'assinatura' });
         const evento = String(corpo.event);
         eventos += 1;
         const payload = {
@@ -103,7 +109,10 @@ export async function iniciarAsaasFalso(opcoes = {}) {
         };
         const r = await fetch(opcoes.urlWebhook, {
           method: 'POST',
-          headers: { 'content-type': 'application/json', 'asaas-access-token': opcoes.tokenWebhook },
+          headers: {
+            'content-type': 'application/json',
+            'asaas-access-token': opcoes.tokenWebhook,
+          },
           body: JSON.stringify(payload),
         });
         return responder(res, 200, { status: r.status, id: payload.id });
@@ -111,9 +120,12 @@ export async function iniciarAsaasFalso(opcoes = {}) {
       return responder(res, 404, { erro: 'rota' });
     }
 
-    if (!caminho.startsWith('/v3/')) return responder(res, 404, { errors: [{ code: 'not_found' }] });
+    if (!caminho.startsWith('/v3/'))
+      return responder(res, 404, { errors: [{ code: 'not_found' }] });
     if (!req.headers['access_token']) {
-      return responder(res, 401, { errors: [{ code: 'invalid_access_token', description: 'Chave ausente.' }] });
+      return responder(res, 401, {
+        errors: [{ code: 'invalid_access_token', description: 'Chave ausente.' }],
+      });
     }
 
     const corpo = req.method === 'POST' ? await lerJson(req) : {};
@@ -121,16 +133,23 @@ export async function iniciarAsaasFalso(opcoes = {}) {
 
     if (req.method === 'POST' && caminho === '/v3/customers') {
       if (deveFalhar('customers')) return responder(res, 500, { errors: [{ code: 'erro' }] });
-      if (!corpo.name || !corpo.cpfCnpj) return responder(res, 400, { errors: [{ code: 'invalid_customer' }] });
+      if (!corpo.name || !corpo.cpfCnpj)
+        return responder(res, 400, { errors: [{ code: 'invalid_customer' }] });
       const id = proximoId('cus');
       // O CPF não fica no estado: o falso só confere que veio.
-      clientes.set(id, { id, name: corpo.name, email: corpo.email, externalReference: corpo.externalReference });
+      clientes.set(id, {
+        id,
+        name: corpo.name,
+        email: corpo.email,
+        externalReference: corpo.externalReference,
+      });
       return responder(res, 200, { object: 'customer', id });
     }
 
     if (req.method === 'POST' && caminho === '/v3/subscriptions') {
       if (deveFalhar('subscriptions')) return responder(res, 500, { errors: [{ code: 'erro' }] });
-      if (!clientes.has(corpo.customer)) return responder(res, 400, { errors: [{ code: 'invalid_customer' }] });
+      if (!clientes.has(corpo.customer))
+        return responder(res, 400, { errors: [{ code: 'invalid_customer' }] });
       const id = proximoId('sub');
       const a = {
         id,
@@ -153,7 +172,12 @@ export async function iniciarAsaasFalso(opcoes = {}) {
       if (deveFalhar('payments')) return responder(res, 500, { errors: [{ code: 'erro' }] });
       const a = assinaturas.get(decodeURIComponent(pagamentos[1]));
       if (!a) return responder(res, 404, { errors: [{ code: 'not_found' }] });
-      return responder(res, 200, { object: 'list', hasMore: false, totalCount: 1, data: a.deleted ? [] : [cobrancaDe(a)] });
+      return responder(res, 200, {
+        object: 'list',
+        hasMore: false,
+        totalCount: 1,
+        data: a.deleted ? [] : [cobrancaDe(a)],
+      });
     }
 
     const uma = /^\/v3\/subscriptions\/([^/]+)$/.exec(caminho);

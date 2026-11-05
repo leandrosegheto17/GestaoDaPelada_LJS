@@ -19,7 +19,8 @@ import {
  * banco `teste_*` é apagado no `finally`.
  */
 
-const URL_BASE = process.env.DATABASE_URL_TESTE ?? 'postgres://postgres:postgres@127.0.0.1:5432/pelada';
+const URL_BASE =
+  process.env.DATABASE_URL_TESTE ?? 'postgres://postgres:postgres@127.0.0.1:5432/pelada';
 
 async function comBancoMigrado<T>(fn: (url: string) => Promise<T>): Promise<T> {
   const nome = `teste_${randomBytes(6).toString('hex')}`;
@@ -95,11 +96,13 @@ describe('esquema:comparar', () => {
   it('FUN-19: host remoto sem PELADA_PERMITIR_HOST_REMOTO=1 aborta antes de conectar', async () => {
     const conectar = vi.spyOn(pg.Client.prototype, 'connect');
     try {
-      const remoto = { NEON_URL_DEV_MIGRACAO: 'postgres://u:p@ep-x.sa-east-1.aws.neon.tech/neondb' };
+      const remoto = {
+        NEON_URL_DEV_MIGRACAO: 'postgres://u:p@ep-x.sa-east-1.aws.neon.tech/neondb',
+      };
       await expect(comandoComparar(['--alvo', 'dev'], remoto)).rejects.toThrow(/não permitido/);
-      await expect(comandoComparar(['--alvo', 'dev'], { ...remoto, PELADA_PERMITIR_HOST_REMOTO: '0' })).rejects.toThrow(
-        /não permitido/,
-      );
+      await expect(
+        comandoComparar(['--alvo', 'dev'], { ...remoto, PELADA_PERMITIR_HOST_REMOTO: '0' }),
+      ).rejects.toThrow(/não permitido/);
       expect(conectar).not.toHaveBeenCalled();
     } finally {
       conectar.mockRestore();

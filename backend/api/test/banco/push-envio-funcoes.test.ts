@@ -26,8 +26,14 @@ afterAll(async () => {
 
 const FUNCOES = [
   (g: string) => ({ sql: 'SELECT * FROM push_envio_grupo($1)', valores: [g] }),
-  (g: string) => ({ sql: `SELECT * FROM push_ranking_lote($1, 0, 40, now() - interval '1 hour')`, valores: [g] }),
-  (g: string) => ({ sql: `SELECT push_ranking_resultado($1, '{}'::bigint[], '{}'::bigint[])`, valores: [g] }),
+  (g: string) => ({
+    sql: `SELECT * FROM push_ranking_lote($1, 0, 40, now() - interval '1 hour')`,
+    valores: [g],
+  }),
+  (g: string) => ({
+    sql: `SELECT push_ranking_resultado($1, '{}'::bigint[], '{}'::bigint[])`,
+    valores: [g],
+  }),
 ];
 
 /** Roda `fn` como `pelada_app` sem contexto, numa transação desfeita; `super` volta ao superusuário dentro dela. */
@@ -36,7 +42,10 @@ async function semContexto<T>(fn: (d: pg.Client) => Promise<T>): Promise<T> {
 }
 
 async function ids(d: pg.Client, grupo: string): Promise<string[]> {
-  const r = await d.query<{ id: string }>('SELECT id::text FROM push_ranking WHERE grupo_id = $1 ORDER BY id', [grupo]);
+  const r = await d.query<{ id: string }>(
+    'SELECT id::text FROM push_ranking WHERE grupo_id = $1 ORDER BY id',
+    [grupo],
+  );
   return r.rows.map((l) => l.id);
 }
 
@@ -83,9 +92,10 @@ describe('push_envio_grupo', () => {
     const { cenario } = aberto;
     const r = await semContexto(async (d) => {
       await d.query('RESET ROLE');
-      await d.query(`UPDATE grupos SET situacao_comercial = 'trial', trial_inicio = '2026-11-01' WHERE id = $1`, [
-        cenario.grupoA,
-      ]);
+      await d.query(
+        `UPDATE grupos SET situacao_comercial = 'trial', trial_inicio = '2026-11-01' WHERE id = $1`,
+        [cenario.grupoA],
+      );
       await d.query('SET LOCAL ROLE pelada_app');
       return d.query<{ situacao_comercial: string; trial_inicio: string }>(
         'SELECT situacao_comercial, trial_inicio::text AS trial_inicio FROM push_envio_grupo($1)',
@@ -101,7 +111,9 @@ describe('push_envio_grupo', () => {
       await d.query('RESET ROLE');
       await d.query('UPDATE grupos SET arquivado_em = now() WHERE id = $1', [cenario.grupoA]);
       await d.query('SET LOCAL ROLE pelada_app');
-      return d.query<{ arquivado: boolean }>('SELECT arquivado FROM push_envio_grupo($1)', [cenario.grupoA]);
+      return d.query<{ arquivado: boolean }>('SELECT arquivado FROM push_envio_grupo($1)', [
+        cenario.grupoA,
+      ]);
     });
     expect(r.rows).toEqual([{ arquivado: true }]);
   });
@@ -142,11 +154,26 @@ describe('push_ranking_lote', () => {
     await semContexto(async (d) => {
       const todas = await encher(d, cenario.grupoA, 1);
       await d.query('RESET ROLE');
-      await d.query(`UPDATE push_ranking SET ultimo_envio_em = now() - interval '1 hour' WHERE id = $1`, [todas[0]]);
+      await d.query(
+        `UPDATE push_ranking SET ultimo_envio_em = now() - interval '1 hour' WHERE id = $1`,
+        [todas[0]],
+      );
       await d.query('SET LOCAL ROLE pelada_app');
-      const depoisDoEnvio = await lote(d, cenario.grupoA, 0, 40, new Date(Date.now() - 30 * 60_000).toISOString());
+      const depoisDoEnvio = await lote(
+        d,
+        cenario.grupoA,
+        0,
+        40,
+        new Date(Date.now() - 30 * 60_000).toISOString(),
+      );
       expect(depoisDoEnvio.rows.map((l) => l.id)).toContain(todas[0]);
-      const antesDoEnvio = await lote(d, cenario.grupoA, 0, 40, new Date(Date.now() - 2 * 3_600_000).toISOString());
+      const antesDoEnvio = await lote(
+        d,
+        cenario.grupoA,
+        0,
+        40,
+        new Date(Date.now() - 2 * 3_600_000).toISOString(),
+      );
       expect(antesDoEnvio.rows.map((l) => l.id)).not.toContain(todas[0]);
     });
   });
@@ -194,9 +221,13 @@ describe('push_ranking_resultado', () => {
   it('listas nulas ou vazias não mudam nada e não falham', async () => {
     const { cenario } = aberto;
     await semContexto(async (d) => {
-      await expect(d.query('SELECT push_ranking_resultado($1, NULL, NULL)', [cenario.grupoA])).resolves.toBeDefined();
       await expect(
-        d.query(`SELECT push_ranking_resultado($1, '{}'::bigint[], '{}'::bigint[])`, [cenario.grupoA]),
+        d.query('SELECT push_ranking_resultado($1, NULL, NULL)', [cenario.grupoA]),
+      ).resolves.toBeDefined();
+      await expect(
+        d.query(`SELECT push_ranking_resultado($1, '{}'::bigint[], '{}'::bigint[])`, [
+          cenario.grupoA,
+        ]),
       ).resolves.toBeDefined();
       await d.query('RESET ROLE');
       expect((await ids(d, cenario.grupoA)).length).toBe(1);

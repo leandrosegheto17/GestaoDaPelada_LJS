@@ -19,31 +19,46 @@ async function mensagensDe(codigo: string, regra: string) {
 
 describe('domínio sem relógio', () => {
   it('GEL-70: Date.now() no domínio reprova', async () => {
-    const erros = await mensagensDe('export const agora = (): number => Date.now();\n', 'no-restricted-syntax');
+    const erros = await mensagensDe(
+      'export const agora = (): number => Date.now();\n',
+      'no-restricted-syntax',
+    );
     expect(erros).toHaveLength(1);
     expect(erros[0]?.message).toContain('GEL-70');
   });
 
   it('GEL-70: new Date() sem argumento no domínio reprova', async () => {
-    const erros = await mensagensDe('export const hoje = (): Date => new Date();\n', 'no-restricted-syntax');
+    const erros = await mensagensDe(
+      'export const hoje = (): Date => new Date();\n',
+      'no-restricted-syntax',
+    );
     expect(erros).toHaveLength(1);
     expect(erros[0]?.message).toContain('GEL-70');
   });
 
   it('GEL-70: performance.now() no domínio reprova', async () => {
-    const erros = await mensagensDe('export const t = (): number => performance.now();\n', 'no-restricted-syntax');
+    const erros = await mensagensDe(
+      'export const t = (): number => performance.now();\n',
+      'no-restricted-syntax',
+    );
     expect(erros).toHaveLength(1);
   });
 
   it("GEL-70: new Date('2026-01-01') (data dada) passa", async () => {
-    const erros = await mensagensDe("export const d = (): Date => new Date('2026-01-01');\n", 'no-restricted-syntax');
+    const erros = await mensagensDe(
+      "export const d = (): Date => new Date('2026-01-01');\n",
+      'no-restricted-syntax',
+    );
     expect(erros).toHaveLength(0);
   });
 });
 
 describe('domínio sem zod', () => {
   it("GEL-104: import { z } from 'zod' no domínio reprova", async () => {
-    const erros = await mensagensDe("import { z } from 'zod';\nexport const s = z.string();\n", 'no-restricted-imports');
+    const erros = await mensagensDe(
+      "import { z } from 'zod';\nexport const s = z.string();\n",
+      'no-restricted-imports',
+    );
     expect(erros).toHaveLength(1);
     expect(erros[0]?.message).toContain('GEL-104');
   });

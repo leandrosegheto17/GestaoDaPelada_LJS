@@ -14,7 +14,8 @@
 import type { Plano } from './plano-efetivo.ts';
 import { LIMITE_JOGADORES_FREE } from './recursos.ts';
 
-export type OperacaoDeEscrita = 'escrita' | 'cadastrar_jogador' | 'reativar_jogador' | 'inativar_jogador';
+export type OperacaoDeEscrita =
+  'escrita' | 'cadastrar_jogador' | 'reativar_jogador' | 'inativar_jogador';
 export type MotivoSomenteLeitura = 'limite_jogadores' | 'limite_grupos';
 
 export interface GrupoDaCriadora {
@@ -59,7 +60,10 @@ export function somenteLeitura(entrada: EntradaExcedente): MotivoSomenteLeitura 
   }
 
   if (jogadoresAtivos > LIMITE_JOGADORES_FREE) return 'limite_jogadores';
-  if (jogadoresAtivos === LIMITE_JOGADORES_FREE && (operacao === 'cadastrar_jogador' || operacao === 'reativar_jogador')) {
+  if (
+    jogadoresAtivos === LIMITE_JOGADORES_FREE &&
+    (operacao === 'cadastrar_jogador' || operacao === 'reativar_jogador')
+  ) {
     return 'limite_jogadores';
   }
   return null;

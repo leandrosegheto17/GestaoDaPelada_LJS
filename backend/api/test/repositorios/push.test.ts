@@ -48,7 +48,11 @@ const daConta = <T>(fn: (db: Db) => Promise<T>) => comDb(aberto.url, aberto.cena
 /** Roda `fn` sem conta e sem slug (o consumidor da fila). */
 const semContexto = <T>(fn: (db: Db) => Promise<T>) => comDb(aberto.url, null, fn);
 
-async function semear(tabela: 'push_ranking' | 'push_conta', dono: string, n: number): Promise<void> {
+async function semear(
+  tabela: 'push_ranking' | 'push_conta',
+  dono: string,
+  n: number,
+): Promise<void> {
   const coluna = tabela === 'push_ranking' ? 'grupo_id' : 'conta_id';
   await aberto.db.query(
     `INSERT INTO ${tabela} (${coluna}, endpoint, p256dh, auth)
@@ -61,20 +65,28 @@ describe('push do ranking (rota pública)', () => {
   it('NOT-05, NOT-07: assinarRanking devolve criada e depois atualizada', async () => {
     const r = await publico(async (db) => [
       await push.assinarRanking(db, aberto.cenario.slugG, { endpoint: EP('a'), ...CHAVES }),
-      await push.assinarRanking(db, aberto.cenario.slugG, { endpoint: EP('a'), p256dh: 'outra', auth: 'outro' }),
+      await push.assinarRanking(db, aberto.cenario.slugG, {
+        endpoint: EP('a'),
+        p256dh: 'outra',
+        auth: 'outro',
+      }),
     ]);
     expect(r).toEqual(['criada', 'atualizada']);
   });
 
   it('NOT-08: slug que não é o do contexto devolve nao_encontrado', async () => {
-    const r = await publico((db) => push.assinarRanking(db, aberto.cenario.slugB, { endpoint: EP('b'), ...CHAVES }));
+    const r = await publico((db) =>
+      push.assinarRanking(db, aberto.cenario.slugB, { endpoint: EP('b'), ...CHAVES }),
+    );
     expect(r).toBe('nao_encontrado');
   });
 
   it('NOT-10: com 200 assinaturas, a nova devolve limite', async () => {
     // A semente de G já tem 1; mais 199 chegam a 200.
     await semear('push_ranking', aberto.cenario.grupoG, 199);
-    const r = await publico((db) => push.assinarRanking(db, aberto.cenario.slugG, { endpoint: EP('nova'), ...CHAVES }));
+    const r = await publico((db) =>
+      push.assinarRanking(db, aberto.cenario.slugG, { endpoint: EP('nova'), ...CHAVES }),
+    );
     expect(r).toBe('limite');
   });
 
@@ -89,11 +101,19 @@ describe('push do ranking (rota pública)', () => {
       const depois = await push.estadoRanking(db, slugG, EP('c'), 'segredo');
       return { sem, com, antes, errado, depois };
     });
-    expect(r).toEqual({ sem: undefined, com: undefined, antes: 'ativa', errado: 'ausente', depois: 'ausente' });
+    expect(r).toEqual({
+      sem: undefined,
+      com: undefined,
+      antes: 'ativa',
+      errado: 'ausente',
+      depois: 'ausente',
+    });
   });
 
   it('NOT-71: estadoRanking com slug de outro grupo devolve nao_encontrado', async () => {
-    const r = await publico((db) => push.estadoRanking(db, aberto.cenario.slugB, EP('d'), 'segredo'));
+    const r = await publico((db) =>
+      push.estadoRanking(db, aberto.cenario.slugB, EP('d'), 'segredo'),
+    );
     expect(r).toBe('nao_encontrado');
   });
 
@@ -114,13 +134,23 @@ describe('push da conta (rota da conta)', () => {
   it('NOT-45: assinarConta devolve criada e depois atualizada; estado e cancelar acompanham', async () => {
     const r = await daConta(async (db) => {
       const primeira = await push.assinarConta(db, { endpoint: EP('conta'), ...CHAVES });
-      const segunda = await push.assinarConta(db, { endpoint: EP('conta'), p256dh: 'outra', auth: 'outro' });
+      const segunda = await push.assinarConta(db, {
+        endpoint: EP('conta'),
+        p256dh: 'outra',
+        auth: 'outro',
+      });
       const estado = await push.estadoConta(db, EP('conta'), 'outro');
       const cancelou = await push.cancelarConta(db, EP('conta'), 'outro');
       const depois = await push.estadoConta(db, EP('conta'), 'outro');
       return { primeira, segunda, estado, cancelou, depois };
     });
-    expect(r).toEqual({ primeira: 'criada', segunda: 'atualizada', estado: 'ativa', cancelou: undefined, depois: 'ausente' });
+    expect(r).toEqual({
+      primeira: 'criada',
+      segunda: 'atualizada',
+      estado: 'ativa',
+      cancelou: undefined,
+      depois: 'ausente',
+    });
   });
 
   it('NOT-17, NOT-45: cancelarConta sem linha devolve o mesmo resultado', async () => {
@@ -134,7 +164,9 @@ describe('push da conta (rota da conta)', () => {
   });
 
   it('NOT-45: sem conta no contexto, assinarConta lança (42501)', async () => {
-    await expect(semContexto((db) => push.assinarConta(db, { endpoint: EP('sem'), ...CHAVES }))).rejects.toThrow();
+    await expect(
+      semContexto((db) => push.assinarConta(db, { endpoint: EP('sem'), ...CHAVES })),
+    ).rejects.toThrow();
   });
 });
 
@@ -149,7 +181,9 @@ describe('envio e limpeza (sessão sem conta e sem slug)', () => {
     expect(typeof achado?.nome).toBe('string');
     expect(nulo).toBeNull();
     // Entradas do planoEfetivo (T18, plano B da S-01): situação do CHECK e datas em texto AAAA-MM-DD ou nulas.
-    expect(['uso_proprio', 'trial', 'ativo', 'inadimplente', 'cancelado']).toContain(achado?.situacaoComercial);
+    expect(['uso_proprio', 'trial', 'ativo', 'inadimplente', 'cancelado']).toContain(
+      achado?.situacaoComercial,
+    );
     for (const data of [achado?.trialInicio, achado?.pagoAte]) {
       if (data !== null) expect(data).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     }
@@ -184,7 +218,9 @@ describe('envio e limpeza (sessão sem conta e sem slug)', () => {
       await push.destinoCobranca(db, '00000000-0000-4000-8000-000000000000'),
     ]);
     expect(com).toMatchObject({ contaId: contaC, grupoNome: expect.any(String) });
-    expect(com?.assinaturas).toEqual([expect.objectContaining({ endpoint: EP('destino'), id: expect.stringMatching(/^\d+$/) })]);
+    expect(com?.assinaturas).toEqual([
+      expect.objectContaining({ endpoint: EP('destino'), id: expect.stringMatching(/^\d+$/) }),
+    ]);
     expect(nulo).toBeNull();
     await aberto.db.query(`DELETE FROM push_conta WHERE endpoint = $1`, [EP('destino')]);
     const vazio = await semContexto((db) => push.destinoCobranca(db, grupoG));

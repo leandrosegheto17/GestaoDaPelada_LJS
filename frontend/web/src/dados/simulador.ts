@@ -56,7 +56,8 @@ export function useContextoSimulador(grupoId: string, data?: string) {
   const api = useCliente();
   return useQuery<ContextoResposta>({
     queryKey: chaveContextoSimulador(grupoId, data),
-    queryFn: async () => contextoResposta.parse(await api.get<unknown>(caminhoContexto(grupoId, data))),
+    queryFn: async () =>
+      contextoResposta.parse(await api.get<unknown>(caminhoContexto(grupoId, data))),
     retry: false,
     enabled: grupoId !== '',
   });
@@ -66,7 +67,8 @@ export function useContextoSimulador(grupoId: string, data?: string) {
 export function usePreviaSimulador(grupoId: string, corpo: PreviaCorpo | null) {
   const api = useCliente();
   const pedir = corpo
-    ? async (): Promise<PreviaResposta> => previaResposta.parse(await api.post<unknown>(`${caminhoSimulador(grupoId)}/previa`, corpo))
+    ? async (): Promise<PreviaResposta> =>
+        previaResposta.parse(await api.post<unknown>(`${caminhoSimulador(grupoId)}/previa`, corpo))
     : null;
   return usePrevia<PreviaResposta>(pedir, corpo ? JSON.stringify(corpo) : '');
 }
@@ -74,7 +76,8 @@ export function usePreviaSimulador(grupoId: string, corpo: PreviaCorpo | null) {
 export function useSugerir(grupoId: string) {
   const api = useCliente();
   return useMutation<SugerirResposta, Error, SugerirCorpo>({
-    mutationFn: async (corpo) => sugerirResposta.parse(await api.post<unknown>(`${caminhoSimulador(grupoId)}/sugerir`, corpo)),
+    mutationFn: async (corpo) =>
+      sugerirResposta.parse(await api.post<unknown>(`${caminhoSimulador(grupoId)}/sugerir`, corpo)),
   });
 }
 
@@ -82,15 +85,29 @@ export function useSugerir(grupoId: string) {
 export function useAvaliar(grupoId: string, corpo: AvaliarCorpo | null) {
   const api = useCliente();
   const pedir = corpo
-    ? async (): Promise<AvaliarResposta> => avaliarResposta.parse(await api.post<unknown>(`${caminhoSimulador(grupoId)}/avaliar`, corpo))
+    ? async (): Promise<AvaliarResposta> =>
+        avaliarResposta.parse(
+          await api.post<unknown>(`${caminhoSimulador(grupoId)}/avaliar`, corpo),
+        )
     : null;
   return usePrevia<AvaliarResposta>(pedir, corpo ? JSON.stringify(corpo) : '', ATRASO_AVALIAR_MS);
 }
 
 /** O corpo de `POST …/escalacoes`: o do contrato (`escalacaoCorpo`), montado pela tela de resultado. */
 export type CorpoEscalacao =
-  | { formato: 'dois_times'; data: string; n: number; k: number | 'ilimitado'; composicao: AvaliarCorpoDois['composicao'] }
-  | { formato: 'varios_times'; data: string; n: number; composicao: AvaliarCorpoVarios['composicao'] };
+  | {
+      formato: 'dois_times';
+      data: string;
+      n: number;
+      k: number | 'ilimitado';
+      composicao: AvaliarCorpoDois['composicao'];
+    }
+  | {
+      formato: 'varios_times';
+      data: string;
+      n: number;
+      composicao: AvaliarCorpoVarios['composicao'];
+    };
 
 type AvaliarCorpoDois = Extract<AvaliarCorpo, { formato: 'dois_times' }>;
 type AvaliarCorpoVarios = Extract<AvaliarCorpo, { formato: 'varios_times' }>;
@@ -99,7 +116,10 @@ export function useConfirmarEscalacao(grupoId: string) {
   const api = useCliente();
   const consultas = useQueryClient();
   return useMutation<EscalacaoResposta, Error, CorpoEscalacao>({
-    mutationFn: async (corpo) => escalacaoResposta.parse(await api.post<unknown>(`${caminhoGrupo(grupoId)}/escalacoes`, corpo)),
+    mutationFn: async (corpo) =>
+      escalacaoResposta.parse(
+        await api.post<unknown>(`${caminhoGrupo(grupoId)}/escalacoes`, corpo),
+      ),
     onSuccess: async () => {
       await Promise.all([
         consultas.invalidateQueries({ queryKey: chaveGrupo(grupoId), exact: true }),

@@ -89,7 +89,9 @@ describe('.env.example com as variáveis VAPID', () => {
       const v = achar(nome);
       expect(v).toBeDefined();
       expect(v?.valor).toBe('');
-      expect(campo(v?.comentario ?? '', 'obrigatória')).toMatch(/^não \(opcional: sem as três VAPID o push fica desligado/);
+      expect(campo(v?.comentario ?? '', 'obrigatória')).toMatch(
+        /^não \(opcional: sem as três VAPID o push fica desligado/,
+      );
       expect(campo(v?.comentario ?? '', 'formato')).not.toBe('');
     },
   );

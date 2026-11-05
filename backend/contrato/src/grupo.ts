@@ -13,7 +13,8 @@ import { z } from 'zod';
  */
 const INVISIVEIS = /[\p{Cc}\p{Cf}]/u;
 
-export const MENSAGEM_TEXTO_INVISIVEL = 'Use só caracteres visíveis, sem caracteres de controle ou invisíveis.';
+export const MENSAGEM_TEXTO_INVISIVEL =
+  'Use só caracteres visíveis, sem caracteres de controle ou invisíveis.';
 
 /**
  * Texto livre que outras pessoas veem (nome do grupo, apelido, nome da habilidade): sem os espaços das pontas, em NFC
@@ -40,7 +41,15 @@ export const MENSAGEM_HORARIO_INVALIDO = 'Horário inválido.';
 export const MENSAGEM_NOME_CONFIRMACAO = 'Digite o nome do grupo.';
 
 /** Os dias aceitos (GEL-04), na ordem da spec. */
-export const DIAS_DA_SEMANA = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'] as const;
+export const DIAS_DA_SEMANA = [
+  'domingo',
+  'segunda',
+  'terca',
+  'quarta',
+  'quinta',
+  'sexta',
+  'sabado',
+] as const;
 export type DiaSemana = (typeof DIAS_DA_SEMANA)[number];
 
 /** As frequências aceitas (GEL-05). */
@@ -48,7 +57,11 @@ export const FREQUENCIAS = ['semanal', 'quinzenal', 'mensal'] as const;
 export type Frequencia = (typeof FREQUENCIAS)[number];
 
 /** Nome do grupo: 3 a 60 caracteres depois do trim (GEL-03), em NFC e sem invisíveis (SEC-005). */
-export const nomeGrupo = textoVisivel(LIMITES_GRUPO.nomeMin, LIMITES_GRUPO.nomeMax, MENSAGEM_NOME_GRUPO);
+export const nomeGrupo = textoVisivel(
+  LIMITES_GRUPO.nomeMin,
+  LIMITES_GRUPO.nomeMax,
+  MENSAGEM_NOME_GRUPO,
+);
 
 /** GEL-04: a spec pede só o erro no campo; o texto segue o tom das outras mensagens. */
 export const diaSemana = z.enum(DIAS_DA_SEMANA, { error: MENSAGEM_DIA_SEMANA });
@@ -62,7 +75,8 @@ const FORMATO_HORARIO = /^([01]\d|2[0-3]):[0-5]\d$/;
 /** Horário (GEL-06): ausente ou vazio pede o horário; fora do formato é inválido. */
 export const horario = z
   .string({
-    error: (problema) => (problema.input === undefined ? MENSAGEM_HORARIO_AUSENTE : MENSAGEM_HORARIO_INVALIDO),
+    error: (problema) =>
+      problema.input === undefined ? MENSAGEM_HORARIO_AUSENTE : MENSAGEM_HORARIO_INVALIDO,
   })
   .refine((valor) => valor !== '', { error: MENSAGEM_HORARIO_AUSENTE, abort: true })
   .refine((valor) => FORMATO_HORARIO.test(valor), { error: MENSAGEM_HORARIO_INVALIDO });
@@ -80,14 +94,18 @@ export const editarGrupoCorpo = dadosGrupo;
 export type DadosGrupo = z.infer<typeof dadosGrupo>;
 
 /** Texto que a criadora digita para arquivar; a comparação exata com o nome é da rota (GEL-22, GEL-23). */
-export const arquivarCorpo = z.object({ nomeConfirmacao: z.string({ error: MENSAGEM_NOME_CONFIRMACAO }) }).strict();
+export const arquivarCorpo = z
+  .object({ nomeConfirmacao: z.string({ error: MENSAGEM_NOME_CONFIRMACAO }) })
+  .strict();
 export type ArquivarCorpo = z.infer<typeof arquivarCorpo>;
 
 const id = z.string().min(1);
 const contagem = z.number().int().min(0);
 
 /** 201 de `POST /api/grupos` (GEL-01, GEL-17): o link público vem de `URL_PUBLICA`, nunca de endereço fixo. */
-export const criarGrupoResposta = z.object({ id, slug: z.string(), linkPublico: z.string() }).strict();
+export const criarGrupoResposta = z
+  .object({ id, slug: z.string(), linkPublico: z.string() })
+  .strict();
 export type CriarGrupoResposta = z.infer<typeof criarGrupoResposta>;
 
 /** `GET` e `PATCH /api/grupos/:grupoId` (GEL-18, GEL-20). */
@@ -115,5 +133,7 @@ export const grupoItem = z
 export type GrupoItem = z.infer<typeof grupoItem>;
 
 /** `GET /api/grupos`: os ativos e, à parte, os arquivados que a conta criou (GEL-25, GEL-27). */
-export const gruposResposta = z.object({ ativos: z.array(grupoItem), arquivados: z.array(grupoItem) }).strict();
+export const gruposResposta = z
+  .object({ ativos: z.array(grupoItem), arquivados: z.array(grupoItem) })
+  .strict();
 export type GruposResposta = z.infer<typeof gruposResposta>;

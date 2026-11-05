@@ -38,7 +38,8 @@ describe('tipos do banco (GEL-112)', () => {
           for (const [coluna, tipo] of Object.entries(colunas)) {
             const achada = porChave.get(`${tabela}.${coluna}`);
             if (!achada) faltando.push(`${tabela}.${coluna}`);
-            else if (achada.tipo !== tipo) divergentes.push(`${tabela}.${coluna}: tipo ${tipo}, banco ${achada.tipo}`);
+            else if (achada.tipo !== tipo)
+              divergentes.push(`${tabela}.${coluna}: tipo ${tipo}, banco ${achada.tipo}`);
           }
         }
         expect(faltando).toEqual([]);
@@ -52,8 +53,17 @@ describe('tipos do banco (GEL-112)', () => {
     await bancoDeTeste(
       async (url) => {
         const linhas = await catalogo(url);
-        for (const tabela of ['grupos', 'jogadores', 'periodos_ativos', 'habilidades', 'notas'] as const) {
-          const doBanco = linhas.filter((l) => l.tabela === tabela).map((l) => l.coluna).sort();
+        for (const tabela of [
+          'grupos',
+          'jogadores',
+          'periodos_ativos',
+          'habilidades',
+          'notas',
+        ] as const) {
+          const doBanco = linhas
+            .filter((l) => l.tabela === tabela)
+            .map((l) => l.coluna)
+            .sort();
           expect(Object.keys(COLUNAS_TIPADAS[tabela]).sort(), tabela).toEqual(doBanco);
         }
       },
@@ -65,8 +75,17 @@ describe('tipos do banco (GEL-112)', () => {
     await bancoDeTeste(
       async (url) => {
         const linhas = await catalogo(url);
-        for (const tabela of ['grupos', 'jogadores', 'periodos_ativos', 'habilidades', 'notas'] as const) {
-          const doBanco = linhas.filter((l) => l.tabela === tabela && l.anulavel).map((l) => l.coluna).sort();
+        for (const tabela of [
+          'grupos',
+          'jogadores',
+          'periodos_ativos',
+          'habilidades',
+          'notas',
+        ] as const) {
+          const doBanco = linhas
+            .filter((l) => l.tabela === tabela && l.anulavel)
+            .map((l) => l.coluna)
+            .sort();
           expect([...(COLUNAS_ANULAVEIS[tabela] ?? [])].sort(), tabela).toEqual(doBanco);
         }
       },

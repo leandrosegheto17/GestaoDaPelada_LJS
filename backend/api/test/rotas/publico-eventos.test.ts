@@ -8,7 +8,12 @@ import { NOME_COOKIE_SESSAO } from '../../src/infraestrutura/sessao/cookie.ts';
 import { gerarToken } from '../../src/infraestrutura/sessao/token.ts';
 import { envAcesso } from '../acesso/apoio.ts';
 import { contextoFalso, fabricaComoApp } from '../db/requisicao.ts';
-import { abrirCenarioGrupos, arquivar, reativar, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  arquivar,
+  reativar,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * `POST /api/publico/:slug/eventos` (partidas-e-ranking T47; PAR-127, PAR-128, PAR-129), com o app real como
@@ -33,7 +38,11 @@ async function sessao(conta: string): Promise<string> {
   return token;
 }
 
-async function enviar(slug: string, corpo: unknown, opcoes: { conta?: string } = {}): Promise<Response> {
+async function enviar(
+  slug: string,
+  corpo: unknown,
+  opcoes: { conta?: string } = {},
+): Promise<Response> {
   const texto = typeof corpo === 'string' ? corpo : JSON.stringify(corpo);
   const headers = new Headers({
     'x-pelada': '1',
@@ -44,7 +53,12 @@ async function enviar(slug: string, corpo: unknown, opcoes: { conta?: string } =
   });
   if (opcoes.conta) headers.set('cookie', `${NOME_COOKIE_SESSAO}=${await sessao(opcoes.conta)}`);
   const ctx = contextoFalso();
-  const r = await app.request(`/api/publico/${slug}/eventos`, { method: 'POST', headers, body: texto }, envAcesso(aberto.url), ctx);
+  const r = await app.request(
+    `/api/publico/${slug}/eventos`,
+    { method: 'POST', headers, body: texto },
+    envAcesso(aberto.url),
+    ctx,
+  );
   await ctx.esperar();
   return r;
 }
@@ -70,9 +84,10 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
-  await aberto.db.query(`DELETE FROM eventos_uso WHERE grupo_id = $1 AND tipo IN ('ranking_aberto', 'pdf_exportado')`, [
-    aberto.cenario.grupoG,
-  ]);
+  await aberto.db.query(
+    `DELETE FROM eventos_uso WHERE grupo_id = $1 AND tipo IN ('ranking_aberto', 'pdf_exportado')`,
+    [aberto.cenario.grupoG],
+  );
 });
 
 describe('POST /api/publico/:slug/eventos', () => {
@@ -85,23 +100,39 @@ describe('POST /api/publico/:slug/eventos', () => {
         WHERE grupo_id = $1 AND tipo = 'ranking_aberto'`,
       [aberto.cenario.grupoG, AGORA],
     );
-    expect(linhas.rows).toEqual([{ tipo: 'ranking_aberto', dispositivo_id: dispositivoId, igual: true }]);
+    expect(linhas.rows).toEqual([
+      { tipo: 'ranking_aberto', dispositivo_id: dispositivoId, igual: true },
+    ]);
   });
 
   it('PAR-127: pdf_exportado válido responde 204 e grava o mês exportado', async () => {
     const r = await enviar(aberto.cenario.slugG, { tipo: 'pdf_exportado', mes: '2026-02' });
     expect(r.status).toBe(204);
-    expect((await eventosPublicos()).map((e) => [e['tipo'], e['mes_exportado']])).toEqual([['pdf_exportado', '2026-02']]);
+    expect((await eventosPublicos()).map((e) => [e['tipo'], e['mes_exportado']])).toEqual([
+      ['pdf_exportado', '2026-02'],
+    ]);
   });
 
   it('PAR-129: a linha gravada não tem IP, user-agent nem conta, com cf-connecting-ip e cookie de sessão na requisição', async () => {
-    const r = await enviar(aberto.cenario.slugG, { tipo: 'ranking_aberto', dispositivoId: crypto.randomUUID() }, {
-      conta: aberto.cenario.contaC,
-    });
+    const r = await enviar(
+      aberto.cenario.slugG,
+      { tipo: 'ranking_aberto', dispositivoId: crypto.randomUUID() },
+      {
+        conta: aberto.cenario.contaC,
+      },
+    );
     expect(r.status).toBe(204);
     const [linha] = await eventosPublicos();
     expect(Object.keys(linha ?? {}).sort()).toEqual(
-      ['data_partida', 'dispositivo_id', 'grupo_id', 'id', 'mes_exportado', 'momento', 'tipo'].sort(),
+      [
+        'data_partida',
+        'dispositivo_id',
+        'grupo_id',
+        'id',
+        'mes_exportado',
+        'momento',
+        'tipo',
+      ].sort(),
     );
     const texto = JSON.stringify(linha);
     expect(texto).not.toContain(IP);
@@ -113,7 +144,10 @@ describe('POST /api/publico/:slug/eventos', () => {
 describe('POST /api/publico/:slug/eventos: recusas', () => {
   it('PAR-128: corpo de 1025 bytes responde 413 sem gravar', async () => {
     const base = JSON.stringify({ tipo: 'pdf_exportado', mes: '2026-02', x: '' });
-    const corpo = base.replace('"x":""', `"x":"${'a'.repeat(LIMITE_CORPO_EVENTO_BYTES + 1 - base.length)}"`);
+    const corpo = base.replace(
+      '"x":""',
+      `"x":"${'a'.repeat(LIMITE_CORPO_EVENTO_BYTES + 1 - base.length)}"`,
+    );
     expect(new TextEncoder().encode(corpo).length).toBe(LIMITE_CORPO_EVENTO_BYTES + 1);
     const r = await enviar(aberto.cenario.slugG, corpo);
     expect(r.status).toBe(413);
@@ -124,7 +158,10 @@ describe('POST /api/publico/:slug/eventos: recusas', () => {
 
   it('PAR-128: corpo de exatamente 1024 bytes não é recusado pelo tamanho', async () => {
     const base = JSON.stringify({ tipo: 'pdf_exportado', mes: '2026-02', x: '' });
-    const corpo = base.replace('"x":""', `"x":"${'a'.repeat(LIMITE_CORPO_EVENTO_BYTES - base.length)}"`);
+    const corpo = base.replace(
+      '"x":""',
+      `"x":"${'a'.repeat(LIMITE_CORPO_EVENTO_BYTES - base.length)}"`,
+    );
     expect(new TextEncoder().encode(corpo).length).toBe(LIMITE_CORPO_EVENTO_BYTES);
     const r = await enviar(aberto.cenario.slugG, corpo);
     // O campo `x` a mais é recusado pelo contrato (422), não pelo tamanho (413).
@@ -134,7 +171,10 @@ describe('POST /api/publico/:slug/eventos: recusas', () => {
   it.each([
     ['tipo desconhecido', { tipo: 'partida_lancada', data: '2026-03-12' }],
     ['campo a mais', { tipo: 'ranking_aberto', dispositivoId: crypto.randomUUID(), ip: '1.2.3.4' }],
-    ['aparelho que não é UUID v4', { tipo: 'ranking_aberto', dispositivoId: '00000000-0000-1000-8000-000000000000' }],
+    [
+      'aparelho que não é UUID v4',
+      { tipo: 'ranking_aberto', dispositivoId: '00000000-0000-1000-8000-000000000000' },
+    ],
     ['mês fora do formato', { tipo: 'pdf_exportado', mes: '2026-2' }],
   ])('PAR-128: %s responde 422 sem gravar', async (_nome, corpo) => {
     const r = await enviar(aberto.cenario.slugG, corpo);

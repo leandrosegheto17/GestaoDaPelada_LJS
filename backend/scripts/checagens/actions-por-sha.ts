@@ -61,12 +61,13 @@ function listarYaml(pasta: string): string[] {
 
 /** Os workflows e as actions compostas de `.github/`. */
 export function arquivosDoGithub(raiz = RAIZ): Arquivo[] {
-  return [...listarYaml(join(raiz, '.github', 'workflows')), ...listarYaml(join(raiz, '.github', 'actions'))].map(
-    (caminho) => ({
-      caminho: relative(raiz, caminho).replace(/\\/g, '/'),
-      conteudo: readFileSync(caminho, 'utf8'),
-    }),
-  );
+  return [
+    ...listarYaml(join(raiz, '.github', 'workflows')),
+    ...listarYaml(join(raiz, '.github', 'actions')),
+  ].map((caminho) => ({
+    caminho: relative(raiz, caminho).replace(/\\/g, '/'),
+    conteudo: readFileSync(caminho, 'utf8'),
+  }));
 }
 
 if (import.meta.main) {

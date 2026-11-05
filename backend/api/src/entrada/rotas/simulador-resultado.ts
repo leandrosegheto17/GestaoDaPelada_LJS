@@ -23,7 +23,10 @@ import type { AptoDoSimulador } from '../../infraestrutura/db/repositorios/jogad
 type CorpoSimulador = SugerirCorpo | AvaliarCorpo;
 
 /** Os aptos do corpo com os dados do banco; nulo quando algum id não é ativo do grupo na data. */
-export function aptosDoCorpo(corpo: CorpoSimulador, ativos: readonly AptoDoSimulador[]): Apto[] | null {
+export function aptosDoCorpo(
+  corpo: CorpoSimulador,
+  ativos: readonly AptoDoSimulador[],
+): Apto[] | null {
   const porId = new Map(ativos.map((a) => [a.id, a]));
   const aptos: Apto[] = [];
   for (const apto of corpo.aptos) {
@@ -98,7 +101,13 @@ function jogadorDe(aptos: ReadonlyMap<string, Apto>, id: string) {
   const a = aptos.get(id);
   // O domínio só devolve ids da entrada; ausência é erro de programação.
   if (!a) throw new Error('jogador da composição fora dos aptos');
-  return { id: a.id, apelido: a.apelido, nivel: a.nivel, semNota: a.semNota, semAno: a.anoNascimento === null };
+  return {
+    id: a.id,
+    apelido: a.apelido,
+    nivel: a.nivel,
+    semNota: a.semNota,
+    semAno: a.anoNascimento === null,
+  };
 }
 
 function avisos(lista: readonly Aviso[]): ResultadoDois['avisos'] {
@@ -122,7 +131,11 @@ export function resultadoDoisSemOrdem(
     const saem = new Set(ind.saem);
     return {
       nome: nomes[i] as string,
-      titulares: time.titulares.map((id) => ({ ...jogadorDe(porId, id), so1oTempo: so1o(id), saiNoIntervalo: saem.has(id) })),
+      titulares: time.titulares.map((id) => ({
+        ...jogadorDe(porId, id),
+        so1oTempo: so1o(id),
+        saiNoIntervalo: saem.has(id),
+      })),
       entramNo2oTempo: time.entram.map((id) => ({ ...jogadorDe(porId, id), so1oTempo: so1o(id) })),
       trocas: ind.pares.map((p) => ({ sai: p.sai, entra: p.entra })),
       saiSemPar: [...ind.saiSemPar],

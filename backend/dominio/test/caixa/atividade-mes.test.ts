@@ -3,7 +3,11 @@ import { ativoNoMes, ativosNoMes, type JogadorComPeriodos } from '../../src/caix
 
 /** Ativo no mês do caixa (T2; FIN-12, FIN-11, FIN-19). Período [início, fim). */
 
-const jogador = (jogadorId: string, apelido: string, ...periodos: JogadorComPeriodos['periodos']): JogadorComPeriodos => ({
+const jogador = (
+  jogadorId: string,
+  apelido: string,
+  ...periodos: JogadorComPeriodos['periodos']
+): JogadorComPeriodos => ({
   jogadorId,
   apelido,
   periodos,
@@ -51,7 +55,14 @@ describe('ativoNoMes', () => {
 describe('ativosNoMes', () => {
   it('FIN-12: saiu em 10/10 e voltou em 20/10 conta uma vez', () => {
     const ativos = ativosNoMes(
-      [jogador('j1', 'Toninho', { inicio: '2026-01-01', fim: '2026-10-10' }, { inicio: '2026-10-20', fim: null })],
+      [
+        jogador(
+          'j1',
+          'Toninho',
+          { inicio: '2026-01-01', fim: '2026-10-10' },
+          { inicio: '2026-10-20', fim: null },
+        ),
+      ],
       '2026-10',
     );
     expect(ativos).toEqual([{ jogadorId: 'j1', apelido: 'Toninho' }]);

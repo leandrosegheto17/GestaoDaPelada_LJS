@@ -46,7 +46,13 @@ export interface ResultadoRestauracao {
   apagadas: string[];
 }
 
-async function chamar<T>(buscar: Buscar, apiKey: string, metodo: string, caminho: string, corpo?: unknown): Promise<T> {
+async function chamar<T>(
+  buscar: Buscar,
+  apiKey: string,
+  metodo: string,
+  caminho: string,
+  corpo?: unknown,
+): Promise<T> {
   const resposta = await buscar(`${API_NEON}${caminho}`, {
     method: metodo,
     headers: {
@@ -68,14 +74,19 @@ export function paraApagar(branches: readonly BranchNeon[], manter = MANTER): Br
   const deRestauracao = branches.filter(
     (b) => b.name.startsWith(PREFIXO) && !INTOCAVEIS.has(b.name) && !b.default && !b.protected,
   );
-  const ordenadas = [...deRestauracao].sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at));
+  const ordenadas = [...deRestauracao].sort(
+    (a, b) => Date.parse(b.created_at) - Date.parse(a.created_at),
+  );
   return ordenadas.slice(manter);
 }
 
-export async function criarBranchRestauracao(opcoes: OpcoesRestauracao): Promise<ResultadoRestauracao> {
+export async function criarBranchRestauracao(
+  opcoes: OpcoesRestauracao,
+): Promise<ResultadoRestauracao> {
   const { apiKey, projeto, runId } = opcoes;
   const buscar = opcoes.buscar ?? ((u, i) => fetch(u, i));
-  if (!apiKey || !projeto || !runId) throw new ErroNeon('Faltam NEON_API_KEY, NEON_PROJECT_ID ou GITHUB_RUN_ID.');
+  if (!apiKey || !projeto || !runId)
+    throw new ErroNeon('Faltam NEON_API_KEY, NEON_PROJECT_ID ou GITHUB_RUN_ID.');
 
   const base = `/projects/${encodeURIComponent(projeto)}/branches`;
   const { branches } = await chamar<{ branches: BranchNeon[] }>(buscar, apiKey, 'GET', base);

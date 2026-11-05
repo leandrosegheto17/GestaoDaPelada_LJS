@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { arquivosReais, ASAAS_URL_SANDBOX, checarSoPrevia, DOMINIO_PERMITIDO } from '../so-previa.ts';
+import {
+  arquivosReais,
+  ASAAS_URL_SANDBOX,
+  checarSoPrevia,
+  DOMINIO_PERMITIDO,
+} from '../so-previa.ts';
 
 const jsonc = (conteudo: string) => [{ caminho: 'wrangler.jsonc', conteudo }];
 const deploy = (conteudo: string) => [{ caminho: '.github/workflows/deploy.yml', conteudo }];
@@ -24,7 +29,9 @@ describe('checagem so-previa', () => {
   });
 
   it('FUN-28: custom_domain no wrangler.jsonc e no deploy.yml reprova', () => {
-    expect(checarSoPrevia(jsonc('  { "pattern": "app.x.com", "custom_domain": true }\n'))).not.toHaveLength(0);
+    expect(
+      checarSoPrevia(jsonc('  { "pattern": "app.x.com", "custom_domain": true }\n')),
+    ).not.toHaveLength(0);
     expect(checarSoPrevia(deploy('# custom_domain: app.x.com\n'))).toHaveLength(1);
   });
 
@@ -57,12 +64,24 @@ describe('checagem so-previa', () => {
     });
 
     it('FUN-28: o domínio permitido não vale no deploy.yml nem como opção do wrangler', () => {
-      expect(checarSoPrevia(deploy(`run: wrangler x --domain ${DOMINIO_PERMITIDO}
-`))).not.toHaveLength(0);
-      expect(checarSoPrevia(deploy(`        routes: ${DOMINIO_PERMITIDO}
-`))).not.toHaveLength(0);
-      expect(checarSoPrevia(deploy(`# custom_domain: ${DOMINIO_PERMITIDO}
-`))).not.toHaveLength(0);
+      expect(
+        checarSoPrevia(
+          deploy(`run: wrangler x --domain ${DOMINIO_PERMITIDO}
+`),
+        ),
+      ).not.toHaveLength(0);
+      expect(
+        checarSoPrevia(
+          deploy(`        routes: ${DOMINIO_PERMITIDO}
+`),
+        ),
+      ).not.toHaveLength(0);
+      expect(
+        checarSoPrevia(
+          deploy(`# custom_domain: ${DOMINIO_PERMITIDO}
+`),
+        ),
+      ).not.toHaveLength(0);
     });
 
     it('FUN-28: a rota permitida não esconde o Worker gestaodapelada sem -v2', () => {
@@ -78,36 +97,62 @@ describe('checagem so-previa', () => {
 
   describe('PLA-38: ASAAS_URL só no sandbox', () => {
     it('PLA-38: ASAAS_URL com https://api.asaas.com/v3 reprova no wrangler.jsonc e no deploy.yml', () => {
-      expect(checarSoPrevia(jsonc('    "ASAAS_URL": "https://api.asaas.com/v3"\n'))).toHaveLength(1);
-      expect(checarSoPrevia(deploy('          --var "ASAAS_URL:https://api.asaas.com/v3"\n'))).toHaveLength(1);
+      expect(checarSoPrevia(jsonc('    "ASAAS_URL": "https://api.asaas.com/v3"\n'))).toHaveLength(
+        1,
+      );
+      expect(
+        checarSoPrevia(deploy('          --var "ASAAS_URL:https://api.asaas.com/v3"\n')),
+      ).toHaveLength(1);
     });
 
     it('PLA-38: a do sandbox passa', () => {
-      expect(checarSoPrevia(jsonc(`    "ASAAS_URL": "${ASAAS_URL_SANDBOX}"
-`))).toEqual([]);
-      expect(checarSoPrevia(deploy(`          --var "ASAAS_URL:${ASAAS_URL_SANDBOX}"
-`))).toEqual([]);
+      expect(
+        checarSoPrevia(
+          jsonc(`    "ASAAS_URL": "${ASAAS_URL_SANDBOX}"
+`),
+        ),
+      ).toEqual([]);
+      expect(
+        checarSoPrevia(
+          deploy(`          --var "ASAAS_URL:${ASAAS_URL_SANDBOX}"
+`),
+        ),
+      ).toEqual([]);
       expect(ASAAS_URL_SANDBOX).toBe('https://api-sandbox.asaas.com/v3');
     });
 
     it('PLA-38: ASAAS_URL vinda de vars, secrets ou variável de shell reprova (o valor não pode ser conferido)', () => {
-      expect(checarSoPrevia(deploy('          --var "ASAAS_URL:${{ vars.ASAAS_URL }}"\n'))).toHaveLength(1);
-      expect(checarSoPrevia(deploy('          ASAAS_URL: ${{ secrets.ASAAS_URL }}\n'))).toHaveLength(1);
+      expect(
+        checarSoPrevia(deploy('          --var "ASAAS_URL:${{ vars.ASAAS_URL }}"\n')),
+      ).toHaveLength(1);
+      expect(
+        checarSoPrevia(deploy('          ASAAS_URL: ${{ secrets.ASAAS_URL }}\n')),
+      ).toHaveLength(1);
       expect(checarSoPrevia(deploy('          --var "ASAAS_URL:$ASAAS_URL"\n'))).toHaveLength(1);
     });
 
     it('PLA-38: o sandbox com outro endereço na mesma linha reprova; outro caminho do sandbox também', () => {
       expect(
-        checarSoPrevia(jsonc(`    "ASAAS_URL": "${ASAAS_URL_SANDBOX}", "X": "https://api.asaas.com/v3"
-`)),
+        checarSoPrevia(
+          jsonc(`    "ASAAS_URL": "${ASAAS_URL_SANDBOX}", "X": "https://api.asaas.com/v3"
+`),
+        ),
       ).toHaveLength(1);
-      expect(checarSoPrevia(jsonc('    "ASAAS_URL": "https://api-sandbox.asaas.com/v2"\n'))).toHaveLength(1);
-      expect(checarSoPrevia(jsonc('    "ASAAS_URL": "https://asaas.exemplo.com/v3"\n'))).toHaveLength(1);
+      expect(
+        checarSoPrevia(jsonc('    "ASAAS_URL": "https://api-sandbox.asaas.com/v2"\n')),
+      ).toHaveLength(1);
+      expect(
+        checarSoPrevia(jsonc('    "ASAAS_URL": "https://asaas.exemplo.com/v3"\n')),
+      ).toHaveLength(1);
     });
 
     it('PLA-38: o endereço de produção do Asaas reprova mesmo sem o nome ASAAS_URL', () => {
-      expect(checarSoPrevia(deploy('        run: curl https://api.asaas.com/v3/payments\n'))).toHaveLength(1);
-      expect(checarSoPrevia(deploy('        run: curl https://API.ASAAS.COM/v3\n'))).toHaveLength(1);
+      expect(
+        checarSoPrevia(deploy('        run: curl https://api.asaas.com/v3/payments\n')),
+      ).toHaveLength(1);
+      expect(checarSoPrevia(deploy('        run: curl https://API.ASAAS.COM/v3\n'))).toHaveLength(
+        1,
+      );
     });
   });
 

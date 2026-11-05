@@ -1,5 +1,10 @@
 import type { CorrigirPeriodoCorpo } from '@pelada/contrato/elenco';
-import { previaInicioResposta, previaResposta, type PreviaInicioResposta, type PreviaResposta } from '@pelada/contrato/previas';
+import {
+  previaInicioResposta,
+  previaResposta,
+  type PreviaInicioResposta,
+  type PreviaResposta,
+} from '@pelada/contrato/previas';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useCliente } from './ContextoCliente.tsx';
 import { caminhoGrupo } from './grupos.ts';
@@ -23,8 +28,14 @@ export type EstadoPrevia<T> =
   | { tipo: 'pronta'; previa: T }
   | { tipo: 'erro'; erro: unknown };
 
-export function usePrevia<T>(pedir: (() => Promise<T>) | null, chave: string, atrasoMs = ATRASO_PREVIA_MS) {
-  const [estado, setEstado] = useState<EstadoPrevia<T>>(pedir ? { tipo: 'calculando' } : { tipo: 'ocioso' });
+export function usePrevia<T>(
+  pedir: (() => Promise<T>) | null,
+  chave: string,
+  atrasoMs = ATRASO_PREVIA_MS,
+) {
+  const [estado, setEstado] = useState<EstadoPrevia<T>>(
+    pedir ? { tipo: 'calculando' } : { tipo: 'ocioso' },
+  );
   const [tentativa, setTentativa] = useState(0);
   const refPedir = useRef(pedir);
 
@@ -67,7 +78,9 @@ export function usePedirPrevias(grupoId: string, jogadorId: string) {
     reativar: async (data: string): Promise<PreviaResposta> =>
       previaResposta.parse(await api.post<unknown>(`${base}/reativar/previa`, { data })),
     periodo: async (periodoId: string, dados: CorrigirPeriodoCorpo): Promise<PreviaResposta> =>
-      previaResposta.parse(await api.post<unknown>(`${base}/periodos/${encodeURIComponent(periodoId)}/previa`, dados)),
+      previaResposta.parse(
+        await api.post<unknown>(`${base}/periodos/${encodeURIComponent(periodoId)}/previa`, dados),
+      ),
     inicio: async (data: string): Promise<PreviaInicioResposta> =>
       previaInicioResposta.parse(await api.post<unknown>(`${base}/inicio/previa`, { data })),
   };

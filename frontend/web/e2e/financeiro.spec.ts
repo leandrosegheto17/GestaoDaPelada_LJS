@@ -50,7 +50,11 @@ interface MensagemDev {
   texto: string;
 }
 
-async function linkDoEmail(request: APIRequestContext, para: string, tipo: string): Promise<string> {
+async function linkDoEmail(
+  request: APIRequestContext,
+  para: string,
+  tipo: string,
+): Promise<string> {
   let link: string | undefined;
   await expect
     .poll(
@@ -104,7 +108,10 @@ async function contaNova(pagina: Page, nome: string, prefixo: string): Promise<s
   return email;
 }
 
-async function criarGrupoPelaApi(pagina: Page, nome: string): Promise<{ id: string; slug: string }> {
+async function criarGrupoPelaApi(
+  pagina: Page,
+  nome: string,
+): Promise<{ id: string; slug: string }> {
   const r = await pagina.request.post('/api/grupos', {
     headers: CABECALHO,
     data: { nome, diaSemana: 'quinta', frequencia: 'semanal', horario: '20:00' },
@@ -113,7 +120,11 @@ async function criarGrupoPelaApi(pagina: Page, nome: string): Promise<{ id: stri
   return (await r.json()) as { id: string; slug: string };
 }
 
-async function criarJogadorPelaApi(pagina: Page, grupoId: string, apelido: string): Promise<string> {
+async function criarJogadorPelaApi(
+  pagina: Page,
+  grupoId: string,
+  apelido: string,
+): Promise<string> {
   const r = await pagina.request.post(`/api/grupos/${grupoId}/jogadores`, {
     headers: CABECALHO,
     data: { apelido, anoNascimento: 1990, posicao: 'meia' },
@@ -126,7 +137,9 @@ function respostaDe(pagina: Page, metodo: string, trecho: string) {
   return pagina.waitForResponse((r) => r.request().method() === metodo && r.url().includes(trecho));
 }
 
-test('J-25: caixa do mês da pelada: configurar, marcar, lançar a saída e desmarcar', async ({ browser }) => {
+test('J-25: caixa do mês da pelada: configurar, marcar, lançar a saída e desmarcar', async ({
+  browser,
+}) => {
   const pagina = await aparelho(browser);
   await contaNova(pagina, 'Organizadora Vinte e Cinco', 'j25');
   const grupo = await criarGrupoPelaApi(pagina, `Pelada Vinte e Cinco ${sufixo()}`);
@@ -140,7 +153,9 @@ test('J-25: caixa do mês da pelada: configurar, marcar, lançar a saída e desm
   // Passo 1 (FIN-34, FIN-08): o cartão do início leva ao Financeiro, ainda sem caixa.
   await pagina.goto(inicio);
   const gerenciar = pagina.getByRole('list', { name: 'Gerenciar' });
-  await expect(gerenciar.getByRole('link', { name: /Financeiro/ })).toContainText('Caixa não configurado');
+  await expect(gerenciar.getByRole('link', { name: /Financeiro/ })).toContainText(
+    'Caixa não configurado',
+  );
   await gerenciar.getByRole('link', { name: /Financeiro/ }).click();
   await expect(pagina).toHaveURL(new RegExp(`${inicio}/financeiro$`));
   await expect(pagina.getByRole('heading', { name: 'Caixa não configurado' })).toBeVisible();
@@ -170,7 +185,9 @@ test('J-25: caixa do mês da pelada: configurar, marcar, lançar a saída e desm
   await expect(saldo).toContainText('1 jogador');
   await expect(pagina.getByRole('switch', { name: 'Pagou: Bigode' })).not.toBeChecked();
 
-  const linhaMensalidades = pagina.getByRole('button', { name: new RegExp(`1 mensalidade de ${mesAno(dataHoje)}`) });
+  const linhaMensalidades = pagina.getByRole('button', {
+    name: new RegExp(`1 mensalidade de ${mesAno(dataHoje)}`),
+  });
   await linhaMensalidades.click();
   const mensalidades = pagina.getByRole('list', { name: `1 mensalidade de ${mesAno(dataHoje)}` });
   const entrada = mensalidades.getByRole('listitem').filter({ hasText: descricaoMensalidade });
@@ -198,7 +215,9 @@ test('J-25: caixa do mês da pelada: configurar, marcar, lançar a saída e desm
   // Passo 5 (FIN-22, FIN-24): desmarcar pede confirmação, remove a entrada e o saldo volta.
   await pagina.getByRole('switch', { name: 'Pagou: Toninho' }).click();
   const confirmar = pagina.getByRole('alertdialog', { name: 'Desmarcar o pagamento de Toninho?' });
-  await expect(confirmar).toContainText(`A entrada “${descricaoMensalidade}” (R$ 75,00) será removida do caixa.`);
+  await expect(confirmar).toContainText(
+    `A entrada “${descricaoMensalidade}” (R$ 75,00) será removida do caixa.`,
+  );
   const desmarcou = respostaDe(pagina, 'DELETE', '/financeiro/pagamentos/');
   await confirmar.getByRole('button', { name: 'Desmarcar' }).click();
   expect((await desmarcou).status()).toBe(204);
@@ -210,7 +229,9 @@ test('J-25: caixa do mês da pelada: configurar, marcar, lançar a saída e desm
 
   // O cartão do início mostra o saldo atual (FIN-34).
   await pagina.goto(inicio);
-  await expect(gerenciar.getByRole('link', { name: /Financeiro/ })).toContainText(`Saldo ${MENOS} R$ 450,00`);
+  await expect(gerenciar.getByRole('link', { name: /Financeiro/ })).toContainText(
+    `Saldo ${MENOS} R$ 450,00`,
+  );
   await pagina.context().close();
 });
 
@@ -246,12 +267,17 @@ test('J-26: permissão do financeiro: convidado sem acesso, concessão pela cria
   const gerenciarO = o.getByRole('list', { name: 'Gerenciar' });
   await expect(gerenciarO.getByRole('link', { name: 'Admins' })).toBeVisible();
   await expect(gerenciarO.getByRole('link', { name: /Financeiro/ })).toHaveCount(0);
-  const detalhe = (await (await o.request.get(`/api/grupos/${grupo.id}`)).json()) as Record<string, unknown>;
+  const detalhe = (await (await o.request.get(`/api/grupos/${grupo.id}`)).json()) as Record<
+    string,
+    unknown
+  >;
   expect(detalhe).not.toHaveProperty('saldoFinanceiroCentavos');
 
   await o.goto(`/app/grupos/${grupo.id}/financeiro`);
   await expect(o.getByText('Sem acesso', { exact: true })).toBeVisible();
-  await expect(o.getByText('Você não tem acesso ao financeiro deste grupo. Peça a um admin com acesso.')).toBeVisible();
+  await expect(
+    o.getByText('Você não tem acesso ao financeiro deste grupo. Peça a um admin com acesso.'),
+  ).toBeVisible();
   const negado = await o.request.get(`/api/grupos/${grupo.id}/financeiro/mes`);
   expect(negado.status()).toBe(403);
   expect(await negado.json()).toMatchObject({ codigo: 'sem_permissao_financeiro' });
@@ -267,7 +293,9 @@ test('J-26: permissão do financeiro: convidado sem acesso, concessão pela cria
 
   // Depois do passo 2, o convidado vê o saldo e o caixa.
   await o.goto(`/app/grupos/${grupo.id}`);
-  await expect(gerenciarO.getByRole('link', { name: /Financeiro/ })).toContainText('Saldo R$ 350,00');
+  await expect(gerenciarO.getByRole('link', { name: /Financeiro/ })).toContainText(
+    'Saldo R$ 350,00',
+  );
   await o.goto(`/app/grupos/${grupo.id}/financeiro`);
   await expect(o.getByRole('region', { name: 'Saldo atual' })).toContainText('R$ 350,00');
   await expect(o.getByText('Sem acesso', { exact: true })).toHaveCount(0);

@@ -38,7 +38,11 @@ interface OpcoesSessaoTeste {
 }
 
 /** Grava, como superusuário, uma sessão com o hash do token em texto e devolve o token. */
-async function sessao(db: pg.Client, conta: string, opcoes: OpcoesSessaoTeste = {}): Promise<string> {
+async function sessao(
+  db: pg.Client,
+  conta: string,
+  opcoes: OpcoesSessaoTeste = {},
+): Promise<string> {
   const { token, hash } = await gerarToken();
   await db.query(
     `INSERT INTO sessoes (token_hash, conta_id, escopo, criada_em, ultimo_uso_em, expira_em)
@@ -52,7 +56,10 @@ async function sessao(db: pg.Client, conta: string, opcoes: OpcoesSessaoTeste = 
 async function existeSessao(db: pg.Client, token: string): Promise<boolean> {
   const { createHash } = await import('node:crypto');
   const hash = createHash('sha256').update(token, 'utf8').digest();
-  const r = await db.query<{ n: number }>('SELECT count(*)::int AS n FROM sessoes WHERE token_hash = $1', [hash]);
+  const r = await db.query<{ n: number }>(
+    'SELECT count(*)::int AS n FROM sessoes WHERE token_hash = $1',
+    [hash],
+  );
   return (r.rows[0]?.n ?? 0) > 0;
 }
 
@@ -67,7 +74,11 @@ function montar() {
   const app = criarApp({
     fabricaBanco: comoAppFab.fabrica,
     registrarExtras: (api) => {
-      api.use('/teste/sessao/*', exigirSessao, comBanco(undefined, { fabrica: comoAppFab.fabrica }));
+      api.use(
+        '/teste/sessao/*',
+        exigirSessao,
+        comBanco(undefined, { fabrica: comoAppFab.fabrica }),
+      );
       api.use('/teste/livre/*', comBanco(undefined, { fabrica: comoAppFab.fabrica }));
       const ver = async (c: Context<Ambiente>) => {
         const espera = Number(c.req.query('espera') ?? '0');
@@ -116,7 +127,11 @@ describe('carregarSessao e exigirSessao', () => {
     const { app } = montar();
     const r = await pedir(app, '/teste/sessao/contexto', token);
     expect(r.status).toBe(200);
-    expect(await r.json()).toEqual({ conta: cenario.contaA, somente_leitura: 'on', papel: 'pelada_app' });
+    expect(await r.json()).toEqual({
+      conta: cenario.contaA,
+      somente_leitura: 'on',
+      papel: 'pelada_app',
+    });
   });
 
   it('ACE-47: POST abre a transação da rota de leitura e escrita, com a mesma conta', async () => {
@@ -130,7 +145,9 @@ describe('carregarSessao e exigirSessao', () => {
 
   it('ACE-15: a leitura da sessão renova o último uso', async () => {
     const { db, cenario } = aberto;
-    const token = await sessao(db, cenario.contaA, { ultimoUsoEm: "now() - interval '10 minutes'" });
+    const token = await sessao(db, cenario.contaA, {
+      ultimoUsoEm: "now() - interval '10 minutes'",
+    });
     const { app } = montar();
     const r = await pedir(app, '/teste/sessao/contexto', token);
     expect(r.status).toBe(200);
@@ -145,7 +162,9 @@ describe('carregarSessao e exigirSessao', () => {
 
   it('ACE-15: sessão com 14 min sem uso ainda vale', async () => {
     const { db, cenario } = aberto;
-    const token = await sessao(db, cenario.contaA, { ultimoUsoEm: "now() - interval '14 minutes'" });
+    const token = await sessao(db, cenario.contaA, {
+      ultimoUsoEm: "now() - interval '14 minutes'",
+    });
     const { app } = montar();
     const r = await pedir(app, '/teste/sessao/contexto', token);
     expect(r.status).toBe(200);
@@ -153,7 +172,9 @@ describe('carregarSessao e exigirSessao', () => {
 
   it('ACE-15: sessão com 15 min sem uso responde 401 sessao_expirada, vence o cookie e some do banco', async () => {
     const { db, cenario } = aberto;
-    const token = await sessao(db, cenario.contaA, { ultimoUsoEm: "now() - interval '15 minutes 1 second'" });
+    const token = await sessao(db, cenario.contaA, {
+      ultimoUsoEm: "now() - interval '15 minutes 1 second'",
+    });
     const { app } = montar();
     const r = await pedir(app, '/teste/sessao/contexto', token);
     expect(r.status).toBe(401);
@@ -186,7 +207,12 @@ describe('carregarSessao e exigirSessao', () => {
     const resultado = await comoApp(
       db,
       { conta: cenario.contaNaoConfirmada },
-      async (c) => (await c.query<{ resultado: string }>('SELECT resultado FROM conta_excluir($1)', [cenario.senhaNaoConfirmada])).rows[0]?.resultado,
+      async (c) =>
+        (
+          await c.query<{ resultado: string }>('SELECT resultado FROM conta_excluir($1)', [
+            cenario.senhaNaoConfirmada,
+          ])
+        ).rows[0]?.resultado,
       { confirmar: true },
     );
     expect(resultado).toBe('ok');

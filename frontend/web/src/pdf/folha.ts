@@ -36,7 +36,15 @@ export const CORES_PDF = {
 } as const;
 
 /** Tamanhos de `--pdf-*` em `tokens.css`, em pt. */
-export const TAMANHOS_PDF = { titulo: 20, sub: 12, pontos: 10, texto: 8.5, pequeno: 7.5, rodape: 7, mes: 7 } as const;
+export const TAMANHOS_PDF = {
+  titulo: 20,
+  sub: 12,
+  pontos: 10,
+  texto: 8.5,
+  pequeno: 7.5,
+  rodape: 7,
+  mes: 7,
+} as const;
 
 export const FONTE_MINIMA = 7;
 export const FONTE_MAXIMA = TAMANHOS_PDF.texto;
@@ -127,8 +135,34 @@ const LARGURA_PTS_FINAL = 36;
 const LARGURA_RODADA = 28;
 const MARCA = { largura: 22 * PX, altura: 15 * PX, raio: 3 * PX };
 
-const MESES_CURTOS = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
-const MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+const MESES_CURTOS = [
+  'jan',
+  'fev',
+  'mar',
+  'abr',
+  'mai',
+  'jun',
+  'jul',
+  'ago',
+  'set',
+  'out',
+  'nov',
+  'dez',
+];
+const MESES = [
+  'janeiro',
+  'fevereiro',
+  'março',
+  'abril',
+  'maio',
+  'junho',
+  'julho',
+  'agosto',
+  'setembro',
+  'outubro',
+  'novembro',
+  'dezembro',
+];
 
 export const TEXTO_RODAPE = 'Gestão da Pelada';
 export const TEXTO_SEM_PARTIDAS_NO_MES = 'Nenhuma partida registrada neste mês';
@@ -157,7 +191,8 @@ const DATA_HORA_SP = new Intl.DateTimeFormat('pt-BR', {
 /** "Gerado em 22/10/2026 18:40" do `geradoEm` (instante ISO), na hora de São Paulo. */
 export function textoGeradoEm(geradoEm: string): string {
   const partes = DATA_HORA_SP.formatToParts(new Date(geradoEm));
-  const v = (tipo: Intl.DateTimeFormatPartTypes) => partes.find((p) => p.type === tipo)?.value ?? '';
+  const v = (tipo: Intl.DateTimeFormatPartTypes) =>
+    partes.find((p) => p.type === tipo)?.value ?? '';
   return `Gerado em ${v('day')}/${v('month')}/${v('year')} ${v('hour')}:${v('minute')}`;
 }
 
@@ -173,22 +208,36 @@ function diaMes(data: string): string {
 }
 
 /** Colunas seguidas do mesmo mês: o rótulo e a primeira coluna do grupo. */
-export function gruposDeMes(colunas: PdfPublico['colunas']): Array<{ rotulo: string; inicio: number; quantas: number }> {
+export function gruposDeMes(
+  colunas: PdfPublico['colunas'],
+): Array<{ rotulo: string; inicio: number; quantas: number }> {
   const grupos: Array<{ rotulo: string; inicio: number; quantas: number; chave: string }> = [];
   colunas.forEach((c, i) => {
     const chave = c.data.slice(0, 7);
     const ultimo = grupos.at(-1);
     if (ultimo && ultimo.chave === chave) ultimo.quantas += 1;
-    else grupos.push({ chave, rotulo: MESES_CURTOS[Number(c.data.slice(5, 7)) - 1] ?? chave, inicio: i, quantas: 1 });
+    else
+      grupos.push({
+        chave,
+        rotulo: MESES_CURTOS[Number(c.data.slice(5, 7)) - 1] ?? chave,
+        inicio: i,
+        quantas: 1,
+      });
   });
   return grupos.map(({ rotulo, inicio, quantas }) => ({ rotulo, inicio, quantas }));
 }
 
 /** Altura da linha e fonte do corpo para `n` linhas no espaço da página (PAR-103): 8,5 pt, reduzida até 7 pt. */
-export function ajustarFonte(n: number, disponivel: number): { fonte: number; alturaLinha: number } {
+export function ajustarFonte(
+  n: number,
+  disponivel: number,
+): { fonte: number; alturaLinha: number } {
   if (n <= 0) return { fonte: FONTE_MAXIMA, alturaLinha: ALTURA_LINHA };
   const cabe = Math.min(ALTURA_LINHA, disponivel / n);
-  const fonte = Math.max(FONTE_MINIMA, Math.min(FONTE_MAXIMA, (FONTE_MAXIMA * cabe) / ALTURA_LINHA));
+  const fonte = Math.max(
+    FONTE_MINIMA,
+    Math.min(FONTE_MAXIMA, (FONTE_MAXIMA * cabe) / ALTURA_LINHA),
+  );
   const alturaLinha = Math.max(cabe, (ALTURA_LINHA * FONTE_MINIMA) / FONTE_MAXIMA);
   return { fonte: Math.round(fonte * 100) / 100, alturaLinha };
 }
@@ -213,31 +262,92 @@ function geometria(colunas: number): Geometria {
   const xPtsFinal = fim - LARGURA_PTS_FINAL;
   const xRodadas = xPtsFinal - colunas * LARGURA_RODADA;
   const xPtsInicial = xRodadas - LARGURA_PTS_INICIAL;
-  return { xPosicao: MARGEM_X, xNome: MARGEM_X + LARGURA_POSICAO, xPtsInicial, xRodadas, xPtsFinal, fim };
+  return {
+    xPosicao: MARGEM_X,
+    xNome: MARGEM_X + LARGURA_POSICAO,
+    xPtsInicial,
+    xRodadas,
+    xPtsFinal,
+    fim,
+  };
 }
 
-function texto(t: Omit<ElTexto, 'tipo' | 'familia' | 'peso' | 'alinhar' | 'cor'> & Partial<ElTexto>): ElTexto {
-  return { tipo: 'texto', familia: 'texto', peso: 'normal', alinhar: 'left', cor: CORES_PDF.texto, ...t };
+function texto(
+  t: Omit<ElTexto, 'tipo' | 'familia' | 'peso' | 'alinhar' | 'cor'> & Partial<ElTexto>,
+): ElTexto {
+  return {
+    tipo: 'texto',
+    familia: 'texto',
+    peso: 'normal',
+    alinhar: 'left',
+    cor: CORES_PDF.texto,
+    ...t,
+  };
 }
 
 function cabecalhoDaFolha(p: PdfPublico): Elemento[] {
   const topo = MARGEM_TOPO;
   const baseSub = topo + ALTURA_CABECALHO - 10 * PX;
   const els: Elemento[] = [
-    texto({ x: MARGEM_X, y: topo + 22, texto: p.grupo.nome.toUpperCase(), tamanho: TAMANHOS_PDF.titulo, familia: 'titulo', peso: 'negrito' }),
-    texto({ x: MARGEM_X, y: baseSub, texto: `Ranking: ${mesPorExtenso(p.mes)}`, tamanho: TAMANHOS_PDF.sub, familia: 'titulo', peso: 'negrito' }),
+    texto({
+      x: MARGEM_X,
+      y: topo + 22,
+      texto: p.grupo.nome.toUpperCase(),
+      tamanho: TAMANHOS_PDF.titulo,
+      familia: 'titulo',
+      peso: 'negrito',
+    }),
+    texto({
+      x: MARGEM_X,
+      y: baseSub,
+      texto: `Ranking: ${mesPorExtenso(p.mes)}`,
+      tamanho: TAMANHOS_PDF.sub,
+      familia: 'titulo',
+      peso: 'negrito',
+    }),
   ];
   const direita = A4.largura - MARGEM_X;
   if (p.semPartidasNoMes) {
     els.push(
-      texto({ x: direita, y: baseSub - 9, texto: textoGeradoEm(p.geradoEm), tamanho: TAMANHOS_PDF.pequeno, cor: CORES_PDF.textoSec, alinhar: 'right' }),
-      texto({ x: direita, y: baseSub, texto: TEXTO_SEM_PARTIDAS_NO_MES, tamanho: TAMANHOS_PDF.pequeno, cor: CORES_PDF.textoSec, alinhar: 'right' }),
+      texto({
+        x: direita,
+        y: baseSub - 9,
+        texto: textoGeradoEm(p.geradoEm),
+        tamanho: TAMANHOS_PDF.pequeno,
+        cor: CORES_PDF.textoSec,
+        alinhar: 'right',
+      }),
+      texto({
+        x: direita,
+        y: baseSub,
+        texto: TEXTO_SEM_PARTIDAS_NO_MES,
+        tamanho: TAMANHOS_PDF.pequeno,
+        cor: CORES_PDF.textoSec,
+        alinhar: 'right',
+      }),
     );
   } else {
-    els.push(texto({ x: direita, y: baseSub, texto: textoGeradoEm(p.geradoEm), tamanho: TAMANHOS_PDF.pequeno, cor: CORES_PDF.textoSec, alinhar: 'right' }));
+    els.push(
+      texto({
+        x: direita,
+        y: baseSub,
+        texto: textoGeradoEm(p.geradoEm),
+        tamanho: TAMANHOS_PDF.pequeno,
+        cor: CORES_PDF.textoSec,
+        alinhar: 'right',
+      }),
+    );
   }
   const yBorda = topo + ALTURA_CABECALHO;
-  els.push({ tipo: 'linha', x1: MARGEM_X, y1: yBorda, x2: direita, y2: yBorda, cor: CORES_PDF.verde, espessura: 3 * PX });
+  els.push({
+    tipo: 'linha',
+    x1: MARGEM_X,
+    y1: yBorda,
+    x2: direita,
+    y2: yBorda,
+    cor: CORES_PDF.verde,
+    espessura: 3 * PX,
+  });
   return els;
 }
 
@@ -246,39 +356,96 @@ function cabecalhoDaTabela(p: PdfPublico, g: Geometria, y: number): Elemento[] {
   const h = ALTURA_LINHA_CABECALHO;
   const meio = (a: number, b: number) => (a + b) / 2;
   const els: Elemento[] = [];
-  const comum = { tamanho: TAMANHOS_PDF.pequeno, peso: 'negrito' as const, cor: CORES_PDF.textoSec };
+  const comum = {
+    tamanho: TAMANHOS_PDF.pequeno,
+    peso: 'negrito' as const,
+    cor: CORES_PDF.textoSec,
+  };
   els.push(
     texto({ ...comum, x: meio(g.xPosicao, g.xNome), y: y + h + 3, texto: '#', alinhar: 'center' }),
     texto({ ...comum, x: g.xNome + 2, y: y + h + 3, texto: 'Jogador' }),
-    texto({ ...comum, x: meio(g.xPtsInicial, g.xRodadas), y: y + h - 2, texto: 'Pts', alinhar: 'center' }),
-    texto({ ...comum, x: meio(g.xPtsInicial, g.xRodadas), y: y + h + 7, texto: 'inicial', alinhar: 'center' }),
+    texto({
+      ...comum,
+      x: meio(g.xPtsInicial, g.xRodadas),
+      y: y + h - 2,
+      texto: 'Pts',
+      alinhar: 'center',
+    }),
+    texto({
+      ...comum,
+      x: meio(g.xPtsInicial, g.xRodadas),
+      y: y + h + 7,
+      texto: 'inicial',
+      alinhar: 'center',
+    }),
     texto({ ...comum, x: meio(g.xPtsFinal, g.fim), y: y + h - 2, texto: 'Pts', alinhar: 'center' }),
-    texto({ ...comum, x: meio(g.xPtsFinal, g.fim), y: y + h + 7, texto: 'final', alinhar: 'center' }),
+    texto({
+      ...comum,
+      x: meio(g.xPtsFinal, g.fim),
+      y: y + h + 7,
+      texto: 'final',
+      alinhar: 'center',
+    }),
   );
   for (const grupo of gruposDeMes(p.colunas)) {
     const x0 = g.xRodadas + grupo.inicio * LARGURA_RODADA;
     const x1 = x0 + grupo.quantas * LARGURA_RODADA;
-    els.push(texto({ ...comum, x: meio(x0, x1), y: y + h - 6, texto: grupo.rotulo.toUpperCase(), tamanho: TAMANHOS_PDF.mes, alinhar: 'center' }));
+    els.push(
+      texto({
+        ...comum,
+        x: meio(x0, x1),
+        y: y + h - 6,
+        texto: grupo.rotulo.toUpperCase(),
+        tamanho: TAMANHOS_PDF.mes,
+        alinhar: 'center',
+      }),
+    );
   }
   p.colunas.forEach((c, i) => {
     const x = g.xRodadas + i * LARGURA_RODADA + LARGURA_RODADA / 2;
-    els.push(
-      texto({ ...comum, x, y: y + h + 7, texto: diaMes(c.data), alinhar: 'center' }),
-      { tipo: 'icone', icone: c.choveu ? 'chuva' : 'sol', x, y: y + 2 * h - 4, tamanho: 7.5, cor: c.choveu ? CORES_PDF.chuva : CORES_PDF.sol },
-    );
+    els.push(texto({ ...comum, x, y: y + h + 7, texto: diaMes(c.data), alinhar: 'center' }), {
+      tipo: 'icone',
+      icone: c.choveu ? 'chuva' : 'sol',
+      x,
+      y: y + 2 * h - 4,
+      tamanho: 7.5,
+      cor: c.choveu ? CORES_PDF.chuva : CORES_PDF.sol,
+    });
   });
   const yBase = y + 2 * h;
-  els.push({ tipo: 'linha', x1: g.xPosicao, y1: yBase, x2: g.fim, y2: yBase, cor: CORES_PDF.texto, espessura: 1 });
+  els.push({
+    tipo: 'linha',
+    x1: g.xPosicao,
+    y1: yBase,
+    x2: g.fim,
+    y2: yBase,
+    cor: CORES_PDF.texto,
+    espessura: 1,
+  });
   return els;
 }
 
 /** Linhas verticais de 2 pt: no começo de cada mês e antes do Pts final (`.pdf-divisa`). */
 function divisas(p: PdfPublico, g: Geometria, y0: number, y1: number): Elemento[] {
-  const xs = [...gruposDeMes(p.colunas).map((grupo) => g.xRodadas + grupo.inicio * LARGURA_RODADA), g.xPtsFinal];
-  return xs.map((x) => ({ tipo: 'linha' as const, x1: x, y1: y0, x2: x, y2: y1, cor: CORES_PDF.texto, espessura: 2 }));
+  const xs = [
+    ...gruposDeMes(p.colunas).map((grupo) => g.xRodadas + grupo.inicio * LARGURA_RODADA),
+    g.xPtsFinal,
+  ];
+  return xs.map((x) => ({
+    tipo: 'linha' as const,
+    x1: x,
+    y1: y0,
+    x2: x,
+    y2: y1,
+    cor: CORES_PDF.texto,
+    espessura: 2,
+  }));
 }
 
-const ESTILO_MARCA: Record<RodadaPublica['situacao'], { fundo?: string; cor: string; sufixo?: string; tracejado?: boolean }> = {
+const ESTILO_MARCA: Record<
+  RodadaPublica['situacao'],
+  { fundo?: string; cor: string; sufixo?: string; tracejado?: boolean }
+> = {
   presente: { fundo: CORES_PDF.pFundo, cor: CORES_PDF.pTexto },
   lesionado: { fundo: CORES_PDF.lFundo, cor: CORES_PDF.lTexto, sufixo: 'L' },
   expulso: { fundo: CORES_PDF.eFundo, cor: CORES_PDF.eTexto, sufixo: 'E' },
@@ -305,34 +472,104 @@ function marca(r: RodadaPublica, x: number, yMeio: number, fonte: number): Eleme
   const valor = textoDosPontos(r);
   if (estilo.sufixo) {
     els.push(
-      texto({ x: x - 1, y: base, texto: valor, tamanho: fonte, peso: 'negrito', cor: estilo.cor, alinhar: 'right' }),
-      texto({ x: x - 0.5, y: base, texto: estilo.sufixo, tamanho: TAMANHOS_PDF.mes, peso: 'negrito', cor: estilo.cor }),
+      texto({
+        x: x - 1,
+        y: base,
+        texto: valor,
+        tamanho: fonte,
+        peso: 'negrito',
+        cor: estilo.cor,
+        alinhar: 'right',
+      }),
+      texto({
+        x: x - 0.5,
+        y: base,
+        texto: estilo.sufixo,
+        tamanho: TAMANHOS_PDF.mes,
+        peso: 'negrito',
+        cor: estilo.cor,
+      }),
     );
   } else {
-    els.push(texto({ x, y: base, texto: valor, tamanho: fonte, peso: 'negrito', cor: estilo.cor, alinhar: 'center' }));
+    els.push(
+      texto({
+        x,
+        y: base,
+        texto: valor,
+        tamanho: fonte,
+        peso: 'negrito',
+        cor: estilo.cor,
+        alinhar: 'center',
+      }),
+    );
   }
   return els;
 }
 
-function linhaDaTabela(l: LinhaPublica, indice: number, g: Geometria, y: number, h: number, fonte: number): Elemento[] {
+function linhaDaTabela(
+  l: LinhaPublica,
+  indice: number,
+  g: Geometria,
+  y: number,
+  h: number,
+  fonte: number,
+): Elemento[] {
   const els: Elemento[] = [];
   if (indice % 2 === 1) {
-    els.push({ tipo: 'retangulo', x: g.xPosicao, y, largura: g.fim - g.xPosicao, altura: h, raio: 0, preenchimento: CORES_PDF.zebra });
+    els.push({
+      tipo: 'retangulo',
+      x: g.xPosicao,
+      y,
+      largura: g.fim - g.xPosicao,
+      altura: h,
+      raio: 0,
+      preenchimento: CORES_PDF.zebra,
+    });
   }
   const yMeio = y + h / 2;
   const base = yMeio + fonte * 0.35;
   els.push(
-    texto({ x: (g.xPosicao + g.xNome) / 2, y: base, texto: String(l.posicao), tamanho: fonte, alinhar: 'center' }),
+    texto({
+      x: (g.xPosicao + g.xNome) / 2,
+      y: base,
+      texto: String(l.posicao),
+      tamanho: fonte,
+      alinhar: 'center',
+    }),
     texto({ x: g.xNome + 2, y: base, texto: l.apelido, tamanho: fonte, peso: 'negrito' }),
-    texto({ x: (g.xPtsInicial + g.xRodadas) / 2, y: base, texto: String(l.ptsInicial), tamanho: fonte, peso: 'negrito', cor: CORES_PDF.textoSec, alinhar: 'center' }),
+    texto({
+      x: (g.xPtsInicial + g.xRodadas) / 2,
+      y: base,
+      texto: String(l.ptsInicial),
+      tamanho: fonte,
+      peso: 'negrito',
+      cor: CORES_PDF.textoSec,
+      alinhar: 'center',
+    }),
   );
   l.rodadas.forEach((r, i) => {
     els.push(...marca(r, g.xRodadas + i * LARGURA_RODADA + LARGURA_RODADA / 2, yMeio, fonte));
   });
   const fontePontos = Math.max(FONTE_MINIMA, (TAMANHOS_PDF.pontos * fonte) / FONTE_MAXIMA);
   els.push(
-    texto({ x: (g.xPtsFinal + g.fim) / 2, y: yMeio + fontePontos * 0.35, texto: String(l.ptsFinal), tamanho: fontePontos, familia: 'titulo', peso: 'negrito', alinhar: 'center' }),
-    { tipo: 'linha', x1: g.xPosicao, y1: y + h, x2: g.fim, y2: y + h, cor: CORES_PDF.linha, espessura: 0.5 },
+    texto({
+      x: (g.xPtsFinal + g.fim) / 2,
+      y: yMeio + fontePontos * 0.35,
+      texto: String(l.ptsFinal),
+      tamanho: fontePontos,
+      familia: 'titulo',
+      peso: 'negrito',
+      alinhar: 'center',
+    }),
+    {
+      tipo: 'linha',
+      x1: g.xPosicao,
+      y1: y + h,
+      x2: g.fim,
+      y2: y + h,
+      cor: CORES_PDF.linha,
+      espessura: 0.5,
+    },
   );
   return els;
 }
@@ -342,7 +579,15 @@ function rodape(p: PdfPublico): Elemento[] {
   const direita = A4.largura - MARGEM_X;
   const comum = { tamanho: TAMANHOS_PDF.rodape, cor: CORES_PDF.textoSec };
   return [
-    { tipo: 'linha', x1: MARGEM_X, y1: y - 12, x2: direita, y2: y - 12, cor: CORES_PDF.linha, espessura: 0.5 },
+    {
+      tipo: 'linha',
+      x1: MARGEM_X,
+      y1: y - 12,
+      x2: direita,
+      y2: y - 12,
+      cor: CORES_PDF.linha,
+      espessura: 0.5,
+    },
     texto({ ...comum, x: MARGEM_X, y, texto: TEXTO_RODAPE }),
     texto({ ...comum, x: direita, y, texto: enderecoSemEsquema(p.urlPublica), alinhar: 'right' }),
   ];
@@ -366,12 +611,22 @@ export function montarFolha(p: PdfPublico): Folha {
     const linhas = p.linhas.slice(n * porPagina, (n + 1) * porPagina);
     const els: Elemento[] = [...cabecalhoDaFolha(p), ...cabecalhoDaTabela(p, g, topoTabela)];
     linhas.forEach((l, i) => {
-      els.push(...linhaDaTabela(l, n * porPagina + i, g, topoCorpo + i * alturaLinha, alturaLinha, fonte));
+      els.push(
+        ...linhaDaTabela(l, n * porPagina + i, g, topoCorpo + i * alturaLinha, alturaLinha, fonte),
+      );
     });
     const fimTabela = topoCorpo + linhas.length * alturaLinha;
     els.push(...divisas(p, g, topoTabela, fimTabela));
     if (n === total - 1) {
-      els.push({ tipo: 'paragrafo', x: MARGEM_X, y: fimTabela + 12 * PX + TAMANHOS_PDF.pequeno, largura: g.fim - MARGEM_X, texto: TEXTO_LEGENDA, tamanho: TAMANHOS_PDF.pequeno, cor: CORES_PDF.textoSec });
+      els.push({
+        tipo: 'paragrafo',
+        x: MARGEM_X,
+        y: fimTabela + 12 * PX + TAMANHOS_PDF.pequeno,
+        largura: g.fim - MARGEM_X,
+        texto: TEXTO_LEGENDA,
+        tamanho: TAMANHOS_PDF.pequeno,
+        cor: CORES_PDF.textoSec,
+      });
     }
     els.push(...rodape(p));
     paginas.push(els);
@@ -381,5 +636,7 @@ export function montarFolha(p: PdfPublico): Folha {
 
 /** Todos os textos da folha, na ordem (o "texto extraído" dos testes). */
 export function textosDaFolha(folha: Folha): string[] {
-  return folha.paginas.flatMap((els) => els.flatMap((e) => (e.tipo === 'texto' || e.tipo === 'paragrafo' ? [e.texto] : [])));
+  return folha.paginas.flatMap((els) =>
+    els.flatMap((e) => (e.tipo === 'texto' || e.tipo === 'paragrafo' ? [e.texto] : [])),
+  );
 }

@@ -33,7 +33,11 @@ export function rotasFinanceiroConfig(): Hono<Ambiente> {
       return respostaDeCampo(c, 'dataSaldoInicial', MENSAGEM_DATA_SALDO_FUTURA);
     }
 
-    const { depois } = await configFinanceira.salvarConfig(c.var.db, c.req.param('grupoId'), corpo.dados);
+    const { depois } = await configFinanceira.salvarConfig(
+      c.var.db,
+      c.req.param('grupoId'),
+      corpo.dados,
+    );
     const resposta: ConfigFinanceiraResposta = depois;
     return c.json(resposta, 200);
   });

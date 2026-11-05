@@ -22,7 +22,9 @@ const CONTADOR_DDL = `
 
 async function tagsDdl(url: string): Promise<string[]> {
   return comCliente(url, async (c) =>
-    (await c.query<{ tag: string }>('SELECT tag FROM espiao.ddl ORDER BY id')).rows.map((r) => r.tag),
+    (await c.query<{ tag: string }>('SELECT tag FROM espiao.ddl ORDER BY id')).rows.map(
+      (r) => r.tag,
+    ),
   );
 }
 
@@ -33,7 +35,9 @@ async function contagens(url: string): Promise<Record<string, number>> {
     );
     const r: Record<string, number> = {};
     for (const { t } of tabelas.rows) {
-      const q = await c.query<{ n: number }>(`SELECT count(*)::int AS n FROM public.${c.escapeIdentifier(t)}`);
+      const q = await c.query<{ n: number }>(
+        `SELECT count(*)::int AS n FROM public.${c.escapeIdentifier(t)}`,
+      );
       r[t] = q.rows[0]?.n ?? 0;
     }
     return r;
@@ -41,7 +45,10 @@ async function contagens(url: string): Promise<Record<string, number>> {
 }
 
 async function pgmigrations(url: string) {
-  return comCliente(url, async (c) => (await c.query('SELECT id, name, run_on FROM pgmigrations ORDER BY id')).rows);
+  return comCliente(
+    url,
+    async (c) => (await c.query('SELECT id, name, run_on FROM pgmigrations ORDER BY id')).rows,
+  );
 }
 
 /** Dados de exemplo em tabelas herdadas, para a contagem não ser só de zeros. */

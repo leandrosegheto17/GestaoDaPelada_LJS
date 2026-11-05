@@ -15,7 +15,8 @@ afterEach(() => {
 function comSessaoEPendentes() {
   const api = { 'GET /api/sessao': () => json(200, SESSAO_ANA) };
   return new Proxy(api as Record<string, () => Response | Promise<Response>>, {
-    get: (alvo, chave: string) => alvo[chave] ?? (chave.startsWith('GET ') ? () => pendente() : undefined),
+    get: (alvo, chave: string) =>
+      alvo[chave] ?? (chave.startsWith('GET ') ? () => pendente() : undefined),
   });
 }
 

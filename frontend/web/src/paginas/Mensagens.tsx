@@ -19,7 +19,9 @@ export function PaginaProvisoria() {
   const [parametros] = useSearchParams();
   return (
     <Casca centralizada>
-      {parametros.get('aviso') === 'conta-excluida' ? <Faixa tipo="sucesso">{TEXTO_CONTA_EXCLUIDA}</Faixa> : null}
+      {parametros.get('aviso') === 'conta-excluida' ? (
+        <Faixa tipo="sucesso">{TEXTO_CONTA_EXCLUIDA}</Faixa>
+      ) : null}
       <EstadoErro formato="tela" titulo="Em breve" mensagem={TEXTO_EM_BREVE} />
     </Casca>
   );

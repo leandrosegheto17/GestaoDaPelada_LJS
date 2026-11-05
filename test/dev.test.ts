@@ -23,13 +23,20 @@ function portaLivre(): Promise<number> {
     s.once('error', rejeitar);
     s.listen(0, '127.0.0.1', () => {
       const endereco = s.address();
-      s.close(() => (typeof endereco === 'object' && endereco ? resolver(endereco.port) : rejeitar(new Error('sem porta'))));
+      s.close(() =>
+        typeof endereco === 'object' && endereco
+          ? resolver(endereco.port)
+          : rejeitar(new Error('sem porta')),
+      );
     });
   });
 }
 
 /** Roda o dev.mjs com o ambiente dado e devolve código de saída e saída de erro. */
-function rodarDev(env: Record<string, string>, ms = 30_000): Promise<{ codigo: number | null; erro: string }> {
+function rodarDev(
+  env: Record<string, string>,
+  ms = 30_000,
+): Promise<{ codigo: number | null; erro: string }> {
   return new Promise((resolver) => {
     const filho = spawn(process.execPath, [DEV], { cwd: RAIZ, env: { ...process.env, ...env } });
     let erro = '';
@@ -44,7 +51,8 @@ function rodarDev(env: Record<string, string>, ms = 30_000): Promise<{ codigo: n
 
 function encerrar(filho: ChildProcess): void {
   if (filho.exitCode !== null || !filho.pid) return;
-  if (process.platform === 'win32') spawnSync('taskkill', ['/pid', String(filho.pid), '/T', '/F'], { stdio: 'ignore' });
+  if (process.platform === 'win32')
+    spawnSync('taskkill', ['/pid', String(filho.pid), '/T', '/F'], { stdio: 'ignore' });
   else filho.kill('SIGTERM');
 }
 
@@ -67,7 +75,10 @@ async function esperarOk(url: string, ms: number): Promise<Response> {
 describe('pnpm dev', () => {
   it('FUN-04: com o Postgres parado, sai com código 1 e a mensagem do docker compose up -d (FUN-55)', async () => {
     const fechada = await portaLivre();
-    const r = await rodarDev({ PELADA_APP_SENHA: 'senha-de-teste', PELADA_DEV_BANCO_PORTA: String(fechada) });
+    const r = await rodarDev({
+      PELADA_APP_SENHA: 'senha-de-teste',
+      PELADA_DEV_BANCO_PORTA: String(fechada),
+    });
     expect(r.codigo).toBe(1);
     expect(r.erro).toContain('docker compose up -d');
   });
@@ -79,7 +90,9 @@ describe('pnpm dev', () => {
   });
 
   it('FUN-04: o localConnectionString do wrangler.jsonc versionado não contém senha', () => {
-    const config = lerJsonc<{ hyperdrive: { localConnectionString: string }[] }>(join(RAIZ, 'wrangler.jsonc'));
+    const config = lerJsonc<{ hyperdrive: { localConnectionString: string }[] }>(
+      join(RAIZ, 'wrangler.jsonc'),
+    );
     for (const h of config.hyperdrive) {
       const url = new URL(h.localConnectionString);
       expect(url.password).toBe('');

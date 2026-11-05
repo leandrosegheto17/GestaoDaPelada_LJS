@@ -9,7 +9,9 @@ import { textoVisivel } from './grupo.ts';
  */
 
 /** Texto `AAAA-MM-DD`; o calendário e o resto ficam no domínio. */
-const dataTexto = z.string({ error: MENSAGEM_DATA_INVALIDA }).regex(/^\d{4}-\d{2}-\d{2}$/, MENSAGEM_DATA_INVALIDA);
+const dataTexto = z
+  .string({ error: MENSAGEM_DATA_INVALIDA })
+  .regex(/^\d{4}-\d{2}-\d{2}$/, MENSAGEM_DATA_INVALIDA);
 
 /** Inativar e reativar: sem data, a rota usa hoje (GEL-52, GEL-55). */
 export const dataCorpo = z.object({ data: dataTexto.optional() }).strict();
@@ -21,7 +23,9 @@ export const MENSAGEM_SAIDA_OU_RETORNO = 'Informe a saída ou o retorno.';
 export const corrigirPeriodoCorpo = z
   .object({ saida: dataTexto.optional(), retorno: dataTexto.optional() })
   .strict()
-  .refine((corpo) => corpo.saida !== undefined || corpo.retorno !== undefined, { error: MENSAGEM_SAIDA_OU_RETORNO });
+  .refine((corpo) => corpo.saida !== undefined || corpo.retorno !== undefined, {
+    error: MENSAGEM_SAIDA_OU_RETORNO,
+  });
 export type CorrigirPeriodoCorpo = z.infer<typeof corrigirPeriodoCorpo>;
 
 /** Alterar a data de início da pontuação (GEL-77): a data é obrigatória. */
@@ -30,7 +34,11 @@ export type InicioCorpo = z.infer<typeof inicioCorpo>;
 
 /** `alterado: false` quando as datas enviadas já eram as atuais (GEL-74, GEL-82). */
 export const corrigirPeriodoResposta = z
-  .object({ alterado: z.boolean(), mensagem: z.string().optional(), periodos: z.array(periodoItem) })
+  .object({
+    alterado: z.boolean(),
+    mensagem: z.string().optional(),
+    periodos: z.array(periodoItem),
+  })
   .strict();
 export type CorrigirPeriodoResposta = z.infer<typeof corrigirPeriodoResposta>;
 
@@ -72,5 +80,7 @@ export const listaHabilidades = z.object({ habilidades: z.array(habilidadeItem) 
 export type ListaHabilidades = z.infer<typeof listaHabilidades>;
 
 /** Nível depois de gravar a nota, em centésimos (GEL-97, GEL-101, GEL-102). */
-export const notaResposta = z.object({ nivel: z.number().int().min(100).max(1000), semNota: z.boolean() }).strict();
+export const notaResposta = z
+  .object({ nivel: z.number().int().min(100).max(1000), semNota: z.boolean() })
+  .strict();
 export type NotaResposta = z.infer<typeof notaResposta>;

@@ -3,7 +3,12 @@ import { fileURLToPath } from 'node:url';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { contas, links } from '../../src/infraestrutura/db/repositorios/contas.ts';
 import { encerrarAtual } from '../../src/infraestrutura/db/repositorios/sessoes.ts';
-import { abrirCenarioConta, criarLink, criarSessao, type CenarioContaAberto } from '../isolamento/cenario-conta.ts';
+import {
+  abrirCenarioConta,
+  criarLink,
+  criarSessao,
+  type CenarioContaAberto,
+} from '../isolamento/cenario-conta.ts';
 import { comDb, hashAleatorio } from './apoio.ts';
 
 /**
@@ -41,8 +46,14 @@ describe('contas.eu', () => {
     const eu = await comDb(url, cenario.contaA, (db) => contas.eu(db));
     expect(eu).toMatchObject({ id: cenario.contaA, nome: 'Conta A', email: cenario.emailA });
     const grupoA = eu?.grupos.find((g) => g.id === cenario.grupoA);
-    expect(grupoA).toEqual({ id: cenario.grupoA, nome: 'Grupo A', slug: cenario.slugA, acessa_financeiro: false });
-    for (const g of eu?.grupos ?? []) expect(Object.keys(g).sort()).toEqual(['acessa_financeiro', 'id', 'nome', 'slug']);
+    expect(grupoA).toEqual({
+      id: cenario.grupoA,
+      nome: 'Grupo A',
+      slug: cenario.slugA,
+      acessa_financeiro: false,
+    });
+    for (const g of eu?.grupos ?? [])
+      expect(Object.keys(g).sort()).toEqual(['acessa_financeiro', 'id', 'nome', 'slug']);
   });
 
   it('ACE-18: não lista o grupo de outra conta nem o grupo arquivado de outra criadora', async () => {
@@ -100,7 +111,12 @@ describe('contas: resultados tipados', () => {
     const { url, cenario } = aberto;
     await comDb(url, null, async (db) => {
       const ip = hashAleatorio();
-      const ok = await contas.entrar(db, { email: cenario.emailA, senha: cenario.senhaA, ipHash: ip, tokenHash: hashAleatorio() });
+      const ok = await contas.entrar(db, {
+        email: cenario.emailA,
+        senha: cenario.senhaA,
+        ipHash: ip,
+        tokenHash: hashAleatorio(),
+      });
       expect(ok).toEqual({ resultado: 'ok', contaId: cenario.contaA, nome: 'Conta A' });
 
       const naoConfirmado = await contas.entrar(db, {
@@ -112,11 +128,26 @@ describe('contas: resultados tipados', () => {
       expect(naoConfirmado).toEqual({ resultado: 'nao_confirmado' });
 
       for (let i = 0; i < 4; i += 1) {
-        const invalida = await contas.entrar(db, { email: cenario.emailB, senha: 'errada', ipHash: ip, tokenHash: hashAleatorio() });
+        const invalida = await contas.entrar(db, {
+          email: cenario.emailB,
+          senha: 'errada',
+          ipHash: ip,
+          tokenHash: hashAleatorio(),
+        });
         expect(invalida).toEqual({ resultado: 'invalida' });
       }
-      await contas.entrar(db, { email: cenario.emailB, senha: 'errada', ipHash: ip, tokenHash: hashAleatorio() });
-      const bloqueado = await contas.entrar(db, { email: cenario.emailB, senha: cenario.senhaB, ipHash: ip, tokenHash: hashAleatorio() });
+      await contas.entrar(db, {
+        email: cenario.emailB,
+        senha: 'errada',
+        ipHash: ip,
+        tokenHash: hashAleatorio(),
+      });
+      const bloqueado = await contas.entrar(db, {
+        email: cenario.emailB,
+        senha: cenario.senhaB,
+        ipHash: ip,
+        tokenHash: hashAleatorio(),
+      });
       expect(bloqueado.resultado).toBe('bloqueado');
       if (bloqueado.resultado === 'bloqueado') expect(bloqueado.bloqueadoAte).toBeInstanceOf(Date);
     });
@@ -126,18 +157,36 @@ describe('contas: resultados tipados', () => {
     const { url, db: admin, cenario } = aberto;
     const sessao = await criarSessao(admin, cenario.contaB);
     await comDb(url, cenario.contaB, async (db) => {
-      expect(await contas.trocarSenha(db, { senhaAtual: 'errada', senhaNova: 'nova senha 123', tokenHash: sessao.hash })).toBe(
-        'senha_incorreta',
-      );
+      expect(
+        await contas.trocarSenha(db, {
+          senhaAtual: 'errada',
+          senhaNova: 'nova senha 123',
+          tokenHash: sessao.hash,
+        }),
+      ).toBe('senha_incorreta');
       for (let i = 0; i < 4; i += 1) {
-        await contas.trocarSenha(db, { senhaAtual: 'errada', senhaNova: 'nova senha 123', tokenHash: sessao.hash });
+        await contas.trocarSenha(db, {
+          senhaAtual: 'errada',
+          senhaNova: 'nova senha 123',
+          tokenHash: sessao.hash,
+        });
       }
-      expect(await contas.trocarSenha(db, { senhaAtual: cenario.senhaB, senhaNova: 'nova senha 123', tokenHash: sessao.hash })).toBe(
-        'bloqueado',
-      );
+      expect(
+        await contas.trocarSenha(db, {
+          senhaAtual: cenario.senhaB,
+          senhaNova: 'nova senha 123',
+          tokenHash: sessao.hash,
+        }),
+      ).toBe('bloqueado');
     });
     await comDb(url, cenario.contaB, async (db) => {
-      expect(await contas.trocarSenha(db, { senhaAtual: cenario.senhaB, senhaNova: 'nova senha 123', tokenHash: sessao.hash })).toBe('ok');
+      expect(
+        await contas.trocarSenha(db, {
+          senhaAtual: cenario.senhaB,
+          senhaNova: 'nova senha 123',
+          tokenHash: sessao.hash,
+        }),
+      ).toBe('ok');
     });
   });
 
@@ -149,7 +198,8 @@ describe('contas: resultados tipados', () => {
     await comDb(url, cenario.contaA, async (db) => {
       const r = await contas.excluir(db, cenario.senhaA);
       expect(r.resultado).toBe('unico_admin');
-      if (r.resultado === 'unico_admin') expect(r.grupos).toContainEqual({ id: cenario.grupoA, nome: 'Grupo A' });
+      if (r.resultado === 'unico_admin')
+        expect(r.grupos).toContainEqual({ id: cenario.grupoA, nome: 'Grupo A' });
     });
     await comDb(url, cenario.contaNaoConfirmada, async (db) => {
       expect(await contas.excluir(db, cenario.senhaNaoConfirmada)).toEqual({ resultado: 'ok' });
@@ -173,15 +223,19 @@ describe('links: resultados tipados', () => {
   it('pedir: conta não confirmada recebe enviar e confirmada falso; e-mail sem conta, enviar falso', async () => {
     const { url, cenario } = aberto;
     await comDb(url, null, async (db) => {
-      expect(await links.pedir(db, cenario.emailNaoConfirmada, 'confirmacao', hashAleatorio())).toMatchObject({
+      expect(
+        await links.pedir(db, cenario.emailNaoConfirmada, 'confirmacao', hashAleatorio()),
+      ).toMatchObject({
         enviar: true,
         confirmada: false,
       });
-      expect(await links.pedir(db, 'ninguem@exemplo.test', 'recuperacao', hashAleatorio())).toEqual({
-        enviar: false,
-        nome: null,
-        confirmada: false,
-      });
+      expect(await links.pedir(db, 'ninguem@exemplo.test', 'recuperacao', hashAleatorio())).toEqual(
+        {
+          enviar: false,
+          nome: null,
+          confirmada: false,
+        },
+      );
       expect(await links.pedir(db, cenario.emailA, 'recuperacao', hashAleatorio())).toMatchObject({
         enviar: true,
         nome: 'Conta A',
@@ -212,7 +266,9 @@ describe('links: resultados tipados', () => {
 
 describe('repositórios de conta', () => {
   it('ACE-43, ACE-63: nenhum repositório lê senha_hash nem e_dono', () => {
-    const pasta = fileURLToPath(new URL('../../src/infraestrutura/db/repositorios/', import.meta.url));
+    const pasta = fileURLToPath(
+      new URL('../../src/infraestrutura/db/repositorios/', import.meta.url),
+    );
     for (const arquivo of readdirSync(pasta).filter((a) => a.endsWith('.ts'))) {
       const fonte = readFileSync(`${pasta}${arquivo}`, 'utf8');
       expect(fonte, arquivo).not.toMatch(/senha_hash|\be_dono\b/);

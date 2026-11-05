@@ -22,13 +22,39 @@ const SESSAO = {
   email: 'leandro@exemplo.com.br',
   grupos: [
     { id: 'g-quinta', nome: 'Pelada de Quinta', slug: 'pelada-de-quinta', acessaFinanceiro: true },
-    { id: 'g-domingo', nome: 'Racha de Domingo', slug: 'racha-de-domingo', acessaFinanceiro: false },
+    {
+      id: 'g-domingo',
+      nome: 'Racha de Domingo',
+      slug: 'racha-de-domingo',
+      acessaFinanceiro: false,
+    },
   ],
 };
 
-const QUINTA = { id: 'g-quinta', nome: 'Pelada de Quinta', slug: 'pelada-de-quinta', diaSemana: 'quinta', frequencia: 'semanal', horario: '20:00' };
-const DOMINGO = { id: 'g-domingo', nome: 'Racha de Domingo', slug: 'racha-de-domingo', diaSemana: 'domingo', frequencia: 'quinzenal', horario: '09:00' };
-const FIRMA = { id: 'g-firma', nome: 'Futebol da Firma', slug: 'futebol-da-firma', diaSemana: 'terca', frequencia: 'semanal', horario: '19:00' };
+const QUINTA = {
+  id: 'g-quinta',
+  nome: 'Pelada de Quinta',
+  slug: 'pelada-de-quinta',
+  diaSemana: 'quinta',
+  frequencia: 'semanal',
+  horario: '20:00',
+};
+const DOMINGO = {
+  id: 'g-domingo',
+  nome: 'Racha de Domingo',
+  slug: 'racha-de-domingo',
+  diaSemana: 'domingo',
+  frequencia: 'quinzenal',
+  horario: '09:00',
+};
+const FIRMA = {
+  id: 'g-firma',
+  nome: 'Futebol da Firma',
+  slug: 'futebol-da-firma',
+  diaSemana: 'terca',
+  frequencia: 'semanal',
+  horario: '19:00',
+};
 
 const COM_ARQUIVADO = { ativos: [QUINTA, DOMINGO], arquivados: [FIRMA] };
 
@@ -38,15 +64,27 @@ afterEach(() => {
 
 describe('textoRecorrencia', () => {
   it('semanal: "Toda quinta · 20:00", com "Todo" nos dias masculinos', () => {
-    expect(textoRecorrencia({ diaSemana: 'quinta', frequencia: 'semanal', horario: '20:00' })).toBe('Toda quinta · 20:00');
-    expect(textoRecorrencia({ diaSemana: 'terca', frequencia: 'semanal', horario: '19:00' })).toBe('Toda terça · 19:00');
-    expect(textoRecorrencia({ diaSemana: 'sabado', frequencia: 'semanal', horario: '08:00' })).toBe('Todo sábado · 08:00');
-    expect(textoRecorrencia({ diaSemana: 'domingo', frequencia: 'semanal', horario: '09:00' })).toBe('Todo domingo · 09:00');
+    expect(textoRecorrencia({ diaSemana: 'quinta', frequencia: 'semanal', horario: '20:00' })).toBe(
+      'Toda quinta · 20:00',
+    );
+    expect(textoRecorrencia({ diaSemana: 'terca', frequencia: 'semanal', horario: '19:00' })).toBe(
+      'Toda terça · 19:00',
+    );
+    expect(textoRecorrencia({ diaSemana: 'sabado', frequencia: 'semanal', horario: '08:00' })).toBe(
+      'Todo sábado · 08:00',
+    );
+    expect(
+      textoRecorrencia({ diaSemana: 'domingo', frequencia: 'semanal', horario: '09:00' }),
+    ).toBe('Todo domingo · 09:00');
   });
 
   it('quinzenal e mensal: "Domingo, quinzenal · 09:00"', () => {
-    expect(textoRecorrencia({ diaSemana: 'domingo', frequencia: 'quinzenal', horario: '09:00' })).toBe('Domingo, quinzenal · 09:00');
-    expect(textoRecorrencia({ diaSemana: 'quinta', frequencia: 'mensal', horario: '20:00' })).toBe('Quinta, mensal · 20:00');
+    expect(
+      textoRecorrencia({ diaSemana: 'domingo', frequencia: 'quinzenal', horario: '09:00' }),
+    ).toBe('Domingo, quinzenal · 09:00');
+    expect(textoRecorrencia({ diaSemana: 'quinta', frequencia: 'mensal', horario: '20:00' })).toBe(
+      'Quinta, mensal · 20:00',
+    );
   });
 });
 
@@ -72,9 +110,13 @@ describe('tela Seus grupos do módulo (t08)', () => {
     expect(within(arquivados).getByText('Futebol da Firma')).toBeTruthy();
     expect(within(arquivados).getByText('Toda terça · 19:00')).toBeTruthy();
     expect(within(arquivados).queryByRole('link')).toBeNull();
-    expect(within(arquivados).getByRole('button', { name: 'Reativar Futebol da Firma' })).toBeTruthy();
+    expect(
+      within(arquivados).getByRole('button', { name: 'Reativar Futebol da Firma' }),
+    ).toBeTruthy();
 
-    expect(screen.getByRole('link', { name: 'Criar grupo' }).getAttribute('href')).toBe('/app/grupos/novo');
+    expect(screen.getByRole('link', { name: 'Criar grupo' }).getAttribute('href')).toBe(
+      '/app/grupos/novo',
+    );
     expect(screen.queryByText(TITULO_VAZIO)).toBeNull();
     await esperarSemViolacoes(container);
   });
@@ -158,7 +200,11 @@ describe('tela Seus grupos do módulo (t08)', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(chamadasA('POST', '/api/grupos/g-firma/reativar')).toHaveLength(1);
     await waitFor(() => expect(screen.queryByRole('region', { name: 'Arquivados' })).toBeNull());
-    expect(within(screen.getByRole('list', { name: 'Seus grupos' })).getByRole('link', { name: /Futebol da Firma/ })).toBeTruthy();
+    expect(
+      within(screen.getByRole('list', { name: 'Seus grupos' })).getByRole('link', {
+        name: /Futebol da Firma/,
+      }),
+    ).toBeTruthy();
     await esperarSemViolacoes(container);
   });
 
@@ -177,10 +223,13 @@ describe('tela Seus grupos do módulo (t08)', () => {
     abrirTela('/app', {
       'GET /api/sessao': () => json(200, SESSAO),
       'GET /api/grupos': () => json(200, COM_ARQUIVADO),
-      'POST /api/grupos/g-firma/reativar': () => erroApi(403, 'so_quem_criou', 'Só quem criou o grupo pode reativá-lo.'),
+      'POST /api/grupos/g-firma/reativar': () =>
+        erroApi(403, 'so_quem_criou', 'Só quem criou o grupo pode reativá-lo.'),
     });
     fireEvent.click(await screen.findByRole('button', { name: 'Reativar Futebol da Firma' }));
-    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Reativar grupo' }));
+    fireEvent.click(
+      within(screen.getByRole('dialog')).getByRole('button', { name: 'Reativar grupo' }),
+    );
     const alerta = await screen.findByRole('alert');
     expect(alerta.textContent).toContain('Só quem criou o grupo pode reativá-lo.');
     expect(screen.queryByText(TEXTO_GRUPO_REATIVADO)).toBeNull();

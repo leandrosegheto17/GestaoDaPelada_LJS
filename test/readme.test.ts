@@ -16,7 +16,13 @@ const VARIAVEIS = readFileSync(join(RAIZ, '.env.example'), 'utf8')
 
 describe('README', () => {
   it('FUN-51: tem as seções de rodar local, variáveis, testes, deploy da prévia e backup', () => {
-    for (const secao of ['## Rodar local', '## Variáveis de ambiente', '## Testes e checagens', '## Deploy da prévia', '## Backup']) {
+    for (const secao of [
+      '## Rodar local',
+      '## Variáveis de ambiente',
+      '## Testes e checagens',
+      '## Deploy da prévia',
+      '## Backup',
+    ]) {
       expect(README, secao).toContain(secao);
     }
   });
@@ -27,7 +33,13 @@ describe('README', () => {
   });
 
   it('FUN-51: os comandos de rodar local levam ao app em http://localhost:5173', () => {
-    for (const comando of ['pnpm install', 'docker compose up -d --wait', 'pnpm migrar', 'pnpm seed', 'pnpm dev']) {
+    for (const comando of [
+      'pnpm install',
+      'docker compose up -d --wait',
+      'pnpm migrar',
+      'pnpm seed',
+      'pnpm dev',
+    ]) {
       expect(README, comando).toContain(comando);
     }
     expect(README).toContain('http://localhost:5173');

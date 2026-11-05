@@ -1,7 +1,17 @@
 import { Hono } from 'hono';
-import { corpoDoErro, jogadorCorpo, type JogadorDetalhe, type ListaJogadores } from '@pelada/contrato';
+import {
+  corpoDoErro,
+  jogadorCorpo,
+  type JogadorDetalhe,
+  type ListaJogadores,
+} from '@pelada/contrato';
 import type { Ambiente } from '../ambiente.ts';
-import { comUnicidade, lerCorpoDoGrupo, MENSAGEM_APELIDO_REPETIDO, respostaDeCampo } from '../corpo.ts';
+import {
+  comUnicidade,
+  lerCorpoDoGrupo,
+  MENSAGEM_APELIDO_REPETIDO,
+  respostaDeCampo,
+} from '../corpo.ts';
 import { jogadores } from '../../infraestrutura/db/repositorios/jogadores.ts';
 import { jogadoresLeitura } from '../../infraestrutura/db/repositorios/jogadores-leitura.ts';
 import { conferirLimiteDeJogadores } from '../../aplicacao/plano/limite-jogadores.ts';
@@ -17,7 +27,9 @@ export function rotasJogadores(): Hono<Ambiente> {
   const rotas = new Hono<Ambiente>();
 
   rotas.get('/grupos/:grupoId/jogadores', async (c) => {
-    const resposta: ListaJogadores = { jogadores: await jogadoresLeitura.listar(c.var.db, c.req.param('grupoId')) };
+    const resposta: ListaJogadores = {
+      jogadores: await jogadoresLeitura.listar(c.var.db, c.req.param('grupoId')),
+    };
     return c.json(resposta, 200);
   });
 
@@ -31,7 +43,8 @@ export function rotasJogadores(): Hono<Ambiente> {
     if (limite !== null) return respostaSomenteLeitura(c, limite);
     return comUnicidade(c, async () => {
       const r = await jogadores.criar(c.var.db, grupoId, corpo.dados, hoje);
-      if (r.resultado === 'apelido_repetido') return respostaDeCampo(c, 'apelido', MENSAGEM_APELIDO_REPETIDO);
+      if (r.resultado === 'apelido_repetido')
+        return respostaDeCampo(c, 'apelido', MENSAGEM_APELIDO_REPETIDO);
       const ficha: JogadorDetalhe | null = await jogadoresLeitura.ler(c.var.db, grupoId, r.id);
       if (!ficha) return c.json(corpoDoErro('nao_encontrado'), 404);
       return c.json(ficha, 201);

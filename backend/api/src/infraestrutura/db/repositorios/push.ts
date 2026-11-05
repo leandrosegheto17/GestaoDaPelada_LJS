@@ -49,14 +49,20 @@ export interface DestinoCobranca {
 }
 
 function conferir<T extends string>(funcao: string, valor: unknown, aceitos: readonly T[]): T {
-  if (typeof valor === 'string' && (aceitos as readonly string[]).includes(valor)) return valor as T;
+  if (typeof valor === 'string' && (aceitos as readonly string[]).includes(valor))
+    return valor as T;
   throw new Error(`${funcao} devolveu um resultado inesperado`);
 }
 
 /** Ids de assinatura em `bigint[]`: texto de inteiro, para o driver montar o array sem perder precisão. */
 const ids = (lista: readonly string[]): string => `{${lista.join(',')}}`;
 
-const ASSINATURA: readonly ResultadoAssinatura[] = ['criada', 'atualizada', 'limite', 'nao_encontrado'];
+const ASSINATURA: readonly ResultadoAssinatura[] = [
+  'criada',
+  'atualizada',
+  'limite',
+  'nao_encontrado',
+];
 const ASSINATURA_CONTA: readonly ResultadoAssinaturaConta[] = ['criada', 'atualizada', 'limite'];
 const ESTADO: readonly EstadoAssinatura[] = ['ativa', 'ausente', 'nao_encontrado'];
 const ESTADO_CONTA: readonly EstadoAssinaturaConta[] = ['ativa', 'ausente'];
@@ -75,12 +81,24 @@ async function assinarRanking(
 }
 
 /** Cancela: o mesmo resultado (nenhum) com ou sem linha para apagar (NOT-17). */
-async function cancelarRanking(db: Db, slug: string, endpoint: string, auth: string): Promise<void> {
+async function cancelarRanking(
+  db: Db,
+  slug: string,
+  endpoint: string,
+  auth: string,
+): Promise<void> {
   await sql`SELECT push_ranking_cancelar(${slug}, ${endpoint}, ${auth})`.execute(db);
 }
 
-async function estadoRanking(db: Db, slug: string, endpoint: string, auth: string): Promise<EstadoAssinatura> {
-  const r = await sql<{ r: string }>`SELECT push_ranking_estado(${slug}, ${endpoint}, ${auth}) AS r`.execute(db);
+async function estadoRanking(
+  db: Db,
+  slug: string,
+  endpoint: string,
+  auth: string,
+): Promise<EstadoAssinatura> {
+  const r = await sql<{
+    r: string;
+  }>`SELECT push_ranking_estado(${slug}, ${endpoint}, ${auth}) AS r`.execute(db);
   return conferir('push_ranking_estado', r.rows[0]?.r, ESTADO);
 }
 
@@ -90,7 +108,9 @@ async function assinarConta(
   assinatura: { endpoint: string; p256dh: string; auth: string },
 ): Promise<ResultadoAssinaturaConta> {
   const r = await sql<{ r: string }>`
-    SELECT push_conta_assinar(${assinatura.endpoint}, ${assinatura.p256dh}, ${assinatura.auth}) AS r`.execute(db);
+    SELECT push_conta_assinar(${assinatura.endpoint}, ${assinatura.p256dh}, ${assinatura.auth}) AS r`.execute(
+    db,
+  );
   return conferir('push_conta_assinar', r.rows[0]?.r, ASSINATURA_CONTA);
 }
 
@@ -99,7 +119,9 @@ async function cancelarConta(db: Db, endpoint: string, auth: string): Promise<vo
 }
 
 async function estadoConta(db: Db, endpoint: string, auth: string): Promise<EstadoAssinaturaConta> {
-  const r = await sql<{ r: string }>`SELECT push_conta_estado(${endpoint}, ${auth}) AS r`.execute(db);
+  const r = await sql<{ r: string }>`SELECT push_conta_estado(${endpoint}, ${auth}) AS r`.execute(
+    db,
+  );
   return conferir('push_conta_estado', r.rows[0]?.r, ESTADO_CONTA);
 }
 
@@ -140,7 +162,9 @@ async function loteRanking(
 ): Promise<AssinaturaDoLote[]> {
   const r = await sql<{ id: string; endpoint: string; p256dh: string; auth: string }>`
     SELECT id::text AS id, endpoint, p256dh, auth
-      FROM push_ranking_lote(${grupoId}::uuid, ${aposId}::bigint, ${limite}::integer, ${desde}::timestamptz)`.execute(db);
+      FROM push_ranking_lote(${grupoId}::uuid, ${aposId}::bigint, ${limite}::integer, ${desde}::timestamptz)`.execute(
+    db,
+  );
   return r.rows;
 }
 
@@ -164,7 +188,9 @@ async function destinoCobranca(db: Db, grupoId: string): Promise<DestinoCobranca
     nome: string;
     grupo_nome: string;
     assinaturas: Array<{ id: number | string; endpoint: string; p256dh: string; auth: string }>;
-  }>`SELECT conta_id, email, nome, grupo_nome, assinaturas FROM aviso_cobranca_destino(${grupoId}::uuid)`.execute(db);
+  }>`SELECT conta_id, email, nome, grupo_nome, assinaturas FROM aviso_cobranca_destino(${grupoId}::uuid)`.execute(
+    db,
+  );
   const linha = r.rows[0];
   if (!linha) return null;
   return {
@@ -177,7 +203,12 @@ async function destinoCobranca(db: Db, grupoId: string): Promise<DestinoCobranca
 }
 
 /** "Uma vez por evento" (NOT-39): `true` se esta é a primeira vez da chave (id externo, tipo), `false` se já existia. */
-async function registrarAviso(db: Db, idExterno: string, tipo: TipoAviso, grupoId: string): Promise<boolean> {
+async function registrarAviso(
+  db: Db,
+  idExterno: string,
+  tipo: TipoAviso,
+  grupoId: string,
+): Promise<boolean> {
   const r = await sql<{ r: boolean }>`
     SELECT aviso_cobranca_registrar(${idExterno}, ${tipo}, ${grupoId}::uuid) AS r`.execute(db);
   return r.rows[0]?.r === true;
@@ -196,7 +227,10 @@ async function resultadoConta(
 
 /** A limpeza diária (NOT-56, NOT-57): quantas linhas apagou de cada tabela. Sessão sem conta e sem slug. */
 async function limpar(db: Db): Promise<{ ranking: number; avisos: number }> {
-  const r = await sql<{ ranking: number; avisos: number }>`SELECT ranking, avisos FROM notificacoes_limpar()`.execute(db);
+  const r = await sql<{
+    ranking: number;
+    avisos: number;
+  }>`SELECT ranking, avisos FROM notificacoes_limpar()`.execute(db);
   return { ranking: r.rows[0]?.ranking ?? 0, avisos: r.rows[0]?.avisos ?? 0 };
 }
 

@@ -62,7 +62,9 @@ describe('public/_headers', () => {
   });
 
   it("FUN-29: a leitura da CSP pega 'unsafe-inline' em script-src (o teste reprova a CSP fraca)", () => {
-    expect(fontesDeScript("default-src 'self'; script-src 'self' 'unsafe-inline'")).toContain("'unsafe-inline'");
+    expect(fontesDeScript("default-src 'self'; script-src 'self' 'unsafe-inline'")).toContain(
+      "'unsafe-inline'",
+    );
     expect(fontesDeScript("default-src 'self' 'unsafe-eval'")).toContain("'unsafe-eval'");
   });
 });

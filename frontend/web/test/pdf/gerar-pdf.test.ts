@@ -8,7 +8,20 @@ import { carregarFontesPadrao, FONTES_TTF, gerarPdf } from '../../src/pdf/gerar-
  * arquivo sai em Helvetica e sem compressão: as páginas e o texto aparecem no conteúdo do PDF.
  */
 
-const DATAS = ['2026-06-25', '2026-08-06', '2026-08-13', '2026-08-20', '2026-08-27', '2026-09-03', '2026-09-10', '2026-09-17', '2026-09-24', '2026-10-01', '2026-10-08', '2026-10-15'];
+const DATAS = [
+  '2026-06-25',
+  '2026-08-06',
+  '2026-08-13',
+  '2026-08-20',
+  '2026-08-27',
+  '2026-09-03',
+  '2026-09-10',
+  '2026-09-17',
+  '2026-09-24',
+  '2026-10-01',
+  '2026-10-08',
+  '2026-10-15',
+];
 
 function projecao(linhas: number): PdfPublico {
   return pdfPublico.parse({
@@ -17,12 +30,18 @@ function projecao(linhas: number): PdfPublico {
     geradoEm: '2026-10-22T21:40:00.000Z',
     urlPublica: 'https://pelada.gestaodapelada.workers.dev/g/pelada-de-quinta',
     semPartidasNoMes: false,
-    colunas: DATAS.map((data) => ({ data, choveu: data.endsWith('-08'), doMesExibido: data.startsWith('2026-10') })),
+    colunas: DATAS.map((data) => ({
+      data,
+      choveu: data.endsWith('-08'),
+      doMesExibido: data.startsWith('2026-10'),
+    })),
     linhas: Array.from({ length: linhas }, (_, i) => ({
       posicao: i + 1,
       apelido: `Jogador ${i + 1}`,
       ptsInicial: 10,
-      rodadas: DATAS.map((_, j) => (j % 3 === 0 ? { situacao: 'expulso', pontos: -1 } : { situacao: 'presente', pontos: 1 })),
+      rodadas: DATAS.map((_, j) =>
+        j % 3 === 0 ? { situacao: 'expulso', pontos: -1 } : { situacao: 'presente', pontos: 1 },
+      ),
       ptsFinal: 15,
     })),
   });

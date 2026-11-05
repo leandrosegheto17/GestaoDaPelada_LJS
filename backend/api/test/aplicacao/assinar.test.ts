@@ -1,10 +1,18 @@
 import { sql } from 'kysely';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { PRECO_PRO_CENTAVOS } from '@pelada/dominio';
-import { assinar, descricaoDaAssinatura, type PedidoAssinar } from '../../src/aplicacao/plano/assinar.ts';
+import {
+  assinar,
+  descricaoDaAssinatura,
+  type PedidoAssinar,
+} from '../../src/aplicacao/plano/assinar.ts';
 import { asaasMemoria, URL_FATURA_FALSA } from '../../src/infraestrutura/asaas/memoria.ts';
 import type { Db } from '../../src/infraestrutura/db/repositorios/tipos.ts';
-import { abrirCenarioGrupos, criarGrupoComoConta, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  criarGrupoComoConta,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 import { comDb } from '../repositorios/apoio.ts';
 
 /**
@@ -33,7 +41,14 @@ const registrar = (l: Record<string, string | number>) => {
 
 beforeAll(async () => {
   aberto = await abrirCenarioGrupos();
-  h2 = (await criarGrupoComoConta(aberto.db, aberto.cenario.contaB, 'Pelada de Domingo', 'pelada-de-domingo-t32')).id;
+  h2 = (
+    await criarGrupoComoConta(
+      aberto.db,
+      aberto.cenario.contaB,
+      'Pelada de Domingo',
+      'pelada-de-domingo-t32',
+    )
+  ).id;
 });
 
 beforeEach(() => {
@@ -50,21 +65,36 @@ function pedido(grupoId: string, conta: string): PedidoAssinar {
 }
 
 async function assinaturasDe(db: Db, grupoId: string): Promise<number> {
-  const r = await sql<{ n: number }>`SELECT count(*)::int AS n FROM assinaturas WHERE grupo_id = ${grupoId}`.execute(db);
+  const r = await sql<{
+    n: number;
+  }>`SELECT count(*)::int AS n FROM assinaturas WHERE grupo_id = ${grupoId}`.execute(db);
   return r.rows[0]?.n ?? 0;
 }
 
 describe('assinar: cliente e assinatura (PLA-29)', () => {
   it('PLA-29: cliente criado com externalReference = id da conta e o e-mail da conta; assinatura com hoje e o nome do grupo', async () => {
     const { url, db: superDb, cenario } = aberto;
-    const email = (await superDb.query<{ email: string }>('SELECT email FROM contas WHERE id = $1', [cenario.contaB])).rows[0]!
-      .email;
-    const nomeH = (await superDb.query<{ nome: string }>('SELECT nome FROM grupos WHERE id = $1', [cenario.grupoH])).rows[0]!
-      .nome;
+    const email = (
+      await superDb.query<{ email: string }>('SELECT email FROM contas WHERE id = $1', [
+        cenario.contaB,
+      ])
+    ).rows[0]!.email;
+    const nomeH = (
+      await superDb.query<{ nome: string }>('SELECT nome FROM grupos WHERE id = $1', [
+        cenario.grupoH,
+      ])
+    ).rows[0]!.nome;
     await comDb(url, cenario.contaB, async (db) => {
       const r = await assinar(db, asaas, pedido(cenario.grupoH, cenario.contaB), { registrar });
-      expect(r).toEqual({ resultado: 'criada', faturaUrl: expect.stringContaining(URL_FATURA_FALSA) });
-      expect(asaas.chamadas.map((c) => c.operacao)).toEqual(['criarCliente', 'criarAssinatura', 'primeiraCobranca']);
+      expect(r).toEqual({
+        resultado: 'criada',
+        faturaUrl: expect.stringContaining(URL_FATURA_FALSA),
+      });
+      expect(asaas.chamadas.map((c) => c.operacao)).toEqual([
+        'criarCliente',
+        'criarAssinatura',
+        'primeiraCobranca',
+      ]);
       expect(asaas.chamadas[0]!.dados).toEqual({
         name: 'Bia Souza',
         cpfCnpj: CPF,
@@ -84,11 +114,16 @@ describe('assinar: cliente e assinatura (PLA-29)', () => {
   it('PLA-29: segundo grupo da mesma conta reaproveita o cliente', async () => {
     const { url, cenario } = aberto;
     await comDb(url, cenario.contaB, async (db) => {
-      expect((await assinar(db, asaas, pedido(cenario.grupoH, cenario.contaB))).resultado).toBe('criada');
+      expect((await assinar(db, asaas, pedido(cenario.grupoH, cenario.contaB))).resultado).toBe(
+        'criada',
+      );
       const cliente = (asaas.chamadas[1]!.dados as { customer: string }).customer;
       asaas.chamadas.length = 0;
       expect((await assinar(db, asaas, pedido(h2, cenario.contaB))).resultado).toBe('criada');
-      expect(asaas.chamadas.map((c) => c.operacao)).toEqual(['criarAssinatura', 'primeiraCobranca']);
+      expect(asaas.chamadas.map((c) => c.operacao)).toEqual([
+        'criarAssinatura',
+        'primeiraCobranca',
+      ]);
       expect((asaas.chamadas[0]!.dados as { customer: string }).customer).toBe(cliente);
     });
   });
@@ -96,7 +131,9 @@ describe('assinar: cliente e assinatura (PLA-29)', () => {
   it('PLA-29: G, com a assinatura cancelada do cenário, reaproveita o cliente dela', async () => {
     const { url, cenario } = aberto;
     await comDb(url, cenario.contaC, async (db) => {
-      expect((await assinar(db, asaas, pedido(cenario.grupoG, cenario.contaC))).resultado).toBe('criada');
+      expect((await assinar(db, asaas, pedido(cenario.grupoG, cenario.contaC))).resultado).toBe(
+        'criada',
+      );
       expect(asaas.chamadas.map((c) => c.operacao)).not.toContain('criarCliente');
     });
   });
@@ -106,7 +143,9 @@ describe('assinar: recusas sem chamar o Asaas (PLA-32, PLA-33)', () => {
   it('PLA-32: admin convidada recebe so_quem_criou e o Asaas não recebe chamada', async () => {
     const { url, cenario } = aberto;
     await comDb(url, cenario.contaO, async (db) => {
-      expect(await assinar(db, asaas, pedido(cenario.grupoG, cenario.contaO))).toEqual({ resultado: 'so_quem_criou' });
+      expect(await assinar(db, asaas, pedido(cenario.grupoG, cenario.contaO))).toEqual({
+        resultado: 'so_quem_criou',
+      });
     });
     expect(asaas.chamadas).toEqual([]);
   });
@@ -132,10 +171,14 @@ describe('assinar: recusas sem chamar o Asaas (PLA-32, PLA-33)', () => {
     await comDb(url, cenario.contaB, async (db) => {
       await assinar(db, asaas, pedido(cenario.grupoH, cenario.contaB));
       await sql`RESET ROLE`.execute(db);
-      await sql`UPDATE assinaturas SET situacao = 'ativa' WHERE grupo_id = ${cenario.grupoH} AND situacao = 'aguardando_pagamento'`.execute(db);
+      await sql`UPDATE assinaturas SET situacao = 'ativa' WHERE grupo_id = ${cenario.grupoH} AND situacao = 'aguardando_pagamento'`.execute(
+        db,
+      );
       await sql`SET ROLE pelada_app`.execute(db);
       asaas.chamadas.length = 0;
-      expect((await assinar(db, asaas, pedido(cenario.grupoH, cenario.contaB))).resultado).toBe('assinatura_ativa');
+      expect((await assinar(db, asaas, pedido(cenario.grupoH, cenario.contaB))).resultado).toBe(
+        'assinatura_ativa',
+      );
       expect(asaas.chamadas).toEqual([]);
     });
   });
@@ -162,7 +205,9 @@ describe('assinar: falhas do Asaas (PLA-36, AD-114)', () => {
     const { url, cenario } = aberto;
     asaas.falharNa(3);
     await comDb(url, cenario.contaB, async (db) => {
-      expect(await assinar(db, asaas, pedido(cenario.grupoH, cenario.contaB), { registrar })).toEqual({
+      expect(
+        await assinar(db, asaas, pedido(cenario.grupoH, cenario.contaB), { registrar }),
+      ).toEqual({
         resultado: 'pagamento_indisponivel',
       });
       expect(asaas.chamadas.map((c) => c.operacao)).toEqual([
@@ -184,11 +229,13 @@ describe('assinar: falhas do Asaas (PLA-36, AD-114)', () => {
     asaas.falharNa(3);
     asaas.falharNa(4);
     await comDb(url, cenario.contaB, async (db) => {
-      expect((await assinar(db, asaas, pedido(cenario.grupoH, cenario.contaB), { registrar })).resultado).toBe(
-        'pagamento_indisponivel',
-      );
+      expect(
+        (await assinar(db, asaas, pedido(cenario.grupoH, cenario.contaB), { registrar })).resultado,
+      ).toBe('pagamento_indisponivel');
       const criada = [...asaas.assinaturas.values()][0]!;
-      expect(logs).toEqual([expect.objectContaining({ evento: 'asaas_compensacao_falhou', assinaturaId: criada.id })]);
+      expect(logs).toEqual([
+        expect.objectContaining({ evento: 'asaas_compensacao_falhou', assinaturaId: criada.id }),
+      ]);
       expect(JSON.stringify(logs)).not.toContain(CPF);
       expect(JSON.stringify(logs)).not.toContain('Bia Souza');
     });
@@ -201,35 +248,50 @@ describe('assinar: plano atual (casos limite)', () => {
     ['trial', '2026-10-01'],
     ['inadimplente', null],
     ['cancelado', null],
-  ] as const)('PLA-29: grupo em %s (trial_inicio %s) assina e o plano não muda (PLA-31)', async (s, t) => {
-    const { url, cenario } = aberto;
-    await comDb(url, cenario.contaB, async (db) => {
-      await sql`RESET ROLE`.execute(db);
-      await sql`UPDATE grupos SET situacao_comercial = ${s}, trial_inicio = ${t}::date WHERE id = ${cenario.grupoH}`.execute(db);
-      await sql`SET ROLE pelada_app`.execute(db);
-      expect((await assinar(db, asaas, pedido(cenario.grupoH, cenario.contaB))).resultado).toBe('criada');
-      await sql`RESET ROLE`.execute(db);
-      const g = await sql<{ s: string }>`SELECT situacao_comercial AS s FROM grupos WHERE id = ${cenario.grupoH}`.execute(db);
-      expect(g.rows[0]?.s).toBe(s);
-    });
-  });
+  ] as const)(
+    'PLA-29: grupo em %s (trial_inicio %s) assina e o plano não muda (PLA-31)',
+    async (s, t) => {
+      const { url, cenario } = aberto;
+      await comDb(url, cenario.contaB, async (db) => {
+        await sql`RESET ROLE`.execute(db);
+        await sql`UPDATE grupos SET situacao_comercial = ${s}, trial_inicio = ${t}::date WHERE id = ${cenario.grupoH}`.execute(
+          db,
+        );
+        await sql`SET ROLE pelada_app`.execute(db);
+        expect((await assinar(db, asaas, pedido(cenario.grupoH, cenario.contaB))).resultado).toBe(
+          'criada',
+        );
+        await sql`RESET ROLE`.execute(db);
+        const g = await sql<{
+          s: string;
+        }>`SELECT situacao_comercial AS s FROM grupos WHERE id = ${cenario.grupoH}`.execute(db);
+        expect(g.rows[0]?.s).toBe(s);
+      });
+    },
+  );
 });
 
 describe('assinar: CPF nunca guardado (PLA-35)', () => {
   it('PLA-35: depois do sucesso, nenhuma tabela nem a auditoria contém o CPF', async () => {
     const { url, cenario } = aberto;
     await comDb(url, cenario.contaB, async (db) => {
-      expect((await assinar(db, asaas, pedido(cenario.grupoH, cenario.contaB))).resultado).toBe('criada');
+      expect((await assinar(db, asaas, pedido(cenario.grupoH, cenario.contaB))).resultado).toBe(
+        'criada',
+      );
       // Busca como superusuário, na mesma transação (ainda não desfeita), em toda coluna de texto do schema public.
       await sql`RESET ROLE`.execute(db);
       const colunas = await sql<{ tabela: string; coluna: string }>`
         SELECT table_name AS tabela, column_name AS coluna
           FROM information_schema.columns
-         WHERE table_schema = 'public' AND data_type IN ('text', 'character varying', 'jsonb', 'json')`.execute(db);
+         WHERE table_schema = 'public' AND data_type IN ('text', 'character varying', 'jsonb', 'json')`.execute(
+        db,
+      );
       const achados: string[] = [];
       for (const { tabela, coluna } of colunas.rows) {
         const r = await sql<{ n: number }>`
-          SELECT count(*)::int AS n FROM ${sql.table(tabela)} WHERE ${sql.ref(coluna)}::text LIKE ${`%${CPF}%`}`.execute(db);
+          SELECT count(*)::int AS n FROM ${sql.table(tabela)} WHERE ${sql.ref(coluna)}::text LIKE ${`%${CPF}%`}`.execute(
+          db,
+        );
         if ((r.rows[0]?.n ?? 0) > 0) achados.push(`${tabela}.${coluna}`);
       }
       expect(achados).toEqual([]);

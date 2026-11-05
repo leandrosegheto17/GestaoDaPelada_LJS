@@ -11,7 +11,8 @@ import type { Page } from '@playwright/test';
 
 const requerer = createRequire(import.meta.url);
 const principal = () => readFileSync(requerer.resolve('pdfjs-dist/build/pdf.min.mjs'), 'utf8');
-const trabalhador = () => readFileSync(requerer.resolve('pdfjs-dist/build/pdf.worker.min.mjs'), 'utf8');
+const trabalhador = () =>
+  readFileSync(requerer.resolve('pdfjs-dist/build/pdf.worker.min.mjs'), 'utf8');
 
 /** Escala de 72 dpi (pt) para 96 dpi (px): a folha A4 vira 794 × 1123 px. */
 export const ESCALA_PT_PARA_PX = 96 / 72;
@@ -19,7 +20,10 @@ export const ESCALA_PT_PARA_PX = 96 / 72;
 export async function rasterizarPrimeiraPagina(page: Page, pdf: Buffer): Promise<Buffer> {
   await page.goto('about:blank');
   const urlDe = (texto: string) =>
-    page.evaluate((conteudo) => URL.createObjectURL(new Blob([conteudo], { type: 'text/javascript' })), texto);
+    page.evaluate(
+      (conteudo) => URL.createObjectURL(new Blob([conteudo], { type: 'text/javascript' })),
+      texto,
+    );
   const [urlLib, urlTrabalhador] = [await urlDe(principal()), await urlDe(trabalhador())];
   await page.addScriptTag({
     type: 'module',

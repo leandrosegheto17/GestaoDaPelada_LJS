@@ -1,13 +1,30 @@
 import { Hono } from 'hono';
-import { corpoDoErro, emailCorpo, erroDeValidacao, MENSAGENS, novaSenhaCorpo } from '@pelada/contrato';
+import {
+  corpoDoErro,
+  emailCorpo,
+  erroDeValidacao,
+  MENSAGENS,
+  novaSenhaCorpo,
+} from '@pelada/contrato';
 import type { Ambiente } from '../ambiente.ts';
 import { comBanco } from '../middlewares/com-banco.ts';
-import { categoriaDaRecuperacao, enviarEmailDeConta, limiteEmailsDia } from '../../aplicacao/acesso/enviar-email.ts';
+import {
+  categoriaDaRecuperacao,
+  enviarEmailDeConta,
+  limiteEmailsDia,
+} from '../../aplicacao/acesso/enviar-email.ts';
 import { links } from '../../infraestrutura/db/repositorios/contas.ts';
 import { remetenteDoAmbiente } from '../../infraestrutura/email/caixa-dev.ts';
 import { emailRecuperacao } from '../../infraestrutura/email/modelos.ts';
 import { gerarToken, hashToken } from '../../infraestrutura/sessao/token.ts';
-import { comFabrica, contarPedidoDeEmail, emailIndisponivel, hex, lerCorpo, type OpcoesRotas } from './apoio-acesso.ts';
+import {
+  comFabrica,
+  contarPedidoDeEmail,
+  emailIndisponivel,
+  hex,
+  lerCorpo,
+  type OpcoesRotas,
+} from './apoio-acesso.ts';
 
 /**
  * Rotas de recuperação de senha (T27; ACE-22 a ACE-25, ACE-50, ACE-76), da tabela do design do
@@ -30,13 +47,22 @@ export function rotasRecuperacao(opcoes: OpcoesRotas = {}): Hono<Ambiente> {
     const { token, hash } = await gerarToken();
     const r = await links.pedir(c.var.db, email, 'recuperacao', hash);
     if (r.enviar) {
-      const conteudo = emailRecuperacao({ urlPublica: c.env.URL_PUBLICA, nome: r.nome ?? email, token });
+      const conteudo = emailRecuperacao({
+        urlPublica: c.env.URL_PUBLICA,
+        nome: r.nome ?? email,
+        token,
+      });
       const envio = await enviarEmailDeConta(c.var.db, remetenteDoAmbiente(c.env), {
         enviar: true,
         // Conta ainda não confirmada gasta a cota de cadastro (ACE-73).
         categoria: categoriaDaRecuperacao(r.confirmada),
         limiteDia: limiteEmailsDia(c.env.LIMITE_EMAILS_DIA),
-        mensagem: { tipo: 'recuperacao', para: email, ...conteudo, idempotencia: `recuperacao:${hex(hash)}` },
+        mensagem: {
+          tipo: 'recuperacao',
+          para: email,
+          ...conteudo,
+          idempotencia: `recuperacao:${hex(hash)}`,
+        },
       });
       if (envio === 'indisponivel') return emailIndisponivel(c);
     }
@@ -54,7 +80,8 @@ export function rotasRecuperacao(opcoes: OpcoesRotas = {}): Hono<Ambiente> {
     const lido = novaSenhaCorpo.safeParse(bruto);
     if (!lido.success) {
       // Token ausente ou malformado é link inválido (ACE-25); senha fora dos limites é 422 (ACE-03).
-      if (lido.error.issues.some((i) => i.path[0] === 'token')) return c.json(corpoDoErro('link_invalido'), 410);
+      if (lido.error.issues.some((i) => i.path[0] === 'token'))
+        return c.json(corpoDoErro('link_invalido'), 410);
       return c.json(erroDeValidacao(lido.error), 422);
     }
     const ok = await links.novaSenha(c.var.db, await hashToken(lido.data.token), lido.data.senha);

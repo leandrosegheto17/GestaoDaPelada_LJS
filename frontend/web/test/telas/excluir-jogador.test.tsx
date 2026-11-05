@@ -35,7 +35,11 @@ const TONINHO = {
 const API = '/api/grupos/g-quinta/jogadores/j-toninho';
 
 function abrir(api: Record<string, Manipulador>) {
-  return abrirTela('/app/grupos/g-quinta/jogadores/j-toninho', { 'GET /api/sessao': () => json(200, SESSAO_ANA), ...api }, rotas);
+  return abrirTela(
+    '/app/grupos/g-quinta/jogadores/j-toninho',
+    { 'GET /api/sessao': () => json(200, SESSAO_ANA), ...api },
+    rotas,
+  );
 }
 
 afterEach(() => {
@@ -49,7 +53,9 @@ describe('ficha do jogador: excluir', () => {
     const dialogo = screen.getByRole('alertdialog', { name: tituloExcluir('Toninho') });
     expect(tituloExcluir('Toninho')).toBe('Excluir Toninho?');
     expect(within(dialogo).getByText(TEXTO_EXCLUIR)).toBeTruthy();
-    expect(TEXTO_EXCLUIR).toBe('O cadastro é apagado. Só é possível excluir quem não tem partidas, notas nem pagamentos.');
+    expect(TEXTO_EXCLUIR).toBe(
+      'O cadastro é apagado. Só é possível excluir quem não tem partidas, notas nem pagamentos.',
+    );
     expect(document.activeElement).toBe(within(dialogo).getByRole('button', { name: 'Cancelar' }));
     expect(within(dialogo).getByRole('button', { name: 'Excluir jogador' })).toBeTruthy();
     await esperarSemViolacoes(container);
@@ -58,7 +64,9 @@ describe('ficha do jogador: excluir', () => {
   it('GEL-87: Cancelar fecha sem chamar a API', async () => {
     const { chamadasA } = abrir({ [`GET ${API}`]: () => json(200, TONINHO) });
     fireEvent.click(await screen.findByRole('button', { name: 'Excluir jogador' }));
-    fireEvent.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Cancelar' }));
+    fireEvent.click(
+      within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Cancelar' }),
+    );
     expect(screen.queryByRole('alertdialog')).toBeNull();
     expect(chamadasA('DELETE', API)).toHaveLength(0);
   });
@@ -69,7 +77,9 @@ describe('ficha do jogador: excluir', () => {
       [`DELETE ${API}`]: () => json(204),
     });
     fireEvent.click(await screen.findByRole('button', { name: 'Excluir jogador' }));
-    fireEvent.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Excluir jogador' }));
+    fireEvent.click(
+      within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Excluir jogador' }),
+    );
     await waitFor(() => expect(local()).toBe('/app/grupos/g-quinta/jogadores'));
     expect(chamadasA('DELETE', API)).toHaveLength(1);
   });
@@ -77,18 +87,29 @@ describe('ficha do jogador: excluir', () => {
   it('GEL-86: 409 mostra a mensagem e "Inativar em vez disso", que abre o diálogo de inativar; axe sem violação', async () => {
     const { container } = abrir({
       [`GET ${API}`]: () => json(200, TONINHO),
-      [`DELETE ${API}`]: () => erroApi(409, 'jogador_com_historico', 'Toninho tem histórico de partidas e não pode ser excluído.'),
+      [`DELETE ${API}`]: () =>
+        erroApi(
+          409,
+          'jogador_com_historico',
+          'Toninho tem histórico de partidas e não pode ser excluído.',
+        ),
     });
     fireEvent.click(await screen.findByRole('button', { name: 'Excluir jogador' }));
-    fireEvent.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Excluir jogador' }));
+    fireEvent.click(
+      within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Excluir jogador' }),
+    );
     const alerta = await screen.findByRole('alert');
-    expect(alerta.textContent).toContain('Toninho tem histórico de partidas e não pode ser excluído.');
+    expect(alerta.textContent).toContain(
+      'Toninho tem histórico de partidas e não pode ser excluído.',
+    );
     expect(screen.queryByRole('alertdialog')).toBeNull();
     await esperarSemViolacoes(container);
 
     fireEvent.click(within(alerta).getByRole('button', { name: 'Inativar em vez disso' }));
     expect(screen.getByRole('dialog', { name: tituloInativar('Toninho') })).toBeTruthy();
-    expect(screen.queryByText('Toninho tem histórico de partidas e não pode ser excluído.')).toBeNull();
+    expect(
+      screen.queryByText('Toninho tem histórico de partidas e não pode ser excluído.'),
+    ).toBeNull();
   });
 
   it('outra falha mostra a mensagem sem "Inativar em vez disso"', async () => {
@@ -97,7 +118,9 @@ describe('ficha do jogador: excluir', () => {
       [`DELETE ${API}`]: () => erroApi(409, 'grupo_arquivado', 'Este grupo está arquivado.'),
     });
     fireEvent.click(await screen.findByRole('button', { name: 'Excluir jogador' }));
-    fireEvent.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Excluir jogador' }));
+    fireEvent.click(
+      within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Excluir jogador' }),
+    );
     const alerta = await screen.findByRole('alert');
     expect(alerta.textContent).toContain('Este grupo está arquivado.');
     expect(within(alerta).queryByRole('button', { name: 'Inativar em vez disso' })).toBeNull();

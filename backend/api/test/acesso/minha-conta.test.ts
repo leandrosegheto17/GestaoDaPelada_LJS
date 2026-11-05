@@ -30,9 +30,10 @@ const NOVA = 'senha nova 456789';
 async function novaConta(): Promise<string> {
   n += 1;
   const email = `minha-conta-${n}@exemplo.test`;
-  await aberto.db.query(`INSERT INTO contas (email, nome, senha_hash, criada_em) VALUES ($1, 'Pessoa Conta', 'x', now())`, [
-    email,
-  ]);
+  await aberto.db.query(
+    `INSERT INTO contas (email, nome, senha_hash, criada_em) VALUES ($1, 'Pessoa Conta', 'x', now())`,
+    [email],
+  );
   await aberto.db.query('SELECT conta_definir_senha($1, $2, false)', [email, SENHA]);
   return email;
 }
@@ -49,31 +50,51 @@ describe('POST /api/conta/senha', () => {
     const email = await novaConta();
     const atual = await sessao(email);
     const outra = await sessao(email, SENHA, '203.0.113.71');
-    const r = await pedir('/conta/senha', { corpo: { senhaAtual: SENHA, senhaNova: NOVA }, sessao: atual });
+    const r = await pedir('/conta/senha', {
+      corpo: { senhaAtual: SENHA, senhaNova: NOVA },
+      sessao: atual,
+    });
     expect(r.status).toBe(204);
     expect((await pedir('/sessao', { sessao: atual })).status).toBe(200);
     expect((await pedir('/sessao', { sessao: outra })).status).toBe(401);
-    expect((await pedir('/sessao/entrar', { corpo: { email, senha: NOVA }, ip: '203.0.113.72' })).status).toBe(200);
+    expect(
+      (await pedir('/sessao/entrar', { corpo: { email, senha: NOVA }, ip: '203.0.113.72' })).status,
+    ).toBe(200);
   });
 
   it('ACE-27: senha atual errada dá 401 senha_atual_incorreta e a senha não muda', async () => {
     const email = await novaConta();
     const atual = await sessao(email);
-    const r = await pedir('/conta/senha', { corpo: { senhaAtual: 'errada', senhaNova: NOVA }, sessao: atual });
+    const r = await pedir('/conta/senha', {
+      corpo: { senhaAtual: 'errada', senhaNova: NOVA },
+      sessao: atual,
+    });
     expect(r.status).toBe(401);
     expect(await r.json()).toMatchObject({ codigo: 'senha_atual_incorreta' });
-    expect((await pedir('/sessao/entrar', { corpo: { email, senha: SENHA }, ip: '203.0.113.73' })).status).toBe(200);
+    expect(
+      (await pedir('/sessao/entrar', { corpo: { email, senha: SENHA }, ip: '203.0.113.73' }))
+        .status,
+    ).toBe(200);
   });
 
   it('ACE-70: a 6.ª tentativa com senha errada recebe o bloqueio, com a mesma resposta para a senha certa', async () => {
     const email = await novaConta();
     const atual = await sessao(email);
     for (let i = 0; i < 5; i += 1) {
-      const r = await pedir('/conta/senha', { corpo: { senhaAtual: 'errada', senhaNova: NOVA }, sessao: atual });
+      const r = await pedir('/conta/senha', {
+        corpo: { senhaAtual: 'errada', senhaNova: NOVA },
+        sessao: atual,
+      });
       expect(r.status).toBe(401);
     }
-    const sexta = await pedir('/conta/senha', { corpo: { senhaAtual: 'errada', senhaNova: NOVA }, sessao: atual });
-    const certa = await pedir('/conta/senha', { corpo: { senhaAtual: SENHA, senhaNova: NOVA }, sessao: atual });
+    const sexta = await pedir('/conta/senha', {
+      corpo: { senhaAtual: 'errada', senhaNova: NOVA },
+      sessao: atual,
+    });
+    const certa = await pedir('/conta/senha', {
+      corpo: { senhaAtual: SENHA, senhaNova: NOVA },
+      sessao: atual,
+    });
     expect(sexta.status).toBe(429);
     expect(certa.status).toBe(429);
     const corpo = await sexta.json();
@@ -85,7 +106,10 @@ describe('POST /api/conta/senha', () => {
     const email = await novaConta();
     const atual = await sessao(email);
     for (let i = 0; i < 5; i += 1) {
-      await pedir('/conta/senha', { corpo: { senhaAtual: 'errada', senhaNova: NOVA }, sessao: atual });
+      await pedir('/conta/senha', {
+        corpo: { senhaAtual: 'errada', senhaNova: NOVA },
+        sessao: atual,
+      });
     }
     const r = await pedir('/conta/excluir', { corpo: { senha: SENHA }, sessao: atual });
     expect(r.status).toBe(429);
@@ -108,7 +132,10 @@ describe('POST /api/conta/excluir', () => {
     expect(r.status).toBe(204);
     expect(cookieVencido(r)).toBe(true);
     expect((await pedir('/sessao', { sessao: outra })).status).toBe(401);
-    expect((await pedir('/sessao/entrar', { corpo: { email, senha: SENHA }, ip: '203.0.113.75' })).status).toBe(401);
+    expect(
+      (await pedir('/sessao/entrar', { corpo: { email, senha: SENHA }, ip: '203.0.113.75' }))
+        .status,
+    ).toBe(401);
   });
 
   it('ACE-29: a única admin de grupo não arquivado recebe 409 unico_admin com a lista', async () => {
@@ -116,7 +143,10 @@ describe('POST /api/conta/excluir', () => {
     const atual = await sessao(cenario.emailA, cenario.senhaA, '203.0.113.76');
     const r = await pedir('/conta/excluir', { corpo: { senha: cenario.senhaA }, sessao: atual });
     expect(r.status).toBe(409);
-    expect(await r.json()).toMatchObject({ codigo: 'unico_admin', grupos: [{ id: cenario.grupoA, nome: 'Grupo A' }] });
+    expect(await r.json()).toMatchObject({
+      codigo: 'unico_admin',
+      grupos: [{ id: cenario.grupoA, nome: 'Grupo A' }],
+    });
     expect((await pedir('/sessao', { sessao: atual })).status).toBe(200);
   });
 

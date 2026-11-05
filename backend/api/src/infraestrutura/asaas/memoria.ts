@@ -5,7 +5,8 @@
  */
 import type { Asaas, Falhou, NovaAssinatura, NovoCliente, PrimeiraCobranca } from './cliente.ts';
 
-export type OperacaoAsaas = 'criarCliente' | 'criarAssinatura' | 'primeiraCobranca' | 'removerAssinatura';
+export type OperacaoAsaas =
+  'criarCliente' | 'criarAssinatura' | 'primeiraCobranca' | 'removerAssinatura';
 
 export interface ChamadaAsaas {
   operacao: OperacaoAsaas;

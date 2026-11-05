@@ -15,7 +15,8 @@ import {
  * contra uma API falsa, que prova que nada chama `escalacoes` e que a contagem do grupo é conferida.
  */
 
-const BASE = 'https://gestaodapelada-v2.exemplo.workers.dev/api/grupos/7f0c1a2b-3c4d-4e5f-8a6b-1c2d3e4f5a6b';
+const BASE =
+  'https://gestaodapelada-v2.exemplo.workers.dev/api/grupos/7f0c1a2b-3c4d-4e5f-8a6b-1c2d3e4f5a6b';
 
 function evento(sufixo: string, cpuTime: number | undefined, extra: Record<string, unknown> = {}) {
   return JSON.stringify({
@@ -32,11 +33,23 @@ function tailDeExemplo(): string {
   const linhas: string[] = ['Successfully created tail, expires at 2026-11-05T20:00:00Z', ''];
   for (let i = 0; i < 50; i++) {
     const cpu = 1 + (i % 5);
-    linhas.push(evento('/simulador/previa', cpu / 2), evento('/simulador/sugerir', cpu), evento('/simulador/avaliar', cpu));
+    linhas.push(
+      evento('/simulador/previa', cpu / 2),
+      evento('/simulador/sugerir', cpu),
+      evento('/simulador/avaliar', cpu),
+    );
   }
   linhas.push(
-    JSON.stringify({ outcome: 'ok', cpuTime: 50, event: { request: { url: `${BASE}/partidas`, method: 'POST' } } }),
-    JSON.stringify({ outcome: 'ok', cpuTime: 50, event: { request: { url: `${BASE}/simulador/contexto`, method: 'GET' } } }),
+    JSON.stringify({
+      outcome: 'ok',
+      cpuTime: 50,
+      event: { request: { url: `${BASE}/partidas`, method: 'POST' } },
+    }),
+    JSON.stringify({
+      outcome: 'ok',
+      cpuTime: 50,
+      event: { request: { url: `${BASE}/simulador/contexto`, method: 'GET' } },
+    }),
   );
   return linhas.join('\n');
 }
@@ -79,26 +92,48 @@ describe('lerTail e julgar', () => {
     expect(r.rotas.sugerir.erros1102).toBe(1);
     expect(r.rotas.sugerir.semCpu).toBe(1);
     const v = julgar(r);
-    expect(v.rotas.find((x) => x.rota === 'sugerir')).toMatchObject({ p99: 5, erros1102: 1, ok: false });
+    expect(v.rotas.find((x) => x.rota === 'sugerir')).toMatchObject({
+      p99: 5,
+      erros1102: 1,
+      ok: false,
+    });
     expect(v.ok).toBe(false);
   });
 
-  it.each(['exceededMemory', 'exceededResources'])('SIM-61: o outcome %s também conta como 1102', (outcome) => {
-    const r = lerTail(evento('/simulador/avaliar', 2, { outcome }));
-    expect(r.rotas.avaliar.erros1102).toBe(1);
-  });
+  it.each(['exceededMemory', 'exceededResources'])(
+    'SIM-61: o outcome %s também conta como 1102',
+    (outcome) => {
+      const r = lerTail(evento('/simulador/avaliar', 2, { outcome }));
+      expect(r.rotas.avaliar.erros1102).toBe(1);
+    },
+  );
 
   it('SIM-61: p99 igual ao teto reprova (o critério é abaixo de 7 ms)', () => {
-    const linhas = Array.from({ length: 50 }, (_, i) => evento('/simulador/sugerir', i === 49 ? TETO_P99_MS : 1));
-    const comAsOutras = [...linhas, evento('/simulador/previa', 1), evento('/simulador/avaliar', 1)].join('\n');
+    const linhas = Array.from({ length: 50 }, (_, i) =>
+      evento('/simulador/sugerir', i === 49 ? TETO_P99_MS : 1),
+    );
+    const comAsOutras = [
+      ...linhas,
+      evento('/simulador/previa', 1),
+      evento('/simulador/avaliar', 1),
+    ].join('\n');
     const v = julgar(lerTail(comAsOutras));
-    expect(v.rotas.find((x) => x.rota === 'sugerir')).toMatchObject({ p99: TETO_P99_MS, ok: false });
+    expect(v.rotas.find((x) => x.rota === 'sugerir')).toMatchObject({
+      p99: TETO_P99_MS,
+      ok: false,
+    });
     expect(v.ok).toBe(false);
   });
 
   it('SIM-61: rota sem nenhuma amostra reprova (não há medição)', () => {
-    const v = julgar(lerTail([evento('/simulador/previa', 1), evento('/simulador/sugerir', 1)].join('\n')));
-    expect(v.rotas.find((x) => x.rota === 'avaliar')).toMatchObject({ amostras: 0, p99: null, ok: false });
+    const v = julgar(
+      lerTail([evento('/simulador/previa', 1), evento('/simulador/sugerir', 1)].join('\n')),
+    );
+    expect(v.rotas.find((x) => x.rota === 'avaliar')).toMatchObject({
+      amostras: 0,
+      p99: null,
+      ok: false,
+    });
     expect(v.ok).toBe(false);
   });
 
@@ -106,7 +141,10 @@ describe('lerTail e julgar', () => {
     const erro = JSON.stringify({
       outcome: 'ok',
       cpuTime: 1,
-      event: { request: { url: `${BASE}/simulador/sugerir`, method: 'POST' }, response: { status: 429 } },
+      event: {
+        request: { url: `${BASE}/simulador/sugerir`, method: 'POST' },
+        response: { status: 429 },
+      },
     });
     const texto = [tailDeExemplo(), erro].join('\n');
     const v = julgar(lerTail(texto));
@@ -130,7 +168,13 @@ function apiFalsa(opcoes: { ativos?: number; mudaContagem?: boolean } = {}) {
         status: 200,
         json: {
           semanas: [
-            { aparelhosRanking: 3, pdfsExportados: 1, partidasLancadas: 2, partidasEm48h: 2, escalacoesConfirmadas: escalacoes },
+            {
+              aparelhosRanking: 3,
+              pdfsExportados: 1,
+              partidasLancadas: 2,
+              partidasEm48h: 2,
+              escalacoesConfirmadas: escalacoes,
+            },
           ],
         },
       };
@@ -165,10 +209,25 @@ describe('disparar', () => {
     const r = await disparar(pedir, GRUPO, 3);
     expect(r.pedidos).toEqual({ previa: 6, sugerir: 6, avaliar: 3 });
     expect(pedidos.some((p) => p.caminho.includes('/escalacoes'))).toBe(false);
-    expect(pedidos.filter((p) => p.metodo === 'POST').every((p) => /\/simulador\/(previa|sugerir|avaliar)$/.test(p.caminho))).toBe(true);
-    const sugerir = pedidos.filter((p) => p.caminho.endsWith('/sugerir')).map((p) => p.corpo as { formato: string; n: number; k?: unknown; aptos: unknown[]; data: string });
-    expect(sugerir.map((c) => [c.formato, c.n, c.k ?? null, c.aptos.length, c.data])).toContainEqual(['dois_times', 11, 'ilimitado', 30, '2026-11-12']);
-    expect(sugerir.map((c) => [c.formato, c.n, c.aptos.length])).toContainEqual(['varios_times', 5, 30]);
+    expect(
+      pedidos
+        .filter((p) => p.metodo === 'POST')
+        .every((p) => /\/simulador\/(previa|sugerir|avaliar)$/.test(p.caminho)),
+    ).toBe(true);
+    const sugerir = pedidos
+      .filter((p) => p.caminho.endsWith('/sugerir'))
+      .map(
+        (p) =>
+          p.corpo as { formato: string; n: number; k?: unknown; aptos: unknown[]; data: string },
+      );
+    expect(
+      sugerir.map((c) => [c.formato, c.n, c.k ?? null, c.aptos.length, c.data]),
+    ).toContainEqual(['dois_times', 11, 'ilimitado', 30, '2026-11-12']);
+    expect(sugerir.map((c) => [c.formato, c.n, c.aptos.length])).toContainEqual([
+      'varios_times',
+      5,
+      30,
+    ]);
     expect(r.antes).toEqual(r.depois);
     expect(r.ok).toBe(true);
   });

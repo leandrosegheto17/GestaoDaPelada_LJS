@@ -27,9 +27,15 @@ function json(corpo: string, status = 200) {
 }
 
 async function prepararApi(pagina: Page) {
-  await pagina.route('**/api/sessao', (rota) => rota.fulfill(json(lerTexto('acesso-sessao-leandro.json'))));
-  await pagina.route('**/api/grupos/g-quinta', (rota) => rota.fulfill(json(lerTexto('elenco-grupo-quinta.json'))));
-  await pagina.route('**/api/grupos/g-quinta/financeiro/mes*', (rota) => rota.fulfill(json(lerTexto('financeiro-2026-10.json'))));
+  await pagina.route('**/api/sessao', (rota) =>
+    rota.fulfill(json(lerTexto('acesso-sessao-leandro.json'))),
+  );
+  await pagina.route('**/api/grupos/g-quinta', (rota) =>
+    rota.fulfill(json(lerTexto('elenco-grupo-quinta.json'))),
+  );
+  await pagina.route('**/api/grupos/g-quinta/financeiro/mes*', (rota) =>
+    rota.fulfill(json(lerTexto('financeiro-2026-10.json'))),
+  );
 }
 
 async function caixa(local: Locator) {
@@ -39,22 +45,38 @@ async function caixa(local: Locator) {
 }
 
 /** Para cada campo com erro: a mensagem abaixo da entrada, antes do campo seguinte, alinhada e dentro do mesmo campo. */
-async function conferirAoLado(pagina: Page, campos: readonly { id: string; seguinte: string | null }[]) {
+async function conferirAoLado(
+  pagina: Page,
+  campos: readonly { id: string; seguinte: string | null }[],
+) {
   for (const { id, seguinte } of campos) {
     const entrada = await caixa(pagina.locator(`#${id}`));
     const mensagem = await caixa(pagina.locator(`#${id}-erro`));
     const linha = await caixa(pagina.locator(`#${id}-erro`).locator('xpath=..'));
-    expect(mensagem.y, `${id}: a mensagem começa abaixo da base do campo`).toBeGreaterThanOrEqual(entrada.y + entrada.height - 1);
-    expect(mensagem.y + mensagem.height, `${id}: a mensagem fica dentro da linha do campo`).toBeLessThanOrEqual(linha.y + linha.height + 1);
-    expect(entrada.y, `${id}: a entrada e a mensagem estão na mesma linha do formulário`).toBeGreaterThanOrEqual(linha.y - 1);
+    expect(mensagem.y, `${id}: a mensagem começa abaixo da base do campo`).toBeGreaterThanOrEqual(
+      entrada.y + entrada.height - 1,
+    );
+    expect(
+      mensagem.y + mensagem.height,
+      `${id}: a mensagem fica dentro da linha do campo`,
+    ).toBeLessThanOrEqual(linha.y + linha.height + 1);
+    expect(
+      entrada.y,
+      `${id}: a entrada e a mensagem estão na mesma linha do formulário`,
+    ).toBeGreaterThanOrEqual(linha.y - 1);
     if (seguinte !== null) {
       const proximo = await caixa(pagina.locator(`label[for="${seguinte}"]`));
       // Em duas colunas (PC, t24) o campo seguinte pode estar ao lado: a regra vale para o seguinte na mesma coluna.
       if (Math.abs(proximo.x - entrada.x) <= 4) {
-        expect(mensagem.y, `${id}: a mensagem começa antes do campo seguinte`).toBeLessThan(proximo.y);
+        expect(mensagem.y, `${id}: a mensagem começa antes do campo seguinte`).toBeLessThan(
+          proximo.y,
+        );
       }
     }
-    expect(Math.abs(mensagem.x - entrada.x), `${id}: a mensagem alinhada à esquerda do campo`).toBeLessThanOrEqual(4);
+    expect(
+      Math.abs(mensagem.x - entrada.x),
+      `${id}: a mensagem alinhada à esquerda do campo`,
+    ).toBeLessThanOrEqual(4);
   }
 }
 
@@ -65,7 +87,9 @@ for (const vp of VIEWPORTS) {
     test(`FIN-47: t23 erro, descrição e valor (${vp.nome})`, async ({ page }) => {
       await prepararApi(page);
       await page.route('**/api/grupos/g-quinta/financeiro/lancamentos', (rota) =>
-        rota.request().method() === 'POST' ? rota.fulfill(json(lerTexto('financeiro-erro-lancamento.json'), 422)) : rota.fallback(),
+        rota.request().method() === 'POST'
+          ? rota.fulfill(json(lerTexto('financeiro-erro-lancamento.json'), 422))
+          : rota.fallback(),
       );
       await page.goto('/app/grupos/g-quinta/financeiro/lancamentos/novo');
       await expect(page.getByText('0 de 80')).toBeVisible();
@@ -81,7 +105,10 @@ for (const vp of VIEWPORTS) {
 
       const caixaResumo = await caixa(resumo);
       const primeiro = await caixa(page.locator('#tipo'));
-      expect(caixaResumo.y + caixaResumo.height, 'o resumo fica acima do primeiro campo').toBeLessThanOrEqual(primeiro.y);
+      expect(
+        caixaResumo.y + caixaResumo.height,
+        'o resumo fica acima do primeiro campo',
+      ).toBeLessThanOrEqual(primeiro.y);
 
       await conferirAoLado(page, [
         { id: 'desc', seguinte: 'valor' },
@@ -101,7 +128,9 @@ for (const vp of VIEWPORTS) {
       await page.getByLabel('Saldo inicial (R$)').fill('mil');
       await page.getByRole('button', { name: 'Salvar' }).click();
 
-      await expect(page.locator('#saldo-erro')).toHaveText('Informe um valor em reais, ex.: 350,00.');
+      await expect(page.locator('#saldo-erro')).toHaveText(
+        'Informe um valor em reais, ex.: 350,00.',
+      );
       await conferirAoLado(page, [{ id: 'saldo', seguinte: null }]);
       expect(chamouPut, 'o texto inválido não vai à API (FIN-48)').toBe(false);
     });

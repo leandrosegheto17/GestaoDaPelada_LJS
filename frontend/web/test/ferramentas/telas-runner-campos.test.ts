@@ -1,7 +1,12 @@
 // @vitest-environment node
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { cssOcultar, ocultarDe, RELOGIO_VISUAL, type MapaTelas } from '../../e2e/ferramentas/telas-reais.mjs';
+import {
+  cssOcultar,
+  ocultarDe,
+  RELOGIO_VISUAL,
+  type MapaTelas,
+} from '../../e2e/ferramentas/telas-reais.mjs';
 
 /**
  * Campos novos do runner visual (partidas-e-ranking T75; PAR-146; AD-044): `ocultar` (global e da entrada, nos dois
@@ -9,12 +14,17 @@ import { cssOcultar, ocultarDe, RELOGIO_VISUAL, type MapaTelas } from '../../e2e
  * Financeiro, `abortar` na t01 `erro`).
  */
 
-const MAPA = JSON.parse(readFileSync(new URL('../../../../.specs/mockup/telas.json', import.meta.url), 'utf8')) as MapaTelas;
+const MAPA = JSON.parse(
+  readFileSync(new URL('../../../../.specs/mockup/telas.json', import.meta.url), 'utf8'),
+) as MapaTelas;
 
 describe('ocultar', () => {
   it('PAR-146: junta os seletores do telas.json e os da entrada', () => {
     const mapa = { viewports: {}, ocultar: ['.relogio'] } as MapaTelas;
-    expect(ocultarDe(mapa, { id: 'X', estado: 'y', mockup: 'm', ocultar: ['.aviso'] })).toEqual(['.relogio', '.aviso']);
+    expect(ocultarDe(mapa, { id: 'X', estado: 'y', mockup: 'm', ocultar: ['.aviso'] })).toEqual([
+      '.relogio',
+      '.aviso',
+    ]);
     expect(ocultarDe({ viewports: {} }, { id: 'X', estado: 'y', mockup: 'm' })).toEqual([]);
   });
 
@@ -40,7 +50,11 @@ describe('telas.json com o patch do LJS', () => {
 
   it('PAR-151 (P28): a t01 erro simula falha de rede com abortar', () => {
     const t01 = (MAPA.telas ?? []).find((t) => t.id === 'T01' && t.estado === 'erro');
-    expect(t01?.respostas?.some((r) => r.abortar === true && r.url.includes('/api/publico/pelada-de-quinta/ranking'))).toBe(true);
+    expect(
+      t01?.respostas?.some(
+        (r) => r.abortar === true && r.url.includes('/api/publico/pelada-de-quinta/ranking'),
+      ),
+    ).toBe(true);
   });
 
   it('PAR-146: a t01 instalar-iphone leva o userAgent do Safari do iPhone', () => {
@@ -49,8 +63,16 @@ describe('telas.json com o patch do LJS', () => {
   });
 
   it('PAR-146 (P27): nenhuma resposta do mockup traz enderecoNovo', () => {
-    for (const arquivo of ['publico-ranking-2026-10.json', 'publico-ranking-2026-07.json', 'publico-ranking-vazio.json', 'sessao-eu-admin.json']) {
-      const texto = readFileSync(new URL(`../../../../.specs/mockup/respostas/${arquivo}`, import.meta.url), 'utf8');
+    for (const arquivo of [
+      'publico-ranking-2026-10.json',
+      'publico-ranking-2026-07.json',
+      'publico-ranking-vazio.json',
+      'sessao-eu-admin.json',
+    ]) {
+      const texto = readFileSync(
+        new URL(`../../../../.specs/mockup/respostas/${arquivo}`, import.meta.url),
+        'utf8',
+      );
       expect({ arquivo, tem: texto.includes('enderecoNovo') }).toEqual({ arquivo, tem: false });
     }
   });
@@ -58,7 +80,12 @@ describe('telas.json com o patch do LJS', () => {
   it('PAR-146: as entradas do financeiro da v2 ficaram (rotas /app, real)', () => {
     const t22 = (MAPA.telas ?? []).filter((t) => t.id === 'T22');
     expect(t22.length).toBeGreaterThan(0);
-    for (const t of t22) expect({ estado: t.estado, real: t.real, rota: t.rota?.startsWith('/app/') }).toEqual({ estado: t.estado, real: true, rota: true });
+    for (const t of t22)
+      expect({ estado: t.estado, real: t.real, rota: t.rota?.startsWith('/app/') }).toEqual({
+        estado: t.estado,
+        real: true,
+        rota: true,
+      });
   });
 });
 

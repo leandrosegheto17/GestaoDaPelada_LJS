@@ -1,6 +1,10 @@
 import type pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { abrirCenarioGrupos, comoConta, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  comoConta,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * Grants por coluna em `partidas` e `config_pesos` (T25; PAR-09), como `pelada_app` com a conta C (admin de G).
@@ -80,7 +84,9 @@ describe('UPDATE e DELETE como pelada_app', () => {
     const { db, cenario } = aberto;
     await expect(
       comoConta(db, cenario.contaC, (d) =>
-        d.query(`UPDATE config_pesos SET vigente_desde = '2026-01-02' WHERE grupo_id = $1`, [cenario.grupoG]),
+        d.query(`UPDATE config_pesos SET vigente_desde = '2026-01-02' WHERE grupo_id = $1`, [
+          cenario.grupoG,
+        ]),
       ),
     ).rejects.toMatchObject(recusa);
   });
@@ -89,12 +95,18 @@ describe('UPDATE e DELETE como pelada_app', () => {
     const { db, cenario } = aberto;
     await expect(
       comoConta(db, cenario.contaC, (d) =>
-        d.query('UPDATE partidas SET grupo_id = $2 WHERE id = $1', [cenario.idsG.partida, cenario.grupoH]),
+        d.query('UPDATE partidas SET grupo_id = $2 WHERE id = $1', [
+          cenario.idsG.partida,
+          cenario.grupoH,
+        ]),
       ),
     ).rejects.toMatchObject(recusa);
     await expect(
       comoConta(db, cenario.contaC, (d) =>
-        d.query('UPDATE config_pesos SET grupo_id = $2 WHERE grupo_id = $1', [cenario.grupoG, cenario.grupoH]),
+        d.query('UPDATE config_pesos SET grupo_id = $2 WHERE grupo_id = $1', [
+          cenario.grupoG,
+          cenario.grupoH,
+        ]),
       ),
     ).rejects.toMatchObject(recusa);
   });
@@ -103,7 +115,10 @@ describe('UPDATE e DELETE como pelada_app', () => {
     const { db, cenario } = aberto;
     await expect(
       comoConta(db, cenario.contaC, (d) =>
-        d.query('UPDATE partidas SET criada_por = $2 WHERE id = $1', [cenario.idsG.partida, cenario.contaO]),
+        d.query('UPDATE partidas SET criada_por = $2 WHERE id = $1', [
+          cenario.idsG.partida,
+          cenario.contaO,
+        ]),
       ),
     ).rejects.toMatchObject(recusa);
   });
@@ -111,7 +126,9 @@ describe('UPDATE e DELETE como pelada_app', () => {
   it('PAR-09: DELETE em config_pesos recusado, sem grant', async () => {
     const { db, cenario } = aberto;
     await expect(
-      comoConta(db, cenario.contaC, (d) => d.query('DELETE FROM config_pesos WHERE grupo_id = $1', [cenario.grupoG])),
+      comoConta(db, cenario.contaC, (d) =>
+        d.query('DELETE FROM config_pesos WHERE grupo_id = $1', [cenario.grupoG]),
+      ),
     ).rejects.toMatchObject(recusa);
   });
 

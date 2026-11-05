@@ -55,7 +55,8 @@ const LINHAS: LinhaPublica[] = [
   },
 ];
 
-const LEGENDA = 'Ranking geral da Pelada de Quinta, com os pontos de cada partida de outubro de 2026';
+const LEGENDA =
+  'Ranking geral da Pelada de Quinta, com os pontos de cada partida de outubro de 2026';
 
 function montar(linhas: LinhaPublica[] = LINHAS, partidas = PARTIDAS) {
   return render(<TabelaRanking partidas={partidas} linhas={linhas} legenda={LEGENDA} />);
@@ -105,7 +106,9 @@ describe('TabelaRanking', () => {
 
   it('PAR-79: cada linha mostra posição, apelido, Pts inicial e Pts final', () => {
     montar();
-    const celulas = within(linhaDe('Toninho')).getAllByRole('cell').map((c) => c.textContent);
+    const celulas = within(linhaDe('Toninho'))
+      .getAllByRole('cell')
+      .map((c) => c.textContent);
     expect(celulas[0]).toBe('1');
     expect(celulas[1]).toBe('27');
     expect(celulas[celulas.length - 1]).toBe('31');
@@ -118,7 +121,9 @@ describe('TabelaRanking', () => {
     expect(screen.getByRole('cell', { name: 'Lesionado, 1 ponto' })).toBeDefined();
     expect(screen.getByRole('cell', { name: 'Expulso, menos 1 ponto' })).toBeDefined();
     expect(screen.getByRole('cell', { name: 'Falta, 0 pontos' })).toBeDefined();
-    expect(screen.getAllByRole('cell', { name: 'Fora do grupo ou antes da data de início' })).toHaveLength(2);
+    expect(
+      screen.getAllByRole('cell', { name: 'Fora do grupo ou antes da data de início' }),
+    ).toHaveLength(2);
   });
 
   it('PAR-80: o número visível é o dos pontos, com "−1" no negativo e "–" no fora, e não entra no nome acessível', () => {
@@ -133,7 +138,8 @@ describe('TabelaRanking', () => {
 
   it('PAR-80: cada situação tem um marcador visual distinto que não é só cor (classe da marca do guia)', () => {
     montar();
-    const classe = (celula: HTMLElement | undefined) => celula?.querySelector('[class*="marca--"]')?.getAttribute('class') ?? '';
+    const classe = (celula: HTMLElement | undefined) =>
+      celula?.querySelector('[class*="marca--"]')?.getAttribute('class') ?? '';
     const [lesionado, falta, expulso] = rodadasDe('Marcão');
     const [presente] = rodadasDe('Toninho');
     const [fora] = rodadasDe('Serginho');
@@ -144,7 +150,9 @@ describe('TabelaRanking', () => {
     expect(classe(falta)).toContain('marca--f');
     expect(classe(fora)).toContain('marca--x');
 
-    const marcadores = [presente, lesionado, expulso, falta, fora].map((c) => classe(c).match(/marca--[plefx]/)?.[0]);
+    const marcadores = [presente, lesionado, expulso, falta, fora].map(
+      (c) => classe(c).match(/marca--[plefx]/)?.[0],
+    );
     expect(new Set(marcadores).size).toBe(5);
   });
 
@@ -158,7 +166,9 @@ describe('TabelaRanking', () => {
 
   it('PAR-79: a tabela rola de lado numa região rotulada e focável', () => {
     montar();
-    const regiao = screen.getByRole('region', { name: 'Tabela do ranking (role para o lado para ver as partidas)' });
+    const regiao = screen.getByRole('region', {
+      name: 'Tabela do ranking (role para o lado para ver as partidas)',
+    });
     expect(regiao.getAttribute('tabindex')).toBe('0');
   });
 

@@ -1,6 +1,10 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { comoApp, type Contexto } from './apoio.ts';
-import { abrirCenarioGrupos, type CenarioGrupos, type CenarioGruposAberto } from './cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  type CenarioGrupos,
+  type CenarioGruposAberto,
+} from './cenario-grupos.ts';
 import { MATRIZ } from './matriz.ts';
 
 /**
@@ -75,7 +79,10 @@ async function foto(): Promise<string> {
 async function recusada(ator: Ator, sql: string, valores: unknown[] = []): Promise<void> {
   const { db, cenario } = aberto;
   const antes = await foto();
-  await expect(comoApp(db, contexto(ator, cenario), (d) => d.query(sql, valores)), `${ator}: ${sql}`).rejects.toMatchObject({
+  await expect(
+    comoApp(db, contexto(ator, cenario), (d) => d.query(sql, valores)),
+    `${ator}: ${sql}`,
+  ).rejects.toMatchObject({
     code: '42501',
   });
   expect(await foto(), `${ator}: ${sql} mudou o conteúdo`).toEqual(antes);
@@ -88,7 +95,10 @@ const ALTERAR: Record<(typeof TABELAS)[number], string> = {
   avisos_cobranca: `UPDATE avisos_cobranca SET enviado_em = now()`,
 };
 
-const INSERIR = (grupo: string, conta: string): Record<(typeof TABELAS)[number], [string, unknown[]]> => ({
+const INSERIR = (
+  grupo: string,
+  conta: string,
+): Record<(typeof TABELAS)[number], [string, unknown[]]> => ({
   push_ranking: [
     `INSERT INTO push_ranking (grupo_id, endpoint, p256dh, auth) VALUES ($1, 'https://fcm.googleapis.com/fcm/send/t12-intruso', 'p', 'a')`,
     [grupo],
@@ -104,34 +114,46 @@ const INSERIR = (grupo: string, conta: string): Record<(typeof TABELAS)[number],
 });
 
 describe.each(TABELAS)('%s × SELECT', (tabela) => {
-  it.each(ATORES)('NOT-52: o ator %s não lê a tabela (permissão negada), nem a própria conta nem o slug do próprio grupo', async (ator) => {
-    await recusada(ator, `SELECT * FROM ${tabela}`);
-    await recusada(ator, `SELECT count(*) FROM ${tabela}`);
-  });
+  it.each(ATORES)(
+    'NOT-52: o ator %s não lê a tabela (permissão negada), nem a própria conta nem o slug do próprio grupo',
+    async (ator) => {
+      await recusada(ator, `SELECT * FROM ${tabela}`);
+      await recusada(ator, `SELECT count(*) FROM ${tabela}`);
+    },
+  );
 });
 
 describe.each(TABELAS)('%s × INSERT, UPDATE, DELETE, TRUNCATE', (tabela) => {
-  it.each(ATORES)('NOT-52: o ator %s não insere direto, e o conteúdo fica idêntico', async (ator) => {
-    const { cenario } = aberto;
-    // Cada ator tenta inserir no grupo G (ou na conta A para push_conta) e no grupo H (ou na conta B).
-    for (const [grupo, conta] of [
-      [cenario.grupoG, cenario.contaC],
-      [cenario.grupoH, cenario.contaB],
-    ] as const) {
-      const [sql, valores] = INSERIR(grupo, conta)[tabela];
-      await recusada(ator, sql, valores);
-    }
-  });
+  it.each(ATORES)(
+    'NOT-52: o ator %s não insere direto, e o conteúdo fica idêntico',
+    async (ator) => {
+      const { cenario } = aberto;
+      // Cada ator tenta inserir no grupo G (ou na conta A para push_conta) e no grupo H (ou na conta B).
+      for (const [grupo, conta] of [
+        [cenario.grupoG, cenario.contaC],
+        [cenario.grupoH, cenario.contaB],
+      ] as const) {
+        const [sql, valores] = INSERIR(grupo, conta)[tabela];
+        await recusada(ator, sql, valores);
+      }
+    },
+  );
 
-  it.each(ATORES)('NOT-52: o ator %s não altera, nem sem WHERE, e o conteúdo fica idêntico', async (ator) => {
-    await recusada(ator, `${ALTERAR[tabela]} WHERE true`);
-    await recusada(ator, ALTERAR[tabela]);
-  });
+  it.each(ATORES)(
+    'NOT-52: o ator %s não altera, nem sem WHERE, e o conteúdo fica idêntico',
+    async (ator) => {
+      await recusada(ator, `${ALTERAR[tabela]} WHERE true`);
+      await recusada(ator, ALTERAR[tabela]);
+    },
+  );
 
-  it.each(ATORES)('NOT-52: o ator %s não apaga, nem sem WHERE, e o conteúdo fica idêntico', async (ator) => {
-    await recusada(ator, `DELETE FROM ${tabela} WHERE true`);
-    await recusada(ator, `DELETE FROM ${tabela}`);
-  });
+  it.each(ATORES)(
+    'NOT-52: o ator %s não apaga, nem sem WHERE, e o conteúdo fica idêntico',
+    async (ator) => {
+      await recusada(ator, `DELETE FROM ${tabela} WHERE true`);
+      await recusada(ator, `DELETE FROM ${tabela}`);
+    },
+  );
 
   it.each(ATORES)('NOT-52: o ator %s não esvazia a tabela com TRUNCATE', async (ator) => {
     await recusada(ator, `TRUNCATE ${tabela}`);
@@ -169,8 +191,14 @@ describe('NOT-54: nem a admin do grupo lê endpoint, p256dh ou auth', () => {
   it('as funções de assinatura e de estado devolvem só texto de estado, nunca endpoint nem chaves', async () => {
     const { db, cenario } = aberto;
     const r = await comoApp(db, { slug: cenario.slugG }, async (d) => [
-      await d.query(`SELECT push_ranking_assinar($1, 'https://fcm.googleapis.com/fcm/send/t12-novo', 'p', 'a') AS r`, [cenario.slugG]),
-      await d.query(`SELECT push_ranking_estado($1, 'https://fcm.googleapis.com/fcm/send/t12-novo', 'a') AS r`, [cenario.slugG]),
+      await d.query(
+        `SELECT push_ranking_assinar($1, 'https://fcm.googleapis.com/fcm/send/t12-novo', 'p', 'a') AS r`,
+        [cenario.slugG],
+      ),
+      await d.query(
+        `SELECT push_ranking_estado($1, 'https://fcm.googleapis.com/fcm/send/t12-novo', 'a') AS r`,
+        [cenario.slugG],
+      ),
     ]);
     expect(r.map((x) => x.rows[0])).toEqual([{ r: 'criada' }, { r: 'ativa' }]);
   });
@@ -181,9 +209,10 @@ describe('NOT-51: o contexto do slug e o da conta só passam pelas funções cer
     const { db, cenario } = aberto;
     const antes = await foto();
     const r = await comoApp(db, { slug: cenario.slugG }, async (d) => [
-      await d.query(`SELECT push_ranking_assinar($1, 'https://fcm.googleapis.com/fcm/send/t12-h', 'p', 'a') AS r`, [
-        'grupo-b',
-      ]),
+      await d.query(
+        `SELECT push_ranking_assinar($1, 'https://fcm.googleapis.com/fcm/send/t12-h', 'p', 'a') AS r`,
+        ['grupo-b'],
+      ),
     ]);
     expect(r[0]?.rows[0]).toEqual({ r: 'nao_encontrado' });
     expect(await foto()).toEqual(antes);
@@ -193,46 +222,90 @@ describe('NOT-51: o contexto do slug e o da conta só passam pelas funções cer
     const { db, cenario } = aberto;
     const antes = await foto();
     const r = await comoApp(db, {}, (d) =>
-      d.query(`SELECT push_ranking_assinar($1, 'https://fcm.googleapis.com/fcm/send/t12-n', 'p', 'a') AS r`, [cenario.slugG]),
+      d.query(
+        `SELECT push_ranking_assinar($1, 'https://fcm.googleapis.com/fcm/send/t12-n', 'p', 'a') AS r`,
+        [cenario.slugG],
+      ),
     );
     expect(r.rows[0]).toEqual({ r: 'nao_encontrado' });
     expect(await foto()).toEqual(antes);
   });
 
-  it.each(['A', 'C', 'B'] as const)('o ator %s, com conta, não chama as funções do slug', async (ator) => {
-    const { cenario } = aberto;
-    await recusada(ator, `SELECT push_ranking_assinar($1, 'https://fcm.googleapis.com/fcm/send/t12-conta', 'p', 'a')`, [
-      cenario.slugG,
-    ]);
-    await recusada(ator, `SELECT push_ranking_cancelar($1, 'https://fcm.googleapis.com/fcm/send/t12-conta', 'a')`, [cenario.slugG]);
-    await recusada(ator, `SELECT push_ranking_estado($1, 'https://fcm.googleapis.com/fcm/send/t12-conta', 'a')`, [cenario.slugG]);
-  });
+  it.each(['A', 'C', 'B'] as const)(
+    'o ator %s, com conta, não chama as funções do slug',
+    async (ator) => {
+      const { cenario } = aberto;
+      await recusada(
+        ator,
+        `SELECT push_ranking_assinar($1, 'https://fcm.googleapis.com/fcm/send/t12-conta', 'p', 'a')`,
+        [cenario.slugG],
+      );
+      await recusada(
+        ator,
+        `SELECT push_ranking_cancelar($1, 'https://fcm.googleapis.com/fcm/send/t12-conta', 'a')`,
+        [cenario.slugG],
+      );
+      await recusada(
+        ator,
+        `SELECT push_ranking_estado($1, 'https://fcm.googleapis.com/fcm/send/t12-conta', 'a')`,
+        [cenario.slugG],
+      );
+    },
+  );
 
-  it.each(['A', 'C', 'B', 'S'] as const)('o ator %s (com conta ou com slug) não chama as funções do envio nem as da limpeza', async (ator) => {
-    const { cenario } = aberto;
-    await recusada(ator, `SELECT * FROM push_envio_grupo($1)`, [cenario.grupoG]);
-    await recusada(ator, `SELECT * FROM push_ranking_lote($1, 0, 40, now())`, [cenario.grupoG]);
-    await recusada(ator, `SELECT push_ranking_resultado($1, '{}'::bigint[], ARRAY[1]::bigint[])`, [cenario.grupoG]);
-    await recusada(ator, `SELECT * FROM aviso_cobranca_destino($1)`, [cenario.grupoG]);
-    await recusada(ator, `SELECT aviso_cobranca_registrar('pay_t12', 'cobranca_gerada', $1)`, [cenario.grupoG]);
-    await recusada(ator, `SELECT push_conta_resultado($1, '{}'::bigint[], ARRAY[1]::bigint[])`, [cenario.contaC]);
-    await recusada(ator, `SELECT * FROM notificacoes_limpar()`);
-  }, 30_000);
+  it.each(['A', 'C', 'B', 'S'] as const)(
+    'o ator %s (com conta ou com slug) não chama as funções do envio nem as da limpeza',
+    async (ator) => {
+      const { cenario } = aberto;
+      await recusada(ator, `SELECT * FROM push_envio_grupo($1)`, [cenario.grupoG]);
+      await recusada(ator, `SELECT * FROM push_ranking_lote($1, 0, 40, now())`, [cenario.grupoG]);
+      await recusada(
+        ator,
+        `SELECT push_ranking_resultado($1, '{}'::bigint[], ARRAY[1]::bigint[])`,
+        [cenario.grupoG],
+      );
+      await recusada(ator, `SELECT * FROM aviso_cobranca_destino($1)`, [cenario.grupoG]);
+      await recusada(ator, `SELECT aviso_cobranca_registrar('pay_t12', 'cobranca_gerada', $1)`, [
+        cenario.grupoG,
+      ]);
+      await recusada(ator, `SELECT push_conta_resultado($1, '{}'::bigint[], ARRAY[1]::bigint[])`, [
+        cenario.contaC,
+      ]);
+      await recusada(ator, `SELECT * FROM notificacoes_limpar()`);
+    },
+    30_000,
+  );
 });
 
 describe('NOT-53: a assinatura do organizador é isolada por conta', () => {
-  it.each(['S', 'N'] as const)('o ator %s (sem conta) não chama as funções da conta', async (ator) => {
-    await recusada(ator, `SELECT push_conta_assinar('https://fcm.googleapis.com/fcm/send/t12-x', 'p', 'a')`);
-    await recusada(ator, `SELECT push_conta_cancelar('https://fcm.googleapis.com/fcm/send/t12-conta-c', 'ac')`);
-    await recusada(ator, `SELECT push_conta_estado('https://fcm.googleapis.com/fcm/send/t12-conta-c', 'ac')`);
-  });
+  it.each(['S', 'N'] as const)(
+    'o ator %s (sem conta) não chama as funções da conta',
+    async (ator) => {
+      await recusada(
+        ator,
+        `SELECT push_conta_assinar('https://fcm.googleapis.com/fcm/send/t12-x', 'p', 'a')`,
+      );
+      await recusada(
+        ator,
+        `SELECT push_conta_cancelar('https://fcm.googleapis.com/fcm/send/t12-conta-c', 'ac')`,
+      );
+      await recusada(
+        ator,
+        `SELECT push_conta_estado('https://fcm.googleapis.com/fcm/send/t12-conta-c', 'ac')`,
+      );
+    },
+  );
 
   it('B não cancela nem consulta a assinatura de A, mesmo com endpoint e auth corretos', async () => {
     const { db, cenario } = aberto;
     const antes = await foto();
     const r = await comoApp(db, { conta: cenario.contaB }, async (d) => {
-      const estado = await d.query(`SELECT push_conta_estado('https://fcm.googleapis.com/fcm/send/t12-conta-c', 'ac') AS r`);
-      await d.query(`SELECT push_conta_cancelar('https://fcm.googleapis.com/fcm/send/t12-conta-c', 'ac')`);
+      const estado = await d.query(
+        `SELECT push_conta_estado('https://fcm.googleapis.com/fcm/send/t12-conta-c', 'ac') AS r`,
+      );
+      await d.query(
+        `SELECT push_conta_cancelar('https://fcm.googleapis.com/fcm/send/t12-conta-c', 'ac')`,
+      );
       return estado.rows[0];
     });
     expect(r).toEqual({ r: 'ausente' });
@@ -242,14 +315,30 @@ describe('NOT-53: a assinatura do organizador é isolada por conta', () => {
   it('A enxerga como ativa só a própria assinatura, e cancelar a apaga só ela', async () => {
     const { db, cenario } = aberto;
     const resultado = await comoApp(db, { conta: cenario.contaC }, async (d) => {
-      const minha = await d.query(`SELECT push_conta_estado('https://fcm.googleapis.com/fcm/send/t12-conta-c', 'ac') AS r`);
-      const deB = await d.query(`SELECT push_conta_estado('https://fcm.googleapis.com/fcm/send/t12-conta-b', 'ab') AS r`);
-      await d.query(`SELECT push_conta_cancelar('https://fcm.googleapis.com/fcm/send/t12-conta-c', 'ac')`);
+      const minha = await d.query(
+        `SELECT push_conta_estado('https://fcm.googleapis.com/fcm/send/t12-conta-c', 'ac') AS r`,
+      );
+      const deB = await d.query(
+        `SELECT push_conta_estado('https://fcm.googleapis.com/fcm/send/t12-conta-b', 'ab') AS r`,
+      );
+      await d.query(
+        `SELECT push_conta_cancelar('https://fcm.googleapis.com/fcm/send/t12-conta-c', 'ac')`,
+      );
       await d.query('RESET ROLE');
-      const restantes = await d.query<{ conta_id: string }>('SELECT conta_id FROM push_conta ORDER BY id');
-      return { minha: minha.rows[0], deB: deB.rows[0], restantes: restantes.rows.map((l) => l.conta_id) };
+      const restantes = await d.query<{ conta_id: string }>(
+        'SELECT conta_id FROM push_conta ORDER BY id',
+      );
+      return {
+        minha: minha.rows[0],
+        deB: deB.rows[0],
+        restantes: restantes.rows.map((l) => l.conta_id),
+      };
     });
-    expect(resultado).toEqual({ minha: { r: 'ativa' }, deB: { r: 'ausente' }, restantes: [cenario.contaB] });
+    expect(resultado).toEqual({
+      minha: { r: 'ativa' },
+      deB: { r: 'ausente' },
+      restantes: [cenario.contaB],
+    });
   });
 });
 

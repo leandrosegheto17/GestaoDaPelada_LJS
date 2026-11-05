@@ -24,7 +24,10 @@ const VALIDO = { apelido: 'Toninho', anoNascimento: 1990, posicao: 'meia' };
 const cadastro = jogadorCorpo(HOJE);
 const edicao = editarJogadorCorpo(HOJE);
 
-function mensagens(resultado: { success: boolean; error?: { issues: { path: PropertyKey[]; message: string }[] } }) {
+function mensagens(resultado: {
+  success: boolean;
+  error?: { issues: { path: PropertyKey[]; message: string }[] };
+}) {
   const porCampo: Record<string, string[]> = {};
   for (const problema of resultado.error?.issues ?? []) {
     const campo = String(problema.path[0] ?? '');
@@ -35,12 +38,16 @@ function mensagens(resultado: { success: boolean; error?: { issues: { path: Prop
 
 describe('apelido', () => {
   it('GEL-34: 1 caractere é recusado com a mensagem', () => {
-    expect(mensagens(cadastro.safeParse({ ...VALIDO, apelido: ' A ' }))).toEqual({ apelido: [MENSAGEM_APELIDO] });
+    expect(mensagens(cadastro.safeParse({ ...VALIDO, apelido: ' A ' }))).toEqual({
+      apelido: [MENSAGEM_APELIDO],
+    });
     expect(MENSAGEM_APELIDO).toBe('O apelido precisa ter de 2 a 30 caracteres.');
   });
 
   it('GEL-34: 31 caracteres são recusados com a mensagem', () => {
-    expect(mensagens(cadastro.safeParse({ ...VALIDO, apelido: 'a'.repeat(31) }))).toEqual({ apelido: [MENSAGEM_APELIDO] });
+    expect(mensagens(cadastro.safeParse({ ...VALIDO, apelido: 'a'.repeat(31) }))).toEqual({
+      apelido: [MENSAGEM_APELIDO],
+    });
   });
 
   it('GEL-34: 2 e 30 caracteres são aceitos, sem os espaços das pontas', () => {
@@ -60,13 +67,17 @@ describe('anoNascimento', () => {
   const MENSAGEM = 'O ano precisa estar entre 1940 e 2016.';
 
   it.each([1939, 2017, 1990.5])('GEL-36: %s é recusado com "entre 1940 e 2016" em 2026', (ano) => {
-    expect(mensagens(cadastro.safeParse({ ...VALIDO, anoNascimento: ano }))).toEqual({ anoNascimento: [MENSAGEM] });
+    expect(mensagens(cadastro.safeParse({ ...VALIDO, anoNascimento: ano }))).toEqual({
+      anoNascimento: [MENSAGEM],
+    });
   });
 
   it('GEL-36: ano ausente ou como texto dá a mesma mensagem', () => {
     const { anoNascimento: _a, ...semAno } = VALIDO;
     expect(mensagens(cadastro.safeParse(semAno))).toEqual({ anoNascimento: [MENSAGEM] });
-    expect(mensagens(cadastro.safeParse({ ...VALIDO, anoNascimento: '1990' }))).toEqual({ anoNascimento: [MENSAGEM] });
+    expect(mensagens(cadastro.safeParse({ ...VALIDO, anoNascimento: '1990' }))).toEqual({
+      anoNascimento: [MENSAGEM],
+    });
   });
 
   it.each([1940, 2016])('GEL-36: %s é aceito em 2026', (ano) => {
@@ -74,8 +85,12 @@ describe('anoNascimento', () => {
   });
 
   it('GEL-36: o máximo acompanha o ano de hoje', () => {
-    expect(jogadorCorpo('2030-01-01').safeParse({ ...VALIDO, anoNascimento: 2020 }).success).toBe(true);
-    expect(mensagens(editarJogadorCorpo('2030-01-01').safeParse({ ...VALIDO, anoNascimento: 2021 }))).toEqual({
+    expect(jogadorCorpo('2030-01-01').safeParse({ ...VALIDO, anoNascimento: 2020 }).success).toBe(
+      true,
+    );
+    expect(
+      mensagens(editarJogadorCorpo('2030-01-01').safeParse({ ...VALIDO, anoNascimento: 2021 })),
+    ).toEqual({
       anoNascimento: ['O ano precisa estar entre 1940 e 2020.'],
     });
   });
@@ -83,12 +98,23 @@ describe('anoNascimento', () => {
 
 describe('posicao', () => {
   it('GEL-37: "defensor" é recusado no campo posicao', () => {
-    expect(mensagens(cadastro.safeParse({ ...VALIDO, posicao: 'defensor' }))).toEqual({ posicao: [MENSAGEM_POSICAO] });
+    expect(mensagens(cadastro.safeParse({ ...VALIDO, posicao: 'defensor' }))).toEqual({
+      posicao: [MENSAGEM_POSICAO],
+    });
   });
 
   it('GEL-37: as 7 posições são aceitas', () => {
-    expect(POSICOES).toEqual(['goleiro', 'zagueiro', 'lateral', 'volante', 'meia', 'atacante', 'centroavante']);
-    for (const posicao of POSICOES) expect(cadastro.safeParse({ ...VALIDO, posicao }).success).toBe(true);
+    expect(POSICOES).toEqual([
+      'goleiro',
+      'zagueiro',
+      'lateral',
+      'volante',
+      'meia',
+      'atacante',
+      'centroavante',
+    ]);
+    for (const posicao of POSICOES)
+      expect(cadastro.safeParse({ ...VALIDO, posicao }).success).toBe(true);
   });
 });
 
@@ -116,7 +142,9 @@ describe('telefone', () => {
     ['letra', '(11) 9123A-5678'],
     ['número em vez de texto', 11912345678],
   ])('GEL-39: %s é recusado com a mensagem', (_nome, telefone) => {
-    expect(mensagens(cadastro.safeParse({ ...VALIDO, telefone }))).toEqual({ telefone: [MENSAGEM_TELEFONE] });
+    expect(mensagens(cadastro.safeParse({ ...VALIDO, telefone }))).toEqual({
+      telefone: [MENSAGEM_TELEFONE],
+    });
     expect(MENSAGEM_TELEFONE).toBe('Informe o telefone como (DD) 9XXXX-XXXX.');
   });
 });
@@ -163,22 +191,30 @@ describe('dataEntrada', () => {
     expect(cadastro.parse(VALIDO).dataEntrada).toBeUndefined();
   });
 
-  it.each(['0000-01-01', '0001-01-01', '1999-12-31'])('SEC-002: %s é recusada com a mensagem do piso', (data) => {
-    expect(mensagens(cadastro.safeParse({ ...VALIDO, dataEntrada: data }))).toEqual({
-      dataEntrada: [MENSAGEM_DATA_ANTES_DO_PISO],
-    });
-    expect(MENSAGEM_DATA_ANTES_DO_PISO).toBe('A data de início não pode ser anterior a 01/01/2000.');
-  });
+  it.each(['0000-01-01', '0001-01-01', '1999-12-31'])(
+    'SEC-002: %s é recusada com a mensagem do piso',
+    (data) => {
+      expect(mensagens(cadastro.safeParse({ ...VALIDO, dataEntrada: data }))).toEqual({
+        dataEntrada: [MENSAGEM_DATA_ANTES_DO_PISO],
+      });
+      expect(MENSAGEM_DATA_ANTES_DO_PISO).toBe(
+        'A data de início não pode ser anterior a 01/01/2000.',
+      );
+    },
+  );
 
   it('SEC-002: 2000-01-01 é aceita', () => {
     expect(cadastro.parse({ ...VALIDO, dataEntrada: '2000-01-01' }).dataEntrada).toBe('2000-01-01');
   });
 
-  it.each(['2026-02-30', '2026-13-01', '05/11/2026', '2026-1-5', ''])('GEL-33: %j dá "Informe uma data válida."', (data) => {
-    expect(mensagens(cadastro.safeParse({ ...VALIDO, dataEntrada: data }))).toEqual({
-      dataEntrada: [MENSAGEM_DATA_INVALIDA],
-    });
-  });
+  it.each(['2026-02-30', '2026-13-01', '05/11/2026', '2026-1-5', ''])(
+    'GEL-33: %j dá "Informe uma data válida."',
+    (data) => {
+      expect(mensagens(cadastro.safeParse({ ...VALIDO, dataEntrada: data }))).toEqual({
+        dataEntrada: [MENSAGEM_DATA_INVALIDA],
+      });
+    },
+  );
 
   it('GEL-41: a edição recusa dataEntrada (só muda pela rota de início)', () => {
     expect(edicao.safeParse({ ...VALIDO, dataEntrada: HOJE }).success).toBe(false);
@@ -199,7 +235,15 @@ describe('corpos .strict() e respostas', () => {
   });
 
   it('GEL-46: item da lista com situação, desde, nível e semNota', () => {
-    const item = { id: 'j1', apelido: 'Toninho', posicao: 'meia', situacao: 'ativo', desde: HOJE, nivel: 550, semNota: true };
+    const item = {
+      id: 'j1',
+      apelido: 'Toninho',
+      posicao: 'meia',
+      situacao: 'ativo',
+      desde: HOJE,
+      nivel: 550,
+      semNota: true,
+    };
     expect(jogadorItem.parse(item)).toEqual(item);
     expect(jogadorItem.safeParse({ ...item, situacao: 'suspenso' }).success).toBe(false);
   });

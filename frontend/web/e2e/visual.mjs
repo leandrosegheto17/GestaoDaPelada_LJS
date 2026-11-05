@@ -6,7 +6,15 @@ import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { chromium } from '@playwright/test';
 import { compararPng, LIMITE_PADRAO, porcentagem } from './ferramentas/comparar.mjs';
-import { aplicarRespostas, cssOcultar, entradasAtivas, ocultarDe, printTela, recorteDe, RELOGIO_VISUAL } from './ferramentas/telas-reais.mjs';
+import {
+  aplicarRespostas,
+  cssOcultar,
+  entradasAtivas,
+  ocultarDe,
+  printTela,
+  recorteDe,
+  RELOGIO_VISUAL,
+} from './ferramentas/telas-reais.mjs';
 
 /**
  * Comparação visual das telas de vitrine com o mockup (FUN-38).
@@ -88,8 +96,17 @@ export function comparacoesReais(mapa, ativas) {
 
 function rodar(comando, args, env = {}) {
   return new Promise((resolver, rejeitar) => {
-    const filho = spawn(comando, args, { cwd: WEB, env: { ...process.env, ...env }, stdio: 'inherit', shell: true });
-    filho.on('exit', (codigo) => (codigo === 0 ? resolver() : rejeitar(new Error(`${comando} ${args.join(' ')} saiu com ${codigo}.`))));
+    const filho = spawn(comando, args, {
+      cwd: WEB,
+      env: { ...process.env, ...env },
+      stdio: 'inherit',
+      shell: true,
+    });
+    filho.on('exit', (codigo) =>
+      codigo === 0
+        ? resolver()
+        : rejeitar(new Error(`${comando} ${args.join(' ')} saiu com ${codigo}.`)),
+    );
   });
 }
 
@@ -121,12 +138,28 @@ async function principal() {
   const reais = comparacoesReais(mapa, JSON.parse(readFileSync(ATIVAS, 'utf8')));
   mkdirSync(SAIDA, { recursive: true });
 
-  await rodar('pnpm', ['exec', 'vite', 'build', '--outDir', JSON.stringify(BUILD), '--emptyOutDir'], { VITE_VITRINE: '1' });
-  if (!existsSync(join(BUILD, 'index.html'))) throw new Error('O build de vitrine não gerou o index.html.');
+  await rodar(
+    'pnpm',
+    ['exec', 'vite', 'build', '--outDir', JSON.stringify(BUILD), '--emptyOutDir'],
+    { VITE_VITRINE: '1' },
+  );
+  if (!existsSync(join(BUILD, 'index.html')))
+    throw new Error('O build de vitrine não gerou o index.html.');
 
   const servidor = spawn(
     'pnpm',
-    ['exec', 'vite', 'preview', '--outDir', JSON.stringify(BUILD), '--host', '127.0.0.1', '--port', String(PORTA), '--strictPort'],
+    [
+      'exec',
+      'vite',
+      'preview',
+      '--outDir',
+      JSON.stringify(BUILD),
+      '--host',
+      '127.0.0.1',
+      '--port',
+      String(PORTA),
+      '--strictPort',
+    ],
     { cwd: WEB, stdio: 'inherit', shell: true },
   );
   const navegador = await chromium.launch();
@@ -153,17 +186,29 @@ async function principal() {
       // Página nova por tela: as rotas falsas e o estado do app não passam de uma para a outra.
       // `userAgent` (T75): contexto próprio só para o lado do app.
       const contextoApp = c.entrada.userAgent
-        ? await navegador.newContext({ serviceWorkers: 'block', deviceScaleFactor: 1, userAgent: c.entrada.userAgent })
+        ? await navegador.newContext({
+            serviceWorkers: 'block',
+            deviceScaleFactor: 1,
+            userAgent: c.entrada.userAgent,
+          })
         : contexto;
       const paginaMockup = await contexto.newPage();
       const paginaApp = await contextoApp.newPage();
       const ocultar = ocultarDe(mapa, c.entrada);
       try {
-        await aplicarRespostas(paginaApp, c.entrada, { mockup: MOCKUP, globais: mapa.respostas ?? [] });
-        const mockup = await printTela(paginaMockup, pathToFileURL(join(MOCKUP, c.entrada.mockup)).href, c.viewport, {
-          recorte: recorteDe(c.entrada, 'mockup'),
-          ocultar: cssOcultar(ocultar, 'mockup'),
+        await aplicarRespostas(paginaApp, c.entrada, {
+          mockup: MOCKUP,
+          globais: mapa.respostas ?? [],
         });
+        const mockup = await printTela(
+          paginaMockup,
+          pathToFileURL(join(MOCKUP, c.entrada.mockup)).href,
+          c.viewport,
+          {
+            recorte: recorteDe(c.entrada, 'mockup'),
+            ocultar: cssOcultar(ocultar, 'mockup'),
+          },
+        );
         const app = await printTela(paginaApp, `${URL_BASE}${c.entrada.rota}`, c.viewport, {
           passos: c.entrada.passos,
           esperar: c.entrada.esperar,
@@ -189,11 +234,22 @@ async function principal() {
 
     // Controle: um componente deformado tem de reprovar.
     const controle = lista[0];
-    const mockup = await print(pagina, pathToFileURL(join(MOCKUP, controle.mockup)).href, controle.viewport);
-    const deformado = await print(pagina, `${URL_BASE}/_vitrine/${controle.vitrine}`, controle.viewport, DEFORMACAO);
+    const mockup = await print(
+      pagina,
+      pathToFileURL(join(MOCKUP, controle.mockup)).href,
+      controle.viewport,
+    );
+    const deformado = await print(
+      pagina,
+      `${URL_BASE}/_vitrine/${controle.vitrine}`,
+      controle.viewport,
+      DEFORMACAO,
+    );
     const r = compararPng(mockup, deformado, { limite: controle.limite });
     if (r.passou) {
-      console.log(`FALHA controle: o componente deslocado passou (${porcentagem(r.proporcao)}); a comparação não pega deformação.`);
+      console.log(
+        `FALHA controle: o componente deslocado passou (${porcentagem(r.proporcao)}); a comparação não pega deformação.`,
+      );
       falhas += 1;
     } else {
       console.log(`ok    controle: o componente deslocado reprovou (${porcentagem(r.proporcao)}).`);
@@ -205,12 +261,20 @@ async function principal() {
       const paginaMockup = await contexto.newPage();
       const paginaApp = await contexto.newPage();
       try {
-        await aplicarRespostas(paginaApp, real.entrada, { mockup: MOCKUP, globais: mapa.respostas ?? [] });
-        const ocultar = ocultarDe(mapa, real.entrada);
-        const m = await printTela(paginaMockup, pathToFileURL(join(MOCKUP, real.entrada.mockup)).href, real.viewport, {
-          recorte: recorteDe(real.entrada, 'mockup'),
-          ocultar: cssOcultar(ocultar, 'mockup'),
+        await aplicarRespostas(paginaApp, real.entrada, {
+          mockup: MOCKUP,
+          globais: mapa.respostas ?? [],
         });
+        const ocultar = ocultarDe(mapa, real.entrada);
+        const m = await printTela(
+          paginaMockup,
+          pathToFileURL(join(MOCKUP, real.entrada.mockup)).href,
+          real.viewport,
+          {
+            recorte: recorteDe(real.entrada, 'mockup'),
+            ocultar: cssOcultar(ocultar, 'mockup'),
+          },
+        );
         const d = await printTela(paginaApp, `${URL_BASE}${real.entrada.rota}`, real.viewport, {
           passos: real.entrada.passos,
           esperar: real.entrada.esperar,
@@ -221,10 +285,14 @@ async function principal() {
         });
         const rr = compararPng(m, d, { limite: real.limite });
         if (rr.passou) {
-          console.log(`FALHA controle ${real.nome}: a tela deformada passou (${porcentagem(rr.proporcao)}).`);
+          console.log(
+            `FALHA controle ${real.nome}: a tela deformada passou (${porcentagem(rr.proporcao)}).`,
+          );
           falhas += 1;
         } else {
-          console.log(`ok    controle ${real.nome}: a tela deformada reprovou (${porcentagem(rr.proporcao)}).`);
+          console.log(
+            `ok    controle ${real.nome}: a tela deformada reprovou (${porcentagem(rr.proporcao)}).`,
+          );
         }
       } finally {
         await paginaMockup.close();
@@ -238,7 +306,11 @@ async function principal() {
   }
 
   const total = lista.length + reais.length;
-  console.log(falhas === 0 ? `Comparação visual: ${total} telas em até 1%.` : `Comparação visual: ${falhas} falha(s). Prints em ${SAIDA}.`);
+  console.log(
+    falhas === 0
+      ? `Comparação visual: ${total} telas em até 1%.`
+      : `Comparação visual: ${falhas} falha(s). Prints em ${SAIDA}.`,
+  );
   process.exitCode = falhas === 0 ? 0 : 1;
 }
 

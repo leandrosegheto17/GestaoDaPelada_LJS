@@ -1,7 +1,12 @@
 import type pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { comCliente } from '../apoio/banco.ts';
-import { abrirCenarioConta, novoToken, sha256, type CenarioContaAberto } from '../isolamento/cenario-conta.ts';
+import {
+  abrirCenarioConta,
+  novoToken,
+  sha256,
+  type CenarioContaAberto,
+} from '../isolamento/cenario-conta.ts';
 import { comoAppAqui, comoSuper, numaTransacao, umaLinha } from './apoio-conta.ts';
 
 /**
@@ -35,21 +40,32 @@ afterAll(async () => {
 });
 
 async function reservarEm(db: pg.Client, momento: string, teto: number): Promise<boolean> {
-  const r = await umaLinha<{ ok: boolean }>(db, 'SELECT email_cota_reservar_em($1::timestamptz, $2) AS ok', [momento, teto]);
+  const r = await umaLinha<{ ok: boolean }>(
+    db,
+    'SELECT email_cota_reservar_em($1::timestamptz, $2) AS ok',
+    [momento, teto],
+  );
   return r.ok;
 }
 
 async function totalDoDia(db: pg.Client, dia: string): Promise<number | null> {
-  const r = await db.query<{ total: number }>('SELECT total FROM envios_email_dia WHERE dia = $1', [dia]);
+  const r = await db.query<{ total: number }>('SELECT total FROM envios_email_dia WHERE dia = $1', [
+    dia,
+  ]);
   return r.rows[0]?.total ?? null;
 }
 
-async function registrarEm(db: pg.Client, momento: string, chave: Buffer, teto: number | null): Promise<boolean> {
-  const r = await umaLinha<{ ok: boolean }>(db, 'SELECT email_origem_registrar_em($1::timestamptz, $2, $3) AS ok', [
-    momento,
-    chave,
-    teto,
-  ]);
+async function registrarEm(
+  db: pg.Client,
+  momento: string,
+  chave: Buffer,
+  teto: number | null,
+): Promise<boolean> {
+  const r = await umaLinha<{ ok: boolean }>(
+    db,
+    'SELECT email_origem_registrar_em($1::timestamptz, $2, $3) AS ok',
+    [momento, chave, teto],
+  );
   return r.ok;
 }
 
@@ -120,7 +136,9 @@ describe('cota diária de e-mails', () => {
       await comoAppAqui(db);
       const r = await umaLinha<{ ok: boolean }>(db, 'SELECT email_cota_reservar(80) AS ok');
       expect(r.ok).toBe(true);
-      await expect(db.query(`SELECT email_cota_reservar_em(now(), 80)`)).rejects.toMatchObject({ code: '42501' });
+      await expect(db.query(`SELECT email_cota_reservar_em(now(), 80)`)).rejects.toMatchObject({
+        code: '42501',
+      });
     });
   });
 });
@@ -129,7 +147,12 @@ describe('cota de pedidos por origem', () => {
   const AGORA = `${DIA} 12:00:00-03`;
   const CHAVE = sha256('203.0.113.0');
 
-  async function pedidosAtras(db: pg.Client, chave: Buffer, n: number, atras: string): Promise<void> {
+  async function pedidosAtras(
+    db: pg.Client,
+    chave: Buffer,
+    n: number,
+    atras: string,
+  ): Promise<void> {
     await db.query(
       `INSERT INTO pedidos_email_origem (chave_hash, momento) SELECT $1, $2::timestamptz - ${atras} FROM generate_series(1, $3)`,
       [chave, AGORA, n],
@@ -142,7 +165,11 @@ describe('cota de pedidos por origem', () => {
       await pedidosAtras(db, CHAVE, 19, "interval '30 minutes'");
       expect(await registrarEm(db, AGORA, CHAVE, 20)).toBe(true);
       expect(await registrarEm(db, AGORA, CHAVE, 20)).toBe(false);
-      const r = await umaLinha<{ n: number }>(db, 'SELECT count(*)::int AS n FROM pedidos_email_origem WHERE chave_hash = $1', [CHAVE]);
+      const r = await umaLinha<{ n: number }>(
+        db,
+        'SELECT count(*)::int AS n FROM pedidos_email_origem WHERE chave_hash = $1',
+        [CHAVE],
+      );
       expect(r.n).toBe(20);
     });
   });
@@ -152,7 +179,11 @@ describe('cota de pedidos por origem', () => {
     await numaTransacao(db, async () => {
       await pedidosAtras(db, CHAVE, 20, "interval '1 hour'");
       expect(await registrarEm(db, AGORA, CHAVE, 20)).toBe(true);
-      const r = await umaLinha<{ n: number }>(db, 'SELECT count(*)::int AS n FROM pedidos_email_origem WHERE chave_hash = $1', [CHAVE]);
+      const r = await umaLinha<{ n: number }>(
+        db,
+        'SELECT count(*)::int AS n FROM pedidos_email_origem WHERE chave_hash = $1',
+        [CHAVE],
+      );
       expect(r.n).toBe(1);
     });
   });
@@ -184,7 +215,9 @@ describe('cota de pedidos por origem', () => {
     const { db } = aberto;
     await numaTransacao(db, async () => {
       await comoAppAqui(db);
-      const r = await umaLinha<{ ok: boolean }>(db, 'SELECT email_origem_registrar($1, 20) AS ok', [CHAVE]);
+      const r = await umaLinha<{ ok: boolean }>(db, 'SELECT email_origem_registrar($1, 20) AS ok', [
+        CHAVE,
+      ]);
       expect(r.ok).toBe(true);
     });
   });
@@ -205,21 +238,33 @@ describe('esqueci a senha de conta não confirmada', () => {
   it('ACE-73: conta não confirmada envia a recuperação com confirmada falso (a API gasta a cota de cadastro)', async () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
-      expect(await pedir(db, cenario.emailNaoConfirmada)).toEqual({ enviar: true, nome: 'Não Confirmada', confirmada: false });
+      expect(await pedir(db, cenario.emailNaoConfirmada)).toEqual({
+        enviar: true,
+        nome: 'Não Confirmada',
+        confirmada: false,
+      });
     });
   });
 
   it('ACE-73: conta confirmada envia com confirmada verdadeiro (cota de recuperação)', async () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
-      expect(await pedir(db, cenario.emailA)).toEqual({ enviar: true, nome: 'Conta A', confirmada: true });
+      expect(await pedir(db, cenario.emailA)).toEqual({
+        enviar: true,
+        nome: 'Conta A',
+        confirmada: true,
+      });
     });
   });
 
   it('ACE-73: sem conta, não envia e responde confirmada falso', async () => {
     const { db } = aberto;
     await numaTransacao(db, async () => {
-      expect(await pedir(db, 'ninguem@exemplo.test')).toEqual({ enviar: false, nome: null, confirmada: false });
+      expect(await pedir(db, 'ninguem@exemplo.test')).toEqual({
+        enviar: false,
+        nome: null,
+        confirmada: false,
+      });
     });
   });
 });
@@ -227,13 +272,18 @@ describe('esqueci a senha de conta não confirmada', () => {
 describe('trava do contador do dia', () => {
   it('ACE-75: com a linha do dia travada por 2,5 s, a reserva falha com 55P03 em cerca de 2 s e não conta', async () => {
     const { db, url } = aberto;
-    const hoje = await umaLinha<{ dia: string }>(db, `SELECT ((now() AT TIME ZONE 'America/Sao_Paulo')::date)::text AS dia`);
+    const hoje = await umaLinha<{ dia: string }>(
+      db,
+      `SELECT ((now() AT TIME ZONE 'America/Sao_Paulo')::date)::text AS dia`,
+    );
     await db.query('INSERT INTO envios_email_dia (dia, total) VALUES ($1, 5)', [hoje.dia]);
     try {
       await comCliente(url, async (dono) => {
         await dono.query('BEGIN');
         try {
-          await dono.query('UPDATE envios_email_dia SET total = total + 1 WHERE dia = $1', [hoje.dia]);
+          await dono.query('UPDATE envios_email_dia SET total = total + 1 WHERE dia = $1', [
+            hoje.dia,
+          ]);
           const segurar = new Promise((r) => setTimeout(r, 2500));
           const inicio = Date.now();
           const tentativa = comCliente(url, async (c) => {
@@ -267,7 +317,10 @@ describe('trava do contador do dia', () => {
       `SELECT proconfig AS config FROM pg_proc WHERE oid = 'email_cota_reservar(integer)'::regprocedure`,
     );
     expect(r.config).toContain('lock_timeout=2s');
-    const conexao = await umaLinha<{ v: string }>(db, `SELECT current_setting('lock_timeout') AS v`);
+    const conexao = await umaLinha<{ v: string }>(
+      db,
+      `SELECT current_setting('lock_timeout') AS v`,
+    );
     expect(conexao.v).toBe('0');
   });
 });

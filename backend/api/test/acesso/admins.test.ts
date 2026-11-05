@@ -70,7 +70,10 @@ describe('POST /api/grupos/:grupoId/admins/convites', () => {
   it('ACE-31: 201 com id, e-mail e validade de 7 dias, e o e-mail com o nome do grupo e o link na caixa', async () => {
     const { cenario } = aberto;
     const email = novoEmail();
-    const r = await pedir(`/grupos/${cenario.grupoA}/admins/convites`, { corpo: { email }, sessao: sessaoA });
+    const r = await pedir(`/grupos/${cenario.grupoA}/admins/convites`, {
+      corpo: { email },
+      sessao: sessaoA,
+    });
     expect(r.status).toBe(201);
     const corpo = (await r.json()) as { id: string; email: string; expiraEm: string };
     expect(corpo.email).toBe(email);
@@ -85,7 +88,10 @@ describe('POST /api/grupos/:grupoId/admins/convites', () => {
 
   it('ACE-32: e-mail que já é admin do grupo dá 409 ja_e_admin', async () => {
     const { cenario } = aberto;
-    const r = await pedir(`/grupos/${cenario.grupoA}/admins/convites`, { corpo: { email: cenario.emailA }, sessao: sessaoA });
+    const r = await pedir(`/grupos/${cenario.grupoA}/admins/convites`, {
+      corpo: { email: cenario.emailA },
+      sessao: sessaoA,
+    });
     expect(r.status).toBe(409);
     expect(await r.json()).toMatchObject({ codigo: 'ja_e_admin' });
   });
@@ -95,7 +101,10 @@ describe('POST /api/grupos/:grupoId/admins/convites', () => {
     const { caixaDev } = await import('../../src/infraestrutura/email/caixa-dev.ts');
     const email = novoEmail();
     caixaDev.falharProximos(1);
-    const r = await pedir(`/grupos/${cenario.grupoA}/admins/convites`, { corpo: { email }, sessao: sessaoA });
+    const r = await pedir(`/grupos/${cenario.grupoA}/admins/convites`, {
+      corpo: { email },
+      sessao: sessaoA,
+    });
     expect(r.status).toBe(503);
     const c = await aberto.db.query('SELECT 1 FROM convites_admin WHERE email = $1', [email]);
     expect(c.rowCount).toBe(0);
@@ -113,22 +122,35 @@ describe('GET e DELETE de convites', () => {
       admins: Array<{ id: string; nome: string; email: string; acessaFinanceiro: boolean }>;
       convites: Array<{ email: string }>;
     };
-    expect(corpo.admins).toContainEqual({ id: cenario.contaA, nome: 'Conta A', email: cenario.emailA, acessaFinanceiro: false });
+    expect(corpo.admins).toContainEqual({
+      id: cenario.contaA,
+      nome: 'Conta A',
+      email: cenario.emailA,
+      acessaFinanceiro: false,
+    });
     expect(corpo.convites.map((c) => c.email)).toContain(email);
   });
 
   it('ACE-38: cancelar dá 204 e o link do convite passa a dar 410', async () => {
     const { cenario } = aberto;
     const email = novoEmail();
-    const criado = await pedir(`/grupos/${cenario.grupoA}/admins/convites`, { corpo: { email }, sessao: sessaoA });
+    const criado = await pedir(`/grupos/${cenario.grupoA}/admins/convites`, {
+      corpo: { email },
+      sessao: sessaoA,
+    });
     const { id } = (await criado.json()) as { id: string };
     const token = tokenDoEmail(emailsPara(email, 'convite')[0]);
     expect((await pedir('/convites/ler', { corpo: { token } })).status).toBe(200);
 
-    const r = await pedir(`/grupos/${cenario.grupoA}/admins/convites/${id}`, { metodo: 'DELETE', sessao: sessaoA });
+    const r = await pedir(`/grupos/${cenario.grupoA}/admins/convites/${id}`, {
+      metodo: 'DELETE',
+      sessao: sessaoA,
+    });
     expect(r.status).toBe(204);
     expect((await pedir('/convites/ler', { corpo: { token } })).status).toBe(410);
-    const lista = (await (await pedir(`/grupos/${cenario.grupoA}/admins`, { sessao: sessaoA })).json()) as {
+    const lista = (await (
+      await pedir(`/grupos/${cenario.grupoA}/admins`, { sessao: sessaoA })
+    ).json()) as {
       convites: Array<{ id: string }>;
     };
     expect(lista.convites.map((c) => c.id)).not.toContain(id);
@@ -137,8 +159,22 @@ describe('GET e DELETE de convites', () => {
   it('ACE-38: cancelar convite inexistente ou com id que não é uuid dá 404', async () => {
     const { cenario } = aberto;
     const inexistente = '00000000-0000-4000-8000-000000000000';
-    expect((await pedir(`/grupos/${cenario.grupoA}/admins/convites/${inexistente}`, { metodo: 'DELETE', sessao: sessaoA })).status).toBe(404);
-    expect((await pedir(`/grupos/${cenario.grupoA}/admins/convites/abc`, { metodo: 'DELETE', sessao: sessaoA })).status).toBe(404);
+    expect(
+      (
+        await pedir(`/grupos/${cenario.grupoA}/admins/convites/${inexistente}`, {
+          metodo: 'DELETE',
+          sessao: sessaoA,
+        })
+      ).status,
+    ).toBe(404);
+    expect(
+      (
+        await pedir(`/grupos/${cenario.grupoA}/admins/convites/abc`, {
+          metodo: 'DELETE',
+          sessao: sessaoA,
+        })
+      ).status,
+    ).toBe(404);
   });
 });
 
@@ -146,9 +182,14 @@ describe('DELETE /api/grupos/:grupoId/admins/:contaId', () => {
   it('ACE-39, ACE-42: remover dá 204, apaga o vínculo e grava a auditoria', async () => {
     const { cenario } = aberto;
     const grupo = await grupoComDoisAdmins();
-    const r = await pedir(`/grupos/${grupo}/admins/${cenario.contaB}`, { metodo: 'DELETE', sessao: sessaoA });
+    const r = await pedir(`/grupos/${grupo}/admins/${cenario.contaB}`, {
+      metodo: 'DELETE',
+      sessao: sessaoA,
+    });
     expect(r.status).toBe(204);
-    const v = await aberto.db.query('SELECT conta_id FROM vinculos_admin WHERE grupo_id = $1', [grupo]);
+    const v = await aberto.db.query('SELECT conta_id FROM vinculos_admin WHERE grupo_id = $1', [
+      grupo,
+    ]);
     expect(v.rows.map((l: { conta_id: string }) => l.conta_id)).toEqual([cenario.contaA]);
     const a = await aberto.db.query<{ acao: string; autor_conta_id: string }>(
       'SELECT acao, autor_conta_id FROM auditoria WHERE grupo_id = $1',
@@ -159,7 +200,10 @@ describe('DELETE /api/grupos/:grupoId/admins/:contaId', () => {
 
   it('ACE-40: remover o último admin dá 409 ultimo_admin', async () => {
     const { cenario } = aberto;
-    const r = await pedir(`/grupos/${cenario.grupoA}/admins/${cenario.contaA}`, { metodo: 'DELETE', sessao: sessaoA });
+    const r = await pedir(`/grupos/${cenario.grupoA}/admins/${cenario.contaA}`, {
+      metodo: 'DELETE',
+      sessao: sessaoA,
+    });
     expect(r.status).toBe(409);
     expect(await r.json()).toMatchObject({ codigo: 'ultimo_admin' });
   });
@@ -167,7 +211,10 @@ describe('DELETE /api/grupos/:grupoId/admins/:contaId', () => {
   it('ACE-42: convidar grava a auditoria com autor, ação e grupo', async () => {
     const { cenario } = aberto;
     const grupo = await grupoComDoisAdmins();
-    await pedir(`/grupos/${grupo}/admins/convites`, { corpo: { email: novoEmail() }, sessao: sessaoB });
+    await pedir(`/grupos/${grupo}/admins/convites`, {
+      corpo: { email: novoEmail() },
+      sessao: sessaoB,
+    });
     const a = await aberto.db.query<{ acao: string; autor_conta_id: string }>(
       'SELECT acao, autor_conta_id FROM auditoria WHERE grupo_id = $1',
       [grupo],
@@ -182,12 +229,24 @@ describe('ACE-41: sem vínculo com o grupo', () => {
     const g = cenario.grupoA;
     const respostas = await Promise.all([
       pedir(`/grupos/${g}/admins`, { sessao: sessaoSemVinculo }),
-      pedir(`/grupos/${g}/admins/convites`, { corpo: { email: novoEmail() }, sessao: sessaoSemVinculo }),
-      pedir(`/grupos/${g}/admins/convites/00000000-0000-4000-8000-000000000000`, { metodo: 'DELETE', sessao: sessaoSemVinculo }),
-      pedir(`/grupos/${g}/admins/${cenario.contaA}`, { metodo: 'DELETE', sessao: sessaoSemVinculo }),
+      pedir(`/grupos/${g}/admins/convites`, {
+        corpo: { email: novoEmail() },
+        sessao: sessaoSemVinculo,
+      }),
+      pedir(`/grupos/${g}/admins/convites/00000000-0000-4000-8000-000000000000`, {
+        metodo: 'DELETE',
+        sessao: sessaoSemVinculo,
+      }),
+      pedir(`/grupos/${g}/admins/${cenario.contaA}`, {
+        metodo: 'DELETE',
+        sessao: sessaoSemVinculo,
+      }),
     ]);
     expect(respostas.map((r) => r.status)).toEqual([404, 404, 404, 404]);
-    const v = await aberto.db.query('SELECT 1 FROM vinculos_admin WHERE grupo_id = $1 AND conta_id = $2', [g, cenario.contaA]);
+    const v = await aberto.db.query(
+      'SELECT 1 FROM vinculos_admin WHERE grupo_id = $1 AND conta_id = $2',
+      [g, cenario.contaA],
+    );
     expect(v.rowCount).toBe(1);
   });
 
@@ -197,7 +256,10 @@ describe('ACE-41: sem vínculo com o grupo', () => {
     const respostas = await Promise.all([
       pedir(`/grupos/${g}/admins`, { sessao: sessaoB }),
       pedir(`/grupos/${g}/admins/convites`, { corpo: { email: novoEmail() }, sessao: sessaoB }),
-      pedir(`/grupos/${g}/admins/convites/00000000-0000-4000-8000-000000000000`, { metodo: 'DELETE', sessao: sessaoB }),
+      pedir(`/grupos/${g}/admins/convites/00000000-0000-4000-8000-000000000000`, {
+        metodo: 'DELETE',
+        sessao: sessaoB,
+      }),
       pedir(`/grupos/${g}/admins/${cenario.contaA}`, { metodo: 'DELETE', sessao: sessaoB }),
     ]);
     expect(respostas.map((r) => r.status)).toEqual([404, 404, 404, 404]);

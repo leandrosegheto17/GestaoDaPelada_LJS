@@ -12,7 +12,13 @@ import { ErroApi, MENSAGEM_REDE } from '../../dados/cliente.ts';
 import { useInativarJogador, useReativarJogador } from '../../dados/elenco.ts';
 import { mensagensDosCampos } from '../../dados/erros-campo.ts';
 import { hojeEmSaoPaulo } from '../../dados/hoje.ts';
-import { TEXTO_CALCULANDO, TEXTO_ERRO_PREVIA, usePedirPrevias, usePrevia, type EstadoPrevia } from '../../dados/previas.ts';
+import {
+  TEXTO_CALCULANDO,
+  TEXTO_ERRO_PREVIA,
+  usePedirPrevias,
+  usePrevia,
+  type EstadoPrevia,
+} from '../../dados/previas.ts';
 import modulo from '../grupos-elenco.module.css';
 import { rotaDoGrupo } from '../grupos/Grupos.tsx';
 
@@ -39,10 +45,12 @@ import { rotaDoGrupo } from '../grupos/Grupos.tsx';
 
 export const TEXTO_INATIVAR =
   'Ele sai do ranking, do lançamento, do simulador e do financeiro a partir da data de saída. O histórico e os pontos ficam guardados.';
-export const TEXTO_REATIVAR_JOGADOR = 'Volta a aparecer no ranking e nas partidas; a data de início não muda.';
+export const TEXTO_REATIVAR_JOGADOR =
+  'Volta a aparecer no ranking e nas partidas; a data de início não muda.';
 export const tituloInativar = (apelido: string) => `Inativar ${apelido}`;
 export const tituloReativarJogador = (apelido: string) => `Reativar ${apelido}`;
-export const textoReativado = (apelido: string, data: string) => `${apelido} reativado desde ${formatarData(data)}.`;
+export const textoReativado = (apelido: string, data: string) =>
+  `${apelido} reativado desde ${formatarData(data)}.`;
 export const ajudaRetorno = (saidaAnterior: string | null) =>
   saidaAnterior === null
     ? 'Pode ser uma data que já passou, se ele voltou a jogar antes de você registrar.'
@@ -66,7 +74,8 @@ export function saidaAnterior(ficha: Pick<JogadorDetalhe, 'periodos'>): string |
 export function recusaDaPrevia(estado: EstadoPrevia<unknown>): string | undefined {
   if (estado.tipo !== 'erro') return undefined;
   const { erro } = estado;
-  if (erro instanceof ErroApi && erro.status >= 400 && erro.status < 500) return erroDePeriodo(erro).campo ?? erro.message;
+  if (erro instanceof ErroApi && erro.status >= 400 && erro.status < 500)
+    return erroDePeriodo(erro).campo ?? erro.message;
   return undefined;
 }
 
@@ -147,7 +156,10 @@ function DialogoData({
 }) {
   const [hoje] = useState(() => hojeEmSaoPaulo());
   const [data, setData] = useState(hoje);
-  const { estado, tentarDeNovo } = usePrevia(pedirPrevia && ehDataReal(data) ? () => pedirPrevia(data) : null, data);
+  const { estado, tentarDeNovo } = usePrevia(
+    pedirPrevia && ehDataReal(data) ? () => pedirPrevia(data) : null,
+    data,
+  );
   const comPrevia = pedirPrevia !== undefined;
   const prontaParaConfirmar = !comPrevia || estado.tipo === 'pronta';
   const erroDoCampo = erroCampo ?? (comPrevia ? recusaDaPrevia(estado) : undefined);
@@ -175,8 +187,22 @@ function DialogoData({
       }
     >
       {falha ? <Faixa tipo="erro">{falha}</Faixa> : null}
-      <CampoData id={id} rotulo={rotulo} max={hoje} ajuda={ajuda} erro={erroDoCampo} value={data} onChange={(e) => setData(e.target.value)} />
-      {comPrevia ? <BlocoPrevia estado={estado} tentarDeNovo={tentarDeNovo} mostrar={(p) => <PreviaPeriodos previa={p} />} /> : null}
+      <CampoData
+        id={id}
+        rotulo={rotulo}
+        max={hoje}
+        ajuda={ajuda}
+        erro={erroDoCampo}
+        value={data}
+        onChange={(e) => setData(e.target.value)}
+      />
+      {comPrevia ? (
+        <BlocoPrevia
+          estado={estado}
+          tentarDeNovo={tentarDeNovo}
+          mostrar={(p) => <PreviaPeriodos previa={p} />}
+        />
+      ) : null}
     </Dialogo>
   );
 }

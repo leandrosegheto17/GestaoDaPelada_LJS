@@ -55,7 +55,9 @@ function paraBase64(buffer: ArrayBuffer): string {
 }
 
 /** Lê as TTF da pasta pública; qualquer falha devolve `null` (Helvetica). */
-export async function carregarFontesPadrao(buscar: typeof fetch = globalThis.fetch.bind(globalThis)): Promise<FontesPdf | null> {
+export async function carregarFontesPadrao(
+  buscar: typeof fetch = globalThis.fetch.bind(globalThis),
+): Promise<FontesPdf | null> {
   try {
     const pares = await Promise.all(
       FONTES_TTF.map(async ({ arquivo }) => {
@@ -95,7 +97,11 @@ function instalarFontes(doc: Documento, fontes: FontesPdf | null): Tipografia {
       texto: (t) => t,
     };
   }
-  return { familia: () => 'helvetica', estilo: (_f, p) => (p === 'negrito' ? 'bold' : 'normal'), texto: paraWinAnsi };
+  return {
+    familia: () => 'helvetica',
+    estilo: (_f, p) => (p === 'negrito' ? 'bold' : 'normal'),
+    texto: paraWinAnsi,
+  };
 }
 
 function desenharIcone(doc: Documento, e: Extract<Elemento, { tipo: 'icone' }>): void {
@@ -107,7 +113,12 @@ function desenharIcone(doc: Documento, e: Extract<Elemento, { tipo: 'icone' }>):
     doc.circle(e.x, e.y, r * 0.38, 'S');
     for (let i = 0; i < 8; i += 1) {
       const a = (Math.PI / 4) * i;
-      doc.line(e.x + Math.cos(a) * r * 0.62, e.y + Math.sin(a) * r * 0.62, e.x + Math.cos(a) * r, e.y + Math.sin(a) * r);
+      doc.line(
+        e.x + Math.cos(a) * r * 0.62,
+        e.y + Math.sin(a) * r * 0.62,
+        e.x + Math.cos(a) * r,
+        e.y + Math.sin(a) * r,
+      );
     }
     return;
   }
@@ -168,7 +179,10 @@ export interface OpcoesGerarPdf {
 
 /** Desenha a folha num documento novo (exportado para o teste da comparação visual, T77). */
 export async function desenharFolha(folha: Folha, opcoes: OpcoesGerarPdf = {}): Promise<Documento> {
-  const [{ jsPDF }, fontes] = await Promise.all([(opcoes.jspdf ?? carregarJspdf)(), (opcoes.fontes ?? carregarFontesPadrao)()]);
+  const [{ jsPDF }, fontes] = await Promise.all([
+    (opcoes.jspdf ?? carregarJspdf)(),
+    (opcoes.fontes ?? carregarFontesPadrao)(),
+  ]);
   const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4', compress: false });
   const tipo = instalarFontes(doc, fontes);
   folha.paginas.forEach((elementos, i) => {

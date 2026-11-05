@@ -1,6 +1,10 @@
 import { cleanup, fireEvent, screen, within } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
-import { Jogadores, TEXTO_SEM_ATIVOS, TEXTO_SEM_INATIVOS } from '../../src/telas/jogadores/Jogadores.tsx';
+import {
+  Jogadores,
+  TEXTO_SEM_ATIVOS,
+  TEXTO_SEM_INATIVOS,
+} from '../../src/telas/jogadores/Jogadores.tsx';
 import { esperarSemViolacoes } from '../apoio/axe.ts';
 import { abrirTela, json, pendente, SESSAO_ANA, type Manipulador } from '../apoio/tela.tsx';
 
@@ -15,7 +19,16 @@ const rotas = () => [
 ];
 
 function jogador(id: string, apelido: string, extra: Record<string, unknown> = {}) {
-  return { id, apelido, posicao: 'meia', situacao: 'ativo', desde: '2026-01-10', nivel: 683, semNota: false, ...extra };
+  return {
+    id,
+    apelido,
+    posicao: 'meia',
+    situacao: 'ativo',
+    desde: '2026-01-10',
+    nivel: 683,
+    semNota: false,
+    ...extra,
+  };
 }
 
 const LISTA = {
@@ -45,14 +58,15 @@ describe('tela Jogadores (t15)', () => {
     const { container } = abrir({ 'GET /api/grupos/g-quinta/jogadores': () => json(200, LISTA) });
     const ativos = await screen.findByRole('tab', { name: 'Ativos (4)' });
     expect(ativos.getAttribute('aria-selected')).toBe('true');
-    expect(screen.getByRole('tab', { name: 'Inativos (1)' }).getAttribute('aria-selected')).toBe('false');
+    expect(screen.getByRole('tab', { name: 'Inativos (1)' }).getAttribute('aria-selected')).toBe(
+      'false',
+    );
     const lista = screen.getByRole('list', { name: 'Jogadores ativos' });
-    expect(within(lista).getAllByRole('link').map((a) => a.querySelector('[class*="item__titulo"]')?.textContent)).toEqual([
-      'alemão',
-      'José',
-      'Léo Baiano',
-      'Zé Carlos',
-    ]);
+    expect(
+      within(lista)
+        .getAllByRole('link')
+        .map((a) => a.querySelector('[class*="item__titulo"]')?.textContent),
+    ).toEqual(['alemão', 'José', 'Léo Baiano', 'Zé Carlos']);
     expect(within(lista).queryByText('Toninho')).toBeNull();
     await esperarSemViolacoes(container);
   });
@@ -82,14 +96,24 @@ describe('tela Jogadores (t15)', () => {
     const busca = await screen.findByRole('searchbox', { name: 'Buscar jogador' });
     fireEvent.change(busca, { target: { value: 'jose' } });
     let lista = screen.getByRole('list', { name: 'Jogadores ativos' });
-    expect(within(lista).getAllByRole('link').map((a) => a.querySelector('[class*="item__titulo"]')?.textContent)).toEqual(['José']);
+    expect(
+      within(lista)
+        .getAllByRole('link')
+        .map((a) => a.querySelector('[class*="item__titulo"]')?.textContent),
+    ).toEqual(['José']);
     fireEvent.change(busca, { target: { value: 'ALEM' } });
     lista = screen.getByRole('list', { name: 'Jogadores ativos' });
-    expect(within(lista).getAllByRole('link').map((a) => a.querySelector('[class*="item__titulo"]')?.textContent)).toEqual(['alemão']);
+    expect(
+      within(lista)
+        .getAllByRole('link')
+        .map((a) => a.querySelector('[class*="item__titulo"]')?.textContent),
+    ).toEqual(['alemão']);
   });
 
   it('GEL-49: sem ativos, "Nenhum jogador cadastrado." com "Novo jogador"; axe sem violação', async () => {
-    const { container } = abrir({ 'GET /api/grupos/g-quinta/jogadores': () => json(200, { jogadores: [] }) });
+    const { container } = abrir({
+      'GET /api/grupos/g-quinta/jogadores': () => json(200, { jogadores: [] }),
+    });
     expect(await screen.findByRole('heading', { level: 2, name: TEXTO_SEM_ATIVOS })).toBeTruthy();
     expect(screen.getByRole('tab', { name: 'Ativos (0)' })).toBeTruthy();
     expect(screen.getByRole('tab', { name: 'Inativos (0)' })).toBeTruthy();
@@ -102,7 +126,8 @@ describe('tela Jogadores (t15)', () => {
 
   it('GEL-49: sem inativos, "Nenhum jogador inativo."; axe sem violação', async () => {
     const { container } = abrir({
-      'GET /api/grupos/g-quinta/jogadores': () => json(200, { jogadores: LISTA.jogadores.filter((j) => j.situacao === 'ativo') }),
+      'GET /api/grupos/g-quinta/jogadores': () =>
+        json(200, { jogadores: LISTA.jogadores.filter((j) => j.situacao === 'ativo') }),
     });
     fireEvent.click(await screen.findByRole('tab', { name: 'Inativos (0)' }));
     expect(screen.getByRole('heading', { level: 2, name: TEXTO_SEM_INATIVOS })).toBeTruthy();

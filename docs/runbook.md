@@ -157,37 +157,37 @@ Nenhum valor real vai para o repositório: o `.env.example` lista só os nomes, 
 
 ### Environment `producao` do GitHub (deploy da prévia, AD-119)
 
-| Secret                  | O que é                                                                    |
-| ----------------------- | -------------------------------------------------------------------------- |
-| `NEON_URL_MIGRACAO`     | URL postgres da role `pelada_owner` da `main` do Neon (migração)           |
-| `NEON_URL_BACKUP`       | URL postgres da role `pelada_backup_ro` da `main` (dump antes do deploy)   |
-| `BACKUP_CHAVE`          | Chave pública `age` do dump antes do deploy (a mesma do backup diário)     |
-| `NEON_API_KEY`          | Chave da API do Neon, com o menor escopo possível (branch de restauração)  |
-| `NEON_PROJECT_ID`       | Identificador do projeto no Neon                                           |
-| `CLOUDFLARE_API_TOKEN`  | Token da API da Cloudflare só com permissão de Workers                     |
-| `CLOUDFLARE_ACCOUNT_ID` | ID da conta Cloudflare                                                     |
-| `URL_PUBLICA`           | URL https da prévia (o endereço padrão da Cloudflare do Worker)            |
-| `VITE_SENTRY_DSN`       | Opcional: Sentry do front; vazio desliga                                   |
+| Secret                  | O que é                                                                   |
+| ----------------------- | ------------------------------------------------------------------------- |
+| `NEON_URL_MIGRACAO`     | URL postgres da role `pelada_owner` da `main` do Neon (migração)          |
+| `NEON_URL_BACKUP`       | URL postgres da role `pelada_backup_ro` da `main` (dump antes do deploy)  |
+| `BACKUP_CHAVE`          | Chave pública `age` do dump antes do deploy (a mesma do backup diário)    |
+| `NEON_API_KEY`          | Chave da API do Neon, com o menor escopo possível (branch de restauração) |
+| `NEON_PROJECT_ID`       | Identificador do projeto no Neon                                          |
+| `CLOUDFLARE_API_TOKEN`  | Token da API da Cloudflare só com permissão de Workers                    |
+| `CLOUDFLARE_ACCOUNT_ID` | ID da conta Cloudflare                                                    |
+| `URL_PUBLICA`           | URL https da prévia (o endereço padrão da Cloudflare do Worker)           |
+| `VITE_SENTRY_DSN`       | Opcional: Sentry do front; vazio desliga                                  |
 
 O plano original previa um environment `previa` sobre a branch `dev` do Neon; pela AD-119 ele não é usado.
 
 ### Environment `backup` do GitHub (backup diário, AD-013)
 
-| Secret            | O que é                                                    |
-| ----------------- | ---------------------------------------------------------- |
-| `NEON_URL_BACKUP` | URL postgres da role `pelada_backup_ro` da `main` do Neon  |
-| `BACKUP_CHAVE`    | Chave pública `age`; a privada fica fora do GitHub         |
+| Secret            | O que é                                                   |
+| ----------------- | --------------------------------------------------------- |
+| `NEON_URL_BACKUP` | URL postgres da role `pelada_backup_ro` da `main` do Neon |
+| `BACKUP_CHAVE`    | Chave pública `age`; a privada fica fora do GitHub        |
 
 ### Secret do Worker (Cloudflare)
 
-| Secret             | O que é                                                                      |
-| ------------------ | ---------------------------------------------------------------------------- |
-| `SENTRY_DSN`       | Opcional: Sentry do Worker; vazio desliga                                    |
-| `RESEND_API_KEY`   | Chave da API do Resend (começa por `re_`), para os e-mails de conta          |
+| Secret             | O que é                                                                          |
+| ------------------ | -------------------------------------------------------------------------------- |
+| `SENTRY_DSN`       | Opcional: Sentry do Worker; vazio desliga                                        |
+| `RESEND_API_KEY`   | Chave da API do Resend (começa por `re_`), para os e-mails de conta              |
 | `RESEND_REMETENTE` | Remetente dos e-mails de conta, ex. `Pelada <nao-responda@<domínio verificado>>` |
 
-| `ASAAS_API_KEY`    | Chave da API do Asaas **sandbox**, para criar cliente e assinatura (PLA-37)  |
-| `ASAAS_WEBHOOK_TOKEN` | `authToken` do webhook do Asaas: 32 a 255 caracteres, diferente da chave  |
+| `ASAAS_API_KEY` | Chave da API do Asaas **sandbox**, para criar cliente e assinatura (PLA-37) |
+| `ASAAS_WEBHOOK_TOKEN` | `authToken` do webhook do Asaas: 32 a 255 caracteres, diferente da chave |
 
 `LIMITE_EMAILS_DIA` é opcional (padrão 100) e `EMAIL_DEV` nunca existe no Worker publicado: sem ela, `GET /api/dev/emails` responde 404. `ASAAS_URL` não é secret: é a variável do `wrangler.jsonc`, fixa no sandbox (`https://api-sandbox.asaas.com/v3`).
 
@@ -198,7 +198,7 @@ Cadastro, reenvio da confirmação, recuperação de senha e convite de admin ma
 **Passos do usuário, uma vez** (nenhum valor vai para o repositório nem para esta página):
 
 1. No painel do Resend, adicione e verifique o domínio do remetente (registros DNS que o Resend mostra). Sem domínio verificado, o Resend só entrega para o e-mail da própria conta.
-2. Crie uma chave de API com permissão só de envio (*Sending access*), restrita a esse domínio.
+2. Crie uma chave de API com permissão só de envio (_Sending access_), restrita a esse domínio.
 3. Grave os dois secrets no Worker da prévia (`gestaodapelada-v2`); o valor é pedido no terminal:
 
 ```bash
@@ -221,7 +221,7 @@ A assinatura do Pro (R$ 9,90/mês por grupo) é cobrada pelo Asaas, **só no san
 
 **Passos do usuário, uma vez (`/preparar` Nível 2)** (nenhum valor vai para o repositório nem para esta página):
 
-1. No sandbox do Asaas (`https://sandbox.asaas.com`), gere a chave de API em *Integrações > Chave de API*.
+1. No sandbox do Asaas (`https://sandbox.asaas.com`), gere a chave de API em _Integrações > Chave de API_.
 2. Gere um token aleatório de 32 a 255 caracteres para o webhook, **diferente da chave** (ex.: `openssl rand -base64 48`).
 3. Grave os dois secrets no Worker da prévia (`gestaodapelada-v2`); o valor é pedido no terminal:
 
@@ -231,13 +231,13 @@ pnpm --filter @pelada/api exec wrangler secret put ASAAS_WEBHOOK_TOKEN --config 
 pnpm --filter @pelada/api exec wrangler secret list --config ../../wrangler.jsonc   # só os nomes
 ```
 
-4. No painel do sandbox, em *Integrações > Webhooks*, crie o webhook: URL `<URL_PUBLICA>/api/webhooks/asaas`, o mesmo token do passo 2 em *Token de autenticação* (o Asaas o manda no header `asaas-access-token`), envio **sequencial**, com os eventos de cobrança (`PAYMENT_*`) e de assinatura (`SUBSCRIPTION_*`) ligados.
-5. Confira: em Meu plano de um grupo de teste, assine com um CPF de teste; abra a fatura e, no painel do sandbox, marque a cobrança como recebida (*Cobranças > a cobrança > Confirmar recebimento*, ou "Simular pagamento"). Em até um minuto Meu plano mostra Pro com o `pagoAte` de um mês depois do vencimento.
+4. No painel do sandbox, em _Integrações > Webhooks_, crie o webhook: URL `<URL_PUBLICA>/api/webhooks/asaas`, o mesmo token do passo 2 em _Token de autenticação_ (o Asaas o manda no header `asaas-access-token`), envio **sequencial**, com os eventos de cobrança (`PAYMENT_*`) e de assinatura (`SUBSCRIPTION_*`) ligados.
+5. Confira: em Meu plano de um grupo de teste, assine com um CPF de teste; abra a fatura e, no painel do sandbox, marque a cobrança como recebida (_Cobranças > a cobrança > Confirmar recebimento_, ou "Simular pagamento"). Em até um minuto Meu plano mostra Pro com o `pagoAte` de um mês depois do vencimento.
 
 **Fila pausada.** O Asaas pausa a fila do webhook depois de **15 falhas seguidas** (qualquer resposta que não seja 200: Worker fora, token trocado, 5xx). Com a fila pausada, nenhum pagamento confirma o Pro e os eventos parados **somem depois de 14 dias**. Para retomar (PLA-72):
 
 1. Corrija a causa: confira a saúde (`/api/health`), o log do Worker (`wrangler tail`; o webhook registra só o tipo do evento e o status, nunca dado pessoal) e se o token do painel é o mesmo de `ASAAS_WEBHOOK_TOKEN`.
-2. No painel, em *Integrações > Webhooks*, reative a fila e mande reprocessar os eventos pendentes, antes dos 14 dias.
+2. No painel, em _Integrações > Webhooks_, reative a fila e mande reprocessar os eventos pendentes, antes dos 14 dias.
 3. Os eventos chegam fora de ordem e alguns repetidos: o app grava cada `id` uma vez só (repetido responde 200 sem efeito) e um evento mais antigo que o último aplicado na assinatura não regride a situação (PLA-48). Não é preciso reprocessar em ordem.
 4. Confira em Meu plano dos grupos afetados que a situação bate com a do painel do Asaas.
 

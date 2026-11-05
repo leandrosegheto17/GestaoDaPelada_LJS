@@ -11,7 +11,9 @@ const CHAVE_DE_PROVA = `${PREFIXO}${'AbC123'.repeat(7).slice(0, 40)}`;
 
 describe('checagem chave-asaas', () => {
   it('PLA-37: arquivo de prova com o prefixo do Asaas seguido de 40 caracteres reprova', () => {
-    const p = checarChaveAsaas([{ caminho: 'backend/api/src/x.ts', conteudo: `// ok\nconst k = '${CHAVE_DE_PROVA}';\n` }]);
+    const p = checarChaveAsaas([
+      { caminho: 'backend/api/src/x.ts', conteudo: `// ok\nconst k = '${CHAVE_DE_PROVA}';\n` },
+    ]);
     expect(p).toHaveLength(1);
     expect(p[0]).toMatch(/^backend\/api\/src\/x\.ts:2: parece uma chave da API do Asaas/);
     expect(p[0]).not.toContain(CHAVE_DE_PROVA);
@@ -19,19 +21,28 @@ describe('checagem chave-asaas', () => {
 
   it('PLA-37: a chave nova (prod_ ou hmlg_) também reprova, em qualquer arquivo', () => {
     const nova = `${PREFIXO}prod_${'a'.repeat(48)}`;
-    expect(checarChaveAsaas([{ caminho: '.env.example', conteudo: `ASAAS_API_KEY=${nova}\n` }])).toHaveLength(1);
-    expect(checarChaveAsaas([{ caminho: 'docs/runbook.md', conteudo: `use ${nova}` }])).toHaveLength(1);
+    expect(
+      checarChaveAsaas([{ caminho: '.env.example', conteudo: `ASAAS_API_KEY=${nova}\n` }]),
+    ).toHaveLength(1);
+    expect(
+      checarChaveAsaas([{ caminho: 'docs/runbook.md', conteudo: `use ${nova}` }]),
+    ).toHaveLength(1);
   });
 
   it('PLA-37: só o prefixo, ou com menos de 40 caracteres, passa (exemplo de formato na documentação)', () => {
-    expect(checarChaveAsaas([{ caminho: 'docs/x.md', conteudo: `A chave começa por ${PREFIXO}.` }])).toEqual([]);
-    expect(checarChaveAsaas([{ caminho: 'x.ts', conteudo: `${PREFIXO}${'a'.repeat(39)}` }])).toEqual([]);
+    expect(
+      checarChaveAsaas([{ caminho: 'docs/x.md', conteudo: `A chave começa por ${PREFIXO}.` }]),
+    ).toEqual([]);
+    expect(
+      checarChaveAsaas([{ caminho: 'x.ts', conteudo: `${PREFIXO}${'a'.repeat(39)}` }]),
+    ).toEqual([]);
   });
 
   it('PLA-37: o .env.example traz ASAAS_API_KEY, ASAAS_WEBHOOK_TOKEN e ASAAS_URL sem valor de segredo', () => {
     const texto = readFileSync(join(RAIZ, '.env.example'), 'utf8');
     const vars = new Map(lerEnvExample(texto).map((v) => [v.nome, v]));
-    for (const nome of ['ASAAS_API_KEY', 'ASAAS_WEBHOOK_TOKEN', 'ASAAS_URL']) expect(vars.has(nome)).toBe(true);
+    for (const nome of ['ASAAS_API_KEY', 'ASAAS_WEBHOOK_TOKEN', 'ASAAS_URL'])
+      expect(vars.has(nome)).toBe(true);
     expect(vars.get('ASAAS_API_KEY')?.valor).toBe('');
     expect(vars.get('ASAAS_WEBHOOK_TOKEN')?.valor).toBe('');
     expect(vars.get('ASAAS_API_KEY')?.comentario).toMatch(/segredo: sim/);

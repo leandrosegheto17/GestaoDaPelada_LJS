@@ -37,7 +37,8 @@ import { ListaPagamentos } from './ListaPagamentos.tsx';
 export const TEXTO_SEM_CONFIG = 'Caixa não configurado';
 export const TEXTO_SEM_CONFIG_AJUDA = 'Configure o saldo inicial para começar.';
 export const TEXTO_SEM_ACESSO = 'Sem acesso';
-export const TEXTO_SEM_ACESSO_AJUDA = 'Você não tem acesso ao financeiro deste grupo. Peça a um admin com acesso.';
+export const TEXTO_SEM_ACESSO_AJUDA =
+  'Você não tem acesso ao financeiro deste grupo. Peça a um admin com acesso.';
 export const TEXTO_SEM_LANCAMENTOS = 'Nenhum lançamento neste mês.';
 
 const NOMES_DOS_MESES = [
@@ -70,7 +71,9 @@ export function jogadores(n: number): string {
  * Os avulsos na ordem da API (do mais recente ao mais antigo) com a linha agrupada das mensalidades (T40) no lugar da
  * mais antiga delas: antes do primeiro avulso de data anterior (`t22-financeiro--sucesso.html:52-54`).
  */
-export function ordemDaLista(lancamentos: readonly LancamentoDoMes[]): Array<LancamentoDoMes | 'mensalidades'> {
+export function ordemDaLista(
+  lancamentos: readonly LancamentoDoMes[],
+): Array<LancamentoDoMes | 'mensalidades'> {
   const avulsos = lancamentos.filter((l) => !l.mensalidade);
   const mensalidades = lancamentos.filter((l) => l.mensalidade);
   if (mensalidades.length === 0) return avulsos;
@@ -83,13 +86,30 @@ export function ordemDaLista(lancamentos: readonly LancamentoDoMes[]): Array<Lan
 
 function Seta({ direcao }: { direcao: 'anterior' | 'seguinte' }) {
   return (
-    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+    <svg
+      viewBox="0 0 24 24"
+      width="26"
+      height="26"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
       <polyline points={direcao === 'anterior' ? '15 18 9 12 15 6' : '9 18 15 12 9 6'} />
     </svg>
   );
 }
 
-function NavegacaoMes({ dados, aoIr }: { dados: MesFinanceiroResposta; aoIr: (mes: string) => void }) {
+function NavegacaoMes({
+  dados,
+  aoIr,
+}: {
+  dados: MesFinanceiroResposta;
+  aoIr: (mes: string) => void;
+}) {
   const { mesAnterior, mesSeguinte } = dados.navegacao;
   return (
     <nav className={fin.mes} aria-label="Mês exibido">
@@ -139,7 +159,10 @@ function Mes({
       </div>
     );
   }
-  const titulo = config.mensalidadeCentavos === null ? 'Pagamentos do mês' : `Pagamentos do mês · ${formatarReais(config.mensalidadeCentavos)}`;
+  const titulo =
+    config.mensalidadeCentavos === null
+      ? 'Pagamentos do mês'
+      : `Pagamentos do mês · ${formatarReais(config.mensalidadeCentavos)}`;
   return (
     <>
       <div className={fin.ferramentas}>
@@ -195,7 +218,9 @@ function Mes({
                   ),
                 )}
               </Lista>
-              {dados.lancamentos.some((l) => l.mensalidade) ? <p className={fin.ajuda}>{TEXTO_AJUDA_MENSALIDADES}</p> : null}
+              {dados.lancamentos.some((l) => l.mensalidade) ? (
+                <p className={fin.ajuda}>{TEXTO_AJUDA_MENSALIDADES}</p>
+              ) : null}
             </>
           )}
         </section>
@@ -244,18 +269,24 @@ export function FinanceiroMes() {
     if (consulta.isPending) return <EsqueletoLista />;
     if (consulta.isError) {
       const erro = erroDoFinanceiro(consulta.error);
-      if (erro.codigo === 'nao_encontrado') return <Faixa tipo="atencao">Grupo não encontrado.</Faixa>;
+      if (erro.codigo === 'nao_encontrado')
+        return <Faixa tipo="atencao">Grupo não encontrado.</Faixa>;
       // Mês fora do histórico ou malformado no endereço (FIN-09): a mensagem da API e o caminho de volta ao mês atual.
       if (erro.status === 422) {
         return (
-          <Faixa tipo="atencao" acao={<LinkBotao para={`${base}/financeiro`}>Ir para o mês atual</LinkBotao>}>
+          <Faixa
+            tipo="atencao"
+            acao={<LinkBotao para={`${base}/financeiro`}>Ir para o mês atual</LinkBotao>}
+          >
             {erro.campos['mes'] ?? erro.mensagem}
           </Faixa>
         );
       }
       return <EstadoErro aoTentarDeNovo={() => void consulta.refetch()} />;
     }
-    return <Mes grupoId={grupoId} dados={consulta.data} base={base} aoIr={(m) => setBusca({ mes: m })} />;
+    return (
+      <Mes grupoId={grupoId} dados={consulta.data} base={base} aoIr={(m) => setBusca({ mes: m })} />
+    );
   }
 
   const semConfig = consulta.isSuccess && consulta.data.config === null;

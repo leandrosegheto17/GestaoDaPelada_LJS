@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { classificarDoisTimes, vagasDeReserva, type AptoOrdenado } from '../../src/simulador/classificacao.ts';
+import {
+  classificarDoisTimes,
+  vagasDeReserva,
+  type AptoOrdenado,
+} from '../../src/simulador/classificacao.ts';
 
 /**
  * Titulares, reservas que entram e "não entra" (T6; SIM-21, SIM-22, SIM-23, SIM-89).
@@ -14,7 +18,10 @@ import { classificarDoisTimes, vagasDeReserva, type AptoOrdenado } from '../../s
  */
 
 function aptos(quantos: number, so1o: readonly number[] = []): AptoOrdenado[] {
-  return Array.from({ length: quantos }, (_, i) => ({ id: `p${String(i + 1).padStart(2, '0')}`, so1oTempo: so1o.includes(i + 1) }));
+  return Array.from({ length: quantos }, (_, i) => ({
+    id: `p${String(i + 1).padStart(2, '0')}`,
+    so1oTempo: so1o.includes(i + 1),
+  }));
 }
 
 const ids = (lista: readonly AptoOrdenado[]): string[] => lista.map((a) => a.id);
@@ -70,7 +77,10 @@ describe('classificarDoisTimes', () => {
 
   it('SIM-23: reserva "só 1º" dentro do limite entra e joga só o 2º tempo', () => {
     const c = classificarDoisTimes(aptos(19, [15]), 7, 2);
-    expect(c.reservasQueEntram[0]).toEqual({ apto: { id: 'p15', so1oTempo: true }, jogaSo2oTempo: true });
+    expect(c.reservasQueEntram[0]).toEqual({
+      apto: { id: 'p15', so1oTempo: true },
+      jogaSo2oTempo: true,
+    });
     expect(c.reservasQueEntram.slice(1).every((r) => !r.jogaSo2oTempo)).toBe(true);
   });
 

@@ -22,15 +22,24 @@ describe('checagem push-hosts-dev', () => {
   });
 
   it('NOT-63: comentário que cita o nome não reprova, no JSONC e no YAML', () => {
-    expect(checarPushHostsDev(`{\n  // ${NOME} só no .env local\n  "vars": {}\n}\n`, 'wrangler.jsonc')).toEqual([]);
-    expect(checarPushHostsDev(`# ${NOME} nunca aqui\nrun: echo ok # sem ${NOME}\n`, '.github/workflows/deploy.yml')).toEqual(
-      [],
-    );
+    expect(
+      checarPushHostsDev(`{\n  // ${NOME} só no .env local\n  "vars": {}\n}\n`, 'wrangler.jsonc'),
+    ).toEqual([]);
+    expect(
+      checarPushHostsDev(
+        `# ${NOME} nunca aqui\nrun: echo ok # sem ${NOME}\n`,
+        '.github/workflows/deploy.yml',
+      ),
+    ).toEqual([]);
   });
 
   it('NOT-63: # dentro de string no YAML e // dentro de string no JSONC não escondem a variável', () => {
-    expect(checarPushHostsDev(`run: echo "a#b" ${NOME}=x\n`, '.github/workflows/deploy.yml')).toHaveLength(1);
-    expect(checarPushHostsDev(`{ "a": "https://x", "${NOME}": "1" }`, 'wrangler.jsonc')).toHaveLength(1);
+    expect(
+      checarPushHostsDev(`run: echo "a#b" ${NOME}=x\n`, '.github/workflows/deploy.yml'),
+    ).toHaveLength(1);
+    expect(
+      checarPushHostsDev(`{ "a": "https://x", "${NOME}": "1" }`, 'wrangler.jsonc'),
+    ).toHaveLength(1);
   });
 
   it('NOT-63: o wrangler.jsonc e o deploy.yml reais passam', () => {

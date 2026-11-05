@@ -4,7 +4,13 @@ import { describe, expect, it } from 'vitest';
 import { criarApp } from '../../src/entrada/app.ts';
 import { comBanco } from '../../src/entrada/middlewares/com-banco.ts';
 import { bancoDeTeste, comCliente } from '../apoio/banco.ts';
-import { contextoFalso, envCom, fabricaEspiada, type ContextoFalso, type FabricaEspiada } from './requisicao.ts';
+import {
+  contextoFalso,
+  envCom,
+  fabricaEspiada,
+  type ContextoFalso,
+  type FabricaEspiada,
+} from './requisicao.ts';
 
 /**
  * Tarefas depois do commit no `comBanco` (notificacoes T15; NOT-20, NOT-21, NOT-22; AD-068, AD-098): a rota registra
@@ -129,7 +135,12 @@ async function pedir(
   metodo = 'POST',
 ): Promise<{ r: Response; ctx: ContextoFalso }> {
   const ctx = contextoFalso();
-  const r = await m.app.request(caminho, { method: metodo, headers: { 'x-pelada': '1' } }, envCom(urlApp), ctx);
+  const r = await m.app.request(
+    caminho,
+    { method: metodo, headers: { 'x-pelada': '1' } },
+    envCom(urlApp),
+    ctx,
+  );
   return { r, ctx };
 }
 
@@ -146,17 +157,20 @@ describe('aposCommit', () => {
     });
   });
 
-  it.each([409, 422])('NOT-21: com %s, a gravação é desfeita e nenhuma tarefa roda', async (status) => {
-    await comMarcas(async (urlApp, admin) => {
-      const m = montar(admin);
-      const { r, ctx } = await pedir(m, urlApp, `/api/teste/apos/grava?fim=${status}`);
-      await ctx.esperar();
-      expect(r.status).toBe(status);
-      expect(m.eventos).toEqual([]);
-      expect(m.visto.linhas).toBeNull();
-      expect(m.espiada.consultas).toContain('ROLLBACK');
-    });
-  });
+  it.each([409, 422])(
+    'NOT-21: com %s, a gravação é desfeita e nenhuma tarefa roda',
+    async (status) => {
+      await comMarcas(async (urlApp, admin) => {
+        const m = montar(admin);
+        const { r, ctx } = await pedir(m, urlApp, `/api/teste/apos/grava?fim=${status}`);
+        await ctx.esperar();
+        expect(r.status).toBe(status);
+        expect(m.eventos).toEqual([]);
+        expect(m.visto.linhas).toBeNull();
+        expect(m.espiada.consultas).toContain('ROLLBACK');
+      });
+    },
+  );
 
   it('NOT-21: exceção no handler (500): nenhuma tarefa roda', async () => {
     await comMarcas(async (urlApp, admin) => {

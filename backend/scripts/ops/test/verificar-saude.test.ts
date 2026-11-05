@@ -34,7 +34,9 @@ async function subir(respostas: Resposta[]): Promise<{ url: string; pedidos: () 
     }
     const r = respostas[Math.min(n, respostas.length - 1)] as Resposta;
     n += 1;
-    res.writeHead(r.status, { 'Content-Type': 'application/json' }).end(JSON.stringify(r.corpo ?? {}));
+    res
+      .writeHead(r.status, { 'Content-Type': 'application/json' })
+      .end(JSON.stringify(r.corpo ?? {}));
   });
   servidor = s;
   await new Promise<void>((r) => s.listen(0, '127.0.0.1', () => r()));
@@ -88,7 +90,9 @@ describe('verificação de saúde pós-deploy', () => {
 
   it('FUN-42: URL com barra no fim consulta /api/health do mesmo jeito', async () => {
     const s = await subir([ok()]);
-    expect((await verificarSaude({ url: `${s.url}/`, sha: SHA, tentativas: 1, esperaMs: 1 })).ok).toBe(true);
+    expect(
+      (await verificarSaude({ url: `${s.url}/`, sha: SHA, tentativas: 1, esperaMs: 1 })).ok,
+    ).toBe(true);
   });
 
   it('FUN-42: URL ou SHA vazio reprova sem consultar', async () => {
@@ -99,16 +103,20 @@ describe('verificação de saúde pós-deploy', () => {
   it('FUN-42: na linha de comando, versão diferente sai com código 1', async () => {
     const s = await subir([ok('sha-antigo')]);
     const codigo = await new Promise<number | null>((resolver) => {
-      const filho = spawn(process.execPath, [join(import.meta.dirname, '..', 'verificar-saude.mjs')], {
-        env: {
-          PATH: process.env.PATH ?? '',
-          URL_PUBLICA: s.url,
-          GITHUB_SHA: SHA,
-          PELADA_SAUDE_TENTATIVAS: '2',
-          PELADA_SAUDE_ESPERA_MS: '1',
+      const filho = spawn(
+        process.execPath,
+        [join(import.meta.dirname, '..', 'verificar-saude.mjs')],
+        {
+          env: {
+            PATH: process.env.PATH ?? '',
+            URL_PUBLICA: s.url,
+            GITHUB_SHA: SHA,
+            PELADA_SAUDE_TENTATIVAS: '2',
+            PELADA_SAUDE_ESPERA_MS: '1',
+          },
+          stdio: 'ignore',
         },
-        stdio: 'ignore',
-      });
+      );
       filho.on('exit', resolver);
     });
     expect(codigo).toBe(1);

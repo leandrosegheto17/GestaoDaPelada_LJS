@@ -4,7 +4,10 @@ import { arquivarCorpo, corpoDoErro } from '@pelada/contrato';
 import type { Ambiente } from '../ambiente.ts';
 import { lerCorpoDoGrupo, respostaDeCampo } from '../corpo.ts';
 import { grupos } from '../../infraestrutura/db/repositorios/grupos.ts';
-import { gruposEstado, type ResultadoEstado } from '../../infraestrutura/db/repositorios/grupos-estado.ts';
+import {
+  gruposEstado,
+  type ResultadoEstado,
+} from '../../infraestrutura/db/repositorios/grupos-estado.ts';
 import { detalheDoGrupo } from './grupo.ts';
 
 /**
@@ -18,7 +21,11 @@ import { detalheDoGrupo } from './grupo.ts';
 /** GEL-23, texto da spec (`GS:142`). */
 export const MENSAGEM_NOME_NAO_CONFERE = 'O nome digitado não confere com o nome do grupo.';
 
-async function responder(c: Context<Ambiente>, grupoId: string, r: ResultadoEstado): Promise<Response> {
+async function responder(
+  c: Context<Ambiente>,
+  grupoId: string,
+  r: ResultadoEstado,
+): Promise<Response> {
   switch (r.resultado) {
     case 'nao_encontrado':
       return c.json(corpoDoErro('nao_encontrado'), 404);
@@ -41,7 +48,11 @@ export function rotasGrupoEstado(): Hono<Ambiente> {
     const corpo = await lerCorpoDoGrupo(c, arquivarCorpo);
     if (!corpo.ok) return corpo.resposta;
     const grupoId = c.req.param('grupoId');
-    return responder(c, grupoId, await gruposEstado.arquivar(c.var.db, grupoId, corpo.dados.nomeConfirmacao));
+    return responder(
+      c,
+      grupoId,
+      await gruposEstado.arquivar(c.var.db, grupoId, corpo.dados.nomeConfirmacao),
+    );
   });
 
   rotas.post('/grupos/:grupoId/reativar', async (c) => {

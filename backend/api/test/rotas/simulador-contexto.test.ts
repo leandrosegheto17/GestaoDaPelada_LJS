@@ -20,8 +20,14 @@ let aberto: CenarioGruposAberto;
 
 const TERCA = '2026-03-03';
 const QUINTA = '2026-03-05';
-const naTerca = criarApp({ fabricaBanco: fabricaComoApp().fabrica, relogio: relogioFixo('2026-03-03T15:00:00Z') });
-const naQuinta = criarApp({ fabricaBanco: fabricaComoApp().fabrica, relogio: relogioFixo('2026-03-05T15:00:00Z') });
+const naTerca = criarApp({
+  fabricaBanco: fabricaComoApp().fabrica,
+  relogio: relogioFixo('2026-03-03T15:00:00Z'),
+});
+const naQuinta = criarApp({
+  fabricaBanco: fabricaComoApp().fabrica,
+  relogio: relogioFixo('2026-03-05T15:00:00Z'),
+});
 
 async function sessao(conta: string): Promise<string> {
   const { token, hash } = await gerarToken();
@@ -33,8 +39,15 @@ async function sessao(conta: string): Promise<string> {
   return token;
 }
 
-async function contexto(consulta = '', app = naTerca, conta = aberto.cenario.contaC): Promise<Response> {
-  const headers = new Headers({ 'x-pelada': '1', cookie: `${NOME_COOKIE_SESSAO}=${await sessao(conta)}` });
+async function contexto(
+  consulta = '',
+  app = naTerca,
+  conta = aberto.cenario.contaC,
+): Promise<Response> {
+  const headers = new Headers({
+    'x-pelada': '1',
+    cookie: `${NOME_COOKIE_SESSAO}=${await sessao(conta)}`,
+  });
   const ctx = contextoFalso();
   const r = await app.request(
     `/api/grupos/${aberto.cenario.grupoG}/simulador/contexto${consulta}`,
@@ -55,10 +68,10 @@ async function novoJogador(apelido: string, ano: number | null = 1990): Promise<
     [cenario.grupoG, apelido, ano, cenario.contaC],
   );
   const id = r.rows[0]!.id;
-  await db.query(`INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio) VALUES ($1, $2, '2026-01-01')`, [
-    id,
-    cenario.grupoG,
-  ]);
+  await db.query(
+    `INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio) VALUES ($1, $2, '2026-01-01')`,
+    [id, cenario.grupoG],
+  );
   return id;
 }
 
@@ -89,7 +102,11 @@ describe('GET …/simulador/contexto', () => {
     expect(corpo.dataSugerida).toBe(QUINTA);
     expect(corpo.hoje).toBe(TERCA);
     expect(corpo.jogadores).toHaveLength(20);
-    const esperados = ['Bira', ...Array.from({ length: 18 }, (_, i) => `Jogador ${String(i).padStart(2, '0')}`), 'Toninho'];
+    const esperados = [
+      'Bira',
+      ...Array.from({ length: 18 }, (_, i) => `Jogador ${String(i).padStart(2, '0')}`),
+      'Toninho',
+    ];
     expect(corpo.jogadores.map((j) => j.apelido)).toEqual(esperados);
   });
 
@@ -113,8 +130,14 @@ describe('GET …/simulador/contexto', () => {
     for (const j of corpo.jogadores) {
       expect(Object.keys(j).sort()).toEqual(['apelido', 'id', 'nivel', 'semAno', 'semNota']);
     }
-    expect(corpo.jogadores.find((j) => j.id === semAno)).toMatchObject({ semAno: true, nivel: 550, semNota: true });
-    expect(corpo.jogadores.find((j) => j.id === aberto.cenario.idsG.jogadorHistorico)).toMatchObject({
+    expect(corpo.jogadores.find((j) => j.id === semAno)).toMatchObject({
+      semAno: true,
+      nivel: 550,
+      semNota: true,
+    });
+    expect(
+      corpo.jogadores.find((j) => j.id === aberto.cenario.idsG.jogadorHistorico),
+    ).toMatchObject({
       semAno: true,
       nivel: 700,
       semNota: false,
@@ -133,7 +156,10 @@ describe('GET …/simulador/contexto', () => {
     async (data) => {
       const r = await contexto(`?data=${encodeURIComponent(data)}`);
       expect(r.status).toBe(422);
-      expect(await r.json()).toMatchObject({ codigo: 'dados_invalidos', mensagens: { data: MENSAGEM_DATA_INVALIDA } });
+      expect(await r.json()).toMatchObject({
+        codigo: 'dados_invalidos',
+        mensagens: { data: MENSAGEM_DATA_INVALIDA },
+      });
     },
   );
 

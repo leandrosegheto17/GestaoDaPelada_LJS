@@ -33,14 +33,24 @@ function focaveis(raiz: HTMLElement): HTMLElement[] {
   return Array.from(raiz.querySelectorAll<HTMLElement>(FOCAVEIS));
 }
 
-export function Dialogo({ titulo, descricao, aoFechar, alerta = false, formato = 'dialogo', children, acoes }: PropsDialogo) {
+export function Dialogo({
+  titulo,
+  descricao,
+  aoFechar,
+  alerta = false,
+  formato = 'dialogo',
+  children,
+  acoes,
+}: PropsDialogo) {
   const folha = formato === 'folha';
   const base = useId();
   const idTitulo = `${base}-titulo`;
   const idTexto = `${base}-texto`;
   const ref = useRef<HTMLElement>(null);
   // Lido no primeiro render, antes de o autoFocus do React mover o foco para dentro do diálogo.
-  const [anterior] = useState(() => (document.activeElement instanceof HTMLElement ? document.activeElement : null));
+  const [anterior] = useState(() =>
+    document.activeElement instanceof HTMLElement ? document.activeElement : null,
+  );
 
   useEffect(() => {
     const raiz = ref.current;
@@ -91,21 +101,26 @@ export function Dialogo({ titulo, descricao, aoFechar, alerta = false, formato =
         onKeyDown={aoTeclar}
       >
         {folha ? null : (
-        <button className={estilos['dialogo__fechar']} type="button" aria-label="Fechar" onClick={aoFechar}>
-          <svg
-            viewBox="0 0 24 24"
-            width="20"
-            height="20"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            aria-hidden="true"
-            focusable="false"
+          <button
+            className={estilos['dialogo__fechar']}
+            type="button"
+            aria-label="Fechar"
+            onClick={aoFechar}
           >
-            <path d="M18 6 6 18M6 6l12 12" />
-          </svg>
-        </button>
+            <svg
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </button>
         )}
         <h2 id={idTitulo} className={folha ? estilos['folha__titulo'] : estilos['dialogo__titulo']}>
           {titulo}

@@ -38,7 +38,12 @@ interface Escrita {
 }
 
 const g = () => `/grupos/${aberto.cenario.grupoG}`;
-const LANCAMENTO = { tipo: 'saida', data: '2026-10-10', descricao: 'Bola nova', valorCentavos: 12000 };
+const LANCAMENTO = {
+  tipo: 'saida',
+  data: '2026-10-10',
+  descricao: 'Bola nova',
+  valorCentavos: 12000,
+};
 
 /** As 8 escritas com ids que existem no cenário (o lançamento do cenário, Bira em 2026-01, O sem acesso). */
 const ESCRITAS: Escrita[] = [
@@ -50,15 +55,28 @@ const ESCRITAS: Escrita[] = [
   },
   // O corpo do marcar leva o id de Toninho, que só existe depois do cenário: vem do `corpoDe`.
   { nome: 'marcar', metodo: 'POST', caminho: () => `${g()}/financeiro/pagamentos` },
-  { nome: 'desmarcar', metodo: 'DELETE', caminho: () => `${g()}/financeiro/pagamentos/${aberto.cenario.idsG.jogadorHistorico}/2026-01` },
-  { nome: 'criar lançamento', metodo: 'POST', caminho: () => `${g()}/financeiro/lancamentos`, corpo: LANCAMENTO },
+  {
+    nome: 'desmarcar',
+    metodo: 'DELETE',
+    caminho: () => `${g()}/financeiro/pagamentos/${aberto.cenario.idsG.jogadorHistorico}/2026-01`,
+  },
+  {
+    nome: 'criar lançamento',
+    metodo: 'POST',
+    caminho: () => `${g()}/financeiro/lancamentos`,
+    corpo: LANCAMENTO,
+  },
   {
     nome: 'editar lançamento',
     metodo: 'PUT',
     caminho: () => `${g()}/financeiro/lancamentos/${aberto.cenario.idsG.lancamento}`,
     corpo: { tipo: 'entrada', data: '2026-01-05', descricao: 'Mensalidade', valorCentavos: 4000 },
   },
-  { nome: 'excluir lançamento', metodo: 'DELETE', caminho: () => `${g()}/financeiro/lancamentos/${aberto.cenario.idsG.lancamento}` },
+  {
+    nome: 'excluir lançamento',
+    metodo: 'DELETE',
+    caminho: () => `${g()}/financeiro/lancamentos/${aberto.cenario.idsG.lancamento}`,
+  },
   {
     nome: 'conceder acesso',
     metodo: 'PATCH',
@@ -75,7 +93,10 @@ const ESCRITAS: Escrita[] = [
 
 const LEITURAS = [
   { nome: 'mês', caminho: () => `${g()}/financeiro/mes` },
-  { nome: 'lançamento', caminho: () => `${g()}/financeiro/lancamentos/${aberto.cenario.idsG.lancamento}` },
+  {
+    nome: 'lançamento',
+    caminho: () => `${g()}/financeiro/lancamentos/${aberto.cenario.idsG.lancamento}`,
+  },
   { nome: 'saldo no início do grupo', caminho: () => g() },
 ];
 
@@ -117,9 +138,19 @@ describe('ponto único em "somente leitura" nas rotas do financeiro (FIN-50)', (
     'FIN-50: %s responde 403 plano_pro e nada é gravado nem auditado',
     async (_nome, e) => {
       const antes = await retrato();
-      const r = await pedir(aberto, { metodo: e.metodo, caminho: e.caminho(), conta: aberto.cenario.contaC, corpo: corpoDe(e), app: app(somenteLeitura) });
+      const r = await pedir(aberto, {
+        metodo: e.metodo,
+        caminho: e.caminho(),
+        conta: aberto.cenario.contaC,
+        corpo: corpoDe(e),
+        app: app(somenteLeitura),
+      });
       expect(r.status).toBe(403);
-      expect(await r.json()).toEqual({ erro: 'plano_pro', recurso: 'financeiro', mensagem: MENSAGEM_PLANO_PRO });
+      expect(await r.json()).toEqual({
+        erro: 'plano_pro',
+        recurso: 'financeiro',
+        mensagem: MENSAGEM_PLANO_PRO,
+      });
       expect(await retrato()).toBe(antes);
     },
   );
@@ -128,10 +159,18 @@ describe('ponto único em "somente leitura" nas rotas do financeiro (FIN-50)', (
     expect(ESCRITAS).toHaveLength(8);
   });
 
-  it.each(LEITURAS.map((l) => [l.nome, l] as const))('FIN-50: leitura do %s responde 200', async (_nome, l) => {
-    const r = await pedir(aberto, { metodo: 'GET', caminho: l.caminho(), conta: aberto.cenario.contaC, app: app(somenteLeitura) });
-    expect(r.status).toBe(200);
-  });
+  it.each(LEITURAS.map((l) => [l.nome, l] as const))(
+    'FIN-50: leitura do %s responde 200',
+    async (_nome, l) => {
+      const r = await pedir(aberto, {
+        metodo: 'GET',
+        caminho: l.caminho(),
+        conta: aberto.cenario.contaC,
+        app: app(somenteLeitura),
+      });
+      expect(r.status).toBe(200);
+    },
+  );
 });
 
 describe('ponto único liberado (FIN-45)', () => {
@@ -141,7 +180,14 @@ describe('ponto único liberado (FIN-45)', () => {
     const enviar = (metodo: Escrita['metodo'], caminho: string, corpo?: unknown) =>
       pedir(aberto, { metodo, caminho, conta, corpo, app: liberado });
     const [configurar, marcar, desmarcar, criar, , , conceder, retirar] = ESCRITAS as [
-      Escrita, Escrita, Escrita, Escrita, Escrita, Escrita, Escrita, Escrita,
+      Escrita,
+      Escrita,
+      Escrita,
+      Escrita,
+      Escrita,
+      Escrita,
+      Escrita,
+      Escrita,
     ];
 
     expect((await enviar('PUT', configurar.caminho(), configurar.corpo)).status).toBe(200);
@@ -151,7 +197,14 @@ describe('ponto único liberado (FIN-45)', () => {
     const criado = await enviar('POST', criar.caminho(), criar.corpo);
     expect(criado.status).toBe(201);
     const { id } = (await criado.json()) as { id: string };
-    expect((await enviar('PUT', `${g()}/financeiro/lancamentos/${id}`, { ...LANCAMENTO, valorCentavos: 13000 })).status).toBe(200);
+    expect(
+      (
+        await enviar('PUT', `${g()}/financeiro/lancamentos/${id}`, {
+          ...LANCAMENTO,
+          valorCentavos: 13000,
+        })
+      ).status,
+    ).toBe(200);
     expect((await enviar('DELETE', `${g()}/financeiro/lancamentos/${id}`)).status).toBe(204);
 
     expect((await enviar('PATCH', conceder.caminho(), conceder.corpo)).status).toBe(200);

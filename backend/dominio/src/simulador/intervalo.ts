@@ -9,7 +9,10 @@ import type { AptoOrdenado } from './classificacao.ts';
  * prioridade, e, até completar max(titulares "só 1º", reservas que entram) saídas, os demais titulares de pior
  * prioridade, do pior para o melhor (SIM-24). Os titulares chegam na ordem de prioridade do time.
  */
-export function saidaNoIntervalo(titularesDoTime: readonly AptoOrdenado[], reservasEntrando: number): string[] {
+export function saidaNoIntervalo(
+  titularesDoTime: readonly AptoOrdenado[],
+  reservasEntrando: number,
+): string[] {
   const so1o = titularesDoTime.filter((t) => t.so1oTempo).map((t) => t.id);
   const total = Math.min(Math.max(so1o.length, reservasEntrando), titularesDoTime.length);
   const demaisDoPiorParaOMelhor = titularesDoTime

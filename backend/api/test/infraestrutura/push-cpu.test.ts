@@ -1,6 +1,10 @@
 import { paraBase64url } from '@pelada/contrato/push';
 import { describe, expect, it } from 'vitest';
-import { enviarPush, TTL_RANKING, type AssinaturaParaEnvio } from '../../src/infraestrutura/push/enviar.ts';
+import {
+  enviarPush,
+  TTL_RANKING,
+  type AssinaturaParaEnvio,
+} from '../../src/infraestrutura/push/enviar.ts';
 import { novoCacheVapid, type ChavesVapid } from '../../src/infraestrutura/push/vapid.ts';
 
 /**
@@ -25,17 +29,29 @@ const PAYLOAD = JSON.stringify({
 });
 
 async function vapid(): Promise<ChavesVapid> {
-  const par = (await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign'])) as CryptoKeyPair;
+  const par = (await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, [
+    'sign',
+  ])) as CryptoKeyPair;
   const jwk = (await crypto.subtle.exportKey('jwk', par.privateKey)) as JsonWebKey;
-  const publica = new Uint8Array((await crypto.subtle.exportKey('raw', par.publicKey)) as ArrayBuffer);
-  return { publica: paraBase64url(publica), privada: jwk.d ?? '', assunto: 'mailto:avisos@exemplo.com' };
+  const publica = new Uint8Array(
+    (await crypto.subtle.exportKey('raw', par.publicKey)) as ArrayBuffer,
+  );
+  return {
+    publica: paraBase64url(publica),
+    privada: jwk.d ?? '',
+    assunto: 'mailto:avisos@exemplo.com',
+  };
 }
 
 async function assinaturas(): Promise<AssinaturaParaEnvio[]> {
   const lista: AssinaturaParaEnvio[] = [];
   for (let i = 0; i < ENVIOS; i += 1) {
-    const par = (await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveBits'])) as CryptoKeyPair;
-    const publica = new Uint8Array((await crypto.subtle.exportKey('raw', par.publicKey)) as ArrayBuffer);
+    const par = (await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, [
+      'deriveBits',
+    ])) as CryptoKeyPair;
+    const publica = new Uint8Array(
+      (await crypto.subtle.exportKey('raw', par.publicKey)) as ArrayBuffer,
+    );
     lista.push({
       endpoint: `https://fcm.googleapis.com/fcm/send/cpu-${i}`,
       p256dh: paraBase64url(publica),
@@ -75,6 +91,9 @@ describe('CPU de 40 envios', () => {
     for (let i = 0; i < RODADAS; i += 1) medidas.push(await umaInvocacao(chaves, lista));
     medidas.sort((a, b) => a - b);
     const mediana = medidas[Math.floor(RODADAS / 2)] as number;
-    expect(mediana, `medidas (ms): ${medidas.map((m) => m.toFixed(2)).join(', ')}`).toBeLessThanOrEqual(ORCAMENTO_MS);
+    expect(
+      mediana,
+      `medidas (ms): ${medidas.map((m) => m.toFixed(2)).join(', ')}`,
+    ).toBeLessThanOrEqual(ORCAMENTO_MS);
   });
 });

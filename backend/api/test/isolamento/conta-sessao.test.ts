@@ -1,7 +1,12 @@
 import type pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { comoApp } from './apoio.ts';
-import { abrirCenarioConta, criarSessao, type CenarioContaAberto, type Token } from './cenario-conta.ts';
+import {
+  abrirCenarioConta,
+  criarSessao,
+  type CenarioContaAberto,
+  type Token,
+} from './cenario-conta.ts';
 
 /**
  * Matriz política × comando de `contas` e `sessoes` (T1; ACE-43, ACE-44, ACE-45), como
@@ -41,13 +46,17 @@ async function comoSuperusuario<T>(db: pg.Client, fn: () => Promise<T>): Promise
 describe('contas como pelada_app', () => {
   it('ACE-43: SELECT da conta A devolve só a própria linha', async () => {
     const { db, cenario } = aberto;
-    const r = await comoApp(db, { conta: cenario.contaA }, (d) => d.query<{ id: string }>(`SELECT ${COLUNAS_CONTA} FROM contas`));
+    const r = await comoApp(db, { conta: cenario.contaA }, (d) =>
+      d.query<{ id: string }>(`SELECT ${COLUNAS_CONTA} FROM contas`),
+    );
     expect(r.rows.map((l) => l.id)).toEqual([cenario.contaA]);
   });
 
   it('ACE-43: SELECT da conta B devolve só a própria linha', async () => {
     const { db, cenario } = aberto;
-    const r = await comoApp(db, { conta: cenario.contaB }, (d) => d.query<{ id: string }>('SELECT id FROM contas'));
+    const r = await comoApp(db, { conta: cenario.contaB }, (d) =>
+      d.query<{ id: string }>('SELECT id FROM contas'),
+    );
     expect(r.rows.map((l) => l.id)).toEqual([cenario.contaB]);
   });
 
@@ -68,22 +77,26 @@ describe('contas como pelada_app', () => {
   it('ACE-43: SELECT de senha_hash, mesmo da própria linha, é recusado pelo grant de coluna', async () => {
     const { db, cenario } = aberto;
     await expect(
-      comoApp(db, { conta: cenario.contaA }, (d) => d.query('SELECT senha_hash FROM contas WHERE id = $1', [cenario.contaA])),
+      comoApp(db, { conta: cenario.contaA }, (d) =>
+        d.query('SELECT senha_hash FROM contas WHERE id = $1', [cenario.contaA]),
+      ),
     ).rejects.toMatchObject(PERMISSAO);
   });
 
   it('ACE-43: SELECT * (que inclui senha_hash) é recusado', async () => {
     const { db, cenario } = aberto;
-    await expect(comoApp(db, { conta: cenario.contaA }, (d) => d.query('SELECT * FROM contas'))).rejects.toMatchObject(
-      PERMISSAO,
-    );
+    await expect(
+      comoApp(db, { conta: cenario.contaA }, (d) => d.query('SELECT * FROM contas')),
+    ).rejects.toMatchObject(PERMISSAO);
   });
 
   it('ACE-43: INSERT em contas é recusado (sem grant)', async () => {
     const { db, cenario } = aberto;
     await expect(
       comoApp(db, { conta: cenario.contaA }, (d) =>
-        d.query(`INSERT INTO contas (email, nome, senha_hash, criada_em) VALUES ('nova@exemplo.test', 'Nova', 'x', now())`),
+        d.query(
+          `INSERT INTO contas (email, nome, senha_hash, criada_em) VALUES ('nova@exemplo.test', 'Nova', 'x', now())`,
+        ),
       ),
     ).rejects.toMatchObject(PERMISSAO);
   });
@@ -99,9 +112,13 @@ describe('contas como pelada_app', () => {
   it('ACE-43: UPDATE da conta B sobre a linha de A afeta 0 linhas e A fica intacta', async () => {
     const { db, cenario } = aberto;
     const depois = await comoApp(db, { conta: cenario.contaB }, async (d) => {
-      const r = await d.query(`UPDATE contas SET nome = 'Invadida' WHERE id = $1`, [cenario.contaA]);
+      const r = await d.query(`UPDATE contas SET nome = 'Invadida' WHERE id = $1`, [
+        cenario.contaA,
+      ]);
       expect(r.rowCount).toBe(0);
-      return comoSuperusuario(d, () => d.query<{ nome: string }>('SELECT nome FROM contas WHERE id = $1', [cenario.contaA]));
+      return comoSuperusuario(d, () =>
+        d.query<{ nome: string }>('SELECT nome FROM contas WHERE id = $1', [cenario.contaA]),
+      );
     });
     expect(depois.rows[0]?.nome).toBe('Conta A');
   });
@@ -111,7 +128,9 @@ describe('contas como pelada_app', () => {
     const alteradas = await comoApp(db, { conta: cenario.contaA }, async (d) => {
       const r = await d.query(`UPDATE contas SET nome = 'Todas'`);
       expect(r.rowCount).toBe(1);
-      return comoSuperusuario(d, () => d.query<{ id: string }>(`SELECT id FROM contas WHERE nome = 'Todas'`));
+      return comoSuperusuario(d, () =>
+        d.query<{ id: string }>(`SELECT id FROM contas WHERE nome = 'Todas'`),
+      );
     });
     expect(alteradas.rows.map((l) => l.id)).toEqual([cenario.contaA]);
   });
@@ -139,16 +158,18 @@ describe('contas como pelada_app', () => {
       `UPDATE contas SET email = 'outro@exemplo.test' WHERE id = $1`,
       'UPDATE contas SET email_confirmado_em = now() WHERE id = $1',
     ]) {
-      await expect(comoApp(db, { conta: cenario.contaA }, (d) => d.query(sql, [cenario.contaA]))).rejects.toMatchObject(
-        PERMISSAO,
-      );
+      await expect(
+        comoApp(db, { conta: cenario.contaA }, (d) => d.query(sql, [cenario.contaA])),
+      ).rejects.toMatchObject(PERMISSAO);
     }
   });
 
   it('ACE-43: DELETE em contas é recusado (sem grant)', async () => {
     const { db, cenario } = aberto;
     await expect(
-      comoApp(db, { conta: cenario.contaA }, (d) => d.query('DELETE FROM contas WHERE id = $1', [cenario.contaA])),
+      comoApp(db, { conta: cenario.contaA }, (d) =>
+        d.query('DELETE FROM contas WHERE id = $1', [cenario.contaA]),
+      ),
     ).rejects.toMatchObject(PERMISSAO);
   });
 });
@@ -175,7 +196,9 @@ describe('sessoes como pelada_app', () => {
 
   it('ACE-44: SELECT da conta B devolve só a sessão de B', async () => {
     const { db, cenario } = aberto;
-    const r = await comoApp(db, { conta: cenario.contaB }, (d) => d.query<{ conta_id: string }>('SELECT conta_id FROM sessoes'));
+    const r = await comoApp(db, { conta: cenario.contaB }, (d) =>
+      d.query<{ conta_id: string }>('SELECT conta_id FROM sessoes'),
+    );
     expect(r.rows.map((l) => l.conta_id)).toEqual([cenario.contaB]);
   });
 
@@ -202,7 +225,9 @@ describe('sessoes como pelada_app', () => {
     const { db, cenario } = aberto;
     await expect(
       comoApp(db, { conta: cenario.contaA }, (d) =>
-        d.query(`UPDATE sessoes SET expira_em = now() + interval '1 year' WHERE conta_id = $1`, [cenario.contaA]),
+        d.query(`UPDATE sessoes SET expira_em = now() + interval '1 year' WHERE conta_id = $1`, [
+          cenario.contaA,
+        ]),
       ),
     ).rejects.toMatchObject(PERMISSAO);
   });
@@ -220,7 +245,9 @@ describe('sessoes como pelada_app', () => {
     const restantes = await comoApp(db, { conta: cenario.contaA }, async (d) => {
       const r = await d.query('DELETE FROM sessoes');
       expect(r.rowCount).toBe(2);
-      return comoSuperusuario(d, () => d.query<{ conta_id: string }>('SELECT conta_id FROM sessoes'));
+      return comoSuperusuario(d, () =>
+        d.query<{ conta_id: string }>('SELECT conta_id FROM sessoes'),
+      );
     });
     expect(restantes.rows.map((l) => l.conta_id)).toEqual([cenario.contaB]);
   });

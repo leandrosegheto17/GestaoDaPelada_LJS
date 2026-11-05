@@ -1,6 +1,12 @@
 import { createHash } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
-import { chaveIp, gerarToken, hashIp, hashToken, SEM_IP } from '../../src/infraestrutura/sessao/token.ts';
+import {
+  chaveIp,
+  gerarToken,
+  hashIp,
+  hashToken,
+  SEM_IP,
+} from '../../src/infraestrutura/sessao/token.ts';
 
 /** Token, hash e chave de IP (T13; ACE-10, ACE-71, ACE-73). */
 
@@ -85,6 +91,8 @@ describe('chaveIp', () => {
     const a = await hashIp('2001:db8:1:2:aaaa::1');
     const b = await hashIp('2001:db8:1:2:bbbb::9');
     expect(Buffer.from(a).equals(Buffer.from(b))).toBe(true);
-    expect(Buffer.from(a).equals(createHash('sha256').update('2001:db8:1:2::/64').digest())).toBe(true);
+    expect(Buffer.from(a).equals(createHash('sha256').update('2001:db8:1:2::/64').digest())).toBe(
+      true,
+    );
   });
 });

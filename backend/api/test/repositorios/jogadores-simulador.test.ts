@@ -56,12 +56,10 @@ async function novoJogador(
   );
   const id = r.rows[0]!.id;
   for (const [inicio, fim] of periodos) {
-    await db.query('INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, $3, $4)', [
-      id,
-      grupo,
-      inicio,
-      fim,
-    ]);
+    await db.query(
+      'INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, $3, $4)',
+      [id, grupo, inicio, fim],
+    );
   }
   criados.push(id);
   return id;
@@ -75,9 +73,17 @@ describe('jogadoresLeitura.paraSimulador', () => {
   it('SIM-01: os ativos na data, com nível e semNota; o inativo fica de fora', async () => {
     const { cenario } = aberto;
     const aptos = await aptosEm('2026-03-05');
-    expect(aptos.map((a) => a.id).sort()).toEqual([cenario.idsG.jogadorAtivo, cenario.idsG.jogadorHistorico].sort());
-    expect(aptos.find((a) => a.id === cenario.idsG.jogadorAtivo)).toMatchObject({ nivel: 550, semNota: true });
-    expect(aptos.find((a) => a.id === cenario.idsG.jogadorHistorico)).toMatchObject({ nivel: 700, semNota: false });
+    expect(aptos.map((a) => a.id).sort()).toEqual(
+      [cenario.idsG.jogadorAtivo, cenario.idsG.jogadorHistorico].sort(),
+    );
+    expect(aptos.find((a) => a.id === cenario.idsG.jogadorAtivo)).toMatchObject({
+      nivel: 550,
+      semNota: true,
+    });
+    expect(aptos.find((a) => a.id === cenario.idsG.jogadorHistorico)).toMatchObject({
+      nivel: 700,
+      semNota: false,
+    });
   });
 
   it('SIM-02: período que termina na data não aparece; o que começa na data aparece', async () => {
@@ -107,18 +113,31 @@ describe('jogadoresLeitura.paraSimulador', () => {
   it('SIM-03: na ordem do apelido sem acento nem caixa', async () => {
     await novoJogador('álvaro', [['2026-01-01', null]]);
     await novoJogador('Caio', [['2026-01-01', null]]);
-    expect((await aptosEm('2026-03-05')).map((a) => a.apelido)).toEqual(['álvaro', 'Bira', 'Caio', 'Toninho']);
+    expect((await aptosEm('2026-03-05')).map((a) => a.apelido)).toEqual([
+      'álvaro',
+      'Bira',
+      'Caio',
+      'Toninho',
+    ]);
   });
 
   it('SIM-03: cada apto traz só id, apelido, ano, nível e semNota', async () => {
     for (const apto of await aptosEm('2026-03-05')) {
-      expect(Object.keys(apto).sort()).toEqual(['anoNascimento', 'apelido', 'id', 'nivel', 'semNota']);
+      expect(Object.keys(apto).sort()).toEqual([
+        'anoNascimento',
+        'apelido',
+        'id',
+        'nivel',
+        'semNota',
+      ]);
     }
   });
 
   it('SIM-95: jogador sem ano sai com anoNascimento nulo', async () => {
     const semAno = await novoJogador('Sem Ano', [['2026-01-01', null]], null);
-    expect((await aptosEm('2026-03-05')).find((a) => a.id === semAno)).toMatchObject({ anoNascimento: null });
+    expect((await aptosEm('2026-03-05')).find((a) => a.id === semAno)).toMatchObject({
+      anoNascimento: null,
+    });
   });
 
   it('SIM-03: as consultas não leem telefone nem posição', async () => {

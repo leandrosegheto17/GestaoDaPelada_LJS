@@ -9,7 +9,12 @@ import {
 } from '@pelada/contrato';
 import { gerarToken } from '../../src/infraestrutura/sessao/token.ts';
 import { cliente, URL_PUBLICA_TESTE } from '../acesso/apoio.ts';
-import { abrirCenarioGrupos, NOME_G, reativar, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  NOME_G,
+  reativar,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * `GET` e `PATCH /api/grupos/:grupoId` (T29; GEL-16 a GEL-21), com o app real como `pelada_app` contra o cenário de
@@ -18,7 +23,12 @@ import { abrirCenarioGrupos, NOME_G, reativar, type CenarioGruposAberto } from '
 
 let aberto: CenarioGruposAberto;
 
-const DADOS_G = { nome: NOME_G, diaSemana: 'quinta', frequencia: 'semanal', horario: '20:00' } as const;
+const DADOS_G = {
+  nome: NOME_G,
+  diaSemana: 'quinta',
+  frequencia: 'semanal',
+  horario: '20:00',
+} as const;
 
 async function sessao(conta: string): Promise<string> {
   const { token, hash } = await gerarToken();
@@ -31,7 +41,9 @@ async function sessao(conta: string): Promise<string> {
 }
 
 async function nomeDeG(): Promise<string | undefined> {
-  const r = await aberto.db.query<{ nome: string }>('SELECT nome FROM grupos WHERE id = $1', [aberto.cenario.grupoG]);
+  const r = await aberto.db.query<{ nome: string }>('SELECT nome FROM grupos WHERE id = $1', [
+    aberto.cenario.grupoG,
+  ]);
   return r.rows[0]?.nome;
 }
 
@@ -54,7 +66,9 @@ beforeEach(async () => {
 describe('GET /api/grupos/:grupoId', () => {
   it('GEL-20: traz as contagens e souCriador verdadeiro para a criadora', async () => {
     const { cenario } = aberto;
-    const r = await cliente(aberto.url)(`/grupos/${cenario.grupoG}`, { sessao: await sessao(cenario.contaC) });
+    const r = await cliente(aberto.url)(`/grupos/${cenario.grupoG}`, {
+      sessao: await sessao(cenario.contaC),
+    });
     expect(r.status).toBe(200);
     const g = (await r.json()) as Record<string, unknown>;
     // A criadora tem acesso ao financeiro: o detalhe traz também o saldo (financeiro T30, FIN-34; autorização de
@@ -95,21 +109,30 @@ describe('GET /api/grupos/:grupoId', () => {
 
   it('GEL-20: souCriador é falso para a outra admin', async () => {
     const { cenario } = aberto;
-    const r = await cliente(aberto.url)(`/grupos/${cenario.grupoG}`, { sessao: await sessao(cenario.contaO) });
+    const r = await cliente(aberto.url)(`/grupos/${cenario.grupoG}`, {
+      sessao: await sessao(cenario.contaO),
+    });
     expect(((await r.json()) as { souCriador: boolean }).souCriador).toBe(false);
   });
 
   it('GEL-17: o link público vem de URL_PUBLICA', async () => {
     const { cenario } = aberto;
-    const r = await cliente(aberto.url, { URL_PUBLICA: 'https://outro.exemplo.test' })(`/grupos/${cenario.grupoG}`, {
-      sessao: await sessao(cenario.contaC),
-    });
-    expect(((await r.json()) as { linkPublico: string }).linkPublico).toBe(`https://outro.exemplo.test/g/${cenario.slugG}`);
+    const r = await cliente(aberto.url, { URL_PUBLICA: 'https://outro.exemplo.test' })(
+      `/grupos/${cenario.grupoG}`,
+      {
+        sessao: await sessao(cenario.contaC),
+      },
+    );
+    expect(((await r.json()) as { linkPublico: string }).linkPublico).toBe(
+      `https://outro.exemplo.test/g/${cenario.slugG}`,
+    );
   });
 
   it('GEL-21: B, sem vínculo, recebe 404', async () => {
     const { cenario } = aberto;
-    const r = await cliente(aberto.url)(`/grupos/${cenario.grupoG}`, { sessao: await sessao(cenario.contaB) });
+    const r = await cliente(aberto.url)(`/grupos/${cenario.grupoG}`, {
+      sessao: await sessao(cenario.contaB),
+    });
     expect(r.status).toBe(404);
     expect(await r.json()).toMatchObject({ codigo: 'nao_encontrado' });
   });
@@ -117,7 +140,10 @@ describe('GET /api/grupos/:grupoId', () => {
   it('GEL-21: id que não existe, ou que não é uuid, dá 404', async () => {
     const { cenario } = aberto;
     const token = await sessao(cenario.contaC);
-    expect((await cliente(aberto.url)('/grupos/00000000-0000-4000-8000-000000000000', { sessao: token })).status).toBe(404);
+    expect(
+      (await cliente(aberto.url)('/grupos/00000000-0000-4000-8000-000000000000', { sessao: token }))
+        .status,
+    ).toBe(404);
     expect((await cliente(aberto.url)('/grupos/nao-e-uuid', { sessao: token })).status).toBe(404);
   });
 
@@ -131,14 +157,21 @@ describe('PATCH /api/grupos/:grupoId', () => {
   it('GEL-18, GEL-16: renomear devolve 200 com o nome novo, o mesmo slug e o mesmo link', async () => {
     const { cenario } = aberto;
     const token = await sessao(cenario.contaO);
-    const antes = (await (await cliente(aberto.url)(`/grupos/${cenario.grupoG}`, { sessao: token })).json()) as {
+    const antes = (await (
+      await cliente(aberto.url)(`/grupos/${cenario.grupoG}`, { sessao: token })
+    ).json()) as {
       slug: string;
       linkPublico: string;
     };
     const r = await cliente(aberto.url)(`/grupos/${cenario.grupoG}`, {
       metodo: 'PATCH',
       sessao: token,
-      corpo: { nome: 'Pelada Renomeada', diaSemana: 'sexta', frequencia: 'mensal', horario: '07:30' },
+      corpo: {
+        nome: 'Pelada Renomeada',
+        diaSemana: 'sexta',
+        frequencia: 'mensal',
+        horario: '07:30',
+      },
     });
     expect(r.status).toBe(200);
     const depois = (await r.json()) as Record<string, unknown>;
@@ -162,19 +195,22 @@ describe('PATCH /api/grupos/:grupoId', () => {
     ['frequência fora da lista', { frequencia: 'anual' }, 'frequencia', MENSAGEM_FREQUENCIA],
     ['horário vazio', { horario: '' }, 'horario', MENSAGEM_HORARIO_AUSENTE],
     ['horário fora de HH:MM', { horario: '25:00' }, 'horario', MENSAGEM_HORARIO_INVALIDO],
-  ] as const)('GEL-19: %s no PATCH dá 422 com a mesma mensagem da criação, e nada muda', async (_caso, mudanca, campo, mensagem) => {
-    const { cenario } = aberto;
-    const r = await cliente(aberto.url)(`/grupos/${cenario.grupoG}`, {
-      metodo: 'PATCH',
-      sessao: await sessao(cenario.contaC),
-      corpo: { ...DADOS_G, ...mudanca },
-    });
-    expect(r.status).toBe(422);
-    const erro = (await r.json()) as { codigo: string; mensagens: Record<string, string> };
-    expect(erro.codigo).toBe('dados_invalidos');
-    expect(erro.mensagens[campo]).toBe(mensagem);
-    expect(await nomeDeG()).toBe(NOME_G);
-  });
+  ] as const)(
+    'GEL-19: %s no PATCH dá 422 com a mesma mensagem da criação, e nada muda',
+    async (_caso, mudanca, campo, mensagem) => {
+      const { cenario } = aberto;
+      const r = await cliente(aberto.url)(`/grupos/${cenario.grupoG}`, {
+        metodo: 'PATCH',
+        sessao: await sessao(cenario.contaC),
+        corpo: { ...DADOS_G, ...mudanca },
+      });
+      expect(r.status).toBe(422);
+      const erro = (await r.json()) as { codigo: string; mensagens: Record<string, string> };
+      expect(erro.codigo).toBe('dados_invalidos');
+      expect(erro.mensagens[campo]).toBe(mensagem);
+      expect(await nomeDeG()).toBe(NOME_G);
+    },
+  );
 
   it.each([
     ['slug', { slug: 'outro-slug' }],
@@ -187,7 +223,10 @@ describe('PATCH /api/grupos/:grupoId', () => {
       corpo: { ...DADOS_G, nome: 'Nome Com Extra', ...extra },
     });
     expect(r.status).toBe(422);
-    const g = await aberto.db.query<{ slug: string; nome: string }>('SELECT slug, nome FROM grupos WHERE id = $1', [cenario.grupoG]);
+    const g = await aberto.db.query<{ slug: string; nome: string }>(
+      'SELECT slug, nome FROM grupos WHERE id = $1',
+      [cenario.grupoG],
+    );
     expect(g.rows[0]).toEqual({ slug: cenario.slugG, nome: NOME_G });
   });
 

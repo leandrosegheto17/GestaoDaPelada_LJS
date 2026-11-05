@@ -16,8 +16,12 @@ import { entradasAtivas, type MapaTelas } from '../../e2e/ferramentas/telas-reai
  */
 
 const RAIZ_MOCKUP = new URL('../../../../.specs/mockup/', import.meta.url);
-const MAPA = JSON.parse(readFileSync(fileURLToPath(new URL('telas.json', RAIZ_MOCKUP)), 'utf8')) as MapaTelas;
-const ATIVAS = JSON.parse(readFileSync(fileURLToPath(new URL('../../e2e/telas-ativas.json', import.meta.url)), 'utf8')) as {
+const MAPA = JSON.parse(
+  readFileSync(fileURLToPath(new URL('telas.json', RAIZ_MOCKUP)), 'utf8'),
+) as MapaTelas;
+const ATIVAS = JSON.parse(
+  readFileSync(fileURLToPath(new URL('../../e2e/telas-ativas.json', import.meta.url)), 'utf8'),
+) as {
   telas: { id: string; estado: string }[];
 };
 const WEB = join(import.meta.dirname, '..', '..');
@@ -46,13 +50,21 @@ describe('telas ativas do simulador', () => {
 
   it('SIM-85: as 16 telas do simulador estão ativas, reais e em PC e celular', () => {
     for (const e of DO_SIMULADOR) expect(ativos).toContain(e);
-    const entradas = entradasAtivas(MAPA, ATIVAS).filter((t) => DO_SIMULADOR.includes(`${t.id} ${t.estado}`));
+    const entradas = entradasAtivas(MAPA, ATIVAS).filter((t) =>
+      DO_SIMULADOR.includes(`${t.id} ${t.estado}`),
+    );
     expect(entradas).toHaveLength(DO_SIMULADOR.length);
-    for (const t of entradas) expect((t as { viewports?: string[] }).viewports, `${t.id} ${t.estado}`).toEqual(['pc', 'celular']);
+    for (const t of entradas)
+      expect((t as { viewports?: string[] }).viewports, `${t.id} ${t.estado}`).toEqual([
+        'pc',
+        'celular',
+      ]);
   });
 
   it('SIM-85: cada tela do simulador abre a rota do app e não deixa chamada da API sem resposta do mockup', () => {
-    const entradas = entradasAtivas(MAPA, ATIVAS).filter((t) => DO_SIMULADOR.includes(`${t.id} ${t.estado}`)) as Array<{
+    const entradas = entradasAtivas(MAPA, ATIVAS).filter((t) =>
+      DO_SIMULADOR.includes(`${t.id} ${t.estado}`),
+    ) as Array<{
       id: string;
       estado: string;
       rota: string;
@@ -60,7 +72,10 @@ describe('telas ativas do simulador', () => {
     }>;
     for (const t of entradas) {
       expect(t.rota.startsWith('/app/grupos/'), `${t.id} ${t.estado}`).toBe(true);
-      expect(t.respostas?.some((r) => r.url === '**/api/sessao'), `${t.id} ${t.estado} sem sessão`).toBe(true);
+      expect(
+        t.respostas?.some((r) => r.url === '**/api/sessao'),
+        `${t.id} ${t.estado} sem sessão`,
+      ).toBe(true);
     }
   });
 
@@ -74,11 +89,15 @@ describe('telas ativas do simulador', () => {
 
   it('SIM-08, AD-118: a t09 sucesso segue ativa e a resposta do grupo traz o próximo dia de jogo com escalação', () => {
     expect(ativos).toContain('T09 sucesso');
-    const t09 = entradasAtivas(MAPA, ATIVAS).find((t) => t.id === 'T09' && t.estado === 'sucesso') as {
+    const t09 = entradasAtivas(MAPA, ATIVAS).find(
+      (t) => t.id === 'T09' && t.estado === 'sucesso',
+    ) as {
       respostas: { url: string; arquivo: string }[];
     };
     const grupo = t09.respostas.find((r) => r.url === '**/api/grupos/g-quinta');
-    const corpo = grupoDetalheComPartidas.parse(JSON.parse(readFileSync(fileURLToPath(new URL(grupo?.arquivo ?? '', RAIZ_MOCKUP)), 'utf8')));
+    const corpo = grupoDetalheComPartidas.parse(
+      JSON.parse(readFileSync(fileURLToPath(new URL(grupo?.arquivo ?? '', RAIZ_MOCKUP)), 'utf8')),
+    );
     expect([corpo.proximoDiaDeJogo, corpo.escalacaoNoProximoDia]).toEqual(['2026-10-22', true]);
   });
 

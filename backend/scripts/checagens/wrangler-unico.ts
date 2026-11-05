@@ -31,7 +31,10 @@ export function checarWrangler(arquivos: readonly Arquivo[]): string[] {
     if (c === UNICO_PERMITIDO || documentacao(c)) continue;
     if (conteudo.includes('\u0000')) continue;
     conteudo.split('\n').forEach((linha, i) => {
-      if (PUBLICA.test(linha)) problemas.push(`${c}:${i + 1}: publica o Worker; o único lugar permitido é ${UNICO_PERMITIDO}`);
+      if (PUBLICA.test(linha))
+        problemas.push(
+          `${c}:${i + 1}: publica o Worker; o único lugar permitido é ${UNICO_PERMITIDO}`,
+        );
     });
   }
   return problemas;

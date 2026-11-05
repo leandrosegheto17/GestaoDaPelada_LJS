@@ -31,7 +31,8 @@ import { avisoPartidaSalva, diaMes, TEXTO_FALHA_SALVAR } from './PaginaNovaParti
  *   [LACUNA] a spec não diz o destino da edição salva; segue o da exclusão.
  */
 
-export const TEXTO_RECALCULO = 'As presenças dessa partida saem do ranking, e os pontos de todos são recalculados.';
+export const TEXTO_RECALCULO =
+  'As presenças dessa partida saem do ranking, e os pontos de todos são recalculados.';
 export const TEXTO_FALHA_EXCLUIR = 'Não foi possível excluir a partida. Tente de novo.';
 
 export function tituloExcluir(data: string): string {
@@ -42,7 +43,9 @@ export function avisoPartidaExcluida(data: string): string {
   return `Partida de ${diaMes(data)} excluída.`;
 }
 
-export function textoUltimaAlteracaoPartida(p: Pick<PartidaResposta, 'alteradaPor' | 'alteradaEm'>): string {
+export function textoUltimaAlteracaoPartida(
+  p: Pick<PartidaResposta, 'alteradaPor' | 'alteradaEm'>,
+): string {
   return `Última alteração: ${p.alteradaPor}, ${diaEHora(p.alteradaEm)}`;
 }
 
@@ -93,7 +96,15 @@ function DialogoExcluir({
   );
 }
 
-function Edicao({ grupoId, partida, base }: { grupoId: string; partida: PartidaResposta; base: string }) {
+function Edicao({
+  grupoId,
+  partida,
+  base,
+}: {
+  grupoId: string;
+  partida: PartidaResposta;
+  base: string;
+}) {
   const navegar = useNavigate();
   const editar = useEditarPartida(grupoId, partida.data);
   const [confirmando, setConfirmando] = useState(false);
@@ -105,7 +116,10 @@ function Edicao({ grupoId, partida, base }: { grupoId: string; partida: PartidaR
     setFalhaSalvar(null);
     setErrosCampos({});
     editar.mutate(corpo, {
-      onSuccess: () => void navegar(partidasDoMes(base, partida.data), { state: { aviso: avisoPartidaSalva(partida.data) } }),
+      onSuccess: () =>
+        void navegar(partidasDoMes(base, partida.data), {
+          state: { aviso: avisoPartidaSalva(partida.data) },
+        }),
       onError: (erro) => {
         if (erro instanceof ErroApi && erro.status === 422) {
           setErrosCampos(mensagensDosCampos(erro));
@@ -172,7 +186,11 @@ function Edicao({ grupoId, partida, base }: { grupoId: string; partida: PartidaR
           grupoId={grupoId}
           data={partida.data}
           aoFechar={() => setConfirmando(false)}
-          aoExcluir={() => void navegar(partidasDoMes(base, partida.data), { state: { aviso: avisoPartidaExcluida(partida.data) } })}
+          aoExcluir={() =>
+            void navegar(partidasDoMes(base, partida.data), {
+              state: { aviso: avisoPartidaExcluida(partida.data) },
+            })
+          }
           aoFalhar={() => {
             setConfirmando(false);
             setFalhaExcluir(true);
@@ -192,14 +210,18 @@ export function PaginaEditarPartida() {
   function conteudo() {
     if (consulta.isPending) return <EsqueletoLista rotulo="Carregando a partida…" />;
     if (consulta.isError) {
-      if (consulta.error instanceof ErroApi && consulta.error.status === 404) return <Faixa tipo="atencao">Partida não encontrada.</Faixa>;
+      if (consulta.error instanceof ErroApi && consulta.error.status === 404)
+        return <Faixa tipo="atencao">Partida não encontrada.</Faixa>;
       return <EstadoErro aoTentarDeNovo={() => void consulta.refetch()} />;
     }
     return <Edicao grupoId={grupoId} partida={consulta.data} base={base} />;
   }
 
   return (
-    <Casca grupo={{ nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' }} titulo="Editar partida">
+    <Casca
+      grupo={{ nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' }}
+      titulo="Editar partida"
+    >
       <LinkVoltar para={partidasDoMes(base, data)}>Partidas</LinkVoltar>
       {conteudo()}
     </Casca>

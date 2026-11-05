@@ -26,7 +26,12 @@ import {
   TelaSemConexao,
   useNavegadorSemRede,
 } from './FaixaSemConexao.tsx';
-import { TEXTO_ERRO_PDF, TEXTO_PREPARANDO_PDF, usarExportarPdf, type ExportarPdf } from './usarExportarPdf.ts';
+import {
+  TEXTO_ERRO_PDF,
+  TEXTO_PREPARANDO_PDF,
+  usarExportarPdf,
+  type ExportarPdf,
+} from './usarExportarPdf.ts';
 
 /**
  * Ranking público (`/g/:slug[?mes=AAAA-MM]`, t01; partidas-e-ranking T56; PAR-79, PAR-81, PAR-82, PAR-88, PAR-89,
@@ -47,7 +52,8 @@ import { TEXTO_ERRO_PDF, TEXTO_PREPARANDO_PDF, usarExportarPdf, type ExportarPdf
  */
 
 export const TEXTO_SEM_JOGADORES = 'Nenhum jogador no ranking ainda.';
-export const TEXTO_SEM_JOGADORES_AJUDA = 'Quando o admin cadastrar os jogadores, o ranking aparece aqui.';
+export const TEXTO_SEM_JOGADORES_AJUDA =
+  'Quando o admin cadastrar os jogadores, o ranking aparece aqui.';
 export const TEXTO_CARREGANDO = 'Carregando o ranking…';
 export { TEXTO_SEM_CONEXAO, TEXTO_SEM_CONEXAO_AJUDA } from './FaixaSemConexao.tsx';
 export const TEXTO_ORDEM = 'Ordem pelos pontos acumulados até hoje.';
@@ -64,7 +70,18 @@ export function nomeCurtoDoMes(mes: string): string {
 
 function Seta({ direcao }: { direcao: 'anterior' | 'seguinte' }) {
   return (
-    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+    <svg
+      viewBox="0 0 24 24"
+      width="26"
+      height="26"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
       <polyline points={direcao === 'anterior' ? '15 18 9 12 15 6' : '9 18 15 12 9 6'} />
     </svg>
   );
@@ -72,7 +89,18 @@ function Seta({ direcao }: { direcao: 'anterior' | 'seguinte' }) {
 
 function IconeExportar() {
   return (
-    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+    <svg
+      viewBox="0 0 24 24"
+      width="20"
+      height="20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
       <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
       <polyline points="16 6 12 2 8 6" />
       <line x1="12" y1="2" x2="12" y2="15" />
@@ -82,7 +110,18 @@ function IconeExportar() {
 
 function IconeEngrenagem() {
   return (
-    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+    <svg
+      viewBox="0 0 24 24"
+      width="24"
+      height="24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
       <circle cx="12" cy="12" r="3" />
       <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
     </svg>
@@ -91,19 +130,47 @@ function IconeEngrenagem() {
 
 function IconeTempo({ choveu }: { choveu: boolean }) {
   return choveu ? (
-    <svg className={pagina['icone-chuva']} viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true" focusable="false">
+    <svg
+      className={pagina['icone-chuva']}
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      aria-hidden="true"
+      focusable="false"
+    >
       <path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25" />
       <path d="M8 13v2M8 19v2M12 15v2M12 21v2M16 13v2M16 19v2" />
     </svg>
   ) : (
-    <svg className={pagina['icone-sol']} viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true" focusable="false">
+    <svg
+      className={pagina['icone-sol']}
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      aria-hidden="true"
+      focusable="false"
+    >
       <circle cx="12" cy="12" r="4" />
       <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
     </svg>
   );
 }
 
-function Cabecalho({ dados, aoTocarAdmin }: { dados: RankingPublico | undefined; aoTocarAdmin: (e: MouseEvent<HTMLAnchorElement>) => void }) {
+function Cabecalho({
+  dados,
+  aoTocarAdmin,
+}: {
+  dados: RankingPublico | undefined;
+  aoTocarAdmin: (e: MouseEvent<HTMLAnchorElement>) => void;
+}) {
   return (
     <>
       <a className={pagina.pular} href="#conteudo">
@@ -115,7 +182,12 @@ function Cabecalho({ dados, aoTocarAdmin }: { dados: RankingPublico | undefined;
           {dados ? <p className={pagina['barra__sub']}>{textoRecorrencia(dados.grupo)}</p> : null}
         </div>
         <nav className={casca['barra__acoes']} aria-label="Acesso dos admins">
-          <a className={casca['botao-icone']} href="/app" aria-label="Área do admin" onClick={aoTocarAdmin}>
+          <a
+            className={casca['botao-icone']}
+            href="/app"
+            aria-label="Área do admin"
+            onClick={aoTocarAdmin}
+          >
             <IconeEngrenagem />
           </a>
         </nav>
@@ -160,7 +232,8 @@ function Legenda() {
         Legenda
       </h2>
       <p className={pagina['legenda__explica']}>
-        A cor mostra a situação; o número, os pontos da rodada. Pts inicial + rodadas do mês = Pts final.
+        A cor mostra a situação; o número, os pontos da rodada. Pts inicial + rodadas do mês = Pts
+        final.
       </p>
       <ul>
         <li>
@@ -205,7 +278,15 @@ function Rodape() {
 }
 
 /** "Exportar PDF" (T70): "Preparando PDF…" enquanto a projeção e o arquivo não ficam prontos (t01 pdf-preparando). */
-function BotaoExportar({ classe, pdf, bloco = false }: { classe?: string; pdf: ExportarPdf; bloco?: boolean }) {
+function BotaoExportar({
+  classe,
+  pdf,
+  bloco = false,
+}: {
+  classe?: string;
+  pdf: ExportarPdf;
+  bloco?: boolean;
+}) {
   const preparando = pdf.estado.tipo === 'preparando';
   return (
     <span className={classe}>
@@ -296,7 +377,8 @@ function Ranking({ dados, aoIr, pdf, somenteLeitura, atualizando }: PropsRanking
           TEXTO_ORDEM
         ) : (
           <>
-            <strong>{partidas(dados.resumoMes.partidas)}</strong> no mês, {dados.resumoMes.comChuva} com chuva. {TEXTO_ORDEM}
+            <strong>{partidas(dados.resumoMes.partidas)}</strong> no mês, {dados.resumoMes.comChuva}{' '}
+            com chuva. {TEXTO_ORDEM}
           </>
         )}
         {atualizando ? (
@@ -306,7 +388,12 @@ function Ranking({ dados, aoIr, pdf, somenteLeitura, atualizando }: PropsRanking
           </>
         ) : null}
       </p>
-      <TabelaRanking partidas={dados.partidas} linhas={dados.linhas} legenda={legenda} nomeMes={nomeCurtoDoMes(dados.mes)} />
+      <TabelaRanking
+        partidas={dados.partidas}
+        linhas={dados.linhas}
+        legenda={legenda}
+        nomeMes={nomeCurtoDoMes(dados.mes)}
+      />
       {semPartidas ? null : <Legenda />}
     </>
   );
@@ -345,7 +432,8 @@ function RankingDoSlug({ slug }: { slug: string }) {
 
   // T73: falha de rede (status 0) usa o guardado do slug e mês pedidos (PAR-149); 5xx e 422 não (P24 de `BC:36`).
   const semRede = erro instanceof ErroApi && erro.status === 0;
-  const guardado = !consulta.data && (consulta.isPending || semRede) ? lerRankingGuardado(slug, mes) : null;
+  const guardado =
+    !consulta.data && (consulta.isPending || semRede) ? lerRankingGuardado(slug, mes) : null;
   const [precisaConexao, setPrecisaConexao] = useState(false);
   const navegadorOffline = useNavegadorSemRede();
 
@@ -370,7 +458,10 @@ function RankingDoSlug({ slug }: { slug: string }) {
     return (
       <>
         <Cabecalho dados={undefined} aoTocarAdmin={aoTocarAdmin} />
-        <TelaSemConexao aoTentar={tentarDeNovo} aviso={precisaConexao ? <FaixaPrecisaConexao /> : null} />
+        <TelaSemConexao
+          aoTentar={tentarDeNovo}
+          aviso={precisaConexao ? <FaixaPrecisaConexao /> : null}
+        />
       </>
     );
   }
@@ -378,7 +469,8 @@ function RankingDoSlug({ slug }: { slug: string }) {
   const dados = consulta.data ?? guardado ?? undefined;
   // PAR-149: o guardado depois de uma falha de rede, ou o que o service worker respondeu do cache com o navegador sem
   // rede (T78): os dois são somente leitura, com a hora do `geradoEm` do que está na tela.
-  const somenteLeitura = dados !== undefined && ((!consulta.data && semRede && guardado !== null) || navegadorOffline);
+  const somenteLeitura =
+    dados !== undefined && ((!consulta.data && semRede && guardado !== null) || navegadorOffline);
   // PAR-152: o guardado aparece enquanto a rede responde, com "atualizando…".
   const atualizando = !consulta.data && consulta.isPending && guardado !== null;
   return (
@@ -390,7 +482,13 @@ function RankingDoSlug({ slug }: { slug: string }) {
         {aviso ? <Faixa tipo="erro">{aviso}</Faixa> : null}
         <AvisosDoPdf pdf={pdf} />
         {dados ? (
-          <Ranking dados={dados} aoIr={aoIr} pdf={pdf} somenteLeitura={somenteLeitura} atualizando={atualizando} />
+          <Ranking
+            dados={dados}
+            aoIr={aoIr}
+            pdf={pdf}
+            somenteLeitura={somenteLeitura}
+            atualizando={atualizando}
+          />
         ) : (
           <EsqueletoLista rotulo={TEXTO_CARREGANDO} />
         )}

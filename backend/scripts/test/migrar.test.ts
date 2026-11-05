@@ -4,7 +4,8 @@ import { describe, expect, it, vi } from 'vitest';
 import { comConexao, executarCli } from '../src/conectar.ts';
 import { comandoMigrar } from '../src/migrar.ts';
 
-const URL_BASE = process.env.DATABASE_URL_TESTE ?? 'postgres://postgres:postgres@127.0.0.1:5432/pelada';
+const URL_BASE =
+  process.env.DATABASE_URL_TESTE ?? 'postgres://postgres:postgres@127.0.0.1:5432/pelada';
 
 async function comBancoVazio(fn: (url: string) => Promise<void>): Promise<void> {
   const nome = `teste_${randomBytes(6).toString('hex')}`;
@@ -23,7 +24,9 @@ describe('pnpm migrar', () => {
     const conectar = vi.spyOn(pg.Client.prototype, 'connect');
     try {
       await expect(
-        comandoMigrar({ DATABASE_URL_MIGRACAO: 'postgres://u:p@ep-x.sa-east-1.aws.neon.tech/neondb' }),
+        comandoMigrar({
+          DATABASE_URL_MIGRACAO: 'postgres://u:p@ep-x.sa-east-1.aws.neon.tech/neondb',
+        }),
       ).rejects.toThrow(/não permitido/);
       await expect(
         comandoMigrar({
@@ -46,7 +49,9 @@ describe('pnpm migrar', () => {
     const antes = process.exitCode;
     try {
       await executarCli(async () => {
-        await comandoMigrar({ DATABASE_URL_MIGRACAO: 'postgres://postgres:postgres@127.0.0.1:1/pelada' });
+        await comandoMigrar({
+          DATABASE_URL_MIGRACAO: 'postgres://postgres:postgres@127.0.0.1:1/pelada',
+        });
       });
       expect(process.exitCode).toBe(1);
       expect(String(erro.mock.calls[0]?.[0])).toContain('docker compose up -d');
@@ -62,8 +67,11 @@ describe('pnpm migrar', () => {
       await comBancoVazio(async (url) => {
         const aplicadas = await comandoMigrar({ DATABASE_URL_MIGRACAO: url });
         expect(aplicadas).toHaveLength(23);
-        const n = await comConexao(url, async (c) =>
-          (await c.query<{ n: number }>('SELECT count(*)::int AS n FROM pgmigrations')).rows[0]?.n,
+        const n = await comConexao(
+          url,
+          async (c) =>
+            (await c.query<{ n: number }>('SELECT count(*)::int AS n FROM pgmigrations')).rows[0]
+              ?.n,
         );
         expect(n).toBe(23);
       });

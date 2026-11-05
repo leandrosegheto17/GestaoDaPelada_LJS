@@ -16,7 +16,10 @@ import {
 
 /** Contrato do simulador (T21, T22; SIM-01, SIM-04, SIM-09, SIM-33, SIM-47, SIM-53, SIM-55, SIM-62, SIM-82). */
 
-function mensagens(resultado: { success: boolean; error?: { issues: { path: PropertyKey[]; message: string }[] } }) {
+function mensagens(resultado: {
+  success: boolean;
+  error?: { issues: { path: PropertyKey[]; message: string }[] };
+}) {
   const porCampo: Record<string, string[]> = {};
   for (const problema of resultado.error?.issues ?? []) {
     const campo = String(problema.path[0] ?? '');
@@ -39,12 +42,19 @@ describe('consultaContexto', () => {
     expect(consultaContexto.parse({ data: '2026-10-22' })).toEqual({ data: '2026-10-22' });
   });
 
-  it.each(['2026-02-30', '2026-1-1', '22/10/2026', ''])('SIM-04: %j é recusada no campo data', (data) => {
-    expect(mensagens(consultaContexto.safeParse({ data }))).toEqual({ data: ['Informe uma data válida.'] });
-  });
+  it.each(['2026-02-30', '2026-1-1', '22/10/2026', ''])(
+    'SIM-04: %j é recusada no campo data',
+    (data) => {
+      expect(mensagens(consultaContexto.safeParse({ data }))).toEqual({
+        data: ['Informe uma data válida.'],
+      });
+    },
+  );
 
   it('SIM-04: campo desconhecido é recusado', () => {
-    expect(consultaContexto.safeParse({ data: '2026-10-22', formato: 'dois_times' }).success).toBe(false);
+    expect(consultaContexto.safeParse({ data: '2026-10-22', formato: 'dois_times' }).success).toBe(
+      false,
+    );
   });
 });
 
@@ -59,20 +69,30 @@ describe('contextoResposta', () => {
     expect(contextoResposta.parse(resposta)).toEqual(resposta);
   });
 
-  it.each(['telefone', 'anoNascimento', 'posicao', 'notas', 'pontos'])('SIM-03: jogador com %s é recusado', (campo) => {
-    const comExtra = { ...resposta, jogadores: [{ ...resposta.jogadores[0], [campo]: 1 }] };
-    expect(contextoResposta.safeParse(comExtra).success).toBe(false);
-  });
+  it.each(['telefone', 'anoNascimento', 'posicao', 'notas', 'pontos'])(
+    'SIM-03: jogador com %s é recusado',
+    (campo) => {
+      const comExtra = { ...resposta, jogadores: [{ ...resposta.jogadores[0], [campo]: 1 }] };
+      expect(contextoResposta.safeParse(comExtra).success).toBe(false);
+    },
+  );
 
   it('SIM-01: nível decimal (6.8) é recusado: o contrato é inteiro × 100', () => {
-    expect(contextoResposta.safeParse({ ...resposta, jogadores: [{ ...resposta.jogadores[0], nivel: 6.8 }] }).success).toBe(false);
+    expect(
+      contextoResposta.safeParse({
+        ...resposta,
+        jogadores: [{ ...resposta.jogadores[0], nivel: 6.8 }],
+      }).success,
+    ).toBe(false);
   });
 });
 
 describe('previaCorpo', () => {
   it('SIM-09: 2 times e 3 ou mais válidos são aceitos', () => {
     expect(previaCorpo.safeParse(PREVIA_DOIS).success).toBe(true);
-    expect(previaCorpo.safeParse({ formato: 'varios_times', n: 4, aptos: [{ id: ID_A }] }).success).toBe(true);
+    expect(
+      previaCorpo.safeParse({ formato: 'varios_times', n: 4, aptos: [{ id: ID_A }] }).success,
+    ).toBe(true);
   });
 
   it('SIM-09: aptos vazios são aceitos (a prévia descreve como insuficiente)', () => {
@@ -111,12 +131,16 @@ describe('previaCorpo', () => {
       { id: ID_A, so1oTempo: false },
       { id: ID_A, so1oTempo: true },
     ];
-    expect(mensagens(previaCorpo.safeParse({ ...PREVIA_DOIS, aptos }))).toEqual({ aptos: [MENSAGEM_APTOS_REPETIDO] });
+    expect(mensagens(previaCorpo.safeParse({ ...PREVIA_DOIS, aptos }))).toEqual({
+      aptos: [MENSAGEM_APTOS_REPETIDO],
+    });
   });
 
   it('SIM-80: id que não é UUID é recusado no campo aptos sem revelar nada', () => {
     const aptos = [{ id: 'j-toninho', so1oTempo: false }];
-    expect(mensagens(previaCorpo.safeParse({ ...PREVIA_DOIS, aptos }))).toEqual({ aptos: [MENSAGEM_APTOS_INATIVOS] });
+    expect(mensagens(previaCorpo.safeParse({ ...PREVIA_DOIS, aptos }))).toEqual({
+      aptos: [MENSAGEM_APTOS_INATIVOS],
+    });
   });
 
   it('SIM-09: dois aptos distintos passam', () => {
@@ -131,9 +155,28 @@ describe('previaCorpo', () => {
 describe('previaResposta', () => {
   it('SIM-10 a SIM-13: aceita as quatro formas', () => {
     for (const previa of [
-      { formato: 'dois_times', valida: true, descricao: '2 times de 7 · 5 reservas', times: 2, reservas: 5 },
-      { formato: 'dois_times', valida: false, motivo: 'aptos_insuficientes', descricao: 'Faltam aptos para 2 times.', maiorNPossivel: null },
-      { formato: 'varios_times', valida: true, descricao: '4 times de 4 + 1 time incompleto de 2', times: 5, timesCompletos: 4, tamanhoIncompleto: 2 },
+      {
+        formato: 'dois_times',
+        valida: true,
+        descricao: '2 times de 7 · 5 reservas',
+        times: 2,
+        reservas: 5,
+      },
+      {
+        formato: 'dois_times',
+        valida: false,
+        motivo: 'aptos_insuficientes',
+        descricao: 'Faltam aptos para 2 times.',
+        maiorNPossivel: null,
+      },
+      {
+        formato: 'varios_times',
+        valida: true,
+        descricao: '4 times de 4 + 1 time incompleto de 2',
+        times: 5,
+        timesCompletos: 4,
+        tamanhoIncompleto: 2,
+      },
       {
         formato: 'varios_times',
         valida: false,
@@ -148,7 +191,10 @@ describe('previaResposta', () => {
   });
 
   it('SIM-09: prévia sem descrição é recusada', () => {
-    expect(previaResposta.safeParse({ formato: 'dois_times', valida: true, times: 2, reservas: 5 }).success).toBe(false);
+    expect(
+      previaResposta.safeParse({ formato: 'dois_times', valida: true, times: 2, reservas: 5 })
+        .success,
+    ).toBe(false);
   });
 });
 
@@ -164,12 +210,29 @@ const SUGERIR_DOIS = {
   k: 1,
   aptos: [1, 2, 3, 4, 5].map((i) => ({ id: u(i), so1oTempo: false })),
 };
-const SUGERIR_VARIOS = { formato: 'varios_times', data: '2026-10-22', n: 2, aptos: [1, 2, 3, 4, 5].map((i) => ({ id: u(i) })) };
+const SUGERIR_VARIOS = {
+  formato: 'varios_times',
+  data: '2026-10-22',
+  n: 2,
+  aptos: [1, 2, 3, 4, 5].map((i) => ({ id: u(i) })),
+};
 
 const COMPOSICAO_DOIS = {
   times: [
-    { titulares: [{ id: u(1), so1oTempo: false }, { id: u(4), so1oTempo: false }], entramNo2oTempo: [{ id: u(5), so1oTempo: false }] },
-    { titulares: [{ id: u(2), so1oTempo: false }, { id: u(3), so1oTempo: false }], entramNo2oTempo: [] },
+    {
+      titulares: [
+        { id: u(1), so1oTempo: false },
+        { id: u(4), so1oTempo: false },
+      ],
+      entramNo2oTempo: [{ id: u(5), so1oTempo: false }],
+    },
+    {
+      titulares: [
+        { id: u(2), so1oTempo: false },
+        { id: u(3), so1oTempo: false },
+      ],
+      entramNo2oTempo: [],
+    },
   ],
   naoEntra: [],
 };
@@ -204,7 +267,9 @@ describe('sugerirCorpo', () => {
 
   it('SIM-53: 61 aptos são recusados com "Há jogador repetido nos aptos." no campo aptos', () => {
     const aptos = Array.from({ length: 61 }, (_, i) => ({ id: u(i + 1), so1oTempo: false }));
-    expect(mensagens(sugerirCorpo.safeParse({ ...SUGERIR_DOIS, aptos }))).toEqual({ aptos: [MENSAGEM_APTOS_REPETIDO] });
+    expect(mensagens(sugerirCorpo.safeParse({ ...SUGERIR_DOIS, aptos }))).toEqual({
+      aptos: [MENSAGEM_APTOS_REPETIDO],
+    });
   });
 
   it('SIM-53: 60 aptos são aceitos', () => {
@@ -214,14 +279,20 @@ describe('sugerirCorpo', () => {
 
   it('SIM-53: id repetido é recusado com "Há jogador repetido nos aptos." no campo aptos', () => {
     const aptos = [...SUGERIR_VARIOS.aptos, { id: u(1) }];
-    expect(mensagens(sugerirCorpo.safeParse({ ...SUGERIR_VARIOS, aptos }))).toEqual({ aptos: [MENSAGEM_APTOS_REPETIDO] });
+    expect(mensagens(sugerirCorpo.safeParse({ ...SUGERIR_VARIOS, aptos }))).toEqual({
+      aptos: [MENSAGEM_APTOS_REPETIDO],
+    });
   });
 });
 
 describe('avaliarCorpo', () => {
   it('SIM-62: a entrada mais a composição é aceita', () => {
-    expect(avaliarCorpo.safeParse({ ...SUGERIR_DOIS, composicao: COMPOSICAO_DOIS }).success).toBe(true);
-    const composicao = { times: [{ jogadores: [u(1), u(2)] }, { jogadores: [u(3), u(4)] }, { jogadores: [u(5)] }] };
+    expect(avaliarCorpo.safeParse({ ...SUGERIR_DOIS, composicao: COMPOSICAO_DOIS }).success).toBe(
+      true,
+    );
+    const composicao = {
+      times: [{ jogadores: [u(1), u(2)] }, { jogadores: [u(3), u(4)] }, { jogadores: [u(5)] }],
+    };
     expect(avaliarCorpo.safeParse({ ...SUGERIR_VARIOS, composicao }).success).toBe(true);
   });
 
@@ -240,8 +311,14 @@ describe('avaliarCorpo', () => {
   });
 
   it('SIM-82: jogador da composição com apelido ou nível é recusado', () => {
-    const titulares = [{ id: u(1), so1oTempo: false, apelido: 'Toninho' }, COMPOSICAO_DOIS.times[0]!.titulares[1]];
-    const composicao = { ...COMPOSICAO_DOIS, times: [{ ...COMPOSICAO_DOIS.times[0], titulares }, COMPOSICAO_DOIS.times[1]] };
+    const titulares = [
+      { id: u(1), so1oTempo: false, apelido: 'Toninho' },
+      COMPOSICAO_DOIS.times[0]!.titulares[1],
+    ];
+    const composicao = {
+      ...COMPOSICAO_DOIS,
+      times: [{ ...COMPOSICAO_DOIS.times[0], titulares }, COMPOSICAO_DOIS.times[1]],
+    };
     expect(avaliarCorpo.safeParse({ ...SUGERIR_DOIS, composicao }).success).toBe(false);
   });
 });
@@ -284,7 +361,12 @@ const RESULTADO_VARIOS = {
   descricao: '5 times de 4',
   avisos: [],
   times: [
-    { nome: 'Time 1', incompleto: false, jogadores: [JOGADOR], indicadores: { jogadores: 1, nivelSoma: 683, nivelMedio: 683, idadeMedia: 3600 } },
+    {
+      nome: 'Time 1',
+      incompleto: false,
+      jogadores: [JOGADOR],
+      indicadores: { jogadores: 1, nivelSoma: 683, nivelMedio: 683, idadeMedia: 3600 },
+    },
   ],
 };
 
@@ -298,12 +380,21 @@ describe('respostas do simulador', () => {
     'SIM-82: titular, reserva, "não entra" ou jogador de 3+ com %s é recusado',
     (campo) => {
       const titular = { ...RESULTADO_DOIS.times[0]!.titulares[0], [campo]: 1 };
-      const dois = { ...RESULTADO_DOIS, times: [{ ...TIME_DOIS, titulares: [titular] }, RESULTADO_DOIS.times[1]] };
+      const dois = {
+        ...RESULTADO_DOIS,
+        times: [{ ...TIME_DOIS, titulares: [titular] }, RESULTADO_DOIS.times[1]],
+      };
       expect(sugerirResposta.safeParse(dois).success).toBe(false);
       const reserva = { ...JOGADOR, so1oTempo: false, [campo]: 1 };
-      const comReserva = { ...RESULTADO_DOIS, times: [{ ...TIME_DOIS, entramNo2oTempo: [reserva] }, RESULTADO_DOIS.times[1]] };
+      const comReserva = {
+        ...RESULTADO_DOIS,
+        times: [{ ...TIME_DOIS, entramNo2oTempo: [reserva] }, RESULTADO_DOIS.times[1]],
+      };
       expect(sugerirResposta.safeParse(comReserva).success).toBe(false);
-      const naoEntra = { ...RESULTADO_DOIS, naoEntra: [{ ...RESULTADO_DOIS.naoEntra[0], [campo]: 1 }] };
+      const naoEntra = {
+        ...RESULTADO_DOIS,
+        naoEntra: [{ ...RESULTADO_DOIS.naoEntra[0], [campo]: 1 }],
+      };
       expect(sugerirResposta.safeParse(naoEntra).success).toBe(false);
       const varios = {
         ...RESULTADO_VARIOS,
@@ -315,7 +406,10 @@ describe('respostas do simulador', () => {
 
   it('SIM-82: nível decimal na resposta é recusado', () => {
     const titular = { ...RESULTADO_DOIS.times[0]!.titulares[0], nivel: 6.83 };
-    const dois = { ...RESULTADO_DOIS, times: [{ ...TIME_DOIS, titulares: [titular] }, RESULTADO_DOIS.times[1]] };
+    const dois = {
+      ...RESULTADO_DOIS,
+      times: [{ ...TIME_DOIS, titulares: [titular] }, RESULTADO_DOIS.times[1]],
+    };
     expect(sugerirResposta.safeParse(dois).success).toBe(false);
   });
 

@@ -115,7 +115,9 @@ describe('GEL-15: violação em outra restrição', () => {
       });
       await db.query('ROLLBACK TO SAVEPOINT tentativa');
       await comoSuper(db);
-      const r = await db.query<{ n: string }>('SELECT (CASE WHEN is_called THEN last_value ELSE 0 END)::text AS n FROM tentativas_teste');
+      const r = await db.query<{ n: string }>(
+        'SELECT (CASE WHEN is_called THEN last_value ELSE 0 END)::text AS n FROM tentativas_teste',
+      );
       expect(r.rows[0]?.n).toBe('1');
     } finally {
       await db.query('ROLLBACK');

@@ -37,15 +37,17 @@ export const ROTULOS_FREQUENCIA: Record<(typeof FREQUENCIAS)[number], string> = 
   mensal: 'Mensal',
 };
 
-export const OPCOES_DIA_SEMANA: readonly OpcaoSeletor<(typeof DIAS_DA_SEMANA)[number]>[] = DIAS_DA_SEMANA.map((valor) => ({
-  valor,
-  rotulo: ROTULOS_DIA_SEMANA[valor],
-}));
+export const OPCOES_DIA_SEMANA: readonly OpcaoSeletor<(typeof DIAS_DA_SEMANA)[number]>[] =
+  DIAS_DA_SEMANA.map((valor) => ({
+    valor,
+    rotulo: ROTULOS_DIA_SEMANA[valor],
+  }));
 
-export const OPCOES_FREQUENCIA: readonly OpcaoSeletor<(typeof FREQUENCIAS)[number]>[] = FREQUENCIAS.map((valor) => ({
-  valor,
-  rotulo: ROTULOS_FREQUENCIA[valor],
-}));
+export const OPCOES_FREQUENCIA: readonly OpcaoSeletor<(typeof FREQUENCIAS)[number]>[] =
+  FREQUENCIAS.map((valor) => ({
+    valor,
+    rotulo: ROTULOS_FREQUENCIA[valor],
+  }));
 
 export interface PropsCampoSeletor<V extends string> {
   id: string;
@@ -98,7 +100,9 @@ export function CampoSeletor<V extends string>({
   const idAjuda = ajuda ? `${id}-ajuda` : undefined;
   const idErro = erro ? `${id}-erro` : undefined;
   const descricao = [idAjuda, idErro].filter(Boolean).join(' ') || undefined;
-  const classeCampo = [estilosCampo.campo, erro ? estilosCampo['campo--erro'] : ''].filter(Boolean).join(' ');
+  const classeCampo = [estilosCampo.campo, erro ? estilosCampo['campo--erro'] : '']
+    .filter(Boolean)
+    .join(' ');
   const rodape = (
     <>
       {ajuda ? (

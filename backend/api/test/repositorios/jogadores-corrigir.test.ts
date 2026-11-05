@@ -39,7 +39,10 @@ afterEach(async () => {
 });
 
 /** Cria o jogador e devolve o id e os ids dos períodos, na ordem dada. */
-async function novoJogador(apelido: string, faixas: Faixa[] = PADRAO): Promise<{ id: string; periodos: string[] }> {
+async function novoJogador(
+  apelido: string,
+  faixas: Faixa[] = PADRAO,
+): Promise<{ id: string; periodos: string[] }> {
   const { db, cenario } = aberto;
   const r = await db.query<{ id: string }>(
     `INSERT INTO jogadores (grupo_id, apelido, ano_nascimento, posicao, pontuacao_inicial, inicio_pontuacao, criado_por,
@@ -83,17 +86,28 @@ function corrigirComo(
   periodoId: string,
   dados: { saida?: string; retorno?: string },
 ) {
-  return comDb(aberto.url, conta, (db) => jogadores.corrigirPeriodo(db, grupo, id, periodoId, dados, HOJE), {
-    confirmar: true,
-  });
+  return comDb(
+    aberto.url,
+    conta,
+    (db) => jogadores.corrigirPeriodo(db, grupo, id, periodoId, dados, HOJE),
+    {
+      confirmar: true,
+    },
+  );
 }
 
 describe('jogadores.corrigirPeriodo', () => {
   it('GEL-71: saída de 05/10 para 03/10 grava e audita antes e depois com a conta autora', async () => {
     const j = await novoJogador('Corrige Saída');
-    const r = await corrigirComo(aberto.cenario.contaO, aberto.cenario.grupoG, j.id, j.periodos[0]!, {
-      saida: '2026-10-03',
-    });
+    const r = await corrigirComo(
+      aberto.cenario.contaO,
+      aberto.cenario.grupoG,
+      j.id,
+      j.periodos[0]!,
+      {
+        saida: '2026-10-03',
+      },
+    );
     expect(r).toEqual({ resultado: 'ok', alterado: true });
     expect(await periodos(j.id)).toEqual([
       { inicio: '2026-01-10', fim: '2026-10-03' },
@@ -109,15 +123,26 @@ describe('jogadores.corrigirPeriodo', () => {
     });
     // T35 da partidas-e-ranking (PAR-122): a auditoria passa a levar acumulado e posição antes e depois.
     expect(Object.keys(a[0]?.resumo ?? {})).toEqual(
-      expect.arrayContaining(['acumuladoAntes', 'acumuladoDepois', 'posicaoAntes', 'posicaoDepois']),
+      expect.arrayContaining([
+        'acumuladoAntes',
+        'acumuladoDepois',
+        'posicaoAntes',
+        'posicaoDepois',
+      ]),
     );
   });
 
   it('GEL-71: corrige o retorno de um período que não é o primeiro', async () => {
     const j = await novoJogador('Corrige Retorno');
-    const r = await corrigirComo(aberto.cenario.contaC, aberto.cenario.grupoG, j.id, j.periodos[1]!, {
-      retorno: '2026-10-15',
-    });
+    const r = await corrigirComo(
+      aberto.cenario.contaC,
+      aberto.cenario.grupoG,
+      j.id,
+      j.periodos[1]!,
+      {
+        retorno: '2026-10-15',
+      },
+    );
     expect(r).toEqual({ resultado: 'ok', alterado: true });
     expect(await periodos(j.id)).toEqual([
       { inicio: '2026-01-10', fim: '2026-10-05' },
@@ -131,10 +156,16 @@ describe('jogadores.corrigirPeriodo', () => {
       ['2026-04-01', '2026-06-01'],
       ['2026-08-01', null],
     ]);
-    const r = await corrigirComo(aberto.cenario.contaC, aberto.cenario.grupoG, j.id, j.periodos[1]!, {
-      retorno: '2026-03-15',
-      saida: '2026-07-01',
-    });
+    const r = await corrigirComo(
+      aberto.cenario.contaC,
+      aberto.cenario.grupoG,
+      j.id,
+      j.periodos[1]!,
+      {
+        retorno: '2026-03-15',
+        saida: '2026-07-01',
+      },
+    );
     expect(r).toEqual({ resultado: 'ok', alterado: true });
     expect(await periodos(j.id)).toEqual([
       { inicio: '2026-01-10', fim: '2026-03-01' },
@@ -145,9 +176,15 @@ describe('jogadores.corrigirPeriodo', () => {
 
   it('GEL-72: saída de período aberto é recusada com "Este período não tem data de saída."', async () => {
     const j = await novoJogador('Aberto');
-    const r = await corrigirComo(aberto.cenario.contaC, aberto.cenario.grupoG, j.id, j.periodos[1]!, {
-      saida: '2026-11-01',
-    });
+    const r = await corrigirComo(
+      aberto.cenario.contaC,
+      aberto.cenario.grupoG,
+      j.id,
+      j.periodos[1]!,
+      {
+        saida: '2026-11-01',
+      },
+    );
     expect(r).toEqual({
       resultado: 'invalido',
       regra: 'nao-corrigivel',
@@ -163,14 +200,21 @@ describe('jogadores.corrigirPeriodo', () => {
 
   it('GEL-73: retorno do primeiro período é recusado com a mensagem de alterar a data de início', async () => {
     const j = await novoJogador('Primeiro');
-    const r = await corrigirComo(aberto.cenario.contaC, aberto.cenario.grupoG, j.id, j.periodos[0]!, {
-      retorno: '2026-01-05',
-    });
+    const r = await corrigirComo(
+      aberto.cenario.contaC,
+      aberto.cenario.grupoG,
+      j.id,
+      j.periodos[0]!,
+      {
+        retorno: '2026-01-05',
+      },
+    );
     expect(r).toEqual({
       resultado: 'invalido',
       regra: 'nao-corrigivel',
       campo: 'retorno',
-      mensagem: 'O início do primeiro período é a data de início da pontuação; use Alterar data de início.',
+      mensagem:
+        'O início do primeiro período é a data de início da pontuação; use Alterar data de início.',
     });
     expect((await periodos(j.id))[0]).toEqual({ inicio: '2026-01-10', fim: '2026-10-05' });
     expect(await corrigidos(j.id)).toEqual([]);
@@ -178,9 +222,15 @@ describe('jogadores.corrigirPeriodo', () => {
 
   it('GEL-74: datas iguais às atuais devolvem alterado: false sem gravar nem auditar', async () => {
     const j = await novoJogador('Igual');
-    const r = await corrigirComo(aberto.cenario.contaC, aberto.cenario.grupoG, j.id, j.periodos[0]!, {
-      saida: '2026-10-05',
-    });
+    const r = await corrigirComo(
+      aberto.cenario.contaC,
+      aberto.cenario.grupoG,
+      j.id,
+      j.periodos[0]!,
+      {
+        saida: '2026-10-05',
+      },
+    );
     expect(r).toEqual({ resultado: 'ok', alterado: false });
     expect(await corrigidos(j.id)).toEqual([]);
   });
@@ -188,9 +238,15 @@ describe('jogadores.corrigirPeriodo', () => {
   it('GEL-75: período de outro jogador do mesmo grupo dá nao_encontrado e nada muda', async () => {
     const a = await novoJogador('Dono do Período');
     const b = await novoJogador('Outro Jogador');
-    const r = await corrigirComo(aberto.cenario.contaC, aberto.cenario.grupoG, b.id, a.periodos[0]!, {
-      saida: '2026-10-03',
-    });
+    const r = await corrigirComo(
+      aberto.cenario.contaC,
+      aberto.cenario.grupoG,
+      b.id,
+      a.periodos[0]!,
+      {
+        saida: '2026-10-03',
+      },
+    );
     expect(r).toEqual({ resultado: 'nao_encontrado' });
     expect((await periodos(a.id))[0]).toEqual({ inicio: '2026-01-10', fim: '2026-10-05' });
     expect(await corrigidos(a.id)).toEqual([]);
@@ -199,19 +255,35 @@ describe('jogadores.corrigirPeriodo', () => {
 
   it('GEL-44: jogador de outro grupo dá nao_encontrado', async () => {
     const j = await novoJogador('De G');
-    const r = await corrigirComo(aberto.cenario.contaB, aberto.cenario.grupoH, j.id, j.periodos[0]!, {
-      saida: '2026-10-03',
-    });
+    const r = await corrigirComo(
+      aberto.cenario.contaB,
+      aberto.cenario.grupoH,
+      j.id,
+      j.periodos[0]!,
+      {
+        saida: '2026-10-03',
+      },
+    );
     expect(r).toEqual({ resultado: 'nao_encontrado' });
     expect((await periodos(j.id))[0]).toEqual({ inicio: '2026-01-10', fim: '2026-10-05' });
   });
 
   it('GEL-66: saída depois do próximo retorno é recusada pela regra de período', async () => {
     const j = await novoJogador('Passa do Retorno');
-    const r = await corrigirComo(aberto.cenario.contaC, aberto.cenario.grupoG, j.id, j.periodos[0]!, {
-      saida: '2026-10-25',
+    const r = await corrigirComo(
+      aberto.cenario.contaC,
+      aberto.cenario.grupoG,
+      j.id,
+      j.periodos[0]!,
+      {
+        saida: '2026-10-25',
+      },
+    );
+    expect(r).toMatchObject({
+      resultado: 'invalido',
+      regra: 'saida-depois-do-proximo-retorno',
+      campo: 'saida',
     });
-    expect(r).toMatchObject({ resultado: 'invalido', regra: 'saida-depois-do-proximo-retorno', campo: 'saida' });
     expect((await periodos(j.id))[0]).toEqual({ inicio: '2026-01-10', fim: '2026-10-05' });
   });
 
@@ -230,7 +302,9 @@ describe('jogadores.corrigirPeriodo', () => {
       'CREATE TRIGGER falha_teste_gel109_corrigir BEFORE INSERT ON auditoria FOR EACH ROW EXECUTE FUNCTION falha_teste_gel109_corrigir()',
     );
     await expect(
-      corrigirComo(aberto.cenario.contaC, aberto.cenario.grupoG, j.id, j.periodos[0]!, { saida: '2026-10-03' }),
+      corrigirComo(aberto.cenario.contaC, aberto.cenario.grupoG, j.id, j.periodos[0]!, {
+        saida: '2026-10-03',
+      }),
     ).rejects.toThrow('falha forçada');
     expect((await periodos(j.id))[0]).toEqual({ inicio: '2026-01-10', fim: '2026-10-05' });
     expect(await corrigidos(j.id)).toEqual([]);

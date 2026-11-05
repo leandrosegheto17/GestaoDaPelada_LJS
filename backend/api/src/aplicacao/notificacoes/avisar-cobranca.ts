@@ -1,11 +1,19 @@
 import * as Sentry from '@sentry/cloudflare';
-import { TENTATIVA_MAXIMA, type MensagemCobranca, type TipoAvisoCobrancaFila } from '@pelada/contrato/fila-avisos';
+import {
+  TENTATIVA_MAXIMA,
+  type MensagemCobranca,
+  type TipoAvisoCobrancaFila,
+} from '@pelada/contrato/fila-avisos';
 import { hostsPushDev } from '@pelada/contrato/push';
 import { payloadCobranca, serializarPayload } from '@pelada/dominio';
 import { enviarEmailDeConta, limiteEmailsDia } from '../acesso/enviar-email.ts';
 import { atrasoDaNovaTentativa } from './enviar-ranking.ts';
 import type { CasoDeUso, ContextoConsumidor, Desfecho } from '../../entrada/consumidor-avisos.ts';
-import { push, type AssinaturaDoLote, type DestinoCobranca } from '../../infraestrutura/db/repositorios/push.ts';
+import {
+  push,
+  type AssinaturaDoLote,
+  type DestinoCobranca,
+} from '../../infraestrutura/db/repositorios/push.ts';
 import { remetenteDoAmbiente } from '../../infraestrutura/email/caixa-dev.ts';
 import { emailCobranca } from '../../infraestrutura/email/modelo-cobranca.ts';
 import type { Remetente } from '../../infraestrutura/email/resend.ts';
@@ -81,7 +89,9 @@ class AvisoPendente extends Error {
 const CONCLUIR: Desfecho = { acao: 'concluir' };
 
 /** Chave de idempotência do Resend: a mesma cobrança e o mesmo tipo nunca dão dois e-mails. */
-export function idempotenciaDoAviso(mensagem: Pick<MensagemCobranca, 'idExterno' | 'aviso'>): string {
+export function idempotenciaDoAviso(
+  mensagem: Pick<MensagemCobranca, 'idExterno' | 'aviso'>,
+): string {
   return `aviso-cobranca:${mensagem.idExterno}:${mensagem.aviso}`;
 }
 
@@ -97,7 +107,11 @@ async function enviarPushDeCobranca(
   if (vapid === null || assinaturas.length === 0) return;
 
   const payload = serializarPayload(
-    payloadCobranca({ tipo: mensagem.aviso, nomeGrupo: destino.grupoNome, grupoId: mensagem.grupoId }),
+    payloadCobranca({
+      tipo: mensagem.aviso,
+      nomeGrupo: destino.grupoNome,
+      grupoId: mensagem.grupoId,
+    }),
   );
   const topico = await topicoDoGrupo(mensagem.grupoId);
   const cache = novoCacheVapid();
@@ -140,7 +154,9 @@ async function enviarPushDeCobranca(
   }
 }
 
-export function criarAvisarCobranca(opcoes: OpcoesAvisarCobranca = {}): CasoDeUso<MensagemCobranca> {
+export function criarAvisarCobranca(
+  opcoes: OpcoesAvisarCobranca = {},
+): CasoDeUso<MensagemCobranca> {
   return async (mensagem, contexto) => {
     const { env, banco } = contexto;
 
@@ -161,7 +177,12 @@ export function criarAvisarCobranca(opcoes: OpcoesAvisarCobranca = {}): CasoDeUs
     let enviadoPara: DestinoCobranca | null;
     try {
       enviadoPara = await banco(async (db) => {
-        const primeira = await push.registrarAviso(db, mensagem.idExterno, mensagem.aviso, mensagem.grupoId);
+        const primeira = await push.registrarAviso(
+          db,
+          mensagem.idExterno,
+          mensagem.aviso,
+          mensagem.grupoId,
+        );
         if (!primeira) return null;
         const destino = await push.destinoCobranca(db, mensagem.grupoId);
         if (destino === null) return null;
@@ -179,7 +200,12 @@ export function criarAvisarCobranca(opcoes: OpcoesAvisarCobranca = {}): CasoDeUs
           // `recuperacao` é a categoria de 100% de LIMITE_EMAILS_DIA (NOT-41, ACE-72).
           categoria: 'recuperacao',
           limiteDia: limite,
-          mensagem: { tipo: 'aviso_cobranca', para: destino.email, ...conteudo, idempotencia: idempotenciaDoAviso(mensagem) },
+          mensagem: {
+            tipo: 'aviso_cobranca',
+            para: destino.email,
+            ...conteudo,
+            idempotencia: idempotenciaDoAviso(mensagem),
+          },
         });
         if (envio !== 'enviado') throw new AvisoPendente();
         return destino;
@@ -187,7 +213,11 @@ export function criarAvisarCobranca(opcoes: OpcoesAvisarCobranca = {}): CasoDeUs
     } catch (erro) {
       if (!(erro instanceof AvisoPendente)) throw erro;
       if (mensagem.tentativa < TENTATIVA_MAXIMA) {
-        await agendarAviso(env, { ...mensagem, tentativa: mensagem.tentativa + 1 }, { aposSegundos: ATRASO_AVISO_COBRANCA_S });
+        await agendarAviso(
+          env,
+          { ...mensagem, tentativa: mensagem.tentativa + 1 },
+          { aposSegundos: ATRASO_AVISO_COBRANCA_S },
+        );
       } else {
         try {
           reportar({ motivo: 'desistencia', tipo: mensagem.aviso });

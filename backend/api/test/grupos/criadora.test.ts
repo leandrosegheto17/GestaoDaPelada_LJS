@@ -2,7 +2,11 @@ import { Buffer } from 'node:buffer';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { gerarToken } from '../../src/infraestrutura/sessao/token.ts';
 import { cliente } from '../acesso/apoio.ts';
-import { abrirCenarioGrupos, reativar, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  reativar,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * A criadora não é removida por outra admin (T32; SEC-001), pela rota `DELETE /api/grupos/:grupoId/admins/:contaId`
@@ -22,9 +26,10 @@ async function sessao(conta: string): Promise<string> {
 }
 
 async function adminsDeG(): Promise<string[]> {
-  const r = await aberto.db.query<{ conta_id: string }>('SELECT conta_id FROM vinculos_admin WHERE grupo_id = $1 ORDER BY conta_id', [
-    aberto.cenario.grupoG,
-  ]);
+  const r = await aberto.db.query<{ conta_id: string }>(
+    'SELECT conta_id FROM vinculos_admin WHERE grupo_id = $1 ORDER BY conta_id',
+    [aberto.cenario.grupoG],
+  );
   return r.rows.map((l) => l.conta_id);
 }
 
@@ -37,7 +42,10 @@ async function remocoes(): Promise<number> {
 }
 
 function remover(token: string, conta: string) {
-  return cliente(aberto.url)(`/grupos/${aberto.cenario.grupoG}/admins/${conta}`, { metodo: 'DELETE', sessao: token });
+  return cliente(aberto.url)(`/grupos/${aberto.cenario.grupoG}/admins/${conta}`, {
+    metodo: 'DELETE',
+    sessao: token,
+  });
 }
 
 beforeAll(async () => {
@@ -92,7 +100,10 @@ describe('SEC-001: remover a criadora', () => {
 
   it('ACE-40: C, última admin, não sai de si mesma (ultimo_admin continua valendo)', async () => {
     const { cenario, db } = aberto;
-    await db.query('DELETE FROM vinculos_admin WHERE grupo_id = $1 AND conta_id = $2', [cenario.grupoG, cenario.contaO]);
+    await db.query('DELETE FROM vinculos_admin WHERE grupo_id = $1 AND conta_id = $2', [
+      cenario.grupoG,
+      cenario.contaO,
+    ]);
     const r = await remover(await sessao(cenario.contaC), cenario.contaC);
     expect(r.status).toBe(409);
     expect(await r.json()).toMatchObject({ codigo: 'ultimo_admin' });

@@ -40,7 +40,9 @@ async function excluir(db: pg.Client, conta: string, senha: string): Promise<Exc
 
 async function tocar(db: pg.Client, hash: Buffer): Promise<string | null> {
   await comoAppAqui(db);
-  const r = await umaLinha<{ conta: string | null }>(db, 'SELECT sessao_tocar($1) AS conta', [hash]);
+  const r = await umaLinha<{ conta: string | null }>(db, 'SELECT sessao_tocar($1) AS conta', [
+    hash,
+  ]);
   await comoSuper(db);
   return r.conta;
 }
@@ -60,13 +62,14 @@ async function rastrosDeA(db: pg.Client): Promise<{ sessao: Buffer }> {
   const sessao = await criarSessao(db, cenario.contaA);
   await criarLink(db, cenario.contaA, 'recuperacao');
   await criarConvite(db, cenario.grupoB, cenario.emailA, cenario.contaB);
-  await db.query(`INSERT INTO tentativas_login (email, ip_hash, momento, sucesso) VALUES ($1, $2, now(), false)`, [
-    cenario.emailA,
-    IP_HASH_1,
-  ]);
-  await db.query(`INSERT INTO envios_email (destino_hash, tipo, enviado_em) VALUES ($1, 'recuperacao', now())`, [
-    sha256(cenario.emailA),
-  ]);
+  await db.query(
+    `INSERT INTO tentativas_login (email, ip_hash, momento, sucesso) VALUES ($1, $2, now(), false)`,
+    [cenario.emailA, IP_HASH_1],
+  );
+  await db.query(
+    `INSERT INTO envios_email (destino_hash, tipo, enviado_em) VALUES ($1, 'recuperacao', now())`,
+    [sha256(cenario.emailA)],
+  );
   return { sessao };
 }
 
@@ -75,8 +78,17 @@ describe('conta_excluir: exclusão', () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
       await segundaAdminNoGrupoA(db);
-      expect(await excluir(db, cenario.contaA, cenario.senhaA)).toEqual({ resultado: 'ok', grupos: [] });
-      const c = await umaLinha<{ email: string; nome: string; senha_hash: string; e_dono: boolean; excluida: boolean }>(
+      expect(await excluir(db, cenario.contaA, cenario.senhaA)).toEqual({
+        resultado: 'ok',
+        grupos: [],
+      });
+      const c = await umaLinha<{
+        email: string;
+        nome: string;
+        senha_hash: string;
+        e_dono: boolean;
+        excluida: boolean;
+      }>(
         db,
         'SELECT email, nome, senha_hash, e_dono, excluida_em = now() AS excluida FROM contas WHERE id = $1',
         [cenario.contaA],
@@ -97,12 +109,26 @@ describe('conta_excluir: exclusão', () => {
       await segundaAdminNoGrupoA(db);
       await rastrosDeA(db);
       expect((await excluir(db, cenario.contaA, cenario.senhaA)).resultado).toBe('ok');
-      expect(await contar(db, 'SELECT 1 FROM sessoes WHERE conta_id = $1', [cenario.contaA])).toBe(0);
-      expect(await contar(db, 'SELECT 1 FROM vinculos_admin WHERE conta_id = $1', [cenario.contaA])).toBe(0);
-      expect(await contar(db, 'SELECT 1 FROM links_conta WHERE conta_id = $1', [cenario.contaA])).toBe(0);
-      expect(await contar(db, 'SELECT 1 FROM convites_admin WHERE email = $1', [cenario.emailA])).toBe(0);
-      expect(await contar(db, 'SELECT 1 FROM tentativas_login WHERE email = $1', [cenario.emailA])).toBe(0);
-      expect(await contar(db, 'SELECT 1 FROM envios_email WHERE destino_hash = $1', [sha256(cenario.emailA)])).toBe(0);
+      expect(await contar(db, 'SELECT 1 FROM sessoes WHERE conta_id = $1', [cenario.contaA])).toBe(
+        0,
+      );
+      expect(
+        await contar(db, 'SELECT 1 FROM vinculos_admin WHERE conta_id = $1', [cenario.contaA]),
+      ).toBe(0);
+      expect(
+        await contar(db, 'SELECT 1 FROM links_conta WHERE conta_id = $1', [cenario.contaA]),
+      ).toBe(0);
+      expect(
+        await contar(db, 'SELECT 1 FROM convites_admin WHERE email = $1', [cenario.emailA]),
+      ).toBe(0);
+      expect(
+        await contar(db, 'SELECT 1 FROM tentativas_login WHERE email = $1', [cenario.emailA]),
+      ).toBe(0);
+      expect(
+        await contar(db, 'SELECT 1 FROM envios_email WHERE destino_hash = $1', [
+          sha256(cenario.emailA),
+        ]),
+      ).toBe(0);
     });
   });
 
@@ -112,8 +138,17 @@ describe('conta_excluir: exclusão', () => {
       await segundaAdminNoGrupoA(db);
       await rastrosDeA(db);
       await excluir(db, cenario.contaA, cenario.senhaA);
-      for (const tabela of ['contas', 'sessoes', 'links_conta', 'convites_admin', 'tentativas_login', 'vinculos_admin']) {
-        const r = await db.query<{ linha: string }>(`SELECT row_to_json(t)::text AS linha FROM ${tabela} t`);
+      for (const tabela of [
+        'contas',
+        'sessoes',
+        'links_conta',
+        'convites_admin',
+        'tentativas_login',
+        'vinculos_admin',
+      ]) {
+        const r = await db.query<{ linha: string }>(
+          `SELECT row_to_json(t)::text AS linha FROM ${tabela} t`,
+        );
         const tudo = r.rows.map((l) => l.linha).join('\n');
         expect(tudo, tabela).not.toContain(cenario.emailA);
         expect(tudo, tabela).not.toContain('Conta A');
@@ -131,7 +166,11 @@ describe('conta_excluir: exclusão', () => {
         [cenario.contaA],
       );
       expect(r.rows).toEqual([{ grupo_id: cenario.grupoA, entidade: 'vinculo_admin' }]);
-      expect(await contar(db, 'SELECT 1 FROM contas WHERE id = $1 AND excluida_em IS NOT NULL', [cenario.contaA])).toBe(1);
+      expect(
+        await contar(db, 'SELECT 1 FROM contas WHERE id = $1 AND excluida_em IS NOT NULL', [
+          cenario.contaA,
+        ]),
+      ).toBe(1);
     });
   });
 
@@ -141,9 +180,17 @@ describe('conta_excluir: exclusão', () => {
       await segundaAdminNoGrupoA(db);
       const sessaoB = await criarSessao(db, cenario.contaB);
       await excluir(db, cenario.contaA, cenario.senhaA);
-      expect(await contar(db, 'SELECT 1 FROM vinculos_admin WHERE conta_id = $1', [cenario.contaSemVinculo])).toBe(1);
+      expect(
+        await contar(db, 'SELECT 1 FROM vinculos_admin WHERE conta_id = $1', [
+          cenario.contaSemVinculo,
+        ]),
+      ).toBe(1);
       expect(await tocar(db, sessaoB.hash)).toBe(cenario.contaB);
-      expect(await contar(db, `SELECT 1 FROM contas WHERE id = $1 AND nome = 'Conta B'`, [cenario.contaB])).toBe(1);
+      expect(
+        await contar(db, `SELECT 1 FROM contas WHERE id = $1 AND nome = 'Conta B'`, [
+          cenario.contaB,
+        ]),
+      ).toBe(1);
     });
   });
 
@@ -153,13 +200,11 @@ describe('conta_excluir: exclusão', () => {
       await segundaAdminNoGrupoA(db);
       await excluir(db, cenario.contaA, cenario.senhaA);
       await comoAppAqui(db);
-      const r = await umaLinha<{ situacao: string }>(db, 'SELECT situacao FROM conta_cadastrar($1, $2, $3, $4, $5)', [
-        cenario.emailA,
-        'Pessoa Nova',
-        'senha nova 12345',
-        '2026-11-01',
-        sha256('token novo'),
-      ]);
+      const r = await umaLinha<{ situacao: string }>(
+        db,
+        'SELECT situacao FROM conta_cadastrar($1, $2, $3, $4, $5)',
+        [cenario.emailA, 'Pessoa Nova', 'senha nova 12345', '2026-11-01', sha256('token novo')],
+      );
       await comoSuper(db);
       expect(r.situacao).toBe('nova');
     });
@@ -183,12 +228,29 @@ describe('conta_excluir: recusas', () => {
     await numaTransacao(db, async () => {
       await rastrosDeA(db);
       const r = await excluir(db, cenario.contaA, cenario.senhaA);
-      expect(r).toEqual({ resultado: 'unico_admin', grupos: [{ id: cenario.grupoA, nome: 'Grupo A' }] });
-      expect(await contar(db, 'SELECT 1 FROM sessoes WHERE conta_id = $1', [cenario.contaA])).toBe(1);
-      expect(await contar(db, 'SELECT 1 FROM vinculos_admin WHERE conta_id = $1', [cenario.contaA])).toBe(1);
-      expect(await contar(db, 'SELECT 1 FROM links_conta WHERE conta_id = $1', [cenario.contaA])).toBe(1);
-      expect(await contar(db, 'SELECT 1 FROM convites_admin WHERE email = $1', [cenario.emailA])).toBe(1);
-      expect(await contar(db, `SELECT 1 FROM contas WHERE id = $1 AND nome = 'Conta A' AND excluida_em IS NULL`, [cenario.contaA])).toBe(1);
+      expect(r).toEqual({
+        resultado: 'unico_admin',
+        grupos: [{ id: cenario.grupoA, nome: 'Grupo A' }],
+      });
+      expect(await contar(db, 'SELECT 1 FROM sessoes WHERE conta_id = $1', [cenario.contaA])).toBe(
+        1,
+      );
+      expect(
+        await contar(db, 'SELECT 1 FROM vinculos_admin WHERE conta_id = $1', [cenario.contaA]),
+      ).toBe(1);
+      expect(
+        await contar(db, 'SELECT 1 FROM links_conta WHERE conta_id = $1', [cenario.contaA]),
+      ).toBe(1);
+      expect(
+        await contar(db, 'SELECT 1 FROM convites_admin WHERE email = $1', [cenario.emailA]),
+      ).toBe(1);
+      expect(
+        await contar(
+          db,
+          `SELECT 1 FROM contas WHERE id = $1 AND nome = 'Conta A' AND excluida_em IS NULL`,
+          [cenario.contaA],
+        ),
+      ).toBe(1);
     });
   });
 
@@ -196,7 +258,10 @@ describe('conta_excluir: recusas', () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
       await db.query('UPDATE grupos SET arquivado_em = now() WHERE id = $1', [cenario.grupoA]);
-      expect(await excluir(db, cenario.contaA, cenario.senhaA)).toEqual({ resultado: 'ok', grupos: [] });
+      expect(await excluir(db, cenario.contaA, cenario.senhaA)).toEqual({
+        resultado: 'ok',
+        grupos: [],
+      });
     });
   });
 
@@ -209,10 +274,10 @@ describe('conta_excluir: recusas', () => {
          VALUES ('Aaa Primeiro', 'aaa-primeiro', 'sabado', 'semanal', '09:00', $1, now()) RETURNING id`,
         [cenario.contaA],
       );
-      await db.query(`INSERT INTO vinculos_admin (conta_id, grupo_id, criado_por, criado_em) VALUES ($1, $2, $1, now())`, [
-        cenario.contaA,
-        outro.id,
-      ]);
+      await db.query(
+        `INSERT INTO vinculos_admin (conta_id, grupo_id, criado_por, criado_em) VALUES ($1, $2, $1, now())`,
+        [cenario.contaA, outro.id],
+      );
       const r = await excluir(db, cenario.contaA, cenario.senhaA);
       expect(r.grupos).toEqual([
         { id: outro.id, nome: 'Aaa Primeiro' },
@@ -226,14 +291,26 @@ describe('conta_excluir: recusas', () => {
     await numaTransacao(db, async () => {
       await segundaAdminNoGrupoA(db);
       await rastrosDeA(db);
-      expect(await excluir(db, cenario.contaA, 'senha errada')).toEqual({ resultado: 'senha_incorreta', grupos: [] });
-      expect(await contar(db, 'SELECT 1 FROM sessoes WHERE conta_id = $1', [cenario.contaA])).toBe(1);
-      expect(await contar(db, 'SELECT 1 FROM vinculos_admin WHERE conta_id = $1', [cenario.contaA])).toBe(1);
-      expect(await contar(db, `SELECT 1 FROM contas WHERE id = $1 AND email = $2 AND excluida_em IS NULL`, [
-        cenario.contaA,
-        cenario.emailA,
-      ])).toBe(1);
-      expect(await contar(db, 'SELECT 1 FROM falhas_senha_atual WHERE conta_id = $1', [cenario.contaA])).toBe(1);
+      expect(await excluir(db, cenario.contaA, 'senha errada')).toEqual({
+        resultado: 'senha_incorreta',
+        grupos: [],
+      });
+      expect(await contar(db, 'SELECT 1 FROM sessoes WHERE conta_id = $1', [cenario.contaA])).toBe(
+        1,
+      );
+      expect(
+        await contar(db, 'SELECT 1 FROM vinculos_admin WHERE conta_id = $1', [cenario.contaA]),
+      ).toBe(1);
+      expect(
+        await contar(
+          db,
+          `SELECT 1 FROM contas WHERE id = $1 AND email = $2 AND excluida_em IS NULL`,
+          [cenario.contaA, cenario.emailA],
+        ),
+      ).toBe(1);
+      expect(
+        await contar(db, 'SELECT 1 FROM falhas_senha_atual WHERE conta_id = $1', [cenario.contaA]),
+      ).toBe(1);
     });
   });
 
@@ -241,11 +318,19 @@ describe('conta_excluir: recusas', () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
       await segundaAdminNoGrupoA(db);
-      await db.query(`INSERT INTO falhas_senha_atual (conta_id, momento) SELECT $1, now() FROM generate_series(1, 5)`, [
-        cenario.contaA,
-      ]);
-      expect(await excluir(db, cenario.contaA, cenario.senhaA)).toEqual({ resultado: 'bloqueado', grupos: [] });
-      expect(await contar(db, 'SELECT 1 FROM contas WHERE id = $1 AND excluida_em IS NULL', [cenario.contaA])).toBe(1);
+      await db.query(
+        `INSERT INTO falhas_senha_atual (conta_id, momento) SELECT $1, now() FROM generate_series(1, 5)`,
+        [cenario.contaA],
+      );
+      expect(await excluir(db, cenario.contaA, cenario.senhaA)).toEqual({
+        resultado: 'bloqueado',
+        grupos: [],
+      });
+      expect(
+        await contar(db, 'SELECT 1 FROM contas WHERE id = $1 AND excluida_em IS NULL', [
+          cenario.contaA,
+        ]),
+      ).toBe(1);
     });
   });
 

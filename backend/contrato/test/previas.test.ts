@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { grupoDetalhe } from '../src/grupo.ts';
-import { grupoDetalheComPartidas, previaInicioResposta, previaResposta, usoResposta } from '../src/previas.ts';
+import {
+  grupoDetalheComPartidas,
+  previaInicioResposta,
+  previaResposta,
+  usoResposta,
+} from '../src/previas.ts';
 
 /** Contrato das prévias, do uso e do início do grupo (T20; PAR-109, PAR-111, PAR-132, PAR-155). */
 
@@ -16,15 +21,19 @@ const previa = {
 
 describe('previaResposta', () => {
   it('PAR-109: aceita posicaoDepois nula e posicaoAntes nula', () => {
-    expect(previaResposta.parse({ ...previa, posicaoAntes: 3, posicaoDepois: null })).toMatchObject({ posicaoDepois: null });
+    expect(previaResposta.parse({ ...previa, posicaoAntes: 3, posicaoDepois: null })).toMatchObject(
+      { posicaoDepois: null },
+    );
     expect(previaResposta.parse(previa)).toEqual(previa);
   });
 
   it('PAR-109: recusa campo extra, no topo e nas rodadas', () => {
     expect(previaResposta.safeParse({ ...previa, jogadorId: 'x' }).success).toBe(false);
     expect(
-      previaResposta.safeParse({ ...previa, rodadasQuePassamAConstar: [{ data: '2026-10-08', situacao: 'falta', pontos: 0 }] })
-        .success,
+      previaResposta.safeParse({
+        ...previa,
+        rodadasQuePassamAConstar: [{ data: '2026-10-08', situacao: 'falta', pontos: 0 }],
+      }).success,
     ).toBe(false);
   });
 
@@ -35,20 +44,36 @@ describe('previaResposta', () => {
   });
 
   it('PAR-114: situação "fora" não pode constar; a data é AAAA-MM-DD', () => {
-    expect(previaResposta.safeParse({ ...previa, rodadasQuePassamAConstar: [{ data: '2026-10-08', situacao: 'fora' }] }).success).toBe(false);
-    expect(previaResposta.safeParse({ ...previa, rodadasQueDeixamDeConstar: [{ data: '08/10' }] }).success).toBe(false);
+    expect(
+      previaResposta.safeParse({
+        ...previa,
+        rodadasQuePassamAConstar: [{ data: '2026-10-08', situacao: 'fora' }],
+      }).success,
+    ).toBe(false);
+    expect(
+      previaResposta.safeParse({ ...previa, rodadasQueDeixamDeConstar: [{ data: '08/10' }] })
+        .success,
+    ).toBe(false);
   });
 });
 
 describe('previaInicioResposta', () => {
-  const inicio = { acumuladoAntes: 0, acumuladoDepois: 11, posicaoAntes: 6, posicaoDepois: 1, rodadasQuePassamAConstar: 6 };
+  const inicio = {
+    acumuladoAntes: 0,
+    acumuladoDepois: 11,
+    posicaoAntes: 6,
+    posicaoDepois: 1,
+    rodadasQuePassamAConstar: 6,
+  };
 
   it('PAR-111: aceita o número de rodadas que passam a constar', () => {
     expect(previaInicioResposta.parse(inicio)).toEqual(inicio);
   });
 
   it('PAR-111: a lista de rodadas e campo extra são recusados', () => {
-    expect(previaInicioResposta.safeParse({ ...inicio, rodadasQuePassamAConstar: [] }).success).toBe(false);
+    expect(
+      previaInicioResposta.safeParse({ ...inicio, rodadasQuePassamAConstar: [] }).success,
+    ).toBe(false);
     expect(previaInicioResposta.safeParse({ ...inicio, aviso: null }).success).toBe(false);
   });
 });
@@ -70,7 +95,9 @@ describe('usoResposta', () => {
   });
 
   it('PAR-155: contador negativo, que falta ou campo extra é recusado', () => {
-    expect(usoResposta.safeParse({ semanas: [{ ...semana, partidasEm48h: -1 }] }).success).toBe(false);
+    expect(usoResposta.safeParse({ semanas: [{ ...semana, partidasEm48h: -1 }] }).success).toBe(
+      false,
+    );
     const { escalacoesConfirmadas: _e, ...falta } = semana;
     expect(usoResposta.safeParse({ semanas: [falta] }).success).toBe(false);
     expect(usoResposta.safeParse({ semanas: [{ ...semana, ip: '1.2.3.4' }] }).success).toBe(false);
@@ -120,8 +147,12 @@ describe('grupoDetalheComPartidas', () => {
   });
 
   it('PAR-132: tipos errados são recusados', () => {
-    expect(grupoDetalheComPartidas.safeParse({ ...completo, pesosPadrao: 'sim' }).success).toBe(false);
-    expect(grupoDetalheComPartidas.safeParse({ ...completo, aparelhosNaSemana: -1 }).success).toBe(false);
+    expect(grupoDetalheComPartidas.safeParse({ ...completo, pesosPadrao: 'sim' }).success).toBe(
+      false,
+    );
+    expect(grupoDetalheComPartidas.safeParse({ ...completo, aparelhosNaSemana: -1 }).success).toBe(
+      false,
+    );
   });
 
   it.each(Object.keys(simulador))('SIM-08: exige o campo %s', (campo) => {
@@ -131,9 +162,16 @@ describe('grupoDetalheComPartidas', () => {
   });
 
   it('SIM-08: tipos dos campos do simulador', () => {
-    expect(grupoDetalheComPartidas.parse({ ...completo, escalacaoNoProximoDia: true }).escalacaoNoProximoDia).toBe(true);
-    expect(grupoDetalheComPartidas.safeParse({ ...completo, proximoDiaDeJogo: '22/10/2026' }).success).toBe(false);
-    expect(grupoDetalheComPartidas.safeParse({ ...completo, escalacaoNoProximoDia: 'sim' }).success).toBe(false);
+    expect(
+      grupoDetalheComPartidas.parse({ ...completo, escalacaoNoProximoDia: true })
+        .escalacaoNoProximoDia,
+    ).toBe(true);
+    expect(
+      grupoDetalheComPartidas.safeParse({ ...completo, proximoDiaDeJogo: '22/10/2026' }).success,
+    ).toBe(false);
+    expect(
+      grupoDetalheComPartidas.safeParse({ ...completo, escalacaoNoProximoDia: 'sim' }).success,
+    ).toBe(false);
   });
 
   it('SIM-08: os campos do simulador não entram no grupoDetalhe do PATCH', () => {

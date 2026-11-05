@@ -48,7 +48,11 @@ function novaPreMarcada(extra: Record<string, unknown> = {}) {
 function abrir(api: Record<string, Manipulador>) {
   return abrirTela(
     '/app/grupos/g-quinta/partidas/nova',
-    { 'GET /api/sessao': () => json(200, SESSAO_ANA), 'GET /api/grupos/g-quinta': () => pendente(), ...api },
+    {
+      'GET /api/sessao': () => json(200, SESSAO_ANA),
+      'GET /api/grupos/g-quinta': () => pendente(),
+      ...api,
+    },
     rotas,
   );
 }
@@ -58,13 +62,17 @@ function situacaoDe(apelido: string) {
 }
 
 function radio(apelido: string, nome: 'Ausente' | 'Presente') {
-  return within(situacaoDe(apelido)).getByRole('radio', { name: new RegExp(nome) }) as HTMLInputElement;
+  return within(situacaoDe(apelido)).getByRole('radio', {
+    name: new RegExp(nome),
+  }) as HTMLInputElement;
 }
 
 describe('faixa de pré-marcação (t11 pre-marcada)', () => {
   it('texto da faixa com a data da escalação', () => {
     expect(textoPreMarcada('2026-10-22')).toBe(TEXTO);
-    expect(textoPreMarcada('2026-11-05')).toBe('Pré-marcado pela escalação de 05/11 (inclui quem ficou como “não entra”).');
+    expect(textoPreMarcada('2026-11-05')).toBe(
+      'Pré-marcado pela escalação de 05/11 (inclui quem ficou como “não entra”).',
+    );
   });
 
   it('SIM-77: com a marca, a faixa aparece e as situações vêm da escalação; axe sem violação', async () => {
@@ -94,9 +102,15 @@ describe('faixa de pré-marcação (t11 pre-marcada)', () => {
     expect(screen.getByText('Presentes 1 · Lesionados 0 · Expulsos 0 · Ausentes 2')).toBeDefined();
 
     fireEvent.click(screen.getByRole('button', { name: 'Salvar partida (1 presente)' }));
-    await waitFor(() => expect(t.chamadasA('POST', '/api/grupos/g-quinta/partidas')).toHaveLength(1));
+    await waitFor(() =>
+      expect(t.chamadasA('POST', '/api/grupos/g-quinta/partidas')).toHaveLength(1),
+    );
     const [chamada] = t.chamadasA('POST', '/api/grupos/g-quinta/partidas');
-    expect(chamada?.corpo).toEqual({ data: '2026-10-22', choveu: false, marcacoes: [{ jogadorId: ALEMAO, situacao: 'presente' }] });
+    expect(chamada?.corpo).toEqual({
+      data: '2026-10-22',
+      choveu: false,
+      marcacoes: [{ jogadorId: ALEMAO, situacao: 'presente' }],
+    });
   });
 
   it('SIM-77: sem a marca, a faixa não aparece', async () => {

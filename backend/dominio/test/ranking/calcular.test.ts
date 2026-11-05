@@ -103,7 +103,9 @@ describe('calcularRanking: PTS INICIAL e PTS FINAL', () => {
     const setembro = ranking('2026-09', semSetembro);
     const outubro = ranking('2026-10', semSetembro);
     expect(setembro.partidas).toEqual([]);
-    expect(setembro.linhas.every((l) => l.ptsInicial === l.ptsFinal && l.rodadas.length === 0)).toBe(true);
+    expect(
+      setembro.linhas.every((l) => l.ptsInicial === l.ptsFinal && l.rodadas.length === 0),
+    ).toBe(true);
     expect(setembro.linhas.map((l) => l.jogadorId)).toEqual(outubro.linhas.map((l) => l.jogadorId));
   });
 

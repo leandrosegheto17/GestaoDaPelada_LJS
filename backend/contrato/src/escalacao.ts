@@ -21,7 +21,11 @@ import {
 function recusarRepetidos(corpo: Escalada, contexto: z.RefinementCtx): void {
   const ids = idsDaComposicao(corpo);
   if (new Set(ids).size !== ids.length) {
-    contexto.addIssue({ code: 'custom', path: ['composicao'], message: MENSAGEM_REPETIDO_NA_COMPOSICAO });
+    contexto.addIssue({
+      code: 'custom',
+      path: ['composicao'],
+      message: MENSAGEM_REPETIDO_NA_COMPOSICAO,
+    });
   }
 }
 
@@ -71,7 +75,10 @@ export const composicaoGravada = {
  * Valida o `jsonb` lido do banco com o schema do contrato; forma inválida (dado antigo) volta nulo, sem lançar, e a
  * escalação é tratada como inexistente (SIM-94).
  */
-export function lerComposicao(formato: 'dois_times' | 'varios_times', json: unknown): Escalada | null {
+export function lerComposicao(
+  formato: 'dois_times' | 'varios_times',
+  json: unknown,
+): Escalada | null {
   if (formato === 'varios_times') {
     const lida = composicaoVarios.safeParse(json);
     return lida.success ? { formato, composicao: lida.data } : null;

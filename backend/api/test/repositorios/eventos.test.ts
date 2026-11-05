@@ -45,7 +45,14 @@ async function evento(
   await aberto.db.query(
     `INSERT INTO eventos_uso (grupo_id, tipo, momento, dispositivo_id, mes_exportado, data_partida)
      VALUES ($1, $2, $3, $4, $5, $6)`,
-    [aberto.cenario.grupoG, tipo, momentoUtc, extra.dispositivo ?? null, extra.mes ?? null, extra.data ?? null],
+    [
+      aberto.cenario.grupoG,
+      tipo,
+      momentoUtc,
+      extra.dispositivo ?? null,
+      extra.mes ?? null,
+      extra.data ?? null,
+    ],
   );
 }
 
@@ -165,7 +172,9 @@ describe('eventos.porSemana', () => {
     const { cenario } = aberto;
     expect(await comoC((db) => eventos.porSemana(db, cenario.grupoG))).toEqual([]);
     await evento('pdf_exportado', '2026-10-19T15:00:00Z', { mes: '2026-10' });
-    expect(await comDb(aberto.url, cenario.contaB, (db) => eventos.porSemana(db, cenario.grupoG))).toEqual([]);
+    expect(
+      await comDb(aberto.url, cenario.contaB, (db) => eventos.porSemana(db, cenario.grupoG)),
+    ).toEqual([]);
   });
 });
 
@@ -176,19 +185,32 @@ describe('eventos.aparelhosDaSemana', () => {
     await evento('ranking_aberto', '2026-10-14T12:00:00Z', { dispositivo: X });
     await evento('ranking_aberto', '2026-10-19T02:30:00Z', { dispositivo: Y });
     await evento('ranking_aberto', '2026-10-20T12:00:00Z', { dispositivo: X });
-    expect(await comoC((db) => eventos.aparelhosDaSemana(db, cenario.grupoG, '2026-10-14'))).toBe(2);
-    expect(await comoC((db) => eventos.aparelhosDaSemana(db, cenario.grupoG, '2026-10-18'))).toBe(2);
-    expect(await comoC((db) => eventos.aparelhosDaSemana(db, cenario.grupoG, '2026-10-19'))).toBe(1);
-    expect(await comoC((db) => eventos.aparelhosDaSemana(db, cenario.grupoG, '2026-11-02'))).toBe(0);
+    expect(await comoC((db) => eventos.aparelhosDaSemana(db, cenario.grupoG, '2026-10-14'))).toBe(
+      2,
+    );
+    expect(await comoC((db) => eventos.aparelhosDaSemana(db, cenario.grupoG, '2026-10-18'))).toBe(
+      2,
+    );
+    expect(await comoC((db) => eventos.aparelhosDaSemana(db, cenario.grupoG, '2026-10-19'))).toBe(
+      1,
+    );
+    expect(await comoC((db) => eventos.aparelhosDaSemana(db, cenario.grupoG, '2026-11-02'))).toBe(
+      0,
+    );
   });
 });
 
 describe('eventos.partidaLancada e registrarPublico', () => {
   it('PAR-127: partidaLancada grava o evento com a data da partida, com conta', async () => {
     const { cenario } = aberto;
-    await comDb(aberto.url, cenario.contaC, (db) => eventos.partidaLancada(db, cenario.grupoG, '2026-10-15'), {
-      confirmar: true,
-    });
+    await comDb(
+      aberto.url,
+      cenario.contaC,
+      (db) => eventos.partidaLancada(db, cenario.grupoG, '2026-10-15'),
+      {
+        confirmar: true,
+      },
+    );
     const r = await aberto.db.query<{ data: string }>(
       `SELECT data_partida::text AS data FROM eventos_uso WHERE grupo_id = $1 AND tipo = 'partida_lancada'`,
       [cenario.grupoG],
@@ -198,23 +220,45 @@ describe('eventos.partidaLancada e registrarPublico', () => {
 
   it('PAR-127: registrarPublico grava com o slug do contexto e devolve true; com o slug de outro grupo, false', async () => {
     const { cenario } = aberto;
-    const slugH = (await aberto.db.query<{ slug: string }>('SELECT slug FROM grupos WHERE id = $1', [cenario.grupoH]))
-      .rows[0]?.slug;
+    const slugH = (
+      await aberto.db.query<{ slug: string }>('SELECT slug FROM grupos WHERE id = $1', [
+        cenario.grupoH,
+      ])
+    ).rows[0]?.slug;
     const resultado = await comDb(
       aberto.url,
       null,
       async (db) => {
         await sql`SELECT set_config('app.slug_publico', ${cenario.slugG}, true)`.execute(db);
         return [
-          await eventos.registrarPublico(db, cenario.slugG, { tipo: 'ranking_aberto', dispositivoId: X }, '2026-10-15T23:00:00Z'),
-          await eventos.registrarPublico(db, cenario.slugG, { tipo: 'pdf_exportado', mes: '2026-10' }, '2026-10-15T23:01:00Z'),
-          await eventos.registrarPublico(db, slugH ?? '', { tipo: 'ranking_aberto', dispositivoId: X }, '2026-10-15T23:02:00Z'),
+          await eventos.registrarPublico(
+            db,
+            cenario.slugG,
+            { tipo: 'ranking_aberto', dispositivoId: X },
+            '2026-10-15T23:00:00Z',
+          ),
+          await eventos.registrarPublico(
+            db,
+            cenario.slugG,
+            { tipo: 'pdf_exportado', mes: '2026-10' },
+            '2026-10-15T23:01:00Z',
+          ),
+          await eventos.registrarPublico(
+            db,
+            slugH ?? '',
+            { tipo: 'ranking_aberto', dispositivoId: X },
+            '2026-10-15T23:02:00Z',
+          ),
         ];
       },
       { confirmar: true },
     );
     expect(resultado).toEqual([true, true, false]);
-    const r = await aberto.db.query<{ tipo: string; dispositivo_id: string | null; mes_exportado: string | null }>(
+    const r = await aberto.db.query<{
+      tipo: string;
+      dispositivo_id: string | null;
+      mes_exportado: string | null;
+    }>(
       'SELECT tipo, dispositivo_id, mes_exportado FROM eventos_uso WHERE grupo_id = $1 ORDER BY momento',
       [cenario.grupoG],
     );

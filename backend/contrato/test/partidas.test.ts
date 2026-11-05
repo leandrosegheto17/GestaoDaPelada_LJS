@@ -13,7 +13,10 @@ import {
 
 /** Contrato das partidas (T18; PAR-19, PAR-26, PAR-39). */
 
-function mensagens(resultado: { success: boolean; error?: { issues: { path: PropertyKey[]; message: string }[] } }) {
+function mensagens(resultado: {
+  success: boolean;
+  error?: { issues: { path: PropertyKey[]; message: string }[] };
+}) {
   const porCampo: Record<string, string[]> = {};
   for (const problema of resultado.error?.issues ?? []) {
     const campo = problema.path.map(String).join('.');
@@ -40,34 +43,55 @@ describe('partidaCorpo', () => {
     expect(partidaCorpo.parse(corpo())).toEqual(corpo());
   });
 
-  it.each(['2026-02-29', '2026-13-01', '2026-10-32', '15/10/2026', '2026-10-1', '', 20261015, null, undefined])(
-    'PAR-19: data %j que não é data real dá "Informe uma data válida."',
-    (data) => {
-      expect(mensagens(partidaCorpo.safeParse(corpo({ data })))).toEqual({ data: ['Informe uma data válida.'] });
-    },
-  );
+  it.each([
+    '2026-02-29',
+    '2026-13-01',
+    '2026-10-32',
+    '15/10/2026',
+    '2026-10-1',
+    '',
+    20261015,
+    null,
+    undefined,
+  ])('PAR-19: data %j que não é data real dá "Informe uma data válida."', (data) => {
+    expect(mensagens(partidaCorpo.safeParse(corpo({ data })))).toEqual({
+      data: ['Informe uma data válida.'],
+    });
+  });
 
   it('PAR-19: 2028-02-29 é data real', () => {
     expect(partidaCorpo.safeParse(corpo({ data: '2028-02-29' })).success).toBe(true);
   });
 
-  it.each(['falta', 'fora', 'PRESENTE', '', null, undefined])('PAR-26: situação %j é recusada no campo da marcação', (situacao) => {
-    const r = partidaCorpo.safeParse(corpo({ marcacoes: [{ jogadorId: BETO, situacao }] }));
-    expect(mensagens(r)).toEqual({ 'marcacoes.0.situacao': [MENSAGEM_SITUACAO] });
-  });
+  it.each(['falta', 'fora', 'PRESENTE', '', null, undefined])(
+    'PAR-26: situação %j é recusada no campo da marcação',
+    (situacao) => {
+      const r = partidaCorpo.safeParse(corpo({ marcacoes: [{ jogadorId: BETO, situacao }] }));
+      expect(mensagens(r)).toEqual({ 'marcacoes.0.situacao': [MENSAGEM_SITUACAO] });
+    },
+  );
 
-  it.each(['ausente', 'presente', 'lesionado', 'expulso'])('PAR-26: situação %s é aceita', (situacao) => {
-    expect(partidaCorpo.safeParse(corpo({ marcacoes: [{ jogadorId: BETO, situacao }] })).success).toBe(true);
-  });
+  it.each(['ausente', 'presente', 'lesionado', 'expulso'])(
+    'PAR-26: situação %s é aceita',
+    (situacao) => {
+      expect(
+        partidaCorpo.safeParse(corpo({ marcacoes: [{ jogadorId: BETO, situacao }] })).success,
+      ).toBe(true);
+    },
+  );
 
   it('PAR-24: jogadorId que não é UUID dá a mensagem do jogador inativo no campo do índice', () => {
-    const r = partidaCorpo.safeParse(corpo({ marcacoes: [corpo().marcacoes[0], { jogadorId: 'j-beto', situacao: 'presente' }] }));
+    const r = partidaCorpo.safeParse(
+      corpo({ marcacoes: [corpo().marcacoes[0], { jogadorId: 'j-beto', situacao: 'presente' }] }),
+    );
     expect(mensagens(r)).toEqual({ 'marcacoes.1.jogadorId': [MENSAGEM_JOGADOR_INATIVO] });
     expect(MENSAGEM_JOGADOR_INATIVO).toBe('Jogador não está ativo nesta data.');
   });
 
   it('PAR-26: marcação com campo a mais é recusada', () => {
-    const r = partidaCorpo.safeParse(corpo({ marcacoes: [{ jogadorId: BETO, situacao: 'presente', pontos: 1 }] }));
+    const r = partidaCorpo.safeParse(
+      corpo({ marcacoes: [{ jogadorId: BETO, situacao: 'presente', pontos: 1 }] }),
+    );
     expect(r.success).toBe(false);
   });
 
@@ -86,7 +110,9 @@ describe('partidaCorpo', () => {
 describe('consultaData e consultaMes', () => {
   it('PAR-17: sem data é aceita; PAR-19: data irreal dá a mensagem', () => {
     expect(consultaData.parse({})).toEqual({});
-    expect(mensagens(consultaData.safeParse({ data: '2026-02-30' }))).toEqual({ data: ['Informe uma data válida.'] });
+    expect(mensagens(consultaData.safeParse({ data: '2026-02-30' }))).toEqual({
+      data: ['Informe uma data válida.'],
+    });
   });
 
   it.each(['2026-13', '2026-00', '2026-1', '10-2026', '2026-10-01', ''])(
@@ -128,7 +154,9 @@ describe('respostas', () => {
     const { preMarcadaPelaEscalacao: _fora, ...sem } = nova;
     expect(partidaNova.safeParse(sem).success).toBe(false);
     expect(partidaNova.safeParse({ ...nova, preMarcadaPelaEscalacao: 'sim' }).success).toBe(false);
-    expect(partidaNova.parse({ ...nova, preMarcadaPelaEscalacao: true }).preMarcadaPelaEscalacao).toBe(true);
+    expect(
+      partidaNova.parse({ ...nova, preMarcadaPelaEscalacao: true }).preMarcadaPelaEscalacao,
+    ).toBe(true);
   });
 
   it('PAR-44: partidaResposta com alteradaPor e alteradaEm', () => {
@@ -149,7 +177,13 @@ describe('respostas', () => {
       mes: '2026-10',
       hoje: '2026-10-16',
       navegacao: { mesAnterior: null, mesSeguinte: null },
-      partidas: [{ data: '2026-10-15', choveu: false, contagem: { presentes: 15, lesionados: 0, expulsos: 1 } }],
+      partidas: [
+        {
+          data: '2026-10-15',
+          choveu: false,
+          contagem: { presentes: 15, lesionados: 0, expulsos: 1 },
+        },
+      ],
     };
     expect(partidasDoMes.parse(r)).toEqual(r);
   });

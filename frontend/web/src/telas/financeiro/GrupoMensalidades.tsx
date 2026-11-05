@@ -15,7 +15,8 @@ import { diaEMes, IconeTipo, ItemLancamento } from './ItemLancamento.tsx';
  * O total soma inteiros; passar do inteiro seguro lança (como no domínio, FIN-13).
  */
 
-export const TEXTO_AJUDA_MENSALIDADES = 'As mensalidades do mês aparecem numa linha só; toque para ver cada uma.';
+export const TEXTO_AJUDA_MENSALIDADES =
+  'As mensalidades do mês aparecem numa linha só; toque para ver cada uma.';
 
 /** `2026-10` → "16 mensalidades de 10/2026". */
 export function rotuloMensalidades(quantidade: number, mes: string): string {
@@ -33,7 +34,8 @@ export function intervaloDeDatas(datas: readonly string[]): string {
 
 export function totalDe(lancamentos: readonly LancamentoDoMes[]): number {
   const total = lancamentos.reduce((soma, l) => soma + l.valorCentavos, 0);
-  if (!Number.isSafeInteger(total)) throw new RangeError('Soma das mensalidades além do inteiro seguro.');
+  if (!Number.isSafeInteger(total))
+    throw new RangeError('Soma das mensalidades além do inteiro seguro.');
   return total;
 }
 
@@ -58,16 +60,23 @@ export function GrupoMensalidades({ mes, mensalidades, base }: PropsGrupoMensali
         onClick={() => setAberta((a) => !a)}
       >
         <span className={lista['item__principal']}>
-          <span className={lista['item__titulo']}>{rotuloMensalidades(mensalidades.length, mes)}</span>
+          <span className={lista['item__titulo']}>
+            {rotuloMensalidades(mensalidades.length, mes)}
+          </span>
           <span className={lista['item__meta']}>
-            {intervaloDeDatas(mensalidades.map((m) => m.data))} · <IconeTipo tipo="entrada" /> Entrada ·{' '}
+            {intervaloDeDatas(mensalidades.map((m) => m.data))} · <IconeTipo tipo="entrada" />{' '}
+            Entrada ·{' '}
             <span className={`${estilos.selo} ${estilos['selo--neutro']}`}>mensalidade</span>
           </span>
         </span>
         <span className={modulo['item-lado']}>{formatarReais(totalDe(mensalidades))}</span>
       </button>
       {aberta ? (
-        <ul className={lista.lista} id={idLista} aria-label={rotuloMensalidades(mensalidades.length, mes)}>
+        <ul
+          className={lista.lista}
+          id={idLista}
+          aria-label={rotuloMensalidades(mensalidades.length, mes)}
+        >
           {mensalidades.map((l) => (
             <ItemLancamento key={l.id} l={l} base={base} />
           ))}

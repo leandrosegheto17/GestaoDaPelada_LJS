@@ -1,7 +1,14 @@
 import type pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { comoApp } from './apoio.ts';
-import { abrirCenarioConta, criarLink, criarSessao, IP_HASH_1, sha256, type CenarioContaAberto } from './cenario-conta.ts';
+import {
+  abrirCenarioConta,
+  criarLink,
+  criarSessao,
+  IP_HASH_1,
+  sha256,
+  type CenarioContaAberto,
+} from './cenario-conta.ts';
 
 /**
  * Matriz de `convites_admin`, `auditoria`, das tabelas de apoio e da role de backup
@@ -20,17 +27,24 @@ beforeAll(async () => {
   // Uma linha em cada tabela de apoio, para a leitura do backup ter o que ler.
   await criarSessao(db, cenario.contaA);
   await criarLink(db, cenario.contaA, 'recuperacao');
-  await db.query(`INSERT INTO tentativas_login (email, ip_hash, momento, sucesso) VALUES ($1, $2, now(), false)`, [
-    cenario.emailA,
+  await db.query(
+    `INSERT INTO tentativas_login (email, ip_hash, momento, sucesso) VALUES ($1, $2, now(), false)`,
+    [cenario.emailA, IP_HASH_1],
+  );
+  await db.query(
+    `INSERT INTO envios_email (destino_hash, tipo, enviado_em) VALUES ($1, 'confirmacao', now())`,
+    [sha256(cenario.emailA)],
+  );
+  await db.query(`INSERT INTO envios_email_dia (dia, total) VALUES (current_date, 1)`);
+  await db.query(`INSERT INTO pedidos_email_origem (chave_hash, momento) VALUES ($1, now())`, [
     IP_HASH_1,
   ]);
-  await db.query(`INSERT INTO envios_email (destino_hash, tipo, enviado_em) VALUES ($1, 'confirmacao', now())`, [
-    sha256(cenario.emailA),
+  await db.query(`INSERT INTO falhas_senha_atual (conta_id, momento) VALUES ($1, now())`, [
+    cenario.contaA,
   ]);
-  await db.query(`INSERT INTO envios_email_dia (dia, total) VALUES (current_date, 1)`);
-  await db.query(`INSERT INTO pedidos_email_origem (chave_hash, momento) VALUES ($1, now())`, [IP_HASH_1]);
-  await db.query(`INSERT INTO falhas_senha_atual (conta_id, momento) VALUES ($1, now())`, [cenario.contaA]);
-  await db.query(`INSERT INTO pedidos_reset (conta_id, ultimo_pedido_em) VALUES ($1, now())`, [cenario.contaA]);
+  await db.query(`INSERT INTO pedidos_reset (conta_id, ultimo_pedido_em) VALUES ($1, now())`, [
+    cenario.contaA,
+  ]);
 });
 
 afterAll(async () => {
@@ -54,12 +68,15 @@ async function comoBackup<T>(db: pg.Client, fn: (db: pg.Client) => Promise<T>): 
 }
 
 async function contar(db: pg.Client, tabela: string): Promise<number> {
-  const r = await db.query<{ n: number }>(`SELECT count(*)::int AS n FROM ${db.escapeIdentifier(tabela)}`);
+  const r = await db.query<{ n: number }>(
+    `SELECT count(*)::int AS n FROM ${db.escapeIdentifier(tabela)}`,
+  );
   return r.rows[0]?.n ?? -1;
 }
 
 describe('convites_admin como pelada_app', () => {
-  const ler = (d: pg.Client) => d.query<{ grupo_id: string }>('SELECT grupo_id, email FROM convites_admin');
+  const ler = (d: pg.Client) =>
+    d.query<{ grupo_id: string }>('SELECT grupo_id, email FROM convites_admin');
 
   it('ACE-45: SELECT da conta A devolve só convites do grupo A', async () => {
     const { db, cenario } = aberto;
@@ -101,23 +118,26 @@ describe('convites_admin como pelada_app', () => {
 
   it('ACE-45: INSERT da conta A no grupo B é recusado pela policy', async () => {
     const { db, cenario } = aberto;
-    await expect(comoApp(db, { conta: cenario.contaA }, inserir(cenario.grupoB, cenario.contaA))).rejects.toMatchObject(
-      PERMISSAO,
-    );
+    await expect(
+      comoApp(db, { conta: cenario.contaA }, inserir(cenario.grupoB, cenario.contaA)),
+    ).rejects.toMatchObject(PERMISSAO);
   });
 
   it('ACE-45: INSERT só com o slug do grupo A, sem conta, é recusado', async () => {
     const { db, cenario } = aberto;
-    await expect(comoApp(db, { slug: cenario.slugA }, inserir(cenario.grupoA, cenario.contaA))).rejects.toMatchObject(
-      PERMISSAO,
-    );
+    await expect(
+      comoApp(db, { slug: cenario.slugA }, inserir(cenario.grupoA, cenario.contaA)),
+    ).rejects.toMatchObject(PERMISSAO);
   });
 
   it('ACE-45: UPDATE que move o convite do grupo A para o grupo B é recusado pelo WITH CHECK', async () => {
     const { db, cenario } = aberto;
     await expect(
       comoApp(db, { conta: cenario.contaA }, (d) =>
-        d.query('UPDATE convites_admin SET grupo_id = $1 WHERE grupo_id = $2', [cenario.grupoB, cenario.grupoA]),
+        d.query('UPDATE convites_admin SET grupo_id = $1 WHERE grupo_id = $2', [
+          cenario.grupoB,
+          cenario.grupoA,
+        ]),
       ),
     ).rejects.toMatchObject(PERMISSAO);
   });
@@ -125,7 +145,9 @@ describe('convites_admin como pelada_app', () => {
   it('ACE-45: UPDATE da conta B sobre os convites do grupo A afeta 0 linhas', async () => {
     const { db, cenario } = aberto;
     const r = await comoApp(db, { conta: cenario.contaB }, (d) =>
-      d.query('UPDATE convites_admin SET cancelado_em = now() WHERE grupo_id = $1', [cenario.grupoA]),
+      d.query('UPDATE convites_admin SET cancelado_em = now() WHERE grupo_id = $1', [
+        cenario.grupoA,
+      ]),
     );
     expect(r.rowCount).toBe(0);
   });
@@ -133,16 +155,19 @@ describe('convites_admin como pelada_app', () => {
   it('ACE-45: UPDATE sem WHERE da conta A afeta só os convites do grupo A', async () => {
     const { db, cenario } = aberto;
     const deA = await comoSuperusuario(db, async () => {
-      const r = await db.query<{ n: number }>('SELECT count(*)::int AS n FROM convites_admin WHERE grupo_id = $1', [
-        cenario.grupoA,
-      ]);
+      const r = await db.query<{ n: number }>(
+        'SELECT count(*)::int AS n FROM convites_admin WHERE grupo_id = $1',
+        [cenario.grupoA],
+      );
       return r.rows[0]?.n ?? 0;
     });
     const cancelados = await comoApp(db, { conta: cenario.contaA }, async (d) => {
       const r = await d.query('UPDATE convites_admin SET cancelado_em = now()');
       expect(r.rowCount).toBe(deA);
       return comoSuperusuario(d, () =>
-        d.query<{ grupo_id: string }>('SELECT DISTINCT grupo_id FROM convites_admin WHERE cancelado_em IS NOT NULL'),
+        d.query<{ grupo_id: string }>(
+          'SELECT DISTINCT grupo_id FROM convites_admin WHERE cancelado_em IS NOT NULL',
+        ),
       );
     });
     expect(cancelados.rows.map((l) => l.grupo_id)).toEqual([cenario.grupoA]);
@@ -150,14 +175,18 @@ describe('convites_admin como pelada_app', () => {
 
   it('ACE-45: UPDATE só com o slug, sem conta, afeta 0 linhas', async () => {
     const { db, cenario } = aberto;
-    const r = await comoApp(db, { slug: cenario.slugA }, (d) => d.query('UPDATE convites_admin SET cancelado_em = now()'));
+    const r = await comoApp(db, { slug: cenario.slugA }, (d) =>
+      d.query('UPDATE convites_admin SET cancelado_em = now()'),
+    );
     expect(r.rowCount).toBe(0);
   });
 
   it('ACE-45: DELETE em convites_admin é recusado (cancelar é marcar cancelado_em)', async () => {
     const { db, cenario } = aberto;
     await expect(
-      comoApp(db, { conta: cenario.contaA }, (d) => d.query('DELETE FROM convites_admin WHERE grupo_id = $1', [cenario.grupoA])),
+      comoApp(db, { conta: cenario.contaA }, (d) =>
+        d.query('DELETE FROM convites_admin WHERE grupo_id = $1', [cenario.grupoA]),
+      ),
     ).rejects.toMatchObject(PERMISSAO);
   });
 });
@@ -178,16 +207,16 @@ describe('auditoria como pelada_app', () => {
 
   it('ACE-46: INSERT da conta A na auditoria do grupo B é recusado pela policy de grupo', async () => {
     const { db, cenario } = aberto;
-    await expect(comoApp(db, { conta: cenario.contaA }, inserir(cenario.grupoB, cenario.contaA))).rejects.toMatchObject(
-      PERMISSAO,
-    );
+    await expect(
+      comoApp(db, { conta: cenario.contaA }, inserir(cenario.grupoB, cenario.contaA)),
+    ).rejects.toMatchObject(PERMISSAO);
   });
 
   it('ACE-46: SELECT na auditoria é recusado (B nunca lê a de A)', async () => {
     const { db, cenario } = aberto;
-    await expect(comoApp(db, { conta: cenario.contaB }, (d) => d.query('SELECT id FROM auditoria'))).rejects.toMatchObject(
-      PERMISSAO,
-    );
+    await expect(
+      comoApp(db, { conta: cenario.contaB }, (d) => d.query('SELECT id FROM auditoria')),
+    ).rejects.toMatchObject(PERMISSAO);
   });
 
   it('ACE-46: UPDATE na auditoria é recusado, mesmo no próprio grupo', async () => {
@@ -202,7 +231,9 @@ describe('auditoria como pelada_app', () => {
   it('ACE-46: DELETE na auditoria é recusado, mesmo no próprio grupo', async () => {
     const { db, cenario } = aberto;
     await expect(
-      comoApp(db, { conta: cenario.contaA }, (d) => d.query('DELETE FROM auditoria WHERE grupo_id = $1', [cenario.grupoA])),
+      comoApp(db, { conta: cenario.contaA }, (d) =>
+        d.query('DELETE FROM auditoria WHERE grupo_id = $1', [cenario.grupoA]),
+      ),
     ).rejects.toMatchObject(PERMISSAO);
   });
 });
@@ -228,10 +259,12 @@ describe.each(APOIO)('%s como pelada_app', (tabela, coluna) => {
 
   it.each(comandos)(`ACE-45: %s em ${tabela} é recusado com a conta A`, async (_comando, sql) => {
     const { db, cenario } = aberto;
-    await expect(comoApp(db, { conta: cenario.contaA }, (d) => d.query(sql))).rejects.toMatchObject({
-      ...PERMISSAO,
-      message: expect.stringContaining(`permission denied for table ${tabela}`),
-    });
+    await expect(comoApp(db, { conta: cenario.contaA }, (d) => d.query(sql))).rejects.toMatchObject(
+      {
+        ...PERMISSAO,
+        message: expect.stringContaining(`permission denied for table ${tabela}`),
+      },
+    );
   });
 
   it.each(comandos)(`ACE-45: %s em ${tabela} é recusado sem contexto`, async (_comando, sql) => {
@@ -259,8 +292,12 @@ describe.each(LIDAS_PELO_BACKUP)('%s como pelada_backup_ro', (tabela) => {
 
   it(`ACE-45: o backup não apaga nem altera ${tabela}`, async () => {
     const { db } = aberto;
-    await expect(comoBackup(db, (d) => d.query(`DELETE FROM ${tabela}`))).rejects.toMatchObject(PERMISSAO);
-    await expect(comoBackup(db, (d) => d.query(`INSERT INTO ${tabela} DEFAULT VALUES`))).rejects.toMatchObject(PERMISSAO);
+    await expect(comoBackup(db, (d) => d.query(`DELETE FROM ${tabela}`))).rejects.toMatchObject(
+      PERMISSAO,
+    );
+    await expect(
+      comoBackup(db, (d) => d.query(`INSERT INTO ${tabela} DEFAULT VALUES`)),
+    ).rejects.toMatchObject(PERMISSAO);
   });
 });
 
@@ -273,9 +310,9 @@ describe('pelada_backup_ro também não altera', () => {
     ...APOIO,
   ] as const)('ACE-45: UPDATE em %s é recusado', async (tabela, coluna) => {
     const { db } = aberto;
-    await expect(comoBackup(db, (d) => d.query(`UPDATE ${tabela} SET ${coluna} = ${coluna}`))).rejects.toMatchObject(
-      PERMISSAO,
-    );
+    await expect(
+      comoBackup(db, (d) => d.query(`UPDATE ${tabela} SET ${coluna} = ${coluna}`)),
+    ).rejects.toMatchObject(PERMISSAO);
   });
 
   it('ACE-45: a role antiga pelada_backup não existe mais neste banco (renomeada)', async () => {

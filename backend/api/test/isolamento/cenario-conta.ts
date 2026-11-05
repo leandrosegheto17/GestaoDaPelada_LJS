@@ -66,7 +66,10 @@ export async function completarCenarioConta(
   opcoes: OpcoesCenarioConta = {},
 ): Promise<CenarioConta> {
   const definir = async (email: string, senha: string): Promise<string> => {
-    const r = await db.query<{ id: string }>('SELECT conta_definir_senha($1, $2, false) AS id', [email, senha]);
+    const r = await db.query<{ id: string }>('SELECT conta_definir_senha($1, $2, false) AS id', [
+      email,
+      senha,
+    ]);
     const id = r.rows[0]?.id;
     if (!id) throw new Error(`conta_definir_senha sem id para ${email}`);
     return id;
@@ -103,7 +106,9 @@ export async function comCenarioConta<T>(
   fn: (db: pg.Client, cenario: CenarioConta, banco: Banco) => Promise<T>,
   opcoes: OpcoesCenarioConta = {},
 ): Promise<T> {
-  return comCenario(async (db, base, banco) => fn(db, await completarCenarioConta(db, base, opcoes), banco));
+  return comCenario(async (db, base, banco) =>
+    fn(db, await completarCenarioConta(db, base, opcoes), banco),
+  );
 }
 
 export interface CenarioContaAberto extends Omit<CenarioAberto, 'cenario'> {
@@ -111,7 +116,9 @@ export interface CenarioContaAberto extends Omit<CenarioAberto, 'cenario'> {
 }
 
 /** `abrirCenario` com o cenário de conta, para `beforeAll`/`afterAll`. Falha na criação fecha o banco. */
-export async function abrirCenarioConta(opcoes: OpcoesCenarioConta = {}): Promise<CenarioContaAberto> {
+export async function abrirCenarioConta(
+  opcoes: OpcoesCenarioConta = {},
+): Promise<CenarioContaAberto> {
   const aberto = await abrirCenario();
   try {
     const cenario = await completarCenarioConta(aberto.db, aberto.cenario, opcoes);
@@ -131,7 +138,11 @@ export interface OpcoesSessao {
 }
 
 /** Grava uma sessão da conta como superusuário. Padrão: completa, criada agora, 12 h. */
-export async function criarSessao(db: pg.Client, conta: string, opcoes: OpcoesSessao = {}): Promise<Token> {
+export async function criarSessao(
+  db: pg.Client,
+  conta: string,
+  opcoes: OpcoesSessao = {},
+): Promise<Token> {
   const t = novoToken();
   await db.query(
     `INSERT INTO sessoes (token_hash, conta_id, escopo, criada_em, ultimo_uso_em, expira_em)

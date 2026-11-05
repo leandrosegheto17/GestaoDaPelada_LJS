@@ -31,20 +31,35 @@ afterEach(() => {
 
 function ranking(mes: string, extra: Record<string, unknown> = {}) {
   return {
-    grupo: { nome: 'Pelada de Quinta', slug: SLUG, diaSemana: 'quinta', frequencia: 'semanal', horario: '20:00' },
+    grupo: {
+      nome: 'Pelada de Quinta',
+      slug: SLUG,
+      diaSemana: 'quinta',
+      frequencia: 'semanal',
+      horario: '20:00',
+    },
     mes,
     hoje: '2026-10-22',
     geradoEm: '2026-10-16T01:30:00.000Z',
     navegacao: { mesAnterior: '2026-09', mesSeguinte: null },
     resumoMes: { partidas: 1, comChuva: 0 },
     partidas: [{ data: `${mes}-15`, choveu: false }],
-    linhas: [{ posicao: 1, apelido: 'Beto', ptsInicial: 3, rodadas: [{ situacao: 'presente', pontos: 1 }], ptsFinal: 4 }],
+    linhas: [
+      {
+        posicao: 1,
+        apelido: 'Beto',
+        ptsInicial: 3,
+        rodadas: [{ situacao: 'presente', pontos: 1 }],
+        ptsFinal: 4,
+      },
+    ],
     ...extra,
   };
 }
 
 function montar(mes: string | undefined, responder: (url: string) => Response) {
-  const fetch = (async (url: string | URL | Request) => responder(String(url))) as unknown as typeof globalThis.fetch;
+  const fetch = (async (url: string | URL | Request) =>
+    responder(String(url))) as unknown as typeof globalThis.fetch;
   const consultas = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   const cliente = criarCliente({ consultas, navegar: () => undefined, fetch });
   const envoltorio = ({ children }: { children: ReactNode }) => (
@@ -61,10 +76,17 @@ describe('gravar', () => {
   it('PAR-148: carregar outubro sem ?mes= grava a chave do mês e a :atual, com o geradoEm', async () => {
     const t = montar(undefined, () => json(200, ranking('2026-10')));
     await waitFor(() => expect(t.result.current.isSuccess).toBe(true));
-    expect(chavesLocais().sort()).toEqual([`pelada:ranking:${SLUG}:2026-10`, `pelada:ranking:${SLUG}:atual`]);
-    const doMes = JSON.parse(window.localStorage.getItem(chaveRanking(SLUG, '2026-10')) ?? 'null') as { geradoEm: string };
+    expect(chavesLocais().sort()).toEqual([
+      `pelada:ranking:${SLUG}:2026-10`,
+      `pelada:ranking:${SLUG}:atual`,
+    ]);
+    const doMes = JSON.parse(
+      window.localStorage.getItem(chaveRanking(SLUG, '2026-10')) ?? 'null',
+    ) as { geradoEm: string };
     expect(doMes.geradoEm).toBe('2026-10-16T01:30:00.000Z');
-    expect(window.localStorage.getItem(chaveRanking(SLUG, undefined))).toBe(window.localStorage.getItem(chaveRanking(SLUG, '2026-10')));
+    expect(window.localStorage.getItem(chaveRanking(SLUG, undefined))).toBe(
+      window.localStorage.getItem(chaveRanking(SLUG, '2026-10')),
+    );
   });
 
   it('PAR-148: com ?mes=2026-09, grava só a chave de setembro', async () => {
@@ -93,7 +115,10 @@ describe('gravar', () => {
 
 describe('validar ao ler', () => {
   it('PAR-154: guardado com campo extra é descartado e removido', () => {
-    window.localStorage.setItem(chaveRanking(SLUG, '2026-10'), JSON.stringify(ranking('2026-10', { telefone: '11999990000' })));
+    window.localStorage.setItem(
+      chaveRanking(SLUG, '2026-10'),
+      JSON.stringify(ranking('2026-10', { telefone: '11999990000' })),
+    );
     expect(lerRankingGuardado(SLUG, '2026-10')).toBeNull();
     expect(window.localStorage.getItem(chaveRanking(SLUG, '2026-10'))).toBeNull();
   });
@@ -113,7 +138,13 @@ describe('validar ao ler', () => {
     expect(lerRankingGuardado(SLUG, '2026-09')).toBeNull();
     window.localStorage.setItem(chaveRanking(SLUG, '2026-08'), JSON.stringify(ranking('2026-07')));
     expect(lerRankingGuardado(SLUG, '2026-08')).toBeNull();
-    window.localStorage.setItem(chaveRanking(SLUG, '2026-06'), JSON.stringify({ ...ranking('2026-06'), grupo: { ...ranking('2026-06').grupo, slug: 'outro' } }));
+    window.localStorage.setItem(
+      chaveRanking(SLUG, '2026-06'),
+      JSON.stringify({
+        ...ranking('2026-06'),
+        grupo: { ...ranking('2026-06').grupo, slug: 'outro' },
+      }),
+    );
     expect(lerRankingGuardado(SLUG, '2026-06')).toBeNull();
     expect(chavesLocais()).toEqual([]);
   });
@@ -144,9 +175,13 @@ describe('o que o aparelho guarda', () => {
       [`GET /api/publico/${SLUG}/ranking`]: () => json(200, ranking('2026-10')),
     });
     await t.roteador.navigate(`/g/${SLUG}`);
-    await waitFor(() => expect(window.localStorage.getItem(chaveRanking(SLUG, undefined))).not.toBeNull());
+    await waitFor(() =>
+      expect(window.localStorage.getItem(chaveRanking(SLUG, undefined))).not.toBeNull(),
+    );
     await t.roteador.navigate('/entrar');
-    fireEvent.change(await screen.findByLabelText('E-mail'), { target: { value: 'ana@exemplo.test' } });
+    fireEvent.change(await screen.findByLabelText('E-mail'), {
+      target: { value: 'ana@exemplo.test' },
+    });
     fireEvent.change(screen.getByLabelText('Senha'), { target: { value: 'SenhaForte123' } });
     fireEvent.click(screen.getByRole('button', { name: 'Entrar' }));
     await waitFor(() => expect(t.local()).toBe('/app'));

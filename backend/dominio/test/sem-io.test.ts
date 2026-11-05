@@ -13,7 +13,9 @@ async function errosDe(codigo: string) {
 
 describe('domínio sem I/O', () => {
   it('FUN-06: import de node:fs no domínio é recusado pelo lint', async () => {
-    const erros = await errosDe("import { readFileSync } from 'node:fs';\nexport const x = readFileSync;\n");
+    const erros = await errosDe(
+      "import { readFileSync } from 'node:fs';\nexport const x = readFileSync;\n",
+    );
     expect(erros).toHaveLength(1);
     expect(erros[0]?.message).toContain('FUN-06');
   });

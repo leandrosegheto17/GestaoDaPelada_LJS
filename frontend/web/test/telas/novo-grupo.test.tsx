@@ -4,7 +4,14 @@ import { MENSAGEM_CAMPO_PADRAO, mensagensDosCampos } from '../../src/dados/erros
 import { ErroApi } from '../../src/dados/cliente.ts';
 import { AJUDA_NOME_GRUPO, NovoGrupo } from '../../src/telas/novo-grupo/NovoGrupo.tsx';
 import { esperarSemViolacoes } from '../apoio/axe.ts';
-import { abrirTela, erroApi, json, pendente, SESSAO_ANA, type Manipulador } from '../apoio/tela.tsx';
+import {
+  abrirTela,
+  erroApi,
+  json,
+  pendente,
+  SESSAO_ANA,
+  type Manipulador,
+} from '../apoio/tela.tsx';
 
 /**
  * Novo grupo (T59; GEL-01, GEL-03, GEL-06, GEL-114, GEL-118), estados de `t27-novo-grupo--*.html` do mockup do
@@ -17,7 +24,11 @@ const rotas = () => [
 ];
 
 function abrir(api: Record<string, Manipulador>) {
-  return abrirTela('/app/grupos/novo', { 'GET /api/sessao': () => json(200, SESSAO_ANA), ...api }, rotas);
+  return abrirTela(
+    '/app/grupos/novo',
+    { 'GET /api/sessao': () => json(200, SESSAO_ANA), ...api },
+    rotas,
+  );
 }
 
 function preencher() {
@@ -41,17 +52,27 @@ afterEach(() => {
 
 describe('mensagensDosCampos', () => {
   it('GEL-118: lê a mensagem de cada campo do 422; campo sem mensagem recebe a padrão', () => {
-    const erro = new ErroApi(422, { erro: 'x', codigo: 'dados_invalidos', campos: ['horario', 'nome'] }, 'x', {
-      erro: 'x',
-      codigo: 'dados_invalidos',
-      campos: ['horario', 'nome'],
-      mensagens: { nome: 'O nome precisa ter de 3 a 60 caracteres.' },
+    const erro = new ErroApi(
+      422,
+      { erro: 'x', codigo: 'dados_invalidos', campos: ['horario', 'nome'] },
+      'x',
+      {
+        erro: 'x',
+        codigo: 'dados_invalidos',
+        campos: ['horario', 'nome'],
+        mensagens: { nome: 'O nome precisa ter de 3 a 60 caracteres.' },
+      },
+    );
+    expect(mensagensDosCampos(erro)).toEqual({
+      nome: 'O nome precisa ter de 3 a 60 caracteres.',
+      horario: MENSAGEM_CAMPO_PADRAO,
     });
-    expect(mensagensDosCampos(erro)).toEqual({ nome: 'O nome precisa ter de 3 a 60 caracteres.', horario: MENSAGEM_CAMPO_PADRAO });
   });
 
   it('outro status ou erro que não é da API não marca campo', () => {
-    expect(mensagensDosCampos(new ErroApi(409, { erro: 'x', codigo: 'grupo_arquivado' }, 'x'))).toEqual({});
+    expect(
+      mensagensDosCampos(new ErroApi(409, { erro: 'x', codigo: 'grupo_arquivado' }, 'x')),
+    ).toEqual({});
     expect(mensagensDosCampos(new Error('rede'))).toEqual({});
   });
 });
@@ -71,7 +92,12 @@ describe('tela Novo grupo (t27)', () => {
 
   it('GEL-01: 201 envia os quatro campos e navega para o início do grupo novo', async () => {
     const { chamadasA, local } = abrir({
-      'POST /api/grupos': () => json(201, { id: 'g-novo', slug: 'pelada-de-quinta', linkPublico: 'https://exemplo.test/g/pelada-de-quinta' }),
+      'POST /api/grupos': () =>
+        json(201, {
+          id: 'g-novo',
+          slug: 'pelada-de-quinta',
+          linkPublico: 'https://exemplo.test/g/pelada-de-quinta',
+        }),
     });
     await screen.findByRole('heading', { level: 1, name: 'Novo grupo' });
     preencher();
@@ -106,7 +132,11 @@ describe('tela Novo grupo (t27)', () => {
 
     const resumo = await screen.findByRole('alert');
     expect(within(resumo).getByText('Corrija 2 campos:')).toBeTruthy();
-    expect(within(resumo).getAllByRole('link').map((a) => [a.textContent, a.getAttribute('href')])).toEqual([
+    expect(
+      within(resumo)
+        .getAllByRole('link')
+        .map((a) => [a.textContent, a.getAttribute('href')]),
+    ).toEqual([
       ['Nome', '#nome'],
       ['Horário', '#hora'],
     ]);
@@ -114,7 +144,9 @@ describe('tela Novo grupo (t27)', () => {
     const nome = screen.getByLabelText('Nome');
     expect(nome.getAttribute('aria-invalid')).toBe('true');
     expect(nome.getAttribute('aria-describedby')).toBe('nome-ajuda nome-erro');
-    expect(document.getElementById('nome-erro')?.textContent).toBe('O nome precisa ter de 3 a 60 caracteres.');
+    expect(document.getElementById('nome-erro')?.textContent).toBe(
+      'O nome precisa ter de 3 a 60 caracteres.',
+    );
     const hora = screen.getByLabelText('Horário');
     expect(hora.getAttribute('aria-invalid')).toBe('true');
     expect(document.getElementById('hora-erro')?.textContent).toBe('Horário inválido.');
@@ -152,7 +184,10 @@ describe('tela Novo grupo (t27)', () => {
   });
 
   it('falha que não é de campo vai para a faixa de erro, sem resumo', async () => {
-    abrir({ 'POST /api/grupos': () => erroApi(429, 'muitas_requisicoes', 'Muitas tentativas. Aguarde um pouco.') });
+    abrir({
+      'POST /api/grupos': () =>
+        erroApi(429, 'muitas_requisicoes', 'Muitas tentativas. Aguarde um pouco.'),
+    });
     await screen.findByRole('heading', { level: 1, name: 'Novo grupo' });
     preencher();
     fireEvent.click(screen.getByRole('button', { name: 'Criar grupo' }));

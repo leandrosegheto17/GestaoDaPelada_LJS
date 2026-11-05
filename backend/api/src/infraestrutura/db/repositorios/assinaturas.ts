@@ -37,7 +37,10 @@ export type ResultadoRegistrar =
   | { resultado: 'so_quem_criou' | 'grupo_arquivado' | 'assinatura_vigente' };
 
 export type ResultadoCancelar =
-  | { resultado: 'ok'; situacaoAnterior: Extract<SituacaoAssinatura, 'aguardando_pagamento' | 'ativa'> }
+  | {
+      resultado: 'ok';
+      situacaoAnterior: Extract<SituacaoAssinatura, 'aguardando_pagamento' | 'ativa'>;
+    }
   | { resultado: 'so_quem_criou' | 'sem_assinatura' };
 
 function codigo(erro: unknown): string | undefined {
@@ -59,7 +62,12 @@ async function pendenteOuAtiva(db: Db, grupoId: string): Promise<AssinaturaPende
      LIMIT 1`.execute(db);
   const l = r.rows[0];
   if (l === undefined) return null;
-  return { id: l.id, situacao: l.situacao, faturaUrl: l.fatura_url, asaasAssinaturaId: l.asaas_assinatura_id };
+  return {
+    id: l.id,
+    situacao: l.situacao,
+    faturaUrl: l.fatura_url,
+    asaasAssinaturaId: l.asaas_assinatura_id,
+  };
 }
 
 /**
@@ -78,12 +86,18 @@ async function clienteDaConta(db: Db, contaId: string): Promise<string | null> {
 }
 
 /** Grava a assinatura `aguardando_pagamento` pela `assinatura_registrar` (T14), com a auditoria na mesma transação. */
-async function registrar(db: Db, grupoId: string, dados: DadosRegistro): Promise<ResultadoRegistrar> {
+async function registrar(
+  db: Db,
+  grupoId: string,
+  dados: DadosRegistro,
+): Promise<ResultadoRegistrar> {
   await sql`SAVEPOINT assinatura_registrar`.execute(db);
   try {
     const r = await sql<{ id: string }>`
       SELECT assinatura_registrar(${grupoId}::uuid, ${dados.clienteId}, ${dados.assinaturaId},
-                                  ${dados.valorCentavos}::integer, ${dados.faturaUrl}) AS id`.execute(db);
+                                  ${dados.valorCentavos}::integer, ${dados.faturaUrl}) AS id`.execute(
+      db,
+    );
     await sql`RELEASE SAVEPOINT assinatura_registrar`.execute(db);
     const id = r.rows[0]?.id;
     if (id === undefined) throw new Error('assinatura_registrar sem retorno');
@@ -128,7 +142,9 @@ async function cancelar(db: Db, grupoId: string): Promise<ResultadoCancelar> {
 
 /** Trava de assinatura do grupo até o fim da transação (AD-097). */
 async function travarGrupo(db: Db, grupoId: string): Promise<void> {
-  await sql`SELECT pg_advisory_xact_lock(hashtextextended(${`assinatura:${grupoId}`}, 0))`.execute(db);
+  await sql`SELECT pg_advisory_xact_lock(hashtextextended(${`assinatura:${grupoId}`}, 0))`.execute(
+    db,
+  );
 }
 
 export const assinaturas = { pendenteOuAtiva, clienteDaConta, registrar, cancelar, travarGrupo };

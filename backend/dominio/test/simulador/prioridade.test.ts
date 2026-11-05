@@ -15,13 +15,20 @@ import { ordemDePrioridade, type HistoricoSim } from '../../src/simulador/priori
  */
 
 const DATA = '2026-10-22';
-const CONFIGS: ConfigPesos[] = [{ ...PESOS_PADRAO, presencaSemChuva: 4, vigenteDesde: '2000-01-01' }];
+const CONFIGS: ConfigPesos[] = [
+  { ...PESOS_PADRAO, presencaSemChuva: 4, vigenteDesde: '2000-01-01' },
+];
 
 function apto(id: string, apelido: string, anoNascimento: number | null): Apto {
   return { id, apelido, nivel: 600, semNota: false, anoNascimento, so1oTempo: false };
 }
 
-function jogador(id: string, apelido: string, pontuacaoInicial: number, anoNascimento: number | null): JogadorDoRanking {
+function jogador(
+  id: string,
+  apelido: string,
+  pontuacaoInicial: number,
+  anoNascimento: number | null,
+): JogadorDoRanking {
   return {
     id,
     apelido,
@@ -44,7 +51,10 @@ describe('ordemDePrioridade', () => {
       partidas: [{ id: 'hoje', data: DATA, choveu: false }],
       presencas: [{ partidaId: 'hoje', jogadorId: 'b', situacao: 'presente' }],
     });
-    expect(ids(ordemDePrioridade([apto('b', 'B', 1990), apto('a', 'A', 1990)], h, DATA))).toEqual(['a', 'b']);
+    expect(ids(ordemDePrioridade([apto('b', 'B', 1990), apto('a', 'A', 1990)], h, DATA))).toEqual([
+      'a',
+      'b',
+    ]);
   });
 
   it('SIM-17: a partida da semana anterior conta (B passa a 12 e fica antes de A)', () => {
@@ -52,7 +62,10 @@ describe('ordemDePrioridade', () => {
       partidas: [{ id: 'antes', data: '2026-10-15', choveu: false }],
       presencas: [{ partidaId: 'antes', jogadorId: 'b', situacao: 'presente' }],
     });
-    expect(ids(ordemDePrioridade([apto('a', 'A', 1990), apto('b', 'B', 1990)], h, DATA))).toEqual(['b', 'a']);
+    expect(ids(ordemDePrioridade([apto('a', 'A', 1990), apto('b', 'B', 1990)], h, DATA))).toEqual([
+      'b',
+      'a',
+    ]);
   });
 
   it('SIM-18: grupo sem partida anterior: ordem por ano, apelido e id; sem ano vai ao fim', () => {
@@ -62,7 +75,12 @@ describe('ordemDePrioridade', () => {
       jogador('3', 'Abel', 0, 1995),
       jogador('4', 'Caio', 0, null),
     ]);
-    const aptos = [apto('4', 'Caio', null), apto('2', 'Beto', 1995), apto('3', 'Abel', 1995), apto('1', 'Zeca', 1980)];
+    const aptos = [
+      apto('4', 'Caio', null),
+      apto('2', 'Beto', 1995),
+      apto('3', 'Abel', 1995),
+      apto('1', 'Zeca', 1980),
+    ];
     expect(ids(ordemDePrioridade(aptos, h, DATA))).toEqual(['1', '3', '2', '4']);
   });
 
@@ -76,6 +94,8 @@ describe('ordemDePrioridade', () => {
 
   it('SIM-16: caixa e acento não mudam a ordem do apelido', () => {
     const h = historico([jogador('x', 'álvaro', 0, 1990), jogador('y', 'Bruno', 0, 1990)]);
-    expect(ids(ordemDePrioridade([apto('y', 'Bruno', 1990), apto('x', 'álvaro', 1990)], h, DATA))).toEqual(['x', 'y']);
+    expect(
+      ids(ordemDePrioridade([apto('y', 'Bruno', 1990), apto('x', 'álvaro', 1990)], h, DATA)),
+    ).toEqual(['x', 'y']);
   });
 });

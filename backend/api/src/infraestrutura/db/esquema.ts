@@ -246,7 +246,10 @@ const CATEGORIAS: Categoria[] = [
   extensoes,
 ];
 
-export async function lerEsquema(cliente: Cliente, opcoes: OpcoesLerEsquema = {}): Promise<string[]> {
+export async function lerEsquema(
+  cliente: Cliente,
+  opcoes: OpcoesLerEsquema = {},
+): Promise<string[]> {
   const tudo: string[] = [];
   for (const categoria of CATEGORIAS) tudo.push(...(await categoria(cliente, opcoes)));
   return tudo.sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));

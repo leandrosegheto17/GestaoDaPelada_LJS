@@ -92,14 +92,22 @@ export function agruparPresencasPorJogador(
     const partida = porId.get(pr.partidaId);
     if (!partida) continue;
     const lista = resultado.get(pr.jogadorId) ?? [];
-    lista.push({ partidaId: pr.partidaId, data: partida.data, choveu: partida.choveu, situacao: pr.situacao });
+    lista.push({
+      partidaId: pr.partidaId,
+      data: partida.data,
+      choveu: partida.choveu,
+      situacao: pr.situacao,
+    });
     resultado.set(pr.jogadorId, lista);
   }
   return resultado;
 }
 
 /** Os jogadores ativos em `data` (PAR-67). */
-export function ativosHoje<T extends { periodos: readonly Periodo[] }>(jogadores: readonly T[], hoje: Data): T[] {
+export function ativosHoje<T extends { periodos: readonly Periodo[] }>(
+  jogadores: readonly T[],
+  hoje: Data,
+): T[] {
   return jogadores.filter((j) => ativoEm(j.periodos, hoje));
 }
 
@@ -115,7 +123,10 @@ export function rodadasNoMes(
   periodoEm: Data,
 ): Rodada[] {
   return rodadasDoJogador(
-    { periodos: jogador.periodos, situacaoPorPartida: new Map(presencas.map((p) => [p.partidaId, p.situacao])) },
+    {
+      periodos: jogador.periodos,
+      situacaoPorPartida: new Map(presencas.map((p) => [p.partidaId, p.situacao])),
+    },
     partidas,
     inicioDaContagem(jogador.inicioPontuacao, jogador.periodos, periodoEm),
     resolver,
@@ -154,7 +165,10 @@ export function calcularRanking(entrada: EntradaRanking): ResultadoRanking {
   const presencasPorJogador = agruparPresencasPorJogador(entrada.partidas, entrada.presencas);
   const ativos = ativosHoje(entrada.jogadores, hoje);
   const acumulados = new Map(
-    ativos.map((j) => [j.id, acumuladoDoJogador(j, presencasPorJogador.get(j.id) ?? [], resolver, hoje)]),
+    ativos.map((j) => [
+      j.id,
+      acumuladoDoJogador(j, presencasPorJogador.get(j.id) ?? [], resolver, hoje),
+    ]),
   );
   const ordem = ordenarPorRanking(ativos, acumulados);
   const doMes = emOrdemDeData(entrada.partidas.filter((p) => mesDe(p.data) === mes));
@@ -162,10 +176,23 @@ export function calcularRanking(entrada: EntradaRanking): ResultadoRanking {
 
   const linhas = ordem.map(({ jogador, posicao }): LinhaRanking => {
     const presencas = presencasPorJogador.get(jogador.id) ?? [];
-    const ptsInicial = acumuladoDoJogador(jogador, presencas, resolver, vespera(primeiroDia(mes)), periodoEm);
+    const ptsInicial = acumuladoDoJogador(
+      jogador,
+      presencas,
+      resolver,
+      vespera(primeiroDia(mes)),
+      periodoEm,
+    );
     const rodadas = rodadasNoMes(jogador, presencas, doMes, resolver, periodoEm);
     const ptsFinal = rodadas.reduce((soma, r) => soma + (r.pontos ?? 0), ptsInicial);
-    return { jogadorId: jogador.id, apelido: jogador.apelido, posicao, ptsInicial, rodadas, ptsFinal };
+    return {
+      jogadorId: jogador.id,
+      apelido: jogador.apelido,
+      posicao,
+      ptsInicial,
+      rodadas,
+      ptsFinal,
+    };
   });
 
   const limites = limitesDeMes(entrada.partidas, hoje);

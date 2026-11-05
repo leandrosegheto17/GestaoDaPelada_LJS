@@ -16,7 +16,10 @@ import { historicoDeTresMeses } from '../apoio/historico.ts';
  */
 
 const HOJE = '2026-10-15';
-const limites = limitesDeMes([{ data: '2026-10-01' }, { data: '2026-08-06' }, { data: '2026-09-10' }], HOJE);
+const limites = limitesDeMes(
+  [{ data: '2026-10-01' }, { data: '2026-08-06' }, { data: '2026-09-10' }],
+  HOJE,
+);
 const semPartidas = limitesDeMes([], HOJE);
 
 describe('mesNoHistorico', () => {
@@ -27,20 +30,36 @@ describe('mesNoHistorico', () => {
   });
 
   it('PAR-66: do mês da primeira partida ao de hoje, inclusive; sem partidas, só o de hoje', () => {
-    expect(['2026-08', '2026-09', '2026-10'].map((m) => mesNoHistorico(limites, m))).toEqual([true, true, true]);
+    expect(['2026-08', '2026-09', '2026-10'].map((m) => mesNoHistorico(limites, m))).toEqual([
+      true,
+      true,
+      true,
+    ]);
     expect(mesNoHistorico(semPartidas, '2026-10')).toBe(true);
   });
 });
 
 describe('navegacaoDeMes', () => {
   it('PAR-84: no mês da primeira partida, mesAnterior nulo; PAR-85: no mês de hoje, mesSeguinte nulo', () => {
-    expect(navegacaoDeMes(limites, '2026-08')).toEqual({ mesAnterior: null, mesSeguinte: '2026-09' });
-    expect(navegacaoDeMes(limites, '2026-10')).toEqual({ mesAnterior: '2026-09', mesSeguinte: null });
-    expect(navegacaoDeMes(limites, '2026-09')).toEqual({ mesAnterior: '2026-08', mesSeguinte: '2026-10' });
+    expect(navegacaoDeMes(limites, '2026-08')).toEqual({
+      mesAnterior: null,
+      mesSeguinte: '2026-09',
+    });
+    expect(navegacaoDeMes(limites, '2026-10')).toEqual({
+      mesAnterior: '2026-09',
+      mesSeguinte: null,
+    });
+    expect(navegacaoDeMes(limites, '2026-09')).toEqual({
+      mesAnterior: '2026-08',
+      mesSeguinte: '2026-10',
+    });
   });
 
   it('PAR-86, PAR-41: sem partidas, navegação nula', () => {
-    expect(navegacaoDeMes(semPartidas, '2026-10')).toEqual({ mesAnterior: null, mesSeguinte: null });
+    expect(navegacaoDeMes(semPartidas, '2026-10')).toEqual({
+      mesAnterior: null,
+      mesSeguinte: null,
+    });
   });
 
   it('PAR-84, PAR-85: primeira partida no mês de hoje deixa as duas pontas nulas', () => {
@@ -52,7 +71,10 @@ describe('navegacaoDeMes', () => {
 
   it('PAR-84, PAR-85: virada de ano', () => {
     const l = limitesDeMes([{ data: '2026-11-05' }], '2027-02-10');
-    expect(navegacaoDeMes(l, '2027-01')).toEqual({ mesAnterior: '2026-12', mesSeguinte: '2027-02' });
+    expect(navegacaoDeMes(l, '2027-01')).toEqual({
+      mesAnterior: '2026-12',
+      mesSeguinte: '2027-02',
+    });
   });
 });
 

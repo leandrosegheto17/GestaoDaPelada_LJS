@@ -63,7 +63,11 @@ export interface OpcoesOrigem {
  * Registra o pedido de e-mail da origem (chave /48 do IP, ACE-73) numa transação própria e
  * devolve falso quando a origem já fez 20 pedidos na última hora (nada é gravado então).
  */
-export async function registrarOrigem(urlBanco: string, ip: string | null | undefined, opcoes: OpcoesOrigem = {}): Promise<boolean> {
+export async function registrarOrigem(
+  urlBanco: string,
+  ip: string | null | undefined,
+  opcoes: OpcoesOrigem = {},
+): Promise<boolean> {
   const chave = Buffer.from(await hashIp(ip, 48));
   const cliente = criarCliente(urlBanco, {
     ...(opcoes.fabrica ? { fabrica: opcoes.fabrica } : {}),
@@ -72,7 +76,10 @@ export async function registrarOrigem(urlBanco: string, ip: string | null | unde
     },
   });
   try {
-    const r = await cliente.consultar<{ ok: boolean }>('SELECT email_origem_registrar($1, $2) AS ok', [chave, TETO_ORIGEM_HORA]);
+    const r = await cliente.consultar<{ ok: boolean }>(
+      'SELECT email_origem_registrar($1, $2) AS ok',
+      [chave, TETO_ORIGEM_HORA],
+    );
     await cliente.consultar('COMMIT');
     return r.rows[0]?.ok === true;
   } catch (erro) {
@@ -94,7 +101,12 @@ export interface PedidoEnvio {
 
 /** Erro do banco com código SQLSTATE (o `pg` põe em `code`). */
 function codigoSql(erro: unknown): string | undefined {
-  return typeof erro === 'object' && erro !== null && 'code' in erro && typeof erro.code === 'string' ? erro.code : undefined;
+  return typeof erro === 'object' &&
+    erro !== null &&
+    'code' in erro &&
+    typeof erro.code === 'string'
+    ? erro.code
+    : undefined;
 }
 
 /**
@@ -102,7 +114,11 @@ function codigoSql(erro: unknown): string | undefined {
  * remetente. Falha do remetente ou da trava desfaz só a reserva (savepoint) e devolve
  * `indisponivel`; a rota responde 503 `email_indisponivel`.
  */
-export async function enviarEmailDeConta(db: Db, remetente: Remetente, p: PedidoEnvio): Promise<ResultadoEnvioConta> {
+export async function enviarEmailDeConta(
+  db: Db,
+  remetente: Remetente,
+  p: PedidoEnvio,
+): Promise<ResultadoEnvioConta> {
   if (!p.enviar) return 'enviado';
 
   await sql`SAVEPOINT cota_email`.execute(db);

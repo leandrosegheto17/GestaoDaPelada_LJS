@@ -28,14 +28,28 @@ export const CONTA_LOCAL = { email: 'admin@exemplo.test', nome: 'Admin Local' } 
 /** Hash que não é bcrypt: a conta não entra até `conta_definir_senha` gravar o da senha. */
 const HASH_PROVISORIO = '!';
 export const GRUPO_LOCAL = { nome: 'Pelada Local', slug: 'pelada-local' } as const;
-export const JOGADORES_LOCAIS = ['Bigode', 'Canhota', 'Paredão', 'Xerife', 'Foguete', 'Maestro'] as const;
+export const JOGADORES_LOCAIS = [
+  'Bigode',
+  'Canhota',
+  'Paredão',
+  'Xerife',
+  'Foguete',
+  'Maestro',
+] as const;
 /** Jogador do seed com o período encerrado (aparece em Inativos). */
 export const JOGADOR_INATIVO_LOCAL = 'Maestro';
 /**
  * As 6 habilidades iniciais, na ordem do GEL-02. Cópia de `HABILIDADES_INICIAIS` (`backend/dominio/src/elenco/nivel.ts:7`):
  * o pacote de scripts não depende do domínio, e o teste do seed confere a ordem.
  */
-export const HABILIDADES_LOCAIS = ['Visão de Jogo', 'Passe', 'Preparo Físico', 'Drible', 'Chute', 'Desarme'] as const;
+export const HABILIDADES_LOCAIS = [
+  'Visão de Jogo',
+  'Passe',
+  'Preparo Físico',
+  'Drible',
+  'Chute',
+  'Desarme',
+] as const;
 /** Notas por jogador, na ordem de `HABILIDADES_LOCAIS`. Paredão fica sem nota ("sem nota" na lista). */
 export const NOTAS_LOCAIS: Readonly<Record<string, readonly number[]>> = {
   Bigode: [8, 7, 6, 7, 8, 5],
@@ -54,12 +68,37 @@ export const NOTAS_LOCAIS: Readonly<Record<string, readonly number[]>> = {
  */
 export const GRUPO_CAIXA = { nome: 'Pelada de Quinta', slug: 'pelada-de-quinta' } as const;
 /** Admin convidado do grupo do caixa, sem acesso ao financeiro; entra com a mesma `SEED_SENHA_ADMIN` (só local). */
-export const CONTA_CONVIDADA = { email: 'convidado@exemplo.test', nome: 'Convidado Local' } as const;
-export const CAIXA_CONFIG = { mensalidadeCentavos: 7500, saldoInicialCentavos: 35000, dataSaldoInicial: '2026-02-05' } as const;
+export const CONTA_CONVIDADA = {
+  email: 'convidado@exemplo.test',
+  nome: 'Convidado Local',
+} as const;
+export const CAIXA_CONFIG = {
+  mensalidadeCentavos: 7500,
+  saldoInicialCentavos: 35000,
+  dataSaldoInicial: '2026-02-05',
+} as const;
 /** Os 20 jogadores do mockup, todos ativos desde a data inicial do caixa. */
 export const JOGADORES_CAIXA = [
-  'Alemão', 'Bigode', 'Cabeça', 'Careca', 'Dudu', 'Fumaça', 'Gordo', 'Japa', 'Juninho', 'Léo Baiano',
-  'Marcão', 'Neném', 'Paulinho', 'Pedrão', 'Rafinha', 'Serginho', 'Tiago', 'Toninho', 'Vini', 'Zé Carlos',
+  'Alemão',
+  'Bigode',
+  'Cabeça',
+  'Careca',
+  'Dudu',
+  'Fumaça',
+  'Gordo',
+  'Japa',
+  'Juninho',
+  'Léo Baiano',
+  'Marcão',
+  'Neném',
+  'Paulinho',
+  'Pedrão',
+  'Rafinha',
+  'Serginho',
+  'Tiago',
+  'Toninho',
+  'Vini',
+  'Zé Carlos',
 ] as const;
 export const MES_CAIXA = '2026-10';
 
@@ -87,7 +126,12 @@ const mensalidade = (data: string, apelido: string): LancamentoSeed => ({
  */
 export const LANCAMENTOS_CAIXA: readonly LancamentoSeed[] = [
   { tipo: 'saida', data: '2026-10-20', descricao: 'Bolas novas (2)', valorCentavos: 10000 },
-  { tipo: 'saida', data: '2026-10-05', descricao: 'Aluguel da quadra outubro', valorCentavos: 80000 },
+  {
+    tipo: 'saida',
+    data: '2026-10-05',
+    descricao: 'Aluguel da quadra outubro',
+    valorCentavos: 80000,
+  },
   mensalidade('2026-10-01', 'Toninho'),
   mensalidade('2026-10-01', 'Bigode'),
   mensalidade('2026-10-01', 'Careca'),
@@ -104,7 +148,12 @@ export const LANCAMENTOS_CAIXA: readonly LancamentoSeed[] = [
   mensalidade('2026-10-09', 'Cabeça'),
   mensalidade('2026-10-12', 'Vini'),
   mensalidade('2026-10-15', 'Léo Baiano'),
-  { tipo: 'entrada', data: '2026-09-30', descricao: 'Sobra do caixa de fevereiro a setembro', valorCentavos: 59550 },
+  {
+    tipo: 'entrada',
+    data: '2026-09-30',
+    descricao: 'Sobra do caixa de fevereiro a setembro',
+    valorCentavos: 59550,
+  },
 ];
 
 /**
@@ -122,8 +171,22 @@ export const LANCAMENTOS_CAIXA: readonly LancamentoSeed[] = [
  * SPEC_DEVIATION: no LJS (P25) o início vinha do período, em 01/10 para todos; aqui o financeiro já fixou o período.
  */
 export const PESOS_EXEMPLO = [
-  { vigenteDesde: CAIXA_CONFIG.dataSaldoInicial, presencaSemChuva: 1, presencaComChuva: 1, lesionadoSemChuva: 1, lesionadoComChuva: 1, expulso: -1 },
-  { vigenteDesde: '2026-09-01', presencaSemChuva: 1, presencaComChuva: 2, lesionadoSemChuva: 1, lesionadoComChuva: 1, expulso: -1 },
+  {
+    vigenteDesde: CAIXA_CONFIG.dataSaldoInicial,
+    presencaSemChuva: 1,
+    presencaComChuva: 1,
+    lesionadoSemChuva: 1,
+    lesionadoComChuva: 1,
+    expulso: -1,
+  },
+  {
+    vigenteDesde: '2026-09-01',
+    presencaSemChuva: 1,
+    presencaComChuva: 2,
+    lesionadoSemChuva: 1,
+    lesionadoComChuva: 1,
+    expulso: -1,
+  },
 ] as const;
 
 export const PARTIDAS_EXEMPLO = [
@@ -135,7 +198,12 @@ export const PARTIDAS_EXEMPLO = [
 type SituacaoExemplo = 'presente' | 'lesionado' | 'expulso' | 'falta' | 'fora';
 
 /** Por jogador: a pontuação inicial e a situação em cada partida de `PARTIDAS_EXEMPLO` (falta e "–" não gravam linha). */
-export const RANKING_EXEMPLO: Readonly<Record<(typeof JOGADORES_CAIXA)[number], { ptsInicial: number; rodadas: readonly SituacaoExemplo[] }>> = {
+export const RANKING_EXEMPLO: Readonly<
+  Record<
+    (typeof JOGADORES_CAIXA)[number],
+    { ptsInicial: number; rodadas: readonly SituacaoExemplo[] }
+  >
+> = {
   Toninho: { ptsInicial: 27, rodadas: ['presente', 'presente', 'presente'] },
   Bigode: { ptsInicial: 26, rodadas: ['presente', 'presente', 'presente'] },
   Careca: { ptsInicial: 27, rodadas: ['presente', 'lesionado', 'presente'] },
@@ -159,7 +227,9 @@ export const RANKING_EXEMPLO: Readonly<Record<(typeof JOGADORES_CAIXA)[number], 
 };
 
 /** Data de início da pontuação de quem entrou no meio de outubro ("–" antes dela). */
-export const INICIO_PONTUACAO_EXEMPLO: Readonly<Partial<Record<(typeof JOGADORES_CAIXA)[number], string>>> = {
+export const INICIO_PONTUACAO_EXEMPLO: Readonly<
+  Partial<Record<(typeof JOGADORES_CAIXA)[number], string>>
+> = {
   'Léo Baiano': '2026-10-08',
   Serginho: '2026-10-15',
 };
@@ -192,7 +262,12 @@ async function idDe(c: pg.Client, sql: string, valores: unknown[]): Promise<stri
   return id;
 }
 
-async function semear(c: pg.Client, senhaApp: string, senhaBackup: string, senhaAdmin: string): Promise<ResultadoSeed> {
+async function semear(
+  c: pg.Client,
+  senhaApp: string,
+  senhaBackup: string,
+  senhaAdmin: string,
+): Promise<ResultadoSeed> {
   await c.query(
     `INSERT INTO contas (email, nome, senha_hash, criada_em)
      VALUES ($1, $2, $3, now())
@@ -200,11 +275,16 @@ async function semear(c: pg.Client, senhaApp: string, senhaBackup: string, senha
     [CONTA_LOCAL.email, CONTA_LOCAL.nome, HASH_PROVISORIO],
   );
   // Troca o hash, confirma o e-mail e encerra as sessões da conta (ACE-64); rodar de novo só troca a senha.
-  const contaId = await idDe(c, 'SELECT conta_definir_senha($1, $2, false) AS id', [CONTA_LOCAL.email, senhaAdmin]);
+  const contaId = await idDe(c, 'SELECT conta_definir_senha($1, $2, false) AS id', [
+    CONTA_LOCAL.email,
+    senhaAdmin,
+  ]);
 
   // O grupo nasce pela grupo_criar (GEL-01), que exige a conta da sessão; o set_config vale só nesta transação.
   await c.query(`SELECT set_config('app.conta_id', $1, true)`, [contaId]);
-  const existente = (await c.query<{ id: string }>('SELECT id FROM grupos WHERE slug = $1', [GRUPO_LOCAL.slug])).rows[0];
+  const existente = (
+    await c.query<{ id: string }>('SELECT id FROM grupos WHERE slug = $1', [GRUPO_LOCAL.slug])
+  ).rows[0];
   if (!existente) {
     await c.query(
       `SELECT id FROM grupo_criar($1, 'sabado', 'semanal', '09:00'::time, $2, $3::text[], ${HOJE_SAO_PAULO})`,
@@ -260,10 +340,17 @@ async function semear(c: pg.Client, senhaApp: string, senhaBackup: string, senha
        JOIN jogadores j ON j.grupo_id = $1 AND lower(j.apelido) = lower(n.apelido)
        JOIN habilidades h ON h.grupo_id = $1 AND lower(h.nome) = lower(n.habilidade)
      ON CONFLICT (jogador_id, habilidade_id) DO NOTHING`,
-    [grupoId, linhas.map((l) => l.apelido), linhas.map((l) => l.habilidade), linhas.map((l) => l.valor)],
+    [
+      grupoId,
+      linhas.map((l) => l.apelido),
+      linhas.map((l) => l.habilidade),
+      linhas.map((l) => l.valor),
+    ],
   );
   const jogadores = (
-    await c.query<{ n: number }>('SELECT count(*)::int AS n FROM jogadores WHERE grupo_id = $1', [grupoId])
+    await c.query<{ n: number }>('SELECT count(*)::int AS n FROM jogadores WHERE grupo_id = $1', [
+      grupoId,
+    ])
   ).rows[0]?.n;
 
   const { grupoCaixaId, contaConvidadaId } = await semearCaixa(c, contaId, senhaAdmin);
@@ -285,7 +372,9 @@ async function semearCaixa(
   contaId: string,
   senhaAdmin: string,
 ): Promise<{ grupoCaixaId: string; contaConvidadaId: string }> {
-  const existente = (await c.query<{ id: string }>('SELECT id FROM grupos WHERE slug = $1', [GRUPO_CAIXA.slug])).rows[0];
+  const existente = (
+    await c.query<{ id: string }>('SELECT id FROM grupos WHERE slug = $1', [GRUPO_CAIXA.slug])
+  ).rows[0];
   if (!existente) {
     await c.query(
       `SELECT id FROM grupo_criar($1, 'quinta', 'semanal', '20:00'::time, $2, $3::text[], ${HOJE_SAO_PAULO})`,
@@ -333,11 +422,19 @@ async function semearCaixa(
     `INSERT INTO config_financeira (grupo_id, mensalidade_centavos, saldo_inicial_centavos, data_saldo_inicial)
      VALUES ($1, $2, $3, $4)
      ON CONFLICT (grupo_id) DO NOTHING`,
-    [grupoCaixaId, CAIXA_CONFIG.mensalidadeCentavos, CAIXA_CONFIG.saldoInicialCentavos, CAIXA_CONFIG.dataSaldoInicial],
+    [
+      grupoCaixaId,
+      CAIXA_CONFIG.mensalidadeCentavos,
+      CAIXA_CONFIG.saldoInicialCentavos,
+      CAIXA_CONFIG.dataSaldoInicial,
+    ],
   );
 
   const temLancamento = (
-    await c.query<{ ok: boolean }>('SELECT EXISTS (SELECT 1 FROM lancamentos WHERE grupo_id = $1) AS ok', [grupoCaixaId])
+    await c.query<{ ok: boolean }>(
+      'SELECT EXISTS (SELECT 1 FROM lancamentos WHERE grupo_id = $1) AS ok',
+      [grupoCaixaId],
+    )
   ).rows[0]?.ok;
   if (!temLancamento) {
     for (const [i, l] of LANCAMENTOS_CAIXA.entries()) {
@@ -378,7 +475,16 @@ async function semearRanking(c: pg.Client, grupoId: string, contaId: string): Pr
                                  lesionado_com_chuva, expulso, registrado_por, registrado_em)
        VALUES ($1, $2::date, $3, $4, $5, $6, $7, $8, ($2::date + time '12:00') AT TIME ZONE 'America/Sao_Paulo')
        ON CONFLICT (grupo_id, vigente_desde) DO NOTHING`,
-      [grupoId, p.vigenteDesde, p.presencaSemChuva, p.presencaComChuva, p.lesionadoSemChuva, p.lesionadoComChuva, p.expulso, contaId],
+      [
+        grupoId,
+        p.vigenteDesde,
+        p.presencaSemChuva,
+        p.presencaComChuva,
+        p.lesionadoSemChuva,
+        p.lesionadoComChuva,
+        p.expulso,
+        contaId,
+      ],
     );
   }
 
@@ -407,7 +513,9 @@ async function semearRanking(c: pg.Client, grupoId: string, contaId: string): Pr
     );
     const presentes = apelidos.flatMap((a) => {
       const situacao = RANKING_EXEMPLO[a].rodadas[i];
-      return situacao === 'presente' || situacao === 'lesionado' || situacao === 'expulso' ? [{ apelido: a, situacao }] : [];
+      return situacao === 'presente' || situacao === 'lesionado' || situacao === 'expulso'
+        ? [{ apelido: a, situacao }]
+        : [];
     });
     await c.query(
       `INSERT INTO presencas (partida_id, jogador_id, grupo_id, situacao)
@@ -434,7 +542,9 @@ export async function comandoSeed(
   try {
     validarSenha(senhaAdmin);
   } catch (erro) {
-    throw new ErroSeed(`SEED_SENHA_ADMIN inválida: ${erro instanceof Error ? erro.message : String(erro)}`);
+    throw new ErroSeed(
+      `SEED_SENHA_ADMIN inválida: ${erro instanceof Error ? erro.message : String(erro)}`,
+    );
   }
 
   return comConexao(url, async (c) => {

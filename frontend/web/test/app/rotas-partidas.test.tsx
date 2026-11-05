@@ -23,7 +23,8 @@ const ROTAS_ADMIN = [
 function comSessaoEPendentes() {
   const api = { 'GET /api/sessao': () => json(200, SESSAO_ANA) };
   return new Proxy(api as Record<string, () => Response | Promise<Response>>, {
-    get: (alvo, chave: string) => alvo[chave] ?? (chave.startsWith('GET ') ? () => pendente() : undefined),
+    get: (alvo, chave: string) =>
+      alvo[chave] ?? (chave.startsWith('GET ') ? () => pendente() : undefined),
   });
 }
 
@@ -65,9 +66,13 @@ describe('rotas de partidas e ranking', () => {
   }
 
   it('PAR-143: /g/:slug abre sem sessão, sem ir a /entrar, e consulta o ranking público', async () => {
-    const t = abrirTela('/g/pelada-de-quinta', { 'GET /api/publico/pelada-de-quinta/ranking': () => pendente() });
+    const t = abrirTela('/g/pelada-de-quinta', {
+      'GET /api/publico/pelada-de-quinta/ranking': () => pendente(),
+    });
     await waitFor(() => expect(t.tela()).toBe('ranking'));
-    await waitFor(() => expect(t.chamadasA('GET', '/api/publico/pelada-de-quinta/ranking')).toHaveLength(1));
+    await waitFor(() =>
+      expect(t.chamadasA('GET', '/api/publico/pelada-de-quinta/ranking')).toHaveLength(1),
+    );
     expect(t.local()).toBe('/g/pelada-de-quinta');
   });
 
@@ -80,7 +85,9 @@ describe('rotas de partidas e ranking', () => {
   it('PAR-143: /g/:slug com slug malformado ainda é a rota do ranking (a tela mostra o indisponível)', async () => {
     const t = abrirTela('/g/Nao_Valido');
     await waitFor(() => expect(t.tela()).toBe('ranking'));
-    expect(await screen.findByRole('heading', { level: 1, name: 'Grupo indisponível' })).toBeDefined();
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Grupo indisponível' }),
+    ).toBeDefined();
   });
 
   it('PAR-83: o link "Ver ranking" do início do grupo aponta para /g/<slug> e abre o ranking', async () => {

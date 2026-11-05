@@ -81,7 +81,9 @@ export function textoItemSimulador(proximoDiaDeJogo: string): string {
 export function textoStatusEscalacao(proximoDiaDeJogo: string, confirmada: boolean): string {
   const [, mes, dia] = proximoDiaDeJogo.split('-');
   const ddmm = `${dia}/${mes}`;
-  return confirmada ? `Escalação de ${ddmm} confirmada` : `Nenhuma escalação confirmada para ${ddmm}`;
+  return confirmada
+    ? `Escalação de ${ddmm} confirmada`
+    : `Nenhuma escalação confirmada para ${ddmm}`;
 }
 
 /** "3 em outubro", "Nenhuma em outubro" (PAR-134). */
@@ -134,7 +136,11 @@ export function InicioGrupo() {
           {temAtivos ? (
             <>
               {g.partidaNaDataSugerida ? (
-                <LinkBotao para={`${base}/partidas/${encodeURIComponent(g.dataSugeridaPartida)}`} variante="principal" bloco>
+                <LinkBotao
+                  para={`${base}/partidas/${encodeURIComponent(g.dataSugeridaPartida)}`}
+                  variante="principal"
+                  bloco
+                >
                   {`Editar partida de ${diaAbreviado(g.dataSugeridaPartida)}`}
                 </LinkBotao>
               ) : (
@@ -178,15 +184,39 @@ export function InicioGrupo() {
         </section>
         <h2 className={estilos.subtitulo}>Gerenciar</h2>
         <Lista rotulo="Gerenciar">
-          <ItemLista titulo="Partidas" meta={textoPartidasDoMes(g.partidasNoMes, mesDe(hojeEmSaoPaulo()))} para={`${base}/partidas`} />
-          <ItemLista titulo="Jogadores" meta={textoJogadores(g.jogadoresAtivos)} para={`${base}/jogadores`} />
-          <ItemLista titulo="Habilidades" meta={textoHabilidades(g.habilidades)} para={`${base}/habilidades`} />
+          <ItemLista
+            titulo="Partidas"
+            meta={textoPartidasDoMes(g.partidasNoMes, mesDe(hojeEmSaoPaulo()))}
+            para={`${base}/partidas`}
+          />
+          <ItemLista
+            titulo="Jogadores"
+            meta={textoJogadores(g.jogadoresAtivos)}
+            para={`${base}/jogadores`}
+          />
+          <ItemLista
+            titulo="Habilidades"
+            meta={textoHabilidades(g.habilidades)}
+            para={`${base}/habilidades`}
+          />
           <ItemLista titulo="Pontuação" meta={textoPontuacao(g)} para={`${base}/pontuacao`} />
           <ItemLista titulo="Admins" meta={textoAdmins(g.admins)} para={`${base}/admins`} />
-          <ItemLista titulo="Dados do grupo" meta={`${textoRecorrencia(g)} · link do ranking`} para={`${base}/dados`} />
-          <ItemLista titulo="Uso do app" meta={textoUso(g.aparelhosNaSemana)} para={`${base}/uso`} />
+          <ItemLista
+            titulo="Dados do grupo"
+            meta={`${textoRecorrencia(g)} · link do ranking`}
+            para={`${base}/dados`}
+          />
+          <ItemLista
+            titulo="Uso do app"
+            meta={textoUso(g.aparelhosNaSemana)}
+            para={`${base}/uso`}
+          />
           {g.saldoFinanceiroCentavos !== undefined ? (
-            <ItemLista titulo="Financeiro" meta={textoSaldo(g.saldoFinanceiroCentavos)} para={`${base}/financeiro`} />
+            <ItemLista
+              titulo="Financeiro"
+              meta={textoSaldo(g.saldoFinanceiroCentavos)}
+              para={`${base}/financeiro`}
+            />
           ) : null}
         </Lista>
       </>
@@ -204,7 +234,17 @@ export function InicioGrupo() {
       to={caminhoDoRanking(grupo.data.slug)}
       aria-label="Ver ranking"
     >
-      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true" focusable="false">
+      <svg
+        viewBox="0 0 24 24"
+        width="24"
+        height="24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        aria-hidden="true"
+        focusable="false"
+      >
         <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
       </svg>
     </Link>

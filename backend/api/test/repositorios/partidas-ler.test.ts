@@ -15,7 +15,9 @@ const extras: string[] = [];
 
 beforeAll(async () => {
   aberto = await abrirCenarioGrupos();
-  const r = await aberto.db.query<{ nome: string }>('SELECT nome FROM contas WHERE id = $1', [aberto.cenario.contaC]);
+  const r = await aberto.db.query<{ nome: string }>('SELECT nome FROM contas WHERE id = $1', [
+    aberto.cenario.contaC,
+  ]);
   nomeC = r.rows[0]?.nome ?? '';
 });
 
@@ -25,13 +27,19 @@ afterAll(async () => {
 
 afterEach(async () => {
   const { db, cenario } = aberto;
-  await db.query(`DELETE FROM partidas WHERE grupo_id = $1 AND data <> '2026-01-08'`, [cenario.grupoG]);
+  await db.query(`DELETE FROM partidas WHERE grupo_id = $1 AND data <> '2026-01-08'`, [
+    cenario.grupoG,
+  ]);
   await db.query('DELETE FROM jogadores WHERE id = ANY($1::uuid[])', [extras]);
   extras.length = 0;
 });
 
 /** Grava uma partida de G como superusuário, com as presenças dadas, e devolve o id. */
-async function partida(data: string, choveu: boolean, presencas: Array<[string, string]> = []): Promise<string> {
+async function partida(
+  data: string,
+  choveu: boolean,
+  presencas: Array<[string, string]> = [],
+): Promise<string> {
   const { db, cenario } = aberto;
   const r = await db.query<{ id: string }>(
     `INSERT INTO partidas (grupo_id, data, choveu, criada_por, criada_em, alterada_por, alterada_em)
@@ -40,12 +48,10 @@ async function partida(data: string, choveu: boolean, presencas: Array<[string, 
   );
   const id = r.rows[0]?.id ?? '';
   for (const [jogador, situacao] of presencas) {
-    await db.query('INSERT INTO presencas (partida_id, jogador_id, grupo_id, situacao) VALUES ($1, $2, $3, $4)', [
-      id,
-      jogador,
-      cenario.grupoG,
-      situacao,
-    ]);
+    await db.query(
+      'INSERT INTO presencas (partida_id, jogador_id, grupo_id, situacao) VALUES ($1, $2, $3, $4)',
+      [id, jogador, cenario.grupoG, situacao],
+    );
   }
   return id;
 }
@@ -58,11 +64,10 @@ async function jogadorAtivo(apelido: string, inicio: string): Promise<string> {
     [cenario.grupoG, apelido, cenario.contaC],
   );
   const id = r.rows[0]?.id ?? '';
-  await db.query('INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, $3, NULL)', [
-    id,
-    cenario.grupoG,
-    inicio,
-  ]);
+  await db.query(
+    'INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, $3, NULL)',
+    [id, cenario.grupoG, inicio],
+  );
   extras.push(id);
   return id;
 }
@@ -94,7 +99,11 @@ describe('partidas.doMes', () => {
   it('PAR-37: mês sem partida devolve lista vazia; a conta de outro grupo não vê as de G', async () => {
     const { cenario } = aberto;
     expect(await comoC((db) => partidas.doMes(db, cenario.grupoG, '2026-12'))).toEqual([]);
-    expect(await comDb(aberto.url, cenario.contaB, (db) => partidas.doMes(db, cenario.grupoG, '2026-01'))).toEqual([]);
+    expect(
+      await comDb(aberto.url, cenario.contaB, (db) =>
+        partidas.doMes(db, cenario.grupoG, '2026-01'),
+      ),
+    ).toEqual([]);
   });
 });
 
@@ -141,13 +150,23 @@ describe('partidas.ler', () => {
     await jogadorAtivo('Éder', '2026-01-01');
     await partida('2026-02-26', false);
     const r = await comoC((db) => partidas.ler(db, cenario.grupoG, '2026-02-26'));
-    expect(r?.jogadores.map((j) => j.apelido)).toEqual(['alberto', 'Álvaro', 'Bira', 'Éder', 'Toninho']);
+    expect(r?.jogadores.map((j) => j.apelido)).toEqual([
+      'alberto',
+      'Álvaro',
+      'Bira',
+      'Éder',
+      'Toninho',
+    ]);
   });
 
   it('PAR-44: sem partida na data, nulo; a conta de outro grupo também recebe nulo', async () => {
     const { cenario } = aberto;
     expect(await comoC((db) => partidas.ler(db, cenario.grupoG, '2026-02-06'))).toBeNull();
-    expect(await comDb(aberto.url, cenario.contaB, (db) => partidas.ler(db, cenario.grupoG, '2026-01-08'))).toBeNull();
+    expect(
+      await comDb(aberto.url, cenario.contaB, (db) =>
+        partidas.ler(db, cenario.grupoG, '2026-01-08'),
+      ),
+    ).toBeNull();
   });
 });
 
@@ -160,6 +179,8 @@ describe('partidas.mesDaPrimeira', () => {
 
   it('PAR-41: sem partida (grupo que a conta não vê), nulo', async () => {
     const { cenario } = aberto;
-    expect(await comDb(aberto.url, cenario.contaB, (db) => partidas.mesDaPrimeira(db, cenario.grupoG))).toBeNull();
+    expect(
+      await comDb(aberto.url, cenario.contaB, (db) => partidas.mesDaPrimeira(db, cenario.grupoG)),
+    ).toBeNull();
   });
 });

@@ -1,7 +1,12 @@
 import { randomBytes } from 'node:crypto';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { OPCOES_REFERENCIA, TABELAS_IGNORADAS, lerEsquema, lerReferencia } from '@pelada/api/esquema';
+import {
+  OPCOES_REFERENCIA,
+  TABELAS_IGNORADAS,
+  lerEsquema,
+  lerReferencia,
+} from '@pelada/api/esquema';
 import { migrar, PASTA_MIGRACOES } from '@pelada/api/migrar';
 import type pg from 'pg';
 import { contarLinhas, restaurarBackup } from '../ops/restaurar-backup.ts';
@@ -120,7 +125,9 @@ export interface RelatorioEnsaio {
   ok: boolean;
 }
 
-async function situacoesDosGrupos(url: string): Promise<Map<string, { slug: string; s: string; t: string | null }>> {
+async function situacoesDosGrupos(
+  url: string,
+): Promise<Map<string, { slug: string; s: string; t: string | null }>> {
   return comConexao(url, async (c) => {
     const r = await c.query<{ id: string; slug: string; s: string; t: string | null }>(
       'SELECT id, slug, situacao_comercial AS s, trial_inicio::text AS t FROM grupos ORDER BY id',
@@ -131,7 +138,9 @@ async function situacoesDosGrupos(url: string): Promise<Map<string, { slug: stri
 
 async function hojeEmSaoPaulo(url: string): Promise<string> {
   return comConexao(url, async (c) => {
-    const r = await c.query<{ hoje: string }>(`SELECT (now() AT TIME ZONE 'America/Sao_Paulo')::date::text AS hoje`);
+    const r = await c.query<{ hoje: string }>(
+      `SELECT (now() AT TIME ZONE 'America/Sao_Paulo')::date::text AS hoje`,
+    );
     return r.rows[0]?.hoje ?? '';
   });
 }
@@ -153,15 +162,19 @@ export function conferirPlanos(
     }
     grupos.push({ grupoId, slug: a.slug, antes: a.s, depois: d.s, trialInicioDepois: d.t });
     if (slugGrupoTeste === null) {
-      if (a.s !== d.s || a.t !== d.t) problemas.push(`${grupoId}: mudou de ${a.s} para ${d.s} sem a cortesia no ensaio`);
+      if (a.s !== d.s || a.t !== d.t)
+        problemas.push(`${grupoId}: mudou de ${a.s} para ${d.s} sem a cortesia no ensaio`);
       continue;
     }
     if (a.s !== 'uso_proprio') {
       if (a.s !== d.s || a.t !== d.t) problemas.push(`${grupoId}: ${a.s} mudou para ${d.s}`);
     } else if (a.slug === slugGrupoTeste) {
-      if (d.s !== 'uso_proprio' || d.t !== null) problemas.push(`${grupoId}: o grupo de teste deixou a cortesia (${d.s})`);
+      if (d.s !== 'uso_proprio' || d.t !== null)
+        problemas.push(`${grupoId}: o grupo de teste deixou a cortesia (${d.s})`);
     } else if (d.s !== 'trial' || d.t !== hoje) {
-      problemas.push(`${grupoId}: uso_proprio virou ${d.s} com trial_inicio ${d.t ?? 'nulo'}, esperado trial em ${hoje}`);
+      problemas.push(
+        `${grupoId}: uso_proprio virou ${d.s} com trial_inicio ${d.t ?? 'nulo'}, esperado trial em ${hoje}`,
+      );
     }
   }
   if (slugGrupoTeste !== null && ![...antes.values()].some((a) => a.slug === slugGrupoTeste)) {
@@ -174,7 +187,9 @@ export function conferirPlanos(
 export function slugDaCortesia(pasta: string): string | null {
   const nome = readdirSync(pasta).find((n) => n.replace(/\.sql$/, '').endsWith(MIGRACAO_CORTESIA));
   if (!nome) return null;
-  const valor = /SLUG_GRUPO_TESTE constant text := '([^']*)';/.exec(readFileSync(join(pasta, nome), 'utf8'))?.[1];
+  const valor = /SLUG_GRUPO_TESTE constant text := '([^']*)';/.exec(
+    readFileSync(join(pasta, nome), 'utf8'),
+  )?.[1];
   return valor ?? null;
 }
 
@@ -183,7 +198,10 @@ async function esquemaDe(url: string): Promise<string[]> {
 }
 
 /** Linhas que só existem antes (removidas) e só depois (novas), ordenadas. */
-export function mudancaDoEsquema(antes: readonly string[], depois: readonly string[]): MudancaDoEsquema {
+export function mudancaDoEsquema(
+  antes: readonly string[],
+  depois: readonly string[],
+): MudancaDoEsquema {
   const deDepois = new Set(depois);
   const deAntes = new Set(antes);
   return {
@@ -203,17 +221,25 @@ async function gruposSemConfig(url: string): Promise<number> {
 
 /** Uma linha nova por grupo que passou a ter configuração; com a `pesos-padrao` aplicada, nenhum grupo fica sem. */
 function pesosOk(p: PesosNoEnsaio, aplicadas: readonly string[]): boolean {
-  const comPesosPadrao = aplicadas.some((n) => n.replace(/\.sql$/, '').endsWith(MIGRACAO_PESOS_PADRAO));
+  const comPesosPadrao = aplicadas.some((n) =>
+    n.replace(/\.sql$/, '').endsWith(MIGRACAO_PESOS_PADRAO),
+  );
   if (comPesosPadrao && p.semConfigDepois !== 0) return false;
   return p.linhasNovas === p.semConfigAntes - p.semConfigDepois;
 }
 
 function semIgnoradas(contagem: Record<string, number>): Record<string, number> {
   const ignoradas: readonly string[] = TABELAS_IGNORADAS;
-  return Object.fromEntries(Object.entries(contagem).filter(([tabela]) => !ignoradas.includes(tabela)));
+  return Object.fromEntries(
+    Object.entries(contagem).filter(([tabela]) => !ignoradas.includes(tabela)),
+  );
 }
 
-function alteradas(antes: Record<string, number>, depois: Record<string, number>, podeGanhar: readonly string[]): string[] {
+function alteradas(
+  antes: Record<string, number>,
+  depois: Record<string, number>,
+  podeGanhar: readonly string[],
+): string[] {
   const tabelas = new Set([...Object.keys(antes), ...Object.keys(depois)]);
   const mudadas: string[] = [];
   for (const tabela of tabelas) {
@@ -228,7 +254,10 @@ function alteradas(antes: Record<string, number>, depois: Record<string, number>
 async function linhasDoCaixa(c: pg.Client, grupoId: string): Promise<number> {
   let total = 0;
   for (const tabela of TABELAS_DO_CAIXA) {
-    const r = await c.query<{ n: number }>(`SELECT count(*)::int AS n FROM ${tabela} WHERE grupo_id = $1`, [grupoId]);
+    const r = await c.query<{ n: number }>(
+      `SELECT count(*)::int AS n FROM ${tabela} WHERE grupo_id = $1`,
+      [grupoId],
+    );
     total += r.rows[0]?.n ?? 0;
   }
   return total;
@@ -266,7 +295,8 @@ async function escolherAmostra(url: string): Promise<AmostraAcesso | null> {
     const esperadas = await linhasDoCaixa(c, linha.grupo_id);
     const lidasComAcesso = await lerComoApp(c, linha.com_acesso, linha.grupo_id);
     const amostra: AmostraAcesso = { grupoId: linha.grupo_id, esperadas, lidasComAcesso };
-    if (linha.sem_acesso) amostra.lidasSemAcesso = await lerComoApp(c, linha.sem_acesso, linha.grupo_id);
+    if (linha.sem_acesso)
+      amostra.lidasSemAcesso = await lerComoApp(c, linha.sem_acesso, linha.grupo_id);
     return amostra;
   });
 }
@@ -294,8 +324,15 @@ export async function ensaiar(url: string, opcoes: OpcoesEnsaio = {}): Promise<R
   const aplicadas = await migrar(url, { pasta: opcoes.pasta });
   const depois = semIgnoradas(await contarLinhas(url));
   const comCortesia = aplicadas.some((n) => n.replace(/\.sql$/, '').endsWith(MIGRACAO_CORTESIA));
-  const slugGrupoTeste = comCortesia ? (opcoes.slugGrupoTeste ?? slugDaCortesia(opcoes.pasta ?? PASTA_MIGRACOES)) : null;
-  const planos = conferirPlanos(situacoesAntes, await situacoesDosGrupos(url), slugGrupoTeste, await hojeEmSaoPaulo(url));
+  const slugGrupoTeste = comCortesia
+    ? (opcoes.slugGrupoTeste ?? slugDaCortesia(opcoes.pasta ?? PASTA_MIGRACOES))
+    : null;
+  const planos = conferirPlanos(
+    situacoesAntes,
+    await situacoesDosGrupos(url),
+    slugGrupoTeste,
+    await hojeEmSaoPaulo(url),
+  );
   const pesos: PesosNoEnsaio = {
     semConfigAntes,
     semConfigDepois: await gruposSemConfig(url),
@@ -307,7 +344,8 @@ export async function ensaiar(url: string, opcoes: OpcoesEnsaio = {}): Promise<R
   const segundaExecucao = await migrar(url, { pasta: opcoes.pasta });
   const depoisDaSegunda = semIgnoradas(await contarLinhas(url));
   const tabelasAlteradas = alteradas(antes, depois, podeGanhar);
-  if (JSON.stringify(depoisDaSegunda) !== JSON.stringify(depois)) tabelasAlteradas.push('segunda execução mudou linhas');
+  if (JSON.stringify(depoisDaSegunda) !== JSON.stringify(depois))
+    tabelasAlteradas.push('segunda execução mudou linhas');
 
   const amostra = await escolherAmostra(url);
   const ok =
@@ -333,7 +371,8 @@ export async function ensaiar(url: string, opcoes: OpcoesEnsaio = {}): Promise<R
   };
 }
 
-export const URL_BASE_ENSAIO = process.env.DATABASE_URL_TESTE ?? 'postgres://postgres:postgres@127.0.0.1:5432/pelada';
+export const URL_BASE_ENSAIO =
+  process.env.DATABASE_URL_TESTE ?? 'postgres://postgres:postgres@127.0.0.1:5432/pelada';
 
 function urlDoBanco(base: string, banco: string): string {
   const u = new URL(base);
@@ -361,23 +400,35 @@ export async function ensaiarBackup(
 }
 
 function imprimir(r: RelatorioEnsaio): void {
-  console.log(`Migrações aplicadas (${r.aplicadas.length}): ${r.aplicadas.join(', ') || 'nenhuma'}`);
+  console.log(
+    `Migrações aplicadas (${r.aplicadas.length}): ${r.aplicadas.join(', ') || 'nenhuma'}`,
+  );
   console.log('Linhas por tabela (antes → depois):');
-  for (const tabela of Object.keys(r.depois).sort()) console.log(`  ${tabela}: ${r.antes[tabela] ?? 0} → ${r.depois[tabela]}`);
-  if (r.tabelasAlteradas.length > 0) console.log(`Tabelas alteradas: ${r.tabelasAlteradas.join('; ')}`);
-  console.log(`Schema: faltando ${r.esquema.faltando.length}, sobrando ${r.esquema.sobrando.length}`);
+  for (const tabela of Object.keys(r.depois).sort())
+    console.log(`  ${tabela}: ${r.antes[tabela] ?? 0} → ${r.depois[tabela]}`);
+  if (r.tabelasAlteradas.length > 0)
+    console.log(`Tabelas alteradas: ${r.tabelasAlteradas.join('; ')}`);
+  console.log(
+    `Schema: faltando ${r.esquema.faltando.length}, sobrando ${r.esquema.sobrando.length}`,
+  );
   for (const l of r.esquema.faltando) console.log(`  - ${l}`);
   for (const l of r.esquema.sobrando) console.log(`  + ${l}`);
   const m = r.mudancaDoEsquema;
-  console.log(`Mudança do schema do dump: ${m.removidas.length} linhas removidas, ${m.novas.length} novas`);
+  console.log(
+    `Mudança do schema do dump: ${m.removidas.length} linhas removidas, ${m.novas.length} novas`,
+  );
   for (const l of m.removidas) console.log(`  - ${l}`);
   for (const l of m.novas) console.log(`  + ${l}`);
-  console.log(`Segunda execução: ${r.segundaExecucao.length === 0 ? 'nada a aplicar' : r.segundaExecucao.join(', ')}`);
+  console.log(
+    `Segunda execução: ${r.segundaExecucao.length === 0 ? 'nada a aplicar' : r.segundaExecucao.join(', ')}`,
+  );
   const a = r.amostra;
   console.log(
     a
       ? `Amostra do grupo ${a.grupoId}: ${a.esperadas} linhas no caixa; conta com acesso leu ${a.lidasComAcesso}` +
-          (a.lidasSemAcesso === undefined ? '; sem conta sem acesso para comparar' : `; conta sem acesso leu ${a.lidasSemAcesso}`)
+          (a.lidasSemAcesso === undefined
+            ? '; sem conta sem acesso para comparar'
+            : `; conta sem acesso leu ${a.lidasSemAcesso}`)
       : 'Amostra: nenhum grupo ativo com caixa e conta com acesso',
   );
   const p = r.pesos;
@@ -391,7 +442,10 @@ function imprimir(r: RelatorioEnsaio): void {
       : `Situação comercial (grupo de teste ${pl.slugGrupoTeste}, data do ensaio ${pl.hoje}):`,
   );
   // Só id e situação: o ensaio não imprime nome de grupo nem de pessoa.
-  for (const g of pl.grupos) console.log(`  ${g.grupoId}: ${g.antes} → ${g.depois}${g.trialInicioDepois ? ` (${g.trialInicioDepois})` : ''}`);
+  for (const g of pl.grupos)
+    console.log(
+      `  ${g.grupoId}: ${g.antes} → ${g.depois}${g.trialInicioDepois ? ` (${g.trialInicioDepois})` : ''}`,
+    );
   for (const problema of pl.problemas) console.log(`  ! ${problema}`);
   console.log(r.ok ? 'Ensaio ok.' : 'Ensaio com problemas: não faça o deploy da prévia.');
 }
@@ -399,7 +453,10 @@ function imprimir(r: RelatorioEnsaio): void {
 if (import.meta.main) {
   await executarCli(async () => {
     const [arquivo, chavePrivada] = process.argv.slice(2);
-    if (!arquivo || !chavePrivada) throw new ErroEnsaio('Uso: pnpm --filter @pelada/scripts ensaio <backup.age> <chave-privada.txt>');
+    if (!arquivo || !chavePrivada)
+      throw new ErroEnsaio(
+        'Uso: pnpm --filter @pelada/scripts ensaio <backup.age> <chave-privada.txt>',
+      );
     const r = await ensaiarBackup(arquivo, chavePrivada);
     imprimir(r);
     if (!r.ok) process.exitCode = 1;

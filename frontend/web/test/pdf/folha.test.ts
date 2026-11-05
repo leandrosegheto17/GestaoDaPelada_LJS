@@ -22,7 +22,20 @@ import {
  * `gerar-pdf.ts` desenha: os textos daqui são o "texto extraído" do arquivo.
  */
 
-const DATAS_12 = ['2026-06-25', '2026-08-06', '2026-08-13', '2026-08-20', '2026-08-27', '2026-09-03', '2026-09-10', '2026-09-17', '2026-09-24', '2026-10-01', '2026-10-08', '2026-10-15'];
+const DATAS_12 = [
+  '2026-06-25',
+  '2026-08-06',
+  '2026-08-13',
+  '2026-08-20',
+  '2026-08-27',
+  '2026-09-03',
+  '2026-09-10',
+  '2026-09-17',
+  '2026-09-24',
+  '2026-10-01',
+  '2026-10-08',
+  '2026-10-15',
+];
 const CHUVA = new Set(['2026-08-13', '2026-09-17', '2026-10-08']);
 
 function projecao(linhas: number, colunas = 12, extra: Partial<PdfPublico> = {}): PdfPublico {
@@ -33,7 +46,11 @@ function projecao(linhas: number, colunas = 12, extra: Partial<PdfPublico> = {})
     geradoEm: '2026-10-22T21:40:00.000Z',
     urlPublica: 'https://pelada.gestaodapelada.workers.dev/g/pelada-de-quinta',
     semPartidasNoMes: false,
-    colunas: datas.map((data) => ({ data, choveu: CHUVA.has(data), doMesExibido: data.startsWith('2026-10') })),
+    colunas: datas.map((data) => ({
+      data,
+      choveu: CHUVA.has(data),
+      doMesExibido: data.startsWith('2026-10'),
+    })),
     linhas: Array.from({ length: linhas }, (_, i) => ({
       posicao: i + 1,
       apelido: `Jogador ${i + 1}`,
@@ -41,7 +58,8 @@ function projecao(linhas: number, colunas = 12, extra: Partial<PdfPublico> = {})
       rodadas: datas.map((_, j) => {
         const situacoes = ['presente', 'lesionado', 'expulso', 'falta', 'fora'] as const;
         const situacao = situacoes[(i + j) % situacoes.length] ?? 'presente';
-        const pontos = situacao === 'fora' ? null : situacao === 'expulso' ? -1 : situacao === 'falta' ? 0 : 1;
+        const pontos =
+          situacao === 'fora' ? null : situacao === 'expulso' ? -1 : situacao === 'falta' ? 0 : 1;
         return { situacao, pontos };
       }),
       ptsFinal: 50 - i,
@@ -52,14 +70,20 @@ function projecao(linhas: number, colunas = 12, extra: Partial<PdfPublico> = {})
 }
 
 function textos(els: Elemento[]): Extract<Elemento, { tipo: 'texto' | 'paragrafo' }>[] {
-  return els.filter((e): e is Extract<Elemento, { tipo: 'texto' | 'paragrafo' }> => e.tipo === 'texto' || e.tipo === 'paragrafo');
+  return els.filter(
+    (e): e is Extract<Elemento, { tipo: 'texto' | 'paragrafo' }> =>
+      e.tipo === 'texto' || e.tipo === 'paragrafo',
+  );
 }
 
 describe('PAR-103: uma página A4 retrato', () => {
   it('PAR-103: 40 linhas × 12 colunas geram exatamente 1 página A4 retrato e nenhuma fonte abaixo de 7 pt', () => {
     const folha = montarFolha(projecao(40, 12));
     expect(folha.paginas).toHaveLength(1);
-    expect({ largura: folha.largura, altura: folha.altura }).toEqual({ largura: 595.28, altura: 841.89 });
+    expect({ largura: folha.largura, altura: folha.altura }).toEqual({
+      largura: 595.28,
+      altura: 841.89,
+    });
     expect(folha.altura).toBeGreaterThan(folha.largura);
     const tamanhos = textos(folha.paginas.flat()).map((t) => t.tamanho);
     expect(Math.min(...tamanhos)).toBeGreaterThanOrEqual(FONTE_MINIMA);
@@ -70,8 +94,10 @@ describe('PAR-103: uma página A4 retrato', () => {
   it('PAR-103: com 40 linhas, todo elemento fica dentro da folha', () => {
     const folha = montarFolha(projecao(40, 12));
     for (const e of folha.paginas.flat()) {
-      const ys = e.tipo === 'linha' ? [e.y1, e.y2] : e.tipo === 'retangulo' ? [e.y, e.y + e.altura] : [e.y];
-      const xs = e.tipo === 'linha' ? [e.x1, e.x2] : e.tipo === 'retangulo' ? [e.x, e.x + e.largura] : [e.x];
+      const ys =
+        e.tipo === 'linha' ? [e.y1, e.y2] : e.tipo === 'retangulo' ? [e.y, e.y + e.altura] : [e.y];
+      const xs =
+        e.tipo === 'linha' ? [e.x1, e.x2] : e.tipo === 'retangulo' ? [e.x, e.x + e.largura] : [e.x];
       for (const y of ys) expect(y).toBeLessThanOrEqual(A4.altura);
       for (const x of xs) expect(x).toBeLessThanOrEqual(A4.largura);
       for (const y of ys) expect(y).toBeGreaterThanOrEqual(0);
@@ -102,7 +128,9 @@ describe('PAR-103: uma página A4 retrato', () => {
     const folha = montarFolha(projecao(120, 12));
     expect(folha.paginas.length).toBeGreaterThan(1);
     expect(folha.fonteTabela).toBe(7);
-    expect(Math.min(...textos(folha.paginas.flat()).map((t) => t.tamanho))).toBeGreaterThanOrEqual(7);
+    expect(Math.min(...textos(folha.paginas.flat()).map((t) => t.tamanho))).toBeGreaterThanOrEqual(
+      7,
+    );
     expect(textosDaFolha(folha)).toContain('Jogador 120');
   });
 });
@@ -150,7 +178,18 @@ describe('PAR-104: conteúdo', () => {
     const folha = montarFolha(projecao(5, 12));
     const lidos = textosDaFolha(folha);
     expect(lidos).toContain(TEXTO_LEGENDA);
-    for (const termo of ['presente', 'lesionado', '“L”', 'expulso', '“E”', 'falta', 'tracejado', '“–”', 'sol', 'chuva']) {
+    for (const termo of [
+      'presente',
+      'lesionado',
+      '“L”',
+      'expulso',
+      '“E”',
+      'falta',
+      'tracejado',
+      '“–”',
+      'sol',
+      'chuva',
+    ]) {
       expect(TEXTO_LEGENDA).toContain(termo);
     }
     // As marcas levam letra ("L", "E"), traço ("–") ou borda tracejada, além da cor.
@@ -158,7 +197,9 @@ describe('PAR-104: conteúdo', () => {
     expect(lidos).toContain('E');
     expect(lidos).toContain('–');
     expect(lidos).toContain('−1');
-    expect(folha.paginas.flat().some((e) => e.tipo === 'retangulo' && e.tracejado === true)).toBe(true);
+    expect(folha.paginas.flat().some((e) => e.tipo === 'retangulo' && e.tracejado === true)).toBe(
+      true,
+    );
   });
 
   it('PAR-104: mês sem partidas mostra "Nenhuma partida registrada neste mês" com o mês exibido', () => {
@@ -171,6 +212,8 @@ describe('PAR-104: conteúdo', () => {
 
   it('PAR-104: cada linha traz posição, apelido, Pts inicial e Pts final', () => {
     const lidos = textosDaFolha(montarFolha(projecao(3, 2)));
-    expect(lidos).toEqual(expect.arrayContaining(['1', 'Jogador 1', '40', '50', 'Pts', 'inicial', 'final']));
+    expect(lidos).toEqual(
+      expect.arrayContaining(['1', 'Jogador 1', '40', '50', 'Pts', 'inicial', 'final']),
+    );
   });
 });

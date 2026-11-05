@@ -53,7 +53,8 @@ export const MENSAGENS_ERRO: Readonly<Record<CodigoErro, string>> = {
   sem_sessao: 'Entre para continuar.',
   link_invalido: 'Link inválido ou vencido.',
   senha_atual_incorreta: 'Senha atual incorreta.',
-  unico_admin: 'Você é a única admin de alguns grupos. Convide outra pessoa antes de excluir a conta.',
+  unico_admin:
+    'Você é a única admin de alguns grupos. Convide outra pessoa antes de excluir a conta.',
   ja_e_admin: 'Essa pessoa já é admin do grupo.',
   convite_de_outro_email: 'Este convite foi enviado para outro e-mail.',
   ultimo_admin: 'O grupo precisa de pelo menos uma pessoa admin.',
@@ -126,7 +127,14 @@ export const sessaoEu = z
     nome: z.string(),
     email: z.string(),
     grupos: z.array(
-      z.object({ id: z.string(), nome: z.string(), slug: z.string(), acessaFinanceiro: z.boolean() }).strict(),
+      z
+        .object({
+          id: z.string(),
+          nome: z.string(),
+          slug: z.string(),
+          acessaFinanceiro: z.boolean(),
+        })
+        .strict(),
     ),
   })
   .strict();
@@ -143,7 +151,9 @@ export const conviteLido = z
 export type ConviteLido = z.infer<typeof conviteLido>;
 
 /** Convite criado (ACE-31): id, e-mail e validade. */
-export const conviteCriado = z.object({ id: z.string(), email: z.string(), expiraEm: z.string() }).strict();
+export const conviteCriado = z
+  .object({ id: z.string(), email: z.string(), expiraEm: z.string() })
+  .strict();
 export type ConviteCriado = z.infer<typeof conviteCriado>;
 
 /** `GET /api/grupos/:grupoId/admins` (ACE-37). */
@@ -172,7 +182,8 @@ export type AdminsResposta = z.infer<typeof adminsResposta>;
 /** Mensagem de sucesso das rotas que respondem igual exista ou não a conta (ACE-01, ACE-08, ACE-22). */
 export const MENSAGENS = {
   cadastro: 'Enviamos um link de confirmação para o seu e-mail',
-  reenvio: 'Se houver uma conta não confirmada com esse e-mail, enviamos um novo link de confirmação',
+  reenvio:
+    'Se houver uma conta não confirmada com esse e-mail, enviamos um novo link de confirmação',
   esqueci: 'Se houver uma conta com esse e-mail, enviamos um link para criar uma nova senha',
 } as const;
 
@@ -181,7 +192,9 @@ export const MENSAGENS = {
  * (ACE-02), senão `dados_invalidos` com os campos (ACE-03).
  */
 export function erroDeValidacao(erro: z.ZodError): CorpoErro {
-  const campos = [...new Set(erro.issues.map((i) => String(i.path[0] ?? '')).filter(Boolean))].sort();
+  const campos = [
+    ...new Set(erro.issues.map((i) => String(i.path[0] ?? '')).filter(Boolean)),
+  ].sort();
   if (erro.issues.some((i) => i.path[0] === 'termos')) {
     return { erro: MENSAGENS_ERRO.termos_obrigatorios, codigo: 'termos_obrigatorios', campos };
   }
@@ -189,6 +202,9 @@ export function erroDeValidacao(erro: z.ZodError): CorpoErro {
 }
 
 /** Corpo de erro de um código, com a mensagem padrão. */
-export function corpoDoErro(codigo: CodigoErro, extra: Pick<CorpoErro, 'campos' | 'grupos' | 'mensagens' | 'sugestao'> = {}): CorpoErro {
+export function corpoDoErro(
+  codigo: CodigoErro,
+  extra: Pick<CorpoErro, 'campos' | 'grupos' | 'mensagens' | 'sugestao'> = {},
+): CorpoErro {
   return { erro: MENSAGENS_ERRO[codigo], codigo, ...extra };
 }

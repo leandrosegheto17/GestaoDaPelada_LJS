@@ -39,13 +39,21 @@ export function rodadasDoJogador(
   resolverPesos: ResolvedorDePesos,
 ): Rodada[] {
   return partidas.map((partida): Rodada => {
-    if (inicioDaContagemDoMes !== undefined && compararDatas(partida.data, inicioDaContagemDoMes) < 0) {
+    if (
+      inicioDaContagemDoMes !== undefined &&
+      compararDatas(partida.data, inicioDaContagemDoMes) < 0
+    ) {
       return { situacao: 'fora', pontos: null };
     }
     const gravada = jogador.situacaoPorPartida.get(partida.id);
     if (gravada !== undefined) {
-      return { situacao: gravada, pontos: pontosDaPresenca(gravada, partida.choveu, resolverPesos(partida.data)) };
+      return {
+        situacao: gravada,
+        pontos: pontosDaPresenca(gravada, partida.choveu, resolverPesos(partida.data)),
+      };
     }
-    return ativoEm(jogador.periodos, partida.data) ? { situacao: 'falta', pontos: 0 } : { situacao: 'fora', pontos: null };
+    return ativoEm(jogador.periodos, partida.data)
+      ? { situacao: 'falta', pontos: 0 }
+      : { situacao: 'fora', pontos: null };
   });
 }

@@ -31,7 +31,12 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export const MENSAGEM_NADA_A_ALTERAR = 'Nada a alterar.';
 
 /** 200 com os períodos atuais do jogador, lidos na mesma transação. */
-async function respostaComPeriodos(c: Context<Ambiente>, grupoId: string, id: string, alterado: boolean) {
+async function respostaComPeriodos(
+  c: Context<Ambiente>,
+  grupoId: string,
+  id: string,
+  alterado: boolean,
+) {
   const ficha = await jogadoresLeitura.ler(c.var.db, grupoId, id);
   if (!ficha) return c.json(corpoDoErro('nao_encontrado'), 404);
   const corpo: CorrigirPeriodoResposta = {
@@ -53,7 +58,14 @@ export function rotasPeriodosCorrecao(): Hono<Ambiente> {
     const corpo = await lerCorpoDoGrupo(c, corrigirPeriodoCorpo);
     if (!corpo.ok) return corpo.resposta;
     const grupoId = c.req.param('grupoId');
-    const r = await jogadores.corrigirPeriodo(c.var.db, grupoId, id, periodoId, corpo.dados, c.var.relogio.hoje());
+    const r = await jogadores.corrigirPeriodo(
+      c.var.db,
+      grupoId,
+      id,
+      periodoId,
+      corpo.dados,
+      c.var.relogio.hoje(),
+    );
     if (r.resultado !== 'ok') return respostaDePeriodo(c, r);
     return respostaComPeriodos(c, grupoId, id, r.alterado);
   });
@@ -64,7 +76,13 @@ export function rotasPeriodosCorrecao(): Hono<Ambiente> {
     const corpo = await lerCorpoDoGrupo(c, inicioCorpo);
     if (!corpo.ok) return corpo.resposta;
     const grupoId = c.req.param('grupoId');
-    const r = await jogadores.alterarInicio(c.var.db, grupoId, id, corpo.dados, c.var.relogio.hoje());
+    const r = await jogadores.alterarInicio(
+      c.var.db,
+      grupoId,
+      id,
+      corpo.dados,
+      c.var.relogio.hoje(),
+    );
     if (r.resultado === 'nao_encontrado') return c.json(naoEncontrado, 404);
     if (r.resultado === 'invalido') return respostaDeCampo(c, 'data', r.mensagem);
     return respostaComPeriodos(c, grupoId, id, r.alterado);
@@ -95,8 +113,13 @@ export function rotasPeriodosCorrecao(): Hono<Ambiente> {
     const hoje = c.var.relogio.hoje();
 
     const estado = await jogadores.lerParaPrevia(c.var.db, grupoId, id);
-    if (!estado || !estado.periodos.some((p) => p.id === periodoId)) return c.json(naoEncontrado, 404);
-    const r = avaliarNaPrevia(estado, { tipo: 'corrigir', periodoId, saida: corpo.dados.saida, retorno: corpo.dados.retorno }, hoje);
+    if (!estado || !estado.periodos.some((p) => p.id === periodoId))
+      return c.json(naoEncontrado, 404);
+    const r = avaliarNaPrevia(
+      estado,
+      { tipo: 'corrigir', periodoId, saida: corpo.dados.saida, retorno: corpo.dados.retorno },
+      hoje,
+    );
     if (!r.ok) return respostaDeCampo(c, r.campo, r.mensagem);
 
     const h = await historico.carregar(c.var.db, grupoId, hoje);
@@ -125,7 +148,12 @@ export function rotasPeriodosCorrecao(): Hono<Ambiente> {
 
     const estado = await jogadores.lerParaPrevia(c.var.db, grupoId, id);
     if (!estado) return c.json(naoEncontrado, 404);
-    const r = avaliarInicio({ periodos: estado.periodos, inicioPontuacao: estado.inicioPontuacao, novaData: corpo.dados.data, hoje });
+    const r = avaliarInicio({
+      periodos: estado.periodos,
+      inicioPontuacao: estado.inicioPontuacao,
+      novaData: corpo.dados.data,
+      hoje,
+    });
     if (!r.ok) return respostaDeCampo(c, 'data', r.mensagem);
 
     const h = await historico.carregar(c.var.db, grupoId, hoje);

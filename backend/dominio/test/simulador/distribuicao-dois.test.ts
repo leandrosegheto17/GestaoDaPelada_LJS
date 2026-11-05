@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { montarElenco, type Apto } from '../../src/simulador/base.ts';
-import { chaveDaComposicao, elencoDois, menorChave, type ComposicaoDois } from '../../src/simulador/chave-dois.ts';
+import {
+  chaveDaComposicao,
+  elencoDois,
+  menorChave,
+  type ComposicaoDois,
+} from '../../src/simulador/chave-dois.ts';
 import { classificarDoisTimes, type Limite } from '../../src/simulador/classificacao.ts';
 import { distribuirDoisTimes } from '../../src/simulador/distribuicao-dois.ts';
 
@@ -18,24 +23,49 @@ import { distribuirDoisTimes } from '../../src/simulador/distribuicao-dois.ts';
 const DATA = '2026-10-22';
 
 function apto(i: number, nivel: number, anoNascimento: number | null, so1oTempo = false): Apto {
-  return { id: `p${String(i).padStart(2, '0')}`, apelido: `P${i}`, nivel, semNota: false, anoNascimento, so1oTempo };
+  return {
+    id: `p${String(i).padStart(2, '0')}`,
+    apelido: `P${i}`,
+    nivel,
+    semNota: false,
+    anoNascimento,
+    so1oTempo,
+  };
 }
 
 /** 19 aptos com níveis, idades e "só 1º" variados, já na ordem de prioridade. */
 const VARIADOS: Apto[] = Array.from({ length: 19 }, (_, k) => {
   const i = k + 1;
-  return apto(i, 400 + ((i * 137) % 500), i % 6 === 0 ? null : 1975 + ((i * 7) % 25), i === 4 || i === 16);
+  return apto(
+    i,
+    400 + ((i * 137) % 500),
+    i % 6 === 0 ? null : 1975 + ((i * 7) % 25),
+    i === 4 || i === 16,
+  );
 });
 
 function rodar(aptos: readonly Apto[], n: number, k: Limite, maxTrocas?: number) {
   const elenco = montarElenco(aptos, DATA);
   const classificacao = classificarDoisTimes(aptos, n, k);
-  const resultado = distribuirDoisTimes(classificacao, n, elenco, maxTrocas === undefined ? {} : { maxTrocas });
-  const ordem = [...classificacao.titulares.map((t) => t.id), ...classificacao.reservasQueEntram.map((r) => r.apto.id)];
+  const resultado = distribuirDoisTimes(
+    classificacao,
+    n,
+    elenco,
+    maxTrocas === undefined ? {} : { maxTrocas },
+  );
+  const ordem = [
+    ...classificacao.titulares.map((t) => t.id),
+    ...classificacao.reservasQueEntram.map((r) => r.apto.id),
+  ];
   return { ...resultado, classificacao, e: elencoDois(ordem, elenco) };
 }
 
-function trocar(c: ComposicaoDois, lista: 'titulares' | 'entram', i: number, j: number): ComposicaoDois {
+function trocar(
+  c: ComposicaoDois,
+  lista: 'titulares' | 'entram',
+  i: number,
+  j: number,
+): ComposicaoDois {
   const a = { titulares: [...c.times[0].titulares], entram: [...c.times[0].entram] };
   const b = { titulares: [...c.times[1].titulares], entram: [...c.times[1].entram] };
   [a[lista][i], b[lista][j]] = [b[lista][j]!, a[lista][i]!];
@@ -55,8 +85,14 @@ describe('distribuirDoisTimes', () => {
     const iguais = Array.from({ length: 10 }, (_, k) => apto(k + 1, 500, 1990));
     const { composicao, trocasAceitas } = rodar(iguais, 4, 1);
     expect(trocasAceitas).toBe(0);
-    expect(composicao.times[0]).toEqual({ titulares: ['p01', 'p04', 'p05', 'p08'], entram: ['p09'] });
-    expect(composicao.times[1]).toEqual({ titulares: ['p02', 'p03', 'p06', 'p07'], entram: ['p10'] });
+    expect(composicao.times[0]).toEqual({
+      titulares: ['p01', 'p04', 'p05', 'p08'],
+      entram: ['p09'],
+    });
+    expect(composicao.times[1]).toEqual({
+      titulares: ['p02', 'p03', 'p06', 'p07'],
+      entram: ['p10'],
+    });
   });
 
   it('SIM-27: um craque muito acima fica no time que, sem ele, tem menos nível', () => {
@@ -86,7 +122,9 @@ describe('distribuirDoisTimes', () => {
   it('SIM-30: N titulares por time e diferença de no máximo 1 nas reservas que entram', () => {
     const { composicao } = rodar(VARIADOS, 7, 2);
     expect(composicao.times.map((t) => t.titulares.length)).toEqual([7, 7]);
-    expect(Math.abs(composicao.times[0].entram.length - composicao.times[1].entram.length)).toBeLessThanOrEqual(1);
+    expect(
+      Math.abs(composicao.times[0].entram.length - composicao.times[1].entram.length),
+    ).toBeLessThanOrEqual(1);
   });
 
   it('SIM-32: titulares e reservas de cada time saem na ordem de prioridade; "não entra" intocado', () => {
@@ -105,7 +143,10 @@ describe('distribuirDoisTimes', () => {
     const { composicao, trocasAceitas, e } = rodar(VARIADOS, 7, 'ilimitado', 1);
     expect(trocasAceitas).toBeLessThanOrEqual(1);
     expect(composicao.times.map((t) => t.titulares.length)).toEqual([7, 7]);
-    const todos = [...composicao.times.flatMap((t) => [...t.titulares, ...t.entram]), ...composicao.naoEntra];
+    const todos = [
+      ...composicao.times.flatMap((t) => [...t.titulares, ...t.entram]),
+      ...composicao.naoEntra,
+    ];
     expect(new Set(todos).size).toBe(VARIADOS.length);
     expect(() => chaveDaComposicao(composicao, 7, e)).not.toThrow();
   });

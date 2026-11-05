@@ -32,7 +32,9 @@ export function deveMostrarAviso(ambiente: AmbienteNavegador, dispensado: boolea
 
 export function lerAmbiente(): AmbienteNavegador {
   const nav = navigator as Navigator & { standalone?: boolean };
-  const displayMode = typeof window.matchMedia === 'function' && window.matchMedia('(display-mode: standalone)').matches;
+  const displayMode =
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(display-mode: standalone)').matches;
   return {
     userAgent: nav.userAgent,
     pontosDeToque: nav.maxTouchPoints ?? 0,
@@ -57,7 +59,10 @@ function gravarDispensa(): void {
   }
 }
 
-export function useModoInstalacao(ambiente?: AmbienteNavegador): { mostrarAviso: boolean; dispensar: () => void } {
+export function useModoInstalacao(ambiente?: AmbienteNavegador): {
+  mostrarAviso: boolean;
+  dispensar: () => void;
+} {
   const [dispensado, setDispensado] = useState(lerDispensa);
   const [atual] = useState(() => ambiente ?? lerAmbiente());
   const dispensar = useCallback(() => {

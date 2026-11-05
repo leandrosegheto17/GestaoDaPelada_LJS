@@ -1,6 +1,12 @@
 import type pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { abrirCenarioConta, criarSessao, novoToken, sha256, type CenarioContaAberto } from '../isolamento/cenario-conta.ts';
+import {
+  abrirCenarioConta,
+  criarSessao,
+  novoToken,
+  sha256,
+  type CenarioContaAberto,
+} from '../isolamento/cenario-conta.ts';
 import { comoAppAqui, comoSuper, contar, numaTransacao, umaLinha } from './apoio-conta.ts';
 
 /**
@@ -30,7 +36,9 @@ afterAll(async () => {
 
 async function tocar(db: pg.Client, hash: Buffer): Promise<string | null> {
   await comoAppAqui(db);
-  const r = await umaLinha<{ conta: string | null }>(db, 'SELECT sessao_tocar($1) AS conta', [hash]);
+  const r = await umaLinha<{ conta: string | null }>(db, 'SELECT sessao_tocar($1) AS conta', [
+    hash,
+  ]);
   await comoSuper(db);
   return r.conta;
 }
@@ -44,7 +52,12 @@ interface Entrada {
 
 async function entrar(db: pg.Client, email: string, senha: string, ip: Buffer): Promise<Entrada> {
   await comoAppAqui(db);
-  const r = await umaLinha<Entrada>(db, 'SELECT * FROM conta_entrar($1, $2, $3, $4)', [email, senha, ip, novoToken().hash]);
+  const r = await umaLinha<Entrada>(db, 'SELECT * FROM conta_entrar($1, $2, $3, $4)', [
+    email,
+    senha,
+    ip,
+    novoToken().hash,
+  ]);
   await comoSuper(db);
   return r;
 }
@@ -55,7 +68,12 @@ function ip(i: number): Buffer {
 }
 
 /** Grava `n` falhas do e-mail, cada uma de um IP diferente, todas `atras` antes de agora. */
-async function falhasDaConta(db: pg.Client, email: string, n: number, atras = "interval '1 minute'"): Promise<void> {
+async function falhasDaConta(
+  db: pg.Client,
+  email: string,
+  n: number,
+  atras = "interval '1 minute'",
+): Promise<void> {
   await db.query(
     `INSERT INTO tentativas_login (email, ip_hash, momento, sucesso)
      SELECT $1, digest('10.9.' || g::text, 'sha256'), now() - ${atras}, false FROM generate_series(1, $2) g`,
@@ -73,9 +91,11 @@ describe('sessao_tocar', () => {
         expiraEm: "now() + interval '11 hours'",
       });
       expect(await tocar(db, s.hash)).toBe(cenario.contaA);
-      const r = await umaLinha<{ renovada: boolean }>(db, 'SELECT ultimo_uso_em = now() AS renovada FROM sessoes WHERE token_hash = $1', [
-        s.hash,
-      ]);
+      const r = await umaLinha<{ renovada: boolean }>(
+        db,
+        'SELECT ultimo_uso_em = now() AS renovada FROM sessoes WHERE token_hash = $1',
+        [s.hash],
+      );
       expect(r.renovada).toBe(true);
     });
   });
@@ -121,7 +141,9 @@ describe('sessao_tocar', () => {
   it('ACE-15: a renovação não estica as 12 h (expira_em não muda)', async () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
-      const s = await criarSessao(db, cenario.contaA, { expiraEm: "now() + interval '30 minutes'" });
+      const s = await criarSessao(db, cenario.contaA, {
+        expiraEm: "now() + interval '30 minutes'",
+      });
       await tocar(db, s.hash);
       const r = await umaLinha<{ igual: boolean }>(
         db,
@@ -150,10 +172,14 @@ describe('sessao_tocar', () => {
   it('ACE-15: apagar a sessão vencida não toca as outras sessões da conta', async () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
-      const vencida = await criarSessao(db, cenario.contaA, { ultimoUsoEm: "now() - interval '20 minutes'" });
+      const vencida = await criarSessao(db, cenario.contaA, {
+        ultimoUsoEm: "now() - interval '20 minutes'",
+      });
       await criarSessao(db, cenario.contaA);
       expect(await tocar(db, vencida.hash)).toBeNull();
-      expect(await contar(db, 'SELECT 1 FROM sessoes WHERE conta_id = $1', [cenario.contaA])).toBe(1);
+      expect(await contar(db, 'SELECT 1 FROM sessoes WHERE conta_id = $1', [cenario.contaA])).toBe(
+        1,
+      );
     });
   });
 });
@@ -166,7 +192,12 @@ describe('conta_entrar: teto de 50 falhas por hora por conta', () => {
       expect((await entrar(db, cenario.emailA, 'errada 50', ip(1))).resultado).toBe('invalida');
       const r = await entrar(db, cenario.emailA, 'errada 51', ip(2));
       const ate = await umaLinha<{ ate: Date }>(db, `SELECT now() + interval '10 minutes' AS ate`);
-      expect(r).toEqual({ resultado: 'bloqueado', conta_id: null, nome: null, bloqueado_ate: ate.ate });
+      expect(r).toEqual({
+        resultado: 'bloqueado',
+        conta_id: null,
+        nome: null,
+        bloqueado_ate: ate.ate,
+      });
     });
   });
 
@@ -219,7 +250,9 @@ describe('conta_entrar: teto de 50 falhas por hora por conta', () => {
     const { db } = aberto;
     await numaTransacao(db, async () => {
       await falhasDaConta(db, 'ninguem@exemplo.test', 50);
-      expect((await entrar(db, 'ninguem@exemplo.test', 'qualquer', ip(9))).resultado).toBe('bloqueado');
+      expect((await entrar(db, 'ninguem@exemplo.test', 'qualquer', ip(9))).resultado).toBe(
+        'bloqueado',
+      );
     });
   });
 
@@ -227,10 +260,14 @@ describe('conta_entrar: teto de 50 falhas por hora por conta', () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
       await falhasDaConta(db, cenario.emailA, 50);
-      expect((await entrar(db, cenario.emailA, cenario.senhaA, ip(10))).resultado).toBe('bloqueado');
+      expect((await entrar(db, cenario.emailA, cenario.senhaA, ip(10))).resultado).toBe(
+        'bloqueado',
+      );
       expect(await contar(db, 'SELECT 1 FROM tentativas_login WHERE sucesso')).toBe(0);
       expect(await contar(db, 'SELECT 1 FROM sessoes')).toBe(0);
-      expect((await entrar(db, cenario.emailA, cenario.senhaA, ip(11))).resultado).toBe('bloqueado');
+      expect((await entrar(db, cenario.emailA, cenario.senhaA, ip(11))).resultado).toBe(
+        'bloqueado',
+      );
     });
   });
 

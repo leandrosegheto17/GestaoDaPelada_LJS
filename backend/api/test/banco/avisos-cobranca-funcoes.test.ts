@@ -60,7 +60,11 @@ describe('aviso_cobranca_destino', () => {
         grupo_nome: 'Grupo A',
       });
       expect(linhas[0]?.assinaturas).toEqual([
-        expect.objectContaining({ endpoint: 'https://fcm.googleapis.com/fcm/send/t11-a', p256dh: 'pa', auth: 'aa' }),
+        expect.objectContaining({
+          endpoint: 'https://fcm.googleapis.com/fcm/send/t11-a',
+          p256dh: 'pa',
+          auth: 'aa',
+        }),
       ]);
     });
   });
@@ -109,37 +113,55 @@ describe('aviso_cobranca_registrar', () => {
   it('NOT-39, NOT-57: a primeira vez grava e devolve true; a segunda da mesma chave devolve false', async () => {
     const { cenario } = aberto;
     await semContexto(async (d) => {
-      expect((await registrar(d, 'pay_t11', 'pagamento_confirmado', cenario.grupoA)).rows[0]?.r).toBe(true);
-      expect((await registrar(d, 'pay_t11', 'pagamento_confirmado', cenario.grupoA)).rows[0]?.r).toBe(false);
+      expect(
+        (await registrar(d, 'pay_t11', 'pagamento_confirmado', cenario.grupoA)).rows[0]?.r,
+      ).toBe(true);
+      expect(
+        (await registrar(d, 'pay_t11', 'pagamento_confirmado', cenario.grupoA)).rows[0]?.r,
+      ).toBe(false);
       await d.query('RESET ROLE');
       const r = await d.query(`SELECT * FROM avisos_cobranca WHERE id_externo = 'pay_t11'`);
       expect(r.rows).toHaveLength(1);
-      expect(Object.keys(r.rows[0] ?? {}).sort()).toEqual(['enviado_em', 'grupo_id', 'id_externo', 'tipo']);
+      expect(Object.keys(r.rows[0] ?? {}).sort()).toEqual([
+        'enviado_em',
+        'grupo_id',
+        'id_externo',
+        'tipo',
+      ]);
     });
   });
 
   it('NOT-39: o mesmo id de cobrança com outro tipo é outra chave (confirmado e recebido são dois avisos)', async () => {
     const { cenario } = aberto;
     await semContexto(async (d) => {
-      expect((await registrar(d, 'pay_t11b', 'pagamento_confirmado', cenario.grupoA)).rows[0]?.r).toBe(true);
-      expect((await registrar(d, 'pay_t11b', 'pagamento_atrasado', cenario.grupoA)).rows[0]?.r).toBe(true);
+      expect(
+        (await registrar(d, 'pay_t11b', 'pagamento_confirmado', cenario.grupoA)).rows[0]?.r,
+      ).toBe(true);
+      expect(
+        (await registrar(d, 'pay_t11b', 'pagamento_atrasado', cenario.grupoA)).rows[0]?.r,
+      ).toBe(true);
     });
   });
 
   it('NOT-39: tipo fora dos 3 falha (23514)', async () => {
     const { cenario } = aberto;
-    await expect(semContexto((d) => registrar(d, 'pay_t11c', 'outro', cenario.grupoA))).rejects.toMatchObject({
+    await expect(
+      semContexto((d) => registrar(d, 'pay_t11c', 'outro', cenario.grupoA)),
+    ).rejects.toMatchObject({
       code: '23514',
     });
   });
 
   describe('duas conexões', () => {
-    const limpar = () => aberto.db.query(`DELETE FROM avisos_cobranca WHERE id_externo LIKE 'pay_corrida_%'`);
+    const limpar = () =>
+      aberto.db.query(`DELETE FROM avisos_cobranca WHERE id_externo LIKE 'pay_corrida_%'`);
 
     const abrir = async (c: pg.Client) => {
       await c.query('BEGIN');
       await c.query('SET LOCAL ROLE pelada_app');
-      await c.query(`SELECT set_config('app.conta_id', '', true), set_config('app.slug_publico', '', true)`);
+      await c.query(
+        `SELECT set_config('app.conta_id', '', true), set_config('app.slug_publico', '', true)`,
+      );
     };
 
     it('NOT-39: a segunda espera a primeira confirmar e recebe false', async () => {
@@ -148,7 +170,12 @@ describe('aviso_cobranca_registrar', () => {
       try {
         await abrir(aberto.db);
         await abrir(outra);
-        const primeira = await registrar(aberto.db, 'pay_corrida_1', 'cobranca_gerada', cenario.grupoA);
+        const primeira = await registrar(
+          aberto.db,
+          'pay_corrida_1',
+          'cobranca_gerada',
+          cenario.grupoA,
+        );
         const segunda = registrar(outra, 'pay_corrida_1', 'cobranca_gerada', cenario.grupoA);
         const estado = await Promise.race([
           segunda.then(() => 'terminou'),
@@ -202,7 +229,11 @@ describe('push_conta_resultado', () => {
       );
       const [a1, a2, b1] = r.rows.map((l) => l.id);
       await d.query('SET LOCAL ROLE pelada_app');
-      await d.query('SELECT push_conta_resultado($1, $2::bigint[], $3::bigint[])', [cenario.contaA, [a1, b1], [a2, b1]]);
+      await d.query('SELECT push_conta_resultado($1, $2::bigint[], $3::bigint[])', [
+        cenario.contaA,
+        [a1, b1],
+        [a2, b1],
+      ]);
       await d.query('RESET ROLE');
       const depois = await d.query<{ id: string; aceita: boolean }>(
         `SELECT id::text, ultimo_envio_em IS NOT NULL AS aceita FROM push_conta WHERE id = ANY ($1::bigint[]) ORDER BY id`,
@@ -222,7 +253,10 @@ describe('notificacoes_limpar_em', () => {
     new Date(Date.parse(MOMENTO) - dias * 86_400_000 + segundos * 1000).toISOString();
 
   /** Semeia, como superusuário, 6 assinaturas do grupo A (endpoints `t11-<nome>`) com o último envio dado. */
-  async function semear(d: pg.Client, linhas: Array<[string, string | null, string]>): Promise<void> {
+  async function semear(
+    d: pg.Client,
+    linhas: Array<[string, string | null, string]>,
+  ): Promise<void> {
     for (const [nome, envio, criada] of linhas) {
       await d.query(
         `INSERT INTO push_ranking (grupo_id, endpoint, p256dh, auth, criada_em, ultimo_envio_em)
@@ -258,7 +292,9 @@ describe('notificacoes_limpar_em', () => {
         ['dias-181', antes(181, 0), antes(400, 0)],
         ['dias-179', antes(179, 0), antes(400, 0)],
       ]);
-      const r = await d.query<{ ranking: number }>('SELECT * FROM notificacoes_limpar_em($1)', [MOMENTO]);
+      const r = await d.query<{ ranking: number }>('SELECT * FROM notificacoes_limpar_em($1)', [
+        MOMENTO,
+      ]);
       expect(r.rows[0]?.ranking).toBe(2);
       expect(await restantes(d)).toEqual(['t11-dias-179', 't11-nova-1s']);
     });
@@ -289,12 +325,17 @@ describe('notificacoes_limpar_em', () => {
           [id, cenario.grupoA, momento],
         );
       }
-      const r = await d.query<{ avisos: number }>('SELECT * FROM notificacoes_limpar_em($1)', [MOMENTO]);
+      const r = await d.query<{ avisos: number }>('SELECT * FROM notificacoes_limpar_em($1)', [
+        MOMENTO,
+      ]);
       expect(r.rows[0]?.avisos).toBeGreaterThanOrEqual(2);
       const ficam = await d.query<{ id_externo: string }>(
         `SELECT id_externo FROM avisos_cobranca WHERE id_externo LIKE 'pay_limpa_%' ORDER BY 1`,
       );
-      expect(ficam.rows.map((l) => l.id_externo)).toEqual(['pay_limpa_89', 'pay_limpa_90_menos_1s']);
+      expect(ficam.rows.map((l) => l.id_externo)).toEqual([
+        'pay_limpa_89',
+        'pay_limpa_90_menos_1s',
+      ]);
     });
   });
 
@@ -303,7 +344,9 @@ describe('notificacoes_limpar_em', () => {
     await expect(
       comoApp(db, {}, (d) => d.query('SELECT * FROM notificacoes_limpar_em(now())')),
     ).rejects.toMatchObject({ code: '42501' });
-    const r = await comoApp(db, {}, (d) => d.query<{ ranking: number; avisos: number }>('SELECT * FROM notificacoes_limpar()'));
+    const r = await comoApp(db, {}, (d) =>
+      d.query<{ ranking: number; avisos: number }>('SELECT * FROM notificacoes_limpar()'),
+    );
     expect(r.rows).toEqual([{ ranking: 0, avisos: 0 }]);
     await expect(
       comoApp(db, { conta: cenario.contaA }, (d) => d.query('SELECT * FROM notificacoes_limpar()')),
@@ -316,8 +359,14 @@ describe('contexto e permissões', () => {
     const { db, cenario } = aberto;
     const chamadas = [
       { sql: 'SELECT * FROM aviso_cobranca_destino($1)', valores: [cenario.grupoA] },
-      { sql: `SELECT aviso_cobranca_registrar('pay_x', 'cobranca_gerada', $1)`, valores: [cenario.grupoA] },
-      { sql: `SELECT push_conta_resultado($1, '{}'::bigint[], '{}'::bigint[])`, valores: [cenario.contaA] },
+      {
+        sql: `SELECT aviso_cobranca_registrar('pay_x', 'cobranca_gerada', $1)`,
+        valores: [cenario.grupoA],
+      },
+      {
+        sql: `SELECT push_conta_resultado($1, '{}'::bigint[], '{}'::bigint[])`,
+        valores: [cenario.contaA],
+      },
       { sql: 'SELECT * FROM notificacoes_limpar()', valores: [] },
     ];
     for (const contexto of [{ conta: cenario.contaA }, { slug: cenario.slugA }]) {

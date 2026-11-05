@@ -25,7 +25,12 @@ async function listar(db: Db, grupoId: string): Promise<HabilidadeItem[]> {
   return r.rows;
 }
 
-async function nomeRepetido(db: Db, grupoId: string, nome: string, exceto: string | null): Promise<boolean> {
+async function nomeRepetido(
+  db: Db,
+  grupoId: string,
+  nome: string,
+  exceto: string | null,
+): Promise<boolean> {
   const r = await sql<{ id: string }>`
     SELECT id FROM habilidades
      WHERE grupo_id = ${grupoId} AND lower(nome) = lower(${nome})
@@ -33,26 +38,43 @@ async function nomeRepetido(db: Db, grupoId: string, nome: string, exceto: strin
   return r.rows.length > 0;
 }
 
-async function criar(db: Db, grupoId: string, dados: HabilidadeCorpo): Promise<ResultadoHabilidade> {
+async function criar(
+  db: Db,
+  grupoId: string,
+  dados: HabilidadeCorpo,
+): Promise<ResultadoHabilidade> {
   if (await nomeRepetido(db, grupoId, dados.nome, null)) return { resultado: 'nome_repetido' };
   const r = await sql<HabilidadeItem>`
     INSERT INTO habilidades (grupo_id, nome) VALUES (${grupoId}, ${dados.nome})
     RETURNING id, nome`.execute(db);
   const habilidade = r.rows[0];
   if (!habilidade) throw new Error('INSERT de habilidade sem id');
-  await auditoria.registrar(db, grupoId, { acao: 'habilidade_criada', entidade: 'habilidade', entidadeId: habilidade.id });
+  await auditoria.registrar(db, grupoId, {
+    acao: 'habilidade_criada',
+    entidade: 'habilidade',
+    entidadeId: habilidade.id,
+  });
   return { resultado: 'ok', habilidade };
 }
 
-async function renomear(db: Db, grupoId: string, id: string, dados: HabilidadeCorpo): Promise<ResultadoHabilidade> {
+async function renomear(
+  db: Db,
+  grupoId: string,
+  id: string,
+  dados: HabilidadeCorpo,
+): Promise<ResultadoHabilidade> {
   const atual = await sql<HabilidadeItem>`
-    SELECT id, nome FROM habilidades WHERE grupo_id = ${grupoId} AND id = ${id} FOR UPDATE`.execute(db);
+    SELECT id, nome FROM habilidades WHERE grupo_id = ${grupoId} AND id = ${id} FOR UPDATE`.execute(
+    db,
+  );
   const linha = atual.rows[0];
   if (!linha) return { resultado: 'nao_encontrada' };
   if (linha.nome === dados.nome) return { resultado: 'ok', habilidade: linha };
   if (await nomeRepetido(db, grupoId, dados.nome, id)) return { resultado: 'nome_repetido' };
 
-  await sql`UPDATE habilidades SET nome = ${dados.nome} WHERE grupo_id = ${grupoId} AND id = ${id}`.execute(db);
+  await sql`UPDATE habilidades SET nome = ${dados.nome} WHERE grupo_id = ${grupoId} AND id = ${id}`.execute(
+    db,
+  );
   await auditoria.registrar(db, grupoId, {
     acao: 'habilidade_renomeada',
     entidade: 'habilidade',
@@ -62,11 +84,19 @@ async function renomear(db: Db, grupoId: string, id: string, dados: HabilidadeCo
   return { resultado: 'ok', habilidade: { id, nome: dados.nome } };
 }
 
-async function excluir(db: Db, grupoId: string, id: string): Promise<{ resultado: 'ok' | 'nao_encontrada' }> {
+async function excluir(
+  db: Db,
+  grupoId: string,
+  id: string,
+): Promise<{ resultado: 'ok' | 'nao_encontrada' }> {
   const r = await sql<{ id: string }>`
     DELETE FROM habilidades WHERE grupo_id = ${grupoId} AND id = ${id} RETURNING id`.execute(db);
   if (r.rows.length === 0) return { resultado: 'nao_encontrada' };
-  await auditoria.registrar(db, grupoId, { acao: 'habilidade_excluida', entidade: 'habilidade', entidadeId: id });
+  await auditoria.registrar(db, grupoId, {
+    acao: 'habilidade_excluida',
+    entidade: 'habilidade',
+    entidadeId: id,
+  });
   return { resultado: 'ok' };
 }
 

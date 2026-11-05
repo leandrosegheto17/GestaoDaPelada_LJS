@@ -64,7 +64,13 @@ const PREVIA_NEUTRA = {
   rodadasQueDeixamDeConstar: [],
   aviso: null,
 };
-const PREVIA_INICIO_NEUTRA = { acumuladoAntes: 0, acumuladoDepois: 0, posicaoAntes: null, posicaoDepois: null, rodadasQuePassamAConstar: 0 };
+const PREVIA_INICIO_NEUTRA = {
+  acumuladoAntes: 0,
+  acumuladoDepois: 0,
+  posicaoAntes: null,
+  posicaoDepois: null,
+  rodadasQuePassamAConstar: 0,
+};
 
 function comPrevias(api: Record<string, Manipulador>): Record<string, Manipulador> {
   return new Proxy(api, {
@@ -84,7 +90,11 @@ async function clicarQuandoPronto(botao: HTMLElement) {
 }
 
 function abrir(id: string, api: Record<string, Manipulador>) {
-  return abrirTela(`/app/grupos/g-quinta/jogadores/${id}`, comPrevias({ 'GET /api/sessao': () => json(200, SESSAO_ANA), ...api }), rotas);
+  return abrirTela(
+    `/app/grupos/g-quinta/jogadores/${id}`,
+    comPrevias({ 'GET /api/sessao': () => json(200, SESSAO_ANA), ...api }),
+    rotas,
+  );
 }
 
 afterEach(() => {
@@ -93,15 +103,26 @@ afterEach(() => {
 
 describe('saída anterior e ajuda do retorno', () => {
   it('a saída anterior é a do último período encerrado', () => {
-    expect(saidaAnterior({ periodos: [{ id: 'a', inicio: '2026-01-01', fim: '2026-03-01' }, { id: 'b', inicio: '2026-04-01', fim: '2026-10-05' }] })).toBe('2026-10-05');
+    expect(
+      saidaAnterior({
+        periodos: [
+          { id: 'a', inicio: '2026-01-01', fim: '2026-03-01' },
+          { id: 'b', inicio: '2026-04-01', fim: '2026-10-05' },
+        ],
+      }),
+    ).toBe('2026-10-05');
     expect(saidaAnterior({ periodos: [{ id: 'a', inicio: '2026-01-01', fim: null }] })).toBeNull();
-    expect(ajudaRetorno('2026-10-05')).toContain('Não pode ser antes da saída anterior (05/10/2026).');
+    expect(ajudaRetorno('2026-10-05')).toContain(
+      'Não pode ser antes da saída anterior (05/10/2026).',
+    );
   });
 });
 
 describe('ficha do jogador: inativar e reativar', () => {
   it('GEL-59: Inativar abre o diálogo com o texto exato, a data de saída hoje, Cancelar e Inativar; axe com o diálogo aberto', async () => {
-    const { container } = abrir('j-toninho', { 'GET /api/grupos/g-quinta/jogadores/j-toninho': () => json(200, TONINHO_ATIVO) });
+    const { container } = abrir('j-toninho', {
+      'GET /api/grupos/g-quinta/jogadores/j-toninho': () => json(200, TONINHO_ATIVO),
+    });
     fireEvent.click(await screen.findByRole('button', { name: 'Inativar' }));
     const dialogo = screen.getByRole('dialog', { name: tituloInativar('Toninho') });
     expect(within(dialogo).getByText(TEXTO_INATIVAR)).toBeTruthy();
@@ -111,7 +132,11 @@ describe('ficha do jogador: inativar e reativar', () => {
     const saida = within(dialogo).getByLabelText('Data de saída') as HTMLInputElement;
     expect(saida.value).toBe(hojeEmSaoPaulo());
     expect(saida.max).toBe(hojeEmSaoPaulo());
-    expect(within(dialogo).getAllByRole('button').map((b) => b.textContent)).toEqual(['', 'Cancelar', 'Inativar']);
+    expect(
+      within(dialogo)
+        .getAllByRole('button')
+        .map((b) => b.textContent),
+    ).toEqual(['', 'Cancelar', 'Inativar']);
     await esperarSemViolacoes(container);
   });
 
@@ -119,7 +144,17 @@ describe('ficha do jogador: inativar e reativar', () => {
     let inativo = false;
     const { chamadasA } = abrir('j-toninho', {
       'GET /api/grupos/g-quinta/jogadores/j-toninho': () =>
-        json(200, inativo ? { ...TONINHO_ATIVO, situacao: 'inativo', desde: '2026-10-20', periodos: [{ id: 'p1', inicio: '2026-02-05', fim: '2026-10-20' }] } : TONINHO_ATIVO),
+        json(
+          200,
+          inativo
+            ? {
+                ...TONINHO_ATIVO,
+                situacao: 'inativo',
+                desde: '2026-10-20',
+                periodos: [{ id: 'p1', inicio: '2026-02-05', fim: '2026-10-20' }],
+              }
+            : TONINHO_ATIVO,
+        ),
       'POST /api/grupos/g-quinta/jogadores/j-toninho/inativar': () => {
         inativo = true;
         return json(200, { alterado: true });
@@ -132,34 +167,45 @@ describe('ficha do jogador: inativar e reativar', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Inativar' }));
     const dialogo = screen.getByRole('dialog');
-    fireEvent.change(within(dialogo).getByLabelText('Data de saída'), { target: { value: '2026-10-20' } });
+    fireEvent.change(within(dialogo).getByLabelText('Data de saída'), {
+      target: { value: '2026-10-20' },
+    });
     fireEvent.click(within(dialogo).getByRole('button', { name: 'Inativar' }));
     expect(await screen.findByText('Inativo desde 20/10/2026.')).toBeTruthy();
     expect(screen.queryByRole('dialog')).toBeNull();
-    expect(chamadasA('POST', '/api/grupos/g-quinta/jogadores/j-toninho/inativar').map((c) => c.corpo)).toEqual([{ data: '2026-10-20' }]);
+    expect(
+      chamadasA('POST', '/api/grupos/g-quinta/jogadores/j-toninho/inativar').map((c) => c.corpo),
+    ).toEqual([{ data: '2026-10-20' }]);
     expect(screen.getByRole('button', { name: 'Reativar' })).toBeTruthy();
   });
 
   it('GEL-53: 409 de já inativo mostra a mensagem na faixa do diálogo', async () => {
     abrir('j-toninho', {
       'GET /api/grupos/g-quinta/jogadores/j-toninho': () => json(200, TONINHO_ATIVO),
-      'POST /api/grupos/g-quinta/jogadores/j-toninho/inativar': () => erroApi(409, 'ja_inativo', 'O jogador já está inativo.'),
+      'POST /api/grupos/g-quinta/jogadores/j-toninho/inativar': () =>
+        erroApi(409, 'ja_inativo', 'O jogador já está inativo.'),
     });
     fireEvent.click(await screen.findByRole('button', { name: 'Inativar' }));
     fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Inativar' }));
     const dialogo = screen.getByRole('dialog');
-    expect((await within(dialogo).findByRole('alert')).textContent).toContain('O jogador já está inativo.');
+    expect((await within(dialogo).findByRole('alert')).textContent).toContain(
+      'O jogador já está inativo.',
+    );
   });
 
   it('GEL-114: inativo mostra "Inativo desde" e Reativar; o diálogo tem a data de retorno e a ajuda; axe sem violação', async () => {
-    const { container } = abrir('j-beto', { 'GET /api/grupos/g-quinta/jogadores/j-beto': () => json(200, BETO_INATIVO) });
+    const { container } = abrir('j-beto', {
+      'GET /api/grupos/g-quinta/jogadores/j-beto': () => json(200, BETO_INATIVO),
+    });
     expect(await screen.findByText('Inativo desde 05/10/2026.')).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Inativar' })).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: 'Reativar' }));
     const dialogo = screen.getByRole('dialog', { name: tituloReativarJogador('Beto') });
     expect(within(dialogo).getByText(TEXTO_REATIVAR_JOGADOR)).toBeTruthy();
     expect(within(dialogo).getByText(ajudaRetorno('2026-10-05'))).toBeTruthy();
-    expect((within(dialogo).getByLabelText('Data de retorno') as HTMLInputElement).value).toBe(hojeEmSaoPaulo());
+    expect((within(dialogo).getByLabelText('Data de retorno') as HTMLInputElement).value).toBe(
+      hojeEmSaoPaulo(),
+    );
     await esperarSemViolacoes(container);
   });
 
@@ -170,7 +216,12 @@ describe('ficha do jogador: inativar e reativar', () => {
         json(
           200,
           ativo
-            ? { ...BETO_INATIVO, situacao: 'ativo', desde: '2026-10-22', periodos: [...BETO_INATIVO.periodos, { id: 'p2', inicio: '2026-10-22', fim: null }] }
+            ? {
+                ...BETO_INATIVO,
+                situacao: 'ativo',
+                desde: '2026-10-22',
+                periodos: [...BETO_INATIVO.periodos, { id: 'p2', inicio: '2026-10-22', fim: null }],
+              }
             : BETO_INATIVO,
         ),
       'POST /api/grupos/g-quinta/jogadores/j-beto/reativar': () => {
@@ -180,10 +231,14 @@ describe('ficha do jogador: inativar e reativar', () => {
     });
     fireEvent.click(await screen.findByRole('button', { name: 'Reativar' }));
     const dialogo = screen.getByRole('dialog');
-    fireEvent.change(within(dialogo).getByLabelText('Data de retorno'), { target: { value: '2026-10-22' } });
+    fireEvent.change(within(dialogo).getByLabelText('Data de retorno'), {
+      target: { value: '2026-10-22' },
+    });
     await clicarQuandoPronto(within(dialogo).getByRole('button', { name: 'Reativar' }));
     expect(await screen.findByText('Beto reativado desde 22/10/2026.')).toBeTruthy();
-    expect(chamadasA('POST', '/api/grupos/g-quinta/jogadores/j-beto/reativar').map((c) => c.corpo)).toEqual([{ data: '2026-10-22' }]);
+    expect(
+      chamadasA('POST', '/api/grupos/g-quinta/jogadores/j-beto/reativar').map((c) => c.corpo),
+    ).toEqual([{ data: '2026-10-22' }]);
     await waitFor(() => expect(screen.getByText('Ativo desde 22/10/2026.')).toBeTruthy());
   });
 
@@ -205,7 +260,9 @@ describe('ficha do jogador: inativar e reativar', () => {
     await clicarQuandoPronto(within(dialogo).getByRole('button', { name: 'Reativar' }));
     await waitFor(() => expect(retorno.getAttribute('aria-invalid')).toBe('true'));
     expect(retorno.getAttribute('aria-describedby')).toBe('retorno-ajuda retorno-erro');
-    expect(document.getElementById('retorno-erro')?.textContent).toBe('O retorno não pode ser antes da saída anterior (05/10/2026).');
+    expect(document.getElementById('retorno-erro')?.textContent).toBe(
+      'O retorno não pode ser antes da saída anterior (05/10/2026).',
+    );
     expect(screen.queryByText(/reativado desde/)).toBeNull();
     await esperarSemViolacoes(container);
   });

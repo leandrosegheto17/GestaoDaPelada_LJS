@@ -33,9 +33,7 @@ const CRIADO_EM_ISO = `'YYYY-MM-DD"T"HH24:MI:SS.US"Z"'`;
 
 /** Dados do plano do grupo; `null` quando o grupo não existe ou não é visível para o contexto (conta ou slug). */
 async function ler(db: Db, grupoId: string): Promise<DadosDoPlano | null> {
-  const r = await sql<
-    Omit<LinhaPlanoDoGrupo, 'criado_em'> & { criado_em: string }
-  >`
+  const r = await sql<Omit<LinhaPlanoDoGrupo, 'criado_em'> & { criado_em: string }>`
     SELECT situacao_comercial,
            trial_inicio::text AS trial_inicio,
            pago_ate::text AS pago_ate,

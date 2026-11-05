@@ -1,6 +1,12 @@
 import type pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { abrirCenarioConta, criarLink, novoToken, sha256, type CenarioContaAberto } from '../isolamento/cenario-conta.ts';
+import {
+  abrirCenarioConta,
+  criarLink,
+  novoToken,
+  sha256,
+  type CenarioContaAberto,
+} from '../isolamento/cenario-conta.ts';
 import { comoAppAqui, comoSuper, contar, numaTransacao, umaLinha } from './apoio-conta.ts';
 
 /**
@@ -28,7 +34,12 @@ interface Cadastro {
   enviar: boolean;
 }
 
-async function cadastrar(db: pg.Client, email: string, nome = 'Pessoa Nova', senha = 'senha nova 12345'): Promise<Cadastro> {
+async function cadastrar(
+  db: pg.Client,
+  email: string,
+  nome = 'Pessoa Nova',
+  senha = 'senha nova 12345',
+): Promise<Cadastro> {
   await comoAppAqui(db);
   const token = novoToken();
   const r = await umaLinha<Cadastro>(db, 'SELECT * FROM conta_cadastrar($1, $2, $3, $4, $5)', [
@@ -45,24 +56,32 @@ async function cadastrar(db: pg.Client, email: string, nome = 'Pessoa Nova', sen
 async function pedirLink(db: pg.Client, email: string, tipo: 'confirmacao' | 'recuperacao') {
   await comoAppAqui(db);
   const token = novoToken();
-  const r = await umaLinha<{ enviar: boolean; nome: string | null }>(db, 'SELECT * FROM link_pedir($1, $2, $3)', [
-    email,
-    tipo,
-    token.hash,
-  ]);
+  const r = await umaLinha<{ enviar: boolean; nome: string | null }>(
+    db,
+    'SELECT * FROM link_pedir($1, $2, $3)',
+    [email, tipo, token.hash],
+  );
   await comoSuper(db);
   return { ...r, token };
 }
 
 async function confirmar(db: pg.Client, hash: Buffer): Promise<string | null> {
   await comoAppAqui(db);
-  const r = await umaLinha<{ conta: string | null }>(db, 'SELECT link_confirmar($1, $2) AS conta', [hash, novoToken().hash]);
+  const r = await umaLinha<{ conta: string | null }>(db, 'SELECT link_confirmar($1, $2) AS conta', [
+    hash,
+    novoToken().hash,
+  ]);
   await comoSuper(db);
   return r.conta;
 }
 
 /** Recua o último envio do tipo para o e-mail, simulando que `segundos` se passaram. */
-async function recuarEnvio(db: pg.Client, email: string, tipo: string, segundos: number): Promise<void> {
+async function recuarEnvio(
+  db: pg.Client,
+  email: string,
+  tipo: string,
+  segundos: number,
+): Promise<void> {
   await db.query(
     `UPDATE envios_email SET enviado_em = now() - make_interval(secs => $3) WHERE destino_hash = $1 AND tipo = $2`,
     [sha256(email), tipo, segundos],
@@ -75,14 +94,24 @@ describe('conta_cadastrar', () => {
     await numaTransacao(db, async () => {
       const r = await cadastrar(db, 'nova@exemplo.test');
       expect(r).toMatchObject({ situacao: 'nova', enviar: true });
-      const conta = await umaLinha<{ email_confirmado_em: Date | null; termos_versao: string; termos_ok: boolean; bcrypt: boolean }>(
+      const conta = await umaLinha<{
+        email_confirmado_em: Date | null;
+        termos_versao: string;
+        termos_ok: boolean;
+        bcrypt: boolean;
+      }>(
         db,
         `SELECT email_confirmado_em, termos_versao, termos_aceitos_em = now() AS termos_ok,
                 senha_hash LIKE '$2_$12$%' AS bcrypt
            FROM contas WHERE id = $1`,
         [r.conta_id],
       );
-      expect(conta).toEqual({ email_confirmado_em: null, termos_versao: VERSAO_TERMOS, termos_ok: true, bcrypt: true });
+      expect(conta).toEqual({
+        email_confirmado_em: null,
+        termos_versao: VERSAO_TERMOS,
+        termos_ok: true,
+        bcrypt: true,
+      });
       const link = await umaLinha<{ tipo: string; validade: string }>(
         db,
         `SELECT tipo, (expira_em - criado_em)::text AS validade FROM links_conta WHERE conta_id = $1`,
@@ -103,12 +132,22 @@ describe('conta_cadastrar', () => {
   it('ACE-04: e-mail já existente devolve existente e não altera a conta', async () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
-      const antes = await umaLinha(db, 'SELECT nome, senha_hash, termos_versao FROM contas WHERE id = $1', [cenario.contaA]);
+      const antes = await umaLinha(
+        db,
+        'SELECT nome, senha_hash, termos_versao FROM contas WHERE id = $1',
+        [cenario.contaA],
+      );
       const r = await cadastrar(db, cenario.emailA, 'Outro Nome', 'outra senha 999');
       expect(r).toMatchObject({ situacao: 'existente', conta_id: cenario.contaA, enviar: true });
-      const depois = await umaLinha(db, 'SELECT nome, senha_hash, termos_versao FROM contas WHERE id = $1', [cenario.contaA]);
+      const depois = await umaLinha(
+        db,
+        'SELECT nome, senha_hash, termos_versao FROM contas WHERE id = $1',
+        [cenario.contaA],
+      );
       expect(depois).toEqual(antes);
-      expect(await contar(db, `SELECT 1 FROM links_conta WHERE conta_id = $1`, [cenario.contaA])).toBe(0);
+      expect(
+        await contar(db, `SELECT 1 FROM links_conta WHERE conta_id = $1`, [cenario.contaA]),
+      ).toBe(0);
     });
   });
 
@@ -124,7 +163,11 @@ describe('conta_cadastrar', () => {
     const { db } = aberto;
     await numaTransacao(db, async () => {
       const r = await cadastrar(db, '  Pessoa.Nova@Exemplo.TEST ');
-      const conta = await umaLinha<{ email: string }>(db, 'SELECT email FROM contas WHERE id = $1', [r.conta_id]);
+      const conta = await umaLinha<{ email: string }>(
+        db,
+        'SELECT email FROM contas WHERE id = $1',
+        [r.conta_id],
+      );
       expect(conta.email).toBe('pessoa.nova@exemplo.test');
     });
   });
@@ -134,7 +177,9 @@ describe('conta_cadastrar', () => {
     await numaTransacao(db, async () => {
       const r = await cadastrar(db, `  ${cenario.emailA.toUpperCase()}  `);
       expect(r).toMatchObject({ situacao: 'existente', conta_id: cenario.contaA });
-      expect(await contar(db, 'SELECT 1 FROM contas WHERE lower(email) = $1', [cenario.emailA])).toBe(1);
+      expect(
+        await contar(db, 'SELECT 1 FROM contas WHERE lower(email) = $1', [cenario.emailA]),
+      ).toBe(1);
     });
   });
 });
@@ -153,13 +198,21 @@ describe('link_confirmar', () => {
     await numaTransacao(db, async () => {
       const link = await linkComRestante(db, cenario.contaNaoConfirmada, 1);
       expect(await confirmar(db, link.hash)).toBe(cenario.contaNaoConfirmada);
-      const conta = await umaLinha<{ ok: boolean }>(db, 'SELECT email_confirmado_em = now() AS ok FROM contas WHERE id = $1', [
-        cenario.contaNaoConfirmada,
-      ]);
+      const conta = await umaLinha<{ ok: boolean }>(
+        db,
+        'SELECT email_confirmado_em = now() AS ok FROM contas WHERE id = $1',
+        [cenario.contaNaoConfirmada],
+      );
       expect(conta.ok).toBe(true);
-      expect(await contar(db, 'SELECT 1 FROM sessoes WHERE conta_id = $1', [cenario.contaNaoConfirmada])).toBe(0);
       expect(
-        await contar(db, 'SELECT 1 FROM links_conta WHERE token_hash = $1 AND usado_em IS NOT NULL', [link.hash]),
+        await contar(db, 'SELECT 1 FROM sessoes WHERE conta_id = $1', [cenario.contaNaoConfirmada]),
+      ).toBe(0);
+      expect(
+        await contar(
+          db,
+          'SELECT 1 FROM links_conta WHERE token_hash = $1 AND usado_em IS NOT NULL',
+          [link.hash],
+        ),
       ).toBe(1);
     });
   });
@@ -169,7 +222,11 @@ describe('link_confirmar', () => {
     await numaTransacao(db, async () => {
       const link = await linkComRestante(db, cenario.contaNaoConfirmada, -1);
       expect(await confirmar(db, link.hash)).toBeNull();
-      expect(await contar(db, 'SELECT 1 FROM contas WHERE id = $1 AND email_confirmado_em IS NULL', [cenario.contaNaoConfirmada])).toBe(1);
+      expect(
+        await contar(db, 'SELECT 1 FROM contas WHERE id = $1 AND email_confirmado_em IS NULL', [
+          cenario.contaNaoConfirmada,
+        ]),
+      ).toBe(1);
     });
   });
 
@@ -184,7 +241,9 @@ describe('link_confirmar', () => {
   it('ACE-07: link já usado devolve nulo na segunda vez', async () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
-      const link = await criarLink(db, cenario.contaNaoConfirmada, 'confirmacao', { expiraEm: "now() + interval '24 hours'" });
+      const link = await criarLink(db, cenario.contaNaoConfirmada, 'confirmacao', {
+        expiraEm: "now() + interval '24 hours'",
+      });
       expect(await confirmar(db, link.hash)).toBe(cenario.contaNaoConfirmada);
       expect(await confirmar(db, link.hash)).toBeNull();
     });
@@ -225,7 +284,9 @@ describe('link_pedir e o intervalo de 60 s', () => {
     await numaTransacao(db, async () => {
       const r = await pedirLink(db, 'ninguem@exemplo.test', 'confirmacao');
       expect({ enviar: r.enviar, nome: r.nome }).toEqual({ enviar: false, nome: null });
-      expect(await contar(db, 'SELECT 1 FROM links_conta WHERE token_hash = $1', [r.token.hash])).toBe(0);
+      expect(
+        await contar(db, 'SELECT 1 FROM links_conta WHERE token_hash = $1', [r.token.hash]),
+      ).toBe(0);
     });
   });
 
@@ -251,11 +312,15 @@ describe('link_pedir e o intervalo de 60 s', () => {
       await recuarEnvio(db, cenario.emailA, 'recuperacao', 60);
       const segundo = await pedirLink(db, cenario.emailA, 'recuperacao');
       expect(segundo.enviar).toBe(true);
-      expect(await contar(db, 'SELECT 1 FROM links_conta WHERE token_hash = $1', [primeiro.token.hash])).toBe(0);
       expect(
-        await contar(db, `SELECT 1 FROM links_conta WHERE conta_id = $1 AND tipo = 'recuperacao' AND usado_em IS NULL`, [
-          cenario.contaA,
-        ]),
+        await contar(db, 'SELECT 1 FROM links_conta WHERE token_hash = $1', [primeiro.token.hash]),
+      ).toBe(0);
+      expect(
+        await contar(
+          db,
+          `SELECT 1 FROM links_conta WHERE conta_id = $1 AND tipo = 'recuperacao' AND usado_em IS NULL`,
+          [cenario.contaA],
+        ),
       ).toBe(1);
     });
   });
@@ -267,7 +332,9 @@ describe('link_pedir e o intervalo de 60 s', () => {
       await recuarEnvio(db, cenario.emailNaoConfirmada, 'confirmacao', 59);
       const segundo = await pedirLink(db, cenario.emailNaoConfirmada, 'confirmacao');
       expect(segundo.enviar).toBe(false);
-      expect(await contar(db, 'SELECT 1 FROM links_conta WHERE token_hash = $1', [segundo.token.hash])).toBe(0);
+      expect(
+        await contar(db, 'SELECT 1 FROM links_conta WHERE token_hash = $1', [segundo.token.hash]),
+      ).toBe(0);
       expect(await confirmar(db, primeiro.token.hash)).toBe(cenario.contaNaoConfirmada);
     });
   });
@@ -302,7 +369,10 @@ describe('link_pedir e o intervalo de 60 s', () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
       await pedirLink(db, cenario.emailNaoConfirmada, 'confirmacao');
-      const r = await umaLinha<{ destino_hash: Buffer }>(db, `SELECT destino_hash FROM envios_email WHERE tipo = 'confirmacao'`);
+      const r = await umaLinha<{ destino_hash: Buffer }>(
+        db,
+        `SELECT destino_hash FROM envios_email WHERE tipo = 'confirmacao'`,
+      );
       expect(r.destino_hash.equals(sha256(cenario.emailNaoConfirmada))).toBe(true);
     });
   });

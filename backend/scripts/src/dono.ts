@@ -48,7 +48,8 @@ export interface ResultadoDono {
   alvo: Alvo;
 }
 
-const USO = 'Uso: pnpm --filter @pelada/scripts dono -- --email <e-mail> [--alvo local|previa|producao]';
+const USO =
+  'Uso: pnpm --filter @pelada/scripts dono -- --email <e-mail> [--alvo local|previa|producao]';
 
 function valorDe(argv: readonly string[], nome: string): string | undefined {
   const i = argv.indexOf(nome);
@@ -87,17 +88,23 @@ export function urlDoAlvo(alvo: Alvo, env: Record<string, string | undefined>): 
 /** Confirmação digitada do alvo `producao` (AD-024): o e-mail do dono e a palavra `producao`. */
 async function confirmarProducao(email: string, terminal: Terminal): Promise<void> {
   terminal.escrever('Atenção: o alvo é a produção (main do Neon).');
-  const digitado = (await terminal.linha('Digite o e-mail do dono para confirmar: ')).trim().toLowerCase();
-  if (digitado !== email) throw new ErroDono('Confirmação recusada: o e-mail digitado não confere. Nada mudou.');
+  const digitado = (await terminal.linha('Digite o e-mail do dono para confirmar: '))
+    .trim()
+    .toLowerCase();
+  if (digitado !== email)
+    throw new ErroDono('Confirmação recusada: o e-mail digitado não confere. Nada mudou.');
   const palavra = (await terminal.linha('Digite producao para confirmar: ')).trim();
-  if (palavra !== 'producao') throw new ErroDono('Confirmação recusada: digite exatamente producao. Nada mudou.');
+  if (palavra !== 'producao')
+    throw new ErroDono('Confirmação recusada: digite exatamente producao. Nada mudou.');
 }
 
 /** Valida a senha nova; a mensagem nunca traz a senha. */
 export function validarSenha(senha: string): void {
   const bytes = new TextEncoder().encode(senha).length;
   if (senha.length < SENHA_MIN || senha.length > SENHA_MAX || bytes > SENHA_MAX_BYTES) {
-    throw new ErroDono(`A senha precisa ter de ${SENHA_MIN} a ${SENHA_MAX} caracteres (até ${SENHA_MAX_BYTES} bytes).`);
+    throw new ErroDono(
+      `A senha precisa ter de ${SENHA_MIN} a ${SENHA_MAX} caracteres (até ${SENHA_MAX_BYTES} bytes).`,
+    );
   }
 }
 
@@ -121,12 +128,17 @@ export async function comandoDono(
   const senha = await lerSenha(terminal);
 
   const contaId = await comConexao(url, async (c) => {
-    const r = await c.query<{ id: string }>('SELECT conta_definir_senha($1, $2, true) AS id', [opcoes.email, senha]);
+    const r = await c.query<{ id: string }>('SELECT conta_definir_senha($1, $2, true) AS id', [
+      opcoes.email,
+      senha,
+    ]);
     const id = r.rows[0]?.id;
     if (!id) throw new ErroDono('conta_definir_senha não devolveu a conta.');
     return id;
   });
-  terminal.escrever(`Senha do dono definida no alvo ${opcoes.alvo} (conta ${contaId}). As sessões dela foram encerradas.`);
+  terminal.escrever(
+    `Senha do dono definida no alvo ${opcoes.alvo} (conta ${contaId}). As sessões dela foram encerradas.`,
+  );
   return { contaId, alvo: opcoes.alvo };
 }
 
@@ -139,7 +151,11 @@ async function perguntar(pergunta: string, oculto: boolean): Promise<string> {
       feito();
     },
   });
-  const rl = createInterface({ input: process.stdin, output: saida, terminal: process.stdin.isTTY === true });
+  const rl = createInterface({
+    input: process.stdin,
+    output: saida,
+    terminal: process.stdin.isTTY === true,
+  });
   try {
     const resposta = rl.question(pergunta);
     // A pergunta já foi escrita de forma síncrona; daqui em diante o eco some.

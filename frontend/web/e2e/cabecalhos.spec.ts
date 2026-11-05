@@ -9,7 +9,9 @@ import { CABECALHOS_DOS_ASSETS, fontesDeScript } from '../test/apoio/cabecalhos.
 const ASSETS = ['/', '/offline.html', '/manifest.webmanifest', '/icones/icone-192.png'];
 
 for (const caminho of ASSETS) {
-  test(`FUN-29: GET ${caminho} traz CSP, nosniff, Referrer-Policy e Strict-Transport-Security`, async ({ request }) => {
+  test(`FUN-29: GET ${caminho} traz CSP, nosniff, Referrer-Policy e Strict-Transport-Security`, async ({
+    request,
+  }) => {
     const resposta = await request.get(caminho);
     expect(resposta.status()).toBe(200);
     const cabecalhos = resposta.headers();
@@ -22,7 +24,9 @@ for (const caminho of ASSETS) {
   });
 }
 
-test('FUN-29: rota da SPA fora dos arquivos (fallback para o index) também traz os cabeçalhos', async ({ request }) => {
+test('FUN-29: rota da SPA fora dos arquivos (fallback para o index) também traz os cabeçalhos', async ({
+  request,
+}) => {
   const resposta = await request.get('/rota/que/nao/existe');
   const cabecalhos = resposta.headers();
   for (const [nome, valor] of Object.entries(CABECALHOS_DOS_ASSETS)) {

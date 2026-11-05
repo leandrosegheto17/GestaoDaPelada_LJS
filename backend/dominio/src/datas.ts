@@ -14,7 +14,8 @@ export type Mes = string;
 export type DiaDaSemana = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 /** Dia da semana como o grupo grava (`grupos.dia_semana`). */
-export type NomeDiaDaSemana = 'domingo' | 'segunda' | 'terca' | 'quarta' | 'quinta' | 'sexta' | 'sabado';
+export type NomeDiaDaSemana =
+  'domingo' | 'segunda' | 'terca' | 'quarta' | 'quinta' | 'sexta' | 'sabado';
 
 export const NUMERO_DO_DIA: Readonly<Record<NomeDiaDaSemana, DiaDaSemana>> = Object.freeze({
   domingo: 0,
@@ -44,7 +45,8 @@ export function ehMes(valor: unknown): valor is Mes {
 }
 
 const doisDigitos = (n: number): string => String(n).padStart(2, '0');
-const montarMes = (ano: number, mes: number): Mes => `${String(ano).padStart(4, '0')}-${doisDigitos(mes)}`;
+const montarMes = (ano: number, mes: number): Mes =>
+  `${String(ano).padStart(4, '0')}-${doisDigitos(mes)}`;
 
 function partesDoMes(mes: Mes): [number, number] {
   const [ano, m] = mes.split('-').map(Number) as [number, number];

@@ -4,7 +4,12 @@ import { arquivosDoGithub, checarActions, problemaDoUses } from '../actions-por-
 const SHA = '3d3c42e5aac5ba805825da76410c181273ba90b1';
 
 function workflow(uses: string): { caminho: string; conteudo: string }[] {
-  return [{ caminho: '.github/workflows/x.yml', conteudo: `jobs:\n  a:\n    steps:\n      - uses: ${uses}\n` }];
+  return [
+    {
+      caminho: '.github/workflows/x.yml',
+      conteudo: `jobs:\n  a:\n    steps:\n      - uses: ${uses}\n`,
+    },
+  ];
 }
 
 describe('checagem actions-por-sha', () => {
@@ -23,7 +28,12 @@ describe('checagem actions-por-sha', () => {
   });
 
   it('FUN-40: branch, SHA curto, SHA com 41 caracteres e sem versão reprovam', () => {
-    for (const ref of ['actions/checkout@main', 'actions/checkout@3d3c42e', `actions/checkout@${SHA}a`, 'actions/checkout']) {
+    for (const ref of [
+      'actions/checkout@main',
+      'actions/checkout@3d3c42e',
+      `actions/checkout@${SHA}a`,
+      'actions/checkout',
+    ]) {
       expect(problemaDoUses(ref), ref).not.toBeNull();
     }
   });
@@ -43,7 +53,12 @@ describe('checagem actions-por-sha', () => {
   });
 
   it('FUN-40: uses na action composta (sem o hífen da lista) também é conferido', () => {
-    const p = checarActions([{ caminho: '.github/actions/x/action.yml', conteudo: 'runs:\n  steps:\n    - name: a\n      uses: actions/cache@v4\n' }]);
+    const p = checarActions([
+      {
+        caminho: '.github/actions/x/action.yml',
+        conteudo: 'runs:\n  steps:\n    - name: a\n      uses: actions/cache@v4\n',
+      },
+    ]);
     expect(p).toHaveLength(1);
   });
 

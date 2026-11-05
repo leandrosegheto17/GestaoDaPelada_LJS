@@ -1,7 +1,14 @@
 import type pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { comCliente } from '../apoio/banco.ts';
-import { abrirCenarioConta, criarConvite, EMAIL_SEM_VINCULO, novoToken, sha256, type CenarioContaAberto } from '../isolamento/cenario-conta.ts';
+import {
+  abrirCenarioConta,
+  criarConvite,
+  EMAIL_SEM_VINCULO,
+  novoToken,
+  sha256,
+  type CenarioContaAberto,
+} from '../isolamento/cenario-conta.ts';
 import { comoAppAqui, comoSuper, contar, numaTransacao, umaLinha } from './apoio-conta.ts';
 
 /**
@@ -37,23 +44,40 @@ interface Criado {
   enviar: boolean;
 }
 
-async function criar(db: pg.Client, conta: string | null, grupo: string, email: string, token = novoToken()): Promise<Criado> {
+async function criar(
+  db: pg.Client,
+  conta: string | null,
+  grupo: string,
+  email: string,
+  token = novoToken(),
+): Promise<Criado> {
   await comoAppAqui(db, conta);
-  const r = await umaLinha<Criado>(db, 'SELECT * FROM convite_criar($1, $2, $3)', [grupo, email, token.hash]);
+  const r = await umaLinha<Criado>(db, 'SELECT * FROM convite_criar($1, $2, $3)', [
+    grupo,
+    email,
+    token.hash,
+  ]);
   await comoSuper(db);
   return r;
 }
 
 async function ler(db: pg.Client, hash: Buffer) {
   await comoAppAqui(db);
-  const r = await db.query<{ email: string; grupo_nome: string; conta_existe: boolean }>('SELECT * FROM convite_ler($1)', [hash]);
+  const r = await db.query<{ email: string; grupo_nome: string; conta_existe: boolean }>(
+    'SELECT * FROM convite_ler($1)',
+    [hash],
+  );
   await comoSuper(db);
   return r.rows;
 }
 
 async function aceitar(db: pg.Client, conta: string | null, hash: Buffer) {
   await comoAppAqui(db, conta);
-  const r = await umaLinha<{ resultado: string; grupo_id: string | null }>(db, 'SELECT * FROM convite_aceitar($1)', [hash]);
+  const r = await umaLinha<{ resultado: string; grupo_id: string | null }>(
+    db,
+    'SELECT * FROM convite_aceitar($1)',
+    [hash],
+  );
   await comoSuper(db);
   return r;
 }
@@ -80,8 +104,16 @@ async function listar(db: pg.Client, conta: string | null, grupo: string) {
 }
 
 /** Convite gravado com a idade dada (expressão de intervalo) e validade de 7 dias. */
-function conviteComIdade(db: pg.Client, grupo: string, email: string, criadoPor: string, idade: string) {
-  return criarConvite(db, grupo, email, criadoPor, { expiraEm: `now() - ${idade} + interval '7 days'` });
+function conviteComIdade(
+  db: pg.Client,
+  grupo: string,
+  email: string,
+  criadoPor: string,
+  idade: string,
+) {
+  return criarConvite(db, grupo, email, criadoPor, {
+    expiraEm: `now() - ${idade} + interval '7 days'`,
+  });
 }
 
 describe('convite_criar', () => {
@@ -89,7 +121,13 @@ describe('convite_criar', () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
       const token = novoToken();
-      const r = await criar(db, cenario.contaA, cenario.grupoA, '  Nova.Pessoa@Exemplo.TEST ', token);
+      const r = await criar(
+        db,
+        cenario.contaA,
+        cenario.grupoA,
+        '  Nova.Pessoa@Exemplo.TEST ',
+        token,
+      );
       expect(r.resultado).toBe('ok');
       expect(r.enviar).toBe(true);
       const c = await umaLinha<{ email: string; validade: string; criado_por: string }>(
@@ -97,13 +135,20 @@ describe('convite_criar', () => {
         'SELECT email, (expira_em - criado_em)::text AS validade, criado_por FROM convites_admin WHERE id = $1',
         [r.convite_id],
       );
-      expect(c).toEqual({ email: 'nova.pessoa@exemplo.test', validade: '7 days', criado_por: cenario.contaA });
-      expect(await contar(db, 'SELECT 1 FROM convites_admin WHERE token_hash = $1', [token.hash])).toBe(1);
+      expect(c).toEqual({
+        email: 'nova.pessoa@exemplo.test',
+        validade: '7 days',
+        criado_por: cenario.contaA,
+      });
       expect(
-        await contar(db, `SELECT 1 FROM auditoria WHERE acao = 'convidar_admin' AND entidade_id = $1 AND grupo_id = $2`, [
-          r.convite_id,
-          cenario.grupoA,
-        ]),
+        await contar(db, 'SELECT 1 FROM convites_admin WHERE token_hash = $1', [token.hash]),
+      ).toBe(1);
+      expect(
+        await contar(
+          db,
+          `SELECT 1 FROM auditoria WHERE acao = 'convidar_admin' AND entidade_id = $1 AND grupo_id = $2`,
+          [r.convite_id, cenario.grupoA],
+        ),
       ).toBe(1);
     });
   });
@@ -113,8 +158,14 @@ describe('convite_criar', () => {
     await numaTransacao(db, async () => {
       const primeiro = await criar(db, cenario.contaA, cenario.grupoA, 'nova@exemplo.test');
       const segundo = await criar(db, cenario.contaA, cenario.grupoA, 'nova@exemplo.test');
-      expect(segundo).toMatchObject({ resultado: 'ok', convite_id: primeiro.convite_id, enviar: false });
-      expect(await contar(db, `SELECT 1 FROM convites_admin WHERE email = 'nova@exemplo.test'`)).toBe(1);
+      expect(segundo).toMatchObject({
+        resultado: 'ok',
+        convite_id: primeiro.convite_id,
+        enviar: false,
+      });
+      expect(
+        await contar(db, `SELECT 1 FROM convites_admin WHERE email = 'nova@exemplo.test'`),
+      ).toBe(1);
     });
   });
 
@@ -122,12 +173,19 @@ describe('convite_criar', () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
       const primeiro = await criar(db, cenario.contaA, cenario.grupoA, 'nova@exemplo.test');
-      await db.query(`UPDATE envios_email SET enviado_em = now() - interval '61 seconds' WHERE destino_hash = $1`, [
-        sha256('nova@exemplo.test'),
-      ]);
+      await db.query(
+        `UPDATE envios_email SET enviado_em = now() - interval '61 seconds' WHERE destino_hash = $1`,
+        [sha256('nova@exemplo.test')],
+      );
       const segundo = await criar(db, cenario.contaA, cenario.grupoA, 'nova@exemplo.test');
       expect(segundo.convite_id).not.toBe(primeiro.convite_id);
-      expect(await contar(db, 'SELECT 1 FROM convites_admin WHERE id = $1 AND cancelado_em IS NOT NULL', [primeiro.convite_id])).toBe(1);
+      expect(
+        await contar(
+          db,
+          'SELECT 1 FROM convites_admin WHERE id = $1 AND cancelado_em IS NOT NULL',
+          [primeiro.convite_id],
+        ),
+      ).toBe(1);
     });
   });
 
@@ -135,15 +193,24 @@ describe('convite_criar', () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
       const r = await criar(db, cenario.contaA, cenario.grupoA, cenario.emailA.toUpperCase());
-      expect(r).toEqual({ resultado: 'ja_e_admin', convite_id: null, expira_em: null, enviar: false });
-      expect(await contar(db, 'SELECT 1 FROM convites_admin WHERE email = $1', [cenario.emailA])).toBe(0);
+      expect(r).toEqual({
+        resultado: 'ja_e_admin',
+        convite_id: null,
+        expira_em: null,
+        enviar: false,
+      });
+      expect(
+        await contar(db, 'SELECT 1 FROM convites_admin WHERE email = $1', [cenario.emailA]),
+      ).toBe(0);
     });
   });
 
   it('ACE-32: o e-mail de admin de outro grupo pode ser convidado', async () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
-      expect((await criar(db, cenario.contaA, cenario.grupoA, cenario.emailB)).resultado).toBe('ok');
+      expect((await criar(db, cenario.contaA, cenario.grupoA, cenario.emailB)).resultado).toBe(
+        'ok',
+      );
     });
   });
 
@@ -151,9 +218,13 @@ describe('convite_criar', () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
       for (const conta of [cenario.contaB, cenario.contaSemVinculo, null]) {
-        expect((await criar(db, conta, cenario.grupoA, 'nova@exemplo.test')).resultado).toBe('sem_vinculo');
+        expect((await criar(db, conta, cenario.grupoA, 'nova@exemplo.test')).resultado).toBe(
+          'sem_vinculo',
+        );
       }
-      expect(await contar(db, `SELECT 1 FROM convites_admin WHERE email = 'nova@exemplo.test'`)).toBe(0);
+      expect(
+        await contar(db, `SELECT 1 FROM convites_admin WHERE email = 'nova@exemplo.test'`),
+      ).toBe(0);
     });
   });
 });
@@ -162,8 +233,16 @@ describe('convite_ler', () => {
   it('ACE-33: convite válido (7 dias menos 1 s) devolve e-mail, nome do grupo e se a conta existe', async () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
-      const c = await conviteComIdade(db, cenario.grupoA, EMAIL_SEM_VINCULO, cenario.contaA, "(interval '7 days' - interval '1 second')");
-      expect(await ler(db, c.hash)).toEqual([{ email: EMAIL_SEM_VINCULO, grupo_nome: 'Grupo A', conta_existe: true }]);
+      const c = await conviteComIdade(
+        db,
+        cenario.grupoA,
+        EMAIL_SEM_VINCULO,
+        cenario.contaA,
+        "(interval '7 days' - interval '1 second')",
+      );
+      expect(await ler(db, c.hash)).toEqual([
+        { email: EMAIL_SEM_VINCULO, grupo_nome: 'Grupo A', conta_existe: true },
+      ]);
       const novo = await criarConvite(db, cenario.grupoA, 'sem-conta@exemplo.test', cenario.contaA);
       expect((await ler(db, novo.hash))[0]?.conta_existe).toBe(false);
     });
@@ -172,12 +251,28 @@ describe('convite_ler', () => {
   it('ACE-36: convite vencido (7 dias mais 1 s), usado, cancelado, de grupo arquivado ou inexistente não é lido', async () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
-      const vencido = await conviteComIdade(db, cenario.grupoA, 'v@exemplo.test', cenario.contaA, "(interval '7 days' + interval '1 second')");
-      const usado = await criarConvite(db, cenario.grupoA, 'u@exemplo.test', cenario.contaA, { usadoEm: 'now()' });
-      const cancelado = await criarConvite(db, cenario.grupoA, 'c@exemplo.test', cenario.contaA, { canceladoEm: 'now()' });
+      const vencido = await conviteComIdade(
+        db,
+        cenario.grupoA,
+        'v@exemplo.test',
+        cenario.contaA,
+        "(interval '7 days' + interval '1 second')",
+      );
+      const usado = await criarConvite(db, cenario.grupoA, 'u@exemplo.test', cenario.contaA, {
+        usadoEm: 'now()',
+      });
+      const cancelado = await criarConvite(db, cenario.grupoA, 'c@exemplo.test', cenario.contaA, {
+        canceladoEm: 'now()',
+      });
       const arquivado = await criarConvite(db, cenario.grupoB, 'a@exemplo.test', cenario.contaB);
       await db.query('UPDATE grupos SET arquivado_em = now() WHERE id = $1', [cenario.grupoB]);
-      for (const hash of [vencido.hash, usado.hash, cancelado.hash, arquivado.hash, novoToken().hash]) {
+      for (const hash of [
+        vencido.hash,
+        usado.hash,
+        cancelado.hash,
+        arquivado.hash,
+        novoToken().hash,
+      ]) {
         expect(await ler(db, hash)).toEqual([]);
       }
     });
@@ -189,16 +284,27 @@ describe('convite_aceitar', () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
       const c = await criarConvite(db, cenario.grupoA, EMAIL_SEM_VINCULO, cenario.contaA);
-      expect(await aceitar(db, cenario.contaSemVinculo, c.hash)).toEqual({ resultado: 'ok', grupo_id: cenario.grupoA });
+      expect(await aceitar(db, cenario.contaSemVinculo, c.hash)).toEqual({
+        resultado: 'ok',
+        grupo_id: cenario.grupoA,
+      });
       const v = await umaLinha<{ acessa_financeiro: boolean; criado_por: string }>(
         db,
         'SELECT acessa_financeiro, criado_por FROM vinculos_admin WHERE conta_id = $1 AND grupo_id = $2',
         [cenario.contaSemVinculo, cenario.grupoA],
       );
       expect(v).toEqual({ acessa_financeiro: false, criado_por: cenario.contaA });
-      expect(await contar(db, 'SELECT 1 FROM convites_admin WHERE id = $1 AND usado_em IS NOT NULL', [c.id])).toBe(1);
       expect(
-        await contar(db, `SELECT 1 FROM auditoria WHERE acao = 'aceitar_convite' AND autor_conta_id = $1`, [cenario.contaSemVinculo]),
+        await contar(db, 'SELECT 1 FROM convites_admin WHERE id = $1 AND usado_em IS NOT NULL', [
+          c.id,
+        ]),
+      ).toBe(1);
+      expect(
+        await contar(
+          db,
+          `SELECT 1 FROM auditoria WHERE acao = 'aceitar_convite' AND autor_conta_id = $1`,
+          [cenario.contaSemVinculo],
+        ),
       ).toBe(1);
     });
   });
@@ -207,9 +313,18 @@ describe('convite_aceitar', () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
       const c = await criarConvite(db, cenario.grupoA, 'outra@exemplo.test', cenario.contaA);
-      expect(await aceitar(db, cenario.contaSemVinculo, c.hash)).toEqual({ resultado: 'convite_de_outro_email', grupo_id: null });
-      expect(await contar(db, 'SELECT 1 FROM convites_admin WHERE id = $1 AND usado_em IS NULL', [c.id])).toBe(1);
-      expect(await contar(db, 'SELECT 1 FROM vinculos_admin WHERE conta_id = $1', [cenario.contaSemVinculo])).toBe(0);
+      expect(await aceitar(db, cenario.contaSemVinculo, c.hash)).toEqual({
+        resultado: 'convite_de_outro_email',
+        grupo_id: null,
+      });
+      expect(
+        await contar(db, 'SELECT 1 FROM convites_admin WHERE id = $1 AND usado_em IS NULL', [c.id]),
+      ).toBe(1);
+      expect(
+        await contar(db, 'SELECT 1 FROM vinculos_admin WHERE conta_id = $1', [
+          cenario.contaSemVinculo,
+        ]),
+      ).toBe(0);
     });
   });
 
@@ -217,17 +332,36 @@ describe('convite_aceitar', () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
       const email = EMAIL_SEM_VINCULO;
-      const vencido = await conviteComIdade(db, cenario.grupoA, email, cenario.contaA, "(interval '7 days' + interval '1 second')");
-      const usado = await criarConvite(db, cenario.grupoB, email, cenario.contaB, { usadoEm: 'now()' });
-      const cancelado = await criarConvite(db, cenario.grupoB, email, cenario.contaB, { canceladoEm: 'now()' });
+      const vencido = await conviteComIdade(
+        db,
+        cenario.grupoA,
+        email,
+        cenario.contaA,
+        "(interval '7 days' + interval '1 second')",
+      );
+      const usado = await criarConvite(db, cenario.grupoB, email, cenario.contaB, {
+        usadoEm: 'now()',
+      });
+      const cancelado = await criarConvite(db, cenario.grupoB, email, cenario.contaB, {
+        canceladoEm: 'now()',
+      });
       for (const hash of [vencido.hash, usado.hash, cancelado.hash, novoToken().hash]) {
-        expect(await aceitar(db, cenario.contaSemVinculo, hash)).toEqual({ resultado: 'link_invalido', grupo_id: null });
+        expect(await aceitar(db, cenario.contaSemVinculo, hash)).toEqual({
+          resultado: 'link_invalido',
+          grupo_id: null,
+        });
       }
       const valido = await criarConvite(db, cenario.grupoB, email, cenario.contaB);
       expect((await aceitar(db, null, valido.hash)).resultado).toBe('link_invalido');
       await db.query('UPDATE grupos SET arquivado_em = now() WHERE id = $1', [cenario.grupoB]);
-      expect((await aceitar(db, cenario.contaSemVinculo, valido.hash)).resultado).toBe('link_invalido');
-      expect(await contar(db, 'SELECT 1 FROM vinculos_admin WHERE conta_id = $1', [cenario.contaSemVinculo])).toBe(0);
+      expect((await aceitar(db, cenario.contaSemVinculo, valido.hash)).resultado).toBe(
+        'link_invalido',
+      );
+      expect(
+        await contar(db, 'SELECT 1 FROM vinculos_admin WHERE conta_id = $1', [
+          cenario.contaSemVinculo,
+        ]),
+      ).toBe(0);
     });
   });
 });
@@ -245,13 +379,29 @@ describe('convite_cadastrar', () => {
         'SELECT email, email_confirmado_em IS NOT NULL AS confirmada, termos_versao FROM contas WHERE id = $1',
         [r.conta_id],
       );
-      expect(conta).toEqual({ email: 'convidada@exemplo.test', confirmada: true, termos_versao: '2026-11-01' });
-      expect(await contar(db, 'SELECT 1 FROM vinculos_admin WHERE conta_id = $1 AND grupo_id = $2 AND NOT acessa_financeiro', [
-        r.conta_id,
-        cenario.grupoA,
-      ])).toBe(1);
-      expect(await contar(db, 'SELECT 1 FROM sessoes WHERE conta_id = $1 AND token_hash = $2', [r.conta_id, r.sessao.hash])).toBe(1);
-      expect(await contar(db, 'SELECT 1 FROM convites_admin WHERE id = $1 AND usado_em IS NOT NULL', [c.id])).toBe(1);
+      expect(conta).toEqual({
+        email: 'convidada@exemplo.test',
+        confirmada: true,
+        termos_versao: '2026-11-01',
+      });
+      expect(
+        await contar(
+          db,
+          'SELECT 1 FROM vinculos_admin WHERE conta_id = $1 AND grupo_id = $2 AND NOT acessa_financeiro',
+          [r.conta_id, cenario.grupoA],
+        ),
+      ).toBe(1);
+      expect(
+        await contar(db, 'SELECT 1 FROM sessoes WHERE conta_id = $1 AND token_hash = $2', [
+          r.conta_id,
+          r.sessao.hash,
+        ]),
+      ).toBe(1);
+      expect(
+        await contar(db, 'SELECT 1 FROM convites_admin WHERE id = $1 AND usado_em IS NOT NULL', [
+          c.id,
+        ]),
+      ).toBe(1);
     });
   });
 
@@ -261,17 +411,33 @@ describe('convite_cadastrar', () => {
       const c = await criarConvite(db, cenario.grupoA, EMAIL_SEM_VINCULO, cenario.contaA);
       const r = await cadastrarPeloConvite(db, c.hash);
       expect(r.resultado).toBe('conta_existente');
-      expect(await contar(db, 'SELECT 1 FROM vinculos_admin WHERE conta_id = $1', [cenario.contaSemVinculo])).toBe(0);
-      expect(await contar(db, 'SELECT 1 FROM convites_admin WHERE id = $1 AND usado_em IS NULL', [c.id])).toBe(1);
+      expect(
+        await contar(db, 'SELECT 1 FROM vinculos_admin WHERE conta_id = $1', [
+          cenario.contaSemVinculo,
+        ]),
+      ).toBe(0);
+      expect(
+        await contar(db, 'SELECT 1 FROM convites_admin WHERE id = $1 AND usado_em IS NULL', [c.id]),
+      ).toBe(1);
     });
   });
 
   it('ACE-36: cadastro por convite vencido, usado, cancelado ou inexistente dá link_invalido', async () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
-      const vencido = await conviteComIdade(db, cenario.grupoA, 'x1@exemplo.test', cenario.contaA, "(interval '7 days' + interval '1 second')");
-      const usado = await criarConvite(db, cenario.grupoA, 'x2@exemplo.test', cenario.contaA, { usadoEm: 'now()' });
-      const cancelado = await criarConvite(db, cenario.grupoA, 'x3@exemplo.test', cenario.contaA, { canceladoEm: 'now()' });
+      const vencido = await conviteComIdade(
+        db,
+        cenario.grupoA,
+        'x1@exemplo.test',
+        cenario.contaA,
+        "(interval '7 days' + interval '1 second')",
+      );
+      const usado = await criarConvite(db, cenario.grupoA, 'x2@exemplo.test', cenario.contaA, {
+        usadoEm: 'now()',
+      });
+      const cancelado = await criarConvite(db, cenario.grupoA, 'x3@exemplo.test', cenario.contaA, {
+        canceladoEm: 'now()',
+      });
       for (const hash of [vencido.hash, usado.hash, cancelado.hash, novoToken().hash]) {
         expect((await cadastrarPeloConvite(db, hash)).resultado).toBe('link_invalido');
       }
@@ -316,7 +482,11 @@ describe('convite_aceitar: concorrência', () => {
         try {
           await c.query('SET LOCAL ROLE pelada_app');
           await c.query(`SELECT set_config('app.conta_id', $1, true)`, [conta.id]);
-          const r = await umaLinha<{ resultado: string }>(c, 'SELECT resultado FROM convite_aceitar($1)', [convite.hash]);
+          const r = await umaLinha<{ resultado: string }>(
+            c,
+            'SELECT resultado FROM convite_aceitar($1)',
+            [convite.hash],
+          );
           await c.query('COMMIT');
           return r.resultado;
         } catch (erro) {
@@ -327,8 +497,16 @@ describe('convite_aceitar: concorrência', () => {
     try {
       const resultados = await Promise.all([aceiteConfirmado(), aceiteConfirmado()]);
       expect(resultados.sort()).toEqual(['link_invalido', 'ok']);
-      expect(await contar(db, 'SELECT 1 FROM vinculos_admin WHERE conta_id = $1', [conta.id])).toBe(1);
-      expect(await contar(db, `SELECT 1 FROM auditoria WHERE autor_conta_id = $1 AND acao = 'aceitar_convite'`, [conta.id])).toBe(1);
+      expect(await contar(db, 'SELECT 1 FROM vinculos_admin WHERE conta_id = $1', [conta.id])).toBe(
+        1,
+      );
+      expect(
+        await contar(
+          db,
+          `SELECT 1 FROM auditoria WHERE autor_conta_id = $1 AND acao = 'aceitar_convite'`,
+          [conta.id],
+        ),
+      ).toBe(1);
     } finally {
       await db.query('DELETE FROM auditoria WHERE autor_conta_id = $1', [conta.id]);
       await db.query('DELETE FROM vinculos_admin WHERE conta_id = $1', [conta.id]);

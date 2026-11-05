@@ -20,13 +20,15 @@ export const SINAL_MENOS = '−';
 function milhares(inteiro: number): string {
   const texto = String(inteiro);
   const partes: string[] = [];
-  for (let fim = texto.length; fim > 0; fim -= 3) partes.unshift(texto.slice(Math.max(0, fim - 3), fim));
+  for (let fim = texto.length; fim > 0; fim -= 3)
+    partes.unshift(texto.slice(Math.max(0, fim - 3), fim));
   return partes.join('.');
 }
 
 /** Centavos inteiros em "R$ 1.245,50"; negativo em "− R$ 900,00". */
 export function formatarReais(centavos: number): string {
-  if (!Number.isSafeInteger(centavos)) throw new RangeError(`Valor em centavos inválido: ${centavos}`);
+  if (!Number.isSafeInteger(centavos))
+    throw new RangeError(`Valor em centavos inválido: ${centavos}`);
   const absoluto = Math.abs(centavos);
   const reais = Math.floor(absoluto / 100);
   const resto = String(absoluto % 100).padStart(2, '0');
@@ -48,6 +50,7 @@ export function lerReais(texto: string): LeituraReais {
   // Só dígitos chegam aqui: o `Number` de "1245" e de "50" é exato até o inteiro seguro, conferido abaixo.
   const reais = Number(inteiro);
   const centavos = reais * 100 + Number(casas);
-  if (!Number.isSafeInteger(reais) || !Number.isSafeInteger(centavos)) return { ok: false, mensagem: MENSAGEM_VALOR_REAIS };
+  if (!Number.isSafeInteger(reais) || !Number.isSafeInteger(centavos))
+    return { ok: false, mensagem: MENSAGEM_VALOR_REAIS };
   return { ok: true, centavos: negativo && centavos !== 0 ? -centavos : centavos };
 }

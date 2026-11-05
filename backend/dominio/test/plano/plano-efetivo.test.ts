@@ -85,6 +85,8 @@ describe('planoEfetivo', () => {
   });
 
   it('valor fora do CHECK nunca dá Pro', () => {
-    expect(planoEfetivo('desconhecido' as SituacaoComercial, null, null, '2026-11-05')).toBe('free');
+    expect(planoEfetivo('desconhecido' as SituacaoComercial, null, null, '2026-11-05')).toBe(
+      'free',
+    );
   });
 });

@@ -22,7 +22,9 @@ let nomeC: string;
 
 beforeAll(async () => {
   aberto = await abrirCenarioGrupos();
-  const r = await aberto.db.query<{ nome: string }>('SELECT nome FROM contas WHERE id = $1', [aberto.cenario.contaC]);
+  const r = await aberto.db.query<{ nome: string }>('SELECT nome FROM contas WHERE id = $1', [
+    aberto.cenario.contaC,
+  ]);
   nomeC = r.rows[0]?.nome ?? '';
 });
 
@@ -99,7 +101,10 @@ describe('contas_nomes_do_grupo', () => {
     const r = await comPreparo(
       cenario.contaC,
       (d) =>
-        d.query(`UPDATE partidas SET alterada_por = $2 WHERE id = $1`, [cenario.idsG.partida, cenario.contaO]),
+        d.query(`UPDATE partidas SET alterada_por = $2 WHERE id = $1`, [
+          cenario.idsG.partida,
+          cenario.contaO,
+        ]),
       (d) => nomes(d, cenario.grupoG),
     );
     expect(r.map((l) => l.id)).toContain(cenario.contaO);
@@ -142,7 +147,11 @@ describe('contas_nomes_do_grupo', () => {
   });
 
   it('PAR-01: SECURITY DEFINER, search_path fixo e EXECUTE só para pelada_app', async () => {
-    const r = await aberto.db.query<{ definer: boolean; config: string[] | null; executores: string[] }>(
+    const r = await aberto.db.query<{
+      definer: boolean;
+      config: string[] | null;
+      executores: string[];
+    }>(
       `SELECT p.prosecdef AS definer, p.proconfig AS config,
               coalesce(array(SELECT coalesce(r.rolname::text, 'PUBLIC')
                                FROM aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) a
@@ -151,6 +160,10 @@ describe('contas_nomes_do_grupo', () => {
                               ORDER BY 1), '{}') AS executores
          FROM pg_proc p WHERE p.oid = 'contas_nomes_do_grupo(uuid)'::regprocedure`,
     );
-    expect(r.rows[0]).toEqual({ definer: true, config: ['search_path=public, pg_temp'], executores: ['pelada_app'] });
+    expect(r.rows[0]).toEqual({
+      definer: true,
+      config: ['search_path=public, pg_temp'],
+      executores: ['pelada_app'],
+    });
   });
 });

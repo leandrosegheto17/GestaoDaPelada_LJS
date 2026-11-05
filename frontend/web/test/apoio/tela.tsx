@@ -23,7 +23,10 @@ export interface Chamada {
 
 export function json(status: number, corpo?: unknown): Response {
   if (corpo === undefined) return new Response(null, { status });
-  return new Response(JSON.stringify(corpo), { status, headers: { 'Content-Type': 'application/json' } });
+  return new Response(JSON.stringify(corpo), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
+  });
 }
 
 export function erroApi(status: number, codigo: string, erro = 'erro'): Response {
@@ -39,20 +42,31 @@ export const SESSAO_ANA = {
   id: 'c-ana',
   nome: 'Ana',
   email: 'ana@exemplo.test',
-  grupos: [{ id: 'g-quinta', nome: 'Pelada de Quinta', slug: 'pelada-de-quinta', acessaFinanceiro: true }],
+  grupos: [
+    { id: 'g-quinta', nome: 'Pelada de Quinta', slug: 'pelada-de-quinta', acessaFinanceiro: true },
+  ],
 };
 
 /**
  * `rotas` troca as rotas reais por outras (telas cujas rotas só entram no app depois, grupos-e-elenco T69); sem
  * ela, as rotas do app.
  */
-export function abrirTela(caminho: string, api: Record<string, Manipulador> = {}, rotas: () => RouteObject[] = criarRotas) {
+export function abrirTela(
+  caminho: string,
+  api: Record<string, Manipulador> = {},
+  rotas: () => RouteObject[] = criarRotas,
+) {
   const chamadas: Chamada[] = [];
   const fetch = (async (url: string | URL | Request, init?: RequestInit) => {
     const metodo = (init?.method ?? 'GET').toUpperCase();
     const caminhoUrl = String(url).split('?')[0] ?? '';
     const corpo = typeof init?.body === 'string' ? (JSON.parse(init.body) as unknown) : undefined;
-    chamadas.push({ metodo, caminho: caminhoUrl, corpo, cabecalhos: (init?.headers ?? {}) as Record<string, string> });
+    chamadas.push({
+      metodo,
+      caminho: caminhoUrl,
+      corpo,
+      cabecalhos: (init?.headers ?? {}) as Record<string, string>,
+    });
     const manipulador = api[`${metodo} ${caminhoUrl}`];
     if (manipulador) return manipulador(corpo);
     if (metodo === 'GET' && caminhoUrl === '/api/sessao') return erroApi(401, 'sem_sessao');
@@ -77,6 +91,7 @@ export function abrirTela(caminho: string, api: Record<string, Manipulador> = {}
     /** Caminho e busca atuais. */
     local: () => `${roteador.state.location.pathname}${roteador.state.location.search}`,
     tela: () => (roteador.state.matches.at(-1)?.route.handle as HandleTela | undefined)?.tela,
-    chamadasA: (metodo: string, caminhoApi: string) => chamadas.filter((c) => c.metodo === metodo && c.caminho === caminhoApi),
+    chamadasA: (metodo: string, caminhoApi: string) =>
+      chamadas.filter((c) => c.metodo === metodo && c.caminho === caminhoApi),
   };
 }

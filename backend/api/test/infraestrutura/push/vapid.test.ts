@@ -23,7 +23,10 @@ function b(texto: string): Uint8Array<ArrayBuffer> {
 
 /** Par novo no formato das variáveis: pública de 65 bytes e `d` de 32, em base64url. */
 async function parVapid(): Promise<{ publica: string; privada: string }> {
-  const par = (await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign', 'verify'])) as CryptoKeyPair;
+  const par = (await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, [
+    'sign',
+    'verify',
+  ])) as CryptoKeyPair;
   const jwk = (await crypto.subtle.exportKey('jwk', par.privateKey)) as JsonWebKey;
   const publica = new Uint8Array([0x04, ...b(jwk.x ?? ''), ...b(jwk.y ?? '')]);
   return { publica: paraBase64url(publica), privada: jwk.d ?? '' };
@@ -35,16 +38,21 @@ async function lerCabecalho(valor: string, publica: string) {
   expect(m).not.toBeNull();
   const [jwt, k] = [m?.[1] ?? '', m?.[2] ?? ''];
   const [h, c, s] = jwt.split('.');
-  const chave = await crypto.subtle.importKey('jwk', jwkP256(b(publica)), { name: 'ECDSA', namedCurve: 'P-256' }, false, [
-    'verify',
-  ]);
+  const chave = await crypto.subtle.importKey(
+    'jwk',
+    jwkP256(b(publica)),
+    { name: 'ECDSA', namedCurve: 'P-256' },
+    false,
+    ['verify'],
+  );
   const valido = await crypto.subtle.verify(
     { name: 'ECDSA', hash: 'SHA-256' },
     chave,
     b(s ?? ''),
     new TextEncoder().encode(`${h}.${c}`),
   );
-  const decodificar = (parte: string | undefined) => JSON.parse(new TextDecoder().decode(b(parte ?? ''))) as Record<string, unknown>;
+  const decodificar = (parte: string | undefined) =>
+    JSON.parse(new TextDecoder().decode(b(parte ?? ''))) as Record<string, unknown>;
   return { valido, k, cabecalho: decodificar(h), corpo: decodificar(c), assinatura: b(s ?? '') };
 }
 
@@ -52,7 +60,11 @@ describe('cabecalhoVapid', () => {
   it('NOT-27: o JWT verifica com a chave pública, com aud, exp ≤ 24 h e sub', async () => {
     const par = await parVapid();
     const chaves: ChavesVapid = { ...par, assunto: ASSUNTO };
-    const valor = await cabecalhoVapid('https://fcm.googleapis.com/fcm/send/abc?x=1#y', chaves, AGORA);
+    const valor = await cabecalhoVapid(
+      'https://fcm.googleapis.com/fcm/send/abc?x=1#y',
+      chaves,
+      AGORA,
+    );
     const lido = await lerCabecalho(valor, par.publica);
     expect(lido.valido).toBe(true);
     expect(lido.k).toBe(par.publica);
@@ -70,8 +82,18 @@ describe('cabecalhoVapid', () => {
     const par = await parVapid();
     const chaves: ChavesVapid = { ...par, assunto: ASSUNTO };
     const cache = novoCacheVapid();
-    const fcm1 = await cabecalhoVapid('https://fcm.googleapis.com/fcm/send/a', chaves, AGORA, cache);
-    const fcm2 = await cabecalhoVapid('https://fcm.googleapis.com/fcm/send/b', chaves, AGORA, cache);
+    const fcm1 = await cabecalhoVapid(
+      'https://fcm.googleapis.com/fcm/send/a',
+      chaves,
+      AGORA,
+      cache,
+    );
+    const fcm2 = await cabecalhoVapid(
+      'https://fcm.googleapis.com/fcm/send/b',
+      chaves,
+      AGORA,
+      cache,
+    );
     const apple = await cabecalhoVapid('https://web.push.apple.com/c', chaves, AGORA, cache);
     expect(fcm2).toBe(fcm1);
     expect((await lerCabecalho(apple, par.publica)).corpo.aud).toBe('https://web.push.apple.com');
@@ -82,16 +104,34 @@ describe('cabecalhoVapid', () => {
     const um = await parVapid();
     const outro = await parVapid();
     const chaves: ChavesVapid = { publica: um.publica, privada: outro.privada, assunto: ASSUNTO };
-    await expect(cabecalhoVapid('https://fcm.googleapis.com/x', chaves, AGORA)).rejects.toBeInstanceOf(ErroChavesVapid);
+    await expect(
+      cabecalhoVapid('https://fcm.googleapis.com/x', chaves, AGORA),
+    ).rejects.toBeInstanceOf(ErroChavesVapid);
   });
 
   it.each([
-    ['pública curta', (p: { publica: string; privada: string }) => ({ ...p, publica: p.publica.slice(0, 40), assunto: ASSUNTO })],
-    ['privada curta', (p: { publica: string; privada: string }) => ({ ...p, privada: p.privada.slice(0, 20), assunto: ASSUNTO })],
+    [
+      'pública curta',
+      (p: { publica: string; privada: string }) => ({
+        ...p,
+        publica: p.publica.slice(0, 40),
+        assunto: ASSUNTO,
+      }),
+    ],
+    [
+      'privada curta',
+      (p: { publica: string; privada: string }) => ({
+        ...p,
+        privada: p.privada.slice(0, 20),
+        assunto: ASSUNTO,
+      }),
+    ],
     ['assunto vazio', (p: { publica: string; privada: string }) => ({ ...p, assunto: ' ' })],
   ])('NOT-27: %s dá ErroChavesVapid', async (_caso, montar) => {
     const chaves = montar(await parVapid());
-    await expect(cabecalhoVapid('https://fcm.googleapis.com/x', chaves, AGORA)).rejects.toBeInstanceOf(ErroChavesVapid);
+    await expect(
+      cabecalhoVapid('https://fcm.googleapis.com/x', chaves, AGORA),
+    ).rejects.toBeInstanceOf(ErroChavesVapid);
   });
 });
 

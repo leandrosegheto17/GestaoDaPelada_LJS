@@ -1,5 +1,10 @@
 import { FORMATO_MES } from '@pelada/contrato/partidas';
-import { pdfPublico, rankingPublico, type PdfPublico, type RankingPublico } from '@pelada/contrato/publico';
+import {
+  pdfPublico,
+  rankingPublico,
+  type PdfPublico,
+  type RankingPublico,
+} from '@pelada/contrato/publico';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { useSearchParams } from 'react-router';

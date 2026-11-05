@@ -10,15 +10,18 @@
 // `inicio_pontuacao` seguem com a checagem `backend/scripts/checagens/escritores-periodo.ts` (GEL-83, GEL-111).
 
 const TABELA = /^periodos_ativos$/i;
-const ESCRITA_SQL = /\b(?:insert\s+into|update|merge\s+into)\s+(?:only\s+)?(?:"?\w+"?\.)?"?periodos_ativos\b/i;
+const ESCRITA_SQL =
+  /\b(?:insert\s+into|update|merge\s+into)\s+(?:only\s+)?(?:"?\w+"?\.)?"?periodos_ativos\b/i;
 const METODOS_DE_ESCRITA = new Set(['insertInto', 'updateTable', 'mergeInto']);
-const MENSAGEM = 'PAR-140: escrita em periodos_ativos fora de repositorios/jogadores.ts e das migrações.';
+const MENSAGEM =
+  'PAR-140: escrita em periodos_ativos fora de repositorios/jogadores.ts e das migrações.';
 
 /** Texto de uma expressão feita só de literais (`'periodos' + '_ativos'`), ou `undefined`. */
 function textoFixo(no) {
   if (!no) return undefined;
   if (no.type === 'Literal' && typeof no.value === 'string') return no.value;
-  if (no.type === 'TemplateLiteral' && no.expressions.length === 0) return no.quasis[0]?.value.cooked ?? undefined;
+  if (no.type === 'TemplateLiteral' && no.expressions.length === 0)
+    return no.quasis[0]?.value.cooked ?? undefined;
   if (no.type === 'BinaryExpression' && no.operator === '+') {
     const a = textoFixo(no.left);
     const b = textoFixo(no.right);
@@ -39,7 +42,10 @@ function metodoChamado(chamada) {
 const semEscritaPeriodo = {
   meta: {
     type: 'problem',
-    docs: { description: 'Só o repositório de jogadores e as migrações escrevem em periodos_ativos (PAR-140).' },
+    docs: {
+      description:
+        'Só o repositório de jogadores e as migrações escrevem em periodos_ativos (PAR-140).',
+    },
     schema: [],
   },
   create(context) {
@@ -47,7 +53,11 @@ const semEscritaPeriodo = {
     /** O nome da tabela como argumento de escrita do Kysely, ou guardado numa variável. */
     const conferirNome = (no) => {
       const pai = no.parent;
-      if (pai?.type === 'CallExpression' && pai.arguments[0] === no && METODOS_DE_ESCRITA.has(metodoChamado(pai) ?? '')) {
+      if (
+        pai?.type === 'CallExpression' &&
+        pai.arguments[0] === no &&
+        METODOS_DE_ESCRITA.has(metodoChamado(pai) ?? '')
+      ) {
         relatar(no);
         return;
       }
@@ -70,7 +80,8 @@ const semEscritaPeriodo = {
           return;
         }
         // `periodos_${x}`: o nome montado em tempo de execução.
-        if (no.expressions.length > 0 && /^periodos_?$/i.test(no.quasis[0]?.value.cooked ?? '')) relatar(no);
+        if (no.expressions.length > 0 && /^periodos_?$/i.test(no.quasis[0]?.value.cooked ?? ''))
+          relatar(no);
       },
       BinaryExpression(no) {
         if (no.operator !== '+') return;

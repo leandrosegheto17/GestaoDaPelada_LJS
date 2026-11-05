@@ -31,8 +31,14 @@ const corpo = (sobre: Record<string, unknown> = {}, chaves: Record<string, unkno
   ...sobre,
 });
 
-function campos(resultado: { success: boolean; error?: { issues: { path: PropertyKey[]; message: string }[] } }) {
-  return (resultado.error?.issues ?? []).map((i) => ({ campo: i.path.map(String).join('.'), mensagem: i.message }));
+function campos(resultado: {
+  success: boolean;
+  error?: { issues: { path: PropertyKey[]; message: string }[] };
+}) {
+  return (resultado.error?.issues ?? []).map((i) => ({
+    campo: i.path.map(String).join('.'),
+    mensagem: i.message,
+  }));
 }
 
 describe('base64url', () => {
@@ -82,7 +88,9 @@ describe('assinaturaPushCorpo: hosts', () => {
   });
 
   it('NOT-06: endpoint que não é texto recusado no campo', () => {
-    expect(campos(assinaturaPushCorpo.safeParse(corpo({ endpoint: 42 })))[0]?.campo).toBe('endpoint');
+    expect(campos(assinaturaPushCorpo.safeParse(corpo({ endpoint: 42 })))[0]?.campo).toBe(
+      'endpoint',
+    );
   });
 
   it('NOT-06: 1024 caracteres no limite é aceito', () => {
@@ -95,7 +103,9 @@ describe('assinaturaPushCorpo: hosts', () => {
   it('NOT-06: host extra (PUSH_HOSTS_DEV) só vale quando passado', () => {
     const endpoint = 'https://push-falso.localhost/x';
     expect(assinaturaPushCorpo.safeParse(corpo({ endpoint })).success).toBe(false);
-    expect(criarAssinaturaPushCorpo(['push-falso.localhost']).safeParse(corpo({ endpoint })).success).toBe(true);
+    expect(
+      criarAssinaturaPushCorpo(['push-falso.localhost']).safeParse(corpo({ endpoint })).success,
+    ).toBe(true);
   });
 });
 
@@ -103,14 +113,20 @@ describe('assinaturaPushCorpo: chaves', () => {
   it.each([
     ['p256dh comprimido de 33 bytes', { p256dh: paraBase64url(bytes(33, 0x02)) }, 'chaves.p256dh'],
     ['p256dh de 65 bytes sem 0x04', { p256dh: paraBase64url(bytes(65, 0x05)) }, 'chaves.p256dh'],
-    ['p256dh em base64 comum', { p256dh: btoa(String.fromCharCode(...bytes(65, 0x04))) + '+/' }, 'chaves.p256dh'],
+    [
+      'p256dh em base64 comum',
+      { p256dh: btoa(String.fromCharCode(...bytes(65, 0x04))) + '+/' },
+      'chaves.p256dh',
+    ],
     ['auth de 15 bytes', { auth: paraBase64url(bytes(15)) }, 'chaves.auth'],
     ['auth de 17 bytes', { auth: paraBase64url(bytes(17)) }, 'chaves.auth'],
     ['auth com preenchimento', { auth: `${AUTH}==` }, 'chaves.auth'],
     ['auth vazio', { auth: '' }, 'chaves.auth'],
     ['auth não texto', { auth: null }, 'chaves.auth'],
   ])('NOT-06: %s recusado no campo', (_caso, chaves, campo) => {
-    expect(campos(assinaturaPushCorpo.safeParse(corpo({}, chaves)))).toEqual([{ campo, mensagem: MENSAGEM_CHAVE }]);
+    expect(campos(assinaturaPushCorpo.safeParse(corpo({}, chaves)))).toEqual([
+      { campo, mensagem: MENSAGEM_CHAVE },
+    ]);
   });
 
   it('NOT-06: corpo válido sai igual', () => {
@@ -146,12 +162,14 @@ describe('cancelarPushCorpo', () => {
   });
 
   it('NOT-06: o p256dh a mais é recusado e o host fora da lista também', () => {
-    expect(cancelarPushCorpo.safeParse({ endpoint: ENDPOINT, chaves: { auth: AUTH, p256dh: P256DH } }).success).toBe(
-      false,
-    );
-    expect(cancelarPushCorpo.safeParse({ endpoint: 'https://exemplo.com/x', chaves: { auth: AUTH } }).success).toBe(
-      false,
-    );
+    expect(
+      cancelarPushCorpo.safeParse({ endpoint: ENDPOINT, chaves: { auth: AUTH, p256dh: P256DH } })
+        .success,
+    ).toBe(false);
+    expect(
+      cancelarPushCorpo.safeParse({ endpoint: 'https://exemplo.com/x', chaves: { auth: AUTH } })
+        .success,
+    ).toBe(false);
   });
 });
 
@@ -164,7 +182,11 @@ describe('códigos de erro', () => {
 
 describe('PUSH_HOSTS_DEV (T27)', () => {
   it('NOT-63: sem PUSH_HOSTS_DEV, localhost é recusado, com http ou https e com ou sem porta', () => {
-    for (const endpoint of ['http://localhost:8790/push/a', 'https://localhost/push/a', 'http://127.0.0.1:8790/push/a']) {
+    for (const endpoint of [
+      'http://localhost:8790/push/a',
+      'https://localhost/push/a',
+      'http://127.0.0.1:8790/push/a',
+    ]) {
       expect(endpointPushAceito(endpoint), endpoint).toBe(false);
       expect(endpointPushAceito(endpoint, hostsPushDev(undefined)), endpoint).toBe(false);
       expect(endpointPushAceito(endpoint, hostsPushDev('')), endpoint).toBe(false);
@@ -182,7 +204,9 @@ describe('PUSH_HOSTS_DEV (T27)', () => {
   });
 
   it('NOT-63: aceita só em localhost: outro host na variável é ignorado', () => {
-    const extras = hostsPushDev('mal.example:8790,mal.example,127.0.0.1:8790,localhost.mal.example');
+    const extras = hostsPushDev(
+      'mal.example:8790,mal.example,127.0.0.1:8790,localhost.mal.example',
+    );
     expect(extras).toEqual([]);
     for (const endpoint of [
       'http://mal.example:8790/x',
@@ -190,9 +214,14 @@ describe('PUSH_HOSTS_DEV (T27)', () => {
       'http://127.0.0.1:8790/x',
       'https://localhost.mal.example/x',
     ]) {
-      expect(endpointPushAceito(endpoint, ['mal.example:8790', 'mal.example', '127.0.0.1:8790', 'localhost.mal.example'])).toBe(
-        false,
-      );
+      expect(
+        endpointPushAceito(endpoint, [
+          'mal.example:8790',
+          'mal.example',
+          '127.0.0.1:8790',
+          'localhost.mal.example',
+        ]),
+      ).toBe(false);
     }
   });
 

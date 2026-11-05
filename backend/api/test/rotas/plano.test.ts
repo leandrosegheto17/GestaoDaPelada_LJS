@@ -36,20 +36,28 @@ async function sessao(conta: string): Promise<string> {
   return token;
 }
 
-async function lerPlano(grupo: string, conta: string, agora = '2026-11-05T15:00:00Z'): Promise<Response> {
+async function lerPlano(
+  grupo: string,
+  conta: string,
+  agora = '2026-11-05T15:00:00Z',
+): Promise<Response> {
   const headers = new Headers({ cookie: `${NOME_COOKIE_SESSAO}=${await sessao(conta)}` });
   const ctx = contextoFalso();
-  const r = await app(agora).request(`/api/grupos/${grupo}/plano`, { method: 'GET', headers }, envAcesso(aberto.url), ctx);
+  const r = await app(agora).request(
+    `/api/grupos/${grupo}/plano`,
+    { method: 'GET', headers },
+    envAcesso(aberto.url),
+    ctx,
+  );
   await ctx.esperar();
   return r;
 }
 
 async function situacao(s: string, t: string | null): Promise<void> {
-  await aberto.db.query('UPDATE grupos SET situacao_comercial = $2, trial_inicio = $3::date WHERE id = $1', [
-    aberto.cenario.grupoG,
-    s,
-    t,
-  ]);
+  await aberto.db.query(
+    'UPDATE grupos SET situacao_comercial = $2, trial_inicio = $3::date WHERE id = $1',
+    [aberto.cenario.grupoG, s, t],
+  );
 }
 
 beforeAll(async () => {
@@ -100,7 +108,10 @@ describe('GET …/plano', () => {
     const { cenario } = aberto;
     const r = await lerPlano(cenario.grupoG, cenario.contaO);
     expect(r.status).toBe(200);
-    expect(planoResposta.parse(await r.json())).toMatchObject({ plano: 'trial', podeAssinar: false });
+    expect(planoResposta.parse(await r.json())).toMatchObject({
+      plano: 'trial',
+      podeAssinar: false,
+    });
   });
 
   it('PLA-08: no Free, limite 20, só partidas e ranking, sem trialFimEm', async () => {
@@ -140,8 +151,14 @@ describe('GET …/plano', () => {
        VALUES ($1, 'cus_t24', 'sub_t24_ativa', 990, 'ativa', 'https://sandbox.asaas.com/i/t24a', '2026-12-05', $2, now())`,
       [cenario.grupoG, cenario.contaC],
     );
-    const corpo = planoResposta.parse(await (await lerPlano(cenario.grupoG, cenario.contaC)).json());
-    expect(corpo).toMatchObject({ plano: 'pro', pagoAte: '2026-12-05', assinatura: { situacao: 'ativa', faturaUrl: null } });
+    const corpo = planoResposta.parse(
+      await (await lerPlano(cenario.grupoG, cenario.contaC)).json(),
+    );
+    expect(corpo).toMatchObject({
+      plano: 'pro',
+      pagoAte: '2026-12-05',
+      assinatura: { situacao: 'ativa', faturaUrl: null },
+    });
   });
 
   it('PLA-09: conta B recebe 404 igual ao de grupo inexistente', async () => {

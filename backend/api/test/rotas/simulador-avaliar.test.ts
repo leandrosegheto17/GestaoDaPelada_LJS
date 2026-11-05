@@ -13,7 +13,12 @@ import { NOME_COOKIE_SESSAO } from '../../src/infraestrutura/sessao/cookie.ts';
 import { gerarToken } from '../../src/infraestrutura/sessao/token.ts';
 import { envAcesso } from '../acesso/apoio.ts';
 import { contextoFalso, fabricaComoApp } from '../db/requisicao.ts';
-import { abrirCenarioGrupos, arquivar, reativar, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  arquivar,
+  reativar,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * `POST /api/grupos/:grupoId/simulador/avaliar` (T36 da simulador; SIM-62, SIM-63), com o app real como `pelada_app`
@@ -28,7 +33,10 @@ let aberto: CenarioGruposAberto;
 let ativos: string[] = [];
 
 const DATA = '2026-03-05';
-const app = criarApp({ fabricaBanco: fabricaComoApp().fabrica, relogio: relogioFixo('2026-03-03T15:00:00Z') });
+const app = criarApp({
+  fabricaBanco: fabricaComoApp().fabrica,
+  relogio: relogioFixo('2026-03-03T15:00:00Z'),
+});
 
 async function sessao(conta: string): Promise<string> {
   const { token, hash } = await gerarToken();
@@ -84,7 +92,8 @@ async function sugestao(): Promise<ResultadoDois> {
 
 async function contagens(): Promise<number[]> {
   const { db, cenario } = aberto;
-  const um = async (sql: string) => (await db.query<{ n: number }>(sql, [cenario.grupoG])).rows[0]?.n ?? -1;
+  const um = async (sql: string) =>
+    (await db.query<{ n: number }>(sql, [cenario.grupoG])).rows[0]?.n ?? -1;
   return [
     await um('SELECT count(*)::int AS n FROM escalacoes WHERE grupo_id = $1'),
     await um('SELECT count(*)::int AS n FROM eventos_uso WHERE grupo_id = $1'),
@@ -103,17 +112,15 @@ beforeAll(async () => {
       [cenario.grupoG, `Aval ${String(i).padStart(2, '0')}`, 1980 + i, i % 5, cenario.contaC],
     );
     const id = r.rows[0]!.id;
-    await db.query(`INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio) VALUES ($1, $2, '2026-01-01')`, [
-      id,
-      cenario.grupoG,
-    ]);
+    await db.query(
+      `INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio) VALUES ($1, $2, '2026-01-01')`,
+      [id, cenario.grupoG],
+    );
     // Nota na primeira habilidade do grupo: níveis diferentes entre os jogadores.
-    await db.query(`INSERT INTO notas (jogador_id, habilidade_id, grupo_id, valor) VALUES ($1, $2, $3, $4)`, [
-      id,
-      cenario.idsG.habilidade,
-      cenario.grupoG,
-      1 + (i % 10),
-    ]);
+    await db.query(
+      `INSERT INTO notas (jogador_id, habilidade_id, grupo_id, valor) VALUES ($1, $2, $3, $4)`,
+      [id, cenario.idsG.habilidade, cenario.grupoG, 1 + (i % 10)],
+    );
     novos.push(id);
   }
   ativos = [cenario.idsG.jogadorAtivo, cenario.idsG.jogadorHistorico, ...novos];
@@ -149,14 +156,22 @@ describe('POST …/simulador/avaliar', () => {
     expect(r.status).toBe(200);
     const a = avaliarResposta.parse(await r.json());
     if (a.formato !== 'dois_times') throw new Error('esperava 2 times');
-    expect(a.times[0].titulares.map((j) => j.id)).toEqual(composicao.times[0]!.titulares.map((j) => j.id));
-    expect(a.times[1].titulares.map((j) => j.id)).toEqual(composicao.times[1]!.titulares.map((j) => j.id));
+    expect(a.times[0].titulares.map((j) => j.id)).toEqual(
+      composicao.times[0]!.titulares.map((j) => j.id),
+    );
+    expect(a.times[1].titulares.map((j) => j.id)).toEqual(
+      composicao.times[1]!.titulares.map((j) => j.id),
+    );
     expect(a.naoEntra.map((j) => j.id)).toEqual(composicao.naoEntra);
     expect(a.times[0].indicadores.jogadores1oTempo).toBe(6);
     expect(a.times[1].indicadores.jogadores1oTempo).toBe(8);
     const nivelDoMovido = s.times[0].titulares.find((j) => j.id === movido.id)?.nivel ?? 0;
-    expect(a.times[0].indicadores.nivelSoma1oTempo).toBe(s.times[0].indicadores.nivelSoma1oTempo - nivelDoMovido);
-    expect(a.times[1].indicadores.nivelSoma1oTempo).toBe(s.times[1].indicadores.nivelSoma1oTempo + nivelDoMovido);
+    expect(a.times[0].indicadores.nivelSoma1oTempo).toBe(
+      s.times[0].indicadores.nivelSoma1oTempo - nivelDoMovido,
+    );
+    expect(a.times[1].indicadores.nivelSoma1oTempo).toBe(
+      s.times[1].indicadores.nivelSoma1oTempo + nivelDoMovido,
+    );
     expect(await contagens()).toEqual(antes);
   });
 
@@ -165,7 +180,9 @@ describe('POST …/simulador/avaliar', () => {
     composicao.naoEntra.push(composicao.times[0]!.titulares[0]!.id);
     const r = await chamar('avaliar', { ...entrada(), composicao });
     expect(r.status).toBe(422);
-    expect(await r.json()).toMatchObject({ mensagens: { composicao: MENSAGEM_REPETIDO_NA_COMPOSICAO } });
+    expect(await r.json()).toMatchObject({
+      mensagens: { composicao: MENSAGEM_REPETIDO_NA_COMPOSICAO },
+    });
   });
 
   it('SIM-63: jogador fora dos aptos na composição dá 422 no campo composicao', async () => {

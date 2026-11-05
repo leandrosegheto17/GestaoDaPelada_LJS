@@ -70,7 +70,8 @@ async function listarDaConta(db: Db): Promise<GruposDaConta> {
       JOIN vinculos_admin v ON v.grupo_id = g.id AND v.conta_id = app_conta_id()
      WHERE g.arquivado_em IS NULL OR g.criado_por = app_conta_id()
      ORDER BY g.nome, g.id`.execute(db);
-  const item = ({ arquivado: _arquivado, ...g }: ItemGrupo & { arquivado: boolean }): ItemGrupo => g;
+  const item = ({ arquivado: _arquivado, ...g }: ItemGrupo & { arquivado: boolean }): ItemGrupo =>
+    g;
   return {
     ativos: r.rows.filter((g) => !g.arquivado).map(item),
     arquivados: r.rows.filter((g) => g.arquivado).map(item),
@@ -117,7 +118,11 @@ export type DetalheGrupoComInicio = DetalheGrupo & DadosDoInicio;
  */
 async function ler(db: Db, grupoId: string): Promise<DetalheGrupo | null>;
 async function ler(db: Db, grupoId: string, hoje: string): Promise<DetalheGrupoComInicio | null>;
-async function ler(db: Db, grupoId: string, hoje?: string): Promise<DetalheGrupo | DetalheGrupoComInicio | null> {
+async function ler(
+  db: Db,
+  grupoId: string,
+  hoje?: string,
+): Promise<DetalheGrupo | DetalheGrupoComInicio | null> {
   const base = await lerBase(db, grupoId);
   if (!base || hoje === undefined) return base;
   return { ...base, ...(await dadosDoInicio(db, grupoId, base.diaSemana, hoje)) };
@@ -138,7 +143,12 @@ interface LinhaPesosInicio {
  * valores padrão (`pesosPadrao`) ou duas, mesmo iguais ao padrão (não é padrão, PAR-135); configuração com vigência
  * depois de hoje não conta como vigente. Todo grupo tem configuração (T21, T22): sem nenhuma até hoje, é erro.
  */
-async function dadosDoInicio(db: Db, grupoId: string, dia: DiaSemana, hoje: string): Promise<DadosDoInicio> {
+async function dadosDoInicio(
+  db: Db,
+  grupoId: string,
+  dia: DiaSemana,
+  hoje: string,
+): Promise<DadosDoInicio> {
   const sugerida = dataSugeridaPartida(hoje, dia);
   const proximo = proximoDiaDeJogo(hoje, dia);
   const mes = mesDe(hoje);
@@ -183,11 +193,13 @@ async function dadosDoInicio(db: Db, grupoId: string, dia: DiaSemana, hoje: stri
 }
 
 async function lerBase(db: Db, grupoId: string): Promise<DetalheGrupo | null> {
-  const r = await sql<Omit<DetalheGrupo, 'jogadoresAtivos' | 'habilidades' | 'admins'> & {
-    jogadoresAtivos: string;
-    habilidades: string;
-    admins: string;
-  }>`
+  const r = await sql<
+    Omit<DetalheGrupo, 'jogadoresAtivos' | 'habilidades' | 'admins'> & {
+      jogadoresAtivos: string;
+      habilidades: string;
+      admins: string;
+    }
+  >`
     SELECT g.id, g.nome, g.slug, g.dia_semana AS "diaSemana", g.frequencia, to_char(g.horario, 'HH24:MI') AS horario,
            g.criado_por = app_conta_id() AS "souCriador",
            g.arquivado_em IS NOT NULL AS arquivado,

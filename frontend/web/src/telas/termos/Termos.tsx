@@ -1,5 +1,11 @@
 import { TERMOS_VERSAO } from '@pelada/contrato/acesso';
-import { DIAS_DE_TRIAL, formatarPreco, LIMITE_GRUPOS_FREE, LIMITE_JOGADORES_FREE, PRECO_PRO_CENTAVOS } from '@pelada/dominio';
+import {
+  DIAS_DE_TRIAL,
+  formatarPreco,
+  LIMITE_GRUPOS_FREE,
+  LIMITE_JOGADORES_FREE,
+  PRECO_PRO_CENTAVOS,
+} from '@pelada/dominio';
 import { Casca } from '../../componentes/Casca.tsx';
 import { LinkVoltar } from '../../componentes/LinkVoltar.tsx';
 import estilos from '../acesso.module.css';
@@ -52,18 +58,23 @@ export const SECOES_TERMOS: readonly Secao[] = [
     texto:
       'Você é responsável pelos dados que cadastra e por manter sua senha em segredo. Os jogadores do grupo não precisam de conta.',
   },
-  { titulo: 'Encerramento', texto: `Você pode excluir sua conta a qualquer momento em Minha conta. ${TEXTO_CANCELAMENTO}` },
+  {
+    titulo: 'Encerramento',
+    texto: `Você pode excluir sua conta a qualquer momento em Minha conta. ${TEXTO_CANCELAMENTO}`,
+  },
 ];
 
 export const SECOES_PRIVACIDADE: readonly Secao[] = [
   {
     titulo: 'O que guardamos',
     texto:
-      'Do jogador: apelido, ano de nascimento, posição, telefone (opcional), data de entrada no grupo, presenças e as notas de habilidade dadas pelos admins. Dos admins: nome, e-mail, a senha guardada de um jeito que ninguém consegue ler, e a data em que aceitou estes termos. Do uso do app: contagens anônimas, sem nome, telefone nem localização. ' + TEXTO_PAGAMENTO,
+      'Do jogador: apelido, ano de nascimento, posição, telefone (opcional), data de entrada no grupo, presenças e as notas de habilidade dadas pelos admins. Dos admins: nome, e-mail, a senha guardada de um jeito que ninguém consegue ler, e a data em que aceitou estes termos. Do uso do app: contagens anônimas, sem nome, telefone nem localização. ' +
+      TEXTO_PAGAMENTO,
   },
   {
     titulo: 'E-mails',
-    texto: 'Enviamos e-mails só para confirmar a conta, recuperar a senha e entregar convites de admin.',
+    texto:
+      'Enviamos e-mails só para confirmar a conta, recuperar a senha e entregar convites de admin.',
   },
   {
     titulo: 'Quem vê',
@@ -77,13 +88,23 @@ export const SECOES_PRIVACIDADE: readonly Secao[] = [
   },
 ];
 
-function PaginaTexto({ titulo, voltar, secoes }: { titulo: string; voltar: string; secoes: readonly Secao[] }) {
+function PaginaTexto({
+  titulo,
+  voltar,
+  secoes,
+}: {
+  titulo: string;
+  voltar: string;
+  secoes: readonly Secao[];
+}) {
   return (
     <Casca estreita>
       <LinkVoltar para={voltar}>Voltar</LinkVoltar>
       <h1 className={estilos['titulo-pagina']}>{titulo}</h1>
       <p className={estilos['acima-2']}>
-        {TEXTO_EM_RASCUNHO ? <span className={`${estilos.selo} ${estilos['selo--atencao']}`}>{SELO_RASCUNHO}</span> : null}{' '}
+        {TEXTO_EM_RASCUNHO ? (
+          <span className={`${estilos.selo} ${estilos['selo--atencao']}`}>{SELO_RASCUNHO}</span>
+        ) : null}{' '}
         <span className={estilos['texto-sec']}>Versão {TERMOS_VERSAO}</span>
       </p>
       {secoes.map((s) => (

@@ -244,7 +244,10 @@ export async function conteudo(db: pg.Client, grupo: string): Promise<Record<str
 /** Ids de uma linha do grupo em jogadores, habilidades e partidas (para os INSERTs com chave estrangeira). */
 export async function idsDoGrupo(db: pg.Client, grupo: string): Promise<IdsDoGrupo> {
   const primeiro = async (tabela: string): Promise<string> => {
-    const r = await db.query<{ id: string }>(`SELECT id FROM ${ident(db, tabela)} WHERE grupo_id = $1 LIMIT 1`, [grupo]);
+    const r = await db.query<{ id: string }>(
+      `SELECT id FROM ${ident(db, tabela)} WHERE grupo_id = $1 LIMIT 1`,
+      [grupo],
+    );
     const id = r.rows[0]?.id;
     if (!id) throw new Error(`Cenário sem linha em ${tabela}`);
     return id;

@@ -1,5 +1,12 @@
 import { randomBytes } from 'node:crypto';
-import { copyFileSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  copyFileSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { lerEsquema, OPCOES_REFERENCIA } from '@pelada/api/esquema';
@@ -26,7 +33,9 @@ let pastaCompleta: string;
 let referencia: string[];
 
 beforeAll(async () => {
-  const nomes = readdirSync(PASTA_MIGRACOES).filter((n) => n.endsWith('.sql')).sort();
+  const nomes = readdirSync(PASTA_MIGRACOES)
+    .filter((n) => n.endsWith('.sql'))
+    .sort();
   const primeira = nomes.find((n) => n.endsWith(PRIMEIRA_DA_FEATURE));
   expect(primeira, 'a migração da T10 existe').toBeDefined();
   pastaAntes = mkdtempSync(join(tmpdir(), 'migracoes-antes-planos-'));
@@ -92,7 +101,11 @@ async function semear(url: string): Promise<Semeado> {
       );
       return id;
     };
-    return { teste: await grupo(SLUG_TESTE, 'uso_proprio'), outro: await grupo('outra-pelada', 'uso_proprio'), ativo: await grupo('pelada-ativa', 'ativo') };
+    return {
+      teste: await grupo(SLUG_TESTE, 'uso_proprio'),
+      outro: await grupo('outra-pelada', 'uso_proprio'),
+      ativo: await grupo('pelada-ativa', 'ativo'),
+    };
   });
 }
 
@@ -116,9 +129,21 @@ describe('ensaio das migrações da planos-e-cobranca', () => {
       expect(r.planos.slugGrupoTeste).toBe(SLUG_TESTE);
       expect(r.planos.problemas).toEqual([]);
       const porId = Object.fromEntries(r.planos.grupos.map((g) => [g.grupoId, g]));
-      expect(porId[s.teste]).toMatchObject({ antes: 'uso_proprio', depois: 'uso_proprio', trialInicioDepois: null });
-      expect(porId[s.outro]).toMatchObject({ antes: 'uso_proprio', depois: 'trial', trialInicioDepois: r.planos.hoje });
-      expect(porId[s.ativo]).toMatchObject({ antes: 'ativo', depois: 'ativo', trialInicioDepois: null });
+      expect(porId[s.teste]).toMatchObject({
+        antes: 'uso_proprio',
+        depois: 'uso_proprio',
+        trialInicioDepois: null,
+      });
+      expect(porId[s.outro]).toMatchObject({
+        antes: 'uso_proprio',
+        depois: 'trial',
+        trialInicioDepois: r.planos.hoje,
+      });
+      expect(porId[s.ativo]).toMatchObject({
+        antes: 'ativo',
+        depois: 'ativo',
+        trialInicioDepois: null,
+      });
       expect(r.segundaExecucao).toEqual([]);
     });
   });
@@ -141,20 +166,38 @@ describe('conferirPlanos', () => {
   });
 
   it('PLA-11: uso_proprio que fica uso_proprio sem ser o de teste é problema', () => {
-    const antes = new Map([['1', g('teste', 'uso_proprio')], ['2', g('outro', 'uso_proprio')]]);
-    const depois = new Map([['1', g('teste', 'uso_proprio')], ['2', g('outro', 'uso_proprio')]]);
+    const antes = new Map([
+      ['1', g('teste', 'uso_proprio')],
+      ['2', g('outro', 'uso_proprio')],
+    ]);
+    const depois = new Map([
+      ['1', g('teste', 'uso_proprio')],
+      ['2', g('outro', 'uso_proprio')],
+    ]);
     expect(conferirPlanos(antes, depois, 'teste', '2026-11-05').problemas).toHaveLength(1);
   });
 
   it('PLA-11: trial com outra data é problema', () => {
-    const antes = new Map([['1', g('teste', 'uso_proprio')], ['2', g('outro', 'uso_proprio')]]);
-    const depois = new Map([['1', g('teste', 'uso_proprio')], ['2', g('outro', 'trial', '2026-11-04')]]);
+    const antes = new Map([
+      ['1', g('teste', 'uso_proprio')],
+      ['2', g('outro', 'uso_proprio')],
+    ]);
+    const depois = new Map([
+      ['1', g('teste', 'uso_proprio')],
+      ['2', g('outro', 'trial', '2026-11-04')],
+    ]);
     expect(conferirPlanos(antes, depois, 'teste', '2026-11-05').problemas).toHaveLength(1);
   });
 
   it('PLA-11: situação que não era uso_proprio e muda é problema', () => {
-    const antes = new Map([['1', g('teste', 'uso_proprio')], ['2', g('ativa', 'ativo')]]);
-    const depois = new Map([['1', g('teste', 'uso_proprio')], ['2', g('ativa', 'trial', '2026-11-05')]]);
+    const antes = new Map([
+      ['1', g('teste', 'uso_proprio')],
+      ['2', g('ativa', 'ativo')],
+    ]);
+    const depois = new Map([
+      ['1', g('teste', 'uso_proprio')],
+      ['2', g('ativa', 'trial', '2026-11-05')],
+    ]);
     expect(conferirPlanos(antes, depois, 'teste', '2026-11-05').problemas).toHaveLength(1);
   });
 
@@ -173,8 +216,16 @@ describe('conferirPlanos', () => {
   });
 
   it('PLA-11: o caso certo não tem problema', () => {
-    const antes = new Map([['1', g('teste', 'uso_proprio')], ['2', g('outro', 'uso_proprio')], ['3', g('ativa', 'ativo')]]);
-    const depois = new Map([['1', g('teste', 'uso_proprio')], ['2', g('outro', 'trial', '2026-11-05')], ['3', g('ativa', 'ativo')]]);
+    const antes = new Map([
+      ['1', g('teste', 'uso_proprio')],
+      ['2', g('outro', 'uso_proprio')],
+      ['3', g('ativa', 'ativo')],
+    ]);
+    const depois = new Map([
+      ['1', g('teste', 'uso_proprio')],
+      ['2', g('outro', 'trial', '2026-11-05')],
+      ['3', g('ativa', 'ativo')],
+    ]);
     expect(conferirPlanos(antes, depois, 'teste', '2026-11-05').problemas).toEqual([]);
   });
 });

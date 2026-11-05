@@ -1,4 +1,11 @@
-import { devices, expect, test, type APIRequestContext, type Browser, type Page } from '@playwright/test';
+import {
+  devices,
+  expect,
+  test,
+  type APIRequestContext,
+  type Browser,
+  type Page,
+} from '@playwright/test';
 import { URL_BASE } from '../playwright.config.ts';
 
 /**
@@ -17,7 +24,14 @@ import { URL_BASE } from '../playwright.config.ts';
 
 const SENHA = 'SenhaForte123';
 const CABECALHO = { 'X-Pelada': '1' };
-const HABILIDADES = ['Visão de Jogo', 'Passe', 'Preparo Físico', 'Drible', 'Chute', 'Desarme'] as const;
+const HABILIDADES = [
+  'Visão de Jogo',
+  'Passe',
+  'Preparo Físico',
+  'Drible',
+  'Chute',
+  'Desarme',
+] as const;
 
 function sufixo(): string {
   return `${Date.now()}${Math.floor(Math.random() * 1e4)}`;
@@ -50,7 +64,11 @@ interface MensagemDev {
   texto: string;
 }
 
-async function linkDoEmail(request: APIRequestContext, para: string, tipo: string): Promise<string> {
+async function linkDoEmail(
+  request: APIRequestContext,
+  para: string,
+  tipo: string,
+): Promise<string> {
   let link: string | undefined;
   await expect
     .poll(
@@ -105,7 +123,10 @@ async function contaNova(pagina: Page, nome: string, prefixo: string): Promise<s
   return email;
 }
 
-async function criarGrupoPelaApi(pagina: Page, nome: string): Promise<{ id: string; slug: string }> {
+async function criarGrupoPelaApi(
+  pagina: Page,
+  nome: string,
+): Promise<{ id: string; slug: string }> {
   const r = await pagina.request.post('/api/grupos', {
     headers: CABECALHO,
     data: { nome, diaSemana: 'quinta', frequencia: 'semanal', horario: '20:00' },
@@ -128,13 +149,18 @@ async function criarJogadorPelaApi(
   return ((await r.json()) as { id: string }).id;
 }
 
-async function habilidadesPelaApi(pagina: Page, grupoId: string): Promise<{ id: string; nome: string }[]> {
+async function habilidadesPelaApi(
+  pagina: Page,
+  grupoId: string,
+): Promise<{ id: string; nome: string }[]> {
   const r = await pagina.request.get(`/api/grupos/${grupoId}/habilidades`);
   expect(r.status()).toBe(200);
   return ((await r.json()) as { habilidades: { id: string; nome: string }[] }).habilidades;
 }
 
-test('J-11: conta nova cria o grupo e cadastra o primeiro jogador no celular', async ({ browser }) => {
+test('J-11: conta nova cria o grupo e cadastra o primeiro jogador no celular', async ({
+  browser,
+}) => {
   const inicio = Date.now();
   const pagina = await aparelho(browser, true);
   await contaNova(pagina, 'Jornada Onze', 'j11');
@@ -176,7 +202,9 @@ test('J-11: conta nova cria o grupo e cadastra o primeiro jogador no celular', a
   await expect(pagina.getByText(`Ativo desde ${naTela(hoje())}.`)).toBeVisible();
 
   await pagina.goto(`/app/grupos/${grupoId}/jogadores`);
-  await expect(pagina.getByRole('list', { name: 'Jogadores ativos' }).getByText('Toninho')).toBeVisible();
+  await expect(
+    pagina.getByRole('list', { name: 'Jogadores ativos' }).getByText('Toninho'),
+  ).toBeVisible();
 
   // GEL-35: o apelido repetido sem diferença de caixa é recusado no campo (GEL-118: a posição é do erros-campo.spec).
   await pagina.goto(`/app/grupos/${grupoId}/jogadores/novo`);
@@ -184,7 +212,9 @@ test('J-11: conta nova cria o grupo e cadastra o primeiro jogador no celular', a
   await pagina.getByLabel('Ano de nascimento').fill('1991');
   await pagina.getByLabel('Posição').selectOption('atacante');
   await pagina.getByRole('button', { name: 'Salvar' }).click();
-  await expect(pagina.getByText('Já existe um jogador com esse apelido neste grupo.').first()).toBeVisible();
+  await expect(
+    pagina.getByText('Já existe um jogador com esse apelido neste grupo.').first(),
+  ).toBeVisible();
   await expect(pagina.getByLabel('Apelido')).toHaveAttribute('aria-invalid', 'true');
   await expect(pagina).toHaveURL(/\/jogadores\/novo$/);
 
@@ -214,7 +244,9 @@ test('J-12: inativar, reativar e corrigir a saída de um jogador', async ({ brow
 
   await pagina.goto(`/app/grupos/${grupo.id}/jogadores`);
   await pagina.getByRole('tab', { name: /Inativos/ }).click();
-  await expect(pagina.getByRole('list', { name: 'Jogadores inativos' }).getByText('Beto')).toBeVisible();
+  await expect(
+    pagina.getByRole('list', { name: 'Jogadores inativos' }).getByText('Beto'),
+  ).toBeVisible();
 
   // GEL-54: reativar com a data de hoje; o início e a pontuação não mudam.
   await pagina.goto(ficha);
@@ -226,21 +258,33 @@ test('J-12: inativar, reativar e corrigir a saída de um jogador', async ({ brow
   await expect(periodos.getByRole('listitem')).toHaveCount(2);
 
   await pagina.goto(`/app/grupos/${grupo.id}/jogadores`);
-  await expect(pagina.getByRole('list', { name: 'Jogadores ativos' }).getByText('Beto')).toBeVisible();
+  await expect(
+    pagina.getByRole('list', { name: 'Jogadores ativos' }).getByText('Beto'),
+  ).toBeVisible();
 
   // GEL-59 a GEL-61: corrigir a saída do primeiro período para um dia antes.
   await pagina.goto(ficha);
-  await periodos.getByRole('listitem').first().getByRole('button', { name: 'Corrigir datas' }).click();
+  await periodos
+    .getByRole('listitem')
+    .first()
+    .getByRole('button', { name: 'Corrigir datas' })
+    .click();
   const corrigir = pagina.getByRole('dialog', { name: 'Corrigir datas' });
   await corrigir.getByLabel('Data de saída').fill(diasAntes(dataHoje, 1));
   await corrigir.getByRole('button', { name: 'Confirmar novas datas' }).click();
   await expect(pagina.getByText('Datas corrigidas.')).toBeVisible();
-  await expect(periodos.getByRole('listitem').first()).toContainText(naTela(diasAntes(dataHoje, 1)));
+  await expect(periodos.getByRole('listitem').first()).toContainText(
+    naTela(diasAntes(dataHoje, 1)),
+  );
 
   // O passo 4 da J-12 (saída antes de uma presença) precisa de partidas, que nascem na feature 4
   // (partidas-e-ranking); a recusa pela presença é provada lá. Aqui fica a recusa pela ordem dos períodos:
   // a saída do primeiro período não pode passar do retorno seguinte.
-  await periodos.getByRole('listitem').first().getByRole('button', { name: 'Corrigir datas' }).click();
+  await periodos
+    .getByRole('listitem')
+    .first()
+    .getByRole('button', { name: 'Corrigir datas' })
+    .click();
   const depois = pagina.getByRole('dialog', { name: 'Corrigir datas' });
   await depois.getByLabel('Data de saída').fill(diasAntes(dataHoje, -1));
   await depois.getByRole('button', { name: 'Confirmar novas datas' }).click();
@@ -254,12 +298,16 @@ test('J-12: inativar, reativar e corrigir a saída de um jogador', async ({ brow
   const alterar = pagina.getByRole('dialog', { name: 'Alterar data de início' });
   await alterar.getByLabel('Data de início').fill(novoInicio);
   await alterar.getByRole('button', { name: 'Confirmar nova data' }).click();
-  await expect(pagina.getByText(`Data de início alterada para ${naTela(novoInicio)}.`)).toBeVisible();
+  await expect(
+    pagina.getByText(`Data de início alterada para ${naTela(novoInicio)}.`),
+  ).toBeVisible();
   await expect(periodos.getByRole('listitem').first()).toContainText(naTela(novoInicio));
   await pagina.context().close();
 });
 
-test('J-13: notas nas 6 habilidades mostram "Nível 6,8"; excluir uma habilidade recalcula', async ({ browser }) => {
+test('J-13: notas nas 6 habilidades mostram "Nível 6,8"; excluir uma habilidade recalcula', async ({
+  browser,
+}) => {
   const pagina = await aparelho(browser);
   await contaNova(pagina, 'Jornada Treze', 'j13');
   const grupo = await criarGrupoPelaApi(pagina, `Pelada Treze ${sufixo()}`);
@@ -283,7 +331,9 @@ test('J-13: notas nas 6 habilidades mostram "Nível 6,8"; excluir uma habilidade
   await pagina.goto(`/app/grupos/${grupo.id}/habilidades`);
   const drible = pagina.getByLabel('Nome da habilidade 4');
   await expect(drible).toHaveValue('Drible');
-  const renomeou = pagina.waitForResponse((r) => r.request().method() !== 'GET' && r.url().includes('/habilidades/'));
+  const renomeou = pagina.waitForResponse(
+    (r) => r.request().method() !== 'GET' && r.url().includes('/habilidades/'),
+  );
   await drible.fill('Drible curto');
   await drible.press('Enter');
   expect((await renomeou).ok()).toBe(true);
@@ -293,7 +343,9 @@ test('J-13: notas nas 6 habilidades mostram "Nível 6,8"; excluir uma habilidade
   const aviso = pagina.getByRole('alertdialog', { name: 'Excluir “Chute”?' });
   await aviso.getByRole('button', { name: 'Excluir habilidade' }).click();
   await expect(aviso).toHaveCount(0);
-  await expect(pagina.getByRole('list', { name: 'Habilidades' }).getByRole('listitem')).toHaveCount(5);
+  await expect(pagina.getByRole('list', { name: 'Habilidades' }).getByRole('listitem')).toHaveCount(
+    5,
+  );
 
   // Sem o 8 de Chute: 8, 7, 6, 7, 5 → 6,6 (GEL-101).
   await pagina.goto(fichaToninho);
@@ -303,10 +355,13 @@ test('J-13: notas nas 6 habilidades mostram "Nível 6,8"; excluir uma habilidade
 
   // GEL-98, GEL-102: apagar todas as notas de outro jogador → "sem nota".
   const [primeira] = await habilidadesPelaApi(pagina, grupo.id);
-  const r = await pagina.request.put(`/api/grupos/${grupo.id}/jogadores/${zeId}/notas/${primeira?.id ?? ''}`, {
-    headers: CABECALHO,
-    data: { nota: 9 },
-  });
+  const r = await pagina.request.put(
+    `/api/grupos/${grupo.id}/jogadores/${zeId}/notas/${primeira?.id ?? ''}`,
+    {
+      headers: CABECALHO,
+      data: { nota: 9 },
+    },
+  );
   expect(r.status()).toBe(200);
   await pagina.goto(`/app/grupos/${grupo.id}/jogadores/${zeId}`);
   await expect(pagina.getByText('Nível 9,0', { exact: true })).toBeVisible();
@@ -314,7 +369,9 @@ test('J-13: notas nas 6 habilidades mostram "Nível 6,8"; excluir uma habilidade
   await expect(pagina.getByText('sem nota', { exact: true })).toBeVisible();
   await pagina.goto(`/app/grupos/${grupo.id}/jogadores`);
   const ativos = pagina.getByRole('list', { name: 'Jogadores ativos' });
-  await expect(ativos.getByRole('listitem').filter({ hasText: 'Zé Sem Nota' })).toContainText('sem nota');
+  await expect(ativos.getByRole('listitem').filter({ hasText: 'Zé Sem Nota' })).toContainText(
+    'sem nota',
+  );
 
   // GEL-103: Toninho tem notas; a exclusão é recusada com "Inativar em vez disso".
   await pagina.goto(fichaToninho);
@@ -338,10 +395,13 @@ test('J-14: a convidada recebe recusa ao arquivar; a criadora arquiva e reativa;
   const [habilidade] = await habilidadesPelaApi(c, grupo.id);
   expect(
     (
-      await c.request.put(`/api/grupos/${grupo.id}/jogadores/${jogadorId}/notas/${habilidade?.id ?? ''}`, {
-        headers: CABECALHO,
-        data: { nota: 7 },
-      })
+      await c.request.put(
+        `/api/grupos/${grupo.id}/jogadores/${jogadorId}/notas/${habilidade?.id ?? ''}`,
+        {
+          headers: CABECALHO,
+          data: { nota: 7 },
+        },
+      )
     ).status(),
   ).toBe(200);
 
@@ -394,7 +454,9 @@ test('J-14: a convidada recebe recusa ao arquivar; a criadora arquiva e reativa;
   };
   const idC = admins.admins.find((a) => a.nome === 'Criadora Catorze')?.id ?? '';
   expect(idC).not.toBe('');
-  const remover = await o.request.delete(`/api/grupos/${grupo.id}/admins/${idC}`, { headers: CABECALHO });
+  const remover = await o.request.delete(`/api/grupos/${grupo.id}/admins/${idC}`, {
+    headers: CABECALHO,
+  });
   expect(remover.status()).toBe(409);
   expect(await remover.json()).toMatchObject({ codigo: 'criadora_nao_removivel' });
 
@@ -429,7 +491,10 @@ test('J-14: a convidada recebe recusa ao arquivar; a criadora arquiva e reativa;
 
   // GEL-28: C reativa.
   await c.getByRole('button', { name: `Reativar ${nome}` }).click();
-  await c.getByRole('dialog', { name: `Reativar “${nome}”?` }).getByRole('button', { name: 'Reativar grupo' }).click();
+  await c
+    .getByRole('dialog', { name: `Reativar “${nome}”?` })
+    .getByRole('button', { name: 'Reativar grupo' })
+    .click();
   await expect(c.getByText('Grupo reativado.')).toBeVisible();
   await expect(c.getByRole('list', { name: 'Seus grupos' }).getByText(nome)).toBeVisible();
 

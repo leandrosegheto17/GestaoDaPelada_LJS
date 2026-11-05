@@ -3,13 +3,21 @@ import type { MensagemAviso } from '@pelada/contrato/fila-avisos';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { Env } from '../../src/entrada/ambiente.ts';
 import { criarApp } from '../../src/entrada/app.ts';
-import { filaMemoria, type FilaAvisos, type FilaMemoria } from '../../src/infraestrutura/fila/avisos.ts';
+import {
+  filaMemoria,
+  type FilaAvisos,
+  type FilaMemoria,
+} from '../../src/infraestrutura/fila/avisos.ts';
 import { relogioFixo } from '../../src/infraestrutura/relogio.ts';
 import { NOME_COOKIE_SESSAO } from '../../src/infraestrutura/sessao/cookie.ts';
 import { gerarToken } from '../../src/infraestrutura/sessao/token.ts';
 import { envAcesso } from '../acesso/apoio.ts';
 import { contextoFalso, fabricaComoApp } from '../db/requisicao.ts';
-import { abrirCenarioGrupos, reativar, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  reativar,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * Gatilho do aviso de ranking nas partidas (notificacoes T21; NOT-20 a NOT-23), com o app real como `pelada_app`, o
@@ -35,7 +43,12 @@ async function sessao(conta: string): Promise<string> {
   return token;
 }
 
-async function pedir(metodo: string, caminho: string, corpo?: unknown, filaDoEnv: FilaAvisos = fila): Promise<Response> {
+async function pedir(
+  metodo: string,
+  caminho: string,
+  corpo?: unknown,
+  filaDoEnv: FilaAvisos = fila,
+): Promise<Response> {
   const headers = new Headers({
     'x-pelada': '1',
     'content-type': 'application/json',
@@ -45,7 +58,13 @@ async function pedir(metodo: string, caminho: string, corpo?: unknown, filaDoEnv
   const env: Env = envAcesso(aberto.url, { FILA_AVISOS: filaDoEnv });
   const r = await app.request(
     `/api/grupos/${aberto.cenario.grupoG}${caminho}`,
-    { method: metodo, headers, ...(corpo === undefined ? {} : { body: typeof corpo === 'string' ? corpo : JSON.stringify(corpo) }) },
+    {
+      method: metodo,
+      headers,
+      ...(corpo === undefined
+        ? {}
+        : { body: typeof corpo === 'string' ? corpo : JSON.stringify(corpo) }),
+    },
     env,
     ctx,
   );
@@ -54,11 +73,18 @@ async function pedir(metodo: string, caminho: string, corpo?: unknown, filaDoEnv
 }
 
 function corpoDaPartida(data: string) {
-  return { data, choveu: false, marcacoes: [{ jogadorId: aberto.cenario.idsG.jogadorAtivo, situacao: 'presente' }] };
+  return {
+    data,
+    choveu: false,
+    marcacoes: [{ jogadorId: aberto.cenario.idsG.jogadorAtivo, situacao: 'presente' }],
+  };
 }
 
 async function partidasNaData(data: string): Promise<number> {
-  const r = await aberto.db.query('SELECT 1 FROM partidas WHERE grupo_id = $1 AND data = $2', [aberto.cenario.grupoG, data]);
+  const r = await aberto.db.query('SELECT 1 FROM partidas WHERE grupo_id = $1 AND data = $2', [
+    aberto.cenario.grupoG,
+    data,
+  ]);
   return r.rowCount ?? 0;
 }
 
@@ -127,9 +153,15 @@ describe('aviso de ranking nas partidas', () => {
   });
 
   it('NOT-21: 422 de corpo inválido não enfileira, no POST e no PUT', async () => {
-    const semMarcacao = { data: DATA, choveu: false, marcacoes: [{ jogadorId: 'nao-e-uuid', situacao: 'presente' }] };
+    const semMarcacao = {
+      data: DATA,
+      choveu: false,
+      marcacoes: [{ jogadorId: 'nao-e-uuid', situacao: 'presente' }],
+    };
     expect((await pedir('POST', '/partidas', semMarcacao)).status).toBe(422);
-    expect((await pedir('PUT', `/partidas/${DATA_DO_CENARIO}`, corpoDaPartida(DATA))).status).toBe(422);
+    expect((await pedir('PUT', `/partidas/${DATA_DO_CENARIO}`, corpoDaPartida(DATA))).status).toBe(
+      422,
+    );
     expect((await pedir('POST', '/partidas', '{')).status).toBe(422);
     expect(fila.enviadas).toEqual([]);
     expect(await partidasNaData(DATA)).toBe(0);
@@ -143,7 +175,10 @@ describe('aviso de ranking nas partidas', () => {
     };
     const comFila = await pedir('POST', '/partidas', corpoDaPartida(DATA));
     const corpoComFila = await comFila.json();
-    await aberto.db.query('DELETE FROM partidas WHERE grupo_id = $1 AND data = $2', [aberto.cenario.grupoG, DATA]);
+    await aberto.db.query('DELETE FROM partidas WHERE grupo_id = $1 AND data = $2', [
+      aberto.cenario.grupoG,
+      DATA,
+    ]);
 
     const semFila = await pedir('POST', '/partidas', corpoDaPartida(DATA), quebrada);
     expect(semFila.status).toBe(201);

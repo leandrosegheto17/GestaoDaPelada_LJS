@@ -45,7 +45,17 @@ export function textoContagem(c: ContagemPartida): string {
 
 function IconeChuva() {
   return (
-    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true" focusable="false">
+    <svg
+      viewBox="0 0 24 24"
+      width="14"
+      height="14"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      aria-hidden="true"
+      focusable="false"
+    >
       <path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25" />
       <path d="M8 13v2M8 19v2M12 15v2M12 21v2M16 13v2M16 19v2" />
     </svg>
@@ -54,7 +64,18 @@ function IconeChuva() {
 
 function Seta({ direcao }: { direcao: 'anterior' | 'seguinte' }) {
   return (
-    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+    <svg
+      viewBox="0 0 24 24"
+      width="26"
+      height="26"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
       <polyline points={direcao === 'anterior' ? '15 18 9 12 15 6' : '9 18 15 12 9 6'} />
     </svg>
   );
@@ -89,7 +110,15 @@ function NavegacaoMes({ dados, aoIr }: { dados: PartidasDoMes; aoIr: (mes: strin
   );
 }
 
-function Mes({ dados, base, aoIr }: { dados: PartidasDoMes; base: string; aoIr: (mes: string) => void }) {
+function Mes({
+  dados,
+  base,
+  aoIr,
+}: {
+  dados: PartidasDoMes;
+  base: string;
+  aoIr: (mes: string) => void;
+}) {
   return (
     <>
       <NavegacaoMes dados={dados} aoIr={aoIr} />
@@ -137,11 +166,15 @@ export function PaginaPartidas() {
     if (consulta.isPending) return <EsqueletoLista linhas={3} />;
     if (consulta.isError) {
       const erro = consulta.error;
-      if (erro instanceof ErroApi && erro.status === 404) return <Faixa tipo="atencao">Grupo não encontrado.</Faixa>;
+      if (erro instanceof ErroApi && erro.status === 404)
+        return <Faixa tipo="atencao">Grupo não encontrado.</Faixa>;
       // Mês malformado ou futuro no endereço: a mensagem da API e o caminho de volta ao mês atual.
       if (erro instanceof ErroApi && erro.status === 422) {
         return (
-          <Faixa tipo="atencao" acao={<LinkBotao para={`${base}/partidas`}>Ir para o mês atual</LinkBotao>}>
+          <Faixa
+            tipo="atencao"
+            acao={<LinkBotao para={`${base}/partidas`}>Ir para o mês atual</LinkBotao>}
+          >
             {erro.message}
           </Faixa>
         );
@@ -152,7 +185,11 @@ export function PaginaPartidas() {
   }
 
   return (
-    <Casca grupo={{ nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' }} titulo="Partidas" ocupada={consulta.isPending}>
+    <Casca
+      grupo={{ nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' }}
+      titulo="Partidas"
+      ocupada={consulta.isPending}
+    >
       <LinkVoltar para={base}>Início</LinkVoltar>
       {aviso ? <Faixa tipo="sucesso">{aviso}</Faixa> : null}
       {conteudo()}

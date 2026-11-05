@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { anoNascimentoMaximo, calcularNivel, HABILIDADES_INICIAIS } from '../../src/elenco/nivel.ts';
+import {
+  anoNascimentoMaximo,
+  calcularNivel,
+  HABILIDADES_INICIAIS,
+} from '../../src/elenco/nivel.ts';
 
 describe('calcularNivel', () => {
   it('GEL-101: 8, 7, 6, 7, 8, 5 → 683', () => {
@@ -37,7 +41,14 @@ describe('calcularNivel', () => {
 
 describe('HABILIDADES_INICIAIS', () => {
   it('GEL-02: as 6 da spec, na ordem', () => {
-    expect(HABILIDADES_INICIAIS).toEqual(['Visão de Jogo', 'Passe', 'Preparo Físico', 'Drible', 'Chute', 'Desarme']);
+    expect(HABILIDADES_INICIAIS).toEqual([
+      'Visão de Jogo',
+      'Passe',
+      'Preparo Físico',
+      'Drible',
+      'Chute',
+      'Desarme',
+    ]);
   });
 });
 

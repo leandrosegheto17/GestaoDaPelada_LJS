@@ -23,7 +23,8 @@ import type { Db } from './tipos.ts';
  * vêm nas T38 a T41.
  */
 
-export type ResultadoCriarJogador = { resultado: 'ok'; id: string } | { resultado: 'apelido_repetido' };
+export type ResultadoCriarJogador =
+  { resultado: 'ok'; id: string } | { resultado: 'apelido_repetido' };
 
 /**
  * Cadastra o jogador (GEL-31): confere o apelido repetido sem caixa (GEL-35; o acento conta, como o índice
@@ -34,9 +35,16 @@ export type ResultadoCriarJogador = { resultado: 'ok'; id: string } | { resultad
  * A corrida de dois cadastros do mesmo apelido passa pela consulta e cai no índice único: o 23505 sobe e a rota o
  * traduz no mesmo 422 (`comUnicidade`, T20), não 500.
  */
-async function criar(db: Db, grupoId: string, dados: JogadorCorpo, hoje: string): Promise<ResultadoCriarJogador> {
+async function criar(
+  db: Db,
+  grupoId: string,
+  dados: JogadorCorpo,
+  hoje: string,
+): Promise<ResultadoCriarJogador> {
   const repetido = await sql<{ id: string }>`
-    SELECT id FROM jogadores WHERE grupo_id = ${grupoId} AND lower(apelido) = lower(${dados.apelido})`.execute(db);
+    SELECT id FROM jogadores WHERE grupo_id = ${grupoId} AND lower(apelido) = lower(${dados.apelido})`.execute(
+    db,
+  );
   if (repetido.rows.length > 0) return { resultado: 'apelido_repetido' };
 
   const entrada = dados.dataEntrada ?? hoje;
@@ -84,7 +92,11 @@ export interface EstadoDoJogador {
  * partida). A segunda escrita concorrente do mesmo jogador espera aqui e é validada sobre o resultado da primeira
  * (`GD:152`, GEL-110). Nulo quando o jogador não é do grupo (GEL-44).
  */
-async function travarParaPeriodo(db: Db, grupoId: string, id: string): Promise<EstadoDoJogador | null> {
+async function travarParaPeriodo(
+  db: Db,
+  grupoId: string,
+  id: string,
+): Promise<EstadoDoJogador | null> {
   return lerEstado(db, grupoId, id, true);
 }
 
@@ -96,7 +108,12 @@ async function lerParaPrevia(db: Db, grupoId: string, id: string): Promise<Estad
   return lerEstado(db, grupoId, id, false);
 }
 
-async function lerEstado(db: Db, grupoId: string, id: string, travar: boolean): Promise<EstadoDoJogador | null> {
+async function lerEstado(
+  db: Db,
+  grupoId: string,
+  id: string,
+  travar: boolean,
+): Promise<EstadoDoJogador | null> {
   const j = await sql<{ inicio_pontuacao: string | null }>`
     SELECT inicio_pontuacao::text AS inicio_pontuacao FROM jogadores
      WHERE grupo_id = ${grupoId} AND id = ${id}
@@ -113,7 +130,11 @@ async function lerEstado(db: Db, grupoId: string, id: string, travar: boolean): 
       JOIN partidas pt ON pt.id = p.partida_id AND pt.grupo_id = p.grupo_id
      WHERE p.grupo_id = ${grupoId} AND p.jogador_id = ${id}
      ORDER BY pt.data`.execute(db);
-  return { inicioPontuacao: linha.inicio_pontuacao, periodos: periodos.rows, presencas: presencas.rows };
+  return {
+    inicioPontuacao: linha.inicio_pontuacao,
+    periodos: periodos.rows,
+    presencas: presencas.rows,
+  };
 }
 
 /** Acumulado e posição do jogador antes e depois da escrita, na auditoria (PAR-122). */
@@ -186,7 +207,13 @@ function avaliar(estado: EstadoDoJogador, operacao: OperacaoPeriodo, hoje: strin
  * - jogador de outro grupo: `nao_encontrado`;
  * - erro depois do `UPDATE` (auditoria que falha): sobe, e a transação da requisição desfaz o período (GEL-109).
  */
-async function inativar(db: Db, grupoId: string, id: string, dados: DataCorpo, hoje: string): Promise<ResultadoPeriodo> {
+async function inativar(
+  db: Db,
+  grupoId: string,
+  id: string,
+  dados: DataCorpo,
+  hoje: string,
+): Promise<ResultadoPeriodo> {
   const estado = await travarParaPeriodo(db, grupoId, id);
   if (!estado) return { resultado: 'nao_encontrado' };
   const aberto = estado.periodos.find((p) => p.fim === null);
@@ -198,7 +225,9 @@ async function inativar(db: Db, grupoId: string, id: string, dados: DataCorpo, h
 
   await sql`
     UPDATE periodos_ativos SET fim = ${saida}::date
-     WHERE grupo_id = ${grupoId} AND jogador_id = ${id} AND id = ${aberto.id} AND fim IS NULL`.execute(db);
+     WHERE grupo_id = ${grupoId} AND jogador_id = ${id} AND id = ${aberto.id} AND fim IS NULL`.execute(
+    db,
+  );
   await auditoria.registrar(db, grupoId, {
     acao: 'jogador_inativado',
     entidade: 'jogador',
@@ -221,7 +250,13 @@ async function inativar(db: Db, grupoId: string, id: string, dados: DataCorpo, h
  * - jogador de outro grupo: `nao_encontrado`;
  * - erro depois do `INSERT`: sobe, e a transação da requisição desfaz o período (GEL-109).
  */
-async function reativar(db: Db, grupoId: string, id: string, dados: DataCorpo, hoje: string): Promise<ResultadoPeriodo> {
+async function reativar(
+  db: Db,
+  grupoId: string,
+  id: string,
+  dados: DataCorpo,
+  hoje: string,
+): Promise<ResultadoPeriodo> {
   const estado = await travarParaPeriodo(db, grupoId, id);
   if (!estado) return { resultado: 'nao_encontrado' };
   if (estado.periodos.some((p) => p.fim === null)) return { resultado: 'ja_ativo' };
@@ -272,7 +307,11 @@ async function corrigirPeriodo(
   const antes = estado.periodos[indice];
   if (!antes) return { resultado: 'nao_encontrado' };
 
-  const r = avaliar(estado, { tipo: 'corrigir', periodoId, saida: dados.saida, retorno: dados.retorno }, hoje);
+  const r = avaliar(
+    estado,
+    { tipo: 'corrigir', periodoId, saida: dados.saida, retorno: dados.retorno },
+    hoje,
+  );
   if (!r.ok) return { resultado: 'invalido', regra: r.regra, campo: r.campo, mensagem: r.mensagem };
   if (!r.alterado) return { resultado: 'ok', alterado: false };
 

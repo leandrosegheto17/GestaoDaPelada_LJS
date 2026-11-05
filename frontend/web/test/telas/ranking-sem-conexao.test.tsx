@@ -23,14 +23,28 @@ const rotas = () => [{ path: '/g/:slug', element: <PaginaRanking />, handle: { t
 
 function ranking(mes = '2026-10', extra: Record<string, unknown> = {}) {
   return {
-    grupo: { nome: 'Pelada de Quinta', slug: SLUG, diaSemana: 'quinta', frequencia: 'semanal', horario: '20:00' },
+    grupo: {
+      nome: 'Pelada de Quinta',
+      slug: SLUG,
+      diaSemana: 'quinta',
+      frequencia: 'semanal',
+      horario: '20:00',
+    },
     mes,
     hoje: '2026-10-22',
     geradoEm: '2026-10-16T01:30:00.000Z',
     navegacao: { mesAnterior: '2026-09', mesSeguinte: null },
     resumoMes: { partidas: 1, comChuva: 0 },
     partidas: [{ data: `${mes}-15`, choveu: false }],
-    linhas: [{ posicao: 1, apelido: 'Toninho', ptsInicial: 27, rodadas: [{ situacao: 'presente', pontos: 1 }], ptsFinal: 28 }],
+    linhas: [
+      {
+        posicao: 1,
+        apelido: 'Toninho',
+        ptsInicial: 27,
+        rodadas: [{ situacao: 'presente', pontos: 1 }],
+        ptsFinal: 28,
+      },
+    ],
     ...extra,
   };
 }
@@ -43,8 +57,12 @@ function guardar(mesPedido: string | undefined, dados = ranking()) {
 
 describe('com o ranking guardado', () => {
   it('PAR-149: geradoEm 2026-10-16T01:30Z mostra "atualizado em 15/10 22:30"', () => {
-    expect(textoAtualizadoEm('2026-10-16T01:30:00.000Z')).toBe('Sem conexão, atualizado em 15/10 22:30');
-    expect(textoAtualizadoEm('2026-10-22T21:40:00Z')).toBe('Sem conexão, atualizado em 22/10 18:40');
+    expect(textoAtualizadoEm('2026-10-16T01:30:00.000Z')).toBe(
+      'Sem conexão, atualizado em 15/10 22:30',
+    );
+    expect(textoAtualizadoEm('2026-10-22T21:40:00Z')).toBe(
+      'Sem conexão, atualizado em 22/10 18:40',
+    );
   });
 
   it('PAR-149: sem rede, mostra o guardado com a faixa e somente leitura (sem "Exportar PDF")', async () => {
@@ -78,7 +96,9 @@ describe('com o ranking guardado', () => {
   it('PAR-149: o guardado é o do mês pedido; outro mês guardado não serve', async () => {
     guardar('2026-09', ranking('2026-09'));
     abrirTela(`/g/${SLUG}?mes=2026-09`, { [API]: semRede }, rotas);
-    expect(await screen.findByRole('heading', { level: 2, name: 'setembro de 2026' })).toBeDefined();
+    expect(
+      await screen.findByRole('heading', { level: 2, name: 'setembro de 2026' }),
+    ).toBeDefined();
     expect(screen.getByText('Sem conexão, atualizado em 15/10 22:30')).toBeDefined();
     cleanup();
 
@@ -88,7 +108,11 @@ describe('com o ranking guardado', () => {
 
   it('PAR-149: erro do servidor (500) não usa o guardado', async () => {
     guardar(undefined);
-    abrirTela(`/g/${SLUG}`, { [API]: () => json(500, { erro: 'x', codigo: 'erro_interno' }) }, rotas);
+    abrirTela(
+      `/g/${SLUG}`,
+      { [API]: () => json(500, { erro: 'x', codigo: 'erro_interno' }) },
+      rotas,
+    );
     expect(await screen.findByText('Conecte-se para ver o ranking.')).toBeDefined();
     expect(screen.queryByText(/atualizado em/)).toBeNull();
   });
@@ -97,7 +121,9 @@ describe('com o ranking guardado', () => {
     guardar(undefined);
     const t = abrirTela(`/g/${SLUG}`, { [API]: semRede }, rotas);
     await screen.findByText('Sem conexão, atualizado em 15/10 22:30');
-    const engrenagem = within(screen.getByRole('banner')).getByRole('link', { name: 'Área do admin' });
+    const engrenagem = within(screen.getByRole('banner')).getByRole('link', {
+      name: 'Área do admin',
+    });
     const clique = new MouseEvent('click', { bubbles: true, cancelable: true });
     fireEvent(engrenagem, clique);
     expect(clique.defaultPrevented).toBe(true);
@@ -109,7 +135,10 @@ describe('com o ranking guardado', () => {
     abrirTela(`/g/${SLUG}`, { [API]: semRede }, rotas);
     await screen.findByText('Conecte-se para ver o ranking.');
     const clique = new MouseEvent('click', { bubbles: true, cancelable: true });
-    fireEvent(within(screen.getByRole('banner')).getByRole('link', { name: 'Área do admin' }), clique);
+    fireEvent(
+      within(screen.getByRole('banner')).getByRole('link', { name: 'Área do admin' }),
+      clique,
+    );
     expect(clique.defaultPrevented).toBe(true);
     expect(await screen.findByText('É preciso conexão para entrar.')).toBeDefined();
   });
@@ -118,7 +147,10 @@ describe('com o ranking guardado', () => {
     abrirTela(`/g/${SLUG}`, { [API]: () => json(200, ranking()) }, rotas);
     await screen.findByRole('heading', { level: 2, name: 'outubro de 2026' });
     const clique = new MouseEvent('click', { bubbles: true, cancelable: true });
-    fireEvent(within(screen.getByRole('banner')).getByRole('link', { name: 'Área do admin' }), clique);
+    fireEvent(
+      within(screen.getByRole('banner')).getByRole('link', { name: 'Área do admin' }),
+      clique,
+    );
     expect(screen.queryByText('É preciso conexão para entrar.')).toBeNull();
   });
 
@@ -133,7 +165,17 @@ describe('com o ranking guardado', () => {
   it('PAR-152: a rede respondendo troca pelos dados novos e o "atualizando…" some', async () => {
     guardar(undefined);
     let responder: (r: Response) => void = () => undefined;
-    const novo = ranking('2026-10', { linhas: [{ posicao: 1, apelido: 'Bigode', ptsInicial: 26, rodadas: [{ situacao: 'presente', pontos: 2 }], ptsFinal: 28 }] });
+    const novo = ranking('2026-10', {
+      linhas: [
+        {
+          posicao: 1,
+          apelido: 'Bigode',
+          ptsInicial: 26,
+          rodadas: [{ situacao: 'presente', pontos: 2 }],
+          ptsFinal: 28,
+        },
+      ],
+    });
     abrirTela(`/g/${SLUG}`, { [API]: () => new Promise<Response>((r) => (responder = r)) }, rotas);
     await screen.findByText('atualizando…');
     expect(screen.getByRole('rowheader', { name: 'Toninho' })).toBeDefined();
@@ -155,7 +197,10 @@ describe('sem guardado', () => {
   });
 
   it('PAR-151: guardado inválido conta como sem guardado', async () => {
-    window.localStorage.setItem(chaveRanking(SLUG, undefined), JSON.stringify(ranking('2026-10', { telefone: '1' })));
+    window.localStorage.setItem(
+      chaveRanking(SLUG, undefined),
+      JSON.stringify(ranking('2026-10', { telefone: '1' })),
+    );
     abrirTela(`/g/${SLUG}`, { [API]: semRede }, rotas);
     expect(await screen.findByText('Conecte-se para ver o ranking.')).toBeDefined();
     expect(window.localStorage.getItem(chaveRanking(SLUG, undefined))).toBeNull();

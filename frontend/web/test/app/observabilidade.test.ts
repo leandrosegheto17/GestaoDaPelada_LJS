@@ -56,10 +56,17 @@ describe('Sentry no front', () => {
   });
 
   it('FUN-24: o beforeSend configurado tira cookie, authorization e e-mail do evento', () => {
-    const { beforeSend } = opcoesSentry({ VITE_SENTRY_DSN: 'https://chave@o0.ingest.sentry.io/0', VITE_VERSAO: 'v' });
+    const { beforeSend } = opcoesSentry({
+      VITE_SENTRY_DSN: 'https://chave@o0.ingest.sentry.io/0',
+      VITE_VERSAO: 'v',
+    });
     const limpo = beforeSend({
       message: 'falha para ana@exemplo.com',
-      request: { data: '{"senha":"x"}', cookies: { s: '1' }, headers: { Cookie: 'a=1', Authorization: 'Bearer t', Accept: '*/*' } },
+      request: {
+        data: '{"senha":"x"}',
+        cookies: { s: '1' },
+        headers: { Cookie: 'a=1', Authorization: 'Bearer t', Accept: '*/*' },
+      },
     });
     expect(limpo.message).not.toContain('ana@exemplo.com');
     expect(limpo.request).not.toHaveProperty('data');

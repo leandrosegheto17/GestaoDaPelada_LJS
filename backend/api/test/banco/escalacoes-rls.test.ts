@@ -49,7 +49,12 @@ async function fotografia(d: pg.Client, grupo: string): Promise<LinhaEscalacao[]
   return r.rows;
 }
 
-async function inserir(d: pg.Client, grupo: string, conta: string, data = '2026-02-07'): Promise<pg.QueryResult> {
+async function inserir(
+  d: pg.Client,
+  grupo: string,
+  conta: string,
+  data = '2026-02-07',
+): Promise<pg.QueryResult> {
   return d.query(
     `INSERT INTO escalacoes (grupo_id, data, formato, n, k, composicao, confirmada_por, confirmada_em)
      VALUES ($1, $2, 'dois_times', 7, 2, '{"times": [], "naoEntra": []}'::jsonb, $3, now())`,
@@ -83,7 +88,9 @@ describe('escalacoes: SELECT', () => {
 
   it('SIM-81: SELECT só com o slug público devolve zero linhas', async () => {
     const { cenario, db } = aberto;
-    const r = await comoApp(db, { slug: cenario.slugA }, (d) => d.query('SELECT id FROM escalacoes'));
+    const r = await comoApp(db, { slug: cenario.slugA }, (d) =>
+      d.query('SELECT id FROM escalacoes'),
+    );
     expect(r.rowCount).toBe(0);
   });
 });
@@ -98,7 +105,9 @@ describe('escalacoes: INSERT', () => {
 
   it('SIM-81: INSERT sem contexto é recusado', async () => {
     const { cenario, db } = aberto;
-    await expect(comoApp(db, {}, (d) => inserir(d, cenario.grupoA, cenario.contaA))).rejects.toMatchObject({
+    await expect(
+      comoApp(db, {}, (d) => inserir(d, cenario.grupoA, cenario.contaA)),
+    ).rejects.toMatchObject({
       code: '42501',
     });
   });
@@ -151,7 +160,10 @@ describe('escalacoes: UPDATE', () => {
     const { cenario, db } = aberto;
     await expect(
       comoApp(db, { conta: cenario.contaA }, (d) =>
-        d.query('UPDATE escalacoes SET grupo_id = $1 WHERE grupo_id = $2', [cenario.grupoB, cenario.grupoA]),
+        d.query('UPDATE escalacoes SET grupo_id = $1 WHERE grupo_id = $2', [
+          cenario.grupoB,
+          cenario.grupoA,
+        ]),
       ),
     ).rejects.toMatchObject({ code: '42501' });
   });
@@ -198,7 +210,9 @@ describe('escalacoes: restrições', () => {
   it('SIM-69: segunda escalação na mesma data do grupo dá 23505 em escalacoes_grupo_data', async () => {
     const { cenario, db } = aberto;
     await expect(
-      comoApp(db, { conta: cenario.contaA }, (d) => inserir(d, cenario.grupoA, cenario.contaA, '2026-01-03')),
+      comoApp(db, { conta: cenario.contaA }, (d) =>
+        inserir(d, cenario.grupoA, cenario.contaA, '2026-01-03'),
+      ),
     ).rejects.toMatchObject({ code: '23505', constraint: 'escalacoes_grupo_data' });
   });
 

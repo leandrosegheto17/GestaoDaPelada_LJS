@@ -29,7 +29,11 @@ export interface TimeDoisEntrada {
 
 /** A composição como a tela a envia (a forma do contrato, T22). */
 export type ComposicaoEntrada =
-  | { formato: 'dois_times'; times: readonly [TimeDoisEntrada, TimeDoisEntrada]; naoEntra: readonly string[] }
+  | {
+      formato: 'dois_times';
+      times: readonly [TimeDoisEntrada, TimeDoisEntrada];
+      naoEntra: readonly string[];
+    }
   | { formato: 'varios_times'; times: readonly (readonly string[])[] };
 
 export interface FalhaAvaliacao {
@@ -69,7 +73,10 @@ export function idsDaComposicaoEntrada(composicao: ComposicaoEntrada): string[] 
 }
 
 /** Repetido antes de fora dos aptos (SIM-63); nulo quando a composição passa. */
-export function problemaNaComposicao(ids: readonly string[], aptos: readonly { id: string }[]): string | null {
+export function problemaNaComposicao(
+  ids: readonly string[],
+  aptos: readonly { id: string }[],
+): string | null {
   if (new Set(ids).size !== ids.length) return MENSAGEM_REPETIDO_NA_COMPOSICAO;
   const permitidos = new Set(aptos.map((a) => a.id));
   return ids.every((id) => permitidos.has(id)) ? null : MENSAGEM_FORA_DOS_APTOS;
@@ -80,8 +87,13 @@ export function problemaNaComposicao(ids: readonly string[], aptos: readonly { i
  * [LACUNA] O legado recusava composição que não cobre todos os aptos ("A composição precisa incluir todos os aptos.");
  * a spec não pede. Vale a spec: quem falta só não entra na conta.
  */
-export function avaliar(entrada: EntradaSimulador, composicao: ComposicaoEntrada, historico: HistoricoSim): Avaliacao {
-  if (composicao.formato !== entrada.formato) throw new Error('formato da composição diferente do da entrada');
+export function avaliar(
+  entrada: EntradaSimulador,
+  composicao: ComposicaoEntrada,
+  historico: HistoricoSim,
+): Avaliacao {
+  if (composicao.formato !== entrada.formato)
+    throw new Error('formato da composição diferente do da entrada');
   const problema = problemaNaComposicao(idsDaComposicaoEntrada(composicao), entrada.aptos);
   if (problema) return { ok: false, campo: 'composicao', mensagem: problema };
 
@@ -93,7 +105,10 @@ export function avaliar(entrada: EntradaSimulador, composicao: ComposicaoEntrada
     const aptos = normalizarAptos('varios_times', entrada.aptos);
     const elenco = montarElenco(aptos, data);
     const times = composicao.times.map((t) => [...t]);
-    const incompleto = previa.valida && previa.formato === 'varios_times' && previa.tamanhoIncompleto > 0 ? times.length - 1 : null;
+    const incompleto =
+      previa.valida && previa.formato === 'varios_times' && previa.tamanhoIncompleto > 0
+        ? times.length - 1
+        : null;
     return {
       ok: true,
       formato: 'varios_times',
@@ -105,7 +120,11 @@ export function avaliar(entrada: EntradaSimulador, composicao: ComposicaoEntrada
     };
   }
 
-  const so1o = new Map(composicao.times.flatMap((t) => [...t.titulares, ...t.entram].map((j) => [j.id, j.so1oTempo] as const)));
+  const so1o = new Map(
+    composicao.times.flatMap((t) =>
+      [...t.titulares, ...t.entram].map((j) => [j.id, j.so1oTempo] as const),
+    ),
+  );
   const aptos: Apto[] = normalizarAptos('dois_times', entrada.aptos).map((a) => ({
     ...a,
     so1oTempo: so1o.get(a.id) ?? a.so1oTempo,
@@ -114,8 +133,14 @@ export function avaliar(entrada: EntradaSimulador, composicao: ComposicaoEntrada
   const posicoes = posicoesDe(ordemDePrioridade(aptos, historico, data));
   const comp: ComposicaoDois = {
     times: [
-      { titulares: composicao.times[0].titulares.map((j) => j.id), entram: composicao.times[0].entram.map((j) => j.id) },
-      { titulares: composicao.times[1].titulares.map((j) => j.id), entram: composicao.times[1].entram.map((j) => j.id) },
+      {
+        titulares: composicao.times[0].titulares.map((j) => j.id),
+        entram: composicao.times[0].entram.map((j) => j.id),
+      },
+      {
+        titulares: composicao.times[1].titulares.map((j) => j.id),
+        entram: composicao.times[1].entram.map((j) => j.id),
+      },
     ],
     naoEntra: [...composicao.naoEntra],
   };

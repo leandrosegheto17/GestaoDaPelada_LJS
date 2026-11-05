@@ -22,7 +22,8 @@ const DIA_HORA_SP = new Intl.DateTimeFormat('pt-BR', {
 /** "Sem conexão, atualizado em dd/mm hh:mm" do `geradoEm`, na hora de São Paulo (a mesma conta da tela). */
 function faixaDe(geradoEm: string): string {
   const partes = DIA_HORA_SP.formatToParts(new Date(geradoEm));
-  const v = (tipo: Intl.DateTimeFormatPartTypes) => partes.find((p) => p.type === tipo)?.value ?? '';
+  const v = (tipo: Intl.DateTimeFormatPartTypes) =>
+    partes.find((p) => p.type === tipo)?.value ?? '';
   return `Sem conexão, atualizado em ${v('day')}/${v('month')} ${v('hour')}:${v('minute')}`;
 }
 
@@ -35,7 +36,9 @@ async function abrirComRede(page: Page): Promise<string> {
   await page.evaluate(async () => {
     await navigator.serviceWorker.ready;
   });
-  const resposta = page.waitForResponse((r) => new URL(r.url()).pathname === `/api/publico/${SLUG}/ranking` && r.status() === 200);
+  const resposta = page.waitForResponse(
+    (r) => new URL(r.url()).pathname === `/api/publico/${SLUG}/ranking` && r.status() === 200,
+  );
   await page.reload();
   await page.waitForFunction(() => navigator.serviceWorker.controller !== null);
   const corpo = (await (await resposta).json()) as { geradoEm: string };
@@ -43,7 +46,10 @@ async function abrirComRede(page: Page): Promise<string> {
   return corpo.geradoEm;
 }
 
-test('PAR-149: offline, a faixa aparece com a hora do geradoEm e o ranking fica somente leitura', async ({ page, context }) => {
+test('PAR-149: offline, a faixa aparece com a hora do geradoEm e o ranking fica somente leitura', async ({
+  page,
+  context,
+}) => {
   const geradoEm = await abrirComRede(page);
   await context.setOffline(true);
   try {
@@ -57,7 +63,10 @@ test('PAR-149: offline, a faixa aparece com a hora do geradoEm e o ranking fica 
   }
 });
 
-test('PAR-150: offline, tocar na engrenagem mostra "É preciso conexão para entrar." e não sai da página', async ({ page, context }) => {
+test('PAR-150: offline, tocar na engrenagem mostra "É preciso conexão para entrar." e não sai da página', async ({
+  page,
+  context,
+}) => {
   const geradoEm = await abrirComRede(page);
   await context.setOffline(true);
   try {
@@ -86,7 +95,9 @@ test('PAR-153: o PDF e os eventos não passam pelo cache do service worker', asy
   expect(chaves.every((u) => /^\/api\/publico\/[a-z0-9-]+\/ranking$/.test(u))).toBe(true);
 });
 
-test('PAR-151: num contexto novo, sem nada guardado e sem rede, "Sem conexão" com "Tentar de novo"', async ({ browser }) => {
+test('PAR-151: num contexto novo, sem nada guardado e sem rede, "Sem conexão" com "Tentar de novo"', async ({
+  browser,
+}) => {
   // Sem service worker: senão o fetch sairia do SW, por fora da rota falsa do Playwright.
   const contexto = await browser.newContext({ serviceWorkers: 'block' });
   try {
@@ -97,7 +108,11 @@ test('PAR-151: num contexto novo, sem nada guardado e sem rede, "Sem conexão" c
     await expect(page.getByRole('heading', { level: 1, name: 'Sem conexão' })).toBeVisible();
     await expect(page.getByText('Conecte-se para ver o ranking.')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Tentar de novo' })).toBeVisible();
-    expect(await page.evaluate(() => Object.keys(window.localStorage).filter((k) => k.startsWith('pelada:ranking:')))).toEqual([]);
+    expect(
+      await page.evaluate(() =>
+        Object.keys(window.localStorage).filter((k) => k.startsWith('pelada:ranking:')),
+      ),
+    ).toEqual([]);
   } finally {
     await contexto.close();
   }

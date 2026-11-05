@@ -34,7 +34,11 @@ let aberto: CenarioGruposAberto;
 let originais: Array<{ id: string; s: string; t: string | null }> = [];
 
 function app() {
-  return criarApp({ fabricaBanco: fabricaComoApp().fabrica, relogio: relogioFixo('2026-11-05T15:00:00Z'), asaas });
+  return criarApp({
+    fabricaBanco: fabricaComoApp().fabrica,
+    relogio: relogioFixo('2026-11-05T15:00:00Z'),
+    asaas,
+  });
 }
 
 async function sessao(conta: string): Promise<string> {
@@ -62,7 +66,11 @@ async function pedir(grupo: string, p: Pedido = {}): Promise<Response> {
   const metodo = p.metodo ?? 'POST';
   const r = await app().request(
     `/api/grupos/${grupo}${p.caminho ?? '/assinatura'}`,
-    { method: metodo, headers, ...(metodo === 'GET' ? {} : { body: JSON.stringify(p.corpo ?? CORPO) }) },
+    {
+      method: metodo,
+      headers,
+      ...(metodo === 'GET' ? {} : { body: JSON.stringify(p.corpo ?? CORPO) }),
+    },
     envAcesso(aberto.url, p.limite ? { LIMITE_ESCRITA: p.limite } : {}),
     ctx,
   );
@@ -87,7 +95,10 @@ beforeAll(async () => {
       [id],
     );
     originais.push({ id, ...r.rows[0]! });
-    await db.query(`UPDATE grupos SET situacao_comercial = 'trial', trial_inicio = '2026-11-01' WHERE id = $1`, [id]);
+    await db.query(
+      `UPDATE grupos SET situacao_comercial = 'trial', trial_inicio = '2026-11-01' WHERE id = $1`,
+      [id],
+    );
   }
 });
 
@@ -102,15 +113,19 @@ afterEach(async () => {
        AND entidade_id IN (SELECT id::text FROM assinaturas WHERE asaas_assinatura_id LIKE 'sub\\_%' ESCAPE '\\')`,
     [[cenario.grupoG, cenario.grupoH]],
   );
-  await db.query(`DELETE FROM assinaturas WHERE grupo_id = ANY($1::uuid[]) AND asaas_assinatura_id ~ '^sub_[0-9]{6}$'`, [
-    [cenario.grupoG, cenario.grupoH],
-  ]);
+  await db.query(
+    `DELETE FROM assinaturas WHERE grupo_id = ANY($1::uuid[]) AND asaas_assinatura_id ~ '^sub_[0-9]{6}$'`,
+    [[cenario.grupoG, cenario.grupoH]],
+  );
 });
 
 afterAll(async () => {
   if (aberto) {
     for (const o of originais) {
-      await aberto.db.query('UPDATE grupos SET situacao_comercial = $2, trial_inicio = $3::date WHERE id = $1', [o.id, o.s, o.t]);
+      await aberto.db.query(
+        'UPDATE grupos SET situacao_comercial = $2, trial_inicio = $3::date WHERE id = $1',
+        [o.id, o.s, o.t],
+      );
     }
     await aberto.fechar();
   }
@@ -133,7 +148,11 @@ describe('POST …/assinatura', () => {
   it('PLA-31: depois do 201, GET …/plano segue trial', async () => {
     const { cenario } = aberto;
     expect((await pedir(cenario.grupoH, { conta: cenario.contaB })).status).toBe(201);
-    const plano = await pedir(cenario.grupoH, { conta: cenario.contaB, metodo: 'GET', caminho: '/plano' });
+    const plano = await pedir(cenario.grupoH, {
+      conta: cenario.contaB,
+      metodo: 'GET',
+      caminho: '/plano',
+    });
     expect(planoResposta.parse(await plano.json())).toMatchObject({
       plano: 'trial',
       situacao: 'trial',
@@ -152,7 +171,9 @@ describe('POST …/assinatura', () => {
 
   it('PLA-33: segundo POST recebe 409 com a mesma faturaUrl', async () => {
     const { cenario } = aberto;
-    const primeiro = assinaturaCriada.parse(await (await pedir(cenario.grupoH, { conta: cenario.contaB })).json());
+    const primeiro = assinaturaCriada.parse(
+      await (await pedir(cenario.grupoH, { conta: cenario.contaB })).json(),
+    );
     asaas.chamadas.length = 0;
     const segundo = await pedir(cenario.grupoH, { conta: cenario.contaB });
     expect(segundo.status).toBe(409);
@@ -169,20 +190,28 @@ describe('POST …/assinatura', () => {
     asaas.falharSempre('criarCliente');
     const r = await pedir(cenario.grupoH, { conta: cenario.contaB });
     expect(r.status).toBe(502);
-    expect(erroPagamentoIndisponivel.parse(await r.json()).mensagem).toBe(MENSAGEM_PAGAMENTO_INDISPONIVEL);
+    expect(erroPagamentoIndisponivel.parse(await r.json()).mensagem).toBe(
+      MENSAGEM_PAGAMENTO_INDISPONIVEL,
+    );
     expect(await assinaturasNovas(cenario.grupoH)).toBe(0);
   });
 
   it('PLA-35: CPF inválido responde 422 sem chamar o Asaas', async () => {
     const { cenario } = aberto;
-    const r = await pedir(cenario.grupoH, { conta: cenario.contaB, corpo: { nome: 'Bia Souza', cpf: '111.111.111-11' } });
+    const r = await pedir(cenario.grupoH, {
+      conta: cenario.contaB,
+      corpo: { nome: 'Bia Souza', cpf: '111.111.111-11' },
+    });
     expect(r.status).toBe(422);
     expect(asaas.chamadas).toEqual([]);
   });
 
   it('PLA-34: campo de cartão no corpo é recusado (422)', async () => {
     const { cenario } = aberto;
-    const r = await pedir(cenario.grupoH, { conta: cenario.contaB, corpo: { ...CORPO, numeroCartao: '4111111111111111' } });
+    const r = await pedir(cenario.grupoH, {
+      conta: cenario.contaB,
+      corpo: { ...CORPO, numeroCartao: '4111111111111111' },
+    });
     expect(r.status).toBe(422);
     expect(asaas.chamadas).toEqual([]);
   });

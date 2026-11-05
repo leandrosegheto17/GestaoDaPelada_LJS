@@ -313,7 +313,13 @@ export const COLUNAS_TIPADAS = {
     alterado_por: 'uuid',
     alterado_em: 'timestamptz',
   },
-  periodos_ativos: { id: 'uuid', jogador_id: 'uuid', grupo_id: 'uuid', inicio: 'date', fim: 'date' },
+  periodos_ativos: {
+    id: 'uuid',
+    jogador_id: 'uuid',
+    grupo_id: 'uuid',
+    inicio: 'date',
+    fim: 'date',
+  },
   habilidades: { id: 'uuid', grupo_id: 'uuid', nome: 'text', ordem: 'int8' },
   notas: { jogador_id: 'uuid', habilidade_id: 'uuid', grupo_id: 'uuid', valor: 'int2' },
   partidas: {
@@ -423,5 +429,12 @@ export const COLUNAS_ANULAVEIS: Readonly<Partial<Record<keyof Banco, readonly st
   escalacoes: ['k'],
   eventos_uso: ['dispositivo_id', 'mes_exportado', 'data_partida'],
   assinaturas: ['fatura_url', 'pago_ate', 'cobranca_pro_id', 'ultimo_evento_em'],
-  eventos_asaas: ['data_criacao', 'cobranca_id', 'assinatura_id', 'status', 'valor_centavos', 'efeito'],
+  eventos_asaas: [
+    'data_criacao',
+    'cobranca_id',
+    'assinatura_id',
+    'status',
+    'valor_centavos',
+    'efeito',
+  ],
 };

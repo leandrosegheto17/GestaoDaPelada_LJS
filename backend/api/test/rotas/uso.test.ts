@@ -19,7 +19,10 @@ import { abrirCenarioGrupos, type CenarioGruposAberto } from '../isolamento/cena
 
 let aberto: CenarioGruposAberto;
 
-const app = criarApp({ fabricaBanco: fabricaComoApp().fabrica, relogio: relogioFixo('2026-03-14T15:00:00Z') });
+const app = criarApp({
+  fabricaBanco: fabricaComoApp().fabrica,
+  relogio: relogioFixo('2026-03-14T15:00:00Z'),
+});
 
 async function sessao(conta: string): Promise<string> {
   const { token, hash } = await gerarToken();
@@ -34,7 +37,12 @@ async function sessao(conta: string): Promise<string> {
 async function uso(conta = aberto.cenario.contaC): Promise<Response> {
   const headers = new Headers({ cookie: `${NOME_COOKIE_SESSAO}=${await sessao(conta)}` });
   const ctx = contextoFalso();
-  const r = await app.request(`/api/grupos/${aberto.cenario.grupoG}/uso`, { method: 'GET', headers }, envAcesso(aberto.url), ctx);
+  const r = await app.request(
+    `/api/grupos/${aberto.cenario.grupoG}/uso`,
+    { method: 'GET', headers },
+    envAcesso(aberto.url),
+    ctx,
+  );
   await ctx.esperar();
   return r;
 }
@@ -69,7 +77,8 @@ describe('GET /api/grupos/:grupoId/uso', () => {
     expect([...inicios].sort().reverse()).toEqual(inicios);
     expect(inicios).not.toContain('2026-03-09');
     expect(inicios.indexOf('2026-03-02')).toBeLessThan(inicios.indexOf('2026-02-23'));
-    for (const s of semanas) expect(s.escalacoesConfirmadas).toBe(s.inicio === '2026-03-02' ? 1 : 0);
+    for (const s of semanas)
+      expect(s.escalacoesConfirmadas).toBe(s.inicio === '2026-03-02' ? 1 : 0);
 
     expect(semanas.find((s) => s.inicio === '2026-03-02')).toEqual({
       inicio: '2026-03-02',
@@ -80,7 +89,10 @@ describe('GET /api/grupos/:grupoId/uso', () => {
       partidasEm48h: 0,
       escalacoesConfirmadas: 1,
     });
-    expect(semanas.find((s) => s.inicio === '2026-02-23')).toMatchObject({ pdfsExportados: 1, aparelhosRanking: 0 });
+    expect(semanas.find((s) => s.inicio === '2026-02-23')).toMatchObject({
+      pdfsExportados: 1,
+      aparelhosRanking: 0,
+    });
   });
 
   it('PAR-155: a outra admin também vê o painel', async () => {

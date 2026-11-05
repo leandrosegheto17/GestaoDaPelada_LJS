@@ -79,7 +79,8 @@ export function NovoJogador() {
       onError: (erro) => {
         const porCampo = errosDoJogador(erro);
         setErros(porCampo);
-        if (Object.keys(porCampo).length === 0) setFalha(erro instanceof ErroApi ? erro.message : MENSAGEM_REDE);
+        if (Object.keys(porCampo).length === 0)
+          setFalha(erro instanceof ErroApi ? erro.message : MENSAGEM_REDE);
       },
     });
   }
@@ -88,7 +89,12 @@ export function NovoJogador() {
     <Casca grupo={{ nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' }} estreita>
       <LinkVoltar para={`${base}/jogadores`}>Jogadores</LinkVoltar>
       <h1 className={estilos['titulo-pagina']}>Novo jogador</h1>
-      <form className={estilos.formulario} noValidate aria-busy={cadastrar.isPending || undefined} onSubmit={enviar}>
+      <form
+        className={estilos.formulario}
+        noValidate
+        aria-busy={cadastrar.isPending || undefined}
+        onSubmit={enviar}
+      >
         <ResumoErros erros={resumoDoJogador(erros)} />
         {falha ? <Faixa tipo="erro">{falha}</Faixa> : null}
         <CamposJogador dados={dados} erros={erros} mudar={mudar} hoje={hoje} comDataEntrada />

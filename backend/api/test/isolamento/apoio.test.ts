@@ -32,12 +32,15 @@ describe('apoio de isolamento', () => {
 
   it('FUN-16: comoApp roda como pelada_app com o contexto e o desfaz ao fim', async () => {
     const { db, cenario } = aberto;
-    const dentro = await comoApp(db, { conta: cenario.contaA }, async (d) =>
-      (
-        await d.query<{ papel: string; conta: string }>(
-          `SELECT current_user AS papel, current_setting('app.conta_id', true) AS conta`,
-        )
-      ).rows[0],
+    const dentro = await comoApp(
+      db,
+      { conta: cenario.contaA },
+      async (d) =>
+        (
+          await d.query<{ papel: string; conta: string }>(
+            `SELECT current_user AS papel, current_setting('app.conta_id', true) AS conta`,
+          )
+        ).rows[0],
     );
     expect(dentro).toEqual({ papel: 'pelada_app', conta: cenario.contaA });
 
@@ -53,12 +56,15 @@ describe('apoio de isolamento', () => {
     const { db, cenario } = aberto;
     await expect(
       comoApp(db, { conta: cenario.contaA }, async (d) => {
-        await d.query(`UPDATE jogadores SET apelido = 'Alterado' WHERE grupo_id = $1`, [cenario.grupoA]);
+        await d.query(`UPDATE jogadores SET apelido = 'Alterado' WHERE grupo_id = $1`, [
+          cenario.grupoA,
+        ]);
         throw new Error('falha de propósito');
       }),
     ).rejects.toThrow('falha de propósito');
 
-    const papel = (await db.query<{ papel: string }>('SELECT current_user AS papel')).rows[0]?.papel;
+    const papel = (await db.query<{ papel: string }>('SELECT current_user AS papel')).rows[0]
+      ?.papel;
     expect(papel).toBe('postgres');
     const alterados = await db.query(`SELECT 1 FROM jogadores WHERE apelido = 'Alterado'`);
     expect(alterados.rowCount).toBe(0);
@@ -67,7 +73,9 @@ describe('apoio de isolamento', () => {
   it('FUN-17: o cenário cria ao menos uma linha por grupo em cada tabela com grupo_id do catálogo', async () => {
     const { db, cenario } = aberto;
     const nomes = cenario.tabelas.map((t) => t.tabela);
-    expect(nomes).toEqual(expect.arrayContaining(['grupos', 'convites_admin', 'auditoria', 'eventos_uso']));
+    expect(nomes).toEqual(
+      expect.arrayContaining(['grupos', 'convites_admin', 'auditoria', 'eventos_uso']),
+    );
     expect(nomes.length).toBeGreaterThanOrEqual(16);
 
     for (const { tabela, coluna } of cenario.tabelas) {

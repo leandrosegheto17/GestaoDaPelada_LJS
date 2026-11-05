@@ -98,9 +98,10 @@ describe('sobrecargas da grupo_criar no catálogo (depois da T25)', () => {
   });
 
   it('SIM-67: a de 6 não existe mais', async () => {
-    const r = await aberto.db.query<{ existe: boolean }>(`SELECT to_regprocedure($1) IS NOT NULL AS existe`, [
-      ASSINATURA_6,
-    ]);
+    const r = await aberto.db.query<{ existe: boolean }>(
+      `SELECT to_regprocedure($1) IS NOT NULL AS existe`,
+      [ASSINATURA_6],
+    );
     expect(r.rows[0]?.existe).toBe(false);
   });
 });

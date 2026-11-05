@@ -29,7 +29,9 @@ describe('migrações herdadas', () => {
 
   it('FUN-08: cada migração herdada tem o SHA-256 da origem, byte a byte', () => {
     for (const [nome, hash] of referencia()) {
-      const atual = createHash('sha256').update(readFileSync(join(DIR, nome))).digest('hex');
+      const atual = createHash('sha256')
+        .update(readFileSync(join(DIR, nome)))
+        .digest('hex');
       expect(atual, nome).toBe(hash);
     }
   });

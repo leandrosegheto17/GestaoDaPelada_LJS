@@ -47,7 +47,8 @@ export const idJogadorCorpo = z.uuid({ error: MENSAGEM_APTOS_INATIVOS });
 /** Id de jogador numa resposta. */
 export const idJogadorResposta = z.string().min(1);
 
-const semRepeticao = (lista: readonly { id: string }[]): boolean => new Set(lista.map((a) => a.id)).size === lista.length;
+const semRepeticao = (lista: readonly { id: string }[]): boolean =>
+  new Set(lista.map((a) => a.id)).size === lista.length;
 
 /**
  * Lista de aptos: até 60 e sem repetido (SIM-53). Vazia é aceita: a prévia e a sugestão a descrevem como insuficiente
@@ -98,7 +99,12 @@ export type ContextoResposta = z.infer<typeof contextoResposta>;
 export const previaCorpo = z.discriminatedUnion(
   'formato',
   [
-    z.strictObject({ formato: z.literal('dois_times'), n: nSimulador, k: kSimulador, aptos: aptosDois }),
+    z.strictObject({
+      formato: z.literal('dois_times'),
+      n: nSimulador,
+      k: kSimulador,
+      aptos: aptosDois,
+    }),
     z.strictObject({ formato: z.literal('varios_times'), n: nSimulador, aptos: aptosVarios }),
   ],
   { error: MENSAGEM_FORMATO },
@@ -111,7 +117,13 @@ const motivo = z.literal('aptos_insuficientes');
 
 /** A prévia com o texto pronto em `descricao` (SIM-10 a SIM-13). */
 export const previaResposta = z.union([
-  z.strictObject({ formato: z.literal('dois_times'), valida: z.literal(true), descricao, times: z.literal(2), reservas: contagem }),
+  z.strictObject({
+    formato: z.literal('dois_times'),
+    valida: z.literal(true),
+    descricao,
+    times: z.literal(2),
+    reservas: contagem,
+  }),
   z.strictObject({
     formato: z.literal('dois_times'),
     valida: z.literal(false),
@@ -159,7 +171,12 @@ export const sugerirCorpo = z.discriminatedUnion(
       k: kSimulador,
       aptos: aptosDois,
     }),
-    z.strictObject({ formato: z.literal('varios_times'), data: dataSimulador, n: nSimulador, aptos: aptosVarios }),
+    z.strictObject({
+      formato: z.literal('varios_times'),
+      data: dataSimulador,
+      n: nSimulador,
+      aptos: aptosVarios,
+    }),
   ],
   { error: MENSAGEM_FORMATO },
 );
@@ -184,7 +201,9 @@ export type ComposicaoDoisContrato = z.infer<typeof composicaoDois>;
 
 /** Composição de 3 ou mais: os times com os ids. */
 export const composicaoVarios = z.strictObject({
-  times: z.array(z.strictObject({ jogadores: z.array(idJogadorCorpo).max(maxAptos) })).max(maxAptos),
+  times: z
+    .array(z.strictObject({ jogadores: z.array(idJogadorCorpo).max(maxAptos) }))
+    .max(maxAptos),
 });
 export type ComposicaoVariosContrato = z.infer<typeof composicaoVarios>;
 
@@ -195,19 +214,29 @@ export type Escalada =
 
 /** Ids da composição: titulares, reservas e "não entra" (2 times), ou todos os times. */
 export function idsDaComposicao(escalada: Escalada): string[] {
-  if (escalada.formato === 'varios_times') return escalada.composicao.times.flatMap((t) => t.jogadores);
+  if (escalada.formato === 'varios_times')
+    return escalada.composicao.times.flatMap((t) => t.jogadores);
   const { times, naoEntra } = escalada.composicao;
-  return [...times.flatMap((t) => [...t.titulares, ...t.entramNo2oTempo].map((j) => j.id)), ...naoEntra];
+  return [
+    ...times.flatMap((t) => [...t.titulares, ...t.entramNo2oTempo].map((j) => j.id)),
+    ...naoEntra,
+  ];
 }
 
 /** Repetido antes de fora dos aptos (SIM-63); nulo quando passa. */
-function problemaNaComposicao(ids: readonly string[], aptos: readonly { id: string }[]): string | null {
+function problemaNaComposicao(
+  ids: readonly string[],
+  aptos: readonly { id: string }[],
+): string | null {
   if (new Set(ids).size !== ids.length) return MENSAGEM_REPETIDO_NA_COMPOSICAO;
   const permitidos = new Set(aptos.map((a) => a.id));
   return ids.every((id) => permitidos.has(id)) ? null : MENSAGEM_FORA_DOS_APTOS;
 }
 
-function conferirComposicao(corpo: Escalada & { aptos: readonly { id: string }[] }, contexto: z.RefinementCtx): void {
+function conferirComposicao(
+  corpo: Escalada & { aptos: readonly { id: string }[] },
+  contexto: z.RefinementCtx,
+): void {
   const problema = problemaNaComposicao(idsDaComposicao(corpo), corpo.aptos);
   if (problema) contexto.addIssue({ code: 'custom', path: ['composicao'], message: problema });
 }
@@ -240,9 +269,17 @@ export const avaliarCorpo = z.discriminatedUnion(
 );
 export type AvaliarCorpo = z.infer<typeof avaliarCorpo>;
 
-export const TIPOS_AVISO = ['so_1o_tempo_sem_reserva', 'composicao_diferente', 'sem_nota', 'incompleto_pequeno'] as const;
+export const TIPOS_AVISO = [
+  'so_1o_tempo_sem_reserva',
+  'composicao_diferente',
+  'sem_nota',
+  'incompleto_pequeno',
+] as const;
 
-export const avisoSimulador = z.strictObject({ tipo: z.enum(TIPOS_AVISO), texto: z.string().min(1) });
+export const avisoSimulador = z.strictObject({
+  tipo: z.enum(TIPOS_AVISO),
+  texto: z.string().min(1),
+});
 
 /** Os campos de jogador que a resposta pode trazer (SIM-82). */
 const jogadorResultado = {
@@ -253,7 +290,11 @@ const jogadorResultado = {
   semAno: z.boolean(),
 };
 
-const titularDois = z.strictObject({ ...jogadorResultado, so1oTempo: z.boolean(), saiNoIntervalo: z.boolean() });
+const titularDois = z.strictObject({
+  ...jogadorResultado,
+  so1oTempo: z.boolean(),
+  saiNoIntervalo: z.boolean(),
+});
 const reservaDois = z.strictObject({ ...jogadorResultado, so1oTempo: z.boolean() });
 const naoEntraDois = z.strictObject({ ...jogadorResultado, so1oTempo: z.boolean() });
 const jogadorVarios = z.strictObject(jogadorResultado);

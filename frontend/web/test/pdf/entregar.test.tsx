@@ -1,6 +1,12 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { compartilhar, entregar, nomeDoArquivo, TITULO_PDF_PRONTO, type NavegadorCompartilha } from '../../src/pdf/entregar.ts';
+import {
+  compartilhar,
+  entregar,
+  nomeDoArquivo,
+  TITULO_PDF_PRONTO,
+  type NavegadorCompartilha,
+} from '../../src/pdf/entregar.ts';
 import { DialogoPdfPronto } from '../../src/telas/ranking/DialogoPdfPronto.tsx';
 import { esperarSemViolacoes } from '../apoio/axe.ts';
 
@@ -23,8 +29,13 @@ function erroComNome(nome: string): Error {
   return erro;
 }
 
-function navegadorQueCompartilha(share: (dados: ShareData) => Promise<void> = async () => undefined): NavegadorCompartilha & { share: ReturnType<typeof vi.fn> } {
-  return { canShare: vi.fn((dados: ShareData) => (dados.files?.length ?? 0) > 0), share: vi.fn(share) };
+function navegadorQueCompartilha(
+  share: (dados: ShareData) => Promise<void> = async () => undefined,
+): NavegadorCompartilha & { share: ReturnType<typeof vi.fn> } {
+  return {
+    canShare: vi.fn((dados: ShareData) => (dados.files?.length ?? 0) > 0),
+    share: vi.fn(share),
+  };
 }
 
 describe('entregar', () => {
@@ -34,7 +45,10 @@ describe('entregar', () => {
 
   it('PAR-106: sem canShare, baixa ranking-pelada-de-quinta-2026-10.pdf e não abre o diálogo', () => {
     const baixar = vi.fn();
-    const r = entregar(BLOB, nomeDoArquivo('pelada-de-quinta', '2026-10'), { navegador: {}, baixar });
+    const r = entregar(BLOB, nomeDoArquivo('pelada-de-quinta', '2026-10'), {
+      navegador: {},
+      baixar,
+    });
     expect(r).toEqual({ tipo: 'baixado', nome: NOME });
     expect(baixar).toHaveBeenCalledTimes(1);
     expect(baixar).toHaveBeenCalledWith(BLOB, NOME);
@@ -42,7 +56,12 @@ describe('entregar', () => {
 
   it('PAR-106: canShare que recusa arquivos (ou lança) também baixa', () => {
     const baixar = vi.fn();
-    expect(entregar(BLOB, NOME, { navegador: { canShare: () => false, share: async () => undefined }, baixar }).tipo).toBe('baixado');
+    expect(
+      entregar(BLOB, NOME, {
+        navegador: { canShare: () => false, share: async () => undefined },
+        baixar,
+      }).tipo,
+    ).toBe('baixado');
     expect(
       entregar(BLOB, NOME, {
         navegador: {
@@ -70,18 +89,49 @@ describe('entregar', () => {
   it('PAR-105: share rejeitado com AbortError (ou NotAllowedError) volta ao diálogo; outra falha sobe', async () => {
     const arquivo = new File([BLOB], NOME, { type: 'application/pdf' });
     const dados = { title: NOME, text: 'x' };
-    expect(await compartilhar(arquivo, dados, navegadorQueCompartilha(() => Promise.reject(erroComNome('AbortError'))))).toBe('dialogo');
-    expect(await compartilhar(arquivo, dados, navegadorQueCompartilha(() => Promise.reject(erroComNome('NotAllowedError'))))).toBe('dialogo');
+    expect(
+      await compartilhar(
+        arquivo,
+        dados,
+        navegadorQueCompartilha(() => Promise.reject(erroComNome('AbortError'))),
+      ),
+    ).toBe('dialogo');
+    expect(
+      await compartilhar(
+        arquivo,
+        dados,
+        navegadorQueCompartilha(() => Promise.reject(erroComNome('NotAllowedError'))),
+      ),
+    ).toBe('dialogo');
     expect(await compartilhar(arquivo, dados, navegadorQueCompartilha())).toBe('compartilhado');
-    await expect(compartilhar(arquivo, dados, navegadorQueCompartilha(() => Promise.reject(erroComNome('DataError'))))).rejects.toThrow('DataError');
+    await expect(
+      compartilhar(
+        arquivo,
+        dados,
+        navegadorQueCompartilha(() => Promise.reject(erroComNome('DataError'))),
+      ),
+    ).rejects.toThrow('DataError');
   });
 });
 
 describe('DialogoPdfPronto', () => {
   function abrir(navegador: NavegadorCompartilha) {
-    const acoes = { aoBaixar: vi.fn(), aoCompartilhar: vi.fn(), aoFalhar: vi.fn(), aoFechar: vi.fn() };
+    const acoes = {
+      aoBaixar: vi.fn(),
+      aoCompartilhar: vi.fn(),
+      aoFalhar: vi.fn(),
+      aoFechar: vi.fn(),
+    };
     const arquivo = new File([BLOB], NOME, { type: 'application/pdf' });
-    const r = render(<DialogoPdfPronto arquivo={arquivo} mesPorExtenso="outubro de 2026" grupo="Pelada de Quinta" navegador={navegador} {...acoes} />);
+    const r = render(
+      <DialogoPdfPronto
+        arquivo={arquivo}
+        mesPorExtenso="outubro de 2026"
+        grupo="Pelada de Quinta"
+        navegador={navegador}
+        {...acoes}
+      />,
+    );
     return { ...r, ...acoes };
   }
 
@@ -100,7 +150,11 @@ describe('DialogoPdfPronto', () => {
     const t = abrir(navegador);
     fireEvent.click(screen.getByRole('button', { name: 'Compartilhar' }));
     await waitFor(() => expect(navegador.share).toHaveBeenCalledTimes(1));
-    await waitFor(() => expect((screen.getByRole('button', { name: 'Compartilhar' }) as HTMLButtonElement).disabled).toBe(false));
+    await waitFor(() =>
+      expect(
+        (screen.getByRole('button', { name: 'Compartilhar' }) as HTMLButtonElement).disabled,
+      ).toBe(false),
+    );
     expect(screen.getByRole('dialog', { name: TITULO_PDF_PRONTO })).toBeDefined();
     expect(t.aoCompartilhar).not.toHaveBeenCalled();
     expect(t.aoFalhar).not.toHaveBeenCalled();

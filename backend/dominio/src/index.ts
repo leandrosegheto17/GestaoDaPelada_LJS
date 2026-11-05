@@ -82,7 +82,11 @@ export {
   type PresencaDoJogador,
   type SituacaoGravada,
 } from './pontuacao/pesos.ts';
-export { criarResolvedorDePesos, MENSAGEM_SEM_PESOS, type ResolvedorDePesos } from './pontuacao/resolvedor.ts';
+export {
+  criarResolvedorDePesos,
+  MENSAGEM_SEM_PESOS,
+  type ResolvedorDePesos,
+} from './pontuacao/resolvedor.ts';
 export { inicioDaContagem } from './pontuacao/inicio.ts';
 
 // planos-e-cobranca (PLA-01 a PLA-06): plano efetivo, recursos e preço, sem relógio nem I/O.
@@ -129,7 +133,12 @@ export {
   type ResultadoMarcacoes,
   type SituacaoMarcacao,
 } from './partidas/marcacoes.ts';
-export { ANO_SEM_INFORMACAO, ordenarPorRanking, type Colocado, type Rankeavel } from './ranking/ordenar.ts';
+export {
+  ANO_SEM_INFORMACAO,
+  ordenarPorRanking,
+  type Colocado,
+  type Rankeavel,
+} from './ranking/ordenar.ts';
 export {
   efeitoDoEvento,
   EVENTOS_TRATADOS,
@@ -166,7 +175,13 @@ export {
   type PresencaDoRanking,
   type ResultadoRanking,
 } from './ranking/calcular.ts';
-export { limitesDeMes, mesNoHistorico, navegacaoDeMes, type LimitesDeMes, type Navegacao } from './ranking/navegacao.ts';
+export {
+  limitesDeMes,
+  mesNoHistorico,
+  navegacaoDeMes,
+  type LimitesDeMes,
+  type Navegacao,
+} from './ranking/navegacao.ts';
 export {
   calcularPdf,
   escolherColunasPdf,

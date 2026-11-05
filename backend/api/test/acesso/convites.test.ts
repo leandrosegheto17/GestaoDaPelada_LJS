@@ -30,16 +30,28 @@ function novoEmail(): string {
   return `convidada-${n}@exemplo.test`;
 }
 
-async function convite(email: string, opcoes: Parameters<typeof conviteDeTeste>[4] = {}): Promise<string> {
+async function convite(
+  email: string,
+  opcoes: Parameters<typeof conviteDeTeste>[4] = {},
+): Promise<string> {
   const { db, cenario } = aberto;
   return conviteDeTeste(db, cenario.grupoA, email, cenario.contaA, opcoes);
 }
 
 /** Conta confirmada nova com o e-mail dado, e a sessão dela. */
 async function contaComSessao(email: string): Promise<string> {
-  await aberto.db.query(`INSERT INTO contas (email, nome, senha_hash, criada_em) VALUES ($1, 'Convidada', 'x', now())`, [email]);
-  await aberto.db.query('SELECT conta_definir_senha($1, $2, false)', [email, 'senha convidada 123']);
-  const r = await pedir('/sessao/entrar', { corpo: { email, senha: 'senha convidada 123' }, ip: '203.0.113.80' });
+  await aberto.db.query(
+    `INSERT INTO contas (email, nome, senha_hash, criada_em) VALUES ($1, 'Convidada', 'x', now())`,
+    [email],
+  );
+  await aberto.db.query('SELECT conta_definir_senha($1, $2, false)', [
+    email,
+    'senha convidada 123',
+  ]);
+  const r = await pedir('/sessao/entrar', {
+    corpo: { email, senha: 'senha convidada 123' },
+    ip: '203.0.113.80',
+  });
   const token = tokenDoCookie(r);
   if (!token) throw new Error(`entrar falhou: ${r.status}`);
   return token;
@@ -92,16 +104,19 @@ describe('POST /api/convites/aceitar', () => {
 
   it('ACE-35: convite de outro e-mail dá 403 convite_de_outro_email e nenhum vínculo', async () => {
     const { cenario } = aberto;
-    const sessao = await pedir('/sessao/entrar', { corpo: { email: cenario.emailB, senha: cenario.senhaB }, ip: '203.0.113.81' });
+    const sessao = await pedir('/sessao/entrar', {
+      corpo: { email: cenario.emailB, senha: cenario.senhaB },
+      ip: '203.0.113.81',
+    });
     const email = novoEmail();
     const token = await convite(email);
     const r = await pedir('/convites/aceitar', { corpo: { token }, sessao: tokenDoCookie(sessao) });
     expect(r.status).toBe(403);
     expect(await r.json()).toMatchObject({ codigo: 'convite_de_outro_email' });
-    const b = await aberto.db.query('SELECT 1 FROM vinculos_admin WHERE conta_id = $1 AND grupo_id = $2', [
-      cenario.contaB,
-      cenario.grupoA,
-    ]);
+    const b = await aberto.db.query(
+      'SELECT 1 FROM vinculos_admin WHERE conta_id = $1 AND grupo_id = $2',
+      [cenario.contaB, cenario.grupoA],
+    );
     expect(b.rowCount).toBe(0);
   });
 
@@ -157,10 +172,10 @@ describe('POST /api/convites/cadastrar', () => {
     const corpo = (await eu.json()) as { email: string; grupos: Array<{ id: string }> };
     expect(corpo.email).toBe(email);
     expect(corpo.grupos.map((g) => g.id)).toContain(aberto.cenario.grupoA);
-    const conta = await aberto.db.query<{ termos_versao: string; email_confirmado_em: Date | null }>(
-      'SELECT termos_versao, email_confirmado_em FROM contas WHERE email = $1',
-      [email],
-    );
+    const conta = await aberto.db.query<{
+      termos_versao: string;
+      email_confirmado_em: Date | null;
+    }>('SELECT termos_versao, email_confirmado_em FROM contas WHERE email = $1', [email]);
     expect(conta.rows[0]?.termos_versao).toBe(TERMOS_VERSAO);
     expect(conta.rows[0]?.email_confirmado_em).not.toBeNull();
   });
@@ -168,14 +183,22 @@ describe('POST /api/convites/cadastrar', () => {
   it('ACE-34: o e-mail fica travado: campo email no corpo é recusado (422)', async () => {
     const token = await convite(novoEmail());
     const r = await pedir('/convites/cadastrar', {
-      corpo: { token, nome: 'Outra', senha: 'senha convidada 123', termos: true, email: 'outra@exemplo.test' },
+      corpo: {
+        token,
+        nome: 'Outra',
+        senha: 'senha convidada 123',
+        termos: true,
+        email: 'outra@exemplo.test',
+      },
     });
     expect(r.status).toBe(422);
   });
 
   it('ACE-02: sem o aceite dos termos dá 422 termos_obrigatorios e o convite segue válido', async () => {
     const token = await convite(novoEmail());
-    const r = await pedir('/convites/cadastrar', { corpo: { token, nome: 'Nova', senha: 'senha convidada 123', termos: false } });
+    const r = await pedir('/convites/cadastrar', {
+      corpo: { token, nome: 'Nova', senha: 'senha convidada 123', termos: false },
+    });
     expect(r.status).toBe(422);
     expect(await r.json()).toMatchObject({ codigo: 'termos_obrigatorios' });
     expect((await pedir('/convites/ler', { corpo: { token } })).status).toBe(200);
@@ -184,7 +207,9 @@ describe('POST /api/convites/cadastrar', () => {
   it('ACE-36: convite inválido dá 410 e nenhuma conta', async () => {
     const email = novoEmail();
     const token = await convite(email, { canceladoEm: 'now()' });
-    const r = await pedir('/convites/cadastrar', { corpo: { token, nome: 'Nova', senha: 'senha convidada 123', termos: true } });
+    const r = await pedir('/convites/cadastrar', {
+      corpo: { token, nome: 'Nova', senha: 'senha convidada 123', termos: true },
+    });
     expect(r.status).toBe(410);
     const conta = await aberto.db.query('SELECT 1 FROM contas WHERE email = $1', [email]);
     expect(conta.rowCount).toBe(0);
@@ -194,7 +219,9 @@ describe('POST /api/convites/cadastrar', () => {
     const email = novoEmail();
     const token = await convite(email);
     await contaComSessao(email);
-    const r = await pedir('/convites/cadastrar', { corpo: { token, nome: 'Nova', senha: 'senha convidada 123', termos: true } });
+    const r = await pedir('/convites/cadastrar', {
+      corpo: { token, nome: 'Nova', senha: 'senha convidada 123', termos: true },
+    });
     expect(r.status).toBe(409);
     expect(r.headers.get('set-cookie')).toBeNull();
     expect(await vinculado(email)).toBe(false);

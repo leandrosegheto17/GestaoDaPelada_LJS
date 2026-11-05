@@ -8,9 +8,16 @@ import { topicoDoGrupo } from '../../../src/infraestrutura/push/topico.ts';
 
 /** Assinante qualquer: um par novo, como o navegador faria. */
 async function assinante() {
-  const par = (await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveBits'])) as CryptoKeyPair;
-  const publica = new Uint8Array((await crypto.subtle.exportKey('raw', par.publicKey)) as ArrayBuffer);
-  return { p256dh: paraBase64url(publica), auth: paraBase64url(crypto.getRandomValues(new Uint8Array(16))) };
+  const par = (await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, [
+    'deriveBits',
+  ])) as CryptoKeyPair;
+  const publica = new Uint8Array(
+    (await crypto.subtle.exportKey('raw', par.publicKey)) as ArrayBuffer,
+  );
+  return {
+    p256dh: paraBase64url(publica),
+    auth: paraBase64url(crypto.getRandomValues(new Uint8Array(16))),
+  };
 }
 
 /** Pior nome: 120 caracteres, todos emoji de 4 bytes em UTF-8. */
@@ -21,13 +28,17 @@ const GRUPO_ID = '0f8fad5b-d9cb-469f-a165-70867728950e';
 
 describe('payload cifrado', () => {
   it('NOT-25: o ranking com o pior nome fica abaixo de 4096 bytes depois de cifrado', async () => {
-    const texto = serializarPayload(payloadRanking({ nomeGrupo: PIOR_NOME, slug: PIOR_SLUG, dataPartida: '2026-12-31' }));
+    const texto = serializarPayload(
+      payloadRanking({ nomeGrupo: PIOR_NOME, slug: PIOR_SLUG, dataPartida: '2026-12-31' }),
+    );
     const corpo = await cifrarPayload(texto, await assinante());
     expect(corpo.length).toBeLessThan(4096);
   });
 
   it('NOT-25, NOT-43: a cobrança com o pior nome fica abaixo de 4096 bytes depois de cifrada', async () => {
-    const texto = serializarPayload(payloadCobranca({ tipo: 'pagamento_confirmado', nomeGrupo: PIOR_NOME, grupoId: GRUPO_ID }));
+    const texto = serializarPayload(
+      payloadCobranca({ tipo: 'pagamento_confirmado', nomeGrupo: PIOR_NOME, grupoId: GRUPO_ID }),
+    );
     const corpo = await cifrarPayload(texto, await assinante());
     expect(corpo.length).toBeLessThan(4096);
   });
@@ -42,7 +53,9 @@ describe('topicoDoGrupo', () => {
 
   it('NOT-66: o mesmo grupo dá sempre o mesmo tópico, e outro grupo dá outro', async () => {
     expect(await topicoDoGrupo(GRUPO_ID)).toBe(await topicoDoGrupo(GRUPO_ID));
-    expect(await topicoDoGrupo(GRUPO_ID)).not.toBe(await topicoDoGrupo('1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed'));
+    expect(await topicoDoGrupo(GRUPO_ID)).not.toBe(
+      await topicoDoGrupo('1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed'),
+    );
   });
 
   it('NOT-28: o tópico não contém o id do grupo', async () => {
@@ -51,7 +64,9 @@ describe('topicoDoGrupo', () => {
   });
 
   it('NOT-28: é o SHA-256 em base64url, cortado em 32 (AD-110)', async () => {
-    const hash = new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode('42')));
+    const hash = new Uint8Array(
+      await crypto.subtle.digest('SHA-256', new TextEncoder().encode('42')),
+    );
     expect(await topicoDoGrupo('42')).toBe(paraBase64url(hash).slice(0, 32));
   });
 });

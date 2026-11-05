@@ -5,9 +5,17 @@ import { MemoryRouter } from 'react-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { criarCliente } from '../../src/dados/cliente.ts';
 import { ProvedorCliente } from '../../src/dados/ContextoCliente.tsx';
-import { caminhoEventos, esquecerAberturas, useEnviarPdfExportado, useEventoRankingAberto } from '../../src/dados/eventos.ts';
+import {
+  caminhoEventos,
+  esquecerAberturas,
+  useEnviarPdfExportado,
+  useEventoRankingAberto,
+} from '../../src/dados/eventos.ts';
 import { useMesDaUrl, useRankingPublico } from '../../src/dados/publico.ts';
-import { CHAVE_DISPOSITIVO, idDoAparelho } from '../../src/pwa/armazenamento/armazenamento-local.ts';
+import {
+  CHAVE_DISPOSITIVO,
+  idDoAparelho,
+} from '../../src/pwa/armazenamento/armazenamento-local.ts';
 import { json } from '../apoio/tela.tsx';
 
 /**
@@ -32,14 +40,28 @@ function ranking(mes: string) {
   const [ano, m] = mes.split('-').map(Number) as [number, number];
   const anterior = m === 1 ? `${ano - 1}-12` : `${ano}-${String(m - 1).padStart(2, '0')}`;
   return {
-    grupo: { nome: 'Pelada de Quinta', slug: SLUG, diaSemana: 'quinta', frequencia: 'semanal', horario: '20:00' },
+    grupo: {
+      nome: 'Pelada de Quinta',
+      slug: SLUG,
+      diaSemana: 'quinta',
+      frequencia: 'semanal',
+      horario: '20:00',
+    },
     mes,
     hoje: '2026-10-22',
     geradoEm: '2026-10-22T12:00:00.000Z',
     navegacao: { mesAnterior: anterior, mesSeguinte: null },
     resumoMes: { partidas: 1, comChuva: 0 },
     partidas: [{ data: `${mes}-15`, choveu: false }],
-    linhas: [{ posicao: 1, apelido: 'Beto', ptsInicial: 3, rodadas: [{ situacao: 'presente', pontos: 1 }], ptsFinal: 4 }],
+    linhas: [
+      {
+        posicao: 1,
+        apelido: 'Beto',
+        ptsInicial: 3,
+        rodadas: [{ situacao: 'presente', pontos: 1 }],
+        ptsFinal: 4,
+      },
+    ],
   };
 }
 
@@ -74,7 +96,8 @@ function montar<T>(hook: () => T, responder: Responder = padrao) {
       </QueryClientProvider>
     </MemoryRouter>
   );
-  const eventos = () => chamadas.filter((c) => c.metodo === 'POST' && c.url === caminhoEventos(SLUG));
+  const eventos = () =>
+    chamadas.filter((c) => c.metodo === 'POST' && c.url === caminhoEventos(SLUG));
   return { ...renderHook(hook, { wrapper: envoltorio }), chamadas, eventos };
 }
 
@@ -120,7 +143,10 @@ describe('ranking_aberto', () => {
   it('PAR-124: o ranking carregado envia ranking_aberto com o dispositivoId', async () => {
     const t = montar(usePagina);
     await waitFor(() => expect(t.eventos()).toHaveLength(1));
-    expect(t.eventos()[0]?.corpo).toEqual({ tipo: 'ranking_aberto', dispositivoId: idDoAparelho() });
+    expect(t.eventos()[0]?.corpo).toEqual({
+      tipo: 'ranking_aberto',
+      dispositivoId: idDoAparelho(),
+    });
   });
 
   it('PAR-124: trocar de mês duas vezes não envia outro ranking_aberto', async () => {
@@ -138,7 +164,11 @@ describe('ranking_aberto', () => {
   });
 
   it('PAR-124: ranking que não carrega (erro) não envia o evento', async () => {
-    const t = montar(usePagina, (metodo) => (metodo === 'POST' ? new Response(null, { status: 204 }) : json(404, { erro: 'x', codigo: 'nao_encontrado' })));
+    const t = montar(usePagina, (metodo) =>
+      metodo === 'POST'
+        ? new Response(null, { status: 204 })
+        : json(404, { erro: 'x', codigo: 'nao_encontrado' }),
+    );
     await waitFor(() => expect(t.result.current.consulta.isError).toBe(true));
     expect(t.eventos()).toHaveLength(0);
   });
@@ -160,7 +190,9 @@ describe('ranking_aberto', () => {
   });
 
   it('PAR-126: 500 no envio é ignorado, sem nova tentativa', async () => {
-    const t = montar(usePagina, (metodo, url) => (metodo === 'POST' ? json(500, { erro: 'x', codigo: 'erro_interno' }) : padrao(metodo, url)));
+    const t = montar(usePagina, (metodo, url) =>
+      metodo === 'POST' ? json(500, { erro: 'x', codigo: 'erro_interno' }) : padrao(metodo, url),
+    );
     await waitFor(() => expect(t.eventos()).toHaveLength(1));
     await new Promise((r) => setTimeout(r, 50));
     expect(t.eventos()).toHaveLength(1);
@@ -173,7 +205,10 @@ describe('pdf_exportado', () => {
     await ok.result.current('2026-10');
     expect(ok.eventos().map((e) => e.corpo)).toEqual([{ tipo: 'pdf_exportado', mes: '2026-10' }]);
 
-    const falha = montar(() => useEnviarPdfExportado(SLUG), () => Promise.reject(new TypeError('Failed to fetch')));
+    const falha = montar(
+      () => useEnviarPdfExportado(SLUG),
+      () => Promise.reject(new TypeError('Failed to fetch')),
+    );
     await expect(falha.result.current('2026-09')).resolves.toBeUndefined();
     expect(falha.eventos()).toHaveLength(1);
   });

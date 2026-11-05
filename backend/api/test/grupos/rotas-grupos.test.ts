@@ -11,7 +11,12 @@ import {
 import { linkPublico } from '../../src/entrada/rotas/grupos.ts';
 import { gerarToken } from '../../src/infraestrutura/sessao/token.ts';
 import { cliente } from '../acesso/apoio.ts';
-import { abrirCenarioGrupos, arquivar, reativar, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  arquivar,
+  reativar,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * `POST` e `GET /api/grupos` (T28; GEL-01, GEL-03 a GEL-10, GEL-17, GEL-27), com o app real como `pelada_app` contra o
@@ -20,7 +25,12 @@ import { abrirCenarioGrupos, arquivar, reativar, type CenarioGruposAberto } from
 
 let aberto: CenarioGruposAberto;
 
-const VALIDO = { nome: 'Pelada das Rotas', diaSemana: 'terca', frequencia: 'semanal', horario: '19:00' } as const;
+const VALIDO = {
+  nome: 'Pelada das Rotas',
+  diaSemana: 'terca',
+  frequencia: 'semanal',
+  horario: '19:00',
+} as const;
 
 async function sessao(conta: string): Promise<string> {
   const { token, hash } = await gerarToken();
@@ -71,7 +81,10 @@ describe('POST /api/grupos', () => {
       const { cenario } = aberto;
       const nome = `Pelada do Link ${url.length}`;
       const pedir = cliente(aberto.url, { URL_PUBLICA: url });
-      const r = await pedir('/grupos', { sessao: await sessao(cenario.contaB), corpo: { ...VALIDO, nome } });
+      const r = await pedir('/grupos', {
+        sessao: await sessao(cenario.contaB),
+        corpo: { ...VALIDO, nome },
+      });
       expect(r.status).toBe(201);
       const corpo = (await r.json()) as { id: string; slug: string; linkPublico: string };
       expect(Object.keys(corpo).sort()).toEqual(['id', 'linkPublico', 'slug']);
@@ -83,21 +96,40 @@ describe('POST /api/grupos', () => {
   it('GEL-01: o grupo nasce com criado_por, vínculo com financeiro e as 6 habilidades', async () => {
     const { cenario } = aberto;
     const pedir = cliente(aberto.url);
-    const r = await pedir('/grupos', { sessao: await sessao(cenario.contaB), corpo: { ...VALIDO, nome: 'Pelada Completa' } });
+    const r = await pedir('/grupos', {
+      sessao: await sessao(cenario.contaB),
+      corpo: { ...VALIDO, nome: 'Pelada Completa' },
+    });
     expect(r.status).toBe(201);
     const { id } = (await r.json()) as { id: string };
     const g = await aberto.db.query('SELECT criado_por FROM grupos WHERE id = $1', [id]);
     expect(g.rows[0]?.criado_por).toBe(cenario.contaB);
-    const v = await aberto.db.query('SELECT conta_id, acessa_financeiro FROM vinculos_admin WHERE grupo_id = $1', [id]);
+    const v = await aberto.db.query(
+      'SELECT conta_id, acessa_financeiro FROM vinculos_admin WHERE grupo_id = $1',
+      [id],
+    );
     expect(v.rows).toEqual([{ conta_id: cenario.contaB, acessa_financeiro: true }]);
-    const h = await aberto.db.query('SELECT nome FROM habilidades WHERE grupo_id = $1 ORDER BY ordem', [id]);
-    expect(h.rows.map((l) => l.nome)).toEqual(['Visão de Jogo', 'Passe', 'Preparo Físico', 'Drible', 'Chute', 'Desarme']);
+    const h = await aberto.db.query(
+      'SELECT nome FROM habilidades WHERE grupo_id = $1 ORDER BY ordem',
+      [id],
+    );
+    expect(h.rows.map((l) => l.nome)).toEqual([
+      'Visão de Jogo',
+      'Passe',
+      'Preparo Físico',
+      'Drible',
+      'Chute',
+      'Desarme',
+    ]);
   });
 
   it('GEL-10: no sucesso há grupo_criado com a conta autora', async () => {
     const { cenario } = aberto;
     const pedir = cliente(aberto.url);
-    const r = await pedir('/grupos', { sessao: await sessao(cenario.contaB), corpo: { ...VALIDO, nome: 'Pelada Auditada' } });
+    const r = await pedir('/grupos', {
+      sessao: await sessao(cenario.contaB),
+      corpo: { ...VALIDO, nome: 'Pelada Auditada' },
+    });
     const { id } = (await r.json()) as { id: string };
     // planos-e-cobranca T13 (PLA-14): a criação grava também a entrada no trial, com a mesma conta autora.
     expect(await auditoriaDe(id)).toEqual([
@@ -117,21 +149,24 @@ describe('POST /api/grupos', () => {
     ['horário vazio', { horario: '' }, 'horario', MENSAGEM_HORARIO_AUSENTE],
     ['horário fora de HH:MM', { horario: '7:30' }, 'horario', MENSAGEM_HORARIO_INVALIDO],
     ['horário 24:00', { horario: '24:00' }, 'horario', MENSAGEM_HORARIO_INVALIDO],
-  ] as const)('GEL-03 a GEL-06: %s dá 422 no campo e nada é criado', async (_caso, mudanca, campo, mensagem) => {
-    const { cenario } = aberto;
-    const nomeBase = 'Pelada Inválida';
-    const corpo: Record<string, unknown> = { ...VALIDO, nome: nomeBase, ...mudanca };
-    for (const [k, v] of Object.entries(corpo)) if (v === undefined) delete corpo[k];
-    const pedir = cliente(aberto.url);
-    const r = await pedir('/grupos', { sessao: await sessao(cenario.contaB), corpo });
-    expect(r.status).toBe(422);
-    const erro = (await r.json()) as Corpo422;
-    expect(erro.erro).toBe(MENSAGEM_CORRIJA_CAMPOS);
-    expect(erro.codigo).toBe('dados_invalidos');
-    expect(erro.campos).toContain(campo);
-    expect(erro.mensagens[campo]).toBe(mensagem);
-    expect(await gruposComNome(nomeBase)).toBe(0);
-  });
+  ] as const)(
+    'GEL-03 a GEL-06: %s dá 422 no campo e nada é criado',
+    async (_caso, mudanca, campo, mensagem) => {
+      const { cenario } = aberto;
+      const nomeBase = 'Pelada Inválida';
+      const corpo: Record<string, unknown> = { ...VALIDO, nome: nomeBase, ...mudanca };
+      for (const [k, v] of Object.entries(corpo)) if (v === undefined) delete corpo[k];
+      const pedir = cliente(aberto.url);
+      const r = await pedir('/grupos', { sessao: await sessao(cenario.contaB), corpo });
+      expect(r.status).toBe(422);
+      const erro = (await r.json()) as Corpo422;
+      expect(erro.erro).toBe(MENSAGEM_CORRIJA_CAMPOS);
+      expect(erro.codigo).toBe('dados_invalidos');
+      expect(erro.campos).toContain(campo);
+      expect(erro.mensagens[campo]).toBe(mensagem);
+      expect(await gruposComNome(nomeBase)).toBe(0);
+    },
+  );
 
   it.each([
     ['slug', { slug: 'meu-slug' }],
@@ -140,7 +175,10 @@ describe('POST /api/grupos', () => {
     const { cenario } = aberto;
     const nome = `Pelada com Campo Extra ${_campo}`;
     const pedir = cliente(aberto.url);
-    const r = await pedir('/grupos', { sessao: await sessao(cenario.contaB), corpo: { ...VALIDO, nome, ...extra } });
+    const r = await pedir('/grupos', {
+      sessao: await sessao(cenario.contaB),
+      corpo: { ...VALIDO, nome, ...extra },
+    });
     expect(r.status).toBe(422);
     expect(((await r.json()) as Corpo422).codigo).toBe('dados_invalidos');
     expect(await gruposComNome(nome)).toBe(0);
@@ -155,7 +193,10 @@ describe('POST /api/grupos', () => {
 
   it('GEL-08: com cookie de sessão inválida, 401 e nada criado', async () => {
     const pedir = cliente(aberto.url);
-    const r = await pedir('/grupos', { sessao: 'token-que-nao-existe', corpo: { ...VALIDO, nome: 'Pelada Cookie Ruim' } });
+    const r = await pedir('/grupos', {
+      sessao: 'token-que-nao-existe',
+      corpo: { ...VALIDO, nome: 'Pelada Cookie Ruim' },
+    });
     expect(r.status).toBe(401);
     expect(await gruposComNome('Pelada Cookie Ruim')).toBe(0);
   });
@@ -177,7 +218,10 @@ describe('POST /api/grupos', () => {
     );
     try {
       const pedir = cliente(aberto.url);
-      const r = await pedir('/grupos', { sessao: await sessao(cenario.contaB), corpo: { ...VALIDO, nome } });
+      const r = await pedir('/grupos', {
+        sessao: await sessao(cenario.contaB),
+        corpo: { ...VALIDO, nome },
+      });
       expect(r.status).toBe(500);
       expect(JSON.stringify(await r.json())).not.toContain('falha forçada');
     } finally {
@@ -207,7 +251,10 @@ describe('GET /api/grupos', () => {
     const pedir = cliente(aberto.url);
     const r = await pedir('/grupos', { sessao: await sessao(cenario.contaC) });
     expect(r.status).toBe(200);
-    const corpo = (await r.json()) as { ativos: Array<{ id: string }>; arquivados: Array<{ id: string }> };
+    const corpo = (await r.json()) as {
+      ativos: Array<{ id: string }>;
+      arquivados: Array<{ id: string }>;
+    };
     expect(Object.keys(corpo).sort()).toEqual(['arquivados', 'ativos']);
     expect(corpo.arquivados.map((g) => g.id)).toEqual([cenario.grupoG]);
     expect(corpo.ativos.map((g) => g.id)).not.toContain(cenario.grupoG);
@@ -217,7 +264,10 @@ describe('GET /api/grupos', () => {
     const { cenario } = aberto;
     const pedir = cliente(aberto.url);
     const r = await pedir('/grupos', { sessao: await sessao(cenario.contaC) });
-    const corpo = (await r.json()) as { ativos: Array<Record<string, unknown>>; arquivados: unknown[] };
+    const corpo = (await r.json()) as {
+      ativos: Array<Record<string, unknown>>;
+      arquivados: unknown[];
+    };
     const g = corpo.ativos.find((item) => item.id === cenario.grupoG);
     expect(g).toMatchObject({ slug: cenario.slugG, nome: 'Pelada de Quinta' });
     expect(g?.horario).toMatch(/^\d{2}:\d{2}$/);
@@ -229,7 +279,10 @@ describe('GET /api/grupos', () => {
     await arquivar(aberto.db, cenario.grupoG);
     const pedir = cliente(aberto.url);
     const r = await pedir('/grupos', { sessao: await sessao(cenario.contaO) });
-    const corpo = (await r.json()) as { ativos: Array<{ id: string }>; arquivados: Array<{ id: string }> };
+    const corpo = (await r.json()) as {
+      ativos: Array<{ id: string }>;
+      arquivados: Array<{ id: string }>;
+    };
     expect(corpo.ativos.map((g) => g.id)).not.toContain(cenario.grupoG);
     expect(corpo.arquivados).toEqual([]);
   });

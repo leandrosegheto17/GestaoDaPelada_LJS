@@ -22,8 +22,15 @@ function lerResposta(arquivo: string): unknown {
 /** Formato antigo do mockup → `corpoErro`; só os campos do formulário (`aceitos`). */
 function corpoDoContrato(antigo: unknown, aceitos: readonly string[]): string {
   const erro = (antigo as { erro: { mensagem: string; campos: Record<string, string> } }).erro;
-  const mensagens = Object.fromEntries(Object.entries(erro.campos).filter(([campo]) => aceitos.includes(campo)));
-  return JSON.stringify({ erro: erro.mensagem, codigo: 'dados_invalidos', campos: Object.keys(mensagens).sort(), mensagens });
+  const mensagens = Object.fromEntries(
+    Object.entries(erro.campos).filter(([campo]) => aceitos.includes(campo)),
+  );
+  return JSON.stringify({
+    erro: erro.mensagem,
+    codigo: 'dados_invalidos',
+    campos: Object.keys(mensagens).sort(),
+    mensagens,
+  });
 }
 
 const SESSAO = lerResposta('acesso-sessao-leandro.json');
@@ -34,7 +41,9 @@ const VIEWPORTS = [
 ] as const;
 
 async function prepararSessao(pagina: Page) {
-  await pagina.route('**/api/sessao', (rota) => rota.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(SESSAO) }));
+  await pagina.route('**/api/sessao', (rota) =>
+    rota.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(SESSAO) }),
+  );
 }
 
 async function caixa(local: Locator) {
@@ -44,19 +53,29 @@ async function caixa(local: Locator) {
 }
 
 /** Para cada campo com erro: a mensagem abaixo da entrada, antes do campo seguinte, e alinhada à esquerda dela. */
-async function conferirAoLado(pagina: Page, campos: readonly { id: string; seguinte: string | null }[]) {
+async function conferirAoLado(
+  pagina: Page,
+  campos: readonly { id: string; seguinte: string | null }[],
+) {
   for (const { id, seguinte } of campos) {
     const entrada = await caixa(pagina.locator(`#${id}`));
     const mensagem = await caixa(pagina.locator(`#${id}-erro`));
-    expect(mensagem.y, `${id}: a mensagem começa abaixo da base do campo`).toBeGreaterThanOrEqual(entrada.y + entrada.height - 1);
+    expect(mensagem.y, `${id}: a mensagem começa abaixo da base do campo`).toBeGreaterThanOrEqual(
+      entrada.y + entrada.height - 1,
+    );
     if (seguinte !== null) {
       const proximo = await caixa(pagina.locator(`label[for="${seguinte}"]`));
       // Em duas colunas (PC) o campo seguinte pode estar ao lado: a regra vale para o seguinte na mesma coluna.
       if (Math.abs(proximo.x - entrada.x) <= 4) {
-        expect(mensagem.y, `${id}: a mensagem começa antes do campo seguinte`).toBeLessThan(proximo.y);
+        expect(mensagem.y, `${id}: a mensagem começa antes do campo seguinte`).toBeLessThan(
+          proximo.y,
+        );
       }
     }
-    expect(Math.abs(mensagem.x - entrada.x), `${id}: a mensagem alinhada à esquerda do campo`).toBeLessThanOrEqual(4);
+    expect(
+      Math.abs(mensagem.x - entrada.x),
+      `${id}: a mensagem alinhada à esquerda do campo`,
+    ).toBeLessThanOrEqual(4);
   }
 }
 
@@ -66,11 +85,20 @@ for (const vp of VIEWPORTS) {
 
     test(`GEL-118: novo grupo, nome e horário (${vp.nome})`, async ({ page }) => {
       await prepararSessao(page);
-      const corpo = corpoDoContrato(lerResposta('erro-validacao-novo-grupo.json'), ['nome', 'diaSemana', 'horario', 'frequencia']);
+      const corpo = corpoDoContrato(lerResposta('erro-validacao-novo-grupo.json'), [
+        'nome',
+        'diaSemana',
+        'horario',
+        'frequencia',
+      ]);
       await page.route('**/api/grupos', (rota) =>
         rota.request().method() === 'POST'
           ? rota.fulfill({ status: 422, contentType: 'application/json', body: corpo })
-          : rota.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ativos: [], arquivados: [] }) }),
+          : rota.fulfill({
+              status: 200,
+              contentType: 'application/json',
+              body: JSON.stringify({ ativos: [], arquivados: [] }),
+            }),
       );
       await page.goto('/app/grupos/novo');
       await page.getByLabel('Nome').fill('Ra');
@@ -79,12 +107,17 @@ for (const vp of VIEWPORTS) {
       const resumo = page.getByRole('alert').filter({ hasText: 'Corrija 2 campos:' });
       await expect(resumo).toBeVisible();
       await expect(resumo.getByRole('link')).toHaveText(['Nome', 'Horário']);
-      await expect(page.locator('#nome-erro')).toHaveText('O nome precisa ter de 3 a 60 caracteres.');
+      await expect(page.locator('#nome-erro')).toHaveText(
+        'O nome precisa ter de 3 a 60 caracteres.',
+      );
       await expect(page.locator('#hora-erro')).toHaveText('Informe o horário.');
 
       const caixaResumo = await caixa(resumo);
       const primeiro = await caixa(page.locator('label[for="nome"]'));
-      expect(caixaResumo.y + caixaResumo.height, 'o resumo fica acima do primeiro campo').toBeLessThanOrEqual(primeiro.y);
+      expect(
+        caixaResumo.y + caixaResumo.height,
+        'o resumo fica acima do primeiro campo',
+      ).toBeLessThanOrEqual(primeiro.y);
 
       await conferirAoLado(page, [
         { id: 'nome', seguinte: 'dia' },
@@ -103,12 +136,20 @@ for (const vp of VIEWPORTS) {
         'pontuacaoInicial',
       ]);
       await page.route('**/api/grupos/g-quinta', (rota) =>
-        rota.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(lerResposta('grupo-quinta.json')) }),
+        rota.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify(lerResposta('grupo-quinta.json')),
+        }),
       );
       await page.route('**/api/grupos/g-quinta/jogadores', (rota) =>
         rota.request().method() === 'POST'
           ? rota.fulfill({ status: 422, contentType: 'application/json', body: corpo })
-          : rota.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ jogadores: [] }) }),
+          : rota.fulfill({
+              status: 200,
+              contentType: 'application/json',
+              body: JSON.stringify({ jogadores: [] }),
+            }),
       );
       await page.goto('/app/grupos/g-quinta/jogadores/novo');
       await page.getByLabel('Apelido').fill('toninho');
@@ -121,7 +162,10 @@ for (const vp of VIEWPORTS) {
 
       const caixaResumo = await caixa(resumo);
       const primeiro = await caixa(page.locator('label[for="apelido"]'));
-      expect(caixaResumo.y + caixaResumo.height, 'o resumo fica acima do primeiro campo').toBeLessThanOrEqual(primeiro.y);
+      expect(
+        caixaResumo.y + caixaResumo.height,
+        'o resumo fica acima do primeiro campo',
+      ).toBeLessThanOrEqual(primeiro.y);
 
       await conferirAoLado(page, [
         { id: 'apelido', seguinte: 'ano' },

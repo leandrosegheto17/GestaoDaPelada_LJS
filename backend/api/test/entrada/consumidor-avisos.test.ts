@@ -73,7 +73,11 @@ function mensagem(body: unknown): MensagemEspiada {
   return m;
 }
 
-async function consumir(body: unknown, casos: CasosDeUso, relatos: MotivoFila[] = []): Promise<MensagemEspiada> {
+async function consumir(
+  body: unknown,
+  casos: CasosDeUso,
+  relatos: MotivoFila[] = [],
+): Promise<MensagemEspiada> {
   const m = mensagem(body);
   await consumirAvisos({ messages: [m] }, env, {
     casos,
@@ -100,7 +104,9 @@ describe('consumidor da fila avisos', () => {
   });
 
   it('caso de uso que pede nova tentativa: retry com o atraso pedido, sem ack', async () => {
-    const m = await consumir(RANKING, { ranking: async () => ({ acao: 'repetir', aposSegundos: 120 }) });
+    const m = await consumir(RANKING, {
+      ranking: async () => ({ acao: 'repetir', aposSegundos: 120 }),
+    });
     expect(m.acks).toBe(0);
     expect(m.retries).toEqual([{ delaySeconds: 120 }]);
   });
@@ -127,7 +133,12 @@ describe('consumidor da fila avisos', () => {
     const m = await consumir(RANKING, {
       ranking: async (_msg, { banco }) => {
         lido = await banco(async (db) => {
-          const r = await sql<{ conta: string | null; slug: string | null; funcao_conta: string | null; papel: string }>`
+          const r = await sql<{
+            conta: string | null;
+            slug: string | null;
+            funcao_conta: string | null;
+            papel: string;
+          }>`
             SELECT current_setting('app.conta_id', true) AS conta,
                    current_setting('app.slug_publico', true) AS slug,
                    app_conta_id()::text AS funcao_conta,
@@ -142,21 +153,30 @@ describe('consumidor da fila avisos', () => {
   });
 
   it('NOT-33: mensagem inválida é descartada e vai ao Sentry sem o corpo', async () => {
-    const consoles = (['log', 'info', 'warn', 'error', 'debug'] as const).map((n) => vi.spyOn(console, n));
+    const consoles = (['log', 'info', 'warn', 'error', 'debug'] as const).map((n) =>
+      vi.spyOn(console, n),
+    );
     const caso = vi.fn(concluir);
     const corpo = { ...RANKING, nome: SEGREDO, email: 'criadora@exemplo.com' };
     const m = mensagem(corpo);
     // Sem `reportar`: o relato padrão, pelo Sentry (simulado neste arquivo).
-    await consumirAvisos({ messages: [m] }, env, { casos: { ranking: caso }, fabrica: fabricaComoApp().fabrica });
+    await consumirAvisos({ messages: [m] }, env, {
+      casos: { ranking: caso },
+      fabrica: fabricaComoApp().fabrica,
+    });
 
     expect(caso).not.toHaveBeenCalled();
     expect(m.acks).toBe(1);
     expect(m.retries).toEqual([]);
     const captura = vi.mocked(Sentry.captureMessage);
     expect(captura).toHaveBeenCalledTimes(1);
-    expect(captura.mock.calls[0]).toEqual(['fila_avisos', { level: 'warning', tags: { motivo: 'mensagem_invalida' } }]);
+    expect(captura.mock.calls[0]).toEqual([
+      'fila_avisos',
+      { level: 'warning', tags: { motivo: 'mensagem_invalida' } },
+    ]);
     const tudo = JSON.stringify([captura.mock.calls, consoles.map((c) => c.mock.calls)]);
-    for (const proibido of [SEGREDO, 'criadora@exemplo.com', RANKING.grupoId]) expect(tudo).not.toContain(proibido);
+    for (const proibido of [SEGREDO, 'criadora@exemplo.com', RANKING.grupoId])
+      expect(tudo).not.toContain(proibido);
   });
 
   it('corpo que não é objeto: descartado como inválido', async () => {
@@ -188,7 +208,9 @@ describe('consumidor da fila avisos', () => {
     const a = mensagem(RANKING);
     const b = mensagem({ ...RANKING, tentativa: 2 });
     await consumirAvisos({ messages: [a, b] }, env, {
-      casos: { ranking: async (msg) => (msg.tentativa === 1 ? { acao: 'concluir' } : { acao: 'repetir' }) },
+      casos: {
+        ranking: async (msg) => (msg.tentativa === 1 ? { acao: 'concluir' } : { acao: 'repetir' }),
+      },
       fabrica: fabricaComoApp().fabrica,
       reportar: () => undefined,
     });

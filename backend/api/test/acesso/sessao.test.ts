@@ -35,7 +35,10 @@ async function novaConta(): Promise<{ id: string; email: string }> {
     `INSERT INTO contas (email, nome, senha_hash, criada_em) VALUES ($1, 'Pessoa Sessão', 'x', now())`,
     [email],
   );
-  const r = await aberto.db.query<{ id: string }>('SELECT conta_definir_senha($1, $2, false) AS id', [email, SENHA]);
+  const r = await aberto.db.query<{ id: string }>(
+    'SELECT conta_definir_senha($1, $2, false) AS id',
+    [email, SENHA],
+  );
   return { id: r.rows[0]!.id, email };
 }
 
@@ -43,26 +46,41 @@ function ip(i: number): string {
   return `198.51.100.${i}`;
 }
 
-const BLOQUEIO = { codigo: 'bloqueado_temporariamente', erro: 'Muitas tentativas. Tente de novo em 15 minutos.' };
+const BLOQUEIO = {
+  codigo: 'bloqueado_temporariamente',
+  erro: 'Muitas tentativas. Tente de novo em 15 minutos.',
+};
 
 describe('POST /api/sessao/entrar', () => {
   it('ACE-09: 200 com nome e e-mail e o cookie __Host-sessao; o banco guarda só o SHA-256 do token (ACE-10)', async () => {
     const { cenario } = aberto;
-    const r = await pedir('/sessao/entrar', { corpo: { email: cenario.emailA, senha: cenario.senhaA }, ip: ip(1) });
+    const r = await pedir('/sessao/entrar', {
+      corpo: { email: cenario.emailA, senha: cenario.senhaA },
+      ip: ip(1),
+    });
     expect(r.status).toBe(200);
     expect(await r.json()).toEqual({ nome: 'Conta A', email: cenario.emailA });
     const token = tokenDoCookie(r);
     expect(token).toMatch(/^[A-Za-z0-9_-]{43}$/);
     const cabecalho = r.headers.get('set-cookie') ?? '';
-    for (const atributo of ['HttpOnly', 'Secure', 'SameSite=Lax', 'Path=/']) expect(cabecalho).toContain(atributo);
-    const s = await aberto.db.query('SELECT 1 FROM sessoes WHERE token_hash = $1', [hashDoTexto(token!)]);
+    for (const atributo of ['HttpOnly', 'Secure', 'SameSite=Lax', 'Path=/'])
+      expect(cabecalho).toContain(atributo);
+    const s = await aberto.db.query('SELECT 1 FROM sessoes WHERE token_hash = $1', [
+      hashDoTexto(token!),
+    ]);
     expect(s.rowCount).toBe(1);
   });
 
   it('ACE-11: e-mail inexistente e senha errada dão o mesmo 401 credenciais_invalidas', async () => {
     const { cenario } = aberto;
-    const errada = await pedir('/sessao/entrar', { corpo: { email: cenario.emailB, senha: 'errada' }, ip: ip(2) });
-    const inexistente = await pedir('/sessao/entrar', { corpo: { email: 'ninguem@exemplo.test', senha: 'errada' }, ip: ip(2) });
+    const errada = await pedir('/sessao/entrar', {
+      corpo: { email: cenario.emailB, senha: 'errada' },
+      ip: ip(2),
+    });
+    const inexistente = await pedir('/sessao/entrar', {
+      corpo: { email: 'ninguem@exemplo.test', senha: 'errada' },
+      ip: ip(2),
+    });
     expect(errada.status).toBe(401);
     expect(inexistente.status).toBe(401);
     const corpo = await errada.json();
@@ -85,10 +103,16 @@ describe('POST /api/sessao/entrar', () => {
   it('ACE-13: 5 falhas do par em 15 min bloqueiam o par, mesmo com a senha certa, com o texto único', async () => {
     const conta = await novaConta();
     for (let i = 0; i < 5; i += 1) {
-      const r = await pedir('/sessao/entrar', { corpo: { email: conta.email, senha: 'errada' }, ip: ip(10) });
+      const r = await pedir('/sessao/entrar', {
+        corpo: { email: conta.email, senha: 'errada' },
+        ip: ip(10),
+      });
       expect(r.status).toBe(401);
     }
-    const certa = await pedir('/sessao/entrar', { corpo: { email: conta.email, senha: SENHA }, ip: ip(10) });
+    const certa = await pedir('/sessao/entrar', {
+      corpo: { email: conta.email, senha: SENHA },
+      ip: ip(10),
+    });
     expect(certa.status).toBe(429);
     expect(await certa.json()).toEqual(BLOQUEIO);
     expect(certa.headers.get('set-cookie')).toBeNull();
@@ -96,16 +120,27 @@ describe('POST /api/sessao/entrar', () => {
 
   it('ACE-13: 4 falhas ainda não bloqueiam', async () => {
     const conta = await novaConta();
-    for (let i = 0; i < 4; i += 1) await pedir('/sessao/entrar', { corpo: { email: conta.email, senha: 'errada' }, ip: ip(11) });
-    const certa = await pedir('/sessao/entrar', { corpo: { email: conta.email, senha: SENHA }, ip: ip(11) });
+    for (let i = 0; i < 4; i += 1)
+      await pedir('/sessao/entrar', { corpo: { email: conta.email, senha: 'errada' }, ip: ip(11) });
+    const certa = await pedir('/sessao/entrar', {
+      corpo: { email: conta.email, senha: SENHA },
+      ip: ip(11),
+    });
     expect(certa.status).toBe(200);
   });
 
   it('ACE-14: o bloqueio de um IP não afeta outro IP sem falhas', async () => {
     const conta = await novaConta();
-    for (let i = 0; i < 5; i += 1) await pedir('/sessao/entrar', { corpo: { email: conta.email, senha: 'errada' }, ip: ip(12) });
-    expect((await pedir('/sessao/entrar', { corpo: { email: conta.email, senha: SENHA }, ip: ip(12) })).status).toBe(429);
-    const outro = await pedir('/sessao/entrar', { corpo: { email: conta.email, senha: SENHA }, ip: ip(13) });
+    for (let i = 0; i < 5; i += 1)
+      await pedir('/sessao/entrar', { corpo: { email: conta.email, senha: 'errada' }, ip: ip(12) });
+    expect(
+      (await pedir('/sessao/entrar', { corpo: { email: conta.email, senha: SENHA }, ip: ip(12) }))
+        .status,
+    ).toBe(429);
+    const outro = await pedir('/sessao/entrar', {
+      corpo: { email: conta.email, senha: SENHA },
+      ip: ip(13),
+    });
     expect(outro.status).toBe(200);
   });
 
@@ -117,7 +152,10 @@ describe('POST /api/sessao/entrar', () => {
        SELECT $1, digest(i::text, 'sha256'), now() - interval '1 minute', false FROM generate_series(1, 50) AS i`,
       [conta.email],
     );
-    const r = await pedir('/sessao/entrar', { corpo: { email: conta.email, senha: SENHA }, ip: ip(14) });
+    const r = await pedir('/sessao/entrar', {
+      corpo: { email: conta.email, senha: SENHA },
+      ip: ip(14),
+    });
     expect(r.status).toBe(429);
     expect(await r.json()).toEqual(BLOQUEIO);
   });
@@ -140,7 +178,10 @@ describe('POST /api/sessao/entrar', () => {
     for (let i = 0; i < 5; i += 1) {
       await semIp('/sessao/entrar', { corpo: { email: conta.email, senha: 'errada' }, ip: '' });
     }
-    expect((await semIp('/sessao/entrar', { corpo: { email: conta.email, senha: SENHA }, ip: '' })).status).toBe(429);
+    expect(
+      (await semIp('/sessao/entrar', { corpo: { email: conta.email, senha: SENHA }, ip: '' }))
+        .status,
+    ).toBe(429);
   });
 
   it('ACE-03: corpo inválido dá 422', async () => {
@@ -152,7 +193,10 @@ describe('POST /api/sessao/entrar', () => {
 describe('GET /api/sessao e POST /api/sessao/sair', () => {
   it('ACE-18: com sessão, id, nome, e-mail e a lista de grupos', async () => {
     const { cenario } = aberto;
-    const entrar = await pedir('/sessao/entrar', { corpo: { email: cenario.emailA, senha: cenario.senhaA }, ip: ip(20) });
+    const entrar = await pedir('/sessao/entrar', {
+      corpo: { email: cenario.emailA, senha: cenario.senhaA },
+      ip: ip(20),
+    });
     const token = tokenDoCookie(entrar);
     const r = await pedir('/sessao', { sessao: token });
     expect(r.status).toBe(200);
@@ -160,7 +204,9 @@ describe('GET /api/sessao e POST /api/sessao/sair', () => {
       id: cenario.contaA,
       nome: 'Conta A',
       email: cenario.emailA,
-      grupos: [{ id: cenario.grupoA, nome: 'Grupo A', slug: cenario.slugA, acessaFinanceiro: false }],
+      grupos: [
+        { id: cenario.grupoA, nome: 'Grupo A', slug: cenario.slugA, acessaFinanceiro: false },
+      ],
     });
   });
 
@@ -171,12 +217,17 @@ describe('GET /api/sessao e POST /api/sessao/sair', () => {
 
   it('ACE-17: sair dá 204 com o cookie vencido, apaga a sessão, e depois GET /api/sessao dá 401', async () => {
     const { cenario } = aberto;
-    const entrar = await pedir('/sessao/entrar', { corpo: { email: cenario.emailB, senha: cenario.senhaB }, ip: ip(21) });
+    const entrar = await pedir('/sessao/entrar', {
+      corpo: { email: cenario.emailB, senha: cenario.senhaB },
+      ip: ip(21),
+    });
     const token = tokenDoCookie(entrar)!;
     const sair = await pedir('/sessao/sair', { metodo: 'POST', sessao: token });
     expect(sair.status).toBe(204);
     expect(cookieVencido(sair)).toBe(true);
-    const s = await aberto.db.query('SELECT 1 FROM sessoes WHERE token_hash = $1', [hashDoTexto(token)]);
+    const s = await aberto.db.query('SELECT 1 FROM sessoes WHERE token_hash = $1', [
+      hashDoTexto(token),
+    ]);
     expect(s.rowCount).toBe(0);
     expect((await pedir('/sessao', { sessao: token })).status).toBe(401);
   });

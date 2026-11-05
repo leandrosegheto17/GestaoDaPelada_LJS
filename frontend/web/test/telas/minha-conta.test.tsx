@@ -1,7 +1,10 @@
 import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 import { TEXTO_CONTA_EXCLUIDA } from '../../src/paginas/Mensagens.tsx';
-import { ERRO_SENHA_INCORRETA, TEXTO_UNICO_ADMIN } from '../../src/telas/minha-conta/MinhaConta.tsx';
+import {
+  ERRO_SENHA_INCORRETA,
+  TEXTO_UNICO_ADMIN,
+} from '../../src/telas/minha-conta/MinhaConta.tsx';
 import { esperarSemViolacoes } from '../apoio/axe.ts';
 import { abrirTela, erroApi, json, type Manipulador } from '../apoio/tela.tsx';
 
@@ -9,7 +12,9 @@ const SESSAO_LEANDRO = {
   id: 'c-leandro',
   nome: 'Leandro',
   email: 'leandro@exemplo.com.br',
-  grupos: [{ id: 'g-quinta', nome: 'Pelada de Quinta', slug: 'pelada-de-quinta', acessaFinanceiro: true }],
+  grupos: [
+    { id: 'g-quinta', nome: 'Pelada de Quinta', slug: 'pelada-de-quinta', acessaFinanceiro: true },
+  ],
 };
 
 const ERRO_UNICO_ADMIN = {
@@ -43,7 +48,9 @@ describe('tela Minha conta', () => {
     expect(await screen.findByRole('heading', { level: 1, name: 'Minha conta' })).toBeTruthy();
     expect(screen.getByText('Leandro')).toBeTruthy();
     expect(screen.getByText('leandro@exemplo.com.br')).toBeTruthy();
-    expect(screen.getByRole('link', { name: 'Trocar senha' }).getAttribute('href')).toBe('/app/conta/senha');
+    expect(screen.getByRole('link', { name: 'Trocar senha' }).getAttribute('href')).toBe(
+      '/app/conta/senha',
+    );
     expect(screen.getByRole('link', { name: 'Seus grupos' }).getAttribute('href')).toBe('/app');
     await esperarSemViolacoes(container);
   });
@@ -52,9 +59,9 @@ describe('tela Minha conta', () => {
     const { container } = abrir();
     fireEvent.click(await screen.findByRole('button', { name: 'Excluir minha conta' }));
     const dialogo = screen.getByRole('alertdialog', { name: 'Excluir sua conta?' });
-    expect(document.getElementById(dialogo.getAttribute('aria-describedby') ?? '')?.textContent).toBe(
-      'Não dá para desfazer. Digite sua senha para confirmar.',
-    );
+    expect(
+      document.getElementById(dialogo.getAttribute('aria-describedby') ?? '')?.textContent,
+    ).toBe('Não dá para desfazer. Digite sua senha para confirmar.');
     expect(document.activeElement).toBe(within(dialogo).getByRole('button', { name: 'Cancelar' }));
     expect((within(dialogo).getByLabelText('Senha') as HTMLInputElement).type).toBe('password');
     await esperarSemViolacoes(container);
@@ -71,7 +78,9 @@ describe('tela Minha conta', () => {
     });
     await excluirCom('SenhaForte123');
     await waitFor(() => expect(local()).toBe('/?aviso=conta-excluida'));
-    expect(chamadasA('POST', '/api/conta/excluir').map((c) => c.corpo)).toEqual([{ senha: 'SenhaForte123' }]);
+    expect(chamadasA('POST', '/api/conta/excluir').map((c) => c.corpo)).toEqual([
+      { senha: 'SenhaForte123' },
+    ]);
     expect(await screen.findByText(TEXTO_CONTA_EXCLUIDA)).toBeTruthy();
   });
 
@@ -81,15 +90,27 @@ describe('tela Minha conta', () => {
     expect(await screen.findByText(TEXTO_UNICO_ADMIN)).toBeTruthy();
     expect(screen.queryByRole('alertdialog')).toBeNull();
     const lista = screen.getByRole('list', { name: 'Grupos em que você é o único admin' });
-    expect(within(lista).getByRole('link', { name: /Pelada de Quinta/ }).getAttribute('href')).toBe('/app/grupos/g-quinta/admins');
-    expect(within(lista).getByRole('link', { name: /Racha de Domingo/ }).getAttribute('href')).toBe('/app/grupos/g-domingo/admins');
+    expect(
+      within(lista)
+        .getByRole('link', { name: /Pelada de Quinta/ })
+        .getAttribute('href'),
+    ).toBe('/app/grupos/g-quinta/admins');
+    expect(
+      within(lista)
+        .getByRole('link', { name: /Racha de Domingo/ })
+        .getAttribute('href'),
+    ).toBe('/app/grupos/g-domingo/admins');
     expect(local()).toBe('/app/conta');
   });
 
   it('ACE-30: 401 senha_atual_incorreta marca o campo com "Senha incorreta." e fica na tela', async () => {
-    const { local } = abrir({ 'POST /api/conta/excluir': () => erroApi(401, 'senha_atual_incorreta') });
+    const { local } = abrir({
+      'POST /api/conta/excluir': () => erroApi(401, 'senha_atual_incorreta'),
+    });
     const dialogo = await excluirCom('Errada123');
-    await waitFor(() => expect(document.getElementById('senha-excluir-erro')?.textContent).toBe(ERRO_SENHA_INCORRETA));
+    await waitFor(() =>
+      expect(document.getElementById('senha-excluir-erro')?.textContent).toBe(ERRO_SENHA_INCORRETA),
+    );
     expect(within(dialogo).getByLabelText('Senha').getAttribute('aria-invalid')).toBe('true');
     expect(local()).toBe('/app/conta');
   });
@@ -104,7 +125,10 @@ describe('tela Minha conta', () => {
   it('ACE-70: 429 bloqueado mostra a mensagem da API no diálogo', async () => {
     abrir({
       'POST /api/conta/excluir': () =>
-        json(429, { erro: 'Muitas tentativas. Tente de novo em alguns minutos.', codigo: 'bloqueado_temporariamente' }),
+        json(429, {
+          erro: 'Muitas tentativas. Tente de novo em alguns minutos.',
+          codigo: 'bloqueado_temporariamente',
+        }),
     });
     const dialogo = await excluirCom('SenhaForte123');
     expect((await within(dialogo).findByRole('alert')).textContent).toContain('Muitas tentativas');

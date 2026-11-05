@@ -32,7 +32,8 @@ export function useSalvarPesos(grupoId: string) {
   const api = useCliente();
   const consultas = useQueryClient();
   return useMutation({
-    mutationFn: async (corpo: PesosCorpo) => pesosPainel.parse(await api.post<unknown>(caminhoPesos(grupoId), corpo)),
+    mutationFn: async (corpo: PesosCorpo) =>
+      pesosPainel.parse(await api.post<unknown>(caminhoPesos(grupoId), corpo)),
     onSuccess: async (painel) => {
       consultas.setQueryData(chavePesos(grupoId), painel);
       await consultas.invalidateQueries({ queryKey: chaveGrupo(grupoId), exact: true });

@@ -42,7 +42,10 @@ export function prepararHistorico(historico: HistoricoDoGrupo): HistoricoPrepara
 }
 
 /** O jogador do histórico; quem chama já conferiu que ele é do grupo (404 fora do grupo, PAR-112). */
-export function jogadorDoHistorico(historico: HistoricoDoGrupo, jogadorId: string): JogadorDoRanking {
+export function jogadorDoHistorico(
+  historico: HistoricoDoGrupo,
+  jogadorId: string,
+): JogadorDoRanking {
   const jogador = historico.jogadores.find((j) => j.id === jogadorId);
   if (!jogador) throw new Error(MENSAGEM_JOGADOR_FORA_DO_HISTORICO);
   return jogador;
@@ -55,7 +58,12 @@ function acumuladoEPosicao(
   acumuladosDosOutros: ReadonlyMap<string, number>,
   hoje: Data,
 ): { acumulado: number; posicao: number | null } {
-  const acumulado = acumuladoDoJogador(alvo, preparado.presencasPorJogador.get(alvo.id) ?? [], preparado.resolver, hoje);
+  const acumulado = acumuladoDoJogador(
+    alvo,
+    preparado.presencasPorJogador.get(alvo.id) ?? [],
+    preparado.resolver,
+    hoje,
+  );
   const jogadores = historico.jogadores.map((j) => (j.id === alvo.id ? alvo : j));
   const ativos = ativosHoje(jogadores, hoje);
   if (!ativos.some((j) => j.id === alvo.id)) return { acumulado, posicao: null };
@@ -84,12 +92,22 @@ export function compararJogador(
   const acumuladosDosOutros = new Map(
     outros.map((j) => [
       j.id,
-      acumuladoDoJogador(j, preparado.presencasPorJogador.get(j.id) ?? [], preparado.resolver, hoje),
+      acumuladoDoJogador(
+        j,
+        preparado.presencasPorJogador.get(j.id) ?? [],
+        preparado.resolver,
+        hoje,
+      ),
     ]),
   );
   const a = acumuladoEPosicao(historico, preparado, antes, acumuladosDosOutros, hoje);
   const d = acumuladoEPosicao(historico, preparado, depois, acumuladosDosOutros, hoje);
-  return { acumuladoAntes: a.acumulado, acumuladoDepois: d.acumulado, posicaoAntes: a.posicao, posicaoDepois: d.posicao };
+  return {
+    acumuladoAntes: a.acumulado,
+    acumuladoDepois: d.acumulado,
+    posicaoAntes: a.posicao,
+    posicaoDepois: d.posicao,
+  };
 }
 
 /**

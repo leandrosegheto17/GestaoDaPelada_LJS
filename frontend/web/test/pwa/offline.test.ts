@@ -22,7 +22,8 @@ function documento(): Document {
 /** Todas as URLs citadas no HTML (href, src, url(...)). */
 function urlsDoHtml(): string[] {
   const achadas: string[] = [];
-  for (const m of HTML.matchAll(/\s(?:href|src|action|poster|data)\s*=\s*["']([^"']*)["']/gi)) achadas.push(m[1] ?? '');
+  for (const m of HTML.matchAll(/\s(?:href|src|action|poster|data)\s*=\s*["']([^"']*)["']/gi))
+    achadas.push(m[1] ?? '');
   for (const m of HTML.matchAll(/url\(\s*["']?([^"')]+)/gi)) achadas.push(m[1] ?? '');
   return achadas;
 }
@@ -64,7 +65,9 @@ describe('página offline', () => {
       for (const nome of usados) {
         expect(TOKENS, `${nome} não está em tokens.css`).toMatch(new RegExp(`${nome}\\s*:`));
       }
-      expect(css, 'cor literal no CSS da página offline').not.toMatch(/#[0-9a-f]{3,8}\b|\brgba?\(|\bhsla?\(/i);
+      expect(css, 'cor literal no CSS da página offline').not.toMatch(
+        /#[0-9a-f]{3,8}\b|\brgba?\(|\bhsla?\(/i,
+      );
     }
   });
 
@@ -81,6 +84,8 @@ describe('página offline', () => {
     const doc = documento();
     expect(doc.querySelector('header.barra .barra__titulo')?.textContent).toBe('Gestão da Pelada');
     expect(doc.querySelector('main.tela-mensagem .vazio__titulo')).not.toBeNull();
-    expect(doc.querySelector('main.tela-mensagem .vazio__texto')?.textContent?.trim().length).toBeGreaterThan(0);
+    expect(
+      doc.querySelector('main.tela-mensagem .vazio__texto')?.textContent?.trim().length,
+    ).toBeGreaterThan(0);
   });
 });

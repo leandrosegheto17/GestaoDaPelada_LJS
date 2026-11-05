@@ -13,9 +13,15 @@ import type { Db } from '../tipos.ts';
  * `nao_encontrado`, sem erro. Toda consulta filtra por `grupo_id`; jogador de outro grupo é `nao_encontrado`.
  */
 
-export type ResultadoDesmarcar = { resultado: 'ok'; valorCentavos: number | null } | { resultado: 'nao_encontrado' };
+export type ResultadoDesmarcar =
+  { resultado: 'ok'; valorCentavos: number | null } | { resultado: 'nao_encontrado' };
 
-async function desmarcar(db: Db, grupoId: string, jogadorId: string, mes: string): Promise<ResultadoDesmarcar> {
+async function desmarcar(
+  db: Db,
+  grupoId: string,
+  jogadorId: string,
+  mes: string,
+): Promise<ResultadoDesmarcar> {
   const p = await sql<{ lancamento_id: string | null }>`
     DELETE FROM pagamentos_mes
      WHERE grupo_id = ${grupoId} AND jogador_id = ${jogadorId} AND mes = ${mes}

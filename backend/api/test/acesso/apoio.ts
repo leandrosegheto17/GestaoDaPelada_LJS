@@ -57,7 +57,11 @@ export function cliente(url: string, extraEnv: Partial<Env> = {}) {
     const ctx = contextoFalso();
     const r = await app.request(
       `/api${caminho}`,
-      { method: p.metodo ?? (body !== undefined ? 'POST' : 'GET'), headers, ...(body !== undefined ? { body } : {}) },
+      {
+        method: p.metodo ?? (body !== undefined ? 'POST' : 'GET'),
+        headers,
+        ...(body !== undefined ? { body } : {}),
+      },
       envAcesso(url, extraEnv),
       ctx,
     );
@@ -68,7 +72,9 @@ export function cliente(url: string, extraEnv: Partial<Env> = {}) {
 
 /** Mensagens da caixa de dev para o endereço, do tipo dado (todas se sem tipo). */
 export function emailsPara(para: string, tipo?: Mensagem['tipo']): Mensagem[] {
-  return caixaDev.mensagens.filter((m) => m.para === para && (tipo === undefined || m.tipo === tipo));
+  return caixaDev.mensagens.filter(
+    (m) => m.para === para && (tipo === undefined || m.tipo === tipo),
+  );
 }
 
 /** O token do link `#t=` no texto do e-mail. */

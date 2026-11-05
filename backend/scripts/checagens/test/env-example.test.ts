@@ -23,7 +23,11 @@ describe('checagem env-example', () => {
   it('FUN-46: variável usada no código e ausente do .env.example reprova', () => {
     const p = checarEnvExample(codigo(`const u = ${ler('process', FALTANDO)};\n`), ENV_OK);
     expect(p).toHaveLength(1);
-    expect(p[0]).toMatch(new RegExp(`^backend/scripts/src/x\\.ts:1: ${FALTANDO} é usada e não está no \\.env\\.example`));
+    expect(p[0]).toMatch(
+      new RegExp(
+        `^backend/scripts/src/x\\.ts:1: ${FALTANDO} é usada e não está no \\.env\\.example`,
+      ),
+    );
   });
 
   it('FUN-46: as formas de leitura (process, import.meta, env[...] e parâmetro env) são todas conferidas', () => {
@@ -38,18 +42,30 @@ describe('checagem env-example', () => {
   });
 
   it('FUN-46: secret ou var de workflow ausente do .env.example reprova', () => {
-    const wf = [{ caminho: '.github/workflows/x.yml', conteudo: `env:\n  A: \${{ secrets.${FALTANDO} }}\n  B: \${{ vars.${FALTANDO}_2 }}\n` }];
+    const wf = [
+      {
+        caminho: '.github/workflows/x.yml',
+        conteudo: `env:\n  A: \${{ secrets.${FALTANDO} }}\n  B: \${{ vars.${FALTANDO}_2 }}\n`,
+      },
+    ];
     expect(checarEnvExample(wf, ENV_OK)).toHaveLength(2);
   });
 
   it('FUN-46: variável listada, do ambiente (CI, GITHUB_*) ou binding do Worker passa', () => {
-    const conteudo = [ler('process', 'DATABASE_URL'), ler('process', 'CI'), ler('process', 'GITHUB_SHA'), 'c.env.HYPERDRIVE'].join('\n');
+    const conteudo = [
+      ler('process', 'DATABASE_URL'),
+      ler('process', 'CI'),
+      ler('process', 'GITHUB_SHA'),
+      'c.env.HYPERDRIVE',
+    ].join('\n');
     expect(checarEnvExample(codigo(conteudo), ENV_OK, new Set(['HYPERDRIVE']))).toEqual([]);
   });
 
   for (const campo of ['obrigatória', 'formato', 'segredo']) {
     it(`FUN-46: variável sem a marcação "${campo}:" reprova`, () => {
-      const comentario = ['obrigatória: sim', 'formato: texto', 'segredo: não'].filter((c) => !c.startsWith(campo)).join(' | ');
+      const comentario = ['obrigatória: sim', 'formato: texto', 'segredo: não']
+        .filter((c) => !c.startsWith(campo))
+        .join(' | ');
       const p = checarEnvExample([], `# ${comentario}\nPELADA_X=\n`);
       expect(p).toHaveLength(1);
       expect(p[0]).toContain(`PELADA_X sem "${campo}:"`);
@@ -61,11 +77,16 @@ describe('checagem env-example', () => {
   });
 
   it('FUN-46: campo com valor vazio conta como ausente', () => {
-    expect(checarEnvExample([], '# obrigatória: | formato: texto | segredo: não\nPELADA_X=\n')).toHaveLength(1);
+    expect(
+      checarEnvExample([], '# obrigatória: | formato: texto | segredo: não\nPELADA_X=\n'),
+    ).toHaveLength(1);
   });
 
   it('FUN-46: segredo com valor no .env.example reprova', () => {
-    const p = checarEnvExample([], '# obrigatória: sim | formato: texto | segredo: sim\nPELADA_X=valor-real\n');
+    const p = checarEnvExample(
+      [],
+      '# obrigatória: sim | formato: texto | segredo: sim\nPELADA_X=valor-real\n',
+    );
     expect(p).toHaveLength(1);
     expect(p[0]).toContain('é segredo e tem valor');
   });

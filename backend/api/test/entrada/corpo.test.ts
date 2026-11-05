@@ -1,6 +1,12 @@
 import type { Hono } from 'hono';
 import { describe, expect, it } from 'vitest';
-import { cadastroCorpo, dadosGrupo, MENSAGEM_CORRIJA_CAMPOS, MENSAGEM_HORARIO_INVALIDO, MENSAGEM_NOME_GRUPO } from '@pelada/contrato';
+import {
+  cadastroCorpo,
+  dadosGrupo,
+  MENSAGEM_CORRIJA_CAMPOS,
+  MENSAGEM_HORARIO_INVALIDO,
+  MENSAGEM_NOME_GRUPO,
+} from '@pelada/contrato';
 import type { Ambiente } from '../../src/entrada/ambiente.ts';
 import { criarApp } from '../../src/entrada/app.ts';
 import {
@@ -59,7 +65,12 @@ async function postar(caminho: string, corpo: unknown, cru?: string): Promise<Re
   return r;
 }
 
-const GRUPO = { nome: 'Pelada de Quinta', diaSemana: 'quinta', frequencia: 'semanal', horario: '20:30' };
+const GRUPO = {
+  nome: 'Pelada de Quinta',
+  diaSemana: 'quinta',
+  frequencia: 'semanal',
+  horario: '20:30',
+};
 
 describe('lerCorpoDoGrupo', () => {
   it('GEL-118: corpo inválido devolve 422 com a mensagem geral e uma mensagem por campo', async () => {
@@ -83,7 +94,10 @@ describe('lerCorpoDoGrupo', () => {
   it('GEL-07: campo a mais (slug) é 422 com a mensagem geral', async () => {
     const r = await postar('/teste-corpo-grupo', { ...GRUPO, slug: 'x' });
     expect(r.status).toBe(422);
-    expect(await r.json()).toMatchObject({ erro: MENSAGEM_CORRIJA_CAMPOS, codigo: 'dados_invalidos' });
+    expect(await r.json()).toMatchObject({
+      erro: MENSAGEM_CORRIJA_CAMPOS,
+      codigo: 'dados_invalidos',
+    });
   });
 
   it('GEL-118: JSON inválido é 422 no campo corpo', async () => {
@@ -101,7 +115,12 @@ describe('lerCorpoDoGrupo', () => {
 
 describe('lerCorpo das rotas de acesso (sem mudança)', () => {
   it('ACE-03: continua com os nomes em campos e a mensagem da conta e acesso', async () => {
-    const r = await postar('/teste-corpo-acesso', { nome: 'A', email: 'ana@exemplo.com', senha: 'senha boa 123', termos: true });
+    const r = await postar('/teste-corpo-acesso', {
+      nome: 'A',
+      email: 'ana@exemplo.com',
+      senha: 'senha boa 123',
+      termos: true,
+    });
     expect(r.status).toBe(422);
     const corpo = (await r.json()) as Record<string, unknown>;
     expect(corpo).toMatchObject({ codigo: 'dados_invalidos', campos: ['nome'] });
@@ -112,7 +131,10 @@ describe('lerCorpo das rotas de acesso (sem mudança)', () => {
 
 describe('erroDeUnicidade e comUnicidade', () => {
   it('GEL-35: 23505 em jogadores_apelido_grupo vira 422 no campo apelido', async () => {
-    falhaDaEscrita = Object.assign(new Error('duplicate key'), { code: '23505', constraint: 'jogadores_apelido_grupo' });
+    falhaDaEscrita = Object.assign(new Error('duplicate key'), {
+      code: '23505',
+      constraint: 'jogadores_apelido_grupo',
+    });
     const r = await postar('/teste-unicidade', {});
     expect(r.status).toBe(422);
     expect(await r.json()).toEqual({
@@ -133,7 +155,10 @@ describe('erroDeUnicidade e comUnicidade', () => {
   });
 
   it('GEL-118: 23505 de outra constraint sobe como 500', async () => {
-    falhaDaEscrita = Object.assign(new Error('duplicate key'), { code: '23505', constraint: 'contas_email_unico' });
+    falhaDaEscrita = Object.assign(new Error('duplicate key'), {
+      code: '23505',
+      constraint: 'contas_email_unico',
+    });
     const r = await postar('/teste-unicidade', {});
     expect(r.status).toBe(500);
     expect(await r.json()).toEqual({ erro: 'Erro interno.' });

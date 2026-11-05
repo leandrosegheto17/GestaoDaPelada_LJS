@@ -47,9 +47,15 @@ export interface MapaTelas {
 
 export declare const RELOGIO_VISUAL: string;
 export declare function ocultarDe(mapa: MapaTelas, entrada: EntradaTela): string[];
-export declare function cssOcultar(seletores: string[] | undefined, lado?: 'mockup' | 'app'): string;
+export declare function cssOcultar(
+  seletores: string[] | undefined,
+  lado?: 'mockup' | 'app',
+): string;
 
-export declare function entradasAtivas(mapa: MapaTelas, ativas: { telas?: { id: string; estado: string }[] }): EntradaTela[];
+export declare function entradasAtivas(
+  mapa: MapaTelas,
+  ativas: { telas?: { id: string; estado: string }[] },
+): EntradaTela[];
 export declare function adaptarCorpo(texto: string): string;
 export declare function seletorDoApp(seletor: string): string;
 export declare function aplicarRespostas(
@@ -62,6 +68,16 @@ export declare function printTela(
   pagina: Page,
   url: string,
   viewport: { width: number; height: number },
-  opcoes?: { passos?: Passo[]; esperar?: string; recorte?: string | string[]; css?: string; ocultar?: string; relogio?: string },
+  opcoes?: {
+    passos?: Passo[];
+    esperar?: string;
+    recorte?: string | string[];
+    css?: string;
+    ocultar?: string;
+    relogio?: string;
+  },
 ): Promise<Buffer>;
-export declare function recorteDe(entrada: EntradaTela, lado: 'mockup' | 'app'): string | string[] | undefined;
+export declare function recorteDe(
+  entrada: EntradaTela,
+  lado: 'mockup' | 'app',
+): string | string[] | undefined;

@@ -27,7 +27,13 @@ export interface TimesVarios {
 
 export type Previa =
   | { formato: 'dois_times'; valida: true; n: number; aptos: number; reservas: number }
-  | { formato: 'dois_times'; valida: false; n: number; aptos: number; maiorNPossivel: number | null }
+  | {
+      formato: 'dois_times';
+      valida: false;
+      n: number;
+      aptos: number;
+      maiorNPossivel: number | null;
+    }
   | ({ formato: 'varios_times'; valida: true; n: number; aptos: number } & TimesVarios)
   | {
       formato: 'varios_times';
@@ -44,7 +50,11 @@ export type Previa =
 export function timesVarios(aptos: number, n: number): TimesVarios {
   const timesCompletos = Math.floor(aptos / n);
   const tamanhoIncompleto = aptos % n;
-  return { times: timesCompletos + (tamanhoIncompleto > 0 ? 1 : 0), timesCompletos, tamanhoIncompleto };
+  return {
+    times: timesCompletos + (tamanhoIncompleto > 0 ? 1 : 0),
+    timesCompletos,
+    tamanhoIncompleto,
+  };
 }
 
 /** A prévia da entrada (SIM-10 a SIM-13). */

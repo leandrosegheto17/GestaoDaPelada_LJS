@@ -54,7 +54,11 @@ describe('dump-cifrado.sh', () => {
   });
 
   it('FUN-49: chave pública inválida sai com código != 0 e não deixa arquivo parcial', () => {
-    const r = dump('/s4', { PG_URL: URL_OK, CHAVE_PUBLICA: 'age1invalida', SAIDA: '/s4/backup.age' });
+    const r = dump('/s4', {
+      PG_URL: URL_OK,
+      CHAVE_PUBLICA: 'age1invalida',
+      SAIDA: '/s4/backup.age',
+    });
     expect(r.codigo).not.toBe(0);
     expect(arquivosEm('/s4')).toEqual([]);
   });

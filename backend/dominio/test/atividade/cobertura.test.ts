@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { coberturaRetirada, falhaPresenca, type PresencaJogador } from '../../src/atividade/cobertura.ts';
+import {
+  coberturaRetirada,
+  falhaPresenca,
+  type PresencaJogador,
+} from '../../src/atividade/cobertura.ts';
 
 /**
  * Presença que sai do período (T13; GEL-68).
@@ -33,7 +37,9 @@ describe('GEL-68: pela saída', () => {
 
   it('GEL-68: presença no dia da saída é retirada', () => {
     const depois = [{ inicio: '2026-09-01', fim: '2026-10-01' }];
-    expect(coberturaRetirada(antes, depois, [presente('2026-10-01')])).toEqual([{ data: '2026-10-01', por: 'saida' }]);
+    expect(coberturaRetirada(antes, depois, [presente('2026-10-01')])).toEqual([
+      { data: '2026-10-01', por: 'saida' },
+    ]);
   });
 
   it('GEL-68: presença na véspera da saída fica dentro e não bloqueia', () => {
@@ -45,7 +51,11 @@ describe('GEL-68: pela saída', () => {
 
   it('GEL-68: várias presenças retiradas, a mensagem usa a última', () => {
     const depois = [{ inicio: '2026-09-01', fim: '2026-09-20' }];
-    const retiradas = coberturaRetirada(antes, depois, [presente('2026-10-08'), presente('2026-09-25'), presente('2026-10-01')]);
+    const retiradas = coberturaRetirada(antes, depois, [
+      presente('2026-10-08'),
+      presente('2026-09-25'),
+      presente('2026-10-01'),
+    ]);
     expect(retiradas.map((r) => r.data)).toEqual(['2026-09-25', '2026-10-01', '2026-10-08']);
     expect(falhaPresenca(retiradas)?.mensagem).toBe(
       'Há presença do jogador em 08/10/2026. A saída precisa ser em 09/10/2026 ou depois. Para usar uma data anterior, remova a presença em Editar partida.',
@@ -59,7 +69,9 @@ describe('GEL-68: pela saída', () => {
 
   it('GEL-68: ausência não bloqueia', () => {
     const depois = [{ inicio: '2026-09-01', fim: '2026-09-30' }];
-    expect(coberturaRetirada(antes, depois, [{ data: '2026-10-01', situacao: 'ausente' }])).toEqual([]);
+    expect(coberturaRetirada(antes, depois, [{ data: '2026-10-01', situacao: 'ausente' }])).toEqual(
+      [],
+    );
   });
 });
 
@@ -90,7 +102,10 @@ describe('GEL-68: pelo retorno', () => {
       { inicio: '2026-03-01', fim: '2026-06-01' },
       { inicio: '2026-06-20', fim: null },
     ];
-    const retiradas = coberturaRetirada(antes, depois, [presente('2026-06-17'), presente('2026-06-12')]);
+    const retiradas = coberturaRetirada(antes, depois, [
+      presente('2026-06-17'),
+      presente('2026-06-12'),
+    ]);
     expect(retiradas).toEqual([
       { data: '2026-06-12', por: 'retorno' },
       { data: '2026-06-17', por: 'retorno' },

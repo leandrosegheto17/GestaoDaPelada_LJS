@@ -33,7 +33,11 @@ interface Linha {
   mes: string | null;
 }
 
-async function vinculoDe(db: Db, grupoId: string, id: string): Promise<{ apelido: string; mes: string } | null> {
+async function vinculoDe(
+  db: Db,
+  grupoId: string,
+  id: string,
+): Promise<{ apelido: string; mes: string } | null> {
   const r = await sql<{ apelido: string; mes: string }>`
     SELECT j.apelido, p.mes
       FROM pagamentos_mes p JOIN jogadores j ON j.id = p.jogador_id AND j.grupo_id = p.grupo_id

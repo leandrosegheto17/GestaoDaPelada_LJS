@@ -16,33 +16,43 @@ import { appFinanceiro, pedir } from './apoio-financeiro.ts';
 
 const AGORA = '2026-11-20T15:00:00.000Z';
 const DATA_ESCALACAO = '2026-11-19';
-const LANCAMENTO = { tipo: 'saida', data: '2026-11-10', descricao: 'Bola nova', valorCentavos: 12000 };
+const LANCAMENTO = {
+  tipo: 'saida',
+  data: '2026-11-10',
+  descricao: 'Bola nova',
+  valorCentavos: 12000,
+};
 
 let aberto: CenarioGruposAberto;
 let original: { s: string; t: string | null };
 const app = appFinanceiro(AGORA);
 
 async function situacao(s: string, t: string | null): Promise<void> {
-  await aberto.db.query('UPDATE grupos SET situacao_comercial = $2, trial_inicio = $3::date WHERE id = $1', [
-    aberto.cenario.grupoG,
-    s,
-    t,
-  ]);
+  await aberto.db.query(
+    'UPDATE grupos SET situacao_comercial = $2, trial_inicio = $3::date WHERE id = $1',
+    [aberto.cenario.grupoG, s, t],
+  );
 }
 
 const free = () => situacao('trial', '2026-10-01');
 
 async function lancamentos(): Promise<number> {
-  const r = await aberto.db.query<{ n: number }>('SELECT count(*)::int AS n FROM lancamentos WHERE grupo_id = $1', [
-    aberto.cenario.grupoG,
-  ]);
+  const r = await aberto.db.query<{ n: number }>(
+    'SELECT count(*)::int AS n FROM lancamentos WHERE grupo_id = $1',
+    [aberto.cenario.grupoG],
+  );
   return r.rows[0]!.n;
 }
 
 const g = () => `/grupos/${aberto.cenario.grupoG}`;
 
 /** Os 4 POST do simulador (AD-092, S-02). */
-const POSTS_DO_SIMULADOR = ['/simulador/previa', '/simulador/sugerir', '/simulador/avaliar', '/escalacoes'] as const;
+const POSTS_DO_SIMULADOR = [
+  '/simulador/previa',
+  '/simulador/sugerir',
+  '/simulador/avaliar',
+  '/escalacoes',
+] as const;
 
 beforeAll(async () => {
   aberto = await abrirCenarioGrupos();
@@ -54,10 +64,14 @@ beforeAll(async () => {
 });
 
 afterEach(async () => {
-  await aberto.db.query('DELETE FROM escalacoes WHERE grupo_id = $1 AND data = $2', [aberto.cenario.grupoG, DATA_ESCALACAO]);
-  await aberto.db.query(`DELETE FROM lancamentos WHERE grupo_id = $1 AND descricao = 'Bola nova' AND data = '2026-11-10'`, [
+  await aberto.db.query('DELETE FROM escalacoes WHERE grupo_id = $1 AND data = $2', [
     aberto.cenario.grupoG,
+    DATA_ESCALACAO,
   ]);
+  await aberto.db.query(
+    `DELETE FROM lancamentos WHERE grupo_id = $1 AND descricao = 'Bola nova' AND data = '2026-11-10'`,
+    [aberto.cenario.grupoG],
+  );
 });
 
 afterAll(async () => {
@@ -68,12 +82,24 @@ afterAll(async () => {
 });
 
 describe('simulador no Free (PLA-23)', () => {
-  it.each(POSTS_DO_SIMULADOR)('PLA-23: grupo Free → POST …%s 403 plano_pro (simulador)', async (caminho) => {
-    await free();
-    const r = await pedir(aberto, { app, metodo: 'POST', caminho: `${g()}${caminho}`, conta: aberto.cenario.contaC, corpo: {} });
-    expect(r.status).toBe(403);
-    expect(erroPlanoPro.parse(await r.json())).toMatchObject({ erro: 'plano_pro', recurso: 'simulador' });
-  });
+  it.each(POSTS_DO_SIMULADOR)(
+    'PLA-23: grupo Free → POST …%s 403 plano_pro (simulador)',
+    async (caminho) => {
+      await free();
+      const r = await pedir(aberto, {
+        app,
+        metodo: 'POST',
+        caminho: `${g()}${caminho}`,
+        conta: aberto.cenario.contaC,
+        corpo: {},
+      });
+      expect(r.status).toBe(403);
+      expect(erroPlanoPro.parse(await r.json())).toMatchObject({
+        erro: 'plano_pro',
+        recurso: 'simulador',
+      });
+    },
+  );
 
   it('PLA-23: a escalação confirmada no tempo de trial segue legível no Free (pré-marcação da partida)', async () => {
     const { db, cenario } = aberto;
@@ -107,13 +133,21 @@ describe('financeiro no Free (PLA-24)', () => {
       corpo: LANCAMENTO,
     });
     expect(r.status).toBe(403);
-    expect(erroPlanoPro.parse(await r.json())).toMatchObject({ erro: 'plano_pro', recurso: 'financeiro' });
+    expect(erroPlanoPro.parse(await r.json())).toMatchObject({
+      erro: 'plano_pro',
+      recurso: 'financeiro',
+    });
     expect(await lancamentos()).toBe(antes);
   });
 
   it('PLA-24: grupo Free → GET …/financeiro/mes 200', async () => {
     await free();
-    const r = await pedir(aberto, { app, metodo: 'GET', caminho: `${g()}/financeiro/mes`, conta: aberto.cenario.contaC });
+    const r = await pedir(aberto, {
+      app,
+      metodo: 'GET',
+      caminho: `${g()}/financeiro/mes`,
+      conta: aberto.cenario.contaC,
+    });
     expect(r.status).toBe(200);
   });
 });
@@ -123,26 +157,30 @@ describe('trial válido, Pro e cortesia (PLA-28)', () => {
     ['trial válido', 'trial', '2026-11-10'],
     ['ativo', 'ativo', null],
     ['uso_proprio', 'uso_proprio', null],
-  ] as const)('PLA-28: em %s, POST …/financeiro/lancamentos grava e o simulador não responde 403', async (_n, s, t) => {
-    await situacao(s, t);
-    const r = await pedir(aberto, {
-      app,
-      metodo: 'POST',
-      caminho: `${g()}/financeiro/lancamentos`,
-      conta: aberto.cenario.contaC,
-      corpo: LANCAMENTO,
-    });
-    expect(r.status).toBe(201);
-    const sim = await pedir(aberto, {
-      app,
-      metodo: 'POST',
-      caminho: `${g()}/simulador/sugerir`,
-      conta: aberto.cenario.contaC,
-      corpo: {},
-    });
-    expect(sim.status).not.toBe(403);
-    await aberto.db.query(`DELETE FROM lancamentos WHERE grupo_id = $1 AND descricao = 'Bola nova' AND data = '2026-11-10'`, [
-      aberto.cenario.grupoG,
-    ]);
-  });
+  ] as const)(
+    'PLA-28: em %s, POST …/financeiro/lancamentos grava e o simulador não responde 403',
+    async (_n, s, t) => {
+      await situacao(s, t);
+      const r = await pedir(aberto, {
+        app,
+        metodo: 'POST',
+        caminho: `${g()}/financeiro/lancamentos`,
+        conta: aberto.cenario.contaC,
+        corpo: LANCAMENTO,
+      });
+      expect(r.status).toBe(201);
+      const sim = await pedir(aberto, {
+        app,
+        metodo: 'POST',
+        caminho: `${g()}/simulador/sugerir`,
+        conta: aberto.cenario.contaC,
+        corpo: {},
+      });
+      expect(sim.status).not.toBe(403);
+      await aberto.db.query(
+        `DELETE FROM lancamentos WHERE grupo_id = $1 AND descricao = 'Bola nova' AND data = '2026-11-10'`,
+        [aberto.cenario.grupoG],
+      );
+    },
+  );
 });

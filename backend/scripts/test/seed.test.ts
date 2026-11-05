@@ -13,7 +13,8 @@ import {
 } from '../src/seed.ts';
 import { entrarComo } from './apoio/banco.ts';
 
-const URL_BASE = process.env.DATABASE_URL_TESTE ?? 'postgres://postgres:postgres@127.0.0.1:5432/pelada';
+const URL_BASE =
+  process.env.DATABASE_URL_TESTE ?? 'postgres://postgres:postgres@127.0.0.1:5432/pelada';
 const ROLES = ['pelada_app', 'pelada_backup_ro'] as const;
 
 function urlDe(base: string, banco: string, usuario?: { nome: string; senha: string }): string {
@@ -33,13 +34,15 @@ function urlDe(base: string, banco: string, usuario?: { nome: string; senha: str
  */
 async function comBancoMigrado(fn: (url: string, nome: string) => Promise<void>): Promise<void> {
   const nome = `teste_${randomBytes(6).toString('hex')}`;
-  const antes = await comConexao(URL_BASE, async (c) =>
-    (
-      await c.query<{ rolname: string; rolcanlogin: boolean; rolpassword: string | null }>(
-        `SELECT rolname, rolcanlogin, rolpassword FROM pg_authid WHERE rolname = ANY ($1::text[])`,
-        [ROLES],
-      )
-    ).rows,
+  const antes = await comConexao(
+    URL_BASE,
+    async (c) =>
+      (
+        await c.query<{ rolname: string; rolcanlogin: boolean; rolpassword: string | null }>(
+          `SELECT rolname, rolcanlogin, rolpassword FROM pg_authid WHERE rolname = ANY ($1::text[])`,
+          [ROLES],
+        )
+      ).rows,
   );
   await comConexao(URL_BASE, (c) => c.query(`CREATE DATABASE ${nome}`));
   try {
@@ -51,7 +54,9 @@ async function comBancoMigrado(fn: (url: string, nome: string) => Promise<void>)
       await c.query(`DROP DATABASE IF EXISTS ${nome} WITH (FORCE)`);
       for (const r of antes) {
         const senha = r.rolpassword === null ? 'NULL' : c.escapeLiteral(r.rolpassword);
-        await c.query(`ALTER ROLE ${c.escapeIdentifier(r.rolname)} ${r.rolcanlogin ? 'LOGIN' : 'NOLOGIN'} PASSWORD ${senha}`);
+        await c.query(
+          `ALTER ROLE ${c.escapeIdentifier(r.rolname)} ${r.rolcanlogin ? 'LOGIN' : 'NOLOGIN'} PASSWORD ${senha}`,
+        );
       }
     });
   }
@@ -97,7 +102,9 @@ describe('pnpm seed', () => {
         try {
           await c.query('SET LOCAL ROLE pelada_app');
           await c.query(`SELECT set_config('app.conta_id', $1, true)`, [r.contaId]);
-          return (await c.query<{ slug: string }>('SELECT slug FROM grupos')).rows.map((l) => l.slug);
+          return (await c.query<{ slug: string }>('SELECT slug FROM grupos')).rows.map(
+            (l) => l.slug,
+          );
         } finally {
           await c.query('ROLLBACK');
         }
@@ -110,13 +117,15 @@ describe('pnpm seed', () => {
     await comBancoMigrado(async (url) => {
       const env = envDe(url);
       await comandoSeed(env);
-      const ok = await comConexao(url, async (c) =>
-        (
-          await c.query<{ ok: boolean; bcrypt: boolean }>(
-            `SELECT crypt($2, senha_hash) = senha_hash AS ok, senha_hash LIKE '$2%' AS bcrypt FROM contas WHERE email = $1`,
-            [CONTA_LOCAL.email, env.SEED_SENHA_ADMIN],
-          )
-        ).rows[0],
+      const ok = await comConexao(
+        url,
+        async (c) =>
+          (
+            await c.query<{ ok: boolean; bcrypt: boolean }>(
+              `SELECT crypt($2, senha_hash) = senha_hash AS ok, senha_hash LIKE '$2%' AS bcrypt FROM contas WHERE email = $1`,
+              [CONTA_LOCAL.email, env.SEED_SENHA_ADMIN],
+            )
+          ).rows[0],
       );
       expect(ok).toEqual({ ok: true, bcrypt: true });
     });
@@ -130,8 +139,10 @@ describe('pnpm seed', () => {
         ['pelada_app', env.PELADA_APP_SENHA],
         ['pelada_backup_ro', env.PELADA_BACKUP_RO_SENHA],
       ] as const) {
-        const papel = await comConexao(urlDe(URL_BASE, nome, { nome: role, senha }), async (c) =>
-          (await c.query<{ papel: string }>('SELECT current_user AS papel')).rows[0]?.papel,
+        const papel = await comConexao(
+          urlDe(URL_BASE, nome, { nome: role, senha }),
+          async (c) =>
+            (await c.query<{ papel: string }>('SELECT current_user AS papel')).rows[0]?.papel,
         );
         expect(papel).toBe(role);
       }
@@ -144,13 +155,13 @@ describe('pnpm seed', () => {
       const remoto = 'postgres://u:p@ep-x.sa-east-1.aws.neon.tech/neondb';
       await expect(comandoSeed(envDe(remoto))).rejects.toThrow(/não permitido/);
       // Nem a permissão de host remoto do deploy libera o seed.
-      await expect(comandoSeed({ ...envDe(remoto), PELADA_PERMITIR_HOST_REMOTO: '1' })).rejects.toThrow(
-        /não permitido/,
-      );
+      await expect(
+        comandoSeed({ ...envDe(remoto), PELADA_PERMITIR_HOST_REMOTO: '1' }),
+      ).rejects.toThrow(/não permitido/);
       // O serviço "postgres" do CI é host de teste, não de seed.
-      await expect(comandoSeed(envDe('postgres://postgres:postgres@postgres:5432/pelada'))).rejects.toThrow(
-        /não permitido/,
-      );
+      await expect(
+        comandoSeed(envDe('postgres://postgres:postgres@postgres:5432/pelada')),
+      ).rejects.toThrow(/não permitido/);
       expect(conectar).not.toHaveBeenCalled();
     } finally {
       conectar.mockRestore();
@@ -162,12 +173,12 @@ describe('pnpm seed', () => {
     try {
       const local = 'postgres://postgres:postgres@127.0.0.1:5432/pelada';
       await expect(comandoSeed({})).rejects.toThrow(/DATABASE_URL_MIGRACAO/);
-      await expect(comandoSeed({ DATABASE_URL_MIGRACAO: local, PELADA_BACKUP_RO_SENHA: 'x' })).rejects.toThrow(
-        /PELADA_APP_SENHA/,
-      );
-      await expect(comandoSeed({ DATABASE_URL_MIGRACAO: local, PELADA_APP_SENHA: 'x' })).rejects.toThrow(
-        /PELADA_BACKUP_RO_SENHA/,
-      );
+      await expect(
+        comandoSeed({ DATABASE_URL_MIGRACAO: local, PELADA_BACKUP_RO_SENHA: 'x' }),
+      ).rejects.toThrow(/PELADA_APP_SENHA/);
+      await expect(
+        comandoSeed({ DATABASE_URL_MIGRACAO: local, PELADA_APP_SENHA: 'x' }),
+      ).rejects.toThrow(/PELADA_BACKUP_RO_SENHA/);
       expect(conectar).not.toHaveBeenCalled();
     } finally {
       conectar.mockRestore();
@@ -196,7 +207,13 @@ describe('pnpm seed', () => {
         `),
       );
       await expect(comandoSeed(envDe(url))).rejects.toThrow('falha de propósito');
-      expect(await contagens(url)).toEqual({ contas: 0, grupos: 0, vinculos: 0, jogadores: 0, periodos: 0 });
+      expect(await contagens(url)).toEqual({
+        contas: 0,
+        grupos: 0,
+        vinculos: 0,
+        jogadores: 0,
+        periodos: 0,
+      });
     });
   });
 });
@@ -206,13 +223,15 @@ describe('pnpm seed: conta admin que entra', () => {
     await comBancoMigrado(async (url) => {
       const env = envDe(url);
       const r = await comandoSeed(env);
-      const conta = await comConexao(url, async (c) =>
-        (
-          await c.query<{ id: string; confirmada: boolean; e_dono: boolean }>(
-            'SELECT id, email_confirmado_em IS NOT NULL AS confirmada, e_dono FROM contas WHERE email = $1',
-            [CONTA_LOCAL.email],
-          )
-        ).rows,
+      const conta = await comConexao(
+        url,
+        async (c) =>
+          (
+            await c.query<{ id: string; confirmada: boolean; e_dono: boolean }>(
+              'SELECT id, email_confirmado_em IS NOT NULL AS confirmada, e_dono FROM contas WHERE email = $1',
+              [CONTA_LOCAL.email],
+            )
+          ).rows,
       );
       expect(conta).toEqual([{ id: r.contaId, confirmada: true, e_dono: false }]);
       expect(await entrarComo(url, CONTA_LOCAL.email, env.SEED_SENHA_ADMIN)).toBe('ok');
@@ -235,10 +254,16 @@ describe('pnpm seed: conta admin que entra', () => {
   it('ACE-64: sem SEED_SENHA_ADMIN, ou com ela fora dos limites, sai com erro antes de conectar', async () => {
     const conectar = vi.spyOn(pg.Client.prototype, 'connect');
     try {
-      const { SEED_SENHA_ADMIN: _ignorada, ...semSenha } = envDe('postgres://postgres:postgres@127.0.0.1:5432/pelada');
+      const { SEED_SENHA_ADMIN: _ignorada, ...semSenha } = envDe(
+        'postgres://postgres:postgres@127.0.0.1:5432/pelada',
+      );
       await expect(comandoSeed(semSenha)).rejects.toThrow(/SEED_SENHA_ADMIN/);
-      await expect(comandoSeed({ ...semSenha, SEED_SENHA_ADMIN: '' })).rejects.toThrow(/SEED_SENHA_ADMIN/);
-      await expect(comandoSeed({ ...semSenha, SEED_SENHA_ADMIN: 'curta' })).rejects.toThrow(/SEED_SENHA_ADMIN inválida/);
+      await expect(comandoSeed({ ...semSenha, SEED_SENHA_ADMIN: '' })).rejects.toThrow(
+        /SEED_SENHA_ADMIN/,
+      );
+      await expect(comandoSeed({ ...semSenha, SEED_SENHA_ADMIN: 'curta' })).rejects.toThrow(
+        /SEED_SENHA_ADMIN inválida/,
+      );
       expect(conectar).not.toHaveBeenCalled();
     } finally {
       conectar.mockRestore();
@@ -254,9 +279,10 @@ describe('pnpm seed: grupo e elenco de exemplo', () => {
       const dados = async () =>
         comConexao(url, async (c) => ({
           grupo: (
-            await c.query<{ criado_por: string; slug: string }>('SELECT criado_por, slug FROM grupos WHERE id = $1', [
-              r.grupoId,
-            ])
+            await c.query<{ criado_por: string; slug: string }>(
+              'SELECT criado_por, slug FROM grupos WHERE id = $1',
+              [r.grupoId],
+            )
           ).rows,
           vinculo: (
             await c.query<{ conta_id: string; acessa_financeiro: boolean }>(
@@ -265,9 +291,10 @@ describe('pnpm seed: grupo e elenco de exemplo', () => {
             )
           ).rows,
           habilidades: (
-            await c.query<{ nome: string }>('SELECT nome FROM habilidades WHERE grupo_id = $1 ORDER BY ordem', [
-              r.grupoId,
-            ])
+            await c.query<{ nome: string }>(
+              'SELECT nome FROM habilidades WHERE grupo_id = $1 ORDER BY ordem',
+              [r.grupoId],
+            )
           ).rows.map((l) => l.nome),
           auditoria: (
             await c.query<{ autor_conta_id: string; entidade_id: string }>(
@@ -296,17 +323,19 @@ describe('pnpm seed: grupo e elenco de exemplo', () => {
   it('GEL-46: há jogador ativo com notas, um ativo sem nota e um inativo com o período encerrado', async () => {
     await comBancoMigrado(async (url) => {
       const r = await comandoSeed(envDe(url));
-      const linhas = await comConexao(url, async (c) =>
-        (
-          await c.query<{ apelido: string; abertos: number; encerrados: number; notas: number }>(
-            `SELECT j.apelido,
+      const linhas = await comConexao(
+        url,
+        async (c) =>
+          (
+            await c.query<{ apelido: string; abertos: number; encerrados: number; notas: number }>(
+              `SELECT j.apelido,
                     (SELECT count(*)::int FROM periodos_ativos p WHERE p.jogador_id = j.id AND p.fim IS NULL) AS abertos,
                     (SELECT count(*)::int FROM periodos_ativos p WHERE p.jogador_id = j.id AND p.fim IS NOT NULL) AS encerrados,
                     (SELECT count(*)::int FROM notas n WHERE n.jogador_id = j.id) AS notas
                FROM jogadores j WHERE j.grupo_id = $1`,
-            [r.grupoId],
-          )
-        ).rows,
+              [r.grupoId],
+            )
+          ).rows,
       );
       const ativos = linhas.filter((l) => l.abertos === 1);
       const inativos = linhas.filter((l) => l.abertos === 0);
@@ -317,13 +346,15 @@ describe('pnpm seed: grupo e elenco de exemplo', () => {
         expect.objectContaining({ apelido: JOGADOR_INATIVO_LOCAL, abertos: 0, encerrados: 1 }),
       ]);
       // Nenhuma nota fora da escala nem de outro grupo.
-      const fora = await comConexao(url, async (c) =>
-        (
-          await c.query<{ n: number }>(
-            'SELECT count(*)::int AS n FROM notas WHERE grupo_id <> $1 OR valor NOT BETWEEN 1 AND 10',
-            [r.grupoId],
-          )
-        ).rows[0]?.n,
+      const fora = await comConexao(
+        url,
+        async (c) =>
+          (
+            await c.query<{ n: number }>(
+              'SELECT count(*)::int AS n FROM notas WHERE grupo_id <> $1 OR valor NOT BETWEEN 1 AND 10',
+              [r.grupoId],
+            )
+          ).rows[0]?.n,
       );
       expect(fora).toBe(0);
     });

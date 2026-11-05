@@ -1,4 +1,9 @@
-import type { AvaliarCorpo, ResultadoDois, ResultadoVarios, SugerirCorpo } from '@pelada/contrato/simulador';
+import type {
+  AvaliarCorpo,
+  ResultadoDois,
+  ResultadoVarios,
+  SugerirCorpo,
+} from '@pelada/contrato/simulador';
 import { useState } from 'react';
 import { Botao } from '../../componentes/Botao.tsx';
 import { Dialogo } from '../../componentes/Dialogo.tsx';
@@ -58,7 +63,11 @@ function semJogador<T extends { id: string }>(lista: readonly T[], id: string): 
 function jogadorDoDois(r: Dois, id: string): JogadorDois | null {
   for (const t of r.times) {
     const achado = [...t.titulares, ...t.entramNo2oTempo].find((j) => j.id === id);
-    if (achado) return { ...achado, saiNoIntervalo: 'saiNoIntervalo' in achado ? achado.saiNoIntervalo : false };
+    if (achado)
+      return {
+        ...achado,
+        saiNoIntervalo: 'saiNoIntervalo' in achado ? achado.saiNoIntervalo : false,
+      };
   }
   const n = r.naoEntra.find((j) => j.id === id);
   return n ? { ...n, saiNoIntervalo: false } : null;
@@ -75,8 +84,13 @@ export function moverNoDois(r: Dois, id: string, destino: Lugar): Dois {
   })) as unknown as Dois['times'];
   let naoEntra = semJogador(r.naoEntra, id);
   const { saiNoIntervalo: _sai, ...reserva } = j;
-  if (destino.tipo === 'titular') times[destino.time].titulares = [...times[destino.time].titulares, { ...j, saiNoIntervalo: false }];
-  else if (destino.tipo === 'reserva') times[destino.time].entramNo2oTempo = [...times[destino.time].entramNo2oTempo, reserva];
+  if (destino.tipo === 'titular')
+    times[destino.time].titulares = [
+      ...times[destino.time].titulares,
+      { ...j, saiNoIntervalo: false },
+    ];
+  else if (destino.tipo === 'reserva')
+    times[destino.time].entramNo2oTempo = [...times[destino.time].entramNo2oTempo, reserva];
   else naoEntra = [...naoEntra, reserva];
   return { ...r, times, naoEntra };
 }
@@ -95,7 +109,11 @@ export function alternarSo1oNoDois(r: Dois, id: string): Dois {
     lista.map((j) => (j.id === id ? { ...j, so1oTempo: !j.so1oTempo } : j));
   return {
     ...r,
-    times: r.times.map((t) => ({ ...t, titulares: vira(t.titulares), entramNo2oTempo: vira(t.entramNo2oTempo) })) as unknown as Dois['times'],
+    times: r.times.map((t) => ({
+      ...t,
+      titulares: vira(t.titulares),
+      entramNo2oTempo: vira(t.entramNo2oTempo),
+    })) as unknown as Dois['times'],
     naoEntra: vira(r.naoEntra),
   };
 }
@@ -136,7 +154,10 @@ export function corpoDoAvaliar(entrada: SugerirCorpo, r: Dois | ResultadoVarios)
     };
   }
   if (entrada.formato === 'varios_times' && r.formato === 'varios_times') {
-    return { ...entrada, composicao: { times: r.times.map((t) => ({ jogadores: t.jogadores.map((j) => j.id) })) } };
+    return {
+      ...entrada,
+      composicao: { times: r.times.map((t) => ({ jogadores: t.jogadores.map((j) => j.id) })) },
+    };
   }
   throw new Error('formato da composição diferente da entrada');
 }
@@ -147,7 +168,11 @@ export type ResultadoNaTela = Dois | ResultadoVarios;
  * O estado do ajuste manual sobre uma sugestão: a composição na tela, os movidos, o recálculo e a falha dele.
  * `sugestao` muda (nova sugestão, refazer): o ajuste é descartado.
  */
-export function useAjusteManual(grupoId: string, entrada: SugerirCorpo | null, sugestao: ResultadoDois | ResultadoVarios | null) {
+export function useAjusteManual(
+  grupoId: string,
+  entrada: SugerirCorpo | null,
+  sugestao: ResultadoDois | ResultadoVarios | null,
+) {
   const [ajustado, setAjustado] = useState<ResultadoNaTela | null>(null);
   const [movidos, setMovidos] = useState<ReadonlySet<string>>(new Set());
   const [daSugestao, setDaSugestao] = useState(sugestao);
@@ -169,7 +194,8 @@ export function useAjusteManual(grupoId: string, entrada: SugerirCorpo | null, s
   // A composição local é a base dos próximos ajustes; na tela, o recálculo pronto (com os números novos) a substitui.
   // Enquanto recalcula ou depois de falhar, a tela mostra a composição local com os números anteriores.
   const base: ResultadoNaTela | null = ajustado ?? sugestao;
-  const naTela: ResultadoNaTela | null = ajustado && estado.tipo === 'pronta' ? estado.previa : base;
+  const naTela: ResultadoNaTela | null =
+    ajustado && estado.tipo === 'pronta' ? estado.previa : base;
 
   return {
     naTela,
@@ -187,7 +213,8 @@ export function useAjusteManual(grupoId: string, entrada: SugerirCorpo | null, s
     },
     trocar(a: string, b: string) {
       if (!base) return;
-      const proximo = base.formato === 'dois_times' ? trocarNoDois(base, a, b) : trocarNoVarios(base, a, b);
+      const proximo =
+        base.formato === 'dois_times' ? trocarNoDois(base, a, b) : trocarNoVarios(base, a, b);
       setAjustado(proximo);
       setMovidos((m) => new Set([...m, a, b]));
     },
@@ -241,7 +268,10 @@ function opcoesDoVarios(r: ResultadoVarios, atual: Lugar | null): Opcao[] {
 }
 
 /** Os outros jogadores, por lugar, para o "Trocar com…". */
-function gruposParaTrocar(r: ResultadoNaTela, id: string): Array<{ titulo: string; jogadores: Array<{ id: string; apelido: string }> }> {
+function gruposParaTrocar(
+  r: ResultadoNaTela,
+  id: string,
+): Array<{ titulo: string; jogadores: Array<{ id: string; apelido: string }> }> {
   const fora = <T extends { id: string }>(l: readonly T[]) => l.filter((j) => j.id !== id);
   if (r.formato === 'dois_times') {
     const grupos = r.times.flatMap((t) => [
@@ -251,7 +281,9 @@ function gruposParaTrocar(r: ResultadoNaTela, id: string): Array<{ titulo: strin
     grupos.push({ titulo: 'Não entra', jogadores: fora(r.naoEntra) });
     return grupos.filter((g) => g.jogadores.length > 0);
   }
-  return r.times.map((t) => ({ titulo: t.nome, jogadores: fora(t.jogadores) })).filter((g) => g.jogadores.length > 0);
+  return r.times
+    .map((t) => ({ titulo: t.nome, jogadores: fora(t.jogadores) }))
+    .filter((g) => g.jogadores.length > 0);
 }
 
 interface PropsFolha {
@@ -264,7 +296,14 @@ interface PropsFolha {
 }
 
 /** A folha "Mover jogador" e o passo "Trocar com…" (SIM-64). */
-export function FolhaMover({ resultado, jogadorId, aoMover, aoTrocar, aoAlternarSo1o, aoFechar }: PropsFolha) {
+export function FolhaMover({
+  resultado,
+  jogadorId,
+  aoMover,
+  aoTrocar,
+  aoAlternarSo1o,
+  aoFechar,
+}: PropsFolha) {
   const [trocando, setTrocando] = useState(false);
   const dois = resultado.formato === 'dois_times';
   const atual = dois ? lugarNoDois(resultado, jogadorId) : lugarNoVarios(resultado, jogadorId);
@@ -282,7 +321,11 @@ export function FolhaMover({ resultado, jogadorId, aoMover, aoTrocar, aoAlternar
             <ul className={estilos['folha__opcoes']}>
               {g.jogadores.map((j) => (
                 <li key={j.id}>
-                  <button className={estilos['folha__opcao']} type="button" onClick={() => aoTrocar(j.id)}>
+                  <button
+                    className={estilos['folha__opcao']}
+                    type="button"
+                    onClick={() => aoTrocar(j.id)}
+                  >
                     {j.apelido}
                   </button>
                 </li>
@@ -292,7 +335,11 @@ export function FolhaMover({ resultado, jogadorId, aoMover, aoTrocar, aoAlternar
         ))}
         <ul className={estilos['folha__opcoes']}>
           <li>
-            <button className={estilos['folha__opcao']} type="button" onClick={() => setTrocando(false)}>
+            <button
+              className={estilos['folha__opcao']}
+              type="button"
+              onClick={() => setTrocando(false)}
+            >
               Voltar
             </button>
           </li>
@@ -316,13 +363,19 @@ export function FolhaMover({ resultado, jogadorId, aoMover, aoTrocar, aoAlternar
                 onClick={() => (eAtual ? aoFechar() : aoMover(o.lugar))}
               >
                 {o.rotulo}
-                {eAtual ? <span className={`${estilos.selo} ${estilos['selo--neutro']}`}>atual</span> : null}
+                {eAtual ? (
+                  <span className={`${estilos.selo} ${estilos['selo--neutro']}`}>atual</span>
+                ) : null}
               </button>
             </li>
           );
         })}
         <li>
-          <button className={estilos['folha__opcao']} type="button" onClick={() => setTrocando(true)}>
+          <button
+            className={estilos['folha__opcao']}
+            type="button"
+            onClick={() => setTrocando(true)}
+          >
             Trocar com…
           </button>
         </li>
@@ -330,7 +383,12 @@ export function FolhaMover({ resultado, jogadorId, aoMover, aoTrocar, aoAlternar
       {dois && jogador ? (
         <label className={estilos.interruptor}>
           <span>Só 1º tempo</span>
-          <input type="checkbox" role="switch" checked={jogador.so1oTempo} onChange={aoAlternarSo1o} />
+          <input
+            type="checkbox"
+            role="switch"
+            checked={jogador.so1oTempo}
+            onChange={aoAlternarSo1o}
+          />
           <span className={estilos['interruptor__trilho']} aria-hidden="true" />
           <span className={estilos['interruptor__estado']} aria-hidden="true">
             {jogador.so1oTempo ? 'Sim' : 'Não'}

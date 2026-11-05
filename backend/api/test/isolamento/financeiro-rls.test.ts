@@ -1,7 +1,11 @@
 import type pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { comoApp, type Contexto } from './apoio.ts';
-import { abrirCenarioGrupos, type CenarioGrupos, type CenarioGruposAberto } from './cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  type CenarioGrupos,
+  type CenarioGruposAberto,
+} from './cenario-grupos.ts';
 
 /**
  * Matriz política × comando do financeiro, colunas SELECT e INSERT (T12; FIN-38, FIN-39, FIN-40), como `pelada_app`.
@@ -86,55 +90,81 @@ async function foto(db: pg.Client, grupo: string): Promise<Record<Tabela, string
 async function linhasDeG(ctx: Contexto, tabela: Tabela): Promise<number> {
   const { db, cenario } = aberto;
   return comoApp(db, ctx, async (d) => {
-    const r = await d.query<{ n: number }>(`SELECT count(*)::int AS n FROM ${tabela} WHERE grupo_id = $1`, [cenario.grupoG]);
+    const r = await d.query<{ n: number }>(
+      `SELECT count(*)::int AS n FROM ${tabela} WHERE grupo_id = $1`,
+      [cenario.grupoG],
+    );
     return r.rows[0]?.n ?? -1;
   });
 }
 
-const CELULAS = TABELAS.flatMap((tabela) => (['X', 'P', 'N'] as const).map((ator) => [tabela, ator] as const));
+const CELULAS = TABELAS.flatMap((tabela) =>
+  (['X', 'P', 'N'] as const).map((ator) => [tabela, ator] as const),
+);
 
 describe('FIN-40: SELECT das 3 tabelas', () => {
   it.each(CELULAS)('FIN-40: %s × %s: zero linhas de G', async (tabela, ator) => {
     expect(await linhasDeG(contexto(ator, aberto.cenario), tabela)).toBe(0);
   });
 
-  it.each(TABELAS)('FIN-40: %s × C (controle): a criadora com acesso lê as linhas de G', async (tabela) => {
-    expect(await linhasDeG({ conta: aberto.cenario.contaC }, tabela)).toBeGreaterThan(0);
-  });
+  it.each(TABELAS)(
+    'FIN-40: %s × C (controle): a criadora com acesso lê as linhas de G',
+    async (tabela) => {
+      expect(await linhasDeG({ conta: aberto.cenario.contaC }, tabela)).toBeGreaterThan(0);
+    },
+  );
 
-  it.each(TABELAS)('FIN-38: %s sem conta e sem slug: zero linhas em toda a tabela', async (tabela) => {
-    const { db } = aberto;
-    const n = await comoApp(db, {}, async (d) => (await d.query(`SELECT 1 FROM ${tabela}`)).rowCount);
-    expect(n).toBe(0);
-  });
+  it.each(TABELAS)(
+    'FIN-38: %s sem conta e sem slug: zero linhas em toda a tabela',
+    async (tabela) => {
+      const { db } = aberto;
+      const n = await comoApp(
+        db,
+        {},
+        async (d) => (await d.query(`SELECT 1 FROM ${tabela}`)).rowCount,
+      );
+      expect(n).toBe(0);
+    },
+  );
 });
 
 describe('FIN-40: INSERT das 3 tabelas', () => {
-  it.each(CELULAS)('FIN-40: %s × %s: INSERT em G recusado e G fica idêntico', async (tabela, ator) => {
-    const { db, cenario } = aberto;
-    const antes = await foto(db, cenario.grupoG);
-    const [sql, valores] = inserir(tabela, cenario, autora(ator, cenario));
-    await expect(comoApp(db, contexto(ator, cenario), (d) => d.query(sql, valores))).rejects.toMatchObject({
-      code: '42501',
-    });
-    expect(await foto(db, cenario.grupoG)).toEqual(antes);
-  });
+  it.each(CELULAS)(
+    'FIN-40: %s × %s: INSERT em G recusado e G fica idêntico',
+    async (tabela, ator) => {
+      const { db, cenario } = aberto;
+      const antes = await foto(db, cenario.grupoG);
+      const [sql, valores] = inserir(tabela, cenario, autora(ator, cenario));
+      await expect(
+        comoApp(db, contexto(ator, cenario), (d) => d.query(sql, valores)),
+      ).rejects.toMatchObject({
+        code: '42501',
+      });
+      expect(await foto(db, cenario.grupoG)).toEqual(antes);
+    },
+  );
 
-  it.each(TABELAS)('FIN-40: %s × C (controle): a criadora com acesso insere em G', async (tabela) => {
-    const { db, cenario } = aberto;
-    const r = await comoApp(db, { conta: cenario.contaC }, async (d) => {
-      // A configuração é uma linha por grupo: sai a de G dentro da transação desfeita para o INSERT valer.
-      if (tabela === 'config_financeira') await d.query('DELETE FROM config_financeira WHERE grupo_id = $1', [cenario.grupoG]);
-      const [sql, valores] = inserir(tabela, cenario, cenario.contaC);
-      return d.query(sql, valores);
-    });
-    expect(r.rowCount).toBe(1);
-  });
+  it.each(TABELAS)(
+    'FIN-40: %s × C (controle): a criadora com acesso insere em G',
+    async (tabela) => {
+      const { db, cenario } = aberto;
+      const r = await comoApp(db, { conta: cenario.contaC }, async (d) => {
+        // A configuração é uma linha por grupo: sai a de G dentro da transação desfeita para o INSERT valer.
+        if (tabela === 'config_financeira')
+          await d.query('DELETE FROM config_financeira WHERE grupo_id = $1', [cenario.grupoG]);
+        const [sql, valores] = inserir(tabela, cenario, cenario.contaC);
+        return d.query(sql, valores);
+      });
+      expect(r.rowCount).toBe(1);
+    },
+  );
 
   it('FIN-40: lançamento de G assinado por N com a criadora como autora também é recusado', async () => {
     const { db, cenario } = aberto;
     const [sql, valores] = inserir('lancamentos', cenario, cenario.contaC);
-    await expect(comoApp(db, { conta: cenario.contaO }, (d) => d.query(sql, valores))).rejects.toMatchObject({
+    await expect(
+      comoApp(db, { conta: cenario.contaO }, (d) => d.query(sql, valores)),
+    ).rejects.toMatchObject({
       code: '42501',
     });
   });

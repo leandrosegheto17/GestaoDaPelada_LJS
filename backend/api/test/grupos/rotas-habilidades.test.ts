@@ -7,7 +7,11 @@ import { NOME_COOKIE_SESSAO } from '../../src/infraestrutura/sessao/cookie.ts';
 import { gerarToken } from '../../src/infraestrutura/sessao/token.ts';
 import { envAcesso } from '../acesso/apoio.ts';
 import { contextoFalso, fabricaComoApp } from '../db/requisicao.ts';
-import { abrirCenarioGrupos, HABILIDADES_INICIAIS, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  HABILIDADES_INICIAIS,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * Rotas de habilidades (T47; GEL-88 a GEL-93, GEL-96), com o app real como `pelada_app` contra o cenário de grupos
@@ -35,8 +39,16 @@ async function sessao(conta: string): Promise<string> {
   return token;
 }
 
-async function pedir(caminho: string, metodo = 'GET', corpo?: unknown, conta = aberto.cenario.contaC): Promise<Response> {
-  const headers = new Headers({ 'x-pelada': '1', cookie: `${NOME_COOKIE_SESSAO}=${await sessao(conta)}` });
+async function pedir(
+  caminho: string,
+  metodo = 'GET',
+  corpo?: unknown,
+  conta = aberto.cenario.contaC,
+): Promise<Response> {
+  const headers = new Headers({
+    'x-pelada': '1',
+    cookie: `${NOME_COOKIE_SESSAO}=${await sessao(conta)}`,
+  });
   if (corpo !== undefined) headers.set('content-type', 'application/json');
   const ctx = contextoFalso();
   const r = await app.request(
@@ -52,14 +64,18 @@ async function pedir(caminho: string, metodo = 'GET', corpo?: unknown, conta = a
 const deG = (resto = '') => `/grupos/${aberto.cenario.grupoG}/habilidades${resto}`;
 
 async function idDe(nome: string, grupo = aberto.cenario.grupoG): Promise<string> {
-  const r = await aberto.db.query<{ id: string }>('SELECT id FROM habilidades WHERE grupo_id = $1 AND nome = $2', [grupo, nome]);
+  const r = await aberto.db.query<{ id: string }>(
+    'SELECT id FROM habilidades WHERE grupo_id = $1 AND nome = $2',
+    [grupo, nome],
+  );
   return r.rows[0]!.id;
 }
 
 async function nomesDeG(): Promise<string[]> {
-  const r = await aberto.db.query<{ nome: string }>('SELECT nome FROM habilidades WHERE grupo_id = $1 ORDER BY ordem', [
-    aberto.cenario.grupoG,
-  ]);
+  const r = await aberto.db.query<{ nome: string }>(
+    'SELECT nome FROM habilidades WHERE grupo_id = $1 ORDER BY ordem',
+    [aberto.cenario.grupoG],
+  );
   return r.rows.map((l) => l.nome);
 }
 
@@ -73,10 +89,14 @@ afterAll(async () => {
 
 afterEach(async () => {
   const { db, cenario } = aberto;
-  await db.query(`DELETE FROM habilidades WHERE grupo_id = ANY($1::uuid[]) AND nome LIKE 'Rota %'`, [
-    [cenario.grupoG, cenario.grupoH],
-  ]);
-  await db.query(`UPDATE habilidades SET nome = 'Drible' WHERE grupo_id = $1 AND nome = 'Rota Finta'`, [cenario.grupoG]);
+  await db.query(
+    `DELETE FROM habilidades WHERE grupo_id = ANY($1::uuid[]) AND nome LIKE 'Rota %'`,
+    [[cenario.grupoG, cenario.grupoH]],
+  );
+  await db.query(
+    `UPDATE habilidades SET nome = 'Drible' WHERE grupo_id = $1 AND nome = 'Rota Finta'`,
+    [cenario.grupoG],
+  );
 });
 
 describe('GET /api/grupos/:grupoId/habilidades', () => {
@@ -148,7 +168,9 @@ describe('PATCH /api/grupos/:grupoId/habilidades/:id', () => {
 
 describe('DELETE /api/grupos/:grupoId/habilidades/:id', () => {
   it('GEL-93: 204 e a habilidade some', async () => {
-    const criada = (await (await pedir(deG(), 'POST', { nome: 'Rota Para Excluir' })).json()) as Corpo;
+    const criada = (await (
+      await pedir(deG(), 'POST', { nome: 'Rota Para Excluir' })
+    ).json()) as Corpo;
     const r = await pedir(deG(`/${criada.id}`), 'DELETE');
     expect(r.status).toBe(204);
     expect(await nomesDeG()).not.toContain('Rota Para Excluir');
@@ -158,22 +180,37 @@ describe('DELETE /api/grupos/:grupoId/habilidades/:id', () => {
 describe('GEL-96: habilidade de outro grupo', () => {
   async function habilidadeDeH(): Promise<string> {
     const { db, cenario } = aberto;
-    const r = await db.query<{ id: string }>(`INSERT INTO habilidades (grupo_id, nome) VALUES ($1, 'Rota Só de H') RETURNING id`, [
-      cenario.grupoH,
-    ]);
+    const r = await db.query<{ id: string }>(
+      `INSERT INTO habilidades (grupo_id, nome) VALUES ($1, 'Rota Só de H') RETURNING id`,
+      [cenario.grupoH],
+    );
     return r.rows[0]!.id;
   }
 
-  it.each(['PATCH', 'DELETE'])('GEL-96: %s com o id de uma habilidade de H, pelo grupo G, dá 404 e nada muda', async (metodo) => {
-    const id = await habilidadeDeH();
-    const r = await pedir(deG(`/${id}`), metodo, metodo === 'PATCH' ? { nome: 'Rota Invadida' } : undefined);
-    expect(r.status).toBe(404);
-    const linha = await aberto.db.query<{ nome: string }>('SELECT nome FROM habilidades WHERE id = $1', [id]);
-    expect(linha.rows[0]?.nome).toBe('Rota Só de H');
-  });
+  it.each(['PATCH', 'DELETE'])(
+    'GEL-96: %s com o id de uma habilidade de H, pelo grupo G, dá 404 e nada muda',
+    async (metodo) => {
+      const id = await habilidadeDeH();
+      const r = await pedir(
+        deG(`/${id}`),
+        metodo,
+        metodo === 'PATCH' ? { nome: 'Rota Invadida' } : undefined,
+      );
+      expect(r.status).toBe(404);
+      const linha = await aberto.db.query<{ nome: string }>(
+        'SELECT nome FROM habilidades WHERE id = $1',
+        [id],
+      );
+      expect(linha.rows[0]?.nome).toBe('Rota Só de H');
+    },
+  );
 
   it.each(['PATCH', 'DELETE'])('GEL-96: %s com id que não é uuid dá 404', async (metodo) => {
-    const r = await pedir(deG('/nao-e-uuid'), metodo, metodo === 'PATCH' ? { nome: 'Rota Qualquer' } : undefined);
+    const r = await pedir(
+      deG('/nao-e-uuid'),
+      metodo,
+      metodo === 'PATCH' ? { nome: 'Rota Qualquer' } : undefined,
+    );
     expect(r.status).toBe(404);
   });
 });

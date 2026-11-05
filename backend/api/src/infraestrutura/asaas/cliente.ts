@@ -80,7 +80,9 @@ function textoNaoVazio(valor: unknown): valor is string {
 }
 
 function campo(corpo: unknown, nome: string): unknown {
-  return typeof corpo === 'object' && corpo !== null ? (corpo as Record<string, unknown>)[nome] : undefined;
+  return typeof corpo === 'object' && corpo !== null
+    ? (corpo as Record<string, unknown>)[nome]
+    : undefined;
 }
 
 export function asaasHttp(config: ConfigAsaas, opcoes: OpcoesAsaas = {}): Asaas {
@@ -95,7 +97,12 @@ export function asaasHttp(config: ConfigAsaas, opcoes: OpcoesAsaas = {}): Asaas 
   };
 
   /** Uma chamada só, sem repetição. Devolve o corpo JSON do 2xx (ou `null` sem corpo) ou `'falhou'`. */
-  async function chamar(operacao: Operacao, metodo: string, caminho: string, corpo?: unknown): Promise<unknown> {
+  async function chamar(
+    operacao: Operacao,
+    metodo: string,
+    caminho: string,
+    corpo?: unknown,
+  ): Promise<unknown> {
     if (!base || !config.ASAAS_API_KEY) return falha(operacao, 0, 'sem_configuracao');
     const controle = new AbortController();
     const relogio = setTimeout(() => controle.abort(), tempoLimite);
@@ -110,7 +117,8 @@ export function asaasHttp(config: ConfigAsaas, opcoes: OpcoesAsaas = {}): Asaas 
         body: corpo === undefined ? undefined : JSON.stringify(corpo),
         signal: controle.signal,
       });
-      if (!resposta.ok) return falha(operacao, resposta.status, resposta.status === 429 ? 'limite' : 'status');
+      if (!resposta.ok)
+        return falha(operacao, resposta.status, resposta.status === 429 ? 'limite' : 'status');
       const texto = await resposta.text();
       if (texto === '') return null;
       try {
@@ -154,21 +162,33 @@ export function asaasHttp(config: ConfigAsaas, opcoes: OpcoesAsaas = {}): Asaas 
     },
 
     async primeiraCobranca(assinaturaId) {
-      const r = await chamar('primeira_cobranca', 'GET', `/subscriptions/${encodeURIComponent(assinaturaId)}/payments`);
+      const r = await chamar(
+        'primeira_cobranca',
+        'GET',
+        `/subscriptions/${encodeURIComponent(assinaturaId)}/payments`,
+      );
       if (r === 'falhou') return r;
       const lista = campo(r, 'data');
-      if (!Array.isArray(lista) || lista.length === 0) return falha('primeira_cobranca', 200, 'sem_cobranca');
+      if (!Array.isArray(lista) || lista.length === 0)
+        return falha('primeira_cobranca', 200, 'sem_cobranca');
       // A lista vem da mais nova para a mais antiga; na criação há só uma. Vale a de menor vencimento.
-      const ordenada = [...lista].sort((a, b) => String(campo(a, 'dueDate')).localeCompare(String(campo(b, 'dueDate'))));
+      const ordenada = [...lista].sort((a, b) =>
+        String(campo(a, 'dueDate')).localeCompare(String(campo(b, 'dueDate'))),
+      );
       const primeira = ordenada[0];
       const id = campo(primeira, 'id');
       const invoiceUrl = campo(primeira, 'invoiceUrl');
-      if (!textoNaoVazio(id) || !textoNaoVazio(invoiceUrl)) return falha('primeira_cobranca', 200, 'sem_fatura');
+      if (!textoNaoVazio(id) || !textoNaoVazio(invoiceUrl))
+        return falha('primeira_cobranca', 200, 'sem_fatura');
       return { id, invoiceUrl };
     },
 
     async removerAssinatura(assinaturaId) {
-      const r = await chamar('remover_assinatura', 'DELETE', `/subscriptions/${encodeURIComponent(assinaturaId)}`);
+      const r = await chamar(
+        'remover_assinatura',
+        'DELETE',
+        `/subscriptions/${encodeURIComponent(assinaturaId)}`,
+      );
       return r === 'falhou' ? r : 'removida';
     },
   };

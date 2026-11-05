@@ -20,7 +20,9 @@ describe('esquema-producao.txt com as migrações do financeiro (FIN-42)', () =>
   it('FIN-42: traz app_acessa_financeiro como função SECURITY DEFINER estável, com search_path fixo e EXECUTE só para pelada_app', () => {
     const funcao = referencia.filter((l) => l.startsWith('funcao app_acessa_financeiro('));
     expect(funcao).toHaveLength(1);
-    expect(funcao[0]).toMatch(/retorna boolean sql security definer stable config=search_path=public, pg_temp corpo=/);
+    expect(funcao[0]).toMatch(
+      /retorna boolean sql security definer stable config=search_path=public, pg_temp corpo=/,
+    );
 
     const grants = referencia.filter((l) => l.startsWith('grant funcao app_acessa_financeiro('));
     expect(grants).toHaveLength(1);
@@ -35,19 +37,31 @@ describe('esquema-producao.txt com as migrações do financeiro (FIN-42)', () =>
   ])('FIN-42: traz a policy restritiva %s para pelada_app, com USING e WITH CHECK', (nome) => {
     const linha = referencia.find((l) => l.startsWith(`policy ${nome} `));
     expect(linha, nome).toBeDefined();
-    expect(linha).toMatch(/^policy \S+ ALL RESTRICTIVE roles=pelada_app using=.*app_acessa_financeiro\(grupo_id\).* check=.*app_acessa_financeiro\(grupo_id\)/);
+    expect(linha).toMatch(
+      /^policy \S+ ALL RESTRICTIVE roles=pelada_app using=.*app_acessa_financeiro\(grupo_id\).* check=.*app_acessa_financeiro\(grupo_id\)/,
+    );
   });
 
   it('FIN-42: traz as 2 policies restritivas de vinculos_admin (UPDATE e INSERT) para pelada_app', () => {
-    const alterar = referencia.find((l) => l.startsWith('policy vinculos_admin.vinculos_admin_trava_financeiro_alterar '));
-    const inserir = referencia.find((l) => l.startsWith('policy vinculos_admin.vinculos_admin_trava_financeiro_inserir '));
-    expect(alterar).toMatch(/ UPDATE RESTRICTIVE roles=pelada_app using=.*app_acessa_financeiro\(grupo_id\).* check=.*app_acessa_financeiro\(grupo_id\)/);
-    expect(inserir).toMatch(/ INSERT RESTRICTIVE roles=pelada_app using= check=.*acessa_financeiro.*app_acessa_financeiro\(grupo_id\)/);
+    const alterar = referencia.find((l) =>
+      l.startsWith('policy vinculos_admin.vinculos_admin_trava_financeiro_alterar '),
+    );
+    const inserir = referencia.find((l) =>
+      l.startsWith('policy vinculos_admin.vinculos_admin_trava_financeiro_inserir '),
+    );
+    expect(alterar).toMatch(
+      / UPDATE RESTRICTIVE roles=pelada_app using=.*app_acessa_financeiro\(grupo_id\).* check=.*app_acessa_financeiro\(grupo_id\)/,
+    );
+    expect(inserir).toMatch(
+      / INSERT RESTRICTIVE roles=pelada_app using= check=.*acessa_financeiro.*app_acessa_financeiro\(grupo_id\)/,
+    );
   });
 
   it('FIN-42: do financeiro só entram a função, o grant dela e as 5 policies (7 linhas com app_acessa_financeiro)', () => {
     const linhas = referencia.filter((l) => l.includes('app_acessa_financeiro'));
-    expect(linhas.filter((l) => l.startsWith('funcao ') || l.startsWith('grant funcao '))).toHaveLength(2);
+    expect(
+      linhas.filter((l) => l.startsWith('funcao ') || l.startsWith('grant funcao ')),
+    ).toHaveLength(2);
     expect(linhas.filter((l) => l.startsWith('policy '))).toHaveLength(5);
     expect(linhas).toHaveLength(7);
   });
@@ -73,7 +87,10 @@ describe('migrações herdadas intactas (FIN-42)', () => {
     // Normaliza a quebra de linha (checkout no Windows), como a checagem `migracao-aditiva`.
     const conteudo = readFileSync(join(PASTA_MIGRACOES, nome), 'utf8');
     const bruto = readFileSync(join(PASTA_MIGRACOES, nome));
-    const calculado = [createHash('sha256').update(bruto).digest('hex'), createHash('sha256').update(conteudo.replace(/\r\n/g, '\n')).digest('hex')];
+    const calculado = [
+      createHash('sha256').update(bruto).digest('hex'),
+      createHash('sha256').update(conteudo.replace(/\r\n/g, '\n')).digest('hex'),
+    ];
     expect(calculado).toContain(hash);
   });
 });

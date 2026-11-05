@@ -33,7 +33,10 @@ async function semear(db: pg.Client, contaA: string, contaB: string): Promise<vo
 }
 
 /** Cria o login temporário que herda de `pelada_backup_ro` e o remove no fim. */
-async function comLogin<T>(db: pg.Client, fn: (usuario: string, senha: string) => Promise<T>): Promise<T> {
+async function comLogin<T>(
+  db: pg.Client,
+  fn: (usuario: string, senha: string) => Promise<T>,
+): Promise<T> {
   const usuario = `t13_${randomBytes(5).toString('hex')}`;
   const senha = randomBytes(12).toString('hex');
   await db.query(`CREATE ROLE ${usuario} LOGIN PASSWORD '${senha}' IN ROLE pelada_backup_ro`);
@@ -67,7 +70,9 @@ function dump(url: string, nome: string, usuario: string, senha: string): string
     { env: { ...process.env, PGPASSWORD: senha }, encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 },
   );
   if ((r.error as NodeJS.ErrnoException | undefined)?.code === 'ENOENT') {
-    throw new Error('pg_dump não encontrado no PATH: instale o cliente do PostgreSQL 18 (o backup.yml usa o mesmo)');
+    throw new Error(
+      'pg_dump não encontrado no PATH: instale o cliente do PostgreSQL 18 (o backup.yml usa o mesmo)',
+    );
   }
   if (r.status !== 0) throw new Error(`pg_dump saiu com ${r.status}: ${r.stderr}`);
   return r.stdout;
@@ -81,7 +86,9 @@ describe('dump com a role de backup', () => {
   it('NOT-58: o dump feito como pelada_backup_ro traz as linhas semeadas das três tabelas', async () => {
     await comCenario(async (db, cenario, banco) => {
       await semear(db, cenario.contaA, cenario.contaB);
-      const texto = await comLogin(db, (usuario, senha) => dump(banco.url, banco.nome, usuario, senha));
+      const texto = await comLogin(db, (usuario, senha) =>
+        dump(banco.url, banco.nome, usuario, senha),
+      );
       for (const tabela of TABELAS) {
         expect(linhasDe(texto, tabela), `linhas de ${tabela} no dump`).toBe(SEMEADO[tabela]);
       }
@@ -99,7 +106,9 @@ describe('dump com a role de backup', () => {
         `SELECT (SELECT count(*) FROM push_ranking) + (SELECT count(*) FROM push_conta) + (SELECT count(*) FROM avisos_cobranca) AS n`,
       );
       expect(Number(total.rows[0]?.n)).toBe(6);
-      const texto = await comLogin(db, (usuario, senha) => dump(banco.url, banco.nome, usuario, senha));
+      const texto = await comLogin(db, (usuario, senha) =>
+        dump(banco.url, banco.nome, usuario, senha),
+      );
       for (const tabela of TABELAS) {
         expect(linhasDe(texto, tabela), `linhas de ${tabela} no dump sem policy`).toBe(0);
         expect(linhasDe(texto, tabela)).not.toBe(SEMEADO[tabela]);
@@ -118,7 +127,10 @@ describe('dump com a role de backup', () => {
           expect(r.rows[0]?.n, tabela).toBe(SEMEADO[tabela]);
         }
         for (const sequencia of ['push_ranking_id_seq', 'push_conta_id_seq']) {
-          await expect(db.query(`SELECT last_value FROM ${sequencia}`), sequencia).resolves.toBeDefined();
+          await expect(
+            db.query(`SELECT last_value FROM ${sequencia}`),
+            sequencia,
+          ).resolves.toBeDefined();
         }
       } finally {
         await db.query('ROLLBACK');

@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { montarElenco, type Apto } from '../../src/simulador/base.ts';
 import { menorChave } from '../../src/simulador/chave-dois.ts';
-import { chaveVariosTimes, distribuirVariosTimes } from '../../src/simulador/distribuicao-varios.ts';
+import {
+  chaveVariosTimes,
+  distribuirVariosTimes,
+} from '../../src/simulador/distribuicao-varios.ts';
 import { montarVariosTimes } from '../../src/simulador/varios-inicial.ts';
 
 /**
@@ -33,7 +36,10 @@ const VARIADOS: Apto[] = Array.from({ length: 22 }, (_, k) => {
 function rodar(aptos: readonly Apto[], n: number, maxTrocas?: number) {
   const elenco = montarElenco(aptos, DATA);
   const inicial = montarVariosTimes(elenco, n);
-  return { elenco, ...distribuirVariosTimes(inicial, elenco, maxTrocas === undefined ? {} : { maxTrocas }) };
+  return {
+    elenco,
+    ...distribuirVariosTimes(inicial, elenco, maxTrocas === undefined ? {} : { maxTrocas }),
+  };
 }
 
 describe('distribuirVariosTimes', () => {
@@ -58,7 +64,9 @@ describe('distribuirVariosTimes', () => {
     const elenco = montarElenco(VARIADOS, DATA);
     const inicial = montarVariosTimes(elenco, 4);
     const final = distribuirVariosTimes(inicial, elenco);
-    expect(menorChave(chaveVariosTimes(inicial.times, elenco), chaveVariosTimes(final.times, elenco))).toBe(false);
+    expect(
+      menorChave(chaveVariosTimes(inicial.times, elenco), chaveVariosTimes(final.times, elenco)),
+    ).toBe(false);
   });
 
   it('SIM-92: com teto de 1 troca, os tamanhos continuam os da prévia', () => {
@@ -92,9 +100,30 @@ describe('distribuirVariosTimes', () => {
   });
 
   it('SIM-95: time só de quem não tem ano não lança e fica fora da amplitude de idade', () => {
-    const semAno = VARIADOS.slice(0, 9).map((a, k) => ({ ...a, anoNascimento: k < 3 ? null : 1990 }));
+    const semAno = VARIADOS.slice(0, 9).map((a, k) => ({
+      ...a,
+      anoNascimento: k < 3 ? null : 1990,
+    }));
     const elenco = montarElenco(semAno, DATA);
-    expect(() => chaveVariosTimes([['p01', 'p02', 'p03'], ['p04', 'p05', 'p06'], ['p07', 'p08', 'p09']], elenco)).not.toThrow();
-    expect(chaveVariosTimes([['p01', 'p02', 'p03'], ['p04', 'p05', 'p06'], ['p07', 'p08', 'p09']], elenco)[1]).toBe(0);
+    expect(() =>
+      chaveVariosTimes(
+        [
+          ['p01', 'p02', 'p03'],
+          ['p04', 'p05', 'p06'],
+          ['p07', 'p08', 'p09'],
+        ],
+        elenco,
+      ),
+    ).not.toThrow();
+    expect(
+      chaveVariosTimes(
+        [
+          ['p01', 'p02', 'p03'],
+          ['p04', 'p05', 'p06'],
+          ['p07', 'p08', 'p09'],
+        ],
+        elenco,
+      )[1],
+    ).toBe(0);
   });
 });

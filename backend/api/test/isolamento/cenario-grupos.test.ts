@@ -1,6 +1,11 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { comCliente, URL_TESTE_PADRAO } from '../apoio/banco.ts';
-import { abrirCenarioGrupos, comCenarioGrupos, gruposVistos, type CenarioGruposAberto } from './cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  comCenarioGrupos,
+  gruposVistos,
+  type CenarioGruposAberto,
+} from './cenario-grupos.ts';
 
 /**
  * Cenário de grupos e elenco (T0; GEL-112). Caracteriza o estado de partida: com as 23 migrações,
@@ -14,7 +19,9 @@ const URL_BASE = process.env.DATABASE_URL_TESTE ?? URL_TESTE_PADRAO;
 
 async function bancosDeTeste(): Promise<string[]> {
   return comCliente(URL_BASE, async (c) => {
-    const r = await c.query<{ datname: string }>(`SELECT datname FROM pg_database WHERE datname LIKE 'teste\\_%'`);
+    const r = await c.query<{ datname: string }>(
+      `SELECT datname FROM pg_database WHERE datname LIKE 'teste\\_%'`,
+    );
     return r.rows.map((l) => l.datname).sort();
   });
 }
@@ -47,9 +54,10 @@ describe('cenário de grupos e elenco', () => {
 
   it('GEL-112: G nasce pela grupo_criar com criado_por = C e o slug da base', async () => {
     const { db, cenario } = aberto;
-    const r = await db.query<{ criado_por: string; slug: string }>('SELECT criado_por, slug FROM grupos WHERE id = $1', [
-      cenario.grupoG,
-    ]);
+    const r = await db.query<{ criado_por: string; slug: string }>(
+      'SELECT criado_por, slug FROM grupos WHERE id = $1',
+      [cenario.grupoG],
+    );
     expect(r.rows[0]).toEqual({ criado_por: cenario.contaC, slug: 'pelada-de-quinta' });
   });
 
@@ -93,7 +101,9 @@ describe('limpeza do cenário de grupos', () => {
   it('GEL-112: o banco é removido quando a criação do cenário de grupos falha', async () => {
     const antes = await bancosDeTeste();
     // Nome com 2 caracteres viola o CHECK de grupos.nome dentro da grupo_criar.
-    await expect(comCenarioGrupos(async () => 'não deveria rodar', { nomeG: 'PQ' })).rejects.toMatchObject({
+    await expect(
+      comCenarioGrupos(async () => 'não deveria rodar', { nomeG: 'PQ' }),
+    ).rejects.toMatchObject({
       code: '23514',
     });
     expect(await bancosDeTeste()).toEqual(antes);

@@ -28,7 +28,10 @@ import { abrirCenarioGrupos, type CenarioGruposAberto } from '../isolamento/cena
 let aberto: CenarioGruposAberto;
 
 const HOJE = '2026-06-15';
-const app = criarApp({ fabricaBanco: fabricaComoApp().fabrica, relogio: relogioFixo('2026-06-15T15:00:00Z') });
+const app = criarApp({
+  fabricaBanco: fabricaComoApp().fabrica,
+  relogio: relogioFixo('2026-06-15T15:00:00Z'),
+});
 
 const VALIDO = { apelido: 'Recruta', anoNascimento: 1998, posicao: 'volante' } as const;
 
@@ -42,8 +45,16 @@ async function sessao(conta: string): Promise<string> {
   return token;
 }
 
-async function pedir(caminho: string, conta: string, metodo = 'GET', corpo?: unknown): Promise<Response> {
-  const headers = new Headers({ 'x-pelada': '1', cookie: `${NOME_COOKIE_SESSAO}=${await sessao(conta)}` });
+async function pedir(
+  caminho: string,
+  conta: string,
+  metodo = 'GET',
+  corpo?: unknown,
+): Promise<Response> {
+  const headers = new Headers({
+    'x-pelada': '1',
+    cookie: `${NOME_COOKIE_SESSAO}=${await sessao(conta)}`,
+  });
   if (corpo !== undefined) headers.set('content-type', 'application/json');
   const ctx = contextoFalso();
   const r = await app.request(
@@ -61,7 +72,10 @@ function cadastrar(corpo: unknown, conta = aberto.cenario.contaC): Promise<Respo
 }
 
 async function existe(apelido: string): Promise<boolean> {
-  const r = await aberto.db.query('SELECT 1 FROM jogadores WHERE grupo_id = $1 AND apelido = $2', [aberto.cenario.grupoG, apelido]);
+  const r = await aberto.db.query('SELECT 1 FROM jogadores WHERE grupo_id = $1 AND apelido = $2', [
+    aberto.cenario.grupoG,
+    apelido,
+  ]);
   return (r.rowCount ?? 0) > 0;
 }
 
@@ -121,39 +135,98 @@ describe('POST /api/grupos/:grupoId/jogadores', () => {
   });
 
   it.each([
-    ['GEL-33', 'data de entrada amanhã', { dataEntrada: '2026-06-16' }, 'dataEntrada', MENSAGEM_DATA_FUTURA],
-    ['GEL-33', 'data de entrada que não existe', { dataEntrada: '2026-02-30' }, 'dataEntrada', MENSAGEM_DATA_INVALIDA],
-    ['SEC-002', 'data de entrada 0000-01-01', { dataEntrada: '0000-01-01' }, 'dataEntrada', MENSAGEM_DATA_ANTES_DO_PISO],
-    ['SEC-002', 'data de entrada 1999-12-31', { dataEntrada: '1999-12-31' }, 'dataEntrada', MENSAGEM_DATA_ANTES_DO_PISO],
+    [
+      'GEL-33',
+      'data de entrada amanhã',
+      { dataEntrada: '2026-06-16' },
+      'dataEntrada',
+      MENSAGEM_DATA_FUTURA,
+    ],
+    [
+      'GEL-33',
+      'data de entrada que não existe',
+      { dataEntrada: '2026-02-30' },
+      'dataEntrada',
+      MENSAGEM_DATA_INVALIDA,
+    ],
+    [
+      'SEC-002',
+      'data de entrada 0000-01-01',
+      { dataEntrada: '0000-01-01' },
+      'dataEntrada',
+      MENSAGEM_DATA_ANTES_DO_PISO,
+    ],
+    [
+      'SEC-002',
+      'data de entrada 1999-12-31',
+      { dataEntrada: '1999-12-31' },
+      'dataEntrada',
+      MENSAGEM_DATA_ANTES_DO_PISO,
+    ],
     ['GEL-34', 'apelido de 1 letra', { apelido: 'A' }, 'apelido', MENSAGEM_APELIDO],
     ['GEL-34', 'apelido de 31 letras', { apelido: 'a'.repeat(31) }, 'apelido', MENSAGEM_APELIDO],
     ['GEL-36', 'ano 1939', { anoNascimento: 1939 }, 'anoNascimento', mensagemAnoNascimento(2016)],
-    ['GEL-36', 'ano 2017 (hoje − 9)', { anoNascimento: 2017 }, 'anoNascimento', mensagemAnoNascimento(2016)],
+    [
+      'GEL-36',
+      'ano 2017 (hoje − 9)',
+      { anoNascimento: 2017 },
+      'anoNascimento',
+      mensagemAnoNascimento(2016),
+    ],
     ['GEL-37', 'posição fora das 7', { posicao: 'defensor' }, 'posicao', MENSAGEM_POSICAO],
     ['GEL-39', 'telefone sem o 9', { telefone: '1187654321' }, 'telefone', MENSAGEM_TELEFONE],
     ['GEL-39', 'telefone com DDD 0', { telefone: '01987654321' }, 'telefone', MENSAGEM_TELEFONE],
-    ['GEL-40', 'pontuação negativa', { pontuacaoInicial: -1 }, 'pontuacaoInicial', MENSAGEM_PONTUACAO],
-    ['GEL-40', 'pontuação 10000', { pontuacaoInicial: 10000 }, 'pontuacaoInicial', MENSAGEM_PONTUACAO],
-    ['GEL-40', 'pontuação fracionária', { pontuacaoInicial: 1.5 }, 'pontuacaoInicial', MENSAGEM_PONTUACAO],
-  ] as const)('%s: %s dá 422 com o campo e a mensagem, e nada é gravado', async (_id, _caso, mudanca, campo, mensagem) => {
-    const apelido = 'apelido' in mudanca ? mudanca.apelido : 'Inválido';
-    const r = await cadastrar({ ...VALIDO, apelido, ...mudanca });
-    expect(r.status).toBe(422);
-    const erro = (await r.json()) as { codigo: string; campos: string[]; mensagens: Record<string, string> };
-    expect(erro.codigo).toBe('dados_invalidos');
-    expect(erro.campos).toContain(campo);
-    expect(erro.mensagens[campo]).toBe(mensagem);
-    expect(await existe(apelido)).toBe(false);
-  });
+    [
+      'GEL-40',
+      'pontuação negativa',
+      { pontuacaoInicial: -1 },
+      'pontuacaoInicial',
+      MENSAGEM_PONTUACAO,
+    ],
+    [
+      'GEL-40',
+      'pontuação 10000',
+      { pontuacaoInicial: 10000 },
+      'pontuacaoInicial',
+      MENSAGEM_PONTUACAO,
+    ],
+    [
+      'GEL-40',
+      'pontuação fracionária',
+      { pontuacaoInicial: 1.5 },
+      'pontuacaoInicial',
+      MENSAGEM_PONTUACAO,
+    ],
+  ] as const)(
+    '%s: %s dá 422 com o campo e a mensagem, e nada é gravado',
+    async (_id, _caso, mudanca, campo, mensagem) => {
+      const apelido = 'apelido' in mudanca ? mudanca.apelido : 'Inválido';
+      const r = await cadastrar({ ...VALIDO, apelido, ...mudanca });
+      expect(r.status).toBe(422);
+      const erro = (await r.json()) as {
+        codigo: string;
+        campos: string[];
+        mensagens: Record<string, string>;
+      };
+      expect(erro.codigo).toBe('dados_invalidos');
+      expect(erro.campos).toContain(campo);
+      expect(erro.mensagens[campo]).toBe(mensagem);
+      expect(await existe(apelido)).toBe(false);
+    },
+  );
 
   it('GEL-36: o ano de hoje − 10 (2016) é aceito', async () => {
-    expect((await cadastrar({ ...VALIDO, apelido: 'Mirim', anoNascimento: 2016 })).status).toBe(201);
+    expect((await cadastrar({ ...VALIDO, apelido: 'Mirim', anoNascimento: 2016 })).status).toBe(
+      201,
+    );
   });
 
   it('GEL-35: apelido repetido sem caixa dá 422 no apelido', async () => {
     const r = await cadastrar({ ...VALIDO, apelido: 'toninho' });
     expect(r.status).toBe(422);
-    expect(((await r.json()) as { mensagens: Record<string, string> }).mensagens.apelido).toBe(MENSAGEM_APELIDO_REPETIDO);
+    expect(((await r.json()) as { mensagens: Record<string, string> }).mensagens.apelido).toBe(
+      MENSAGEM_APELIDO_REPETIDO,
+    );
   });
 
   it('GEL-31: dataEntrada é o único campo de data aceito; campo extra dá 422', async () => {
@@ -177,7 +250,15 @@ describe('GET /api/grupos/:grupoId/jogadores', () => {
     expect(Object.keys(corpo)).toEqual(['jogadores']);
     expect(corpo.jogadores).toHaveLength(3);
     for (const j of corpo.jogadores) {
-      expect(Object.keys(j).sort()).toEqual(['apelido', 'desde', 'id', 'nivel', 'posicao', 'semNota', 'situacao']);
+      expect(Object.keys(j).sort()).toEqual([
+        'apelido',
+        'desde',
+        'id',
+        'nivel',
+        'posicao',
+        'semNota',
+        'situacao',
+      ]);
     }
     expect(JSON.stringify(corpo)).not.toContain('telefone');
   });

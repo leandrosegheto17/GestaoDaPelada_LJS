@@ -26,7 +26,8 @@ function semEmails(v: unknown): unknown {
   if (Array.isArray(v)) return v.map(semEmails);
   if (objeto(v)) {
     const copia: Objeto = {};
-    for (const [chave, valor] of Object.entries(v)) copia[chave.replace(EMAIL, EMAIL_REMOVIDO)] = semEmails(valor);
+    for (const [chave, valor] of Object.entries(v))
+      copia[chave.replace(EMAIL, EMAIL_REMOVIDO)] = semEmails(valor);
     return copia;
   }
   return v;

@@ -30,7 +30,10 @@ async function travarEValidar(
   grupoId: string,
   data: string,
   marcacoes: PartidaCorpo['marcacoes'],
-): Promise<{ ok: true; presencas: PresencaMarcada[]; contagem: ContagemDaPartida } | { ok: false; campos: Record<string, string> }> {
+): Promise<
+  | { ok: true; presencas: PresencaMarcada[]; contagem: ContagemDaPartida }
+  | { ok: false; campos: Record<string, string> }
+> {
   await jogadores.travarVarios(
     db,
     grupoId,
@@ -41,7 +44,12 @@ async function travarEValidar(
 }
 
 /** Uma linha de presença para cada marcação gravada (PAR-23: `ausente` e ativo sem marcação não gravam linha). */
-async function inserirPresencas(db: Db, grupoId: string, partidaId: string, presencas: readonly PresencaMarcada[]) {
+async function inserirPresencas(
+  db: Db,
+  grupoId: string,
+  partidaId: string,
+  presencas: readonly PresencaMarcada[],
+) {
   if (presencas.length === 0) return;
   await sql`
     INSERT INTO presencas (partida_id, jogador_id, grupo_id, situacao)
@@ -92,7 +100,8 @@ async function lancar(db: Db, grupoId: string, dados: PartidaCorpo): Promise<Res
   } catch (erro) {
     await sql`ROLLBACK TO SAVEPOINT lancar_partida`.execute(db);
     const e = erro as { code?: string; constraint?: string };
-    if (e.code === '23505' && e.constraint === UNICA_POR_DATA) return { resultado: 'partida_ja_existe' };
+    if (e.code === '23505' && e.constraint === UNICA_POR_DATA)
+      return { resultado: 'partida_ja_existe' };
     throw erro;
   }
   await sql`RELEASE SAVEPOINT lancar_partida`.execute(db);
@@ -139,7 +148,12 @@ async function travarPartida(db: Db, grupoId: string, data: string): Promise<str
  * Um jogador com presença gravada que não está mais ativo na data não chega a existir: a correção de período que o
  * tiraria da data é recusada pela grupos-e-elenco (GEL-68).
  */
-async function editar(db: Db, grupoId: string, data: string, dados: PartidaCorpo): Promise<ResultadoEditar> {
+async function editar(
+  db: Db,
+  grupoId: string,
+  data: string,
+  dados: PartidaCorpo,
+): Promise<ResultadoEditar> {
   const partidaId = await travarPartida(db, grupoId, data);
   if (!partidaId) return { resultado: 'nao_encontrada' };
   if (dados.data !== data) return { resultado: 'data_alterada' };
@@ -150,7 +164,9 @@ async function editar(db: Db, grupoId: string, data: string, dados: PartidaCorpo
   await sql`
     UPDATE partidas SET choveu = ${dados.choveu}, alterada_por = app_conta_id(), alterada_em = now()
      WHERE grupo_id = ${grupoId} AND id = ${partidaId}`.execute(db);
-  await sql`DELETE FROM presencas WHERE grupo_id = ${grupoId} AND partida_id = ${partidaId}`.execute(db);
+  await sql`DELETE FROM presencas WHERE grupo_id = ${grupoId} AND partida_id = ${partidaId}`.execute(
+    db,
+  );
   await inserirPresencas(db, grupoId, partidaId, v.presencas);
   await auditoria.registrar(db, grupoId, {
     acao: 'partida_editada',
@@ -193,7 +209,13 @@ export interface PartidaDoMesLida {
  * expulsos (PAR-37). A navegação e o `hoje` são da rota (PAR-41).
  */
 async function doMes(db: Db, grupoId: string, mes: string): Promise<PartidaDoMesLida[]> {
-  const r = await sql<{ data: string; choveu: boolean; presentes: number; lesionados: number; expulsos: number }>`
+  const r = await sql<{
+    data: string;
+    choveu: boolean;
+    presentes: number;
+    lesionados: number;
+    expulsos: number;
+  }>`
     SELECT p.data::text AS data, p.choveu,
            count(*) FILTER (WHERE pr.situacao = 'presente')::int AS presentes,
            count(*) FILTER (WHERE pr.situacao = 'lesionado')::int AS lesionados,
@@ -230,7 +252,10 @@ export interface PartidaLida {
 
 /** Apelido sem acento nem caixa, para a ordem da tela (PAR-44). */
 function chaveDeOrdem(apelido: string): string {
-  return apelido.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
+  return apelido
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase();
 }
 
 /**
@@ -253,14 +278,17 @@ async function ler(db: Db, grupoId: string, data: string): Promise<PartidaLida |
        AND (pr.jogador_id IS NOT NULL
             OR EXISTS (SELECT 1 FROM periodos_ativos pa
                         WHERE pa.grupo_id = j.grupo_id AND pa.jogador_id = j.id
-                          AND pa.inicio <= ${data}::date AND (pa.fim IS NULL OR pa.fim > ${data}::date)))`.execute(db);
+                          AND pa.inicio <= ${data}::date AND (pa.fim IS NULL OR pa.fim > ${data}::date)))`.execute(
+    db,
+  );
 
   const autoras = await sql<{ id: string; nome: string }>`
     SELECT id, nome FROM contas_nomes_do_grupo(${grupoId})`.execute(db);
   const alteradaPor = autoras.rows.find((a) => a.id === partida.alterada_por)?.nome ?? '';
 
   const jogadoresOrdenados = [...j.rows].sort(
-    (a, b) => chaveDeOrdem(a.apelido).localeCompare(chaveDeOrdem(b.apelido)) || a.id.localeCompare(b.id),
+    (a, b) =>
+      chaveDeOrdem(a.apelido).localeCompare(chaveDeOrdem(b.apelido)) || a.id.localeCompare(b.id),
   );
   return {
     data,
@@ -274,7 +302,9 @@ async function ler(db: Db, grupoId: string, data: string): Promise<PartidaLida |
 /** Mês (`AAAA-MM`) da primeira partida do grupo, ou nulo sem partida: o limite da navegação (PAR-41). */
 async function mesDaPrimeira(db: Db, grupoId: string): Promise<string | null> {
   const r = await sql<{ mes: string | null }>`
-    SELECT to_char(min(data), 'YYYY-MM') AS mes FROM partidas WHERE grupo_id = ${grupoId}`.execute(db);
+    SELECT to_char(min(data), 'YYYY-MM') AS mes FROM partidas WHERE grupo_id = ${grupoId}`.execute(
+    db,
+  );
   return r.rows[0]?.mes ?? null;
 }
 

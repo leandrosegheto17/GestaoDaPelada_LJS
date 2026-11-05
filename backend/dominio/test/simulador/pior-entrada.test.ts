@@ -27,9 +27,17 @@ const HISTORICO = historicoGrande(MAX_APTOS_SIMULADOR, 104);
 const NS = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
 const FORMATOS: Formato[] = ['dois_times', 'varios_times'];
 
-const COMBINACOES: [Formato, number][] = FORMATOS.flatMap((formato) => NS.map((n): [Formato, number] => [formato, n]));
+const COMBINACOES: [Formato, number][] = FORMATOS.flatMap((formato) =>
+  NS.map((n): [Formato, number] => [formato, n]),
+);
 
-const entradaDe = (formato: Formato, n: number): EntradaSimulador => ({ formato, data: DATA, n, k: 'ilimitado', aptos: APTOS });
+const entradaDe = (formato: Formato, n: number): EntradaSimulador => ({
+  formato,
+  data: DATA,
+  n,
+  k: 'ilimitado',
+  aptos: APTOS,
+});
 
 /** A composição da sugestão no formato que a tela envia ao `avaliar`. */
 function composicaoDe(s: Sugestao): ComposicaoEntrada {
@@ -39,8 +47,14 @@ function composicaoDe(s: Sugestao): ComposicaoEntrada {
   return {
     formato: 'dois_times',
     times: [
-      { titulares: s.composicao.times[0].titulares.map(so1o), entram: s.composicao.times[0].entram.map(so1o) },
-      { titulares: s.composicao.times[1].titulares.map(so1o), entram: s.composicao.times[1].entram.map(so1o) },
+      {
+        titulares: s.composicao.times[0].titulares.map(so1o),
+        entram: s.composicao.times[0].entram.map(so1o),
+      },
+      {
+        titulares: s.composicao.times[1].titulares.map(so1o),
+        entram: s.composicao.times[1].entram.map(so1o),
+      },
     ],
     naoEntra: s.composicao.naoEntra,
   };
@@ -49,7 +63,10 @@ function composicaoDe(s: Sugestao): ComposicaoEntrada {
 function idsDa(s: Sugestao): string[] {
   if (!s.valida) return [];
   if (s.formato === 'varios_times') return s.times.flat();
-  return [...s.composicao.times.flatMap((t) => [...t.titulares, ...t.entram]), ...s.composicao.naoEntra];
+  return [
+    ...s.composicao.times.flatMap((t) => [...t.titulares, ...t.entram]),
+    ...s.composicao.naoEntra,
+  ];
 }
 
 describe('pior entrada válida', () => {
@@ -62,7 +79,10 @@ describe('pior entrada válida', () => {
     }
     if (s.valida && s.formato === 'varios_times') {
       const resto = APTOS.length % n;
-      const esperados = [...Array<number>(Math.floor(APTOS.length / n)).fill(n), ...(resto > 0 ? [resto] : [])];
+      const esperados = [
+        ...Array<number>(Math.floor(APTOS.length / n)).fill(n),
+        ...(resto > 0 ? [resto] : []),
+      ];
       expect(s.times.map((t) => t.length)).toEqual(esperados);
     }
   });
@@ -73,12 +93,17 @@ describe('pior entrada válida', () => {
       const composicao = composicaoDe(sugerir(entrada, HISTORICO));
       return [
         { nome: `sugerir ${formato} N=${n}`, ...medir(() => sugerir(entrada, HISTORICO), 20, 5) },
-        { nome: `avaliar ${formato} N=${n}`, ...medir(() => avaliar(entrada, composicao, HISTORICO), 20, 5) },
+        {
+          nome: `avaliar ${formato} N=${n}`,
+          ...medir(() => avaliar(entrada, composicao, HISTORICO), 20, 5),
+        },
       ];
     });
     const pior = resultados.reduce((a, b) => (b.p99 > a.p99 ? b : a));
     console.info(`SIM-58 pior combinação: ${pior.nome}, p99 ${pior.p99.toFixed(3)} ms`);
-    const acima = resultados.filter((r) => r.p99 >= LIMIAR_MS).map((r) => `${r.nome}: ${r.p99.toFixed(3)} ms`);
+    const acima = resultados
+      .filter((r) => r.p99 >= LIMIAR_MS)
+      .map((r) => `${r.nome}: ${r.p99.toFixed(3)} ms`);
     expect(acima).toEqual([]);
   });
 });

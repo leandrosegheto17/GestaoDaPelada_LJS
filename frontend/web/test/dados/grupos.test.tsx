@@ -17,8 +17,22 @@ import { json } from '../apoio/tela.tsx';
 
 /** Dados de grupos no front (grupos-e-elenco T53; GEL-01, GEL-18, GEL-22, GEL-27). */
 
-const QUINTA = { id: 'g-quinta', nome: 'Pelada de Quinta', slug: 'pelada-de-quinta', diaSemana: 'quinta', frequencia: 'semanal', horario: '20:00' };
-const VELHA = { id: 'g-velha', nome: 'Pelada Velha', slug: 'pelada-velha', diaSemana: 'sabado', frequencia: 'mensal', horario: '09:00' };
+const QUINTA = {
+  id: 'g-quinta',
+  nome: 'Pelada de Quinta',
+  slug: 'pelada-de-quinta',
+  diaSemana: 'quinta',
+  frequencia: 'semanal',
+  horario: '20:00',
+};
+const VELHA = {
+  id: 'g-velha',
+  nome: 'Pelada Velha',
+  slug: 'pelada-velha',
+  diaSemana: 'sabado',
+  frequencia: 'mensal',
+  horario: '09:00',
+};
 const DETALHE = {
   ...QUINTA,
   linkPublico: 'https://pelada.exemplo.test/g/pelada-de-quinta',
@@ -36,7 +50,12 @@ const DETALHE = {
   proximoDiaDeJogo: '2026-10-22',
   escalacaoNoProximoDia: false,
 };
-const DADOS = { nome: 'Pelada de Quinta', diaSemana: 'quinta', frequencia: 'semanal', horario: '20:00' } as const;
+const DADOS = {
+  nome: 'Pelada de Quinta',
+  diaSemana: 'quinta',
+  frequencia: 'semanal',
+  horario: '20:00',
+} as const;
 
 /** Põe a lista, o grupo e a sessão no cache, para ver quais a mutação invalida. */
 function semear(consultas: QueryClient) {
@@ -56,12 +75,16 @@ describe('useGrupos e useGrupo', () => {
   });
 
   it('GEL-27: resposta fora do contrato é erro, não dado', async () => {
-    const { result } = montarHook(() => useGrupos(), { 'GET /api/grupos': () => json(200, { ativos: 'x' }) });
+    const { result } = montarHook(() => useGrupos(), {
+      'GET /api/grupos': () => json(200, { ativos: 'x' }),
+    });
     await waitFor(() => expect(result.current.isError).toBe(true));
   });
 
   it('GEL-20: useGrupo lê o detalhe do grupo', async () => {
-    const { result } = montarHook(() => useGrupo('g-quinta'), { 'GET /api/grupos/g-quinta': () => json(200, DETALHE) });
+    const { result } = montarHook(() => useGrupo('g-quinta'), {
+      'GET /api/grupos/g-quinta': () => json(200, DETALHE),
+    });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data?.souCriador).toBe(true);
   });
@@ -70,7 +93,8 @@ describe('useGrupos e useGrupo', () => {
 describe('mutações de grupo', () => {
   it('GEL-01: criarGrupo faz POST /api/grupos e invalida a lista e a sessão', async () => {
     const m = montarHook(() => useCriarGrupo(), {
-      'POST /api/grupos': () => json(201, { id: 'g-novo', slug: 'pelada-de-quinta-2', linkPublico: 'https://x/g/y' }),
+      'POST /api/grupos': () =>
+        json(201, { id: 'g-novo', slug: 'pelada-de-quinta-2', linkPublico: 'https://x/g/y' }),
     });
     semear(m.consultas);
     let resposta: unknown;
@@ -86,23 +110,31 @@ describe('mutações de grupo', () => {
 
   it('GEL-18: editarGrupo faz PATCH, guarda o detalhe novo e invalida a lista e a sessão', async () => {
     const novo = { ...DETALHE, nome: 'Pelada Renomeada' };
-    const m = montarHook(() => useEditarGrupo('g-quinta'), { 'PATCH /api/grupos/g-quinta': () => json(200, novo) });
+    const m = montarHook(() => useEditarGrupo('g-quinta'), {
+      'PATCH /api/grupos/g-quinta': () => json(200, novo),
+    });
     semear(m.consultas);
     await act(async () => {
       await m.result.current.mutateAsync({ ...DADOS, nome: 'Pelada Renomeada' });
     });
-    expect(m.consultas.getQueryData(chaveGrupo('g-quinta'))).toMatchObject({ nome: 'Pelada Renomeada' });
+    expect(m.consultas.getQueryData(chaveGrupo('g-quinta'))).toMatchObject({
+      nome: 'Pelada Renomeada',
+    });
     expect(estaInvalidada(m.consultas, CHAVE_GRUPOS)).toBe(true);
     expect(estaInvalidada(m.consultas, CHAVE_SESSAO)).toBe(true);
   });
 
   it('GEL-22: arquivar invalida a lista, o grupo e a sessão', async () => {
-    const m = montarHook(() => useArquivarGrupo('g-quinta'), { 'POST /api/grupos/g-quinta/arquivar': () => json(200, {}) });
+    const m = montarHook(() => useArquivarGrupo('g-quinta'), {
+      'POST /api/grupos/g-quinta/arquivar': () => json(200, {}),
+    });
     semear(m.consultas);
     await act(async () => {
       await m.result.current.mutateAsync({ nomeConfirmacao: 'Pelada de Quinta' });
     });
-    expect(m.chamadasA('POST', '/api/grupos/g-quinta/arquivar')[0]?.corpo).toEqual({ nomeConfirmacao: 'Pelada de Quinta' });
+    expect(m.chamadasA('POST', '/api/grupos/g-quinta/arquivar')[0]?.corpo).toEqual({
+      nomeConfirmacao: 'Pelada de Quinta',
+    });
     expect(estaInvalidada(m.consultas, CHAVE_GRUPOS)).toBe(true);
     expect(estaInvalidada(m.consultas, chaveGrupo('g-quinta'))).toBe(true);
     expect(estaInvalidada(m.consultas, CHAVE_SESSAO)).toBe(true);
@@ -111,18 +143,23 @@ describe('mutações de grupo', () => {
 
   it('GEL-22: arquivar recusado não invalida nada', async () => {
     const m = montarHook(() => useArquivarGrupo('g-quinta'), {
-      'POST /api/grupos/g-quinta/arquivar': () => json(403, { erro: 'Só quem criou.', codigo: 'so_quem_criou' }),
+      'POST /api/grupos/g-quinta/arquivar': () =>
+        json(403, { erro: 'Só quem criou.', codigo: 'so_quem_criou' }),
     });
     semear(m.consultas);
     await act(async () => {
-      await m.result.current.mutateAsync({ nomeConfirmacao: 'Pelada de Quinta' }).catch(() => undefined);
+      await m.result.current
+        .mutateAsync({ nomeConfirmacao: 'Pelada de Quinta' })
+        .catch(() => undefined);
     });
     expect(estaInvalidada(m.consultas, CHAVE_GRUPOS)).toBe(false);
     expect(estaInvalidada(m.consultas, CHAVE_SESSAO)).toBe(false);
   });
 
   it('GEL-28: reativar invalida a lista, o grupo e a sessão', async () => {
-    const m = montarHook(() => useReativarGrupo('g-quinta'), { 'POST /api/grupos/g-quinta/reativar': () => json(200, {}) });
+    const m = montarHook(() => useReativarGrupo('g-quinta'), {
+      'POST /api/grupos/g-quinta/reativar': () => json(200, {}),
+    });
     semear(m.consultas);
     await act(async () => {
       await m.result.current.mutateAsync();

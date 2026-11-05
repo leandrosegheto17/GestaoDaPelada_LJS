@@ -49,8 +49,11 @@ const CODIGOS_ANTIGOS = { nao_autenticado: 'sem_sessao' };
 export function entradasAtivas(mapa, ativas) {
   const lista = [];
   for (const { id, estado } of ativas.telas ?? []) {
-    const entrada = (mapa.telas ?? []).find((t) => t.id === id && t.estado === estado && t.real === true);
-    if (!entrada) throw new Error(`${id} ${estado} não é uma tela real (real: true) do telas.json.`);
+    const entrada = (mapa.telas ?? []).find(
+      (t) => t.id === id && t.estado === estado && t.real === true,
+    );
+    if (!entrada)
+      throw new Error(`${id} ${estado} não é uma tela real (real: true) do telas.json.`);
     lista.push(entrada);
   }
   return lista;
@@ -85,7 +88,11 @@ export function seletorDoApp(seletor) {
     .map((parte) => {
       const p = parte.trim();
       if (/^(role|text|xpath|internal:)/.test(p)) return parte;
-      return parte.replace(/\.([A-Za-z_][\w-]*)/g, (_, nome) => `:is(.${nome}, [class^="${nome}${SUFIXO_MODULO}"], [class*=" ${nome}${SUFIXO_MODULO}"])`);
+      return parte.replace(
+        /\.([A-Za-z_][\w-]*)/g,
+        (_, nome) =>
+          `:is(.${nome}, [class^="${nome}${SUFIXO_MODULO}"], [class*=" ${nome}${SUFIXO_MODULO}"])`,
+      );
     })
     .join(' >> ');
 }
@@ -100,7 +107,11 @@ function respostaDoArquivo(mockup, item) {
 /** Registra as rotas de API falsas de uma entrada na página (antes do `goto`). */
 export async function aplicarRespostas(pagina, entrada, { mockup, globais = [] }) {
   await pagina.route('**/api/**', (rota) =>
-    rota.fulfill({ status: 404, contentType: 'application/json', body: JSON.stringify({ erro: 'Não encontrado.', codigo: 'nao_encontrado' }) }),
+    rota.fulfill({
+      status: 404,
+      contentType: 'application/json',
+      body: JSON.stringify({ erro: 'Não encontrado.', codigo: 'nao_encontrado' }),
+    }),
   );
   for (const item of [...globais, ...(entrada.respostas ?? [])]) {
     if (item.pendente) {
@@ -123,9 +134,18 @@ export async function aplicarRespostas(pagina, entrada, { mockup, globais = [] }
 /** Executa os `passos` de uma entrada, na ordem. */
 export async function executarPassos(pagina, passos = []) {
   for (const passo of passos) {
-    if ('preencher' in passo) await pagina.locator(seletorDoApp(passo.preencher)).first().fill(String(passo.valor ?? ''));
-    else if ('clicar' in passo) await pagina.locator(seletorDoApp(passo.clicar)).nth(passo.indice ?? 0).click();
-    else if ('esperar' in passo) await pagina.locator(seletorDoApp(passo.esperar)).first().waitFor({ state: 'visible' });
+    if ('preencher' in passo)
+      await pagina
+        .locator(seletorDoApp(passo.preencher))
+        .first()
+        .fill(String(passo.valor ?? ''));
+    else if ('clicar' in passo)
+      await pagina
+        .locator(seletorDoApp(passo.clicar))
+        .nth(passo.indice ?? 0)
+        .click();
+    else if ('esperar' in passo)
+      await pagina.locator(seletorDoApp(passo.esperar)).first().waitFor({ state: 'visible' });
     else if ('aguardarMs' in passo) await pagina.waitForTimeout(passo.aguardarMs);
     else throw new Error(`Passo desconhecido: ${JSON.stringify(passo)}`);
   }
@@ -143,14 +163,24 @@ async function caixaDe(pagina, seletores) {
   const y = Math.min(...caixas.map((c) => c.y));
   const largura = Math.max(...caixas.map((c) => c.x + c.width)) - x;
   const altura = Math.max(...caixas.map((c) => c.y + c.height)) - y;
-  return { x: Math.floor(x), y: Math.floor(y), width: Math.ceil(largura), height: Math.ceil(altura) };
+  return {
+    x: Math.floor(x),
+    y: Math.floor(y),
+    width: Math.ceil(largura),
+    height: Math.ceil(altura),
+  };
 }
 
 /**
  * Print de uma tela: abre a `url`, roda os passos e o `esperar`, carrega as fontes e tira o
  * print do viewport, ou só do `recorte` (seletor ou lista de seletores, já no formato da página).
  */
-export async function printTela(pagina, url, viewport, { passos, esperar, recorte, css, ocultar, relogio } = {}) {
+export async function printTela(
+  pagina,
+  url,
+  viewport,
+  { passos, esperar, recorte, css, ocultar, relogio } = {},
+) {
   await pagina.setViewportSize(viewport);
   // AD-044: o relógio fica parado antes de a página carregar (Date.now e new Date()).
   if (relogio) await pagina.clock.setFixedTime(new Date(relogio));
@@ -164,7 +194,8 @@ export async function printTela(pagina, url, viewport, { passos, esperar, recort
   await pagina.evaluate(() => document.fonts.ready);
   const opcoes = { animations: 'disabled', caret: 'hide' };
   if (!recorte) return pagina.screenshot(opcoes);
-  if (Array.isArray(recorte)) return pagina.screenshot({ ...opcoes, clip: await caixaDe(pagina, recorte) });
+  if (Array.isArray(recorte))
+    return pagina.screenshot({ ...opcoes, clip: await caixaDe(pagina, recorte) });
   return pagina.locator(recorte).first().screenshot(opcoes);
 }
 

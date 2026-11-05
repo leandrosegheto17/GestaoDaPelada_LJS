@@ -18,8 +18,7 @@ import type { Db } from './tipos.ts';
  */
 
 export type ResultadoEditarJogador =
-  | { resultado: 'ok'; mudou: boolean }
-  | { resultado: 'nao_encontrado' | 'apelido_repetido' };
+  { resultado: 'ok'; mudou: boolean } | { resultado: 'nao_encontrado' | 'apelido_repetido' };
 
 export type ResultadoExcluirJogador =
   | { resultado: 'ok' }
@@ -36,7 +35,12 @@ interface Atual {
 
 const CAMPOS = ['apelido', 'anoNascimento', 'posicao', 'telefone', 'pontuacaoInicial'] as const;
 
-async function editar(db: Db, grupoId: string, id: string, dados: EditarJogadorCorpo): Promise<ResultadoEditarJogador> {
+async function editar(
+  db: Db,
+  grupoId: string,
+  id: string,
+  dados: EditarJogadorCorpo,
+): Promise<ResultadoEditarJogador> {
   const r = await sql<Atual>`
     SELECT apelido, ano_nascimento AS "anoNascimento", posicao, telefone, pontuacao_inicial AS "pontuacaoInicial"
       FROM jogadores WHERE grupo_id = ${grupoId} AND id = ${id}
@@ -46,7 +50,9 @@ async function editar(db: Db, grupoId: string, id: string, dados: EditarJogadorC
 
   const repetido = await sql<{ id: string }>`
     SELECT id FROM jogadores
-     WHERE grupo_id = ${grupoId} AND id <> ${id} AND lower(apelido) = lower(${dados.apelido})`.execute(db);
+     WHERE grupo_id = ${grupoId} AND id <> ${id} AND lower(apelido) = lower(${dados.apelido})`.execute(
+    db,
+  );
   if (repetido.rows.length > 0) return { resultado: 'apelido_repetido' };
 
   // Pontuação omitida mantém o valor (GEL-43).
@@ -58,7 +64,10 @@ async function editar(db: Db, grupoId: string, id: string, dados: EditarJogadorC
     pontuacaoInicial: dados.pontuacaoInicial ?? Number(atual.pontuacaoInicial),
   };
   const campos = CAMPOS.filter((campo) => {
-    const antes = campo === 'pontuacaoInicial' || campo === 'anoNascimento' ? numeroOuNulo(atual[campo]) : atual[campo];
+    const antes =
+      campo === 'pontuacaoInicial' || campo === 'anoNascimento'
+        ? numeroOuNulo(atual[campo])
+        : atual[campo];
     return antes !== novo[campo];
   });
   if (campos.length === 0) return { resultado: 'ok', mudou: false };
@@ -70,7 +79,12 @@ async function editar(db: Db, grupoId: string, id: string, dados: EditarJogadorC
            alterado_por = app_conta_id(), alterado_em = now()
      WHERE grupo_id = ${grupoId} AND id = ${id}`.execute(db);
 
-  await auditoria.registrar(db, grupoId, { acao: 'jogador_editado', entidade: 'jogador', entidadeId: id, resumo: { campos } });
+  await auditoria.registrar(db, grupoId, {
+    acao: 'jogador_editado',
+    entidade: 'jogador',
+    entidadeId: id,
+    resumo: { campos },
+  });
   if (campos.includes('pontuacaoInicial')) {
     await auditoria.registrar(db, grupoId, {
       acao: 'jogador_pontuacao_inicial_alterada',
@@ -99,7 +113,11 @@ async function excluir(db: Db, grupoId: string, id: string): Promise<ResultadoEx
   if (jogador.historico) return { resultado: 'com_historico', apelido: jogador.apelido };
 
   await sql`DELETE FROM jogadores WHERE grupo_id = ${grupoId} AND id = ${id}`.execute(db);
-  await auditoria.registrar(db, grupoId, { acao: 'jogador_excluido', entidade: 'jogador', entidadeId: id });
+  await auditoria.registrar(db, grupoId, {
+    acao: 'jogador_excluido',
+    entidade: 'jogador',
+    entidadeId: id,
+  });
   return { resultado: 'ok' };
 }
 

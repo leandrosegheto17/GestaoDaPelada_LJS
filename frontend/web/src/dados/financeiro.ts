@@ -1,5 +1,10 @@
 import type { AdminsResposta } from '@pelada/contrato/acesso';
-import { mesFinanceiroResposta, type ConfigFinanceiraCorpo, type ConfigFinanceiraResposta, type MesFinanceiroResposta } from '@pelada/contrato/financeiro';
+import {
+  mesFinanceiroResposta,
+  type ConfigFinanceiraCorpo,
+  type ConfigFinanceiraResposta,
+  type MesFinanceiroResposta,
+} from '@pelada/contrato/financeiro';
 import {
   CODIGOS_ERRO_FINANCEIRO,
   lancamentoResposta,
@@ -74,7 +79,8 @@ export function useMesFinanceiro(grupoId: string, mes?: string) {
   const api = useCliente();
   return useQuery<MesFinanceiroResposta>({
     queryKey: chaveMesFinanceiro(grupoId, mes),
-    queryFn: async () => mesFinanceiroResposta.parse(await api.get<unknown>(caminhoMes(grupoId, mes))),
+    queryFn: async () =>
+      mesFinanceiroResposta.parse(await api.get<unknown>(caminhoMes(grupoId, mes))),
     retry: false,
     enabled: grupoId !== '',
   });
@@ -84,7 +90,8 @@ export function useSalvarConfig(grupoId: string) {
   const api = useCliente();
   const consultas = useQueryClient();
   return useMutation({
-    mutationFn: (dados: ConfigFinanceiraCorpo) => api.put<ConfigFinanceiraResposta>(`${caminhoFinanceiro(grupoId)}/config`, dados),
+    mutationFn: (dados: ConfigFinanceiraCorpo) =>
+      api.put<ConfigFinanceiraResposta>(`${caminhoFinanceiro(grupoId)}/config`, dados),
     onSuccess: () => invalidarFinanceiro(consultas, grupoId),
   });
 }
@@ -93,7 +100,8 @@ export function useMarcarPagamento(grupoId: string) {
   const api = useCliente();
   const consultas = useQueryClient();
   return useMutation({
-    mutationFn: (dados: PagamentoCorpo) => api.post<undefined>(`${caminhoFinanceiro(grupoId)}/pagamentos`, dados),
+    mutationFn: (dados: PagamentoCorpo) =>
+      api.post<undefined>(`${caminhoFinanceiro(grupoId)}/pagamentos`, dados),
     onSuccess: () => invalidarFinanceiro(consultas, grupoId),
   });
 }
@@ -103,7 +111,9 @@ export function useDesmarcarPagamento(grupoId: string) {
   const consultas = useQueryClient();
   return useMutation({
     mutationFn: ({ jogadorId, mes }: PagamentoCorpo) =>
-      api.delete<undefined>(`${caminhoFinanceiro(grupoId)}/pagamentos/${encodeURIComponent(jogadorId)}/${encodeURIComponent(mes)}`),
+      api.delete<undefined>(
+        `${caminhoFinanceiro(grupoId)}/pagamentos/${encodeURIComponent(jogadorId)}/${encodeURIComponent(mes)}`,
+      ),
     onSuccess: () => invalidarFinanceiro(consultas, grupoId),
   });
 }
@@ -112,7 +122,8 @@ export function useLancamento(grupoId: string, id: string) {
   const api = useCliente();
   return useQuery<LancamentoResposta>({
     queryKey: chaveLancamento(grupoId, id),
-    queryFn: async () => lancamentoResposta.parse(await api.get<unknown>(caminhoLancamento(grupoId, id))),
+    queryFn: async () =>
+      lancamentoResposta.parse(await api.get<unknown>(caminhoLancamento(grupoId, id))),
     retry: false,
     enabled: grupoId !== '' && id !== '',
   });
@@ -122,7 +133,8 @@ export function useCriarLancamento(grupoId: string) {
   const api = useCliente();
   const consultas = useQueryClient();
   return useMutation({
-    mutationFn: (dados: LancamentoCorpo) => api.post<LancamentoResposta>(caminhoLancamentos(grupoId), dados),
+    mutationFn: (dados: LancamentoCorpo) =>
+      api.post<LancamentoResposta>(caminhoLancamentos(grupoId), dados),
     onSuccess: (criado) => {
       consultas.setQueryData(chaveLancamento(grupoId, criado.id), criado);
       return invalidarFinanceiro(consultas, grupoId);
@@ -134,7 +146,8 @@ export function useEditarLancamento(grupoId: string, id: string) {
   const api = useCliente();
   const consultas = useQueryClient();
   return useMutation({
-    mutationFn: (dados: LancamentoCorpo) => api.put<LancamentoResposta>(caminhoLancamento(grupoId, id), dados),
+    mutationFn: (dados: LancamentoCorpo) =>
+      api.put<LancamentoResposta>(caminhoLancamento(grupoId, id), dados),
     onSuccess: async (editado) => {
       await invalidarFinanceiro(consultas, grupoId);
       consultas.setQueryData(chaveLancamento(grupoId, id), editado);
@@ -159,7 +172,10 @@ export function useAlterarAcessoFinanceiro(grupoId: string) {
   const consultas = useQueryClient();
   return useMutation({
     mutationFn: ({ contaId, acessaFinanceiro }: { contaId: string; acessaFinanceiro: boolean }) =>
-      api.patch<AdminsResposta>(`${caminhoGrupo(grupoId)}/admins/${encodeURIComponent(contaId)}/financeiro`, { acessaFinanceiro }),
+      api.patch<AdminsResposta>(
+        `${caminhoGrupo(grupoId)}/admins/${encodeURIComponent(contaId)}/financeiro`,
+        { acessaFinanceiro },
+      ),
     // A mesma chave da tela de admins (`telas/admins/Admins.tsx`, `chaveAdmins`).
     onSuccess: (lista) => consultas.setQueryData(['admins', grupoId], lista),
   });
@@ -167,7 +183,8 @@ export function useAlterarAcessoFinanceiro(grupoId: string) {
 
 // ---------------------------------------------------------------- erros
 
-export type CodigoDoFinanceiro = CodigoErroFinanceiro | 'dados_invalidos' | 'nao_encontrado' | 'grupo_arquivado';
+export type CodigoDoFinanceiro =
+  CodigoErroFinanceiro | 'dados_invalidos' | 'nao_encontrado' | 'grupo_arquivado';
 
 export interface ErroFinanceiro {
   /** Nulo quando o erro não é da API (rede) ou o código é desconhecido. */
@@ -188,19 +205,38 @@ function texto(valor: unknown): string | undefined {
 /** Traduz o erro de uma consulta ou mutação do financeiro. */
 export function erroDoFinanceiro(erro: unknown): ErroFinanceiro {
   if (!(erro instanceof ErroApi)) {
-    return { codigo: null, mensagem: erro instanceof Error ? erro.message : 'Algo deu errado. Tente de novo.', campos: {}, status: 0 };
+    return {
+      codigo: null,
+      mensagem: erro instanceof Error ? erro.message : 'Algo deu errado. Tente de novo.',
+      campos: {},
+      status: 0,
+    };
   }
-  const corpo = (typeof erro.corpo === 'object' && erro.corpo !== null ? erro.corpo : {}) as Record<string, unknown>;
+  const corpo = (typeof erro.corpo === 'object' && erro.corpo !== null ? erro.corpo : {}) as Record<
+    string,
+    unknown
+  >;
   const campos = mensagensDosCampos(erro);
 
   // AD-091: `{ erro: 'plano_pro', recurso, mensagem }`, sem `codigo`.
   if (corpo.erro === 'plano_pro') {
-    return { codigo: 'plano_pro', mensagem: texto(corpo.mensagem) ?? erro.message, campos, status: erro.status };
+    return {
+      codigo: 'plano_pro',
+      mensagem: texto(corpo.mensagem) ?? erro.message,
+      campos,
+      status: erro.status,
+    };
   }
   const bruto = corpo.codigo;
   const conhecido =
-    typeof bruto === 'string' && ((CODIGOS_ERRO_FINANCEIRO as readonly string[]).includes(bruto) || OUTROS_CODIGOS.has(bruto))
+    typeof bruto === 'string' &&
+    ((CODIGOS_ERRO_FINANCEIRO as readonly string[]).includes(bruto) || OUTROS_CODIGOS.has(bruto))
       ? (bruto as CodigoDoFinanceiro)
       : null;
-  return { codigo: conhecido, mensagem: texto(corpo.erro) ?? erro.message, campos, status: erro.status };
+  return {
+    codigo: conhecido,
+    mensagem: texto(corpo.erro) ?? erro.message,
+    campos,
+    status: erro.status,
+  };
 }

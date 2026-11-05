@@ -55,7 +55,10 @@ export function rotasSessao(opcoes: OpcoesRotas = {}): Hono<Ambiente> {
         return c.json(corpoDoErro('email_nao_confirmado'), 403);
       case 'bloqueado':
         // SPEC_DEVIATION: o contrato tem "Tente de novo em alguns minutos."; a T26 pede este texto único.
-        return c.json({ ...corpoDoErro('bloqueado_temporariamente'), erro: MENSAGEM_BLOQUEIO }, 429);
+        return c.json(
+          { ...corpoDoErro('bloqueado_temporariamente'), erro: MENSAGEM_BLOQUEIO },
+          429,
+        );
       default:
         return c.json(corpoDoErro('credenciais_invalidas'), 401);
     }
@@ -68,7 +71,12 @@ export function rotasSessao(opcoes: OpcoesRotas = {}): Hono<Ambiente> {
       id: eu.id,
       nome: eu.nome,
       email: eu.email,
-      grupos: eu.grupos.map((g) => ({ id: g.id, nome: g.nome, slug: g.slug, acessaFinanceiro: g.acessa_financeiro })),
+      grupos: eu.grupos.map((g) => ({
+        id: g.id,
+        nome: g.nome,
+        slug: g.slug,
+        acessaFinanceiro: g.acessa_financeiro,
+      })),
     };
     return c.json(resposta, 200);
   });

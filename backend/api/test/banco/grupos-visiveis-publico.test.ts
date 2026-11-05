@@ -30,7 +30,9 @@ let slugH: string;
 
 beforeAll(async () => {
   aberto = await abrirCenarioGrupos();
-  const r = await aberto.db.query<{ slug: string }>('SELECT slug FROM grupos WHERE id = $1', [aberto.cenario.grupoH]);
+  const r = await aberto.db.query<{ slug: string }>('SELECT slug FROM grupos WHERE id = $1', [
+    aberto.cenario.grupoH,
+  ]);
   slugH = r.rows[0]?.slug ?? '';
 });
 
@@ -83,7 +85,13 @@ describe('ramo do slug de grupos_visiveis()', () => {
     await reativar(db, cenario.grupoG);
     const vistos = await vistoPeloSlug(cenario.slugG);
     expect(vistos.grupos).toBe(1);
-    for (const tabela of ['jogadores', 'periodos_ativos', 'partidas', 'presencas', 'config_pesos'] as const) {
+    for (const tabela of [
+      'jogadores',
+      'periodos_ativos',
+      'partidas',
+      'presencas',
+      'config_pesos',
+    ] as const) {
       expect(vistos[tabela], tabela).toBeGreaterThan(0);
     }
     // eventos_uso só se lê com conta (T23), também com o grupo ativo.
@@ -102,7 +110,12 @@ describe('ramo do slug de grupos_visiveis()', () => {
   });
 
   it('PAR-91: SECURITY DEFINER, search_path fixo, STABLE e EXECUTE só para pelada_app', async () => {
-    const r = await aberto.db.query<{ definer: boolean; volatil: string; config: string[] | null; executores: string[] }>(
+    const r = await aberto.db.query<{
+      definer: boolean;
+      volatil: string;
+      config: string[] | null;
+      executores: string[];
+    }>(
       `SELECT p.prosecdef AS definer, p.provolatile::text AS volatil, p.proconfig AS config,
               coalesce(array(SELECT coalesce(r.rolname::text, 'PUBLIC')
                                FROM aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) a

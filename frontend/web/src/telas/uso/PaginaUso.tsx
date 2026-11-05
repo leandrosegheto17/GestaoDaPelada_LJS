@@ -40,7 +40,9 @@ export function textoPartidas(s: Pick<SemanaDeUso, 'partidasLancadas' | 'partida
 }
 
 /** "E / N": escalações confirmadas sobre partidas lançadas. */
-export function textoEscalacoes(s: Pick<SemanaDeUso, 'escalacoesConfirmadas' | 'partidasLancadas'>): string {
+export function textoEscalacoes(
+  s: Pick<SemanaDeUso, 'escalacoesConfirmadas' | 'partidasLancadas'>,
+): string {
   return `${s.escalacoesConfirmadas} / ${s.partidasLancadas}`;
 }
 
@@ -109,14 +111,18 @@ export function PaginaUso() {
   function conteudo() {
     if (consulta.isPending) return <EsqueletoLista linhas={4} rotulo="Carregando o uso do app…" />;
     if (consulta.isError) {
-      if (consulta.error instanceof ErroApi && consulta.error.status === 404) return <Faixa tipo="atencao">Grupo não encontrado.</Faixa>;
+      if (consulta.error instanceof ErroApi && consulta.error.status === 404)
+        return <Faixa tipo="atencao">Grupo não encontrado.</Faixa>;
       return <EstadoErro aoTentarDeNovo={() => void consulta.refetch()} />;
     }
     return <Semanas semanas={consulta.data.semanas} />;
   }
 
   return (
-    <Casca grupo={{ nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' }} titulo="Uso do app">
+    <Casca
+      grupo={{ nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' }}
+      titulo="Uso do app"
+    >
       <LinkVoltar para={base}>Início</LinkVoltar>
       {conteudo()}
     </Casca>

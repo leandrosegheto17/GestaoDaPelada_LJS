@@ -3,7 +3,18 @@
   "rules": {
     "color-no-hex": true,
     "color-named": "never",
-    "function-disallowed-list": ["rgb", "rgba", "hsl", "hsla", "hwb", "lab", "lch", "oklab", "oklch", "color"],
+    "function-disallowed-list": [
+      "rgb",
+      "rgba",
+      "hsl",
+      "hsla",
+      "hwb",
+      "lab",
+      "lch",
+      "oklab",
+      "oklch",
+      "color"
+    ],
     "pelada/so-tokens": true
   },
   "overrides": [

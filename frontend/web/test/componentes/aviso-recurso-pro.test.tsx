@@ -34,7 +34,9 @@ describe('AvisoRecursoPro', () => {
 
   it('PLA-27: o botão tem a aparência de botão principal do guia', () => {
     montar();
-    expect(screen.getByRole('link', { name: 'Ver Meu plano' }).className).toContain('botao--principal');
+    expect(screen.getByRole('link', { name: 'Ver Meu plano' }).className).toContain(
+      'botao--principal',
+    );
   });
 
   it('PLA-27: axe sem violações', async () => {

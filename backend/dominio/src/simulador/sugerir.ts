@@ -5,7 +5,14 @@
  * a entrada é normalizada (aptos por id) antes de calcular. Regra do legado `dominio/src/simulador/sugerir.ts`,
  * escrita do zero.
  */
-import { compararIds, montarElenco, type Apto, type Data, type Formato, type Limite } from './base.ts';
+import {
+  compararIds,
+  montarElenco,
+  type Apto,
+  type Data,
+  type Formato,
+  type Limite,
+} from './base.ts';
 import { avisosDoisTimes, avisosVariosTimes, type Aviso } from './avisos.ts';
 import type { ComposicaoDois } from './chave-dois.ts';
 import { classificarDoisTimes } from './classificacao.ts';
@@ -62,7 +69,9 @@ export type Sugestao = SugestaoDois | SugestaoVarios | SugestaoInvalida;
 /** Aptos por id; em 3 ou mais, sem "só 1º" (o contrato já recusa, SIM-33). */
 export function normalizarAptos(formato: Formato, aptos: readonly Apto[]): Apto[] {
   const ordenados = [...aptos].sort((a, b) => compararIds(a.id, b.id));
-  return formato === 'varios_times' ? ordenados.map((a) => ({ ...a, so1oTempo: false })) : ordenados;
+  return formato === 'varios_times'
+    ? ordenados.map((a) => ({ ...a, so1oTempo: false }))
+    : ordenados;
 }
 
 export function sugerir(entrada: EntradaSimulador, historico: HistoricoSim): Sugestao {

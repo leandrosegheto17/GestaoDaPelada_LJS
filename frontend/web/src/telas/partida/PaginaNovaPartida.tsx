@@ -40,7 +40,8 @@ import pagina from './partida.module.css';
 
 export const TEXTO_FALHA_SALVAR = 'Não salvou. Suas marcações continuam aqui.';
 export const TEXTO_SEM_ATIVOS = 'Ninguém estava ativo nessa data.';
-export const TEXTO_SEM_ATIVOS_AJUDA = 'Escolha outra data ou confira as datas de entrada dos jogadores.';
+export const TEXTO_SEM_ATIVOS_AJUDA =
+  'Escolha outra data ou confira as datas de entrada dos jogadores.';
 
 /** "2026-10-15" → "15/10". */
 export function diaMes(data: string): string {
@@ -130,13 +131,17 @@ export function PaginaNovaPartida() {
 
   function conteudo() {
     if (consulta.isError && consulta.data === undefined && dataConsultada === undefined) {
-      if (consulta.error instanceof ErroApi && consulta.error.status === 404) return <Faixa tipo="atencao">Grupo não encontrado.</Faixa>;
+      if (consulta.error instanceof ErroApi && consulta.error.status === 404)
+        return <Faixa tipo="atencao">Grupo não encontrado.</Faixa>;
       return <EstadoErro aoTentarDeNovo={() => void consulta.refetch()} />;
     }
-    if (consulta.isPending && dataConsultada === undefined) return <EsqueletoLista rotulo="Carregando os jogadores ativos…" />;
+    if (consulta.isPending && dataConsultada === undefined)
+      return <EsqueletoLista rotulo="Carregando os jogadores ativos…" />;
 
     const dataAtual = dataConsultada ?? consulta.data?.data ?? '';
-    const erroDoCampo = erroData ?? (duplicada ? `Já existe uma partida em ${dataCompleta(duplicada)}.` : errosCampos['data']);
+    const erroDoCampo =
+      erroData ??
+      (duplicada ? `Já existe uma partida em ${dataCompleta(duplicada)}.` : errosCampos['data']);
     const resumo: ErroDoResumo[] = Object.keys(errosCampos)
       .filter((c) => c in ROTULOS_CAMPOS)
       .map((c) => ({ id: c, rotulo: ROTULOS_CAMPOS[c] ?? c }));
@@ -155,7 +160,10 @@ export function PaginaNovaPartida() {
           onChange={(e) => trocarData(e.target.value)}
         />
         {duplicada ? (
-          <LinkBotao para={`${base}/partidas/${encodeURIComponent(duplicada)}`} variante="secundario">
+          <LinkBotao
+            para={`${base}/partidas/${encodeURIComponent(duplicada)}`}
+            variante="secundario"
+          >
             {`Editar a partida de ${diaMes(duplicada)}`}
           </LinkBotao>
         ) : null}
@@ -190,7 +198,10 @@ export function PaginaNovaPartida() {
 
     // Pré-marcação pela escalação confirmada (simulador T52; SIM-75, SIM-77): só com a lista da data na tela; as
     // marcações continuam editáveis antes de salvar.
-    const preMarcada = jogadores !== undefined && jogadores.length > 0 && consulta.data?.preMarcadaPelaEscalacao === true;
+    const preMarcada =
+      jogadores !== undefined &&
+      jogadores.length > 0 &&
+      consulta.data?.preMarcadaPelaEscalacao === true;
     const avisoPreMarcada = preMarcada ? (
       <div className={pagina['acima-3']}>
         <Faixa tipo="info">{textoPreMarcada(dataAtual)}</Faixa>
@@ -228,7 +239,10 @@ export function PaginaNovaPartida() {
   }
 
   return (
-    <Casca grupo={{ nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' }} titulo="Lançar partida">
+    <Casca
+      grupo={{ nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' }}
+      titulo="Lançar partida"
+    >
       <LinkVoltar para={base}>Início</LinkVoltar>
       {conteudo()}
     </Casca>

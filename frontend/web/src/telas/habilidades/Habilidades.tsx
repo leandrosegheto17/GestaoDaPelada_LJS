@@ -15,7 +15,12 @@ import estilosCampo from '../../componentes/Campo.module.css';
 import { ErroApi, MENSAGEM_REDE } from '../../dados/cliente.ts';
 import { mensagensDosCampos } from '../../dados/erros-campo.ts';
 import { useGrupo } from '../../dados/grupos.ts';
-import { useCriarHabilidade, useExcluirHabilidade, useHabilidades, useRenomearHabilidade } from '../../dados/habilidades.ts';
+import {
+  useCriarHabilidade,
+  useExcluirHabilidade,
+  useHabilidades,
+  useRenomearHabilidade,
+} from '../../dados/habilidades.ts';
 import estilos from '../acesso.module.css';
 import { rotaDoGrupo } from '../grupos/Grupos.tsx';
 
@@ -34,7 +39,8 @@ import { rotaDoGrupo } from '../grupos/Grupos.tsx';
 export const TITULO_SEM_HABILIDADES = 'Nenhuma habilidade';
 export const TEXTO_SEM_HABILIDADES = 'O simulador vai usar nível 5,5 para todos.';
 export const tituloExcluirHabilidade = (nome: string) => `Excluir “${nome}”?`;
-export const textoExcluirHabilidade = (nome: string) => `Excluir “${nome}” apaga as notas de todos os jogadores nessa habilidade.`;
+export const textoExcluirHabilidade = (nome: string) =>
+  `Excluir “${nome}” apaga as notas de todos os jogadores nessa habilidade.`;
 
 function mensagemDoNome(erro: unknown): { campo?: string; faixa?: string } {
   const campo = mensagensDosCampos(erro).nome;
@@ -106,7 +112,15 @@ function ItemHabilidade({
   );
 }
 
-function DialogoExcluir({ grupoId, habilidade, aoFechar }: { grupoId: string; habilidade: HabilidadeItem; aoFechar: () => void }) {
+function DialogoExcluir({
+  grupoId,
+  habilidade,
+  aoFechar,
+}: {
+  grupoId: string;
+  habilidade: HabilidadeItem;
+  aoFechar: () => void;
+}) {
   const excluir = useExcluirHabilidade(grupoId);
   const [falha, setFalha] = useState<string | null>(null);
   return (
@@ -186,11 +200,22 @@ export function Habilidades() {
         ) : (
           <ul className={listas.lista} aria-label="Habilidades">
             {habilidades.map((h, i) => (
-              <ItemHabilidade key={`${h.id}-${h.nome}`} grupoId={grupoId} habilidade={h} indice={i} aoExcluir={() => setExcluir(h)} />
+              <ItemHabilidade
+                key={`${h.id}-${h.nome}`}
+                grupoId={grupoId}
+                habilidade={h}
+                indice={i}
+                aoExcluir={() => setExcluir(h)}
+              />
             ))}
           </ul>
         )}
-        <form className={`${estilos.formulario} ${estilos.secao}`} noValidate aria-busy={criar.isPending || undefined} onSubmit={adicionar}>
+        <form
+          className={`${estilos.formulario} ${estilos.secao}`}
+          noValidate
+          aria-busy={criar.isPending || undefined}
+          onSubmit={adicionar}
+        >
           <Campo
             id="nova"
             rotulo="Nova habilidade"
@@ -211,11 +236,17 @@ export function Habilidades() {
   }
 
   return (
-    <Casca grupo={{ nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' }} estreita ocupada={lista.isPending}>
+    <Casca
+      grupo={{ nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' }}
+      estreita
+      ocupada={lista.isPending}
+    >
       <LinkVoltar para={rotaDoGrupo(grupoId)}>Início</LinkVoltar>
       <h1 className={estilos['titulo-pagina']}>Habilidades</h1>
       {conteudo()}
-      {excluir ? <DialogoExcluir grupoId={grupoId} habilidade={excluir} aoFechar={() => setExcluir(null)} /> : null}
+      {excluir ? (
+        <DialogoExcluir grupoId={grupoId} habilidade={excluir} aoFechar={() => setExcluir(null)} />
+      ) : null}
     </Casca>
   );
 }

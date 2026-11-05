@@ -33,7 +33,9 @@ export function chaveConta(contaId: string): string {
   return `conta:${contaId}`;
 }
 
-const limite = limiteTaxa('LIMITE_ESCRITA', (c) => (c.var.contaId ? chaveConta(c.var.contaId) : undefined));
+const limite = limiteTaxa('LIMITE_ESCRITA', (c) =>
+  c.var.contaId ? chaveConta(c.var.contaId) : undefined,
+);
 
 export const limitarEscritasDeGrupo: MiddlewareHandler<Ambiente> = async (c, next) => {
   if (!eEscritaDeGrupo(c.req.method, c.req.path)) {

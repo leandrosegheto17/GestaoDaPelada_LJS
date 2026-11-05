@@ -13,7 +13,9 @@ export function App() {
   // Um cliente e um roteador por montagem: nos testes, cada render começa do zero.
   const [consultas] = useState(() => new QueryClient());
   const [roteador] = useState(() => createBrowserRouter(criarRotas()));
-  const [api] = useState(() => criarCliente({ consultas, navegar: (destino) => void roteador.navigate(destino) }));
+  const [api] = useState(() =>
+    criarCliente({ consultas, navegar: (destino) => void roteador.navigate(destino) }),
+  );
   return (
     <QueryClientProvider client={consultas}>
       <ProvedorCliente cliente={api}>

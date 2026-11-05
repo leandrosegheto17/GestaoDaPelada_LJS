@@ -1,6 +1,11 @@
 import type { Context } from 'hono';
 import type { z } from 'zod';
-import { corpoDoErro, erroDeValidacao, MENSAGEM_CORRIJA_CAMPOS, type CorpoErro } from '@pelada/contrato';
+import {
+  corpoDoErro,
+  erroDeValidacao,
+  MENSAGEM_CORRIJA_CAMPOS,
+  type CorpoErro,
+} from '@pelada/contrato';
 import type { Ambiente } from './ambiente.ts';
 
 /**
@@ -21,7 +26,9 @@ import type { Ambiente } from './ambiente.ts';
 
 export type Leitura<T> = { ok: true; dados: T } | { ok: false; resposta: Response };
 
-async function lerJson(c: Context<Ambiente>): Promise<{ ok: true; bruto: unknown } | { ok: false }> {
+async function lerJson(
+  c: Context<Ambiente>,
+): Promise<{ ok: true; bruto: unknown } | { ok: false }> {
   try {
     return { ok: true, bruto: await c.req.json() };
   } catch {
@@ -30,7 +37,10 @@ async function lerJson(c: Context<Ambiente>): Promise<{ ok: true; bruto: unknown
 }
 
 /** Corpo JSON pelo schema do contrato, no formato das rotas de acesso (ACE-02, ACE-03). */
-export async function lerCorpo<S extends z.ZodType>(c: Context<Ambiente>, schema: S): Promise<Leitura<z.infer<S>>> {
+export async function lerCorpo<S extends z.ZodType>(
+  c: Context<Ambiente>,
+  schema: S,
+): Promise<Leitura<z.infer<S>>> {
   const json = await lerJson(c);
   if (!json.ok) return { ok: false, resposta: c.json(corpoDoErro('dados_invalidos'), 422) };
   const r = schema.safeParse(json.bruto);
@@ -74,9 +84,11 @@ export async function lerCorpoDoGrupo<S extends z.ZodType>(
   preparar: (bruto: unknown) => unknown = (bruto) => bruto,
 ): Promise<Leitura<z.infer<S>>> {
   const json = await lerJson(c);
-  if (!json.ok) return { ok: false, resposta: c.json(erroDeCampos({ corpo: 'Envie um JSON válido.' }), 422) };
+  if (!json.ok)
+    return { ok: false, resposta: c.json(erroDeCampos({ corpo: 'Envie um JSON válido.' }), 422) };
   const r = schema.safeParse(preparar(json.bruto));
-  if (!r.success) return { ok: false, resposta: c.json(erroDeCampos(mensagensDoZod(r.error)), 422) };
+  if (!r.success)
+    return { ok: false, resposta: c.json(erroDeCampos(mensagensDoZod(r.error)), 422) };
   return { ok: true, dados: r.data };
 }
 
@@ -104,7 +116,10 @@ export function erroDeUnicidade(erro: unknown): { campo: string; mensagem: strin
  * Roda a escrita e traduz o 23505 de apelido ou habilidade no 422 do campo; o resto sobe. O `comBanco` desfaz a
  * transação no 422 (status 4xx).
  */
-export async function comUnicidade(c: Context<Ambiente>, escrever: () => Promise<Response>): Promise<Response> {
+export async function comUnicidade(
+  c: Context<Ambiente>,
+  escrever: () => Promise<Response>,
+): Promise<Response> {
   try {
     return await escrever();
   } catch (erro) {

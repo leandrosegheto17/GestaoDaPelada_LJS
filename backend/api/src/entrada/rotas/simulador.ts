@@ -69,13 +69,21 @@ export function rotasSimulador(): Hono<Ambiente> {
     const grupoId = c.req.param('grupoId');
     const hoje = c.var.relogio.hoje();
 
-    const grupo = await c.var.db.selectFrom('grupos').select('dia_semana').where('id', '=', grupoId).executeTakeFirst();
+    const grupo = await c.var.db
+      .selectFrom('grupos')
+      .select('dia_semana')
+      .where('id', '=', grupoId)
+      .executeTakeFirst();
     // O vínculo já leu o grupo na mesma transação; sem linha só numa corrida.
     if (!grupo) return c.json(corpoDoErro('nao_encontrado'), 404);
     // `dia_semana` tem o CHECK dos 7 nomes no banco (GEL-04).
     const dataSugerida = proximoDiaDeJogo(hoje, grupo.dia_semana as NomeDiaDaSemana);
 
-    const aptos = await jogadoresLeitura.paraSimulador(c.var.db, grupoId, consulta.data.data ?? dataSugerida);
+    const aptos = await jogadoresLeitura.paraSimulador(
+      c.var.db,
+      grupoId,
+      consulta.data.data ?? dataSugerida,
+    );
     const resposta: ContextoResposta = {
       dataSugerida,
       hoje,
@@ -93,7 +101,11 @@ export function rotasSimulador(): Hono<Ambiente> {
   rotas.post('/grupos/:grupoId/simulador/previa', async (c) => {
     const corpo = await lerCorpoDoGrupo(c, previaCorpo);
     if (!corpo.ok) return corpo.resposta;
-    const previa = calcularPrevia({ formato: corpo.dados.formato, n: corpo.dados.n, aptos: corpo.dados.aptos.length });
+    const previa = calcularPrevia({
+      formato: corpo.dados.formato,
+      n: corpo.dados.n,
+      aptos: corpo.dados.aptos.length,
+    });
     return c.json(respostaDaPrevia(previa), 200);
   });
 
@@ -104,7 +116,10 @@ export function rotasSimulador(): Hono<Ambiente> {
     registrarRequisicao('sugerir', dados);
     const grupoId = c.req.param('grupoId');
 
-    const aptos = aptosDoCorpo(dados, await jogadoresLeitura.paraSimulador(c.var.db, grupoId, dados.data));
+    const aptos = aptosDoCorpo(
+      dados,
+      await jogadoresLeitura.paraSimulador(c.var.db, grupoId, dados.data),
+    );
     if (!aptos) return respostaDeCampo(c, 'aptos', MENSAGEM_APTOS_INATIVOS);
 
     // Só as partidas até a véspera contam para a prioridade (SIM-17).
@@ -119,7 +134,15 @@ export function rotasSimulador(): Hono<Ambiente> {
         ordemPrioridade: s.ordemPrioridade,
       };
     } else if (s.formato === 'varios_times' && dados.formato === 'varios_times') {
-      resposta = resultadoVarios(dados, s.descricao, s.times, s.incompleto, s.indicadores, s.avisos, aptos);
+      resposta = resultadoVarios(
+        dados,
+        s.descricao,
+        s.times,
+        s.incompleto,
+        s.indicadores,
+        s.avisos,
+        aptos,
+      );
     } else {
       throw new Error('formato da sugestão diferente do pedido');
     }
@@ -133,7 +156,10 @@ export function rotasSimulador(): Hono<Ambiente> {
     const dados = corpo.dados;
     const grupoId = c.req.param('grupoId');
 
-    const doBanco = aptosDoCorpo(dados, await jogadoresLeitura.paraSimulador(c.var.db, grupoId, dados.data));
+    const doBanco = aptosDoCorpo(
+      dados,
+      await jogadoresLeitura.paraSimulador(c.var.db, grupoId, dados.data),
+    );
     if (!doBanco) return respostaDeCampo(c, 'aptos', MENSAGEM_APTOS_INATIVOS);
     // O "só 1º" vale como está na composição ajustada (T16).
     const aptos = comSo1oDaComposicao(doBanco, dados);
@@ -144,9 +170,24 @@ export function rotasSimulador(): Hono<Ambiente> {
 
     let resposta: AvaliarResposta;
     if (a.formato === 'dois_times' && dados.formato === 'dois_times') {
-      resposta = resultadoDoisSemOrdem(dados, a.descricao, a.composicao, a.indicadores, a.avisos, aptos);
+      resposta = resultadoDoisSemOrdem(
+        dados,
+        a.descricao,
+        a.composicao,
+        a.indicadores,
+        a.avisos,
+        aptos,
+      );
     } else if (a.formato === 'varios_times' && dados.formato === 'varios_times') {
-      resposta = resultadoVarios(dados, a.descricao, a.times, a.incompleto, a.indicadores, a.avisos, aptos);
+      resposta = resultadoVarios(
+        dados,
+        a.descricao,
+        a.times,
+        a.incompleto,
+        a.indicadores,
+        a.avisos,
+        aptos,
+      );
     } else {
       throw new Error('formato da avaliação diferente do pedido');
     }
@@ -168,7 +209,13 @@ export function respostaDaPrevia(previa: Previa): PreviaResposta {
   if (previa.formato === 'dois_times') {
     return previa.valida
       ? { formato: 'dois_times', valida: true, descricao, times: 2, reservas: previa.reservas }
-      : { formato: 'dois_times', valida: false, motivo: 'aptos_insuficientes', descricao, maiorNPossivel: previa.maiorNPossivel };
+      : {
+          formato: 'dois_times',
+          valida: false,
+          motivo: 'aptos_insuficientes',
+          descricao,
+          maiorNPossivel: previa.maiorNPossivel,
+        };
   }
   return previa.valida
     ? {

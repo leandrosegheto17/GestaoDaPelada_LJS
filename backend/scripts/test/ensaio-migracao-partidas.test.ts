@@ -54,7 +54,11 @@ interface Ids {
 /** Dois grupos da mesma criadora, com caixa (para a amostra do financeiro); só o primeiro tem pesos configurados. */
 async function semear(url: string): Promise<Ids> {
   return comConexao(url, async (c) => {
-    const conta = (await c.query<{ id: string }>(`INSERT INTO contas (email, nome, senha_hash, criada_em) VALUES ('criadora@exemplo.test', 'Criadora', 'x', now()) RETURNING id`)).rows[0]!.id;
+    const conta = (
+      await c.query<{ id: string }>(
+        `INSERT INTO contas (email, nome, senha_hash, criada_em) VALUES ('criadora@exemplo.test', 'Criadora', 'x', now()) RETURNING id`,
+      )
+    ).rows[0]!.id;
     const grupo = async (slug: string): Promise<string> =>
       (
         await c.query<{ id: string }>(
@@ -66,8 +70,14 @@ async function semear(url: string): Promise<Ids> {
     const comPesos = await grupo('pelada-com-pesos');
     const semPesos = await grupo('pelada-sem-pesos');
     for (const g of [comPesos, semPesos]) {
-      await c.query(`INSERT INTO vinculos_admin (conta_id, grupo_id, acessa_financeiro, criado_por, criado_em) VALUES ($1, $2, true, $1, now())`, [conta, g]);
-      await c.query(`INSERT INTO config_financeira (grupo_id, mensalidade_centavos, saldo_inicial_centavos, data_saldo_inicial) VALUES ($1, 5000, 0, '2026-01-01')`, [g]);
+      await c.query(
+        `INSERT INTO vinculos_admin (conta_id, grupo_id, acessa_financeiro, criado_por, criado_em) VALUES ($1, $2, true, $1, now())`,
+        [conta, g],
+      );
+      await c.query(
+        `INSERT INTO config_financeira (grupo_id, mensalidade_centavos, saldo_inicial_centavos, data_saldo_inicial) VALUES ($1, 5000, 0, '2026-01-01')`,
+        [g],
+      );
       await c.query(
         `INSERT INTO lancamentos (grupo_id, tipo, data, descricao, valor_centavos, criado_por, criado_em, alterado_por, alterado_em)
          VALUES ($1, 'entrada', '2026-01-05', 'Mensalidade', 5000, $2, now(), $2, now())`,
@@ -99,14 +109,16 @@ async function comBancoDeProducao(fn: (url: string, ids: Ids) => Promise<void>):
 }
 
 async function pesosDe(url: string, grupoId: string) {
-  return comConexao(url, async (c) =>
-    (
-      await c.query<{ vigente_desde: string; presenca_sem_chuva: number; expulso: number }>(
-        `SELECT to_char(vigente_desde, 'YYYY-MM-DD') AS vigente_desde, presenca_sem_chuva, expulso
+  return comConexao(
+    url,
+    async (c) =>
+      (
+        await c.query<{ vigente_desde: string; presenca_sem_chuva: number; expulso: number }>(
+          `SELECT to_char(vigente_desde, 'YYYY-MM-DD') AS vigente_desde, presenca_sem_chuva, expulso
            FROM config_pesos WHERE grupo_id = $1 ORDER BY vigente_desde`,
-        [grupoId],
-      )
-    ).rows,
+          [grupoId],
+        )
+      ).rows,
   );
 }
 
@@ -131,16 +143,21 @@ describe('ensaiar com as migrações da partidas-e-ranking', () => {
   it('PAR-14: a configuração que já existia fica intacta e o grupo sem configuração recebe os pesos padrão do dia da criação em São Paulo', async () => {
     await comBancoDeProducao(async (url, ids) => {
       await ensaiar(url, { referencia });
-      expect(await pesosDe(url, ids.comPesos)).toEqual([{ vigente_desde: '2026-02-01', presenca_sem_chuva: 3, expulso: -5 }]);
+      expect(await pesosDe(url, ids.comPesos)).toEqual([
+        { vigente_desde: '2026-02-01', presenca_sem_chuva: 3, expulso: -5 },
+      ]);
       // criado_em 2026-03-10T23:30Z é 20h30 de 10/03 em São Paulo.
-      expect(await pesosDe(url, ids.semPesos)).toEqual([{ vigente_desde: '2026-03-10', presenca_sem_chuva: 1, expulso: -1 }]);
+      expect(await pesosDe(url, ids.semPesos)).toEqual([
+        { vigente_desde: '2026-03-10', presenca_sem_chuva: 1, expulso: -1 },
+      ]);
     });
   });
 
   it('PAR-14: migração que dá duas linhas de pesos ao mesmo grupo reprova o ensaio', async () => {
     const pasta = mkdtempSync(join(tmpdir(), 'migracoes-pesos-a-mais-'));
     try {
-      for (const nome of readdirSync(PASTA_MIGRACOES)) copyFileSync(join(PASTA_MIGRACOES, nome), join(pasta, nome));
+      for (const nome of readdirSync(PASTA_MIGRACOES))
+        copyFileSync(join(PASTA_MIGRACOES, nome), join(pasta, nome));
       writeFileSync(
         join(pasta, '1792999999999_pesos-duplicados.sql'),
         `-- Up Migration
@@ -169,7 +186,9 @@ SELECT id, '2026-04-01', 1, 1, 1, 1, -1, -1, criado_por, criado_em FROM grupos;
       }
       await comBancoDeProducao(async (url) => {
         const r = await ensaiar(url, { referencia, pasta });
-        expect(r.aplicadas.some((n) => n.replace(/\.sql$/, '').endsWith('_pesos-padrao'))).toBe(false);
+        expect(r.aplicadas.some((n) => n.replace(/\.sql$/, '').endsWith('_pesos-padrao'))).toBe(
+          false,
+        );
         expect(r.pesos).toEqual({ semConfigAntes: 1, semConfigDepois: 1, linhasNovas: 0 });
       });
     } finally {
@@ -180,10 +199,14 @@ SELECT id, '2026-04-01', 1, 1, 1, 1, -1, -1, criado_por, criado_em FROM grupos;
   it('PAR-13: com a pesos-padrao aplicada, grupo que termina sem configuração reprova o ensaio', async () => {
     const pasta = mkdtempSync(join(tmpdir(), 'migracoes-apaga-pesos-'));
     try {
-      for (const nome of readdirSync(PASTA_MIGRACOES)) copyFileSync(join(PASTA_MIGRACOES, nome), join(pasta, nome));
+      for (const nome of readdirSync(PASTA_MIGRACOES))
+        copyFileSync(join(PASTA_MIGRACOES, nome), join(pasta, nome));
       // Apaga a linha que a pesos-padrao acabou de criar: config_pesos fica com a mesma contagem (não aparece em
       // tabelasAlteradas), mas o grupo volta a ficar sem configuração.
-      writeFileSync(join(pasta, '1792999999999_apaga-pesos-padrao.sql'), `-- Up Migration\nDELETE FROM config_pesos WHERE vigente_desde = '2026-03-10';\n`);
+      writeFileSync(
+        join(pasta, '1792999999999_apaga-pesos-padrao.sql'),
+        `-- Up Migration\nDELETE FROM config_pesos WHERE vigente_desde = '2026-03-10';\n`,
+      );
       await comBancoDeProducao(async (url) => {
         const r = await ensaiar(url, { referencia, pasta });
         expect(r.tabelasAlteradas).toEqual([]);
@@ -206,8 +229,12 @@ SELECT id, '2026-04-01', 1, 1, 1, 1, -1, -1, criado_por, criado_em FROM grupos;
 
   it('PAR-91: referência sem a função pública de eventos reprova o ensaio e lista o que sobra', async () => {
     await comBancoDeProducao(async (url) => {
-      const r = await ensaiar(url, { referencia: referencia.filter((l) => !l.startsWith('funcao evento_publico_registrar(')) });
-      expect(r.esquema.sobrando.some((l) => l.startsWith('funcao evento_publico_registrar('))).toBe(true);
+      const r = await ensaiar(url, {
+        referencia: referencia.filter((l) => !l.startsWith('funcao evento_publico_registrar(')),
+      });
+      expect(r.esquema.sobrando.some((l) => l.startsWith('funcao evento_publico_registrar('))).toBe(
+        true,
+      );
       expect(r.ok).toBe(false);
     });
   });

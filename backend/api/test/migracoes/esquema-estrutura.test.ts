@@ -53,11 +53,19 @@ describe('lerEsquema: estrutura', () => {
   });
 
   const MUTACOES: Array<[string, string, RegExp]> = [
-    ['tipo de coluna', 'ALTER TABLE filho ALTER COLUMN pai_id TYPE bigint', /^coluna filho\.pai_id/],
+    [
+      'tipo de coluna',
+      'ALTER TABLE filho ALTER COLUMN pai_id TYPE bigint',
+      /^coluna filho\.pai_id/,
+    ],
     ['índice apagado', 'DROP INDEX filho_pai_idx', /^indice filho\.filho_pai_idx/],
     ['not null', 'ALTER TABLE filho ALTER COLUMN pai_id SET NOT NULL', /^coluna filho\.pai_id/],
     ['default', "ALTER TABLE pais ALTER COLUMN nome SET DEFAULT 'y'", /^coluna pais\.nome/],
-    ['restrição', 'ALTER TABLE pais ADD CONSTRAINT nome_unico UNIQUE (nome)', /^restricao pais\.nome_unico/],
+    [
+      'restrição',
+      'ALTER TABLE pais ADD CONSTRAINT nome_unico UNIQUE (nome)',
+      /^restricao pais\.nome_unico/,
+    ],
     ['trigger', 'DROP TRIGGER filho_toca ON filho', /^trigger filho\.filho_toca/],
     ['tabela', 'CREATE TABLE neto (id int)', /^tabela neto/],
   ];
@@ -74,7 +82,10 @@ describe('lerEsquema: estrutura', () => {
           ...antes.filter((l) => !depois.includes(l)),
           ...depois.filter((l) => !antes.includes(l)),
         ];
-        expect(mudou.some((l) => linha.test(l)), mudou.join('\n')).toBe(true);
+        expect(
+          mudou.some((l) => linha.test(l)),
+          mudou.join('\n'),
+        ).toBe(true);
       });
     });
   }

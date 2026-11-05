@@ -17,7 +17,15 @@ export const LIMITES_JOGADOR = {
 } as const;
 
 /** As 7 posições do CHECK do banco (GEL-37), na ordem da spec. */
-export const POSICOES = ['goleiro', 'zagueiro', 'lateral', 'volante', 'meia', 'atacante', 'centroavante'] as const;
+export const POSICOES = [
+  'goleiro',
+  'zagueiro',
+  'lateral',
+  'volante',
+  'meia',
+  'atacante',
+  'centroavante',
+] as const;
 export type Posicao = (typeof POSICOES)[number];
 
 export const MENSAGEM_APELIDO = `O apelido precisa ter de ${LIMITES_JOGADOR.apelidoMin} a ${LIMITES_JOGADOR.apelidoMax} caracteres.`;
@@ -48,7 +56,11 @@ export function anoMaximoNascimento(hoje: string): number {
 }
 
 /** Apelido de 2 a 30 depois do trim (GEL-34), em NFC e sem invisíveis (SEC-005). A unicidade é do repositório. */
-export const apelido = textoVisivel(LIMITES_JOGADOR.apelidoMin, LIMITES_JOGADOR.apelidoMax, MENSAGEM_APELIDO);
+export const apelido = textoVisivel(
+  LIMITES_JOGADOR.apelidoMin,
+  LIMITES_JOGADOR.apelidoMax,
+  MENSAGEM_APELIDO,
+);
 
 /** GEL-37: a spec pede só o erro no campo. */
 export const posicao = z.enum(POSICOES, { error: MENSAGEM_POSICAO });
@@ -104,7 +116,10 @@ function dataEntrada(hoje: string) {
   return z
     .string({ error: MENSAGEM_DATA_INVALIDA })
     .refine(ehDataDoCalendario, { error: MENSAGEM_DATA_INVALIDA, abort: true })
-    .refine((valor) => valor >= PISO_DATA_ENTRADA, { error: MENSAGEM_DATA_ANTES_DO_PISO, abort: true })
+    .refine((valor) => valor >= PISO_DATA_ENTRADA, {
+      error: MENSAGEM_DATA_ANTES_DO_PISO,
+      abort: true,
+    })
     .refine((valor) => valor <= hoje, { error: MENSAGEM_DATA_FUTURA });
 }
 
@@ -193,7 +208,11 @@ export const jogadorDetalhe = jogadorItem
     periodos: z.array(periodoItem),
     notas: z.array(
       z
-        .object({ habilidadeId: id, habilidade: z.string(), nota: z.number().int().min(1).max(10).nullable() })
+        .object({
+          habilidadeId: id,
+          habilidade: z.string(),
+          nota: z.number().int().min(1).max(10).nullable(),
+        })
         .strict(),
     ),
   })

@@ -27,7 +27,8 @@ describe('rotas de grupos e elenco', () => {
       // As leituras da API ficam pendentes: a rota e a guarda bastam aqui; cada tela tem o próprio teste.
       const api = { 'GET /api/sessao': () => json(200, SESSAO_ANA) };
       const pendentes = new Proxy(api as Record<string, () => Response | Promise<Response>>, {
-        get: (alvo, chave: string) => alvo[chave] ?? (chave.startsWith('GET ') ? () => pendente() : undefined),
+        get: (alvo, chave: string) =>
+          alvo[chave] ?? (chave.startsWith('GET ') ? () => pendente() : undefined),
       });
       const { tela, local } = abrirTela(caminho, pendentes);
       await waitFor(() => expect(tela()).toBe(esperada));

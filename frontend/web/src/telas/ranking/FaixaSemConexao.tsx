@@ -32,7 +32,8 @@ const DIA_HORA_SP = new Intl.DateTimeFormat('pt-BR', {
 /** "Sem conexão, atualizado em 15/10 22:30" do `geradoEm` (instante ISO), na hora de São Paulo (PAR-149). */
 export function textoAtualizadoEm(geradoEm: string): string {
   const partes = DIA_HORA_SP.formatToParts(new Date(geradoEm));
-  const v = (tipo: Intl.DateTimeFormatPartTypes) => partes.find((p) => p.type === tipo)?.value ?? '';
+  const v = (tipo: Intl.DateTimeFormatPartTypes) =>
+    partes.find((p) => p.type === tipo)?.value ?? '';
   return `Sem conexão, atualizado em ${v('day')}/${v('month')} ${v('hour')}:${v('minute')}`;
 }
 
@@ -73,7 +74,17 @@ export function FaixaPrecisaConexao() {
 
 function IconeAtualizar() {
   return (
-    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true" focusable="false">
+    <svg
+      viewBox="0 0 24 24"
+      width="14"
+      height="14"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      aria-hidden="true"
+      focusable="false"
+    >
       <path d="M21 12a9 9 0 1 1-3-6.7L21 8M21 3v5h-5" />
     </svg>
   );

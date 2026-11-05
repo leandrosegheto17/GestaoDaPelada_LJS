@@ -10,13 +10,34 @@ import { LinkBotao } from '../../componentes/LinkBotao.tsx';
 import { LinkVoltar } from '../../componentes/LinkVoltar.tsx';
 import { ErroApi } from '../../dados/cliente.ts';
 import { useGrupo } from '../../dados/grupos.ts';
-import { useConfirmarEscalacao, useContextoSimulador, usePreviaSimulador, useSugerir } from '../../dados/simulador.ts';
+import {
+  useConfirmarEscalacao,
+  useContextoSimulador,
+  usePreviaSimulador,
+  useSugerir,
+} from '../../dados/simulador.ts';
 import acesso from '../acesso.module.css';
 import { rotaDoGrupo } from '../grupos/Grupos.tsx';
-import { corpoDaPrevia, corpoDoSugerir, EntradasSimulador, entradasIniciais, type Entradas } from './EntradasSimulador.tsx';
-import { ID_PREVIA_ERRO, podeSugerir, PreviaSimulador, previaInvalida } from './PreviaSimulador.tsx';
+import {
+  corpoDaPrevia,
+  corpoDoSugerir,
+  EntradasSimulador,
+  entradasIniciais,
+  type Entradas,
+} from './EntradasSimulador.tsx';
+import {
+  ID_PREVIA_ERRO,
+  podeSugerir,
+  PreviaSimulador,
+  previaInvalida,
+} from './PreviaSimulador.tsx';
 import { MontandoTimes, ResultadoDoisTimes, TEXTO_MONTANDO } from './ResultadoDoisTimes.tsx';
-import { AcoesResultado, avisoEscalacaoConfirmada, corpoDaEscalacao, FalhaConfirmar } from './AcoesResultado.tsx';
+import {
+  AcoesResultado,
+  avisoEscalacaoConfirmada,
+  corpoDaEscalacao,
+  FalhaConfirmar,
+} from './AcoesResultado.tsx';
 import { FalhaRecalcular, FolhaMover, useAjusteManual } from './MoverJogador.tsx';
 import { ResultadoVariosTimes } from './ResultadoVariosTimes.tsx';
 import estilos from './simulador.module.css';
@@ -64,7 +85,17 @@ export function PaginaSimulador() {
   if (ctx && dataDoCtx !== null && dataDasEntradas !== dataDoCtx) {
     // Ajuste de estado durante a renderização (padrão do React para estado derivado de uma consulta).
     const iniciais = entradasIniciais(ctx, dataDoCtx);
-    setEntradas(entradas ? { ...iniciais, formato: entradas.formato, n: entradas.n, k: entradas.k, ilimitado: entradas.ilimitado } : iniciais);
+    setEntradas(
+      entradas
+        ? {
+            ...iniciais,
+            formato: entradas.formato,
+            n: entradas.n,
+            k: entradas.k,
+            ilimitado: entradas.ilimitado,
+          }
+        : iniciais,
+    );
     setDataDasEntradas(dataDoCtx);
   }
 
@@ -128,7 +159,9 @@ export function PaginaSimulador() {
     if (sugerirTimes.isPending || (!sugestao && !sugerirTimes.isError)) return <MontandoTimes />;
     if (!sugestao) {
       // [LACUNA] a spec não define a falha do `sugerir`; o rascunho usa o estado de erro padrão, com "Tentar de novo".
-      return <EstadoErro aoTentarDeNovo={() => entradaDaSugestao && sugerirCom(entradaDaSugestao)} />;
+      return (
+        <EstadoErro aoTentarDeNovo={() => entradaDaSugestao && sugerirCom(entradaDaSugestao)} />
+      );
     }
     const naTela = ajuste.naTela ?? sugestao;
     const comum = {
@@ -169,7 +202,11 @@ export function PaginaSimulador() {
     ) : null;
     return (
       <>
-        {naTela.formato === 'dois_times' ? <ResultadoDoisTimes resultado={naTela} {...comum} /> : <ResultadoVariosTimes resultado={naTela} {...comum} />}
+        {naTela.formato === 'dois_times' ? (
+          <ResultadoDoisTimes resultado={naTela} {...comum} />
+        ) : (
+          <ResultadoVariosTimes resultado={naTela} {...comum} />
+        )}
         {folha}
       </>
     );
@@ -177,7 +214,8 @@ export function PaginaSimulador() {
 
   function conteudo() {
     if (contexto.isError && ctx === undefined) {
-      if (contexto.error instanceof ErroApi && contexto.error.status === 404) return <Faixa tipo="atencao">Grupo não encontrado.</Faixa>;
+      if (contexto.error instanceof ErroApi && contexto.error.status === 404)
+        return <Faixa tipo="atencao">Grupo não encontrado.</Faixa>;
       return <EstadoErro aoTentarDeNovo={() => void contexto.refetch()} />;
     }
     if (!ctx || !entradas) return <EsqueletoLista rotulo="Carregando os jogadores ativos…" />;
@@ -218,7 +256,13 @@ export function PaginaSimulador() {
     );
   }
 
-  const titulo = !noResultado ? 'Simulador' : sugestao ? TITULO_RESULTADO : sugerirTimes.isError ? 'Simulador' : TEXTO_MONTANDO;
+  const titulo = !noResultado
+    ? 'Simulador'
+    : sugestao
+      ? TITULO_RESULTADO
+      : sugerirTimes.isError
+        ? 'Simulador'
+        : TEXTO_MONTANDO;
 
   return (
     <Casca grupo={{ nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' }} titulo={titulo}>

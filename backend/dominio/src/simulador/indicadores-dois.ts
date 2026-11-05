@@ -35,7 +35,11 @@ function ordenarPorPrioridade(ids: readonly string[], posicoes: Posicoes): strin
 }
 
 /** Os indicadores de um time. */
-export function indicadoresDoTime(time: TimeDois, elenco: Elenco, posicoes: Posicoes): IndicadoresTimeDois {
+export function indicadoresDoTime(
+  time: TimeDois,
+  elenco: Elenco,
+  posicoes: Posicoes,
+): IndicadoresTimeDois {
   const titulares = ordenarPorPrioridade(time.titulares, posicoes);
   const entram = ordenarPorPrioridade(time.entram, posicoes);
   const saem = saidaNoIntervalo(
@@ -44,7 +48,8 @@ export function indicadoresDoTime(time: TimeDois, elenco: Elenco, posicoes: Posi
   );
   const saemSet = new Set(saem);
   const segundoTempo = [...titulares.filter((id) => !saemSet.has(id)), ...entram];
-  const somar = (ids: readonly string[]): number => ids.reduce((s, id) => s + jogadorDe(elenco, id).nivel, 0);
+  const somar = (ids: readonly string[]): number =>
+    ids.reduce((s, id) => s + jogadorDe(elenco, id).nivel, 0);
   const nivel1 = somar(titulares);
   const nivel2 = somar(segundoTempo);
 

@@ -20,9 +20,11 @@ import {
  */
 const VETOR = {
   texto: 'When I grow up, I want to be a watermelon',
-  asPublica: 'BP4z9KsN6nGRTbVYI_c7VJSPQTBtkgcy27mlmlMoZIIgDll6e3vCYLocInmYWAmS6TlzAC8wEqKK6PBru3jl7A8',
+  asPublica:
+    'BP4z9KsN6nGRTbVYI_c7VJSPQTBtkgcy27mlmlMoZIIgDll6e3vCYLocInmYWAmS6TlzAC8wEqKK6PBru3jl7A8',
   asPrivada: 'yfWPiYE-n46HLnH0KqZOF1fJJU3MYrct3AELtAQ-oRw',
-  uaPublica: 'BCVxsr7N_eNgVRqvHtD0zTZsEc6-VV-JvLexhqUzORcxaOzi6-AYWXvTBHm4bjyPjs7Vd8pZGH6SRpkNtoIAiw4',
+  uaPublica:
+    'BCVxsr7N_eNgVRqvHtD0zTZsEc6-VV-JvLexhqUzORcxaOzi6-AYWXvTBHm4bjyPjs7Vd8pZGH6SRpkNtoIAiw4',
   uaPrivada: 'q1dXpw3UpT5VOmu_cf_v6ih07Aems3njxI-JWgLcM94',
   sal: 'DGv6ra1nlYgDCS1FRnbzlw',
   auth: 'BTBZMqHH6r4Tts7J_aSIgg',
@@ -37,13 +39,25 @@ function b(texto: string): Uint8Array<ArrayBuffer> {
 }
 
 const ASSINANTE = { p256dh: VETOR.uaPublica, auth: VETOR.auth };
-const OPCOES_VETOR = { efemera: { publica: b(VETOR.asPublica), privada: b(VETOR.asPrivada) }, sal: b(VETOR.sal) };
+const OPCOES_VETOR = {
+  efemera: { publica: b(VETOR.asPublica), privada: b(VETOR.asPrivada) },
+  sal: b(VETOR.sal),
+};
 
-async function hkdf(sal: Uint8Array<ArrayBuffer>, ikm: Uint8Array<ArrayBuffer>, info: string | Uint8Array<ArrayBuffer>, bytes: number) {
+async function hkdf(
+  sal: Uint8Array<ArrayBuffer>,
+  ikm: Uint8Array<ArrayBuffer>,
+  info: string | Uint8Array<ArrayBuffer>,
+  bytes: number,
+) {
   const chave = await crypto.subtle.importKey('raw', ikm, 'HKDF', false, ['deriveBits']);
   const infoBytes = typeof info === 'string' ? new TextEncoder().encode(info) : info;
   return new Uint8Array(
-    await crypto.subtle.deriveBits({ name: 'HKDF', hash: 'SHA-256', salt: sal, info: infoBytes }, chave, bytes * 8),
+    await crypto.subtle.deriveBits(
+      { name: 'HKDF', hash: 'SHA-256', salt: sal, info: infoBytes },
+      chave,
+      bytes * 8,
+    ),
   );
 }
 
@@ -51,7 +65,12 @@ async function hkdf(sal: Uint8Array<ArrayBuffer>, ikm: Uint8Array<ArrayBuffer>, 
  * Decifra do lado do navegador, escrita aqui sem usar a cifra (o lado de quem recebe, RFC 8291 §3.4 com os papéis
  * trocados): lê o cabeçalho, deriva com a chave privada do assinante e tira o delimitador.
  */
-async function decifrar(corpo: Uint8Array, uaPublica: string, uaPrivada: string, auth: string): Promise<string> {
+async function decifrar(
+  corpo: Uint8Array,
+  uaPublica: string,
+  uaPrivada: string,
+  auth: string,
+): Promise<string> {
   const sal = new Uint8Array(corpo.subarray(0, 16));
   const rs = new DataView(corpo.buffer, corpo.byteOffset + 16, 4).getUint32(0);
   expect(rs).toBe(TAMANHO_REGISTRO);
@@ -61,17 +80,35 @@ async function decifrar(corpo: Uint8Array, uaPublica: string, uaPrivada: string,
   const cifrado = new Uint8Array(corpo.subarray(21 + idlen));
 
   const ua = b(uaPublica);
-  const privada = await crypto.subtle.importKey('jwk', jwkP256(ua, b(uaPrivada)), { name: 'ECDH', namedCurve: 'P-256' }, false, [
-    'deriveBits',
+  const privada = await crypto.subtle.importKey(
+    'jwk',
+    jwkP256(ua, b(uaPrivada)),
+    { name: 'ECDH', namedCurve: 'P-256' },
+    false,
+    ['deriveBits'],
+  );
+  const publica = await crypto.subtle.importKey(
+    'raw',
+    asPublica,
+    { name: 'ECDH', namedCurve: 'P-256' },
+    false,
+    [],
+  );
+  const ecdh = new Uint8Array(
+    await crypto.subtle.deriveBits({ name: 'ECDH', public: publica }, privada, 256),
+  );
+  const info = new Uint8Array([
+    ...new TextEncoder().encode('WebPush: info\0'),
+    ...ua,
+    ...asPublica,
   ]);
-  const publica = await crypto.subtle.importKey('raw', asPublica, { name: 'ECDH', namedCurve: 'P-256' }, false, []);
-  const ecdh = new Uint8Array(await crypto.subtle.deriveBits({ name: 'ECDH', public: publica }, privada, 256));
-  const info = new Uint8Array([...new TextEncoder().encode('WebPush: info\0'), ...ua, ...asPublica]);
   const ikm = await hkdf(b(auth), ecdh, info, 32);
   const cek = await hkdf(sal, ikm, 'Content-Encoding: aes128gcm\0', 16);
   const nonce = await hkdf(sal, ikm, 'Content-Encoding: nonce\0', 12);
   const chave = await crypto.subtle.importKey('raw', cek, 'AES-GCM', false, ['decrypt']);
-  const registro = new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: nonce }, chave, cifrado));
+  const registro = new Uint8Array(
+    await crypto.subtle.decrypt({ name: 'AES-GCM', iv: nonce }, chave, cifrado),
+  );
   let fim = registro.length - 1;
   while (fim >= 0 && registro[fim] === 0) fim -= 1;
   expect(registro[fim]).toBe(0x02);
@@ -108,18 +145,33 @@ describe('cifrarPayload', () => {
     expect(PAYLOAD_MAX_BYTES).toBe(3993);
     const corpo = await cifrarPayload('a'.repeat(3993), ASSINANTE);
     expect(corpo.length).toBe(4096);
-    expect(await decifrar(corpo, VETOR.uaPublica, VETOR.uaPrivada, VETOR.auth)).toBe('a'.repeat(3993));
-    await expect(cifrarPayload('a'.repeat(3994), ASSINANTE)).rejects.toBeInstanceOf(ErroPayloadGrande);
+    expect(await decifrar(corpo, VETOR.uaPublica, VETOR.uaPrivada, VETOR.auth)).toBe(
+      'a'.repeat(3993),
+    );
+    await expect(cifrarPayload('a'.repeat(3994), ASSINANTE)).rejects.toBeInstanceOf(
+      ErroPayloadGrande,
+    );
   });
 
   it('NOT-25: o limite conta bytes UTF-8, não caracteres', async () => {
-    await expect(cifrarPayload('é'.repeat(2000), ASSINANTE)).rejects.toBeInstanceOf(ErroPayloadGrande);
+    await expect(cifrarPayload('é'.repeat(2000), ASSINANTE)).rejects.toBeInstanceOf(
+      ErroPayloadGrande,
+    );
   });
 
   it.each([
-    ['p256dh comprimido de 33 bytes', { p256dh: paraBase64url(new Uint8Array(33).fill(2)), auth: VETOR.auth }],
+    [
+      'p256dh comprimido de 33 bytes',
+      { p256dh: paraBase64url(new Uint8Array(33).fill(2)), auth: VETOR.auth },
+    ],
     ['p256dh sem 0x04', { p256dh: paraBase64url(new Uint8Array(65).fill(5)), auth: VETOR.auth }],
-    ['ponto fora da curva', { p256dh: paraBase64url(new Uint8Array([4, ...new Uint8Array(64).fill(1)])), auth: VETOR.auth }],
+    [
+      'ponto fora da curva',
+      {
+        p256dh: paraBase64url(new Uint8Array([4, ...new Uint8Array(64).fill(1)])),
+        auth: VETOR.auth,
+      },
+    ],
     ['p256dh que não é base64url', { p256dh: 'não+base64', auth: VETOR.auth }],
     ['auth de 15 bytes', { p256dh: VETOR.uaPublica, auth: paraBase64url(new Uint8Array(15)) }],
   ])('NOT-26: %s dá ErroChaveAssinante', async (_caso, assinante) => {

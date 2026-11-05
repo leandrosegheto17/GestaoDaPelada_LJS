@@ -29,7 +29,10 @@ export function avisoEscalacaoConfirmada(data: string): string {
 }
 
 /** O corpo de `POST …/escalacoes`: a entrada da sugestão sem os aptos, com a composição na tela (SIM-67, SIM-72). */
-export function corpoDaEscalacao(entrada: SugerirCorpo, composicao: ResultadoNaTela): CorpoEscalacao {
+export function corpoDaEscalacao(
+  entrada: SugerirCorpo,
+  composicao: ResultadoNaTela,
+): CorpoEscalacao {
   const { aptos: _aptos, ...semAptos } = corpoDoAvaliar(entrada, composicao);
   return semAptos as CorpoEscalacao;
 }
@@ -46,7 +49,13 @@ interface PropsAcoes {
   aoEditar: () => void;
 }
 
-export function AcoesResultado({ ajustado, confirmando, aoConfirmar, aoRefazer, aoEditar }: PropsAcoes) {
+export function AcoesResultado({
+  ajustado,
+  confirmando,
+  aoConfirmar,
+  aoRefazer,
+  aoEditar,
+}: PropsAcoes) {
   const [perguntando, setPerguntando] = useState(false);
   return (
     <>
@@ -55,7 +64,10 @@ export function AcoesResultado({ ajustado, confirmando, aoConfirmar, aoRefazer, 
           <Botao variante="principal" carregando={confirmando} onClick={aoConfirmar}>
             Confirmar escalação
           </Botao>
-          <Botao variante="secundario" onClick={() => (ajustado ? setPerguntando(true) : aoRefazer())}>
+          <Botao
+            variante="secundario"
+            onClick={() => (ajustado ? setPerguntando(true) : aoRefazer())}
+          >
             Refazer sugestão
           </Botao>
           <Botao variante="texto" onClick={aoEditar}>

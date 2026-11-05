@@ -28,12 +28,17 @@ const EH_JSPDF = /(^|[/\\])jspdf([/\\@]|$)/;
 function arquivos(pasta: string): string[] {
   return readdirSync(pasta).flatMap((nome) => {
     const caminho = join(pasta, nome);
-    return statSync(caminho).isDirectory() ? arquivos(caminho) : /\.(ts|tsx)$/.test(nome) ? [caminho] : [];
+    return statSync(caminho).isDirectory()
+      ? arquivos(caminho)
+      : /\.(ts|tsx)$/.test(nome)
+        ? [caminho]
+        : [];
   });
 }
 
 /** Import estático do jspdf: `import ... from 'jspdf'`, `import 'jspdf'` ou `export ... from 'jspdf'` (não `import('jspdf')`). */
-const IMPORT_ESTATICO = /(^|\n)\s*(import|export)\b[^;()]*?\bfrom\s*['"]jspdf['"]|(^|\n)\s*import\s*['"]jspdf['"]/;
+const IMPORT_ESTATICO =
+  /(^|\n)\s*(import|export)\b[^;()]*?\bfrom\s*['"]jspdf['"]|(^|\n)\s*import\s*['"]jspdf['"]/;
 
 /** Chaves do manifesto alcançáveis a partir das entradas só por imports estáticos: o carregamento inicial. */
 function chunksIniciais(m: Manifesto): Set<string> {
@@ -75,7 +80,9 @@ describe('jspdf sob demanda', () => {
         logLevel: 'silent',
         build: { outDir: saida, emptyOutDir: true, manifest: true },
       });
-      manifesto = JSON.parse(readFileSync(join(saida, '.vite', 'manifest.json'), 'utf8')) as Manifesto;
+      manifesto = JSON.parse(
+        readFileSync(join(saida, '.vite', 'manifest.json'), 'utf8'),
+      ) as Manifesto;
     }, 180_000);
 
     afterAll(() => {
@@ -85,7 +92,9 @@ describe('jspdf sob demanda', () => {
     it('PAR-102: nenhum chunk do carregamento inicial é do jspdf', () => {
       const iniciais = [...chunksIniciais(manifesto)];
       expect(iniciais.length).toBeGreaterThan(0);
-      const comJspdf = iniciais.filter((k) => EH_JSPDF.test(k) || EH_JSPDF.test(manifesto[k]?.src ?? ''));
+      const comJspdf = iniciais.filter(
+        (k) => EH_JSPDF.test(k) || EH_JSPDF.test(manifesto[k]?.src ?? ''),
+      );
       expect(comJspdf).toEqual([]);
     });
 
@@ -93,9 +102,15 @@ describe('jspdf sob demanda', () => {
       const doJspdf = Object.keys(manifesto).filter((k) => EH_JSPDF.test(k));
       // Até a T68 nenhum código importa o pacote e não há chunk dele; daí em diante cada chunk do jspdf tem de ser
       // alcançado por um dynamicImports de alguém, nunca por imports estáticos (o teste anterior).
-      const alcancadosPorDinamico = new Set(Object.values(manifesto).flatMap((e) => e.dynamicImports ?? []));
+      const alcancadosPorDinamico = new Set(
+        Object.values(manifesto).flatMap((e) => e.dynamicImports ?? []),
+      );
       for (const k of doJspdf) {
-        const raiz = alcancadosPorDinamico.has(k) || Object.values(manifesto).some((e) => (e.dynamicImports ?? []).some((d) => manifesto[d]?.imports?.includes(k)));
+        const raiz =
+          alcancadosPorDinamico.has(k) ||
+          Object.values(manifesto).some((e) =>
+            (e.dynamicImports ?? []).some((d) => manifesto[d]?.imports?.includes(k)),
+          );
         expect({ chunk: k, dinamico: raiz }).toEqual({ chunk: k, dinamico: true });
       }
     });

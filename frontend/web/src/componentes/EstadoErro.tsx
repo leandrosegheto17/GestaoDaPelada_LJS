@@ -65,7 +65,12 @@ function IconeIndisponivel() {
   );
 }
 
-export function EstadoErro({ formato = 'faixa', titulo, mensagem = TEXTO_ERRO_REDE, aoTentarDeNovo }: PropsEstadoErro) {
+export function EstadoErro({
+  formato = 'faixa',
+  titulo,
+  mensagem = TEXTO_ERRO_REDE,
+  aoTentarDeNovo,
+}: PropsEstadoErro) {
   const refBotao = useRef<HTMLButtonElement>(null);
   const refTitulo = useRef<HTMLHeadingElement>(null);
 

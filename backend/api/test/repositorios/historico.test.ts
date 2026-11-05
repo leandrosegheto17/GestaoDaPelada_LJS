@@ -1,4 +1,9 @@
-import { sql, type KyselyPlugin, type PluginTransformQueryArgs, type PluginTransformResultArgs } from 'kysely';
+import {
+  sql,
+  type KyselyPlugin,
+  type PluginTransformQueryArgs,
+  type PluginTransformResultArgs,
+} from 'kysely';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { historico } from '../../src/infraestrutura/db/repositorios/historico.ts';
 import type { Db } from '../../src/infraestrutura/db/repositorios/tipos.ts';
@@ -53,10 +58,16 @@ describe('historico.carregar', () => {
   it('PAR-62: traz o histórico de G para a admin, em 4 consultas', async () => {
     const { cenario } = aberto;
     const espiao = new Espiao();
-    const h = await comoConta(cenario.contaC, (db) => historico.carregar(db.withPlugin(espiao), cenario.grupoG, ATE));
+    const h = await comoConta(cenario.contaC, (db) =>
+      historico.carregar(db.withPlugin(espiao), cenario.grupoG, ATE),
+    );
     expect(espiao.consultas).toHaveLength(4);
     expect(h.jogadores.map((j) => j.id).sort()).toEqual(
-      [cenario.idsG.jogadorAtivo, cenario.idsG.jogadorInativo, cenario.idsG.jogadorHistorico].sort(),
+      [
+        cenario.idsG.jogadorAtivo,
+        cenario.idsG.jogadorInativo,
+        cenario.idsG.jogadorHistorico,
+      ].sort(),
     );
     expect(h.partidas.map((p) => p.id)).toContain(cenario.idsG.partida);
     expect(h.presencas).toContainEqual({
@@ -85,14 +96,18 @@ describe('historico.carregar', () => {
     const { cenario } = aberto;
     const h = await comoConta(cenario.contaC, (db) => historico.carregar(db, cenario.grupoG, ATE));
     const inativo = h.jogadores.find((j) => j.id === cenario.idsG.jogadorInativo);
-    expect(inativo?.periodos).toEqual([expect.objectContaining({ inicio: '2025-03-01', fim: '2025-12-31' })]);
+    expect(inativo?.periodos).toEqual([
+      expect.objectContaining({ inicio: '2025-03-01', fim: '2025-12-31' }),
+    ]);
     const ativo = h.jogadores.find((j) => j.id === cenario.idsG.jogadorAtivo);
     expect(ativo?.periodos).toEqual([expect.objectContaining({ inicio: '2026-01-01', fim: null })]);
   });
 
   it('PAR-62: partidas depois de `ate` e as presenças delas ficam de fora', async () => {
     const { cenario } = aberto;
-    const h = await comoConta(cenario.contaC, (db) => historico.carregar(db, cenario.grupoG, '2026-01-07'));
+    const h = await comoConta(cenario.contaC, (db) =>
+      historico.carregar(db, cenario.grupoG, '2026-01-07'),
+    );
     expect(h.partidas).toEqual([]);
     expect(h.presencas).toEqual([]);
   });
@@ -100,7 +115,9 @@ describe('historico.carregar', () => {
   it('PAR-77: nenhuma consulta seleciona telefone, posição nem notas', async () => {
     const { cenario } = aberto;
     const espiao = new Espiao();
-    await comoConta(cenario.contaC, (db) => historico.carregar(db.withPlugin(espiao), cenario.grupoG, ATE));
+    await comoConta(cenario.contaC, (db) =>
+      historico.carregar(db.withPlugin(espiao), cenario.grupoG, ATE),
+    );
     const texto = espiao.consultas.join('\n');
     expect(texto).not.toMatch(/telefone|posicao|\bnotas\b/i);
   });
@@ -111,7 +128,9 @@ describe('historico.carregar', () => {
       await sql`
         INSERT INTO config_pesos (grupo_id, vigente_desde, presenca_sem_chuva, presenca_com_chuva, lesionado_sem_chuva,
                                   lesionado_com_chuva, expulso, expulso_com_chuva, registrado_por, registrado_em)
-        VALUES (${cenario.grupoG}, '2026-03-01', 3, 4, 1, 2, -2, -5, ${cenario.contaC}, now())`.execute(db);
+        VALUES (${cenario.grupoG}, '2026-03-01', 3, 4, 1, 2, -2, -5, ${cenario.contaC}, now())`.execute(
+        db,
+      );
       return historico.carregar(db, cenario.grupoG, ATE);
     });
     expect(h.configsPesos.find((c) => c.vigenteDesde === '2026-03-01')).toEqual({
@@ -130,8 +149,10 @@ describe('historico.carregar', () => {
     const h = await comoConta(cenario.contaC, (db) => historico.carregar(db, cenario.grupoG, ATE));
     const semInicio = h.jogadores.filter((j) => j.inicioPontuacao === undefined);
     expect(semInicio.length).toBeGreaterThan(0);
-    expect(h.jogadores.every((j) => j.inicioPontuacao === undefined || /^\d{4}-\d{2}-\d{2}$/.test(j.inicioPontuacao))).toBe(
-      true,
-    );
+    expect(
+      h.jogadores.every(
+        (j) => j.inicioPontuacao === undefined || /^\d{4}-\d{2}-\d{2}$/.test(j.inicioPontuacao),
+      ),
+    ).toBe(true);
   });
 });

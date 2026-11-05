@@ -18,7 +18,9 @@ export interface PropsTelaMensagem {
 }
 
 function Icone({ tipo }: { tipo: IconeTelaMensagem }) {
-  const classe = [estilos['vazio__icone'], tipo === 'erro' ? estilos['vazio__icone--erro'] : ''].filter(Boolean).join(' ');
+  const classe = [estilos['vazio__icone'], tipo === 'erro' ? estilos['vazio__icone--erro'] : '']
+    .filter(Boolean)
+    .join(' ');
   const comum = {
     className: classe,
     viewBox: '0 0 24 24',

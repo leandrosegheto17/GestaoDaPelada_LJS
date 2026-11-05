@@ -9,7 +9,9 @@ afterEach(() => {
 
 describe('Campo', () => {
   it('ACE-56: estado normal tem rótulo ligado à entrada, sem aria-invalid; axe sem violação', async () => {
-    const { container } = render(<Campo id="email" rotulo="E-mail" type="email" autoComplete="username" />);
+    const { container } = render(
+      <Campo id="email" rotulo="E-mail" type="email" autoComplete="username" />,
+    );
     const entrada = screen.getByLabelText('E-mail') as HTMLInputElement;
     expect(entrada.id).toBe('email');
     expect(entrada.className).toContain('campo__entrada');

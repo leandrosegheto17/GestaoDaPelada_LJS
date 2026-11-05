@@ -32,12 +32,20 @@ export function escaparHtml(texto: string): string {
 export function montarLink(urlPublica: string, caminho: string, token?: string): string {
   const base = urlPublica.trim().replace(/\/+$/, '');
   if (!/^https?:\/\//.test(base)) throw new Error('URL_PUBLICA ausente ou inválida');
-  return token === undefined ? `${base}${caminho}` : `${base}${caminho}#t=${encodeURIComponent(token)}`;
+  return token === undefined
+    ? `${base}${caminho}`
+    : `${base}${caminho}#t=${encodeURIComponent(token)}`;
 }
 
-function html(titulo: string, paragrafos: string[], botao?: { texto: string; link: string }): string {
+function html(
+  titulo: string,
+  paragrafos: string[],
+  botao?: { texto: string; link: string },
+): string {
   const corpo = paragrafos.map((p) => `<p>${p}</p>`).join('\n');
-  const acao = botao ? `\n<p><a href="${escaparHtml(botao.link)}">${escaparHtml(botao.texto)}</a></p>` : '';
+  const acao = botao
+    ? `\n<p><a href="${escaparHtml(botao.link)}">${escaparHtml(botao.texto)}</a></p>`
+    : '';
   return `<!doctype html>\n<html lang="pt-BR"><body>\n<h1>${escaparHtml(titulo)}</h1>\n${corpo}${acao}\n</body></html>`;
 }
 
@@ -48,7 +56,11 @@ export function emailConfirmacao(d: { urlPublica: string; nome: string; token: s
     texto: `Olá, ${d.nome}.\n\nPara confirmar o seu e-mail, abra o link abaixo (vale por 24 horas):\n${link}\n\nSe não foi você, ignore esta mensagem.`,
     html: html(
       'Confirme o seu e-mail',
-      [`Olá, ${escaparHtml(d.nome)}.`, 'Para confirmar o seu e-mail, use o botão abaixo. O link vale por 24 horas.', 'Se não foi você, ignore esta mensagem.'],
+      [
+        `Olá, ${escaparHtml(d.nome)}.`,
+        'Para confirmar o seu e-mail, use o botão abaixo. O link vale por 24 horas.',
+        'Se não foi você, ignore esta mensagem.',
+      ],
       { texto: 'Confirmar e-mail', link },
     ),
   };
@@ -87,7 +99,11 @@ export function nomeDoGrupoNoEmail(nome: string): string {
   return Array.from(semLink).slice(0, NOME_GRUPO_EMAIL_MAX).join('').trim();
 }
 
-export function emailConvite(d: { urlPublica: string; grupoNome: string; token: string }): Conteudo {
+export function emailConvite(d: {
+  urlPublica: string;
+  grupoNome: string;
+  token: string;
+}): Conteudo {
   const link = montarLink(d.urlPublica, CAMINHOS.convite, d.token);
   const grupo = nomeDoGrupoNoEmail(d.grupoNome);
   return {

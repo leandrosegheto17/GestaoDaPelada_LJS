@@ -64,7 +64,8 @@ beforeAll(async () => {
 });
 
 afterAll(() => {
-  for (const p of [pastaAntes, pastaAteContrair]) if (p) rmSync(p, { recursive: true, force: true });
+  for (const p of [pastaAntes, pastaAteContrair])
+    if (p) rmSync(p, { recursive: true, force: true });
 });
 
 /** Um grupo com caixa, jogador e partida (os pesos vêm da `pesos-padrao`, já aplicada no dump). */
@@ -104,7 +105,10 @@ async function semear(url: string): Promise<string> {
         [grupo, conta],
       )
     ).rows[0]!.id;
-    await c.query(`INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio) VALUES ($1, $2, '2026-01-01')`, [jogador, grupo]);
+    await c.query(
+      `INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio) VALUES ($1, $2, '2026-01-01')`,
+      [jogador, grupo],
+    );
     const partida = (
       await c.query<{ id: string }>(
         `INSERT INTO partidas (grupo_id, data, criada_por, criada_em, alterada_por, alterada_em)
@@ -112,11 +116,10 @@ async function semear(url: string): Promise<string> {
         [grupo, conta],
       )
     ).rows[0]!.id;
-    await c.query(`INSERT INTO presencas (partida_id, jogador_id, grupo_id, situacao) VALUES ($1, $2, $3, 'presente')`, [
-      partida,
-      jogador,
-      grupo,
-    ]);
+    await c.query(
+      `INSERT INTO presencas (partida_id, jogador_id, grupo_id, situacao) VALUES ($1, $2, $3, 'presente')`,
+      [partida, jogador, grupo],
+    );
     return grupo;
   });
 }
@@ -155,14 +158,19 @@ describe('ensaiar com a migração da simulador', () => {
   it('SIM-67: nenhuma tabela perde linha e o diff do schema é só a grupo_criar de 6 parâmetros', async () => {
     await comBancoDeProducao(async (url) => {
       const r = await ensaiar(url, { pasta: pastaAteContrair, referencia: referenciaAteContrair });
-      expect(r.aplicadas.map((n) => n.replace(/\.sql$/, ''))).toEqual([nomeContrair.replace(/\.sql$/, '')]);
+      expect(r.aplicadas.map((n) => n.replace(/\.sql$/, ''))).toEqual([
+        nomeContrair.replace(/\.sql$/, ''),
+      ]);
       expect(r.tabelasAlteradas).toEqual([]);
-      for (const tabela of Object.keys(r.antes)) expect({ tabela, n: r.depois[tabela] }).toEqual({ tabela, n: r.antes[tabela] });
+      for (const tabela of Object.keys(r.antes))
+        expect({ tabela, n: r.depois[tabela] }).toEqual({ tabela, n: r.antes[tabela] });
       expect(r.mudancaDoEsquema.novas).toEqual([]);
       // Sai a função e o que pende dela (grants de EXECUTE), nada mais.
       expect(r.mudancaDoEsquema.removidas.length).toBeGreaterThanOrEqual(1);
       for (const linha of r.mudancaDoEsquema.removidas) expect(linha).toContain('grupo_criar(');
-      expect(r.mudancaDoEsquema.removidas.filter((l) => l.startsWith(FUNCAO_GRUPO_CRIAR))).toHaveLength(1);
+      expect(
+        r.mudancaDoEsquema.removidas.filter((l) => l.startsWith(FUNCAO_GRUPO_CRIAR)),
+      ).toHaveLength(1);
       expect(r.esquema).toEqual({ faltando: [], sobrando: [] });
       expect(r.segundaExecucao).toEqual([]);
     });
@@ -182,9 +190,14 @@ describe('ensaiar com a migração da simulador', () => {
   it('SIM-67: referência que ainda tem a grupo_criar de 6 reprova o ensaio e a lista como faltando', async () => {
     await comBancoDeProducao(async (url) => {
       const comAAntiga = await comConexao(url, (c) => lerEsquema(c, OPCOES_REFERENCIA));
-      const daAntiga = comAAntiga.filter((l) => l.includes('grupo_criar(') && !referenciaAteContrair.includes(l));
+      const daAntiga = comAAntiga.filter(
+        (l) => l.includes('grupo_criar(') && !referenciaAteContrair.includes(l),
+      );
       expect(daAntiga.length).toBeGreaterThanOrEqual(1);
-      const r = await ensaiar(url, { pasta: pastaAteContrair, referencia: [...referenciaAteContrair, ...daAntiga] });
+      const r = await ensaiar(url, {
+        pasta: pastaAteContrair,
+        referencia: [...referenciaAteContrair, ...daAntiga],
+      });
       expect(r.esquema.faltando).toEqual(expect.arrayContaining(daAntiga));
       expect(r.ok).toBe(false);
     });
@@ -193,7 +206,10 @@ describe('ensaiar com a migração da simulador', () => {
 
 describe('mudancaDoEsquema', () => {
   it('SIM-67: separa as linhas que saíram das que entraram, ordenadas', () => {
-    expect(mudancaDoEsquema(['b', 'a', 'c'], ['c', 'd', 'a'])).toEqual({ removidas: ['b'], novas: ['d'] });
+    expect(mudancaDoEsquema(['b', 'a', 'c'], ['c', 'd', 'a'])).toEqual({
+      removidas: ['b'],
+      novas: ['d'],
+    });
     expect(mudancaDoEsquema(['a'], ['a'])).toEqual({ removidas: [], novas: [] });
   });
 });

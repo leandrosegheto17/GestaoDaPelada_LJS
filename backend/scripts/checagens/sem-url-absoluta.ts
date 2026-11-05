@@ -55,7 +55,8 @@ export function checarUrls(arquivos: readonly Arquivo[]): string[] {
     const linhas = conteudo.split('\n');
     linhas.forEach((linha, i) => {
       for (const [termo, re] of PROIBIDOS) {
-        if (re.test(linha)) problemas.push(`${caminho}:${i + 1}: cita ${termo}; use a variável URL_PUBLICA`);
+        if (re.test(linha))
+          problemas.push(`${caminho}:${i + 1}: cita ${termo}; use a variável URL_PUBLICA`);
       }
     });
   }

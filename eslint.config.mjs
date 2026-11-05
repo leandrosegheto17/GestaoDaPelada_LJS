@@ -47,7 +47,11 @@ const somasInternas = (nomes) =>
     { selector: `CallExpression[callee.name='${nome}']`, message: MSG_ACUMULADO },
     { selector: `MemberExpression[property.name='${nome}']`, message: MSG_ACUMULADO },
   ]);
-const ACUMULADO_SO_NA_PONTUACAO = somasInternas(['acumuladoAte', 'acumuladoComInicial', 'pontosDaPresenca']);
+const ACUMULADO_SO_NA_PONTUACAO = somasInternas([
+  'acumuladoAte',
+  'acumuladoComInicial',
+  'pontosDaPresenca',
+]);
 /** As rodadas do ranking mostram o ponto de cada presença, mas não somam por conta própria. */
 const SOMA_SO_NA_PONTUACAO = somasInternas(['acumuladoAte', 'acumuladoComInicial']);
 
@@ -99,9 +103,15 @@ export default tseslint.config(
             ...MODULOS_IO.map((name) => ({ name, message: 'FUN-06: o domínio não faz I/O.' })),
           ],
           patterns: [
-            { group: ['node:fs/*', 'fs/*', 'pg/*', 'hono/*'], message: 'FUN-06: o domínio não faz I/O.' },
+            {
+              group: ['node:fs/*', 'fs/*', 'pg/*', 'hono/*'],
+              message: 'FUN-06: o domínio não faz I/O.',
+            },
             // GEL-104 (AD-028): validação de entrada é do contrato; o domínio recebe dados já validados.
-            { group: ['zod', 'zod/*'], message: 'GEL-104: o domínio não usa zod; a validação é do contrato.' },
+            {
+              group: ['zod', 'zod/*'],
+              message: 'GEL-104: o domínio não usa zod; a validação é do contrato.',
+            },
           ],
         },
       ],
@@ -131,7 +141,10 @@ export default tseslint.config(
     // Quem grava presença (`repositorios/partidas.ts`) só lê os períodos. `deleteFrom` e `inicio_pontuacao` seguem com
     // a checagem `escritores-periodo` (GEL-83, GEL-111).
     files: ['backend/api/src/**/*.ts'],
-    ignores: ['backend/api/src/infraestrutura/db/repositorios/jogadores.ts', 'backend/api/src/infraestrutura/db/migracoes/**'],
+    ignores: [
+      'backend/api/src/infraestrutura/db/repositorios/jogadores.ts',
+      'backend/api/src/infraestrutura/db/migracoes/**',
+    ],
     plugins: { pelada: pluginPelada },
     rules: { 'pelada/sem-escrita-periodo': 'error' },
   },

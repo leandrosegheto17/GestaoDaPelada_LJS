@@ -55,7 +55,8 @@ export function portaAberta(porta, host = '127.0.0.1', espera = 2000) {
 /** Mata o processo e os filhos (no Windows, o `shell` deixa o filho real embaixo do cmd). */
 function encerrar(filho) {
   if (!filho || filho.exitCode !== null) return;
-  if (process.platform === 'win32') spawnSync('taskkill', ['/pid', String(filho.pid), '/T', '/F'], { stdio: 'ignore' });
+  if (process.platform === 'win32')
+    spawnSync('taskkill', ['/pid', String(filho.pid), '/T', '/F'], { stdio: 'ignore' });
   else filho.kill('SIGTERM');
 }
 
@@ -73,12 +74,37 @@ export async function principal(env = process.env) {
   const comum = { cwd: RAIZ, stdio: 'inherit', shell: process.platform === 'win32' };
   const worker = spawn(
     'pnpm',
-    ['--filter', '@pelada/api', 'exec', 'wrangler', 'dev', '--config', '../../wrangler.jsonc', '--ip', '127.0.0.1', '--port', String(cfg.api)],
-    { ...comum, env: { ...env, CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE: cfg.hyperdrive } },
+    [
+      '--filter',
+      '@pelada/api',
+      'exec',
+      'wrangler',
+      'dev',
+      '--config',
+      '../../wrangler.jsonc',
+      '--ip',
+      '127.0.0.1',
+      '--port',
+      String(cfg.api),
+    ],
+    {
+      ...comum,
+      env: { ...env, CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE: cfg.hyperdrive },
+    },
   );
   const web = spawn(
     'pnpm',
-    ['--filter', '@pelada/web', 'exec', 'vite', '--host', '127.0.0.1', '--port', String(cfg.web), '--strictPort'],
+    [
+      '--filter',
+      '@pelada/web',
+      'exec',
+      'vite',
+      '--host',
+      '127.0.0.1',
+      '--port',
+      String(cfg.web),
+      '--strictPort',
+    ],
     { ...comum, env: { ...env, PELADA_DEV_PORTA_API: String(cfg.api) } },
   );
 

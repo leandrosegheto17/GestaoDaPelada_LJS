@@ -22,7 +22,10 @@ describe('calcularPrevia em 2 times', () => {
   });
 
   it('SIM-10: 14 aptos, N = 7: válida com 0 reservas', () => {
-    expect(calcularPrevia({ formato: 'dois_times', n: 7, aptos: 14 })).toMatchObject({ valida: true, reservas: 0 });
+    expect(calcularPrevia({ formato: 'dois_times', n: 7, aptos: 14 })).toMatchObject({
+      valida: true,
+      reservas: 0,
+    });
   });
 
   it('SIM-11: 19 aptos, N = 11: inválida com maior N possível 9', () => {
@@ -36,11 +39,17 @@ describe('calcularPrevia em 2 times', () => {
   });
 
   it('SIM-11: 13 aptos, N = 7 (2N − 1): inválida com maior N 6', () => {
-    expect(calcularPrevia({ formato: 'dois_times', n: 7, aptos: 13 })).toMatchObject({ valida: false, maiorNPossivel: 6 });
+    expect(calcularPrevia({ formato: 'dois_times', n: 7, aptos: 13 })).toMatchObject({
+      valida: false,
+      maiorNPossivel: 6,
+    });
   });
 
   it.each([3, 1, 0])('SIM-11: %i aptos: maior N possível nulo', (aptos) => {
-    expect(calcularPrevia({ formato: 'dois_times', n: 7, aptos })).toMatchObject({ valida: false, maiorNPossivel: null });
+    expect(calcularPrevia({ formato: 'dois_times', n: 7, aptos })).toMatchObject({
+      valida: false,
+      maiorNPossivel: null,
+    });
   });
 });
 

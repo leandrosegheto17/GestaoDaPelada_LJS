@@ -98,7 +98,13 @@ function canalizar(origem: string[], destino: string[]): Promise<void> {
 export async function restaurarBackup(opcoes: OpcoesRestaurar): Promise<Record<string, number>> {
   exigirHostPermitido(opcoes.urlDestino, HOSTS_LOCAIS);
   await exigirBancoVazio(opcoes.urlDestino);
-  const age = [...(opcoes.comandoAge ?? COMANDO_AGE), '-d', '-i', opcoes.chavePrivada, opcoes.arquivo];
+  const age = [
+    ...(opcoes.comandoAge ?? COMANDO_AGE),
+    '-d',
+    '-i',
+    opcoes.chavePrivada,
+    opcoes.arquivo,
+  ];
   const pgRestore = [
     ...(opcoes.comandoPgRestore ?? COMANDO_PG_RESTORE),
     '--no-owner',

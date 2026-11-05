@@ -33,8 +33,12 @@ interface LinhaJogador {
 }
 
 /** Situação e desde a partir do período escolhido pela consulta. */
-function situacaoDe(l: Pick<LinhaJogador, 'inicio' | 'fim'>): Pick<ItemJogador, 'situacao' | 'desde'> {
-  return l.fim === null ? { situacao: 'ativo', desde: l.inicio } : { situacao: 'inativo', desde: l.fim };
+function situacaoDe(
+  l: Pick<LinhaJogador, 'inicio' | 'fim'>,
+): Pick<ItemJogador, 'situacao' | 'desde'> {
+  return l.fim === null
+    ? { situacao: 'ativo', desde: l.inicio }
+    : { situacao: 'inativo', desde: l.fim };
 }
 
 /** Os jogadores do grupo, na ordem do apelido sem acento e sem caixa (GEL-47), em duas consultas. */
@@ -122,7 +126,12 @@ async function ler(db: Db, grupoId: string, id: string): Promise<DetalheJogador 
 
   const lista = periodos.rows;
   const aberto = lista.find((p) => p.fim === null);
-  const ultimo = aberto ?? lista.reduce<PeriodoJogador | undefined>((m, p) => (!m || p.inicio > m.inicio ? p : m), undefined);
+  const ultimo =
+    aberto ??
+    lista.reduce<PeriodoJogador | undefined>(
+      (m, p) => (!m || p.inicio > m.inicio ? p : m),
+      undefined,
+    );
   const primeiro = lista[0];
   const valores = notas.rows.filter((n) => n.nota !== null).map((n) => Number(n.nota));
   return {

@@ -8,18 +8,25 @@ const WORKERS = ['gestaodapelada-v2', 'conta', 'workers', 'dev'].join('.');
 
 describe('checagem sem-url-absoluta', () => {
   it('FUN-23: arquivo de código com o domínio do LJS reprova', () => {
-    const p = checarUrls([{ caminho: 'backend/api/src/exemplo.ts', conteudo: `const u = 'https://${LJS}/g';\n` }]);
+    const p = checarUrls([
+      { caminho: 'backend/api/src/exemplo.ts', conteudo: `const u = 'https://${LJS}/g';\n` },
+    ]);
     expect(p).toHaveLength(1);
     expect(p[0]).toMatch(/^backend\/api\/src\/exemplo\.ts:1: cita domínio do LJS/);
   });
 
   it('FUN-23: o domínio do LJS em docs/ passa', () => {
-    expect(checarUrls([{ caminho: 'docs/runbook.md', conteudo: `Abra https://${LJS}\n` }])).toEqual([]);
+    expect(checarUrls([{ caminho: 'docs/runbook.md', conteudo: `Abra https://${LJS}\n` }])).toEqual(
+      [],
+    );
   });
 
   it('FUN-23: o endereço padrão da Cloudflare (workers + .dev) num .ts reprova', () => {
     const p = checarUrls([
-      { caminho: 'frontend/web/src/app/api.ts', conteudo: `// ok\nfetch('https://${WORKERS}/api/health');\n` },
+      {
+        caminho: 'frontend/web/src/app/api.ts',
+        conteudo: `// ok\nfetch('https://${WORKERS}/api/health');\n`,
+      },
     ]);
     expect(p).toHaveLength(1);
     expect(p[0]).toMatch(/^frontend\/web\/src\/app\/api\.ts:2: cita workers/);
@@ -36,8 +43,12 @@ describe('checagem sem-url-absoluta', () => {
   });
 
   it('FUN-23: maiúsculas não escapam', () => {
-    expect(checarUrls([{ caminho: 'a.ts', conteudo: `'https://${LJS.toUpperCase()}'` }])).toHaveLength(1);
-    expect(checarUrls([{ caminho: 'a.ts', conteudo: `'https://${WORKERS.toUpperCase()}'` }])).toHaveLength(1);
+    expect(
+      checarUrls([{ caminho: 'a.ts', conteudo: `'https://${LJS.toUpperCase()}'` }]),
+    ).toHaveLength(1);
+    expect(
+      checarUrls([{ caminho: 'a.ts', conteudo: `'https://${WORKERS.toUpperCase()}'` }]),
+    ).toHaveLength(1);
   });
 
   it('FUN-23: wrangler.jsonc, .env.example e .specs/ são permitidos', () => {

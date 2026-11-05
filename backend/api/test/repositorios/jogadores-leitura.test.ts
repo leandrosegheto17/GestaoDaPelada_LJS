@@ -37,10 +37,20 @@ function contando(db: Db): { db: Db; consultas: () => number } {
 describe('jogadoresLeitura.listar', () => {
   it('GEL-46: cada item traz id, apelido, posição, situação, desde, nível e semNota', async () => {
     const { url, cenario } = aberto;
-    const lista = await comDb(url, cenario.contaC, (db) => jogadoresLeitura.listar(db, cenario.grupoG));
+    const lista = await comDb(url, cenario.contaC, (db) =>
+      jogadoresLeitura.listar(db, cenario.grupoG),
+    );
     expect(lista).toHaveLength(3);
     for (const j of lista) {
-      expect(Object.keys(j).sort()).toEqual(['apelido', 'desde', 'id', 'nivel', 'posicao', 'semNota', 'situacao']);
+      expect(Object.keys(j).sort()).toEqual([
+        'apelido',
+        'desde',
+        'id',
+        'nivel',
+        'posicao',
+        'semNota',
+        'situacao',
+      ]);
     }
     expect(lista.find((j) => j.id === cenario.idsG.jogadorAtivo)).toMatchObject({
       apelido: 'Toninho',
@@ -51,41 +61,64 @@ describe('jogadoresLeitura.listar', () => {
 
   it('GEL-50: jogador com período encerrado sai como inativo desde a data de saída', async () => {
     const { url, cenario } = aberto;
-    const lista = await comDb(url, cenario.contaC, (db) => jogadoresLeitura.listar(db, cenario.grupoG));
-    expect(lista.find((j) => j.id === cenario.idsG.jogadorInativo)).toMatchObject({ situacao: 'inativo', desde: '2025-12-31' });
+    const lista = await comDb(url, cenario.contaC, (db) =>
+      jogadoresLeitura.listar(db, cenario.grupoG),
+    );
+    expect(lista.find((j) => j.id === cenario.idsG.jogadorInativo)).toMatchObject({
+      situacao: 'inativo',
+      desde: '2025-12-31',
+    });
   });
 
   it('GEL-50: quem saiu e voltou é ativo desde o retorno, não desde o primeiro período', async () => {
     const { url, cenario } = aberto;
     const item = await comDb(url, cenario.contaC, async (db) => {
       await sql`INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim)
-                VALUES (${cenario.idsG.jogadorInativo}, ${cenario.grupoG}, '2026-03-01', NULL)`.execute(db);
-      return (await jogadoresLeitura.listar(db, cenario.grupoG)).find((j) => j.id === cenario.idsG.jogadorInativo);
+                VALUES (${cenario.idsG.jogadorInativo}, ${cenario.grupoG}, '2026-03-01', NULL)`.execute(
+        db,
+      );
+      return (await jogadoresLeitura.listar(db, cenario.grupoG)).find(
+        (j) => j.id === cenario.idsG.jogadorInativo,
+      );
     });
     expect(item).toMatchObject({ situacao: 'ativo', desde: '2026-03-01' });
   });
 
   it('GEL-102: jogador sem nota sai com 550 e semNota', async () => {
     const { url, cenario } = aberto;
-    const lista = await comDb(url, cenario.contaC, (db) => jogadoresLeitura.listar(db, cenario.grupoG));
-    expect(lista.find((j) => j.id === cenario.idsG.jogadorAtivo)).toMatchObject({ nivel: 550, semNota: true });
+    const lista = await comDb(url, cenario.contaC, (db) =>
+      jogadoresLeitura.listar(db, cenario.grupoG),
+    );
+    expect(lista.find((j) => j.id === cenario.idsG.jogadorAtivo)).toMatchObject({
+      nivel: 550,
+      semNota: true,
+    });
   });
 
   it('GEL-101: jogador com nota 7 sai com nível 700 e sem semNota', async () => {
     const { url, cenario } = aberto;
-    const lista = await comDb(url, cenario.contaC, (db) => jogadoresLeitura.listar(db, cenario.grupoG));
-    expect(lista.find((j) => j.id === cenario.idsG.jogadorHistorico)).toMatchObject({ nivel: 700, semNota: false });
+    const lista = await comDb(url, cenario.contaC, (db) =>
+      jogadoresLeitura.listar(db, cenario.grupoG),
+    );
+    expect(lista.find((j) => j.id === cenario.idsG.jogadorHistorico)).toMatchObject({
+      nivel: 700,
+      semNota: false,
+    });
   });
 
   it('GEL-47: a lista sai na ordem do apelido sem acento e sem caixa', async () => {
     const { url, cenario } = aberto;
-    const lista = await comDb(url, cenario.contaC, (db) => jogadoresLeitura.listar(db, cenario.grupoG));
+    const lista = await comDb(url, cenario.contaC, (db) =>
+      jogadoresLeitura.listar(db, cenario.grupoG),
+    );
     expect(lista.map((j) => j.apelido)).toEqual(['Bira', 'Toninho', 'Zé Inativo']);
   });
 
   it('GEL-44: o grupo H não traz os jogadores de G', async () => {
     const { url, cenario } = aberto;
-    const lista = await comDb(url, cenario.contaB, (db) => jogadoresLeitura.listar(db, cenario.grupoH));
+    const lista = await comDb(url, cenario.contaB, (db) =>
+      jogadoresLeitura.listar(db, cenario.grupoH),
+    );
     expect(lista.map((j) => j.id)).not.toContain(cenario.idsG.jogadorAtivo);
   });
 
@@ -115,23 +148,47 @@ describe('jogadoresLeitura.listar', () => {
 describe('jogadoresLeitura.ler', () => {
   it('GEL-46: a ficha traz os períodos, as notas por habilidade e os dados do jogador', async () => {
     const { url, cenario } = aberto;
-    const ficha = await comDb(url, cenario.contaC, (db) => jogadoresLeitura.ler(db, cenario.grupoG, cenario.idsG.jogadorHistorico));
-    expect(ficha).toMatchObject({ id: cenario.idsG.jogadorHistorico, apelido: 'Bira', situacao: 'ativo', nivel: 700 });
+    const ficha = await comDb(url, cenario.contaC, (db) =>
+      jogadoresLeitura.ler(db, cenario.grupoG, cenario.idsG.jogadorHistorico),
+    );
+    expect(ficha).toMatchObject({
+      id: cenario.idsG.jogadorHistorico,
+      apelido: 'Bira',
+      situacao: 'ativo',
+      nivel: 700,
+    });
     expect(ficha?.periodos).toEqual([expect.objectContaining({ inicio: '2026-01-01', fim: null })]);
     expect(ficha?.notas).toHaveLength(6);
-    expect(ficha?.notas[0]).toMatchObject({ habilidadeId: cenario.idsG.habilidade, habilidade: 'Visão de Jogo', nota: 7 });
+    expect(ficha?.notas[0]).toMatchObject({
+      habilidadeId: cenario.idsG.habilidade,
+      habilidade: 'Visão de Jogo',
+      nota: 7,
+    });
     expect(ficha?.notas.slice(1).every((n) => n.nota === null)).toBe(true);
   });
 
   it('GEL-50: a ficha do inativo diz inativo desde a saída, com o período encerrado', async () => {
     const { url, cenario } = aberto;
-    const ficha = await comDb(url, cenario.contaC, (db) => jogadoresLeitura.ler(db, cenario.grupoG, cenario.idsG.jogadorInativo));
-    expect(ficha).toMatchObject({ situacao: 'inativo', desde: '2025-12-31', semNota: true, nivel: 550 });
-    expect(ficha?.periodos).toEqual([expect.objectContaining({ inicio: '2025-03-01', fim: '2025-12-31' })]);
+    const ficha = await comDb(url, cenario.contaC, (db) =>
+      jogadoresLeitura.ler(db, cenario.grupoG, cenario.idsG.jogadorInativo),
+    );
+    expect(ficha).toMatchObject({
+      situacao: 'inativo',
+      desde: '2025-12-31',
+      semNota: true,
+      nivel: 550,
+    });
+    expect(ficha?.periodos).toEqual([
+      expect.objectContaining({ inicio: '2025-03-01', fim: '2025-12-31' }),
+    ]);
   });
 
   it('GEL-44: jogador de G pedido pelo grupo H é nulo', async () => {
     const { url, cenario } = aberto;
-    expect(await comDb(url, cenario.contaB, (db) => jogadoresLeitura.ler(db, cenario.grupoH, cenario.idsG.jogadorAtivo))).toBeNull();
+    expect(
+      await comDb(url, cenario.contaB, (db) =>
+        jogadoresLeitura.ler(db, cenario.grupoH, cenario.idsG.jogadorAtivo),
+      ),
+    ).toBeNull();
   });
 });

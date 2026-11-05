@@ -110,7 +110,10 @@ export const contagemPartida = z.strictObject({
 });
 export type ContagemPartida = z.infer<typeof contagemPartida>;
 
-export const navegacaoMes = z.strictObject({ mesAnterior: mesResposta.nullable(), mesSeguinte: mesResposta.nullable() });
+export const navegacaoMes = z.strictObject({
+  mesAnterior: mesResposta.nullable(),
+  mesSeguinte: mesResposta.nullable(),
+});
 export type NavegacaoMes = z.infer<typeof navegacaoMes>;
 
 /** `GET …/partidas?mes`: as partidas do mês, da mais recente para a mais antiga (PAR-37, PAR-41). */
@@ -118,6 +121,8 @@ export const partidasDoMes = z.strictObject({
   mes: mesResposta,
   hoje: dataTexto,
   navegacao: navegacaoMes,
-  partidas: z.array(z.strictObject({ data: dataTexto, choveu: z.boolean(), contagem: contagemPartida })),
+  partidas: z.array(
+    z.strictObject({ data: dataTexto, choveu: z.boolean(), contagem: contagemPartida }),
+  ),
 });
 export type PartidasDoMes = z.infer<typeof partidasDoMes>;

@@ -113,13 +113,18 @@ function medir({ titulares, entram }: TimeIdx, e: ElencoDois): Medidas {
  * [LACUNA] A spec só diz que o time sem ninguém com ano tem idade média nula (SIM-95); não diz como comparar um time
  * nulo com outro que tem idade. Vale 0 (critério ignorado), a leitura que não favorece nenhum dos dois.
  */
-export function chaveDoisTimes(times: readonly [TimeIdx, TimeIdx], n: number, e: ElencoDois): ChaveDois {
+export function chaveDoisTimes(
+  times: readonly [TimeIdx, TimeIdx],
+  n: number,
+  e: ElencoDois,
+): ChaveDois {
   const a = medir(times[0], e);
   const b = medir(times[1], e);
   const foraDeN = Number(a.titulares !== n) + Number(b.titulares !== n);
   const excessoSubs = Math.max(0, Math.abs(a.substituicoes - b.substituicoes) - 1);
   const difNivel = Math.abs(a.nivel1 - b.nivel1) + Math.abs(a.nivel2 - b.nivel2);
-  const difIdade = a.idadeMedia === null || b.idadeMedia === null ? 0 : Math.abs(a.idadeMedia - b.idadeMedia);
+  const difIdade =
+    a.idadeMedia === null || b.idadeMedia === null ? 0 : Math.abs(a.idadeMedia - b.idadeMedia);
   return [foraDeN, excessoSubs, difNivel, difIdade];
 }
 

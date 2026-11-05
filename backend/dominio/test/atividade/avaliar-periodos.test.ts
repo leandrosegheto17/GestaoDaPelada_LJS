@@ -23,8 +23,19 @@ import type { Periodo } from '../../src/atividade/datas.ts';
 
 const HOJE = '2026-10-15';
 
-function entrada(periodos: Periodo[], operacao: EntradaAvaliacao['operacao'], extra: Partial<EntradaAvaliacao> = {}): EntradaAvaliacao {
-  return { periodos, operacao, presencas: [], inicioPontuacao: periodos[0]?.inicio ?? null, hoje: HOJE, ...extra };
+function entrada(
+  periodos: Periodo[],
+  operacao: EntradaAvaliacao['operacao'],
+  extra: Partial<EntradaAvaliacao> = {},
+): EntradaAvaliacao {
+  return {
+    periodos,
+    operacao,
+    presencas: [],
+    inicioPontuacao: periodos[0]?.inicio ?? null,
+    hoje: HOJE,
+    ...extra,
+  };
 }
 
 const ABERTO: Periodo[] = [{ id: 'p1', inicio: '2026-03-01', fim: null }];
@@ -47,7 +58,9 @@ describe('GEL-58: inativar e reativar válidos', () => {
   });
 
   it('GEL-58: reativar abre um período novo no fim', () => {
-    expect(avaliarPeriodos(entrada(ENCERRADOS, { tipo: 'reativar', retorno: '2026-09-01' }))).toEqual({
+    expect(
+      avaliarPeriodos(entrada(ENCERRADOS, { tipo: 'reativar', retorno: '2026-09-01' })),
+    ).toEqual({
       ok: true,
       periodos: [...ENCERRADOS, { inicio: '2026-09-01', fim: null }],
       alterado: true,
@@ -55,7 +68,9 @@ describe('GEL-58: inativar e reativar válidos', () => {
   });
 
   it('GEL-58: reativar antes da saída anterior falha pela regra de ordem', () => {
-    expect(avaliarPeriodos(entrada(ENCERRADOS, { tipo: 'reativar', retorno: '2026-08-31' }))).toMatchObject({
+    expect(
+      avaliarPeriodos(entrada(ENCERRADOS, { tipo: 'reativar', retorno: '2026-08-31' })),
+    ).toMatchObject({
       ok: false,
       regra: 'retorno-antes-da-saida-anterior',
       campo: 'retorno',
@@ -63,11 +78,15 @@ describe('GEL-58: inativar e reativar válidos', () => {
   });
 
   it('GEL-58: inativar sem período aberto é erro de uso', () => {
-    expect(() => avaliarPeriodos(entrada(ENCERRADOS, { tipo: 'inativar', saida: '2026-10-01' }))).toThrow(EstadoDePeriodoInvalido);
+    expect(() =>
+      avaliarPeriodos(entrada(ENCERRADOS, { tipo: 'inativar', saida: '2026-10-01' })),
+    ).toThrow(EstadoDePeriodoInvalido);
   });
 
   it('GEL-58: reativar com período aberto é erro de uso', () => {
-    expect(() => avaliarPeriodos(entrada(DOIS, { tipo: 'reativar', retorno: '2026-10-01' }))).toThrow(EstadoDePeriodoInvalido);
+    expect(() =>
+      avaliarPeriodos(entrada(DOIS, { tipo: 'reativar', retorno: '2026-10-01' })),
+    ).toThrow(EstadoDePeriodoInvalido);
   });
 });
 
@@ -75,30 +94,40 @@ describe('GEL-62: só a primeira falha, na ordem da spec', () => {
   it('GEL-62: data futura e sobreposição juntas devolvem só a de data futura', () => {
     // Retorno em 2026-10-20 é futuro e, se valesse, ficaria antes da saída anterior.
     const periodos: Periodo[] = [{ id: 'p1', inicio: '2026-03-01', fim: '2026-12-01' }];
-    expect(avaliarPeriodos(entrada(periodos, { tipo: 'reativar', retorno: '2026-10-20' }))).toEqual({
-      ok: false,
-      regra: 'futuro',
-      mensagem: 'A data não pode ser no futuro.',
-      campo: 'retorno',
-    });
+    expect(avaliarPeriodos(entrada(periodos, { tipo: 'reativar', retorno: '2026-10-20' }))).toEqual(
+      {
+        ok: false,
+        regra: 'futuro',
+        mensagem: 'A data não pode ser no futuro.',
+        campo: 'retorno',
+      },
+    );
   });
 
   it('GEL-62: data inválida vem antes de campo não corrigível', () => {
-    expect(avaliarPeriodos(entrada(DOIS, { tipo: 'corrigir', periodoId: 'p2', saida: '2026-02-30' }))).toMatchObject({
+    expect(
+      avaliarPeriodos(entrada(DOIS, { tipo: 'corrigir', periodoId: 'p2', saida: '2026-02-30' })),
+    ).toMatchObject({
       regra: 'data-invalida',
       mensagem: 'Informe uma data válida.',
     });
   });
 
   it('GEL-62: campo não corrigível vem antes de data futura', () => {
-    expect(avaliarPeriodos(entrada(DOIS, { tipo: 'corrigir', periodoId: 'p2', saida: '2026-12-01' }))).toMatchObject({
+    expect(
+      avaliarPeriodos(entrada(DOIS, { tipo: 'corrigir', periodoId: 'p2', saida: '2026-12-01' })),
+    ).toMatchObject({
       regra: 'nao-corrigivel',
     });
   });
 
   it('GEL-62: ordem vem antes de presença', () => {
     const r = avaliarPeriodos(
-      entrada(DOIS, { tipo: 'corrigir', periodoId: 'p1', saida: '2026-02-20' }, { presencas: [{ data: '2026-05-01', situacao: 'presente' }] }),
+      entrada(
+        DOIS,
+        { tipo: 'corrigir', periodoId: 'p1', saida: '2026-02-20' },
+        { presencas: [{ data: '2026-05-01', situacao: 'presente' }] },
+      ),
     );
     expect(r).toMatchObject({ regra: 'saida-antes-do-inicio' });
   });
@@ -108,7 +137,10 @@ describe('GEL-62: só a primeira falha, na ordem da spec', () => {
       entrada(
         DOIS,
         { tipo: 'corrigir', periodoId: 'p1', saida: '2026-03-05' },
-        { presencas: [{ data: '2026-05-01', situacao: 'presente' }], inicioPontuacao: '2026-04-01' },
+        {
+          presencas: [{ data: '2026-05-01', situacao: 'presente' }],
+          inicioPontuacao: '2026-04-01',
+        },
       ),
     );
     expect(r).toMatchObject({ regra: 'presenca' });
@@ -117,7 +149,9 @@ describe('GEL-62: só a primeira falha, na ordem da spec', () => {
 
 describe('GEL-72, GEL-73: campo não corrigível', () => {
   it('GEL-72: corrigir a saída de período aberto dá "Este período não tem data de saída."', () => {
-    expect(avaliarPeriodos(entrada(DOIS, { tipo: 'corrigir', periodoId: 'p2', saida: '2026-10-01' }))).toEqual({
+    expect(
+      avaliarPeriodos(entrada(DOIS, { tipo: 'corrigir', periodoId: 'p2', saida: '2026-10-01' })),
+    ).toEqual({
       ok: false,
       regra: 'nao-corrigivel',
       mensagem: 'Este período não tem data de saída.',
@@ -127,10 +161,13 @@ describe('GEL-72, GEL-73: campo não corrigível', () => {
   });
 
   it('GEL-73: corrigir o início do primeiro período dá a mensagem de Alterar data de início', () => {
-    expect(avaliarPeriodos(entrada(DOIS, { tipo: 'corrigir', periodoId: 'p1', retorno: '2026-02-01' }))).toEqual({
+    expect(
+      avaliarPeriodos(entrada(DOIS, { tipo: 'corrigir', periodoId: 'p1', retorno: '2026-02-01' })),
+    ).toEqual({
       ok: false,
       regra: 'nao-corrigivel',
-      mensagem: 'O início do primeiro período é a data de início da pontuação; use Alterar data de início.',
+      mensagem:
+        'O início do primeiro período é a data de início da pontuação; use Alterar data de início.',
       campo: 'retorno',
     });
     expect(MENSAGEM_INICIO_DO_PRIMEIRO).toBe(
@@ -142,7 +179,13 @@ describe('GEL-72, GEL-73: campo não corrigível', () => {
 describe('GEL-69: saída do primeiro período antes do início da pontuação', () => {
   it('GEL-69: mensagem exata, com a data de início da pontuação', () => {
     expect(
-      avaliarPeriodos(entrada(DOIS, { tipo: 'corrigir', periodoId: 'p1', saida: '2026-03-20' }, { inicioPontuacao: '2026-04-01' })),
+      avaliarPeriodos(
+        entrada(
+          DOIS,
+          { tipo: 'corrigir', periodoId: 'p1', saida: '2026-03-20' },
+          { inicioPontuacao: '2026-04-01' },
+        ),
+      ),
     ).toEqual({
       ok: false,
       regra: 'antes-do-inicio-da-pontuacao',
@@ -154,13 +197,25 @@ describe('GEL-69: saída do primeiro período antes do início da pontuação', 
 
   it('GEL-69: saída no dia do início da pontuação vale', () => {
     expect(
-      avaliarPeriodos(entrada(DOIS, { tipo: 'corrigir', periodoId: 'p1', saida: '2026-04-01' }, { inicioPontuacao: '2026-04-01' })),
+      avaliarPeriodos(
+        entrada(
+          DOIS,
+          { tipo: 'corrigir', periodoId: 'p1', saida: '2026-04-01' },
+          { inicioPontuacao: '2026-04-01' },
+        ),
+      ),
     ).toMatchObject({ ok: true, alterado: true });
   });
 
   it('GEL-69: inativar no primeiro período antes do início da pontuação também falha', () => {
     expect(
-      avaliarPeriodos(entrada(ABERTO, { tipo: 'inativar', saida: '2026-03-10' }, { inicioPontuacao: '2026-04-01' })),
+      avaliarPeriodos(
+        entrada(
+          ABERTO,
+          { tipo: 'inativar', saida: '2026-03-10' },
+          { inicioPontuacao: '2026-04-01' },
+        ),
+      ),
     ).toMatchObject({ regra: 'antes-do-inicio-da-pontuacao' });
   });
 });
@@ -168,13 +223,27 @@ describe('GEL-69: saída do primeiro período antes do início da pontuação', 
 describe('GEL-74: corrigir com as datas atuais', () => {
   it('GEL-74: saída e retorno iguais aos atuais devolvem alterado false', () => {
     expect(
-      avaliarPeriodos(entrada(ENCERRADOS, { tipo: 'corrigir', periodoId: 'p2', saida: '2026-09-01', retorno: '2026-06-10' })),
+      avaliarPeriodos(
+        entrada(ENCERRADOS, {
+          tipo: 'corrigir',
+          periodoId: 'p2',
+          saida: '2026-09-01',
+          retorno: '2026-06-10',
+        }),
+      ),
     ).toEqual({ ok: true, periodos: ENCERRADOS, alterado: false });
   });
 
   it('GEL-71: corrigir saída e retorno do segundo período grava as duas', () => {
     expect(
-      avaliarPeriodos(entrada(ENCERRADOS, { tipo: 'corrigir', periodoId: 'p2', saida: '2026-08-20', retorno: '2026-06-05' })),
+      avaliarPeriodos(
+        entrada(ENCERRADOS, {
+          tipo: 'corrigir',
+          periodoId: 'p2',
+          saida: '2026-08-20',
+          retorno: '2026-06-05',
+        }),
+      ),
     ).toEqual({
       ok: true,
       periodos: [ENCERRADOS[0], { id: 'p2', inicio: '2026-06-05', fim: '2026-08-20' }],

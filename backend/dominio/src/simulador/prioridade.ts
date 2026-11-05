@@ -26,7 +26,11 @@ export interface HistoricoSim {
 }
 
 /** Acumulado de cada apto até a véspera da data (SIM-17: a partida da própria data não conta). */
-export function acumuladosNaVespera(aptos: readonly Apto[], historico: HistoricoSim, data: Data): Map<string, number> {
+export function acumuladosNaVespera(
+  aptos: readonly Apto[],
+  historico: HistoricoSim,
+  data: Data,
+): Map<string, number> {
   const referencia = vespera(data);
   const resolver = criarResolvedorDePesos(historico.configsPesos);
   const presencas = agruparPresencasPorJogador(historico.partidas, historico.presencas);
@@ -54,7 +58,11 @@ export function acumuladosNaVespera(aptos: readonly Apto[], historico: Historico
  * Os aptos na ordem de prioridade. A ordem da entrada não influi (SIM-49): o último desempate é o id. Sem partida
  * anterior, o acumulado é a pontuação inicial de cada um e decidem os desempates (SIM-18).
  */
-export function ordemDePrioridade<A extends Apto>(aptos: readonly A[], historico: HistoricoSim, data: Data): A[] {
+export function ordemDePrioridade<A extends Apto>(
+  aptos: readonly A[],
+  historico: HistoricoSim,
+  data: Data,
+): A[] {
   const acumulados = acumuladosNaVespera(aptos, historico, data);
   const ano = (a: A): number => a.anoNascimento ?? Number.MAX_SAFE_INTEGER;
   return [...aptos].sort((a, b) => {

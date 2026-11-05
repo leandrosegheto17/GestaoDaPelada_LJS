@@ -21,7 +21,8 @@ export const CHAVE_SESSAO = ['sessao'] as const;
 export const PARAMETRO_VOLTA = 'volta';
 export const DESTINO_PADRAO = '/app';
 
-export type EstadoSessao = { tipo: 'ativa'; sessao: SessaoEu } | { tipo: 'ausente' } | { tipo: 'expirada' };
+export type EstadoSessao =
+  { tipo: 'ativa'; sessao: SessaoEu } | { tipo: 'ausente' } | { tipo: 'expirada' };
 
 export function useSessao() {
   const api = useCliente();
@@ -29,7 +30,9 @@ export function useSessao() {
     queryKey: CHAVE_SESSAO,
     queryFn: async () => {
       try {
-        const sessao = await api.requisitar<SessaoEu>('GET', '/api/sessao', undefined, { semTratarExpiracao: true });
+        const sessao = await api.requisitar<SessaoEu>('GET', '/api/sessao', undefined, {
+          semTratarExpiracao: true,
+        });
         return { tipo: 'ativa', sessao };
       } catch (erro) {
         if (erro instanceof ErroApi && erro.status === 401) {
@@ -66,10 +69,21 @@ export function GuardaApp() {
   const local = useLocation();
   if (isPending) return <EsqueletoLista />;
   if (isError || !data) {
-    return <EstadoErro formato="tela" titulo="Não foi possível carregar" aoTentarDeNovo={() => void refetch()} />;
+    return (
+      <EstadoErro
+        formato="tela"
+        titulo="Não foi possível carregar"
+        aoTentarDeNovo={() => void refetch()}
+      />
+    );
   }
   if (data.tipo !== 'ativa') {
-    return <Navigate to={paraEntrar(`${local.pathname}${local.search}`, data.tipo === 'expirada')} replace />;
+    return (
+      <Navigate
+        to={paraEntrar(`${local.pathname}${local.search}`, data.tipo === 'expirada')}
+        replace
+      />
+    );
   }
   return <Outlet />;
 }
@@ -77,7 +91,8 @@ export function GuardaApp() {
 export function GuardaPublica() {
   const { data } = useSessao();
   const [parametros] = useSearchParams();
-  if (data?.tipo === 'ativa') return <Navigate to={destinoSeguro(parametros.get(PARAMETRO_VOLTA))} replace />;
+  if (data?.tipo === 'ativa')
+    return <Navigate to={destinoSeguro(parametros.get(PARAMETRO_VOLTA))} replace />;
   // Carregando ou com erro, a tela pública aparece: ela funciona sem sessão.
   return <Outlet />;
 }

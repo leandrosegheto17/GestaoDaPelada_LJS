@@ -17,7 +17,11 @@ const rotas = () => [
 ];
 
 function abrir(api: Record<string, Manipulador>) {
-  return abrirTela('/app/grupos/g-quinta/jogadores/novo', { 'GET /api/sessao': () => json(200, SESSAO_ANA), ...api }, rotas);
+  return abrirTela(
+    '/app/grupos/g-quinta/jogadores/novo',
+    { 'GET /api/sessao': () => json(200, SESSAO_ANA), ...api },
+    rotas,
+  );
 }
 
 function erro422(mensagens: Record<string, string>): Response {
@@ -55,11 +59,37 @@ describe('hojeEmSaoPaulo e máscara do telefone', () => {
 
   it('o corpo leva telefone vazio como null, ano numérico, e omite pontuação vazia', () => {
     expect(
-      corpoDoJogador({ apelido: 'Zé', anoNascimento: '1990', posicao: 'meia', telefone: '', dataEntrada: '2026-11-01', pontuacaoInicial: '' }),
-    ).toEqual({ apelido: 'Zé', anoNascimento: 1990, posicao: 'meia', telefone: null, dataEntrada: '2026-11-01' });
+      corpoDoJogador({
+        apelido: 'Zé',
+        anoNascimento: '1990',
+        posicao: 'meia',
+        telefone: '',
+        dataEntrada: '2026-11-01',
+        pontuacaoInicial: '',
+      }),
+    ).toEqual({
+      apelido: 'Zé',
+      anoNascimento: 1990,
+      posicao: 'meia',
+      telefone: null,
+      dataEntrada: '2026-11-01',
+    });
     expect(
-      corpoDoJogador({ apelido: 'Zé', anoNascimento: '', posicao: '', telefone: '(11) 9', dataEntrada: '', pontuacaoInicial: '12' }),
-    ).toEqual({ apelido: 'Zé', anoNascimento: null, posicao: '', telefone: '(11) 9', pontuacaoInicial: 12 });
+      corpoDoJogador({
+        apelido: 'Zé',
+        anoNascimento: '',
+        posicao: '',
+        telefone: '(11) 9',
+        dataEntrada: '',
+        pontuacaoInicial: '12',
+      }),
+    ).toEqual({
+      apelido: 'Zé',
+      anoNascimento: null,
+      posicao: '',
+      telefone: '(11) 9',
+      pontuacaoInicial: 12,
+    });
   });
 });
 
@@ -67,13 +97,19 @@ describe('tela Novo jogador (t16)', () => {
   it('GEL-114: formulário com data de entrada hoje (sem futuro) e pontuação 0; axe sem violação', async () => {
     const { container } = abrir({});
     expect(await screen.findByRole('heading', { level: 1, name: 'Novo jogador' })).toBeTruthy();
-    expect(screen.getByRole('link', { name: 'Jogadores' }).getAttribute('href')).toBe('/app/grupos/g-quinta/jogadores');
+    expect(screen.getByRole('link', { name: 'Jogadores' }).getAttribute('href')).toBe(
+      '/app/grupos/g-quinta/jogadores',
+    );
     expect(screen.getByText(AJUDA_APELIDO)).toBeTruthy();
     const entrada = screen.getByLabelText('Data de entrada') as HTMLInputElement;
     expect(entrada.value).toBe(hojeEmSaoPaulo());
     expect(entrada.max).toBe(hojeEmSaoPaulo());
     expect((screen.getByLabelText('Pontuação inicial') as HTMLInputElement).value).toBe('0');
-    expect(Array.from((screen.getByLabelText('Posição') as HTMLSelectElement).options).map((o) => o.textContent)).toEqual([
+    expect(
+      Array.from((screen.getByLabelText('Posição') as HTMLSelectElement).options).map(
+        (o) => o.textContent,
+      ),
+    ).toEqual([
       'Escolha',
       'Zagueiro',
       'Lateral',
@@ -92,7 +128,9 @@ describe('tela Novo jogador (t16)', () => {
     });
     await screen.findByRole('heading', { level: 1, name: 'Novo jogador' });
     preencher();
-    fireEvent.change(screen.getByLabelText('Telefone (opcional)'), { target: { value: '11987654321' } });
+    fireEvent.change(screen.getByLabelText('Telefone (opcional)'), {
+      target: { value: '11987654321' },
+    });
     fireEvent.click(screen.getByRole('button', { name: 'Salvar' }));
     await waitFor(() => expect(local()).toBe('/app/grupos/g-quinta/jogadores/j-novo'));
     expect(chamadasA('POST', '/api/grupos/g-quinta/jogadores').map((c) => c.corpo)).toEqual([
@@ -121,15 +159,27 @@ describe('tela Novo jogador (t16)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Salvar' }));
     const resumo = await screen.findByRole('alert');
     expect(within(resumo).getByText('Corrija 3 campos:')).toBeTruthy();
-    expect(within(resumo).getAllByRole('link').map((a) => [a.textContent, a.getAttribute('href')])).toEqual([
+    expect(
+      within(resumo)
+        .getAllByRole('link')
+        .map((a) => [a.textContent, a.getAttribute('href')]),
+    ).toEqual([
       ['Apelido', '#apelido'],
       ['Telefone (opcional)', '#tel'],
       ['Data de entrada', '#entrada'],
     ]);
-    expect(document.getElementById('apelido-erro')?.textContent).toBe('O apelido precisa ter de 2 a 30 caracteres.');
-    expect(screen.getByLabelText('Apelido').getAttribute('aria-describedby')).toBe('apelido-ajuda apelido-erro');
-    expect(document.getElementById('entrada-erro')?.textContent).toBe('A data não pode ser no futuro.');
-    expect(document.getElementById('tel-erro')?.textContent).toBe('Informe o telefone como (DD) 9XXXX-XXXX.');
+    expect(document.getElementById('apelido-erro')?.textContent).toBe(
+      'O apelido precisa ter de 2 a 30 caracteres.',
+    );
+    expect(screen.getByLabelText('Apelido').getAttribute('aria-describedby')).toBe(
+      'apelido-ajuda apelido-erro',
+    );
+    expect(document.getElementById('entrada-erro')?.textContent).toBe(
+      'A data não pode ser no futuro.',
+    );
+    expect(document.getElementById('tel-erro')?.textContent).toBe(
+      'Informe o telefone como (DD) 9XXXX-XXXX.',
+    );
     expect(screen.getByLabelText('Ano de nascimento').getAttribute('aria-invalid')).toBeNull();
     await esperarSemViolacoes(container);
   });
@@ -146,7 +196,13 @@ describe('tela Novo jogador (t16)', () => {
     preencher();
     fireEvent.click(screen.getByRole('button', { name: 'Salvar' }));
     const resumo = await screen.findByRole('alert');
-    expect(within(resumo).getAllByRole('link').map((a) => a.textContent)).toEqual(['Apelido', 'Ano de nascimento']);
-    expect(document.getElementById('ano-erro')?.textContent).toBe('O ano precisa estar entre 1940 e 2016.');
+    expect(
+      within(resumo)
+        .getAllByRole('link')
+        .map((a) => a.textContent),
+    ).toEqual(['Apelido', 'Ano de nascimento']);
+    expect(document.getElementById('ano-erro')?.textContent).toBe(
+      'O ano precisa estar entre 1940 e 2016.',
+    );
   });
 });

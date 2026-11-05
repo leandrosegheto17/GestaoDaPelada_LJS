@@ -55,14 +55,17 @@ function inicialDo(dados: MesFinanceiroResposta): FormularioConfig {
   const { config } = dados;
   if (config === null) return { mensalidade: '', saldo: '', data: dados.hoje };
   return {
-    mensalidade: config.mensalidadeCentavos === null ? '' : reaisParaCampo(config.mensalidadeCentavos),
+    mensalidade:
+      config.mensalidadeCentavos === null ? '' : reaisParaCampo(config.mensalidadeCentavos),
     saldo: reaisParaCampo(config.saldoInicialCentavos),
     data: config.dataSaldoInicial,
   };
 }
 
 /** O formulário em corpo do `PUT`, ou os erros de cada campo em reais (FIN-48). */
-export function corpoDaConfig(dados: FormularioConfig): { ok: true; corpo: ConfigFinanceiraCorpo } | { ok: false; erros: ErrosConfig } {
+export function corpoDaConfig(
+  dados: FormularioConfig,
+): { ok: true; corpo: ConfigFinanceiraCorpo } | { ok: false; erros: ErrosConfig } {
   const erros: ErrosConfig = {};
   let mensalidadeCentavos: number | null = null;
   if (dados.mensalidade.trim() !== '') {
@@ -73,10 +76,25 @@ export function corpoDaConfig(dados: FormularioConfig): { ok: true; corpo: Confi
   const saldo = lerReais(dados.saldo);
   if (!saldo.ok) erros.saldoInicialCentavos = saldo.mensagem;
   if (!saldo.ok || Object.keys(erros).length > 0) return { ok: false, erros };
-  return { ok: true, corpo: { mensalidadeCentavos, saldoInicialCentavos: saldo.centavos, dataSaldoInicial: dados.data } };
+  return {
+    ok: true,
+    corpo: {
+      mensalidadeCentavos,
+      saldoInicialCentavos: saldo.centavos,
+      dataSaldoInicial: dados.data,
+    },
+  };
 }
 
-function Formulario({ grupoId, inicial, hoje }: { grupoId: string; inicial: FormularioConfig; hoje: string }) {
+function Formulario({
+  grupoId,
+  inicial,
+  hoje,
+}: {
+  grupoId: string;
+  inicial: FormularioConfig;
+  hoje: string;
+}) {
   const navegar = useNavigate();
   const salvar = useSalvarConfig(grupoId);
   const [dados, setDados] = useState<FormularioConfig>(inicial);
@@ -112,7 +130,12 @@ function Formulario({ grupoId, inicial, hoje }: { grupoId: string; inicial: Form
   }
 
   return (
-    <form className={estilos.formulario} noValidate aria-busy={salvar.isPending || undefined} onSubmit={enviar}>
+    <form
+      className={estilos.formulario}
+      noValidate
+      aria-busy={salvar.isPending || undefined}
+      onSubmit={enviar}
+    >
       {doServidor ? <ResumoErros erros={resumoDosErros(erros, CAMPOS)} /> : null}
       {falha ? <Faixa tipo="erro">{falha}</Faixa> : null}
       <Campo
@@ -164,7 +187,8 @@ export function ConfigCaixa() {
     if (mes.isPending) return <EsqueletoLista linhas={3} />;
     if (mes.isError) {
       const erro = erroDoFinanceiro(mes.error);
-      if (erro.codigo === 'sem_permissao_financeiro') return <Faixa tipo="erro">{erro.mensagem}</Faixa>;
+      if (erro.codigo === 'sem_permissao_financeiro')
+        return <Faixa tipo="erro">{erro.mensagem}</Faixa>;
       if (erro.status === 404) return <Faixa tipo="atencao">Grupo não encontrado.</Faixa>;
       return <EstadoErro aoTentarDeNovo={() => void mes.refetch()} />;
     }
@@ -172,7 +196,11 @@ export function ConfigCaixa() {
   }
 
   return (
-    <Casca grupo={{ nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' }} estreita ocupada={mes.isPending}>
+    <Casca
+      grupo={{ nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' }}
+      estreita
+      ocupada={mes.isPending}
+    >
       <LinkVoltar para={`${rotaDoGrupo(grupoId)}/financeiro`}>Financeiro</LinkVoltar>
       <h1 className={estilos['titulo-pagina']}>Configurar caixa</h1>
       {conteudo()}

@@ -50,12 +50,10 @@ async function novoJogador(apelido: string, faixas: Faixa[] = PADRAO): Promise<s
   const id = r.rows[0]!.id;
   jogadoresCriados.push(id);
   for (const [inicio, fim] of faixas) {
-    await db.query('INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, $3, $4)', [
-      id,
-      cenario.grupoG,
-      inicio,
-      fim,
-    ]);
+    await db.query(
+      'INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, $3, $4)',
+      [id, cenario.grupoG, inicio, fim],
+    );
   }
   return id;
 }
@@ -85,7 +83,9 @@ async function alteracoes(id: string) {
 }
 
 function alterarComo(conta: string, grupo: string, id: string, data: string) {
-  return comDb(aberto.url, conta, (db) => jogadores.alterarInicio(db, grupo, id, { data }, HOJE), { confirmar: true });
+  return comDb(aberto.url, conta, (db) => jogadores.alterarInicio(db, grupo, id, { data }, HOJE), {
+    confirmar: true,
+  });
 }
 
 describe('jogadores.alterarInicio', () => {
@@ -104,7 +104,12 @@ describe('jogadores.alterarInicio', () => {
     expect(a[0]?.resumo).toMatchObject({ anterior: '2026-02-05', nova: '2026-02-01' });
     // T35 da partidas-e-ranking (PAR-122): a auditoria passa a levar acumulado e posição antes e depois.
     expect(Object.keys(a[0]?.resumo ?? {})).toEqual(
-      expect.arrayContaining(['acumuladoAntes', 'acumuladoDepois', 'posicaoAntes', 'posicaoDepois']),
+      expect.arrayContaining([
+        'acumuladoAntes',
+        'acumuladoDepois',
+        'posicaoAntes',
+        'posicaoDepois',
+      ]),
     );
   });
 
@@ -151,11 +156,15 @@ describe('jogadores.alterarInicio', () => {
 
   it('GEL-78, GEL-79: antes do piso e no futuro são recusados', async () => {
     const id = await novoJogador('Fora dos Limites');
-    expect(await alterarComo(aberto.cenario.contaC, aberto.cenario.grupoG, id, '1999-12-31')).toMatchObject({
+    expect(
+      await alterarComo(aberto.cenario.contaC, aberto.cenario.grupoG, id, '1999-12-31'),
+    ).toMatchObject({
       resultado: 'invalido',
       regra: 'antes-do-piso',
     });
-    expect(await alterarComo(aberto.cenario.contaC, aberto.cenario.grupoG, id, '2026-11-06')).toMatchObject({
+    expect(
+      await alterarComo(aberto.cenario.contaC, aberto.cenario.grupoG, id, '2026-11-06'),
+    ).toMatchObject({
       resultado: 'invalido',
       regra: 'futuro',
     });
@@ -183,9 +192,9 @@ describe('jogadores.alterarInicio', () => {
     await aberto.db.query(
       'CREATE TRIGGER falha_teste_gel109_inicio BEFORE INSERT ON auditoria FOR EACH ROW EXECUTE FUNCTION falha_teste_gel109_inicio()',
     );
-    await expect(alterarComo(aberto.cenario.contaC, aberto.cenario.grupoG, id, '2026-02-01')).rejects.toThrow(
-      'falha forçada',
-    );
+    await expect(
+      alterarComo(aberto.cenario.contaC, aberto.cenario.grupoG, id, '2026-02-01'),
+    ).rejects.toThrow('falha forçada');
     expect(await inicio(id)).toBe('2026-02-05');
     expect((await periodos(id))[0]).toEqual({ inicio: '2026-02-05', fim: '2026-06-30' });
   });

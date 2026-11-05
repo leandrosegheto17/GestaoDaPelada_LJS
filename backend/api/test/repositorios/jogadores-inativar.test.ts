@@ -36,7 +36,11 @@ afterEach(async () => {
   await db.query('DROP FUNCTION IF EXISTS falha_teste_gel109()');
 });
 
-async function novoJogador(apelido: string, inicio = '2026-09-01', fim: string | null = null): Promise<string> {
+async function novoJogador(
+  apelido: string,
+  inicio = '2026-09-01',
+  fim: string | null = null,
+): Promise<string> {
   const { db, cenario } = aberto;
   const r = await db.query<{ id: string }>(
     `INSERT INTO jogadores (grupo_id, apelido, ano_nascimento, posicao, pontuacao_inicial, inicio_pontuacao, criado_por,
@@ -45,12 +49,10 @@ async function novoJogador(apelido: string, inicio = '2026-09-01', fim: string |
     [cenario.grupoG, apelido, inicio, cenario.contaC],
   );
   const id = r.rows[0]!.id;
-  await db.query('INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, $3, $4)', [
-    id,
-    cenario.grupoG,
-    inicio,
-    fim,
-  ]);
+  await db.query(
+    'INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, $3, $4)',
+    [id, cenario.grupoG, inicio, fim],
+  );
   jogadoresCriados.push(id);
   return id;
 }
@@ -63,12 +65,10 @@ async function presencaEm(jogador: string, data: string, situacao = 'presente'):
     [cenario.grupoG, data, cenario.contaC],
   );
   partidasCriadas.push(p.rows[0]!.id);
-  await db.query('INSERT INTO presencas (partida_id, jogador_id, grupo_id, situacao) VALUES ($1, $2, $3, $4)', [
-    p.rows[0]!.id,
-    jogador,
-    cenario.grupoG,
-    situacao,
-  ]);
+  await db.query(
+    'INSERT INTO presencas (partida_id, jogador_id, grupo_id, situacao) VALUES ($1, $2, $3, $4)',
+    [p.rows[0]!.id, jogador, cenario.grupoG, situacao],
+  );
 }
 
 async function periodos(id: string) {
@@ -88,9 +88,14 @@ async function inativados(id: string) {
 }
 
 function inativarComo(conta: string, grupo: string, id: string, data?: string, confirmar = true) {
-  return comDb(aberto.url, conta, (db) => jogadores.inativar(db, grupo, id, data === undefined ? {} : { data }, HOJE), {
-    confirmar,
-  });
+  return comDb(
+    aberto.url,
+    conta,
+    (db) => jogadores.inativar(db, grupo, id, data === undefined ? {} : { data }, HOJE),
+    {
+      confirmar,
+    },
+  );
 }
 
 describe('jogadores.inativar', () => {
@@ -177,7 +182,9 @@ describe('jogadores.inativar', () => {
     await aberto.db.query(
       'CREATE TRIGGER falha_teste_gel109 BEFORE INSERT ON auditoria FOR EACH ROW EXECUTE FUNCTION falha_teste_gel109()',
     );
-    await expect(inativarComo(aberto.cenario.contaC, aberto.cenario.grupoG, id, '2026-10-01')).rejects.toThrow('falha forçada');
+    await expect(
+      inativarComo(aberto.cenario.contaC, aberto.cenario.grupoG, id, '2026-10-01'),
+    ).rejects.toThrow('falha forçada');
     expect(await periodos(id)).toEqual([{ inicio: '2026-09-01', fim: null }]);
     expect(await inativados(id)).toEqual([]);
   });

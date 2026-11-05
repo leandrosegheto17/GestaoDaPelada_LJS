@@ -34,13 +34,19 @@ describe('validarMarcacoes', () => {
     ['inativo na data', 'j-saiu-hoje'],
     ['inexistente', '00000000-0000-4000-8000-000000000000'],
     ['de outro grupo (fora da lista de ativos deste)', 'j-de-outro-grupo'],
-  ])('PAR-24: jogador %s dá "Jogador não está ativo nesta data." em marcacoes.<i>.jogadorId', (_caso, jogadorId) => {
-    const r = validarMarcacoes(ATIVOS, [
-      { jogadorId: 'j-ativo', situacao: 'presente' },
-      { jogadorId, situacao: 'presente' },
-    ]);
-    expect(r).toEqual({ ok: false, campos: { 'marcacoes.1.jogadorId': MENSAGEM_JOGADOR_INATIVO } });
-  });
+  ])(
+    'PAR-24: jogador %s dá "Jogador não está ativo nesta data." em marcacoes.<i>.jogadorId',
+    (_caso, jogadorId) => {
+      const r = validarMarcacoes(ATIVOS, [
+        { jogadorId: 'j-ativo', situacao: 'presente' },
+        { jogadorId, situacao: 'presente' },
+      ]);
+      expect(r).toEqual({
+        ok: false,
+        campos: { 'marcacoes.1.jogadorId': MENSAGEM_JOGADOR_INATIVO },
+      });
+    },
+  );
 
   it('PAR-25: jogador repetido dá "Há jogador repetido nas marcações." em marcacoes', () => {
     const r = validarMarcacoes(ATIVOS, [
@@ -72,14 +78,24 @@ describe('validarMarcacoes', () => {
   });
 
   it('PAR-23: sem marcações, nada a gravar', () => {
-    expect(validarMarcacoes(ATIVOS, [])).toEqual({ ok: true, presencas: [], contagem: { presentes: 0, lesionados: 0, expulsos: 0 } });
+    expect(validarMarcacoes(ATIVOS, [])).toEqual({
+      ok: true,
+      presencas: [],
+      contagem: { presentes: 0, lesionados: 0, expulsos: 0 },
+    });
   });
 });
 
 describe('contagemDaPartida', () => {
   it('PAR-23: conta presentes, lesionados e expulsos; ausente não entra', () => {
     expect(
-      contagemDaPartida([{ situacao: 'presente' }, { situacao: 'presente' }, { situacao: 'lesionado' }, { situacao: 'ausente' }, { situacao: 'expulso' }]),
+      contagemDaPartida([
+        { situacao: 'presente' },
+        { situacao: 'presente' },
+        { situacao: 'lesionado' },
+        { situacao: 'ausente' },
+        { situacao: 'expulso' },
+      ]),
     ).toEqual({ presentes: 2, lesionados: 1, expulsos: 1 });
   });
 });

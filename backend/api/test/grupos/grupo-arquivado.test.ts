@@ -4,7 +4,13 @@ import { criarApp } from '../../src/entrada/app.ts';
 import { passaComGrupoArquivado } from '../../src/entrada/middlewares/grupo-ativo.ts';
 import { gerarToken } from '../../src/infraestrutura/sessao/token.ts';
 import { cliente } from '../acesso/apoio.ts';
-import { abrirCenarioGrupos, arquivar, NOME_G, reativar, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  arquivar,
+  NOME_G,
+  reativar,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * Isolamento do grupo arquivado nas rotas (T31; GEL-25, GEL-26). As rotas vêm do `app.routes` (como a suíte da conta
@@ -99,16 +105,21 @@ describe('rotas de grupo registradas', () => {
 });
 
 describe('G arquivado, para a outra admin', () => {
-  it.each(ROTAS.map((r) => [`${r.metodo} ${r.padrao}`, r] as const))('GEL-25: %s responde 404 à O', async (_nome, rota) => {
-    const { cenario } = aberto;
-    const r = await cliente(aberto.url)(caminho(rota.padrao, cenario.grupoG), {
-      metodo: rota.metodo,
-      sessao: await sessao(cenario.contaO),
-      ...(ESCRITA.has(rota.metodo) ? { corpo: rota.padrao.endsWith('/arquivar') ? { nomeConfirmacao: NOME_G } : {} } : {}),
-    });
-    expect(r.status).toBe(404);
-    expect(await r.text()).not.toContain(NOME_G);
-  });
+  it.each(ROTAS.map((r) => [`${r.metodo} ${r.padrao}`, r] as const))(
+    'GEL-25: %s responde 404 à O',
+    async (_nome, rota) => {
+      const { cenario } = aberto;
+      const r = await cliente(aberto.url)(caminho(rota.padrao, cenario.grupoG), {
+        metodo: rota.metodo,
+        sessao: await sessao(cenario.contaO),
+        ...(ESCRITA.has(rota.metodo)
+          ? { corpo: rota.padrao.endsWith('/arquivar') ? { nomeConfirmacao: NOME_G } : {} }
+          : {}),
+      });
+      expect(r.status).toBe(404);
+      expect(await r.text()).not.toContain(NOME_G);
+    },
+  );
 
   it('GEL-25: G some de GET /api/grupos e de GET /api/sessao da O', async () => {
     const { cenario } = aberto;
@@ -118,25 +129,34 @@ describe('G arquivado, para a outra admin', () => {
       arquivados: Array<{ id: string }>;
     };
     expect([...lista.ativos, ...lista.arquivados].map((g) => g.id)).not.toContain(cenario.grupoG);
-    const eu = (await (await cliente(aberto.url)('/sessao', { sessao: token })).json()) as { grupos: Array<{ id: string }> };
+    const eu = (await (await cliente(aberto.url)('/sessao', { sessao: token })).json()) as {
+      grupos: Array<{ id: string }>;
+    };
     expect(eu.grupos.map((g) => g.id)).not.toContain(cenario.grupoG);
   });
 
   it('GEL-25: O não reativa: 404 e G continua arquivado', async () => {
     const { cenario } = aberto;
-    await cliente(aberto.url)(`/grupos/${cenario.grupoG}/reativar`, { metodo: 'POST', sessao: await sessao(cenario.contaO) });
-    const g = await aberto.db.query('SELECT arquivado_em FROM grupos WHERE id = $1', [cenario.grupoG]);
+    await cliente(aberto.url)(`/grupos/${cenario.grupoG}/reativar`, {
+      metodo: 'POST',
+      sessao: await sessao(cenario.contaO),
+    });
+    const g = await aberto.db.query('SELECT arquivado_em FROM grupos WHERE id = $1', [
+      cenario.grupoG,
+    ]);
     expect(g.rows[0]?.arquivado_em).not.toBeNull();
   });
 });
 
 describe('G arquivado, para a criadora', () => {
-  const bloqueadas = ESCRITAS.filter((r) => !passaComGrupoArquivado(r.metodo, `/api${caminho(r.padrao, 'g')}`));
+  const bloqueadas = ESCRITAS.filter(
+    (r) => !passaComGrupoArquivado(r.metodo, `/api${caminho(r.padrao, 'g')}`),
+  );
 
   it('GEL-26: as exceções são só reativar, arquivar e cancelar convite', () => {
-    const excecoes = ESCRITAS.filter((r) => passaComGrupoArquivado(r.metodo, `/api${caminho(r.padrao, 'g')}`)).map(
-      (r) => `${r.metodo} ${r.padrao}`,
-    );
+    const excecoes = ESCRITAS.filter((r) =>
+      passaComGrupoArquivado(r.metodo, `/api${caminho(r.padrao, 'g')}`),
+    ).map((r) => `${r.metodo} ${r.padrao}`);
     expect(excecoes.sort()).toEqual(
       [
         'DELETE /api/grupos/:grupoId/admins/convites/:id',
@@ -160,14 +180,15 @@ describe('G arquivado, para a criadora', () => {
     },
   );
 
-  it.each(ROTAS.filter((r) => r.metodo === 'GET').map((r) => [`${r.metodo} ${r.padrao}`, r] as const))(
-    'GEL-26: %s (leitura) não responde 409 à criadora',
-    async (_nome, rota) => {
-      const { cenario } = aberto;
-      const r = await cliente(aberto.url)(caminho(rota.padrao, cenario.grupoG), { sessao: await sessao(cenario.contaC) });
-      expect(r.status).not.toBe(409);
-    },
-  );
+  it.each(
+    ROTAS.filter((r) => r.metodo === 'GET').map((r) => [`${r.metodo} ${r.padrao}`, r] as const),
+  )('GEL-26: %s (leitura) não responde 409 à criadora', async (_nome, rota) => {
+    const { cenario } = aberto;
+    const r = await cliente(aberto.url)(caminho(rota.padrao, cenario.grupoG), {
+      sessao: await sessao(cenario.contaC),
+    });
+    expect(r.status).not.toBe(409);
+  });
 
   it('GEL-26: arquivar de novo responde 200 e reativar responde 200 (as exceções passam)', async () => {
     const { cenario } = aberto;
@@ -177,7 +198,10 @@ describe('G arquivado, para a criadora', () => {
       corpo: { nomeConfirmacao: NOME_G },
     });
     expect(arquivarDeNovo.status).toBe(200);
-    const reativado = await cliente(aberto.url)(`/grupos/${cenario.grupoG}/reativar`, { metodo: 'POST', sessao: token });
+    const reativado = await cliente(aberto.url)(`/grupos/${cenario.grupoG}/reativar`, {
+      metodo: 'POST',
+      sessao: token,
+    });
     expect(reativado.status).toBe(200);
   });
 });
@@ -188,18 +212,25 @@ describe('criadora removida do grupo', () => {
     ['reativar', undefined],
   ] as const)('GEL-25: a criadora sem vínculo recebe 404 em %s', async (acao, corpo) => {
     const { cenario, db } = aberto;
-    await db.query('DELETE FROM vinculos_admin WHERE grupo_id = $1 AND conta_id = $2', [cenario.grupoG, cenario.contaC]);
+    await db.query('DELETE FROM vinculos_admin WHERE grupo_id = $1 AND conta_id = $2', [
+      cenario.grupoG,
+      cenario.contaC,
+    ]);
     try {
       for (const estado of ['arquivado', 'ativo'] as const) {
         if (estado === 'ativo') await reativar(db, cenario.grupoG);
-        const antes = await db.query('SELECT arquivado_em FROM grupos WHERE id = $1', [cenario.grupoG]);
+        const antes = await db.query('SELECT arquivado_em FROM grupos WHERE id = $1', [
+          cenario.grupoG,
+        ]);
         const r = await cliente(aberto.url)(`/grupos/${cenario.grupoG}/${acao}`, {
           metodo: 'POST',
           sessao: await sessao(cenario.contaC),
           ...(corpo ? { corpo } : {}),
         });
         expect(r.status, `${acao} com G ${estado}`).toBe(404);
-        const depois = await db.query('SELECT arquivado_em FROM grupos WHERE id = $1', [cenario.grupoG]);
+        const depois = await db.query('SELECT arquivado_em FROM grupos WHERE id = $1', [
+          cenario.grupoG,
+        ]);
         expect(depois.rows[0]?.arquivado_em).toEqual(antes.rows[0]?.arquivado_em);
       }
     } finally {

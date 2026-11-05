@@ -27,7 +27,8 @@ function aptos(quantos: number): Apto[] {
   }));
 }
 
-const montar = (lista: readonly Apto[], n: number) => montarVariosTimes(montarElenco(lista, DATA), n);
+const montar = (lista: readonly Apto[], n: number) =>
+  montarVariosTimes(montarElenco(lista, DATA), n);
 
 describe('montarVariosTimes', () => {
   it('SIM-34: 22 aptos, N = 4: 5 times de 4 e um incompleto de 2, por último', () => {

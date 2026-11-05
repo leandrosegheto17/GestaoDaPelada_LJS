@@ -60,7 +60,9 @@ describe('restaurarBackup', () => {
   });
 
   it('FUN-50: chave privada errada falha e não deixa o banco como restaurado', async () => {
-    c.sh('psql -U postgres -c "CREATE DATABASE destino_ruim" && age-keygen -o /outra.txt 2>/dev/null');
+    c.sh(
+      'psql -U postgres -c "CREATE DATABASE destino_ruim" && age-keygen -o /outra.txt 2>/dev/null',
+    );
     await expect(
       restaurarBackup({ ...opcoes('destino_ruim'), chavePrivada: '/outra.txt' }),
     ).rejects.toThrow(/age falhou|pg_restore falhou/);

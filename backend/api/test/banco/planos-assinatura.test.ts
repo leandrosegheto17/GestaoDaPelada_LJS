@@ -34,7 +34,10 @@ async function caso<T, R>(
   try {
     await preparar(db);
     await db.query('SET LOCAL ROLE pelada_app');
-    await db.query(`SELECT set_config('app.conta_id', $1, true), set_config('app.slug_publico', '', true)`, [conta ?? '']);
+    await db.query(
+      `SELECT set_config('app.conta_id', $1, true), set_config('app.slug_publico', '', true)`,
+      [conta ?? ''],
+    );
     const resultado = await fn(db);
     await db.query('RESET ROLE');
     return await conferir(db, resultado);
@@ -55,14 +58,20 @@ const cancelar = (d: pg.Client, grupo: string) =>
   d.query<{ antes: string }>('SELECT assinatura_cancelar($1) AS antes', [grupo]);
 
 async function grupoComoEsta(d: pg.Client, grupo: string) {
-  const r = await d.query('SELECT situacao_comercial, trial_inicio::text FROM grupos WHERE id = $1', [grupo]);
+  const r = await d.query(
+    'SELECT situacao_comercial, trial_inicio::text FROM grupos WHERE id = $1',
+    [grupo],
+  );
   return r.rows[0];
 }
 
 /** G passa a `ativo` com uma assinatura `ativa` paga até 2026-12-05 (o que o webhook faria). */
 async function gAtivo(d: pg.Client): Promise<void> {
   const { cenario } = aberto;
-  await d.query(`UPDATE grupos SET situacao_comercial = 'ativo', trial_inicio = NULL WHERE id = $1`, [cenario.grupoG]);
+  await d.query(
+    `UPDATE grupos SET situacao_comercial = 'ativo', trial_inicio = NULL WHERE id = $1`,
+    [cenario.grupoG],
+  );
   await d.query(
     `INSERT INTO assinaturas (grupo_id, asaas_cliente_id, asaas_assinatura_id, valor_centavos, situacao, pago_ate,
        cobranca_pro_id, criada_por, criada_em)
@@ -135,7 +144,9 @@ describe('assinatura_registrar', () => {
     const conta = ator === 'O' ? cenario.contaO : ator === 'B' ? cenario.contaB : null;
     const { db } = aberto;
     const antes = await db.query('SELECT count(*)::int AS n FROM assinaturas');
-    await expect(caso(conta, nada, (d) => registrar(d, cenario.grupoG), nada)).rejects.toMatchObject({ code: '42501' });
+    await expect(
+      caso(conta, nada, (d) => registrar(d, cenario.grupoG), nada),
+    ).rejects.toMatchObject({ code: '42501' });
     expect((await db.query('SELECT count(*)::int AS n FROM assinaturas')).rows).toEqual(antes.rows);
   });
 
@@ -144,7 +155,10 @@ describe('assinatura_registrar', () => {
     await expect(
       caso(
         cenario.contaC,
-        (d) => d.query('UPDATE grupos SET arquivado_em = now() WHERE id = $1', [cenario.grupoG]).then(() => undefined),
+        (d) =>
+          d
+            .query('UPDATE grupos SET arquivado_em = now() WHERE id = $1', [cenario.grupoG])
+            .then(() => undefined),
         (d) => registrar(d, cenario.grupoG),
         nada,
       ),
@@ -175,7 +189,9 @@ describe('assinatura_cancelar', () => {
       gAtivo,
       async (d) => (await cancelar(d, cenario.grupoG)).rows[0]?.antes,
       async (d, antes) => {
-        const a = await d.query(`SELECT situacao, pago_ate::text FROM assinaturas WHERE asaas_assinatura_id = 'sub_t14_ativa'`);
+        const a = await d.query(
+          `SELECT situacao, pago_ate::text FROM assinaturas WHERE asaas_assinatura_id = 'sub_t14_ativa'`,
+        );
         return { antes, assinatura: a.rows[0], grupo: await grupoComoEsta(d, cenario.grupoG) };
       },
     );
@@ -219,7 +235,9 @@ describe('assinatura_cancelar', () => {
         return (await cancelar(d, cenario.grupoG)).rows[0]?.antes;
       },
       async (d, antes) => {
-        const a = await d.query(`SELECT situacao FROM assinaturas WHERE asaas_assinatura_id = 'sub_t14'`);
+        const a = await d.query(
+          `SELECT situacao FROM assinaturas WHERE asaas_assinatura_id = 'sub_t14'`,
+        );
         return { antes, assinatura: a.rows[0], grupo: await grupoComoEsta(d, cenario.grupoG) };
       },
     );
@@ -230,7 +248,9 @@ describe('assinatura_cancelar', () => {
 
   it('PLA-55: sem assinatura vigente, cancelar dá P0002', async () => {
     const { cenario } = aberto;
-    await expect(caso(cenario.contaC, nada, (d) => cancelar(d, cenario.grupoG), nada)).rejects.toMatchObject({
+    await expect(
+      caso(cenario.contaC, nada, (d) => cancelar(d, cenario.grupoG), nada),
+    ).rejects.toMatchObject({
       code: 'P0002',
     });
   });
@@ -256,6 +276,8 @@ describe('assinatura_cancelar', () => {
   ] as const)('PLA-13: %s não cancela (42501)', async (_nome, ator) => {
     const { cenario } = aberto;
     const conta = ator === 'O' ? cenario.contaO : null;
-    await expect(caso(conta, gAtivo, (d) => cancelar(d, cenario.grupoG), nada)).rejects.toMatchObject({ code: '42501' });
+    await expect(
+      caso(conta, gAtivo, (d) => cancelar(d, cenario.grupoG), nada),
+    ).rejects.toMatchObject({ code: '42501' });
   });
 });

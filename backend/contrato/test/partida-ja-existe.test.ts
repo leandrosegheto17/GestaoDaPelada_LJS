@@ -16,11 +16,18 @@ describe('partida_ja_existe', () => {
   });
 
   it('PAR-21: o corpo de erro aceita dataExistente AAAA-MM-DD', () => {
-    const corpo = { erro: mensagemPartidaJaExiste('2026-01-08'), codigo: 'partida_ja_existe', dataExistente: '2026-01-08' };
+    const corpo = {
+      erro: mensagemPartidaJaExiste('2026-01-08'),
+      codigo: 'partida_ja_existe',
+      dataExistente: '2026-01-08',
+    };
     expect(corpoErro.parse(corpo)).toEqual(corpo);
   });
 
   it('PAR-21: dataExistente fora do formato é recusada', () => {
-    expect(corpoErro.safeParse({ erro: 'x', codigo: 'partida_ja_existe', dataExistente: '08/01/2026' }).success).toBe(false);
+    expect(
+      corpoErro.safeParse({ erro: 'x', codigo: 'partida_ja_existe', dataExistente: '08/01/2026' })
+        .success,
+    ).toBe(false);
   });
 });

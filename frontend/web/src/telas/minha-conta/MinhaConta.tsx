@@ -110,15 +110,21 @@ export function MinhaConta() {
           Excluir conta
         </h2>
         <p className={estilos.paragrafo}>
-          Seu nome e seu e-mail são apagados e você perde o acesso a todos os grupos. Os dados dos grupos continuam com os
-          outros admins.
+          Seu nome e seu e-mail são apagados e você perde o acesso a todos os grupos. Os dados dos
+          grupos continuam com os outros admins.
         </p>
         {unicoAdmin ? (
           <>
             <Faixa tipo="erro">{TEXTO_UNICO_ADMIN}</Faixa>
             <Lista rotulo="Grupos em que você é o único admin">
               {unicoAdmin.map((g) => (
-                <ItemLista key={g.id} titulo={g.nome} meta="Convidar admin" para={destinoDoGrupo(g.id)} seta />
+                <ItemLista
+                  key={g.id}
+                  titulo={g.nome}
+                  meta="Convidar admin"
+                  para={destinoDoGrupo(g.id)}
+                  seta
+                />
               ))}
             </Lista>
           </>

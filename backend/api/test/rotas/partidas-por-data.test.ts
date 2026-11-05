@@ -1,13 +1,22 @@
 import { Buffer } from 'node:buffer';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { MENSAGEM_DATA_ALTERADA, MENSAGEM_JOGADOR_INATIVO, partidaResposta } from '@pelada/contrato';
+import {
+  MENSAGEM_DATA_ALTERADA,
+  MENSAGEM_JOGADOR_INATIVO,
+  partidaResposta,
+} from '@pelada/contrato';
 import { criarApp } from '../../src/entrada/app.ts';
 import { relogioFixo } from '../../src/infraestrutura/relogio.ts';
 import { NOME_COOKIE_SESSAO } from '../../src/infraestrutura/sessao/cookie.ts';
 import { gerarToken } from '../../src/infraestrutura/sessao/token.ts';
 import { envAcesso } from '../acesso/apoio.ts';
 import { contextoFalso, fabricaComoApp } from '../db/requisicao.ts';
-import { abrirCenarioGrupos, arquivar, reativar, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  arquivar,
+  reativar,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * `GET`, `PUT` e `DELETE /api/grupos/:grupoId/partidas/:data` (partidas-e-ranking T41; PAR-44 a PAR-48, PAR-50), com
@@ -21,7 +30,10 @@ let partida: string;
 let caco: string;
 
 const DATA = '2026-03-05';
-const app = criarApp({ fabricaBanco: fabricaComoApp().fabrica, relogio: relogioFixo('2026-03-14T15:00:00Z') });
+const app = criarApp({
+  fabricaBanco: fabricaComoApp().fabrica,
+  relogio: relogioFixo('2026-03-14T15:00:00Z'),
+});
 
 async function sessao(conta: string): Promise<string> {
   const { token, hash } = await gerarToken();
@@ -33,8 +45,16 @@ async function sessao(conta: string): Promise<string> {
   return token;
 }
 
-async function pedir(metodo: 'GET' | 'PUT' | 'DELETE', data: string, corpo?: unknown, conta = aberto.cenario.contaC): Promise<Response> {
-  const headers = new Headers({ 'x-pelada': '1', cookie: `${NOME_COOKIE_SESSAO}=${await sessao(conta)}` });
+async function pedir(
+  metodo: 'GET' | 'PUT' | 'DELETE',
+  data: string,
+  corpo?: unknown,
+  conta = aberto.cenario.contaC,
+): Promise<Response> {
+  const headers = new Headers({
+    'x-pelada': '1',
+    cookie: `${NOME_COOKIE_SESSAO}=${await sessao(conta)}`,
+  });
   if (corpo !== undefined) headers.set('content-type', 'application/json');
   const ctx = contextoFalso();
   const r = await app.request(
@@ -56,7 +76,10 @@ async function presencas(): Promise<Array<{ jogador_id: string; situacao: string
 }
 
 async function choveu(): Promise<boolean | null> {
-  const r = await aberto.db.query<{ choveu: boolean }>('SELECT choveu FROM partidas WHERE id = $1', [partida]);
+  const r = await aberto.db.query<{ choveu: boolean }>(
+    'SELECT choveu FROM partidas WHERE id = $1',
+    [partida],
+  );
   return r.rows[0]?.choveu ?? null;
 }
 
@@ -69,10 +92,10 @@ beforeAll(async () => {
     [cenario.grupoG, cenario.contaC],
   );
   caco = r.rows[0]!.id;
-  await db.query(`INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, '2026-03-10', NULL)`, [
-    caco,
-    cenario.grupoG,
-  ]);
+  await db.query(
+    `INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, '2026-03-10', NULL)`,
+    [caco, cenario.grupoG],
+  );
 });
 
 afterAll(async () => {
@@ -95,7 +118,10 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
-  await aberto.db.query('DELETE FROM partidas WHERE grupo_id = $1 AND data = $2', [aberto.cenario.grupoG, DATA]);
+  await aberto.db.query('DELETE FROM partidas WHERE grupo_id = $1 AND data = $2', [
+    aberto.cenario.grupoG,
+    DATA,
+  ]);
 });
 
 describe('GET …/partidas/:data', () => {
@@ -141,9 +167,15 @@ describe('PUT …/partidas/:data', () => {
   });
 
   it('PAR-48: jogador ativo hoje mas não na data da partida é recusado no campo da marcação', async () => {
-    const r = await pedir('PUT', DATA, { data: DATA, choveu: false, marcacoes: [{ jogadorId: caco, situacao: 'presente' }] });
+    const r = await pedir('PUT', DATA, {
+      data: DATA,
+      choveu: false,
+      marcacoes: [{ jogadorId: caco, situacao: 'presente' }],
+    });
     expect(r.status).toBe(422);
-    expect(await r.json()).toMatchObject({ mensagens: { 'marcacoes.0.jogadorId': MENSAGEM_JOGADOR_INATIVO } });
+    expect(await r.json()).toMatchObject({
+      mensagens: { 'marcacoes.0.jogadorId': MENSAGEM_JOGADOR_INATIVO },
+    });
     expect(await presencas()).toHaveLength(2);
   });
 
@@ -161,11 +193,17 @@ describe('DELETE …/partidas/:data', () => {
     expect(r.status).toBe(204);
     expect(await choveu()).toBeNull();
     expect(await presencas()).toEqual([]);
-    const auditoria = await aberto.db.query<{ acao: string; resumo: unknown; autor_conta_id: string }>(
+    const auditoria = await aberto.db.query<{
+      acao: string;
+      resumo: unknown;
+      autor_conta_id: string;
+    }>(
       `SELECT acao, resumo, autor_conta_id FROM auditoria WHERE grupo_id = $1 AND entidade_id = $2`,
       [aberto.cenario.grupoG, partida],
     );
-    expect(auditoria.rows).toEqual([{ acao: 'partida_excluida', resumo: { data: DATA }, autor_conta_id: aberto.cenario.contaC }]);
+    expect(auditoria.rows).toEqual([
+      { acao: 'partida_excluida', resumo: { data: DATA }, autor_conta_id: aberto.cenario.contaC },
+    ]);
   });
 
   it('PAR-50: grupo arquivado responde 409 e a partida fica', async () => {

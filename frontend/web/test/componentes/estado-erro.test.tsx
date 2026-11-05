@@ -45,7 +45,13 @@ describe('EstadoErro (faixa, padrao--erro-rede)', () => {
 
 describe('EstadoErro (tela, t03-indisponivel--erro)', () => {
   it('FUN-31: mostra título e texto, e o foco inicial vai para o título', () => {
-    render(<EstadoErro formato="tela" titulo="Grupo indisponível" mensagem="Fale com o admin do seu grupo." />);
+    render(
+      <EstadoErro
+        formato="tela"
+        titulo="Grupo indisponível"
+        mensagem="Fale com o admin do seu grupo."
+      />,
+    );
     const titulo = screen.getByRole('heading', { level: 1, name: 'Grupo indisponível' });
     expect(document.activeElement).toBe(titulo);
     expect(screen.getByText('Fale com o admin do seu grupo.').className).toContain('vazio__texto');
@@ -62,7 +68,12 @@ describe('EstadoErro (tela, t03-indisponivel--erro)', () => {
   it('FUN-31: axe sem violações', async () => {
     const { container } = render(
       <main>
-        <EstadoErro formato="tela" titulo="Grupo indisponível" mensagem="Texto." aoTentarDeNovo={() => undefined} />
+        <EstadoErro
+          formato="tela"
+          titulo="Grupo indisponível"
+          mensagem="Texto."
+          aoTentarDeNovo={() => undefined}
+        />
       </main>,
     );
     await esperarSemViolacoes(container);

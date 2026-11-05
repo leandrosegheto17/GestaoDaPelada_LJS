@@ -22,7 +22,8 @@ export const MENSAGEM_LIMITE = 'Muitas requisições. Tente de novo em instantes
  */
 export function limiteTaxa(
   binding: NomeLimite,
-  chaveDe: (c: Context<Ambiente>) => string | undefined = (c) => chaveIp(c.req.header('cf-connecting-ip'), 64),
+  chaveDe: (c: Context<Ambiente>) => string | undefined = (c) =>
+    chaveIp(c.req.header('cf-connecting-ip'), 64),
 ): MiddlewareHandler<Ambiente> {
   return async (c, next) => {
     const chave = chaveDe(c);

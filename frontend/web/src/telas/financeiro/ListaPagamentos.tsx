@@ -5,7 +5,11 @@ import { Dialogo } from '../../componentes/Dialogo.tsx';
 import { Faixa } from '../../componentes/Faixa.tsx';
 import { ItemLista, Lista } from '../../componentes/Lista.tsx';
 import { formatarReais } from '../../dados/dinheiro.ts';
-import { erroDoFinanceiro, useDesmarcarPagamento, useMarcarPagamento } from '../../dados/financeiro.ts';
+import {
+  erroDoFinanceiro,
+  useDesmarcarPagamento,
+  useMarcarPagamento,
+} from '../../dados/financeiro.ts';
 import fin from './financeiro.module.css';
 
 /**
@@ -94,7 +98,12 @@ export function ListaPagamentos({ grupoId, dados }: PropsListaPagamentos) {
   }
 
   const entrada = confirmar
-    ? entradaDoPagamento(confirmar.apelido, dados.mes, dados.lancamentos, dados.config?.mensalidadeCentavos ?? null)
+    ? entradaDoPagamento(
+        confirmar.apelido,
+        dados.mes,
+        dados.lancamentos,
+        dados.config?.mensalidadeCentavos ?? null,
+      )
     : null;
 
   return (
@@ -114,7 +123,11 @@ export function ListaPagamentos({ grupoId, dados }: PropsListaPagamentos) {
                     role="switch"
                     checked={pagou}
                     aria-label={`Pagou: ${p.apelido}`}
-                    onChange={() => (pagou ? setConfirmar({ jogadorId: p.jogadorId, apelido: p.apelido }) : aoMarcar(p.jogadorId, p.apelido))}
+                    onChange={() =>
+                      pagou
+                        ? setConfirmar({ jogadorId: p.jogadorId, apelido: p.apelido })
+                        : aoMarcar(p.jogadorId, p.apelido)
+                    }
                   />
                   <span className={fin['interruptor__trilho']} aria-hidden="true" />
                   <span className={fin['interruptor__estado']} aria-hidden="true">
@@ -134,7 +147,12 @@ export function ListaPagamentos({ grupoId, dados }: PropsListaPagamentos) {
           aoFechar={() => setConfirmar(null)}
           acoes={
             <>
-              <Botao variante="secundario" type="button" autoFocus onClick={() => setConfirmar(null)}>
+              <Botao
+                variante="secundario"
+                type="button"
+                autoFocus
+                onClick={() => setConfirmar(null)}
+              >
                 Cancelar
               </Botao>
               <Botao variante="destrutivo" type="button" onClick={aoDesmarcar}>

@@ -1,7 +1,11 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import * as dominio from '../../src/index.ts';
 import { acumuladoPorInicio, type EntradaAcumulado } from '../../src/pontuacao/acumulado.ts';
-import { PESOS_PADRAO, type ConfigPesos, type PresencaDoJogador } from '../../src/pontuacao/pesos.ts';
+import {
+  PESOS_PADRAO,
+  type ConfigPesos,
+  type PresencaDoJogador,
+} from '../../src/pontuacao/pesos.ts';
 import { criarResolvedorDePesos } from '../../src/pontuacao/resolvedor.ts';
 
 /**
@@ -21,7 +25,11 @@ import { criarResolvedorDePesos } from '../../src/pontuacao/resolvedor.ts';
 
 const antiga: ConfigPesos = { ...PESOS_PADRAO, vigenteDesde: '2026-02-05' };
 const nova: ConfigPesos = { ...PESOS_PADRAO, presencaComChuva: 2, vigenteDesde: '2026-10-01' };
-const p = (data: string, choveu = false, situacao: PresencaDoJogador['situacao'] = 'presente'): PresencaDoJogador => ({
+const p = (
+  data: string,
+  choveu = false,
+  situacao: PresencaDoJogador['situacao'] = 'presente',
+): PresencaDoJogador => ({
   data,
   choveu,
   situacao,
@@ -30,8 +38,21 @@ const p = (data: string, choveu = false, situacao: PresencaDoJogador['situacao']
 /** Presenças em 20/09, 27/09 e 11/10, pontuação inicial 30. */
 const TRES = [p('2026-09-20'), p('2026-09-27'), p('2026-10-11')];
 
-function conta(inicio: string | undefined, presencas: PresencaDoJogador[], referencia: string, inicial = 30, extra: Partial<EntradaAcumulado> = {}) {
-  return acumuladoPorInicio({ inicio, pontuacaoInicial: inicial, presencas, configs: [antiga, nova], referencia, ...extra });
+function conta(
+  inicio: string | undefined,
+  presencas: PresencaDoJogador[],
+  referencia: string,
+  inicial = 30,
+  extra: Partial<EntradaAcumulado> = {},
+) {
+  return acumuladoPorInicio({
+    inicio,
+    pontuacaoInicial: inicial,
+    presencas,
+    configs: [antiga, nova],
+    referencia,
+    ...extra,
+  });
 }
 
 describe('pontuação inicial (PAR-59)', () => {
@@ -76,14 +97,29 @@ describe('soma do início da contagem até D (PAR-58)', () => {
   });
 
   it('PAR-58: pesos pela data de cada partida e acumulado negativo', () => {
-    expect(conta(undefined, [p('2026-09-30', true), p('2026-10-01', true)], '2026-10-20', 0)).toBe(1 + 2);
-    expect(conta(undefined, [p('2026-03-01', false, 'expulso'), p('2026-03-08', true, 'expulso')], '2026-12-31', 0)).toBe(-2);
+    expect(conta(undefined, [p('2026-09-30', true), p('2026-10-01', true)], '2026-10-20', 0)).toBe(
+      1 + 2,
+    );
+    expect(
+      conta(
+        undefined,
+        [p('2026-03-01', false, 'expulso'), p('2026-03-08', true, 'expulso')],
+        '2026-12-31',
+        0,
+      ),
+    ).toBe(-2);
   });
 
   it('PAR-58: o resolvedor pronto dá o mesmo resultado das configurações', () => {
     const resolvedor = criarResolvedorDePesos([antiga, nova]);
     expect(
-      acumuladoPorInicio({ inicio: '2026-09-27', pontuacaoInicial: 0, presencas: TRES, configs: resolvedor, referencia: '2026-10-20' }),
+      acumuladoPorInicio({
+        inicio: '2026-09-27',
+        pontuacaoInicial: 0,
+        presencas: TRES,
+        configs: resolvedor,
+        referencia: '2026-10-20',
+      }),
     ).toBe(2);
   });
 });
@@ -107,7 +143,9 @@ describe('saiu e voltou (PAR-57 dentro da função única)', () => {
   });
 
   it('PAR-58: periodoEm escolhe o período: PTS INICIAL do mês do retorno é 0', () => {
-    expect(conta('2026-02-05', presencas, '2026-09-30', 50, { periodos, periodoEm: '2026-10-31' })).toBe(0);
+    expect(
+      conta('2026-02-05', presencas, '2026-09-30', 50, { periodos, periodoEm: '2026-10-31' }),
+    ).toBe(0);
   });
 
   it('PAR-58: antes do retorno vale o primeiro período, com a inicial', () => {

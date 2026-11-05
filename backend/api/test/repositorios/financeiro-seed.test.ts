@@ -20,28 +20,52 @@ interface RespostaMockup {
   mes: string;
   hoje: string;
   navegacao: { mesAnterior: string | null; mesSeguinte: string | null };
-  config: { mensalidadeCentavos: number | null; saldoInicialCentavos: number; dataSaldoInicial: string };
+  config: {
+    mensalidadeCentavos: number | null;
+    saldoInicialCentavos: number;
+    dataSaldoInicial: string;
+  };
   saldoAtualCentavos: number;
-  resumoMes: { entradasCentavos: number; saidasCentavos: number; resultadoCentavos: number; naoPagaram: number };
+  resumoMes: {
+    entradasCentavos: number;
+    saidasCentavos: number;
+    resultadoCentavos: number;
+    naoPagaram: number;
+  };
   pagamentos: Array<{ jogadorId: string; apelido: string; pagou: boolean }>;
-  lancamentos: Array<{ id: string; tipo: string; data: string; descricao: string; valorCentavos: number; mensalidade: boolean }>;
+  lancamentos: Array<{
+    id: string;
+    tipo: string;
+    data: string;
+    descricao: string;
+    valorCentavos: number;
+    mensalidade: boolean;
+  }>;
 }
 
 const RESPOSTA = JSON.parse(
-  readFileSync(new URL('../../../../.specs/mockup/respostas/financeiro-2026-10.json', import.meta.url), 'utf8'),
+  readFileSync(
+    new URL('../../../../.specs/mockup/respostas/financeiro-2026-10.json', import.meta.url),
+    'utf8',
+  ),
 ) as RespostaMockup;
 
 const ROLES = ['pelada_app', 'pelada_backup_ro'] as const;
 
-async function comSeed(fn: (url: string, r: ResultadoSeed) => Promise<void>, vezes = 1): Promise<void> {
+async function comSeed(
+  fn: (url: string, r: ResultadoSeed) => Promise<void>,
+  vezes = 1,
+): Promise<void> {
   const base = process.env.DATABASE_URL_TESTE ?? URL_TESTE_PADRAO;
-  const antes = await comCliente(base, async (c) =>
-    (
-      await c.query<{ rolname: string; rolcanlogin: boolean; rolpassword: string | null }>(
-        'SELECT rolname, rolcanlogin, rolpassword FROM pg_authid WHERE rolname = ANY ($1::text[])',
-        [ROLES],
-      )
-    ).rows,
+  const antes = await comCliente(
+    base,
+    async (c) =>
+      (
+        await c.query<{ rolname: string; rolcanlogin: boolean; rolpassword: string | null }>(
+          'SELECT rolname, rolcanlogin, rolpassword FROM pg_authid WHERE rolname = ANY ($1::text[])',
+          [ROLES],
+        )
+      ).rows,
   );
   try {
     await bancoDeTeste(
@@ -62,7 +86,9 @@ async function comSeed(fn: (url: string, r: ResultadoSeed) => Promise<void>, vez
     await comCliente(base, async (c) => {
       for (const r of antes) {
         const senha = r.rolpassword === null ? 'NULL' : c.escapeLiteral(r.rolpassword);
-        await c.query(`ALTER ROLE ${c.escapeIdentifier(r.rolname)} ${r.rolcanlogin ? 'LOGIN' : 'NOLOGIN'} PASSWORD ${senha}`);
+        await c.query(
+          `ALTER ROLE ${c.escapeIdentifier(r.rolname)} ${r.rolcanlogin ? 'LOGIN' : 'NOLOGIN'} PASSWORD ${senha}`,
+        );
       }
     });
   }
@@ -74,7 +100,9 @@ describe('seed: caixa do exemplo', () => {
   it('FIN-07: o mês 2026-10 do grupo do caixa, lido pela criadora com hoje = 2026-10-22, dá os totais do mockup', async () => {
     await comSeed(async (url, r) => {
       expect(MES_CAIXA).toBe(RESPOSTA.mes);
-      const mes = await comDb(url, r.contaId, (db) => financeiroMes.lerMes(db, r.grupoCaixaId, RESPOSTA.mes, RESPOSTA.hoje));
+      const mes = await comDb(url, r.contaId, (db) =>
+        financeiroMes.lerMes(db, r.grupoCaixaId, RESPOSTA.mes, RESPOSTA.hoje),
+      );
 
       expect(mes.mes).toBe(RESPOSTA.mes);
       expect(mes.hoje).toBe(RESPOSTA.hoje);
@@ -92,15 +120,17 @@ describe('seed: caixa do exemplo', () => {
 
   it('FIN-07: o admin convidado do grupo do caixa não tem acesso ao financeiro e não lê o caixa', async () => {
     await comSeed(async (url, r) => {
-      const vinculo = await comCliente(url, async (c) =>
-        (
-          await c.query<{ email: string; acessa_financeiro: boolean }>(
-            `SELECT c.email, v.acessa_financeiro
+      const vinculo = await comCliente(
+        url,
+        async (c) =>
+          (
+            await c.query<{ email: string; acessa_financeiro: boolean }>(
+              `SELECT c.email, v.acessa_financeiro
                FROM vinculos_admin v JOIN contas c ON c.id = v.conta_id
               WHERE v.grupo_id = $1 AND v.conta_id = $2`,
-            [r.grupoCaixaId, r.contaConvidadaId],
-          )
-        ).rows,
+              [r.grupoCaixaId, r.contaConvidadaId],
+            )
+          ).rows,
       );
       expect(vinculo).toEqual([{ email: CONTA_CONVIDADA.email, acessa_financeiro: false }]);
 
@@ -116,7 +146,8 @@ describe('seed: caixa do exemplo', () => {
   it('FIN-07: rodar o seed duas vezes não duplica configuração, lançamentos nem pagamentos', async () => {
     await comSeed(async (url, r) => {
       const contagens = await comCliente(url, async (c) => {
-        const n = async (sql: string) => (await c.query<{ n: number }>(sql, [r.grupoCaixaId])).rows[0]?.n;
+        const n = async (sql: string) =>
+          (await c.query<{ n: number }>(sql, [r.grupoCaixaId])).rows[0]?.n;
         return {
           config: await n('SELECT count(*)::int AS n FROM config_financeira WHERE grupo_id = $1'),
           lancamentos: await n('SELECT count(*)::int AS n FROM lancamentos WHERE grupo_id = $1'),

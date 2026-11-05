@@ -1,5 +1,10 @@
 import { Hono } from 'hono';
-import { escalacaoCorpo, idsDaComposicao, MENSAGEM_APTOS_INATIVOS, type EscalacaoResposta } from '@pelada/contrato';
+import {
+  escalacaoCorpo,
+  idsDaComposicao,
+  MENSAGEM_APTOS_INATIVOS,
+  type EscalacaoResposta,
+} from '@pelada/contrato';
 import type { Ambiente } from '../ambiente.ts';
 import { lerCorpoDoGrupo, respostaDeCampo } from '../corpo.ts';
 import { escalacoes } from '../../infraestrutura/db/repositorios/escalacoes.ts';
@@ -30,7 +35,9 @@ export function rotasEscalacoes(): Hono<Ambiente> {
     const grupoId = c.req.param('grupoId');
     const dados = corpo.dados;
 
-    const ativos = new Set((await jogadoresLeitura.paraSimulador(c.var.db, grupoId, dados.data)).map((a) => a.id));
+    const ativos = new Set(
+      (await jogadoresLeitura.paraSimulador(c.var.db, grupoId, dados.data)).map((a) => a.id),
+    );
     const escalada =
       dados.formato === 'dois_times'
         ? { formato: 'dois_times' as const, composicao: dados.composicao }
@@ -44,7 +51,12 @@ export function rotasEscalacoes(): Hono<Ambiente> {
     const gravada = await escalacoes.confirmar(
       c.var.db,
       grupoId,
-      { data: dados.data, n: dados.n, ...(dados.formato === 'dois_times' ? { k: dados.k } : {}), escalada },
+      {
+        data: dados.data,
+        n: dados.n,
+        ...(dados.formato === 'dois_times' ? { k: dados.k } : {}),
+        escalada,
+      },
       conta,
       c.var.relogio.agoraIso(),
     );

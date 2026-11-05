@@ -31,11 +31,21 @@ interface PropsResultadoVarios {
   acoes?: ReactNode;
 }
 
-export function ResultadoVariosTimes({ resultado, recalculando = false, aoTocarJogador, movidos, antes, acoes }: PropsResultadoVarios) {
-  const numero = (v: string) => (recalculando ? <span className={estilos.recalculando}>recalculando…</span> : v);
+export function ResultadoVariosTimes({
+  resultado,
+  recalculando = false,
+  aoTocarJogador,
+  movidos,
+  antes,
+  acoes,
+}: PropsResultadoVarios) {
+  const numero = (v: string) =>
+    recalculando ? <span className={estilos.recalculando}>recalculando…</span> : v;
   return (
     <>
-      <p className={`${estilos.paragrafo} ${estilos['texto-sec']}`}>{cabecalhoVarios(resultado.data, resultado.descricao)}</p>
+      <p className={`${estilos.paragrafo} ${estilos['texto-sec']}`}>
+        {cabecalhoVarios(resultado.data, resultado.descricao)}
+      </p>
       {antes}
       {resultado.avisos.length > 0 ? (
         <div role="status">
@@ -52,16 +62,27 @@ export function ResultadoVariosTimes({ resultado, recalculando = false, aoTocarJ
           return (
             <section
               key={t.nome}
-              className={[estilos['cartao-time'], t.incompleto ? estilos['cartao-time--incompleto'] : ''].filter(Boolean).join(' ')}
+              className={[
+                estilos['cartao-time'],
+                t.incompleto ? estilos['cartao-time--incompleto'] : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
               aria-labelledby={idTitulo}
             >
               <h2 id={idTitulo} className={estilos['cartao-time__titulo']}>
                 {t.nome}
                 {t.incompleto ? (
-                  <span className={`${estilos.selo} ${estilos['selo--neutro']}`}>{rotuloIncompleto(t.jogadores.length, resultado.n)}</span>
+                  <span className={`${estilos.selo} ${estilos['selo--neutro']}`}>
+                    {rotuloIncompleto(t.jogadores.length, resultado.n)}
+                  </span>
                 ) : null}
               </h2>
-              <ListaJogadores jogadores={t.jogadores.map((j) => ({ ...j, so1oTempo: false }))} aoTocar={aoTocarJogador} movidos={movidos} />
+              <ListaJogadores
+                jogadores={t.jogadores.map((j) => ({ ...j, so1oTempo: false }))}
+                aoTocar={aoTocarJogador}
+                movidos={movidos}
+              />
               <dl className={estilos.indicadores} aria-busy={recalculando || undefined}>
                 <dt>Jogadores</dt>
                 <dd>{numero(String(t.indicadores.jogadores))}</dd>

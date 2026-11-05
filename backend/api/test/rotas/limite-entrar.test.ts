@@ -65,18 +65,24 @@ describe('LIMITE_ENTRAR nas rotas de acesso', () => {
     );
   });
 
-  it.each([...ROTAS_LIMITE_ENTRAR])('ACE-50: POST /api%s acima do LIMITE_ENTRAR responde 429', async (rota) => {
-    const { pedir } = montar(nega);
-    const r = await pedir(rota, { headers: { 'cf-connecting-ip': '203.0.113.7' } });
-    expect(r.status).toBe(429);
-    expect(r.headers.get('retry-after')).toBe('60');
-  });
+  it.each([...ROTAS_LIMITE_ENTRAR])(
+    'ACE-50: POST /api%s acima do LIMITE_ENTRAR responde 429',
+    async (rota) => {
+      const { pedir } = montar(nega);
+      const r = await pedir(rota, { headers: { 'cf-connecting-ip': '203.0.113.7' } });
+      expect(r.status).toBe(429);
+      expect(r.headers.get('retry-after')).toBe('60');
+    },
+  );
 
-  it.each([...ROTAS_LIMITE_ENTRAR])('ACE-50: POST /api%s dentro do LIMITE_ENTRAR não recebe 429', async (rota) => {
-    const { pedir } = montar(permite, nega);
-    const r = await pedir(rota, { headers: { 'cf-connecting-ip': '203.0.113.7' } });
-    expect(r.status).not.toBe(429);
-  });
+  it.each([...ROTAS_LIMITE_ENTRAR])(
+    'ACE-50: POST /api%s dentro do LIMITE_ENTRAR não recebe 429',
+    async (rota) => {
+      const { pedir } = montar(permite, nega);
+      const r = await pedir(rota, { headers: { 'cf-connecting-ip': '203.0.113.7' } });
+      expect(r.status).not.toBe(429);
+    },
+  );
 
   it('ACE-50: rotas com sessão fora da lista (GET /api/sessao, sair) não usam o LIMITE_ENTRAR', async () => {
     const { pedir } = montar(nega);
@@ -104,8 +110,12 @@ describe('chave do limitador', () => {
   it('ACE-71: dois IPv6 do mesmo /64 dividem a cota', async () => {
     const entrar = bindingPorChave(1);
     const { pedir } = montar(entrar);
-    const primeiro = await pedir('/sessao/entrar', { headers: { 'cf-connecting-ip': '2001:db8:1:2:aaaa::1' } });
-    const segundo = await pedir('/sessao/entrar', { headers: { 'cf-connecting-ip': '2001:db8:1:2:bbbb::9' } });
+    const primeiro = await pedir('/sessao/entrar', {
+      headers: { 'cf-connecting-ip': '2001:db8:1:2:aaaa::1' },
+    });
+    const segundo = await pedir('/sessao/entrar', {
+      headers: { 'cf-connecting-ip': '2001:db8:1:2:bbbb::9' },
+    });
     expect(primeiro.status).not.toBe(429);
     expect(segundo.status).toBe(429);
     expect(entrar.chaves[0]).toBe(entrar.chaves[1]);
@@ -115,7 +125,9 @@ describe('chave do limitador', () => {
     const entrar = bindingPorChave(1);
     const { pedir } = montar(entrar);
     await pedir('/sessao/entrar', { headers: { 'cf-connecting-ip': '2001:db8:1:2::1' } });
-    const outro = await pedir('/sessao/entrar', { headers: { 'cf-connecting-ip': '2001:db8:1:3::1' } });
+    const outro = await pedir('/sessao/entrar', {
+      headers: { 'cf-connecting-ip': '2001:db8:1:3::1' },
+    });
     expect(outro.status).not.toBe(429);
     expect(entrar.chaves[0]).not.toBe(entrar.chaves[1]);
   });
@@ -124,7 +136,9 @@ describe('chave do limitador', () => {
     const entrar = bindingPorChave(1);
     const { pedir } = montar(entrar);
     await pedir('/sessao/entrar', { headers: { 'cf-connecting-ip': '203.0.113.7' } });
-    const vizinho = await pedir('/sessao/entrar', { headers: { 'cf-connecting-ip': '203.0.113.8' } });
+    const vizinho = await pedir('/sessao/entrar', {
+      headers: { 'cf-connecting-ip': '203.0.113.8' },
+    });
     expect(vizinho.status).not.toBe(429);
     expect(entrar.chaves).toEqual(['203.0.113.7', '203.0.113.8']);
   });

@@ -1,7 +1,11 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { AvisoInstalarIphone, TEXTO_AVISO } from '../../src/pwa/AvisoInstalarIphone.tsx';
-import { CHAVE_DISPENSA, deveMostrarAviso, type AmbienteNavegador } from '../../src/pwa/useModoInstalacao.ts';
+import {
+  CHAVE_DISPENSA,
+  deveMostrarAviso,
+  type AmbienteNavegador,
+} from '../../src/pwa/useModoInstalacao.ts';
 import { esperarSemViolacoes } from '../apoio/axe.ts';
 
 const UA = {

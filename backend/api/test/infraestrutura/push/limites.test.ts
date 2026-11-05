@@ -19,17 +19,29 @@ const GRUPO = '6f1c2a54-2b1e-4c7a-9a43-0d8f3b1e5c21';
 const TETO_SUBREQUISICOES = 50;
 
 async function vapid(): Promise<Pick<Env, 'VAPID_PUBLICA' | 'VAPID_PRIVADA' | 'VAPID_ASSUNTO'>> {
-  const par = (await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign'])) as CryptoKeyPair;
+  const par = (await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, [
+    'sign',
+  ])) as CryptoKeyPair;
   const jwk = (await crypto.subtle.exportKey('jwk', par.privateKey)) as JsonWebKey;
-  const publica = new Uint8Array((await crypto.subtle.exportKey('raw', par.publicKey)) as ArrayBuffer);
-  return { VAPID_PUBLICA: paraBase64url(publica), VAPID_PRIVADA: jwk.d ?? '', VAPID_ASSUNTO: 'mailto:avisos@exemplo.com' };
+  const publica = new Uint8Array(
+    (await crypto.subtle.exportKey('raw', par.publicKey)) as ArrayBuffer,
+  );
+  return {
+    VAPID_PUBLICA: paraBase64url(publica),
+    VAPID_PRIVADA: jwk.d ?? '',
+    VAPID_ASSUNTO: 'mailto:avisos@exemplo.com',
+  };
 }
 
 async function assinaturas(n: number): Promise<AssinaturaDoLote[]> {
   const lista: AssinaturaDoLote[] = [];
   for (let i = 1; i <= n; i += 1) {
-    const par = (await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveBits'])) as CryptoKeyPair;
-    const publica = new Uint8Array((await crypto.subtle.exportKey('raw', par.publicKey)) as ArrayBuffer);
+    const par = (await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, [
+      'deriveBits',
+    ])) as CryptoKeyPair;
+    const publica = new Uint8Array(
+      (await crypto.subtle.exportKey('raw', par.publicKey)) as ArrayBuffer,
+    );
     lista.push({
       id: String(i),
       endpoint: `https://fcm.googleapis.com/fcm/send/t20-${i}`,
@@ -64,7 +76,10 @@ interface Contagem {
   total(): number;
 }
 
-async function invocar(n: number, respostas: number[] = []): Promise<{ contagem: Contagem; fila: FilaMemoria }> {
+async function invocar(
+  n: number,
+  respostas: number[] = [],
+): Promise<{ contagem: Contagem; fila: FilaMemoria }> {
   const todas = await assinaturas(n);
   simularRepositorio(todas);
   const servico = servicoPushFalso();
@@ -90,7 +105,10 @@ async function invocar(n: number, respostas: number[] = []): Promise<{ contagem:
   const env = {
     ...(await vapid()),
     FILA_AVISOS: {
-      send: async (corpo: Parameters<FilaMemoria['send']>[0], opcoes?: Parameters<FilaMemoria['send']>[1]) => {
+      send: async (
+        corpo: Parameters<FilaMemoria['send']>[0],
+        opcoes?: Parameters<FilaMemoria['send']>[1],
+      ) => {
         contagem.fila += 1;
         await fila.send(corpo, opcoes);
       },
@@ -137,7 +155,9 @@ describe('limites de uma invocação com 40 assinaturas', () => {
   });
 
   it('NOT-34: 41 com nova tentativa e revogação no meio: continua dentro do teto, contando a fila', async () => {
-    const respostas = Array.from({ length: 40 }, (_, i) => (i % 10 === 0 ? 503 : i % 10 === 1 ? 410 : 201));
+    const respostas = Array.from({ length: 40 }, (_, i) =>
+      i % 10 === 0 ? 503 : i % 10 === 1 ? 410 : 201,
+    );
     const { contagem, fila } = await invocar(41, respostas);
     expect(contagem.fetchPush).toBe(40);
     expect(fila.enviadas).toHaveLength(2); // continuação e nova tentativa

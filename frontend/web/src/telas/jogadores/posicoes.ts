@@ -16,9 +16,19 @@ export const ROTULOS_POSICAO: Record<Posicao, string> = {
   centroavante: 'Centroavante',
 };
 
-const ORDEM_DO_MOCKUP: readonly Posicao[] = ['zagueiro', 'lateral', 'volante', 'meia', 'atacante', 'centroavante', 'goleiro'];
+const ORDEM_DO_MOCKUP: readonly Posicao[] = [
+  'zagueiro',
+  'lateral',
+  'volante',
+  'meia',
+  'atacante',
+  'centroavante',
+  'goleiro',
+];
 
-export const OPCOES_POSICAO: readonly OpcaoSeletor<Posicao>[] = ORDEM_DO_MOCKUP.filter((p) => POSICOES.includes(p)).map((valor) => ({
+export const OPCOES_POSICAO: readonly OpcaoSeletor<Posicao>[] = ORDEM_DO_MOCKUP.filter((p) =>
+  POSICOES.includes(p),
+).map((valor) => ({
   valor,
   rotulo: ROTULOS_POSICAO[valor],
 }));

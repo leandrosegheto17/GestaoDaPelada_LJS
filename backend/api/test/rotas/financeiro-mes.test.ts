@@ -1,6 +1,11 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { mesFinanceiroResposta } from '@pelada/contrato';
-import { abrirCenarioGrupos, arquivar, reativar, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  arquivar,
+  reativar,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 import { pedir, restaurarCaixa } from './apoio-financeiro.ts';
 
 /**
@@ -17,9 +22,18 @@ import { pedir, restaurarCaixa } from './apoio-financeiro.ts';
 let aberto: CenarioGruposAberto;
 
 const lerMes = (consulta = '', conta = aberto.cenario.contaC) =>
-  pedir(aberto, { metodo: 'GET', caminho: `/grupos/${aberto.cenario.grupoG}/financeiro/mes${consulta}`, conta });
+  pedir(aberto, {
+    metodo: 'GET',
+    caminho: `/grupos/${aberto.cenario.grupoG}/financeiro/mes${consulta}`,
+    conta,
+  });
 
-async function lancar(tipo: 'entrada' | 'saida', data: string, descricao: string, valor: number): Promise<string> {
+async function lancar(
+  tipo: 'entrada' | 'saida',
+  data: string,
+  descricao: string,
+  valor: number,
+): Promise<string> {
   const { db, cenario } = aberto;
   const r = await db.query<{ id: string }>(
     `INSERT INTO lancamentos (grupo_id, tipo, data, descricao, valor_centavos, criado_por, criado_em, alterado_por, alterado_em)
@@ -52,7 +66,11 @@ describe('GET …/financeiro/mes', () => {
       mes: '2026-10',
       hoje: '2026-10-15',
       navegacao: { mesAnterior: '2026-09', mesSeguinte: null },
-      config: { mensalidadeCentavos: 5000, saldoInicialCentavos: 0, dataSaldoInicial: '2026-01-01' },
+      config: {
+        mensalidadeCentavos: 5000,
+        saldoInicialCentavos: 0,
+        dataSaldoInicial: '2026-01-01',
+      },
       saldoAtualCentavos: 5000,
       resumoMes: { entradasCentavos: 0, saidasCentavos: 0, resultadoCentavos: 0, naoPagaram: 2 },
       pagamentos: [
@@ -69,13 +87,25 @@ describe('GET …/financeiro/mes', () => {
     expect(r.status).toBe(200);
     const corpo = mesFinanceiroResposta.parse(await r.json());
     expect(corpo.navegacao).toEqual({ mesAnterior: null, mesSeguinte: '2026-02' });
-    expect(corpo.resumoMes).toEqual({ entradasCentavos: 5000, saidasCentavos: 0, resultadoCentavos: 5000, naoPagaram: 1 });
+    expect(corpo.resumoMes).toEqual({
+      entradasCentavos: 5000,
+      saidasCentavos: 0,
+      resultadoCentavos: 5000,
+      naoPagaram: 1,
+    });
     expect(corpo.pagamentos).toEqual([
       { jogadorId: idsG.jogadorHistorico, apelido: 'Bira', pagou: true },
       { jogadorId: idsG.jogadorAtivo, apelido: 'Toninho', pagou: false },
     ]);
     expect(corpo.lancamentos).toEqual([
-      { id: idsG.lancamento, tipo: 'entrada', data: '2026-01-05', descricao: 'Mensalidade', valorCentavos: 5000, mensalidade: true },
+      {
+        id: idsG.lancamento,
+        tipo: 'entrada',
+        data: '2026-01-05',
+        descricao: 'Mensalidade',
+        valorCentavos: 5000,
+        mensalidade: true,
+      },
     ]);
   });
 
@@ -88,13 +118,23 @@ describe('GET …/financeiro/mes', () => {
     const corpo = mesFinanceiroResposta.parse(await r.json());
     expect(corpo.lancamentos.map((l) => l.id)).toEqual([mesmoDiaDepois, recente, antigo]);
     expect(corpo.lancamentos.every((l) => l.mensalidade === false)).toBe(true);
-    expect(corpo.lancamentos.find((l) => l.id === antigo)).toMatchObject({ tipo: 'saida', valorCentavos: 12000 });
-    expect(corpo.resumoMes).toEqual({ entradasCentavos: 4000, saidasCentavos: 12000, resultadoCentavos: -8000, naoPagaram: 2 });
+    expect(corpo.lancamentos.find((l) => l.id === antigo)).toMatchObject({
+      tipo: 'saida',
+      valorCentavos: 12000,
+    });
+    expect(corpo.resumoMes).toEqual({
+      entradasCentavos: 4000,
+      saidasCentavos: 12000,
+      resultadoCentavos: -8000,
+      naoPagaram: 2,
+    });
     expect(corpo.saldoAtualCentavos).toBe(5000 + 4000 - 12000);
   });
 
   it('FIN-08: sem configuração, 200 com configuração, saldo e resumo nulos, listas vazias e navegação nula', async () => {
-    await aberto.db.query('DELETE FROM config_financeira WHERE grupo_id = $1', [aberto.cenario.grupoG]);
+    await aberto.db.query('DELETE FROM config_financeira WHERE grupo_id = $1', [
+      aberto.cenario.grupoG,
+    ]);
     const r = await lerMes();
     expect(r.status).toBe(200);
     expect(mesFinanceiroResposta.parse(await r.json())).toEqual({
@@ -109,21 +149,30 @@ describe('GET …/financeiro/mes', () => {
     });
   });
 
-  it.each(['2025-12', '2026-11'])('FIN-09: %s, fora do histórico, dá 422 com a mensagem no campo mes', async (mes) => {
-    const r = await lerMes(`?mes=${mes}`);
-    expect(r.status).toBe(422);
-    expect(await r.json()).toMatchObject({
-      codigo: 'dados_invalidos',
-      campos: ['mes'],
-      mensagens: { mes: 'Mês fora do histórico do caixa.' },
-    });
-  });
+  it.each(['2025-12', '2026-11'])(
+    'FIN-09: %s, fora do histórico, dá 422 com a mensagem no campo mes',
+    async (mes) => {
+      const r = await lerMes(`?mes=${mes}`);
+      expect(r.status).toBe(422);
+      expect(await r.json()).toMatchObject({
+        codigo: 'dados_invalidos',
+        campos: ['mes'],
+        mensagens: { mes: 'Mês fora do histórico do caixa.' },
+      });
+    },
+  );
 
-  it.each(['2026-13', '10-2026', '2026-1', ''])('FIN-09: mes malformado (%j) dá 422 "Mês inválido." no campo', async (mes) => {
-    const r = await lerMes(`?mes=${mes}`);
-    expect(r.status).toBe(422);
-    expect(await r.json()).toMatchObject({ campos: ['mes'], mensagens: { mes: 'Mês inválido.' } });
-  });
+  it.each(['2026-13', '10-2026', '2026-1', ''])(
+    'FIN-09: mes malformado (%j) dá 422 "Mês inválido." no campo',
+    async (mes) => {
+      const r = await lerMes(`?mes=${mes}`);
+      expect(r.status).toBe(422);
+      expect(await r.json()).toMatchObject({
+        campos: ['mes'],
+        mensagens: { mes: 'Mês inválido.' },
+      });
+    },
+  );
 
   it('parâmetro extra na consulta dá 422', async () => {
     const r = await lerMes('?mes=2026-10&ano=2026');
@@ -135,11 +184,19 @@ describe('GET …/financeiro/mes', () => {
       metodo: 'PUT',
       caminho: `/grupos/${aberto.cenario.grupoG}/financeiro/config`,
       conta: aberto.cenario.contaC,
-      corpo: { mensalidadeCentavos: 7000, saldoInicialCentavos: 20000, dataSaldoInicial: '2026-03-01' },
+      corpo: {
+        mensalidadeCentavos: 7000,
+        saldoInicialCentavos: 20000,
+        dataSaldoInicial: '2026-03-01',
+      },
     });
     expect(put.status).toBe(200);
     const corpo = mesFinanceiroResposta.parse(await (await lerMes()).json());
-    expect(corpo.config).toEqual({ mensalidadeCentavos: 7000, saldoInicialCentavos: 20000, dataSaldoInicial: '2026-03-01' });
+    expect(corpo.config).toEqual({
+      mensalidadeCentavos: 7000,
+      saldoInicialCentavos: 20000,
+      dataSaldoInicial: '2026-03-01',
+    });
     // O lançamento de janeiro fica antes da data inicial: não entra no saldo (FIN-10).
     expect(corpo.saldoAtualCentavos).toBe(20000);
     // Janeiro saiu do histórico.

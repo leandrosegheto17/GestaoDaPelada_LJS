@@ -36,11 +36,10 @@ function sinal(): { promessa: Promise<void>; disparar: () => void } {
 }
 
 async function situacao(s: string, t: string | null): Promise<void> {
-  await aberto.db.query('UPDATE grupos SET situacao_comercial = $2, trial_inicio = $3::date WHERE id = $1', [
-    aberto.cenario.grupoG,
-    s,
-    t,
-  ]);
+  await aberto.db.query(
+    'UPDATE grupos SET situacao_comercial = $2, trial_inicio = $3::date WHERE id = $1',
+    [aberto.cenario.grupoG, s, t],
+  );
 }
 
 async function ativos(): Promise<number> {
@@ -63,10 +62,10 @@ async function completarAte(alvo: number): Promise<void> {
     );
     const id = r.rows[0]!.id;
     criados.push(id);
-    await db.query(`INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, '2026-01-01', NULL)`, [
-      id,
-      cenario.grupoG,
-    ]);
+    await db.query(
+      `INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, '2026-01-01', NULL)`,
+      [id, cenario.grupoG],
+    );
     n += 1;
   }
 }
@@ -130,9 +129,19 @@ describe('conferirLimiteDeJogadores', () => {
       url,
       cenario.contaC,
       async (db) => {
-        const limite = await conferirLimiteDeJogadores(db, cenario.grupoG, HOJE, 'cadastrar_jogador');
+        const limite = await conferirLimiteDeJogadores(
+          db,
+          cenario.grupoG,
+          HOJE,
+          'cadastrar_jogador',
+        );
         expect(limite).toBeNull();
-        const r = await jogadores.criar(db, cenario.grupoG, { ...NOVO, apelido: 'Simultâneo 1' }, HOJE);
+        const r = await jogadores.criar(
+          db,
+          cenario.grupoG,
+          { ...NOVO, apelido: 'Simultâneo 1' },
+          HOJE,
+        );
         primeiroGravou.disparar();
         await soltar.promessa;
         return r.resultado;
@@ -145,9 +154,19 @@ describe('conferirLimiteDeJogadores', () => {
       url,
       cenario.contaC,
       async (db) => {
-        const limite = await conferirLimiteDeJogadores(db, cenario.grupoG, HOJE, 'cadastrar_jogador');
+        const limite = await conferirLimiteDeJogadores(
+          db,
+          cenario.grupoG,
+          HOJE,
+          'cadastrar_jogador',
+        );
         if (limite !== null) return limite;
-        const r = await jogadores.criar(db, cenario.grupoG, { ...NOVO, apelido: 'Simultâneo 2' }, HOJE);
+        const r = await jogadores.criar(
+          db,
+          cenario.grupoG,
+          { ...NOVO, apelido: 'Simultâneo 2' },
+          HOJE,
+        );
         return r.resultado;
       },
       { confirmar: true },

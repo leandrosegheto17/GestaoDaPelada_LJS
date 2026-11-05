@@ -52,16 +52,28 @@ async function jogadoresDoMes(db: Db, grupoId: string, mes: string): Promise<Jog
        AND p.inicio < ((${mes} || '-01')::date + interval '1 month')
        AND (p.fim IS NULL OR p.fim > (${mes} || '-01')::date)
      ORDER BY j.id, p.inicio`.execute(db);
-  const porJogador = new Map<string, { jogadorId: string; apelido: string; periodos: Array<{ inicio: string; fim: string | null }> }>();
+  const porJogador = new Map<
+    string,
+    { jogadorId: string; apelido: string; periodos: Array<{ inicio: string; fim: string | null }> }
+  >();
   for (const l of r.rows) {
-    const j = porJogador.get(l.jogador_id) ?? { jogadorId: l.jogador_id, apelido: l.apelido, periodos: [] };
+    const j = porJogador.get(l.jogador_id) ?? {
+      jogadorId: l.jogador_id,
+      apelido: l.apelido,
+      periodos: [],
+    };
     j.periodos.push({ inicio: l.inicio, fim: l.fim });
     porJogador.set(l.jogador_id, j);
   }
   return [...porJogador.values()];
 }
 
-async function lerMes(db: Db, grupoId: string, mes: string, hoje: string): Promise<MesFinanceiroResposta> {
+async function lerMes(
+  db: Db,
+  grupoId: string,
+  mes: string,
+  hoje: string,
+): Promise<MesFinanceiroResposta> {
   const config = await configFinanceira.lerConfig(db, grupoId);
   if (config === null) {
     return {
@@ -130,14 +142,22 @@ export type SaldoDoGrupo = { acessa: false } | { acessa: true; saldoCentavos: nu
  * `[data do saldo inicial, hoje]` (FIN-10, FIN-13).
  */
 async function saldoDoGrupo(db: Db, grupoId: string, hoje: string): Promise<SaldoDoGrupo> {
-  const a = await sql<{ ok: boolean }>`SELECT app_acessa_financeiro(${grupoId}::uuid) AS ok`.execute(db);
+  const a = await sql<{
+    ok: boolean;
+  }>`SELECT app_acessa_financeiro(${grupoId}::uuid) AS ok`.execute(db);
   if (a.rows[0]?.ok !== true) return { acessa: false };
   const config = await configFinanceira.lerConfig(db, grupoId);
   if (config === null) return { acessa: true, saldoCentavos: null };
   const r = await sql<{ tipo: 'entrada' | 'saida'; data: string; valor_centavos: number }>`
     SELECT tipo, data::text AS data, valor_centavos FROM lancamentos
-     WHERE grupo_id = ${grupoId} AND data >= ${config.dataSaldoInicial}::date AND data <= ${hoje}::date`.execute(db);
-  const movimentos: MovimentoCaixa[] = r.rows.map((l) => ({ tipo: l.tipo, data: l.data, valorCentavos: Number(l.valor_centavos) }));
+     WHERE grupo_id = ${grupoId} AND data >= ${config.dataSaldoInicial}::date AND data <= ${hoje}::date`.execute(
+    db,
+  );
+  const movimentos: MovimentoCaixa[] = r.rows.map((l) => ({
+    tipo: l.tipo,
+    data: l.data,
+    valorCentavos: Number(l.valor_centavos),
+  }));
   return { acessa: true, saldoCentavos: saldoAtual(config, movimentos, hoje) };
 }
 

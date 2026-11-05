@@ -17,7 +17,10 @@ import { z } from 'zod';
  */
 
 /** Hosts exatos aceitos (AD-109, `S:241`). */
-export const HOSTS_PUSH_EXATOS = ['fcm.googleapis.com', 'updates.push.services.mozilla.com'] as const;
+export const HOSTS_PUSH_EXATOS = [
+  'fcm.googleapis.com',
+  'updates.push.services.mozilla.com',
+] as const;
 /** Sufixos aceitos só com subdomínio (`*.push.apple.com`; o do Edge é PREMISSA, AD-109). */
 export const SUFIXOS_PUSH = ['.push.apple.com', '.notify.windows.com'] as const;
 
@@ -34,7 +37,8 @@ const BASE64URL = /^[A-Za-z0-9_-]*$/;
 /** Bytes de um texto base64url sem preenchimento; `null` se o texto não é base64url válido. */
 export function deBase64url(texto: string): Uint8Array | null {
   if (!BASE64URL.test(texto) || texto.length % 4 === 1) return null;
-  const base64 = texto.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - (texto.length % 4)) % 4);
+  const base64 =
+    texto.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - (texto.length % 4)) % 4);
   let binario: string;
   try {
     binario = atob(base64);
@@ -113,14 +117,16 @@ export function endpointPushAceito(endpoint: string, extras: readonly string[] =
   const cru = /^https:\/\/([^/?#]*)/i.exec(endpoint);
   if (!cru) return false;
   const autoridade = cru[1] ?? '';
-  if (autoridade.includes('@') || autoridade.includes(':') || autoridade.startsWith('[')) return false;
+  if (autoridade.includes('@') || autoridade.includes(':') || autoridade.startsWith('['))
+    return false;
   let url: URL;
   try {
     url = new URL(endpoint);
   } catch {
     return false;
   }
-  if (url.protocol !== 'https:' || url.username !== '' || url.password !== '' || url.port !== '') return false;
+  if (url.protocol !== 'https:' || url.username !== '' || url.password !== '' || url.port !== '')
+    return false;
   return hostPushAceito(url.hostname, extras);
 }
 
@@ -141,7 +147,9 @@ export const auth = chave(LIMITES_PUSH.authBytes);
 
 function endpoint(extras: readonly string[]) {
   // O teto de 1024 fica no `endpointPushAceito`: um `.max` aqui somaria uma segunda mensagem igual no campo.
-  return z.string({ error: MENSAGEM_ENDPOINT }).refine((e) => endpointPushAceito(e, extras), { error: MENSAGEM_ENDPOINT });
+  return z
+    .string({ error: MENSAGEM_ENDPOINT })
+    .refine((e) => endpointPushAceito(e, extras), { error: MENSAGEM_ENDPOINT });
 }
 
 /** Corpo de `POST .../push`: `endpoint` e as duas chaves do `PushSubscription.toJSON()`. */

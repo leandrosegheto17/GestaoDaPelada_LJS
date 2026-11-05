@@ -11,7 +11,14 @@ import {
 } from '../../src/telas/dados-grupo/DadosGrupo.tsx';
 import { Grupos } from '../../src/telas/grupos/Grupos.tsx';
 import { esperarSemViolacoes } from '../apoio/axe.ts';
-import { abrirTela, erroApi, json, pendente, SESSAO_ANA, type Manipulador } from '../apoio/tela.tsx';
+import {
+  abrirTela,
+  erroApi,
+  json,
+  pendente,
+  SESSAO_ANA,
+  type Manipulador,
+} from '../apoio/tela.tsx';
 
 /**
  * Dados do grupo e arquivar (T61; GEL-18, GEL-19, GEL-22, GEL-23, GEL-114, GEL-118), estados de
@@ -48,7 +55,11 @@ const QUINTA = {
 };
 
 function abrir(api: Record<string, Manipulador>) {
-  return abrirTela('/app/grupos/g-quinta/dados', { 'GET /api/sessao': () => json(200, SESSAO_ANA), ...api }, rotas);
+  return abrirTela(
+    '/app/grupos/g-quinta/dados',
+    { 'GET /api/sessao': () => json(200, SESSAO_ANA), ...api },
+    rotas,
+  );
 }
 
 function erro422(mensagens: Record<string, string>): Response {
@@ -69,7 +80,9 @@ describe('tela Dados do grupo (t20)', () => {
   it('GEL-114: campos preenchidos do grupo, link do ranking e zona de arquivar para a criadora; axe sem violação', async () => {
     const { container } = abrir({ 'GET /api/grupos/g-quinta': () => json(200, QUINTA) });
     expect(await screen.findByRole('heading', { level: 1, name: 'Dados do grupo' })).toBeTruthy();
-    expect(screen.getByRole('link', { name: 'Início' }).getAttribute('href')).toBe('/app/grupos/g-quinta');
+    expect(screen.getByRole('link', { name: 'Início' }).getAttribute('href')).toBe(
+      '/app/grupos/g-quinta',
+    );
     expect((screen.getByLabelText('Nome') as HTMLInputElement).value).toBe('Pelada de Quinta');
     expect((screen.getByLabelText('Dia da semana') as HTMLSelectElement).value).toBe('quinta');
     expect((screen.getByLabelText('Horário') as HTMLInputElement).value).toBe('20:00');
@@ -100,15 +113,25 @@ describe('tela Dados do grupo (t20)', () => {
   it('GEL-19, GEL-118: 422 marca os campos com o resumo e não mostra "Dados salvos."; axe sem violação', async () => {
     const { container } = abrir({
       'GET /api/grupos/g-quinta': () => json(200, QUINTA),
-      'PATCH /api/grupos/g-quinta': () => erro422({ nome: 'O nome precisa ter de 3 a 60 caracteres.', horario: 'Informe o horário.' }),
+      'PATCH /api/grupos/g-quinta': () =>
+        erro422({
+          nome: 'O nome precisa ter de 3 a 60 caracteres.',
+          horario: 'Informe o horário.',
+        }),
     });
     await screen.findByRole('heading', { level: 1, name: 'Dados do grupo' });
     fireEvent.change(screen.getByLabelText('Nome'), { target: { value: 'Ra' } });
     fireEvent.click(screen.getByRole('button', { name: 'Salvar' }));
     const resumo = await screen.findByRole('alert');
     expect(within(resumo).getByText('Corrija 2 campos:')).toBeTruthy();
-    expect(within(resumo).getAllByRole('link').map((a) => a.textContent)).toEqual(['Nome', 'Horário']);
-    expect(document.getElementById('nome-erro')?.textContent).toBe('O nome precisa ter de 3 a 60 caracteres.');
+    expect(
+      within(resumo)
+        .getAllByRole('link')
+        .map((a) => a.textContent),
+    ).toEqual(['Nome', 'Horário']);
+    expect(document.getElementById('nome-erro')?.textContent).toBe(
+      'O nome precisa ter de 3 a 60 caracteres.',
+    );
     expect(document.getElementById('hora-erro')?.textContent).toBe('Informe o horário.');
     expect(screen.queryByText(TEXTO_DADOS_SALVOS)).toBeNull();
     await esperarSemViolacoes(container);
@@ -132,7 +155,18 @@ describe('tela Dados do grupo (t20)', () => {
       'GET /api/grupos': () =>
         json(200, {
           ativos: [],
-          arquivados: arquivado ? [{ id: 'g-quinta', nome: 'Pelada de Quinta', slug: 'pelada-de-quinta', diaSemana: 'quinta', frequencia: 'semanal', horario: '20:00' }] : [],
+          arquivados: arquivado
+            ? [
+                {
+                  id: 'g-quinta',
+                  nome: 'Pelada de Quinta',
+                  slug: 'pelada-de-quinta',
+                  diaSemana: 'quinta',
+                  frequencia: 'semanal',
+                  horario: '20:00',
+                },
+              ]
+            : [],
         }),
     });
     fireEvent.click(await screen.findByRole('button', { name: 'Arquivar grupo' }));
@@ -140,10 +174,14 @@ describe('tela Dados do grupo (t20)', () => {
     expect(within(dialogo).getByText(TEXTO_ARQUIVAR)).toBeTruthy();
     await esperarSemViolacoes(container);
 
-    fireEvent.change(within(dialogo).getByLabelText(ROTULO_CONFIRMACAO), { target: { value: 'Pelada de Quinta' } });
+    fireEvent.change(within(dialogo).getByLabelText(ROTULO_CONFIRMACAO), {
+      target: { value: 'Pelada de Quinta' },
+    });
     fireEvent.click(within(dialogo).getByRole('button', { name: 'Arquivar grupo' }));
     await waitFor(() => expect(local()).toBe('/app'));
-    expect(chamadasA('POST', '/api/grupos/g-quinta/arquivar').map((c) => c.corpo)).toEqual([{ nomeConfirmacao: 'Pelada de Quinta' }]);
+    expect(chamadasA('POST', '/api/grupos/g-quinta/arquivar').map((c) => c.corpo)).toEqual([
+      { nomeConfirmacao: 'Pelada de Quinta' },
+    ]);
     expect(await screen.findByText('Grupo arquivado.')).toBeTruthy();
   });
 
@@ -160,7 +198,9 @@ describe('tela Dados do grupo (t20)', () => {
     fireEvent.click(within(dialogo).getByRole('button', { name: 'Arquivar grupo' }));
     await waitFor(() => expect(campo.getAttribute('aria-invalid')).toBe('true'));
     expect(campo.getAttribute('aria-describedby')).toBe('conf-erro');
-    expect(document.getElementById('conf-erro')?.textContent).toBe('O nome digitado não confere com o nome do grupo.');
+    expect(document.getElementById('conf-erro')?.textContent).toBe(
+      'O nome digitado não confere com o nome do grupo.',
+    );
     expect(local()).toBe('/app/grupos/g-quinta/dados');
     await esperarSemViolacoes(container);
   });
@@ -168,7 +208,9 @@ describe('tela Dados do grupo (t20)', () => {
   it('GEL-22: Cancelar fecha o diálogo sem chamar a API', async () => {
     const { chamadasA } = abrir({ 'GET /api/grupos/g-quinta': () => json(200, QUINTA) });
     fireEvent.click(await screen.findByRole('button', { name: 'Arquivar grupo' }));
-    fireEvent.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Cancelar' }));
+    fireEvent.click(
+      within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Cancelar' }),
+    );
     expect(screen.queryByRole('alertdialog')).toBeNull();
     expect(chamadasA('POST', '/api/grupos/g-quinta/arquivar')).toHaveLength(0);
   });
@@ -188,7 +230,9 @@ describe('tela Dados do grupo (t20)', () => {
     await esperarSemViolacoes(carregando.container);
     cleanup();
 
-    const { container } = abrir({ 'GET /api/grupos/g-quinta': () => erroApi(503, 'email_indisponivel') });
+    const { container } = abrir({
+      'GET /api/grupos/g-quinta': () => erroApi(503, 'email_indisponivel'),
+    });
     expect(await screen.findByRole('button', { name: 'Tentar de novo' })).toBeTruthy();
     await esperarSemViolacoes(container);
   });

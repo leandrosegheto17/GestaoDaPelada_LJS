@@ -15,8 +15,28 @@ export const CONFIGS: ConfigPesos[] = [
 ];
 
 const APELIDOS = [
-  'Toninho', 'Bigode', 'Careca', 'Juninho', 'Marcão', 'Paulinho', 'Zé Carlos', 'Dudu', 'Gordo', 'Tiago', 'Neném',
-  'Rafinha', 'Alemão', 'Pedrão', 'Cabeça', 'Vini', 'Japa', 'Léo Baiano', 'Serginho', 'Bira', 'Tico', 'Nando',
+  'Toninho',
+  'Bigode',
+  'Careca',
+  'Juninho',
+  'Marcão',
+  'Paulinho',
+  'Zé Carlos',
+  'Dudu',
+  'Gordo',
+  'Tiago',
+  'Neném',
+  'Rafinha',
+  'Alemão',
+  'Pedrão',
+  'Cabeça',
+  'Vini',
+  'Japa',
+  'Léo Baiano',
+  'Serginho',
+  'Bira',
+  'Tico',
+  'Nando',
 ];
 
 /** id `j01` … `j22`. */
@@ -39,7 +59,17 @@ export function aptosFixos(quantos = 22, so1o: readonly number[] = []): Apto[] {
 
 /** Histórico: 8 partidas semanais antes da data e uma na própria data, presenças variadas. */
 export function historicoFixo(quantos = 22): HistoricoSim {
-  const datas = ['2026-08-27', '2026-09-03', '2026-09-10', '2026-09-17', '2026-09-24', '2026-10-01', '2026-10-08', '2026-10-15', DATA];
+  const datas = [
+    '2026-08-27',
+    '2026-09-03',
+    '2026-09-10',
+    '2026-09-17',
+    '2026-09-24',
+    '2026-10-01',
+    '2026-10-08',
+    '2026-10-15',
+    DATA,
+  ];
   const partidas = datas.map((data, p) => ({ id: `p${p}`, data, choveu: p % 3 === 0 }));
   const presencas = partidas.flatMap((partida, p) =>
     Array.from({ length: quantos }, (_, k) => k + 1)
@@ -99,7 +129,9 @@ export function historicoGrande(jogadores: number, partidas: number): HistoricoS
     })),
     partidas: lista,
     presencas,
-    configsPesos: [{ ...PESOS_PADRAO, presencaSemChuva: 3, presencaComChuva: 4, vigenteDesde: '2020-01-01' }],
+    configsPesos: [
+      { ...PESOS_PADRAO, presencaSemChuva: 3, presencaComChuva: 4, vigenteDesde: '2020-01-01' },
+    ],
   };
 }
 

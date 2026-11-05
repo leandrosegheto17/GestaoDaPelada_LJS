@@ -1,5 +1,9 @@
 import * as Sentry from '@sentry/cloudflare';
-import { mensagemAviso, type MensagemAviso, type TipoMensagemAviso } from '@pelada/contrato/fila-avisos';
+import {
+  mensagemAviso,
+  type MensagemAviso,
+  type TipoMensagemAviso,
+} from '@pelada/contrato/fila-avisos';
 import { avisarCobranca } from '../aplicacao/notificacoes/avisar-cobranca.ts';
 import { enviarRanking } from '../aplicacao/notificacoes/enviar-ranking.ts';
 import type { ConexaoPg } from '../infraestrutura/db/cliente.ts';
@@ -54,7 +58,9 @@ export type CasoDeUso<M extends MensagemAviso = MensagemAviso> = (
   contexto: ContextoConsumidor,
 ) => Promise<Desfecho>;
 
-export type CasosDeUso = { [K in TipoMensagemAviso]?: CasoDeUso<Extract<MensagemAviso, { tipo: K }>> };
+export type CasosDeUso = {
+  [K in TipoMensagemAviso]?: CasoDeUso<Extract<MensagemAviso, { tipo: K }>>;
+};
 
 /** Os casos de uso ligados: o ranking (T18) e o aviso de cobrança (T24; o push dele entra na T25). */
 export const CASOS_PADRAO: CasosDeUso = { ranking: enviarRanking, cobranca: avisarCobranca };
@@ -73,8 +79,15 @@ export interface OpcoesConsumidor {
   reportar?: (motivo: MotivoFila) => void;
 }
 
-export function bancoSemContexto(env: Env, fabrica?: (connectionString: string) => ConexaoPg): AbrirBanco {
-  return (fn) => transacaoCurta(env.HYPERDRIVE.connectionString, fn, { conta: null, ...(fabrica ? { fabrica } : {}) });
+export function bancoSemContexto(
+  env: Env,
+  fabrica?: (connectionString: string) => ConexaoPg,
+): AbrirBanco {
+  return (fn) =>
+    transacaoCurta(env.HYPERDRIVE.connectionString, fn, {
+      conta: null,
+      ...(fabrica ? { fabrica } : {}),
+    });
 }
 
 function relatar(reportar: (motivo: MotivoFila) => void, motivo: MotivoFila): void {
@@ -85,7 +98,11 @@ function relatar(reportar: (motivo: MotivoFila) => void, motivo: MotivoFila): vo
   }
 }
 
-async function consumirUma(mensagem: MensagemDaFila, contexto: ContextoConsumidor, opcoes: OpcoesConsumidor) {
+async function consumirUma(
+  mensagem: MensagemDaFila,
+  contexto: ContextoConsumidor,
+  opcoes: OpcoesConsumidor,
+) {
   const reportar = opcoes.reportar ?? reportarPadrao;
   const lida = mensagemAviso.safeParse(mensagem.body);
   if (!lida.success) {
@@ -119,7 +136,11 @@ async function consumirUma(mensagem: MensagemDaFila, contexto: ContextoConsumido
 }
 
 /** O `queue` do Worker: uma mensagem por vez, cada uma com o seu desfecho. */
-export async function consumirAvisos(lote: LoteDaFila, env: Env, opcoes: OpcoesConsumidor = {}): Promise<void> {
+export async function consumirAvisos(
+  lote: LoteDaFila,
+  env: Env,
+  opcoes: OpcoesConsumidor = {},
+): Promise<void> {
   const contexto: ContextoConsumidor = { env, banco: bancoSemContexto(env, opcoes.fabrica) };
   for (const mensagem of lote.messages) await consumirUma(mensagem, contexto, opcoes);
 }

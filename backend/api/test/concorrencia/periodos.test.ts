@@ -1,5 +1,8 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
-import { jogadores, type ResultadoPeriodo } from '../../src/infraestrutura/db/repositorios/jogadores.ts';
+import {
+  jogadores,
+  type ResultadoPeriodo,
+} from '../../src/infraestrutura/db/repositorios/jogadores.ts';
 import { abrirCenarioGrupos, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
 import { comDb } from '../repositorios/apoio.ts';
 
@@ -52,7 +55,10 @@ afterEach(async () => {
 
 type Faixa = [string, string | null];
 
-async function novoJogador(apelido: string, faixas: Faixa[]): Promise<{ id: string; periodos: string[] }> {
+async function novoJogador(
+  apelido: string,
+  faixas: Faixa[],
+): Promise<{ id: string; periodos: string[] }> {
   const { db, cenario } = aberto;
   const r = await db.query<{ id: string }>(
     `INSERT INTO jogadores (grupo_id, apelido, ano_nascimento, posicao, pontuacao_inicial, inicio_pontuacao, criado_por,
@@ -119,7 +125,10 @@ async function emCorrida(primeira: Escrita, segunda: Escrita) {
   try {
     await escreveu.promessa;
     const inicio = Date.now();
-    const p2 = comDb(url, cenario.contaO, segunda, { confirmar: true }).then((r) => ({ r, ms: Date.now() - inicio }));
+    const p2 = comDb(url, cenario.contaO, segunda, { confirmar: true }).then((r) => ({
+      r,
+      ms: Date.now() - inicio,
+    }));
     await esperarAlguemNaTrava();
     await esperar(SEGURAR_MS);
     liberar.disparar();
@@ -184,7 +193,8 @@ describe('concorrência das escritas de período', () => {
     const { grupoG } = aberto.cenario;
     const { r1, r2 } = await emCorrida(
       (db) => jogadores.inativar(db, grupoG, j.id, { data: '2026-10-01' }, HOJE),
-      (db) => jogadores.corrigirPeriodo(db, grupoG, j.id, j.periodos[1]!, { saida: '2026-09-15' }, HOJE),
+      (db) =>
+        jogadores.corrigirPeriodo(db, grupoG, j.id, j.periodos[1]!, { saida: '2026-09-15' }, HOJE),
     );
     expect(r1).toEqual({ resultado: 'ok', alterado: true });
     expect(r2).toEqual({ resultado: 'ok', alterado: true });

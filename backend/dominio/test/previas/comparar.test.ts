@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { compararCenarios, MENSAGEM_JOGADOR_FORA_DO_HISTORICO } from '../../src/previas/comparar.ts';
+import {
+  compararCenarios,
+  MENSAGEM_JOGADOR_FORA_DO_HISTORICO,
+} from '../../src/previas/comparar.ts';
 import { calcularRanking } from '../../src/ranking/calcular.ts';
 import { historicoDeTresMeses, presenca } from '../apoio/historico.ts';
 
@@ -32,12 +35,22 @@ describe('compararCenarios', () => {
       HOJE,
     );
     // O retorno recomeça a contagem: sem presença desde 08/10 e sem a pontuação inicial (havia presença antes).
-    expect(r).toEqual({ acumuladoAntes: 2, acumuladoDepois: 0, posicaoAntes: null, posicaoDepois: 6 });
+    expect(r).toEqual({
+      acumuladoAntes: 2,
+      acumuladoDepois: 0,
+      posicaoAntes: null,
+      posicaoDepois: 6,
+    });
   });
 
   it('PAR-113: corrigir a saída para antes de hoje dá posicaoDepois nula', () => {
     const r = compararCenarios(base, 'a', [{ inicio: '2026-01-01', fim: '2026-10-10' }], HOJE);
-    expect(r).toEqual({ acumuladoAntes: 8, acumuladoDepois: 8, posicaoAntes: 1, posicaoDepois: null });
+    expect(r).toEqual({
+      acumuladoAntes: 8,
+      acumuladoDepois: 8,
+      posicaoAntes: 1,
+      posicaoDepois: null,
+    });
   });
 
   it('PAR-113: posições dos outros jogadores são recalculadas no cenário depois', () => {
@@ -53,7 +66,9 @@ describe('compararCenarios', () => {
 
     const cenarioDepois = {
       ...comPresenca,
-      jogadores: comPresenca.jogadores.map((j) => (j.id === 'e' ? { ...j, periodos: periodosDepois } : j)),
+      jogadores: comPresenca.jogadores.map((j) =>
+        j.id === 'e' ? { ...j, periodos: periodosDepois } : j,
+      ),
     };
     const ranking = calcularRanking({ ...cenarioDepois, hoje: HOJE, mes: '2026-10' });
     expect(ranking.linhas.find((l) => l.jogadorId === 'e')?.posicao).toBe(r.posicaoDepois);
@@ -61,7 +76,12 @@ describe('compararCenarios', () => {
   });
 
   it('PAR-113: a posição de antes é a do ranking de hoje', () => {
-    const r = compararCenarios(base, 'c', base.jogadores.find((j) => j.id === 'c')?.periodos ?? [], HOJE);
+    const r = compararCenarios(
+      base,
+      'c',
+      base.jogadores.find((j) => j.id === 'c')?.periodos ?? [],
+      HOJE,
+    );
     const ranking = calcularRanking({ ...base, hoje: HOJE, mes: '2026-10' });
     expect(r.posicaoAntes).toBe(ranking.linhas.find((l) => l.jogadorId === 'c')?.posicao);
     expect(r).toEqual({ acumuladoAntes: 3, acumuladoDepois: 3, posicaoAntes: 3, posicaoDepois: 3 });
@@ -74,6 +94,8 @@ describe('compararCenarios', () => {
   });
 
   it('PAR-112: jogador fora do histórico lança', () => {
-    expect(() => compararCenarios(base, 'zzz', [], HOJE)).toThrow(MENSAGEM_JOGADOR_FORA_DO_HISTORICO);
+    expect(() => compararCenarios(base, 'zzz', [], HOJE)).toThrow(
+      MENSAGEM_JOGADOR_FORA_DO_HISTORICO,
+    );
   });
 });

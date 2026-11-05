@@ -38,10 +38,16 @@ export const DO_AMBIENTE: ReadonlySet<string> = new Set([
 const PREFIXOS_DO_AMBIENTE = ['GITHUB_', 'RUNNER_'];
 
 /** Leitura de variável no código: o objeto `env` (de `process`, `import.meta` ou do Worker). */
-const LEITURAS: readonly RegExp[] = [/\benv\.([A-Z][A-Z0-9_]*)\b/g, /\benv\[\s*['"]([A-Z][A-Z0-9_]*)['"]\s*\]/g];
+const LEITURAS: readonly RegExp[] = [
+  /\benv\.([A-Z][A-Z0-9_]*)\b/g,
+  /\benv\[\s*['"]([A-Z][A-Z0-9_]*)['"]\s*\]/g,
+];
 
 /** Citação nos workflows: `secrets.X` e `vars.X`. */
-const DO_GITHUB: readonly RegExp[] = [/\bsecrets\.([A-Z][A-Z0-9_]*)\b/g, /\bvars\.([A-Z][A-Z0-9_]*)\b/g];
+const DO_GITHUB: readonly RegExp[] = [
+  /\bsecrets\.([A-Z][A-Z0-9_]*)\b/g,
+  /\bvars\.([A-Z][A-Z0-9_]*)\b/g,
+];
 
 const CODIGO = /\.(?:ts|tsx|mts|cts|mjs|cjs|js)$/;
 const WORKFLOW = /^\.github\/.+\.ya?ml$/;
@@ -83,11 +89,14 @@ export function checarMarcacao(variaveis: readonly Variavel[]): string[] {
   const problemas: string[] = [];
   for (const v of variaveis) {
     for (const nome of ['obrigatória', 'formato', 'segredo'] as const) {
-      if (!campo(v.comentario, nome)) problemas.push(`.env.example:${v.linha}: ${v.nome} sem "${nome}:" no comentário de cima`);
+      if (!campo(v.comentario, nome))
+        problemas.push(`.env.example:${v.linha}: ${v.nome} sem "${nome}:" no comentário de cima`);
     }
     const segredo = campo(v.comentario, 'segredo').toLowerCase();
     if (segredo && segredo !== 'sim' && segredo !== 'não') {
-      problemas.push(`.env.example:${v.linha}: ${v.nome} com "segredo: ${segredo}"; use sim ou não`);
+      problemas.push(
+        `.env.example:${v.linha}: ${v.nome} com "segredo: ${segredo}"; use sim ou não`,
+      );
     }
     if (segredo === 'sim' && v.valor !== '') {
       problemas.push(`.env.example:${v.linha}: ${v.nome} é segredo e tem valor; deixe vazio`);
@@ -119,11 +128,16 @@ export function variaveisUsadas(arquivos: readonly Arquivo[]): Map<string, strin
 /** Bindings do Worker no `wrangler.jsonc` (não são variáveis de ambiente). */
 export function bindingsDoWrangler(texto: string): Set<string> {
   const nomes = new Set<string>();
-  for (const m of texto.matchAll(/"(?:binding|name)"\s*:\s*"([A-Z][A-Z0-9_]*)"/g)) if (m[1]) nomes.add(m[1]);
+  for (const m of texto.matchAll(/"(?:binding|name)"\s*:\s*"([A-Z][A-Z0-9_]*)"/g))
+    if (m[1]) nomes.add(m[1]);
   return nomes;
 }
 
-export function checarEnvExample(arquivos: readonly Arquivo[], envExample: string, bindings: ReadonlySet<string> = new Set()): string[] {
+export function checarEnvExample(
+  arquivos: readonly Arquivo[],
+  envExample: string,
+  bindings: ReadonlySet<string> = new Set(),
+): string[] {
   const variaveis = lerEnvExample(envExample);
   const listadas = new Set(variaveis.map((v) => v.nome));
   const problemas = checarMarcacao(variaveis);

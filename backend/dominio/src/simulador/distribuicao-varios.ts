@@ -73,7 +73,10 @@ function chaveDe(agregados: readonly Agregado[]): ChaveVarios {
 }
 
 /** A chave de uma composição em ids (para conferir o ótimo local no teste). */
-export function chaveVariosTimes(times: readonly (readonly string[])[], elenco: Elenco): ChaveVarios {
+export function chaveVariosTimes(
+  times: readonly (readonly string[])[],
+  elenco: Elenco,
+): ChaveVarios {
   return chaveDe(times.map((ids) => agregar(ids, elenco)));
 }
 

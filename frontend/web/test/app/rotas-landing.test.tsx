@@ -43,7 +43,12 @@ function abrir(caminho: string, sessao: () => Promise<Response>) {
 }
 
 const json = (status: number, corpo: unknown) =>
-  Promise.resolve(new Response(JSON.stringify(corpo), { status, headers: { 'Content-Type': 'application/json' } }));
+  Promise.resolve(
+    new Response(JSON.stringify(corpo), {
+      status,
+      headers: { 'Content-Type': 'application/json' },
+    }),
+  );
 
 describe('rota /', () => {
   it('PLA-64: com sessão, / vai a /app', async () => {
@@ -53,7 +58,9 @@ describe('rota /', () => {
   });
 
   it('PLA-64: sem sessão, / fica na landing', async () => {
-    const { tela, caminhoAtual } = abrir('/', () => json(401, { erro: 'Entre para continuar.', codigo: 'sem_sessao' }));
+    const { tela, caminhoAtual } = abrir('/', () =>
+      json(401, { erro: 'Entre para continuar.', codigo: 'sem_sessao' }),
+    );
     expect(await screen.findByRole('heading', { level: 1, name: 'Gestão da Pelada' })).toBeTruthy();
     expect(tela()).toBe('inicio-publico');
     expect(caminhoAtual()).toBe('/');
@@ -81,7 +88,9 @@ describe('rota /', () => {
   });
 
   it('AD-094: a landing só chama /api/sessao', async () => {
-    const { chamadas } = abrir('/', () => json(401, { erro: 'Entre para continuar.', codigo: 'sem_sessao' }));
+    const { chamadas } = abrir('/', () =>
+      json(401, { erro: 'Entre para continuar.', codigo: 'sem_sessao' }),
+    );
     await screen.findByRole('heading', { level: 1, name: 'Gestão da Pelada' });
     expect(new Set(chamadas)).toEqual(new Set(['/api/sessao']));
   });

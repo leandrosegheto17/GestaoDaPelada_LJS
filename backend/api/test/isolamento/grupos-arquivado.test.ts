@@ -11,7 +11,12 @@ import {
   type IdsDoGrupo,
   type Tentativa,
 } from './casos-escrita.ts';
-import { abrirCenarioGrupos, arquivar, reativar, type CenarioGruposAberto } from './cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  arquivar,
+  reativar,
+  type CenarioGruposAberto,
+} from './cenario-grupos.ts';
 import { MATRIZ } from './matriz.ts';
 
 /**
@@ -58,9 +63,10 @@ function esperaZero(t: Tentativa): void {
 
 async function linhasDeG(tabela: string, coluna: string): Promise<number> {
   const { db, cenario } = aberto;
-  const r = await db.query<{ n: number }>(`SELECT count(*)::int AS n FROM ${q(db, tabela)} WHERE ${q(db, coluna)} = $1`, [
-    cenario.grupoG,
-  ]);
+  const r = await db.query<{ n: number }>(
+    `SELECT count(*)::int AS n FROM ${q(db, tabela)} WHERE ${q(db, coluna)} = $1`,
+    [cenario.grupoG],
+  );
   return r.rows[0]?.n ?? 0;
 }
 
@@ -115,9 +121,11 @@ describe.each(porGrupo)('GEL-25: G arquivado, $tabela', (caso) => {
 
   it('GEL-25: UPDATE com WHERE, a outra admin O afeta zero linhas de G', async () => {
     const { db, cenario } = aberto;
-    const t = await tentarEmG(cenario.contaO, `UPDATE ${q(db, tab)} SET ${e.alterar} WHERE ${q(db, col)} = $1`, [
-      cenario.grupoG,
-    ]);
+    const t = await tentarEmG(
+      cenario.contaO,
+      `UPDATE ${q(db, tab)} SET ${e.alterar} WHERE ${q(db, col)} = $1`,
+      [cenario.grupoG],
+    );
     if (e.altera) esperaZero(t);
     else esperaRecusa(t, SEM_GRANT);
   });
@@ -131,9 +139,11 @@ describe.each(porGrupo)('GEL-25: G arquivado, $tabela', (caso) => {
 
   it('GEL-25: UPDATE com WHERE, a criadora C altera G', async () => {
     const { db, cenario } = aberto;
-    const t = await tentarEmG(cenario.contaC, `UPDATE ${q(db, tab)} SET ${e.alterar} WHERE ${q(db, col)} = $1`, [
-      cenario.grupoG,
-    ]);
+    const t = await tentarEmG(
+      cenario.contaC,
+      `UPDATE ${q(db, tab)} SET ${e.alterar} WHERE ${q(db, col)} = $1`,
+      [cenario.grupoG],
+    );
     if (!e.altera) {
       esperaRecusa(t, SEM_GRANT);
       return;
@@ -144,7 +154,11 @@ describe.each(porGrupo)('GEL-25: G arquivado, $tabela', (caso) => {
 
   it('GEL-25: DELETE com WHERE, a outra admin O afeta zero linhas de G', async () => {
     const { db, cenario } = aberto;
-    const t = await tentarEmG(cenario.contaO, `DELETE FROM ${q(db, tab)} WHERE ${q(db, col)} = $1`, [cenario.grupoG]);
+    const t = await tentarEmG(
+      cenario.contaO,
+      `DELETE FROM ${q(db, tab)} WHERE ${q(db, col)} = $1`,
+      [cenario.grupoG],
+    );
     if (e.apaga) esperaZero(t);
     else esperaRecusa(t, SEM_GRANT);
   });
@@ -158,7 +172,11 @@ describe.each(porGrupo)('GEL-25: G arquivado, $tabela', (caso) => {
 
   it('GEL-25: DELETE com WHERE, a criadora C não é barrada pela RLS onde há grant', async () => {
     const { db, cenario } = aberto;
-    const t = await tentarEmG(cenario.contaC, `DELETE FROM ${q(db, tab)} WHERE ${q(db, col)} = $1`, [cenario.grupoG]);
+    const t = await tentarEmG(
+      cenario.contaC,
+      `DELETE FROM ${q(db, tab)} WHERE ${q(db, col)} = $1`,
+      [cenario.grupoG],
+    );
     if (!e.apaga) {
       esperaRecusa(t, SEM_GRANT);
       return;
@@ -195,7 +213,12 @@ describe('GEL-112 e PAR-92: o slug público não vê G arquivado', () => {
 
   it('GEL-112: sem conta, com o slug de G, a escrita continua recusada', async () => {
     const { cenario } = aberto;
-    const t = await tentar(aberto.db, { slug: cenario.slugG }, cenario.grupoG, `UPDATE grupos SET nome = 'Invadido'`);
+    const t = await tentar(
+      aberto.db,
+      { slug: cenario.slugG },
+      cenario.grupoG,
+      `UPDATE grupos SET nome = 'Invadido'`,
+    );
     expect(t.erro, t.erro?.message).toBeNull();
     expect(t.linhas).toBe(0);
     expect(t.observado).toEqual(antesG);
@@ -214,7 +237,9 @@ describe('GEL-25: reativado, a outra admin O volta a ver G', () => {
   it('GEL-25: O vê G e as linhas de G em jogadores', async () => {
     const { cenario } = aberto;
     expect(await vistoEmG(cenario.contaO, 'grupos', 'id')).toBe(1);
-    expect(await vistoEmG(cenario.contaO, 'jogadores', 'grupo_id')).toBe(await linhasDeG('jogadores', 'grupo_id'));
+    expect(await vistoEmG(cenario.contaO, 'jogadores', 'grupo_id')).toBe(
+      await linhasDeG('jogadores', 'grupo_id'),
+    );
   });
 
   it('GEL-107: reativado, B continua sem ver G', async () => {

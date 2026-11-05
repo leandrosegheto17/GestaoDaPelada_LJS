@@ -56,7 +56,10 @@ function Icone({ tipo }: { tipo: TipoFaixa }) {
 
 export function Faixa({ tipo, titulo, children, acao }: PropsFaixa) {
   return (
-    <div className={`${estilos.faixa} ${estilos[`faixa--${tipo}`]}`} role={tipo === 'erro' ? 'alert' : 'status'}>
+    <div
+      className={`${estilos.faixa} ${estilos[`faixa--${tipo}`]}`}
+      role={tipo === 'erro' ? 'alert' : 'status'}
+    >
       <Icone tipo={tipo} />
       {titulo ? (
         <div className={estilos['faixa__texto']}>

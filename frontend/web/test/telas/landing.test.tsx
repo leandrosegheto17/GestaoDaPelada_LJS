@@ -27,7 +27,9 @@ describe('Landing', () => {
 
   it('PLA-61: os dois botões levam a /cadastro e /entrar', () => {
     montar();
-    expect(screen.getByRole('link', { name: 'Criar conta' }).getAttribute('href')).toBe('/cadastro');
+    expect(screen.getByRole('link', { name: 'Criar conta' }).getAttribute('href')).toBe(
+      '/cadastro',
+    );
     expect(screen.getByRole('link', { name: 'Entrar' }).getAttribute('href')).toBe('/entrar');
   });
 
@@ -47,7 +49,13 @@ describe('Landing', () => {
     const pro = screen.getByRole('region', { name: 'Pro' });
     expect(within(pro).getByText('R$ 9,90/mês por grupo')).toBeDefined();
     expect(within(pro).getByText('14 dias de Pro grátis, sem cartão')).toBeDefined();
-    for (const item of ['Simulador de times', 'Financeiro: mensalidades e caixa', 'PDF do ranking', 'Avisos no celular', 'Jogadores ilimitados']) {
+    for (const item of [
+      'Simulador de times',
+      'Financeiro: mensalidades e caixa',
+      'PDF do ranking',
+      'Avisos no celular',
+      'Jogadores ilimitados',
+    ]) {
       expect(within(pro).getByText(item)).toBeDefined();
     }
   });
@@ -57,8 +65,12 @@ describe('Landing', () => {
     // O rodapé fica dentro do `main` da Casca: é `footer`, mas não é a landmark `contentinfo`.
     const rodape = container.querySelector('footer');
     if (!rodape) throw new Error('sem rodapé');
-    expect(within(rodape).getByRole('link', { name: 'Termos de uso' }).getAttribute('href')).toBe('/termos');
-    expect(within(rodape).getByRole('link', { name: 'Privacidade' }).getAttribute('href')).toBe('/privacidade');
+    expect(within(rodape).getByRole('link', { name: 'Termos de uso' }).getAttribute('href')).toBe(
+      '/termos',
+    );
+    expect(within(rodape).getByRole('link', { name: 'Privacidade' }).getAttribute('href')).toBe(
+      '/privacidade',
+    );
   });
 
   it('PLA-63: com ?aviso=conta-excluida, a faixa "Sua conta foi excluída." aparece', () => {

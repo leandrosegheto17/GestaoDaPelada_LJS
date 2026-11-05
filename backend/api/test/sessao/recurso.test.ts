@@ -12,7 +12,12 @@ import { NOME_COOKIE_SESSAO } from '../../src/infraestrutura/sessao/cookie.ts';
 import { gerarToken } from '../../src/infraestrutura/sessao/token.ts';
 import { envAcesso } from '../acesso/apoio.ts';
 import { contextoFalso, fabricaComoApp } from '../db/requisicao.ts';
-import { abrirCenarioGrupos, arquivar, reativar, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  arquivar,
+  reativar,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * `recursoLiberado` e `exigirRecurso('simulador')` (T32 da simulador; SIM-68, AD-049, AD-062, AD-077, AD-091), contra o
@@ -111,8 +116,12 @@ describe('recursoLiberado padrão', () => {
   it('SIM-68: com o plano em Pro (trial do cenário), G e H têm o simulador', async () => {
     const { cenario } = aberto;
     const pontoUnico = recursoLiberadoPeloPlano(relogioDoSistema());
-    expect(await comDb(aberto.url, cenario.contaC, (db) => pontoUnico(db, cenario.grupoG, 'simulador'))).toBe(true);
-    expect(await comDb(aberto.url, cenario.contaB, (db) => pontoUnico(db, cenario.grupoH, 'simulador'))).toBe(true);
+    expect(
+      await comDb(aberto.url, cenario.contaC, (db) => pontoUnico(db, cenario.grupoG, 'simulador')),
+    ).toBe(true);
+    expect(
+      await comDb(aberto.url, cenario.contaB, (db) => pontoUnico(db, cenario.grupoH, 'simulador')),
+    ).toBe(true);
   });
 
   it('SIM-68: com G em inadimplente, o padrão nega o simulador de G', async () => {
@@ -121,45 +130,60 @@ describe('recursoLiberado padrão', () => {
       'SELECT situacao_comercial AS s, trial_inicio::text AS t FROM grupos WHERE id = $1',
       [cenario.grupoG],
     );
-    await db.query(`UPDATE grupos SET situacao_comercial = 'inadimplente', trial_inicio = NULL WHERE id = $1`, [
-      cenario.grupoG,
-    ]);
+    await db.query(
+      `UPDATE grupos SET situacao_comercial = 'inadimplente', trial_inicio = NULL WHERE id = $1`,
+      [cenario.grupoG],
+    );
     try {
       const pontoUnico = recursoLiberadoPeloPlano(relogioDoSistema());
-      expect(await comDb(aberto.url, cenario.contaC, (d) => pontoUnico(d, cenario.grupoG, 'simulador'))).toBe(false);
+      expect(
+        await comDb(aberto.url, cenario.contaC, (d) => pontoUnico(d, cenario.grupoG, 'simulador')),
+      ).toBe(false);
     } finally {
-      await db.query('UPDATE grupos SET situacao_comercial = $2, trial_inicio = $3::date WHERE id = $1', [
-        cenario.grupoG,
-        antes.rows[0]?.s,
-        antes.rows[0]?.t ?? null,
-      ]);
+      await db.query(
+        'UPDATE grupos SET situacao_comercial = $2, trial_inicio = $3::date WHERE id = $1',
+        [cenario.grupoG, antes.rows[0]?.s, antes.rows[0]?.t ?? null],
+      );
     }
   });
 
   it.each(ROTAS_TRAVADAS)('SIM-68: com o padrão, %s %s passa', async (metodo, caminho) => {
     const { cenario } = aberto;
     const antes = chamadas;
-    const r = await pedir(montar(), `/grupos/${cenario.grupoG}${caminho}`, await sessao(cenario.contaC), metodo, {});
+    const r = await pedir(
+      montar(),
+      `/grupos/${cenario.grupoG}${caminho}`,
+      await sessao(cenario.contaC),
+      metodo,
+      {},
+    );
     expect(r.status).toBe(200);
     expect(chamadas).toBe(antes + 1);
   });
 });
 
 describe('exigirRecurso com o recurso negado', () => {
-  it.each(ROTAS_TRAVADAS)('SIM-68: %s %s dá 403 plano_pro sem chamar a rota', async (metodo, caminho) => {
-    const { cenario } = aberto;
-    const antes = chamadas;
-    const r = await pedir(
-      montar({ recursoLiberado: negar }),
-      `/grupos/${cenario.grupoG}${caminho}`,
-      await sessao(cenario.contaC),
-      metodo,
-      {},
-    );
-    expect(r.status).toBe(403);
-    expect(await r.json()).toEqual({ erro: 'plano_pro', recurso: 'simulador', mensagem: MENSAGEM_PLANO_PRO });
-    expect(chamadas).toBe(antes);
-  });
+  it.each(ROTAS_TRAVADAS)(
+    'SIM-68: %s %s dá 403 plano_pro sem chamar a rota',
+    async (metodo, caminho) => {
+      const { cenario } = aberto;
+      const antes = chamadas;
+      const r = await pedir(
+        montar({ recursoLiberado: negar }),
+        `/grupos/${cenario.grupoG}${caminho}`,
+        await sessao(cenario.contaC),
+        metodo,
+        {},
+      );
+      expect(r.status).toBe(403);
+      expect(await r.json()).toEqual({
+        erro: 'plano_pro',
+        recurso: 'simulador',
+        mensagem: MENSAGEM_PLANO_PRO,
+      });
+      expect(chamadas).toBe(antes);
+    },
+  );
 
   it('SIM-68: a trava recebe o grupo da URL e o recurso simulador', async () => {
     const { cenario } = aberto;
@@ -173,18 +197,21 @@ describe('exigirRecurso com o recurso negado', () => {
     expect(pedidosDaTrava).toEqual([{ grupoId: cenario.grupoG, recurso: 'simulador' }]);
   });
 
-  it.each(['GET', 'POST'])('SIM-68: %s numa rota do grupo fora do simulador não passa pela trava', async (metodo) => {
-    const { cenario } = aberto;
-    const r = await pedir(
-      montar({ recursoLiberado: negar }),
-      `/grupos/${cenario.grupoG}/teste`,
-      await sessao(cenario.contaC),
-      metodo,
-      {},
-    );
-    expect(r.status).toBe(200);
-    expect(pedidosDaTrava).toEqual([]);
-  });
+  it.each(['GET', 'POST'])(
+    'SIM-68: %s numa rota do grupo fora do simulador não passa pela trava',
+    async (metodo) => {
+      const { cenario } = aberto;
+      const r = await pedir(
+        montar({ recursoLiberado: negar }),
+        `/grupos/${cenario.grupoG}/teste`,
+        await sessao(cenario.contaC),
+        metodo,
+        {},
+      );
+      expect(r.status).toBe(200);
+      expect(pedidosDaTrava).toEqual([]);
+    },
+  );
 
   it('SIM-68, AD-077: sem vínculo dá 404 antes da trava', async () => {
     const { cenario } = aberto;
@@ -245,7 +272,10 @@ describe('meta-teste da trava (SIM-68)', () => {
     return [
       ...new Set(
         app.routes
-          .filter((r) => r.method !== 'ALL' && /\/grupos\/:grupoId\/(simulador\/|escalacoes)/.test(r.path))
+          .filter(
+            (r) =>
+              r.method !== 'ALL' && /\/grupos\/:grupoId\/(simulador\/|escalacoes)/.test(r.path),
+          )
           .map((r) => `${r.method} ${r.path}`),
       ),
     ].sort();
@@ -264,7 +294,10 @@ describe('meta-teste da trava (SIM-68)', () => {
     const semTrava: string[] = [];
     for (const rota of rotas) {
       const [metodo, caminho] = rota.split(' ') as [string, string];
-      const url = caminho.replace('/api', '').replace(':grupoId', cenario.grupoG).replace(/:[a-zA-Z]+/g, '2026-01-08');
+      const url = caminho
+        .replace('/api', '')
+        .replace(':grupoId', cenario.grupoG)
+        .replace(/:[a-zA-Z]+/g, '2026-01-08');
       const r = await pedir(app, url, token, metodo, metodo === 'GET' ? undefined : {});
       if (r.status !== 403) semTrava.push(`${rota}: ${r.status}`);
     }

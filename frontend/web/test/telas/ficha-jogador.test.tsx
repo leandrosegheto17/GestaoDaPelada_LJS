@@ -1,6 +1,10 @@
 import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
-import { FichaJogador, TEXTO_DADOS_SALVOS, telefoneNaTela } from '../../src/telas/jogador/FichaJogador.tsx';
+import {
+  FichaJogador,
+  TEXTO_DADOS_SALVOS,
+  telefoneNaTela,
+} from '../../src/telas/jogador/FichaJogador.tsx';
 import { esperarSemViolacoes } from '../apoio/axe.ts';
 import { abrirTela, json, pendente, SESSAO_ANA, type Manipulador } from '../apoio/tela.tsx';
 
@@ -29,7 +33,11 @@ const TONINHO = {
   pontuacaoInicial: 0,
   inicioPontuacao: '2026-02-05',
   periodos: [{ id: 'p1', inicio: '2026-02-05', fim: null }],
-  notas: HABILIDADES.map((habilidade, i) => ({ habilidadeId: `h${i + 1}`, habilidade, nota: null })),
+  notas: HABILIDADES.map((habilidade, i) => ({
+    habilidadeId: `h${i + 1}`,
+    habilidade,
+    nota: null,
+  })),
 };
 
 const CAMINHO = '/app/grupos/g-quinta/jogadores/j-toninho';
@@ -50,7 +58,10 @@ function servidorDeNotas() {
       else notas.set(`h${i}`, nota);
       const valores = [...notas.values()];
       if (valores.length === 0) return json(200, { nivel: 550, semNota: true });
-      return json(200, { nivel: Math.round((valores.reduce((a, b) => a + b, 0) * 100) / valores.length), semNota: false });
+      return json(200, {
+        nivel: Math.round((valores.reduce((a, b) => a + b, 0) * 100) / valores.length),
+        semNota: false,
+      });
     };
   }
   return api;
@@ -67,7 +78,9 @@ describe('ficha do jogador: dados e notas (t16)', () => {
     expect((screen.getByLabelText('Apelido') as HTMLInputElement).value).toBe('Toninho');
     expect((screen.getByLabelText('Ano de nascimento') as HTMLInputElement).value).toBe('1978');
     expect((screen.getByLabelText('Posição') as HTMLSelectElement).value).toBe('atacante');
-    expect((screen.getByLabelText('Telefone (opcional)') as HTMLInputElement).value).toBe('(11) 98765-4321');
+    expect((screen.getByLabelText('Telefone (opcional)') as HTMLInputElement).value).toBe(
+      '(11) 98765-4321',
+    );
     expect(screen.queryByLabelText('Data de entrada')).toBeNull();
     expect(screen.getByText('05/02/2026', { selector: '#inicio-valor' })).toBeTruthy();
     const habilidades = screen.getByRole('region', { name: 'Habilidades e nível' });
@@ -93,18 +106,31 @@ describe('ficha do jogador: dados e notas (t16)', () => {
 
     const notas = [8, 7, 6, 7, 8, 5];
     for (const [i, nota] of notas.entries()) {
-      fireEvent.change(within(habilidades).getByLabelText(HABILIDADES[i] ?? ''), { target: { value: String(nota) } });
+      fireEvent.change(within(habilidades).getByLabelText(HABILIDADES[i] ?? ''), {
+        target: { value: String(nota) },
+      });
       await waitFor(() => expect(chamadas.filter((c) => c.metodo === 'PUT')).toHaveLength(i + 1));
     }
     expect(await within(habilidades).findByText('Nível 6,8')).toBeTruthy();
-    expect(chamadas.filter((c) => c.metodo === 'PUT').map((c) => c.corpo)).toEqual(notas.map((nota) => ({ nota })));
+    expect(chamadas.filter((c) => c.metodo === 'PUT').map((c) => c.corpo)).toEqual(
+      notas.map((nota) => ({ nota })),
+    );
 
     for (const [i] of notas.entries()) {
-      fireEvent.change(within(habilidades).getByLabelText(HABILIDADES[i] ?? ''), { target: { value: '' } });
-      await waitFor(() => expect(chamadas.filter((c) => c.metodo === 'PUT')).toHaveLength(notas.length + i + 1));
+      fireEvent.change(within(habilidades).getByLabelText(HABILIDADES[i] ?? ''), {
+        target: { value: '' },
+      });
+      await waitFor(() =>
+        expect(chamadas.filter((c) => c.metodo === 'PUT')).toHaveLength(notas.length + i + 1),
+      );
     }
     expect(await within(habilidades).findByText('sem nota')).toBeTruthy();
-    expect(chamadas.filter((c) => c.metodo === 'PUT').slice(notas.length).map((c) => c.corpo)).toEqual(notas.map(() => ({ nota: null })));
+    expect(
+      chamadas
+        .filter((c) => c.metodo === 'PUT')
+        .slice(notas.length)
+        .map((c) => c.corpo),
+    ).toEqual(notas.map(() => ({ nota: null })));
   });
 
   it('GEL-41: salvar os dados chama o PATCH sem dataEntrada e mostra "Dados salvos."', async () => {
@@ -118,7 +144,13 @@ describe('ficha do jogador: dados e notas (t16)', () => {
     expect(await screen.findByText(TEXTO_DADOS_SALVOS)).toBeTruthy();
     const corpos = chamadasA('PATCH', API_FICHA).map((c) => c.corpo as Record<string, unknown>);
     expect(corpos).toEqual([
-      { apelido: 'Toninho Bala', anoNascimento: 1978, posicao: 'atacante', telefone: '(11) 98765-4321', pontuacaoInicial: 0 },
+      {
+        apelido: 'Toninho Bala',
+        anoNascimento: 1978,
+        posicao: 'atacante',
+        telefone: '(11) 98765-4321',
+        pontuacaoInicial: 0,
+      },
     ]);
     expect('dataEntrada' in (corpos[0] ?? {})).toBe(false);
   });
@@ -137,7 +169,9 @@ describe('ficha do jogador: dados e notas (t16)', () => {
     await screen.findByRole('heading', { level: 1, name: 'Toninho' });
     fireEvent.click(screen.getByRole('button', { name: 'Salvar' }));
     expect(await screen.findByText('Corrija 1 campo:')).toBeTruthy();
-    expect(document.getElementById('apelido-erro')?.textContent).toBe('Já existe um jogador com esse apelido neste grupo.');
+    expect(document.getElementById('apelido-erro')?.textContent).toBe(
+      'Já existe um jogador com esse apelido neste grupo.',
+    );
     expect(screen.queryByText(TEXTO_DADOS_SALVOS)).toBeNull();
   });
 

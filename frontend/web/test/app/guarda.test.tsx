@@ -16,7 +16,10 @@ type Servidor = { estado: 'ativa' | 'sem_sessao' | 'sessao_expirada' };
 
 function respostaSessao(s: Servidor): Response {
   if (s.estado === 'ativa') {
-    return new Response(JSON.stringify(SESSAO), { status: 200, headers: { 'Content-Type': 'application/json' } });
+    return new Response(JSON.stringify(SESSAO), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
   return new Response(JSON.stringify({ erro: 'x', codigo: s.estado }), {
     status: 401,
@@ -47,7 +50,10 @@ function abrir(caminho: string, servidor: Servidor) {
   const fetch = (async () => respostaSessao(servidor)) as unknown as typeof globalThis.fetch;
   const roteador = createMemoryRouter(
     [
-      { element: <GuardaPublica />, children: [{ path: '/entrar', element: <EntrarFalso servidor={servidor} /> }] },
+      {
+        element: <GuardaPublica />,
+        children: [{ path: '/entrar', element: <EntrarFalso servidor={servidor} /> }],
+      },
       {
         path: '/app',
         element: <GuardaApp />,

@@ -5,7 +5,12 @@ import { NOME_COOKIE_SESSAO } from '../../src/infraestrutura/sessao/cookie.ts';
 import { gerarToken } from '../../src/infraestrutura/sessao/token.ts';
 import { envAcesso } from '../acesso/apoio.ts';
 import { contextoFalso, fabricaComoApp } from '../db/requisicao.ts';
-import { abrirCenarioGrupos, arquivar, reativar, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  arquivar,
+  reativar,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * `exigirFinanceiro` (T23; FIN-33, FIN-37; AD-077), contra o cenário de grupos (C criadora de G com acesso, O admin de
@@ -28,7 +33,10 @@ function montar() {
   return criarApp({
     fabricaBanco: fabricaComoApp().fabrica,
     registrarExtras: (api) => {
-      const responder = (c: { var: { acessaFinanceiro?: boolean }; json: (v: unknown, s: 200) => Response }) => {
+      const responder = (c: {
+        var: { acessaFinanceiro?: boolean };
+        json: (v: unknown, s: 200) => Response;
+      }) => {
         chamadas += 1;
         visto = c.var.acessaFinanceiro;
         return c.json({ ok: true }, 200);
@@ -51,7 +59,10 @@ async function sessao(conta: string): Promise<string> {
 }
 
 async function pedir(caminho: string, conta: string, metodo: string): Promise<Response> {
-  const headers = new Headers({ 'x-pelada': '1', cookie: `${NOME_COOKIE_SESSAO}=${await sessao(conta)}` });
+  const headers = new Headers({
+    'x-pelada': '1',
+    cookie: `${NOME_COOKIE_SESSAO}=${await sessao(conta)}`,
+  });
   const comCorpo = metodo !== 'GET' && metodo !== 'HEAD';
   if (comCorpo) headers.set('content-type', 'application/json');
   const ctx = contextoFalso();
@@ -88,40 +99,62 @@ describe('exigirFinanceiro', () => {
     expect(visto).toBe(true);
   });
 
-  it.each(METODOS)('FIN-33: %s de admin sem acesso dá 403 sem_permissao_financeiro sem chamar a rota', async (metodo) => {
-    const { cenario } = aberto;
-    const antes = chamadas;
-    const r = await pedir(`/grupos/${cenario.grupoG}/financeiro/teste`, cenario.contaO, metodo);
-    expect(r.status).toBe(403);
-    expect(await r.json()).toEqual({ erro: MENSAGEM, codigo: 'sem_permissao_financeiro' });
-    expect(chamadas).toBe(antes);
-  });
+  it.each(METODOS)(
+    'FIN-33: %s de admin sem acesso dá 403 sem_permissao_financeiro sem chamar a rota',
+    async (metodo) => {
+      const { cenario } = aberto;
+      const antes = chamadas;
+      const r = await pedir(`/grupos/${cenario.grupoG}/financeiro/teste`, cenario.contaO, metodo);
+      expect(r.status).toBe(403);
+      expect(await r.json()).toEqual({ erro: MENSAGEM, codigo: 'sem_permissao_financeiro' });
+      expect(chamadas).toBe(antes);
+    },
+  );
 
   it('FIN-33: PATCH de admins/:contaId/financeiro também é travado', async () => {
     const { cenario } = aberto;
-    const r = await pedir(`/grupos/${cenario.grupoG}/admins/${cenario.contaC}/financeiro`, cenario.contaO, 'PATCH');
+    const r = await pedir(
+      `/grupos/${cenario.grupoG}/admins/${cenario.contaC}/financeiro`,
+      cenario.contaO,
+      'PATCH',
+    );
     expect(r.status).toBe(403);
     expect(await r.json()).toMatchObject({ codigo: 'sem_permissao_financeiro' });
-    const ok = await pedir(`/grupos/${cenario.grupoG}/admins/${cenario.contaO}/financeiro`, cenario.contaC, 'PATCH');
+    const ok = await pedir(
+      `/grupos/${cenario.grupoG}/admins/${cenario.contaO}/financeiro`,
+      cenario.contaC,
+      'PATCH',
+    );
     expect(ok.status).toBe(200);
   });
 
-  it.each(['GET', 'POST'])('FIN-33: sem vínculo, o 404 do exigirVinculo vem antes (%s)', async (metodo) => {
-    const { cenario } = aberto;
-    const antes = chamadas;
-    const r = await pedir(`/grupos/${cenario.grupoG}/financeiro/teste`, cenario.contaB, metodo);
-    expect(r.status).toBe(404);
-    expect(chamadas).toBe(antes);
-  });
+  it.each(['GET', 'POST'])(
+    'FIN-33: sem vínculo, o 404 do exigirVinculo vem antes (%s)',
+    async (metodo) => {
+      const { cenario } = aberto;
+      const antes = chamadas;
+      const r = await pedir(`/grupos/${cenario.grupoG}/financeiro/teste`, cenario.contaB, metodo);
+      expect(r.status).toBe(404);
+      expect(chamadas).toBe(antes);
+    },
+  );
 
   it('FIN-37, AD-077: escrita em arquivado dá 409 antes, também para quem não tem acesso', async () => {
     const { cenario } = aberto;
     await arquivar(aberto.db, cenario.grupoG);
-    const daCriadora = await pedir(`/grupos/${cenario.grupoG}/financeiro/teste`, cenario.contaC, 'POST');
+    const daCriadora = await pedir(
+      `/grupos/${cenario.grupoG}/financeiro/teste`,
+      cenario.contaC,
+      'POST',
+    );
     expect(daCriadora.status).toBe(409);
     expect(await daCriadora.json()).toMatchObject({ codigo: 'grupo_arquivado' });
     // Para a não criadora, o arquivado some pela RLS: 404 antes de tudo.
-    const daOutra = await pedir(`/grupos/${cenario.grupoG}/financeiro/teste`, cenario.contaO, 'POST');
+    const daOutra = await pedir(
+      `/grupos/${cenario.grupoG}/financeiro/teste`,
+      cenario.contaO,
+      'POST',
+    );
     expect(daOutra.status).toBe(404);
   });
 
@@ -132,9 +165,12 @@ describe('exigirFinanceiro', () => {
     expect(r.status).toBe(200);
   });
 
-  it.each(['GET', 'POST'])('FIN-33: %s numa rota do grupo fora do financeiro não é travado para quem não tem acesso', async (metodo) => {
-    const { cenario } = aberto;
-    const r = await pedir(`/grupos/${cenario.grupoG}/teste`, cenario.contaO, metodo);
-    expect(r.status).toBe(200);
-  });
+  it.each(['GET', 'POST'])(
+    'FIN-33: %s numa rota do grupo fora do financeiro não é travado para quem não tem acesso',
+    async (metodo) => {
+      const { cenario } = aberto;
+      const r = await pedir(`/grupos/${cenario.grupoG}/teste`, cenario.contaO, metodo);
+      expect(r.status).toBe(200);
+    },
+  );
 });

@@ -27,8 +27,18 @@ const json = (corpo: string) => ({ status: 200, contentType: 'application/json',
 export const LIMITE_PDF = process.env.CI ? 0.09 : 0.045;
 
 const ESTADOS = [
-  { nome: 'sucesso', mes: '2026-10', pdf: 'publico-pdf-2026-10.json', ranking: 'publico-ranking-2026-10.json' },
-  { nome: 'mes-vazio', mes: '2026-07', pdf: 'publico-pdf-2026-07.json', ranking: 'publico-ranking-2026-07.json' },
+  {
+    nome: 'sucesso',
+    mes: '2026-10',
+    pdf: 'publico-pdf-2026-10.json',
+    ranking: 'publico-ranking-2026-10.json',
+  },
+  {
+    nome: 'mes-vazio',
+    mes: '2026-07',
+    pdf: 'publico-pdf-2026-07.json',
+    ranking: 'publico-ranking-2026-07.json',
+  },
 ] as const;
 
 /** Uma coluna de rodada deslocada 24 px: tem de reprovar. */
@@ -38,9 +48,19 @@ const COLUNA_DESLOCADA = '.pdf-tabela tr > :nth-child(6) { transform: translateX
 test.use({ launchOptions: { args: ['--disable-lcd-text'] }, serviceWorkers: 'block' });
 
 async function abrirRanking(page: Page, estado: (typeof ESTADOS)[number]) {
-  await page.route('**/api/**', (r) => r.fulfill({ status: 404, contentType: 'application/json', body: '{"erro":"Não encontrado.","codigo":"nao_encontrado"}' }));
-  await page.route('**/api/publico/pelada-de-quinta/ranking*', (r) => r.fulfill(json(resposta(estado.ranking))));
-  await page.route('**/api/publico/pelada-de-quinta/pdf*', (r) => r.fulfill(json(resposta(estado.pdf))));
+  await page.route('**/api/**', (r) =>
+    r.fulfill({
+      status: 404,
+      contentType: 'application/json',
+      body: '{"erro":"Não encontrado.","codigo":"nao_encontrado"}',
+    }),
+  );
+  await page.route('**/api/publico/pelada-de-quinta/ranking*', (r) =>
+    r.fulfill(json(resposta(estado.ranking))),
+  );
+  await page.route('**/api/publico/pelada-de-quinta/pdf*', (r) =>
+    r.fulfill(json(resposta(estado.pdf))),
+  );
   await page.route('**/api/publico/pelada-de-quinta/eventos', (r) => r.fulfill({ status: 204 }));
   await page.goto(`/g/pelada-de-quinta?mes=${estado.mes}`);
 }
@@ -59,7 +79,10 @@ function tamanho(png: Buffer): string {
 }
 
 for (const estado of ESTADOS) {
-  test(`PAR-108: PDF do ranking (${estado.nome}) confere com o mockup P01`, async ({ page, context }) => {
+  test(`PAR-108: PDF do ranking (${estado.nome}) confere com o mockup P01`, async ({
+    page,
+    context,
+  }) => {
     await abrirRanking(page, estado);
     const download = page.waitForEvent('download');
     await page.getByRole('button', { name: 'Exportar PDF' }).first().click();
@@ -79,11 +102,16 @@ for (const estado of ESTADOS) {
     expect(tamanho(esperado)).toBe('794x1123');
     const r = compararPng(obtido, esperado, { limite: LIMITE_PDF });
     if (r.diff) writeFileSync(join(RESULTADOS, `pdf-${estado.nome}-diff.png`), r.diff);
-    expect(r.proporcao, `${porcentagem(r.proporcao)} dos pixels divergem (limite ${porcentagem(LIMITE_PDF)})`).toBeLessThanOrEqual(LIMITE_PDF);
+    expect(
+      r.proporcao,
+      `${porcentagem(r.proporcao)} dos pixels divergem (limite ${porcentagem(LIMITE_PDF)})`,
+    ).toBeLessThanOrEqual(LIMITE_PDF);
   });
 }
 
-test('PAR-108: controle, uma coluna deslocada de propósito reprova no limite do PDF', async ({ context }) => {
+test('PAR-108: controle, uma coluna deslocada de propósito reprova no limite do PDF', async ({
+  context,
+}) => {
   const certo = await folhaDoMockup(await context.newPage(), 'sucesso');
   const deslocado = await folhaDoMockup(await context.newPage(), 'sucesso', COLUNA_DESLOCADA);
   const r = compararPng(certo, deslocado, { limite: LIMITE_PDF });

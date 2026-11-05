@@ -13,7 +13,12 @@ const WEB = join(import.meta.dirname, '..');
 const CONFIG = join(WEB, '.stylelintrc.json');
 
 async function lint(code: string, arquivo = 'src/exemplo.module.css') {
-  const r = await stylelint.lint({ code, codeFilename: join(WEB, arquivo), configFile: CONFIG, configBasedir: WEB });
+  const r = await stylelint.lint({
+    code,
+    codeFilename: join(WEB, arquivo),
+    configFile: CONFIG,
+    configBasedir: WEB,
+  });
   const avisos = r.results.flatMap((x) => x.warnings);
   return { erros: r.errored === true, regras: avisos.map((a) => a.rule) };
 }
@@ -80,7 +85,9 @@ describe('Stylelint: só tokens', () => {
   });
 
   it('FUN-32: o script lint do front chama o ESLint e o Stylelint', () => {
-    const pkg = JSON.parse(readFileSync(join(WEB, 'package.json'), 'utf8')) as { scripts: Record<string, string> };
+    const pkg = JSON.parse(readFileSync(join(WEB, 'package.json'), 'utf8')) as {
+      scripts: Record<string, string>;
+    };
     expect(pkg.scripts.lint).toMatch(/eslint/);
     expect(pkg.scripts.lint).toMatch(/stylelint/);
   });

@@ -32,7 +32,8 @@ import { textoRecorrencia } from './recorrencia.ts';
  */
 
 export const TITULO_VAZIO = 'Nenhum grupo ainda';
-export const TEXTO_VAZIO = 'Crie o grupo da sua pelada. Se um admin convidar você, o grupo dele também aparece aqui.';
+export const TEXTO_VAZIO =
+  'Crie o grupo da sua pelada. Se um admin convidar você, o grupo dele também aparece aqui.';
 export const TITULO_ARQUIVADOS = 'Arquivados';
 export const TEXTO_ARQUIVADOS =
   'Só você, que criou estes grupos, os vê aqui. Os outros admins não têm acesso enquanto estiverem arquivados.';
@@ -43,7 +44,8 @@ export const ROTA_NOVO_GRUPO = '/app/grupos/novo';
 export const AVISO_GRUPO_ARQUIVADO = 'grupo-arquivado';
 
 export const tituloReativar = (nome: string) => `Reativar “${nome}”?`;
-export const TEXTO_REATIVAR = 'O grupo volta como estava, com o mesmo link, e os outros admins voltam a ter acesso.';
+export const TEXTO_REATIVAR =
+  'O grupo volta como estava, com o mesmo link, e os outros admins voltam a ter acesso.';
 
 export function rotaDoGrupo(grupoId: string): string {
   return `/app/grupos/${encodeURIComponent(grupoId)}`;
@@ -95,7 +97,9 @@ export function Grupos() {
   const local = useLocation();
   const [reativar, setReativar] = useState<GrupoItem | null>(null);
   const [aviso, setAviso] = useState<string | null>(() =>
-    (local.state as { aviso?: string } | null)?.aviso === AVISO_GRUPO_ARQUIVADO ? TEXTO_GRUPO_ARQUIVADO : null,
+    (local.state as { aviso?: string } | null)?.aviso === AVISO_GRUPO_ARQUIVADO
+      ? TEXTO_GRUPO_ARQUIVADO
+      : null,
   );
   const [falha, setFalha] = useState<string | null>(null);
 
@@ -133,7 +137,9 @@ export function Grupos() {
                     {semFinanceiro.has(g.id) ? (
                       <>
                         {' '}
-                        <span className={`${estilos.selo} ${estilos['selo--neutro']}`}>{TEXTO_SEM_FINANCEIRO}</span>
+                        <span className={`${estilos.selo} ${estilos['selo--neutro']}`}>
+                          {TEXTO_SEM_FINANCEIRO}
+                        </span>
                       </>
                     ) : null}
                   </>
@@ -157,7 +163,11 @@ export function Grupos() {
                   titulo={g.nome}
                   meta={textoRecorrencia(g)}
                   lateral={
-                    <Botao variante="secundario" aria-label={`Reativar ${g.nome}`} onClick={() => setReativar(g)}>
+                    <Botao
+                      variante="secundario"
+                      aria-label={`Reativar ${g.nome}`}
+                      onClick={() => setReativar(g)}
+                    >
                       Reativar
                     </Botao>
                   }

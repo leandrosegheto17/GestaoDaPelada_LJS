@@ -40,7 +40,12 @@ afterAll(async () => {
 
 /** Problemas de uma função pelo catálogo. Lista vazia = conforme a regra. */
 async function problemasDa(db: pg.Client, regra: Regra): Promise<string[]> {
-  const r = await db.query<{ definer: boolean; config: string[] | null; publico: boolean; executores: string[] }>(
+  const r = await db.query<{
+    definer: boolean;
+    config: string[] | null;
+    publico: boolean;
+    executores: string[];
+  }>(
     `SELECT p.prosecdef AS definer, p.proconfig AS config,
             EXISTS (SELECT 1 FROM aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) a
                      WHERE a.grantee = 0 AND a.privilege_type = 'EXECUTE') AS publico,
@@ -54,12 +59,15 @@ async function problemasDa(db: pg.Client, regra: Regra): Promise<string[]> {
   const f = r.rows[0];
   if (!f) return [`${regra.assinatura}: não existe`];
   const problemas: string[] = [];
-  if (!(f.config ?? []).includes(SEARCH_PATH)) problemas.push(`${regra.assinatura}: sem search_path fixo`);
+  if (!(f.config ?? []).includes(SEARCH_PATH))
+    problemas.push(`${regra.assinatura}: sem search_path fixo`);
   if (f.publico) problemas.push(`${regra.assinatura}: EXECUTE para PUBLIC`);
   if (regra.definer) {
     if (!f.definer) problemas.push(`${regra.assinatura}: sem SECURITY DEFINER`);
     if (f.executores.join(',') !== 'pelada_app') {
-      problemas.push(`${regra.assinatura}: EXECUTE para ${f.executores.join(',') || 'ninguém'}, esperado só pelada_app`);
+      problemas.push(
+        `${regra.assinatura}: EXECUTE para ${f.executores.join(',') || 'ninguém'}, esperado só pelada_app`,
+      );
     }
   }
   return problemas;
@@ -83,8 +91,9 @@ describe('GEL-112: meta-teste das funções de grupo', () => {
 
   it('GEL-112: uma função SECURITY DEFINER de teste sem search_path e sem REVOKE reprova', async () => {
     const regra: Regra = { assinatura: 'exemplo_grupo_sem_path()', definer: true };
-    const p = await com(`CREATE FUNCTION exemplo_grupo_sem_path() RETURNS int LANGUAGE sql SECURITY DEFINER AS 'SELECT 1'`, () =>
-      problemasDa(aberto.db, regra),
+    const p = await com(
+      `CREATE FUNCTION exemplo_grupo_sem_path() RETURNS int LANGUAGE sql SECURITY DEFINER AS 'SELECT 1'`,
+      () => problemasDa(aberto.db, regra),
     );
     expect(p).toEqual([
       'exemplo_grupo_sem_path(): sem search_path fixo',
@@ -95,19 +104,27 @@ describe('GEL-112: meta-teste das funções de grupo', () => {
 
   it('GEL-112: dar EXECUTE a PUBLIC na grupo_criar reprova', async () => {
     const regra = FUNCOES[0] as Regra;
-    const p = await com(`GRANT EXECUTE ON FUNCTION ${regra.assinatura} TO PUBLIC`, () => problemasDa(aberto.db, regra));
+    const p = await com(`GRANT EXECUTE ON FUNCTION ${regra.assinatura} TO PUBLIC`, () =>
+      problemasDa(aberto.db, regra),
+    );
     expect(p).toEqual([`${regra.assinatura}: EXECUTE para PUBLIC`]);
   });
 
   it('GEL-112: dar EXECUTE a pelada_backup_ro na grupos_visiveis reprova', async () => {
     const regra = FUNCOES[1] as Regra;
-    const p = await com(`GRANT EXECUTE ON FUNCTION ${regra.assinatura} TO pelada_backup_ro`, () => problemasDa(aberto.db, regra));
-    expect(p).toEqual([`${regra.assinatura}: EXECUTE para pelada_app,pelada_backup_ro, esperado só pelada_app`]);
+    const p = await com(`GRANT EXECUTE ON FUNCTION ${regra.assinatura} TO pelada_backup_ro`, () =>
+      problemasDa(aberto.db, regra),
+    );
+    expect(p).toEqual([
+      `${regra.assinatura}: EXECUTE para pelada_app,pelada_backup_ro, esperado só pelada_app`,
+    ]);
   });
 
   it('GEL-112: PUBLIC executando a função da trigger reprova', async () => {
     const regra = FUNCOES[2] as Regra;
-    const p = await com(`GRANT EXECUTE ON FUNCTION ${regra.assinatura} TO PUBLIC`, () => problemasDa(aberto.db, regra));
+    const p = await com(`GRANT EXECUTE ON FUNCTION ${regra.assinatura} TO PUBLIC`, () =>
+      problemasDa(aberto.db, regra),
+    );
     expect(p).toEqual([`${regra.assinatura}: EXECUTE para PUBLIC`]);
   });
 });

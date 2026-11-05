@@ -68,8 +68,10 @@ export function MinhaSenha() {
       setTrocada(true);
     } catch (erro) {
       // O erro da API marca só o campo, sem o resumo (`t25-senha--erro`).
-      if (erro instanceof ErroApi && erro.codigo === 'senha_atual_incorreta') setErros({ atual: ERRO_SENHA_ATUAL });
-      else if (erro instanceof ErroApi && erro.campos.includes('senhaNova')) setErros({ nova: ERRO_SENHA });
+      if (erro instanceof ErroApi && erro.codigo === 'senha_atual_incorreta')
+        setErros({ atual: ERRO_SENHA_ATUAL });
+      else if (erro instanceof ErroApi && erro.campos.includes('senhaNova'))
+        setErros({ nova: ERRO_SENHA });
       else setFalha(erro instanceof ErroApi ? erro.message : MENSAGEM_REDE);
     } finally {
       setEnviando(false);
@@ -81,7 +83,12 @@ export function MinhaSenha() {
       <LinkVoltar para="/app">Início</LinkVoltar>
       <h1 className={estilos['titulo-pagina']}>Minha senha</h1>
       {trocada ? <Faixa tipo="sucesso">{TEXTO_SENHA_TROCADA}</Faixa> : null}
-      <form className={estilos.formulario} noValidate aria-busy={enviando || undefined} onSubmit={trocar}>
+      <form
+        className={estilos.formulario}
+        noValidate
+        aria-busy={enviando || undefined}
+        onSubmit={trocar}
+      >
         <ResumoErros erros={resumo.map((c) => ({ id: c, rotulo: ROTULOS[c] }))} />
         {falha ? <Faixa tipo="erro">{falha}</Faixa> : null}
         <Campo

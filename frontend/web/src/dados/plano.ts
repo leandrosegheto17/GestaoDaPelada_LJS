@@ -54,7 +54,8 @@ export function useAssinar(grupoId: string) {
   const api = useCliente();
   const consultas = useQueryClient();
   return useMutation({
-    mutationFn: (dados: AssinaturaCorpo) => api.post<AssinaturaCriada>(caminhoAssinatura(grupoId), dados),
+    mutationFn: (dados: AssinaturaCorpo) =>
+      api.post<AssinaturaCriada>(caminhoAssinatura(grupoId), dados),
     // O 409 também muda o que Meu plano mostra (há assinatura pendente): relê nos dois casos.
     onSettled: () => invalidarPlano(consultas, grupoId),
   });

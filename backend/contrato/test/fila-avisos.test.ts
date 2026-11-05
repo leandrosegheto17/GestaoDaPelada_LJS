@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { mensagemAviso, mensagemCobranca, mensagemRanking, TENTATIVA_MAXIMA } from '../src/fila-avisos.ts';
+import {
+  mensagemAviso,
+  mensagemCobranca,
+  mensagemRanking,
+  TENTATIVA_MAXIMA,
+} from '../src/fila-avisos.ts';
 
 /** Mensagens da fila `avisos` (notificacoes T16; NOT-22, NOT-43). */
 
@@ -50,7 +55,11 @@ describe('mensagem ranking', () => {
   });
 
   it('NOT-43: recusa endpoint, chave ou qualquer campo a mais', () => {
-    for (const extra of [{ endpoint: 'https://fcm.googleapis.com/x' }, { p256dh: 'x' }, { apelidos: ['Caco'] }]) {
+    for (const extra of [
+      { endpoint: 'https://fcm.googleapis.com/x' },
+      { p256dh: 'x' },
+      { apelidos: ['Caco'] },
+    ]) {
       expect(mensagemRanking.safeParse({ ...RANKING, ...extra }).success).toBe(false);
     }
   });
@@ -58,7 +67,11 @@ describe('mensagem ranking', () => {
 
 describe('mensagem cobranca', () => {
   it('NOT-38: aceita os 3 tipos de aviso com valor em centavos inteiros', () => {
-    for (const aviso of ['cobranca_gerada', 'pagamento_confirmado', 'pagamento_atrasado'] as const) {
+    for (const aviso of [
+      'cobranca_gerada',
+      'pagamento_confirmado',
+      'pagamento_atrasado',
+    ] as const) {
       expect(mensagemCobranca.parse({ ...COBRANCA, aviso })).toEqual({ ...COBRANCA, aviso });
     }
   });

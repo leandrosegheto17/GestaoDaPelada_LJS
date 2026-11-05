@@ -25,14 +25,27 @@ export function textoPdfPronto(mesPorExtenso: string, grupo: string): string {
   return `Ranking de ${mesPorExtenso} da ${grupo}.`;
 }
 
-export function DialogoPdfPronto({ arquivo, mesPorExtenso, grupo, aoBaixar, aoCompartilhar, aoFalhar, aoFechar, navegador }: PropsDialogoPdfPronto) {
+export function DialogoPdfPronto({
+  arquivo,
+  mesPorExtenso,
+  grupo,
+  aoBaixar,
+  aoCompartilhar,
+  aoFalhar,
+  aoFechar,
+  navegador,
+}: PropsDialogoPdfPronto) {
   const [compartilhando, setCompartilhando] = useState(false);
   const texto = textoPdfPronto(mesPorExtenso, grupo);
 
   const aoTocarCompartilhar = async () => {
     setCompartilhando(true);
     try {
-      const resultado = await compartilhar(arquivo, { title: arquivo.name, text: texto }, navegador);
+      const resultado = await compartilhar(
+        arquivo,
+        { title: arquivo.name, text: texto },
+        navegador,
+      );
       if (resultado === 'compartilhado') aoCompartilhar();
     } catch (erro) {
       aoFalhar(erro);
@@ -51,7 +64,11 @@ export function DialogoPdfPronto({ arquivo, mesPorExtenso, grupo, aoBaixar, aoCo
           <Botao variante="secundario" onClick={aoBaixar}>
             Baixar
           </Botao>
-          <Botao variante="principal" onClick={() => void aoTocarCompartilhar()} disabled={compartilhando}>
+          <Botao
+            variante="principal"
+            onClick={() => void aoTocarCompartilhar()}
+            disabled={compartilhando}
+          >
             Compartilhar
           </Botao>
         </>

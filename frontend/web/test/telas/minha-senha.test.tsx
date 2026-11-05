@@ -35,23 +35,31 @@ describe('tela Minha senha', () => {
     const { container, chamadasA } = abrir({ 'POST /api/conta/senha': () => json(204) });
     await preencher();
     expect((await screen.findByRole('status')).textContent).toBe(TEXTO_SENHA_TROCADA);
-    expect(chamadasA('POST', '/api/conta/senha').map((c) => c.corpo)).toEqual([{ senhaAtual: 'Antiga12', senhaNova: 'NovaSenha1' }]);
+    expect(chamadasA('POST', '/api/conta/senha').map((c) => c.corpo)).toEqual([
+      { senhaAtual: 'Antiga12', senhaNova: 'NovaSenha1' },
+    ]);
     expect((screen.getByLabelText('Senha atual') as HTMLInputElement).value).toBe('');
     expect((screen.getByLabelText('Nova senha') as HTMLInputElement).value).toBe('');
     await esperarSemViolacoes(container);
   });
 
   it('ACE-27: 401 senha_atual_incorreta marca o campo da senha atual com a mensagem; axe sem violação', async () => {
-    const { container } = abrir({ 'POST /api/conta/senha': () => erroApi(401, 'senha_atual_incorreta') });
+    const { container } = abrir({
+      'POST /api/conta/senha': () => erroApi(401, 'senha_atual_incorreta'),
+    });
     await preencher();
-    await waitFor(() => expect(document.getElementById('atual-erro')?.textContent).toBe(ERRO_SENHA_ATUAL));
+    await waitFor(() =>
+      expect(document.getElementById('atual-erro')?.textContent).toBe(ERRO_SENHA_ATUAL),
+    );
     expect(screen.getByLabelText('Senha atual').getAttribute('aria-invalid')).toBe('true');
     expect(screen.queryByText(TEXTO_SENHA_TROCADA)).toBeNull();
     await esperarSemViolacoes(container);
   });
 
   it('ACE-27: o 401 da troca não leva a /entrar (só sessao_expirada leva)', async () => {
-    const { local } = abrir({ 'POST /api/conta/senha': () => erroApi(401, 'senha_atual_incorreta') });
+    const { local } = abrir({
+      'POST /api/conta/senha': () => erroApi(401, 'senha_atual_incorreta'),
+    });
     await preencher();
     await waitFor(() => expect(document.getElementById('atual-erro')).toBeTruthy());
     expect(local()).toBe('/app/conta/senha');
@@ -60,7 +68,9 @@ describe('tela Minha senha', () => {
   it('ACE-26: confirmação diferente marca a confirmação e não chama a API', async () => {
     const { chamadasA } = abrir();
     await preencher('Antiga12', 'NovaSenha1', 'NovaSenha2');
-    await waitFor(() => expect(document.getElementById('conf-erro')?.textContent).toBe(ERRO_SENHAS_DIFERENTES));
+    await waitFor(() =>
+      expect(document.getElementById('conf-erro')?.textContent).toBe(ERRO_SENHAS_DIFERENTES),
+    );
     expect(screen.getByRole('alert').textContent).toContain('Corrija 1 campo:');
     expect(chamadasA('POST', '/api/conta/senha')).toHaveLength(0);
   });
@@ -75,7 +85,10 @@ describe('tela Minha senha', () => {
   it('ACE-70: 429 bloqueado mostra a mensagem da API na faixa de erro', async () => {
     abrir({
       'POST /api/conta/senha': () =>
-        json(429, { erro: 'Muitas tentativas. Tente de novo em alguns minutos.', codigo: 'bloqueado_temporariamente' }),
+        json(429, {
+          erro: 'Muitas tentativas. Tente de novo em alguns minutos.',
+          codigo: 'bloqueado_temporariamente',
+        }),
     });
     await preencher();
     expect((await screen.findByRole('alert')).textContent).toContain('Muitas tentativas');

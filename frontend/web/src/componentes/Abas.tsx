@@ -33,7 +33,14 @@ export function textoAba(aba: Aba): string {
   return aba.contagem === undefined ? aba.rotulo : `${aba.rotulo} (${aba.contagem})`;
 }
 
-export function Abas<C extends string>({ rotulo, abas, ativa, aoMudar, idPainel, id }: PropsAbas<C>) {
+export function Abas<C extends string>({
+  rotulo,
+  abas,
+  ativa,
+  aoMudar,
+  idPainel,
+  id,
+}: PropsAbas<C>) {
   const botoes = useRef<(HTMLButtonElement | null)[]>([]);
 
   function irPara(indice: number) {

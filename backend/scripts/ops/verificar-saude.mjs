@@ -20,7 +20,10 @@ const dormir = (ms) => new Promise((r) => setTimeout(r, ms));
 async function consultar(endereco, sha, buscar) {
   let resposta;
   try {
-    resposta = await buscar(endereco, { headers: { Accept: 'application/json' }, cache: 'no-store' });
+    resposta = await buscar(endereco, {
+      headers: { Accept: 'application/json' },
+      cache: 'no-store',
+    });
   } catch (erro) {
     return `sem resposta (${erro instanceof Error ? erro.message : String(erro)})`;
   }
@@ -45,17 +48,27 @@ export async function verificarSaude(opcoes) {
   const tentativas = opcoes.tentativas ?? TENTATIVAS_PADRAO;
   const esperaMs = opcoes.esperaMs ?? ESPERA_PADRAO_MS;
   const buscar = opcoes.buscar ?? ((u, i) => fetch(u, i));
-  if (!url) return { ok: false, tentativas: 0, mensagem: 'URL_PUBLICA vazia: não há onde conferir a saúde.' };
+  if (!url)
+    return {
+      ok: false,
+      tentativas: 0,
+      mensagem: 'URL_PUBLICA vazia: não há onde conferir a saúde.',
+    };
   if (!sha) return { ok: false, tentativas: 0, mensagem: 'SHA esperado vazio (GITHUB_SHA).' };
 
   const endereco = `${url.replace(/\/+$/, '')}/api/health`;
   let motivo = '';
   for (let i = 1; i <= tentativas; i += 1) {
     motivo = await consultar(endereco, sha, buscar);
-    if (motivo === null) return { ok: true, tentativas: i, mensagem: `Saúde ok na tentativa ${i}: versao ${sha}.` };
+    if (motivo === null)
+      return { ok: true, tentativas: i, mensagem: `Saúde ok na tentativa ${i}: versao ${sha}.` };
     if (i < tentativas) await dormir(esperaMs);
   }
-  return { ok: false, tentativas, mensagem: `Saúde reprovada depois de ${tentativas} tentativas em ${endereco}: ${motivo}.` };
+  return {
+    ok: false,
+    tentativas,
+    mensagem: `Saúde reprovada depois de ${tentativas} tentativas em ${endereco}: ${motivo}.`,
+  };
 }
 
 function numero(valor, padrao) {

@@ -71,7 +71,9 @@ describe('wrangler.jsonc da prévia', () => {
   it('FUN-27: Worker gestaodapelada-v2 no workers.dev e só com o domínio da AD-121', () => {
     expect(config.name).toBe('gestaodapelada-v2');
     expect(config.workers_dev).toBe(true);
-    expect(config.routes).toEqual([{ pattern: 'gestaodapelada.ljssoftware.com.br', custom_domain: true }]);
+    expect(config.routes).toEqual([
+      { pattern: 'gestaodapelada.ljssoftware.com.br', custom_domain: true },
+    ]);
     const todas = chaves(config);
     for (const proibida of ['route', 'zone_name', 'zone_id']) {
       expect(todas, proibida).not.toContain(proibida);

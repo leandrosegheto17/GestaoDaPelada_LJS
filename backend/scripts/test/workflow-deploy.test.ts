@@ -37,7 +37,10 @@ function usaSecretSensivel(p: Passo): boolean {
 
 /** Roda o script do passo no bash com o ambiente dado. */
 function rodarPasso(p: Passo | undefined, env: Record<string, string>) {
-  return spawnSync('bash', ['-c', p?.run ?? 'exit 99'], { env: { PATH: process.env.PATH ?? '', ...env }, encoding: 'utf8' });
+  return spawnSync('bash', ['-c', p?.run ?? 'exit 99'], {
+    env: { PATH: process.env.PATH ?? '', ...env },
+    encoding: 'utf8',
+  });
 }
 
 describe('deploy.yml', () => {
@@ -76,7 +79,8 @@ describe('deploy.yml', () => {
     const primeiroSensivel = indice(usaSecretSensivel);
     expect(primeiroSensivel).toBeGreaterThan(BUILD);
     expect(usaSecretSensivel(lista[BUILD] as Passo)).toBe(false);
-    for (const p of lista.slice(0, BUILD + 1)) expect(usaSecretSensivel(p), p.name ?? p.uses).toBe(false);
+    for (const p of lista.slice(0, BUILD + 1))
+      expect(usaSecretSensivel(p), p.name ?? p.uses).toBe(false);
   });
 
   it('FUN-44: o deploy vem depois da migração, e nenhum passo segue em erro nem tem if próprio', () => {
@@ -99,6 +103,8 @@ describe('deploy.yml', () => {
 
   it('FUN-41: toda action de terceiros está fixada por SHA', () => {
     for (const u of usesExternos(texto)) expect(u).toMatch(SHA_40);
-    expect(checarActions([{ caminho: '.github/workflows/deploy.yml', conteudo: texto }])).toEqual([]);
+    expect(checarActions([{ caminho: '.github/workflows/deploy.yml', conteudo: texto }])).toEqual(
+      [],
+    );
   });
 });

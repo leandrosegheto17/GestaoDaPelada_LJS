@@ -23,7 +23,8 @@ function semComentario(linha: string, marcador: '//' | '#'): string {
     if (aspas !== null) continue;
     if (marcador === '//' && c === '/' && linha[i + 1] === '/') return linha.slice(0, i);
     // No YAML, `#` só abre comentário no começo ou depois de espaço.
-    if (marcador === '#' && c === '#' && (i === 0 || /\s/.test(linha[i - 1] ?? ''))) return linha.slice(0, i);
+    if (marcador === '#' && c === '#' && (i === 0 || /\s/.test(linha[i - 1] ?? '')))
+      return linha.slice(0, i);
   }
   return linha;
 }
@@ -34,7 +35,9 @@ export function checarPushHostsDev(conteudo: string, caminho: string): string[] 
   const problemas: string[] = [];
   conteudo.split('\n').forEach((linha, i) => {
     if (NOME.test(semComentario(linha, marcador))) {
-      problemas.push(`${caminho}:${i + 1}: define PUSH_HOSTS_DEV; ela só vale no .env local e no e2e`);
+      problemas.push(
+        `${caminho}:${i + 1}: define PUSH_HOSTS_DEV; ela só vale no .env local e no e2e`,
+      );
     }
   });
   return problemas;
@@ -43,7 +46,9 @@ export function checarPushHostsDev(conteudo: string, caminho: string): string[] 
 export const ARQUIVOS_VIGIADOS = ['wrangler.jsonc', '.github/workflows/deploy.yml'] as const;
 
 export function checarRepositorio(raiz = RAIZ): string[] {
-  return ARQUIVOS_VIGIADOS.flatMap((caminho) => checarPushHostsDev(readFileSync(join(raiz, caminho), 'utf8'), caminho));
+  return ARQUIVOS_VIGIADOS.flatMap((caminho) =>
+    checarPushHostsDev(readFileSync(join(raiz, caminho), 'utf8'), caminho),
+  );
 }
 
 if (import.meta.main) {

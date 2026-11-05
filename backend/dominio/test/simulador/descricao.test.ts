@@ -13,7 +13,8 @@ import { calcularPrevia } from '../../src/simulador/previa.ts';
  *   N sugerido ≥ 2 exige 5 aptos ou mais, e com 4 já há 2 times; o texto cobre o caso do mesmo jeito).
  */
 
-const dois = (n: number, aptos: number): string => descreverPrevia(calcularPrevia({ formato: 'dois_times', n, aptos }));
+const dois = (n: number, aptos: number): string =>
+  descreverPrevia(calcularPrevia({ formato: 'dois_times', n, aptos }));
 const varios = (n: number, aptos: number): string =>
   descreverPrevia(calcularPrevia({ formato: 'varios_times', n, aptos }));
 
@@ -49,7 +50,9 @@ describe('descreverPrevia em 3 ou mais times', () => {
   });
 
   it('SIM-13: N menor e 2 times: "Use N menor ou o formato 2 times."', () => {
-    expect(varios(4, 8)).toBe('Com 8 aptos e N = 4 não há 3 times. Use N menor ou o formato 2 times.');
+    expect(varios(4, 8)).toBe(
+      'Com 8 aptos e N = 4 não há 3 times. Use N menor ou o formato 2 times.',
+    );
   });
 
   it('SIM-13: só 2 times: "Use o formato 2 times."', () => {

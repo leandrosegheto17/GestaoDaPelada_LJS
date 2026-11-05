@@ -19,7 +19,13 @@ const DEPOIS_DA_VIRADA = appFinanceiro('2026-11-01T03:05:00.000Z');
 type App = ReturnType<typeof appFinanceiro>;
 
 const g = () => `/grupos/${aberto.cenario.grupoG}`;
-const lerMes = (app: App) => pedir(aberto, { metodo: 'GET', caminho: `${g()}/financeiro/mes`, conta: aberto.cenario.contaC, app });
+const lerMes = (app: App) =>
+  pedir(aberto, {
+    metodo: 'GET',
+    caminho: `${g()}/financeiro/mes`,
+    conta: aberto.cenario.contaC,
+    app,
+  });
 const marcarNovembro = (app: App) =>
   pedir(aberto, {
     metodo: 'POST',
@@ -56,7 +62,10 @@ describe('virada de mês em São Paulo (FIN-49)', () => {
       campos: ['mes'],
       mensagens: { mes: 'Não dá para marcar o pagamento de um mês que ainda não começou.' },
     });
-    const p = await aberto.db.query('SELECT 1 FROM pagamentos_mes WHERE grupo_id = $1 AND mes = $2', [aberto.cenario.grupoG, '2026-11']);
+    const p = await aberto.db.query(
+      'SELECT 1 FROM pagamentos_mes WHERE grupo_id = $1 AND mes = $2',
+      [aberto.cenario.grupoG, '2026-11'],
+    );
     expect(p.rows).toEqual([]);
   });
 
@@ -81,7 +90,8 @@ describe('virada de mês em São Paulo (FIN-49)', () => {
     expect(depois.saldoAtualCentavos).toBe(6000);
 
     // O mesmo fim do saldo no início do grupo (FIN-34).
-    const detalhe = (app: App) => pedir(aberto, { metodo: 'GET', caminho: g(), conta: cenario.contaC, app });
+    const detalhe = (app: App) =>
+      pedir(aberto, { metodo: 'GET', caminho: g(), conta: cenario.contaC, app });
     expect(await saldoDe(await detalhe(ANTES_DA_VIRADA))).toBe(5000);
     expect(await saldoDe(await detalhe(DEPOIS_DA_VIRADA))).toBe(6000);
   });

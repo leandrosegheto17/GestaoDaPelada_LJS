@@ -1,6 +1,10 @@
 import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
-import { ERRO_SENHA_CURTA, ERROS_CAMPO, TEXTO_ENVIADO } from '../../src/telas/cadastro/Cadastro.tsx';
+import {
+  ERRO_SENHA_CURTA,
+  ERROS_CAMPO,
+  TEXTO_ENVIADO,
+} from '../../src/telas/cadastro/Cadastro.tsx';
 import { esperarSemViolacoes } from '../apoio/axe.ts';
 import { abrirTela, erroApi, json, pendente } from '../apoio/tela.tsx';
 
@@ -8,7 +12,12 @@ afterEach(() => {
   cleanup();
 });
 
-function preencher({ nome = 'Leandro', email = 'leandro@exemplo.com.br', senha = 'SenhaForte123', termos = true } = {}) {
+function preencher({
+  nome = 'Leandro',
+  email = 'leandro@exemplo.com.br',
+  senha = 'SenhaForte123',
+  termos = true,
+} = {}) {
   fireEvent.change(screen.getByLabelText('Seu nome'), { target: { value: nome } });
   fireEvent.change(screen.getByLabelText('E-mail'), { target: { value: email } });
   fireEvent.change(screen.getByLabelText('Senha'), { target: { value: senha } });
@@ -25,9 +34,15 @@ describe('tela Cadastro', () => {
     expect(await screen.findByRole('heading', { level: 1, name: 'Criar conta' })).toBeTruthy();
     const aceite = screen.getByRole('checkbox') as HTMLInputElement;
     expect(aceite.checked).toBe(false);
-    expect(screen.getByRole('link', { name: 'termos de uso' }).getAttribute('href')).toBe('/termos');
-    expect(screen.getByRole('link', { name: 'política de privacidade' }).getAttribute('href')).toBe('/privacidade');
-    expect(screen.getByRole('link', { name: 'Já tenho conta' }).getAttribute('href')).toBe('/entrar');
+    expect(screen.getByRole('link', { name: 'termos de uso' }).getAttribute('href')).toBe(
+      '/termos',
+    );
+    expect(screen.getByRole('link', { name: 'política de privacidade' }).getAttribute('href')).toBe(
+      '/privacidade',
+    );
+    expect(screen.getByRole('link', { name: 'Já tenho conta' }).getAttribute('href')).toBe(
+      '/entrar',
+    );
     await esperarSemViolacoes(container);
   });
 
@@ -52,7 +67,12 @@ describe('tela Cadastro', () => {
 
   it('ACE-03: 422 da API com campos marca o campo inválido e preenche o ResumoErros', async () => {
     abrirTela('/cadastro', {
-      'POST /api/conta': () => json(422, { erro: 'Confira os campos destacados.', codigo: 'dados_invalidos', campos: ['email'] }),
+      'POST /api/conta': () =>
+        json(422, {
+          erro: 'Confira os campos destacados.',
+          codigo: 'dados_invalidos',
+          campos: ['email'],
+        }),
     });
     await screen.findByLabelText('Seu nome');
     preencher();
@@ -64,7 +84,10 @@ describe('tela Cadastro', () => {
   });
 
   it('ACE-02: 422 termos_obrigatorios marca o aceite', async () => {
-    abrirTela('/cadastro', { 'POST /api/conta': () => json(422, { erro: 'x', codigo: 'termos_obrigatorios', campos: ['termos'] }) });
+    abrirTela('/cadastro', {
+      'POST /api/conta': () =>
+        json(422, { erro: 'x', codigo: 'termos_obrigatorios', campos: ['termos'] }),
+    });
     await screen.findByLabelText('Seu nome');
     preencher();
     criar();
@@ -74,20 +97,27 @@ describe('tela Cadastro', () => {
 
   it('ACE-01: 201 envia nome, e-mail, senha e o aceite, e mostra "Enviamos um link de confirmação para o seu e-mail"; axe sem violação', async () => {
     const { container, chamadasA } = abrirTela('/cadastro', {
-      'POST /api/conta': () => json(201, { mensagem: 'Enviamos um link de confirmação para o seu e-mail' }),
+      'POST /api/conta': () =>
+        json(201, { mensagem: 'Enviamos um link de confirmação para o seu e-mail' }),
     });
     await screen.findByLabelText('Seu nome');
     preencher();
     criar();
-    expect(await screen.findByRole('heading', { level: 1, name: 'Verifique seu e-mail' })).toBeTruthy();
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Verifique seu e-mail' }),
+    ).toBeTruthy();
     const faixa = screen.getByRole('status');
     expect(faixa.textContent).toBe(TEXTO_ENVIADO);
     expect(faixa.textContent).toContain('Enviamos um link de confirmação para o seu e-mail');
     expect(chamadasA('POST', '/api/conta').map((c) => c.corpo)).toEqual([
       { nome: 'Leandro', email: 'leandro@exemplo.com.br', senha: 'SenhaForte123', termos: true },
     ]);
-    expect(screen.getByRole('link', { name: 'Enviar outro link' }).getAttribute('href')).toBe('/confirmar');
-    expect(screen.getByRole('link', { name: 'Voltar para entrar' }).getAttribute('href')).toBe('/entrar');
+    expect(screen.getByRole('link', { name: 'Enviar outro link' }).getAttribute('href')).toBe(
+      '/confirmar',
+    );
+    expect(screen.getByRole('link', { name: 'Voltar para entrar' }).getAttribute('href')).toBe(
+      '/entrar',
+    );
     await esperarSemViolacoes(container);
   });
 
@@ -104,12 +134,20 @@ describe('tela Cadastro', () => {
   it('erro da API sem campos (503) mostra a mensagem na faixa de erro', async () => {
     abrirTela('/cadastro', {
       'POST /api/conta': () =>
-        erroApi(503, 'email_indisponivel', 'Não conseguimos enviar o e-mail agora. Tente de novo em alguns minutos.'),
+        erroApi(
+          503,
+          'email_indisponivel',
+          'Não conseguimos enviar o e-mail agora. Tente de novo em alguns minutos.',
+        ),
     });
     await screen.findByLabelText('Seu nome');
     preencher();
     criar();
-    await waitFor(() => expect(screen.getByRole('alert').textContent).toMatch(/Não conseguimos enviar o e-mail agora/));
+    await waitFor(() =>
+      expect(screen.getByRole('alert').textContent).toMatch(
+        /Não conseguimos enviar o e-mail agora/,
+      ),
+    );
     expect(screen.getByRole('heading', { level: 1, name: 'Criar conta' })).toBeTruthy();
   });
 });

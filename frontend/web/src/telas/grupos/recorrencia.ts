@@ -10,7 +10,11 @@ import { ROTULOS_DIA_SEMANA } from '../../componentes/CampoSeletor.tsx';
 
 const MASCULINOS: ReadonlySet<DiaSemana> = new Set(['sabado', 'domingo']);
 
-export function textoRecorrencia(g: { diaSemana: DiaSemana; frequencia: Frequencia; horario: string }): string {
+export function textoRecorrencia(g: {
+  diaSemana: DiaSemana;
+  frequencia: Frequencia;
+  horario: string;
+}): string {
   const dia = ROTULOS_DIA_SEMANA[g.diaSemana];
   if (g.frequencia === 'semanal') {
     const artigo = MASCULINOS.has(g.diaSemana) ? 'Todo' : 'Toda';

@@ -1,5 +1,9 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { abrirCenarioGrupos, comoConta, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  comoConta,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * Trava de `vinculos_admin.acessa_financeiro` e nomes das autoras (T10; FIN-41, FIN-32, FIN-42), como `pelada_app`.
@@ -122,7 +126,9 @@ describe('contas_nomes_do_grupo com autoras de lançamentos', () => {
   async function nomesVistosPor(conta: string): Promise<string[]> {
     const { db, cenario } = aberto;
     return comoConta(db, conta, async (d) => {
-      const r = await d.query<{ id: string }>('SELECT id FROM contas_nomes_do_grupo($1)', [cenario.grupoG]);
+      const r = await d.query<{ id: string }>('SELECT id FROM contas_nomes_do_grupo($1)', [
+        cenario.grupoG,
+      ]);
       return r.rows.map((l) => l.id);
     });
   }

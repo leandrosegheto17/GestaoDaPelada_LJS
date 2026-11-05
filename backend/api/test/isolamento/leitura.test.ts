@@ -19,9 +19,14 @@ afterAll(async () => {
 });
 
 /** Grupos distintos das linhas que a conexão enxerga na tabela, ordenados, e o total de linhas. */
-async function visto(db: pg.Client, caso: CasoMatriz): Promise<{ grupos: string[]; linhas: number }> {
+async function visto(
+  db: pg.Client,
+  caso: CasoMatriz,
+): Promise<{ grupos: string[]; linhas: number }> {
   const coluna = db.escapeIdentifier(caso.coluna);
-  const r = await db.query<{ g: string }>(`SELECT ${coluna}::text AS g FROM ${db.escapeIdentifier(caso.tabela)}`);
+  const r = await db.query<{ g: string }>(
+    `SELECT ${coluna}::text AS g FROM ${db.escapeIdentifier(caso.tabela)}`,
+  );
   return { grupos: [...new Set(r.rows.map((l) => l.g))].sort(), linhas: r.rowCount ?? 0 };
 }
 
@@ -60,7 +65,9 @@ describe.each(porGrupo)('FUN-13: SELECT em $tabela', (caso) => {
 
   it('FUN-13: a conta A com o slug do grupo B continua lendo só o grupo A (o slug é ignorado)', async () => {
     const { db, cenario } = aberto;
-    const v = await comoApp(db, { conta: cenario.contaA, slug: cenario.slugB }, (d) => visto(d, caso));
+    const v = await comoApp(db, { conta: cenario.contaA, slug: cenario.slugB }, (d) =>
+      visto(d, caso),
+    );
     expect(v.grupos).toEqual([cenario.grupoA]);
   });
 });
@@ -72,7 +79,9 @@ describe.each(semGrant)('FUN-13: SELECT em $tabela, sem grant para pelada_app', 
     ['conta sem vínculo', 'contaSemVinculo'],
   ] as const)('FUN-13: %s recebe erro de permissão na tabela', async (_nome, chave) => {
     const { db, cenario } = aberto;
-    await expect(comoApp(db, { conta: cenario[chave] }, (d) => visto(d, caso))).rejects.toMatchObject({
+    await expect(
+      comoApp(db, { conta: cenario[chave] }, (d) => visto(d, caso)),
+    ).rejects.toMatchObject({
       code: '42501',
       message: expect.stringContaining(`permission denied for table ${caso.tabela}`),
     });

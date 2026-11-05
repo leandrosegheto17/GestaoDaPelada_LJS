@@ -39,10 +39,16 @@ export const TEXTO_BUSCA_VAZIA = 'Nenhum jogador encontrado.';
 
 type Aba = 'ativos' | 'inativos';
 
-export function filtrarJogadores(jogadores: readonly JogadorItem[], situacao: 'ativo' | 'inativo', busca: string): JogadorItem[] {
+export function filtrarJogadores(
+  jogadores: readonly JogadorItem[],
+  situacao: 'ativo' | 'inativo',
+  busca: string,
+): JogadorItem[] {
   const chave = chaveBusca(busca.trim());
   return jogadores
-    .filter((j) => j.situacao === situacao && (chave === '' || chaveBusca(j.apelido).includes(chave)))
+    .filter(
+      (j) => j.situacao === situacao && (chave === '' || chaveBusca(j.apelido).includes(chave)),
+    )
     .sort((a, b) => compararApelido(a.apelido, b.apelido));
 }
 
@@ -86,7 +92,9 @@ export function Jogadores() {
         <div id="painel-jogadores" role="tabpanel" aria-labelledby={`filtro-${aba}`}>
           {totalDaAba === 0 ? (
             <div className={`${estilos.vazio} ${estilos['acima-4']}`}>
-              <h2 className={estilos['vazio__titulo']}>{aba === 'ativos' ? TEXTO_SEM_ATIVOS : TEXTO_SEM_INATIVOS}</h2>
+              <h2 className={estilos['vazio__titulo']}>
+                {aba === 'ativos' ? TEXTO_SEM_ATIVOS : TEXTO_SEM_INATIVOS}
+              </h2>
               {aba === 'ativos' ? (
                 <LinkBotao para={novo} variante="principal">
                   Novo jogador
@@ -104,10 +112,16 @@ export function Jogadores() {
                     <ItemLista
                       key={j.id}
                       titulo={j.apelido}
-                      meta={j.semNota ? ROTULOS_POSICAO[j.posicao] : `${ROTULOS_POSICAO[j.posicao]} · nível ${exibirNivel(j.nivel, false)}`}
+                      meta={
+                        j.semNota
+                          ? ROTULOS_POSICAO[j.posicao]
+                          : `${ROTULOS_POSICAO[j.posicao]} · nível ${exibirNivel(j.nivel, false)}`
+                      }
                       lateral={
                         j.semNota ? (
-                          <span className={`${estilos.selo} ${estilos['selo--atencao']}`}>{TEXTO_SEM_NOTA}</span>
+                          <span className={`${estilos.selo} ${estilos['selo--atencao']}`}>
+                            {TEXTO_SEM_NOTA}
+                          </span>
                         ) : undefined
                       }
                       para={`${base}/jogadores/${encodeURIComponent(j.id)}`}
@@ -134,7 +148,10 @@ export function Jogadores() {
   }
 
   return (
-    <Casca grupo={{ nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' }} ocupada={lista.isPending}>
+    <Casca
+      grupo={{ nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' }}
+      ocupada={lista.isPending}
+    >
       <LinkVoltar para={base}>Início</LinkVoltar>
       <h1 className={estilos['titulo-pagina']}>Jogadores</h1>
       {conteudo()}

@@ -38,7 +38,8 @@ export function passaComGrupoArquivado(metodo: string, caminho: string): boolean
 }
 
 /** A leitura de `arquivado_em` da escrita, com a trava que o arquivamento respeita (SEC-007). */
-export const SQL_GRUPO_ATIVO = 'SELECT arquivado_em IS NOT NULL AS arquivado FROM grupos WHERE id = $1 FOR KEY SHARE';
+export const SQL_GRUPO_ATIVO =
+  'SELECT arquivado_em IS NOT NULL AS arquivado FROM grupos WHERE id = $1 FOR KEY SHARE';
 
 /**
  * Prévia (partidas-e-ranking T36; PAR-112, `BD:35`): a transação é `READ ONLY` (`transacaoSomenteLeitura`), onde o
@@ -53,10 +54,14 @@ export const exigirGrupoAtivo: MiddlewareHandler<Ambiente> = async (c, next) => 
   }
   const grupoId = c.req.param('grupoId') ?? '';
   const r = transacaoSomenteLeitura(metodo, c.req.path)
-    ? await sql<{ arquivado: boolean }>`SELECT arquivado_em IS NOT NULL AS arquivado FROM grupos WHERE id = ${grupoId}`.execute(
+    ? await sql<{
+        arquivado: boolean;
+      }>`SELECT arquivado_em IS NOT NULL AS arquivado FROM grupos WHERE id = ${grupoId}`.execute(
         c.var.db,
       )
-    : await sql<{ arquivado: boolean }>`SELECT arquivado_em IS NOT NULL AS arquivado FROM grupos WHERE id = ${grupoId} FOR KEY SHARE`.execute(
+    : await sql<{
+        arquivado: boolean;
+      }>`SELECT arquivado_em IS NOT NULL AS arquivado FROM grupos WHERE id = ${grupoId} FOR KEY SHARE`.execute(
         c.var.db,
       );
   if (r.rows[0]?.arquivado === true && !passaComGrupoArquivado(metodo, c.req.path)) {

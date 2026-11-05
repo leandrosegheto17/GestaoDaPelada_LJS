@@ -8,11 +8,23 @@ import {
 } from '../../../src/aplicacao/notificacoes/avisar-cobranca.ts';
 import type { Env } from '../../../src/entrada/ambiente.ts';
 import { bancoSemContexto, type AbrirBanco } from '../../../src/entrada/consumidor-avisos.ts';
-import { remetenteMemoria, type RemetenteMemoria } from '../../../src/infraestrutura/email/resend.ts';
+import {
+  remetenteMemoria,
+  type RemetenteMemoria,
+} from '../../../src/infraestrutura/email/resend.ts';
 import { filaMemoria, type FilaMemoria } from '../../../src/infraestrutura/fila/avisos.ts';
-import { servicoPushFalso, TTL_COBRANCA, type ServicoPushFalso } from '../../../src/infraestrutura/push/enviar.ts';
+import {
+  servicoPushFalso,
+  TTL_COBRANCA,
+  type ServicoPushFalso,
+} from '../../../src/infraestrutura/push/enviar.ts';
 import { topicoDoGrupo } from '../../../src/infraestrutura/push/topico.ts';
-import { assinanteDeTeste, chavesVapidDeTeste, decifrarPush, type AssinanteDeTeste } from '../../apoio/push.ts';
+import {
+  assinanteDeTeste,
+  chavesVapidDeTeste,
+  decifrarPush,
+  type AssinanteDeTeste,
+} from '../../apoio/push.ts';
 import { envCom, fabricaComoApp } from '../../db/requisicao.ts';
 import { abrirCenario, type CenarioAberto } from '../../isolamento/apoio.ts';
 
@@ -77,9 +89,16 @@ async function avisosRegistrados(): Promise<number> {
 beforeAll(async () => {
   aberto = await abrirCenario();
   fila = filaMemoria();
-  env = { ...envCom(aberto.url), URL_PUBLICA, LIMITE_EMAILS_DIA: String(LIMITE), FILA_AVISOS: fila } as Env;
+  env = {
+    ...envCom(aberto.url),
+    URL_PUBLICA,
+    LIMITE_EMAILS_DIA: String(LIMITE),
+    FILA_AVISOS: fila,
+  } as Env;
   banco = bancoSemContexto(env, fabricaComoApp().fabrica);
-  const r = await aberto.db.query<{ email: string }>('SELECT email FROM contas WHERE id = $1', [aberto.cenario.contaA]);
+  const r = await aberto.db.query<{ email: string }>('SELECT email FROM contas WHERE id = $1', [
+    aberto.cenario.contaA,
+  ]);
   emailCriadora = r.rows[0]?.email ?? '';
 });
 
@@ -90,9 +109,10 @@ afterAll(async () => {
 beforeEach(async () => {
   await aberto.db.query('DELETE FROM envios_email_dia');
   await aberto.db.query('DELETE FROM avisos_cobranca');
-  await aberto.db.query(`UPDATE grupos SET situacao_comercial = 'ativo', trial_inicio = NULL WHERE id = $1`, [
-    aberto.cenario.grupoA,
-  ]);
+  await aberto.db.query(
+    `UPDATE grupos SET situacao_comercial = 'ativo', trial_inicio = NULL WHERE id = $1`,
+    [aberto.cenario.grupoA],
+  );
   fila.enviadas.length = 0;
   remetente = remetenteMemoria();
   relatos = [];
@@ -112,7 +132,9 @@ describe('avisarCobranca', () => {
   });
 
   it('NOT-38: o grupo B manda à criadora do B, nunca à do A', async () => {
-    const r = await aberto.db.query<{ email: string }>('SELECT email FROM contas WHERE id = $1', [aberto.cenario.contaB]);
+    const r = await aberto.db.query<{ email: string }>('SELECT email FROM contas WHERE id = $1', [
+      aberto.cenario.contaB,
+    ]);
     await avisar(mensagem({ grupoId: aberto.cenario.grupoB }));
     expect(remetente.mensagens.map((e) => e.para)).toEqual([r.rows[0]?.email]);
   });
@@ -151,7 +173,9 @@ describe('avisarCobranca', () => {
     const m = mensagem();
     await avisar(m);
     expect(remetente.mensagens).toHaveLength(0);
-    expect(fila.enviadas).toEqual([{ corpo: { ...m, tentativa: 2 }, delaySeconds: ATRASO_AVISO_COBRANCA_S }]);
+    expect(fila.enviadas).toEqual([
+      { corpo: { ...m, tentativa: 2 }, delaySeconds: ATRASO_AVISO_COBRANCA_S },
+    ]);
     expect(await avisosRegistrados()).toBe(0);
     expect(await totalDoDia()).toBe(LIMITE);
   });
@@ -164,11 +188,17 @@ describe('avisarCobranca', () => {
     expect(await totalDoDia()).toBe(0);
     expect(await avisosRegistrados()).toBe(0);
     const segunda = fila.enviadas.shift();
-    expect(segunda).toEqual({ corpo: { ...m, tentativa: 2 }, delaySeconds: ATRASO_AVISO_COBRANCA_S });
+    expect(segunda).toEqual({
+      corpo: { ...m, tentativa: 2 },
+      delaySeconds: ATRASO_AVISO_COBRANCA_S,
+    });
 
     await avisar(segunda?.corpo as MensagemCobranca);
     const terceira = fila.enviadas.shift();
-    expect(terceira).toEqual({ corpo: { ...m, tentativa: 3 }, delaySeconds: ATRASO_AVISO_COBRANCA_S });
+    expect(terceira).toEqual({
+      corpo: { ...m, tentativa: 3 },
+      delaySeconds: ATRASO_AVISO_COBRANCA_S,
+    });
     expect(relatos).toEqual([]);
 
     await avisar(terceira?.corpo as MensagemCobranca);
@@ -178,7 +208,8 @@ describe('avisarCobranca', () => {
     // O Sentry recebe só a desistência e o tipo: nem e-mail, nem nome, nem valor, nem id da cobrança.
     expect(relatos).toEqual([{ motivo: 'desistencia', tipo: 'pagamento_atrasado' }]);
     const texto = JSON.stringify(relatos);
-    for (const proibido of [emailCriadora, m.idExterno, '990', 'Grupo A']) expect(texto).not.toContain(proibido);
+    for (const proibido of [emailCriadora, m.idExterno, '990', 'Grupo A'])
+      expect(texto).not.toContain(proibido);
   });
 
   it('NOT-42: falhou uma vez e a nova tentativa envia, uma vez só', async () => {
@@ -193,7 +224,9 @@ describe('avisarCobranca', () => {
   });
 
   it('NOT-47: grupo Free também recebe o aviso', async () => {
-    await aberto.db.query(`UPDATE grupos SET situacao_comercial = 'inadimplente' WHERE id = $1`, [aberto.cenario.grupoA]);
+    await aberto.db.query(`UPDATE grupos SET situacao_comercial = 'inadimplente' WHERE id = $1`, [
+      aberto.cenario.grupoA,
+    ]);
     await avisar(mensagem());
     expect(remetente.mensagens).toHaveLength(1);
   });
@@ -217,7 +250,12 @@ describe('avisarCobranca: push à criadora (T25)', () => {
 
   beforeAll(async () => {
     const v = await chavesVapidDeTeste();
-    envPush = { ...env, VAPID_PUBLICA: v.publica, VAPID_PRIVADA: v.privada, VAPID_ASSUNTO: v.assunto } as Env;
+    envPush = {
+      ...env,
+      VAPID_PUBLICA: v.publica,
+      VAPID_PRIVADA: v.privada,
+      VAPID_ASSUNTO: v.assunto,
+    } as Env;
   });
 
   beforeEach(async () => {
@@ -226,7 +264,9 @@ describe('avisarCobranca: push à criadora (T25)', () => {
   });
 
   /** Assinaturas de push da criadora (conta A), como superusuário, em ordem de id. */
-  async function assinar(n: number): Promise<Array<AssinanteDeTeste & { id: string; endpoint: string }>> {
+  async function assinar(
+    n: number,
+  ): Promise<Array<AssinanteDeTeste & { id: string; endpoint: string }>> {
     const lista: Array<AssinanteDeTeste & { id: string; endpoint: string }> = [];
     for (let i = 1; i <= n; i += 1) {
       const a = await assinanteDeTeste();
@@ -288,8 +328,11 @@ describe('avisarCobranca: push à criadora (T25)', () => {
 
   it('NOT-43: o payload enviado tem só o título e o caminho de Meu plano, sem valor, e-mail nem nome', async () => {
     const [um] = await assinar(1);
-    const nome = (await aberto.db.query<{ nome: string }>('SELECT nome FROM contas WHERE id = $1', [aberto.cenario.contaA]))
-      .rows[0]?.nome;
+    const nome = (
+      await aberto.db.query<{ nome: string }>('SELECT nome FROM contas WHERE id = $1', [
+        aberto.cenario.contaA,
+      ])
+    ).rows[0]?.nome;
     await avisarComPush(mensagem({ valorCentavos: 12345 }));
     const [pedido] = servico.pedidos;
     const texto = await decifrarPush(pedido?.corpo ?? new Uint8Array(), um as AssinanteDeTeste);
@@ -297,7 +340,8 @@ describe('avisarCobranca: push à criadora (T25)', () => {
       titulo: 'Pagamento atrasado: Grupo A',
       caminho: `/app/grupos/${aberto.cenario.grupoA}/plano`,
     });
-    for (const proibido of ['12345', '123,45', 'R$', emailCriadora, nome ?? '']) expect(texto).not.toContain(proibido);
+    for (const proibido of ['12345', '123,45', 'R$', emailCriadora, nome ?? ''])
+      expect(texto).not.toContain(proibido);
   });
 
   it('NOT-48: 503 volta à fila só com o push: a nova tentativa não manda outro e-mail', async () => {
@@ -311,7 +355,11 @@ describe('avisarCobranca: push à criadora (T25)', () => {
 
     await avisarComPush(nova?.corpo as MensagemCobranca);
     expect(remetente.mensagens).toHaveLength(1);
-    expect(servico.pedidos.map((p) => p.url)).toEqual([um?.endpoint, dois?.endpoint, dois?.endpoint]);
+    expect(servico.pedidos.map((p) => p.url)).toEqual([
+      um?.endpoint,
+      dois?.endpoint,
+      dois?.endpoint,
+    ]);
     expect((await linhasDaConta()).every((l) => l.enviado)).toBe(true);
     expect(fila.enviadas).toEqual([]);
   });

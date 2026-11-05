@@ -10,11 +10,21 @@ import {
   type PdfPublico,
   type RankingPublico,
 } from '@pelada/contrato';
-import { calcularPdf, calcularRanking, limitesDeMes, mesDe, mesNoHistorico, type LinhaRanking } from '@pelada/dominio';
+import {
+  calcularPdf,
+  calcularRanking,
+  limitesDeMes,
+  mesDe,
+  mesNoHistorico,
+  type LinhaRanking,
+} from '@pelada/dominio';
 import type { Ambiente } from '../ambiente.ts';
 import { erroDeCampos, lerCorpoDoGrupo, mensagensDoZod, respostaDeCampo } from '../corpo.ts';
 import { eventos } from '../../infraestrutura/db/repositorios/eventos.ts';
-import { grupoPublico, type GrupoPublico } from '../../infraestrutura/db/repositorios/grupo-publico.ts';
+import {
+  grupoPublico,
+  type GrupoPublico,
+} from '../../infraestrutura/db/repositorios/grupo-publico.ts';
 import { historico } from '../../infraestrutura/db/repositorios/historico.ts';
 import { linkPublico } from './grupos.ts';
 import { MENSAGEM_PLANO_PRO } from '../middlewares/recurso.ts';
@@ -71,10 +81,17 @@ export function rotasPublico(): Hono<Ambiente> {
     const mes = consulta.data.mes ?? mesDe(hoje);
     const h = await historico.carregar(c.var.db, grupo.id, hoje);
     const r = calcularRanking({ ...h, hoje, mes });
-    if (!mesNoHistorico(r.limites, mes)) return respostaDeCampo(c, 'mes', MENSAGEM_MES_FORA_DO_HISTORICO);
+    if (!mesNoHistorico(r.limites, mes))
+      return respostaDeCampo(c, 'mes', MENSAGEM_MES_FORA_DO_HISTORICO);
 
     const resposta: RankingPublico = {
-      grupo: { nome: grupo.nome, slug: grupo.slug, diaSemana: grupo.diaSemana, frequencia: grupo.frequencia, horario: grupo.horario },
+      grupo: {
+        nome: grupo.nome,
+        slug: grupo.slug,
+        diaSemana: grupo.diaSemana,
+        frequencia: grupo.frequencia,
+        horario: grupo.horario,
+      },
       mes,
       hoje,
       geradoEm: c.var.relogio.agoraIso(),
@@ -105,7 +122,8 @@ export function rotasPublico(): Hono<Ambiente> {
     const hoje = c.var.relogio.hoje();
     const mes = consulta.data.mes ?? mesDe(hoje);
     const h = await historico.carregar(c.var.db, grupo.id, hoje);
-    if (!mesNoHistorico(limitesDeMes(h.partidas, hoje), mes)) return respostaDeCampo(c, 'mes', MENSAGEM_MES_FORA_DO_HISTORICO);
+    if (!mesNoHistorico(limitesDeMes(h.partidas, hoje), mes))
+      return respostaDeCampo(c, 'mes', MENSAGEM_MES_FORA_DO_HISTORICO);
     const p = calcularPdf({ ...h, hoje, mes });
 
     const resposta: PdfPublico = {
@@ -114,7 +132,11 @@ export function rotasPublico(): Hono<Ambiente> {
       geradoEm: c.var.relogio.agoraIso(),
       urlPublica: linkPublico(c.env.URL_PUBLICA, grupo.slug),
       semPartidasNoMes: p.semPartidasNoMes,
-      colunas: p.colunas.map((col) => ({ data: col.data, choveu: col.choveu, doMesExibido: col.doMesExibido })),
+      colunas: p.colunas.map((col) => ({
+        data: col.data,
+        choveu: col.choveu,
+        doMesExibido: col.doMesExibido,
+      })),
       linhas: p.linhas.map(linhaPublicaDe),
     };
     return c.json(resposta, 200);
@@ -143,9 +165,15 @@ export function rotasPublico(): Hono<Ambiente> {
         // qualquer plano (PLA-19).
         const grupo = await grupoDoSlug(c);
         if (grupo instanceof Response) return grupo;
-        if (!(await c.var.recursoLiberado(c.var.db, grupo.id, 'pdf'))) return respostaPlanoProPdf(c);
+        if (!(await c.var.recursoLiberado(c.var.db, grupo.id, 'pdf')))
+          return respostaPlanoProPdf(c);
       }
-      const gravou = await eventos.registrarPublico(c.var.db, c.var.slugPublico ?? '', corpo.dados, c.var.relogio.agoraIso());
+      const gravou = await eventos.registrarPublico(
+        c.var.db,
+        c.var.slugPublico ?? '',
+        corpo.dados,
+        c.var.relogio.agoraIso(),
+      );
       if (!gravou) return c.json(corpoDoErro('nao_encontrado'), 404);
       return c.body(null, 204);
     },

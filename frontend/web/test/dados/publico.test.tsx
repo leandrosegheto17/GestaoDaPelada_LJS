@@ -25,14 +25,28 @@ const SLUG = 'pelada-de-quinta';
 
 function ranking(mes: string, extra: Record<string, unknown> = {}) {
   return {
-    grupo: { nome: 'Pelada de Quinta', slug: SLUG, diaSemana: 'quinta', frequencia: 'semanal', horario: '20:00' },
+    grupo: {
+      nome: 'Pelada de Quinta',
+      slug: SLUG,
+      diaSemana: 'quinta',
+      frequencia: 'semanal',
+      horario: '20:00',
+    },
     mes,
     hoje: '2026-10-22',
     geradoEm: '2026-10-22T12:00:00.000Z',
     navegacao: { mesAnterior: '2026-09', mesSeguinte: null },
     resumoMes: { partidas: 1, comChuva: 0 },
     partidas: [{ data: `${mes}-15`, choveu: false }],
-    linhas: [{ posicao: 1, apelido: 'Beto', ptsInicial: 3, rodadas: [{ situacao: 'presente', pontos: 1 }], ptsFinal: 4 }],
+    linhas: [
+      {
+        posicao: 1,
+        apelido: 'Beto',
+        ptsInicial: 3,
+        rodadas: [{ situacao: 'presente', pontos: 1 }],
+        ptsFinal: 4,
+      },
+    ],
     ...extra,
   };
 }
@@ -44,7 +58,15 @@ const PDF = {
   urlPublica: 'https://gestaodapelada-v2.exemplo.workers.dev/g/pelada-de-quinta',
   semPartidasNoMes: false,
   colunas: [{ data: '2026-10-15', choveu: false, doMesExibido: true }],
-  linhas: [{ posicao: 1, apelido: 'Beto', ptsInicial: 3, rodadas: [{ situacao: 'presente', pontos: 1 }], ptsFinal: 4 }],
+  linhas: [
+    {
+      posicao: 1,
+      apelido: 'Beto',
+      ptsInicial: 3,
+      rodadas: [{ situacao: 'presente', pontos: 1 }],
+      ptsFinal: 4,
+    },
+  ],
 };
 
 type Resposta = (url: string) => Response;
@@ -117,7 +139,21 @@ describe('useRankingPublico', () => {
     const { result } = montar(
       () => useRankingPublico(SLUG),
       () =>
-        json(200, ranking('2026-10', { linhas: [{ posicao: 1, apelido: 'Beto', jogadorId: 'x', ptsInicial: 0, rodadas: [{ situacao: 'presente', pontos: 1 }], ptsFinal: 1 }] })),
+        json(
+          200,
+          ranking('2026-10', {
+            linhas: [
+              {
+                posicao: 1,
+                apelido: 'Beto',
+                jogadorId: 'x',
+                ptsInicial: 0,
+                rodadas: [{ situacao: 'presente', pontos: 1 }],
+                ptsFinal: 1,
+              },
+            ],
+          }),
+        ),
     );
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(result.current.data).toBeUndefined();
@@ -132,7 +168,11 @@ describe('useRankingPublico', () => {
   });
 
   it('PAR-65: 422 "Mês inválido." chega como erro da consulta, com a mensagem da API', async () => {
-    const { result } = montar(usePagina, () => json(422, { erro: 'Mês inválido.', codigo: 'dados_invalidos', campos: ['mes'] }), `/g/${SLUG}?mes=julho`);
+    const { result } = montar(
+      usePagina,
+      () => json(422, { erro: 'Mês inválido.', codigo: 'dados_invalidos', campos: ['mes'] }),
+      `/g/${SLUG}?mes=julho`,
+    );
     await waitFor(() => expect(result.current.consulta.isError).toBe(true));
     expect(result.current.consulta.error?.message).toBe('Mês inválido.');
   });
@@ -155,7 +195,10 @@ describe('useMesDaUrl', () => {
     await waitFor(() => expect(result.current.consulta.data?.mes).toBe('2026-09'));
     expect(result.current.busca).toBe('?mes=2026-09');
     expect(result.current.mes).toBe('2026-09');
-    expect(urls).toEqual([`/api/publico/${SLUG}/ranking`, `/api/publico/${SLUG}/ranking?mes=2026-09`]);
+    expect(urls).toEqual([
+      `/api/publico/${SLUG}/ranking`,
+      `/api/publico/${SLUG}/ranking?mes=2026-09`,
+    ]);
   });
 
   it('PAR-89: a troca substitui a entrada da história: voltar sai da página, não vai ao mês anterior', async () => {
@@ -189,14 +232,21 @@ describe('useMesDaUrl', () => {
     await waitFor(() => expect(result.current.consulta.isSuccess).toBe(true));
     act(() => result.current.trocar('2026-09'));
     await waitFor(() => expect(result.current.consulta.data?.mes).toBe('2026-09'));
-    expect(consultas.getQueryData<{ mes: string }>(chaveRankingPublico(SLUG, undefined))?.mes).toBe('2026-10');
-    expect(consultas.getQueryData<{ mes: string }>(chaveRankingPublico(SLUG, '2026-09'))?.mes).toBe('2026-09');
+    expect(consultas.getQueryData<{ mes: string }>(chaveRankingPublico(SLUG, undefined))?.mes).toBe(
+      '2026-10',
+    );
+    expect(consultas.getQueryData<{ mes: string }>(chaveRankingPublico(SLUG, '2026-09'))?.mes).toBe(
+      '2026-09',
+    );
   });
 });
 
 describe('useBuscarPdfPublico', () => {
   it('PAR-102: lê a projeção do PDF do mês pedido, só quando chamada', async () => {
-    const { result, urls } = montar(() => useBuscarPdfPublico(SLUG), () => json(200, PDF));
+    const { result, urls } = montar(
+      () => useBuscarPdfPublico(SLUG),
+      () => json(200, PDF),
+    );
     expect(urls).toEqual([]);
     let pdf: unknown;
     await act(async () => {
@@ -207,8 +257,15 @@ describe('useBuscarPdfPublico', () => {
   });
 
   it('PAR-102: projeção do PDF fora do contrato (13 colunas) é recusada', async () => {
-    const colunas = Array.from({ length: 13 }, (_, i) => ({ data: `2026-10-${String(i + 1).padStart(2, '0')}`, choveu: false, doMesExibido: true }));
-    const { result } = montar(() => useBuscarPdfPublico(SLUG), () => json(200, { ...PDF, colunas, linhas: [] }));
+    const colunas = Array.from({ length: 13 }, (_, i) => ({
+      data: `2026-10-${String(i + 1).padStart(2, '0')}`,
+      choveu: false,
+      doMesExibido: true,
+    }));
+    const { result } = montar(
+      () => useBuscarPdfPublico(SLUG),
+      () => json(200, { ...PDF, colunas, linhas: [] }),
+    );
     await expect(result.current('2026-10')).rejects.toThrow();
   });
 });

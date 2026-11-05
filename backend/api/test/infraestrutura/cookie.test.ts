@@ -48,7 +48,9 @@ describe('definirCookieSessao', () => {
 
   it('ACE-09: o Set-Cookie não tem Domain', async () => {
     const r = await app().request('/entrar', { method: 'POST' });
-    expect(atributos(r.headers.get('set-cookie') ?? '').some((a) => a.startsWith('domain'))).toBe(false);
+    expect(atributos(r.headers.get('set-cookie') ?? '').some((a) => a.startsWith('domain'))).toBe(
+      false,
+    );
   });
 
   it('ACE-16: o cookie dura as 12 h da sessão', async () => {
@@ -74,13 +76,17 @@ describe('vencerCookieSessao', () => {
 
 describe('lerCookieSessao', () => {
   it('ACE-09: lê o token do cookie da requisição', async () => {
-    const r = await app().request('/ler', { headers: { cookie: `outro=1; ${NOME_COOKIE_SESSAO}=${TOKEN}` } });
+    const r = await app().request('/ler', {
+      headers: { cookie: `outro=1; ${NOME_COOKIE_SESSAO}=${TOKEN}` },
+    });
     expect(await r.json()).toEqual({ token: TOKEN });
   });
 
   it('ACE-18: sem o cookie, ou com ele vazio, devolve nulo', async () => {
     expect(await (await app().request('/ler')).json()).toEqual({ token: null });
-    expect(await (await app().request('/ler', { headers: { cookie: `${NOME_COOKIE_SESSAO}=` } })).json()).toEqual({ token: null });
+    expect(
+      await (await app().request('/ler', { headers: { cookie: `${NOME_COOKIE_SESSAO}=` } })).json(),
+    ).toEqual({ token: null });
   });
 
   it('ACE-09: cookie com outro nome (sessao, sem o prefixo) não vale', async () => {

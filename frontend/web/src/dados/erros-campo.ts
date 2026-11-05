@@ -13,7 +13,9 @@ export function mensagensDosCampos(erro: unknown): Record<string, string> {
   const resultado: Record<string, string> = {};
   const corpo = erro.corpo;
   const mensagens =
-    corpo !== null && typeof corpo === 'object' && 'mensagens' in corpo ? (corpo as { mensagens: unknown }).mensagens : undefined;
+    corpo !== null && typeof corpo === 'object' && 'mensagens' in corpo
+      ? (corpo as { mensagens: unknown }).mensagens
+      : undefined;
   if (mensagens !== null && typeof mensagens === 'object') {
     for (const [campo, texto] of Object.entries(mensagens as Record<string, unknown>)) {
       if (typeof texto === 'string' && texto !== '') resultado[campo] = texto;

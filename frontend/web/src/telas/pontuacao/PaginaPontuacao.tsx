@@ -1,4 +1,10 @@
-import { CAMPOS_PESO, LIMITES_PESO, type CampoPeso, type PesosCorpo, type PesosPainel } from '@pelada/contrato/pesos';
+import {
+  CAMPOS_PESO,
+  LIMITES_PESO,
+  type CampoPeso,
+  type PesosCorpo,
+  type PesosPainel,
+} from '@pelada/contrato/pesos';
 import { useState, type FormEvent } from 'react';
 import { useParams } from 'react-router';
 import { Botao } from '../../componentes/Botao.tsx';
@@ -116,9 +122,16 @@ function Painel({ grupoId, painel }: { grupoId: string; painel: PesosPainel }) {
       onError: (erro) => {
         if (erro instanceof ErroApi && erro.status === 422) {
           const porCampo = mensagensDosCampos(erro);
-          const conhecidos = Object.fromEntries(Object.entries(porCampo).filter(([c]) => c in ROTULOS_PESO)) as Partial<Record<CampoPeso, string>>;
+          const conhecidos = Object.fromEntries(
+            Object.entries(porCampo).filter(([c]) => c in ROTULOS_PESO),
+          ) as Partial<Record<CampoPeso, string>>;
           setErros(conhecidos);
-          setResumo(CAMPOS_PESO.filter((c) => c in conhecidos).map((c) => ({ id: c, rotulo: ROTULOS_PESO[c] })));
+          setResumo(
+            CAMPOS_PESO.filter((c) => c in conhecidos).map((c) => ({
+              id: c,
+              rotulo: ROTULOS_PESO[c],
+            })),
+          );
           if (Object.keys(conhecidos).length === 0) setFalha(erro.message);
           return;
         }
@@ -215,14 +228,19 @@ export function PaginaPontuacao() {
   function conteudo() {
     if (consulta.isPending) return <EsqueletoLista linhas={4} rotulo="Carregando a pontuação…" />;
     if (consulta.isError) {
-      if (consulta.error instanceof ErroApi && consulta.error.status === 404) return <Faixa tipo="atencao">Grupo não encontrado.</Faixa>;
+      if (consulta.error instanceof ErroApi && consulta.error.status === 404)
+        return <Faixa tipo="atencao">Grupo não encontrado.</Faixa>;
       return <EstadoErro aoTentarDeNovo={() => void consulta.refetch()} />;
     }
     return <Painel grupoId={grupoId} painel={consulta.data} />;
   }
 
   return (
-    <Casca grupo={{ nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' }} titulo="Pontuação" estreita>
+    <Casca
+      grupo={{ nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' }}
+      titulo="Pontuação"
+      estreita
+    >
       <LinkVoltar para={base}>Início</LinkVoltar>
       {conteudo()}
     </Casca>

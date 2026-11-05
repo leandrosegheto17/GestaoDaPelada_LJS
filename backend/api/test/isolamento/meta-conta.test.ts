@@ -51,8 +51,16 @@ afterAll(async () => {
 });
 
 /** Problemas das tabelas sem `grupo_id` (exceto `grupos`). Lista vazia = coberto. */
-async function problemasDeTabelas(db: pg.Client, matriz: Readonly<Record<string, string>> = MATRIZ_CONTA): Promise<string[]> {
-  const r = await db.query<{ tabela: string; habilitada: boolean; forcada: boolean; backup: boolean }>(
+async function problemasDeTabelas(
+  db: pg.Client,
+  matriz: Readonly<Record<string, string>> = MATRIZ_CONTA,
+): Promise<string[]> {
+  const r = await db.query<{
+    tabela: string;
+    habilitada: boolean;
+    forcada: boolean;
+    backup: boolean;
+  }>(
     `SELECT c.relname::text AS tabela, c.relrowsecurity AS habilitada, c.relforcerowsecurity AS forcada,
             EXISTS (SELECT 1 FROM pg_policy p JOIN pg_roles r ON r.oid = ANY (p.polroles)
                      WHERE p.polrelid = c.oid AND r.rolname = 'pelada_backup_ro'
@@ -98,7 +106,8 @@ async function problemasDeFuncoes(db: pg.Client): Promise<string[]> {
   );
   const problemas: string[] = [];
   for (const f of r.rows) {
-    if (!(f.config ?? []).includes(SEARCH_PATH)) problemas.push(`${f.funcao}: SECURITY DEFINER sem search_path fixo`);
+    if (!(f.config ?? []).includes(SEARCH_PATH))
+      problemas.push(`${f.funcao}: SECURITY DEFINER sem search_path fixo`);
     if (f.publico) problemas.push(`${f.funcao}: EXECUTE para PUBLIC`);
   }
   return problemas;
@@ -125,7 +134,9 @@ describe('meta-teste das tabelas de conta', () => {
   });
 
   it('ACE-45: tabela nova sem RLS, sem policy do backup e sem linha na matriz reprova', async () => {
-    const p = await com('CREATE TABLE exemplo_conta (id int PRIMARY KEY)', () => problemasDeTabelas(aberto.db));
+    const p = await com('CREATE TABLE exemplo_conta (id int PRIMARY KEY)', () =>
+      problemasDeTabelas(aberto.db),
+    );
     expect(p).toEqual([
       'exemplo_conta: sem ENABLE ROW LEVEL SECURITY',
       'exemplo_conta: sem FORCE ROW LEVEL SECURITY',
@@ -146,17 +157,24 @@ describe('meta-teste das tabelas de conta', () => {
   });
 
   it('ACE-45: tirar o FORCE de sessoes reprova', async () => {
-    const p = await com('ALTER TABLE sessoes NO FORCE ROW LEVEL SECURITY', () => problemasDeTabelas(aberto.db));
+    const p = await com('ALTER TABLE sessoes NO FORCE ROW LEVEL SECURITY', () =>
+      problemasDeTabelas(aberto.db),
+    );
     expect(p).toEqual(['sessoes: sem FORCE ROW LEVEL SECURITY']);
   });
 
   it('ACE-45: tirar a policy do backup de links_conta reprova', async () => {
-    const p = await com('DROP POLICY links_conta_backup ON links_conta', () => problemasDeTabelas(aberto.db));
+    const p = await com('DROP POLICY links_conta_backup ON links_conta', () =>
+      problemasDeTabelas(aberto.db),
+    );
     expect(p).toEqual(['links_conta: sem policy de leitura para pelada_backup_ro']);
   });
 
   it('ACE-45: linha da matriz sem tabela no catálogo reprova', async () => {
-    const p = await problemasDeTabelas(aberto.db, { ...MATRIZ_CONTA, tabela_que_nao_existe: 'nenhum' });
+    const p = await problemasDeTabelas(aberto.db, {
+      ...MATRIZ_CONTA,
+      tabela_que_nao_existe: 'nenhum',
+    });
     expect(p).toEqual(['tabela_que_nao_existe: linha na matriz sem tabela no catálogo']);
   });
 });
@@ -179,18 +197,24 @@ describe('meta-teste das funções SECURITY DEFINER', () => {
       `CREATE FUNCTION exemplo_sem_path() RETURNS int LANGUAGE sql SECURITY DEFINER AS 'SELECT 1'`,
       () => problemasDeFuncoes(aberto.db),
     );
-    expect(p).toEqual(['exemplo_sem_path: SECURITY DEFINER sem search_path fixo', 'exemplo_sem_path: EXECUTE para PUBLIC']);
+    expect(p).toEqual([
+      'exemplo_sem_path: SECURITY DEFINER sem search_path fixo',
+      'exemplo_sem_path: EXECUTE para PUBLIC',
+    ]);
   });
 
   it('ACE-43: dar EXECUTE a PUBLIC numa função de conta reprova', async () => {
-    const p = await com('GRANT EXECUTE ON FUNCTION sessao_tocar(bytea) TO PUBLIC', () => problemasDeFuncoes(aberto.db));
+    const p = await com('GRANT EXECUTE ON FUNCTION sessao_tocar(bytea) TO PUBLIC', () =>
+      problemasDeFuncoes(aberto.db),
+    );
     expect(p).toEqual(['sessao_tocar: EXECUTE para PUBLIC']);
   });
 
   it.each(SO_OWNER)('ACE-43: pelada_app não executa %s', async (assinatura) => {
-    const r = await aberto.db.query<{ pode: boolean }>(`SELECT has_function_privilege('pelada_app', $1, 'EXECUTE') AS pode`, [
-      assinatura,
-    ]);
+    const r = await aberto.db.query<{ pode: boolean }>(
+      `SELECT has_function_privilege('pelada_app', $1, 'EXECUTE') AS pode`,
+      [assinatura],
+    );
     expect(r.rows[0]?.pode).toBe(false);
   });
 
@@ -208,7 +232,9 @@ describe('meta-teste das funções SECURITY DEFINER', () => {
     await db.query('BEGIN');
     try {
       await db.query('SET LOCAL ROLE pelada_app');
-      await expect(db.query(`SELECT conta_definir_senha('conta-a@exemplo.test', 'x', false)`)).rejects.toMatchObject({
+      await expect(
+        db.query(`SELECT conta_definir_senha('conta-a@exemplo.test', 'x', false)`),
+      ).rejects.toMatchObject({
         code: '42501',
       });
     } finally {

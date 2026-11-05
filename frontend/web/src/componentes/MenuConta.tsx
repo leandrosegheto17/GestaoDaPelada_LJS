@@ -77,7 +77,11 @@ export function MenuConta() {
         <Dialogo formato="folha" titulo={nome} aoFechar={() => setAberto(false)}>
           <ul className={estilos.opcoes}>
             <li>
-              <Link className={estilos.opcao} to={ROTA_MINHA_CONTA} onClick={() => setAberto(false)}>
+              <Link
+                className={estilos.opcao}
+                to={ROTA_MINHA_CONTA}
+                onClick={() => setAberto(false)}
+              >
                 Minha conta
               </Link>
             </li>
@@ -92,7 +96,13 @@ export function MenuConta() {
               </Link>
             </li>
             <li>
-              <button className={estilos.opcao} type="button" disabled={saindo} aria-busy={saindo || undefined} onClick={() => void sair()}>
+              <button
+                className={estilos.opcao}
+                type="button"
+                disabled={saindo}
+                aria-busy={saindo || undefined}
+                onClick={() => void sair()}
+              >
                 Sair
               </button>
             </li>
@@ -103,7 +113,10 @@ export function MenuConta() {
   );
 }
 
-export function CascaConta({ children, ...props }: Omit<PropsCasca, 'grupo' | 'acoes'> & { children?: ReactNode }) {
+export function CascaConta({
+  children,
+  ...props
+}: Omit<PropsCasca, 'grupo' | 'acoes'> & { children?: ReactNode }) {
   return (
     <Casca {...props} grupo={{ nome: NOME_DO_APP }} acoes={<MenuConta />}>
       {children}

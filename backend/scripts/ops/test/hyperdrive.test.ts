@@ -11,7 +11,13 @@ function config(caching?: unknown): string {
   const base: Record<string, unknown> = {
     id: '0123456789abcdef0123456789abcdef',
     name: 'gestaodapelada-v2-dev',
-    origin: { host: 'ep-exemplo.neon.tech', port: 5432, database: 'pelada', user: 'pelada_app', scheme: 'postgres' },
+    origin: {
+      host: 'ep-exemplo.neon.tech',
+      port: 5432,
+      database: 'pelada',
+      user: 'pelada_app',
+      scheme: 'postgres',
+    },
   };
   if (caching !== undefined) base.caching = caching;
   return JSON.stringify(base);
@@ -23,7 +29,9 @@ describe('conferirSemCache', () => {
   });
 
   it('FUN-18: caching.disabled false reprova com mensagem clara', () => {
-    const r = conferirSemCache(config({ disabled: false, max_age: 60, stale_while_revalidate: 15 }));
+    const r = conferirSemCache(
+      config({ disabled: false, max_age: 60, stale_while_revalidate: 15 }),
+    );
     expect(r).toEqual({ ok: false, mensagem: MENSAGEM_CACHE_LIGADO });
     expect(MENSAGEM_CACHE_LIGADO).toMatch(/cache do Hyperdrive está ligado/);
   });
@@ -33,7 +41,10 @@ describe('conferirSemCache', () => {
   });
 
   it('FUN-18: caching sem disabled reprova', () => {
-    expect(conferirSemCache(config({ max_age: 60 }))).toEqual({ ok: false, mensagem: MENSAGEM_SEM_CACHING });
+    expect(conferirSemCache(config({ max_age: 60 }))).toEqual({
+      ok: false,
+      mensagem: MENSAGEM_SEM_CACHING,
+    });
   });
 
   for (const [nome, valor] of [
@@ -42,7 +53,10 @@ describe('conferirSemCache', () => {
     ['nulo', null],
   ] as const) {
     it(`FUN-18: disabled ${nome} (não booleano verdadeiro) reprova`, () => {
-      expect(conferirSemCache(config({ disabled: valor }))).toEqual({ ok: false, mensagem: MENSAGEM_CACHE_LIGADO });
+      expect(conferirSemCache(config({ disabled: valor }))).toEqual({
+        ok: false,
+        mensagem: MENSAGEM_CACHE_LIGADO,
+      });
     });
   }
 

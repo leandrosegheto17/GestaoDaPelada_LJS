@@ -27,7 +27,12 @@ async function publico(caminho: string, init: RequestInit = { method: 'GET' }): 
   const ctx = contextoFalso();
   const headers = new Headers(init.headers);
   headers.set('cf-connecting-ip', '203.0.113.9');
-  const r = await app.request(`/api/publico/${aberto.cenario.slugG}${caminho}`, { ...init, headers }, envAcesso(aberto.url, { URL_PUBLICA }), ctx);
+  const r = await app.request(
+    `/api/publico/${aberto.cenario.slugG}${caminho}`,
+    { ...init, headers },
+    envAcesso(aberto.url, { URL_PUBLICA }),
+    ctx,
+  );
   await ctx.esperar();
   return r;
 }
@@ -41,11 +46,10 @@ function evento(corpo: unknown): Promise<Response> {
 }
 
 async function situacao(s: string, t: string | null): Promise<void> {
-  await aberto.db.query('UPDATE grupos SET situacao_comercial = $2, trial_inicio = $3::date WHERE id = $1', [
-    aberto.cenario.grupoG,
-    s,
-    t,
-  ]);
+  await aberto.db.query(
+    'UPDATE grupos SET situacao_comercial = $2, trial_inicio = $3::date WHERE id = $1',
+    [aberto.cenario.grupoG, s, t],
+  );
 }
 
 const free = () => situacao('trial', '2026-10-01');
@@ -68,9 +72,10 @@ beforeAll(async () => {
 });
 
 afterEach(async () => {
-  await aberto.db.query(`DELETE FROM eventos_uso WHERE grupo_id = $1 AND tipo IN ('ranking_aberto', 'pdf_exportado')`, [
-    aberto.cenario.grupoG,
-  ]);
+  await aberto.db.query(
+    `DELETE FROM eventos_uso WHERE grupo_id = $1 AND tipo IN ('ranking_aberto', 'pdf_exportado')`,
+    [aberto.cenario.grupoG],
+  );
 });
 
 afterAll(async () => {
@@ -156,10 +161,10 @@ describe('ranking público no Free (PLA-19)', () => {
         [cenario.grupoG, `Público ${i + 1}`, cenario.contaC],
       );
       extras.push(r.rows[0]!.id);
-      await db.query(`INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, '2026-01-01', NULL)`, [
-        r.rows[0]!.id,
-        cenario.grupoG,
-      ]);
+      await db.query(
+        `INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, '2026-01-01', NULL)`,
+        [r.rows[0]!.id, cenario.grupoG],
+      );
     }
     const r = await publico('/ranking?mes=2026-01');
     expect(r.status).toBe(200);

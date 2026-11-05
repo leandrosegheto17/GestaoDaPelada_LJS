@@ -37,7 +37,10 @@ import { financeiroPagamentosDesmarcar } from '../../infraestrutura/db/repositor
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export function corpoPagamentoJaMarcado() {
-  return { erro: MENSAGENS_ERRO_FINANCEIRO.pagamento_ja_marcado, codigo: 'pagamento_ja_marcado' as const };
+  return {
+    erro: MENSAGENS_ERRO_FINANCEIRO.pagamento_ja_marcado,
+    codigo: 'pagamento_ja_marcado' as const,
+  };
 }
 
 export function rotasFinanceiroPagamentos(): Hono<Ambiente> {
@@ -51,19 +54,32 @@ export function rotasFinanceiroPagamentos(): Hono<Ambiente> {
     const { jogadorId, mes } = corpo.dados;
     if (mesFuturo(mes, hoje)) return respostaDeCampo(c, 'mes', MENSAGEM_MES_FUTURO);
 
-    const r = await financeiroPagamentos.marcar(c.var.db, c.req.param('grupoId'), jogadorId, mes, hoje);
-    if (r.resultado === 'jogador_fora_do_mes') return respostaDeCampo(c, 'jogadorId', MENSAGEM_JOGADOR_FORA_DO_MES);
+    const r = await financeiroPagamentos.marcar(
+      c.var.db,
+      c.req.param('grupoId'),
+      jogadorId,
+      mes,
+      hoje,
+    );
+    if (r.resultado === 'jogador_fora_do_mes')
+      return respostaDeCampo(c, 'jogadorId', MENSAGEM_JOGADOR_FORA_DO_MES);
     if (r.resultado === 'ja_marcado') return c.json(corpoPagamentoJaMarcado(), 409);
     return c.body(null, 204);
   });
 
   rotas.delete('/grupos/:grupoId/financeiro/pagamentos/:jogadorId/:mes', async (c) => {
     const mes = c.req.param('mes');
-    if (!mesFinanceiro.safeParse(mes).success) return respostaDeCampo(c, 'mes', MENSAGEM_MES_INVALIDO);
+    if (!mesFinanceiro.safeParse(mes).success)
+      return respostaDeCampo(c, 'mes', MENSAGEM_MES_INVALIDO);
     const jogadorId = c.req.param('jogadorId');
     if (!UUID.test(jogadorId)) return c.json(naoEncontrado, 404);
 
-    const r = await financeiroPagamentosDesmarcar.desmarcar(c.var.db, c.req.param('grupoId'), jogadorId, mes);
+    const r = await financeiroPagamentosDesmarcar.desmarcar(
+      c.var.db,
+      c.req.param('grupoId'),
+      jogadorId,
+      mes,
+    );
     if (r.resultado === 'nao_encontrado') return c.json(naoEncontrado, 404);
     return c.body(null, 204);
   });

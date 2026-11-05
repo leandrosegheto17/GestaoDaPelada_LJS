@@ -17,7 +17,10 @@ function abrir(caminho: string, logado: boolean) {
   const consultas = new QueryClient();
   const fetch = (async () =>
     logado
-      ? new Response(JSON.stringify(SESSAO), { status: 200, headers: { 'Content-Type': 'application/json' } })
+      ? new Response(JSON.stringify(SESSAO), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        })
       : new Response(JSON.stringify({ erro: 'Entre para continuar.', codigo: 'sem_sessao' }), {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
@@ -123,6 +126,8 @@ describe('rotas do app de acesso', () => {
 
   it('rota desconhecida dentro de /app, com sessão, cai no 404', async () => {
     abrir('/app/qualquer', true);
-    expect(await screen.findByRole('heading', { level: 1, name: 'Página não encontrada' })).toBeTruthy();
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Página não encontrada' }),
+    ).toBeTruthy();
   });
 });

@@ -29,7 +29,10 @@ export const ERRO_SENHAS_DIFERENTES = 'As senhas não conferem.';
 export const ERRO_SENHA = 'A senha precisa ter de 8 a 72 caracteres.';
 
 type CampoSenha = 'nova' | 'conf';
-const ROTULOS: Readonly<Record<CampoSenha, string>> = { nova: 'Nova senha', conf: 'Confirmar nova senha' };
+const ROTULOS: Readonly<Record<CampoSenha, string>> = {
+  nova: 'Nova senha',
+  conf: 'Confirmar nova senha',
+};
 
 export function NovaSenha() {
   const api = useCliente();
@@ -63,7 +66,8 @@ export function NovaSenha() {
       void navegar(DESTINO_SENHA_ALTERADA, { replace: true });
     } catch (erro) {
       if (erro instanceof ErroApi && erro.status === 410) setInvalido(true);
-      else if (erro instanceof ErroApi && erro.campos.includes('senha')) setErros({ nova: ERRO_SENHA });
+      else if (erro instanceof ErroApi && erro.campos.includes('senha'))
+        setErros({ nova: ERRO_SENHA });
       else setFalha(erro instanceof ErroApi ? erro.message : MENSAGEM_REDE);
     } finally {
       setEnviando(false);
@@ -85,14 +89,22 @@ export function NovaSenha() {
     );
   }
 
-  const resumo = (['nova', 'conf'] as const).filter((c) => erros[c]).map((c) => ({ id: c, rotulo: ROTULOS[c] }));
+  const resumo = (['nova', 'conf'] as const)
+    .filter((c) => erros[c])
+    .map((c) => ({ id: c, rotulo: ROTULOS[c] }));
 
   return (
     <Casca titulo="Crie uma nova senha" estreita>
       <p className={estilos.paragrafo}>
-        Depois de salvar, todos os aparelhos conectados à sua conta saem e você entra de novo com a senha nova.
+        Depois de salvar, todos os aparelhos conectados à sua conta saem e você entra de novo com a
+        senha nova.
       </p>
-      <form className={estilos.formulario} noValidate aria-busy={enviando || undefined} onSubmit={salvar}>
+      <form
+        className={estilos.formulario}
+        noValidate
+        aria-busy={enviando || undefined}
+        onSubmit={salvar}
+      >
         <ResumoErros erros={resumo} />
         {falha ? <Faixa tipo="erro">{falha}</Faixa> : null}
         <Campo

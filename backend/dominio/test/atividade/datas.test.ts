@@ -25,16 +25,27 @@ import {
 const HOJE = '2026-10-15';
 
 describe('ehDataValida', () => {
-  it.each(['2024-02-29', '2000-02-29', '2026-01-01', '2026-12-31', '2026-04-30'])('GEL-63: %s é data real', (d) => {
-    expect(ehDataValida(d)).toBe(true);
-  });
-
-  it.each(['2026-02-29', '1900-02-29', '2026-13-01', '2026-00-10', '2026-04-31', '2026-01-00', '2026-1-1', '26-01-01', '2026/01/01', ''])(
-    'GEL-63: %s não é data real',
+  it.each(['2024-02-29', '2000-02-29', '2026-01-01', '2026-12-31', '2026-04-30'])(
+    'GEL-63: %s é data real',
     (d) => {
-      expect(ehDataValida(d)).toBe(false);
+      expect(ehDataValida(d)).toBe(true);
     },
   );
+
+  it.each([
+    '2026-02-29',
+    '1900-02-29',
+    '2026-13-01',
+    '2026-00-10',
+    '2026-04-31',
+    '2026-01-00',
+    '2026-1-1',
+    '26-01-01',
+    '2026/01/01',
+    '',
+  ])('GEL-63: %s não é data real', (d) => {
+    expect(ehDataValida(d)).toBe(false);
+  });
 
   it.each([20261001, null, undefined, {}])('GEL-63: %s (não texto) não é data', (v) => {
     expect(ehDataValida(v)).toBe(false);
@@ -42,15 +53,18 @@ describe('ehDataValida', () => {
 });
 
 describe('validarData', () => {
-  it.each(['2026-02-29', '2026-13-01', '2026-1-1'])('GEL-63: %s dá "Informe uma data válida."', (d) => {
-    expect(validarData(d, HOJE, 'saida')).toEqual({
-      ok: false,
-      regra: 'data-invalida',
-      mensagem: MENSAGEM_DATA_INVALIDA,
-      campo: 'saida',
-    });
-    expect(MENSAGEM_DATA_INVALIDA).toBe('Informe uma data válida.');
-  });
+  it.each(['2026-02-29', '2026-13-01', '2026-1-1'])(
+    'GEL-63: %s dá "Informe uma data válida."',
+    (d) => {
+      expect(validarData(d, HOJE, 'saida')).toEqual({
+        ok: false,
+        regra: 'data-invalida',
+        mensagem: MENSAGEM_DATA_INVALIDA,
+        campo: 'saida',
+      });
+      expect(MENSAGEM_DATA_INVALIDA).toBe('Informe uma data válida.');
+    },
+  );
 
   it('GEL-64: amanhã dá "A data não pode ser no futuro."', () => {
     expect(validarData('2026-10-16', HOJE, 'retorno')).toEqual({
@@ -77,24 +91,39 @@ describe('validarData', () => {
 
 describe('intervalo [início, fim)', () => {
   it('GEL-61: [01/10, 05/10) e [05/10, aberto) não se sobrepõem', () => {
-    expect(sobrepoem({ inicio: '2026-10-01', fim: '2026-10-05' }, { inicio: '2026-10-05', fim: null })).toBe(false);
-    expect(sobrepoem({ inicio: '2026-10-05', fim: null }, { inicio: '2026-10-01', fim: '2026-10-05' })).toBe(false);
+    expect(
+      sobrepoem({ inicio: '2026-10-01', fim: '2026-10-05' }, { inicio: '2026-10-05', fim: null }),
+    ).toBe(false);
+    expect(
+      sobrepoem({ inicio: '2026-10-05', fim: null }, { inicio: '2026-10-01', fim: '2026-10-05' }),
+    ).toBe(false);
   });
 
   it('GEL-61: [01/10, 06/10) e [05/10, aberto) se sobrepõem', () => {
-    expect(sobrepoem({ inicio: '2026-10-01', fim: '2026-10-06' }, { inicio: '2026-10-05', fim: null })).toBe(true);
+    expect(
+      sobrepoem({ inicio: '2026-10-01', fim: '2026-10-06' }, { inicio: '2026-10-05', fim: null }),
+    ).toBe(true);
   });
 
   it('GEL-61: dois abertos se sobrepõem', () => {
-    expect(sobrepoem({ inicio: '2026-10-01', fim: null }, { inicio: '2026-11-01', fim: null })).toBe(true);
+    expect(
+      sobrepoem({ inicio: '2026-10-01', fim: null }, { inicio: '2026-11-01', fim: null }),
+    ).toBe(true);
   });
 
   it('GEL-61: período dentro de outro se sobrepõe', () => {
-    expect(sobrepoem({ inicio: '2026-01-01', fim: '2026-12-31' }, { inicio: '2026-03-01', fim: '2026-04-01' })).toBe(true);
+    expect(
+      sobrepoem(
+        { inicio: '2026-01-01', fim: '2026-12-31' },
+        { inicio: '2026-03-01', fim: '2026-04-01' },
+      ),
+    ).toBe(true);
   });
 
   it('GEL-61: período vazio não sobrepõe', () => {
-    expect(sobrepoem({ inicio: '2026-03-01', fim: '2026-03-01' }, { inicio: '2026-01-01', fim: null })).toBe(false);
+    expect(
+      sobrepoem({ inicio: '2026-03-01', fim: '2026-03-01' }, { inicio: '2026-01-01', fim: null }),
+    ).toBe(false);
   });
 
   it('GEL-61: o dia da saída fica fora do período; o dia do início, dentro', () => {

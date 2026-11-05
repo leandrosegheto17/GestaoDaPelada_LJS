@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { avaliarInicio, MENSAGEM_ANTES_DO_PISO, type EntradaInicio } from '../../src/atividade/avaliar-inicio.ts';
+import {
+  avaliarInicio,
+  MENSAGEM_ANTES_DO_PISO,
+  type EntradaInicio,
+} from '../../src/atividade/avaliar-inicio.ts';
 import type { Periodo } from '../../src/atividade/datas.ts';
 
 /**
@@ -22,7 +26,13 @@ const ENCERRADO_E_ABERTO: Periodo[] = [
 const ABERTO: Periodo[] = [{ id: 'p1', inicio: '2026-02-05', fim: null }];
 
 function entrada(novaData: unknown, extra: Partial<EntradaInicio> = {}): EntradaInicio {
-  return { periodos: ENCERRADO_E_ABERTO, inicioPontuacao: '2026-02-05', novaData, hoje: HOJE, ...extra };
+  return {
+    periodos: ENCERRADO_E_ABERTO,
+    inicioPontuacao: '2026-02-05',
+    novaData,
+    hoje: HOJE,
+    ...extra,
+  };
 }
 
 describe('validações da data de início', () => {
@@ -37,7 +47,11 @@ describe('validações da data de início', () => {
   });
 
   it('GEL-78: 01/01/2000 é aceita', () => {
-    expect(avaliarInicio(entrada('2000-01-01'))).toMatchObject({ ok: true, alterado: true, inicioPontuacao: '2000-01-01' });
+    expect(avaliarInicio(entrada('2000-01-01'))).toMatchObject({
+      ok: true,
+      alterado: true,
+      inicioPontuacao: '2000-01-01',
+    });
   });
 
   it('GEL-79: amanhã dá "A data não pode ser no futuro."', () => {
@@ -50,7 +64,10 @@ describe('validações da data de início', () => {
   });
 
   it('GEL-79: hoje é aceita com o primeiro período aberto', () => {
-    expect(avaliarInicio(entrada(HOJE, { periodos: ABERTO }))).toMatchObject({ ok: true, alterado: true });
+    expect(avaliarInicio(entrada(HOJE, { periodos: ABERTO }))).toMatchObject({
+      ok: true,
+      alterado: true,
+    });
   });
 
   it('GEL-80: um dia depois da saída do primeiro período dá a mensagem com a saída', () => {
@@ -64,11 +81,18 @@ describe('validações da data de início', () => {
   });
 
   it('GEL-80: igual à saída do primeiro período é aceita', () => {
-    expect(avaliarInicio(entrada('2026-06-01'))).toMatchObject({ ok: true, alterado: true, inicioPontuacao: '2026-06-01' });
+    expect(avaliarInicio(entrada('2026-06-01'))).toMatchObject({
+      ok: true,
+      alterado: true,
+      inicioPontuacao: '2026-06-01',
+    });
   });
 
   it('GEL-63: data que não existe dá "Informe uma data válida."', () => {
-    expect(avaliarInicio(entrada('2026-02-30'))).toMatchObject({ regra: 'data-invalida', mensagem: 'Informe uma data válida.' });
+    expect(avaliarInicio(entrada('2026-02-30'))).toMatchObject({
+      regra: 'data-invalida',
+      mensagem: 'Informe uma data válida.',
+    });
   });
 });
 
@@ -112,6 +136,9 @@ describe('efeito da nova data de início', () => {
   });
 
   it('GEL-82: com inicio_pontuacao nulo, a atual é o início do primeiro período', () => {
-    expect(avaliarInicio(entrada('2026-02-05', { inicioPontuacao: null }))).toMatchObject({ ok: true, alterado: false });
+    expect(avaliarInicio(entrada('2026-02-05', { inicioPontuacao: null }))).toMatchObject({
+      ok: true,
+      alterado: false,
+    });
   });
 });

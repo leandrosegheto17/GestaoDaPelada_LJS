@@ -11,7 +11,12 @@ import { NOME_COOKIE_SESSAO } from '../../src/infraestrutura/sessao/cookie.ts';
 import { gerarToken } from '../../src/infraestrutura/sessao/token.ts';
 import { envAcesso } from '../acesso/apoio.ts';
 import { contextoFalso } from '../db/requisicao.ts';
-import { abrirCenarioGrupos, arquivar, reativar, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  arquivar,
+  reativar,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * Prévias em transação somente leitura (partidas-e-ranking T36; PAR-109, PAR-110, PAR-111, PAR-112, AD-035), com o
@@ -54,7 +59,9 @@ const app = criarApp({
       chamadas += 1;
       const grupoId = c.req.param('grupoId') ?? '';
       try {
-        await sql`INSERT INTO habilidades (grupo_id, nome) VALUES (${grupoId}, ${NOME_PROVA})`.execute(c.var.db);
+        await sql`INSERT INTO habilidades (grupo_id, nome) VALUES (${grupoId}, ${NOME_PROVA})`.execute(
+          c.var.db,
+        );
         return c.json({ gravou: true, codigo: null }, 200);
       } catch (erro) {
         return c.json({ gravou: false, codigo: (erro as { code?: string }).code ?? null }, 200);
@@ -111,7 +118,10 @@ afterAll(async () => {
 
 beforeEach(async () => {
   await reativar(aberto.db, aberto.cenario.grupoG);
-  await aberto.db.query('DELETE FROM habilidades WHERE grupo_id = $1 AND nome = $2', [aberto.cenario.grupoG, NOME_PROVA]);
+  await aberto.db.query('DELETE FROM habilidades WHERE grupo_id = $1 AND nome = $2', [
+    aberto.cenario.grupoG,
+    NOME_PROVA,
+  ]);
 });
 
 describe('prévia em transação somente leitura', () => {

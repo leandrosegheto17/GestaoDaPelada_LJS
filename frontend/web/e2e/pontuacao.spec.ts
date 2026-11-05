@@ -24,13 +24,19 @@ const VIEWPORTS = [
 ] as const;
 
 async function prepararApi(pagina: Page, posts: string[]) {
-  await pagina.route('**/api/sessao', (rota) => rota.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(SESSAO) }));
+  await pagina.route('**/api/sessao', (rota) =>
+    rota.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(SESSAO) }),
+  );
   await pagina.route('**/api/grupos/*/pesos', (rota) => {
     if (rota.request().method() === 'POST') {
       posts.push(rota.request().url());
       return rota.fulfill({ status: 500, contentType: 'application/json', body: '{}' });
     }
-    return rota.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(PESOS) });
+    return rota.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(PESOS),
+    });
   });
 }
 
@@ -62,7 +68,10 @@ for (const vp of VIEWPORTS) {
       // Na mesma linha (o topo da mensagem dentro da altura do campo) ou logo abaixo (até 24 px da base).
       expect(erro.y, 'a mensagem não fica acima do campo').toBeGreaterThanOrEqual(entrada.y);
       expect(distancia, 'a mensagem fica logo abaixo do campo (≤ 24 px)').toBeLessThanOrEqual(24);
-      expect(Math.abs(erro.x - entrada.x), 'a mensagem alinhada à esquerda do campo').toBeLessThanOrEqual(4);
+      expect(
+        Math.abs(erro.x - entrada.x),
+        'a mensagem alinhada à esquerda do campo',
+      ).toBeLessThanOrEqual(4);
       expect(posts, 'a validação local não envia').toEqual([]);
     });
   });

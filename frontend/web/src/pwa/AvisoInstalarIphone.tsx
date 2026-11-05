@@ -6,7 +6,8 @@ import { useModoInstalacao, type AmbienteNavegador } from './useModoInstalacao.t
  * faixa informativa no topo, com o botão de fechar. Fechar grava a dispensa.
  */
 
-export const TEXTO_AVISO = 'Instale: toque em Compartilhar e depois em “Adicionar à Tela de Início”.';
+export const TEXTO_AVISO =
+  'Instale: toque em Compartilhar e depois em “Adicionar à Tela de Início”.';
 
 export interface PropsAvisoInstalarIphone {
   /** Só para os testes: o navegador simulado. */
@@ -17,7 +18,10 @@ export function AvisoInstalarIphone({ ambiente }: PropsAvisoInstalarIphone) {
   const { mostrarAviso, dispensar } = useModoInstalacao(ambiente);
   if (!mostrarAviso) return null;
   return (
-    <div className={`${estilos.faixa} ${estilos['faixa--info']} ${estilos['faixa--topo']}`} role="note">
+    <div
+      className={`${estilos.faixa} ${estilos['faixa--info']} ${estilos['faixa--topo']}`}
+      role="note"
+    >
       <svg
         className={estilos.icone}
         viewBox="0 0 24 24"
@@ -34,7 +38,12 @@ export function AvisoInstalarIphone({ ambiente }: PropsAvisoInstalarIphone) {
         <path d="M12 16v-4M12 8h.01" />
       </svg>
       <p className={estilos['faixa__texto']}>{TEXTO_AVISO}</p>
-      <button className={estilos['faixa__fechar']} type="button" aria-label="Fechar aviso de instalação" onClick={dispensar}>
+      <button
+        className={estilos['faixa__fechar']}
+        type="button"
+        aria-label="Fechar aviso de instalação"
+        onClick={dispensar}
+      >
         <svg
           viewBox="0 0 24 24"
           width="20"

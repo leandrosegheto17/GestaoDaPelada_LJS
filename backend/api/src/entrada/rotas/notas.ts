@@ -23,7 +23,13 @@ export function rotasNotas(): Hono<Ambiente> {
     if (!UUID.test(id) || !UUID.test(habilidadeId)) return c.json(naoEncontrado, 404);
     const corpo = await lerCorpoDoGrupo(c, notaCorpo);
     if (!corpo.ok) return corpo.resposta;
-    const r = await notas.salvar(c.var.db, c.req.param('grupoId'), id, habilidadeId, corpo.dados.nota);
+    const r = await notas.salvar(
+      c.var.db,
+      c.req.param('grupoId'),
+      id,
+      habilidadeId,
+      corpo.dados.nota,
+    );
     if (r.resultado === 'nao_encontrado') return c.json(naoEncontrado, 404);
     const resposta: NotaResposta = r.nivel;
     return c.json(resposta, 200);

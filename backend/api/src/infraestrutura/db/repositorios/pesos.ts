@@ -1,5 +1,10 @@
 import { sql } from 'kysely';
-import type { ConfiguracaoAnterior, ConfiguracaoVigente, PesosCorpo, PesosPainel } from '@pelada/contrato';
+import type {
+  ConfiguracaoAnterior,
+  ConfiguracaoVigente,
+  PesosCorpo,
+  PesosPainel,
+} from '@pelada/contrato';
 import { vespera } from '@pelada/dominio';
 import { auditoria } from './convites.ts';
 import type { Db } from './tipos.ts';
@@ -66,12 +71,10 @@ async function painel(db: Db, grupoId: string, hoje: string): Promise<PesosPaine
   const nomes = new Map(autoras.rows.map((a) => [a.id, a.nome]));
 
   // configs.rows está da mais recente para a mais antiga: a seguinte de anteriores[i] é configs.rows[i].
-  const historico = anteriores.map(
-    (c, i): ConfiguracaoAnterior => ({
-      ...vigenteDe(c, nomes),
-      vigenteAte: vespera((configs.rows[i] as LinhaConfig).vigente_desde),
-    }),
-  );
+  const historico = anteriores.map((c, i): ConfiguracaoAnterior => ({
+    ...vigenteDe(c, nomes),
+    vigenteAte: vespera((configs.rows[i] as LinhaConfig).vigente_desde),
+  }));
   return { hoje, vigente: vigenteDe(maisRecente, nomes), historico };
 }
 
@@ -81,7 +84,12 @@ export interface ResultadoSalvarPesos {
 }
 
 /** Grava a configuração vigente desde hoje, pela conta da sessão, e a auditoria na mesma transação (PAR-03 a PAR-05). */
-async function salvar(db: Db, grupoId: string, p: PesosCorpo, hoje: string): Promise<ResultadoSalvarPesos> {
+async function salvar(
+  db: Db,
+  grupoId: string,
+  p: PesosCorpo,
+  hoje: string,
+): Promise<ResultadoSalvarPesos> {
   // xmax diferente de zero na linha devolvida = o ON CONFLICT atualizou uma linha que já existia.
   const r = await sql<{ substituiu: boolean }>`
     INSERT INTO config_pesos (grupo_id, vigente_desde, presenca_sem_chuva, presenca_com_chuva, lesionado_sem_chuva,

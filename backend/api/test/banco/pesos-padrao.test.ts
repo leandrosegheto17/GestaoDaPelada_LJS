@@ -3,7 +3,11 @@ import { join } from 'node:path';
 import type pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { PASTA_MIGRACOES } from '../../src/infraestrutura/db/migrar.ts';
-import { abrirCenarioGrupos, comoSuperusuario, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  comoSuperusuario,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * Migração dos pesos padrão (T21; PAR-13, PAR-14; `BD:120-124`). No banco migrado a migração já rodou sem grupos;
@@ -19,7 +23,8 @@ const SUFIXO = '_pesos-padrao.sql';
 
 function arquivoDaMigracao(): string {
   const achados = readdirSync(PASTA_MIGRACOES).filter((f) => f.endsWith(SUFIXO));
-  if (achados.length !== 1) throw new Error(`esperava uma migração ${SUFIXO}, achei ${achados.length}`);
+  if (achados.length !== 1)
+    throw new Error(`esperava uma migração ${SUFIXO}, achei ${achados.length}`);
   return join(PASTA_MIGRACOES, achados[0] ?? '');
 }
 
@@ -56,7 +61,13 @@ async function pesosDe(d: pg.Client, grupo: string): Promise<LinhaPesos[]> {
   return r.rows;
 }
 
-async function novoGrupo(d: pg.Client, conta: string, slug: string, criadoEm: string, arquivado = false): Promise<string> {
+async function novoGrupo(
+  d: pg.Client,
+  conta: string,
+  slug: string,
+  criadoEm: string,
+  arquivado = false,
+): Promise<string> {
   const r = await d.query<{ id: string }>(
     `INSERT INTO grupos (nome, slug, dia_semana, frequencia, horario, criado_por, criado_em, arquivado_em)
      VALUES ($1, $1, 'quinta', 'semanal', '20:00', $2, $3, CASE WHEN $4 THEN now() END) RETURNING id`,
@@ -79,7 +90,12 @@ describe('migração dos pesos padrão', () => {
       const x = await novoGrupo(d, cenario.contaB, 'racha-da-madrugada', '2026-10-01T02:30:00Z');
       await d.query(SQL_MIGRACAO);
       expect(await pesosDe(d, x)).toEqual([
-        { vigente_desde: '2026-09-30', pesos: [1, 1, 1, 1, -1, -1], registrado_por: cenario.contaB, mesmo_momento: true },
+        {
+          vigente_desde: '2026-09-30',
+          pesos: [1, 1, 1, 1, -1, -1],
+          registrado_por: cenario.contaB,
+          mesmo_momento: true,
+        },
       ]);
     });
   });
@@ -140,7 +156,9 @@ describe('migração dos pesos padrão', () => {
     const semComentario = SQL_MIGRACAO.split('\n')
       .map((l) => l.replace(/--.*$/, ''))
       .join('\n');
-    expect(semComentario).not.toMatch(/\bnow\s*\(|\bcurrent_(date|timestamp)\b|\blocaltimestamp\b|\bclock_timestamp\b/i);
+    expect(semComentario).not.toMatch(
+      /\bnow\s*\(|\bcurrent_(date|timestamp)\b|\blocaltimestamp\b|\bclock_timestamp\b/i,
+    );
     expect(semComentario).toMatch(/criado_em\s+AT\s+TIME\s+ZONE\s+'America\/Sao_Paulo'/i);
   });
 });

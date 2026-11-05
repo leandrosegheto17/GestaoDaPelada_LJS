@@ -27,7 +27,12 @@ function sinal(): { promessa: Promise<void>; disparar: () => void } {
   return { promessa, disparar };
 }
 
-const DADOS = { clienteId: 'cus_t31', assinaturaId: 'sub_t31', valorCentavos: 990, faturaUrl: 'https://sandbox.asaas.com/i/t31' };
+const DADOS = {
+  clienteId: 'cus_t31',
+  assinaturaId: 'sub_t31',
+  valorCentavos: 990,
+  faturaUrl: 'https://sandbox.asaas.com/i/t31',
+};
 
 beforeAll(async () => {
   aberto = await abrirCenarioGrupos();
@@ -51,7 +56,9 @@ describe('registrar e pendenteOuAtiva', () => {
         asaasAssinaturaId: DADOS.assinaturaId,
       });
       const auditoria = await sql<{ n: number }>`
-        SELECT count(*)::int AS n FROM auditoria WHERE grupo_id = ${cenario.grupoG} AND acao = 'plano_assinado'`.execute(db);
+        SELECT count(*)::int AS n FROM auditoria WHERE grupo_id = ${cenario.grupoG} AND acao = 'plano_assinado'`.execute(
+        db,
+      );
       expect(auditoria.rows[0]?.n).toBeGreaterThanOrEqual(1);
     });
   });
@@ -60,29 +67,45 @@ describe('registrar e pendenteOuAtiva', () => {
     const { url, cenario } = aberto;
     await comDb(url, cenario.contaC, async (db) => {
       expect((await assinaturas.registrar(db, cenario.grupoG, DADOS)).resultado).toBe('ok');
-      const segunda = await assinaturas.registrar(db, cenario.grupoG, { ...DADOS, assinaturaId: 'sub_t31_b' });
+      const segunda = await assinaturas.registrar(db, cenario.grupoG, {
+        ...DADOS,
+        assinaturaId: 'sub_t31_b',
+      });
       expect(segunda).toEqual({ resultado: 'assinatura_vigente' });
-      expect((await assinaturas.pendenteOuAtiva(db, cenario.grupoG))?.asaasAssinaturaId).toBe('sub_t31');
+      expect((await assinaturas.pendenteOuAtiva(db, cenario.grupoG))?.asaasAssinaturaId).toBe(
+        'sub_t31',
+      );
     });
   });
 
   it('PLA-30: a admin convidada recebe so_quem_criou e nada é gravado', async () => {
     const { url, cenario } = aberto;
     await comDb(url, cenario.contaO, async (db) => {
-      expect(await assinaturas.registrar(db, cenario.grupoG, DADOS)).toEqual({ resultado: 'so_quem_criou' });
+      expect(await assinaturas.registrar(db, cenario.grupoG, DADOS)).toEqual({
+        resultado: 'so_quem_criou',
+      });
       expect(await assinaturas.pendenteOuAtiva(db, cenario.grupoG)).toBeNull();
     });
   });
 
   it('PLA-30: a conta B não lê a assinatura de G', async () => {
     const { url, cenario } = aberto;
-    await comDb(url, cenario.contaC, (db) => assinaturas.registrar(db, cenario.grupoG, DADOS), { confirmar: true });
+    await comDb(url, cenario.contaC, (db) => assinaturas.registrar(db, cenario.grupoG, DADOS), {
+      confirmar: true,
+    });
     try {
-      expect(await comDb(url, cenario.contaB, (db) => assinaturas.pendenteOuAtiva(db, cenario.grupoG))).toBeNull();
-      expect(await comDb(url, cenario.contaC, (db) => assinaturas.pendenteOuAtiva(db, cenario.grupoG))).not.toBeNull();
+      expect(
+        await comDb(url, cenario.contaB, (db) => assinaturas.pendenteOuAtiva(db, cenario.grupoG)),
+      ).toBeNull();
+      expect(
+        await comDb(url, cenario.contaC, (db) => assinaturas.pendenteOuAtiva(db, cenario.grupoG)),
+      ).not.toBeNull();
     } finally {
-      await aberto.db.query(`DELETE FROM auditoria WHERE grupo_id = $1 AND acao = 'plano_assinado' AND entidade_id IN
-                               (SELECT id::text FROM assinaturas WHERE asaas_assinatura_id = 'sub_t31')`, [cenario.grupoG]);
+      await aberto.db.query(
+        `DELETE FROM auditoria WHERE grupo_id = $1 AND acao = 'plano_assinado' AND entidade_id IN
+                               (SELECT id::text FROM assinaturas WHERE asaas_assinatura_id = 'sub_t31')`,
+        [cenario.grupoG],
+      );
       await aberto.db.query(`DELETE FROM assinaturas WHERE asaas_assinatura_id = 'sub_t31'`);
     }
   });
@@ -98,20 +121,27 @@ describe('cancelar', () => {
         situacaoAnterior: 'aguardando_pagamento',
       });
       expect(await assinaturas.pendenteOuAtiva(db, cenario.grupoG)).toBeNull();
-      expect((await assinaturas.registrar(db, cenario.grupoG, { ...DADOS, assinaturaId: 'sub_t31_c' })).resultado).toBe('ok');
+      expect(
+        (await assinaturas.registrar(db, cenario.grupoG, { ...DADOS, assinaturaId: 'sub_t31_c' }))
+          .resultado,
+      ).toBe('ok');
     });
   });
 
   it('PLA-30: cancelar sem assinatura vigente devolve sem_assinatura', async () => {
     const { url, cenario } = aberto;
-    expect(await comDb(url, cenario.contaC, (db) => assinaturas.cancelar(db, cenario.grupoG))).toEqual({
+    expect(
+      await comDb(url, cenario.contaC, (db) => assinaturas.cancelar(db, cenario.grupoG)),
+    ).toEqual({
       resultado: 'sem_assinatura',
     });
   });
 
   it('PLA-30: a admin convidada não cancela', async () => {
     const { url, cenario } = aberto;
-    expect(await comDb(url, cenario.contaO, (db) => assinaturas.cancelar(db, cenario.grupoG))).toEqual({
+    expect(
+      await comDb(url, cenario.contaO, (db) => assinaturas.cancelar(db, cenario.grupoG)),
+    ).toEqual({
       resultado: 'so_quem_criou',
     });
   });
@@ -130,7 +160,9 @@ describe('clienteDaConta', () => {
 
   it('PLA-30: conta que nunca assinou recebe null', async () => {
     const { url, cenario } = aberto;
-    expect(await comDb(url, cenario.contaO, (db) => assinaturas.clienteDaConta(db, cenario.contaO))).toBeNull();
+    expect(
+      await comDb(url, cenario.contaO, (db) => assinaturas.clienteDaConta(db, cenario.contaO)),
+    ).toBeNull();
   });
 });
 

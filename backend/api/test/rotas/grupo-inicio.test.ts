@@ -21,9 +21,15 @@ import { abrirCenarioGrupos, type CenarioGruposAberto } from '../isolamento/cena
 
 let aberto: CenarioGruposAberto;
 
-const app = criarApp({ fabricaBanco: fabricaComoApp().fabrica, relogio: relogioFixo('2026-03-13T15:00:00Z') });
+const app = criarApp({
+  fabricaBanco: fabricaComoApp().fabrica,
+  relogio: relogioFixo('2026-03-13T15:00:00Z'),
+});
 /** Terça 10/03/2026, 12h de São Paulo: o próximo dia de jogo de G (quinta) é 12/03 (SIM-08). */
-const appTerca = criarApp({ fabricaBanco: fabricaComoApp().fabrica, relogio: relogioFixo('2026-03-10T15:00:00Z') });
+const appTerca = criarApp({
+  fabricaBanco: fabricaComoApp().fabrica,
+  relogio: relogioFixo('2026-03-10T15:00:00Z'),
+});
 
 /** O detalhe pelo contrato do GET; o saldo (FIN-34) é da financeiro e sai antes. */
 function detalheDoGet(json: unknown) {
@@ -44,7 +50,12 @@ async function sessao(conta: string): Promise<string> {
 async function detalhe(conta = aberto.cenario.contaC, comApp = app): Promise<Response> {
   const headers = new Headers({ cookie: `${NOME_COOKIE_SESSAO}=${await sessao(conta)}` });
   const ctx = contextoFalso();
-  const r = await comApp.request(`/api/grupos/${aberto.cenario.grupoG}`, { method: 'GET', headers }, envAcesso(aberto.url), ctx);
+  const r = await comApp.request(
+    `/api/grupos/${aberto.cenario.grupoG}`,
+    { method: 'GET', headers },
+    envAcesso(aberto.url),
+    ctx,
+  );
   await ctx.esperar();
   return r;
 }
@@ -58,7 +69,9 @@ afterAll(async () => {
 });
 
 afterEach(async () => {
-  await aberto.db.query(`DELETE FROM partidas WHERE grupo_id = $1 AND data = '2026-03-12'`, [aberto.cenario.grupoG]);
+  await aberto.db.query(`DELETE FROM partidas WHERE grupo_id = $1 AND data = '2026-03-12'`, [
+    aberto.cenario.grupoG,
+  ]);
 });
 
 describe('GET /api/grupos/:grupoId com o início do grupo', () => {
@@ -124,12 +137,17 @@ describe('GET /api/grupos/:grupoId com o próximo dia de jogo (simulador T39)', 
       const naSexta = detalheDoGet(await (await detalhe()).json());
       expect(naSexta.escalacaoNoProximoDia).toBe(false);
     } finally {
-      await db.query(`DELETE FROM escalacoes WHERE grupo_id = $1 AND data = '2026-03-12'`, [cenario.grupoG]);
+      await db.query(`DELETE FROM escalacoes WHERE grupo_id = $1 AND data = '2026-03-12'`, [
+        cenario.grupoG,
+      ]);
     }
   });
 
   it('SIM-08: a admin sem acesso ao financeiro também recebe os 2 campos', async () => {
-    const json = (await (await detalhe(aberto.cenario.contaO, appTerca)).json()) as Record<string, unknown>;
+    const json = (await (await detalhe(aberto.cenario.contaO, appTerca)).json()) as Record<
+      string,
+      unknown
+    >;
     expect(json).toMatchObject({ proximoDiaDeJogo: '2026-03-12', escalacaoNoProximoDia: false });
   });
 });

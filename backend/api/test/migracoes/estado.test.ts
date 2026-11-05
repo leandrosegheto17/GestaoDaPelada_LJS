@@ -3,7 +3,11 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { lerEsquema } from '../../src/infraestrutura/db/esquema.ts';
-import { detectarEstado, ErroEsquemaDivergente, listarMigracoes } from '../../src/infraestrutura/db/estado.ts';
+import {
+  detectarEstado,
+  ErroEsquemaDivergente,
+  listarMigracoes,
+} from '../../src/infraestrutura/db/estado.ts';
 import { migrar, PASTA_MIGRACOES } from '../../src/infraestrutura/db/migrar.ts';
 import { bancoDeTeste, comCliente } from '../apoio/banco.ts';
 
@@ -18,7 +22,9 @@ async function foto(url: string): Promise<{ esquema: string[]; linhas: Record<st
     );
     const linhas: Record<string, number> = {};
     for (const { t } of tabelas.rows) {
-      const r = await c.query<{ n: number }>(`SELECT count(*)::int AS n FROM public.${c.escapeIdentifier(t)}`);
+      const r = await c.query<{ n: number }>(
+        `SELECT count(*)::int AS n FROM public.${c.escapeIdentifier(t)}`,
+      );
       linhas[t] = r.rows[0]?.n ?? 0;
     }
     return { esquema, linhas };
@@ -65,7 +71,9 @@ const DIVERGENTES: Array<[string, (url: string) => Promise<void>, RegExp]> = [
   [
     'tabelas sem pgmigrations',
     async (url) => {
-      await comCliente(url, (c) => c.query('CREATE TABLE solta (id int); INSERT INTO solta VALUES (1)'));
+      await comCliente(url, (c) =>
+        c.query('CREATE TABLE solta (id int); INSERT INTO solta VALUES (1)'),
+      );
     },
     /tabelas sem pgmigrations: solta/,
   ],
@@ -73,7 +81,9 @@ const DIVERGENTES: Array<[string, (url: string) => Promise<void>, RegExp]> = [
     'controle do legado sem pgmigrations',
     async (url) => {
       await comCliente(url, (c) =>
-        c.query("CREATE TABLE migracoes_aplicadas (nome text); INSERT INTO migracoes_aplicadas VALUES ('x')"),
+        c.query(
+          "CREATE TABLE migracoes_aplicadas (nome text); INSERT INTO migracoes_aplicadas VALUES ('x')",
+        ),
       );
     },
     /controle de migração do legado presente: migracoes_aplicadas/,

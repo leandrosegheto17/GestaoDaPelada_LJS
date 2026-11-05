@@ -38,7 +38,12 @@ export function rotasFinanceiroMes(): Hono<Ambiente> {
       return respostaDeCampo(c, 'mes', MENSAGEM_MES_FORA_DO_HISTORICO);
     }
 
-    const resposta: MesFinanceiroResposta = await financeiroMes.lerMes(c.var.db, grupoId, mes, hoje);
+    const resposta: MesFinanceiroResposta = await financeiroMes.lerMes(
+      c.var.db,
+      grupoId,
+      mes,
+      hoje,
+    );
     return c.json(resposta, 200);
   });
 

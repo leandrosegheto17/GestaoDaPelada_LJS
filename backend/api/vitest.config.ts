@@ -2,7 +2,8 @@ import { cloudflareTest } from '@cloudflare/vitest-pool-workers';
 import { defineConfig } from 'vitest/config';
 import { VERSAO_TESTE } from './test/rotas/constantes.ts';
 
-const URL_TESTE = process.env.DATABASE_URL_TESTE ?? 'postgres://postgres:postgres@127.0.0.1:5432/pelada';
+const URL_TESTE =
+  process.env.DATABASE_URL_TESTE ?? 'postgres://postgres:postgres@127.0.0.1:5432/pelada';
 
 export default defineConfig({
   test: {

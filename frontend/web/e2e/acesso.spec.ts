@@ -27,7 +27,11 @@ interface MensagemDev {
 }
 
 /** Caminho com o fragmento (`/confirmar#t=...`) do último e-mail do tipo para o endereço. */
-async function linkDoEmail(request: APIRequestContext, para: string, tipo: string): Promise<string> {
+async function linkDoEmail(
+  request: APIRequestContext,
+  para: string,
+  tipo: string,
+): Promise<string> {
   let link: string | undefined;
   await expect
     .poll(
@@ -65,7 +69,10 @@ async function entrar(pagina: Page, email: string, senha: string) {
 }
 
 async function respostaDoLogin(pagina: Page, email: string, senha: string): Promise<number> {
-  const r = await pagina.request.post('/api/sessao/entrar', { headers: { 'X-Pelada': '1' }, data: { email, senha } });
+  const r = await pagina.request.post('/api/sessao/entrar', {
+    headers: { 'X-Pelada': '1' },
+    data: { email, senha },
+  });
   return r.status();
 }
 
@@ -99,7 +106,9 @@ test('J-06: cadastro, link capturado, aviso em /entrar e login até /app', async
   await pagina.context().close();
 });
 
-test('J-07: esqueci a senha, link, a senha nova entra e a antiga é recusada', async ({ browser }) => {
+test('J-07: esqueci a senha, link, a senha nova entra e a antiga é recusada', async ({
+  browser,
+}) => {
   const pagina = await aparelho(browser);
   const email = emailNovo('j07');
   await criarContaConfirmada(pagina, 'Jornada Sete', email);
@@ -132,7 +141,10 @@ test('J-07: esqueci a senha, link, a senha nova entra e a antiga é recusada', a
 
 test('J-08: A convida B, B aceita, os dois veem o grupo e A remove B', async ({ browser }) => {
   const senhaSeed = process.env.SEED_SENHA_ADMIN;
-  test.skip(!senhaSeed, 'SEED_SENHA_ADMIN ausente no .env da raiz: a J-08 precisa da conta do seed (pnpm seed).');
+  test.skip(
+    !senhaSeed,
+    'SEED_SENHA_ADMIN ausente no .env da raiz: a J-08 precisa da conta do seed (pnpm seed).',
+  );
   const a = await aparelho(browser);
   await entrar(a, CONTA_SEED, senhaSeed ?? '');
   await expect(a).toHaveURL(/\/app$/);
@@ -176,7 +188,9 @@ test('J-08: A convida B, B aceita, os dois veem o grupo e A remove B', async ({ 
   await a.context().close();
 });
 
-test('J-09: conta sem grupos troca a senha, exclui a conta e o login seguinte responde 401', async ({ browser }) => {
+test('J-09: conta sem grupos troca a senha, exclui a conta e o login seguinte responde 401', async ({
+  browser,
+}) => {
   const pagina = await aparelho(browser);
   const email = emailNovo('j09');
   await criarContaConfirmada(pagina, 'Jornada Nove', email);
@@ -193,7 +207,9 @@ test('J-09: conta sem grupos troca a senha, exclui a conta e o login seguinte re
   await pagina.getByLabel('Nova senha', { exact: true }).fill(SENHA_NOVA);
   await pagina.getByLabel('Confirmar nova senha').fill(SENHA_NOVA);
   await pagina.getByRole('button', { name: 'Trocar senha' }).click();
-  await expect(pagina.getByText('Senha trocada. Outros aparelhos foram desconectados.')).toBeVisible();
+  await expect(
+    pagina.getByText('Senha trocada. Outros aparelhos foram desconectados.'),
+  ).toBeVisible();
   expect((await pagina.request.get('/api/sessao')).status()).toBe(200);
 
   // No outro aparelho, usar o app leva a /entrar com o aviso de sessão expirada (ACE-20).

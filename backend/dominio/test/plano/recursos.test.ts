@@ -67,7 +67,8 @@ describe('preço em centavos', () => {
 
   it('PLA-06: ida e volta sem arredondamento de 1 a 99.999 centavos', () => {
     for (let c = 1; c <= 99_999; c++) {
-      if (reaisParaCentavos(centavosParaReais(c)) !== c) throw new Error(`ida e volta quebrou em ${c}`);
+      if (reaisParaCentavos(centavosParaReais(c)) !== c)
+        throw new Error(`ida e volta quebrou em ${c}`);
     }
   });
 

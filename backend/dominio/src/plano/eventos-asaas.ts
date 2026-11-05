@@ -94,10 +94,12 @@ export function efeitoDoEvento(evento: EventoAsaas, assinatura: AssinaturaGravad
   // PLA-48: o que é mais antigo que o último aplicado não muda nada, de qualquer tipo (o `PAYMENT_CREATED` atrasado
   // sai como `fora_de_ordem`). Sem data e com algo já aplicado, não há como provar a ordem: não aplica (conservador).
   if (assinatura.ultimoEventoEm !== null) {
-    if (evento.dataCriacao === null || evento.dataCriacao < assinatura.ultimoEventoEm) return nenhum('fora_de_ordem');
+    if (evento.dataCriacao === null || evento.dataCriacao < assinatura.ultimoEventoEm)
+      return nenhum('fora_de_ordem');
   }
 
-  if (!(EVENTOS_TRATADOS as readonly string[]).includes(evento.evento)) return nenhum('nao_tratado');
+  if (!(EVENTOS_TRATADOS as readonly string[]).includes(evento.evento))
+    return nenhum('nao_tratado');
 
   switch (evento.evento) {
     case 'SUBSCRIPTION_DELETED':
@@ -111,7 +113,8 @@ export function efeitoDoEvento(evento: EventoAsaas, assinatura: AssinaturaGravad
       if (assinatura.situacao === 'cancelada') return nenhum('assinatura_cancelada');
       const cobranca = evento.cobranca;
       if (cobranca === null || cobranca.vencimento === null) return nenhum('incompleto');
-      if (centavosDe(cobranca.valorReais) !== assinatura.valorCentavos) return nenhum('valor_divergente');
+      if (centavosDe(cobranca.valorReais) !== assinatura.valorCentavos)
+        return nenhum('valor_divergente');
       if (cobranca.id === assinatura.cobrancaDoPro) return nenhum('ja_aplicado');
       return { tipo: 'ativar', pagoAte: pagoAteDe(cobranca.vencimento), cobrancaId: cobranca.id };
     }
@@ -120,7 +123,8 @@ export function efeitoDoEvento(evento: EventoAsaas, assinatura: AssinaturaGravad
       if (assinatura.situacao === 'aguardando_pagamento') return nenhum('aguardando_pagamento');
       if (assinatura.situacao === 'cancelada') return nenhum('assinatura_cancelada');
       const cobranca = evento.cobranca;
-      if (cobranca === null || cobranca.vencimento === null || assinatura.pagoAte === null) return nenhum('incompleto');
+      if (cobranca === null || cobranca.vencimento === null || assinatura.pagoAte === null)
+        return nenhum('incompleto');
       // [LACUNA] "Cobrança mais recente" (PLA-45) não é guardada em `assinaturas` (AD-088). Interpretação: é a que
       // vence no `pagoAte` ou depois dele, isto é, a que ainda não foi coberta por um pagamento; a que vence antes já
       // foi superada por uma cobrança paga mais nova e não derruba o Pro.
@@ -130,7 +134,8 @@ export function efeitoDoEvento(evento: EventoAsaas, assinatura: AssinaturaGravad
 
     case 'PAYMENT_REFUNDED':
     case 'PAYMENT_CHARGEBACK_REQUESTED': {
-      if (evento.cobranca === null || evento.cobranca.id !== assinatura.cobrancaDoPro) return nenhum('outra_cobranca');
+      if (evento.cobranca === null || evento.cobranca.id !== assinatura.cobrancaDoPro)
+        return nenhum('outra_cobranca');
       return { tipo: 'inadimplente' };
     }
 

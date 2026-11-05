@@ -12,7 +12,13 @@ import { MENSAGEM_LIMITE } from '../../src/entrada/middlewares/limite-taxa.ts';
 import { relogioFixo } from '../../src/infraestrutura/relogio.ts';
 import { envAcesso } from '../acesso/apoio.ts';
 import { contextoFalso, fabricaComoApp } from '../db/requisicao.ts';
-import { abrirCenarioGrupos, arquivar, NOME_G, reativar, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  arquivar,
+  NOME_G,
+  reativar,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * `GET /api/publico/:slug/pdf?mes=` (partidas-e-ranking T46; PAR-95, PAR-100, PAR-101), com o app real como
@@ -54,7 +60,11 @@ async function ranking(slug: string, consulta = '', extra: Partial<Env> = {}): P
 /** Quintas de `de` até `ate`, inclusive. */
 function quintas(de: string, ate: string): string[] {
   const datas: string[] = [];
-  for (let d = new Date(`${de}T12:00:00Z`); d <= new Date(`${ate}T12:00:00Z`); d.setUTCDate(d.getUTCDate() + 7)) {
+  for (
+    let d = new Date(`${de}T12:00:00Z`);
+    d <= new Date(`${ate}T12:00:00Z`);
+    d.setUTCDate(d.getUTCDate() + 7)
+  ) {
     datas.push(d.toISOString().slice(0, 10));
   }
   return datas;
@@ -64,25 +74,31 @@ beforeAll(async () => {
   aberto = await abrirCenarioGrupos();
   const { db, cenario } = aberto;
   // Toninho entra antes das partidas de 2025, para estar ativo em todas.
-  await db.query(`UPDATE periodos_ativos SET inicio = '2025-11-01' WHERE jogador_id = $1`, [cenario.idsG.jogadorAtivo]);
-  await db.query(`UPDATE jogadores SET inicio_pontuacao = '2025-11-01' WHERE id = $1`, [cenario.idsG.jogadorAtivo]);
+  await db.query(`UPDATE periodos_ativos SET inicio = '2025-11-01' WHERE jogador_id = $1`, [
+    cenario.idsG.jogadorAtivo,
+  ]);
+  await db.query(`UPDATE jogadores SET inicio_pontuacao = '2025-11-01' WHERE id = $1`, [
+    cenario.idsG.jogadorAtivo,
+  ]);
   await db.query(
     `INSERT INTO config_pesos (grupo_id, vigente_desde, presenca_sem_chuva, presenca_com_chuva,
        lesionado_sem_chuva, lesionado_com_chuva, expulso, registrado_por, registrado_em)
      VALUES ($1, '2025-11-01', 3, 4, 1, 2, -1, $2, now())`,
     [cenario.grupoG, cenario.contaC],
   );
-  for (const data of [...quintas('2025-11-06', '2025-12-25'), ...quintas('2026-01-15', '2026-03-12')]) {
+  for (const data of [
+    ...quintas('2025-11-06', '2025-12-25'),
+    ...quintas('2026-01-15', '2026-03-12'),
+  ]) {
     const p = await db.query<{ id: string }>(
       `INSERT INTO partidas (grupo_id, data, choveu, criada_por, criada_em, alterada_por, alterada_em)
        VALUES ($1, $2, false, $3, now(), $3, now()) RETURNING id`,
       [cenario.grupoG, data, cenario.contaC],
     );
-    await db.query(`INSERT INTO presencas (partida_id, jogador_id, grupo_id, situacao) VALUES ($1, $2, $3, 'presente')`, [
-      p.rows[0]!.id,
-      cenario.idsG.jogadorAtivo,
-      cenario.grupoG,
-    ]);
+    await db.query(
+      `INSERT INTO presencas (partida_id, jogador_id, grupo_id, situacao) VALUES ($1, $2, $3, 'presente')`,
+      [p.rows[0]!.id, cenario.idsG.jogadorAtivo, cenario.grupoG],
+    );
   }
 });
 
@@ -124,29 +140,47 @@ describe('GET /api/publico/:slug/pdf', () => {
     const r = (await (await ranking(aberto.cenario.slugG, '?mes=2026-03')).json()) as {
       linhas: Array<{ apelido: string; ptsFinal: number }>;
     };
-    expect(p.linhas.map((l) => [l.apelido, l.ptsFinal])).toEqual(r.linhas.map((l) => [l.apelido, l.ptsFinal]));
+    expect(p.linhas.map((l) => [l.apelido, l.ptsFinal])).toEqual(
+      r.linhas.map((l) => [l.apelido, l.ptsFinal]),
+    );
   });
 });
 
 describe('PAR-100: recusas iguais às do ranking', () => {
-  it.each(['?mes=2026-1', '?mes=2026-13', '?mes=', '?dia=1'])('PAR-100: consulta %j responde como no ranking', async (consulta) => {
-    const rp = await pdf(aberto.cenario.slugG, consulta);
-    const rr = await ranking(aberto.cenario.slugG, consulta);
-    expect(rp.status).toBe(422);
-    expect({ status: rp.status, corpo: await rp.json() }).toEqual({ status: rr.status, corpo: await rr.json() });
-  });
+  it.each(['?mes=2026-1', '?mes=2026-13', '?mes=', '?dia=1'])(
+    'PAR-100: consulta %j responde como no ranking',
+    async (consulta) => {
+      const rp = await pdf(aberto.cenario.slugG, consulta);
+      const rr = await ranking(aberto.cenario.slugG, consulta);
+      expect(rp.status).toBe(422);
+      expect({ status: rp.status, corpo: await rp.json() }).toEqual({
+        status: rr.status,
+        corpo: await rr.json(),
+      });
+    },
+  );
 
   it('PAR-100: mês inválido traz "Mês inválido."', async () => {
-    expect(await (await pdf(aberto.cenario.slugG, '?mes=2026-1')).json()).toMatchObject({ mensagens: { mes: MENSAGEM_MES_PUBLICO } });
+    expect(await (await pdf(aberto.cenario.slugG, '?mes=2026-1')).json()).toMatchObject({
+      mensagens: { mes: MENSAGEM_MES_PUBLICO },
+    });
   });
 
-  it.each(['?mes=2025-10', '?mes=2026-04'])('PAR-100: %s fora do histórico responde como no ranking', async (consulta) => {
-    const rp = await pdf(aberto.cenario.slugG, consulta);
-    const rr = await ranking(aberto.cenario.slugG, consulta);
-    expect(rp.status).toBe(422);
-    expect(await rp.clone().json()).toMatchObject({ mensagens: { mes: MENSAGEM_MES_FORA_DO_HISTORICO } });
-    expect({ status: rp.status, corpo: await rp.json() }).toEqual({ status: rr.status, corpo: await rr.json() });
-  });
+  it.each(['?mes=2025-10', '?mes=2026-04'])(
+    'PAR-100: %s fora do histórico responde como no ranking',
+    async (consulta) => {
+      const rp = await pdf(aberto.cenario.slugG, consulta);
+      const rr = await ranking(aberto.cenario.slugG, consulta);
+      expect(rp.status).toBe(422);
+      expect(await rp.clone().json()).toMatchObject({
+        mensagens: { mes: MENSAGEM_MES_FORA_DO_HISTORICO },
+      });
+      expect({ status: rp.status, corpo: await rp.json() }).toEqual({
+        status: rr.status,
+        corpo: await rr.json(),
+      });
+    },
+  );
 
   it('PAR-100: slug inexistente e de grupo arquivado respondem como no ranking', async () => {
     const inexistente = await pdf('grupo-que-nao-existe');

@@ -23,7 +23,10 @@ export interface Manipulador {
   scheduled?(evento: unknown, env: Env, ctx: unknown): Promise<void>;
 }
 
-export type EmbrulharSentry = (opcoes: (env: Env) => OpcoesSentry, manipulador: Manipulador) => Manipulador;
+export type EmbrulharSentry = (
+  opcoes: (env: Env) => OpcoesSentry,
+  manipulador: Manipulador,
+) => Manipulador;
 
 const embrulharPadrao = Sentry.withSentry as unknown as EmbrulharSentry;
 
@@ -46,13 +49,20 @@ export function sentryLigado(env: Env): boolean {
  * Entrada do Worker: com `SENTRY_DSN`, passa pelo `withSentry`; sem ele, chama o app direto.
  * `embrulhar` existe para os testes trocarem o `withSentry`.
  */
-export function criarWorker(app: Manipulador, embrulhar: EmbrulharSentry = embrulharPadrao): Manipulador {
+export function criarWorker(
+  app: Manipulador,
+  embrulhar: EmbrulharSentry = embrulharPadrao,
+): Manipulador {
   const consumir = app.queue?.bind(app);
   const agendado = app.scheduled?.bind(app);
   const comSentry = embrulhar(opcoesSentry, {
     fetch: (r, env, ctx) => app.fetch(r, env, ctx),
-    ...(consumir ? { queue: (lote: unknown, env: Env, ctx: unknown) => consumir(lote, env, ctx) } : {}),
-    ...(agendado ? { scheduled: (evento: unknown, env: Env, ctx: unknown) => agendado(evento, env, ctx) } : {}),
+    ...(consumir
+      ? { queue: (lote: unknown, env: Env, ctx: unknown) => consumir(lote, env, ctx) }
+      : {}),
+    ...(agendado
+      ? { scheduled: (evento: unknown, env: Env, ctx: unknown) => agendado(evento, env, ctx) }
+      : {}),
   });
   const manipulador: Manipulador = {
     fetch: (requisicao, env, ctx) =>
@@ -61,12 +71,16 @@ export function criarWorker(app: Manipulador, embrulhar: EmbrulharSentry = embru
   // A fila passa pelo mesmo `withSentry` do fetch (notificacoes T17): sem DSN, vai direto ao consumidor.
   if (consumir) {
     manipulador.queue = (lote, env, ctx) =>
-      sentryLigado(env) && comSentry.queue ? comSentry.queue(lote, env, ctx) : consumir(lote, env, ctx);
+      sentryLigado(env) && comSentry.queue
+        ? comSentry.queue(lote, env, ctx)
+        : consumir(lote, env, ctx);
   }
   // O Cron também (notificacoes T26).
   if (agendado) {
     manipulador.scheduled = (evento, env, ctx) =>
-      sentryLigado(env) && comSentry.scheduled ? comSentry.scheduled(evento, env, ctx) : agendado(evento, env, ctx);
+      sentryLigado(env) && comSentry.scheduled
+        ? comSentry.scheduled(evento, env, ctx)
+        : agendado(evento, env, ctx);
   }
   return manipulador;
 }

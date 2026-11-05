@@ -1,5 +1,10 @@
 import { sql } from 'kysely';
-import type { ConfigPesos, HistoricoDoGrupo, JogadorDoRanking, PresencaDoRanking } from '@pelada/dominio';
+import type {
+  ConfigPesos,
+  HistoricoDoGrupo,
+  JogadorDoRanking,
+  PresencaDoRanking,
+} from '@pelada/dominio';
 import type { Db } from './tipos.ts';
 
 /**
@@ -77,29 +82,29 @@ async function carregar(db: Db, grupoId: string, ate: string): Promise<Historico
      ORDER BY vigente_desde`.execute(db);
 
   return {
-    jogadores: jogadores.rows.map(
-      (j): JogadorDoRanking => ({
-        id: j.id,
-        apelido: j.apelido,
-        anoNascimento: j.ano_nascimento,
-        periodos: j.periodos,
-        pontuacaoInicial: j.pontuacao_inicial,
-        inicioPontuacao: j.inicio_pontuacao ?? undefined,
-      }),
-    ),
+    jogadores: jogadores.rows.map((j): JogadorDoRanking => ({
+      id: j.id,
+      apelido: j.apelido,
+      anoNascimento: j.ano_nascimento,
+      periodos: j.periodos,
+      pontuacaoInicial: j.pontuacao_inicial,
+      inicioPontuacao: j.inicio_pontuacao ?? undefined,
+    })),
     partidas: partidas.rows.map((p) => ({ id: p.id, data: p.data, choveu: p.choveu })),
-    presencas: presencas.rows.map((p) => ({ partidaId: p.partida_id, jogadorId: p.jogador_id, situacao: p.situacao })),
-    configsPesos: pesos.rows.map(
-      (c): ConfigPesos => ({
-        vigenteDesde: c.vigente_desde,
-        presencaSemChuva: c.presenca_sem_chuva,
-        presencaComChuva: c.presenca_com_chuva,
-        lesionadoSemChuva: c.lesionado_sem_chuva,
-        lesionadoComChuva: c.lesionado_com_chuva,
-        expulsoSemChuva: c.expulso,
-        expulsoComChuva: c.expulso_com_chuva,
-      }),
-    ),
+    presencas: presencas.rows.map((p) => ({
+      partidaId: p.partida_id,
+      jogadorId: p.jogador_id,
+      situacao: p.situacao,
+    })),
+    configsPesos: pesos.rows.map((c): ConfigPesos => ({
+      vigenteDesde: c.vigente_desde,
+      presencaSemChuva: c.presenca_sem_chuva,
+      presencaComChuva: c.presenca_com_chuva,
+      lesionadoSemChuva: c.lesionado_sem_chuva,
+      lesionadoComChuva: c.lesionado_com_chuva,
+      expulsoSemChuva: c.expulso,
+      expulsoComChuva: c.expulso_com_chuva,
+    })),
   };
 }
 

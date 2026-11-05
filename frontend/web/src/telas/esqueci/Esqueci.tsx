@@ -64,8 +64,15 @@ export function Esqueci() {
     <Casca estreita>
       <LinkVoltar para="/entrar">Voltar para entrar</LinkVoltar>
       <h1 className={estilos['titulo-pagina']}>Esqueci a senha</h1>
-      <p className={estilos.paragrafo}>Informe o e-mail da sua conta. Vamos enviar um link para você criar uma nova senha.</p>
-      <form className={estilos.formulario} noValidate aria-busy={enviando || undefined} onSubmit={enviar}>
+      <p className={estilos.paragrafo}>
+        Informe o e-mail da sua conta. Vamos enviar um link para você criar uma nova senha.
+      </p>
+      <form
+        className={estilos.formulario}
+        noValidate
+        aria-busy={enviando || undefined}
+        onSubmit={enviar}
+      >
         <Campo
           id="email"
           rotulo="E-mail"

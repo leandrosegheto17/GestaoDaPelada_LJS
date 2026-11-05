@@ -35,9 +35,12 @@ describe('slugBase', () => {
     expect(slugBase(nome)).toBe('grupo');
   });
 
-  it.each(SLUGS_RESERVADOS.filter((r) => r.length >= 3))('GEL-13: a reservada "%s" vira <base>-grupo', (reservada) => {
-    expect(slugBase(reservada)).toBe(`${reservada}-grupo`);
-  });
+  it.each(SLUGS_RESERVADOS.filter((r) => r.length >= 3))(
+    'GEL-13: a reservada "%s" vira <base>-grupo',
+    (reservada) => {
+      expect(slugBase(reservada)).toBe(`${reservada}-grupo`);
+    },
+  );
 
   it('GEL-13: "Admin" vira admin-grupo e "Well Known" vira well-known-grupo', () => {
     expect(slugBase('Admin')).toBe('admin-grupo');
@@ -50,7 +53,17 @@ describe('slugBase', () => {
 
   it('GEL-13: a lista tem as 9 reservadas da spec', () => {
     expect([...SLUGS_RESERVADOS].sort()).toEqual(
-      ['admin', 'api', 'assets', 'conta', 'dono', 'entrar', 'g', 'privacidade', 'well-known'].sort(),
+      [
+        'admin',
+        'api',
+        'assets',
+        'conta',
+        'dono',
+        'entrar',
+        'g',
+        'privacidade',
+        'well-known',
+      ].sort(),
     );
   });
 });

@@ -50,8 +50,14 @@ function acumuladoComInicial(entrada: EntradaAcumulado, desde: Data | undefined)
   for (const p of entrada.presencas) {
     if (primeira === undefined || compararDatas(p.data, primeira) < 0) primeira = p.data;
   }
-  const inicialVale = primeira === undefined || desde === undefined || compararDatas(desde, primeira) <= 0;
-  const partidas = acumuladoAte(entrada.presencas, comoResolvedor(entrada.configs), desde, entrada.referencia);
+  const inicialVale =
+    primeira === undefined || desde === undefined || compararDatas(desde, primeira) <= 0;
+  const partidas = acumuladoAte(
+    entrada.presencas,
+    comoResolvedor(entrada.configs),
+    desde,
+    entrada.referencia,
+  );
   return (inicialVale ? entrada.pontuacaoInicial : 0) + partidas;
 }
 
@@ -62,6 +68,10 @@ function acumuladoComInicial(entrada: EntradaAcumulado, desde: Data | undefined)
  * há presença (PAR-59). Sem relógio nem I/O (PAR-61).
  */
 export function acumuladoPorInicio(entrada: EntradaAcumulado): number {
-  const desde = inicioDaContagem(entrada.inicio, entrada.periodos, entrada.periodoEm ?? entrada.referencia);
+  const desde = inicioDaContagem(
+    entrada.inicio,
+    entrada.periodos,
+    entrada.periodoEm ?? entrada.referencia,
+  );
   return acumuladoComInicial(entrada, desde);
 }

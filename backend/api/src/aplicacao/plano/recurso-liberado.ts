@@ -7,7 +7,10 @@ import {
   type RecursoPro,
   type RecursosDoPlano,
 } from '@pelada/dominio';
-import { plano as repositorioPlano, type DadosDoPlano } from '../../infraestrutura/db/repositorios/plano.ts';
+import {
+  plano as repositorioPlano,
+  type DadosDoPlano,
+} from '../../infraestrutura/db/repositorios/plano.ts';
 import type { Db } from '../../infraestrutura/db/repositorios/tipos.ts';
 import type { Relogio } from '../../infraestrutura/relogio.ts';
 
@@ -41,7 +44,11 @@ export interface EstadoDoPlano extends DadosDoPlano {
  * Lê os dados do plano e decide o plano efetivo de hoje (`AAAA-MM-DD`, São Paulo). `null` quando o grupo não é visível
  * para o contexto da transação.
  */
-export async function estadoDoPlano(db: Db, grupoId: string, hoje: Data): Promise<EstadoDoPlano | null> {
+export async function estadoDoPlano(
+  db: Db,
+  grupoId: string,
+  hoje: Data,
+): Promise<EstadoDoPlano | null> {
   const dados = await repositorioPlano.ler(db, grupoId);
   if (dados === null) return null;
   const plano = planoEfetivo(dados.situacaoComercial, dados.trialInicio, dados.pagoAte, hoje);

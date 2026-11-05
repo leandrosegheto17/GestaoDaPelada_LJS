@@ -2,7 +2,8 @@ import { randomUUID } from 'node:crypto';
 import { describe, expect, it, vi } from 'vitest';
 import { comConexao, conectar, ErroBancoFora, executarCli } from '../src/conectar.ts';
 
-const URL_TESTE = process.env.DATABASE_URL_TESTE ?? 'postgres://postgres:postgres@127.0.0.1:5432/pelada';
+const URL_TESTE =
+  process.env.DATABASE_URL_TESTE ?? 'postgres://postgres:postgres@127.0.0.1:5432/pelada';
 const PORTA_FECHADA = 'postgres://postgres:postgres@127.0.0.1:1/pelada';
 
 describe('conectar', () => {
@@ -39,7 +40,10 @@ describe('conectar', () => {
     const r = await comConexao(url.toString(), async (c) => (await c.query('SELECT 1 AS um')).rows);
     expect(r).toEqual([{ um: 1 }]);
     const abertas = await comConexao(URL_TESTE, async (c) => {
-      const res = await c.query('SELECT count(*)::int AS n FROM pg_stat_activity WHERE application_name = $1', [nome]);
+      const res = await c.query(
+        'SELECT count(*)::int AS n FROM pg_stat_activity WHERE application_name = $1',
+        [nome],
+      );
       return res.rows[0].n as number;
     });
     expect(abertas).toBe(0);
@@ -55,7 +59,10 @@ describe('conectar', () => {
       }),
     ).rejects.toThrow('falha de propósito');
     const abertas = await comConexao(URL_TESTE, async (c) => {
-      const res = await c.query('SELECT count(*)::int AS n FROM pg_stat_activity WHERE application_name = $1', [nome]);
+      const res = await c.query(
+        'SELECT count(*)::int AS n FROM pg_stat_activity WHERE application_name = $1',
+        [nome],
+      );
       return res.rows[0].n as number;
     });
     expect(abertas).toBe(0);

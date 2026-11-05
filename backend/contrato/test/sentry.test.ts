@@ -22,9 +22,16 @@ function eventoSujo() {
     exception: { values: [{ type: 'Error', value: 'conta beltrano@exemplo.org não existe' }] },
     breadcrumbs: [
       { category: 'console', message: 'login de ciclano@exemplo.net' },
-      { category: 'fetch', data: { url: '/api/x', corpo: 'para: joao.silva+pelada@mail.exemplo.com' } },
+      {
+        category: 'fetch',
+        data: { url: '/api/x', corpo: 'para: joao.silva+pelada@mail.exemplo.com' },
+      },
     ],
-    extra: { contato: 'maria@exemplo.com', lista: ['ana@exemplo.com', 'sem email'], aninhado: { e: 'x@y.io' } },
+    extra: {
+      contato: 'maria@exemplo.com',
+      lista: ['ana@exemplo.com', 'sem email'],
+      aninhado: { e: 'x@y.io' },
+    },
   };
 }
 
@@ -36,7 +43,14 @@ describe('limparEvento', () => {
     expect(limpo.request).not.toHaveProperty('cookies');
     expect(Object.keys(limpo.request.headers).map((h) => h.toLowerCase())).toEqual(['user-agent']);
     expect(limpo.message).toBe(`Falha ao convidar ${EMAIL_REMOVIDO} para o grupo`);
-    for (const trecho of ['segredo', 'cookie-de-sessao', 'token-secreto', 'sessao=outro', 'fulana@', '@exemplo']) {
+    for (const trecho of [
+      'segredo',
+      'cookie-de-sessao',
+      'token-secreto',
+      'sessao=outro',
+      'fulana@',
+      '@exemplo',
+    ]) {
       expect(texto).not.toContain(trecho);
     }
     // O que não é dado pessoal fica.
@@ -50,7 +64,11 @@ describe('limparEvento', () => {
       event_id: 'e1',
       release: 'sha-2',
       message: 'Falha ao listar grupos',
-      request: { url: 'https://app.test/api/grupos', method: 'GET', headers: { 'User-Agent': 'x' } },
+      request: {
+        url: 'https://app.test/api/grupos',
+        method: 'GET',
+        headers: { 'User-Agent': 'x' },
+      },
       exception: { values: [{ type: 'TypeError', value: 'x is undefined' }] },
       breadcrumbs: [{ category: 'console', message: 'ok' }],
       extra: { tentativa: 2, ativo: true, nada: null },

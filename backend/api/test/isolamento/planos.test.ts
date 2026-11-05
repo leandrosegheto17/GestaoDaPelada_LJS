@@ -1,7 +1,11 @@
 import type pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { comoApp, type Contexto } from './apoio.ts';
-import { abrirCenarioGrupos, type CenarioGrupos, type CenarioGruposAberto } from './cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  type CenarioGrupos,
+  type CenarioGruposAberto,
+} from './cenario-grupos.ts';
 
 /**
  * Matriz política × comando das tabelas do plano (planos-e-cobranca T11; PLA-13, PLA-35), como `pelada_app` e como
@@ -74,7 +78,9 @@ async function foto(): Promise<[number, number, string]> {
 async function recusada(ator: Ator, sql: string, valores: unknown[] = []): Promise<void> {
   const { db, cenario } = aberto;
   const antes = await foto();
-  await expect(comoApp(db, contexto(ator, cenario), (d) => d.query(sql, valores))).rejects.toMatchObject({
+  await expect(
+    comoApp(db, contexto(ator, cenario), (d) => d.query(sql, valores)),
+  ).rejects.toMatchObject({
     code: '42501',
   });
   expect(await foto()).toEqual(antes);
@@ -128,10 +134,15 @@ describe('assinaturas × SELECT', () => {
     expect(n).toBe(0);
   });
 
-  it.each(['S', 'N'] as const)('PLA-13: %s, sem conta, vê zero assinaturas de qualquer grupo', async (ator) => {
-    const { db, cenario } = aberto;
-    expect(await comoApp(db, contexto(ator, cenario), (d) => contar(d, 'SELECT 1 FROM assinaturas'))).toBe(0);
-  });
+  it.each(['S', 'N'] as const)(
+    'PLA-13: %s, sem conta, vê zero assinaturas de qualquer grupo',
+    async (ator) => {
+      const { db, cenario } = aberto;
+      expect(
+        await comoApp(db, contexto(ator, cenario), (d) => contar(d, 'SELECT 1 FROM assinaturas')),
+      ).toBe(0);
+    },
+  );
 });
 
 describe('assinaturas × INSERT, UPDATE, DELETE', () => {
@@ -146,7 +157,10 @@ describe('assinaturas × INSERT, UPDATE, DELETE', () => {
   });
 
   it.each(ATORES)('PLA-13: UPDATE com WHERE de %s é recusado', async (ator) => {
-    await recusada(ator, `UPDATE assinaturas SET situacao = 'ativa', pago_ate = '2099-12-31' WHERE asaas_assinatura_id = 'sub_g'`);
+    await recusada(
+      ator,
+      `UPDATE assinaturas SET situacao = 'ativa', pago_ate = '2099-12-31' WHERE asaas_assinatura_id = 'sub_g'`,
+    );
   });
 
   it.each(ATORES)('PLA-13: UPDATE sem WHERE de %s é recusado', async (ator) => {
@@ -194,7 +208,10 @@ describe('eventos_asaas × comando', () => {
 describe('pelada_backup_ro nas tabelas do plano', () => {
   it('PLA-13: pelada_backup_ro lê todas as linhas das duas tabelas', async () => {
     const { db } = aberto;
-    const total = [await contar(db, 'SELECT 1 FROM assinaturas'), await contar(db, 'SELECT 1 FROM eventos_asaas')];
+    const total = [
+      await contar(db, 'SELECT 1 FROM assinaturas'),
+      await contar(db, 'SELECT 1 FROM eventos_asaas'),
+    ];
     const visto = await comoBackup(async (d) => [
       await contar(d, 'SELECT 1 FROM assinaturas'),
       await contar(d, 'SELECT 1 FROM eventos_asaas'),
@@ -204,11 +221,17 @@ describe('pelada_backup_ro nas tabelas do plano', () => {
   });
 
   it.each([
-    ['INSERT em assinaturas', `INSERT INTO assinaturas (grupo_id, asaas_cliente_id, asaas_assinatura_id, valor_centavos, situacao, criada_por, criada_em)
-       SELECT grupo_id, 'cus_y', 'sub_y', 990, 'cancelada', criada_por, now() FROM assinaturas LIMIT 1`],
+    [
+      'INSERT em assinaturas',
+      `INSERT INTO assinaturas (grupo_id, asaas_cliente_id, asaas_assinatura_id, valor_centavos, situacao, criada_por, criada_em)
+       SELECT grupo_id, 'cus_y', 'sub_y', 990, 'cancelada', criada_por, now() FROM assinaturas LIMIT 1`,
+    ],
     ['UPDATE em assinaturas', `UPDATE assinaturas SET pago_ate = '2099-12-31'`],
     ['DELETE em assinaturas', 'DELETE FROM assinaturas'],
-    ['INSERT em eventos_asaas', `INSERT INTO eventos_asaas (id, evento, recebido_em) VALUES ('evt_y', 'X', now())`],
+    [
+      'INSERT em eventos_asaas',
+      `INSERT INTO eventos_asaas (id, evento, recebido_em) VALUES ('evt_y', 'X', now())`,
+    ],
     ['UPDATE em eventos_asaas', `UPDATE eventos_asaas SET efeito = 'x'`],
     ['DELETE em eventos_asaas', 'DELETE FROM eventos_asaas'],
   ])('PLA-13: pelada_backup_ro recusado no %s', async (_nome, sql) => {
@@ -223,7 +246,9 @@ describe('PLA-35: nenhuma das tabelas do plano guarda CPF', () => {
         WHERE table_schema = 'public' AND table_name IN ('assinaturas', 'eventos_asaas')`,
     );
     expect(r.rows.length).toBeGreaterThan(0);
-    expect(r.rows.map((l) => l.coluna).filter((c) => /cpf|cnpj|documento|cpfcnpj/i.test(c))).toEqual([]);
+    expect(
+      r.rows.map((l) => l.coluna).filter((c) => /cpf|cnpj|documento|cpfcnpj/i.test(c)),
+    ).toEqual([]);
   });
 });
 
@@ -254,17 +279,20 @@ const FUNCOES_SO_DO_OWNER: readonly string[] = [
 ];
 
 describe('PLA-13: funções auxiliares do plano só do owner', () => {
-  it.each(FUNCOES_SO_DO_OWNER)('PLA-13: %s sem EXECUTE para PUBLIC nem para pelada_app', async (assinatura) => {
-    const r = await aberto.db.query<{ executores: string[] }>(
-      `SELECT coalesce(array(SELECT coalesce(r.rolname, 'PUBLIC')::text
+  it.each(FUNCOES_SO_DO_OWNER)(
+    'PLA-13: %s sem EXECUTE para PUBLIC nem para pelada_app',
+    async (assinatura) => {
+      const r = await aberto.db.query<{ executores: string[] }>(
+        `SELECT coalesce(array(SELECT coalesce(r.rolname, 'PUBLIC')::text
                                FROM aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) a
                                LEFT JOIN pg_roles r ON r.oid = a.grantee
                               WHERE a.privilege_type = 'EXECUTE' AND a.grantee <> p.proowner), '{}') AS executores
          FROM pg_proc p WHERE p.oid = $1::regprocedure`,
-      [assinatura],
-    );
-    expect(r.rows[0]?.executores).toEqual([]);
-  });
+        [assinatura],
+      );
+      expect(r.rows[0]?.executores).toEqual([]);
+    },
+  );
 });
 
 describe('PLA-13: funções do plano sem EXECUTE para PUBLIC', () => {

@@ -19,11 +19,31 @@ const NOME_LONGO = [...'Pelada dos Amigos ⚽🏆 '.repeat(7)].slice(0, 120).joi
  * pontuação inicial, financeiro. A prova forte é a lista exata de chaves; esta lista pega um campo a mais com nome
  * conhecido.
  */
-const PROIBIDOS = ['jogadorId', 'apelido', 'pontos', 'posicao', 'telefone', 'ano', 'idade', 'notas', 'nivel', 'periodos', 'pontuacaoInicial', 'financeiro', 'valor', 'email', 'nome'];
+const PROIBIDOS = [
+  'jogadorId',
+  'apelido',
+  'pontos',
+  'posicao',
+  'telefone',
+  'ano',
+  'idade',
+  'notas',
+  'nivel',
+  'periodos',
+  'pontuacaoInicial',
+  'financeiro',
+  'valor',
+  'email',
+  'nome',
+];
 
 describe('payloadRanking', () => {
   it('NOT-25: título, texto com dd/mm e caminho com o mês, e só essas três chaves', () => {
-    const p = payloadRanking({ nomeGrupo: 'Pelada de Quinta', slug: 'pelada-de-quinta', dataPartida: '2026-11-05' });
+    const p = payloadRanking({
+      nomeGrupo: 'Pelada de Quinta',
+      slug: 'pelada-de-quinta',
+      dataPartida: '2026-11-05',
+    });
     expect(p).toEqual({
       titulo: 'Ranking atualizado',
       texto: 'Pelada de Quinta: partida de 05/11',
@@ -59,9 +79,14 @@ describe('payloadRanking', () => {
     expect(p.texto).toBe(`${NOME_LONGO}: partida de 05/11`);
   });
 
-  it.each(['2026-02-30', '2026-13-01', '05/11/2026', ''])('NOT-25: data %j que não existe é recusada', (data) => {
-    expect(() => payloadRanking({ nomeGrupo: 'G', slug: 'g', dataPartida: data })).toThrow(RangeError);
-  });
+  it.each(['2026-02-30', '2026-13-01', '05/11/2026', ''])(
+    'NOT-25: data %j que não existe é recusada',
+    (data) => {
+      expect(() => payloadRanking({ nomeGrupo: 'G', slug: 'g', dataPartida: data })).toThrow(
+        RangeError,
+      );
+    },
+  );
 });
 
 describe('payloadCobranca', () => {
@@ -69,7 +94,10 @@ describe('payloadCobranca', () => {
     'NOT-43: %s tem só o título com o tipo e o grupo, e o caminho de Meu plano',
     (tipo, nomeTipo) => {
       const p = payloadCobranca({ tipo, nomeGrupo: 'Pelada de Quinta', grupoId: 'g-123' });
-      expect(p).toEqual({ titulo: `${nomeTipo}: Pelada de Quinta`, caminho: '/app/grupos/g-123/plano' });
+      expect(p).toEqual({
+        titulo: `${nomeTipo}: Pelada de Quinta`,
+        caminho: '/app/grupos/g-123/plano',
+      });
     },
   );
 

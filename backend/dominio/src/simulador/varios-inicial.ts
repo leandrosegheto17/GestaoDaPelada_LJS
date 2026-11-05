@@ -46,7 +46,9 @@ export function montarVariosTimes(elenco: Elenco, n: number): VariosTimes {
     throw new RangeError(`aptos demais: ${jogadores.length} (máximo ${MAX_APTOS_SIMULADOR})`);
   }
   const { times: total, tamanhoIncompleto } = timesVarios(jogadores.length, n);
-  const capacidade = Array.from({ length: total }, (_, t) => (t === total - 1 && tamanhoIncompleto > 0 ? tamanhoIncompleto : n));
+  const capacidade = Array.from({ length: total }, (_, t) =>
+    t === total - 1 && tamanhoIncompleto > 0 ? tamanhoIncompleto : n,
+  );
 
   const times: string[][] = Array.from({ length: total }, () => []);
   let t = 0;
@@ -61,5 +63,8 @@ export function montarVariosTimes(elenco: Elenco, n: number): VariosTimes {
     avancar();
   }
 
-  return { times: ordenarTimes(times, elenco), incompleto: tamanhoIncompleto > 0 ? total - 1 : null };
+  return {
+    times: ordenarTimes(times, elenco),
+    incompleto: tamanhoIncompleto > 0 ? total - 1 : null,
+  };
 }

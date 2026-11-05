@@ -67,7 +67,12 @@ async function pedir(grupo: string, token: string | null, metodo = 'GET'): Promi
   const headers = new Headers({ 'x-pelada': '1' });
   if (token !== null) headers.set('cookie', `${NOME_COOKIE_SESSAO}=${token}`);
   const ctx = contextoFalso();
-  const r = await montar().request(`/api/grupos/${grupo}/teste`, { method: metodo, headers }, envCom(aberto.url), ctx);
+  const r = await montar().request(
+    `/api/grupos/${grupo}/teste`,
+    { method: metodo, headers },
+    envCom(aberto.url),
+    ctx,
+  );
   await ctx.esperar();
   return r;
 }
@@ -80,14 +85,17 @@ describe('exigirVinculo', () => {
     expect(await r.json()).toEqual({ grupo: cenario.grupoA });
   });
 
-  it.each(['GET', 'POST', 'DELETE'])('ACE-41: conta B em rota do grupo de A recebe 404 (%s), sem chamar o handler', async (metodo) => {
-    const { db, cenario } = aberto;
-    const antes = chamadas;
-    const r = await pedir(cenario.grupoA, await sessao(db, cenario.contaB), metodo);
-    expect(r.status).toBe(404);
-    expect(await r.json()).toMatchObject({ codigo: 'nao_encontrado' });
-    expect(chamadas).toBe(antes);
-  });
+  it.each(['GET', 'POST', 'DELETE'])(
+    'ACE-41: conta B em rota do grupo de A recebe 404 (%s), sem chamar o handler',
+    async (metodo) => {
+      const { db, cenario } = aberto;
+      const antes = chamadas;
+      const r = await pedir(cenario.grupoA, await sessao(db, cenario.contaB), metodo);
+      expect(r.status).toBe(404);
+      expect(await r.json()).toMatchObject({ codigo: 'nao_encontrado' });
+      expect(chamadas).toBe(antes);
+    },
+  );
 
   it('ACE-41: grupo inexistente responde o mesmo 404 que o grupo de outra conta', async () => {
     const { db, cenario } = aberto;
@@ -98,11 +106,14 @@ describe('exigirVinculo', () => {
     expect(await inexistente.json()).toEqual(await deOutro.json());
   });
 
-  it.each(['nao-e-uuid', '123', "1' OR '1'='1"])('ACE-41: grupoId que não é uuid (%s) responde 404, não 500', async (grupo) => {
-    const { db, cenario } = aberto;
-    const r = await pedir(encodeURIComponent(grupo), await sessao(db, cenario.contaA));
-    expect(r.status).toBe(404);
-  });
+  it.each(['nao-e-uuid', '123', "1' OR '1'='1"])(
+    'ACE-41: grupoId que não é uuid (%s) responde 404, não 500',
+    async (grupo) => {
+      const { db, cenario } = aberto;
+      const r = await pedir(encodeURIComponent(grupo), await sessao(db, cenario.contaA));
+      expect(r.status).toBe(404);
+    },
+  );
 
   it('ACE-41: grupo arquivado de que a conta não é criadora responde 404', async () => {
     const { db, cenario } = aberto;

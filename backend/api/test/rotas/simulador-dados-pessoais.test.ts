@@ -22,7 +22,10 @@ let aberto: CenarioGruposAberto;
 let ativos: string[] = [];
 
 const DATA = '2026-03-05';
-const app = criarApp({ fabricaBanco: fabricaComoApp().fabrica, relogio: relogioFixo('2026-03-03T15:00:00Z') });
+const app = criarApp({
+  fabricaBanco: fabricaComoApp().fabrica,
+  relogio: relogioFixo('2026-03-03T15:00:00Z'),
+});
 
 /** O que nunca sai nas respostas do simulador nem na composição gravada (SIM-82, SIM-03). */
 const CAMPOS_PROIBIDOS_SIMULADOR = [
@@ -45,12 +48,21 @@ const CAMPOS_PROIBIDOS_SIMULADOR = [
  * As chaves de um jogador nas respostas (SIM-03, SIM-82): id, apelido, nível, `semNota`, `semAno` e "só 1º"; o titular
  * de 2 times leva também `saiNoIntervalo` (SIM-24), que é da escalação, não dado da pessoa.
  */
-const CHAVES_DE_JOGADOR = new Set(['id', 'apelido', 'nivel', 'semNota', 'semAno', 'so1oTempo', 'saiNoIntervalo']);
+const CHAVES_DE_JOGADOR = new Set([
+  'id',
+  'apelido',
+  'nivel',
+  'semNota',
+  'semAno',
+  'so1oTempo',
+  'saiNoIntervalo',
+]);
 
 /** Os caminhos dos campos proibidos achados em qualquer nível de `valor`. */
 function proibidosEm(valor: unknown, caminho = ''): string[] {
   const lista: readonly string[] = CAMPOS_PROIBIDOS_SIMULADOR;
-  if (Array.isArray(valor)) return valor.flatMap((item, i) => proibidosEm(item, caminho ? `${caminho}.${i}` : `${i}`));
+  if (Array.isArray(valor))
+    return valor.flatMap((item, i) => proibidosEm(item, caminho ? `${caminho}.${i}` : `${i}`));
   if (valor === null || typeof valor !== 'object') return [];
   return Object.entries(valor).flatMap(([chave, filho]) => {
     const aqui = caminho ? `${caminho}.${chave}` : chave;
@@ -63,12 +75,17 @@ function jogadoresEm(valor: unknown, caminho = ''): Array<{ caminho: string; cha
   if (Array.isArray(valor)) return valor.flatMap((item, i) => jogadoresEm(item, `${caminho}.${i}`));
   if (valor === null || typeof valor !== 'object') return [];
   const aqui = 'apelido' in valor ? [{ caminho, chaves: Object.keys(valor) }] : [];
-  return [...aqui, ...Object.entries(valor).flatMap(([chave, filho]) => jogadoresEm(filho, `${caminho}.${chave}`))];
+  return [
+    ...aqui,
+    ...Object.entries(valor).flatMap(([chave, filho]) => jogadoresEm(filho, `${caminho}.${chave}`)),
+  ];
 }
 
 /** As chaves fora de `CHAVES_DE_JOGADOR` nos jogadores achados. */
 function chavesAMais(valor: unknown): string[] {
-  return jogadoresEm(valor).flatMap((j) => j.chaves.filter((c) => !CHAVES_DE_JOGADOR.has(c)).map((c) => `${j.caminho}.${c}`));
+  return jogadoresEm(valor).flatMap((j) =>
+    j.chaves.filter((c) => !CHAVES_DE_JOGADOR.has(c)).map((c) => `${j.caminho}.${c}`),
+  );
 }
 
 async function sessao(conta: string): Promise<string> {
@@ -82,7 +99,10 @@ async function sessao(conta: string): Promise<string> {
 }
 
 async function chamar(metodo: 'GET' | 'POST', caminho: string, corpo?: unknown): Promise<Response> {
-  const headers = new Headers({ 'x-pelada': '1', cookie: `${NOME_COOKIE_SESSAO}=${await sessao(aberto.cenario.contaC)}` });
+  const headers = new Headers({
+    'x-pelada': '1',
+    cookie: `${NOME_COOKIE_SESSAO}=${await sessao(aberto.cenario.contaC)}`,
+  });
   if (corpo !== undefined) headers.set('content-type', 'application/json');
   const ctx = contextoFalso();
   const r = await app.request(
@@ -105,12 +125,14 @@ async function jogadorCompleto(apelido: string, telefone: string): Promise<strin
     [cenario.grupoG, apelido, telefone, cenario.contaC],
   );
   const id = r.rows[0]!.id;
-  await db.query(`INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio) VALUES ($1, $2, '2026-01-01')`, [id, cenario.grupoG]);
-  await db.query(`INSERT INTO notas (jogador_id, habilidade_id, grupo_id, valor) VALUES ($1, $2, $3, 7)`, [
-    id,
-    cenario.idsG.habilidade,
-    cenario.grupoG,
-  ]);
+  await db.query(
+    `INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio) VALUES ($1, $2, '2026-01-01')`,
+    [id, cenario.grupoG],
+  );
+  await db.query(
+    `INSERT INTO notas (jogador_id, habilidade_id, grupo_id, valor) VALUES ($1, $2, $3, 7)`,
+    [id, cenario.idsG.habilidade, cenario.grupoG],
+  );
   return id;
 }
 
@@ -155,8 +177,13 @@ afterAll(async () => {
 
 afterEach(async () => {
   const { db, cenario } = aberto;
-  await db.query('DELETE FROM escalacoes WHERE grupo_id = $1 AND data = $2', [cenario.grupoG, DATA]);
-  await db.query(`DELETE FROM eventos_uso WHERE grupo_id = $1 AND tipo = 'escalacao_confirmada'`, [cenario.grupoG]);
+  await db.query('DELETE FROM escalacoes WHERE grupo_id = $1 AND data = $2', [
+    cenario.grupoG,
+    DATA,
+  ]);
+  await db.query(`DELETE FROM eventos_uso WHERE grupo_id = $1 AND tipo = 'escalacao_confirmada'`, [
+    cenario.grupoG,
+  ]);
 });
 
 describe('simulador: só os campos permitidos', () => {
@@ -165,7 +192,8 @@ describe('simulador: só os campos permitidos', () => {
     expect(r.status).toBe(200);
     const json = (await r.json()) as { jogadores: Array<Record<string, unknown>> };
     expect(json.jogadores.length).toBeGreaterThanOrEqual(10);
-    for (const j of json.jogadores) expect(Object.keys(j).sort()).toEqual(['apelido', 'id', 'nivel', 'semAno', 'semNota']);
+    for (const j of json.jogadores)
+      expect(Object.keys(j).sort()).toEqual(['apelido', 'id', 'nivel', 'semAno', 'semNota']);
     expect(proibidosEm(json)).toEqual([]);
     // Nem o valor do telefone escapa com outro nome.
     expect(JSON.stringify(json)).not.toContain('11999990001');
@@ -178,7 +206,10 @@ describe('simulador: só os campos permitidos', () => {
     expect(rs.status).toBe(200);
     const sugestao = (await rs.json()) as Parameters<typeof composicaoDe>[0];
 
-    const ra = await chamar('POST', '/simulador/avaliar', { ...entrada(), composicao: composicaoDe(sugestao) });
+    const ra = await chamar('POST', '/simulador/avaliar', {
+      ...entrada(),
+      composicao: composicaoDe(sugestao),
+    });
     expect(ra.status).toBe(200);
     const avaliacao: unknown = await ra.json();
 
@@ -199,7 +230,9 @@ describe('simulador: só os campos permitidos', () => {
 
   it('SIM-82: o JSON gravado em escalacoes.composicao só tem id e so1oTempo por jogador', async () => {
     const { db, cenario } = aberto;
-    const sugestao = (await (await chamar('POST', '/simulador/sugerir', entrada())).json()) as Parameters<typeof composicaoDe>[0];
+    const sugestao = (await (
+      await chamar('POST', '/simulador/sugerir', entrada())
+    ).json()) as Parameters<typeof composicaoDe>[0];
     const r = await chamar('POST', '/escalacoes', {
       formato: 'dois_times',
       data: DATA,
@@ -210,10 +243,10 @@ describe('simulador: só os campos permitidos', () => {
     expect(r.status).toBe(201);
     expect(proibidosEm(await r.json())).toEqual([]);
 
-    const linha = await db.query<{ composicao: unknown }>('SELECT composicao FROM escalacoes WHERE grupo_id = $1 AND data = $2', [
-      cenario.grupoG,
-      DATA,
-    ]);
+    const linha = await db.query<{ composicao: unknown }>(
+      'SELECT composicao FROM escalacoes WHERE grupo_id = $1 AND data = $2',
+      [cenario.grupoG, DATA],
+    );
     const gravada = linha.rows[0]?.composicao as {
       times: Array<Record<string, Array<Record<string, unknown>>>>;
       naoEntra: unknown[];

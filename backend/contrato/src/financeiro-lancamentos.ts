@@ -1,5 +1,12 @@
 import { z } from 'zod';
-import { centavos, dataFinanceira, idResposta, LIMITES_FINANCEIRO, mesFinanceiro, tipoLancamento } from './financeiro.ts';
+import {
+  centavos,
+  dataFinanceira,
+  idResposta,
+  LIMITES_FINANCEIRO,
+  mesFinanceiro,
+  tipoLancamento,
+} from './financeiro.ts';
 
 /**
  * Contrato de pagamentos, lançamentos e acesso do financeiro (T8; FIN-25, FIN-26, FIN-35, FIN-36). Corpos `.strict()`:
@@ -74,7 +81,9 @@ export const CODIGOS_ERRO_FINANCEIRO = [
 ] as const;
 export type CodigoErroFinanceiro = (typeof CODIGOS_ERRO_FINANCEIRO)[number];
 
-export const MENSAGENS_ERRO_FINANCEIRO: Readonly<Record<Exclude<CodigoErroFinanceiro, 'lancamento_vinculado'>, string>> = {
+export const MENSAGENS_ERRO_FINANCEIRO: Readonly<
+  Record<Exclude<CodigoErroFinanceiro, 'lancamento_vinculado'>, string>
+> = {
   pagamento_ja_marcado: 'O pagamento deste mês já está marcado.',
   sem_permissao_financeiro: 'Você não tem acesso ao financeiro deste grupo.',
   acao_na_propria_conta: 'Você não pode alterar a sua própria permissão.',

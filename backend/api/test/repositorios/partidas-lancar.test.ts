@@ -20,9 +20,10 @@ let jogadorDeH: string;
 
 beforeAll(async () => {
   aberto = await abrirCenarioGrupos();
-  const r = await aberto.db.query<{ id: string }>('SELECT id FROM jogadores WHERE grupo_id = $1 LIMIT 1', [
-    aberto.cenario.grupoH,
-  ]);
+  const r = await aberto.db.query<{ id: string }>(
+    'SELECT id FROM jogadores WHERE grupo_id = $1 LIMIT 1',
+    [aberto.cenario.grupoH],
+  );
   jogadorDeH = r.rows[0]?.id ?? '';
 });
 
@@ -32,7 +33,9 @@ afterAll(async () => {
 
 afterEach(async () => {
   const { db, cenario } = aberto;
-  await db.query(`DELETE FROM partidas WHERE grupo_id = $1 AND data <> '2026-01-08'`, [cenario.grupoG]);
+  await db.query(`DELETE FROM partidas WHERE grupo_id = $1 AND data <> '2026-01-08'`, [
+    cenario.grupoG,
+  ]);
   await db.query(
     `DELETE FROM eventos_uso WHERE grupo_id = $1 AND tipo = 'partida_lancada' AND data_partida <> '2026-01-08'`,
     [cenario.grupoG],
@@ -45,7 +48,9 @@ afterEach(async () => {
 const espera = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
 function lancarComo(conta: string, dados: PartidaCorpo) {
-  return comDb(aberto.url, conta, (db) => partidas.lancar(db, aberto.cenario.grupoG, dados), { confirmar: true });
+  return comDb(aberto.url, conta, (db) => partidas.lancar(db, aberto.cenario.grupoG, dados), {
+    confirmar: true,
+  });
 }
 
 async function partidaDe(data: string) {
@@ -88,9 +93,16 @@ describe('partidas.lancar', () => {
       choveu: true,
       marcacoes: [{ jogadorId: cenario.idsG.jogadorAtivo, situacao: 'presente' }],
     });
-    expect(r).toMatchObject({ resultado: 'ok', contagem: { presentes: 1, lesionados: 0, expulsos: 0 } });
-    expect(await partidaDe('2026-02-05')).toEqual([{ id: expect.any(String), choveu: true, criada_por: cenario.contaC }]);
-    expect(await presencasDe('2026-02-05')).toEqual([{ jogador_id: cenario.idsG.jogadorAtivo, situacao: 'presente' }]);
+    expect(r).toMatchObject({
+      resultado: 'ok',
+      contagem: { presentes: 1, lesionados: 0, expulsos: 0 },
+    });
+    expect(await partidaDe('2026-02-05')).toEqual([
+      { id: expect.any(String), choveu: true, criada_por: cenario.contaC },
+    ]);
+    expect(await presencasDe('2026-02-05')).toEqual([
+      { jogador_id: cenario.idsG.jogadorAtivo, situacao: 'presente' },
+    ]);
     expect(await eventosDe('2026-02-05')).toBe(1);
     expect((await auditoriasLancada()).map((a) => a.autor)).toEqual([cenario.contaC]);
   });
@@ -105,14 +117,26 @@ describe('partidas.lancar', () => {
         { jogadorId: cenario.idsG.jogadorHistorico, situacao: 'ausente' },
       ],
     });
-    expect(r).toMatchObject({ resultado: 'ok', contagem: { presentes: 0, lesionados: 1, expulsos: 0 } });
-    expect(await presencasDe('2026-02-12')).toEqual([{ jogador_id: cenario.idsG.jogadorAtivo, situacao: 'lesionado' }]);
+    expect(r).toMatchObject({
+      resultado: 'ok',
+      contagem: { presentes: 0, lesionados: 1, expulsos: 0 },
+    });
+    expect(await presencasDe('2026-02-12')).toEqual([
+      { jogador_id: cenario.idsG.jogadorAtivo, situacao: 'lesionado' },
+    ]);
   });
 
   it('PAR-23: partida sem nenhuma marcação grava a partida com as contagens zeradas', async () => {
     const { cenario } = aberto;
-    const r = await lancarComo(cenario.contaC, { data: '2026-02-19', choveu: false, marcacoes: [] });
-    expect(r).toMatchObject({ resultado: 'ok', contagem: { presentes: 0, lesionados: 0, expulsos: 0 } });
+    const r = await lancarComo(cenario.contaC, {
+      data: '2026-02-19',
+      choveu: false,
+      marcacoes: [],
+    });
+    expect(r).toMatchObject({
+      resultado: 'ok',
+      contagem: { presentes: 0, lesionados: 0, expulsos: 0 },
+    });
     expect(await partidaDe('2026-02-19')).toHaveLength(1);
     expect(await presencasDe('2026-02-19')).toEqual([]);
   });
@@ -127,7 +151,10 @@ describe('partidas.lancar', () => {
         { jogadorId: cenario.idsG.jogadorInativo, situacao: 'presente' },
       ],
     });
-    expect(r).toEqual({ resultado: 'invalido', campos: { 'marcacoes.1.jogadorId': MENSAGEM_JOGADOR_INATIVO } });
+    expect(r).toEqual({
+      resultado: 'invalido',
+      campos: { 'marcacoes.1.jogadorId': MENSAGEM_JOGADOR_INATIVO },
+    });
     expect(await partidaDe('2026-02-26')).toEqual([]);
     expect(await eventosDe('2026-02-26')).toBe(0);
     expect(await auditoriasLancada()).toEqual([]);
@@ -141,7 +168,10 @@ describe('partidas.lancar', () => {
       choveu: false,
       marcacoes: [{ jogadorId: jogadorDeH, situacao: 'presente' }],
     });
-    expect(r).toEqual({ resultado: 'invalido', campos: { 'marcacoes.0.jogadorId': MENSAGEM_JOGADOR_INATIVO } });
+    expect(r).toEqual({
+      resultado: 'invalido',
+      campos: { 'marcacoes.0.jogadorId': MENSAGEM_JOGADOR_INATIVO },
+    });
     expect(await partidaDe('2026-02-26')).toEqual([]);
   });
 
@@ -162,7 +192,11 @@ describe('partidas.lancar', () => {
   it('PAR-30: data que já tem partida devolve partida_ja_existe e a transação continua utilizável', async () => {
     const { cenario } = aberto;
     const depois = await comDb(aberto.url, cenario.contaC, async (db) => {
-      const r = await partidas.lancar(db, cenario.grupoG, { data: '2026-01-08', choveu: false, marcacoes: [] });
+      const r = await partidas.lancar(db, cenario.grupoG, {
+        data: '2026-01-08',
+        choveu: false,
+        marcacoes: [],
+      });
       const ainda = await sql<{ ok: number }>`SELECT 1 AS ok`.execute(db);
       return { r, ainda: ainda.rows[0]?.ok };
     });
@@ -194,9 +228,14 @@ describe('partidas.lancar', () => {
       { confirmar: true },
     );
     await gravou;
-    const segundo = comDb(aberto.url, cenario.contaO, (db) => partidas.lancar(db, cenario.grupoG, dados), {
-      confirmar: true,
-    });
+    const segundo = comDb(
+      aberto.url,
+      cenario.contaO,
+      (db) => partidas.lancar(db, cenario.grupoG, dados),
+      {
+        confirmar: true,
+      },
+    );
     await espera(300);
     liberar();
     const [r1, r2] = await Promise.all([primeiro, segundo]);
@@ -242,6 +281,12 @@ describe('partidas.lancar', () => {
       ],
     });
     const [a] = await auditoriasLancada();
-    expect(a?.resumo).toEqual({ data: '2026-03-19', choveu: true, presentes: 1, lesionados: 0, expulsos: 1 });
+    expect(a?.resumo).toEqual({
+      data: '2026-03-19',
+      choveu: true,
+      presentes: 1,
+      lesionados: 0,
+      expulsos: 1,
+    });
   });
 });

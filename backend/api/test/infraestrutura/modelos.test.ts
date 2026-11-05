@@ -15,7 +15,9 @@ const TOKEN = 'AbCdEfGhIjKlMnOpQrStUvWxYz0123456789_-abcde';
 
 /** Os links (href) do HTML e as URLs do texto. */
 function links(conteudo: { texto: string; html: string }): string[] {
-  const doHtml = [...conteudo.html.matchAll(/href="([^"]+)"/g)].map((m) => (m[1] ?? '').replace(/&amp;/g, '&'));
+  const doHtml = [...conteudo.html.matchAll(/href="([^"]+)"/g)].map((m) =>
+    (m[1] ?? '').replace(/&amp;/g, '&'),
+  );
   const doTexto = [...conteudo.texto.matchAll(/https?:\/\/\S+/g)].map((m) => m[0]);
   return [...doHtml, ...doTexto];
 }
@@ -66,7 +68,11 @@ describe('modelos', () => {
   });
 
   it('ACE-31: nome do grupo e nome da pessoa são escapados no HTML', () => {
-    const c = emailConvite({ urlPublica: URL, grupoNome: '<script>alert(1)</script>', token: TOKEN });
+    const c = emailConvite({
+      urlPublica: URL,
+      grupoNome: '<script>alert(1)</script>',
+      token: TOKEN,
+    });
     expect(c.html).not.toContain('<script>');
     expect(c.html).toContain('&lt;script&gt;');
     const r = emailRecuperacao({ urlPublica: URL, nome: 'Ana "<b>"', token: TOKEN });

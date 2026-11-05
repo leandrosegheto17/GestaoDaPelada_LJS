@@ -24,7 +24,9 @@ const cenarios = {
 /** Resposta das prévias de reativar e de corrigir período (PAR-109, PAR-110). */
 export const previaResposta = z.strictObject({
   ...cenarios,
-  rodadasQuePassamAConstar: z.array(z.strictObject({ data: dataTexto, situacao: z.enum(SITUACOES_QUE_PASSAM) })),
+  rodadasQuePassamAConstar: z.array(
+    z.strictObject({ data: dataTexto, situacao: z.enum(SITUACOES_QUE_PASSAM) }),
+  ),
   rodadasQueDeixamDeConstar: z.array(z.strictObject({ data: dataTexto })),
   /** PAR-116: nulo quando nenhuma rodada que passa a constar é falta. */
   aviso: z.string().nullable(),
@@ -32,7 +34,10 @@ export const previaResposta = z.strictObject({
 export type PreviaResposta = z.infer<typeof previaResposta>;
 
 /** Resposta da prévia da data de início (PAR-111): só o número de rodadas que passam a constar. */
-export const previaInicioResposta = z.strictObject({ ...cenarios, rodadasQuePassamAConstar: contagem });
+export const previaInicioResposta = z.strictObject({
+  ...cenarios,
+  rodadasQuePassamAConstar: contagem,
+});
 export type PreviaInicioResposta = z.infer<typeof previaInicioResposta>;
 
 /** Uma semana do painel de uso, de segunda a domingo em São Paulo (PAR-155, PAR-156). */

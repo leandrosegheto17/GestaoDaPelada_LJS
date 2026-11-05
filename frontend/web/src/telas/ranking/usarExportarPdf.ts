@@ -63,7 +63,13 @@ export function usarExportarPdf(slug: string, mes: string | undefined): Exportar
           setEstado({ tipo: 'baixado' });
           void enviarPdfExportado(projecao.mes);
         } else {
-          setEstado({ tipo: 'dialogo', arquivo: entrega.arquivo, mes: projecao.mes, mesPorExtenso: mesPorExtenso(projecao.mes), grupo: projecao.grupo.nome });
+          setEstado({
+            tipo: 'dialogo',
+            arquivo: entrega.arquivo,
+            mes: projecao.mes,
+            mesPorExtenso: mesPorExtenso(projecao.mes),
+            grupo: projecao.grupo.nome,
+          });
         }
       } catch {
         setEstado({ tipo: 'erro' });

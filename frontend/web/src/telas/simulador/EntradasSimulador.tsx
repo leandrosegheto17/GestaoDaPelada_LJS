@@ -1,4 +1,9 @@
-import { LIMITES_SIMULADOR, type ContextoResposta, type PreviaCorpo, type SugerirCorpo } from '@pelada/contrato/simulador';
+import {
+  LIMITES_SIMULADOR,
+  type ContextoResposta,
+  type PreviaCorpo,
+  type SugerirCorpo,
+} from '@pelada/contrato/simulador';
 import type { ReactNode } from 'react';
 import { Botao } from '../../componentes/Botao.tsx';
 import { CampoData } from '../../componentes/CampoData.tsx';
@@ -61,7 +66,8 @@ function aptosEmOrdem(e: Entradas, contexto: ContextoResposta): string[] {
 /** O corpo da prévia (sem a data, SIM-09). */
 export function corpoDaPrevia(e: Entradas, contexto: ContextoResposta): PreviaCorpo {
   const ids = aptosEmOrdem(e, contexto);
-  if (e.formato === 'varios_times') return { formato: 'varios_times', n: e.n, aptos: ids.map((id) => ({ id })) };
+  if (e.formato === 'varios_times')
+    return { formato: 'varios_times', n: e.n, aptos: ids.map((id) => ({ id })) };
   return {
     formato: 'dois_times',
     n: e.n,
@@ -103,7 +109,18 @@ interface PropsNumero {
   lateral?: ReactNode;
 }
 
-function CampoNumero({ id, rotulo, valor, min, max, rotuloMenos, rotuloMais, desabilitado, aoMudar, lateral }: PropsNumero) {
+function CampoNumero({
+  id,
+  rotulo,
+  valor,
+  min,
+  max,
+  rotuloMenos,
+  rotuloMais,
+  desabilitado,
+  aoMudar,
+  lateral,
+}: PropsNumero) {
   return (
     <div className={estilos.campo}>
       <label className={estilos['campo__rotulo']} htmlFor={id}>
@@ -151,7 +168,14 @@ function CampoNumero({ id, rotulo, valor, min, max, rotuloMenos, rotuloMais, des
 export const TEXTO_PROXIMO_DIA = 'Próximo dia de jogo.';
 export const TEXTO_SEM_ANO = 'sem ano';
 
-export function EntradasSimulador({ contexto, entradas, aoMudar, aoTrocarData, previa, acao }: PropsEntradas) {
+export function EntradasSimulador({
+  contexto,
+  entradas,
+  aoMudar,
+  aoTrocarData,
+  previa,
+  acao,
+}: PropsEntradas) {
   const dois = entradas.formato === 'dois_times';
   const marcados = contexto.jogadores.filter((j) => entradas.aptos.has(j.id)).length;
 
@@ -233,10 +257,18 @@ export function EntradasSimulador({ contexto, entradas, aoMudar, aoTrocarData, p
       <div>
         <h2 className={estilos.subtitulo}>{`Aptos (${marcados})`}</h2>
         <div className={estilos['grupo-botoes']}>
-          <Botao variante="texto" onClick={() => aoMudar({ ...entradas, aptos: new Set(contexto.jogadores.map((j) => j.id)) })}>
+          <Botao
+            variante="texto"
+            onClick={() =>
+              aoMudar({ ...entradas, aptos: new Set(contexto.jogadores.map((j) => j.id)) })
+            }
+          >
             Marcar todos
           </Botao>
-          <Botao variante="texto" onClick={() => aoMudar({ ...entradas, aptos: new Set(), so1o: new Set() })}>
+          <Botao
+            variante="texto"
+            onClick={() => aoMudar({ ...entradas, aptos: new Set(), so1o: new Set() })}
+          >
             Desmarcar todos
           </Botao>
         </div>
@@ -260,11 +292,19 @@ export function EntradasSimulador({ contexto, entradas, aoMudar, aoTrocarData, p
                 </label>
                 <span className={estilos['item__lado']}>
                   {j.semNota ? (
-                    <span className={`${estilos.selo} ${estilos['selo--atencao']}`}>{exibirNivel(j.nivel, true)}</span>
+                    <span className={`${estilos.selo} ${estilos['selo--atencao']}`}>
+                      {exibirNivel(j.nivel, true)}
+                    </span>
                   ) : (
-                    <span className={estilos['texto-sec']}>{`nível ${exibirNivel(j.nivel, false)}`}</span>
+                    <span
+                      className={estilos['texto-sec']}
+                    >{`nível ${exibirNivel(j.nivel, false)}`}</span>
                   )}
-                  {j.semAno ? <span className={`${estilos.selo} ${estilos['selo--neutro']}`}>{TEXTO_SEM_ANO}</span> : null}
+                  {j.semAno ? (
+                    <span className={`${estilos.selo} ${estilos['selo--neutro']}`}>
+                      {TEXTO_SEM_ANO}
+                    </span>
+                  ) : null}
                   {dois ? (
                     <label className={estilos.interruptor}>
                       <input
@@ -273,7 +313,9 @@ export function EntradasSimulador({ contexto, entradas, aoMudar, aoTrocarData, p
                         aria-label={`Só 1º tempo: ${j.apelido}`}
                         checked={entradas.so1o.has(j.id)}
                         disabled={!apto}
-                        onChange={() => aoMudar({ ...entradas, so1o: alternar(entradas.so1o, j.id) })}
+                        onChange={() =>
+                          aoMudar({ ...entradas, so1o: alternar(entradas.so1o, j.id) })
+                        }
                       />
                       <span className={estilos['interruptor__trilho']} aria-hidden="true" />
                       <span className={estilos['interruptor__estado']} aria-hidden="true">

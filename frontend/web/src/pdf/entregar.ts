@@ -52,7 +52,12 @@ export function ambientePadrao(): AmbienteEntrega {
 }
 
 function podeCompartilhar(arquivo: File, navegador: NavegadorCompartilha | undefined): boolean {
-  if (!navegador || typeof navegador.canShare !== 'function' || typeof navegador.share !== 'function') return false;
+  if (
+    !navegador ||
+    typeof navegador.canShare !== 'function' ||
+    typeof navegador.share !== 'function'
+  )
+    return false;
   try {
     return navegador.canShare({ files: [arquivo] });
   } catch {
@@ -61,7 +66,11 @@ function podeCompartilhar(arquivo: File, navegador: NavegadorCompartilha | undef
 }
 
 /** PAR-105 e PAR-106: diálogo quando o aparelho compartilha arquivo; senão, baixa na hora. */
-export function entregar(blob: Blob, nome: string, ambiente: AmbienteEntrega = ambientePadrao()): Entrega {
+export function entregar(
+  blob: Blob,
+  nome: string,
+  ambiente: AmbienteEntrega = ambientePadrao(),
+): Entrega {
   const arquivo = new File([blob], nome, { type: TIPO_PDF });
   if (podeCompartilhar(arquivo, ambiente.navegador)) return { tipo: 'dialogo', arquivo };
   ambiente.baixar(blob, nome);

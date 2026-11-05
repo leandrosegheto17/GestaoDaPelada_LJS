@@ -15,13 +15,20 @@ export function montarHook<T>(hook: () => T, api: Record<string, Manipulador> = 
     const metodo = (init?.method ?? 'GET').toUpperCase();
     const caminho = String(url).split('?')[0] ?? '';
     const corpo = typeof init?.body === 'string' ? (JSON.parse(init.body) as unknown) : undefined;
-    chamadas.push({ metodo, caminho, corpo, cabecalhos: (init?.headers ?? {}) as Record<string, string> });
+    chamadas.push({
+      metodo,
+      caminho,
+      corpo,
+      cabecalhos: (init?.headers ?? {}) as Record<string, string>,
+    });
     const manipulador = api[`${metodo} ${caminho}`];
     if (manipulador) return manipulador(corpo);
     return erroApi(404, 'nao_encontrado');
   }) as unknown as typeof globalThis.fetch;
 
-  const consultas = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });
+  const consultas = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
   const cliente = criarCliente({ consultas, navegar: () => undefined, fetch });
   const envoltorio = ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={consultas}>
@@ -33,7 +40,8 @@ export function montarHook<T>(hook: () => T, api: Record<string, Manipulador> = 
     ...resultado,
     consultas,
     chamadas,
-    chamadasA: (metodo: string, caminho: string) => chamadas.filter((c) => c.metodo === metodo && c.caminho === caminho),
+    chamadasA: (metodo: string, caminho: string) =>
+      chamadas.filter((c) => c.metodo === metodo && c.caminho === caminho),
   };
 }
 

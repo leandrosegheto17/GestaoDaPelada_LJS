@@ -22,11 +22,18 @@ import {
 /** Schemas das rotas de acesso (T12; ACE-02, ACE-58). */
 
 const TOKEN = 'A'.repeat(43);
-const CADASTRO = { nome: 'Ana Souza', email: 'ana@exemplo.com', senha: 'senha boa 123', termos: true };
+const CADASTRO = {
+  nome: 'Ana Souza',
+  email: 'ana@exemplo.com',
+  senha: 'senha boa 123',
+  termos: true,
+};
 
 describe('cadastroCorpo', () => {
   it('ACE-01: cadastro válido passa e normaliza o e-mail', () => {
-    expect(cadastroCorpo.parse({ ...CADASTRO, email: ' Ana@Exemplo.COM ' }).email).toBe('ana@exemplo.com');
+    expect(cadastroCorpo.parse({ ...CADASTRO, email: ' Ana@Exemplo.COM ' }).email).toBe(
+      'ana@exemplo.com',
+    );
   });
 
   it.each([
@@ -69,7 +76,11 @@ describe('.strict() em todo corpo', () => {
     ['trocarSenhaCorpo', trocarSenhaCorpo, { senhaAtual: 'x', senhaNova: 'senha boa 123' }],
     ['excluirCorpo', excluirCorpo, { senha: 'x' }],
     ['conviteCorpo', conviteCorpo, { email: 'a@b.com' }],
-    ['conviteCadastroCorpo', conviteCadastroCorpo, { token: TOKEN, nome: 'Ana', senha: 'senha boa 123', termos: true }],
+    [
+      'conviteCadastroCorpo',
+      conviteCadastroCorpo,
+      { token: TOKEN, nome: 'Ana', senha: 'senha boa 123', termos: true },
+    ],
   ] as const)('ACE-03: %s aceita o corpo válido e recusa campo a mais', (_nome, schema, valido) => {
     expect(schema.safeParse(valido).success).toBe(true);
     expect(schema.safeParse({ ...valido, e_dono: true }).success).toBe(false);
@@ -77,12 +88,20 @@ describe('.strict() em todo corpo', () => {
 
   it('ACE-34: o cadastro pelo convite não aceita e-mail no corpo (o e-mail é o do convite)', () => {
     expect(
-      conviteCadastroCorpo.safeParse({ token: TOKEN, nome: 'Ana', senha: 'senha boa 123', termos: true, email: 'a@b.com' }).success,
+      conviteCadastroCorpo.safeParse({
+        token: TOKEN,
+        nome: 'Ana',
+        senha: 'senha boa 123',
+        termos: true,
+        email: 'a@b.com',
+      }).success,
     ).toBe(false);
   });
 
   it('ACE-26: a senha nova da troca segue os limites da senha (73 caracteres falha)', () => {
-    expect(trocarSenhaCorpo.safeParse({ senhaAtual: 'x', senhaNova: 'a'.repeat(73) }).success).toBe(false);
+    expect(trocarSenhaCorpo.safeParse({ senhaAtual: 'x', senhaNova: 'a'.repeat(73) }).success).toBe(
+      false,
+    );
   });
 });
 
@@ -109,7 +128,11 @@ describe('respostas', () => {
 
   it('ACE-29: corpoDoErro de unico_admin leva a lista de grupos e passa no corpoErro', () => {
     const corpo = corpoDoErro('unico_admin', { grupos: [{ id: 'g', nome: 'Grupo' }] });
-    expect(corpoErro.parse(corpo)).toEqual({ erro: MENSAGENS_ERRO.unico_admin, codigo: 'unico_admin', grupos: [{ id: 'g', nome: 'Grupo' }] });
+    expect(corpoErro.parse(corpo)).toEqual({
+      erro: MENSAGENS_ERRO.unico_admin,
+      codigo: 'unico_admin',
+      grupos: [{ id: 'g', nome: 'Grupo' }],
+    });
   });
 
   it('ACE-11: todo código de erro tem mensagem', () => {

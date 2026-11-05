@@ -1,7 +1,14 @@
 import { MENSAGENS, TERMOS_VERSAO } from '@pelada/contrato';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { abrirCenarioConta, type CenarioContaAberto } from '../isolamento/cenario-conta.ts';
-import { cliente, emailsPara, limparCaixa, tokenDoCookie, tokenDoEmail, URL_PUBLICA_TESTE } from './apoio.ts';
+import {
+  cliente,
+  emailsPara,
+  limparCaixa,
+  tokenDoCookie,
+  tokenDoEmail,
+  URL_PUBLICA_TESTE,
+} from './apoio.ts';
 
 /**
  * Rotas de cadastro e confirmação (T25; ACE-01 a ACE-08, ACE-58, ACE-68), contra um banco
@@ -29,14 +36,22 @@ beforeEach(async () => {
 let n = 0;
 function cadastro(extra: Record<string, unknown> = {}) {
   n += 1;
-  return { nome: 'Pessoa Nova', email: `nova-${n}@exemplo.test`, senha: 'senha segura 123', termos: true, ...extra };
+  return {
+    nome: 'Pessoa Nova',
+    email: `nova-${n}@exemplo.test`,
+    senha: 'senha segura 123',
+    termos: true,
+    ...extra,
+  };
 }
 
 async function contaPorEmail(email: string) {
-  const r = await aberto.db.query<{ id: string; nome: string; termos_versao: string | null; email_confirmado_em: Date | null }>(
-    'SELECT id, nome, termos_versao, email_confirmado_em FROM contas WHERE email = $1',
-    [email],
-  );
+  const r = await aberto.db.query<{
+    id: string;
+    nome: string;
+    termos_versao: string | null;
+    email_confirmado_em: Date | null;
+  }>('SELECT id, nome, termos_versao, email_confirmado_em FROM contas WHERE email = $1', [email]);
   return r.rows[0] ?? null;
 }
 
@@ -50,7 +65,9 @@ describe('POST /api/conta', () => {
     const corpo = cadastro();
     const r = await pedir('/conta', { corpo });
     expect(r.status).toBe(201);
-    expect(await r.json()).toEqual({ mensagem: 'Enviamos um link de confirmação para o seu e-mail' });
+    expect(await r.json()).toEqual({
+      mensagem: 'Enviamos um link de confirmação para o seu e-mail',
+    });
     const [email] = emailsPara(corpo.email, 'confirmacao');
     expect(email?.texto).toContain(`${URL_PUBLICA_TESTE}/confirmar#t=`);
     const conta = await contaPorEmail(corpo.email);
@@ -155,7 +172,9 @@ describe('POST /api/conta/confirmar', () => {
     const corpo = cadastro();
     await pedir('/conta', { corpo });
     const token = tokenDoEmail(emailsPara(corpo.email, 'confirmacao')[0]);
-    await aberto.db.query(`UPDATE links_conta SET expira_em = now() - interval '1 second' WHERE tipo = 'confirmacao'`);
+    await aberto.db.query(
+      `UPDATE links_conta SET expira_em = now() - interval '1 second' WHERE tipo = 'confirmacao'`,
+    );
     const r = await pedir('/conta/confirmar', { corpo: { token } });
     expect(r.status).toBe(410);
   });
@@ -180,7 +199,9 @@ describe('POST /api/conta/reenviar-confirmacao', () => {
     await pedir('/conta', { corpo });
     await passar61s();
     const comConta = await pedir('/conta/reenviar-confirmacao', { corpo: { email: corpo.email } });
-    const semConta = await pedir('/conta/reenviar-confirmacao', { corpo: { email: 'ninguem@exemplo.test' } });
+    const semConta = await pedir('/conta/reenviar-confirmacao', {
+      corpo: { email: 'ninguem@exemplo.test' },
+    });
     expect(semConta.status).toBe(comConta.status);
     expect(await semConta.json()).toEqual(await comConta.json());
     expect(emailsPara('ninguem@exemplo.test')).toEqual([]);

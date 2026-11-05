@@ -55,7 +55,9 @@ describe('lerEsquema: funções, policies, grants e roles', () => {
   it('FUN-08: mudar o search_path de uma função muda a saída', async () => {
     const m = await mudancas(() => 'ALTER FUNCTION f() SET search_path = public, pg_temp');
     expect(mudouCategoria(m, /^funcao f\(\)/), m.join('\n')).toBe(true);
-    expect(m.some((l) => l.startsWith('+ ') && l.includes('search_path=public, pg_temp'))).toBe(true);
+    expect(m.some((l) => l.startsWith('+ ') && l.includes('search_path=public, pg_temp'))).toBe(
+      true,
+    );
   });
 
   it('FUN-08: tornar a função SECURITY DEFINER muda a saída', async () => {
@@ -78,7 +80,9 @@ describe('lerEsquema: funções, policies, grants e roles', () => {
       (r) => `CREATE POLICY t_inserir ON t FOR INSERT TO ${r} WITH CHECK (grupo_id = 1)`,
     );
     expect(m).toHaveLength(1);
-    expect(m[0]).toMatch(/^\+ policy t\.t_inserir INSERT PERMISSIVE roles=pelada_t20_\w+ using= check=/);
+    expect(m[0]).toMatch(
+      /^\+ policy t\.t_inserir INSERT PERMISSIVE roles=pelada_t20_\w+ using= check=/,
+    );
   });
 
   it('FUN-08: ligar o FORCE muda a saída', async () => {
@@ -114,7 +118,9 @@ describe('lerEsquema: funções, policies, grants e roles', () => {
   });
 
   it('FUN-08: mudar só a senha de uma role não muda a saída', async () => {
-    const m = await mudancas((r) => `ALTER ROLE ${r} PASSWORD 'outra-senha-${randomBytes(4).toString('hex')}'`);
+    const m = await mudancas(
+      (r) => `ALTER ROLE ${r} PASSWORD 'outra-senha-${randomBytes(4).toString('hex')}'`,
+    );
     expect(m).toEqual([]);
   });
 

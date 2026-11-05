@@ -16,7 +16,13 @@ let aberto: CenarioGruposAberto;
 const HOJE = '2026-06-15';
 
 /** O corpo já passado pelo contrato: telefone ausente ou vazio chega nulo (GEL-38, T17). */
-const NOVO = { apelido: 'Novato', anoNascimento: 1995, posicao: 'meia', telefone: null, pontuacaoInicial: 0 } as const;
+const NOVO = {
+  apelido: 'Novato',
+  anoNascimento: 1995,
+  posicao: 'meia',
+  telefone: null,
+  pontuacaoInicial: 0,
+} as const;
 
 beforeAll(async () => {
   aberto = await abrirCenarioGrupos();
@@ -28,10 +34,12 @@ afterAll(async () => {
 
 afterEach(async () => {
   const { db, cenario } = aberto;
-  await db.query(
-    `DELETE FROM jogadores WHERE grupo_id = $1 AND id NOT IN ($2, $3, $4)`,
-    [cenario.grupoG, cenario.idsG.jogadorAtivo, cenario.idsG.jogadorInativo, cenario.idsG.jogadorHistorico],
-  );
+  await db.query(`DELETE FROM jogadores WHERE grupo_id = $1 AND id NOT IN ($2, $3, $4)`, [
+    cenario.grupoG,
+    cenario.idsG.jogadorAtivo,
+    cenario.idsG.jogadorInativo,
+    cenario.idsG.jogadorHistorico,
+  ]);
 });
 
 async function jogadorGravado(id: string) {
@@ -66,11 +74,20 @@ async function esperarAlguemNaTrava(prazoMs = 5000): Promise<void> {
 describe('jogadores.criar', () => {
   it('GEL-31, GEL-32: sem data de entrada, período aberto e inicio_pontuacao em hoje', async () => {
     const { url, cenario } = aberto;
-    const r = await comDb(url, cenario.contaC, (db) => jogadores.criar(db, cenario.grupoG, NOVO, HOJE), { confirmar: true });
+    const r = await comDb(
+      url,
+      cenario.contaC,
+      (db) => jogadores.criar(db, cenario.grupoG, NOVO, HOJE),
+      { confirmar: true },
+    );
     expect(r.resultado).toBe('ok');
     if (r.resultado !== 'ok') return;
     expect(await periodosDe(r.id)).toEqual([{ inicio: HOJE, fim: null }]);
-    expect(await jogadorGravado(r.id)).toMatchObject({ apelido: 'Novato', inicio_pontuacao: HOJE, criado_por: cenario.contaC });
+    expect(await jogadorGravado(r.id)).toMatchObject({
+      apelido: 'Novato',
+      inicio_pontuacao: HOJE,
+      criado_por: cenario.contaC,
+    });
   });
 
   it('GEL-31: com data de entrada, o período e o início da pontuação começam nela', async () => {
@@ -78,7 +95,13 @@ describe('jogadores.criar', () => {
     const r = await comDb(
       url,
       cenario.contaC,
-      (db) => jogadores.criar(db, cenario.grupoG, { ...NOVO, apelido: 'Com Data', dataEntrada: '2026-03-10' }, HOJE),
+      (db) =>
+        jogadores.criar(
+          db,
+          cenario.grupoG,
+          { ...NOVO, apelido: 'Com Data', dataEntrada: '2026-03-10' },
+          HOJE,
+        ),
       { confirmar: true },
     );
     if (r.resultado !== 'ok') throw new Error('esperava ok');
@@ -86,25 +109,40 @@ describe('jogadores.criar', () => {
     expect((await jogadorGravado(r.id))?.inicio_pontuacao).toBe('2026-03-10');
   });
 
-  it.each(['toninho', 'TONINHO', 'ToNiNhO'])('GEL-35: "%s" com "Toninho" existente dá apelido_repetido e nada é gravado', async (apelido) => {
-    const { url, cenario } = aberto;
-    const r = await comDb(url, cenario.contaC, (db) => jogadores.criar(db, cenario.grupoG, { ...NOVO, apelido }, HOJE), {
-      confirmar: true,
-    });
-    expect(r).toEqual({ resultado: 'apelido_repetido' });
-    const n = await aberto.db.query('SELECT 1 FROM jogadores WHERE grupo_id = $1 AND lower(apelido) = $2', [cenario.grupoG, 'toninho']);
-    expect(n.rowCount).toBe(1);
-  });
+  it.each(['toninho', 'TONINHO', 'ToNiNhO'])(
+    'GEL-35: "%s" com "Toninho" existente dá apelido_repetido e nada é gravado',
+    async (apelido) => {
+      const { url, cenario } = aberto;
+      const r = await comDb(
+        url,
+        cenario.contaC,
+        (db) => jogadores.criar(db, cenario.grupoG, { ...NOVO, apelido }, HOJE),
+        {
+          confirmar: true,
+        },
+      );
+      expect(r).toEqual({ resultado: 'apelido_repetido' });
+      const n = await aberto.db.query(
+        'SELECT 1 FROM jogadores WHERE grupo_id = $1 AND lower(apelido) = $2',
+        [cenario.grupoG, 'toninho'],
+      );
+      expect(n.rowCount).toBe(1);
+    },
+  );
 
   it('GEL-35: o acento conta: "Ze Inativo" não colide com "Zé Inativo"', async () => {
     const { url, cenario } = aberto;
-    const r = await comDb(url, cenario.contaC, (db) => jogadores.criar(db, cenario.grupoG, { ...NOVO, apelido: 'Ze Inativo' }, HOJE));
+    const r = await comDb(url, cenario.contaC, (db) =>
+      jogadores.criar(db, cenario.grupoG, { ...NOVO, apelido: 'Ze Inativo' }, HOJE),
+    );
     expect(r.resultado).toBe('ok');
   });
 
   it('GEL-35: o mesmo apelido em outro grupo é aceito', async () => {
     const { url, cenario } = aberto;
-    const r = await comDb(url, cenario.contaB, (db) => jogadores.criar(db, cenario.grupoH, { ...NOVO, apelido: 'Toninho' }, HOJE));
+    const r = await comDb(url, cenario.contaB, (db) =>
+      jogadores.criar(db, cenario.grupoH, { ...NOVO, apelido: 'Toninho' }, HOJE),
+    );
     expect(r.resultado).toBe('ok');
   });
 
@@ -133,7 +171,12 @@ describe('jogadores.criar', () => {
     );
     await gravou;
     // O segundo não vê o primeiro (não confirmado), passa pela consulta e para no índice único.
-    const segundo = comDb(url, cenario.contaO, (db) => jogadores.criar(db, cenario.grupoG, dados, HOJE), { confirmar: true }).then(
+    const segundo = comDb(
+      url,
+      cenario.contaO,
+      (db) => jogadores.criar(db, cenario.grupoG, dados, HOJE),
+      { confirmar: true },
+    ).then(
       (r) => ({ ok: true as const, r }),
       (erro: unknown) => ({ ok: false as const, erro }),
     );
@@ -146,8 +189,14 @@ describe('jogadores.criar', () => {
     const s = await segundo;
     expect(s.ok).toBe(false);
     if (s.ok) return;
-    expect(erroDeUnicidade(s.erro)).toEqual({ campo: 'apelido', mensagem: MENSAGEM_APELIDO_REPETIDO });
-    const n = await aberto.db.query(`SELECT 1 FROM jogadores WHERE grupo_id = $1 AND apelido = 'Gêmeo'`, [cenario.grupoG]);
+    expect(erroDeUnicidade(s.erro)).toEqual({
+      campo: 'apelido',
+      mensagem: MENSAGEM_APELIDO_REPETIDO,
+    });
+    const n = await aberto.db.query(
+      `SELECT 1 FROM jogadores WHERE grupo_id = $1 AND apelido = 'Gêmeo'`,
+      [cenario.grupoG],
+    );
     expect(n.rowCount).toBe(1);
   });
 
@@ -156,7 +205,8 @@ describe('jogadores.criar', () => {
     const r = await comDb(
       url,
       cenario.contaC,
-      (db) => jogadores.criar(db, cenario.grupoG, { ...NOVO, apelido: 'Sem Fone', telefone: null }, HOJE),
+      (db) =>
+        jogadores.criar(db, cenario.grupoG, { ...NOVO, apelido: 'Sem Fone', telefone: null }, HOJE),
       { confirmar: true },
     );
     if (r.resultado !== 'ok') throw new Error('esperava ok');
@@ -168,11 +218,21 @@ describe('jogadores.criar', () => {
     const r = await comDb(
       url,
       cenario.contaC,
-      (db) => jogadores.criar(db, cenario.grupoG, { ...NOVO, apelido: 'Auditado', telefone: '11987654321', anoNascimento: 1988 }, HOJE),
+      (db) =>
+        jogadores.criar(
+          db,
+          cenario.grupoG,
+          { ...NOVO, apelido: 'Auditado', telefone: '11987654321', anoNascimento: 1988 },
+          HOJE,
+        ),
       { confirmar: true },
     );
     if (r.resultado !== 'ok') throw new Error('esperava ok');
-    const a = await aberto.db.query<{ autor: string; entidade_id: string; resumo: Record<string, unknown> }>(
+    const a = await aberto.db.query<{
+      autor: string;
+      entidade_id: string;
+      resumo: Record<string, unknown>;
+    }>(
       `SELECT autor_conta_id AS autor, entidade_id, resumo FROM auditoria WHERE acao = 'jogador_criado' AND entidade_id = $1`,
       [r.id],
     );

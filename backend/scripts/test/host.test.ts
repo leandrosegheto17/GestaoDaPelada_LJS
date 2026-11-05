@@ -41,7 +41,10 @@ describe('exigirHostPermitido', () => {
   it('FUN-19: usuário e senha nunca aparecem na mensagem', () => {
     let mensagem = '';
     try {
-      exigirHostPermitido('postgres://usuario_secreto:senha_secreta@ep-x.neon.tech/db', HOSTS_TESTE);
+      exigirHostPermitido(
+        'postgres://usuario_secreto:senha_secreta@ep-x.neon.tech/db',
+        HOSTS_TESTE,
+      );
     } catch (e) {
       mensagem = (e as Error).message;
     }

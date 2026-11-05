@@ -97,14 +97,17 @@ describe('useHabilidades', () => {
 describe('useSalvarNota', () => {
   it('GEL-97: salvar nota atualiza o nível da ficha com a resposta', async () => {
     const m = montarHook(() => useSalvarNota(G, J), {
-      [`PUT /api/grupos/${G}/jogadores/${J}/notas/h-passe`]: () => json(200, { nivel: 700, semNota: false }),
+      [`PUT /api/grupos/${G}/jogadores/${J}/notas/h-passe`]: () =>
+        json(200, { nivel: 700, semNota: false }),
     });
     m.consultas.setQueryData(chaveJogador(G, J), FICHA);
     m.consultas.setQueryData(chaveJogadores(G), { jogadores: [] });
     await act(async () => {
       await m.result.current.mutateAsync({ habilidadeId: 'h-passe', nota: 7 });
     });
-    expect(m.chamadasA('PUT', `/api/grupos/${G}/jogadores/${J}/notas/h-passe`)[0]?.corpo).toEqual({ nota: 7 });
+    expect(m.chamadasA('PUT', `/api/grupos/${G}/jogadores/${J}/notas/h-passe`)[0]?.corpo).toEqual({
+      nota: 7,
+    });
     const ficha = m.consultas.getQueryData<typeof FICHA>(chaveJogador(G, J));
     expect(ficha?.nivel).toBe(700);
     expect(ficha?.semNota).toBe(false);
@@ -117,7 +120,8 @@ describe('useSalvarNota', () => {
 
   it('GEL-98: apagar a nota (null) volta a ficha a semNota com o nível da resposta', async () => {
     const m = montarHook(() => useSalvarNota(G, J), {
-      [`PUT /api/grupos/${G}/jogadores/${J}/notas/h-passe`]: () => json(200, { nivel: 550, semNota: true }),
+      [`PUT /api/grupos/${G}/jogadores/${J}/notas/h-passe`]: () =>
+        json(200, { nivel: 550, semNota: true }),
     });
     m.consultas.setQueryData(chaveJogador(G, J), {
       ...FICHA,

@@ -44,14 +44,22 @@ export interface Pedido {
 
 /** Pede `/api<caminho>` com `X-Pelada: 1` e a sessão da conta. */
 export async function pedir(aberto: CenarioGruposAberto, p: Pedido): Promise<Response> {
-  const headers = new Headers({ 'x-pelada': '1', cookie: `${NOME_COOKIE_SESSAO}=${await sessaoDe(aberto, p.conta)}` });
+  const headers = new Headers({
+    'x-pelada': '1',
+    cookie: `${NOME_COOKIE_SESSAO}=${await sessaoDe(aberto, p.conta)}`,
+  });
   const init: RequestInit = { method: p.metodo, headers };
   if (p.corpo !== undefined) {
     headers.set('content-type', 'application/json');
     init.body = typeof p.corpo === 'string' ? p.corpo : JSON.stringify(p.corpo);
   }
   const ctx = contextoFalso();
-  const r = await (p.app ?? appFinanceiro()).request(`/api${p.caminho}`, init, envAcesso(aberto.url), ctx);
+  const r = await (p.app ?? appFinanceiro()).request(
+    `/api${p.caminho}`,
+    init,
+    envAcesso(aberto.url),
+    ctx,
+  );
   await ctx.esperar();
   return r;
 }
@@ -65,7 +73,8 @@ export async function saldoDe(r: Response): Promise<number | null | undefined> {
   const corpo = (await r.json()) as Record<string, unknown>;
   const valor = corpo['saldoFinanceiroCentavos'];
   if (valor === undefined || valor === null) return valor;
-  if (typeof valor !== 'number' || !Number.isSafeInteger(valor)) throw new Error(`saldoFinanceiroCentavos inválido: ${String(valor)}`);
+  if (typeof valor !== 'number' || !Number.isSafeInteger(valor))
+    throw new Error(`saldoFinanceiroCentavos inválido: ${String(valor)}`);
   return valor;
 }
 
@@ -76,7 +85,10 @@ export interface LinhaConfig {
 }
 
 /** A configuração de G lida como superusuário. */
-export async function configDe(aberto: CenarioGruposAberto, grupo: string): Promise<LinhaConfig | null> {
+export async function configDe(
+  aberto: CenarioGruposAberto,
+  grupo: string,
+): Promise<LinhaConfig | null> {
   const r = await aberto.db.query<LinhaConfig>(
     `SELECT mensalidade_centavos, saldo_inicial_centavos, data_saldo_inicial::text AS data_saldo_inicial
        FROM config_financeira WHERE grupo_id = $1`,
@@ -86,11 +98,15 @@ export async function configDe(aberto: CenarioGruposAberto, grupo: string): Prom
 }
 
 /** Quantas linhas de auditoria com a ação em G. */
-export async function auditorias(aberto: CenarioGruposAberto, grupo: string, acao: string): Promise<number> {
-  const r = await aberto.db.query<{ n: string }>('SELECT count(*) AS n FROM auditoria WHERE grupo_id = $1 AND acao = $2', [
-    grupo,
-    acao,
-  ]);
+export async function auditorias(
+  aberto: CenarioGruposAberto,
+  grupo: string,
+  acao: string,
+): Promise<number> {
+  const r = await aberto.db.query<{ n: string }>(
+    'SELECT count(*) AS n FROM auditoria WHERE grupo_id = $1 AND acao = $2',
+    [grupo, acao],
+  );
   return Number(r.rows[0]?.n ?? 0);
 }
 
@@ -101,11 +117,14 @@ export async function auditorias(aberto: CenarioGruposAberto, grupo: string, aca
 export async function restaurarCaixa(aberto: CenarioGruposAberto): Promise<void> {
   const { db, cenario } = aberto;
   const g = cenario.grupoG;
-  await db.query('DELETE FROM pagamentos_mes WHERE grupo_id = $1 AND lancamento_id IS DISTINCT FROM $2', [
+  await db.query(
+    'DELETE FROM pagamentos_mes WHERE grupo_id = $1 AND lancamento_id IS DISTINCT FROM $2',
+    [g, cenario.idsG.lancamento],
+  );
+  await db.query('DELETE FROM lancamentos WHERE grupo_id = $1 AND id <> $2', [
     g,
     cenario.idsG.lancamento,
   ]);
-  await db.query('DELETE FROM lancamentos WHERE grupo_id = $1 AND id <> $2', [g, cenario.idsG.lancamento]);
   // O lançamento e o pagamento do cenário (Bira, 2026-01) voltam iguais, mesmo se um teste os editou ou apagou.
   await db.query(
     `INSERT INTO lancamentos (id, grupo_id, tipo, data, descricao, valor_centavos, criado_por, criado_em, alterado_por, alterado_em)
@@ -126,8 +145,8 @@ export async function restaurarCaixa(aberto: CenarioGruposAberto): Promise<void>
                                           data_saldo_inicial = '2026-01-01'`,
     [g],
   );
-  await db.query('UPDATE vinculos_admin SET acessa_financeiro = false WHERE grupo_id = $1 AND conta_id = $2', [
-    g,
-    cenario.contaO,
-  ]);
+  await db.query(
+    'UPDATE vinculos_admin SET acessa_financeiro = false WHERE grupo_id = $1 AND conta_id = $2',
+    [g, cenario.contaO],
+  );
 }

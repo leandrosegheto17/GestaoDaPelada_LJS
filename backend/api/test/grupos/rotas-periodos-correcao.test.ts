@@ -18,7 +18,10 @@ import { abrirCenarioGrupos, type CenarioGruposAberto } from '../isolamento/cena
 let aberto: CenarioGruposAberto;
 const criados: string[] = [];
 
-const app = criarApp({ fabricaBanco: fabricaComoApp().fabrica, relogio: relogioFixo('2026-11-05T15:00:00Z') });
+const app = criarApp({
+  fabricaBanco: fabricaComoApp().fabrica,
+  relogio: relogioFixo('2026-11-05T15:00:00Z'),
+});
 
 interface Resposta {
   alterado?: boolean;
@@ -39,7 +42,12 @@ async function sessao(conta: string): Promise<string> {
   return token;
 }
 
-async function pedir(caminho: string, metodo: string, corpo: unknown, conta = aberto.cenario.contaC): Promise<Response> {
+async function pedir(
+  caminho: string,
+  metodo: string,
+  corpo: unknown,
+  conta = aberto.cenario.contaC,
+): Promise<Response> {
   const headers = new Headers({
     'x-pelada': '1',
     cookie: `${NOME_COOKIE_SESSAO}=${await sessao(conta)}`,
@@ -81,7 +89,11 @@ async function novoJogador(apelido: string): Promise<{ id: string; periodos: str
 }
 
 function corrigir(id: string, periodoId: string, corpo: unknown) {
-  return pedir(`/grupos/${aberto.cenario.grupoG}/jogadores/${id}/periodos/${periodoId}`, 'PATCH', corpo);
+  return pedir(
+    `/grupos/${aberto.cenario.grupoG}/jogadores/${id}/periodos/${periodoId}`,
+    'PATCH',
+    corpo,
+  );
 }
 
 function alterarInicio(id: string, corpo: unknown) {
@@ -89,7 +101,10 @@ function alterarInicio(id: string, corpo: unknown) {
 }
 
 async function inicioPontuacao(id: string) {
-  const r = await aberto.db.query<{ inicio: string }>('SELECT inicio_pontuacao::text AS inicio FROM jogadores WHERE id = $1', [id]);
+  const r = await aberto.db.query<{ inicio: string }>(
+    'SELECT inicio_pontuacao::text AS inicio FROM jogadores WHERE id = $1',
+    [id],
+  );
   return r.rows[0]?.inicio;
 }
 
@@ -152,9 +167,10 @@ describe('PATCH …/jogadores/:id/periodos/:periodoId', () => {
     const b = await novoJogador('Rota Outro');
     const r = await corrigir(b.id, a.periodos[0]!, { saida: '2026-10-03' });
     expect(r.status).toBe(404);
-    const linha = await aberto.db.query<{ fim: string }>('SELECT fim::text AS fim FROM periodos_ativos WHERE id = $1', [
-      a.periodos[0],
-    ]);
+    const linha = await aberto.db.query<{ fim: string }>(
+      'SELECT fim::text AS fim FROM periodos_ativos WHERE id = $1',
+      [a.periodos[0]],
+    );
     expect(linha.rows[0]?.fim).toBe('2026-10-05');
   });
 
@@ -178,7 +194,11 @@ describe('PUT …/jogadores/:id/inicio', () => {
     expect(r.status).toBe(200);
     const corpo = (await r.json()) as Resposta;
     expect(corpo.alterado).toBe(true);
-    expect(corpo.periodos?.[0]).toEqual({ id: j.periodos[0], inicio: '2026-02-01', fim: '2026-10-05' });
+    expect(corpo.periodos?.[0]).toEqual({
+      id: j.periodos[0],
+      inicio: '2026-02-01',
+      fim: '2026-10-05',
+    });
     expect(await inicioPontuacao(j.id)).toBe('2026-02-01');
   });
 

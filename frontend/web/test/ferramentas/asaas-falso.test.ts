@@ -22,13 +22,19 @@ afterEach(async () => {
 });
 
 async function post(caminho: string, corpo: unknown, cabecalhos: Record<string, string> = CHAVE) {
-  return fetch(`${falso?.url}${caminho}`, { method: 'POST', headers: cabecalhos, body: JSON.stringify(corpo) });
+  return fetch(`${falso?.url}${caminho}`, {
+    method: 'POST',
+    headers: cabecalhos,
+    body: JSON.stringify(corpo),
+  });
 }
 
 describe('asaas falso', () => {
   it('PLA-53: responde às 4 rotas no formato do Asaas, com a fatura falsa', async () => {
     falso = await iniciarAsaasFalso();
-    const cliente = (await (await post('/customers', { name: 'Maria', cpfCnpj: '52998224725' })).json()) as { id: string };
+    const cliente = (await (
+      await post('/customers', { name: 'Maria', cpfCnpj: '52998224725' })
+    ).json()) as { id: string };
     expect(cliente.id).toMatch(/^cus_/);
 
     const r = await post('/subscriptions', {
@@ -45,14 +51,19 @@ describe('asaas falso', () => {
 
     const lista = (await (
       await fetch(`${falso.url}/subscriptions/${assinatura.id}/payments`, { headers: CHAVE })
-    ).json()) as { data: Array<{ id: string; invoiceUrl: string; value: number; dueDate: string }> };
+    ).json()) as {
+      data: Array<{ id: string; invoiceUrl: string; value: number; dueDate: string }>;
+    };
     expect(lista.data).toHaveLength(1);
     expect(lista.data[0]).toMatchObject({ value: 9.9, dueDate: '2026-11-05' });
     const fatura = await fetch(lista.data[0]?.invoiceUrl ?? '');
     expect(fatura.status).toBe(200);
     expect(await fatura.text()).toContain('Fatura de teste');
 
-    const apagada = await fetch(`${falso.url}/subscriptions/${assinatura.id}`, { method: 'DELETE', headers: CHAVE });
+    const apagada = await fetch(`${falso.url}/subscriptions/${assinatura.id}`, {
+      method: 'DELETE',
+      headers: CHAVE,
+    });
     expect(await apagada.json()).toEqual({ deleted: true, id: assinatura.id });
   });
 
@@ -62,22 +73,33 @@ describe('asaas falso', () => {
     expect((await post('/customers', { name: 'x', cpfCnpj: '1' }, semChave)).status).toBe(401);
     expect((await post('/subscriptions', {}, semChave)).status).toBe(401);
     expect((await fetch(`${falso.url}/subscriptions/sub_1/payments`)).status).toBe(401);
-    expect((await fetch(`${falso.url}/subscriptions/sub_1`, { method: 'DELETE' })).status).toBe(401);
+    expect((await fetch(`${falso.url}/subscriptions/sub_1`, { method: 'DELETE' })).status).toBe(
+      401,
+    );
   });
 
   it('PLA-36: /teste/falhar faz a próxima chamada da rota dar 500', async () => {
     falso = await iniciarAsaasFalso();
-    await fetch(`${falso.base}/teste/falhar`, { method: 'POST', body: JSON.stringify({ rota: 'customers', vezes: 1 }) });
+    await fetch(`${falso.base}/teste/falhar`, {
+      method: 'POST',
+      body: JSON.stringify({ rota: 'customers', vezes: 1 }),
+    });
     expect((await post('/customers', { name: 'Maria', cpfCnpj: '52998224725' })).status).toBe(500);
     expect((await post('/customers', { name: 'Maria', cpfCnpj: '52998224725' })).status).toBe(200);
   });
 
   it('dispara o webhook no endereço configurado com o token, como o Asaas', async () => {
-    const recebidos: Array<{ token: string | undefined; corpo: { event: string; payment?: { subscription: string } } }> = [];
+    const recebidos: Array<{
+      token: string | undefined;
+      corpo: { event: string; payment?: { subscription: string } };
+    }> = [];
     receptor = createServer(async (req: IncomingMessage, res) => {
       let texto = '';
       for await (const parte of req) texto += parte;
-      recebidos.push({ token: req.headers['asaas-access-token'] as string | undefined, corpo: JSON.parse(texto) });
+      recebidos.push({
+        token: req.headers['asaas-access-token'] as string | undefined,
+        corpo: JSON.parse(texto),
+      });
       res.writeHead(200).end();
     });
     await new Promise((r) => receptor?.listen(0, '127.0.0.1', () => r(undefined)));
@@ -88,8 +110,12 @@ describe('asaas falso', () => {
       urlWebhook: `http://127.0.0.1:${porta}/api/webhooks/asaas`,
       tokenWebhook: 'token-falso-do-webhook-do-e2e-com-32-caracteres',
     });
-    const cliente = (await (await post('/customers', { name: 'Maria', cpfCnpj: '52998224725' })).json()) as { id: string };
-    const assinatura = (await (await post('/subscriptions', { customer: cliente.id, value: 9.9 })).json()) as { id: string };
+    const cliente = (await (
+      await post('/customers', { name: 'Maria', cpfCnpj: '52998224725' })
+    ).json()) as { id: string };
+    const assinatura = (await (
+      await post('/subscriptions', { customer: cliente.id, value: 9.9 })
+    ).json()) as { id: string };
 
     const disparo = await fetch(`${falso.base}/teste/webhook`, {
       method: 'POST',

@@ -54,9 +54,11 @@ describe('roles do banco', () => {
     ['CREATE SCHEMA', 'CREATE SCHEMA intruso'],
   ])('FUN-11: pelada_app tentando %s recebe erro de permissão', async (_comando, sql) => {
     const { db, cenario } = aberto;
-    await expect(comoApp(db, { conta: cenario.contaA }, (d) => d.query(sql))).rejects.toMatchObject({
-      code: '42501',
-    });
+    await expect(comoApp(db, { conta: cenario.contaA }, (d) => d.query(sql))).rejects.toMatchObject(
+      {
+        code: '42501',
+      },
+    );
   });
 
   it('FUN-11: os comandos recusados não mudaram nada (jogadores segue com as linhas e sem a coluna)', async () => {
@@ -89,14 +91,18 @@ describe('roles do banco', () => {
          FROM pg_roles WHERE rolname = 'pelada_backup_ro'`,
     );
     expect(r.rows).toEqual([{ rolbypassrls: false, rolsuper: false, cria: false }]);
-    expect(await escritasDe(db, 'pelada_backup_ro', ['INSERT', 'UPDATE', 'DELETE', 'TRUNCATE'])).toEqual([]);
+    expect(
+      await escritasDe(db, 'pelada_backup_ro', ['INSERT', 'UPDATE', 'DELETE', 'TRUNCATE']),
+    ).toEqual([]);
   });
 
   it('FUN-11: pelada_backup_ro tentando INSERT recebe erro de permissão', async () => {
     const { db, cenario } = aberto;
     await expect(
       comoRole(db, 'pelada_backup_ro', () =>
-        db.query(`INSERT INTO habilidades (grupo_id, nome) VALUES ($1, 'Intrusa')`, [cenario.grupoA]),
+        db.query(`INSERT INTO habilidades (grupo_id, nome) VALUES ($1, 'Intrusa')`, [
+          cenario.grupoA,
+        ]),
       ),
     ).rejects.toMatchObject({ code: '42501' });
   });
@@ -114,7 +120,11 @@ describe('roles do banco', () => {
     for (const t of tabelas) {
       const sql = `SELECT count(*)::int AS n FROM ${db.escapeIdentifier(t)}`;
       const total = (await db.query<{ n: number }>(sql)).rows[0]?.n;
-      const visto = await comoRole(db, 'pelada_backup_ro', async () => (await db.query<{ n: number }>(sql)).rows[0]?.n);
+      const visto = await comoRole(
+        db,
+        'pelada_backup_ro',
+        async () => (await db.query<{ n: number }>(sql)).rows[0]?.n,
+      );
       expect(visto, `${t}: linhas vistas por pelada_backup_ro`).toBe(total);
     }
 
@@ -124,7 +134,11 @@ describe('roles do banco', () => {
         db,
         'pelada_backup_ro',
         async () =>
-          (await db.query<{ n: number }>(`SELECT count(*)::int AS n FROM ${db.escapeIdentifier(tabela)}`)).rows[0]?.n,
+          (
+            await db.query<{ n: number }>(
+              `SELECT count(*)::int AS n FROM ${db.escapeIdentifier(tabela)}`,
+            )
+          ).rows[0]?.n,
       );
       expect(n, `${tabela}: linhas dos dois grupos`).toBeGreaterThanOrEqual(2);
     }

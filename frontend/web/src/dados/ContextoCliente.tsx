@@ -4,7 +4,13 @@ import type { ClienteApi } from './cliente.ts';
 /** O cliente HTTP do app (T36) para as telas e os hooks de dados; o App cria um por montagem. */
 const Contexto = createContext<ClienteApi | null>(null);
 
-export function ProvedorCliente({ cliente, children }: { cliente: ClienteApi; children: ReactNode }) {
+export function ProvedorCliente({
+  cliente,
+  children,
+}: {
+  cliente: ClienteApi;
+  children: ReactNode;
+}) {
   return <Contexto.Provider value={cliente}>{children}</Contexto.Provider>;
 }
 

@@ -28,7 +28,12 @@ export function rotasMinhaConta(opcoes: OpcoesRotas = {}): Hono<Ambiente> {
 
     const r = await transacaoCurta(
       c.env.HYPERDRIVE.connectionString,
-      (db) => contas.trocarSenha(db, { senhaAtual: corpo.dados.senhaAtual, senhaNova: corpo.dados.senhaNova, tokenHash }),
+      (db) =>
+        contas.trocarSenha(db, {
+          senhaAtual: corpo.dados.senhaAtual,
+          senhaNova: corpo.dados.senhaNova,
+          tokenHash,
+        }),
       { ...comFabrica(opcoes), conta: c.var.contaId ?? null },
     );
     if (r === 'bloqueado') return c.json(corpoDoErro('bloqueado_temporariamente'), 429);
@@ -41,10 +46,14 @@ export function rotasMinhaConta(opcoes: OpcoesRotas = {}): Hono<Ambiente> {
     const corpo = await lerCorpo(c, excluirCorpo);
     if (!corpo.ok) return corpo.resposta;
 
-    const r = await transacaoCurta(c.env.HYPERDRIVE.connectionString, (db) => contas.excluir(db, corpo.dados.senha), {
-      ...comFabrica(opcoes),
-      conta: c.var.contaId ?? null,
-    });
+    const r = await transacaoCurta(
+      c.env.HYPERDRIVE.connectionString,
+      (db) => contas.excluir(db, corpo.dados.senha),
+      {
+        ...comFabrica(opcoes),
+        conta: c.var.contaId ?? null,
+      },
+    );
     switch (r.resultado) {
       case 'ok':
         // Sessões, vínculos e links apagados e a conta anonimizada (ACE-28): o cookie vence.

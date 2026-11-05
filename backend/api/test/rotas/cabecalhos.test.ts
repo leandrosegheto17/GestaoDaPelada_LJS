@@ -60,7 +60,9 @@ describe('cabeçalhos de /api/*', () => {
   it('FUN-22: o handler não consegue trocar o Cache-Control da API', async () => {
     const app = criarApp({
       registrarExtras: (api) =>
-        api.get('/teste/cache', (c) => c.json({ ok: true }, 200, { 'Cache-Control': 'public, max-age=600' })),
+        api.get('/teste/cache', (c) =>
+          c.json({ ok: true }, 200, { 'Cache-Control': 'public, max-age=600' }),
+        ),
     });
     const r = await app.request('/api/teste/cache', {}, env);
     esperaCabecalhos(r);

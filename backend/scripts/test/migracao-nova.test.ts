@@ -9,7 +9,10 @@ const ts = (arquivo: string) => Number(arquivo.split('_')[0]);
 
 beforeEach(() => {
   pasta = mkdtempSync(join(tmpdir(), 'pelada-migracao-nova-'));
-  writeFileSync(join(pasta, `${ULTIMA_HERDADA}_grupos-arquivar-so-criadora.sql`), '-- Up Migration\n');
+  writeFileSync(
+    join(pasta, `${ULTIMA_HERDADA}_grupos-arquivar-so-criadora.sql`),
+    '-- Up Migration\n',
+  );
 });
 
 afterEach(() => rmSync(pasta, { recursive: true, force: true }));
@@ -31,7 +34,10 @@ describe('pnpm migracao:nova', () => {
   });
 
   it('FUN-07: o nome é normalizado em minúsculas e hifens', () => {
-    const arquivo = criarMigracao('  Presença dos Jogadores_v2! ', { pasta, agora: () => 1900000000000 });
+    const arquivo = criarMigracao('  Presença dos Jogadores_v2! ', {
+      pasta,
+      agora: () => 1900000000000,
+    });
     expect(arquivo).toBe('1900000000000_presenca-dos-jogadores-v2.sql');
     expect(normalizarNome('Ação__Rápida')).toBe('acao-rapida');
   });

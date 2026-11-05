@@ -13,7 +13,11 @@ const requerer = createRequire(import.meta.url);
 async function semViolacoesAxe(pagina: Page): Promise<void> {
   await pagina.addScriptTag({ path: requerer.resolve('axe-core/axe.min.js') });
   const violacoes = await pagina.evaluate(async () => {
-    const axe = (window as unknown as { axe: { run: (alvo: Document) => Promise<{ violations: { id: string }[] }> } }).axe;
+    const axe = (
+      window as unknown as {
+        axe: { run: (alvo: Document) => Promise<{ violations: { id: string }[] }> };
+      }
+    ).axe;
     const r = await axe.run(document);
     return r.violations.map((v) => v.id);
   });
@@ -52,16 +56,30 @@ test.describe('landing sem sessão', () => {
 
   test('PLA-61: os botões e o rodapé levam aos destinos', async ({ page }) => {
     await page.goto('/');
-    await expect(page.getByRole('link', { name: 'Criar conta' })).toHaveAttribute('href', '/cadastro');
-    await expect(page.getByRole('link', { name: 'Entrar', exact: true })).toHaveAttribute('href', '/entrar');
+    await expect(page.getByRole('link', { name: 'Criar conta' })).toHaveAttribute(
+      'href',
+      '/cadastro',
+    );
+    await expect(page.getByRole('link', { name: 'Entrar', exact: true })).toHaveAttribute(
+      'href',
+      '/entrar',
+    );
     const rodape = page.locator('footer');
-    await expect(rodape.getByRole('link', { name: 'Termos de uso' })).toHaveAttribute('href', '/termos');
-    await expect(rodape.getByRole('link', { name: 'Privacidade' })).toHaveAttribute('href', '/privacidade');
+    await expect(rodape.getByRole('link', { name: 'Termos de uso' })).toHaveAttribute(
+      'href',
+      '/termos',
+    );
+    await expect(rodape.getByRole('link', { name: 'Privacidade' })).toHaveAttribute(
+      'href',
+      '/privacidade',
+    );
     await rodape.getByRole('link', { name: 'Termos de uso' }).click();
     await expect(page).toHaveURL(/\/termos$/);
   });
 
-  test('PLA-65: axe sem violação e nenhuma chamada a /api/* além de /api/sessao', async ({ page }) => {
+  test('PLA-65: axe sem violação e nenhuma chamada a /api/* além de /api/sessao', async ({
+    page,
+  }) => {
     const chamadas: string[] = [];
     page.on('request', (r) => {
       const caminho = new URL(r.url()).pathname;
@@ -75,7 +93,9 @@ test.describe('landing sem sessão', () => {
   });
 
   test('PLA-65: com /api/sessao fora do ar, a landing aparece inteira', async ({ page }) => {
-    await page.route('**/api/sessao', (rota) => rota.fulfill({ status: 500, body: '{}', contentType: 'application/json' }));
+    await page.route('**/api/sessao', (rota) =>
+      rota.fulfill({ status: 500, body: '{}', contentType: 'application/json' }),
+    );
     await page.goto('/');
     await expect(page.getByRole('heading', { level: 1, name: 'Gestão da Pelada' })).toBeVisible();
     await expect(cartao(page, 'Free')).toBeVisible();
@@ -92,7 +112,10 @@ test.describe('landing sem sessão', () => {
 
 test('PLA-64: com sessão, / vai a /app', async ({ page }) => {
   const senhaSeed = process.env.SEED_SENHA_ADMIN;
-  test.skip(!senhaSeed, 'SEED_SENHA_ADMIN ausente no .env da raiz: o teste precisa da conta do seed (pnpm seed).');
+  test.skip(
+    !senhaSeed,
+    'SEED_SENHA_ADMIN ausente no .env da raiz: o teste precisa da conta do seed (pnpm seed).',
+  );
   const r = await page.request.post('/api/sessao/entrar', {
     headers: { 'X-Pelada': '1' },
     data: { email: CONTA_SEED, senha: senhaSeed },

@@ -8,7 +8,8 @@ import { TelaMensagem } from '../../componentes/TelaMensagem.tsx';
  */
 
 export const TEXTO_INDISPONIVEL = 'Grupo indisponível';
-export const TEXTO_INDISPONIVEL_AJUDA = 'Este grupo não está disponível no momento. Fale com o admin do seu grupo.';
+export const TEXTO_INDISPONIVEL_AJUDA =
+  'Este grupo não está disponível no momento. Fale com o admin do seu grupo.';
 
 /**
  * Formato do slug público, o mesmo `SLUG_PUBLICO` da API (`backend/api/src/entrada/middlewares/contexto-publico.ts:24`):

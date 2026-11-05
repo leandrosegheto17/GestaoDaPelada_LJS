@@ -12,12 +12,22 @@ import type { Ambiente } from '../ambiente.ts';
 import { lerCorpoDoGrupo } from '../corpo.ts';
 import { corpoSemPermissaoFinanceiro } from '../middlewares/financeiro.ts';
 import { enviarEmailDeConta, limiteEmailsDia } from '../../aplicacao/acesso/enviar-email.ts';
-import { admins, convites, type ListaAdmins } from '../../infraestrutura/db/repositorios/convites.ts';
+import {
+  admins,
+  convites,
+  type ListaAdmins,
+} from '../../infraestrutura/db/repositorios/convites.ts';
 import { acessoFinanceiro } from '../../infraestrutura/db/repositorios/financeiro/acesso.ts';
 import { remetenteDoAmbiente } from '../../infraestrutura/email/caixa-dev.ts';
 import { emailConvite } from '../../infraestrutura/email/modelos.ts';
 import { gerarToken } from '../../infraestrutura/sessao/token.ts';
-import { contarPedidoDeEmail, emailIndisponivel, hex, lerCorpo, type OpcoesRotas } from './apoio-acesso.ts';
+import {
+  contarPedidoDeEmail,
+  emailIndisponivel,
+  hex,
+  lerCorpo,
+  type OpcoesRotas,
+} from './apoio-acesso.ts';
 
 /**
  * Rotas de admins do grupo (T30; ACE-31, ACE-32, ACE-37 a ACE-42), da tabela do design do LJS
@@ -30,8 +40,17 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 /** A lista de admins e convites no formato do contrato (o GET e o PATCH do financeiro, FIN-35). */
 function adminsResposta(lista: ListaAdmins): AdminsResposta {
   return {
-    admins: lista.admins.map((a) => ({ id: a.id, nome: a.nome, email: a.email, acessaFinanceiro: a.acessa_financeiro })),
-    convites: lista.convites.map((p) => ({ id: p.id, email: p.email, expiraEm: new Date(p.expira_em).toISOString() })),
+    admins: lista.admins.map((a) => ({
+      id: a.id,
+      nome: a.nome,
+      email: a.email,
+      acessaFinanceiro: a.acessa_financeiro,
+    })),
+    convites: lista.convites.map((p) => ({
+      id: p.id,
+      email: p.email,
+      expiraEm: new Date(p.expira_em).toISOString(),
+    })),
   };
 }
 
@@ -57,10 +76,18 @@ export function rotasAdmins(opcoes: OpcoesRotas = {}): Hono<Ambiente> {
     if (!UUID.test(contaId)) return c.json(naoEncontrado, 404);
     const corpo = await lerCorpoDoGrupo(c, acessoFinanceiroCorpo);
     if (!corpo.ok) return corpo.resposta;
-    const r = await acessoFinanceiro.alterarFinanceiro(c.var.db, c.req.param('grupoId'), contaId, corpo.dados.acessaFinanceiro);
+    const r = await acessoFinanceiro.alterarFinanceiro(
+      c.var.db,
+      c.req.param('grupoId'),
+      contaId,
+      corpo.dados.acessaFinanceiro,
+    );
     if (r.resultado === 'propria_conta') {
       return c.json(
-        { erro: MENSAGENS_ERRO_FINANCEIRO.acao_na_propria_conta, codigo: 'acao_na_propria_conta' as const },
+        {
+          erro: MENSAGENS_ERRO_FINANCEIRO.acao_na_propria_conta,
+          codigo: 'acao_na_propria_conta' as const,
+        },
         409,
       );
     }
@@ -82,13 +109,24 @@ export function rotasAdmins(opcoes: OpcoesRotas = {}): Hono<Ambiente> {
     if (r.resultado !== 'ok') return c.json(naoEncontrado, 404);
 
     if (r.enviar) {
-      const grupo = await sql<{ nome: string }>`SELECT nome FROM grupos WHERE id = ${grupoId}`.execute(c.var.db);
-      const conteudo = emailConvite({ urlPublica: c.env.URL_PUBLICA, grupoNome: grupo.rows[0]?.nome ?? '', token });
+      const grupo = await sql<{
+        nome: string;
+      }>`SELECT nome FROM grupos WHERE id = ${grupoId}`.execute(c.var.db);
+      const conteudo = emailConvite({
+        urlPublica: c.env.URL_PUBLICA,
+        grupoNome: grupo.rows[0]?.nome ?? '',
+        token,
+      });
       const envio = await enviarEmailDeConta(c.var.db, remetenteDoAmbiente(c.env), {
         enviar: true,
         categoria: 'cadastro',
         limiteDia: limiteEmailsDia(c.env.LIMITE_EMAILS_DIA),
-        mensagem: { tipo: 'convite', para: email, ...conteudo, idempotencia: `convite:${hex(hash)}` },
+        mensagem: {
+          tipo: 'convite',
+          para: email,
+          ...conteudo,
+          idempotencia: `convite:${hex(hash)}`,
+        },
       });
       if (envio === 'indisponivel') return emailIndisponivel(c);
     }

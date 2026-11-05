@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { calcularPdf, escolherColunasPdf, MAX_COLUNAS_PDF } from '../../src/pdf/calcular.ts';
 import { calcularRanking } from '../../src/ranking/calcular.ts';
-import { CONFIGS, datasSemanais, historicoDeTresMeses, jogador, partida, presenca } from '../apoio/historico.ts';
+import {
+  CONFIGS,
+  datasSemanais,
+  historicoDeTresMeses,
+  jogador,
+  partida,
+  presenca,
+} from '../apoio/historico.ts';
 
 /**
  * calcularPdf e escolha das colunas (T13; PAR-96, PAR-97, PAR-98, PAR-99).
@@ -18,7 +25,10 @@ import { CONFIGS, datasSemanais, historicoDeTresMeses, jogador, partida, presenc
 describe('escolherColunasPdf', () => {
   it('PAR-96: mês com 14 partidas fica com as 12 mais recentes, em ordem cronológica', () => {
     const datas = datasSemanais('2026-10-01', 14, 2);
-    const { colunas, semPartidasNoMes } = escolherColunasPdf(datas.map((d) => partida(d)), '2026-10');
+    const { colunas, semPartidasNoMes } = escolherColunasPdf(
+      datas.map((d) => partida(d)),
+      '2026-10',
+    );
     expect(colunas).toHaveLength(MAX_COLUNAS_PDF);
     expect(colunas.map((c) => c.data)).toEqual(datas.slice(2));
     expect(colunas.every((c) => c.doMesExibido)).toBe(true);
@@ -27,19 +37,30 @@ describe('escolherColunasPdf', () => {
 
   it('PAR-96: janeiro completa as colunas com dezembro do ano anterior', () => {
     const datas = datasSemanais('2026-10-01', 16);
-    const { colunas } = escolherColunasPdf(datas.map((d) => partida(d)), '2027-01');
+    const { colunas } = escolherColunasPdf(
+      datas.map((d) => partida(d)),
+      '2027-01',
+    );
     expect(colunas).toHaveLength(12);
     expect(colunas.some((c) => c.data.startsWith('2026-12') && !c.doMesExibido)).toBe(true);
-    expect(colunas.filter((c) => c.doMesExibido).map((c) => c.data)).toEqual(datas.filter((d) => d.startsWith('2027-01')));
+    expect(colunas.filter((c) => c.doMesExibido).map((c) => c.data)).toEqual(
+      datas.filter((d) => d.startsWith('2027-01')),
+    );
   });
 
   it('PAR-96: partidas depois do fim do mês exibido não entram', () => {
-    const { colunas } = escolherColunasPdf([partida('2026-09-24'), partida('2026-10-01')], '2026-09');
+    const { colunas } = escolherColunasPdf(
+      [partida('2026-09-24'), partida('2026-10-01')],
+      '2026-09',
+    );
     expect(colunas.map((c) => c.data)).toEqual(['2026-09-24']);
   });
 
   it('PAR-97: mês sem partida marca semPartidasNoMes com colunas só de meses anteriores', () => {
-    const { colunas, semPartidasNoMes } = escolherColunasPdf([partida('2026-08-06'), partida('2026-09-03')], '2026-10');
+    const { colunas, semPartidasNoMes } = escolherColunasPdf(
+      [partida('2026-08-06'), partida('2026-09-03')],
+      '2026-10',
+    );
     expect(semPartidasNoMes).toBe(true);
     expect(colunas.map((c) => [c.data, c.doMesExibido])).toEqual([
       ['2026-08-06', false],
@@ -72,7 +93,9 @@ describe('calcularPdf', () => {
     );
     for (const linha of pdf.linhas) {
       expect(linha.rodadas).toHaveLength(pdf.colunas.length);
-      expect(linha.ptsInicial + linha.rodadas.reduce((s, r) => s + (r.pontos ?? 0), 0)).toBe(linha.ptsFinal);
+      expect(linha.ptsInicial + linha.rodadas.reduce((s, r) => s + (r.pontos ?? 0), 0)).toBe(
+        linha.ptsFinal,
+      );
     }
   });
 
@@ -107,7 +130,9 @@ describe('calcularPdf', () => {
     expect(pdf).toEqual({
       semPartidasNoMes: true,
       colunas: [],
-      linhas: [{ jogadorId: 'x', posicao: 1, apelido: 'Xico', ptsInicial: 7, rodadas: [], ptsFinal: 7 }],
+      linhas: [
+        { jogadorId: 'x', posicao: 1, apelido: 'Xico', ptsInicial: 7, rodadas: [], ptsFinal: 7 },
+      ],
     });
   });
 });

@@ -16,7 +16,13 @@
 import { somarDias, type Data } from '../atividade/datas.ts';
 
 /** Os 5 valores do CHECK de `grupos.situacao_comercial` (`linha-de-base.sql:72-78`). */
-export const SITUACOES_COMERCIAIS = ['uso_proprio', 'trial', 'ativo', 'inadimplente', 'cancelado'] as const;
+export const SITUACOES_COMERCIAIS = [
+  'uso_proprio',
+  'trial',
+  'ativo',
+  'inadimplente',
+  'cancelado',
+] as const;
 export type SituacaoComercial = (typeof SITUACOES_COMERCIAIS)[number];
 
 /** O plano que vale para o grupo. O Free não é situação gravada: é o que sobra. */

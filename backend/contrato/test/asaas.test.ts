@@ -56,11 +56,17 @@ describe('asaasEventoCorpo', () => {
   });
 
   it('PLA-50: só id e event bastam', () => {
-    expect(asaasEventoCorpo.safeParse({ id: 'evt_1', event: 'SUBSCRIPTION_DELETED' }).success).toBe(true);
+    expect(asaasEventoCorpo.safeParse({ id: 'evt_1', event: 'SUBSCRIPTION_DELETED' }).success).toBe(
+      true,
+    );
   });
 
   it('PLA-50: campo conhecido com tipo inesperado vira null em vez de recusar', () => {
-    const r = asaasEventoCorpo.safeParse({ ...EVENTO, payment: { ...EVENTO.payment, value: '9.90' }, subscription: 7 });
+    const r = asaasEventoCorpo.safeParse({
+      ...EVENTO,
+      payment: { ...EVENTO.payment, value: '9.90' },
+      subscription: 7,
+    });
     expect(r.success).toBe(true);
     if (!r.success) return;
     expect(r.data.payment?.value).toBeNull();
@@ -79,7 +85,11 @@ describe('asaasEventoCorpo', () => {
   });
 
   it('subscription com id é lida', () => {
-    const r = asaasEventoCorpo.parse({ id: 'evt_2', event: 'SUBSCRIPTION_DELETED', subscription: { id: 'sub_1', x: 1 } });
+    const r = asaasEventoCorpo.parse({
+      id: 'evt_2',
+      event: 'SUBSCRIPTION_DELETED',
+      subscription: { id: 'sub_1', x: 1 },
+    });
     expect(r.subscription).toEqual({ id: 'sub_1' });
   });
 });

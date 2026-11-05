@@ -57,7 +57,9 @@ describe('meta-teste da RLS', () => {
   });
 
   it('FUN-12: tabela nova com grupo_id sem RLS e sem caso na matriz faz o meta-teste falhar', async () => {
-    const p = await problemasCom('CREATE TABLE exemplo_sem_rls (id int PRIMARY KEY, grupo_id uuid)');
+    const p = await problemasCom(
+      'CREATE TABLE exemplo_sem_rls (id int PRIMARY KEY, grupo_id uuid)',
+    );
     expect(p).toEqual([
       'exemplo_sem_rls: sem ENABLE ROW LEVEL SECURITY',
       'exemplo_sem_rls: sem FORCE ROW LEVEL SECURITY',

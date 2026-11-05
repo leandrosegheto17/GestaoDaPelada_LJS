@@ -41,7 +41,13 @@ const ler = (mes = JANEIRO, hoje = HOJE) => {
   return comDb(url, cenario.contaC, (db) => financeiroMes.lerMes(db, cenario.grupoG, mes, hoje));
 };
 
-async function lancar(tipo: 'entrada' | 'saida', data: string, descricao: string, valor: number, criadoEm = 'now()'): Promise<string> {
+async function lancar(
+  tipo: 'entrada' | 'saida',
+  data: string,
+  descricao: string,
+  valor: number,
+  criadoEm = 'now()',
+): Promise<string> {
   const { db, cenario } = aberto;
   const r = await db.query<{ id: string }>(
     `INSERT INTO lancamentos (grupo_id, tipo, data, descricao, valor_centavos, criado_por, criado_em, alterado_por, alterado_em)
@@ -51,7 +57,12 @@ async function lancar(tipo: 'entrada' | 'saida', data: string, descricao: string
   return r.rows[0]!.id;
 }
 
-async function jogador(grupo: string, apelido: string, inicio: string, fim: string | null): Promise<string> {
+async function jogador(
+  grupo: string,
+  apelido: string,
+  inicio: string,
+  fim: string | null,
+): Promise<string> {
   const { db, cenario } = aberto;
   const r = await db.query<{ id: string }>(
     `INSERT INTO jogadores (grupo_id, apelido, posicao, criado_por, criado_em, alterado_por, alterado_em)
@@ -59,7 +70,10 @@ async function jogador(grupo: string, apelido: string, inicio: string, fim: stri
     [grupo, apelido, cenario.contaC],
   );
   const id = r.rows[0]!.id;
-  await db.query(`INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, $3, $4)`, [id, grupo, inicio, fim]);
+  await db.query(
+    `INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, $3, $4)`,
+    [id, grupo, inicio, fim],
+  );
   return id;
 }
 
@@ -85,9 +99,18 @@ describe('financeiroMes.lerMes', () => {
     expect(m.mes).toBe(JANEIRO);
     expect(m.hoje).toBe(HOJE);
     expect(m.navegacao).toEqual({ mesAnterior: null, mesSeguinte: '2026-02' });
-    expect(m.config).toEqual({ mensalidadeCentavos: 5000, saldoInicialCentavos: 0, dataSaldoInicial: '2026-01-01' });
+    expect(m.config).toEqual({
+      mensalidadeCentavos: 5000,
+      saldoInicialCentavos: 0,
+      dataSaldoInicial: '2026-01-01',
+    });
     expect(m.saldoAtualCentavos).toBe(5000);
-    expect(m.resumoMes).toEqual({ entradasCentavos: 5000, saidasCentavos: 0, resultadoCentavos: 5000, naoPagaram: 1 });
+    expect(m.resumoMes).toEqual({
+      entradasCentavos: 5000,
+      saidasCentavos: 0,
+      resultadoCentavos: 5000,
+      naoPagaram: 1,
+    });
     expect(m.pagamentos.map((p) => [p.apelido, p.pagou])).toEqual([
       ['Bira', true],
       ['Toninho', false],
@@ -119,7 +142,12 @@ describe('financeiroMes.lerMes', () => {
     await lancar('saida', '2026-01-20', 'T17 coletes', 1500);
     await lancar('entrada', '2026-02-03', 'T17 fevereiro', 100);
     const m = await ler();
-    expect(m.resumoMes).toEqual({ entradasCentavos: 5000, saidasCentavos: 1500, resultadoCentavos: 3500, naoPagaram: 1 });
+    expect(m.resumoMes).toEqual({
+      entradasCentavos: 5000,
+      saidasCentavos: 1500,
+      resultadoCentavos: 3500,
+      naoPagaram: 1,
+    });
     expect(m.saldoAtualCentavos).toBe(5000 - 1500 + 100);
   });
 
@@ -148,7 +176,10 @@ describe('financeiroMes.lerMes', () => {
   it('FIN-12: lista por apelido sem acento e sem caixa, com quem saiu e voltou no mês uma vez só', async () => {
     const { cenario, db } = aberto;
     const id = await jogador(cenario.grupoG, 'T17 álvaro', '2026-01-02', '2026-01-10');
-    await db.query(`INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, '2026-01-20', NULL)`, [id, cenario.grupoG]);
+    await db.query(
+      `INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, '2026-01-20', NULL)`,
+      [id, cenario.grupoG],
+    );
     const apelidos = (await ler()).pagamentos.map((p) => p.apelido);
     expect(apelidos.filter((a) => a === 'T17 álvaro')).toHaveLength(1);
     expect(apelidos).toEqual(['Bira', 'T17 álvaro', 'Toninho']);
@@ -166,7 +197,9 @@ describe('financeiroMes.lerMes', () => {
       expect(m.resumoMes?.naoPagaram).toBe(1);
       expect(m.pagamentos.map((p) => p.apelido)).not.toContain('Zé Inativo');
     } finally {
-      await db.query(`DELETE FROM pagamentos_mes WHERE jogador_id = $1`, [cenario.idsG.jogadorInativo]);
+      await db.query(`DELETE FROM pagamentos_mes WHERE jogador_id = $1`, [
+        cenario.idsG.jogadorInativo,
+      ]);
     }
   });
 
@@ -187,7 +220,9 @@ describe('financeiroMes.lerMes', () => {
 
   it('FIN-39: a leitura de uma conta sem acesso ao financeiro vê o caixa como não configurado (a RLS esconde tudo)', async () => {
     const { url, cenario } = aberto;
-    const m = await comDb(url, cenario.contaO, (db) => financeiroMes.lerMes(db, cenario.grupoG, JANEIRO, HOJE));
+    const m = await comDb(url, cenario.contaO, (db) =>
+      financeiroMes.lerMes(db, cenario.grupoG, JANEIRO, HOJE),
+    );
     expect(m.config).toBeNull();
     expect(m.lancamentos).toEqual([]);
     expect(m.pagamentos).toEqual([]);

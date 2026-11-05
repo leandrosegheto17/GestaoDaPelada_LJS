@@ -1,6 +1,10 @@
 import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
-import { lerPeso, PaginaPontuacao, textoPesos } from '../../src/telas/pontuacao/PaginaPontuacao.tsx';
+import {
+  lerPeso,
+  PaginaPontuacao,
+  textoPesos,
+} from '../../src/telas/pontuacao/PaginaPontuacao.tsx';
 import { esperarSemViolacoes } from '../apoio/axe.ts';
 import { abrirTela, json, pendente, SESSAO_ANA, type Manipulador } from '../apoio/tela.tsx';
 
@@ -14,7 +18,14 @@ const rotas = () => [{ path: '/app/grupos/:grupoId/pontuacao', element: <PaginaP
 const LER = 'GET /api/grupos/g-quinta/pesos';
 const SALVAR = 'POST /api/grupos/g-quinta/pesos';
 
-const PESOS_SET = { presencaSemChuva: 1, presencaComChuva: 2, lesionadoSemChuva: 1, lesionadoComChuva: 1, expulsoSemChuva: -1, expulsoComChuva: -1 };
+const PESOS_SET = {
+  presencaSemChuva: 1,
+  presencaComChuva: 2,
+  lesionadoSemChuva: 1,
+  lesionadoComChuva: 1,
+  expulsoSemChuva: -1,
+  expulsoComChuva: -1,
+};
 
 const PAINEL = {
   hoje: '2026-10-22',
@@ -48,13 +59,25 @@ const PAINEL = {
 const SALVO = {
   hoje: '2026-10-22',
   vigente: { ...PESOS_SET, lesionadoComChuva: 2, vigenteDesde: '2026-10-22', registradoPor: 'Ana' },
-  historico: [{ ...PESOS_SET, vigenteDesde: '2026-09-01', vigenteAte: '2026-10-21', registradoPor: 'Leandro' }, ...PAINEL.historico],
+  historico: [
+    {
+      ...PESOS_SET,
+      vigenteDesde: '2026-09-01',
+      vigenteAte: '2026-10-21',
+      registradoPor: 'Leandro',
+    },
+    ...PAINEL.historico,
+  ],
 };
 
 function abrir(api: Record<string, Manipulador>) {
   return abrirTela(
     '/app/grupos/g-quinta/pontuacao',
-    { 'GET /api/sessao': () => json(200, SESSAO_ANA), 'GET /api/grupos/g-quinta': () => pendente(), ...api },
+    {
+      'GET /api/sessao': () => json(200, SESSAO_ANA),
+      'GET /api/grupos/g-quinta': () => pendente(),
+      ...api,
+    },
     rotas,
   );
 }
@@ -82,17 +105,29 @@ describe('Pontuação (t18)', () => {
     abrir({ [LER]: () => json(200, PAINEL) });
     expect(await screen.findByRole('heading', { name: 'Vigente desde 01/09/2026' })).toBeDefined();
     const tabela = screen.getByRole('table', { name: 'Pesos vigentes' });
-    expect(within(tabela).getByRole('rowheader', { name: 'Presença com chuva' }).closest('tr')?.textContent).toBe('Presença com chuva2');
-    expect(within(tabela).getByRole('rowheader', { name: 'Expulso sem chuva' }).closest('tr')?.textContent).toBe('Expulso sem chuva−1');
-    expect(screen.getByRole('heading', { name: 'Nova configuração (vale a partir de hoje)' })).toBeDefined();
-    expect(screen.getByText('Inteiros de −10 a 10. Partidas anteriores a hoje não mudam.')).toBeDefined();
+    expect(
+      within(tabela).getByRole('rowheader', { name: 'Presença com chuva' }).closest('tr')
+        ?.textContent,
+    ).toBe('Presença com chuva2');
+    expect(
+      within(tabela).getByRole('rowheader', { name: 'Expulso sem chuva' }).closest('tr')
+        ?.textContent,
+    ).toBe('Expulso sem chuva−1');
+    expect(
+      screen.getByRole('heading', { name: 'Nova configuração (vale a partir de hoje)' }),
+    ).toBeDefined();
+    expect(
+      screen.getByText('Inteiros de −10 a 10. Partidas anteriores a hoje não mudam.'),
+    ).toBeDefined();
     expect((screen.getByLabelText('Presença com chuva') as HTMLInputElement).value).toBe('2');
   });
 
   it('PAR-10: o histórico mostra uma linha por configuração anterior, mais recente primeiro', async () => {
     abrir({ [LER]: () => json(200, PAINEL) });
     const lista = await screen.findByRole('list', { name: 'Configurações anteriores' });
-    const itens = within(lista).getAllByRole('listitem').map((i) => i.textContent);
+    const itens = within(lista)
+      .getAllByRole('listitem')
+      .map((i) => i.textContent);
     expect(itens).toEqual([
       'De 01/05/2026 a 31/08/20261 · 1 · 1 · 1 · −1 · −1 · registrado por Leandro',
       'De 05/02/2026 a 30/04/20261 · 1 · 0 · 0 · −2 · −2 · registrado por Bia',
@@ -105,7 +140,9 @@ describe('Pontuação (t18)', () => {
     fireEvent.change(campo, { target: { value: '' } });
     fireEvent.click(screen.getByRole('button', { name: 'Salvar nova configuração' }));
     const mensagem = await screen.findByText('Use um número inteiro de −10 a 10.');
-    expect(campo.getAttribute('aria-describedby')?.split(' ')).toContain(mensagem.closest('[id]')?.id);
+    expect(campo.getAttribute('aria-describedby')?.split(' ')).toContain(
+      mensagem.closest('[id]')?.id,
+    );
     expect(campo.getAttribute('aria-invalid')).toBe('true');
     expect(t.chamadasA('POST', '/api/grupos/g-quinta/pesos')).toHaveLength(0);
   });
@@ -126,8 +163,13 @@ describe('Pontuação (t18)', () => {
     fireEvent.change(campo, { target: { value: '2' } });
     fireEvent.click(screen.getByRole('button', { name: 'Salvar nova configuração' }));
     expect(await screen.findByText('Nova configuração vale a partir de hoje.')).toBeDefined();
-    expect(t.chamadasA('POST', '/api/grupos/g-quinta/pesos')[0]?.corpo).toEqual({ ...PESOS_SET, lesionadoComChuva: 2 });
-    await waitFor(() => expect(screen.getByRole('heading', { name: 'Vigente desde 22/10/2026' })).toBeDefined());
+    expect(t.chamadasA('POST', '/api/grupos/g-quinta/pesos')[0]?.corpo).toEqual({
+      ...PESOS_SET,
+      lesionadoComChuva: 2,
+    });
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Vigente desde 22/10/2026' })).toBeDefined(),
+    );
   });
 
   it('PAR-147: 422 da API mostra "Corrija 2 campos: …" e a mensagem em cada campo', async () => {
@@ -138,16 +180,31 @@ describe('Pontuação (t18)', () => {
           erro: 'Dados inválidos.',
           codigo: 'dados_invalidos',
           campos: ['presencaComChuva', 'expulsoSemChuva'],
-          mensagens: { presencaComChuva: 'Use um número inteiro de -10 a 10.', expulsoSemChuva: 'Use um número inteiro de -10 a 10.' },
+          mensagens: {
+            presencaComChuva: 'Use um número inteiro de -10 a 10.',
+            expulsoSemChuva: 'Use um número inteiro de -10 a 10.',
+          },
         }),
     });
     fireEvent.click(await screen.findByRole('button', { name: 'Salvar nova configuração' }));
-    const resumo = (await screen.findByText('Corrija 2 campos:')).closest('[role="alert"]') as HTMLElement;
+    const resumo = (await screen.findByText('Corrija 2 campos:')).closest(
+      '[role="alert"]',
+    ) as HTMLElement;
     expect(within(resumo).getByRole('link', { name: 'Presença com chuva' })).toBeDefined();
     expect(within(resumo).getByRole('link', { name: 'Expulso sem chuva' })).toBeDefined();
-    expect((screen.getByLabelText('Presença com chuva') as HTMLInputElement).getAttribute('aria-invalid')).toBe('true');
-    expect((screen.getByLabelText('Expulso sem chuva') as HTMLInputElement).getAttribute('aria-invalid')).toBe('true');
-    expect((screen.getByLabelText('Presença sem chuva') as HTMLInputElement).getAttribute('aria-invalid')).toBeNull();
+    expect(
+      (screen.getByLabelText('Presença com chuva') as HTMLInputElement).getAttribute(
+        'aria-invalid',
+      ),
+    ).toBe('true');
+    expect(
+      (screen.getByLabelText('Expulso sem chuva') as HTMLInputElement).getAttribute('aria-invalid'),
+    ).toBe('true');
+    expect(
+      (screen.getByLabelText('Presença sem chuva') as HTMLInputElement).getAttribute(
+        'aria-invalid',
+      ),
+    ).toBeNull();
   });
 
   it('axe sem violações', async () => {

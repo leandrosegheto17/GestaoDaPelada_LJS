@@ -15,20 +15,40 @@ import type { ChavesVapid } from '../../../src/infraestrutura/push/vapid.ts';
 
 const AGORA = new Date('2026-11-05T12:00:00Z');
 const TOPICO = 'AbCdEfGhIjKlMnOpQrStUvWxYz012345';
-const PAYLOAD = JSON.stringify({ titulo: 'Ranking atualizado', texto: 'Pelada Secreta: partida de 05/11', caminho: '/g/pelada-secreta?mes=2026-11' });
+const PAYLOAD = JSON.stringify({
+  titulo: 'Ranking atualizado',
+  texto: 'Pelada Secreta: partida de 05/11',
+  caminho: '/g/pelada-secreta?mes=2026-11',
+});
 const ENDPOINT = 'https://fcm.googleapis.com/fcm/send/token-do-aparelho-secreto-123';
 
 async function vapid(): Promise<ChavesVapid> {
-  const par = (await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign'])) as CryptoKeyPair;
+  const par = (await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, [
+    'sign',
+  ])) as CryptoKeyPair;
   const jwk = (await crypto.subtle.exportKey('jwk', par.privateKey)) as JsonWebKey;
-  const publica = new Uint8Array((await crypto.subtle.exportKey('raw', par.publicKey)) as ArrayBuffer);
-  return { publica: paraBase64url(publica), privada: jwk.d ?? '', assunto: 'mailto:avisos@exemplo.com' };
+  const publica = new Uint8Array(
+    (await crypto.subtle.exportKey('raw', par.publicKey)) as ArrayBuffer,
+  );
+  return {
+    publica: paraBase64url(publica),
+    privada: jwk.d ?? '',
+    assunto: 'mailto:avisos@exemplo.com',
+  };
 }
 
 async function assinatura(endpoint = ENDPOINT): Promise<AssinaturaParaEnvio> {
-  const par = (await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveBits'])) as CryptoKeyPair;
-  const publica = new Uint8Array((await crypto.subtle.exportKey('raw', par.publicKey)) as ArrayBuffer);
-  return { endpoint, p256dh: paraBase64url(publica), auth: paraBase64url(crypto.getRandomValues(new Uint8Array(16))) };
+  const par = (await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, [
+    'deriveBits',
+  ])) as CryptoKeyPair;
+  const publica = new Uint8Array(
+    (await crypto.subtle.exportKey('raw', par.publicKey)) as ArrayBuffer,
+  );
+  return {
+    endpoint,
+    p256dh: paraBase64url(publica),
+    auth: paraBase64url(crypto.getRandomValues(new Uint8Array(16))),
+  };
 }
 
 /** Prepara um envio com o serviço falso, o relato do Sentry capturado e o console espionado. */
@@ -37,7 +57,9 @@ async function cenario() {
   const relatos: RelatoPush[] = [];
   const chaves = await vapid();
   const a = await assinatura();
-  const consoles = (['log', 'info', 'warn', 'error', 'debug'] as const).map((m) => vi.spyOn(console, m));
+  const consoles = (['log', 'info', 'warn', 'error', 'debug'] as const).map((m) =>
+    vi.spyOn(console, m),
+  );
   const enviar = (ttl = TTL_RANKING, sobre: Partial<AssinaturaParaEnvio> = {}) =>
     enviarPush({ ...a, ...sobre }, PAYLOAD, {
       vapid: chaves,
@@ -50,7 +72,15 @@ async function cenario() {
   /** NOT-33: nada do que é secreto aparece no console nem no relato do Sentry. */
   const esperaSemSegredo = () => {
     const texto = JSON.stringify([relatos, consoles.map((c) => c.mock.calls)]);
-    for (const proibido of [a.endpoint, 'token-do-aparelho-secreto', a.p256dh, a.auth, PAYLOAD, 'Pelada Secreta', chaves.privada]) {
+    for (const proibido of [
+      a.endpoint,
+      'token-do-aparelho-secreto',
+      a.p256dh,
+      a.auth,
+      PAYLOAD,
+      'Pelada Secreta',
+      chaves.privada,
+    ]) {
       expect(texto).not.toContain(proibido);
     }
   };
@@ -73,7 +103,9 @@ describe('enviarPush: requisição', () => {
     expect(h?.get('ttl')).toBe(String(TTL_RANKING));
     expect(h?.get('urgency')).toBe('normal');
     expect(h?.get('topic')).toBe(TOPICO);
-    expect(h?.get('authorization')).toMatch(new RegExp(`^vapid t=[\\w-]+\\.[\\w-]+\\.[\\w-]+, k=${c.chaves.publica}$`));
+    expect(h?.get('authorization')).toMatch(
+      new RegExp(`^vapid t=[\\w-]+\\.[\\w-]+\\.[\\w-]+, k=${c.chaves.publica}$`),
+    );
     expect(pedido?.corpo.length).toBeGreaterThan(86);
     expect(new TextDecoder().decode(pedido?.corpo)).not.toContain('Ranking atualizado');
   });
@@ -126,7 +158,10 @@ describe('enviarPush: classes da resposta', () => {
 
   it('NOT-31: 503 com Retry-After em data HTTP', async () => {
     const c = await cenario();
-    c.servico.responder({ status: 503, cabecalhos: { 'Retry-After': 'Thu, 05 Nov 2026 12:02:00 GMT' } });
+    c.servico.responder({
+      status: 503,
+      cabecalhos: { 'Retry-After': 'Thu, 05 Nov 2026 12:02:00 GMT' },
+    });
     expect(await c.enviar()).toEqual({ classe: 'tentarDeNovo', aposSegundos: 120 });
   });
 
@@ -138,12 +173,15 @@ describe('enviarPush: classes da resposta', () => {
     c.esperaSemSegredo();
   });
 
-  it.each([200, 202, 301, 401, 405])('[LACUNA] %i fora da spec é erro reportado, sem apagar', async (status) => {
-    const c = await cenario();
-    c.servico.responder(status);
-    expect(await c.enviar()).toEqual({ classe: 'erro' });
-    expect(c.relatos).toEqual([{ host: 'fcm.googleapis.com', status, motivo: 'status' }]);
-  });
+  it.each([200, 202, 301, 401, 405])(
+    '[LACUNA] %i fora da spec é erro reportado, sem apagar',
+    async (status) => {
+      const c = await cenario();
+      c.servico.responder(status);
+      expect(await c.enviar()).toEqual({ classe: 'erro' });
+      expect(c.relatos).toEqual([{ host: 'fcm.googleapis.com', status, motivo: 'status' }]);
+    },
+  );
 
   it('[LACUNA] fetch que lança é tentarDeNovo, sem relato e sem segredo no console', async () => {
     const c = await cenario();
@@ -174,7 +212,9 @@ describe('enviarPush: classes da resposta', () => {
     });
     expect(r).toEqual({ classe: 'erro' });
     expect(c.servico.pedidos).toHaveLength(0);
-    expect(c.relatos).toEqual([{ host: 'fcm.googleapis.com', status: 0, motivo: 'payload_grande' }]);
+    expect(c.relatos).toEqual([
+      { host: 'fcm.googleapis.com', status: 0, motivo: 'payload_grande' },
+    ]);
     c.esperaSemSegredo();
   });
 });

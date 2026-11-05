@@ -50,7 +50,9 @@ const app = criarApp({
         SELECT current_setting('app.conta_id', true) AS conta, current_setting('app.slug_publico', true) AS slug`.execute(
         c.var.db,
       );
-      const grupos = await sql<{ id: string }>`SELECT id::text AS id FROM grupos ORDER BY id`.execute(c.var.db);
+      const grupos = await sql<{
+        id: string;
+      }>`SELECT id::text AS id FROM grupos ORDER BY id`.execute(c.var.db);
       return c.json(
         {
           contaDaRequisicao: c.var.contaId ?? null,
@@ -111,7 +113,9 @@ function binding(sucesso: boolean): LimiteDeTaxa & { chaves: string[] } {
 async function capturarLogs(fn: () => Promise<void>): Promise<string[]> {
   const linhas: string[] = [];
   const guardar = (...args: unknown[]) => {
-    linhas.push(args.map((a) => (typeof a === 'string' ? a : (JSON.stringify(a) ?? String(a)))).join(' '));
+    linhas.push(
+      args.map((a) => (typeof a === 'string' ? a : (JSON.stringify(a) ?? String(a)))).join(' '),
+    );
   };
   for (const metodo of ['log', 'info', 'warn', 'error', 'debug'] as const) {
     vi.spyOn(console, metodo).mockImplementation(guardar);
@@ -148,7 +152,11 @@ describe('contextoPublico com slug válido', () => {
   it('PAR-77: o mesmo admin no slug do próprio grupo A vê só A, pelo slug e não pela conta', async () => {
     const { cenario } = aberto;
     const r = await pedir(cenario.slugA, { token: await sessao(cenario.contaA) });
-    expect(await r.json()).toMatchObject({ contaNoBanco: '', slugNoBanco: cenario.slugA, grupos: [cenario.grupoA] });
+    expect(await r.json()).toMatchObject({
+      contaNoBanco: '',
+      slugNoBanco: cenario.slugA,
+      grupos: [cenario.grupoA],
+    });
   });
 
   it('PAR-77: visitante sem sessão vê o grupo do slug', async () => {
@@ -174,15 +182,18 @@ describe('contextoPublico com slug malformado', () => {
     ['acento', 'pelada-s%C3%A3o'],
     ['ponto', 'grupo.a'],
     ['65 caracteres', 'a'.repeat(65)],
-  ])('PAR-90: slug com %s responde 404 nao_encontrado sem abrir conexão nem chamar a rota', async (_nome, slug) => {
-    const antesConexoes = conexoes;
-    const antesChamadas = chamadas;
-    const r = await pedir(slug);
-    expect(r.status).toBe(404);
-    expect(await r.json()).toMatchObject({ codigo: 'nao_encontrado' });
-    expect(conexoes).toBe(antesConexoes);
-    expect(chamadas).toBe(antesChamadas);
-  });
+  ])(
+    'PAR-90: slug com %s responde 404 nao_encontrado sem abrir conexão nem chamar a rota',
+    async (_nome, slug) => {
+      const antesConexoes = conexoes;
+      const antesChamadas = chamadas;
+      const r = await pedir(slug);
+      expect(r.status).toBe(404);
+      expect(await r.json()).toMatchObject({ codigo: 'nao_encontrado' });
+      expect(conexoes).toBe(antesConexoes);
+      expect(chamadas).toBe(antesChamadas);
+    },
+  );
 
   it.each([
     ['grupo-a', true],
@@ -203,7 +214,10 @@ describe('LIMITE_PUBLICO nas rotas públicas', () => {
     const nega = binding(false);
     const antesConexoes = conexoes;
     const antesChamadas = chamadas;
-    const r = await pedir(aberto.cenario.slugA, { ip: '203.0.113.77', env: { LIMITE_PUBLICO: nega } });
+    const r = await pedir(aberto.cenario.slugA, {
+      ip: '203.0.113.77',
+      env: { LIMITE_PUBLICO: nega },
+    });
     expect(r.status).toBe(429);
     expect(await r.json()).toEqual({ erro: MENSAGEM_LIMITE });
     expect(MENSAGEM_LIMITE).toBe('Muitas requisições. Tente de novo em instantes.');
@@ -222,7 +236,10 @@ describe('LIMITE_PUBLICO nas rotas públicas', () => {
 
   it('PAR-78: binding que permite deixa passar e gasta a cota do IP uma vez', async () => {
     const permite = binding(true);
-    const r = await pedir(aberto.cenario.slugA, { ip: '203.0.113.79', env: { LIMITE_PUBLICO: permite } });
+    const r = await pedir(aberto.cenario.slugA, {
+      ip: '203.0.113.79',
+      env: { LIMITE_PUBLICO: permite },
+    });
     expect(r.status).toBe(200);
     expect(permite.chaves).toEqual(['203.0.113.79']);
   });

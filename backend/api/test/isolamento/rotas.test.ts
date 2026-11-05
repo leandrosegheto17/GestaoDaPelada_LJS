@@ -62,7 +62,10 @@ afterAll(async () => {
 async function retratoDeA(): Promise<string> {
   const { db, cenario } = aberto;
   const partes = await Promise.all([
-    db.query('SELECT conta_id, acessa_financeiro FROM vinculos_admin WHERE grupo_id = $1 ORDER BY conta_id', [cenario.grupoA]),
+    db.query(
+      'SELECT conta_id, acessa_financeiro FROM vinculos_admin WHERE grupo_id = $1 ORDER BY conta_id',
+      [cenario.grupoA],
+    ),
     // O convite do caso de aceitar é do próprio teste e fica fora do retrato.
     db.query(
       `SELECT id, email, usado_em, cancelado_em FROM convites_admin
@@ -70,7 +73,9 @@ async function retratoDeA(): Promise<string> {
       [cenario.grupoA],
     ),
     db.query('SELECT nome, arquivado_em FROM grupos WHERE id = $1', [cenario.grupoA]),
-    db.query('SELECT nome, email, senha_hash, excluida_em FROM contas WHERE id = $1', [cenario.contaA]),
+    db.query('SELECT nome, email, senha_hash, excluida_em FROM contas WHERE id = $1', [
+      cenario.contaA,
+    ]),
     db.query('SELECT count(*)::int AS n FROM sessoes WHERE conta_id = $1', [cenario.contaA]),
   ]);
   return JSON.stringify(partes.map((p) => p.rows));
@@ -78,7 +83,8 @@ async function retratoDeA(): Promise<string> {
 
 type Linha = { caso: () => Promise<void> } | { naoSeAplica: string };
 
-const SEM_SESSAO = 'rota sem sessão: age só pelo token ou pelo e-mail do corpo, não por conta nem grupo';
+const SEM_SESSAO =
+  'rota sem sessão: age só pelo token ou pelo e-mail do corpo, não por conta nem grupo';
 
 // ---------------------------------------------------------------- grupos e elenco (T50)
 
@@ -101,9 +107,10 @@ beforeAll(async () => {
     [deH.jogador, cenario.grupoH],
   );
   deH.periodo = p.rows[0]!.id;
-  const h = await db.query<{ id: string }>(`INSERT INTO habilidades (grupo_id, nome) VALUES ($1, 'Isolada de H') RETURNING id`, [
-    cenario.grupoH,
-  ]);
+  const h = await db.query<{ id: string }>(
+    `INSERT INTO habilidades (grupo_id, nome) VALUES ($1, 'Isolada de H') RETURNING id`,
+    [cenario.grupoH],
+  );
   deH.habilidade = h.rows[0]!.id;
   const doAtivo = await db.query<{ id: string }>(
     'SELECT id FROM periodos_ativos WHERE jogador_id = $1 ORDER BY inicio LIMIT 1',
@@ -117,14 +124,23 @@ async function retratoDeG(): Promise<string> {
   const { db, cenario } = aberto;
   const g = cenario.grupoG;
   const partes = await Promise.all([
-    db.query('SELECT nome, dia_semana, frequencia, horario, arquivado_em FROM grupos WHERE id = $1', [g]),
+    db.query(
+      'SELECT nome, dia_semana, frequencia, horario, arquivado_em FROM grupos WHERE id = $1',
+      [g],
+    ),
     db.query(
       'SELECT id, apelido, posicao, pontuacao_inicial, inicio_pontuacao::text FROM jogadores WHERE grupo_id = $1 ORDER BY id',
       [g],
     ),
-    db.query('SELECT id, inicio::text, fim::text FROM periodos_ativos WHERE grupo_id = $1 ORDER BY id', [g]),
+    db.query(
+      'SELECT id, inicio::text, fim::text FROM periodos_ativos WHERE grupo_id = $1 ORDER BY id',
+      [g],
+    ),
     db.query('SELECT id, nome FROM habilidades WHERE grupo_id = $1 ORDER BY id', [g]),
-    db.query('SELECT jogador_id, habilidade_id, valor FROM notas WHERE grupo_id = $1 ORDER BY jogador_id, habilidade_id', [g]),
+    db.query(
+      'SELECT jogador_id, habilidade_id, valor FROM notas WHERE grupo_id = $1 ORDER BY jogador_id, habilidade_id',
+      [g],
+    ),
     db.query('SELECT conta_id FROM vinculos_admin WHERE grupo_id = $1 ORDER BY conta_id', [g]),
   ]);
   return JSON.stringify(partes.map((p) => p.rows));
@@ -135,10 +151,19 @@ async function retratoDeH(): Promise<string> {
   const { db, cenario } = aberto;
   const h = cenario.grupoH;
   const partes = await Promise.all([
-    db.query('SELECT id, apelido, inicio_pontuacao::text FROM jogadores WHERE grupo_id = $1 ORDER BY id', [h]),
-    db.query('SELECT id, inicio::text, fim::text FROM periodos_ativos WHERE grupo_id = $1 ORDER BY id', [h]),
+    db.query(
+      'SELECT id, apelido, inicio_pontuacao::text FROM jogadores WHERE grupo_id = $1 ORDER BY id',
+      [h],
+    ),
+    db.query(
+      'SELECT id, inicio::text, fim::text FROM periodos_ativos WHERE grupo_id = $1 ORDER BY id',
+      [h],
+    ),
     db.query('SELECT id, nome FROM habilidades WHERE grupo_id = $1 ORDER BY id', [h]),
-    db.query('SELECT jogador_id, habilidade_id, valor FROM notas WHERE grupo_id = $1 ORDER BY jogador_id, habilidade_id', [h]),
+    db.query(
+      'SELECT jogador_id, habilidade_id, valor FROM notas WHERE grupo_id = $1 ORDER BY jogador_id, habilidade_id',
+      [h],
+    ),
   ]);
   return JSON.stringify(partes.map((p) => p.rows));
 }
@@ -163,7 +188,11 @@ function casoDeGrupo(p: PedidoDeGrupo): Linha {
   return {
     caso: async () => {
       const { cenario } = aberto;
-      const idsDeG: IdsFilhos = { jogador: cenario.idsG.jogadorAtivo, periodo: periodoDeG, habilidade: cenario.idsG.habilidade };
+      const idsDeG: IdsFilhos = {
+        jogador: cenario.idsG.jogadorAtivo,
+        periodo: periodoDeG,
+        habilidade: cenario.idsG.habilidade,
+      };
       const enviar = (grupo: string, ids: IdsFilhos, sessaoDaVez: string) =>
         pedir(`/grupos/${grupo}${p.caminho(ids)}`, {
           metodo: p.metodo,
@@ -208,7 +237,11 @@ const ROTAS_DE_GRUPO: Record<string, Linha> = {
     caminho: () => '/arquivar',
     corpo: { nomeConfirmacao: 'Pelada de Quinta' },
   }),
-  'POST /api/grupos/:grupoId/reativar': casoDeGrupo({ metodo: 'POST', caminho: () => '/reativar', corpo: {} }),
+  'POST /api/grupos/:grupoId/reativar': casoDeGrupo({
+    metodo: 'POST',
+    caminho: () => '/reativar',
+    corpo: {},
+  }),
   'GET /api/grupos/:grupoId/jogadores': casoDeGrupo({ metodo: 'GET', caminho: () => '/jogadores' }),
   'POST /api/grupos/:grupoId/jogadores': casoDeGrupo({
     metodo: 'POST',
@@ -261,7 +294,10 @@ const ROTAS_DE_GRUPO: Record<string, Linha> = {
     corpo: { nota: 3 },
     comFilho: true,
   }),
-  'GET /api/grupos/:grupoId/habilidades': casoDeGrupo({ metodo: 'GET', caminho: () => '/habilidades' }),
+  'GET /api/grupos/:grupoId/habilidades': casoDeGrupo({
+    metodo: 'GET',
+    caminho: () => '/habilidades',
+  }),
   'POST /api/grupos/:grupoId/habilidades': casoDeGrupo({
     metodo: 'POST',
     caminho: () => '/habilidades',
@@ -302,7 +338,12 @@ interface PedidoDoCaixa {
   comFilho?: boolean;
 }
 
-const LANCAMENTO_VALIDO = { tipo: 'saida', data: '2026-02-10', descricao: 'Isolamento', valorCentavos: 100 };
+const LANCAMENTO_VALIDO = {
+  tipo: 'saida',
+  data: '2026-02-10',
+  descricao: 'Isolamento',
+  valorCentavos: 100,
+};
 
 const PEDIDOS_DO_FINANCEIRO: Record<string, PedidoDoCaixa> = {
   'PUT /api/grupos/:grupoId/financeiro/config': {
@@ -368,10 +409,10 @@ beforeAll(async () => {
   );
   // B passa a ter acesso ao financeiro de H: o "B com H na rota e ids de G" precisa chegar à rota (404), não parar no
   // 403 do `exigirFinanceiro`.
-  await db.query('UPDATE vinculos_admin SET acessa_financeiro = true WHERE grupo_id = $1 AND conta_id = $2', [
-    cenario.grupoH,
-    cenario.contaB,
-  ]);
+  await db.query(
+    'UPDATE vinculos_admin SET acessa_financeiro = true WHERE grupo_id = $1 AND conta_id = $2',
+    [cenario.grupoH, cenario.contaB],
+  );
 });
 
 const idsDoCaixaDeG = (): IdsDoCaixa => ({
@@ -379,16 +420,32 @@ const idsDoCaixaDeG = (): IdsDoCaixa => ({
   jogador: aberto.cenario.idsG.jogadorHistorico,
   conta: aberto.cenario.contaO,
 });
-const idsDoCaixaDeH = (): IdsDoCaixa => ({ lancamento: caixaDeH.lancamento, jogador: deH.jogador, conta: aberto.cenario.contaB });
+const idsDoCaixaDeH = (): IdsDoCaixa => ({
+  lancamento: caixaDeH.lancamento,
+  jogador: deH.jogador,
+  conta: aberto.cenario.contaB,
+});
 
 /** O caixa e os acessos de um grupo, para provar que nada mudou. */
 async function retratoDoCaixa(grupo: string): Promise<string> {
   const { db } = aberto;
   const partes = await Promise.all([
-    db.query('SELECT mensalidade_centavos, saldo_inicial_centavos, data_saldo_inicial::text FROM config_financeira WHERE grupo_id = $1', [grupo]),
-    db.query('SELECT id, tipo, data::text, descricao, valor_centavos FROM lancamentos WHERE grupo_id = $1 ORDER BY id', [grupo]),
-    db.query('SELECT jogador_id, mes, lancamento_id FROM pagamentos_mes WHERE grupo_id = $1 ORDER BY jogador_id, mes', [grupo]),
-    db.query('SELECT conta_id, acessa_financeiro FROM vinculos_admin WHERE grupo_id = $1 ORDER BY conta_id', [grupo]),
+    db.query(
+      'SELECT mensalidade_centavos, saldo_inicial_centavos, data_saldo_inicial::text FROM config_financeira WHERE grupo_id = $1',
+      [grupo],
+    ),
+    db.query(
+      'SELECT id, tipo, data::text, descricao, valor_centavos FROM lancamentos WHERE grupo_id = $1 ORDER BY id',
+      [grupo],
+    ),
+    db.query(
+      'SELECT jogador_id, mes, lancamento_id FROM pagamentos_mes WHERE grupo_id = $1 ORDER BY jogador_id, mes',
+      [grupo],
+    ),
+    db.query(
+      'SELECT conta_id, acessa_financeiro FROM vinculos_admin WHERE grupo_id = $1 ORDER BY conta_id',
+      [grupo],
+    ),
   ]);
   return JSON.stringify(partes.map((p) => p.rows));
 }
@@ -398,7 +455,12 @@ beforeAll(async () => {
   sessaoO = await sessao(aberto.cenario.contaO);
 });
 
-function enviarAoCaixa(p: PedidoDoCaixa, grupo: string, ids: IdsDoCaixa, sessaoDaVez: string): Promise<Response> {
+function enviarAoCaixa(
+  p: PedidoDoCaixa,
+  grupo: string,
+  ids: IdsDoCaixa,
+  sessaoDaVez: string,
+): Promise<Response> {
   return pedir(`/grupos/${grupo}${p.caminho(ids)}`, {
     metodo: p.metodo,
     sessao: sessaoDaVez,
@@ -453,19 +515,24 @@ beforeAll(async () => {
      VALUES ($1, $2, true, $3, now(), $3, now()) RETURNING id`,
     [cenario.grupoH, DATA_SO_DE_H, cenario.contaB],
   );
-  await db.query(`INSERT INTO presencas (partida_id, jogador_id, grupo_id, situacao) VALUES ($1, $2, $3, 'presente')`, [
-    p.rows[0]!.id,
-    deH.jogador,
-    cenario.grupoH,
-  ]);
+  await db.query(
+    `INSERT INTO presencas (partida_id, jogador_id, grupo_id, situacao) VALUES ($1, $2, $3, 'presente')`,
+    [p.rows[0]!.id, deH.jogador, cenario.grupoH],
+  );
 });
 
 /** Partidas, presenças, pesos, eventos e auditoria de um grupo, para provar que nada mudou (PAR-138). */
 async function retratoDePartidas(grupo: string): Promise<string> {
   const { db } = aberto;
   const partes = await Promise.all([
-    db.query('SELECT id, data::text, choveu, alterada_por, alterada_em FROM partidas WHERE grupo_id = $1 ORDER BY id', [grupo]),
-    db.query('SELECT partida_id, jogador_id, situacao FROM presencas WHERE grupo_id = $1 ORDER BY partida_id, jogador_id', [grupo]),
+    db.query(
+      'SELECT id, data::text, choveu, alterada_por, alterada_em FROM partidas WHERE grupo_id = $1 ORDER BY id',
+      [grupo],
+    ),
+    db.query(
+      'SELECT partida_id, jogador_id, situacao FROM presencas WHERE grupo_id = $1 ORDER BY partida_id, jogador_id',
+      [grupo],
+    ),
     db.query(
       `SELECT vigente_desde::text, presenca_sem_chuva, presenca_com_chuva, lesionado_sem_chuva, lesionado_com_chuva, expulso,
               expulso_com_chuva, registrado_por FROM config_pesos WHERE grupo_id = $1 ORDER BY vigente_desde`,
@@ -507,7 +574,12 @@ function casoDePartidas(p: PedidoDePartida): Linha {
           ...(p.corpo !== undefined ? { corpo: p.corpo(ids) } : {}),
         });
 
-      const antes = [await retratoDeG(), await retratoDeH(), await retratoDePartidas(cenario.grupoG), await retratoDePartidas(cenario.grupoH)];
+      const antes = [
+        await retratoDeG(),
+        await retratoDeH(),
+        await retratoDePartidas(cenario.grupoG),
+        await retratoDePartidas(cenario.grupoH),
+      ];
 
       const r = await enviar(cenario.grupoG, idsDeG, sessaoB);
       expect(r.status, 'PAR-138: B com o id de G').toBe(404);
@@ -522,7 +594,12 @@ function casoDePartidas(p: PedidoDePartida): Linha {
         expect(await bComG.text()).not.toContain('Toninho');
       }
 
-      const depois = [await retratoDeG(), await retratoDeH(), await retratoDePartidas(cenario.grupoG), await retratoDePartidas(cenario.grupoH)];
+      const depois = [
+        await retratoDeG(),
+        await retratoDeH(),
+        await retratoDePartidas(cenario.grupoG),
+        await retratoDePartidas(cenario.grupoH),
+      ];
       expect(depois).toEqual(antes);
     },
   };
@@ -539,22 +616,37 @@ const PESOS_VALIDOS = {
 
 const PEDIDOS_DE_PARTIDAS: Record<string, PedidoDePartida> = {
   'GET /api/grupos/:grupoId/pesos': { metodo: 'GET', caminho: () => '/pesos' },
-  'POST /api/grupos/:grupoId/pesos': { metodo: 'POST', caminho: () => '/pesos', corpo: () => PESOS_VALIDOS },
-  'GET /api/grupos/:grupoId/partidas/nova': { metodo: 'GET', caminho: () => '/partidas/nova?data=2026-02-26' },
+  'POST /api/grupos/:grupoId/pesos': {
+    metodo: 'POST',
+    caminho: () => '/pesos',
+    corpo: () => PESOS_VALIDOS,
+  },
+  'GET /api/grupos/:grupoId/partidas/nova': {
+    metodo: 'GET',
+    caminho: () => '/partidas/nova?data=2026-02-26',
+  },
   'GET /api/grupos/:grupoId/partidas': { metodo: 'GET', caminho: () => '/partidas?mes=2026-01' },
   'POST /api/grupos/:grupoId/partidas': {
     metodo: 'POST',
     caminho: () => '/partidas',
     corpo: () => ({ data: '2026-02-26', choveu: false, marcacoes: [] }),
   },
-  'GET /api/grupos/:grupoId/partidas/:data': { metodo: 'GET', caminho: (i) => `/partidas/${i.data}`, comFilho: true },
+  'GET /api/grupos/:grupoId/partidas/:data': {
+    metodo: 'GET',
+    caminho: (i) => `/partidas/${i.data}`,
+    comFilho: true,
+  },
   'PUT /api/grupos/:grupoId/partidas/:data': {
     metodo: 'PUT',
     caminho: (i) => `/partidas/${i.data}`,
     corpo: (i) => ({ data: i.data, choveu: false, marcacoes: [] }),
     comFilho: true,
   },
-  'DELETE /api/grupos/:grupoId/partidas/:data': { metodo: 'DELETE', caminho: (i) => `/partidas/${i.data}`, comFilho: true },
+  'DELETE /api/grupos/:grupoId/partidas/:data': {
+    metodo: 'DELETE',
+    caminho: (i) => `/partidas/${i.data}`,
+    comFilho: true,
+  },
   'GET /api/grupos/:grupoId/uso': { metodo: 'GET', caminho: () => '/uso' },
   'POST /api/grupos/:grupoId/jogadores/:id/reativar/previa': {
     metodo: 'POST',
@@ -592,12 +684,16 @@ interface PedidoPublico {
 }
 
 async function nomeDe(grupo: string): Promise<string> {
-  const r = await aberto.db.query<{ nome: string }>('SELECT nome FROM grupos WHERE id = $1', [grupo]);
+  const r = await aberto.db.query<{ nome: string }>('SELECT nome FROM grupos WHERE id = $1', [
+    grupo,
+  ]);
   return r.rows[0]!.nome;
 }
 
 async function slugDe(grupo: string): Promise<string> {
-  const r = await aberto.db.query<{ slug: string }>('SELECT slug FROM grupos WHERE id = $1', [grupo]);
+  const r = await aberto.db.query<{ slug: string }>('SELECT slug FROM grupos WHERE id = $1', [
+    grupo,
+  ]);
   return r.rows[0]!.slug;
 }
 
@@ -616,7 +712,12 @@ function casoPublico(p: PedidoPublico): Linha {
       const antesG = await retratoDePartidas(cenario.grupoG);
       const antesH = await retratoDePartidas(cenario.grupoH);
       const eventosDe = async (g: string) =>
-        (await db.query<{ n: number }>('SELECT count(*)::int AS n FROM eventos_uso WHERE grupo_id = $1', [g])).rows[0]!.n;
+        (
+          await db.query<{ n: number }>(
+            'SELECT count(*)::int AS n FROM eventos_uso WHERE grupo_id = $1',
+            [g],
+          )
+        ).rows[0]!.n;
       const eventosAntesG = await eventosDe(cenario.grupoG);
 
       const deG = await enviar(cenario.slugG);
@@ -642,11 +743,10 @@ function casoPublico(p: PedidoPublico): Linha {
       if (p.metodo === 'POST') {
         // O evento de G e o de H caem cada um no grupo do slug; os deste teste (pelo aparelho) saem, o resto fica.
         expect(await eventosDe(cenario.grupoG)).toBe(eventosAntesG + 1);
-        await db.query('DELETE FROM eventos_uso WHERE dispositivo_id = $1 AND grupo_id IN ($2, $3)', [
-          APARELHO_DO_ISOLAMENTO,
-          cenario.grupoG,
-          cenario.grupoH,
-        ]);
+        await db.query(
+          'DELETE FROM eventos_uso WHERE dispositivo_id = $1 AND grupo_id IN ($2, $3)',
+          [APARELHO_DO_ISOLAMENTO, cenario.grupoG, cenario.grupoH],
+        );
       }
       expect(await retratoDePartidas(cenario.grupoG)).toBe(antesG);
       expect(await retratoDePartidas(cenario.grupoH)).toBe(antesH);
@@ -701,8 +801,20 @@ interface PedidoDoSimulador {
 const aptosDoPedido = (ids: QuatroIds) => ids.map((id) => ({ id, so1oTempo: false }));
 const composicaoDoPedido = ([a, b, c, d]: QuatroIds) => ({
   times: [
-    { titulares: [{ id: a, so1oTempo: false }, { id: b, so1oTempo: false }], entramNo2oTempo: [] },
-    { titulares: [{ id: c, so1oTempo: false }, { id: d, so1oTempo: false }], entramNo2oTempo: [] },
+    {
+      titulares: [
+        { id: a, so1oTempo: false },
+        { id: b, so1oTempo: false },
+      ],
+      entramNo2oTempo: [],
+    },
+    {
+      titulares: [
+        { id: c, so1oTempo: false },
+        { id: d, so1oTempo: false },
+      ],
+      entramNo2oTempo: [],
+    },
   ],
   naoEntra: [],
 });
@@ -720,7 +832,13 @@ const PEDIDOS_DO_SIMULADOR: Record<string, PedidoDoSimulador> = {
   'POST /api/grupos/:grupoId/simulador/sugerir': {
     metodo: 'POST',
     caminho: '/simulador/sugerir',
-    corpo: (ids) => ({ formato: 'dois_times', data: DATA_DO_SIMULADOR, n: 2, k: 0, aptos: aptosDoPedido(ids) }),
+    corpo: (ids) => ({
+      formato: 'dois_times',
+      data: DATA_DO_SIMULADOR,
+      n: 2,
+      k: 0,
+      aptos: aptosDoPedido(ids),
+    }),
     comJogadores: true,
   },
   'POST /api/grupos/:grupoId/simulador/avaliar': {
@@ -739,7 +857,13 @@ const PEDIDOS_DO_SIMULADOR: Record<string, PedidoDoSimulador> = {
   'POST /api/grupos/:grupoId/escalacoes': {
     metodo: 'POST',
     caminho: '/escalacoes',
-    corpo: (ids) => ({ formato: 'dois_times', data: DATA_DO_SIMULADOR, n: 2, k: 0, composicao: composicaoDoPedido(ids) }),
+    corpo: (ids) => ({
+      formato: 'dois_times',
+      data: DATA_DO_SIMULADOR,
+      n: 2,
+      k: 0,
+      composicao: composicaoDoPedido(ids),
+    }),
     comJogadores: true,
   },
 };
@@ -751,9 +875,10 @@ async function retratoDoSimulador(grupo: string): Promise<string> {
     'SELECT data::text, formato, n, k, composicao, confirmada_por, confirmada_em FROM escalacoes WHERE grupo_id = $1 ORDER BY data',
     [grupo],
   );
-  const eventos = await db.query('SELECT tipo, count(*)::int AS n FROM eventos_uso WHERE grupo_id = $1 GROUP BY tipo ORDER BY tipo', [
-    grupo,
-  ]);
+  const eventos = await db.query(
+    'SELECT tipo, count(*)::int AS n FROM eventos_uso WHERE grupo_id = $1 GROUP BY tipo ORDER BY tipo',
+    [grupo],
+  );
   return JSON.stringify([escalacoes.rows, eventos.rows, await retratoDePartidas(grupo)]);
 }
 
@@ -762,7 +887,12 @@ function idsDoSimulador(doGrupo: string, doOutro: string): QuatroIds {
   return [doGrupo, doOutro, SEM_JOGADOR_1, SEM_JOGADOR_2];
 }
 
-function enviarAoSimulador(p: PedidoDoSimulador, grupo: string, ids: QuatroIds, sessaoDaVez?: string): Promise<Response> {
+function enviarAoSimulador(
+  p: PedidoDoSimulador,
+  grupo: string,
+  ids: QuatroIds,
+  sessaoDaVez?: string,
+): Promise<Response> {
   return pedir(`/grupos/${grupo}${p.caminho}`, {
     metodo: p.metodo,
     ...(sessaoDaVez !== undefined ? { sessao: sessaoDaVez } : {}),
@@ -783,7 +913,12 @@ function casoDoSimulador(p: PedidoDoSimulador): Linha {
       const antes = await retratos();
 
       // SIM-79: B com G na rota dá 404, sem dado de G na resposta e sem ler nem gravar nada de G.
-      const r = await enviarAoSimulador(p, cenario.grupoG, idsDoSimulador(cenario.idsG.jogadorAtivo, deH.jogador), sessaoB);
+      const r = await enviarAoSimulador(
+        p,
+        cenario.grupoG,
+        idsDoSimulador(cenario.idsG.jogadorAtivo, deH.jogador),
+        sessaoB,
+      );
       expect(r.status, 'SIM-79: B com o id de G').toBe(404);
       const texto = await r.text();
       expect(texto).not.toContain('Toninho');
@@ -834,23 +969,36 @@ const TABELA: Record<string, Linha> = {
   'POST /api/conta/senha': {
     caso: async () => {
       // A conta B, com a senha de A, não troca senha nenhuma (a função só vê a conta da sessão).
-      const r = await pedir('/conta/senha', { corpo: { senhaAtual: aberto.cenario.senhaA, senhaNova: 'outra senha 123' }, sessao: sessaoB });
+      const r = await pedir('/conta/senha', {
+        corpo: { senhaAtual: aberto.cenario.senhaA, senhaNova: 'outra senha 123' },
+        sessao: sessaoB,
+      });
       expect(r.status).toBe(401);
     },
   },
   'POST /api/conta/excluir': {
     caso: async () => {
-      const r = await pedir('/conta/excluir', { corpo: { senha: aberto.cenario.senhaA }, sessao: sessaoB });
+      const r = await pedir('/conta/excluir', {
+        corpo: { senha: aberto.cenario.senhaA },
+        sessao: sessaoB,
+      });
       expect(r.status).toBe(401);
     },
   },
   'POST /api/convites/aceitar': {
     caso: async () => {
       // Convite do grupo A para outro e-mail: B não vira admin de A.
-      const token = await conviteDeTeste(aberto.db, aberto.cenario.grupoA, 'isolamento@exemplo.test', aberto.cenario.contaA);
+      const token = await conviteDeTeste(
+        aberto.db,
+        aberto.cenario.grupoA,
+        'isolamento@exemplo.test',
+        aberto.cenario.contaA,
+      );
       const r = await pedir('/convites/aceitar', { corpo: { token }, sessao: sessaoB });
       expect(r.status).toBe(403);
-      await aberto.db.query(`UPDATE convites_admin SET cancelado_em = now() WHERE email = 'isolamento@exemplo.test'`);
+      await aberto.db.query(
+        `UPDATE convites_admin SET cancelado_em = now() WHERE email = 'isolamento@exemplo.test'`,
+      );
     },
   },
   'GET /api/grupos/:grupoId/admins': {
@@ -862,21 +1010,33 @@ const TABELA: Record<string, Linha> = {
   },
   'POST /api/grupos/:grupoId/admins/convites': {
     caso: async () => {
-      const r = await pedir(`/grupos/${aberto.cenario.grupoA}/admins/convites`, { corpo: { email: 'intrusa@exemplo.test' }, sessao: sessaoB });
+      const r = await pedir(`/grupos/${aberto.cenario.grupoA}/admins/convites`, {
+        corpo: { email: 'intrusa@exemplo.test' },
+        sessao: sessaoB,
+      });
       expect(r.status).toBe(404);
     },
   },
   'DELETE /api/grupos/:grupoId/admins/convites/:id': {
     caso: async () => {
-      const c = await aberto.db.query<{ id: string }>('SELECT id FROM convites_admin WHERE grupo_id = $1 LIMIT 1', [aberto.cenario.grupoA]);
+      const c = await aberto.db.query<{ id: string }>(
+        'SELECT id FROM convites_admin WHERE grupo_id = $1 LIMIT 1',
+        [aberto.cenario.grupoA],
+      );
       const id = c.rows[0]?.id ?? '00000000-0000-4000-8000-000000000000';
-      const r = await pedir(`/grupos/${aberto.cenario.grupoA}/admins/convites/${id}`, { metodo: 'DELETE', sessao: sessaoB });
+      const r = await pedir(`/grupos/${aberto.cenario.grupoA}/admins/convites/${id}`, {
+        metodo: 'DELETE',
+        sessao: sessaoB,
+      });
       expect(r.status).toBe(404);
     },
   },
   'DELETE /api/grupos/:grupoId/admins/:contaId': {
     caso: async () => {
-      const r = await pedir(`/grupos/${aberto.cenario.grupoA}/admins/${aberto.cenario.contaA}`, { metodo: 'DELETE', sessao: sessaoB });
+      const r = await pedir(`/grupos/${aberto.cenario.grupoA}/admins/${aberto.cenario.contaA}`, {
+        metodo: 'DELETE',
+        sessao: sessaoB,
+      });
       expect(r.status).toBe(404);
     },
   },
@@ -908,7 +1068,9 @@ describe('isolamento de rotas', () => {
   });
 
   it('ACE-48: uma rota de teste nova sem caso reprova', () => {
-    const app = criarApp({ registrarExtras: (api) => api.get('/teste/rota-nova', (c) => c.json({ ok: true })) });
+    const app = criarApp({
+      registrarExtras: (api) => api.get('/teste/rota-nova', (c) => c.json({ ok: true })),
+    });
     expect(rotasSemLinha(app, TABELA)).toEqual(['GET /api/teste/rota-nova']);
   });
 
@@ -916,10 +1078,13 @@ describe('isolamento de rotas', () => {
     const doFinanceiro = rotasDoApp(criarApp()).filter((r) => r.includes('/financeiro'));
     expect(doFinanceiro.length).toBeGreaterThanOrEqual(9);
     expect(doFinanceiro.filter((r) => !(r in PEDIDOS_DO_FINANCEIRO))).toEqual([]);
-    const comNova = criarApp({ registrarExtras: (api) => api.get('/grupos/:grupoId/financeiro/nova', (c) => c.json({ ok: true })) });
-    expect(rotasDoApp(comNova).filter((r) => r.includes('/financeiro') && !(r in PEDIDOS_DO_FINANCEIRO))).toEqual([
-      'GET /api/grupos/:grupoId/financeiro/nova',
-    ]);
+    const comNova = criarApp({
+      registrarExtras: (api) =>
+        api.get('/grupos/:grupoId/financeiro/nova', (c) => c.json({ ok: true })),
+    });
+    expect(
+      rotasDoApp(comNova).filter((r) => r.includes('/financeiro') && !(r in PEDIDOS_DO_FINANCEIRO)),
+    ).toEqual(['GET /api/grupos/:grupoId/financeiro/nova']);
   });
 
   it('PAR-138: as 13 rotas de admin da partidas-e-ranking estão no app e têm caso de isolamento', () => {
@@ -943,7 +1108,8 @@ describe('isolamento de rotas', () => {
     const semLinha = rotasSemLinha(app, TABELA);
     for (const rota of novas) expect(semLinha, rota).toContain(rota);
     // Sem as rotas extras, nenhuma rota de partidas, pesos, uso, prévia ou pública fica sem linha.
-    const daFeature = /\/(pesos|partidas|uso)\b|\/jogadores\/:id\/(reativar|periodos\/:periodoId|inicio)\/previa$|\/api\/publico\//;
+    const daFeature =
+      /\/(pesos|partidas|uso)\b|\/jogadores\/:id\/(reativar|periodos\/:periodoId|inicio)\/previa$|\/api\/publico\//;
     expect(rotasSemLinha(criarApp(), TABELA).filter((r) => daFeature.test(r))).toEqual([]);
   });
 
@@ -962,7 +1128,10 @@ describe('isolamento de rotas', () => {
       const ids = { ...idsDoCaixaDeG(), conta: cenario.contaC };
       const r = await enviarAoCaixa(p, cenario.grupoG, ids, sessaoO);
       expect(r.status).toBe(403);
-      expect(await r.json()).toEqual({ erro: 'Você não tem acesso ao financeiro deste grupo.', codigo: 'sem_permissao_financeiro' });
+      expect(await r.json()).toEqual({
+        erro: 'Você não tem acesso ao financeiro deste grupo.',
+        codigo: 'sem_permissao_financeiro',
+      });
       expect(await retratoDoCaixa(cenario.grupoG)).toBe(antes);
     },
   );
@@ -1011,35 +1180,58 @@ describe('isolamento de rotas', () => {
     expect(rotasSemLinha(criarApp(), TABELA).filter((r) => doSimulador.test(r))).toEqual([]);
   });
 
-  it.each(Object.entries(PEDIDOS_DO_SIMULADOR))('SIM-79: %s sem sessão dá 401 e nada muda', async (_rota, p) => {
-    const { cenario } = aberto;
-    const antes = await retratoDoSimulador(cenario.grupoG);
-    const r = await enviarAoSimulador(p, cenario.grupoG, idsDoSimulador(cenario.idsG.jogadorAtivo, deH.jogador));
-    expect(r.status).toBe(401);
-    expect(await r.text()).not.toContain('Toninho');
-    expect(await retratoDoSimulador(cenario.grupoG)).toBe(antes);
-  });
+  it.each(Object.entries(PEDIDOS_DO_SIMULADOR))(
+    'SIM-79: %s sem sessão dá 401 e nada muda',
+    async (_rota, p) => {
+      const { cenario } = aberto;
+      const antes = await retratoDoSimulador(cenario.grupoG);
+      const r = await enviarAoSimulador(
+        p,
+        cenario.grupoG,
+        idsDoSimulador(cenario.idsG.jogadorAtivo, deH.jogador),
+      );
+      expect(r.status).toBe(401);
+      expect(await r.text()).not.toContain('Toninho');
+      expect(await retratoDoSimulador(cenario.grupoG)).toBe(antes);
+    },
+  );
 
   it.each(Object.entries(PEDIDOS_DO_SIMULADOR).filter(([, p]) => p.comJogadores))(
     'SIM-80: %s com o jogador de H em G (e o de G em H) dá 422 sem o apelido nem o id do outro grupo',
     async (_rota, p) => {
       const { cenario } = aberto;
-      const antes = [await retratoDoSimulador(cenario.grupoG), await retratoDoSimulador(cenario.grupoH)];
+      const antes = [
+        await retratoDoSimulador(cenario.grupoG),
+        await retratoDoSimulador(cenario.grupoH),
+      ];
 
-      const emG = await enviarAoSimulador(p, cenario.grupoG, idsDoSimulador(cenario.idsG.jogadorAtivo, deH.jogador), sessaoA);
+      const emG = await enviarAoSimulador(
+        p,
+        cenario.grupoG,
+        idsDoSimulador(cenario.idsG.jogadorAtivo, deH.jogador),
+        sessaoA,
+      );
       expect(emG.status, 'A em G com o jogador de H').toBe(422);
       const textoG = await emG.text();
       expect(textoG).not.toContain('Isolado de H');
       expect(textoG).not.toContain(deH.jogador);
       expect(JSON.parse(textoG)).toMatchObject({ codigo: 'dados_invalidos' });
 
-      const emH = await enviarAoSimulador(p, cenario.grupoH, idsDoSimulador(deH.jogador, cenario.idsG.jogadorAtivo), sessaoB);
+      const emH = await enviarAoSimulador(
+        p,
+        cenario.grupoH,
+        idsDoSimulador(deH.jogador, cenario.idsG.jogadorAtivo),
+        sessaoB,
+      );
       expect(emH.status, 'B em H com o jogador de G').toBe(422);
       const textoH = await emH.text();
       expect(textoH).not.toContain('Toninho');
       expect(textoH).not.toContain(cenario.idsG.jogadorAtivo);
 
-      expect([await retratoDoSimulador(cenario.grupoG), await retratoDoSimulador(cenario.grupoH)]).toEqual(antes);
+      expect([
+        await retratoDoSimulador(cenario.grupoG),
+        await retratoDoSimulador(cenario.grupoH),
+      ]).toEqual(antes);
     },
   );
 
@@ -1049,7 +1241,12 @@ describe('isolamento de rotas', () => {
     await db.query('UPDATE grupos SET arquivado_em = now() WHERE id = $1', [cenario.grupoG]);
     try {
       for (const [rota, p] of Object.entries(PEDIDOS_DO_SIMULADOR)) {
-        const r = await enviarAoSimulador(p, cenario.grupoG, idsDoSimulador(cenario.idsG.jogadorAtivo, SEM_JOGADOR_1), sessaoA);
+        const r = await enviarAoSimulador(
+          p,
+          cenario.grupoG,
+          idsDoSimulador(cenario.idsG.jogadorAtivo, SEM_JOGADOR_1),
+          sessaoA,
+        );
         if (p.metodo === 'GET') {
           expect(r.status, `${rota}: leitura da criadora`).toBe(200);
         } else {
@@ -1063,13 +1260,18 @@ describe('isolamento de rotas', () => {
     expect(await retratoDoSimulador(cenario.grupoG)).toBe(antes);
   });
 
-  const casos = Object.entries(TABELA).filter((e): e is [string, { caso: () => Promise<void> }] => 'caso' in e[1]);
+  const casos = Object.entries(TABELA).filter(
+    (e): e is [string, { caso: () => Promise<void> }] => 'caso' in e[1],
+  );
 
-  it.each(casos)('ACE-41: %s com a conta B não muda nada do grupo nem da conta de A', async (_rota, linha) => {
-    limparCaixa();
-    await aberto.db.query('DELETE FROM pedidos_email_origem');
-    const antes = await retratoDeA();
-    await linha.caso();
-    expect(await retratoDeA()).toBe(antes);
-  });
+  it.each(casos)(
+    'ACE-41: %s com a conta B não muda nada do grupo nem da conta de A',
+    async (_rota, linha) => {
+      limparCaixa();
+      await aberto.db.query('DELETE FROM pedidos_email_origem');
+      const antes = await retratoDeA();
+      await linha.caso();
+      expect(await retratoDeA()).toBe(antes);
+    },
+  );
 });

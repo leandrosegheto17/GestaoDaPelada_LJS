@@ -185,7 +185,8 @@ function Formulario({ grupo }: { grupo: GrupoDetalhe }) {
       onError: (erro) => {
         const porCampo = errosDoGrupo(erro);
         setErros(porCampo);
-        if (Object.keys(porCampo).length === 0) setFalha(erro instanceof ErroApi ? erro.message : MENSAGEM_REDE);
+        if (Object.keys(porCampo).length === 0)
+          setFalha(erro instanceof ErroApi ? erro.message : MENSAGEM_REDE);
       },
     });
   }
@@ -193,7 +194,12 @@ function Formulario({ grupo }: { grupo: GrupoDetalhe }) {
   return (
     <>
       {salvo ? <Faixa tipo="sucesso">{TEXTO_DADOS_SALVOS}</Faixa> : null}
-      <form className={estilos.formulario} noValidate aria-busy={editar.isPending || undefined} onSubmit={enviar}>
+      <form
+        className={estilos.formulario}
+        noValidate
+        aria-busy={editar.isPending || undefined}
+        onSubmit={enviar}
+      >
         <ResumoErros erros={resumoDoGrupo(erros)} />
         {falha ? <Faixa tipo="erro">{falha}</Faixa> : null}
         <CamposGrupo dados={dados} erros={erros} mudar={mudar} />

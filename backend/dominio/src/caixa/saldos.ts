@@ -30,8 +30,12 @@ export interface Totais {
 /** Soma das entradas e das saídas, cada uma positiva. */
 export function totais(movimentos: readonly MovimentoCaixa[]): Totais {
   return {
-    entradasCentavos: somarCentavos(movimentos.filter((m) => m.tipo === 'entrada').map((m) => m.valorCentavos)),
-    saidasCentavos: somarCentavos(movimentos.filter((m) => m.tipo === 'saida').map((m) => m.valorCentavos)),
+    entradasCentavos: somarCentavos(
+      movimentos.filter((m) => m.tipo === 'entrada').map((m) => m.valorCentavos),
+    ),
+    saidasCentavos: somarCentavos(
+      movimentos.filter((m) => m.tipo === 'saida').map((m) => m.valorCentavos),
+    ),
   };
 }
 
@@ -39,9 +43,18 @@ export function totais(movimentos: readonly MovimentoCaixa[]): Totais {
  * Saldo inicial + entradas − saídas dos lançamentos com data entre a data do saldo inicial e hoje, inclusive as
  * duas pontas. Hoje anterior à data inicial: só o saldo inicial.
  */
-export function saldoAtual(config: ConfigCaixa, lancamentos: readonly MovimentoCaixa[], hoje: DataCaixa): number {
+export function saldoAtual(
+  config: ConfigCaixa,
+  lancamentos: readonly MovimentoCaixa[],
+  hoje: DataCaixa,
+): number {
   if (hoje < config.dataSaldoInicial) return config.saldoInicialCentavos;
-  const noIntervalo = lancamentos.filter((l) => l.data >= config.dataSaldoInicial && l.data <= hoje);
+  const noIntervalo = lancamentos.filter(
+    (l) => l.data >= config.dataSaldoInicial && l.data <= hoje,
+  );
   const { entradasCentavos, saidasCentavos } = totais(noIntervalo);
-  return subtrairCentavos(somarCentavos([config.saldoInicialCentavos, entradasCentavos]), saidasCentavos);
+  return subtrairCentavos(
+    somarCentavos([config.saldoInicialCentavos, entradasCentavos]),
+    saidasCentavos,
+  );
 }

@@ -20,7 +20,9 @@ export async function gerarParVapid(): Promise<ParVapid> {
     'sign',
     'verify',
   ])) as CryptoKeyPair;
-  const publica = new Uint8Array((await crypto.subtle.exportKey('raw', par.publicKey)) as ArrayBuffer);
+  const publica = new Uint8Array(
+    (await crypto.subtle.exportKey('raw', par.publicKey)) as ArrayBuffer,
+  );
   const jwk = (await crypto.subtle.exportKey('jwk', par.privateKey)) as JsonWebKey;
   if (!jwk.d) throw new Error('A chave gerada não trouxe o d.');
   return { publica: base64url(publica), privada: jwk.d };

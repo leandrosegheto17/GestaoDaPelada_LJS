@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { montarElenco, type Apto } from '../../src/simulador/base.ts';
 import type { ComposicaoDois } from '../../src/simulador/chave-dois.ts';
-import { avisosDoisTimes, avisosVariosTimes, nAlternativos, type Aviso } from '../../src/simulador/avisos.ts';
+import {
+  avisosDoisTimes,
+  avisosVariosTimes,
+  nAlternativos,
+  type Aviso,
+} from '../../src/simulador/avisos.ts';
 import { indicadoresDoisTimes } from '../../src/simulador/indicadores-dois.ts';
 
 /**
@@ -21,7 +26,11 @@ import { indicadoresDoisTimes } from '../../src/simulador/indicadores-dois.ts';
 
 const DATA = '2026-10-22';
 
-function apto(id: string, apelido: string, opcoes: { semNota?: boolean; so1oTempo?: boolean } = {}): Apto {
+function apto(
+  id: string,
+  apelido: string,
+  opcoes: { semNota?: boolean; so1oTempo?: boolean } = {},
+): Apto {
   return {
     id,
     apelido,
@@ -55,13 +64,40 @@ describe('avisos de 2 times', () => {
       apto('d', 'Careca'),
       apto('e', 'Serginho', { semNota: true }),
     ];
-    const avisos = dois(aptos, { times: [{ titulares: ['a', 'd'], entram: [] }, { titulares: ['b', 'c'], entram: [] }], naoEntra: ['e'] }, 2);
-    expect(textos(avisos, 'sem_nota')).toEqual(['Léo Baiano e Serginho não têm nota: usamos nível 5,5.']);
+    const avisos = dois(
+      aptos,
+      {
+        times: [
+          { titulares: ['a', 'd'], entram: [] },
+          { titulares: ['b', 'c'], entram: [] },
+        ],
+        naoEntra: ['e'],
+      },
+      2,
+    );
+    expect(textos(avisos, 'sem_nota')).toEqual([
+      'Léo Baiano e Serginho não têm nota: usamos nível 5,5.',
+    ]);
   });
 
   it('SIM-44: um só: "não tem nota"', () => {
-    const aptos = [apto('a', 'A'), apto('b', 'B'), apto('c', 'Juca', { semNota: true }), apto('d', 'D')];
-    const avisos = dois(aptos, { times: [{ titulares: ['a', 'd'], entram: [] }, { titulares: ['b', 'c'], entram: [] }], naoEntra: [] }, 2);
+    const aptos = [
+      apto('a', 'A'),
+      apto('b', 'B'),
+      apto('c', 'Juca', { semNota: true }),
+      apto('d', 'D'),
+    ];
+    const avisos = dois(
+      aptos,
+      {
+        times: [
+          { titulares: ['a', 'd'], entram: [] },
+          { titulares: ['b', 'c'], entram: [] },
+        ],
+        naoEntra: [],
+      },
+      2,
+    );
     expect(textos(avisos, 'sem_nota')).toEqual(['Juca não tem nota: usamos nível 5,5.']);
   });
 
@@ -72,8 +108,20 @@ describe('avisos de 2 times', () => {
       apto('m', 'Mané', { semNota: true }),
       apto('a', 'Abel', { semNota: true }),
     ];
-    const avisos = dois(aptos, { times: [{ titulares: ['a', 'z'], entram: [] }, { titulares: ['b', 'm'], entram: [] }], naoEntra: [] }, 2);
-    expect(textos(avisos, 'sem_nota')).toEqual(['Zeca, Mané e Abel não têm nota: usamos nível 5,5.']);
+    const avisos = dois(
+      aptos,
+      {
+        times: [
+          { titulares: ['a', 'z'], entram: [] },
+          { titulares: ['b', 'm'], entram: [] },
+        ],
+        naoEntra: [],
+      },
+      2,
+    );
+    expect(textos(avisos, 'sem_nota')).toEqual([
+      'Zeca, Mané e Abel não têm nota: usamos nível 5,5.',
+    ]);
   });
 
   it('SIM-42, SIM-90: 1 "só 1º" a mais que as reservas avisa no singular', () => {
@@ -84,7 +132,17 @@ describe('avisos de 2 times', () => {
       apto('d', 'D'),
       apto('r', 'R'),
     ];
-    const avisos = dois(aptos, { times: [{ titulares: ['a', 'c'], entram: ['r'] }, { titulares: ['b', 'd'], entram: [] }], naoEntra: [] }, 2);
+    const avisos = dois(
+      aptos,
+      {
+        times: [
+          { titulares: ['a', 'c'], entram: ['r'] },
+          { titulares: ['b', 'd'], entram: [] },
+        ],
+        naoEntra: [],
+      },
+      2,
+    );
     expect(textos(avisos, 'so_1o_tempo_sem_reserva')).toEqual([
       'Time A: 1 jogador que só joga o 1º tempo sem reserva para entrar; o time terá menos gente no 2º tempo.',
     ]);
@@ -103,7 +161,13 @@ describe('avisos de 2 times', () => {
     ];
     const avisos = dois(
       aptos,
-      { times: [{ titulares: ['b', 'd', 'f'], entram: ['r'] }, { titulares: ['a', 'c', 'e'], entram: ['s'] }], naoEntra: [] },
+      {
+        times: [
+          { titulares: ['b', 'd', 'f'], entram: ['r'] },
+          { titulares: ['a', 'c', 'e'], entram: ['s'] },
+        ],
+        naoEntra: [],
+      },
       3,
     );
     expect(textos(avisos, 'so_1o_tempo_sem_reserva')).toEqual([
@@ -112,31 +176,74 @@ describe('avisos de 2 times', () => {
   });
 
   it('SIM-42: tantos "só 1º" quanto reservas não avisa', () => {
-    const aptos = [apto('a', 'A', { so1oTempo: true }), apto('b', 'B'), apto('c', 'C'), apto('d', 'D'), apto('r', 'R')];
-    const avisos = dois(aptos, { times: [{ titulares: ['a', 'd'], entram: ['r'] }, { titulares: ['b', 'c'], entram: [] }], naoEntra: [] }, 2);
+    const aptos = [
+      apto('a', 'A', { so1oTempo: true }),
+      apto('b', 'B'),
+      apto('c', 'C'),
+      apto('d', 'D'),
+      apto('r', 'R'),
+    ];
+    const avisos = dois(
+      aptos,
+      {
+        times: [
+          { titulares: ['a', 'd'], entram: ['r'] },
+          { titulares: ['b', 'c'], entram: [] },
+        ],
+        naoEntra: [],
+      },
+      2,
+    );
     expect(textos(avisos, 'so_1o_tempo_sem_reserva')).toEqual([]);
   });
 
   it('SIM-43: time sem N titulares e reserva sem par avisam a composição diferente', () => {
-    const aptos = [apto('a', 'A'), apto('b', 'B'), apto('c', 'C'), apto('d', 'D'), apto('r', 'R'), apto('s', 'S')];
+    const aptos = [
+      apto('a', 'A'),
+      apto('b', 'B'),
+      apto('c', 'C'),
+      apto('d', 'D'),
+      apto('r', 'R'),
+      apto('s', 'S'),
+    ];
     // A tem 3 titulares (N = 2); B tem 1 titular e 2 reservas: só 1 sai, e uma reserva fica sem par.
     const avisos = dois(
       aptos,
-      { times: [{ titulares: ['a', 'b', 'c'], entram: [] }, { titulares: ['d'], entram: ['r', 's'] }], naoEntra: [] },
+      {
+        times: [
+          { titulares: ['a', 'b', 'c'], entram: [] },
+          { titulares: ['d'], entram: ['r', 's'] },
+        ],
+        naoEntra: [],
+      },
       2,
     );
-    expect(textos(avisos, 'composicao_diferente')).toEqual(['A composição difere da prevista: confira Time A e Time B.']);
+    expect(textos(avisos, 'composicao_diferente')).toEqual([
+      'A composição difere da prevista: confira Time A e Time B.',
+    ]);
   });
 
   it('SIM-43: composição prevista não avisa', () => {
     const aptos = [apto('a', 'A'), apto('b', 'B'), apto('c', 'C'), apto('d', 'D')];
-    const avisos = dois(aptos, { times: [{ titulares: ['a', 'd'], entram: [] }, { titulares: ['b', 'c'], entram: [] }], naoEntra: [] }, 2);
+    const avisos = dois(
+      aptos,
+      {
+        times: [
+          { titulares: ['a', 'd'], entram: [] },
+          { titulares: ['b', 'c'], entram: [] },
+        ],
+        naoEntra: [],
+      },
+      2,
+    );
     expect(avisos).toEqual([]);
   });
 });
 
 describe('avisos de 3 ou mais times', () => {
-  const aptos13 = Array.from({ length: 13 }, (_, k) => apto(`p${String(k + 1).padStart(2, '0')}`, `P${k + 1}`));
+  const aptos13 = Array.from({ length: 13 }, (_, k) =>
+    apto(`p${String(k + 1).padStart(2, '0')}`, `P${k + 1}`),
+  );
   const em = (tamanhos: number[]): string[][] => {
     let i = 0;
     return tamanhos.map((q) => aptos13.slice(i, (i += q)).map((a) => a.id));
@@ -150,9 +257,20 @@ describe('avisos de 3 ou mais times', () => {
 
   it('SIM-45: incompleto com exatamente a metade de N não avisa', () => {
     const aptos10 = aptos13.slice(0, 10);
-    expect(textos(varios(aptos10, [['p01', 'p02', 'p03', 'p04'], ['p05', 'p06', 'p07', 'p08'], ['p09', 'p10']], 4), 'incompleto_pequeno')).toEqual(
-      [],
-    );
+    expect(
+      textos(
+        varios(
+          aptos10,
+          [
+            ['p01', 'p02', 'p03', 'p04'],
+            ['p05', 'p06', 'p07', 'p08'],
+            ['p09', 'p10'],
+          ],
+          4,
+        ),
+        'incompleto_pequeno',
+      ),
+    ).toEqual([]);
   });
 
   it('SIM-45: nAlternativos procura N−1, N+1, N−2… e para em 2', () => {
@@ -177,8 +295,20 @@ describe('avisos de 3 ou mais times', () => {
   });
 
   it('SIM-44: em 3 ou mais, os apelidos sem nota saem por id', () => {
-    const lista = [apto('c', 'Caio', { semNota: true }), apto('a', 'Zé', { semNota: true }), ...aptos13.slice(0, 7)];
-    const avisos = varios(lista, [['c', 'p01', 'p02'], ['p03', 'p04', 'a'], ['p05', 'p06', 'p07']], 3);
+    const lista = [
+      apto('c', 'Caio', { semNota: true }),
+      apto('a', 'Zé', { semNota: true }),
+      ...aptos13.slice(0, 7),
+    ];
+    const avisos = varios(
+      lista,
+      [
+        ['c', 'p01', 'p02'],
+        ['p03', 'p04', 'a'],
+        ['p05', 'p06', 'p07'],
+      ],
+      3,
+    );
     expect(textos(avisos, 'sem_nota')).toEqual(['Zé e Caio não têm nota: usamos nível 5,5.']);
   });
 });
@@ -195,18 +325,36 @@ describe('avisos não expõem nível nem bloqueiam', () => {
     ];
     const avisos2 = dois(
       aptos,
-      { times: [{ titulares: ['a', 'c', 'b'], entram: [] }, { titulares: ['d'], entram: ['r', 's'] }], naoEntra: [] },
+      {
+        times: [
+          { titulares: ['a', 'c', 'b'], entram: [] },
+          { titulares: ['d'], entram: ['r', 's'] },
+        ],
+        naoEntra: [],
+      },
       2,
     );
-    const aptos13 = Array.from({ length: 13 }, (_, k) => apto(`p${k}`, `P${k}`, { semNota: k === 3 }));
+    const aptos13 = Array.from({ length: 13 }, (_, k) =>
+      apto(`p${k}`, `P${k}`, { semNota: k === 3 }),
+    );
     const avisos3 = avisosVariosTimes({
       n: 4,
-      times: [aptos13.slice(0, 4), aptos13.slice(4, 7), aptos13.slice(7, 10), aptos13.slice(10)].map((t) => t.map((a) => a.id)),
+      times: [
+        aptos13.slice(0, 4),
+        aptos13.slice(4, 7),
+        aptos13.slice(7, 10),
+        aptos13.slice(10),
+      ].map((t) => t.map((a) => a.id)),
       elenco: montarElenco(aptos13, DATA),
     });
     const todos = [...avisos2, ...avisos3];
     expect(new Set(todos.map((a) => a.tipo))).toEqual(
-      new Set(['so_1o_tempo_sem_reserva', 'composicao_diferente', 'sem_nota', 'incompleto_pequeno']),
+      new Set([
+        'so_1o_tempo_sem_reserva',
+        'composicao_diferente',
+        'sem_nota',
+        'incompleto_pequeno',
+      ]),
     );
     for (const aviso of todos) {
       if (aviso.tipo === 'sem_nota') expect(aviso.texto.match(/\d,\d/g)).toEqual(['5,5']);

@@ -86,7 +86,11 @@ function rotaDoEvento(e: EventoTail): RotaMedida | null {
 /** Lê a saída do `wrangler tail --format json`: um evento JSON por linha. */
 export function lerTail(texto: string): ResultadoTail {
   const vazia = (): MedicaoDaRota => ({ amostras: [], semCpu: 0, naoOk: 0, erros1102: 0 });
-  const rotas: Record<RotaMedida, MedicaoDaRota> = { previa: vazia(), sugerir: vazia(), avaliar: vazia() };
+  const rotas: Record<RotaMedida, MedicaoDaRota> = {
+    previa: vazia(),
+    sugerir: vazia(),
+    avaliar: vazia(),
+  };
   let linhasIgnoradas = 0;
   for (const linha of texto.split(/\r?\n/)) {
     if (linha.trim() === '') continue;
@@ -167,13 +171,21 @@ export interface Ambiente {
   sessao: string;
 }
 
-export type Pedir = (caminho: string, metodo: 'GET' | 'POST', corpo?: unknown) => Promise<{ status: number; json: unknown }>;
+export type Pedir = (
+  caminho: string,
+  metodo: 'GET' | 'POST',
+  corpo?: unknown,
+) => Promise<{ status: number; json: unknown }>;
 
 /** Cliente da API da prévia: origem própria (passa na guarda de origem), cabeçalho `x-pelada` e o cookie da sessão. */
 export function clienteDaPrevia(amb: Ambiente): Pedir {
   const origem = new URL(amb.urlPublica).origin;
   return async (caminho, metodo, corpo) => {
-    const headers = new Headers({ 'x-pelada': '1', origin: origem, cookie: `${COOKIE_SESSAO}=${amb.sessao}` });
+    const headers = new Headers({
+      'x-pelada': '1',
+      origin: origem,
+      cookie: `${COOKIE_SESSAO}=${amb.sessao}`,
+    });
     if (corpo !== undefined) headers.set('content-type', 'application/json');
     const r = await fetch(`${origem}/api${caminho}`, {
       method: metodo,
@@ -207,7 +219,8 @@ interface SemanaDeUso {
 
 export async function contagensDoGrupo(pedir: Pedir, grupoId: string): Promise<Contagens> {
   const r = await pedir(`/grupos/${grupoId}/uso`, 'GET');
-  if (r.status !== 200) throw new ErroMedicao(`GET uso respondeu ${r.status}: confira a sessão e o grupo.`);
+  if (r.status !== 200)
+    throw new ErroMedicao(`GET uso respondeu ${r.status}: confira a sessão e o grupo.`);
   const semanas = (r.json as { semanas: SemanaDeUso[] }).semanas;
   let escalacoes = 0;
   let eventos = 0;
@@ -238,7 +251,10 @@ interface ResultadoDoisMedido {
 function composicaoDe(r: ResultadoDoisMedido) {
   const so = (j: JogadorDoResultado) => ({ id: j.id, so1oTempo: j.so1oTempo === true });
   return {
-    times: r.times.map((t) => ({ titulares: t.titulares.map(so), entramNo2oTempo: t.entramNo2oTempo.map(so) })),
+    times: r.times.map((t) => ({
+      titulares: t.titulares.map(so),
+      entramNo2oTempo: t.entramNo2oTempo.map(so),
+    })),
     naoEntra: r.naoEntra.map((j) => j.id),
   };
 }
@@ -253,7 +269,11 @@ export interface RelatorioDisparo {
 }
 
 /** Dispara as rotas medidas contra a prévia. Nunca chama `escalacoes` (AD-117). */
-export async function disparar(pedir: Pedir, grupoId: string, repeticoes = REPETICOES): Promise<RelatorioDisparo> {
+export async function disparar(
+  pedir: Pedir,
+  grupoId: string,
+  repeticoes = REPETICOES,
+): Promise<RelatorioDisparo> {
   const antes = await contagensDoGrupo(pedir, grupoId);
   const ctx = await pedir(`/grupos/${grupoId}/simulador/contexto`, 'GET');
   if (ctx.status !== 200) throw new ErroMedicao(`GET contexto respondeu ${ctx.status}.`);
@@ -264,7 +284,9 @@ export async function disparar(pedir: Pedir, grupoId: string, repeticoes = REPET
     );
   }
   const data = contexto.dataSugerida;
-  const aptos = contexto.jogadores.slice(0, APTOS_MEDIDOS).map((j) => ({ id: j.id, so1oTempo: false }));
+  const aptos = contexto.jogadores
+    .slice(0, APTOS_MEDIDOS)
+    .map((j) => ({ id: j.id, so1oTempo: false }));
   const pedidos: Record<RotaMedida, number> = { previa: 0, sugerir: 0, avaliar: 0 };
   const naoOk: string[] = [];
   const registrar = (rota: RotaMedida, status: number) => {
@@ -274,25 +296,38 @@ export async function disparar(pedir: Pedir, grupoId: string, repeticoes = REPET
 
   let sugestaoDois: ResultadoDoisMedido | null = null;
   for (const config of CONFIGURACOES_SUGERIR) {
-    const corpo = { ...config, data, aptos: config.formato === 'dois_times' ? aptos : aptos.map(({ id }) => ({ id })) };
+    const corpo = {
+      ...config,
+      data,
+      aptos: config.formato === 'dois_times' ? aptos : aptos.map(({ id }) => ({ id })),
+    };
     const { data: _data, ...daPrevia } = corpo;
     for (let i = 0; i < repeticoes; i++) {
       const p = await pedir(`/grupos/${grupoId}/simulador/previa`, 'POST', daPrevia);
       registrar('previa', p.status);
       const s = await pedir(`/grupos/${grupoId}/simulador/sugerir`, 'POST', corpo);
       registrar('sugerir', s.status);
-      if (s.status === 200 && config.formato === 'dois_times') sugestaoDois = s.json as ResultadoDoisMedido;
+      if (s.status === 200 && config.formato === 'dois_times')
+        sugestaoDois = s.json as ResultadoDoisMedido;
     }
   }
   if (!sugestaoDois) throw new ErroMedicao('Nenhuma sugestão de 2 times para medir o avaliar.');
-  const corpoAvaliar = { ...CONFIGURACOES_SUGERIR[0], data, aptos, composicao: composicaoDe(sugestaoDois) };
+  const corpoAvaliar = {
+    ...CONFIGURACOES_SUGERIR[0],
+    data,
+    aptos,
+    composicao: composicaoDe(sugestaoDois),
+  };
   for (let i = 0; i < repeticoes; i++) {
     const a = await pedir(`/grupos/${grupoId}/simulador/avaliar`, 'POST', corpoAvaliar);
     registrar('avaliar', a.status);
   }
 
   const depois = await contagensDoGrupo(pedir, grupoId);
-  const ok = naoOk.length === 0 && depois.escalacoes === antes.escalacoes && depois.eventos === antes.eventos;
+  const ok =
+    naoOk.length === 0 &&
+    depois.escalacoes === antes.escalacoes &&
+    depois.eventos === antes.eventos;
   return { data, pedidos, naoOk, antes, depois, ok };
 }
 
@@ -304,7 +339,11 @@ function imprimirVeredito(v: Veredito, linhasIgnoradas: number): void {
     );
   }
   if (linhasIgnoradas > 0) console.log(`Linhas do tail ignoradas (não JSON): ${linhasIgnoradas}`);
-  console.log(v.ok ? `Medição ok (p99 < ${TETO_P99_MS} ms, zero 1102).` : 'Medição reprovada: pare para a decisão do usuário.');
+  console.log(
+    v.ok
+      ? `Medição ok (p99 < ${TETO_P99_MS} ms, zero 1102).`
+      : 'Medição reprovada: pare para a decisão do usuário.',
+  );
 }
 
 if (import.meta.main) {
@@ -319,16 +358,23 @@ if (import.meta.main) {
     }
     if (etapa === 'disparar' && alvo) {
       if (!resto.includes('--confirmo-previa')) {
-        throw new ErroMedicao('Disparo contra a prévia publicada exige --confirmo-previa (confirmação do usuário na hora).');
+        throw new ErroMedicao(
+          'Disparo contra a prévia publicada exige --confirmo-previa (confirmação do usuário na hora).',
+        );
       }
       const urlPublica = process.env.URL_PUBLICA;
       const sessao = process.env.SESSAO_MEDICAO;
-      if (!urlPublica || !sessao) throw new ErroMedicao('Defina URL_PUBLICA e SESSAO_MEDICAO no ambiente.');
+      if (!urlPublica || !sessao)
+        throw new ErroMedicao('Defina URL_PUBLICA e SESSAO_MEDICAO no ambiente.');
       const r = await disparar(clienteDaPrevia({ urlPublica, sessao }), alvo);
       console.log(`Data: ${r.data}; pedidos: ${JSON.stringify(r.pedidos)}`);
-      console.log(`Escalações antes/depois: ${r.antes.escalacoes}/${r.depois.escalacoes}; eventos: ${r.antes.eventos}/${r.depois.eventos}`);
+      console.log(
+        `Escalações antes/depois: ${r.antes.escalacoes}/${r.depois.escalacoes}; eventos: ${r.antes.eventos}/${r.depois.eventos}`,
+      );
       if (r.naoOk.length > 0) console.log(`Fora do 200: ${r.naoOk.join(', ')}`);
-      console.log(r.ok ? 'Disparo ok: agora rode a etapa analisar sobre o tail.' : 'Disparo com problemas.');
+      console.log(
+        r.ok ? 'Disparo ok: agora rode a etapa analisar sobre o tail.' : 'Disparo com problemas.',
+      );
       if (!r.ok) process.exitCode = 1;
       return;
     }

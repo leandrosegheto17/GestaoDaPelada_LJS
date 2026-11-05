@@ -42,7 +42,10 @@ export function diferencas(referencia: readonly string[], atual: readonly string
   };
 }
 
-export async function compararEsquema(url: string, referencia: readonly string[] = lerReferencia()): Promise<Diferencas> {
+export async function compararEsquema(
+  url: string,
+  referencia: readonly string[] = lerReferencia(),
+): Promise<Diferencas> {
   const atual = await comConexao(url, (c) => lerEsquema(c, OPCOES_REFERENCIA));
   return diferencas(referencia, atual);
 }
@@ -52,9 +55,10 @@ export const ROLES_CONFERIDAS = ['pelada_owner', 'pelada_app', 'pelada_backup_ro
 
 export async function conferirRoles(url: string): Promise<Record<string, boolean>> {
   return comConexao(url, async (c) => {
-    const r = await c.query<{ rolname: string }>('SELECT rolname FROM pg_roles WHERE rolname = ANY($1)', [
-      [...ROLES_CONFERIDAS],
-    ]);
+    const r = await c.query<{ rolname: string }>(
+      'SELECT rolname FROM pg_roles WHERE rolname = ANY($1)',
+      [[...ROLES_CONFERIDAS]],
+    );
     const presentes = new Set(r.rows.map((l) => l.rolname));
     return Object.fromEntries(ROLES_CONFERIDAS.map((nome) => [nome, presentes.has(nome)]));
   });
@@ -83,12 +87,16 @@ export interface OpcoesComando {
 export function lerArgumentos(argv: readonly string[]): OpcoesComando {
   const i = argv.indexOf('--alvo');
   const alvo = i >= 0 ? argv[i + 1] : undefined;
-  if (alvo !== 'dev' && alvo !== 'local') throw new ErroComparar('Uso: pnpm esquema:comparar --alvo dev|local [--migrar]');
+  if (alvo !== 'dev' && alvo !== 'local')
+    throw new ErroComparar('Uso: pnpm esquema:comparar --alvo dev|local [--migrar]');
   return { alvo, migrar: argv.includes('--migrar') };
 }
 
 /** URL do alvo, com a trava de host: remoto só com `PELADA_PERMITIR_HOST_REMOTO=1`. */
-export function urlDoAlvo(alvo: OpcoesComando['alvo'], env: Record<string, string | undefined>): string {
+export function urlDoAlvo(
+  alvo: OpcoesComando['alvo'],
+  env: Record<string, string | undefined>,
+): string {
   const url =
     alvo === 'dev'
       ? env.NEON_URL_DEV_MIGRACAO
@@ -123,15 +131,24 @@ export async function comandoComparar(
 
 function imprimir(r: Relatorio): void {
   if (r.migracao) {
-    console.log(`Migrações aplicadas: ${r.migracao.aplicadas.length}${r.migracao.aplicadas.length ? ` (${r.migracao.aplicadas.join(', ')})` : ''}`);
-    console.log(`Contagem de linhas por tabela ${r.migracao.contagemIgual ? 'idêntica' : 'DIFERENTE'} antes e depois.`);
+    console.log(
+      `Migrações aplicadas: ${r.migracao.aplicadas.length}${r.migracao.aplicadas.length ? ` (${r.migracao.aplicadas.join(', ')})` : ''}`,
+    );
+    console.log(
+      `Contagem de linhas por tabela ${r.migracao.contagemIgual ? 'idêntica' : 'DIFERENTE'} antes e depois.`,
+    );
     if (!r.migracao.contagemIgual) {
       for (const t of Object.keys({ ...r.migracao.antes, ...r.migracao.depois })) {
-        if (r.migracao.antes[t] !== r.migracao.depois[t]) console.log(`  ${t}: ${r.migracao.antes[t]} → ${r.migracao.depois[t]}`);
+        if (r.migracao.antes[t] !== r.migracao.depois[t])
+          console.log(`  ${t}: ${r.migracao.antes[t]} → ${r.migracao.depois[t]}`);
       }
     }
   }
-  console.log(`Roles: ${Object.entries(r.roles).map(([n, tem]) => `${n} ${tem ? 'existe' : 'AUSENTE'}`).join(', ')}`);
+  console.log(
+    `Roles: ${Object.entries(r.roles)
+      .map(([n, tem]) => `${n} ${tem ? 'existe' : 'AUSENTE'}`)
+      .join(', ')}`,
+  );
   console.log(`Faltando (${r.diferencas.faltando.length}):`);
   for (const l of r.diferencas.faltando) console.log(`  - ${l}`);
   console.log(`Sobrando (${r.diferencas.sobrando.length}):`);

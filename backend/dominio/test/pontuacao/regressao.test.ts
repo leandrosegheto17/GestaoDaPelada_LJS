@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { acumuladoPorInicio } from '../../src/pontuacao/acumulado.ts';
-import { PESOS_PADRAO, type ConfigPesos, type PresencaDoJogador } from '../../src/pontuacao/pesos.ts';
+import {
+  PESOS_PADRAO,
+  type ConfigPesos,
+  type PresencaDoJogador,
+} from '../../src/pontuacao/pesos.ts';
 
 /**
  * Regressão com os casos do legado (T6; PAR-57, PAR-58, PAR-59; AD-041). Só as entradas e os valores esperados vêm da
@@ -29,7 +33,11 @@ const CONFIGS: ConfigPesos[] = [
   { ...PESOS_PADRAO, presencaComChuva: 2, vigenteDesde: '2026-10-01' },
 ];
 
-const presente = (data: string): PresencaDoJogador => ({ data, choveu: false, situacao: 'presente' });
+const presente = (data: string): PresencaDoJogador => ({
+  data,
+  choveu: false,
+  situacao: 'presente',
+});
 
 const VANDRE = ['2026-09-20', '2026-09-27', '2026-10-11'].map(presente);
 
@@ -41,14 +49,28 @@ describe('regressão: Vandré (PAR-58, PAR-59)', () => {
     ['S recuado para 01/08, sem lançamento no intervalo', '2026-08-01', '2026-10-20', 33],
     ['S um dia depois da primeira presença', '2026-09-21', '2026-10-20', 2],
   ])('PAR-58: Vandré, %s', (_nome, inicio, referencia, esperado) => {
-    expect(acumuladoPorInicio({ inicio, pontuacaoInicial: 30, presencas: VANDRE, configs: CONFIGS, referencia })).toBe(esperado);
+    expect(
+      acumuladoPorInicio({
+        inicio,
+        pontuacaoInicial: 30,
+        presencas: VANDRE,
+        configs: CONFIGS,
+        referencia,
+      }),
+    ).toBe(esperado);
   });
 });
 
 describe('regressão: Kim, início hoje (PAR-58, PAR-59)', () => {
   it('PAR-58: data de início hoje dá 0, inclusive a inicial; voltar a S devolve 33', () => {
     const conta = (inicio: string) =>
-      acumuladoPorInicio({ inicio, pontuacaoInicial: 30, presencas: VANDRE, configs: CONFIGS, referencia: '2026-10-20' });
+      acumuladoPorInicio({
+        inicio,
+        pontuacaoInicial: 30,
+        presencas: VANDRE,
+        configs: CONFIGS,
+        referencia: '2026-10-20',
+      });
     expect(conta('2026-10-20')).toBe(0);
     expect(conta('2026-09-20')).toBe(33);
   });
@@ -58,7 +80,9 @@ describe('regressão: saiu e voltou (PAR-57, PAR-58, PAR-59)', () => {
   const PERIODOS = [{ inicio: '2022-07-03' }, { inicio: '2026-10-04' }];
   // 21 presenças semanais de julho de 2022 em diante, nos dias 03, 10, 17 e 24 de cada mês (a mesma geração da origem).
   const ANTIGAS = Array.from({ length: 21 }, (_, i) =>
-    presente(`2022-${String(7 + Math.floor(i / 4)).padStart(2, '0')}-${String(3 + (i % 4) * 7).padStart(2, '0')}`),
+    presente(
+      `2022-${String(7 + Math.floor(i / 4)).padStart(2, '0')}-${String(3 + (i % 4) * 7).padStart(2, '0')}`,
+    ),
   );
   const KIM = [...ANTIGAS, presente('2026-10-04'), presente('2026-10-11')];
 

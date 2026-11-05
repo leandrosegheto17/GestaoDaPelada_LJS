@@ -1,4 +1,8 @@
-import { LIMITES_LANCAMENTO, type LancamentoCorpo, type LancamentoResposta } from '@pelada/contrato/financeiro-lancamentos';
+import {
+  LIMITES_LANCAMENTO,
+  type LancamentoCorpo,
+  type LancamentoResposta,
+} from '@pelada/contrato/financeiro-lancamentos';
 import type { TipoLancamento } from '@pelada/contrato/financeiro';
 import { useState, type FormEvent } from 'react';
 import { useNavigate, useParams } from 'react-router';
@@ -72,7 +76,10 @@ export function resumoDosErros<C extends string>(
 }
 
 /** Só os campos conhecidos do 422; o resto fica de fora (a faixa mostra a mensagem geral). */
-export function errosConhecidos<C extends string>(porCampo: Record<string, string>, campos: readonly { campo: C }[]): Partial<Record<C, string>> {
+export function errosConhecidos<C extends string>(
+  porCampo: Record<string, string>,
+  campos: readonly { campo: C }[],
+): Partial<Record<C, string>> {
   const resultado: Partial<Record<C, string>> = {};
   for (const { campo } of campos) {
     const texto = porCampo[campo];
@@ -102,7 +109,9 @@ export function diaEHora(iso: string): string {
   return `${valor('day')}/${valor('month')} ${valor('hour')}:${valor('minute')}`;
 }
 
-export function textoUltimaAlteracao(l: Pick<LancamentoResposta, 'alteradoPor' | 'alteradoEm'>): string {
+export function textoUltimaAlteracao(
+  l: Pick<LancamentoResposta, 'alteradoPor' | 'alteradoEm'>,
+): string {
   const nome = l.alteradoPor.trim() === '' ? AUTORA_EXCLUIDA : l.alteradoPor;
   return `Última alteração: ${nome}, ${diaEHora(l.alteradoEm)}`;
 }
@@ -161,7 +170,15 @@ function DialogoExcluir({
   );
 }
 
-function Formulario({ grupoId, inicial, lancamento }: { grupoId: string; inicial: FormularioLancamento; lancamento?: LancamentoResposta }) {
+function Formulario({
+  grupoId,
+  inicial,
+  lancamento,
+}: {
+  grupoId: string;
+  inicial: FormularioLancamento;
+  lancamento?: LancamentoResposta;
+}) {
   const navegar = useNavigate();
   const criar = useCriarLancamento(grupoId);
   const editar = useEditarLancamento(grupoId, lancamento?.id ?? '');
@@ -186,21 +203,32 @@ function Formulario({ grupoId, inicial, lancamento }: { grupoId: string; inicial
       setErros({ valorCentavos: valor.mensagem });
       return;
     }
-    const corpo: LancamentoCorpo = { tipo: dados.tipo, data: dados.data, descricao: dados.descricao, valorCentavos: valor.centavos };
+    const corpo: LancamentoCorpo = {
+      tipo: dados.tipo,
+      data: dados.data,
+      descricao: dados.descricao,
+      valorCentavos: valor.centavos,
+    };
     salvar.mutate(corpo, {
       onSuccess: () => void navegar(voltar),
       onError: (erro) => {
         const traduzido = erroDoFinanceiro(erro);
         const porCampo = errosConhecidos(traduzido.campos, CAMPOS);
         setErros(porCampo);
-        if (Object.keys(porCampo).length === 0) setFalha({ tipo: 'erro', texto: traduzido.mensagem });
+        if (Object.keys(porCampo).length === 0)
+          setFalha({ tipo: 'erro', texto: traduzido.mensagem });
       },
     });
   }
 
   return (
     <>
-      <form className={estilos.formulario} noValidate aria-busy={salvar.isPending || undefined} onSubmit={enviar}>
+      <form
+        className={estilos.formulario}
+        noValidate
+        aria-busy={salvar.isPending || undefined}
+        onSubmit={enviar}
+      >
         <ResumoErros erros={resumoDosErros(erros, CAMPOS)} />
         {falha ? <Faixa tipo={falha.tipo}>{falha.texto}</Faixa> : null}
         <CampoSeletor
@@ -212,7 +240,13 @@ function Formulario({ grupoId, inicial, lancamento }: { grupoId: string; inicial
           aoMudar={(v) => mudar('tipo', v)}
           erro={erros.tipo}
         />
-        <CampoData id="data" rotulo="Data" value={dados.data} erro={erros.data} onChange={(e) => mudar('data', e.target.value)} />
+        <CampoData
+          id="data"
+          rotulo="Data"
+          value={dados.data}
+          erro={erros.data}
+          onChange={(e) => mudar('data', e.target.value)}
+        />
         <Campo
           id="desc"
           rotulo="Descrição"
@@ -271,29 +305,43 @@ function ConteudoNovo({ grupoId }: { grupoId: string }) {
   // A data de hoje vem da API (FIN-32, FIN-49): o `hoje` do mês atual do caixa.
   const mes = useMesFinanceiro(grupoId);
   if (mes.isPending) return <EsqueletoLista linhas={4} />;
-  if (mes.isError) return <ErroDaLeitura erro={mes.error} aoTentarDeNovo={() => void mes.refetch()} />;
-  return <Formulario grupoId={grupoId} inicial={{ tipo: 'entrada', data: mes.data.hoje, descricao: '', valor: '' }} />;
+  if (mes.isError)
+    return <ErroDaLeitura erro={mes.error} aoTentarDeNovo={() => void mes.refetch()} />;
+  return (
+    <Formulario
+      grupoId={grupoId}
+      inicial={{ tipo: 'entrada', data: mes.data.hoje, descricao: '', valor: '' }}
+    />
+  );
 }
 
 function ConteudoEdicao({ grupoId, id }: { grupoId: string; id: string }) {
   const consulta = useLancamento(grupoId, id);
   if (consulta.isPending) return <EsqueletoLista linhas={4} />;
-  if (consulta.isError) return <ErroDaLeitura erro={consulta.error} aoTentarDeNovo={() => void consulta.refetch()} />;
+  if (consulta.isError)
+    return <ErroDaLeitura erro={consulta.error} aoTentarDeNovo={() => void consulta.refetch()} />;
   const l = consulta.data;
   return (
     <Formulario
       key={l.id}
       grupoId={grupoId}
       lancamento={l}
-      inicial={{ tipo: l.tipo, data: l.data, descricao: l.descricao, valor: reaisParaCampo(l.valorCentavos) }}
+      inicial={{
+        tipo: l.tipo,
+        data: l.data,
+        descricao: l.descricao,
+        valor: reaisParaCampo(l.valorCentavos),
+      }}
     />
   );
 }
 
 function ErroDaLeitura({ erro, aoTentarDeNovo }: { erro: unknown; aoTentarDeNovo: () => void }) {
   const traduzido = erroDoFinanceiro(erro);
-  if (traduzido.codigo === 'nao_encontrado' || traduzido.status === 404) return <Faixa tipo="atencao">Lançamento não encontrado.</Faixa>;
-  if (traduzido.codigo === 'sem_permissao_financeiro') return <Faixa tipo="erro">{traduzido.mensagem}</Faixa>;
+  if (traduzido.codigo === 'nao_encontrado' || traduzido.status === 404)
+    return <Faixa tipo="atencao">Lançamento não encontrado.</Faixa>;
+  if (traduzido.codigo === 'sem_permissao_financeiro')
+    return <Faixa tipo="erro">{traduzido.mensagem}</Faixa>;
   return <EstadoErro aoTentarDeNovo={aoTentarDeNovo} />;
 }
 
@@ -305,7 +353,11 @@ export function Lancamento() {
     <Casca grupo={{ nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' }} estreita>
       <LinkVoltar para={`${rotaDoGrupo(grupoId)}/financeiro`}>Financeiro</LinkVoltar>
       <h1 className={estilos['titulo-pagina']}>{novo ? TITULO_NOVO : TITULO_EDICAO}</h1>
-      {novo ? <ConteudoNovo grupoId={grupoId} /> : <ConteudoEdicao grupoId={grupoId} id={lancamentoId} />}
+      {novo ? (
+        <ConteudoNovo grupoId={grupoId} />
+      ) : (
+        <ConteudoEdicao grupoId={grupoId} id={lancamentoId} />
+      )}
     </Casca>
   );
 }

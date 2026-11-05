@@ -87,7 +87,12 @@ describe('rede da partidas-e-ranking: grupo_criar de 6 parâmetros (b)', () => {
       expect(id).toBeTruthy();
       await d.query('RESET ROLE');
       expect(await contar(d, 'SELECT 1 FROM grupos WHERE id = $1', [id])).toBe(1);
-      expect(await contar(d, 'SELECT 1 FROM vinculos_admin WHERE grupo_id = $1 AND conta_id = $2', [id, cenario.contaC])).toBe(1);
+      expect(
+        await contar(d, 'SELECT 1 FROM vinculos_admin WHERE grupo_id = $1 AND conta_id = $2', [
+          id,
+          cenario.contaC,
+        ]),
+      ).toBe(1);
       expect(await contar(d, 'SELECT 1 FROM habilidades WHERE grupo_id = $1', [id])).toBe(2);
     });
   });
@@ -125,7 +130,9 @@ describe('rede da partidas-e-ranking: grants atuais (c)', () => {
   });
 
   it('PAR-130: pelada_app tem SELECT, INSERT, UPDATE e DELETE em presencas', async () => {
-    expect(await privilegios('presencas')).toEqual(expect.arrayContaining(['DELETE', 'INSERT', 'SELECT', 'UPDATE']));
+    expect(await privilegios('presencas')).toEqual(
+      expect.arrayContaining(['DELETE', 'INSERT', 'SELECT', 'UPDATE']),
+    );
   });
 
   // Trocado pela T23 (1792844700000_eventos-uso.sql): antes, nenhum grant; agora, exatamente SELECT e INSERT.

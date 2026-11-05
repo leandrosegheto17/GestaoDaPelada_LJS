@@ -60,9 +60,20 @@ export class ContainerAge {
   }
 
   static iniciar(opcoes: { publicarPorta?: boolean } = {}): ContainerAge {
-    docker(['build', '-q', '-t', IMAGEM, '-'], { input: DOCKERFILE, stdio: ['pipe', 'pipe', 'pipe'] });
+    docker(['build', '-q', '-t', IMAGEM, '-'], {
+      input: DOCKERFILE,
+      stdio: ['pipe', 'pipe', 'pipe'],
+    });
     const porta = opcoes.publicarPorta ? ['-p', '127.0.0.1::5432'] : [];
-    const id = docker(['run', '-d', '--rm', ...porta, '-e', 'POSTGRES_PASSWORD=postgres', IMAGEM]).trim();
+    const id = docker([
+      'run',
+      '-d',
+      '--rm',
+      ...porta,
+      '-e',
+      'POSTGRES_PASSWORD=postgres',
+      IMAGEM,
+    ]).trim();
     let portaHost: number | undefined;
     if (opcoes.publicarPorta) {
       const linha = docker(['port', id, '5432/tcp']).split('\n')[0] ?? '';

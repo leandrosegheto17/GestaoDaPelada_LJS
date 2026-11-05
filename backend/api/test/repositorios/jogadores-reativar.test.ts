@@ -42,11 +42,10 @@ async function novoJogador(apelido: string, fim: string | null = '2026-03-01'): 
     [cenario.grupoG, apelido, cenario.contaC],
   );
   const id = r.rows[0]!.id;
-  await db.query(`INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, '2026-01-10', $3)`, [
-    id,
-    cenario.grupoG,
-    fim,
-  ]);
+  await db.query(
+    `INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, '2026-01-10', $3)`,
+    [id, cenario.grupoG, fim],
+  );
   jogadoresCriados.push(id);
   return id;
 }
@@ -76,9 +75,14 @@ async function reativados(id: string) {
 }
 
 function reativarComo(conta: string, grupo: string, id: string, data?: string, confirmar = true) {
-  return comDb(aberto.url, conta, (db) => jogadores.reativar(db, grupo, id, data === undefined ? {} : { data }, HOJE), {
-    confirmar,
-  });
+  return comDb(
+    aberto.url,
+    conta,
+    (db) => jogadores.reativar(db, grupo, id, data === undefined ? {} : { data }, HOJE),
+    {
+      confirmar,
+    },
+  );
 }
 
 describe('jogadores.reativar', () => {
@@ -130,7 +134,12 @@ describe('jogadores.reativar', () => {
     expect(a[0]?.resumo).toMatchObject({ retorno: '2026-10-20', saidaAnterior: '2026-03-01' });
     // T35 da partidas-e-ranking (PAR-122): a auditoria passa a levar acumulado e posição antes e depois.
     expect(Object.keys(a[0]?.resumo ?? {})).toEqual(
-      expect.arrayContaining(['acumuladoAntes', 'acumuladoDepois', 'posicaoAntes', 'posicaoDepois']),
+      expect.arrayContaining([
+        'acumuladoAntes',
+        'acumuladoDepois',
+        'posicaoAntes',
+        'posicaoDepois',
+      ]),
     );
   });
 
@@ -175,9 +184,9 @@ describe('jogadores.reativar', () => {
     await aberto.db.query(
       'CREATE TRIGGER falha_teste_gel109_reativar BEFORE INSERT ON auditoria FOR EACH ROW EXECUTE FUNCTION falha_teste_gel109_reativar()',
     );
-    await expect(reativarComo(aberto.cenario.contaC, aberto.cenario.grupoG, id, '2026-10-01')).rejects.toThrow(
-      'falha forçada',
-    );
+    await expect(
+      reativarComo(aberto.cenario.contaC, aberto.cenario.grupoG, id, '2026-10-01'),
+    ).rejects.toThrow('falha forçada');
     expect(await periodos(id)).toEqual([{ inicio: '2026-01-10', fim: '2026-03-01' }]);
     expect(await reativados(id)).toEqual([]);
   });

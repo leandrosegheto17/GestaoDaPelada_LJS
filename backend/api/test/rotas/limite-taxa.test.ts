@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import type { Env, LimiteDeTaxa, NomeLimite } from '../../src/entrada/ambiente.ts';
 import { criarApp } from '../../src/entrada/app.ts';
-import { CHAVE_SEM_IP, limiteTaxa, MENSAGEM_LIMITE } from '../../src/entrada/middlewares/limite-taxa.ts';
+import {
+  CHAVE_SEM_IP,
+  limiteTaxa,
+  MENSAGEM_LIMITE,
+} from '../../src/entrada/middlewares/limite-taxa.ts';
 
 /** Binding falso: responde o que o teste mandar e guarda as chaves recebidas. */
 function bindingFalso(permite: boolean): LimiteDeTaxa & { chaves: string[] } {
@@ -38,7 +42,11 @@ function montar(binding: NomeLimite, falso: LimiteDeTaxa) {
   } as unknown as Env;
   const pedir = (cabecalhos: Record<string, string> = {}) =>
     // X-Pelada: 1 desde a T18 (ACE-49): sem ele a escrita é recusada antes do limitador.
-    app.request('/api/teste/limitada', { method: 'POST', headers: { 'x-pelada': '1', ...cabecalhos } }, env);
+    app.request(
+      '/api/teste/limitada',
+      { method: 'POST', headers: { 'x-pelada': '1', ...cabecalhos } },
+      env,
+    );
   return { pedir, chamadas: () => chamadas };
 }
 

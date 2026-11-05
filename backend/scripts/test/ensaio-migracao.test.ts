@@ -45,7 +45,12 @@ interface Ids {
 async function semear(url: string, comAdminSemAcesso = true): Promise<Ids> {
   return comConexao(url, async (c) => {
     const conta = async (email: string): Promise<string> =>
-      (await c.query<{ id: string }>(`INSERT INTO contas (email, nome, senha_hash, criada_em) VALUES ($1, $1, 'x', now()) RETURNING id`, [email])).rows[0]!.id;
+      (
+        await c.query<{ id: string }>(
+          `INSERT INTO contas (email, nome, senha_hash, criada_em) VALUES ($1, $1, 'x', now()) RETURNING id`,
+          [email],
+        )
+      ).rows[0]!.id;
     const comAcesso = await conta('criadora@exemplo.test');
     const semAcesso = await conta('outra@exemplo.test');
     const grupo = (
@@ -55,11 +60,20 @@ async function semear(url: string, comAdminSemAcesso = true): Promise<Ids> {
         [comAcesso],
       )
     ).rows[0]!.id;
-    await c.query(`INSERT INTO vinculos_admin (conta_id, grupo_id, acessa_financeiro, criado_por, criado_em) VALUES ($1, $2, true, $1, now())`, [comAcesso, grupo]);
+    await c.query(
+      `INSERT INTO vinculos_admin (conta_id, grupo_id, acessa_financeiro, criado_por, criado_em) VALUES ($1, $2, true, $1, now())`,
+      [comAcesso, grupo],
+    );
     if (comAdminSemAcesso) {
-      await c.query(`INSERT INTO vinculos_admin (conta_id, grupo_id, acessa_financeiro, criado_por, criado_em) VALUES ($1, $2, false, $3, now())`, [semAcesso, grupo, comAcesso]);
+      await c.query(
+        `INSERT INTO vinculos_admin (conta_id, grupo_id, acessa_financeiro, criado_por, criado_em) VALUES ($1, $2, false, $3, now())`,
+        [semAcesso, grupo, comAcesso],
+      );
     }
-    await c.query(`INSERT INTO config_financeira (grupo_id, mensalidade_centavos, saldo_inicial_centavos, data_saldo_inicial) VALUES ($1, 5000, 0, '2026-01-01')`, [grupo]);
+    await c.query(
+      `INSERT INTO config_financeira (grupo_id, mensalidade_centavos, saldo_inicial_centavos, data_saldo_inicial) VALUES ($1, 5000, 0, '2026-01-01')`,
+      [grupo],
+    );
     await c.query(
       `INSERT INTO lancamentos (grupo_id, tipo, data, descricao, valor_centavos, criado_por, criado_em, alterado_por, alterado_em)
        VALUES ($1, 'entrada', '2026-01-05', 'Mensalidade', 5000, $2, now(), $2, now()),
@@ -71,7 +85,10 @@ async function semear(url: string, comAdminSemAcesso = true): Promise<Ids> {
 }
 
 /** Banco `ensaio_*` migrado até antes do financeiro; apagado no `finally`. */
-async function comBancoDeProducao(fn: (url: string) => Promise<void>, opcoes: { semear?: boolean; adminSemAcesso?: boolean } = {}): Promise<void> {
+async function comBancoDeProducao(
+  fn: (url: string) => Promise<void>,
+  opcoes: { semear?: boolean; adminSemAcesso?: boolean } = {},
+): Promise<void> {
   const nome = `ensaio_teste_${randomBytes(6).toString('hex')}`;
   await comConexao(URL_BASE, (c) => c.query(`CREATE DATABASE ${nome}`));
   try {
@@ -123,7 +140,11 @@ describe('ensaiar', () => {
       async (url) => {
         await expect(ensaiar(url, { referencia })).rejects.toThrow(ErroEnsaio);
         await expect(ensaiar(url, { referencia })).rejects.toThrow(/não prova nada/);
-        const aplicadas = await comConexao(url, async (c) => (await c.query(`SELECT 1 FROM pgmigrations WHERE name LIKE '%financeiro%'`)).rowCount);
+        const aplicadas = await comConexao(
+          url,
+          async (c) =>
+            (await c.query(`SELECT 1 FROM pgmigrations WHERE name LIKE '%financeiro%'`)).rowCount,
+        );
         expect(aplicadas).toBe(0);
       },
       { semear: false },
@@ -133,8 +154,12 @@ describe('ensaiar', () => {
   it('FIN-42: migração que apaga linhas reprova o ensaio e a tabela aparece com antes e depois', async () => {
     const pasta = mkdtempSync(join(tmpdir(), 'migracoes-apaga-'));
     try {
-      for (const nome of readdirSync(PASTA_MIGRACOES)) copyFileSync(join(PASTA_MIGRACOES, nome), join(pasta, nome));
-      writeFileSync(join(pasta, '1792999999999_apaga-lancamentos.sql'), '-- Up Migration\nDELETE FROM lancamentos;\n');
+      for (const nome of readdirSync(PASTA_MIGRACOES))
+        copyFileSync(join(PASTA_MIGRACOES, nome), join(pasta, nome));
+      writeFileSync(
+        join(pasta, '1792999999999_apaga-lancamentos.sql'),
+        '-- Up Migration\nDELETE FROM lancamentos;\n',
+      );
       await comBancoDeProducao(async (url) => {
         const r = await ensaiar(url, { referencia, pasta });
         expect(r.tabelasAlteradas).toEqual(['lancamentos: 2 → 0']);
@@ -148,7 +173,8 @@ describe('ensaiar', () => {
   it('FIN-42: tabela listada em podeGanhar pode crescer, mas não encolher', async () => {
     const pasta = mkdtempSync(join(tmpdir(), 'migracoes-cresce-'));
     try {
-      for (const nome of readdirSync(PASTA_MIGRACOES)) copyFileSync(join(PASTA_MIGRACOES, nome), join(pasta, nome));
+      for (const nome of readdirSync(PASTA_MIGRACOES))
+        copyFileSync(join(PASTA_MIGRACOES, nome), join(pasta, nome));
       writeFileSync(
         join(pasta, '1792999999999_enche-config.sql'),
         `-- Up Migration\nINSERT INTO habilidades (grupo_id, nome) SELECT id, 'Extra' FROM grupos;\n`,
@@ -168,13 +194,19 @@ describe('ensaiar', () => {
 
   it('FIN-42: schema diferente da referência reprova o ensaio e lista o que sobra', async () => {
     await comBancoDeProducao(async (url) => {
-      const r = await ensaiar(url, { referencia: referencia.filter((l) => !l.startsWith('funcao app_acessa_financeiro(')) });
-      expect(r.esquema.sobrando.some((l) => l.startsWith('funcao app_acessa_financeiro('))).toBe(true);
+      const r = await ensaiar(url, {
+        referencia: referencia.filter((l) => !l.startsWith('funcao app_acessa_financeiro(')),
+      });
+      expect(r.esquema.sobrando.some((l) => l.startsWith('funcao app_acessa_financeiro('))).toBe(
+        true,
+      );
       expect(r.ok).toBe(false);
     });
   });
 
   it('FIN-42: host fora da lista local é recusado antes de qualquer conexão', async () => {
-    await expect(ensaiar('postgres://u:p@ep-abc.sa-east-1.aws.neon.tech/neondb', { referencia })).rejects.toThrow(/não permitido/);
+    await expect(
+      ensaiar('postgres://u:p@ep-abc.sa-east-1.aws.neon.tech/neondb', { referencia }),
+    ).rejects.toThrow(/não permitido/);
   });
 });

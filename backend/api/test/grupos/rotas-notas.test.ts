@@ -28,7 +28,11 @@ async function sessao(conta: string): Promise<string> {
   return token;
 }
 
-async function pedir(caminho: string, corpo: unknown, conta = aberto.cenario.contaC): Promise<Response> {
+async function pedir(
+  caminho: string,
+  corpo: unknown,
+  conta = aberto.cenario.contaC,
+): Promise<Response> {
   const headers = new Headers({
     'x-pelada': '1',
     cookie: `${NOME_COOKIE_SESSAO}=${await sessao(conta)}`,
@@ -55,19 +59,25 @@ async function novoJogador(apelido: string, grupo = aberto.cenario.grupoG): Prom
     [grupo, apelido, conta],
   );
   const id = r.rows[0]!.id;
-  await db.query(`INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio) VALUES ($1, $2, '2026-01-01')`, [id, grupo]);
+  await db.query(
+    `INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio) VALUES ($1, $2, '2026-01-01')`,
+    [id, grupo],
+  );
   criados.push(id);
   return id;
 }
 
 async function habilidade(nome: string, grupo = aberto.cenario.grupoG): Promise<string> {
-  const r = await aberto.db.query<{ id: string }>('SELECT id FROM habilidades WHERE grupo_id = $1 AND nome = $2', [grupo, nome]);
+  const r = await aberto.db.query<{ id: string }>(
+    'SELECT id FROM habilidades WHERE grupo_id = $1 AND nome = $2',
+    [grupo, nome],
+  );
   const id = r.rows[0]?.id;
   if (id) return id;
-  const novo = await aberto.db.query<{ id: string }>('INSERT INTO habilidades (grupo_id, nome) VALUES ($1, $2) RETURNING id', [
-    grupo,
-    nome,
-  ]);
+  const novo = await aberto.db.query<{ id: string }>(
+    'INSERT INTO habilidades (grupo_id, nome) VALUES ($1, $2) RETURNING id',
+    [grupo, nome],
+  );
   return novo.rows[0]!.id;
 }
 
@@ -76,10 +86,10 @@ function nota(jogador: string, hab: string, corpo: unknown, conta?: string) {
 }
 
 async function valorDe(jogador: string, hab: string): Promise<number | undefined> {
-  const r = await aberto.db.query<{ valor: number }>('SELECT valor FROM notas WHERE jogador_id = $1 AND habilidade_id = $2', [
-    jogador,
-    hab,
-  ]);
+  const r = await aberto.db.query<{ valor: number }>(
+    'SELECT valor FROM notas WHERE jogador_id = $1 AND habilidade_id = $2',
+    [jogador, hab],
+  );
   return r.rows[0]?.valor;
 }
 
@@ -93,9 +103,13 @@ afterAll(async () => {
 
 afterEach(async () => {
   const { db, cenario } = aberto;
-  await db.query('DELETE FROM notas WHERE jogador_id = ANY($1::uuid[])', [[...criados, cenario.idsG.jogadorInativo]]);
+  await db.query('DELETE FROM notas WHERE jogador_id = ANY($1::uuid[])', [
+    [...criados, cenario.idsG.jogadorInativo],
+  ]);
   await db.query('DELETE FROM jogadores WHERE id = ANY($1::uuid[])', [criados]);
-  await db.query(`DELETE FROM habilidades WHERE grupo_id = $1 AND nome = 'Nota Só de H'`, [cenario.grupoH]);
+  await db.query(`DELETE FROM habilidades WHERE grupo_id = $1 AND nome = 'Nota Só de H'`, [
+    cenario.grupoH,
+  ]);
   criados.length = 0;
 });
 

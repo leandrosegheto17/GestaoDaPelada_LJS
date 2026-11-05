@@ -34,7 +34,10 @@ async function novoJogador(apelido: string): Promise<string> {
     [cenario.grupoG, apelido, cenario.contaC],
   );
   const id = r.rows[0]!.id;
-  await db.query(`INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio) VALUES ($1, $2, '2026-01-01')`, [id, cenario.grupoG]);
+  await db.query(
+    `INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio) VALUES ($1, $2, '2026-01-01')`,
+    [id, cenario.grupoG],
+  );
   criados.push(id);
   return id;
 }
@@ -76,10 +79,18 @@ describe('GET /api/grupos/:grupoId/jogadores/:id', () => {
 describe('PATCH /api/grupos/:grupoId/jogadores/:id', () => {
   it('GEL-41: PATCH válido dá 200, grava e ignora a dataEntrada enviada', async () => {
     const id = await novoJogador('Para Editar');
-    const r = await jogador(id, aberto.cenario.contaC, 'PATCH', { ...EDICAO, dataEntrada: '2020-05-05' });
+    const r = await jogador(id, aberto.cenario.contaC, 'PATCH', {
+      ...EDICAO,
+      dataEntrada: '2020-05-05',
+    });
     expect(r.status).toBe(200);
     const ficha = (await r.json()) as Record<string, unknown>;
-    expect(ficha).toMatchObject({ apelido: 'Editado Rota', posicao: 'atacante', inicioPontuacao: '2026-01-01', pontuacaoInicial: 5 });
+    expect(ficha).toMatchObject({
+      apelido: 'Editado Rota',
+      posicao: 'atacante',
+      inicioPontuacao: '2026-01-01',
+      pontuacaoInicial: 5,
+    });
     expect(ficha.periodos).toEqual([expect.objectContaining({ inicio: '2026-01-01', fim: null })]);
   });
 
@@ -92,7 +103,11 @@ describe('PATCH /api/grupos/:grupoId/jogadores/:id', () => {
 
   it('GEL-41: a dataEntrada ignorada não esconde outro campo extra (continua 422)', async () => {
     const id = await novoJogador('Estrito');
-    const r = await jogador(id, aberto.cenario.contaC, 'PATCH', { ...EDICAO, dataEntrada: '2020-05-05', inicioPontuacao: '2020-05-05' });
+    const r = await jogador(id, aberto.cenario.contaC, 'PATCH', {
+      ...EDICAO,
+      dataEntrada: '2020-05-05',
+      inicioPontuacao: '2020-05-05',
+    });
     expect(r.status).toBe(422);
   });
 });
@@ -113,7 +128,13 @@ describe('DELETE /api/grupos/:grupoId/jogadores/:id', () => {
       erro: 'Bira tem histórico de partidas e não pode ser excluído.',
       sugestao: 'inativar',
     });
-    expect((await aberto.db.query('SELECT 1 FROM jogadores WHERE id = $1', [aberto.cenario.idsG.jogadorHistorico])).rowCount).toBe(1);
+    expect(
+      (
+        await aberto.db.query('SELECT 1 FROM jogadores WHERE id = $1', [
+          aberto.cenario.idsG.jogadorHistorico,
+        ])
+      ).rowCount,
+    ).toBe(1);
   });
 });
 
@@ -127,21 +148,40 @@ describe('GEL-44: jogador de outro grupo', () => {
       [cenario.grupoH, cenario.contaB],
     );
     const id = r.rows[0]!.id;
-    await db.query(`INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio) VALUES ($1, $2, '2026-01-01')`, [id, cenario.grupoH]);
+    await db.query(
+      `INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio) VALUES ($1, $2, '2026-01-01')`,
+      [id, cenario.grupoH],
+    );
     criados.push(id);
     return id;
   }
 
-  it.each(['GET', 'PATCH', 'DELETE'])('GEL-44: %s com o id de um jogador de H, pelo grupo G, dá 404 e nada muda', async (metodo) => {
-    const id = await jogadorDeH();
-    const r = await jogador(id, aberto.cenario.contaC, metodo, metodo === 'PATCH' ? EDICAO : undefined);
-    expect(r.status).toBe(404);
-    const linha = await aberto.db.query<{ apelido: string }>('SELECT apelido FROM jogadores WHERE id = $1', [id]);
-    expect(linha.rows[0]?.apelido).toBe('Do Grupo H');
-  });
+  it.each(['GET', 'PATCH', 'DELETE'])(
+    'GEL-44: %s com o id de um jogador de H, pelo grupo G, dá 404 e nada muda',
+    async (metodo) => {
+      const id = await jogadorDeH();
+      const r = await jogador(
+        id,
+        aberto.cenario.contaC,
+        metodo,
+        metodo === 'PATCH' ? EDICAO : undefined,
+      );
+      expect(r.status).toBe(404);
+      const linha = await aberto.db.query<{ apelido: string }>(
+        'SELECT apelido FROM jogadores WHERE id = $1',
+        [id],
+      );
+      expect(linha.rows[0]?.apelido).toBe('Do Grupo H');
+    },
+  );
 
   it.each(['GET', 'PATCH', 'DELETE'])('GEL-44: %s com id que não é uuid dá 404', async (metodo) => {
-    const r = await jogador('nao-e-uuid', aberto.cenario.contaC, metodo, metodo === 'PATCH' ? EDICAO : undefined);
+    const r = await jogador(
+      'nao-e-uuid',
+      aberto.cenario.contaC,
+      metodo,
+      metodo === 'PATCH' ? EDICAO : undefined,
+    );
     expect(r.status).toBe(404);
   });
 });

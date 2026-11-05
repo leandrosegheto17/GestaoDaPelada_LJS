@@ -48,7 +48,10 @@ describe('migrar', () => {
   it('FUN-07: migração que falha no meio não deixa DDL parcial dela', async () => {
     const pasta = mkdtempSync(join(tmpdir(), 'pelada-migracoes-'));
     try {
-      writeFileSync(join(pasta, '1000_a.sql'), '-- Up Migration\nCREATE TABLE exemplo_a (x int);\n');
+      writeFileSync(
+        join(pasta, '1000_a.sql'),
+        '-- Up Migration\nCREATE TABLE exemplo_a (x int);\n',
+      );
       writeFileSync(
         join(pasta, '2000_b.sql'),
         '-- Up Migration\nCREATE TABLE exemplo_b (x int);\nSELECT 1 / 0;\nCREATE TABLE exemplo_c (x int);\n',
@@ -68,7 +71,10 @@ describe('migrar', () => {
   it('FUN-07: só arquivos .sql entram', async () => {
     const pasta = mkdtempSync(join(tmpdir(), 'pelada-migracoes-'));
     try {
-      writeFileSync(join(pasta, '1000_a.sql'), '-- Up Migration\nCREATE TABLE exemplo_a (x int);\n');
+      writeFileSync(
+        join(pasta, '1000_a.sql'),
+        '-- Up Migration\nCREATE TABLE exemplo_a (x int);\n',
+      );
       writeFileSync(join(pasta, 'notas.txt'), 'não é migração');
       writeFileSync(join(pasta, 'migracoes.sha256'), 'abc  1000_a.sql\n');
       await bancoDeTeste(async (url) => {

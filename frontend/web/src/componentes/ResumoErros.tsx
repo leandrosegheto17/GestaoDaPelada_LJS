@@ -39,7 +39,12 @@ export function ResumoErros({ erros }: PropsResumoErros) {
   };
 
   return (
-    <div className={`${estilos.faixa} ${estilos['faixa--erro']} ${estilos['resumo-erros']}`} role="alert" tabIndex={-1} ref={ref}>
+    <div
+      className={`${estilos.faixa} ${estilos['faixa--erro']} ${estilos['resumo-erros']}`}
+      role="alert"
+      tabIndex={-1}
+      ref={ref}
+    >
       <div className={estilos['faixa__texto']}>
         <strong>{tituloDoResumo(erros.length)}</strong>
         <ul>

@@ -1,6 +1,11 @@
 import type pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { abrirCenarioGrupos, comoConta, comoSuperusuario, type CenarioGruposAberto } from './cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  comoConta,
+  comoSuperusuario,
+  type CenarioGruposAberto,
+} from './cenario-grupos.ts';
 
 /**
  * Grants por coluna em `grupos` e trigger da criadora (T4; GEL-16, GEL-24, SEC-009). Caracteriza, como `pelada_app`:
@@ -55,7 +60,9 @@ describe('GEL-16: o slug é imutável', () => {
   it('GEL-16: UPDATE grupos SET slug como pelada_app falha pelo grant', async () => {
     const { cenario } = aberto;
     recusado(
-      await comando(cenario.contaC, `UPDATE grupos SET slug = 'outro-slug' WHERE id = $1`, [cenario.grupoG]),
+      await comando(cenario.contaC, `UPDATE grupos SET slug = 'outro-slug' WHERE id = $1`, [
+        cenario.grupoG,
+      ]),
       /permission denied/,
     );
   });
@@ -78,12 +85,18 @@ describe('GEL-24: colunas fora do grant', () => {
   ] as const)('GEL-24: UPDATE de %s como pelada_app é recusado', async (_coluna, set, comConta) => {
     const { cenario } = aberto;
     const valores = comConta ? [cenario.grupoG, cenario.contaO] : [cenario.grupoG];
-    recusado(await comando(cenario.contaC, `UPDATE grupos SET ${set} WHERE id = $1`, valores), /permission denied/);
+    recusado(
+      await comando(cenario.contaC, `UPDATE grupos SET ${set} WHERE id = $1`, valores),
+      /permission denied/,
+    );
   });
 
   it('GEL-24: DELETE em grupos como pelada_app é recusado (sem grant)', async () => {
     const { cenario } = aberto;
-    recusado(await comando(cenario.contaC, 'DELETE FROM grupos WHERE id = $1', [cenario.grupoG]), /permission denied/);
+    recusado(
+      await comando(cenario.contaC, 'DELETE FROM grupos WHERE id = $1', [cenario.grupoG]),
+      /permission denied/,
+    );
   });
 
   it.each([
@@ -93,7 +106,9 @@ describe('GEL-24: colunas fora do grant', () => {
     ['horario', `horario = '21:30'`],
   ] as const)('GEL-24: controle, UPDATE de %s pela criadora altera G', async (_coluna, set) => {
     const { cenario } = aberto;
-    expect(await comando(cenario.contaC, `UPDATE grupos SET ${set} WHERE id = $1`, [cenario.grupoG])).toEqual({
+    expect(
+      await comando(cenario.contaC, `UPDATE grupos SET ${set} WHERE id = $1`, [cenario.grupoG]),
+    ).toEqual({
       linhas: 1,
       erro: null,
     });
@@ -104,7 +119,9 @@ describe('GEL-24: colunas fora do grant', () => {
     const r = await comoConta(db, cenario.contaC, async (d) => {
       const res = await executar(d, `UPDATE grupos SET nome = 'Sem Where'`);
       await d.query('RESET ROLE');
-      const h = await d.query<{ nome: string }>('SELECT nome FROM grupos WHERE id = $1', [cenario.grupoH]);
+      const h = await d.query<{ nome: string }>('SELECT nome FROM grupos WHERE id = $1', [
+        cenario.grupoH,
+      ]);
       return { ...res, nomeH: h.rows[0]?.nome };
     });
     expect(r.erro).toBeNull();
@@ -117,14 +134,20 @@ describe('SEC-009: só a criadora muda arquivado_em', () => {
   it('SEC-009: a outra admin O muda arquivado_em de G ativo e recebe 42501', async () => {
     const { cenario } = aberto;
     recusado(
-      await comando(cenario.contaO, 'UPDATE grupos SET arquivado_em = now() WHERE id = $1', [cenario.grupoG]),
+      await comando(cenario.contaO, 'UPDATE grupos SET arquivado_em = now() WHERE id = $1', [
+        cenario.grupoG,
+      ]),
       /Só quem criou o grupo pode arquivar ou reativar\./,
     );
   });
 
   it('SEC-009: UPDATE de nome pela outra admin O passa', async () => {
     const { cenario } = aberto;
-    expect(await comando(cenario.contaO, `UPDATE grupos SET nome = 'Renomeado por O' WHERE id = $1`, [cenario.grupoG])).toEqual({
+    expect(
+      await comando(cenario.contaO, `UPDATE grupos SET nome = 'Renomeado por O' WHERE id = $1`, [
+        cenario.grupoG,
+      ]),
+    ).toEqual({
       linhas: 1,
       erro: null,
     });
@@ -133,8 +156,12 @@ describe('SEC-009: só a criadora muda arquivado_em', () => {
   it('SEC-009: a criadora C arquiva e reativa G', async () => {
     const { db, cenario } = aberto;
     const r = await comoConta(db, cenario.contaC, async (d) => ({
-      arquivar: await executar(d, 'UPDATE grupos SET arquivado_em = now() WHERE id = $1', [cenario.grupoG]),
-      reativar: await executar(d, 'UPDATE grupos SET arquivado_em = NULL WHERE id = $1', [cenario.grupoG]),
+      arquivar: await executar(d, 'UPDATE grupos SET arquivado_em = now() WHERE id = $1', [
+        cenario.grupoG,
+      ]),
+      reativar: await executar(d, 'UPDATE grupos SET arquivado_em = NULL WHERE id = $1', [
+        cenario.grupoG,
+      ]),
     }));
     expect(r).toEqual({ arquivar: { linhas: 1, erro: null }, reativar: { linhas: 1, erro: null } });
   });
@@ -150,7 +177,9 @@ describe('SEC-009: só a criadora muda arquivado_em', () => {
   it('SEC-009: a outra admin O com o mesmo valor de arquivado_em (sem mudança) não dispara a trigger', async () => {
     const { cenario } = aberto;
     expect(
-      await comando(cenario.contaO, 'UPDATE grupos SET arquivado_em = arquivado_em WHERE id = $1', [cenario.grupoG]),
+      await comando(cenario.contaO, 'UPDATE grupos SET arquivado_em = arquivado_em WHERE id = $1', [
+        cenario.grupoG,
+      ]),
     ).toEqual({ linhas: 1, erro: null });
   });
 });

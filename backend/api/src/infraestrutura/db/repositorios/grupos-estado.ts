@@ -97,14 +97,22 @@ async function travarComoCriadora(db: Db, grupoId: string): Promise<LinhaGrupo |
 }
 
 /** Arquiva o grupo (GEL-22): só a criadora, com o nome exato; idempotente (GEL-29). */
-async function arquivar(db: Db, grupoId: string, nomeConfirmacao: string): Promise<ResultadoEstado> {
+async function arquivar(
+  db: Db,
+  grupoId: string,
+  nomeConfirmacao: string,
+): Promise<ResultadoEstado> {
   const grupo = await travarComoCriadora(db, grupoId);
   if (!grupo) return { resultado: 'nao_encontrado' };
   if (!grupo.souCriador) return { resultado: 'so_quem_criou' };
   if (nomeConfirmacao !== grupo.nome) return { resultado: 'nome_nao_confere' };
   if (grupo.arquivado) return { resultado: 'ok', mudou: false };
   await sql`UPDATE grupos SET arquivado_em = now() WHERE id = ${grupoId}`.execute(db);
-  await auditoria.registrar(db, grupoId, { acao: 'grupo_arquivado', entidade: 'grupo', entidadeId: grupoId });
+  await auditoria.registrar(db, grupoId, {
+    acao: 'grupo_arquivado',
+    entidade: 'grupo',
+    entidadeId: grupoId,
+  });
   return { resultado: 'ok', mudou: true };
 }
 
@@ -115,7 +123,11 @@ async function reativar(db: Db, grupoId: string): Promise<ResultadoEstado> {
   if (!grupo.souCriador) return { resultado: 'so_quem_criou' };
   if (!grupo.arquivado) return { resultado: 'ok', mudou: false };
   await sql`UPDATE grupos SET arquivado_em = NULL WHERE id = ${grupoId}`.execute(db);
-  await auditoria.registrar(db, grupoId, { acao: 'grupo_reativado', entidade: 'grupo', entidadeId: grupoId });
+  await auditoria.registrar(db, grupoId, {
+    acao: 'grupo_reativado',
+    entidade: 'grupo',
+    entidadeId: grupoId,
+  });
   return { resultado: 'ok', mudou: true };
 }
 

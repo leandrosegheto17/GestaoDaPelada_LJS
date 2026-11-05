@@ -33,9 +33,17 @@ interface LinhaPeriodo {
   fim: string | null;
 }
 
-async function marcar(db: Db, grupoId: string, jogadorId: string, mes: string, hoje: string): Promise<ResultadoMarcar> {
+async function marcar(
+  db: Db,
+  grupoId: string,
+  jogadorId: string,
+  mes: string,
+  hoje: string,
+): Promise<ResultadoMarcar> {
   const j = await sql<LinhaJogador>`
-    SELECT apelido FROM jogadores WHERE grupo_id = ${grupoId} AND id = ${jogadorId} FOR UPDATE`.execute(db);
+    SELECT apelido FROM jogadores WHERE grupo_id = ${grupoId} AND id = ${jogadorId} FOR UPDATE`.execute(
+    db,
+  );
   const jogador = j.rows[0];
   if (!jogador) return { resultado: 'jogador_fora_do_mes' };
 
@@ -45,10 +53,17 @@ async function marcar(db: Db, grupoId: string, jogadorId: string, mes: string, h
   if (!ativoNoMes(periodos.rows, mes)) return { resultado: 'jogador_fora_do_mes' };
 
   const existente = await sql`
-    SELECT 1 FROM pagamentos_mes WHERE grupo_id = ${grupoId} AND jogador_id = ${jogadorId} AND mes = ${mes}`.execute(db);
+    SELECT 1 FROM pagamentos_mes WHERE grupo_id = ${grupoId} AND jogador_id = ${jogadorId} AND mes = ${mes}`.execute(
+    db,
+  );
   if (existente.rows.length > 0) return { resultado: 'ja_marcado' };
 
-  const entrada = entradaDaMensalidade(await configFinanceira.lerConfig(db, grupoId), jogador.apelido, mes, hoje);
+  const entrada = entradaDaMensalidade(
+    await configFinanceira.lerConfig(db, grupoId),
+    jogador.apelido,
+    mes,
+    hoje,
+  );
 
   await sql`SAVEPOINT marcar_pagamento`.execute(db);
   let lancamentoId: string | null = null;
@@ -63,7 +78,9 @@ async function marcar(db: Db, grupoId: string, jogadorId: string, mes: string, h
     }
     await sql`
       INSERT INTO pagamentos_mes (grupo_id, jogador_id, mes, lancamento_id, marcado_por, marcado_em)
-      VALUES (${grupoId}, ${jogadorId}, ${mes}, ${lancamentoId}, app_conta_id(), now())`.execute(db);
+      VALUES (${grupoId}, ${jogadorId}, ${mes}, ${lancamentoId}, app_conta_id(), now())`.execute(
+      db,
+    );
   } catch (erro) {
     await sql`ROLLBACK TO SAVEPOINT marcar_pagamento`.execute(db);
     if ((erro as { code?: string }).code === '23505') return { resultado: 'ja_marcado' };

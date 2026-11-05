@@ -36,7 +36,11 @@ export function partida(data: string, choveu = false): PartidaDoRanking {
   return { id: `p-${data}`, data, choveu };
 }
 
-export function presenca(jogadorId: string, data: string, situacao: SituacaoGravada = 'presente'): PresencaDoRanking {
+export function presenca(
+  jogadorId: string,
+  data: string,
+  situacao: SituacaoGravada = 'presente',
+): PresencaDoRanking {
   return { partidaId: `p-${data}`, jogadorId, situacao };
 }
 
@@ -44,7 +48,14 @@ export const datasSemanais = (inicio: string, quantas: number, passo = 7): strin
   Array.from({ length: quantas }, (_, i) => somarDias(inicio, i * passo));
 
 /** Chuva em 10/09 e 08/10. */
-export const DATAS_TRES_MESES = ['2026-08-06', '2026-08-13', '2026-09-03', '2026-09-10', '2026-10-01', '2026-10-08'];
+export const DATAS_TRES_MESES = [
+  '2026-08-06',
+  '2026-08-13',
+  '2026-09-03',
+  '2026-09-10',
+  '2026-10-01',
+  '2026-10-08',
+];
 
 /**
  * Seis jogadores, agosto a outubro de 2026:
@@ -56,7 +67,9 @@ export const DATAS_TRES_MESES = ['2026-08-06', '2026-08-13', '2026-09-03', '2026
  * - Fê: saiu em 20/09 (inativa hoje).
  */
 export function historicoDeTresMeses(): Omit<EntradaRanking, 'hoje' | 'mes'> {
-  const partidas = DATAS_TRES_MESES.map((d) => partida(d, d === '2026-09-10' || d === '2026-10-08'));
+  const partidas = DATAS_TRES_MESES.map((d) =>
+    partida(d, d === '2026-09-10' || d === '2026-10-08'),
+  );
   const jogadores = [
     jogador('a', 'Ana', { anoNascimento: 1990 }),
     jogador('b', 'Bia', { anoNascimento: 1991 }),
@@ -69,7 +82,10 @@ export function historicoDeTresMeses(): Omit<EntradaRanking, 'hoje' | 'mes'> {
         { inicio: '2026-10-01', fim: null },
       ],
     }),
-    jogador('f', 'Fê', { anoNascimento: 1995, periodos: [{ inicio: '2026-01-01', fim: '2026-09-20' }] }),
+    jogador('f', 'Fê', {
+      anoNascimento: 1995,
+      periodos: [{ inicio: '2026-01-01', fim: '2026-09-20' }],
+    }),
   ];
   const presencas: PresencaDoRanking[] = [
     ...DATAS_TRES_MESES.map((d) => presenca('a', d)),

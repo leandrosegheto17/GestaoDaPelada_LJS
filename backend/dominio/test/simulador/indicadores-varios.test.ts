@@ -35,11 +35,22 @@ describe('indicadoresVariosTimes', () => {
 
   it('SIM-95: time só com jogadores sem ano tem idade média nula', () => {
     const [time] = indicadoresVariosTimes([['e', 'f']], ELENCO);
-    expect(time).toMatchObject({ jogadores: 2, nivelSoma: 1050, nivelMedio: 525, idadeMedia: null });
+    expect(time).toMatchObject({
+      jogadores: 2,
+      nivelSoma: 1050,
+      nivelMedio: 525,
+      idadeMedia: null,
+    });
   });
 
   it('SIM-40: um bloco por time, na ordem recebida', () => {
-    const blocos = indicadoresVariosTimes([['e', 'f'], ['a', 'b', 'c', 'd']], ELENCO);
+    const blocos = indicadoresVariosTimes(
+      [
+        ['e', 'f'],
+        ['a', 'b', 'c', 'd'],
+      ],
+      ELENCO,
+    );
     expect(blocos.map((b) => b.jogadores)).toEqual([2, 4]);
   });
 });

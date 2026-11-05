@@ -38,11 +38,10 @@ beforeEach(async () => {
     [cenario.grupoG, DATA, cenario.contaC],
   );
   partidaId = p.rows[0]?.id ?? '';
-  await db.query(`INSERT INTO presencas (partida_id, jogador_id, grupo_id, situacao) VALUES ($1, $2, $3, 'presente')`, [
-    partidaId,
-    cenario.idsG.jogadorAtivo,
-    cenario.grupoG,
-  ]);
+  await db.query(
+    `INSERT INTO presencas (partida_id, jogador_id, grupo_id, situacao) VALUES ($1, $2, $3, 'presente')`,
+    [partidaId, cenario.idsG.jogadorAtivo, cenario.grupoG],
+  );
   await db.query(
     `INSERT INTO eventos_uso (grupo_id, tipo, momento, data_partida) VALUES ($1, 'partida_lancada', now(), $2)`,
     [cenario.grupoG, DATA],
@@ -53,18 +52,25 @@ beforeEach(async () => {
     [cenario.grupoG, cenario.contaC],
   );
   novato = n.rows[0]?.id ?? '';
-  await db.query(`INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, '2026-06-01', NULL)`, [
-    novato,
-    cenario.grupoG,
-  ]);
+  await db.query(
+    `INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, '2026-06-01', NULL)`,
+    [novato, cenario.grupoG],
+  );
 });
 
 afterEach(async () => {
   const { db, cenario } = aberto;
-  await db.query(`DELETE FROM partidas WHERE grupo_id = $1 AND data <> '2026-01-08'`, [cenario.grupoG]);
-  await db.query(`DELETE FROM eventos_uso WHERE grupo_id = $1 AND data_partida = $2`, [cenario.grupoG, DATA]);
+  await db.query(`DELETE FROM partidas WHERE grupo_id = $1 AND data <> '2026-01-08'`, [
+    cenario.grupoG,
+  ]);
+  await db.query(`DELETE FROM eventos_uso WHERE grupo_id = $1 AND data_partida = $2`, [
+    cenario.grupoG,
+    DATA,
+  ]);
   await db.query('DELETE FROM jogadores WHERE id = $1', [novato]);
-  await db.query(`DELETE FROM auditoria WHERE acao IN ('partida_editada', 'partida_excluida', 'jogador_inicio_alterado')`);
+  await db.query(
+    `DELETE FROM auditoria WHERE acao IN ('partida_editada', 'partida_excluida', 'jogador_inicio_alterado')`,
+  );
   await db.query('DROP TRIGGER IF EXISTS falha_teste_par49 ON auditoria');
   await db.query('DROP FUNCTION IF EXISTS falha_teste_par49()');
 });
@@ -72,11 +78,15 @@ afterEach(async () => {
 const espera = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
 function editarComo(conta: string, dados: PartidaCorpo, data = DATA) {
-  return comDb(aberto.url, conta, (db) => partidas.editar(db, aberto.cenario.grupoG, data, dados), { confirmar: true });
+  return comDb(aberto.url, conta, (db) => partidas.editar(db, aberto.cenario.grupoG, data, dados), {
+    confirmar: true,
+  });
 }
 
 function excluirComo(conta: string, data = DATA) {
-  return comDb(aberto.url, conta, (db) => partidas.excluir(db, aberto.cenario.grupoG, data), { confirmar: true });
+  return comDb(aberto.url, conta, (db) => partidas.excluir(db, aberto.cenario.grupoG, data), {
+    confirmar: true,
+  });
 }
 
 async function estado() {
@@ -140,7 +150,11 @@ describe('partidas.editar', () => {
 
   it('PAR-45: sem partida na data, nao_encontrada, sem gravar', async () => {
     const { cenario } = aberto;
-    const r = await editarComo(cenario.contaC, { data: '2026-02-06', choveu: true, marcacoes: [] }, '2026-02-06');
+    const r = await editarComo(
+      cenario.contaC,
+      { data: '2026-02-06', choveu: true, marcacoes: [] },
+      '2026-02-06',
+    );
     expect(r).toEqual({ resultado: 'nao_encontrada' });
     expect(await auditorias('partida_editada')).toEqual([]);
   });
@@ -161,7 +175,10 @@ describe('partidas.editar', () => {
       choveu: true,
       marcacoes: [{ jogadorId: novato, situacao: 'presente' }],
     });
-    expect(r).toEqual({ resultado: 'invalido', campos: { 'marcacoes.0.jogadorId': MENSAGEM_JOGADOR_INATIVO } });
+    expect(r).toEqual({
+      resultado: 'invalido',
+      campos: { 'marcacoes.0.jogadorId': MENSAGEM_JOGADOR_INATIVO },
+    });
     expect(await estado()).toEqual(antes);
   });
 
@@ -237,7 +254,9 @@ describe('partidas.excluir', () => {
     const { cenario } = aberto;
     expect(await excluirComo(cenario.contaC)).toEqual({ resultado: 'ok' });
     expect(await estado()).toEqual({ partida: null, presencas: [] });
-    expect(await auditorias('partida_excluida')).toEqual([{ autor: cenario.contaC, resumo: { data: DATA } }]);
+    expect(await auditorias('partida_excluida')).toEqual([
+      { autor: cenario.contaC, resumo: { data: DATA } },
+    ]);
   });
 
   it('PAR-51: excluir mantém o evento partida_lancada', async () => {
@@ -248,7 +267,9 @@ describe('partidas.excluir', () => {
 
   it('PAR-45: sem partida na data, nao_encontrada', async () => {
     const { cenario } = aberto;
-    expect(await excluirComo(cenario.contaC, '2026-02-06')).toEqual({ resultado: 'nao_encontrada' });
+    expect(await excluirComo(cenario.contaC, '2026-02-06')).toEqual({
+      resultado: 'nao_encontrada',
+    });
   });
 
   it('PAR-50: a conta de outro grupo não encontra a partida de G', async () => {

@@ -32,7 +32,8 @@ const AGORA = '2026-11-20T15:00:00.000Z';
 const URL_PUBLICA = 'https://pelada.exemplo.test';
 const ID = '00000000-0000-4000-8000-0000000000aa';
 
-type Esperado = { erro: 'somente_leitura'; motivo: 'limite_jogadores' } | { erro: 'plano_pro'; recurso: string };
+type Esperado =
+  { erro: 'somente_leitura'; motivo: 'limite_jogadores' } | { erro: 'plano_pro'; recurso: string };
 
 interface Linha {
   metodo: 'POST' | 'PUT' | 'PATCH' | 'DELETE';
@@ -68,7 +69,11 @@ const TABELA: readonly Linha[] = [
   { metodo: 'POST', rota: '/api/grupos/:grupoId/escalacoes', esperado: SIM },
   { metodo: 'PUT', rota: '/api/grupos/:grupoId/financeiro/config', esperado: FIN },
   { metodo: 'POST', rota: '/api/grupos/:grupoId/financeiro/pagamentos', esperado: FIN },
-  { metodo: 'DELETE', rota: '/api/grupos/:grupoId/financeiro/pagamentos/:jogadorId/:mes', esperado: FIN },
+  {
+    metodo: 'DELETE',
+    rota: '/api/grupos/:grupoId/financeiro/pagamentos/:jogadorId/:mes',
+    esperado: FIN,
+  },
   { metodo: 'POST', rota: '/api/grupos/:grupoId/financeiro/lancamentos', esperado: FIN },
   { metodo: 'PUT', rota: '/api/grupos/:grupoId/financeiro/lancamentos/:id', esperado: FIN },
   { metodo: 'DELETE', rota: '/api/grupos/:grupoId/financeiro/lancamentos/:id', esperado: FIN },
@@ -102,7 +107,11 @@ let original: { s: string; t: string | null };
 const extras: string[] = [];
 
 function montar(opcoes: Pick<OpcoesApp, 'registrarExtras'> = {}): Hono<Ambiente> {
-  return criarApp({ fabricaBanco: fabricaComoApp().fabrica, relogio: relogioFixo(AGORA), ...opcoes });
+  return criarApp({
+    fabricaBanco: fabricaComoApp().fabrica,
+    relogio: relogioFixo(AGORA),
+    ...opcoes,
+  });
 }
 
 const app = montar();
@@ -127,9 +136,18 @@ function url(rota: string): string {
 }
 
 async function pedir(metodo: string, caminho: string, token: string): Promise<Response> {
-  const headers = new Headers({ 'x-pelada': '1', 'content-type': 'application/json', cookie: `${NOME_COOKIE_SESSAO}=${token}` });
+  const headers = new Headers({
+    'x-pelada': '1',
+    'content-type': 'application/json',
+    cookie: `${NOME_COOKIE_SESSAO}=${token}`,
+  });
   const ctx = contextoFalso();
-  const r = await app.request(`/api${caminho}`, { method: metodo, headers, body: '{}' }, envAcesso(aberto.url, { URL_PUBLICA }), ctx);
+  const r = await app.request(
+    `/api${caminho}`,
+    { method: metodo, headers, body: '{}' },
+    envAcesso(aberto.url, { URL_PUBLICA }),
+    ctx,
+  );
   await ctx.esperar();
   return r;
 }
@@ -147,11 +165,10 @@ async function pdf(): Promise<Response> {
 }
 
 async function situacao(s: string, t: string | null): Promise<void> {
-  await aberto.db.query('UPDATE grupos SET situacao_comercial = $2, trial_inicio = $3::date WHERE id = $1', [
-    aberto.cenario.grupoG,
-    s,
-    t,
-  ]);
+  await aberto.db.query(
+    'UPDATE grupos SET situacao_comercial = $2, trial_inicio = $3::date WHERE id = $1',
+    [aberto.cenario.grupoG, s, t],
+  );
 }
 
 /** Linhas de G nas tabelas que as rotas da tabela escrevem (PLA-18). */
@@ -171,9 +188,10 @@ async function contagens(): Promise<Record<string, number>> {
   ];
   const saida: Record<string, number> = {};
   for (const t of tabelas) {
-    const r = await aberto.db.query<{ n: number }>(`SELECT count(*)::int AS n FROM ${t} WHERE grupo_id = $1`, [
-      aberto.cenario.grupoG,
-    ]);
+    const r = await aberto.db.query<{ n: number }>(
+      `SELECT count(*)::int AS n FROM ${t} WHERE grupo_id = $1`,
+      [aberto.cenario.grupoG],
+    );
     saida[t] = r.rows[0]!.n;
   }
   const g = await aberto.db.query<{ g: string }>(
@@ -214,10 +232,10 @@ beforeAll(async () => {
       [cenario.grupoG, `Matriz ${i + 1}`, cenario.contaC],
     );
     extras.push(j.rows[0]!.id);
-    await db.query(`INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, '2026-01-01', NULL)`, [
-      j.rows[0]!.id,
-      cenario.grupoG,
-    ]);
+    await db.query(
+      `INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, '2026-01-01', NULL)`,
+      [j.rows[0]!.id, cenario.grupoG],
+    );
   }
 });
 
@@ -286,6 +304,8 @@ describe('meta-teste da tabela (PLA-28)', () => {
 
   it('PLA-28: a tabela não cita rota que o app não registra', () => {
     const registradas = new Set(app.routes.map((r) => `${r.method} ${r.path}`));
-    expect(TABELA.map((l) => `${l.metodo} ${l.rota}`).filter((r) => !registradas.has(r))).toEqual([]);
+    expect(TABELA.map((l) => `${l.metodo} ${l.rota}`).filter((r) => !registradas.has(r))).toEqual(
+      [],
+    );
   });
 });

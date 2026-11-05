@@ -98,7 +98,9 @@ export function sobrepoem(a: Periodo, b: Periodo): boolean {
  * Valida uma data informada: real (GEL-63) e não futura (GEL-64), nesta ordem. Devolve a primeira falha, ou nulo.
  */
 export function validarData(valor: unknown, hoje: Data, campo: CampoPeriodo): FalhaPeriodo | null {
-  if (!ehDataValida(valor)) return { ok: false, regra: 'data-invalida', mensagem: MENSAGEM_DATA_INVALIDA, campo };
-  if (ehFutura(valor, hoje)) return { ok: false, regra: 'futuro', mensagem: MENSAGEM_FUTURO, campo };
+  if (!ehDataValida(valor))
+    return { ok: false, regra: 'data-invalida', mensagem: MENSAGEM_DATA_INVALIDA, campo };
+  if (ehFutura(valor, hoje))
+    return { ok: false, regra: 'futuro', mensagem: MENSAGEM_FUTURO, campo };
   return null;
 }

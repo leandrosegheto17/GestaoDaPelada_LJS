@@ -1,5 +1,12 @@
 import { formatarData } from '../elenco/apelido.ts';
-import { contem, somarDias, type CampoPeriodo, type Data, type FalhaPeriodo, type Periodo } from './datas.ts';
+import {
+  contem,
+  somarDias,
+  type CampoPeriodo,
+  type Data,
+  type FalhaPeriodo,
+  type Periodo,
+} from './datas.ts';
 
 /**
  * Presença que sai de dentro de um período (GEL-68). Uma presença (presente, lesionado ou expulso) que estava dentro

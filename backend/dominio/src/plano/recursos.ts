@@ -10,7 +10,12 @@ export const RECURSOS = ['partidas', 'ranking', 'simulador', 'financeiro', 'pdf'
 export type Recurso = (typeof RECURSOS)[number];
 
 /** Recursos que só o Pro (trial, pro, cortesia) libera: os que respondem 403 `plano_pro` no Free. */
-export const RECURSOS_PRO = ['simulador', 'financeiro', 'pdf', 'push'] as const satisfies readonly Recurso[];
+export const RECURSOS_PRO = [
+  'simulador',
+  'financeiro',
+  'pdf',
+  'push',
+] as const satisfies readonly Recurso[];
 export type RecursoPro = (typeof RECURSOS_PRO)[number];
 
 export interface RecursosDoPlano {
@@ -25,7 +30,14 @@ export const LIMITE_JOGADORES_FREE = 20;
 export const LIMITE_GRUPOS_FREE = 1;
 
 const PRO: RecursosDoPlano = Object.freeze({
-  recursos: Object.freeze(['partidas', 'ranking', 'simulador', 'financeiro', 'pdf', 'push'] as const),
+  recursos: Object.freeze([
+    'partidas',
+    'ranking',
+    'simulador',
+    'financeiro',
+    'pdf',
+    'push',
+  ] as const),
   limiteJogadores: null,
   limiteGrupos: null,
 });
@@ -69,7 +81,8 @@ export function centavosParaReais(centavos: number): number {
 export function reaisParaCentavos(reais: number): number {
   if (!Number.isFinite(reais) || reais < 0) throw new RangeError('Valor em reais inválido.');
   const centavos = Math.round(reais * 100);
-  if (Math.abs(centavos - reais * 100) > 1e-6) throw new RangeError('Valor em reais com mais de 2 casas.');
+  if (Math.abs(centavos - reais * 100) > 1e-6)
+    throw new RangeError('Valor em reais com mais de 2 casas.');
   return centavos;
 }
 

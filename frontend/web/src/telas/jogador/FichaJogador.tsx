@@ -69,11 +69,20 @@ export function corpoDaEdicao(dados: FormularioJogador): Record<string, unknown>
     posicao: dados.posicao,
     telefone: dados.telefone.trim() === '' ? null : dados.telefone,
   };
-  if (dados.pontuacaoInicial.trim() !== '') corpo.pontuacaoInicial = numeroOuNulo(dados.pontuacaoInicial);
+  if (dados.pontuacaoInicial.trim() !== '')
+    corpo.pontuacaoInicial = numeroOuNulo(dados.pontuacaoInicial);
   return corpo;
 }
 
-function Dados({ grupoId, ficha, avisar }: { grupoId: string; ficha: JogadorDetalhe; avisar: (texto: string | null) => void }) {
+function Dados({
+  grupoId,
+  ficha,
+  avisar,
+}: {
+  grupoId: string;
+  ficha: JogadorDetalhe;
+  avisar: (texto: string | null) => void;
+}) {
   const editar = useEditarJogador(grupoId, ficha.id);
   const [hoje] = useState(() => hojeEmSaoPaulo());
   const [dados, setDados] = useState<FormularioJogador>({
@@ -106,7 +115,8 @@ function Dados({ grupoId, ficha, avisar }: { grupoId: string; ficha: JogadorDeta
       onError: (erro) => {
         const porCampo = errosDoJogador(erro);
         setErros(porCampo);
-        if (Object.keys(porCampo).length === 0) setFalha(erro instanceof ErroApi ? erro.message : MENSAGEM_REDE);
+        if (Object.keys(porCampo).length === 0)
+          setFalha(erro instanceof ErroApi ? erro.message : MENSAGEM_REDE);
       },
     });
   }
@@ -117,10 +127,21 @@ function Dados({ grupoId, ficha, avisar }: { grupoId: string; ficha: JogadorDeta
         Dados
       </h2>
       {salvo ? <Faixa tipo="sucesso">{TEXTO_DADOS_SALVOS}</Faixa> : null}
-      <form className={estilos.formulario} noValidate aria-busy={editar.isPending || undefined} onSubmit={enviar}>
+      <form
+        className={estilos.formulario}
+        noValidate
+        aria-busy={editar.isPending || undefined}
+        onSubmit={enviar}
+      >
         <ResumoErros erros={resumoDoJogador(erros)} />
         {falha ? <Faixa tipo="erro">{falha}</Faixa> : null}
-        <CamposJogador dados={dados} erros={erros} mudar={mudar} hoje={hoje} comDataEntrada={false} />
+        <CamposJogador
+          dados={dados}
+          erros={erros}
+          mudar={mudar}
+          hoje={hoje}
+          comDataEntrada={false}
+        />
         <div>
           <span className={estilos.ajuda}>Data de início</span>
           <p className={estilos.paragrafo} id="inicio-valor">
@@ -153,7 +174,10 @@ function Notas({ grupoId, ficha }: { grupoId: string; ficha: JogadorDetalhe }) {
       { habilidadeId, nota },
       {
         onError: (erro) =>
-          setFalhas((f) => ({ ...f, [habilidadeId]: erro instanceof ErroApi ? erro.message : MENSAGEM_REDE })),
+          setFalhas((f) => ({
+            ...f,
+            [habilidadeId]: erro instanceof ErroApi ? erro.message : MENSAGEM_REDE,
+          })),
       },
     );
   }
@@ -220,7 +244,13 @@ function Situacao({
                   <span className={listas['item__meta']}>{i === 0 ? 'Entrada' : 'Retorno'}</span>
                 </div>
                 <div className={modulo['item-lado']}>
-                  <CorrigirPeriodo grupoId={grupoId} ficha={ficha} periodo={p} indice={i} avisar={avisar} />
+                  <CorrigirPeriodo
+                    grupoId={grupoId}
+                    ficha={ficha}
+                    periodo={p}
+                    indice={i}
+                    avisar={avisar}
+                  />
                 </div>
               </li>
             ))}
@@ -231,7 +261,12 @@ function Situacao({
           ficha={ficha}
           avisar={avisar}
           acaoExtra={(abrirInativar) => (
-            <ExcluirJogador grupoId={grupoId} ficha={ficha} abrirInativar={abrirInativar} alertar={alertar} />
+            <ExcluirJogador
+              grupoId={grupoId}
+              ficha={ficha}
+              abrirInativar={abrirInativar}
+              alertar={alertar}
+            />
           )}
         />
       </div>
@@ -295,7 +330,11 @@ export function FichaJogador() {
   }
 
   return (
-    <Casca grupo={{ nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' }} estreita ocupada={ficha.isPending}>
+    <Casca
+      grupo={{ nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' }}
+      estreita
+      ocupada={ficha.isPending}
+    >
       <LinkVoltar para={`${base}/jogadores`}>Jogadores</LinkVoltar>
       {conteudo()}
     </Casca>

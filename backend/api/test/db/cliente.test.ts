@@ -1,9 +1,19 @@
 import { randomBytes } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 import { criarApp } from '../../src/entrada/app.ts';
-import { criarCliente, fecharNoFim, type OpcoesCliente } from '../../src/infraestrutura/db/cliente.ts';
+import {
+  criarCliente,
+  fecharNoFim,
+  type OpcoesCliente,
+} from '../../src/infraestrutura/db/cliente.ts';
 import { bancoDeTeste, comCliente } from '../apoio/banco.ts';
-import { comNomeDeAplicacao, contextoFalso, envCom, fabricaEspiada, sessoesCom } from './requisicao.ts';
+import {
+  comNomeDeAplicacao,
+  contextoFalso,
+  envCom,
+  fabricaEspiada,
+  sessoesCom,
+} from './requisicao.ts';
 
 /**
  * Cliente `pg` por requisição (FUN-16). O app roda no Node, contra um banco `teste_*` do
@@ -14,7 +24,10 @@ import { comNomeDeAplicacao, contextoFalso, envCom, fabricaEspiada, sessoesCom }
 const nomeUnico = () => `pelada_teste_${randomBytes(4).toString('hex')}`;
 
 /** App com uma rota de teste que cria o cliente e o fecha no fim, como o `comBanco` fará. */
-function appCom(rota: (consultar: (sql: string) => Promise<unknown>) => Promise<void>, opcoes: OpcoesCliente = {}) {
+function appCom(
+  rota: (consultar: (sql: string) => Promise<unknown>) => Promise<void>,
+  opcoes: OpcoesCliente = {},
+) {
   return criarApp({
     registrarExtras: (api) =>
       api.get('/teste/cliente', async (c) => {
@@ -43,7 +56,12 @@ describe('cliente pg por requisição', () => {
           { fabrica: espiada.fabrica },
         );
         const ctx = contextoFalso();
-        const r = await app.request('/api/teste/cliente', {}, envCom(comNomeDeAplicacao(url, nome)), ctx);
+        const r = await app.request(
+          '/api/teste/cliente',
+          {},
+          envCom(comNomeDeAplicacao(url, nome)),
+          ctx,
+        );
         await ctx.esperar();
         expect(r.status).toBe(200);
         expect(espiada.criadas()).toBe(0);
@@ -68,7 +86,12 @@ describe('cliente pg por requisição', () => {
           { fabrica: espiada.fabrica },
         );
         const ctx = contextoFalso();
-        const r = await app.request('/api/teste/cliente', {}, envCom(comNomeDeAplicacao(url, nome)), ctx);
+        const r = await app.request(
+          '/api/teste/cliente',
+          {},
+          envCom(comNomeDeAplicacao(url, nome)),
+          ctx,
+        );
         expect(r.status).toBe(200);
         // Uma conexão só, aberta durante a rota; o fechamento foi agendado, não feito antes.
         expect(espiada.criadas()).toBe(1);
@@ -89,7 +112,12 @@ describe('cliente pg por requisição', () => {
           throw new Error('falha da rota');
         });
         const ctx = contextoFalso();
-        const r = await app.request('/api/teste/cliente', {}, envCom(comNomeDeAplicacao(url, nome)), ctx);
+        const r = await app.request(
+          '/api/teste/cliente',
+          {},
+          envCom(comNomeDeAplicacao(url, nome)),
+          ctx,
+        );
         await ctx.esperar();
         expect(r.status).toBe(500);
         expect(await sessoesCom(admin, nome)).toBe(0);
@@ -108,7 +136,14 @@ describe('cliente pg por requisição', () => {
     await ctx.esperar();
     expect(r.status).toBe(503);
     const corpo = await r.text();
-    for (const trecho of ['senha-que-nao-vaza', 'usuario_secreto', 'banco_secreto', '127.0.0.1', 'postgres://', 'ECONNREFUSED']) {
+    for (const trecho of [
+      'senha-que-nao-vaza',
+      'usuario_secreto',
+      'banco_secreto',
+      '127.0.0.1',
+      'postgres://',
+      'ECONNREFUSED',
+    ]) {
       expect(corpo).not.toContain(trecho);
     }
     expect(JSON.parse(corpo)).toHaveProperty('erro');

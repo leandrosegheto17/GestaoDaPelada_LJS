@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { idadeNaData, mediaInteira, montarElenco, proximoDiaDeJogo } from '../../src/simulador/base.ts';
+import {
+  idadeNaData,
+  mediaInteira,
+  montarElenco,
+  proximoDiaDeJogo,
+} from '../../src/simulador/base.ts';
 
 /**
  * Base do simulador (T2; SIM-01, SIM-51, SIM-95).
@@ -67,7 +72,14 @@ describe('montarElenco', () => {
   it('SIM-95: calcula a idade na data e deixa nula sem ano', () => {
     const elenco = montarElenco(
       [
-        { id: 'a', apelido: 'A', nivel: 600, semNota: false, anoNascimento: 1990, so1oTempo: false },
+        {
+          id: 'a',
+          apelido: 'A',
+          nivel: 600,
+          semNota: false,
+          anoNascimento: 1990,
+          so1oTempo: false,
+        },
         { id: 'b', apelido: 'B', nivel: 550, semNota: true, anoNascimento: null, so1oTempo: false },
       ],
       '2026-10-22',

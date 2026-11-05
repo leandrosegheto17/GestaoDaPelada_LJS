@@ -1,6 +1,10 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { grupoDetalhe } from '@pelada/contrato';
-import { abrirCenarioGrupos, reativar, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  reativar,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 import { pedir, restaurarCaixa, saldoDe } from './apoio-financeiro.ts';
 
 /**
@@ -15,7 +19,8 @@ import { pedir, restaurarCaixa, saldoDe } from './apoio-financeiro.ts';
 
 let aberto: CenarioGruposAberto;
 
-const detalhe = (conta: string) => pedir(aberto, { metodo: 'GET', caminho: `/grupos/${aberto.cenario.grupoG}`, conta });
+const detalhe = (conta: string) =>
+  pedir(aberto, { metodo: 'GET', caminho: `/grupos/${aberto.cenario.grupoG}`, conta });
 
 async function lancar(tipo: 'entrada' | 'saida', data: string, valor: number): Promise<void> {
   const { db, cenario } = aberto;
@@ -53,7 +58,9 @@ describe('GET /api/grupos/:grupoId com o saldo do caixa', () => {
   });
 
   it('FIN-34: sem configuração, a chave vem com null', async () => {
-    await aberto.db.query('DELETE FROM config_financeira WHERE grupo_id = $1', [aberto.cenario.grupoG]);
+    await aberto.db.query('DELETE FROM config_financeira WHERE grupo_id = $1', [
+      aberto.cenario.grupoG,
+    ]);
     const corpo = (await (await detalhe(aberto.cenario.contaC)).json()) as Record<string, unknown>;
     expect('saldoFinanceiroCentavos' in corpo).toBe(true);
     expect(corpo['saldoFinanceiroCentavos']).toBeNull();
@@ -69,10 +76,10 @@ describe('GET /api/grupos/:grupoId com o saldo do caixa', () => {
   });
 
   it('FIN-34: a convidada que ganha o acesso passa a ver o saldo', async () => {
-    await aberto.db.query('UPDATE vinculos_admin SET acessa_financeiro = true WHERE grupo_id = $1 AND conta_id = $2', [
-      aberto.cenario.grupoG,
-      aberto.cenario.contaO,
-    ]);
+    await aberto.db.query(
+      'UPDATE vinculos_admin SET acessa_financeiro = true WHERE grupo_id = $1 AND conta_id = $2',
+      [aberto.cenario.grupoG, aberto.cenario.contaO],
+    );
     expect(await saldoDe(await detalhe(aberto.cenario.contaO))).toBe(5000);
   });
 
@@ -81,7 +88,12 @@ describe('GET /api/grupos/:grupoId com o saldo do caixa', () => {
       metodo: 'PATCH',
       caminho: `/grupos/${aberto.cenario.grupoG}`,
       conta: aberto.cenario.contaC,
-      corpo: { nome: 'Pelada de Quinta', diaSemana: 'quinta', frequencia: 'semanal', horario: '20:00' },
+      corpo: {
+        nome: 'Pelada de Quinta',
+        diaSemana: 'quinta',
+        frequencia: 'semanal',
+        horario: '20:00',
+      },
     });
     expect(r.status).toBe(200);
     expect(grupoDetalhe.safeParse(await r.json()).success).toBe(true);

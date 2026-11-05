@@ -3,7 +3,12 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { recursoLiberadoPeloPlano } from '../../src/entrada/middlewares/recurso.ts';
 import { relogioDoSistema } from '../../src/infraestrutura/relogio.ts';
 import { comDb } from '../repositorios/apoio.ts';
-import { abrirCenarioGrupos, comoConta, criarGrupoComoConta, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  comoConta,
+  criarGrupoComoConta,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * Rede de proteção da planos-e-cobranca (T0; PLA-12, PLA-13, linha de base): como o banco trata a situação comercial
@@ -57,7 +62,10 @@ describe('rede do plano: default e CHECK (a, b)', () => {
     const { db, cenario } = aberto;
     await expect(
       comoSuper(db, (d) =>
-        d.query(`UPDATE grupos SET situacao_comercial = 'trial', trial_inicio = NULL WHERE id = $1`, [cenario.grupoG]),
+        d.query(
+          `UPDATE grupos SET situacao_comercial = 'trial', trial_inicio = NULL WHERE id = $1`,
+          [cenario.grupoG],
+        ),
       ),
     ).rejects.toMatchObject({ code: '23514' });
   });
@@ -66,9 +74,10 @@ describe('rede do plano: default e CHECK (a, b)', () => {
     const { db, cenario } = aberto;
     await expect(
       comoSuper(db, (d) =>
-        d.query(`UPDATE grupos SET situacao_comercial = 'ativo', trial_inicio = '2026-11-01' WHERE id = $1`, [
-          cenario.grupoG,
-        ]),
+        d.query(
+          `UPDATE grupos SET situacao_comercial = 'ativo', trial_inicio = '2026-11-01' WHERE id = $1`,
+          [cenario.grupoG],
+        ),
       ),
     ).rejects.toMatchObject({ code: '23514' });
   });
@@ -76,9 +85,10 @@ describe('rede do plano: default e CHECK (a, b)', () => {
   it('PLA-12: CHECK grupos_trial aceita trial com trial_inicio (controle)', async () => {
     const { db, cenario } = aberto;
     const r = await comoSuper(db, (d) =>
-      d.query(`UPDATE grupos SET situacao_comercial = 'trial', trial_inicio = '2026-11-01' WHERE id = $1`, [
-        cenario.grupoG,
-      ]),
+      d.query(
+        `UPDATE grupos SET situacao_comercial = 'trial', trial_inicio = '2026-11-01' WHERE id = $1`,
+        [cenario.grupoG],
+      ),
     );
     expect(r.rowCount).toBe(1);
   });
@@ -119,7 +129,9 @@ describe('rede do plano: pelada_app sem escrita direta (c)', () => {
   it('PLA-13: UPDATE sem WHERE de situacao_comercial como pelada_app dá 42501', async () => {
     const { db, cenario } = aberto;
     await expect(
-      comoConta(db, cenario.contaB, (d) => d.query(`UPDATE grupos SET situacao_comercial = 'ativo'`)),
+      comoConta(db, cenario.contaB, (d) =>
+        d.query(`UPDATE grupos SET situacao_comercial = 'ativo'`),
+      ),
     ).rejects.toMatchObject({ code: '42501' });
   });
 });
@@ -130,14 +142,21 @@ describe('rede do plano: grupo_criar depois da T13 (d)', () => {
   it('PLA-10 (depois da T13): grupo criado pela grupo_criar nasce trial com trial_inicio = a data passada', async () => {
     const { db, cenario } = aberto;
     const novo = await criarGrupoComoConta(db, cenario.contaB, 'Pelada da Rede', 'pelada-da-rede');
-    const r = await db.query<{ situacao_comercial: string; trial_inicio: string | null; hoje: string }>(
+    const r = await db.query<{
+      situacao_comercial: string;
+      trial_inicio: string | null;
+      hoje: string;
+    }>(
       `SELECT situacao_comercial, trial_inicio::text, (now() AT TIME ZONE 'America/Sao_Paulo')::date::text AS hoje
          FROM grupos WHERE id = $1`,
       [novo.id],
     );
     const linha = r.rows[0];
     expect(linha).toBeDefined();
-    expect({ situacao_comercial: linha?.situacao_comercial, trial_inicio: linha?.trial_inicio }).toEqual({
+    expect({
+      situacao_comercial: linha?.situacao_comercial,
+      trial_inicio: linha?.trial_inicio,
+    }).toEqual({
       situacao_comercial: 'trial',
       trial_inicio: linha?.hoje,
     });
@@ -151,8 +170,12 @@ describe('rede do plano: recursoLiberado depois da T21 (e)', () => {
   it('PLA-07: o recursoLiberado vigente libera G e H em Pro', async () => {
     const { cenario } = aberto;
     const pontoUnico = recursoLiberadoPeloPlano(relogioDoSistema());
-    expect(await comDb(aberto.url, cenario.contaC, (db) => pontoUnico(db, cenario.grupoG, 'simulador'))).toBe(true);
-    expect(await comDb(aberto.url, cenario.contaB, (db) => pontoUnico(db, cenario.grupoH, 'financeiro'))).toBe(true);
+    expect(
+      await comDb(aberto.url, cenario.contaC, (db) => pontoUnico(db, cenario.grupoG, 'simulador')),
+    ).toBe(true);
+    expect(
+      await comDb(aberto.url, cenario.contaB, (db) => pontoUnico(db, cenario.grupoH, 'financeiro')),
+    ).toBe(true);
   });
 
   it('PLA-07: o recursoLiberado vigente nega G em inadimplente', async () => {
@@ -161,18 +184,20 @@ describe('rede do plano: recursoLiberado depois da T21 (e)', () => {
       'SELECT situacao_comercial AS s, trial_inicio::text AS t FROM grupos WHERE id = $1',
       [cenario.grupoG],
     );
-    await db.query(`UPDATE grupos SET situacao_comercial = 'inadimplente', trial_inicio = NULL WHERE id = $1`, [
-      cenario.grupoG,
-    ]);
+    await db.query(
+      `UPDATE grupos SET situacao_comercial = 'inadimplente', trial_inicio = NULL WHERE id = $1`,
+      [cenario.grupoG],
+    );
     try {
       const pontoUnico = recursoLiberadoPeloPlano(relogioDoSistema());
-      expect(await comDb(aberto.url, cenario.contaC, (d) => pontoUnico(d, cenario.grupoG, 'simulador'))).toBe(false);
+      expect(
+        await comDb(aberto.url, cenario.contaC, (d) => pontoUnico(d, cenario.grupoG, 'simulador')),
+      ).toBe(false);
     } finally {
-      await db.query('UPDATE grupos SET situacao_comercial = $2, trial_inicio = $3::date WHERE id = $1', [
-        cenario.grupoG,
-        antes.rows[0]?.s,
-        antes.rows[0]?.t ?? null,
-      ]);
+      await db.query(
+        'UPDATE grupos SET situacao_comercial = $2, trial_inicio = $3::date WHERE id = $1',
+        [cenario.grupoG, antes.rows[0]?.s, antes.rows[0]?.t ?? null],
+      );
     }
   });
 });

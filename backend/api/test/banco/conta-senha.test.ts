@@ -1,6 +1,13 @@
 import type pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { abrirCenarioConta, criarLink, criarSessao, IP_HASH_1, novoToken, type CenarioContaAberto } from '../isolamento/cenario-conta.ts';
+import {
+  abrirCenarioConta,
+  criarLink,
+  criarSessao,
+  IP_HASH_1,
+  novoToken,
+  type CenarioContaAberto,
+} from '../isolamento/cenario-conta.ts';
 import { comoAppAqui, comoSuper, contar, numaTransacao, umaLinha } from './apoio-conta.ts';
 
 /**
@@ -31,34 +38,47 @@ afterAll(async () => {
 
 async function novaSenha(db: pg.Client, hash: Buffer, senha = NOVA): Promise<boolean> {
   await comoAppAqui(db);
-  const r = await umaLinha<{ ok: boolean }>(db, 'SELECT link_nova_senha($1, $2) AS ok', [hash, senha]);
+  const r = await umaLinha<{ ok: boolean }>(db, 'SELECT link_nova_senha($1, $2) AS ok', [
+    hash,
+    senha,
+  ]);
   await comoSuper(db);
   return r.ok;
 }
 
-async function trocar(db: pg.Client, conta: string, atual: string, nova: string, sessaoAtual: Buffer): Promise<boolean | null> {
+async function trocar(
+  db: pg.Client,
+  conta: string,
+  atual: string,
+  nova: string,
+  sessaoAtual: Buffer,
+): Promise<boolean | null> {
   await comoAppAqui(db, conta);
-  const r = await umaLinha<{ ok: boolean | null }>(db, 'SELECT conta_trocar_senha($1, $2, $3) AS ok', [atual, nova, sessaoAtual]);
+  const r = await umaLinha<{ ok: boolean | null }>(
+    db,
+    'SELECT conta_trocar_senha($1, $2, $3) AS ok',
+    [atual, nova, sessaoAtual],
+  );
   await comoSuper(db);
   return r.ok;
 }
 
 async function senhaConfere(db: pg.Client, conta: string, senha: string): Promise<boolean> {
-  const r = await umaLinha<{ ok: boolean }>(db, 'SELECT senha_hash = crypt($1, senha_hash) AS ok FROM contas WHERE id = $2', [
-    senha,
-    conta,
-  ]);
+  const r = await umaLinha<{ ok: boolean }>(
+    db,
+    'SELECT senha_hash = crypt($1, senha_hash) AS ok FROM contas WHERE id = $2',
+    [senha, conta],
+  );
   return r.ok;
 }
 
 async function entrar(db: pg.Client, email: string, senha: string): Promise<string> {
   await comoAppAqui(db);
-  const r = await umaLinha<{ resultado: string }>(db, 'SELECT resultado FROM conta_entrar($1, $2, $3, $4)', [
-    email,
-    senha,
-    IP_HASH_1,
-    novoToken().hash,
-  ]);
+  const r = await umaLinha<{ resultado: string }>(
+    db,
+    'SELECT resultado FROM conta_entrar($1, $2, $3, $4)',
+    [email, senha, IP_HASH_1, novoToken().hash],
+  );
   await comoSuper(db);
   return r.resultado;
 }
@@ -75,11 +95,19 @@ describe('link_nova_senha', () => {
   it('ACE-24: link válido (1 h menos 1 s) troca a senha e consome o link', async () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
-      const link = await linkComIdade(db, cenario.contaA, "(interval '1 hour' - interval '1 second')");
+      const link = await linkComIdade(
+        db,
+        cenario.contaA,
+        "(interval '1 hour' - interval '1 second')",
+      );
       expect(await novaSenha(db, link.hash)).toBe(true);
       expect(await senhaConfere(db, cenario.contaA, NOVA)).toBe(true);
       expect(await senhaConfere(db, cenario.contaA, cenario.senhaA)).toBe(false);
-      expect(await contar(db, 'SELECT 1 FROM links_conta WHERE token_hash = $1 AND usado_em = now()', [link.hash])).toBe(1);
+      expect(
+        await contar(db, 'SELECT 1 FROM links_conta WHERE token_hash = $1 AND usado_em = now()', [
+          link.hash,
+        ]),
+      ).toBe(1);
     });
   });
 
@@ -91,8 +119,12 @@ describe('link_nova_senha', () => {
       await criarSessao(db, cenario.contaB);
       const link = await criarLink(db, cenario.contaA, 'recuperacao');
       expect(await novaSenha(db, link.hash)).toBe(true);
-      expect(await contar(db, 'SELECT 1 FROM sessoes WHERE conta_id = $1', [cenario.contaA])).toBe(0);
-      expect(await contar(db, 'SELECT 1 FROM sessoes WHERE conta_id = $1', [cenario.contaB])).toBe(1);
+      expect(await contar(db, 'SELECT 1 FROM sessoes WHERE conta_id = $1', [cenario.contaA])).toBe(
+        0,
+      );
+      expect(await contar(db, 'SELECT 1 FROM sessoes WHERE conta_id = $1', [cenario.contaB])).toBe(
+        1,
+      );
     });
   });
 
@@ -108,7 +140,11 @@ describe('link_nova_senha', () => {
   it('ACE-25: link vencido (1 h mais 1 s) devolve falso e a senha fica intacta', async () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
-      const link = await linkComIdade(db, cenario.contaA, "(interval '1 hour' + interval '1 second')");
+      const link = await linkComIdade(
+        db,
+        cenario.contaA,
+        "(interval '1 hour' + interval '1 second')",
+      );
       expect(await novaSenha(db, link.hash)).toBe(false);
       expect(await senhaConfere(db, cenario.contaA, cenario.senhaA)).toBe(true);
     });
@@ -132,7 +168,9 @@ describe('link_nova_senha', () => {
       expect(await novaSenha(db, novoToken().hash)).toBe(false);
       expect(await novaSenha(db, confirmacao.hash)).toBe(false);
       expect(await senhaConfere(db, cenario.contaA, cenario.senhaA)).toBe(true);
-      expect(await contar(db, 'SELECT 1 FROM sessoes WHERE conta_id = $1', [cenario.contaA])).toBe(1);
+      expect(await contar(db, 'SELECT 1 FROM sessoes WHERE conta_id = $1', [cenario.contaA])).toBe(
+        1,
+      );
     });
   });
 
@@ -142,11 +180,19 @@ describe('link_nova_senha', () => {
       await comoAppAqui(db);
       const primeiro = novoToken();
       const segundo = novoToken();
-      await db.query('SELECT * FROM link_pedir($1, $2, $3)', [cenario.emailA, 'recuperacao', primeiro.hash]);
+      await db.query('SELECT * FROM link_pedir($1, $2, $3)', [
+        cenario.emailA,
+        'recuperacao',
+        primeiro.hash,
+      ]);
       await comoSuper(db);
       await db.query(`UPDATE envios_email SET enviado_em = now() - interval '61 seconds'`);
       await comoAppAqui(db);
-      await db.query('SELECT * FROM link_pedir($1, $2, $3)', [cenario.emailA, 'recuperacao', segundo.hash]);
+      await db.query('SELECT * FROM link_pedir($1, $2, $3)', [
+        cenario.emailA,
+        'recuperacao',
+        segundo.hash,
+      ]);
       await comoSuper(db);
       expect(await novaSenha(db, primeiro.hash)).toBe(false);
       expect(await novaSenha(db, segundo.hash)).toBe(true);
@@ -164,7 +210,9 @@ describe('link_nova_senha', () => {
       expect(await entrar(db, cenario.emailA, cenario.senhaA)).toBe('bloqueado');
       const link = await criarLink(db, cenario.contaA, 'recuperacao');
       expect(await novaSenha(db, link.hash)).toBe(true);
-      expect(await contar(db, 'SELECT 1 FROM tentativas_login WHERE email = $1', [cenario.emailA])).toBe(0);
+      expect(
+        await contar(db, 'SELECT 1 FROM tentativas_login WHERE email = $1', [cenario.emailA]),
+      ).toBe(0);
       expect(await entrar(db, cenario.emailA, NOVA)).toBe('ok');
     });
   });
@@ -172,13 +220,15 @@ describe('link_nova_senha', () => {
   it('ACE-76: a nova senha não apaga as tentativas de outro e-mail', async () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
-      await db.query(`INSERT INTO tentativas_login (email, ip_hash, momento, sucesso) VALUES ($1, $2, now(), false)`, [
-        cenario.emailB,
-        IP_HASH_1,
-      ]);
+      await db.query(
+        `INSERT INTO tentativas_login (email, ip_hash, momento, sucesso) VALUES ($1, $2, now(), false)`,
+        [cenario.emailB, IP_HASH_1],
+      );
       const link = await criarLink(db, cenario.contaA, 'recuperacao');
       await novaSenha(db, link.hash);
-      expect(await contar(db, 'SELECT 1 FROM tentativas_login WHERE email = $1', [cenario.emailB])).toBe(1);
+      expect(
+        await contar(db, 'SELECT 1 FROM tentativas_login WHERE email = $1', [cenario.emailB]),
+      ).toBe(1);
     });
   });
 });
@@ -192,9 +242,16 @@ describe('conta_trocar_senha', () => {
       await criarSessao(db, cenario.contaB);
       expect(await trocar(db, cenario.contaA, cenario.senhaA, NOVA, atual.hash)).toBe(true);
       expect(await senhaConfere(db, cenario.contaA, NOVA)).toBe(true);
-      const restantes = await db.query<{ token_hash: Buffer }>('SELECT token_hash FROM sessoes WHERE conta_id = $1', [cenario.contaA]);
-      expect(restantes.rows.map((l) => l.token_hash.toString('hex'))).toEqual([atual.hash.toString('hex')]);
-      expect(await contar(db, 'SELECT 1 FROM sessoes WHERE conta_id = $1', [cenario.contaB])).toBe(1);
+      const restantes = await db.query<{ token_hash: Buffer }>(
+        'SELECT token_hash FROM sessoes WHERE conta_id = $1',
+        [cenario.contaA],
+      );
+      expect(restantes.rows.map((l) => l.token_hash.toString('hex'))).toEqual([
+        atual.hash.toString('hex'),
+      ]);
+      expect(await contar(db, 'SELECT 1 FROM sessoes WHERE conta_id = $1', [cenario.contaB])).toBe(
+        1,
+      );
     });
   });
 
@@ -205,8 +262,12 @@ describe('conta_trocar_senha', () => {
       await criarSessao(db, cenario.contaA);
       expect(await trocar(db, cenario.contaA, 'senha errada', NOVA, atual.hash)).toBe(false);
       expect(await senhaConfere(db, cenario.contaA, cenario.senhaA)).toBe(true);
-      expect(await contar(db, 'SELECT 1 FROM sessoes WHERE conta_id = $1', [cenario.contaA])).toBe(2);
-      expect(await contar(db, 'SELECT 1 FROM falhas_senha_atual WHERE conta_id = $1', [cenario.contaA])).toBe(1);
+      expect(await contar(db, 'SELECT 1 FROM sessoes WHERE conta_id = $1', [cenario.contaA])).toBe(
+        2,
+      );
+      expect(
+        await contar(db, 'SELECT 1 FROM falhas_senha_atual WHERE conta_id = $1', [cenario.contaA]),
+      ).toBe(1);
     });
   });
 
@@ -224,18 +285,23 @@ describe('conta_trocar_senha', () => {
     const { db } = aberto;
     await numaTransacao(db, async () => {
       await comoAppAqui(db);
-      const r = await umaLinha<{ ok: boolean | null }>(db, 'SELECT conta_trocar_senha($1, $2, $3) AS ok', [
-        'qualquer',
-        NOVA,
-        novoToken().hash,
-      ]);
+      const r = await umaLinha<{ ok: boolean | null }>(
+        db,
+        'SELECT conta_trocar_senha($1, $2, $3) AS ok',
+        ['qualquer', NOVA, novoToken().hash],
+      );
       expect(r.ok).toBe(false);
     });
   });
 });
 
 describe('bloqueio da senha atual', () => {
-  async function falhasSenha(db: pg.Client, conta: string, n: number, atras = "interval '1 minute'"): Promise<void> {
+  async function falhasSenha(
+    db: pg.Client,
+    conta: string,
+    n: number,
+    atras = "interval '1 minute'",
+  ): Promise<void> {
     await db.query(
       `INSERT INTO falhas_senha_atual (conta_id, momento) SELECT $1, now() - ${atras} FROM generate_series(1, $2)`,
       [conta, n],
@@ -248,7 +314,9 @@ describe('bloqueio da senha atual', () => {
       const atual = await criarSessao(db, cenario.contaA);
       await falhasSenha(db, cenario.contaA, 4);
       expect(await trocar(db, cenario.contaA, cenario.senhaA, NOVA, atual.hash)).toBe(true);
-      expect(await contar(db, 'SELECT 1 FROM falhas_senha_atual WHERE conta_id = $1', [cenario.contaA])).toBe(0);
+      expect(
+        await contar(db, 'SELECT 1 FROM falhas_senha_atual WHERE conta_id = $1', [cenario.contaA]),
+      ).toBe(0);
     });
   });
 
@@ -270,7 +338,9 @@ describe('bloqueio da senha atual', () => {
       expect(await trocar(db, cenario.contaA, cenario.senhaA, NOVA, atual.hash)).toBeNull();
       expect(await trocar(db, cenario.contaA, 'errada', NOVA, atual.hash)).toBeNull();
       expect(await senhaConfere(db, cenario.contaA, cenario.senhaA)).toBe(true);
-      expect(await contar(db, 'SELECT 1 FROM falhas_senha_atual WHERE conta_id = $1', [cenario.contaA])).toBe(5);
+      expect(
+        await contar(db, 'SELECT 1 FROM falhas_senha_atual WHERE conta_id = $1', [cenario.contaA]),
+      ).toBe(5);
     });
   });
 

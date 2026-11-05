@@ -31,7 +31,9 @@ function entrada(id: string, estado: string) {
   return e;
 }
 
-test('ACE-54: uma entrada com respostas serve o JSON indicado e a tela renderiza com ele', async ({ page }) => {
+test('ACE-54: uma entrada com respostas serve o JSON indicado e a tela renderiza com ele', async ({
+  page,
+}) => {
   const t32 = entrada('T32', 'sucesso');
   await aplicarRespostas(page, t32, { mockup: MOCKUP, globais: MAPA.respostas ?? [] });
   await page.goto(t32.rota ?? '/');
@@ -40,7 +42,9 @@ test('ACE-54: uma entrada com respostas serve o JSON indicado e a tela renderiza
   await expect(page.getByText('leandro@exemplo.com.br')).toBeVisible();
 });
 
-test('ACE-54: chamada de API sem resposta na entrada recebe 404, não o index.html', async ({ page }) => {
+test('ACE-54: chamada de API sem resposta na entrada recebe 404, não o index.html', async ({
+  page,
+}) => {
   const t32 = entrada('T32', 'sucesso');
   await aplicarRespostas(page, t32, { mockup: MOCKUP });
   await page.goto('/');
@@ -51,7 +55,9 @@ test('ACE-54: chamada de API sem resposta na entrada recebe 404, não o index.ht
   expect(r).toEqual({ status: 404, corpo: { erro: 'Não encontrado.', codigo: 'nao_encontrado' } });
 });
 
-test('ACE-54: os passos rodam e o erro antigo do mockup chega como o código do contrato', async ({ page }) => {
+test('ACE-54: os passos rodam e o erro antigo do mockup chega como o código do contrato', async ({
+  page,
+}) => {
   const t25 = entrada('T25', 'erro');
   await aplicarRespostas(page, t25, { mockup: MOCKUP });
   await page.goto(t25.rota ?? '/');
@@ -81,10 +87,15 @@ test('PAR-146: ocultar esconde o seletor nas duas imagens', async ({ page }) => 
   const pagina = (texto: string) =>
     `data:text/html,${encodeURIComponent(`<body style="margin:0"><p style="font:40px sans-serif">Igual</p><p class="variavel" style="font:40px sans-serif;color:red">${texto}</p></body>`)}`;
 
-  const semOcultar = compararPng(await printTela(page, pagina('AAAA'), viewport), await printTela(page, pagina('BBBBBBBB'), viewport));
+  const semOcultar = compararPng(
+    await printTela(page, pagina('AAAA'), viewport),
+    await printTela(page, pagina('BBBBBBBB'), viewport),
+  );
   expect(semOcultar.passou).toBe(false);
 
-  const css = cssOcultar(ocultarDe({ viewports: {}, ocultar: ['.variavel'] }, { id: 'X', estado: 'y', mockup: 'm' }));
+  const css = cssOcultar(
+    ocultarDe({ viewports: {}, ocultar: ['.variavel'] }, { id: 'X', estado: 'y', mockup: 'm' }),
+  );
   const a = await printTela(page, pagina('AAAA'), viewport, { ocultar: css });
   const b = await printTela(page, pagina('BBBBBBBB'), viewport, { ocultar: css });
   const r = compararPng(a, b);
@@ -109,7 +120,9 @@ test('PAR-151: abortar derruba a requisição (falha de rede, não um status)', 
   expect(r).toBe('falhou: TypeError');
 });
 
-test('PAR-146, AD-044: com o relógio congelado em 2026-10-16, a t09 sem-jogadores mostra "Nenhuma em outubro"', async ({ page }) => {
+test('PAR-146, AD-044: com o relógio congelado em 2026-10-16, a t09 sem-jogadores mostra "Nenhuma em outubro"', async ({
+  page,
+}) => {
   const t09 = entrada('T09', 'sem-jogadores');
   await aplicarRespostas(page, t09, { mockup: MOCKUP, globais: MAPA.respostas ?? [] });
   await printTela(page, t09.rota ?? '/', { width: 390, height: 844 }, { relogio: RELOGIO_VISUAL });

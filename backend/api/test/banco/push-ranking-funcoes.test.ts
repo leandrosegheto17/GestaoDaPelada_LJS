@@ -30,8 +30,19 @@ afterAll(async () => {
 
 const EP = (n: number | string) => `https://fcm.googleapis.com/fcm/send/t8-${n}`;
 
-const assinar = (d: pg.Client, slug: string, endpoint: string, p256dh = 'chave', auth = 'segredo') =>
-  d.query<{ r: string }>('SELECT push_ranking_assinar($1, $2, $3, $4) AS r', [slug, endpoint, p256dh, auth]);
+const assinar = (
+  d: pg.Client,
+  slug: string,
+  endpoint: string,
+  p256dh = 'chave',
+  auth = 'segredo',
+) =>
+  d.query<{ r: string }>('SELECT push_ranking_assinar($1, $2, $3, $4) AS r', [
+    slug,
+    endpoint,
+    p256dh,
+    auth,
+  ]);
 
 const cancelar = (d: pg.Client, slug: string, endpoint: string, auth: string) =>
   d.query('SELECT push_ranking_cancelar($1, $2, $3)', [slug, endpoint, auth]);
@@ -40,7 +51,10 @@ const estado = (d: pg.Client, slug: string, endpoint: string, auth: string) =>
   d.query<{ r: string }>('SELECT push_ranking_estado($1, $2, $3) AS r', [slug, endpoint, auth]);
 
 async function total(grupo: string, db: pg.Client = aberto.db): Promise<number> {
-  const r = await db.query<{ n: number }>('SELECT count(*)::int AS n FROM push_ranking WHERE grupo_id = $1', [grupo]);
+  const r = await db.query<{ n: number }>(
+    'SELECT count(*)::int AS n FROM push_ranking WHERE grupo_id = $1',
+    [grupo],
+  );
   return r.rows[0]?.n ?? -1;
 }
 
@@ -54,7 +68,8 @@ async function encher(db: pg.Client, grupo: string, n: number): Promise<void> {
 }
 
 /** Roda `fn` como o contexto público do slug, numa transação desfeita (o cenário não muda entre os casos). */
-const publico = <T>(slug: string, fn: (d: pg.Client) => Promise<T>) => comoApp(aberto.db, { slug }, fn);
+const publico = <T>(slug: string, fn: (d: pg.Client) => Promise<T>) =>
+  comoApp(aberto.db, { slug }, fn);
 
 describe('push_ranking_assinar', () => {
   it('NOT-05, NOT-07: a primeira chamada devolve criada e a segunda, atualizada', async () => {
@@ -72,9 +87,10 @@ describe('push_ranking_assinar', () => {
     await aberto.db.query('BEGIN');
     try {
       await aberto.db.query('SET LOCAL ROLE pelada_app');
-      await aberto.db.query(`SELECT set_config('app.conta_id', '', true), set_config('app.slug_publico', $1, true)`, [
-        cenario.slugA,
-      ]);
+      await aberto.db.query(
+        `SELECT set_config('app.conta_id', '', true), set_config('app.slug_publico', $1, true)`,
+        [cenario.slugA],
+      );
       await assinar(aberto.db, cenario.slugA, EP('troca'), 'p-velha', 'a-velha');
       await assinar(aberto.db, cenario.slugA, EP('troca'), 'p-nova', 'a-nova');
       await aberto.db.query('RESET ROLE');
@@ -93,9 +109,10 @@ describe('push_ranking_assinar', () => {
     await aberto.db.query('BEGIN');
     try {
       await aberto.db.query('SET LOCAL ROLE pelada_app');
-      await aberto.db.query(`SELECT set_config('app.conta_id', '', true), set_config('app.slug_publico', $1, true)`, [
-        cenario.slugA,
-      ]);
+      await aberto.db.query(
+        `SELECT set_config('app.conta_id', '', true), set_config('app.slug_publico', $1, true)`,
+        [cenario.slugA],
+      );
       expect((await assinar(aberto.db, cenario.slugA, EP('dois'))).rows[0]?.r).toBe('criada');
       await aberto.db.query(`SELECT set_config('app.slug_publico', $1, true)`, [cenario.slugB]);
       expect((await assinar(aberto.db, cenario.slugB, EP('dois'))).rows[0]?.r).toBe('criada');
@@ -116,8 +133,16 @@ describe('push_ranking_assinar', () => {
 
   it('NOT-08: slug inexistente ou nulo devolve nao_encontrado', async () => {
     const { cenario } = aberto;
-    expect((await publico('nao-existe', (d) => assinar(d, 'nao-existe', EP('x')))).rows[0]?.r).toBe('nao_encontrado');
-    expect((await publico(cenario.slugA, (d) => d.query(`SELECT push_ranking_assinar(NULL, $1, 'c', 's') AS r`, [EP('y')]))).rows[0]).toEqual({
+    expect((await publico('nao-existe', (d) => assinar(d, 'nao-existe', EP('x')))).rows[0]?.r).toBe(
+      'nao_encontrado',
+    );
+    expect(
+      (
+        await publico(cenario.slugA, (d) =>
+          d.query(`SELECT push_ranking_assinar(NULL, $1, 'c', 's') AS r`, [EP('y')]),
+        )
+      ).rows[0],
+    ).toEqual({
       r: 'nao_encontrado',
     });
   });
@@ -137,7 +162,9 @@ describe('push_ranking_assinar', () => {
   it('NOT-51: com conta no contexto, recusa com 42501 e nada é gravado', async () => {
     const { db, cenario } = aberto;
     await expect(
-      comoApp(db, { conta: cenario.contaA, slug: cenario.slugA }, (d) => assinar(d, cenario.slugA, EP('conta'))),
+      comoApp(db, { conta: cenario.contaA, slug: cenario.slugA }, (d) =>
+        assinar(d, cenario.slugA, EP('conta')),
+      ),
     ).rejects.toMatchObject({ code: '42501' });
     expect(await total(cenario.grupoA)).toBe(1);
   });
@@ -148,9 +175,10 @@ describe('push_ranking_assinar', () => {
     try {
       await encher(db, cenario.grupoA, 199);
       await db.query('SET LOCAL ROLE pelada_app');
-      await db.query(`SELECT set_config('app.conta_id', '', true), set_config('app.slug_publico', $1, true)`, [
-        cenario.slugA,
-      ]);
+      await db.query(
+        `SELECT set_config('app.conta_id', '', true), set_config('app.slug_publico', $1, true)`,
+        [cenario.slugA],
+      );
       // A semente já tem 1 linha: 199 + 1 = 200 no grupo; a nova teria 200 outras.
       expect((await assinar(db, cenario.slugA, EP('nova'))).rows[0]?.r).toBe('limite');
       await db.query('RESET ROLE');
@@ -162,9 +190,10 @@ describe('push_ranking_assinar', () => {
     try {
       await encher(db, cenario.grupoA, 198);
       await db.query('SET LOCAL ROLE pelada_app');
-      await db.query(`SELECT set_config('app.conta_id', '', true), set_config('app.slug_publico', $1, true)`, [
-        cenario.slugA,
-      ]);
+      await db.query(
+        `SELECT set_config('app.conta_id', '', true), set_config('app.slug_publico', $1, true)`,
+        [cenario.slugA],
+      );
       // 198 + 1 da semente = 199 outras: a nova é a 200ª.
       expect((await assinar(db, cenario.slugA, EP('nova'))).rows[0]?.r).toBe('criada');
       await db.query('RESET ROLE');
@@ -180,10 +209,13 @@ describe('push_ranking_assinar', () => {
     try {
       await encher(db, cenario.grupoA, 199);
       await db.query('SET LOCAL ROLE pelada_app');
-      await db.query(`SELECT set_config('app.conta_id', '', true), set_config('app.slug_publico', $1, true)`, [
-        cenario.slugA,
-      ]);
-      expect((await assinar(db, cenario.slugA, EP('fixo-7'), 'p-nova', 'a-nova')).rows[0]?.r).toBe('atualizada');
+      await db.query(
+        `SELECT set_config('app.conta_id', '', true), set_config('app.slug_publico', $1, true)`,
+        [cenario.slugA],
+      );
+      expect((await assinar(db, cenario.slugA, EP('fixo-7'), 'p-nova', 'a-nova')).rows[0]?.r).toBe(
+        'atualizada',
+      );
       await db.query('RESET ROLE');
       expect(await total(cenario.grupoA)).toBe(200);
     } finally {
@@ -198,15 +230,24 @@ describe('push_ranking_assinar: concorrência', () => {
     try {
       await fn();
     } finally {
-      await aberto.db.query('DELETE FROM push_ranking WHERE grupo_id = $1 AND endpoint LIKE $2', [grupo, '%t8-corrida-%']);
-      await aberto.db.query('DELETE FROM push_ranking WHERE grupo_id = $1 AND endpoint LIKE $2', [grupo, '%t8-fixo-%']);
+      await aberto.db.query('DELETE FROM push_ranking WHERE grupo_id = $1 AND endpoint LIKE $2', [
+        grupo,
+        '%t8-corrida-%',
+      ]);
+      await aberto.db.query('DELETE FROM push_ranking WHERE grupo_id = $1 AND endpoint LIKE $2', [
+        grupo,
+        '%t8-fixo-%',
+      ]);
     }
   }
 
   const sessao = async (c: pg.Client, slug: string) => {
     await c.query('BEGIN');
     await c.query('SET LOCAL ROLE pelada_app');
-    await c.query(`SELECT set_config('app.conta_id', '', true), set_config('app.slug_publico', $1, true)`, [slug]);
+    await c.query(
+      `SELECT set_config('app.conta_id', '', true), set_config('app.slug_publico', $1, true)`,
+      [slug],
+    );
   };
 
   it('NOT-65: duas conexões com o mesmo endpoint gravam uma linha, uma criada e uma atualizada', async () => {
@@ -270,7 +311,10 @@ describe('push_ranking_cancelar e push_ranking_estado', () => {
     await db.query('BEGIN');
     try {
       await db.query('SET LOCAL ROLE pelada_app');
-      await db.query(`SELECT set_config('app.conta_id', '', true), set_config('app.slug_publico', $1, true)`, [slug]);
+      await db.query(
+        `SELECT set_config('app.conta_id', '', true), set_config('app.slug_publico', $1, true)`,
+        [slug],
+      );
       await assinar(db, slug, EP('c'), 'chave', 'segredo');
       await fn(db);
     } finally {
@@ -302,7 +346,9 @@ describe('push_ranking_cancelar e push_ranking_estado', () => {
     await comUma(async (d) => {
       await cancelar(d, cenario.slugB, EP('c'), 'segredo');
       expect((await estado(d, cenario.slugA, EP('c'), 'segredo')).rows[0]?.r).toBe('ativa');
-      expect((await estado(d, cenario.slugB, EP('c'), 'segredo')).rows[0]?.r).toBe('nao_encontrado');
+      expect((await estado(d, cenario.slugB, EP('c'), 'segredo')).rows[0]?.r).toBe(
+        'nao_encontrado',
+      );
     }, cenario.slugA);
   });
 
@@ -316,13 +362,19 @@ describe('push_ranking_cancelar e push_ranking_estado', () => {
       );
       await db.query(`UPDATE grupos SET arquivado_em = now() WHERE id = $1`, [cenario.grupoA]);
       await db.query('SET LOCAL ROLE pelada_app');
-      await db.query(`SELECT set_config('app.conta_id', '', true), set_config('app.slug_publico', $1, true)`, [
-        cenario.slugA,
-      ]);
-      expect((await estado(db, cenario.slugA, EP('arq'), 'segredo')).rows[0]?.r).toBe('nao_encontrado');
+      await db.query(
+        `SELECT set_config('app.conta_id', '', true), set_config('app.slug_publico', $1, true)`,
+        [cenario.slugA],
+      );
+      expect((await estado(db, cenario.slugA, EP('arq'), 'segredo')).rows[0]?.r).toBe(
+        'nao_encontrado',
+      );
       await cancelar(db, cenario.slugA, EP('arq'), 'segredo');
       await db.query('RESET ROLE');
-      const r = await db.query<{ n: number }>('SELECT count(*)::int AS n FROM push_ranking WHERE endpoint = $1', [EP('arq')]);
+      const r = await db.query<{ n: number }>(
+        'SELECT count(*)::int AS n FROM push_ranking WHERE endpoint = $1',
+        [EP('arq')],
+      );
       expect(r.rows[0]?.n).toBe(0);
     } finally {
       await db.query('ROLLBACK');
@@ -335,7 +387,9 @@ describe('push_ranking_cancelar e push_ranking_estado', () => {
       (d: pg.Client) => cancelar(d, cenario.slugA, EP('c'), 'segredo'),
       (d: pg.Client) => estado(d, cenario.slugA, EP('c'), 'segredo'),
     ]) {
-      await expect(comoApp(db, { conta: cenario.contaA, slug: cenario.slugA }, chamar)).rejects.toMatchObject({
+      await expect(
+        comoApp(db, { conta: cenario.contaA, slug: cenario.slugA }, chamar),
+      ).rejects.toMatchObject({
         code: '42501',
       });
     }
@@ -351,7 +405,11 @@ describe('permissões das funções', () => {
          FROM pg_proc p WHERE p.pronamespace = 'public'::regnamespace
           AND p.proname IN ('push_ranking_assinar', 'push_ranking_cancelar', 'push_ranking_estado') ORDER BY 1`,
     );
-    expect(r.rows.map((l) => l.funcao)).toEqual(['push_ranking_assinar', 'push_ranking_cancelar', 'push_ranking_estado']);
+    expect(r.rows.map((l) => l.funcao)).toEqual([
+      'push_ranking_assinar',
+      'push_ranking_cancelar',
+      'push_ranking_estado',
+    ]);
     for (const l of r.rows) {
       expect(l.app, l.funcao).toBe(true);
       expect(l.publico, l.funcao).toBe(false);

@@ -13,8 +13,13 @@ import { ordenarPorRanking, type Rankeavel } from '../../src/ranking/ordenar.ts'
  * - empate em pontos mas não em ano: posições diferentes.
  */
 
-const j = (id: string, apelido: string, anoNascimento: number | null = 1990): Rankeavel => ({ id, apelido, anoNascimento });
-const posicoes = (r: ReturnType<typeof ordenarPorRanking>) => r.map((c) => [c.jogador.apelido, c.posicao]);
+const j = (id: string, apelido: string, anoNascimento: number | null = 1990): Rankeavel => ({
+  id,
+  apelido,
+  anoNascimento,
+});
+const posicoes = (r: ReturnType<typeof ordenarPorRanking>) =>
+  r.map((c) => [c.jogador.apelido, c.posicao]);
 
 describe('ordenarPorRanking', () => {
   it('PAR-69: "José", "Jose" e "Jôse" empatados em tudo ficam na mesma posição e o seguinte é o 4', () => {
@@ -32,13 +37,27 @@ describe('ordenarPorRanking', () => {
 
   it('PAR-69: empate só em pontos não repete a posição (1, 1, 3 só com três critérios iguais)', () => {
     const jogadores = [j('1', 'Beto', 1990), j('2', 'Beto', 1990), j('3', 'Caio', 1991)];
-    const r = ordenarPorRanking(jogadores, new Map([['1', 7], ['2', 7], ['3', 7]]));
+    const r = ordenarPorRanking(
+      jogadores,
+      new Map([
+        ['1', 7],
+        ['2', 7],
+        ['3', 7],
+      ]),
+    );
     expect(r.map((c) => c.posicao)).toEqual([1, 1, 3]);
   });
 
   it('PAR-68: sem ano de nascimento vai depois de todos com ano, no mesmo acumulado', () => {
     const jogadores = [j('1', 'Aldo', null), j('2', 'Zeca', 2005), j('3', 'Bia', 1980)];
-    const r = ordenarPorRanking(jogadores, new Map([['1', 3], ['2', 3], ['3', 3]]));
+    const r = ordenarPorRanking(
+      jogadores,
+      new Map([
+        ['1', 3],
+        ['2', 3],
+        ['3', 3],
+      ]),
+    );
     expect(posicoes(r)).toEqual([
       ['Bia', 1],
       ['Zeca', 2],
@@ -48,7 +67,13 @@ describe('ordenarPorRanking', () => {
 
   it('PAR-68: acumulado maior primeiro, inclusive negativo, e sem acumulado conta 0', () => {
     const jogadores = [j('1', 'Ana'), j('2', 'Bia'), j('3', 'Cris')];
-    const r = ordenarPorRanking(jogadores, new Map([['1', -2], ['3', 4]]));
+    const r = ordenarPorRanking(
+      jogadores,
+      new Map([
+        ['1', -2],
+        ['3', 4],
+      ]),
+    );
     expect(posicoes(r)).toEqual([
       ['Cris', 1],
       ['Bia', 2],

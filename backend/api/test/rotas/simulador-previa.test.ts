@@ -9,7 +9,12 @@ import { NOME_COOKIE_SESSAO } from '../../src/infraestrutura/sessao/cookie.ts';
 import { gerarToken } from '../../src/infraestrutura/sessao/token.ts';
 import { envAcesso } from '../acesso/apoio.ts';
 import { contextoFalso } from '../db/requisicao.ts';
-import { abrirCenarioGrupos, arquivar, reativar, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  arquivar,
+  reativar,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * `POST /api/grupos/:grupoId/simulador/previa` (T34 da simulador; SIM-09, SIM-83), com o app real como `pelada_app` e
@@ -34,7 +39,10 @@ function fabricaEspiada(connectionString: string): ConexaoPg {
   };
 }
 
-const app = criarApp({ fabricaBanco: fabricaEspiada, relogio: relogioFixo('2026-03-03T15:00:00Z') });
+const app = criarApp({
+  fabricaBanco: fabricaEspiada,
+  relogio: relogioFixo('2026-03-03T15:00:00Z'),
+});
 
 async function sessao(conta: string): Promise<string> {
   const { token, hash } = await gerarToken();
@@ -85,14 +93,21 @@ beforeEach(async () => {
 });
 
 /** Tabelas de negócio que a prévia não pode ler nem gravar (SIM-09). */
-const TABELAS_DE_NEGOCIO = /\b(jogadores|periodos_ativos|notas|habilidades|partidas|presencas|config_pesos|escalacoes|eventos_uso|auditoria)\b/;
+const TABELAS_DE_NEGOCIO =
+  /\b(jogadores|periodos_ativos|notas|habilidades|partidas|presencas|config_pesos|escalacoes|eventos_uso|auditoria)\b/;
 
 describe('POST …/simulador/previa', () => {
   it('SIM-09: 19 aptos, N = 7 responde "2 times de 7 · 5 reservas" sem consultar tabela de negócio', async () => {
     const r = await previa({ formato: 'dois_times', n: 7, k: 2, aptos: aptosDois(19) });
     expect(r.status).toBe(200);
     const corpo = previaResposta.parse(await r.json());
-    expect(corpo).toEqual({ formato: 'dois_times', valida: true, descricao: '2 times de 7 · 5 reservas', times: 2, reservas: 5 });
+    expect(corpo).toEqual({
+      formato: 'dois_times',
+      valida: true,
+      descricao: '2 times de 7 · 5 reservas',
+      times: 2,
+      reservas: 5,
+    });
     expect(consultas.length).toBeGreaterThan(0);
     expect(consultas.filter((s) => TABELAS_DE_NEGOCIO.test(s))).toEqual([]);
   });
@@ -103,7 +118,9 @@ describe('POST …/simulador/previa', () => {
   });
 
   it('SIM-11: 2 times sem aptos suficientes devolve o maior N possível', async () => {
-    const corpo = previaResposta.parse(await (await previa({ formato: 'dois_times', n: 11, k: 0, aptos: aptosDois(19) })).json());
+    const corpo = previaResposta.parse(
+      await (await previa({ formato: 'dois_times', n: 11, k: 0, aptos: aptosDois(19) })).json(),
+    );
     expect(corpo).toEqual({
       formato: 'dois_times',
       valida: false,
@@ -114,7 +131,9 @@ describe('POST …/simulador/previa', () => {
   });
 
   it('SIM-12: 3 ou mais com 18 aptos e N = 4: 4 completos e um incompleto de 2', async () => {
-    const corpo = previaResposta.parse(await (await previa({ formato: 'varios_times', n: 4, aptos: aptosVarios(18) })).json());
+    const corpo = previaResposta.parse(
+      await (await previa({ formato: 'varios_times', n: 4, aptos: aptosVarios(18) })).json(),
+    );
     expect(corpo).toEqual({
       formato: 'varios_times',
       valida: true,
@@ -126,7 +145,9 @@ describe('POST …/simulador/previa', () => {
   });
 
   it('SIM-13: 3 ou mais com 8 aptos e N = 4 é inválida, com N sugerido e 2 times possível', async () => {
-    const corpo = previaResposta.parse(await (await previa({ formato: 'varios_times', n: 4, aptos: aptosVarios(8) })).json());
+    const corpo = previaResposta.parse(
+      await (await previa({ formato: 'varios_times', n: 4, aptos: aptosVarios(8) })).json(),
+    );
     expect(corpo).toEqual({
       formato: 'varios_times',
       valida: false,
@@ -140,7 +161,10 @@ describe('POST …/simulador/previa', () => {
   it('SIM-55: N fora de 2 a 11 dá 422 no campo n', async () => {
     const r = await previa({ formato: 'dois_times', n: 12, k: 0, aptos: aptosDois(4) });
     expect(r.status).toBe(422);
-    expect(await r.json()).toMatchObject({ codigo: 'dados_invalidos', mensagens: { n: MENSAGEM_N } });
+    expect(await r.json()).toMatchObject({
+      codigo: 'dados_invalidos',
+      mensagens: { n: MENSAGEM_N },
+    });
   });
 
   it('SIM-53: apto repetido dá 422 no campo aptos', async () => {
@@ -163,7 +187,10 @@ describe('POST …/simulador/previa', () => {
   });
 
   it('a conta B recebe 404 na prévia de G', async () => {
-    const r = await previa({ formato: 'dois_times', n: 7, k: 2, aptos: aptosDois(19) }, aberto.cenario.contaB);
+    const r = await previa(
+      { formato: 'dois_times', n: 7, k: 2, aptos: aptosDois(19) },
+      aberto.cenario.contaB,
+    );
     expect(r.status).toBe(404);
   });
 });

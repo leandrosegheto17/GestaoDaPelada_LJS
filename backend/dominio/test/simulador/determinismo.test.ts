@@ -39,7 +39,9 @@ describe('módulo do simulador sem aleatoriedade nem relógio', () => {
     const arquivos = readdirSync(PASTA).filter((nome) => nome.endsWith('.ts'));
     expect(arquivos.length).toBeGreaterThan(0);
     const achados = arquivos.flatMap((nome) =>
-      proibidosEm(readFileSync(join(PASTA, nome), 'utf8')).map((proibido) => `${nome}: ${proibido}`),
+      proibidosEm(readFileSync(join(PASTA, nome), 'utf8')).map(
+        (proibido) => `${nome}: ${proibido}`,
+      ),
     );
     expect(achados).toEqual([]);
   });
@@ -48,11 +50,15 @@ describe('módulo do simulador sem aleatoriedade nem relógio', () => {
 describe('sugerir é determinístico', () => {
   const casos: [string, EntradaSimulador][] = [
     ['2 times', { formato: 'dois_times', data: DATA, n: 7, k: 2, aptos: aptosFixos(19, [4, 16]) }],
-    ['3 ou mais', { formato: 'varios_times', data: DATA, n: 4, k: 'ilimitado', aptos: aptosFixos(22) }],
+    [
+      '3 ou mais',
+      { formato: 'varios_times', data: DATA, n: 4, k: 'ilimitado', aptos: aptosFixos(22) },
+    ],
   ];
 
   it.each(casos)('SIM-48: 20 chamadas iguais dão respostas iguais (%s)', (_, entrada) => {
     const primeira = sugerir(entrada, historicoFixo());
-    for (let i = 0; i < 20; i += 1) expect(sugerir(entrada, historicoFixo())).toStrictEqual(primeira);
+    for (let i = 0; i < 20; i += 1)
+      expect(sugerir(entrada, historicoFixo())).toStrictEqual(primeira);
   });
 });

@@ -1,5 +1,12 @@
 import { formatarData } from '../elenco/apelido.ts';
-import { ehDataValida, ehFutura, MENSAGEM_DATA_INVALIDA, MENSAGEM_FUTURO, type Data, type Periodo } from './datas.ts';
+import {
+  ehDataValida,
+  ehFutura,
+  MENSAGEM_DATA_INVALIDA,
+  MENSAGEM_FUTURO,
+  type Data,
+  type Periodo,
+} from './datas.ts';
 
 /**
  * Avaliação da data de início da pontuação (GEL-77 a GEL-82). Regras, nesta ordem: data válida, piso de 01/01/2000
@@ -10,7 +17,8 @@ import { ehDataValida, ehFutura, MENSAGEM_DATA_INVALIDA, MENSAGEM_FUTURO, type D
 export const PISO_INICIO: Data = '2000-01-01';
 export const MENSAGEM_ANTES_DO_PISO = 'A data de início não pode ser anterior a 01/01/2000.';
 
-export type RegraInicio = 'data-invalida' | 'antes-do-piso' | 'futuro' | 'depois-da-saida-do-primeiro';
+export type RegraInicio =
+  'data-invalida' | 'antes-do-piso' | 'futuro' | 'depois-da-saida-do-primeiro';
 
 export interface FalhaInicio {
   ok: false;
@@ -54,7 +62,8 @@ export function avaliarInicio(entrada: EntradaInicio): ResultadoInicio {
 
   const copia = periodos.map((p) => ({ ...p }));
   const atual = inicioPontuacao ?? primeiro?.inicio ?? novaData;
-  if (novaData === atual) return { ok: true, alterado: false, inicioPontuacao: atual, periodos: copia };
+  if (novaData === atual)
+    return { ok: true, alterado: false, inicioPontuacao: atual, periodos: copia };
 
   const novoPrimeiro = copia[0];
   if (novoPrimeiro && novaData < novoPrimeiro.inicio) novoPrimeiro.inicio = novaData;

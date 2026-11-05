@@ -1,7 +1,12 @@
 import { Hono } from 'hono';
 import { corpoDoErro, editarJogadorCorpo } from '@pelada/contrato';
 import type { Ambiente } from '../ambiente.ts';
-import { comUnicidade, lerCorpoDoGrupo, MENSAGEM_APELIDO_REPETIDO, respostaDeCampo } from '../corpo.ts';
+import {
+  comUnicidade,
+  lerCorpoDoGrupo,
+  MENSAGEM_APELIDO_REPETIDO,
+  respostaDeCampo,
+} from '../corpo.ts';
 import { jogadoresEdicao } from '../../infraestrutura/db/repositorios/jogadores-edicao.ts';
 import { jogadoresLeitura } from '../../infraestrutura/db/repositorios/jogadores-leitura.ts';
 
@@ -44,13 +49,18 @@ export function rotasJogador(): Hono<Ambiente> {
   rotas.patch('/grupos/:grupoId/jogadores/:id', async (c) => {
     const id = c.req.param('id');
     if (!UUID.test(id)) return c.json(naoEncontrado, 404);
-    const corpo = await lerCorpoDoGrupo(c, editarJogadorCorpo(c.var.relogio.hoje()), semDataEntrada);
+    const corpo = await lerCorpoDoGrupo(
+      c,
+      editarJogadorCorpo(c.var.relogio.hoje()),
+      semDataEntrada,
+    );
     if (!corpo.ok) return corpo.resposta;
     const grupoId = c.req.param('grupoId');
     return comUnicidade(c, async () => {
       const r = await jogadoresEdicao.editar(c.var.db, grupoId, id, corpo.dados);
       if (r.resultado === 'nao_encontrado') return c.json(naoEncontrado, 404);
-      if (r.resultado === 'apelido_repetido') return respostaDeCampo(c, 'apelido', MENSAGEM_APELIDO_REPETIDO);
+      if (r.resultado === 'apelido_repetido')
+        return respostaDeCampo(c, 'apelido', MENSAGEM_APELIDO_REPETIDO);
       const ficha = await jogadoresLeitura.ler(c.var.db, grupoId, id);
       if (!ficha) return c.json(naoEncontrado, 404);
       return c.json(ficha, 200);
@@ -64,7 +74,10 @@ export function rotasJogador(): Hono<Ambiente> {
     if (r.resultado === 'nao_encontrado') return c.json(naoEncontrado, 404);
     if (r.resultado === 'com_historico') {
       return c.json(
-        { ...corpoDoErro('jogador_com_historico', { sugestao: 'inativar' }), erro: mensagemComHistorico(r.apelido) },
+        {
+          ...corpoDoErro('jogador_com_historico', { sugestao: 'inativar' }),
+          erro: mensagemComHistorico(r.apelido),
+        },
         409,
       );
     }

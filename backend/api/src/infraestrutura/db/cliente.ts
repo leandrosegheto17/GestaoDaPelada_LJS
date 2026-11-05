@@ -7,7 +7,8 @@ import pg from 'pg';
  * não consulta o banco não abre conexão.
  */
 
-export const MENSAGEM_BANCO_INDISPONIVEL = 'Serviço temporariamente indisponível. Tente de novo em instantes.';
+export const MENSAGEM_BANCO_INDISPONIVEL =
+  'Serviço temporariamente indisponível. Tente de novo em instantes.';
 
 /**
  * Falha ao abrir a conexão. A mensagem é fixa: nunca leva a URL, o host nem o erro do driver,
@@ -34,12 +35,17 @@ export interface OpcoesCliente {
    * Roda logo depois de conectar, antes da primeira consulta pedida (ex.: `BEGIN` e o contexto
    * da RLS, no `comBanco`). Se falhar, a consulta falha e a conexão é fechada no `fechar()`.
    */
-  aoAbrir?: (consultar: (sql: string, valores?: unknown[]) => Promise<pg.QueryResult>) => Promise<void>;
+  aoAbrir?: (
+    consultar: (sql: string, valores?: unknown[]) => Promise<pg.QueryResult>,
+  ) => Promise<void>;
 }
 
 export interface ClienteRequisicao {
   /** Abre a conexão na primeira chamada e roda a consulta. */
-  consultar<L extends pg.QueryResultRow = pg.QueryResultRow>(sql: string, valores?: unknown[]): Promise<pg.QueryResult<L>>;
+  consultar<L extends pg.QueryResultRow = pg.QueryResultRow>(
+    sql: string,
+    valores?: unknown[],
+  ): Promise<pg.QueryResult<L>>;
   /** Verdadeiro quando a conexão abriu e o `aoAbrir` terminou. */
   aberto(): boolean;
   /** Fecha a conexão, se abriu. Nunca lança. Chamadas repetidas não fazem nada. */
@@ -48,7 +54,10 @@ export interface ClienteRequisicao {
 
 const fabricaPadrao = (connectionString: string): ConexaoPg => new pg.Client({ connectionString });
 
-export function criarCliente(connectionString: string, opcoes: OpcoesCliente = {}): ClienteRequisicao {
+export function criarCliente(
+  connectionString: string,
+  opcoes: OpcoesCliente = {},
+): ClienteRequisicao {
   const fabrica = opcoes.fabrica ?? fabricaPadrao;
   let conexao: ConexaoPg | null = null;
   let abrindo: Promise<ConexaoPg> | null = null;
@@ -71,7 +80,10 @@ export function criarCliente(connectionString: string, opcoes: OpcoesCliente = {
   }
 
   return {
-    async consultar<L extends pg.QueryResultRow>(sql: string, valores?: unknown[]): Promise<pg.QueryResult<L>> {
+    async consultar<L extends pg.QueryResultRow>(
+      sql: string,
+      valores?: unknown[],
+    ): Promise<pg.QueryResult<L>> {
       abrindo ??= abrir();
       const c = await abrindo;
       return (await c.query(sql, valores)) as pg.QueryResult<L>;

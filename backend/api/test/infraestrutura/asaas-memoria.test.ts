@@ -3,7 +3,12 @@ import { asaasMemoria } from '../../src/infraestrutura/asaas/memoria.ts';
 
 /** Asaas em memória (T30; PLA-36, PLA-53). */
 
-const CLIENTE = { name: 'Maria', cpfCnpj: '52998224725', email: 'maria@exemplo.com', externalReference: 'conta-1' };
+const CLIENTE = {
+  name: 'Maria',
+  cpfCnpj: '52998224725',
+  email: 'maria@exemplo.com',
+  externalReference: 'conta-1',
+};
 const ASSINATURA = {
   customer: 'cus_1',
   valorCentavos: 990,
@@ -22,7 +27,11 @@ describe('asaasMemoria', () => {
     const cobranca = await asaas.primeiraCobranca(assinatura.id);
     if (cobranca === 'falhou') throw new Error('não devia falhar');
     expect(cobranca.invoiceUrl).toMatch(/^https:\/\/sandbox\.asaas\.com\/i\/pay_/);
-    expect(asaas.chamadas.map((c) => c.operacao)).toEqual(['criarCliente', 'criarAssinatura', 'primeiraCobranca']);
+    expect(asaas.chamadas.map((c) => c.operacao)).toEqual([
+      'criarCliente',
+      'criarAssinatura',
+      'primeiraCobranca',
+    ]);
   });
 
   it('PLA-36: programada para falhar na segunda chamada devolve falhou nela, e só nela', async () => {

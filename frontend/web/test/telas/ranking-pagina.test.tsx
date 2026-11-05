@@ -18,14 +18,47 @@ const API = `GET /api/publico/${SLUG}/ranking`;
 const rotas = () => [{ path: '/g/:slug', element: <PaginaRanking />, handle: { tela: 'ranking' } }];
 
 const LINHAS_OUTUBRO = [
-  { posicao: 1, apelido: 'Toninho', ptsInicial: 27, rodadas: [{ situacao: 'presente', pontos: 1 }, { situacao: 'presente', pontos: 2 }], ptsFinal: 30 },
-  { posicao: 2, apelido: 'Bigode', ptsInicial: 26, rodadas: [{ situacao: 'falta', pontos: 0 }, { situacao: 'presente', pontos: 2 }], ptsFinal: 28 },
-  { posicao: 3, apelido: 'Serginho', ptsInicial: 0, rodadas: [{ situacao: 'fora', pontos: null }, { situacao: 'presente', pontos: 1 }], ptsFinal: 1 },
+  {
+    posicao: 1,
+    apelido: 'Toninho',
+    ptsInicial: 27,
+    rodadas: [
+      { situacao: 'presente', pontos: 1 },
+      { situacao: 'presente', pontos: 2 },
+    ],
+    ptsFinal: 30,
+  },
+  {
+    posicao: 2,
+    apelido: 'Bigode',
+    ptsInicial: 26,
+    rodadas: [
+      { situacao: 'falta', pontos: 0 },
+      { situacao: 'presente', pontos: 2 },
+    ],
+    ptsFinal: 28,
+  },
+  {
+    posicao: 3,
+    apelido: 'Serginho',
+    ptsInicial: 0,
+    rodadas: [
+      { situacao: 'fora', pontos: null },
+      { situacao: 'presente', pontos: 1 },
+    ],
+    ptsFinal: 1,
+  },
 ];
 
 function ranking(extra: Record<string, unknown> = {}) {
   return {
-    grupo: { nome: 'Pelada de Quinta', slug: SLUG, diaSemana: 'quinta', frequencia: 'semanal', horario: '20:00' },
+    grupo: {
+      nome: 'Pelada de Quinta',
+      slug: SLUG,
+      diaSemana: 'quinta',
+      frequencia: 'semanal',
+      horario: '20:00',
+    },
     mes: '2026-10',
     hoje: '2026-10-22',
     geradoEm: '2026-10-22T12:00:00.000Z',
@@ -47,9 +80,27 @@ const SETEMBRO = ranking({
   resumoMes: { partidas: 1, comChuva: 0 },
   partidas: [{ data: '2026-09-24', choveu: false }],
   linhas: [
-    { posicao: 1, apelido: 'Toninho', ptsInicial: 26, rodadas: [{ situacao: 'presente', pontos: 1 }], ptsFinal: 27 },
-    { posicao: 2, apelido: 'Bigode', ptsInicial: 25, rodadas: [{ situacao: 'presente', pontos: 1 }], ptsFinal: 26 },
-    { posicao: 3, apelido: 'Serginho', ptsInicial: 0, rodadas: [{ situacao: 'fora', pontos: null }], ptsFinal: 0 },
+    {
+      posicao: 1,
+      apelido: 'Toninho',
+      ptsInicial: 26,
+      rodadas: [{ situacao: 'presente', pontos: 1 }],
+      ptsFinal: 27,
+    },
+    {
+      posicao: 2,
+      apelido: 'Bigode',
+      ptsInicial: 25,
+      rodadas: [{ situacao: 'presente', pontos: 1 }],
+      ptsFinal: 26,
+    },
+    {
+      posicao: 3,
+      apelido: 'Serginho',
+      ptsInicial: 0,
+      rodadas: [{ situacao: 'fora', pontos: null }],
+      ptsFinal: 0,
+    },
   ],
 });
 
@@ -79,11 +130,18 @@ function apelidos(): string[] {
 describe('PaginaRanking', () => {
   it('PAR-79: nome, agenda, mês, "Exportar PDF", resumo do mês e a tabela', async () => {
     abrirTela(`/g/${SLUG}`, { [API]: () => json(200, ranking()) }, rotas);
-    expect(await screen.findByRole('heading', { level: 1, name: 'Pelada de Quinta' })).toBeDefined();
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Pelada de Quinta' }),
+    ).toBeDefined();
     expect(screen.getByText('Toda quinta · 20:00')).toBeDefined();
     expect(screen.getByRole('heading', { level: 2, name: 'outubro de 2026' })).toBeDefined();
     expect(screen.getAllByRole('button', { name: 'Exportar PDF' }).length).toBeGreaterThan(0);
-    const resumo = screen.getByText((_, el) => el?.tagName === 'P' && el.textContent === '2 partidas no mês, 1 com chuva. Ordem pelos pontos acumulados até hoje.');
+    const resumo = screen.getByText(
+      (_, el) =>
+        el?.tagName === 'P' &&
+        el.textContent ===
+          '2 partidas no mês, 1 com chuva. Ordem pelos pontos acumulados até hoje.',
+    );
     expect(resumo).toBeDefined();
     expect(apelidos()).toEqual(['Toninho', 'Bigode', 'Serginho']);
   });
@@ -91,17 +149,28 @@ describe('PaginaRanking', () => {
   it('PAR-79: uma partida usa o singular no resumo', async () => {
     abrirTela(`/g/${SLUG}`, { [API]: () => json(200, SETEMBRO) }, rotas);
     expect(
-      await screen.findByText((_, el) => el?.tagName === 'P' && el.textContent === '1 partida no mês, 0 com chuva. Ordem pelos pontos acumulados até hoje.'),
+      await screen.findByText(
+        (_, el) =>
+          el?.tagName === 'P' &&
+          el.textContent ===
+            '1 partida no mês, 0 com chuva. Ordem pelos pontos acumulados até hoje.',
+      ),
     ).toBeDefined();
   });
 
   it('PAR-88: mês sem partidas mostra "Nenhuma partida registrada neste mês" e "Pts inicial (início de julho)"', async () => {
     abrirTela(`/g/${SLUG}?mes=2026-07`, { [API]: () => json(200, JULHO_SEM_PARTIDAS) }, rotas);
-    expect(await screen.findByRole('cell', { name: 'Nenhuma partida registrada neste mês' })).toBeDefined();
-    expect(screen.getByRole('columnheader', { name: 'Pts inicial (início de julho)' })).toBeDefined();
+    expect(
+      await screen.findByRole('cell', { name: 'Nenhuma partida registrada neste mês' }),
+    ).toBeDefined();
+    expect(
+      screen.getByRole('columnheader', { name: 'Pts inicial (início de julho)' }),
+    ).toBeDefined();
     expect(screen.getByRole('columnheader', { name: 'Pts final (fim de julho)' })).toBeDefined();
     // No lugar das colunas de partida: nenhuma coluna "dd/mm".
-    expect(screen.getAllByRole('columnheader').map((c) => c.textContent)).not.toContain(expect.stringMatching(/^\d{2}\/\d{2}/));
+    expect(screen.getAllByRole('columnheader').map((c) => c.textContent)).not.toContain(
+      expect.stringMatching(/^\d{2}\/\d{2}/),
+    );
     expect(screen.getByText('Ordem pelos pontos acumulados até hoje.')).toBeDefined();
     expect(apelidos()).toEqual(['Toninho', 'Bigode', 'Serginho']);
   });
@@ -123,7 +192,12 @@ describe('PaginaRanking', () => {
   it('PAR-89: trocar de mês troca o ?mes= e as colunas, com as linhas e a ordem iguais', async () => {
     const t = abrirTela(
       `/g/${SLUG}`,
-      { [API]: emSequencia(() => json(200, ranking()), () => json(200, SETEMBRO)) },
+      {
+        [API]: emSequencia(
+          () => json(200, ranking()),
+          () => json(200, SETEMBRO),
+        ),
+      },
       rotas,
     );
     await screen.findByRole('heading', { level: 2, name: 'outubro de 2026' });
@@ -138,21 +212,44 @@ describe('PaginaRanking', () => {
     expect(screen.queryByRole('columnheader', { name: '08/10, com chuva' })).toBeNull();
     expect(apelidos()).toEqual(antes);
     const toninho = screen.getByRole('rowheader', { name: 'Toninho' }).closest('tr');
-    expect(within(toninho as HTMLElement).getAllByRole('cell').map((c) => c.textContent)).toEqual(['1', '26', expect.any(String), '27']);
+    expect(
+      within(toninho as HTMLElement)
+        .getAllByRole('cell')
+        .map((c) => c.textContent),
+    ).toEqual(['1', '26', expect.any(String), '27']);
   });
 
   it('PAR-81: sem ativos, "Nenhum jogador no ranking ainda." e o texto de ajuda, sem tabela', async () => {
     abrirTela(
       `/g/${SLUG}`,
-      { [API]: () => json(200, ranking({ linhas: [], partidas: [], resumoMes: { partidas: 0, comChuva: 0 }, navegacao: { mesAnterior: null, mesSeguinte: null } })) },
+      {
+        [API]: () =>
+          json(
+            200,
+            ranking({
+              linhas: [],
+              partidas: [],
+              resumoMes: { partidas: 0, comChuva: 0 },
+              navegacao: { mesAnterior: null, mesSeguinte: null },
+            }),
+          ),
+      },
       rotas,
     );
-    expect(await screen.findByRole('heading', { name: 'Nenhum jogador no ranking ainda.' })).toBeDefined();
-    expect(screen.getByText('Quando o admin cadastrar os jogadores, o ranking aparece aqui.')).toBeDefined();
+    expect(
+      await screen.findByRole('heading', { name: 'Nenhum jogador no ranking ainda.' }),
+    ).toBeDefined();
+    expect(
+      screen.getByText('Quando o admin cadastrar os jogadores, o ranking aparece aqui.'),
+    ).toBeDefined();
     expect(screen.queryByRole('table')).toBeNull();
     expect(screen.queryByRole('button', { name: 'Exportar PDF' })).toBeNull();
-    expect((screen.getByRole('button', { name: 'Mês anterior' }) as HTMLButtonElement).disabled).toBe(true);
-    expect((screen.getByRole('button', { name: 'Mês seguinte' }) as HTMLButtonElement).disabled).toBe(true);
+    expect(
+      (screen.getByRole('button', { name: 'Mês anterior' }) as HTMLButtonElement).disabled,
+    ).toBe(true);
+    expect(
+      (screen.getByRole('button', { name: 'Mês seguinte' }) as HTMLButtonElement).disabled,
+    ).toBe(true);
   });
 
   it('PAR-82: carregando pela primeira vez, "Carregando o ranking…"', () => {
@@ -175,7 +272,12 @@ describe('PaginaRanking', () => {
       `/g/${SLUG}?mes=2020-01`,
       {
         [API]: emSequencia(
-          () => json(422, { erro: 'Mês fora do histórico do grupo.', codigo: 'dados_invalidos', campos: ['mes'] }),
+          () =>
+            json(422, {
+              erro: 'Mês fora do histórico do grupo.',
+              codigo: 'dados_invalidos',
+              campos: ['mes'],
+            }),
           () => json(200, ranking()),
         ),
       },
@@ -210,7 +312,9 @@ describe('PaginaRanking', () => {
   it('PAR-79: axe sem violações', async () => {
     const { container } = abrirTela(`/g/${SLUG}`, { [API]: () => json(200, ranking()) }, rotas);
     await screen.findByRole('table');
-    await waitFor(() => expect(screen.getByRole('heading', { level: 2, name: 'outubro de 2026' })).toBeDefined());
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { level: 2, name: 'outubro de 2026' })).toBeDefined(),
+    );
     await esperarSemViolacoes(container);
   });
 });

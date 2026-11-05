@@ -13,7 +13,9 @@ export function rotasUso(): Hono<Ambiente> {
   const rotas = new Hono<Ambiente>();
 
   rotas.get('/grupos/:grupoId/uso', async (c) => {
-    const resposta: UsoResposta = { semanas: await eventos.porSemana(c.var.db, c.req.param('grupoId')) };
+    const resposta: UsoResposta = {
+      semanas: await eventos.porSemana(c.var.db, c.req.param('grupoId')),
+    };
     return c.json(resposta, 200);
   });
 

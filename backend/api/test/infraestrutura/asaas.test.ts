@@ -1,5 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { asaasHttp, TEMPO_LIMITE_ASAAS_MS, type NovaAssinatura, type NovoCliente } from '../../src/infraestrutura/asaas/cliente.ts';
+import {
+  asaasHttp,
+  TEMPO_LIMITE_ASAAS_MS,
+  type NovaAssinatura,
+  type NovoCliente,
+} from '../../src/infraestrutura/asaas/cliente.ts';
 
 /**
  * Cliente do Asaas (T29; PLA-06, PLA-29, PLA-34, PLA-35, PLA-36).
@@ -26,8 +31,15 @@ const ASSINATURA: NovaAssinatura = {
   externalReference: 'grupo-1',
 };
 
-function resposta(status: number, corpo: unknown = {}, cabecalhos: Record<string, string> = {}): Response {
-  return new Response(JSON.stringify(corpo), { status, headers: { 'content-type': 'application/json', ...cabecalhos } });
+function resposta(
+  status: number,
+  corpo: unknown = {},
+  cabecalhos: Record<string, string> = {},
+): Response {
+  return new Response(JSON.stringify(corpo), {
+    status,
+    headers: { 'content-type': 'application/json', ...cabecalhos },
+  });
 }
 
 function comLog() {
@@ -35,7 +47,10 @@ function comLog() {
   return { linhas, registrar: (l: Record<string, string | number>) => linhas.push(l) };
 }
 
-function chamada(buscar: ReturnType<typeof vi.fn>, i = 0): { url: string; init: RequestInit; corpo: unknown } {
+function chamada(
+  buscar: ReturnType<typeof vi.fn>,
+  i = 0,
+): { url: string; init: RequestInit; corpo: unknown } {
   const [url, init] = buscar.mock.calls[i] as unknown as [string, RequestInit];
   return { url, init, corpo: init.body === undefined ? undefined : JSON.parse(String(init.body)) };
 }
@@ -47,7 +62,9 @@ afterEach(() => {
 describe('asaasHttp: criarAssinatura', () => {
   it('PLA-29: o corpo tem billingType UNDEFINED, cycle MONTHLY, value 9.9 e externalReference = id do grupo', async () => {
     const buscar = vi.fn(async () => resposta(200, { id: 'sub_1', object: 'subscription' }));
-    expect(await asaasHttp(CONFIG, { fetch: buscar }).criarAssinatura(ASSINATURA)).toEqual({ id: 'sub_1' });
+    expect(await asaasHttp(CONFIG, { fetch: buscar }).criarAssinatura(ASSINATURA)).toEqual({
+      id: 'sub_1',
+    });
     const { url, init, corpo } = chamada(buscar);
     expect(url).toBe('https://api-sandbox.asaas.com/v3/subscriptions');
     expect(init.method).toBe('POST');
@@ -72,7 +89,10 @@ describe('asaasHttp: criarAssinatura', () => {
 
   it('PLA-06: o valor sai de centavosParaReais', async () => {
     const buscar = vi.fn(async () => resposta(200, { id: 'sub_1' }));
-    await asaasHttp(CONFIG, { fetch: buscar }).criarAssinatura({ ...ASSINATURA, valorCentavos: 1234 });
+    await asaasHttp(CONFIG, { fetch: buscar }).criarAssinatura({
+      ...ASSINATURA,
+      valorCentavos: 1234,
+    });
     expect((chamada(buscar).corpo as { value: number }).value).toBe(12.34);
   });
 });
@@ -80,10 +100,17 @@ describe('asaasHttp: criarAssinatura', () => {
 describe('asaasHttp: criarCliente', () => {
   it('PLA-29: manda name, cpfCnpj, email e externalReference = id da conta', async () => {
     const buscar = vi.fn(async () => resposta(200, { id: 'cus_1' }));
-    expect(await asaasHttp(CONFIG, { fetch: buscar }).criarCliente(CLIENTE)).toEqual({ id: 'cus_1' });
+    expect(await asaasHttp(CONFIG, { fetch: buscar }).criarCliente(CLIENTE)).toEqual({
+      id: 'cus_1',
+    });
     const { url, corpo } = chamada(buscar);
     expect(url).toBe('https://api-sandbox.asaas.com/v3/customers');
-    expect(corpo).toEqual({ name: CLIENTE.name, cpfCnpj: CPF, email: CLIENTE.email, externalReference: 'conta-1' });
+    expect(corpo).toEqual({
+      name: CLIENTE.name,
+      cpfCnpj: CPF,
+      email: CLIENTE.email,
+      externalReference: 'conta-1',
+    });
   });
 });
 
@@ -96,12 +123,23 @@ describe('asaasHttp: falhas', () => {
   ])('PLA-36: status %i vira falhou sem segunda chamada', async (status, cabecalhos) => {
     const log = comLog();
     const buscar = vi.fn(async () =>
-      resposta(status, { errors: [{ code: 'invalid', description: `CPF ${CPF} inválido` }] }, cabecalhos),
+      resposta(
+        status,
+        { errors: [{ code: 'invalid', description: `CPF ${CPF} inválido` }] },
+        cabecalhos,
+      ),
     );
-    expect(await asaasHttp(CONFIG, { fetch: buscar, registrar: log.registrar }).criarCliente(CLIENTE)).toBe('falhou');
+    expect(
+      await asaasHttp(CONFIG, { fetch: buscar, registrar: log.registrar }).criarCliente(CLIENTE),
+    ).toBe('falhou');
     expect(buscar).toHaveBeenCalledTimes(1);
     expect(log.linhas).toEqual([
-      { evento: 'asaas_falhou', operacao: 'criar_cliente', status, motivo: status === 429 ? 'limite' : 'status' },
+      {
+        evento: 'asaas_falhou',
+        operacao: 'criar_cliente',
+        status,
+        motivo: status === 429 ? 'limite' : 'status',
+      },
     ]);
   });
 
@@ -110,11 +148,15 @@ describe('asaasHttp: falhas', () => {
     const buscar = vi.fn(async () => {
       throw new TypeError('rede');
     });
-    expect(await asaasHttp(CONFIG, { fetch: buscar, registrar: log.registrar }).criarAssinatura(ASSINATURA)).toBe(
-      'falhou',
-    );
+    expect(
+      await asaasHttp(CONFIG, { fetch: buscar, registrar: log.registrar }).criarAssinatura(
+        ASSINATURA,
+      ),
+    ).toBe('falhou');
     expect(buscar).toHaveBeenCalledTimes(1);
-    expect(log.linhas).toEqual([{ evento: 'asaas_falhou', operacao: 'criar_assinatura', status: 0, motivo: 'rede' }]);
+    expect(log.linhas).toEqual([
+      { evento: 'asaas_falhou', operacao: 'criar_assinatura', status: 0, motivo: 'rede' },
+    ]);
   });
 
   it('PLA-36: resposta depois de 10 s é abortada e vira falhou', async () => {
@@ -125,12 +167,15 @@ describe('asaasHttp: falhas', () => {
       (_url: string, init: RequestInit) =>
         new Promise<Response>((_resolver, rejeitar) => {
           sinal = init.signal ?? undefined;
-          init.signal?.addEventListener('abort', () => rejeitar(new DOMException('abortado', 'AbortError')));
+          init.signal?.addEventListener('abort', () =>
+            rejeitar(new DOMException('abortado', 'AbortError')),
+          );
         }),
     );
-    const pedido = asaasHttp(CONFIG, { fetch: buscar as unknown as typeof fetch, registrar: log.registrar }).criarAssinatura(
-      ASSINATURA,
-    );
+    const pedido = asaasHttp(CONFIG, {
+      fetch: buscar as unknown as typeof fetch,
+      registrar: log.registrar,
+    }).criarAssinatura(ASSINATURA);
     await vi.advanceTimersByTimeAsync(TEMPO_LIMITE_ASAAS_MS - 1);
     expect(sinal?.aborted).toBe(false);
     await vi.advanceTimersByTimeAsync(1);
@@ -144,18 +189,26 @@ describe('asaasHttp: falhas', () => {
 
   it('PLA-36: sem ASAAS_URL ou sem ASAAS_API_KEY, falha sem chamar a rede', async () => {
     const buscar = vi.fn(async () => resposta(200, { id: 'x' }));
-    expect(await asaasHttp({ ASAAS_API_KEY: CHAVE }, { fetch: buscar, registrar: () => {} }).criarCliente(CLIENTE)).toBe(
-      'falhou',
-    );
-    expect(await asaasHttp({ ASAAS_URL: CONFIG.ASAAS_URL }, { fetch: buscar, registrar: () => {} }).criarCliente(CLIENTE)).toBe(
-      'falhou',
-    );
+    expect(
+      await asaasHttp(
+        { ASAAS_API_KEY: CHAVE },
+        { fetch: buscar, registrar: () => {} },
+      ).criarCliente(CLIENTE),
+    ).toBe('falhou');
+    expect(
+      await asaasHttp(
+        { ASAAS_URL: CONFIG.ASAAS_URL },
+        { fetch: buscar, registrar: () => {} },
+      ).criarCliente(CLIENTE),
+    ).toBe('falhou');
     expect(buscar).not.toHaveBeenCalled();
   });
 
   it('2xx sem id vira falhou', async () => {
     const buscar = vi.fn(async () => resposta(200, { object: 'customer' }));
-    expect(await asaasHttp(CONFIG, { fetch: buscar, registrar: () => {} }).criarCliente(CLIENTE)).toBe('falhou');
+    expect(
+      await asaasHttp(CONFIG, { fetch: buscar, registrar: () => {} }).criarCliente(CLIENTE),
+    ).toBe('falhou');
   });
 });
 
@@ -183,7 +236,11 @@ describe('asaasHttp: primeiraCobranca e removerAssinatura', () => {
   it('PLA-36: lista de cobranças vazia vira falhou', async () => {
     const log = comLog();
     const buscar = vi.fn(async () => resposta(200, { object: 'list', data: [] }));
-    expect(await asaasHttp(CONFIG, { fetch: buscar, registrar: log.registrar }).primeiraCobranca('sub_1')).toBe('falhou');
+    expect(
+      await asaasHttp(CONFIG, { fetch: buscar, registrar: log.registrar }).primeiraCobranca(
+        'sub_1',
+      ),
+    ).toBe('falhou');
     expect(log.linhas[0]).toMatchObject({ operacao: 'primeira_cobranca', motivo: 'sem_cobranca' });
   });
 
@@ -197,25 +254,34 @@ describe('asaasHttp: primeiraCobranca e removerAssinatura', () => {
 
   it('PLA-36: removerAssinatura com 500 vira falhou', async () => {
     const buscar = vi.fn(async () => resposta(500));
-    expect(await asaasHttp(CONFIG, { fetch: buscar, registrar: () => {} }).removerAssinatura('sub_1')).toBe('falhou');
+    expect(
+      await asaasHttp(CONFIG, { fetch: buscar, registrar: () => {} }).removerAssinatura('sub_1'),
+    ).toBe('falhou');
   });
 });
 
 describe('asaasHttp: dado pessoal e cartão', () => {
   it('PLA-35: nenhum log contém o CPF, o nome, o e-mail nem o access_token', async () => {
     const log = comLog();
-    const buscar = vi.fn(async () => resposta(400, { errors: [{ code: 'invalid_cpfCnpj', description: `O CPF ${CPF} é inválido` }] }));
+    const buscar = vi.fn(async () =>
+      resposta(400, {
+        errors: [{ code: 'invalid_cpfCnpj', description: `O CPF ${CPF} é inválido` }],
+      }),
+    );
     const asaas = asaasHttp(CONFIG, { fetch: buscar, registrar: log.registrar });
     await asaas.criarCliente(CLIENTE);
     await asaas.criarAssinatura(ASSINATURA);
     await asaas.primeiraCobranca('sub_1');
     await asaas.removerAssinatura('sub_1');
     const texto = JSON.stringify(log.linhas);
-    for (const proibido of [CPF, CLIENTE.name, CLIENTE.email, CHAVE, 'aact']) expect(texto).not.toContain(proibido);
+    for (const proibido of [CPF, CLIENTE.name, CLIENTE.email, CHAVE, 'aact'])
+      expect(texto).not.toContain(proibido);
   });
 
   it('PLA-34: nenhum corpo enviado tem campo de cartão', async () => {
-    const buscar = vi.fn(async () => resposta(200, { id: 'x', data: [{ id: 'p', dueDate: '2026-11-05', invoiceUrl: 'u' }] }));
+    const buscar = vi.fn(async () =>
+      resposta(200, { id: 'x', data: [{ id: 'p', dueDate: '2026-11-05', invoiceUrl: 'u' }] }),
+    );
     const asaas = asaasHttp(CONFIG, { fetch: buscar });
     await asaas.criarCliente(CLIENTE);
     await asaas.criarAssinatura(ASSINATURA);

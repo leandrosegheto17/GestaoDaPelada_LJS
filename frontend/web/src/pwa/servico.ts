@@ -10,7 +10,8 @@ export const SHELL = 'index.html';
 export const PAGINA_OFFLINE = 'offline.html';
 
 /** Entrada do precache, no formato que o Workbox injeta em `self.__WB_MANIFEST`. */
-export type EntradaPrecache = string | { url: string; revision?: string | null; integrity?: string };
+export type EntradaPrecache =
+  string | { url: string; revision?: string | null; integrity?: string };
 
 function urlDa(entrada: EntradaPrecache): string {
   return (typeof entrada === 'string' ? entrada : entrada.url).replace(/^\/+/, '');
@@ -40,7 +41,10 @@ export interface DependenciasNavegacao {
  * Navegação fora do precache (FUN-35): vai à rede; sem rede, responde a página offline do
  * cache. Resposta de erro do servidor (4xx, 5xx) passa como veio: só a falha de rede cai aqui.
  */
-export async function responderNavegacao(requisicao: Request, deps: DependenciasNavegacao): Promise<Response> {
+export async function responderNavegacao(
+  requisicao: Request,
+  deps: DependenciasNavegacao,
+): Promise<Response> {
   try {
     return await deps.buscar(requisicao);
   } catch {
@@ -87,11 +91,19 @@ export function ehRankingPublico(url: URL, origem: string): boolean {
 
 /** Plugin do Workbox: a resposta tirada do cache leva `X-Pelada-Cache: 1`. */
 export const marcarRespostaDoCache = {
-  cachedResponseWillBeUsed: async ({ cachedResponse }: { cachedResponse?: Response | null }): Promise<Response | null> => {
+  cachedResponseWillBeUsed: async ({
+    cachedResponse,
+  }: {
+    cachedResponse?: Response | null;
+  }): Promise<Response | null> => {
     if (!cachedResponse) return null;
     const cabecalhos = new Headers(cachedResponse.headers);
     cabecalhos.set(CABECALHO_DO_CACHE, '1');
-    return new Response(cachedResponse.body, { status: cachedResponse.status, statusText: cachedResponse.statusText, headers: cabecalhos });
+    return new Response(cachedResponse.body, {
+      status: cachedResponse.status,
+      statusText: cachedResponse.statusText,
+      headers: cabecalhos,
+    });
   },
 };
 

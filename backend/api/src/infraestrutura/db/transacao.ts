@@ -15,7 +15,8 @@ export type { Banco };
  */
 export function kyselyDoCliente(cliente: ClienteRequisicao): Kysely<Banco> {
   const conexao = {
-    query: (sql: string, parametros: ReadonlyArray<unknown>) => cliente.consultar(sql, [...parametros]),
+    query: (sql: string, parametros: ReadonlyArray<unknown>) =>
+      cliente.consultar(sql, [...parametros]),
     release: () => undefined,
   } as unknown as PostgresPoolClient;
   const pool: PostgresPool = {

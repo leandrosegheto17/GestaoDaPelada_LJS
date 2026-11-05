@@ -12,7 +12,10 @@ import {
 
 /** Contrato de períodos, habilidades e notas (T18; GEL-52, GEL-55, GEL-90, GEL-99, SEC-005). */
 
-function mensagens(resultado: { success: boolean; error?: { issues: { path: PropertyKey[]; message: string }[] } }) {
+function mensagens(resultado: {
+  success: boolean;
+  error?: { issues: { path: PropertyKey[]; message: string }[] };
+}) {
   const porCampo: Record<string, string[]> = {};
   for (const problema of resultado.error?.issues ?? []) {
     const campo = String(problema.path[0] ?? '');
@@ -31,8 +34,12 @@ describe('dataCorpo', () => {
   });
 
   it('GEL-63: data fora do formato dá "Informe uma data válida."', () => {
-    expect(mensagens(dataCorpo.safeParse({ data: '05/11/2026' }))).toEqual({ data: ['Informe uma data válida.'] });
-    expect(mensagens(dataCorpo.safeParse({ data: 20261105 }))).toEqual({ data: ['Informe uma data válida.'] });
+    expect(mensagens(dataCorpo.safeParse({ data: '05/11/2026' }))).toEqual({
+      data: ['Informe uma data válida.'],
+    });
+    expect(mensagens(dataCorpo.safeParse({ data: 20261105 }))).toEqual({
+      data: ['Informe uma data válida.'],
+    });
   });
 
   it('dataCorpo recusa campo a mais', () => {
@@ -44,7 +51,9 @@ describe('corrigirPeriodoCorpo e inicioCorpo', () => {
   it('GEL-71: aceita só a saída, só o retorno ou os dois', () => {
     expect(corrigirPeriodoCorpo.safeParse({ saida: '2026-01-10' }).success).toBe(true);
     expect(corrigirPeriodoCorpo.safeParse({ retorno: '2026-01-10' }).success).toBe(true);
-    expect(corrigirPeriodoCorpo.safeParse({ saida: '2026-01-10', retorno: '2026-02-01' }).success).toBe(true);
+    expect(
+      corrigirPeriodoCorpo.safeParse({ saida: '2026-01-10', retorno: '2026-02-01' }).success,
+    ).toBe(true);
   });
 
   it('GEL-71: sem saída nem retorno é recusado', () => {
@@ -52,7 +61,9 @@ describe('corrigirPeriodoCorpo e inicioCorpo', () => {
   });
 
   it('GEL-71: campo a mais é recusado', () => {
-    expect(corrigirPeriodoCorpo.safeParse({ saida: '2026-01-10', inicio: '2026-01-01' }).success).toBe(false);
+    expect(
+      corrigirPeriodoCorpo.safeParse({ saida: '2026-01-10', inicio: '2026-01-01' }).success,
+    ).toBe(false);
   });
 
   it('GEL-77: o início exige a data', () => {
@@ -63,7 +74,9 @@ describe('corrigirPeriodoCorpo e inicioCorpo', () => {
 
 describe('habilidadeCorpo', () => {
   it.each([' A ', 'a'.repeat(31)])('GEL-90: %j é recusado com a mensagem', (nome) => {
-    expect(mensagens(habilidadeCorpo.safeParse({ nome }))).toEqual({ nome: [MENSAGEM_NOME_HABILIDADE] });
+    expect(mensagens(habilidadeCorpo.safeParse({ nome }))).toEqual({
+      nome: [MENSAGEM_NOME_HABILIDADE],
+    });
     expect(MENSAGEM_NOME_HABILIDADE).toBe('O nome precisa ter de 2 a 30 caracteres.');
   });
 
@@ -73,7 +86,9 @@ describe('habilidadeCorpo', () => {
   });
 
   it('SEC-005: NUL no nome da habilidade é recusado', () => {
-    expect(mensagens(habilidadeCorpo.safeParse({ nome: 'Dri\u0000ble' }))).toEqual({ nome: [MENSAGEM_TEXTO_INVISIVEL] });
+    expect(mensagens(habilidadeCorpo.safeParse({ nome: 'Dri\u0000ble' }))).toEqual({
+      nome: [MENSAGEM_TEXTO_INVISIVEL],
+    });
   });
 
   it('SEC-005: nome só de invisíveis é recusado', () => {

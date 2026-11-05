@@ -41,7 +41,10 @@ export default defineConfig({
   // Build da comparação visual (T54): o nome da classe do CSS Module começa pela classe do
   // mockup (`faixa--erro--m-<hash>`), para o `recorte` do telas.json achar o elemento no app
   // (`e2e/ferramentas/telas-reais.mjs`, `seletorDoApp`). O build da prévia segue com o padrão.
-  css: process.env.VITE_VITRINE === '1' ? { modules: { generateScopedName: '[local]--m-[hash:base64:5]' } } : undefined,
+  css:
+    process.env.VITE_VITRINE === '1'
+      ? { modules: { generateScopedName: '[local]--m-[hash:base64:5]' } }
+      : undefined,
   server: {
     // pnpm dev (FUN-04) passa a porta do wrangler dev; padrão 8787.
     proxy: { '/api': `http://127.0.0.1:${process.env.PELADA_DEV_PORTA_API || '8787'}` },

@@ -29,7 +29,12 @@ async function comoC<T>(fn: (d: pg.Client) => Promise<T>): Promise<T> {
   return comoApp(aberto.db, { conta: aberto.cenario.contaC }, fn);
 }
 
-async function criar(d: pg.Client, base: string, hoje: string | null, habilidades: string[] = ['Passe']) {
+async function criar(
+  d: pg.Client,
+  base: string,
+  hoje: string | null,
+  habilidades: string[] = ['Passe'],
+) {
   const r = await d.query<{ id: string; slug: string }>(
     `SELECT id, slug FROM grupo_criar('Racha do Trial', 'sabado', 'semanal', '09:00', $1, $2::text[], $3::date)`,
     [base, habilidades, hoje],
@@ -44,7 +49,10 @@ describe('grupo_criar em trial', () => {
     const linha = await comoC(async (d) => {
       const g = await criar(d, 'racha-trial', '2026-11-01');
       await d.query('RESET ROLE');
-      const r = await d.query('SELECT situacao_comercial, trial_inicio::text FROM grupos WHERE id = $1', [g.id]);
+      const r = await d.query(
+        'SELECT situacao_comercial, trial_inicio::text FROM grupos WHERE id = $1',
+        [g.id],
+      );
       return r.rows[0];
     });
     expect(linha).toEqual({ situacao_comercial: 'trial', trial_inicio: '2026-11-01' });
@@ -78,7 +86,10 @@ describe('grupo_criar em trial', () => {
     const acoes = await comoC(async (d) => {
       const g = await criar(d, 'racha-trial-ordem', '2026-11-01');
       await d.query('RESET ROLE');
-      const r = await d.query<{ acao: string }>('SELECT acao FROM auditoria WHERE grupo_id = $1 ORDER BY id', [g.id]);
+      const r = await d.query<{ acao: string }>(
+        'SELECT acao FROM auditoria WHERE grupo_id = $1 ORDER BY id',
+        [g.id],
+      );
       return r.rows.map((l) => l.acao);
     });
     expect(acoes).toEqual(['grupo_criado', 'plano_trial_iniciado']);
@@ -89,10 +100,10 @@ describe('grupo_criar em trial', () => {
       const a = await criar(d, 'racha-colide', '2026-11-02');
       const b = await criar(d, 'racha-colide', '2026-11-02');
       await d.query('RESET ROLE');
-      const r = await d.query('SELECT slug, situacao_comercial, trial_inicio::text FROM grupos WHERE id IN ($1, $2) ORDER BY slug', [
-        a.id,
-        b.id,
-      ]);
+      const r = await d.query(
+        'SELECT slug, situacao_comercial, trial_inicio::text FROM grupos WHERE id IN ($1, $2) ORDER BY slug',
+        [a.id, b.id],
+      );
       return r.rows;
     });
     expect(linhas).toEqual([
@@ -106,8 +117,12 @@ describe('grupo_criar em trial', () => {
     const antes = await db.query<{ g: number; a: number }>(
       'SELECT (SELECT count(*)::int FROM grupos) AS g, (SELECT count(*)::int FROM auditoria) AS a',
     );
-    await expect(comoC((d) => criar(d, 'racha-sem-data', null))).rejects.toMatchObject({ code: '22023' });
-    const depois = await db.query('SELECT (SELECT count(*)::int FROM grupos) AS g, (SELECT count(*)::int FROM auditoria) AS a');
+    await expect(comoC((d) => criar(d, 'racha-sem-data', null))).rejects.toMatchObject({
+      code: '22023',
+    });
+    const depois = await db.query(
+      'SELECT (SELECT count(*)::int FROM grupos) AS g, (SELECT count(*)::int FROM auditoria) AS a',
+    );
     expect(depois.rows).toEqual(antes.rows);
   });
 
@@ -123,7 +138,9 @@ describe('grupo_criar em trial', () => {
     const antes = await contar(db);
     await comoC(async (d) => {
       await d.query('SAVEPOINT antes');
-      await expect(criar(d, 'racha-falho-trial', '2026-11-01', ['Passe', 'X'])).rejects.toMatchObject({ code: '23514' });
+      await expect(
+        criar(d, 'racha-falho-trial', '2026-11-01', ['Passe', 'X']),
+      ).rejects.toMatchObject({ code: '23514' });
       await d.query('ROLLBACK TO SAVEPOINT antes');
       await d.query('RESET ROLE');
       expect(await contar(d)).toEqual(antes);
@@ -134,7 +151,10 @@ describe('grupo_criar em trial', () => {
     const linha = await comoC(async (d) => {
       const g = await criar(d, 'racha-futuro', '2027-01-15');
       await d.query('RESET ROLE');
-      const r = await d.query('SELECT situacao_comercial, trial_inicio::text FROM grupos WHERE id = $1', [g.id]);
+      const r = await d.query(
+        'SELECT situacao_comercial, trial_inicio::text FROM grupos WHERE id = $1',
+        [g.id],
+      );
       return r.rows[0];
     });
     expect(linha).toEqual({ situacao_comercial: 'trial', trial_inicio: '2027-01-15' });

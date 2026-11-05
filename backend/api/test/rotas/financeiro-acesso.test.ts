@@ -1,5 +1,10 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
-import { abrirCenarioGrupos, arquivar, reativar, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  arquivar,
+  reativar,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 import { auditorias, pedir, restaurarCaixa } from './apoio-financeiro.ts';
 
 /**
@@ -19,7 +24,12 @@ interface Admin {
 }
 
 const alterar = (alvo: string, corpo: unknown, conta = aberto.cenario.contaC) =>
-  pedir(aberto, { metodo: 'PATCH', caminho: `/grupos/${aberto.cenario.grupoG}/admins/${alvo}/financeiro`, conta, corpo });
+  pedir(aberto, {
+    metodo: 'PATCH',
+    caminho: `/grupos/${aberto.cenario.grupoG}/admins/${alvo}/financeiro`,
+    conta,
+    corpo,
+  });
 
 const concedidos = () => auditorias(aberto, aberto.cenario.grupoG, 'financeiro_concedido');
 const retirados = () => auditorias(aberto, aberto.cenario.grupoG, 'financeiro_retirado');
@@ -59,7 +69,10 @@ describe('PATCH …/admins/:contaId/financeiro', () => {
 
     const repetido = await alterar(contaO, { acessaFinanceiro: true });
     expect(repetido.status).toBe(200);
-    expect(((await repetido.json()) as { admins: Admin[] }).admins.find((a) => a.id === contaO)?.acessaFinanceiro).toBe(true);
+    expect(
+      ((await repetido.json()) as { admins: Admin[] }).admins.find((a) => a.id === contaO)
+        ?.acessaFinanceiro,
+    ).toBe(true);
     expect(await concedidos()).toBe(antes + 1);
   });
 
@@ -69,7 +82,10 @@ describe('PATCH …/admins/:contaId/financeiro', () => {
     const antes = await retirados();
     const r = await alterar(contaO, { acessaFinanceiro: false });
     expect(r.status).toBe(200);
-    expect(((await r.json()) as { admins: Admin[] }).admins.find((a) => a.id === contaO)?.acessaFinanceiro).toBe(false);
+    expect(
+      ((await r.json()) as { admins: Admin[] }).admins.find((a) => a.id === contaO)
+        ?.acessaFinanceiro,
+    ).toBe(false);
     expect(await acessoNoBanco(contaO)).toBe(false);
     expect(await retirados()).toBe(antes + 1);
   });
@@ -95,7 +111,10 @@ describe('PATCH …/admins/:contaId/financeiro', () => {
     const antes = await retirados();
     const r = await alterar(contaC, { acessaFinanceiro: false });
     expect(r.status).toBe(409);
-    expect(await r.json()).toEqual({ erro: 'Você não pode alterar a sua própria permissão.', codigo: 'acao_na_propria_conta' });
+    expect(await r.json()).toEqual({
+      erro: 'Você não pode alterar a sua própria permissão.',
+      codigo: 'acao_na_propria_conta',
+    });
     expect(await acessoNoBanco(contaC)).toBe(true);
     expect(await retirados()).toBe(antes);
   });
@@ -129,7 +148,11 @@ describe('PATCH …/admins/:contaId/financeiro', () => {
   });
 
   it('o GET de admins continua com o mesmo formato', async () => {
-    const r = await pedir(aberto, { metodo: 'GET', caminho: `/grupos/${aberto.cenario.grupoG}/admins`, conta: aberto.cenario.contaC });
+    const r = await pedir(aberto, {
+      metodo: 'GET',
+      caminho: `/grupos/${aberto.cenario.grupoG}/admins`,
+      conta: aberto.cenario.contaC,
+    });
     expect(r.status).toBe(200);
     const corpo = (await r.json()) as { admins: Admin[] };
     expect(corpo.admins.map((a) => [a.id, a.acessaFinanceiro]).sort()).toEqual(

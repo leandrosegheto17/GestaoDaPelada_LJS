@@ -38,8 +38,13 @@ describe('EsqueletoLista', () => {
   });
 
   it('FUN-31: com prefers-reduced-motion, o esqueleto não anima', () => {
-    const css = readFileSync(join(import.meta.dirname, '../../src/componentes/EsqueletoLista.module.css'), 'utf8');
-    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)\s*\{\s*\.esqueleto\s*\{\s*animation: none;/);
+    const css = readFileSync(
+      join(import.meta.dirname, '../../src/componentes/EsqueletoLista.module.css'),
+      'utf8',
+    );
+    expect(css).toMatch(
+      /@media \(prefers-reduced-motion: reduce\)\s*\{\s*\.esqueleto\s*\{\s*animation: none;/,
+    );
   });
 
   it('FUN-31: axe sem violações', async () => {

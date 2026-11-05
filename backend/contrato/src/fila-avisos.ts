@@ -17,7 +17,11 @@ import { ehDataDoCalendario } from './elenco.ts';
  * Campo a mais em qualquer uma (inclusive `email`, `nome`, `endpoint`) é recusado: `.strict()` (NOT-43).
  */
 
-export const TIPOS_AVISO_COBRANCA = ['cobranca_gerada', 'pagamento_confirmado', 'pagamento_atrasado'] as const;
+export const TIPOS_AVISO_COBRANCA = [
+  'cobranca_gerada',
+  'pagamento_confirmado',
+  'pagamento_atrasado',
+] as const;
 export type TipoAvisoCobrancaFila = (typeof TIPOS_AVISO_COBRANCA)[number];
 
 /** Até 2 novas tentativas depois da primeira (NOT-31, NOT-42). */

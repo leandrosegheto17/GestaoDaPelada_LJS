@@ -3,7 +3,10 @@ import { fileURLToPath } from 'node:url';
 import { act, cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { PaginaSimulador } from '../../src/telas/simulador/PaginaSimulador.tsx';
-import { ID_PREVIA_ERRO, TEXTO_CALCULANDO_PREVIA } from '../../src/telas/simulador/PreviaSimulador.tsx';
+import {
+  ID_PREVIA_ERRO,
+  TEXTO_CALCULANDO_PREVIA,
+} from '../../src/telas/simulador/PreviaSimulador.tsx';
 import { abrirTela, json, pendente, SESSAO_ANA, type Manipulador } from '../apoio/tela.tsx';
 
 /**
@@ -28,7 +31,13 @@ const CONTEXTO_OK = {
   ],
 };
 
-const VALIDA = { formato: 'dois_times', valida: true, descricao: '2 times de 7 · 5 reservas', times: 2, reservas: 5 };
+const VALIDA = {
+  formato: 'dois_times',
+  valida: true,
+  descricao: '2 times de 7 · 5 reservas',
+  times: 2,
+  reservas: 5,
+};
 const INVALIDA = {
   formato: 'dois_times',
   valida: false,
@@ -79,7 +88,11 @@ describe('Simulador: prévia (t12)', () => {
     expect(t.chamadasA('POST', CAMINHO_PREVIA)).toHaveLength(1);
     await act(() => vi.advanceTimersByTimeAsync(1));
     await waitFor(() => expect(t.chamadasA('POST', CAMINHO_PREVIA)).toHaveLength(2));
-    expect(t.chamadasA('POST', CAMINHO_PREVIA)[1]?.corpo).toMatchObject({ formato: 'dois_times', n: 10, k: 2 });
+    expect(t.chamadasA('POST', CAMINHO_PREVIA)[1]?.corpo).toMatchObject({
+      formato: 'dois_times',
+      n: 10,
+      k: 2,
+    });
   });
 
   it('SIM-15: trocar formato, K e aptos também pede a prévia, com o corpo das entradas', async () => {
@@ -99,12 +112,20 @@ describe('Simulador: prévia (t12)', () => {
     fireEvent.click(screen.getByRole('radio', { name: '3 ou mais times' }));
     await act(() => vi.advanceTimersByTimeAsync(300));
     await waitFor(() => expect(t.chamadasA('POST', CAMINHO_PREVIA)).toHaveLength(2));
-    expect(t.chamadasA('POST', CAMINHO_PREVIA)[1]?.corpo).toEqual({ formato: 'varios_times', n: 7, aptos: [{ id: ALEMAO }, { id: BIGODE }] });
+    expect(t.chamadasA('POST', CAMINHO_PREVIA)[1]?.corpo).toEqual({
+      formato: 'varios_times',
+      n: 7,
+      aptos: [{ id: ALEMAO }, { id: BIGODE }],
+    });
 
     fireEvent.click(screen.getByRole('checkbox', { name: 'Bigode' }));
     await act(() => vi.advanceTimersByTimeAsync(300));
     await waitFor(() => expect(t.chamadasA('POST', CAMINHO_PREVIA)).toHaveLength(3));
-    expect(t.chamadasA('POST', CAMINHO_PREVIA)[2]?.corpo).toEqual({ formato: 'varios_times', n: 7, aptos: [{ id: ALEMAO }] });
+    expect(t.chamadasA('POST', CAMINHO_PREVIA)[2]?.corpo).toEqual({
+      formato: 'varios_times',
+      n: 7,
+      aptos: [{ id: ALEMAO }],
+    });
   });
 
   it('SIM-14: prévia pendente mostra "Prévia" e "calculando…" e o botão desabilitado', async () => {
@@ -132,7 +153,10 @@ describe('Simulador: prévia (t12)', () => {
 
   it('SIM-15: a prévia, as entradas e a página não importam nada de @pelada/dominio', () => {
     for (const arquivo of ['PreviaSimulador.tsx', 'EntradasSimulador.tsx', 'PaginaSimulador.tsx']) {
-      const fonte = readFileSync(fileURLToPath(new URL(`../../src/telas/simulador/${arquivo}`, import.meta.url)), 'utf8');
+      const fonte = readFileSync(
+        fileURLToPath(new URL(`../../src/telas/simulador/${arquivo}`, import.meta.url)),
+        'utf8',
+      );
       expect(fonte, arquivo).not.toMatch(/@pelada\/dominio/);
     }
   });

@@ -16,7 +16,9 @@ export interface OpcoesRotas {
 }
 
 /** As opções de fábrica no formato do `comBanco` e do `registrarOrigem`. */
-export function comFabrica(opcoes: OpcoesRotas): { fabrica?: NonNullable<OpcoesCliente['fabrica']> } {
+export function comFabrica(opcoes: OpcoesRotas): {
+  fabrica?: NonNullable<OpcoesCliente['fabrica']>;
+} {
   return opcoes.fabrica ? { fabrica: opcoes.fabrica } : {};
 }
 
@@ -39,7 +41,11 @@ export function emailIndisponivel(c: Context<Ambiente>): Response {
  */
 export function contarPedidoDeEmail(opcoes: OpcoesRotas = {}): MiddlewareHandler<Ambiente> {
   return async (c, next) => {
-    const ok = await registrarOrigem(c.env.HYPERDRIVE.connectionString, ipDa(c), comFabrica(opcoes));
+    const ok = await registrarOrigem(
+      c.env.HYPERDRIVE.connectionString,
+      ipDa(c),
+      comFabrica(opcoes),
+    );
     if (!ok) return c.json(corpoDoErro('muitas_requisicoes'), 429);
     await next();
   };

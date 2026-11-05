@@ -14,7 +14,11 @@ import { NOME_COOKIE_SESSAO } from '../../src/infraestrutura/sessao/cookie.ts';
 import { gerarToken } from '../../src/infraestrutura/sessao/token.ts';
 import { envAcesso } from '../acesso/apoio.ts';
 import { contextoFalso, fabricaComoApp } from '../db/requisicao.ts';
-import { abrirCenarioGrupos, criarGrupoComoConta, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  criarGrupoComoConta,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * `GET …/partidas/nova?data=` e `GET …/partidas?mes=` (partidas-e-ranking T39; PAR-17 a PAR-21, PAR-37 a PAR-41), com
@@ -30,7 +34,10 @@ let grupoS: string;
 let alvaro: string;
 
 const HOJE = '2026-03-14';
-const app = criarApp({ fabricaBanco: fabricaComoApp().fabrica, relogio: relogioFixo('2026-03-14T15:00:00Z') });
+const app = criarApp({
+  fabricaBanco: fabricaComoApp().fabrica,
+  relogio: relogioFixo('2026-03-14T15:00:00Z'),
+});
 
 async function sessao(conta: string): Promise<string> {
   const { token, hash } = await gerarToken();
@@ -42,10 +49,19 @@ async function sessao(conta: string): Promise<string> {
   return token;
 }
 
-async function pedir(caminho: string, conta = aberto.cenario.contaC, grupo = aberto.cenario.grupoG): Promise<Response> {
+async function pedir(
+  caminho: string,
+  conta = aberto.cenario.contaC,
+  grupo = aberto.cenario.grupoG,
+): Promise<Response> {
   const headers = new Headers({ cookie: `${NOME_COOKIE_SESSAO}=${await sessao(conta)}` });
   const ctx = contextoFalso();
-  const r = await app.request(`/api/grupos/${grupo}${caminho}`, { method: 'GET', headers }, envAcesso(aberto.url), ctx);
+  const r = await app.request(
+    `/api/grupos/${grupo}${caminho}`,
+    { method: 'GET', headers },
+    envAcesso(aberto.url),
+    ctx,
+  );
   await ctx.esperar();
   return r;
 }
@@ -59,10 +75,10 @@ beforeAll(async () => {
     [cenario.grupoG, cenario.contaC],
   );
   alvaro = r.rows[0]!.id;
-  await db.query(`INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, '2026-01-01', NULL)`, [
-    alvaro,
-    cenario.grupoG,
-  ]);
+  await db.query(
+    `INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, '2026-01-01', NULL)`,
+    [alvaro, cenario.grupoG],
+  );
   grupoS = (await criarGrupoComoConta(db, cenario.contaC, 'Sem Partidas', 'sem-partidas')).id;
 });
 
@@ -94,7 +110,9 @@ describe('GET …/partidas/nova', () => {
     const corpo = partidaNova.parse(await (await pedir('/partidas/nova?data=2025-06-05')).json());
     expect(corpo.data).toBe('2025-06-05');
     expect(corpo.dataSugerida).toBe('2026-03-12');
-    expect(corpo.jogadores).toEqual([{ id: aberto.cenario.idsG.jogadorInativo, apelido: 'Zé Inativo', situacao: 'ausente' }]);
+    expect(corpo.jogadores).toEqual([
+      { id: aberto.cenario.idsG.jogadorInativo, apelido: 'Zé Inativo', situacao: 'ausente' },
+    ]);
   });
 
   it('PAR-18: data num dia que não é o do grupo é aceita (a sugerida é só sugestão)', async () => {
@@ -108,11 +126,17 @@ describe('GET …/partidas/nova', () => {
     expect(r.status).toBe(200);
   });
 
-  it.each(['2026-02-30', '2026-13-01', '14/03/2026', ''])('PAR-19: data %j dá 422 "Informe uma data válida."', async (data) => {
-    const r = await pedir(`/partidas/nova?data=${encodeURIComponent(data)}`);
-    expect(r.status).toBe(422);
-    expect(await r.json()).toMatchObject({ codigo: 'dados_invalidos', mensagens: { data: MENSAGEM_DATA_INVALIDA } });
-  });
+  it.each(['2026-02-30', '2026-13-01', '14/03/2026', ''])(
+    'PAR-19: data %j dá 422 "Informe uma data válida."',
+    async (data) => {
+      const r = await pedir(`/partidas/nova?data=${encodeURIComponent(data)}`);
+      expect(r.status).toBe(422);
+      expect(await r.json()).toMatchObject({
+        codigo: 'dados_invalidos',
+        mensagens: { data: MENSAGEM_DATA_INVALIDA },
+      });
+    },
+  );
 
   it('PAR-20: data de amanhã dá "A data não pode ser no futuro."', async () => {
     const r = await pedir('/partidas/nova?data=2026-03-15');
@@ -150,7 +174,13 @@ describe('GET …/partidas?mes', () => {
       mes: '2026-01',
       hoje: HOJE,
       navegacao: { mesAnterior: null, mesSeguinte: '2026-02' },
-      partidas: [{ data: '2026-01-08', choveu: false, contagem: { presentes: 1, lesionados: 0, expulsos: 0 } }],
+      partidas: [
+        {
+          data: '2026-01-08',
+          choveu: false,
+          contagem: { presentes: 1, lesionados: 0, expulsos: 0 },
+        },
+      ],
     });
   });
 
@@ -166,16 +196,21 @@ describe('GET …/partidas?mes', () => {
   });
 
   it('PAR-41: grupo sem partida tem mesAnterior e mesSeguinte nulos', async () => {
-    const corpo = partidasDoMes.parse(await (await pedir('/partidas', aberto.cenario.contaC, grupoS)).json());
+    const corpo = partidasDoMes.parse(
+      await (await pedir('/partidas', aberto.cenario.contaC, grupoS)).json(),
+    );
     expect(corpo.navegacao).toEqual({ mesAnterior: null, mesSeguinte: null });
     expect(corpo.partidas).toEqual([]);
   });
 
-  it.each(['2026-13', '2026-3', '03-2026', ''])('PAR-39: mes %j dá 422 "Informe o mês como AAAA-MM."', async (mes) => {
-    const r = await pedir(`/partidas?mes=${encodeURIComponent(mes)}`);
-    expect(r.status).toBe(422);
-    expect(await r.json()).toMatchObject({ mensagens: { mes: MENSAGEM_MES } });
-  });
+  it.each(['2026-13', '2026-3', '03-2026', ''])(
+    'PAR-39: mes %j dá 422 "Informe o mês como AAAA-MM."',
+    async (mes) => {
+      const r = await pedir(`/partidas?mes=${encodeURIComponent(mes)}`);
+      expect(r.status).toBe(422);
+      expect(await r.json()).toMatchObject({ mensagens: { mes: MENSAGEM_MES } });
+    },
+  );
 
   it('PAR-40: mês seguinte ao de hoje dá "O mês não pode ser futuro."', async () => {
     const r = await pedir('/partidas?mes=2026-04');

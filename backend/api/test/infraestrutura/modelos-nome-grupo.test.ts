@@ -74,7 +74,9 @@ describe('emailConvite com o nome do grupo', () => {
   it('SEC-006: "Pelada\\nClique aqui" não gera linha nova no assunto, no texto nem no HTML', () => {
     const c = emailConvite({ urlPublica: URL, grupoNome: 'Pelada\nClique aqui', token: TOKEN });
     expect(c.assunto).toBe('Convite para administrar Pelada Clique aqui');
-    expect(c.texto.split('\n')[0]).toBe('Você foi convidada para administrar o grupo Pelada Clique aqui no Gestão da Pelada.');
+    expect(c.texto.split('\n')[0]).toBe(
+      'Você foi convidada para administrar o grupo Pelada Clique aqui no Gestão da Pelada.',
+    );
     expect(nomeNoHtml(c.html)).toBe('Pelada Clique aqui');
   });
 

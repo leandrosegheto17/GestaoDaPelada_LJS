@@ -32,7 +32,12 @@ async function partidaLancada(db: Db, grupoId: string, data: string): Promise<vo
  * Evento anônimo da página pública (PAR-127): chama a `evento_publico_registrar` com o slug do contexto e o momento do
  * relógio. Devolve `false` quando o grupo do slug não existe ou está arquivado (nada gravado).
  */
-async function registrarPublico(db: Db, slug: string, evento: EventoPublicoCorpo, momento: string): Promise<boolean> {
+async function registrarPublico(
+  db: Db,
+  slug: string,
+  evento: EventoPublicoCorpo,
+  momento: string,
+): Promise<boolean> {
   const dispositivo = evento.tipo === 'ranking_aberto' ? evento.dispositivoId : null;
   const mes = evento.tipo === 'pdf_exportado' ? evento.mes : null;
   const r = await sql<{ ok: boolean }>`

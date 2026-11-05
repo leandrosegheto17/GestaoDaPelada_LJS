@@ -49,12 +49,10 @@ async function jogadorComHistorico(periodos: Periodo[], inicio: string): Promise
   const id = j.rows[0]?.id ?? '';
   criados.push(id);
   for (const p of periodos) {
-    await db.query('INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, $3, $4)', [
-      id,
-      cenario.grupoG,
-      p.inicio,
-      p.fim,
-    ]);
+    await db.query(
+      'INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, $3, $4)',
+      [id, cenario.grupoG, p.inicio, p.fim],
+    );
   }
   const pt = await db.query<{ id: string }>(
     `INSERT INTO partidas (grupo_id, data, choveu, criada_por, criada_em, alterada_por, alterada_em)
@@ -62,17 +60,18 @@ async function jogadorComHistorico(periodos: Periodo[], inicio: string): Promise
     [cenario.grupoG, cenario.contaC],
   );
   partidaId = pt.rows[0]?.id ?? '';
-  await db.query(`INSERT INTO presencas (partida_id, jogador_id, grupo_id, situacao) VALUES ($1, $2, $3, 'presente')`, [
-    partidaId,
-    id,
-    cenario.grupoG,
-  ]);
+  await db.query(
+    `INSERT INTO presencas (partida_id, jogador_id, grupo_id, situacao) VALUES ($1, $2, $3, 'presente')`,
+    [partidaId, id, cenario.grupoG],
+  );
   return id;
 }
 
 /** O histórico de G como a conta C o vê agora, numa transação desfeita. */
 function historicoAgora() {
-  return comDb(aberto.url, aberto.cenario.contaC, (db) => historico.carregar(db, aberto.cenario.grupoG, HOJE));
+  return comDb(aberto.url, aberto.cenario.contaC, (db) =>
+    historico.carregar(db, aberto.cenario.grupoG, HOJE),
+  );
 }
 
 async function resumoDe(acao: string, id: string): Promise<Record<string, unknown> | undefined> {
@@ -92,7 +91,12 @@ describe('auditoria das escritas de período com acumulado e posição', () => {
     const { cenario } = aberto;
     const antes: Periodo[] = [{ inicio: '2026-01-10', fim: '2026-03-01' }];
     const id = await jogadorComHistorico(antes, '2026-01-10');
-    const previa = previaDosPeriodos(await historicoAgora(), id, [...antes, { inicio: '2026-10-01', fim: null }], HOJE);
+    const previa = previaDosPeriodos(
+      await historicoAgora(),
+      id,
+      [...antes, { inicio: '2026-10-01', fim: null }],
+      HOJE,
+    );
 
     const r = await comDb(
       aberto.url,
@@ -129,18 +133,23 @@ describe('auditoria das escritas de período com acumulado e posição', () => {
     const r = await comDb(
       aberto.url,
       cenario.contaC,
-      (db) => jogadores.corrigirPeriodo(db, cenario.grupoG, id, periodoId, { saida: '2026-02-20' }, HOJE),
+      (db) =>
+        jogadores.corrigirPeriodo(db, cenario.grupoG, id, periodoId, { saida: '2026-02-20' }, HOJE),
       { confirmar: true },
     );
     expect(r).toEqual({ resultado: 'ok', alterado: true });
-    expect(soCenarios((await resumoDe('jogador_periodo_corrigido', id)) ?? {})).toEqual(soCenarios({ ...previa }));
+    expect(soCenarios((await resumoDe('jogador_periodo_corrigido', id)) ?? {})).toEqual(
+      soCenarios({ ...previa }),
+    );
   });
 
   it('PAR-122: alterar o início grava os quatro valores, iguais aos da prévia de início', async () => {
     const { cenario } = aberto;
     const id = await jogadorComHistorico([{ inicio: '2026-01-10', fim: null }], '2026-02-06');
     const previa = previaDoInicio(await historicoAgora(), id, '2026-02-01', HOJE);
-    expect(previa.acumuladoDepois, 'a presença de 05/02 passa a contar').not.toBe(previa.acumuladoAntes);
+    expect(previa.acumuladoDepois, 'a presença de 05/02 passa a contar').not.toBe(
+      previa.acumuladoAntes,
+    );
 
     const r = await comDb(
       aberto.url,

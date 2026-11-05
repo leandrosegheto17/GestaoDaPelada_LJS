@@ -12,11 +12,28 @@ import { textoVisivel } from './grupo.ts';
 
 /** Os planos efetivos e as situações, iguais aos do domínio (`backend/dominio/src/plano/`). */
 export const PLANOS_CONTRATO = ['cortesia', 'trial', 'pro', 'free'] as const;
-export const SITUACOES_CONTRATO = ['uso_proprio', 'trial', 'ativo', 'inadimplente', 'cancelado'] as const;
-export const RECURSOS_CONTRATO = ['partidas', 'ranking', 'simulador', 'financeiro', 'pdf', 'push'] as const;
+export const SITUACOES_CONTRATO = [
+  'uso_proprio',
+  'trial',
+  'ativo',
+  'inadimplente',
+  'cancelado',
+] as const;
+export const RECURSOS_CONTRATO = [
+  'partidas',
+  'ranking',
+  'simulador',
+  'financeiro',
+  'pdf',
+  'push',
+] as const;
 export const RECURSOS_PRO_CONTRATO = ['simulador', 'financeiro', 'pdf', 'push'] as const;
 export const MOTIVOS_SOMENTE_LEITURA = ['limite_jogadores', 'limite_grupos'] as const;
-export const SITUACOES_ASSINATURA_CONTRATO = ['aguardando_pagamento', 'ativa', 'cancelada'] as const;
+export const SITUACOES_ASSINATURA_CONTRATO = [
+  'aguardando_pagamento',
+  'ativa',
+  'cancelada',
+] as const;
 
 const data = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 const contagem = z.number().int().min(0);
@@ -36,7 +53,10 @@ export const planoResposta = z
     pagoAte: data.nullable(),
     jogadoresAtivos: contagem,
     limiteJogadores: z.literal(20).nullable(),
-    somenteLeitura: z.object({ motivo: z.enum(MOTIVOS_SOMENTE_LEITURA) }).strict().nullable(),
+    somenteLeitura: z
+      .object({ motivo: z.enum(MOTIVOS_SOMENTE_LEITURA) })
+      .strict()
+      .nullable(),
     recursos: z.array(z.enum(RECURSOS_CONTRATO)),
     podeAssinar: z.boolean(),
     assinatura: z
@@ -73,21 +93,23 @@ export function cpfValido(digitos: string): boolean {
 }
 
 /** CPF do pagador (PLA-35): validado aqui, enviado ao Asaas e nunca gravado. Sai só com os 11 dígitos. */
-export const cpf = z
-  .string({ error: MENSAGEM_CPF })
-  .transform((valor, ctx) => {
-    const digitos = soDigitosDoCpf(valor);
-    if (digitos === null || !cpfValido(digitos)) {
-      ctx.addIssue({ code: 'custom', message: MENSAGEM_CPF });
-      return z.NEVER;
-    }
-    return digitos;
-  });
+export const cpf = z.string({ error: MENSAGEM_CPF }).transform((valor, ctx) => {
+  const digitos = soDigitosDoCpf(valor);
+  if (digitos === null || !cpfValido(digitos)) {
+    ctx.addIssue({ code: 'custom', message: MENSAGEM_CPF });
+    return z.NEVER;
+  }
+  return digitos;
+});
 
 /** `POST /api/grupos/:grupoId/assinatura`. Sem campo de cartão: campo a mais é recusado (PLA-34). */
 export const assinaturaCorpo = z
   .object({
-    nome: textoVisivel(LIMITES_ASSINATURA.nomeMin, LIMITES_ASSINATURA.nomeMax, MENSAGEM_NOME_PAGADOR),
+    nome: textoVisivel(
+      LIMITES_ASSINATURA.nomeMin,
+      LIMITES_ASSINATURA.nomeMax,
+      MENSAGEM_NOME_PAGADOR,
+    ),
     cpf,
   })
   .strict();
@@ -102,7 +124,11 @@ export const MENSAGEM_PAGAMENTO_INDISPONIVEL =
 
 /** 403 de recurso Pro no Free (PLA-23 a PLA-25, AD-091). */
 export const erroPlanoPro = z
-  .object({ erro: z.literal('plano_pro'), recurso: z.enum(RECURSOS_PRO_CONTRATO), mensagem: z.string().optional() })
+  .object({
+    erro: z.literal('plano_pro'),
+    recurso: z.enum(RECURSOS_PRO_CONTRATO),
+    mensagem: z.string().optional(),
+  })
   .strict();
 
 /** 403 de escrita no excedente do Free (PLA-15 a PLA-17). */
@@ -116,17 +142,28 @@ export const erroSomenteLeitura = z
 
 /** 409 de assinar com assinatura já pendente (PLA-33): devolve a fatura em aberto. */
 export const erroAssinaturaPendente = z
-  .object({ erro: z.literal('assinatura_pendente'), faturaUrl: z.string().nullable(), mensagem: z.string().optional() })
+  .object({
+    erro: z.literal('assinatura_pendente'),
+    faturaUrl: z.string().nullable(),
+    mensagem: z.string().optional(),
+  })
   .strict();
 
 /** 409 de assinar com assinatura já ativa (PLA-33). */
 export const erroAssinaturaAtiva = z
-  .object({ erro: z.literal('assinatura_ativa'), faturaUrl: z.string().nullable().optional(), mensagem: z.string().optional() })
+  .object({
+    erro: z.literal('assinatura_ativa'),
+    faturaUrl: z.string().nullable().optional(),
+    mensagem: z.string().optional(),
+  })
   .strict();
 
 /** 502 quando o Asaas falha, demora ou responde 429 (PLA-36, PLA-56). */
 export const erroPagamentoIndisponivel = z
-  .object({ erro: z.literal('pagamento_indisponivel'), mensagem: z.literal(MENSAGEM_PAGAMENTO_INDISPONIVEL) })
+  .object({
+    erro: z.literal('pagamento_indisponivel'),
+    mensagem: z.literal(MENSAGEM_PAGAMENTO_INDISPONIVEL),
+  })
   .strict();
 
 export const CODIGOS_ERRO_PLANO = [

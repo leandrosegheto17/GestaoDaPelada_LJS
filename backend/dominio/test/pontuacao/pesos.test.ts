@@ -70,7 +70,9 @@ describe('ehPesosPadrao', () => {
   });
 
   it('PAR-135: falso com uma não padrão', () => {
-    expect(ehPesosPadrao([{ ...PESOS_PADRAO, expulsoComChuva: -2, vigenteDesde: '2026-01-01' }])).toBe(false);
+    expect(
+      ehPesosPadrao([{ ...PESOS_PADRAO, expulsoComChuva: -2, vigenteDesde: '2026-01-01' }]),
+    ).toBe(false);
   });
 
   it('PAR-135: falso sem configuração', () => {

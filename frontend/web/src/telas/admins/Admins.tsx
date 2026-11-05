@@ -44,11 +44,14 @@ import fin from '../financeiro/financeiro.module.css';
  * faixa. Para quem não acessa, só o selo "Financeiro" nos que acessam.
  */
 
-export const TEXTO_CONVITE_ENVIADO = (email: string) => `Convite enviado para ${email}. Vale por 7 dias.`;
+export const TEXTO_CONVITE_ENVIADO = (email: string) =>
+  `Convite enviado para ${email}. Vale por 7 dias.`;
 export const ERRO_JA_ADMIN = 'Essa pessoa já é admin do grupo.';
 export const ERRO_EMAIL = 'Informe um e-mail válido.';
-export const TEXTO_UNICO_ADMIN_GRUPO = 'Você é o único admin deste grupo. Todo grupo precisa de pelo menos um admin.';
-export const TEXTO_ULTIMO_ADMIN = 'O grupo precisa de pelo menos uma pessoa admin. Convide outra pessoa antes de remover esta.';
+export const TEXTO_UNICO_ADMIN_GRUPO =
+  'Você é o único admin deste grupo. Todo grupo precisa de pelo menos um admin.';
+export const TEXTO_ULTIMO_ADMIN =
+  'O grupo precisa de pelo menos uma pessoa admin. Convide outra pessoa antes de remover esta.';
 export const TEXTO_GRUPO_NAO_ENCONTRADO = 'Grupo não encontrado.';
 export const TEXTO_CRIADORA_NAO_REMOVIVEL = MENSAGENS_ERRO.criadora_nao_removivel;
 export const ROTULO_ACESSA_FINANCEIRO = 'Acessa financeiro';
@@ -74,7 +77,17 @@ export function dataDoConvite(iso: string): string {
  * SPEC_DEVIATION: o estado "Financeiro" ao lado do trilho só aparece com o interruptor ligado (no legado aparece em
  * todos), para o texto visível dizer quem acessa, como o selo (e o `ACE-37` seguir achando um único "Financeiro").
  */
-function InterruptorFinanceiro({ admin, eu, ocupado, aoAlternar }: { admin: Admin; eu: boolean; ocupado: boolean; aoAlternar: () => void }) {
+function InterruptorFinanceiro({
+  admin,
+  eu,
+  ocupado,
+  aoAlternar,
+}: {
+  admin: Admin;
+  eu: boolean;
+  ocupado: boolean;
+  aoAlternar: () => void;
+}) {
   const idAjuda = `ajuda-acesso-${admin.id}`;
   return (
     <>
@@ -195,7 +208,8 @@ export function Admins() {
       await api.delete(`${base}/convites/${encodeURIComponent(id)}`);
     } catch (erro) {
       // Convite que já não existe (404) só some da lista ao reler.
-      if (!(erro instanceof ErroApi && erro.status === 404)) setFalhaLista(erro instanceof ErroApi ? erro.message : MENSAGEM_REDE);
+      if (!(erro instanceof ErroApi && erro.status === 404))
+        setFalhaLista(erro instanceof ErroApi ? erro.message : MENSAGEM_REDE);
     }
     await reler();
   }
@@ -207,9 +221,12 @@ export function Admins() {
     try {
       await api.delete(`${base}/${encodeURIComponent(remover.id)}`);
     } catch (erro) {
-      if (erro instanceof ErroApi && erro.codigo === 'ultimo_admin') setFalhaLista(TEXTO_ULTIMO_ADMIN);
-      else if (erro instanceof ErroApi && erro.codigo === 'criadora_nao_removivel') setFalhaLista(TEXTO_CRIADORA_NAO_REMOVIVEL);
-      else if (!(erro instanceof ErroApi && erro.status === 404)) setFalhaLista(erro instanceof ErroApi ? erro.message : MENSAGEM_REDE);
+      if (erro instanceof ErroApi && erro.codigo === 'ultimo_admin')
+        setFalhaLista(TEXTO_ULTIMO_ADMIN);
+      else if (erro instanceof ErroApi && erro.codigo === 'criadora_nao_removivel')
+        setFalhaLista(TEXTO_CRIADORA_NAO_REMOVIVEL);
+      else if (!(erro instanceof ErroApi && erro.status === 404))
+        setFalhaLista(erro instanceof ErroApi ? erro.message : MENSAGEM_REDE);
     } finally {
       setRemovendo(false);
       setRemover(null);
@@ -245,14 +262,22 @@ export function Admins() {
                       <InterruptorFinanceiro
                         admin={a}
                         eu={eu}
-                        ocupado={alterarAcesso.isPending && alterarAcesso.variables?.contaId === a.id}
+                        ocupado={
+                          alterarAcesso.isPending && alterarAcesso.variables?.contaId === a.id
+                        }
                         aoAlternar={() => alternarAcesso(a)}
                       />
                     ) : a.acessaFinanceiro ? (
-                      <span className={`${estilos.selo} ${estilos['selo--neutro']}`}>Financeiro</span>
+                      <span className={`${estilos.selo} ${estilos['selo--neutro']}`}>
+                        Financeiro
+                      </span>
                     ) : null}
                     {eu || a.criador === true ? null : (
-                      <Botao variante="texto-destrutivo" aria-label={`Remover ${a.nome}`} onClick={() => setRemover(a)}>
+                      <Botao
+                        variante="texto-destrutivo"
+                        aria-label={`Remover ${a.nome}`}
+                        onClick={() => setRemover(a)}
+                      >
                         Remover
                       </Botao>
                     )}
@@ -262,7 +287,9 @@ export function Admins() {
             );
           })}
         </Lista>
-        {admins.length === 1 ? <p className={`${estilos.ajuda} ${estilos['acima-2']}`}>{TEXTO_UNICO_ADMIN_GRUPO}</p> : null}
+        {admins.length === 1 ? (
+          <p className={`${estilos.ajuda} ${estilos['acima-2']}`}>{TEXTO_UNICO_ADMIN_GRUPO}</p>
+        ) : null}
         {convites.length > 0 ? (
           <>
             <h2 className={estilos.subtitulo}>Convites pendentes</h2>
@@ -301,8 +328,15 @@ export function Admins() {
         <h2 id="add" className={estilos.subtitulo}>
           Convidar admin
         </h2>
-        <p className={estilos.paragrafo}>A pessoa recebe um link por e-mail. Se ainda não tiver conta, cria uma pelo próprio link.</p>
-        <form className={estilos.formulario} noValidate aria-busy={enviando || undefined} onSubmit={convidar}>
+        <p className={estilos.paragrafo}>
+          A pessoa recebe um link por e-mail. Se ainda não tiver conta, cria uma pelo próprio link.
+        </p>
+        <form
+          className={estilos.formulario}
+          noValidate
+          aria-busy={enviando || undefined}
+          onSubmit={convidar}
+        >
           {falhaConvite ? <Faixa tipo="erro">{falhaConvite}</Faixa> : null}
           <Campo
             id="email-convite"
@@ -333,7 +367,11 @@ export function Admins() {
               <Botao variante="secundario" autoFocus onClick={() => setRemover(null)}>
                 Cancelar
               </Botao>
-              <Botao variante="destrutivo" carregando={removendo} onClick={() => void confirmarRemocao()}>
+              <Botao
+                variante="destrutivo"
+                carregando={removendo}
+                onClick={() => void confirmarRemocao()}
+              >
                 Remover do grupo
               </Botao>
             </>

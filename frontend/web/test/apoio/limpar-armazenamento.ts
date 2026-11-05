@@ -7,5 +7,6 @@ import { afterEach } from 'vitest';
  * testes de ambiente `node` não há `window`, e nada é feito.
  */
 afterEach(() => {
-  if (typeof window !== 'undefined' && typeof window.localStorage !== 'undefined') window.localStorage.clear();
+  if (typeof window !== 'undefined' && typeof window.localStorage !== 'undefined')
+    window.localStorage.clear();
 });

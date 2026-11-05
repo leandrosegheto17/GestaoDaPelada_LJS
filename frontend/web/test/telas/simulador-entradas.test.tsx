@@ -1,6 +1,10 @@
 import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
-import { PaginaSimulador, TEXTO_SEM_JOGADORES, TEXTO_SEM_JOGADORES_AJUDA } from '../../src/telas/simulador/PaginaSimulador.tsx';
+import {
+  PaginaSimulador,
+  TEXTO_SEM_JOGADORES,
+  TEXTO_SEM_JOGADORES_AJUDA,
+} from '../../src/telas/simulador/PaginaSimulador.tsx';
 import { TEXTO_PROXIMO_DIA, TEXTO_SEM_ANO } from '../../src/telas/simulador/EntradasSimulador.tsx';
 import { esperarSemViolacoes } from '../apoio/axe.ts';
 import { abrirTela, json, pendente, SESSAO_ANA, type Manipulador } from '../apoio/tela.tsx';
@@ -53,7 +57,12 @@ function emSequencia(...respostas: Array<() => Response | Promise<Response>>): M
 function abrir(api: Record<string, Manipulador>) {
   return abrirTela(
     '/app/grupos/g-quinta/simulador',
-    { 'GET /api/sessao': () => json(200, SESSAO_ANA), 'GET /api/grupos/g-quinta': () => pendente(), [PREVIA]: () => pendente(), ...api },
+    {
+      'GET /api/sessao': () => json(200, SESSAO_ANA),
+      'GET /api/grupos/g-quinta': () => pendente(),
+      [PREVIA]: () => pendente(),
+      ...api,
+    },
     rotas,
   );
 }
@@ -64,7 +73,9 @@ describe('Simulador: entradas (t12)', () => {
     const data = (await screen.findByLabelText('Data da partida')) as HTMLInputElement;
     expect(data.value).toBe('2026-10-22');
     expect(screen.getByText(TEXTO_PROXIMO_DIA)).toBeDefined();
-    expect((screen.getByRole('radio', { name: '2 times (1º e 2º tempo)' }) as HTMLInputElement).checked).toBe(true);
+    expect(
+      (screen.getByRole('radio', { name: '2 times (1º e 2º tempo)' }) as HTMLInputElement).checked,
+    ).toBe(true);
     expect(screen.getByRole('radio', { name: '3 ou mais times' })).toBeDefined();
     expect(screen.getByLabelText('Jogadores por time')).toBeDefined();
     expect(screen.getByRole('button', { name: 'Diminuir jogadores por time' })).toBeDefined();
@@ -114,11 +125,15 @@ describe('Simulador: entradas (t12)', () => {
     abrir({ [CONTEXTO]: () => json(200, contexto()) });
     await screen.findByLabelText('Data da partida');
     fireEvent.click(screen.getByRole('checkbox', { name: 'Ilimitado' }));
-    expect((screen.getByLabelText('Limite de substituições por time') as HTMLInputElement).disabled).toBe(true);
+    expect(
+      (screen.getByLabelText('Limite de substituições por time') as HTMLInputElement).disabled,
+    ).toBe(true);
     const n = screen.getByLabelText('Jogadores por time') as HTMLInputElement;
-    for (let i = 0; i < 12; i++) fireEvent.click(screen.getByRole('button', { name: 'Aumentar jogadores por time' }));
+    for (let i = 0; i < 12; i++)
+      fireEvent.click(screen.getByRole('button', { name: 'Aumentar jogadores por time' }));
     expect(n.value).toBe('11');
-    for (let i = 0; i < 12; i++) fireEvent.click(screen.getByRole('button', { name: 'Diminuir jogadores por time' }));
+    for (let i = 0; i < 12; i++)
+      fireEvent.click(screen.getByRole('button', { name: 'Diminuir jogadores por time' }));
     expect(n.value).toBe('2');
   });
 

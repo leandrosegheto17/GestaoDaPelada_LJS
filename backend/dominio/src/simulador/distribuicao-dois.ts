@@ -42,7 +42,10 @@ export function distribuirDoisTimes(
   elenco: Elenco,
   { maxTrocas = MAX_TROCAS_ACEITAS }: OpcoesDistribuicao = {},
 ): DistribuicaoDois {
-  const ordem = [...classificacao.titulares.map((t) => t.id), ...classificacao.reservasQueEntram.map((r) => r.apto.id)];
+  const ordem = [
+    ...classificacao.titulares.map((t) => t.id),
+    ...classificacao.reservasQueEntram.map((r) => r.apto.id),
+  ];
   const e = elencoDois(ordem, elenco);
   const qtdTitulares = classificacao.titulares.length;
 

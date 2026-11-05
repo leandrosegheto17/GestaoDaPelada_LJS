@@ -8,7 +8,15 @@ import { join } from 'node:path';
  * em `.specs/STATE.md`. As 23 herdadas ficam numa lista fechada por hash (`migracoes.sha256`).
  */
 export const RAIZ = join(import.meta.dirname, '..', '..', '..');
-export const PASTA_MIGRACOES = join(RAIZ, 'backend', 'api', 'src', 'infraestrutura', 'db', 'migracoes');
+export const PASTA_MIGRACOES = join(
+  RAIZ,
+  'backend',
+  'api',
+  'src',
+  'infraestrutura',
+  'db',
+  'migracoes',
+);
 export const ARQUIVO_STATE = join(RAIZ, '.specs', 'STATE.md');
 
 const DESTRUTIVOS: Array<[string, RegExp]> = [
@@ -44,7 +52,8 @@ export function checarMigracoes(entrada: Entrada): string[] {
     const hashEsperado = entrada.herdadas.get(nome);
     if (hashEsperado !== undefined) {
       const hash = createHash('sha256').update(conteudo).digest('hex');
-      if (hash !== hashEsperado) problemas.push(`${nome}: migração herdada alterada (hash diferente)`);
+      if (hash !== hashEsperado)
+        problemas.push(`${nome}: migração herdada alterada (hash diferente)`);
       continue;
     }
     const sql = semComentarios(conteudo);
@@ -52,7 +61,9 @@ export function checarMigracoes(entrada: Entrada): string[] {
     if (achados.length === 0) continue;
     const excecao = EXCECAO.exec(conteudo)?.[1];
     if (!excecao) {
-      problemas.push(`${nome}: não é aditiva (${achados.join(', ')}) e não declara excecao-aditiva`);
+      problemas.push(
+        `${nome}: não é aditiva (${achados.join(', ')}) e não declara excecao-aditiva`,
+      );
     } else if (!entrada.state.includes(`**${excecao}**`)) {
       problemas.push(`${nome}: excecao-aditiva cita ${excecao}, que não está em .specs/STATE.md`);
     }

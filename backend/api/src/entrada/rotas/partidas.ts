@@ -15,7 +15,14 @@ import {
   type PartidaResposta,
   type PartidasDoMes,
 } from '@pelada/contrato';
-import { compararApelido, compararDatas, compararMeses, dataSugeridaPartida, mesDe, navegacaoDeMes } from '@pelada/dominio';
+import {
+  compararApelido,
+  compararDatas,
+  compararMeses,
+  dataSugeridaPartida,
+  mesDe,
+  navegacaoDeMes,
+} from '@pelada/dominio';
 import type { Ambiente } from '../ambiente.ts';
 import { erroDeCampos, mensagensDoZod, respostaDeCampo, type Leitura } from '../corpo.ts';
 import { grupos } from '../../infraestrutura/db/repositorios/grupos.ts';
@@ -73,7 +80,12 @@ export async function lerPartidaCorpo(c: Context<Ambiente>): Promise<Leitura<Par
 }
 
 /** Resposta da partida gravada (201 do lançamento, 200 da edição; PAR-22, PAR-46), relida na mesma transação. */
-export async function respostaDaPartida(c: Context<Ambiente>, grupoId: string, data: string, status: 200 | 201): Promise<Response> {
+export async function respostaDaPartida(
+  c: Context<Ambiente>,
+  grupoId: string,
+  data: string,
+  status: 200 | 201,
+): Promise<Response> {
   const lida = await partidas.ler(c.var.db, grupoId, data);
   // Acabou de gravar na mesma transação: sem a partida, é erro (500, e o `comBanco` desfaz).
   if (!lida) throw new Error('partida gravada não encontrada na releitura');
@@ -83,7 +95,11 @@ export async function respostaDaPartida(c: Context<Ambiente>, grupoId: string, d
 
 /** 409 do PAR-21: a mensagem com a data e a data que já tem partida. */
 export function respostaPartidaJaExiste(c: Context<Ambiente>, data: string): Response {
-  const corpo: CorpoErro = { erro: mensagemPartidaJaExiste(data), codigo: 'partida_ja_existe', dataExistente: data };
+  const corpo: CorpoErro = {
+    erro: mensagemPartidaJaExiste(data),
+    codigo: 'partida_ja_existe',
+    dataExistente: data,
+  };
   return c.json(corpo, 409);
 }
 
@@ -97,7 +113,14 @@ function avisarRankingAtualizado(c: Context<Ambiente>, grupoId: string, data: st
   const env = c.env;
   const criadoEm = c.var.relogio.agoraIso();
   c.var.aposCommit(() =>
-    agendarAviso(env, { tipo: 'ranking', grupoId, dataPartida: data, criadoEm, aposId: '0', tentativa: 1 }),
+    agendarAviso(env, {
+      tipo: 'ranking',
+      grupoId,
+      dataPartida: data,
+      criadoEm,
+      aposId: '0',
+      tentativa: 1,
+    }),
   );
 }
 
@@ -135,7 +158,10 @@ export function rotasPartidas(): Hono<Ambiente> {
       choveu: false,
       preMarcadaPelaEscalacao: escalados !== null,
       jogadores: [...ativos]
-        .sort((a, b) => compararApelido(a.apelido, b.apelido) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
+        .sort(
+          (a, b) =>
+            compararApelido(a.apelido, b.apelido) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
+        )
         .map((j) => ({
           id: j.id,
           apelido: j.apelido,
@@ -156,7 +182,8 @@ export function rotasPartidas(): Hono<Ambiente> {
     if (!corpo.ok) return corpo.resposta;
     const grupoId = c.req.param('grupoId');
     const dados = corpo.dados;
-    if (ehFutura(dados.data, c.var.relogio.hoje())) return respostaDeCampo(c, 'data', MENSAGEM_DATA_FUTURA);
+    if (ehFutura(dados.data, c.var.relogio.hoje()))
+      return respostaDeCampo(c, 'data', MENSAGEM_DATA_FUTURA);
 
     const r = await partidas.lancar(c.var.db, grupoId, dados);
     if (r.resultado === 'invalido') return c.json(erroDeCampos(r.campos), 422);

@@ -21,14 +21,18 @@ export interface NavegacaoDoCaixa {
 }
 
 export const MENSAGEM_MES_FORA_DO_HISTORICO = 'Mês fora do histórico do caixa.';
-export const MENSAGEM_MES_FUTURO = 'Não dá para marcar o pagamento de um mês que ainda não começou.';
+export const MENSAGEM_MES_FUTURO =
+  'Não dá para marcar o pagamento de um mês que ainda não começou.';
 
 /**
  * Do mês da data do saldo inicial ao mês de hoje. Sem configuração (`dataSaldoInicial` nulo), só o mês de hoje.
  * [LACUNA] A spec não define o histórico quando a data do saldo inicial cai num mês posterior ao de hoje (o FIN-02 a
  * recusa no futuro, então só aconteceria com relógio voltando): vale só o mês de hoje, a leitura mais conservadora.
  */
-export function limitesDoCaixa(dataSaldoInicial: DataCaixa | null, hoje: DataCaixa): LimitesDoCaixa {
+export function limitesDoCaixa(
+  dataSaldoInicial: DataCaixa | null,
+  hoje: DataCaixa,
+): LimitesDoCaixa {
   const ultimo = mesDe(hoje);
   if (dataSaldoInicial === null) return { primeiro: null, ultimo };
   const primeiro = mesDe(dataSaldoInicial);
@@ -39,7 +43,8 @@ export function limitesDoCaixa(dataSaldoInicial: DataCaixa | null, hoje: DataCai
 export function mesesDoCaixa(dataSaldoInicial: DataCaixa | null, hoje: DataCaixa): MesCaixa[] {
   const { primeiro, ultimo } = limitesDoCaixa(dataSaldoInicial, hoje);
   const meses: MesCaixa[] = [];
-  for (let mes = primeiro ?? ultimo; compararMeses(mes, ultimo) <= 0; mes = mesSeguinte(mes)) meses.push(mes);
+  for (let mes = primeiro ?? ultimo; compararMeses(mes, ultimo) <= 0; mes = mesSeguinte(mes))
+    meses.push(mes);
   return meses;
 }
 
@@ -48,7 +53,11 @@ export function mesesDoCaixa(dataSaldoInicial: DataCaixa | null, hoje: DataCaixa
  * [LACUNA] A spec (FIN-08) só define a resposta sem configuração para o mês padrão; outro mês sem configuração é
  * tratado como fora do histórico (422), a leitura mais conservadora.
  */
-export function mesNoHistorico(mes: MesCaixa, dataSaldoInicial: DataCaixa | null, hoje: DataCaixa): boolean {
+export function mesNoHistorico(
+  mes: MesCaixa,
+  dataSaldoInicial: DataCaixa | null,
+  hoje: DataCaixa,
+): boolean {
   const { primeiro, ultimo } = limitesDoCaixa(dataSaldoInicial, hoje);
   if (primeiro === null) return mes === ultimo;
   return compararMeses(mes, primeiro) >= 0 && compararMeses(mes, ultimo) <= 0;
@@ -58,7 +67,11 @@ export function mesNoHistorico(mes: MesCaixa, dataSaldoInicial: DataCaixa | null
  * `mesAnterior` só depois do primeiro mês do histórico; `mesSeguinte` só antes do mês de hoje (FIN-07). Sem
  * configuração, os dois nulos (FIN-08).
  */
-export function navegacao(mes: MesCaixa, dataSaldoInicial: DataCaixa | null, hoje: DataCaixa): NavegacaoDoCaixa {
+export function navegacao(
+  mes: MesCaixa,
+  dataSaldoInicial: DataCaixa | null,
+  hoje: DataCaixa,
+): NavegacaoDoCaixa {
   const { primeiro, ultimo } = limitesDoCaixa(dataSaldoInicial, hoje);
   if (primeiro === null) return { mesAnterior: null, mesSeguinte: null };
   return {

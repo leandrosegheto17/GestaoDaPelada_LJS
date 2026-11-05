@@ -1,7 +1,11 @@
 import type pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { comoApp } from '../isolamento/apoio.ts';
-import { abrirCenarioGrupos, HABILIDADES_INICIAIS, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  HABILIDADES_INICIAIS,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * Caracterização da `grupo_criar` (T2; GEL-01, GEL-02, GEL-09, GEL-10, GEL-14), versão de
@@ -27,7 +31,12 @@ interface Criado {
   slug: string;
 }
 
-async function criar(d: pg.Client, nome: string, base: string, habilidades: readonly string[] = HABILIDADES_INICIAIS): Promise<Criado> {
+async function criar(
+  d: pg.Client,
+  nome: string,
+  base: string,
+  habilidades: readonly string[] = HABILIDADES_INICIAIS,
+): Promise<Criado> {
   const r = await d.query<Criado>(
     // De 7 parâmetros desde a T25 do simulador (AD-037), com a data que a de 6 usava.
     `SELECT id, slug FROM grupo_criar($1, 'sabado', 'semanal', '09:00', $2, $3::text[],
@@ -56,13 +65,21 @@ describe('grupo_criar', () => {
       const g = await criar(d, 'Racha do Sábado', 'racha-do-sabado');
       expect(g.slug).toBe('racha-do-sabado');
       await d.query('RESET ROLE');
-      const grupo = await d.query<{ criado_por: string; nome: string }>('SELECT criado_por, nome FROM grupos WHERE id = $1', [g.id]);
-      expect(grupo.rows[0]).toEqual({ criado_por: cenario.contaC, nome: 'Racha do Sábado' });
-      const vinculo = await d.query<{ conta_id: string; acessa_financeiro: boolean; criado_por: string }>(
-        'SELECT conta_id, acessa_financeiro, criado_por FROM vinculos_admin WHERE grupo_id = $1',
+      const grupo = await d.query<{ criado_por: string; nome: string }>(
+        'SELECT criado_por, nome FROM grupos WHERE id = $1',
         [g.id],
       );
-      expect(vinculo.rows).toEqual([{ conta_id: cenario.contaC, acessa_financeiro: true, criado_por: cenario.contaC }]);
+      expect(grupo.rows[0]).toEqual({ criado_por: cenario.contaC, nome: 'Racha do Sábado' });
+      const vinculo = await d.query<{
+        conta_id: string;
+        acessa_financeiro: boolean;
+        criado_por: string;
+      }>('SELECT conta_id, acessa_financeiro, criado_por FROM vinculos_admin WHERE grupo_id = $1', [
+        g.id,
+      ]);
+      expect(vinculo.rows).toEqual([
+        { conta_id: cenario.contaC, acessa_financeiro: true, criado_por: cenario.contaC },
+      ]);
     });
   });
 
@@ -70,7 +87,10 @@ describe('grupo_criar', () => {
     await comoC(async (d) => {
       const ordem = ['Desarme', 'Chute', 'Passe'];
       const g = await criar(d, 'Racha da Ordem', 'racha-da-ordem', ordem);
-      const r = await d.query<{ nome: string }>('SELECT nome FROM habilidades WHERE grupo_id = $1 ORDER BY ordem', [g.id]);
+      const r = await d.query<{ nome: string }>(
+        'SELECT nome FROM habilidades WHERE grupo_id = $1 ORDER BY ordem',
+        [g.id],
+      );
       expect(r.rows.map((l) => l.nome)).toEqual(ordem);
     });
   });
@@ -78,7 +98,10 @@ describe('grupo_criar', () => {
   it('GEL-02: com as 6 iniciais, a ordem é Visão de Jogo, Passe, Preparo Físico, Drible, Chute, Desarme', async () => {
     await comoC(async (d) => {
       const g = await criar(d, 'Racha Inicial', 'racha-inicial');
-      const r = await d.query<{ nome: string }>('SELECT nome FROM habilidades WHERE grupo_id = $1 ORDER BY ordem', [g.id]);
+      const r = await d.query<{ nome: string }>(
+        'SELECT nome FROM habilidades WHERE grupo_id = $1 ORDER BY ordem',
+        [g.id],
+      );
       expect(r.rows.map((l) => l.nome)).toEqual([...HABILIDADES_INICIAIS]);
     });
   });
@@ -107,7 +130,9 @@ describe('grupo_criar', () => {
     const antes = await totais(aberto.db);
     await comoC(async (d) => {
       await d.query('SAVEPOINT antes');
-      await expect(criar(d, 'Racha Falho', 'racha-falho', ['Passe', 'X'])).rejects.toMatchObject({ code: '23514' });
+      await expect(criar(d, 'Racha Falho', 'racha-falho', ['Passe', 'X'])).rejects.toMatchObject({
+        code: '23514',
+      });
       await d.query('ROLLBACK TO SAVEPOINT antes');
       await d.query('RESET ROLE');
       expect(await totais(d)).toEqual(antes);
@@ -119,16 +144,30 @@ describe('grupo_criar', () => {
     await comoC(async (d) => {
       const g = await criar(d, 'Racha Auditado', 'racha-auditado');
       await d.query('RESET ROLE');
-      const r = await d.query<{ autor_tipo: string; autor_conta_id: string; entidade: string; entidade_id: string }>(
+      const r = await d.query<{
+        autor_tipo: string;
+        autor_conta_id: string;
+        entidade: string;
+        entidade_id: string;
+      }>(
         `SELECT autor_tipo, autor_conta_id, entidade, entidade_id FROM auditoria WHERE acao = 'grupo_criado' AND grupo_id = $1`,
         [g.id],
       );
-      expect(r.rows).toEqual([{ autor_tipo: 'conta', autor_conta_id: cenario.contaC, entidade: 'grupo', entidade_id: g.id }]);
+      expect(r.rows).toEqual([
+        {
+          autor_tipo: 'conta',
+          autor_conta_id: cenario.contaC,
+          entidade: 'grupo',
+          entidade_id: g.id,
+        },
+      ]);
     });
   });
 
   it('GEL-01: sem app.conta_id, a grupo_criar recusa com 42501', async () => {
-    await expect(comoApp(aberto.db, {}, (d) => criar(d, 'Racha Sem Conta', 'racha-sem-conta'))).rejects.toMatchObject({
+    await expect(
+      comoApp(aberto.db, {}, (d) => criar(d, 'Racha Sem Conta', 'racha-sem-conta')),
+    ).rejects.toMatchObject({
       code: '42501',
     });
   });

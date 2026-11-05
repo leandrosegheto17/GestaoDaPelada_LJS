@@ -35,7 +35,9 @@ export async function conferirLimiteDeJogadores(
   const antes = await estadoDoPlano(db, grupoId, hoje);
   if (antes === null || antes.plano !== 'free') return null;
 
-  await sql`SELECT pg_advisory_xact_lock(hashtextextended(${`jogadores_ativos:${grupoId}`}, 0))`.execute(db);
+  await sql`SELECT pg_advisory_xact_lock(hashtextextended(${`jogadores_ativos:${grupoId}`}, 0))`.execute(
+    db,
+  );
 
   // Releitura depois da trava: em READ COMMITTED, a consulta nova vê o que a transação anterior confirmou.
   const estado = await estadoDoPlano(db, grupoId, hoje);

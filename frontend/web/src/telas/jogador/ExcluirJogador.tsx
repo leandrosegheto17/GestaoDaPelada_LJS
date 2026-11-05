@@ -20,7 +20,8 @@ import { rotaDoGrupo } from '../grupos/Grupos.tsx';
  */
 
 export const tituloExcluir = (apelido: string) => `Excluir ${apelido}?`;
-export const TEXTO_EXCLUIR = 'O cadastro é apagado. Só é possível excluir quem não tem partidas, notas nem pagamentos.';
+export const TEXTO_EXCLUIR =
+  'O cadastro é apagado. Só é possível excluir quem não tem partidas, notas nem pagamentos.';
 
 export function ExcluirJogador({
   grupoId,

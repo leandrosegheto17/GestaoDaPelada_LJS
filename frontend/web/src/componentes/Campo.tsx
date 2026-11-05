@@ -14,7 +14,10 @@ import estilos from './Campo.module.css';
  * `aria-controls`, e alterna o `type` entre `password` e `text`.
  */
 
-export interface PropsCampo extends Omit<InputHTMLAttributes<HTMLInputElement>, 'className' | 'id' | 'readOnly'> {
+export interface PropsCampo extends Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  'className' | 'id' | 'readOnly'
+> {
   id: string;
   rotulo: string;
   ajuda?: ReactNode;
@@ -110,7 +113,12 @@ export function CampoSenha(props: PropsCampoSenha) {
       {...props}
       type={visivel ? 'text' : 'password'}
       lateral={
-        <Botao variante="secundario" aria-pressed={visivel} aria-controls={props.id} onClick={() => setVisivel((v) => !v)}>
+        <Botao
+          variante="secundario"
+          aria-pressed={visivel}
+          aria-controls={props.id}
+          onClick={() => setVisivel((v) => !v)}
+        >
           Mostrar
         </Botao>
       }

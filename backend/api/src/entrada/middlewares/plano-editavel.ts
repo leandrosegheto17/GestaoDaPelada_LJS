@@ -73,8 +73,14 @@ export function operacaoNaTrava(metodo: string, caminho: string): OperacaoDeEscr
 }
 
 /** 403 `somente_leitura` na forma de `erroSomenteLeitura` do contrato (T6); usado também pelas rotas da T23. */
-export function respostaSomenteLeitura(c: Context<Ambiente>, motivo: MotivoSomenteLeitura): Response {
-  return c.json({ erro: 'somente_leitura', motivo, mensagem: MENSAGENS_ERRO_PLANO.somente_leitura }, 403);
+export function respostaSomenteLeitura(
+  c: Context<Ambiente>,
+  motivo: MotivoSomenteLeitura,
+): Response {
+  return c.json(
+    { erro: 'somente_leitura', motivo, mensagem: MENSAGENS_ERRO_PLANO.somente_leitura },
+    403,
+  );
 }
 
 export const exigirPlanoEditavel: MiddlewareHandler<Ambiente> = async (c, next) => {

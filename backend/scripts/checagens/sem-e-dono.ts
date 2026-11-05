@@ -31,7 +31,10 @@ export const PASTA_MIGRACOES = 'backend/api/src/infraestrutura/db/migracoes/';
 const PROIBIDOS_HASH: ReadonlyArray<[string, RegExp]> = [
   ['crypt(', /\bcrypt\s*\(/i],
   ['scrypt(', /\bscrypt(Sync)?\s*\(/],
-  ['biblioteca de hash de senha', /['"](bcrypt|bcryptjs|argon2|@node-rs\/argon2|@node-rs\/bcrypt|scrypt-js)['"]/],
+  [
+    'biblioteca de hash de senha',
+    /['"](bcrypt|bcryptjs|argon2|@node-rs\/argon2|@node-rs\/bcrypt|scrypt-js)['"]/,
+  ],
 ];
 
 function emAlguma(caminho: string, pastas: readonly string[]): boolean {
@@ -49,11 +52,14 @@ export function checarDonoEHash(arquivos: readonly Arquivo[]): string[] {
     if (!semDono && !semHash) continue;
     conteudo.split('\n').forEach((linha, i) => {
       if (semDono && RE_DONO.test(linha)) {
-        problemas.push(`${caminho}:${i + 1}: cita a coluna ${COLUNA_DONO}; nenhuma rota lê ou escreve a marca de dono (ACE-63)`);
+        problemas.push(
+          `${caminho}:${i + 1}: cita a coluna ${COLUNA_DONO}; nenhuma rota lê ou escreve a marca de dono (ACE-63)`,
+        );
       }
       if (semHash) {
         for (const [termo, re] of PROIBIDOS_HASH) {
-          if (re.test(linha)) problemas.push(`${caminho}:${i + 1}: usa ${termo}; o hash de senha é só do banco`);
+          if (re.test(linha))
+            problemas.push(`${caminho}:${i + 1}: usa ${termo}; o hash de senha é só do banco`);
         }
       }
     });

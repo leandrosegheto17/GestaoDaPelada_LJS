@@ -86,7 +86,12 @@ export async function assinar(
   if (clienteId === null) {
     const eu = await contas.eu(db);
     if (eu === null) return { resultado: 'so_quem_criou' };
-    const cliente = await asaas.criarCliente({ name: nome, cpfCnpj: cpf, email: eu.email, externalReference: conta });
+    const cliente = await asaas.criarCliente({
+      name: nome,
+      cpfCnpj: cpf,
+      email: eu.email,
+      externalReference: conta,
+    });
     if (cliente === 'falhou') return { resultado: 'pagamento_indisponivel' };
     clienteId = cliente.id;
   }

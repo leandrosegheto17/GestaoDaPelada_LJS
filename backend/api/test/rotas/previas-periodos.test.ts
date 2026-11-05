@@ -8,7 +8,12 @@ import { NOME_COOKIE_SESSAO } from '../../src/infraestrutura/sessao/cookie.ts';
 import { gerarToken } from '../../src/infraestrutura/sessao/token.ts';
 import { envAcesso } from '../acesso/apoio.ts';
 import { contextoFalso, fabricaComoApp } from '../db/requisicao.ts';
-import { abrirCenarioGrupos, arquivar, reativar, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  arquivar,
+  reativar,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * Prévias de reativar, corrigir período e alterar o início (partidas-e-ranking T42; PAR-109 a PAR-116), com o app
@@ -31,7 +36,10 @@ let periodoLia: string;
 let periodoToninho: string;
 let forasteiro: string;
 
-const app = criarApp({ fabricaBanco: fabricaComoApp().fabrica, relogio: relogioFixo('2026-03-14T15:00:00Z') });
+const app = criarApp({
+  fabricaBanco: fabricaComoApp().fabrica,
+  relogio: relogioFixo('2026-03-14T15:00:00Z'),
+});
 
 async function sessao(conta: string): Promise<string> {
   const { token, hash } = await gerarToken();
@@ -43,7 +51,12 @@ async function sessao(conta: string): Promise<string> {
   return token;
 }
 
-async function pedir(metodo: string, caminho: string, corpo: unknown, conta = aberto.cenario.contaC): Promise<Response> {
+async function pedir(
+  metodo: string,
+  caminho: string,
+  corpo: unknown,
+  conta = aberto.cenario.contaC,
+): Promise<Response> {
   const headers = new Headers({
     'x-pelada': '1',
     'content-type': 'application/json',
@@ -60,12 +73,20 @@ async function pedir(metodo: string, caminho: string, corpo: unknown, conta = ab
   return r;
 }
 
-const previaReativar = (id: string, corpo: unknown) => pedir('POST', `/jogadores/${id}/reativar/previa`, corpo);
+const previaReativar = (id: string, corpo: unknown) =>
+  pedir('POST', `/jogadores/${id}/reativar/previa`, corpo);
 const previaPeriodo = (id: string, periodo: string, corpo: unknown) =>
   pedir('POST', `/jogadores/${id}/periodos/${periodo}/previa`, corpo);
-const previaInicio = (id: string, corpo: unknown) => pedir('POST', `/jogadores/${id}/inicio/previa`, corpo);
+const previaInicio = (id: string, corpo: unknown) =>
+  pedir('POST', `/jogadores/${id}/inicio/previa`, corpo);
 
-async function jogador(grupo: string, apelido: string, conta: string, inicio: string, fim: string | null): Promise<[string, string]> {
+async function jogador(
+  grupo: string,
+  apelido: string,
+  conta: string,
+  inicio: string,
+  fim: string | null,
+): Promise<[string, string]> {
   const { db } = aberto;
   const j = await db.query<{ id: string }>(
     `INSERT INTO jogadores (grupo_id, apelido, posicao, inicio_pontuacao, criado_por, criado_em, alterado_por, alterado_em)
@@ -87,35 +108,61 @@ async function partidaComToninho(data: string): Promise<void> {
      VALUES ($1, $2, false, $3, now(), $3, now()) RETURNING id`,
     [cenario.grupoG, data, cenario.contaC],
   );
-  await db.query(`INSERT INTO presencas (partida_id, jogador_id, grupo_id, situacao) VALUES ($1, $2, $3, 'presente')`, [
-    p.rows[0]!.id,
-    cenario.idsG.jogadorAtivo,
-    cenario.grupoG,
-  ]);
+  await db.query(
+    `INSERT INTO presencas (partida_id, jogador_id, grupo_id, situacao) VALUES ($1, $2, $3, 'presente')`,
+    [p.rows[0]!.id, cenario.idsG.jogadorAtivo, cenario.grupoG],
+  );
 }
 
 /** O que uma escrita de período mudaria: períodos, inícios, auditoria, partidas e presenças de G. */
 async function retrato(): Promise<string> {
   const { db, cenario } = aberto;
   const g = cenario.grupoG;
-  const periodos = await db.query('SELECT id, jogador_id, inicio::text, fim::text FROM periodos_ativos WHERE grupo_id = $1 ORDER BY id', [g]);
-  const inicios = await db.query('SELECT id, inicio_pontuacao::text FROM jogadores WHERE grupo_id = $1 ORDER BY id', [g]);
-  const auditoria = await db.query('SELECT count(*)::int AS n FROM auditoria WHERE grupo_id = $1', [g]);
-  const partidas = await db.query('SELECT count(*)::int AS n FROM partidas WHERE grupo_id = $1', [g]);
-  const presencas = await db.query('SELECT count(*)::int AS n FROM presencas WHERE grupo_id = $1', [g]);
-  return JSON.stringify([periodos.rows, inicios.rows, auditoria.rows, partidas.rows, presencas.rows]);
+  const periodos = await db.query(
+    'SELECT id, jogador_id, inicio::text, fim::text FROM periodos_ativos WHERE grupo_id = $1 ORDER BY id',
+    [g],
+  );
+  const inicios = await db.query(
+    'SELECT id, inicio_pontuacao::text FROM jogadores WHERE grupo_id = $1 ORDER BY id',
+    [g],
+  );
+  const auditoria = await db.query('SELECT count(*)::int AS n FROM auditoria WHERE grupo_id = $1', [
+    g,
+  ]);
+  const partidas = await db.query('SELECT count(*)::int AS n FROM partidas WHERE grupo_id = $1', [
+    g,
+  ]);
+  const presencas = await db.query('SELECT count(*)::int AS n FROM presencas WHERE grupo_id = $1', [
+    g,
+  ]);
+  return JSON.stringify([
+    periodos.rows,
+    inicios.rows,
+    auditoria.rows,
+    partidas.rows,
+    presencas.rows,
+  ]);
 }
 
 beforeAll(async () => {
   aberto = await abrirCenarioGrupos();
   const { db, cenario } = aberto;
-  [gil, periodoGil] = await jogador(cenario.grupoG, 'Gil', cenario.contaC, '2026-01-01', '2026-02-01');
+  [gil, periodoGil] = await jogador(
+    cenario.grupoG,
+    'Gil',
+    cenario.contaC,
+    '2026-01-01',
+    '2026-02-01',
+  );
   [lia, periodoLia] = await jogador(cenario.grupoG, 'Lia', cenario.contaC, '2026-02-10', null);
   [forasteiro] = await jogador(cenario.grupoH, 'Forasteiro', cenario.contaB, '2026-01-01', null);
   await partidaComToninho('2026-02-05');
   await partidaComToninho('2026-02-12');
   periodoToninho = (
-    await db.query<{ id: string }>('SELECT id FROM periodos_ativos WHERE jogador_id = $1 AND fim IS NULL', [cenario.idsG.jogadorAtivo])
+    await db.query<{ id: string }>(
+      'SELECT id FROM periodos_ativos WHERE jogador_id = $1 AND fim IS NULL',
+      [cenario.idsG.jogadorAtivo],
+    )
   ).rows[0]!.id;
 });
 
@@ -143,7 +190,9 @@ describe('prévia de reativar', () => {
   });
 
   it('PAR-113: Gil inativo hoje não tem posição antes; reativado, tem', async () => {
-    const corpo = previaResposta.parse(await (await previaReativar(gil, { data: '2026-02-05' })).json());
+    const corpo = previaResposta.parse(
+      await (await previaReativar(gil, { data: '2026-02-05' })).json(),
+    );
     expect(corpo.posicaoAntes).toBeNull();
     expect(corpo.posicaoDepois).not.toBeNull();
   });
@@ -166,20 +215,26 @@ describe('prévia de corrigir período', () => {
   });
 
   it('PAR-116: adiar a saída para 06/02 traz uma rodada e o aviso no singular', async () => {
-    const corpo = previaResposta.parse(await (await previaPeriodo(gil, periodoGil, { saida: '2026-02-06' })).json());
+    const corpo = previaResposta.parse(
+      await (await previaPeriodo(gil, periodoGil, { saida: '2026-02-06' })).json(),
+    );
     expect(corpo.rodadasQuePassamAConstar).toEqual([{ data: '2026-02-05', situacao: 'falta' }]);
     expect(corpo.aviso).toBe(AVISO_UMA_FALTA);
   });
 
   it('PAR-114: antecipar a saída para 05/01 tira a rodada de 08/01', async () => {
-    const corpo = previaResposta.parse(await (await previaPeriodo(gil, periodoGil, { saida: '2026-01-05' })).json());
+    const corpo = previaResposta.parse(
+      await (await previaPeriodo(gil, periodoGil, { saida: '2026-01-05' })).json(),
+    );
     expect(corpo.rodadasQueDeixamDeConstar).toEqual([{ data: '2026-01-08' }]);
     expect(corpo.rodadasQuePassamAConstar).toEqual([]);
     expect(corpo.aviso).toBeNull();
   });
 
   it('PAR-110: datas iguais às atuais mostram o cenário sem mudança', async () => {
-    const corpo = previaResposta.parse(await (await previaPeriodo(gil, periodoGil, { saida: '2026-02-01' })).json());
+    const corpo = previaResposta.parse(
+      await (await previaPeriodo(gil, periodoGil, { saida: '2026-02-01' })).json(),
+    );
     expect(corpo.acumuladoDepois).toBe(corpo.acumuladoAntes);
     expect(corpo.rodadasQuePassamAConstar).toEqual([]);
     expect(corpo.rodadasQueDeixamDeConstar).toEqual([]);
@@ -197,32 +252,127 @@ describe('prévia da data de início', () => {
   });
 
   it('PAR-111: data igual à atual devolve 0 e os acumulados iguais', async () => {
-    const corpo = previaInicioResposta.parse(await (await previaInicio(lia, { data: '2026-02-10' })).json());
+    const corpo = previaInicioResposta.parse(
+      await (await previaInicio(lia, { data: '2026-02-10' })).json(),
+    );
     expect(corpo.rodadasQuePassamAConstar).toBe(0);
     expect(corpo.acumuladoDepois).toBe(corpo.acumuladoAntes);
   });
 });
 
 describe('PAR-112: cada recusa da gravação sai igual na prévia', () => {
-  type Caso = [nome: string, previa: () => [string, string], gravacao: () => [string, string], corpo: unknown];
+  type Caso = [
+    nome: string,
+    previa: () => [string, string],
+    gravacao: () => [string, string],
+    corpo: unknown,
+  ];
   const casos: Caso[] = [
-    ['reativar quem já está ativo (409)', () => ['POST', `/jogadores/${aberto.cenario.idsG.jogadorAtivo}/reativar/previa`], () => ['POST', `/jogadores/${aberto.cenario.idsG.jogadorAtivo}/reativar`], {}],
-    ['reativar antes da saída anterior (422)', () => ['POST', `/jogadores/${gil}/reativar/previa`], () => ['POST', `/jogadores/${gil}/reativar`], { data: '2026-01-15' }],
-    ['reativar no futuro (422)', () => ['POST', `/jogadores/${gil}/reativar/previa`], () => ['POST', `/jogadores/${gil}/reativar`], { data: '2026-03-15' }],
-    ['reativar com data que não existe (422)', () => ['POST', `/jogadores/${gil}/reativar/previa`], () => ['POST', `/jogadores/${gil}/reativar`], { data: '2026-02-30' }],
-    ['reativar com campo a mais (422)', () => ['POST', `/jogadores/${gil}/reativar/previa`], () => ['POST', `/jogadores/${gil}/reativar`], { data: '2026-02-05', x: 1 }],
-    ['reativar jogador de outro grupo (404)', () => ['POST', `/jogadores/${forasteiro}/reativar/previa`], () => ['POST', `/jogadores/${forasteiro}/reativar`], {}],
-    ['reativar id que não é uuid (404)', () => ['POST', '/jogadores/nao-e-uuid/reativar/previa'], () => ['POST', '/jogadores/nao-e-uuid/reativar'], {}],
-    ['corrigir a saída do período aberto (422)', () => ['POST', `/jogadores/${aberto.cenario.idsG.jogadorAtivo}/periodos/${periodoToninho}/previa`], () => ['PATCH', `/jogadores/${aberto.cenario.idsG.jogadorAtivo}/periodos/${periodoToninho}`], { saida: '2026-03-01' }],
-    ['corrigir o retorno do primeiro período (422)', () => ['POST', `/jogadores/${gil}/periodos/${periodoGil}/previa`], () => ['PATCH', `/jogadores/${gil}/periodos/${periodoGil}`], { retorno: '2025-12-01' }],
-    ['corrigir com período de outro jogador (404)', () => ['POST', `/jogadores/${gil}/periodos/${periodoLia}/previa`], () => ['PATCH', `/jogadores/${gil}/periodos/${periodoLia}`], { saida: '2026-02-13' }],
-    ['corrigir sem saída nem retorno (422)', () => ['POST', `/jogadores/${gil}/periodos/${periodoGil}/previa`], () => ['PATCH', `/jogadores/${gil}/periodos/${periodoGil}`], {}],
-    ['corrigir a saída para o futuro (422)', () => ['POST', `/jogadores/${gil}/periodos/${periodoGil}/previa`], () => ['PATCH', `/jogadores/${gil}/periodos/${periodoGil}`], { saida: '2026-03-20' }],
-    ['início no futuro (422)', () => ['POST', `/jogadores/${lia}/inicio/previa`], () => ['PUT', `/jogadores/${lia}/inicio`], { data: '2026-03-15' }],
-    ['início antes do piso (422)', () => ['POST', `/jogadores/${lia}/inicio/previa`], () => ['PUT', `/jogadores/${lia}/inicio`], { data: '1999-12-31' }],
-    ['início depois da saída do primeiro período (422)', () => ['POST', `/jogadores/${gil}/inicio/previa`], () => ['PUT', `/jogadores/${gil}/inicio`], { data: '2026-02-05' }],
-    ['início sem data (422)', () => ['POST', `/jogadores/${lia}/inicio/previa`], () => ['PUT', `/jogadores/${lia}/inicio`], {}],
-    ['início de jogador de outro grupo (404)', () => ['POST', `/jogadores/${forasteiro}/inicio/previa`], () => ['PUT', `/jogadores/${forasteiro}/inicio`], { data: '2026-02-01' }],
+    [
+      'reativar quem já está ativo (409)',
+      () => ['POST', `/jogadores/${aberto.cenario.idsG.jogadorAtivo}/reativar/previa`],
+      () => ['POST', `/jogadores/${aberto.cenario.idsG.jogadorAtivo}/reativar`],
+      {},
+    ],
+    [
+      'reativar antes da saída anterior (422)',
+      () => ['POST', `/jogadores/${gil}/reativar/previa`],
+      () => ['POST', `/jogadores/${gil}/reativar`],
+      { data: '2026-01-15' },
+    ],
+    [
+      'reativar no futuro (422)',
+      () => ['POST', `/jogadores/${gil}/reativar/previa`],
+      () => ['POST', `/jogadores/${gil}/reativar`],
+      { data: '2026-03-15' },
+    ],
+    [
+      'reativar com data que não existe (422)',
+      () => ['POST', `/jogadores/${gil}/reativar/previa`],
+      () => ['POST', `/jogadores/${gil}/reativar`],
+      { data: '2026-02-30' },
+    ],
+    [
+      'reativar com campo a mais (422)',
+      () => ['POST', `/jogadores/${gil}/reativar/previa`],
+      () => ['POST', `/jogadores/${gil}/reativar`],
+      { data: '2026-02-05', x: 1 },
+    ],
+    [
+      'reativar jogador de outro grupo (404)',
+      () => ['POST', `/jogadores/${forasteiro}/reativar/previa`],
+      () => ['POST', `/jogadores/${forasteiro}/reativar`],
+      {},
+    ],
+    [
+      'reativar id que não é uuid (404)',
+      () => ['POST', '/jogadores/nao-e-uuid/reativar/previa'],
+      () => ['POST', '/jogadores/nao-e-uuid/reativar'],
+      {},
+    ],
+    [
+      'corrigir a saída do período aberto (422)',
+      () => [
+        'POST',
+        `/jogadores/${aberto.cenario.idsG.jogadorAtivo}/periodos/${periodoToninho}/previa`,
+      ],
+      () => ['PATCH', `/jogadores/${aberto.cenario.idsG.jogadorAtivo}/periodos/${periodoToninho}`],
+      { saida: '2026-03-01' },
+    ],
+    [
+      'corrigir o retorno do primeiro período (422)',
+      () => ['POST', `/jogadores/${gil}/periodos/${periodoGil}/previa`],
+      () => ['PATCH', `/jogadores/${gil}/periodos/${periodoGil}`],
+      { retorno: '2025-12-01' },
+    ],
+    [
+      'corrigir com período de outro jogador (404)',
+      () => ['POST', `/jogadores/${gil}/periodos/${periodoLia}/previa`],
+      () => ['PATCH', `/jogadores/${gil}/periodos/${periodoLia}`],
+      { saida: '2026-02-13' },
+    ],
+    [
+      'corrigir sem saída nem retorno (422)',
+      () => ['POST', `/jogadores/${gil}/periodos/${periodoGil}/previa`],
+      () => ['PATCH', `/jogadores/${gil}/periodos/${periodoGil}`],
+      {},
+    ],
+    [
+      'corrigir a saída para o futuro (422)',
+      () => ['POST', `/jogadores/${gil}/periodos/${periodoGil}/previa`],
+      () => ['PATCH', `/jogadores/${gil}/periodos/${periodoGil}`],
+      { saida: '2026-03-20' },
+    ],
+    [
+      'início no futuro (422)',
+      () => ['POST', `/jogadores/${lia}/inicio/previa`],
+      () => ['PUT', `/jogadores/${lia}/inicio`],
+      { data: '2026-03-15' },
+    ],
+    [
+      'início antes do piso (422)',
+      () => ['POST', `/jogadores/${lia}/inicio/previa`],
+      () => ['PUT', `/jogadores/${lia}/inicio`],
+      { data: '1999-12-31' },
+    ],
+    [
+      'início depois da saída do primeiro período (422)',
+      () => ['POST', `/jogadores/${gil}/inicio/previa`],
+      () => ['PUT', `/jogadores/${gil}/inicio`],
+      { data: '2026-02-05' },
+    ],
+    [
+      'início sem data (422)',
+      () => ['POST', `/jogadores/${lia}/inicio/previa`],
+      () => ['PUT', `/jogadores/${lia}/inicio`],
+      {},
+    ],
+    [
+      'início de jogador de outro grupo (404)',
+      () => ['POST', `/jogadores/${forasteiro}/inicio/previa`],
+      () => ['PUT', `/jogadores/${forasteiro}/inicio`],
+      { data: '2026-02-01' },
+    ],
   ];
 
   it.each(casos)('PAR-112: %s', async (_nome, previa, gravacao, corpo) => {
@@ -232,7 +382,10 @@ describe('PAR-112: cada recusa da gravação sai igual na prévia', () => {
     const rp = await pedir(mp, cp, corpo);
     const rg = await pedir(mg, cg, corpo);
     expect(rp.status).toBeGreaterThanOrEqual(400);
-    expect({ status: rp.status, corpo: await rp.json() }).toEqual({ status: rg.status, corpo: await rg.json() });
+    expect({ status: rp.status, corpo: await rp.json() }).toEqual({
+      status: rg.status,
+      corpo: await rg.json(),
+    });
     expect(await retrato()).toBe(antes);
   });
 
@@ -246,10 +399,13 @@ describe('PAR-112: cada recusa da gravação sai igual na prévia', () => {
     ['reativar', () => `/jogadores/${gil}/reativar/previa`, { data: '2026-02-05' }],
     ['corrigir', () => `/jogadores/${gil}/periodos/${periodoGil}/previa`, { saida: '2026-02-13' }],
     ['início', () => `/jogadores/${lia}/inicio/previa`, { data: '2026-02-01' }],
-  ] as const)('PAR-112: prévia de %s em grupo arquivado responde 409 grupo_arquivado', async (_nome, caminho, corpo) => {
-    await arquivar(aberto.db, aberto.cenario.grupoG);
-    const r = await pedir('POST', caminho(), corpo);
-    expect(r.status).toBe(409);
-    expect(await r.json()).toMatchObject({ codigo: 'grupo_arquivado' });
-  });
+  ] as const)(
+    'PAR-112: prévia de %s em grupo arquivado responde 409 grupo_arquivado',
+    async (_nome, caminho, corpo) => {
+      await arquivar(aberto.db, aberto.cenario.grupoG);
+      const r = await pedir('POST', caminho(), corpo);
+      expect(r.status).toBe(409);
+      expect(await r.json()).toMatchObject({ codigo: 'grupo_arquivado' });
+    },
+  );
 });

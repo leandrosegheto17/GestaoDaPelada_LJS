@@ -1,10 +1,19 @@
 import { Hono, type Context } from 'hono';
 import { corpoDoErro, dataCorpo, type PreviaResposta } from '@pelada/contrato';
-import { avaliarPeriodos, previaDosPeriodos, type OperacaoPeriodo, type PreviaDosPeriodos } from '@pelada/dominio';
+import {
+  avaliarPeriodos,
+  previaDosPeriodos,
+  type OperacaoPeriodo,
+  type PreviaDosPeriodos,
+} from '@pelada/dominio';
 import type { Ambiente } from '../ambiente.ts';
 import { lerCorpoDoGrupo, respostaDeCampo } from '../corpo.ts';
 import { historico } from '../../infraestrutura/db/repositorios/historico.ts';
-import { jogadores, type EstadoDoJogador, type ResultadoPeriodo } from '../../infraestrutura/db/repositorios/jogadores.ts';
+import {
+  jogadores,
+  type EstadoDoJogador,
+  type ResultadoPeriodo,
+} from '../../infraestrutura/db/repositorios/jogadores.ts';
 import { conferirLimiteDeJogadores } from '../../aplicacao/plano/limite-jogadores.ts';
 import { respostaSomenteLeitura } from '../middlewares/plano-editavel.ts';
 
@@ -26,7 +35,11 @@ import { respostaSomenteLeitura } from '../middlewares/plano-editavel.ts';
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** O resultado do repositório na resposta HTTP. */
-export function respostaDePeriodo(c: Context<Ambiente>, r: ResultadoPeriodo, campoDoCorpo?: string): Response {
+export function respostaDePeriodo(
+  c: Context<Ambiente>,
+  r: ResultadoPeriodo,
+  campoDoCorpo?: string,
+): Response {
   if (r.resultado === 'nao_encontrado') return c.json(corpoDoErro('nao_encontrado'), 404);
   if (r.resultado === 'ja_inativo') return c.json(corpoDoErro('ja_inativo'), 409);
   if (r.resultado === 'ja_ativo') return c.json(corpoDoErro('ja_ativo'), 409);
@@ -52,7 +65,10 @@ export function respostaDaPrevia(p: PreviaDosPeriodos): PreviaResposta {
     acumuladoDepois: p.acumuladoDepois,
     posicaoAntes: p.posicaoAntes,
     posicaoDepois: p.posicaoDepois,
-    rodadasQuePassamAConstar: p.rodadasQuePassamAConstar.map((r) => ({ data: r.data, situacao: r.situacao })),
+    rodadasQuePassamAConstar: p.rodadasQuePassamAConstar.map((r) => ({
+      data: r.data,
+      situacao: r.situacao,
+    })),
     rodadasQueDeixamDeConstar: p.rodadasQueDeixamDeConstar.map((r) => ({ data: r.data })),
     aviso: p.aviso,
   };
@@ -77,7 +93,13 @@ export function rotasPeriodos(): Hono<Ambiente> {
         );
         if (limite !== null) return respostaSomenteLeitura(c, limite);
       }
-      const r = await jogadores[acao](c.var.db, c.req.param('grupoId'), id, corpo.dados, c.var.relogio.hoje());
+      const r = await jogadores[acao](
+        c.var.db,
+        c.req.param('grupoId'),
+        id,
+        corpo.dados,
+        c.var.relogio.hoje(),
+      );
       return respostaDePeriodo(c, r, 'data');
     });
   }

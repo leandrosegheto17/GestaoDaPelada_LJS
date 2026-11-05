@@ -63,7 +63,9 @@ function entradaDe(caso: Caso): EntradaSimulador {
 describe('casos de referência conferidos contra o legado (SIM-52)', () => {
   it('SIM-52: a referência registra o comando e o commit do legado', () => {
     expect(referencia.commit).toBe('ece227e0');
-    expect(referencia.comando, 'rodar o legado e registrar o comando (Evidência da T18)').toEqual(expect.any(String));
+    expect(referencia.comando, 'rodar o legado e registrar o comando (Evidência da T18)').toEqual(
+      expect.any(String),
+    );
     expect(referencia.conferidoEm).toEqual(expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/));
   });
 
@@ -78,7 +80,10 @@ describe('casos de referência conferidos contra o legado (SIM-52)', () => {
       if (sugestao.formato === 'dois_times') {
         const obtido: SaidaDois = {
           ordemPrioridade: sugestao.ordemPrioridade,
-          times: sugestao.composicao.times.map((t) => ({ titulares: t.titulares, entram: t.entram })),
+          times: sugestao.composicao.times.map((t) => ({
+            titulares: t.titulares,
+            entram: t.entram,
+          })),
           naoEntra: sugestao.composicao.naoEntra,
           avisos: sugestao.avisos.map((a) => a.texto),
         };

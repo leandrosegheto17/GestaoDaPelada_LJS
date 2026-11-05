@@ -26,10 +26,15 @@ function montar(escrita: LimiteDeTaxa = permite) {
   let handler = 0;
   const app = criarApp({
     registrarExtras: (api) => {
-      api.on(['POST', 'PUT', 'PATCH', 'DELETE'], '/teste/escrita', limiteTaxa('LIMITE_ESCRITA'), (c) => {
-        handler += 1;
-        return c.json({ ok: true });
-      });
+      api.on(
+        ['POST', 'PUT', 'PATCH', 'DELETE'],
+        '/teste/escrita',
+        limiteTaxa('LIMITE_ESCRITA'),
+        (c) => {
+          handler += 1;
+          return c.json({ ok: true });
+        },
+      );
       api.get('/teste/leitura', limiteTaxa('LIMITE_ESCRITA'), (c) => c.json({ ok: true }));
     },
   });
@@ -42,7 +47,8 @@ function montar(escrita: LimiteDeTaxa = permite) {
     LIMITE_WEBHOOK: permite,
     LIMITE_ESCRITA: escrita,
   } as unknown as Env;
-  const pedir = (caminho: string, init: RequestInit = {}) => app.request(`/api${caminho}`, init, env);
+  const pedir = (caminho: string, init: RequestInit = {}) =>
+    app.request(`/api${caminho}`, init, env);
   return { pedir, handler: () => handler };
 }
 
@@ -51,7 +57,10 @@ describe('exigirCabecalhoPelada', () => {
     const cota = bindingComCota(10);
     const { pedir, handler } = montar(cota);
     for (let i = 0; i < 11; i += 1) {
-      const r = await pedir('/teste/escrita', { method: 'POST', headers: { 'cf-connecting-ip': '203.0.113.7' } });
+      const r = await pedir('/teste/escrita', {
+        method: 'POST',
+        headers: { 'cf-connecting-ip': '203.0.113.7' },
+      });
       expect(r.status).toBe(403);
       expect(await r.json()).toMatchObject({ codigo: 'origem_recusada' });
     }
@@ -67,12 +76,15 @@ describe('exigirCabecalhoPelada', () => {
     expect(handler()).toBe(1);
   });
 
-  it.each(['PUT', 'PATCH', 'DELETE'])('ACE-49: %s sem X-Pelada recebe 403 e não chama o handler', async (metodo) => {
-    const { pedir, handler } = montar();
-    const r = await pedir('/teste/escrita', { method: metodo });
-    expect(r.status).toBe(403);
-    expect(handler()).toBe(0);
-  });
+  it.each(['PUT', 'PATCH', 'DELETE'])(
+    'ACE-49: %s sem X-Pelada recebe 403 e não chama o handler',
+    async (metodo) => {
+      const { pedir, handler } = montar();
+      const r = await pedir('/teste/escrita', { method: metodo });
+      expect(r.status).toBe(403);
+      expect(handler()).toBe(0);
+    },
+  );
 
   it.each(['PUT', 'PATCH', 'DELETE'])('ACE-49: %s com X-Pelada: 1 passa', async (metodo) => {
     const { pedir } = montar();
@@ -80,12 +92,15 @@ describe('exigirCabecalhoPelada', () => {
     expect(r.status).toBe(200);
   });
 
-  it.each(['', '0', 'true', ' 1', '11'])('ACE-49: POST com X-Pelada "%s" (valor diferente de 1) recebe 403', async (valor) => {
-    const { pedir, handler } = montar();
-    const r = await pedir('/teste/escrita', { method: 'POST', headers: { 'X-Pelada': valor } });
-    expect(r.status).toBe(403);
-    expect(handler()).toBe(0);
-  });
+  it.each(['', '0', 'true', ' 1', '11'])(
+    'ACE-49: POST com X-Pelada "%s" (valor diferente de 1) recebe 403',
+    async (valor) => {
+      const { pedir, handler } = montar();
+      const r = await pedir('/teste/escrita', { method: 'POST', headers: { 'X-Pelada': valor } });
+      expect(r.status).toBe(403);
+      expect(handler()).toBe(0);
+    },
+  );
 
   it('ACE-49: o nome do cabeçalho não diferencia maiúsculas', async () => {
     const { pedir } = montar();

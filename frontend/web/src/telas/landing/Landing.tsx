@@ -47,14 +47,32 @@ export function textoTrial(): string {
 /** Itens do plano: os recursos da tabela e os limites (ou "ilimitados"). */
 export function itensDoPlano(plano: RecursosDoPlano): string[] {
   const itens = plano.recursos.map((r) => NOMES_RECURSOS[r]);
-  itens.push(plano.limiteJogadores === null ? 'Jogadores ilimitados' : `Até ${plano.limiteJogadores} jogadores ativos`);
   itens.push(
-    plano.limiteGrupos === null ? 'Quantos grupos quiser' : `${plano.limiteGrupos} grupo${plano.limiteGrupos > 1 ? 's' : ''}`,
+    plano.limiteJogadores === null
+      ? 'Jogadores ilimitados'
+      : `Até ${plano.limiteJogadores} jogadores ativos`,
+  );
+  itens.push(
+    plano.limiteGrupos === null
+      ? 'Quantos grupos quiser'
+      : `${plano.limiteGrupos} grupo${plano.limiteGrupos > 1 ? 's' : ''}`,
   );
   return itens;
 }
 
-function Plano({ id, nome, preco, destaque, itens }: { id: string; nome: string; preco: string; destaque?: string; itens: string[] }) {
+function Plano({
+  id,
+  nome,
+  preco,
+  destaque,
+  itens,
+}: {
+  id: string;
+  nome: string;
+  preco: string;
+  destaque?: string;
+  itens: string[];
+}) {
   return (
     <section className={estilos.plano} aria-labelledby={id} data-plano={id}>
       <h2 className={estilos['plano__nome']} id={id}>
@@ -75,7 +93,9 @@ export function Landing() {
   const [parametros] = useSearchParams();
   return (
     <Casca>
-      {parametros.get('aviso') === 'conta-excluida' ? <Faixa tipo="sucesso">{TEXTO_CONTA_EXCLUIDA}</Faixa> : null}
+      {parametros.get('aviso') === 'conta-excluida' ? (
+        <Faixa tipo="sucesso">{TEXTO_CONTA_EXCLUIDA}</Faixa>
+      ) : null}
       <div className={estilos.topo}>
         <h1 className={estilos.titulo}>{TITULO_LANDING}</h1>
         <p className={estilos.proposta}>{TEXTO_PROPOSTA}</p>
@@ -90,7 +110,12 @@ export function Landing() {
       </div>
 
       <div className={estilos.planos}>
-        <Plano id="plano-free" nome="Free" preco={TEXTO_GRATIS} itens={itensDoPlano(RECURSOS_POR_PLANO.free)} />
+        <Plano
+          id="plano-free"
+          nome="Free"
+          preco={TEXTO_GRATIS}
+          itens={itensDoPlano(RECURSOS_POR_PLANO.free)}
+        />
         <Plano
           id="plano-pro"
           nome="Pro"

@@ -16,28 +16,44 @@ import {
  */
 
 const MAPA = JSON.parse(
-  readFileSync(fileURLToPath(new URL('../../../../.specs/mockup/telas.json', import.meta.url)), 'utf8'),
+  readFileSync(
+    fileURLToPath(new URL('../../../../.specs/mockup/telas.json', import.meta.url)),
+    'utf8',
+  ),
 ) as MapaTelas;
-const ATIVAS = JSON.parse(readFileSync(fileURLToPath(new URL('../../e2e/telas-ativas.json', import.meta.url)), 'utf8')) as {
+const ATIVAS = JSON.parse(
+  readFileSync(fileURLToPath(new URL('../../e2e/telas-ativas.json', import.meta.url)), 'utf8'),
+) as {
   telas: { id: string; estado: string }[];
 };
 
 describe('adaptarCorpo', () => {
   it('ACE-54: converte o erro antigo do mockup no corpoErro do contrato', () => {
-    const antigo = JSON.stringify({ erro: { codigo: 'senha_atual_incorreta', mensagem: 'Senha atual incorreta.' } });
-    expect(JSON.parse(adaptarCorpo(antigo))).toEqual({ erro: 'Senha atual incorreta.', codigo: 'senha_atual_incorreta' });
+    const antigo = JSON.stringify({
+      erro: { codigo: 'senha_atual_incorreta', mensagem: 'Senha atual incorreta.' },
+    });
+    expect(JSON.parse(adaptarCorpo(antigo))).toEqual({
+      erro: 'Senha atual incorreta.',
+      codigo: 'senha_atual_incorreta',
+    });
   });
 
   it('ACE-54: leva os grupos do único admin e troca nao_autenticado por sem_sessao', () => {
     const grupos = [{ id: 'g-quinta', nome: 'Pelada de Quinta' }];
-    expect(JSON.parse(adaptarCorpo(JSON.stringify({ erro: { codigo: 'unico_admin', mensagem: 'x', grupos } })))).toEqual({
+    expect(
+      JSON.parse(
+        adaptarCorpo(JSON.stringify({ erro: { codigo: 'unico_admin', mensagem: 'x', grupos } })),
+      ),
+    ).toEqual({
       erro: 'x',
       codigo: 'unico_admin',
       grupos,
     });
-    expect(JSON.parse(adaptarCorpo(JSON.stringify({ erro: { codigo: 'nao_autenticado', mensagem: 'Entre.' } }))).codigo).toBe(
-      'sem_sessao',
-    );
+    expect(
+      JSON.parse(
+        adaptarCorpo(JSON.stringify({ erro: { codigo: 'nao_autenticado', mensagem: 'Entre.' } })),
+      ).codigo,
+    ).toBe('sem_sessao');
   });
 
   it('ACE-54: corpo que não é erro antigo passa igual', () => {
@@ -53,12 +69,18 @@ describe('adaptarCorpo', () => {
 
 describe('seletorDoApp', () => {
   it('ACE-54: a classe casa a global e a do CSS Module do build visual', () => {
-    expect(seletorDoApp('.faixa--erro')).toBe(':is(.faixa--erro, [class^="faixa--erro--m-"], [class*=" faixa--erro--m-"])');
+    expect(seletorDoApp('.faixa--erro')).toBe(
+      ':is(.faixa--erro, [class^="faixa--erro--m-"], [class*=" faixa--erro--m-"])',
+    );
   });
 
   it('ACE-54: role=, text=, id e atributo ficam como estão; partes de >> são tratadas uma a uma', () => {
-    expect(seletorDoApp("role=button[name='Trocar senha']")).toBe("role=button[name='Trocar senha']");
-    expect(seletorDoApp('text=Senha trocada. Outros aparelhos')).toBe('text=Senha trocada. Outros aparelhos');
+    expect(seletorDoApp("role=button[name='Trocar senha']")).toBe(
+      "role=button[name='Trocar senha']",
+    );
+    expect(seletorDoApp('text=Senha trocada. Outros aparelhos')).toBe(
+      'text=Senha trocada. Outros aparelhos',
+    );
     expect(seletorDoApp('#nova')).toBe('#nova');
     expect(seletorDoApp('[role=dialog]')).toBe('[role=dialog]');
     expect(seletorDoApp(".dialogo >> role=button[name='Arquivar grupo']")).toBe(
@@ -69,16 +91,25 @@ describe('seletorDoApp', () => {
 
 describe('entradasAtivas', () => {
   it('ACE-55: acha a entrada real pelo id e estado, na ordem da lista', () => {
-    const r = entradasAtivas(MAPA, { telas: [{ id: 'T25', estado: 'erro' }, { id: 'T04', estado: 'vazio' }] });
+    const r = entradasAtivas(MAPA, {
+      telas: [
+        { id: 'T25', estado: 'erro' },
+        { id: 'T04', estado: 'vazio' },
+      ],
+    });
     expect(r.map((e) => `${e.id} ${e.estado}`)).toEqual(['T25 erro', 'T04 vazio']);
     expect(r[0]?.rota).toBe('/app/conta/senha');
   });
 
   it('ACE-55: estado que não existe, ou entrada sem real: true, falha com mensagem clara', () => {
-    expect(() => entradasAtivas(MAPA, { telas: [{ id: 'T25', estado: 'inexistente' }] })).toThrow('T25 inexistente');
+    expect(() => entradasAtivas(MAPA, { telas: [{ id: 'T25', estado: 'inexistente' }] })).toThrow(
+      'T25 inexistente',
+    );
     // T01 instalar-iphone é uma entrada do mockup sem `real: true` (a T01 sucesso passou a real na partidas-e-ranking
     // T75, com o telas.json do LJS; a escolhida segue sem `real`, como a P26 do LJS).
-    expect(() => entradasAtivas(MAPA, { telas: [{ id: 'T01', estado: 'instalar-iphone' }] })).toThrow('real: true');
+    expect(() =>
+      entradasAtivas(MAPA, { telas: [{ id: 'T01', estado: 'instalar-iphone' }] }),
+    ).toThrow('real: true');
   });
 
   it('ACE-55: todas as entradas do telas-ativas.json existem no telas.json', () => {
@@ -87,7 +118,9 @@ describe('entradasAtivas', () => {
 
   it('ACE-54, ACE-55: todos os estados reais das telas públicas de acesso estão ativos (T55)', () => {
     const publicas = ['T04', 'T05', 'T06', 'T07', 'T29', 'T30', 'T31', 'T33'];
-    const esperados = (MAPA.telas ?? []).filter((t) => t.real === true && publicas.includes(t.id)).map((t) => `${t.id} ${t.estado}`);
+    const esperados = (MAPA.telas ?? [])
+      .filter((t) => t.real === true && publicas.includes(t.id))
+      .map((t) => `${t.id} ${t.estado}`);
     const ativos = ATIVAS.telas.map((t) => `${t.id} ${t.estado}`);
     expect(esperados.length).toBeGreaterThan(0);
     for (const e of esperados) expect(ativos).toContain(e);
@@ -95,7 +128,9 @@ describe('entradasAtivas', () => {
 
   it('ACE-54, ACE-55: os estados reais das telas com sessão estão ativos, sem as T08 da grupos-e-elenco (T56, AD-031)', () => {
     const comSessao = ['T19', 'T25', 'T32'];
-    const esperados = (MAPA.telas ?? []).filter((t) => t.real === true && comSessao.includes(t.id)).map((t) => `${t.id} ${t.estado}`);
+    const esperados = (MAPA.telas ?? [])
+      .filter((t) => t.real === true && comSessao.includes(t.id))
+      .map((t) => `${t.id} ${t.estado}`);
     const ativos = ATIVAS.telas.map((t) => `${t.id} ${t.estado}`);
     for (const e of [...esperados, 'T09 menu-conta']) expect(ativos).toContain(e);
     expect(ativos.filter((a) => a.startsWith('T08 '))).toEqual([]);
@@ -104,7 +139,12 @@ describe('entradasAtivas', () => {
 
 describe('recorteDe', () => {
   it('ACE-54: o recorte do app é reescrito; o do mockup não', () => {
-    const entrada = { id: 'X', estado: 'y', mockup: 'm.html', recorte: { mockup: '.faixa--erro', app: ['#nova', '.faixa'] } };
+    const entrada = {
+      id: 'X',
+      estado: 'y',
+      mockup: 'm.html',
+      recorte: { mockup: '.faixa--erro', app: ['#nova', '.faixa'] },
+    };
     expect(recorteDe(entrada, 'mockup')).toBe('.faixa--erro');
     expect(recorteDe(entrada, 'app')).toEqual(['#nova', seletorDoApp('.faixa')]);
     expect(recorteDe({ id: 'X', estado: 'y', mockup: 'm.html' }, 'app')).toBeUndefined();

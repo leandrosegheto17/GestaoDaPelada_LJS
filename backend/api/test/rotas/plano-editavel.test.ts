@@ -27,7 +27,10 @@ import {
  */
 
 const DATA_PARTIDA = '2026-11-19';
-const app = criarApp({ fabricaBanco: fabricaComoApp().fabrica, relogio: relogioFixo('2026-11-20T15:00:00Z') });
+const app = criarApp({
+  fabricaBanco: fabricaComoApp().fabrica,
+  relogio: relogioFixo('2026-11-20T15:00:00Z'),
+});
 
 let aberto: CenarioGruposAberto;
 let g2: string;
@@ -67,7 +70,10 @@ async function pedir(
 }
 
 async function situacao(grupo: string, s: string, t: string | null): Promise<void> {
-  await aberto.db.query('UPDATE grupos SET situacao_comercial = $2, trial_inicio = $3::date WHERE id = $1', [grupo, s, t]);
+  await aberto.db.query(
+    'UPDATE grupos SET situacao_comercial = $2, trial_inicio = $3::date WHERE id = $1',
+    [grupo, s, t],
+  );
 }
 
 async function ativo(grupo: string, apelido: string, conta: string): Promise<string> {
@@ -78,10 +84,10 @@ async function ativo(grupo: string, apelido: string, conta: string): Promise<str
     [grupo, apelido, conta],
   );
   const id = r.rows[0]!.id;
-  await db.query(`INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, '2026-01-01', NULL)`, [
-    id,
-    grupo,
-  ]);
+  await db.query(
+    `INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, '2026-01-01', NULL)`,
+    [id, grupo],
+  );
   return id;
 }
 
@@ -106,7 +112,8 @@ beforeAll(async () => {
   );
   original = r.rows[0]!;
   // G2 nasce depois de G: G é o mais antigo da criadora, o único editável no Free (PLA-17).
-  g2 = (await criarGrupoComoConta(db, cenario.contaC, 'Pelada de Sábado', 'pelada-de-sabado-t22')).id;
+  g2 = (await criarGrupoComoConta(db, cenario.contaC, 'Pelada de Sábado', 'pelada-de-sabado-t22'))
+    .id;
 });
 
 afterAll(async () => {
@@ -161,7 +168,8 @@ describe('excedente de jogadores no Free (21 ativos)', () => {
   beforeAll(async () => {
     const { cenario } = aberto;
     await situacao(cenario.grupoG, 'trial', '2026-10-01');
-    for (let i = 0; i < 19; i++) extras.push(await ativo(cenario.grupoG, `Extra ${i + 1}`, cenario.contaC));
+    for (let i = 0; i < 19; i++)
+      extras.push(await ativo(cenario.grupoG, `Extra ${i + 1}`, cenario.contaC));
   });
 
   afterEach(async () => {
@@ -180,13 +188,19 @@ describe('excedente de jogadores no Free (21 ativos)', () => {
 
   it('PLA-18: os GET do grupo somente leitura devolvem o mesmo corpo de antes da queda', async () => {
     const { cenario } = aberto;
-    const caminhos = ['', '/jogadores', '/habilidades', '/partidas', '/pesos'].map((s) => `/grupos/${cenario.grupoG}${s}`);
+    const caminhos = ['', '/jogadores', '/habilidades', '/partidas', '/pesos'].map(
+      (s) => `/grupos/${cenario.grupoG}${s}`,
+    );
     await situacao(cenario.grupoG, 'uso_proprio', null);
     const antes = await Promise.all(caminhos.map(async (c) => ({ c, r: await pedir('GET', c) })));
-    const corposAntes = await Promise.all(antes.map(async ({ r }) => ({ status: r.status, corpo: await r.json() })));
+    const corposAntes = await Promise.all(
+      antes.map(async ({ r }) => ({ status: r.status, corpo: await r.json() })),
+    );
     await situacao(cenario.grupoG, 'trial', '2026-10-01');
     const depois = await Promise.all(caminhos.map((c) => pedir('GET', c)));
-    const corposDepois = await Promise.all(depois.map(async (r) => ({ status: r.status, corpo: await r.json() })));
+    const corposDepois = await Promise.all(
+      depois.map(async (r) => ({ status: r.status, corpo: await r.json() })),
+    );
     expect(corposDepois).toEqual(corposAntes);
     for (const { status } of corposDepois) expect(status).toBe(200);
   });
@@ -201,7 +215,10 @@ describe('excedente de jogadores no Free (21 ativos)', () => {
     });
     expect(r.status).toBe(403);
     const corpo = await r.json();
-    expect(erroSomenteLeitura.parse(corpo)).toMatchObject({ erro: 'somente_leitura', motivo: 'limite_jogadores' });
+    expect(erroSomenteLeitura.parse(corpo)).toMatchObject({
+      erro: 'somente_leitura',
+      motivo: 'limite_jogadores',
+    });
     expect(await contagens(cenario.grupoG)).toEqual(antes);
   });
 
@@ -209,7 +226,12 @@ describe('excedente de jogadores no Free (21 ativos)', () => {
     const { cenario } = aberto;
     const g = `/grupos/${cenario.grupoG}`;
     const respostas = await Promise.all([
-      pedir('PATCH', g, { nome: NOME_G, diaSemana: 'quinta', frequencia: 'semanal', horario: '21:00' }),
+      pedir('PATCH', g, {
+        nome: NOME_G,
+        diaSemana: 'quinta',
+        frequencia: 'semanal',
+        horario: '21:00',
+      }),
       pedir('POST', `${g}/habilidades`, { nome: 'Cabeceio' }),
       pedir('POST', `${g}/jogadores`, { apelido: 'Novo', posicao: 'meia' }),
     ]);
@@ -221,14 +243,20 @@ describe('excedente de jogadores no Free (21 ativos)', () => {
 
   it('PLA-21: a prévia (só leitura) passa pela trava', async () => {
     const { cenario } = aberto;
-    const r = await pedir('POST', `/grupos/${cenario.grupoG}/jogadores/${extras[0]}/reativar/previa`, {});
+    const r = await pedir(
+      'POST',
+      `/grupos/${cenario.grupoG}/jogadores/${extras[0]}/reativar/previa`,
+      {},
+    );
     expect(r.status).not.toBe(403);
   });
 
   it('PLA-15: POST …/inativar responde 200 com 21 ativos', async () => {
     const { cenario } = aberto;
     inativado = extras[extras.length - 1]!;
-    const r = await pedir('POST', `/grupos/${cenario.grupoG}/jogadores/${inativado}/inativar`, { data: DATA_PARTIDA });
+    const r = await pedir('POST', `/grupos/${cenario.grupoG}/jogadores/${inativado}/inativar`, {
+      data: DATA_PARTIDA,
+    });
     expect(r.status).toBe(200);
   });
 
@@ -245,7 +273,10 @@ describe('excedente de jogadores no Free (21 ativos)', () => {
 
   it('PLA-16 (via T22): com 20 ativos, cadastrar jogador ainda recebe 403 limite_jogadores', async () => {
     const { cenario } = aberto;
-    const r = await pedir('POST', `/grupos/${cenario.grupoG}/jogadores`, { apelido: 'Vigésimo Primeiro', posicao: 'meia' });
+    const r = await pedir('POST', `/grupos/${cenario.grupoG}/jogadores`, {
+      apelido: 'Vigésimo Primeiro',
+      posicao: 'meia',
+    });
     expect(r.status).toBe(403);
     expect(await r.json()).toMatchObject({ erro: 'somente_leitura', motivo: 'limite_jogadores' });
   });

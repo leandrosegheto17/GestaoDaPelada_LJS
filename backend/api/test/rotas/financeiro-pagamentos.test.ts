@@ -1,6 +1,11 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { mesFinanceiroResposta } from '@pelada/contrato';
-import { abrirCenarioGrupos, arquivar, reativar, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  arquivar,
+  reativar,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 import { auditorias, pedir, restaurarCaixa } from './apoio-financeiro.ts';
 
 /**
@@ -18,11 +23,15 @@ let aberto: CenarioGruposAberto;
 let deH = '';
 
 const base = () => `/grupos/${aberto.cenario.grupoG}/financeiro/pagamentos`;
-const marcar = (corpo: unknown, conta = aberto.cenario.contaC) => pedir(aberto, { metodo: 'POST', caminho: base(), conta, corpo });
+const marcar = (corpo: unknown, conta = aberto.cenario.contaC) =>
+  pedir(aberto, { metodo: 'POST', caminho: base(), conta, corpo });
 const desmarcar = (jogador: string, mes: string, conta = aberto.cenario.contaC) =>
   pedir(aberto, { metodo: 'DELETE', caminho: `${base()}/${jogador}/${mes}`, conta });
 
-async function pagamentos(jogador: string, mes: string): Promise<Array<{ lancamento_id: string | null }>> {
+async function pagamentos(
+  jogador: string,
+  mes: string,
+): Promise<Array<{ lancamento_id: string | null }>> {
   const r = await aberto.db.query<{ lancamento_id: string | null }>(
     'SELECT lancamento_id FROM pagamentos_mes WHERE grupo_id = $1 AND jogador_id = $2 AND mes = $3',
     [aberto.cenario.grupoG, jogador, mes],
@@ -30,7 +39,9 @@ async function pagamentos(jogador: string, mes: string): Promise<Array<{ lancame
   return r.rows;
 }
 
-async function lancamentosComDescricao(descricao: string): Promise<Array<{ id: string; valor_centavos: number; data: string }>> {
+async function lancamentosComDescricao(
+  descricao: string,
+): Promise<Array<{ id: string; valor_centavos: number; data: string }>> {
   const r = await aberto.db.query<{ id: string; valor_centavos: number; data: string }>(
     `SELECT id, valor_centavos, data::text AS data FROM lancamentos WHERE grupo_id = $1 AND descricao = $2`,
     [aberto.cenario.grupoG, descricao],
@@ -47,7 +58,10 @@ beforeAll(async () => {
     [cenario.grupoH, cenario.contaB],
   );
   deH = r.rows[0]!.id;
-  await db.query(`INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio) VALUES ($1, $2, '2026-01-01')`, [deH, cenario.grupoH]);
+  await db.query(
+    `INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio) VALUES ($1, $2, '2026-01-01')`,
+    [deH, cenario.grupoH],
+  );
 });
 
 afterAll(async () => {
@@ -68,17 +82,33 @@ describe('POST …/financeiro/pagamentos', () => {
     expect(await r.text()).toBe('');
 
     const mes = mesFinanceiroResposta.parse(
-      await (await pedir(aberto, { metodo: 'GET', caminho: `/grupos/${aberto.cenario.grupoG}/financeiro/mes`, conta: aberto.cenario.contaC })).json(),
+      await (
+        await pedir(aberto, {
+          metodo: 'GET',
+          caminho: `/grupos/${aberto.cenario.grupoG}/financeiro/mes`,
+          conta: aberto.cenario.contaC,
+        })
+      ).json(),
     );
     expect(mes.lancamentos).toEqual([
-      expect.objectContaining({ tipo: 'entrada', data: '2026-10-15', descricao: 'Mensalidade Toninho 10/2026', valorCentavos: 5000, mensalidade: true }),
+      expect.objectContaining({
+        tipo: 'entrada',
+        data: '2026-10-15',
+        descricao: 'Mensalidade Toninho 10/2026',
+        valorCentavos: 5000,
+        mensalidade: true,
+      }),
     ]);
     expect(mes.pagamentos.find((p) => p.jogadorId === idsG.jogadorAtivo)?.pagou).toBe(true);
     expect(await auditorias(aberto, aberto.cenario.grupoG, 'pagamento_marcado')).toBe(antes + 1);
   });
 
   it('FIN-16: o valor do corpo é recusado (o valor vem só da configuração)', async () => {
-    const r = await marcar({ jogadorId: aberto.cenario.idsG.jogadorAtivo, mes: '2026-10', valorCentavos: 1 });
+    const r = await marcar({
+      jogadorId: aberto.cenario.idsG.jogadorAtivo,
+      mes: '2026-10',
+      valorCentavos: 1,
+    });
     expect(r.status).toBe(422);
     expect(await pagamentos(aberto.cenario.idsG.jogadorAtivo, '2026-10')).toEqual([]);
   });
@@ -92,10 +122,15 @@ describe('POST …/financeiro/pagamentos', () => {
   });
 
   it('FIN-17: sem mensalidade, só o pagamento, com lancamento_id nulo', async () => {
-    await aberto.db.query('UPDATE config_financeira SET mensalidade_centavos = NULL WHERE grupo_id = $1', [aberto.cenario.grupoG]);
+    await aberto.db.query(
+      'UPDATE config_financeira SET mensalidade_centavos = NULL WHERE grupo_id = $1',
+      [aberto.cenario.grupoG],
+    );
     const r = await marcar({ jogadorId: aberto.cenario.idsG.jogadorAtivo, mes: '2026-10' });
     expect(r.status).toBe(204);
-    expect(await pagamentos(aberto.cenario.idsG.jogadorAtivo, '2026-10')).toEqual([{ lancamento_id: null }]);
+    expect(await pagamentos(aberto.cenario.idsG.jogadorAtivo, '2026-10')).toEqual([
+      { lancamento_id: null },
+    ]);
     expect(await lancamentosComDescricao('Mensalidade Toninho 10/2026')).toEqual([]);
   });
 
@@ -134,7 +169,9 @@ describe('POST …/financeiro/pagamentos', () => {
   ])('FIN-19: jogador %s dá a mesma 422 em jogadorId', async (_nome, id) => {
     const r = await marcar({ jogadorId: id(), mes: '2026-10' });
     expect(r.status).toBe(422);
-    expect(await r.json()).toMatchObject({ mensagens: { jogadorId: 'O jogador precisa estar ativo no grupo nesse mês.' } });
+    expect(await r.json()).toMatchObject({
+      mensagens: { jogadorId: 'O jogador precisa estar ativo no grupo nesse mês.' },
+    });
   });
 
   it('FIN-19: id que não é uuid dá 422 em jogadorId', async () => {
@@ -148,7 +185,10 @@ describe('POST …/financeiro/pagamentos', () => {
     expect((await marcar(corpo)).status).toBe(204);
     const r = await marcar(corpo);
     expect(r.status).toBe(409);
-    expect(await r.json()).toEqual({ erro: 'O pagamento deste mês já está marcado.', codigo: 'pagamento_ja_marcado' });
+    expect(await r.json()).toEqual({
+      erro: 'O pagamento deste mês já está marcado.',
+      codigo: 'pagamento_ja_marcado',
+    });
     expect(await lancamentosComDescricao('Mensalidade Toninho 10/2026')).toHaveLength(1);
   });
 
@@ -161,7 +201,10 @@ describe('POST …/financeiro/pagamentos', () => {
   });
 
   it('FIN-33: admin sem acesso recebe 403 e nada é gravado', async () => {
-    const r = await marcar({ jogadorId: aberto.cenario.idsG.jogadorAtivo, mes: '2026-10' }, aberto.cenario.contaO);
+    const r = await marcar(
+      { jogadorId: aberto.cenario.idsG.jogadorAtivo, mes: '2026-10' },
+      aberto.cenario.contaO,
+    );
     expect(r.status).toBe(403);
     expect(await pagamentos(aberto.cenario.idsG.jogadorAtivo, '2026-10')).toEqual([]);
   });
@@ -179,7 +222,10 @@ describe('DELETE …/financeiro/pagamentos/:jogadorId/:mes', () => {
   it('FIN-22: 204 apaga o pagamento e a entrada editada, e audita o valor editado', async () => {
     const { idsG, grupoG } = aberto.cenario;
     expect((await marcar({ jogadorId: idsG.jogadorAtivo, mes: '2026-10' })).status).toBe(204);
-    await aberto.db.query(`UPDATE lancamentos SET valor_centavos = 4500 WHERE grupo_id = $1 AND descricao = 'Mensalidade Toninho 10/2026'`, [grupoG]);
+    await aberto.db.query(
+      `UPDATE lancamentos SET valor_centavos = 4500 WHERE grupo_id = $1 AND descricao = 'Mensalidade Toninho 10/2026'`,
+      [grupoG],
+    );
 
     const r = await desmarcar(idsG.jogadorAtivo, '2026-10');
     expect(r.status).toBe(204);
@@ -196,7 +242,10 @@ describe('DELETE …/financeiro/pagamentos/:jogadorId/:mes', () => {
     const { idsG, grupoG } = aberto.cenario;
     const r = await desmarcar(idsG.jogadorHistorico, '2026-01');
     expect(r.status).toBe(204);
-    const l = await aberto.db.query('SELECT 1 FROM lancamentos WHERE grupo_id = $1 AND id = $2', [grupoG, idsG.lancamento]);
+    const l = await aberto.db.query('SELECT 1 FROM lancamentos WHERE grupo_id = $1 AND id = $2', [
+      grupoG,
+      idsG.lancamento,
+    ]);
     expect(l.rows).toEqual([]);
     // O `restaurarCaixa` do afterEach repõe o lançamento e o pagamento do cenário.
   });
@@ -224,7 +273,10 @@ describe('DELETE …/financeiro/pagamentos/:jogadorId/:mes', () => {
   it('FIN-23: dois DELETE simultâneos dão 204 e 404, nenhum 500', async () => {
     const { idsG } = aberto.cenario;
     expect((await marcar({ jogadorId: idsG.jogadorAtivo, mes: '2026-10' })).status).toBe(204);
-    const respostas = await Promise.all([desmarcar(idsG.jogadorAtivo, '2026-10'), desmarcar(idsG.jogadorAtivo, '2026-10')]);
+    const respostas = await Promise.all([
+      desmarcar(idsG.jogadorAtivo, '2026-10'),
+      desmarcar(idsG.jogadorAtivo, '2026-10'),
+    ]);
     expect(respostas.map((r) => r.status).sort()).toEqual([204, 404]);
     expect(await lancamentosComDescricao('Mensalidade Toninho 10/2026')).toEqual([]);
   });

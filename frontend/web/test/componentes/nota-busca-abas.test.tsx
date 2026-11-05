@@ -56,7 +56,13 @@ describe('CampoNota', () => {
 
   it('GEL-115: com erro, ligado por aria-describedby; axe sem violação', async () => {
     const { container } = render(
-      <CampoNota id="h4" rotulo="Chute" valor={null} aoMudar={() => {}} erro="Não foi possível salvar a nota." />,
+      <CampoNota
+        id="h4"
+        rotulo="Chute"
+        valor={null}
+        aoMudar={() => {}}
+        erro="Não foi possível salvar a nota."
+      />,
     );
     const seletor = screen.getByLabelText('Chute');
     expect(seletor.getAttribute('aria-invalid')).toBe('true');
@@ -69,7 +75,9 @@ describe('CampoNota', () => {
 describe('Busca', () => {
   it('GEL-115: campo de busca com rótulo para leitor de tela e placeholder; axe sem violação', async () => {
     const aoMudar = vi.fn();
-    const { container } = render(<Busca id="busca" rotulo="Buscar jogador" valor="" aoMudar={aoMudar} />);
+    const { container } = render(
+      <Busca id="busca" rotulo="Buscar jogador" valor="" aoMudar={aoMudar} />,
+    );
     const entrada = screen.getByRole('searchbox', { name: 'Buscar jogador' }) as HTMLInputElement;
     expect(entrada.type).toBe('search');
     expect(entrada.placeholder).toBe('Buscar jogador');

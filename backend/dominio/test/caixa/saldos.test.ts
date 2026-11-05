@@ -1,13 +1,30 @@
 import { describe, expect, it } from 'vitest';
 import { ErroEstouroCentavos } from '../../src/caixa/centavos.ts';
-import { saldoAtual, totais, type ConfigCaixa, type MovimentoCaixa } from '../../src/caixa/saldos.ts';
+import {
+  saldoAtual,
+  totais,
+  type ConfigCaixa,
+  type MovimentoCaixa,
+} from '../../src/caixa/saldos.ts';
 
 /** Saldo atual do caixa (T3; FIN-10, FIN-13, FIN-49). "Hoje" chega como parâmetro, já no fuso de São Paulo. */
 
-const config: ConfigCaixa = { mensalidadeCentavos: 7_500, saldoInicialCentavos: 35_000, dataSaldoInicial: '2026-10-01' };
+const config: ConfigCaixa = {
+  mensalidadeCentavos: 7_500,
+  saldoInicialCentavos: 35_000,
+  dataSaldoInicial: '2026-10-01',
+};
 
-const entrada = (data: string, valorCentavos: number): MovimentoCaixa => ({ tipo: 'entrada', data, valorCentavos });
-const saida = (data: string, valorCentavos: number): MovimentoCaixa => ({ tipo: 'saida', data, valorCentavos });
+const entrada = (data: string, valorCentavos: number): MovimentoCaixa => ({
+  tipo: 'entrada',
+  data,
+  valorCentavos,
+});
+const saida = (data: string, valorCentavos: number): MovimentoCaixa => ({
+  tipo: 'saida',
+  data,
+  valorCentavos,
+});
 
 describe('saldoAtual', () => {
   it('FIN-10: sem lançamentos, o saldo é o saldo inicial', () => {
@@ -15,7 +32,11 @@ describe('saldoAtual', () => {
   });
 
   it('FIN-10: saldo inicial + entradas − saídas do intervalo', () => {
-    const lancamentos = [entrada('2026-10-02', 7_500), entrada('2026-10-03', 7_500), saida('2026-10-10', 80_000)];
+    const lancamentos = [
+      entrada('2026-10-02', 7_500),
+      entrada('2026-10-03', 7_500),
+      saida('2026-10-10', 80_000),
+    ];
     expect(saldoAtual(config, lancamentos, '2026-10-15')).toBe(35_000 + 15_000 - 80_000);
   });
 
@@ -39,9 +60,13 @@ describe('saldoAtual', () => {
 
   it('FIN-10: hoje antes da data inicial devolve o saldo inicial', () => {
     const futuro: ConfigCaixa = { ...config, dataSaldoInicial: '2026-11-01' };
-    expect(saldoAtual(futuro, [entrada('2026-11-01', 7_500), entrada('2026-10-30', 7_500)], '2026-10-31')).toBe(
-      35_000,
-    );
+    expect(
+      saldoAtual(
+        futuro,
+        [entrada('2026-11-01', 7_500), entrada('2026-10-30', 7_500)],
+        '2026-10-31',
+      ),
+    ).toBe(35_000);
   });
 
   it('FIN-49: a virada de mês não muda o corte, que é sempre a data de hoje recebida', () => {
@@ -63,7 +88,9 @@ describe('saldoAtual', () => {
 
 describe('totais', () => {
   it('FIN-13: separa entradas e saídas, ambas positivas', () => {
-    expect(totais([entrada('2026-10-02', 7_500), saida('2026-10-03', 900), entrada('2026-10-04', 100)])).toEqual({
+    expect(
+      totais([entrada('2026-10-02', 7_500), saida('2026-10-03', 900), entrada('2026-10-04', 100)]),
+    ).toEqual({
       entradasCentavos: 7_600,
       saidasCentavos: 900,
     });

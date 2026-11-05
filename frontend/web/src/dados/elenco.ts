@@ -6,7 +6,12 @@ import {
   type JogadorDetalhe,
   type ListaJogadores,
 } from '@pelada/contrato/elenco';
-import type { CorrigirPeriodoCorpo, CorrigirPeriodoResposta, DataCorpo, InicioCorpo } from '@pelada/contrato/periodos';
+import type {
+  CorrigirPeriodoCorpo,
+  CorrigirPeriodoResposta,
+  DataCorpo,
+  InicioCorpo,
+} from '@pelada/contrato/periodos';
 import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { useCliente } from './ContextoCliente.tsx';
 import { caminhoGrupo, chaveGrupo } from './grupos.ts';
@@ -36,10 +41,16 @@ function caminhoJogador(grupoId: string, id: string): string {
 }
 
 /** Invalida a lista, a ficha (quando dada) e o detalhe do grupo. */
-export async function invalidarElenco(consultas: QueryClient, grupoId: string, id?: string): Promise<void> {
+export async function invalidarElenco(
+  consultas: QueryClient,
+  grupoId: string,
+  id?: string,
+): Promise<void> {
   await Promise.all([
     consultas.invalidateQueries({ queryKey: chaveJogadores(grupoId), exact: true }),
-    id === undefined ? Promise.resolve() : consultas.invalidateQueries({ queryKey: chaveJogador(grupoId, id), exact: true }),
+    id === undefined
+      ? Promise.resolve()
+      : consultas.invalidateQueries({ queryKey: chaveJogador(grupoId, id), exact: true }),
     consultas.invalidateQueries({ queryKey: chaveGrupo(grupoId), exact: true }),
   ]);
 }
@@ -80,7 +91,8 @@ export function useEditarJogador(grupoId: string, id: string) {
   const api = useCliente();
   const consultas = useQueryClient();
   return useMutation({
-    mutationFn: (dados: EditarJogadorCorpo) => api.patch<JogadorDetalhe>(caminhoJogador(grupoId, id), dados),
+    mutationFn: (dados: EditarJogadorCorpo) =>
+      api.patch<JogadorDetalhe>(caminhoJogador(grupoId, id), dados),
     onSuccess: (ficha) => {
       consultas.setQueryData(chaveJogador(grupoId, id), ficha);
       return invalidarElenco(consultas, grupoId, id);
@@ -104,7 +116,8 @@ function usePeriodo(grupoId: string, id: string, acao: 'inativar' | 'reativar') 
   const api = useCliente();
   const consultas = useQueryClient();
   return useMutation({
-    mutationFn: (dados: DataCorpo) => api.post<{ alterado: boolean }>(`${caminhoJogador(grupoId, id)}/${acao}`, dados),
+    mutationFn: (dados: DataCorpo) =>
+      api.post<{ alterado: boolean }>(`${caminhoJogador(grupoId, id)}/${acao}`, dados),
     onSuccess: () => invalidarElenco(consultas, grupoId, id),
   });
 }
@@ -122,7 +135,10 @@ export function useCorrigirPeriodo(grupoId: string, id: string) {
   const consultas = useQueryClient();
   return useMutation({
     mutationFn: ({ periodoId, dados }: { periodoId: string; dados: CorrigirPeriodoCorpo }) =>
-      api.patch<CorrigirPeriodoResposta>(`${caminhoJogador(grupoId, id)}/periodos/${encodeURIComponent(periodoId)}`, dados),
+      api.patch<CorrigirPeriodoResposta>(
+        `${caminhoJogador(grupoId, id)}/periodos/${encodeURIComponent(periodoId)}`,
+        dados,
+      ),
     onSuccess: () => invalidarElenco(consultas, grupoId, id),
   });
 }
@@ -131,7 +147,8 @@ export function useAlterarInicio(grupoId: string, id: string) {
   const api = useCliente();
   const consultas = useQueryClient();
   return useMutation({
-    mutationFn: (dados: InicioCorpo) => api.put<CorrigirPeriodoResposta>(`${caminhoJogador(grupoId, id)}/inicio`, dados),
+    mutationFn: (dados: InicioCorpo) =>
+      api.put<CorrigirPeriodoResposta>(`${caminhoJogador(grupoId, id)}/inicio`, dados),
     onSuccess: () => invalidarElenco(consultas, grupoId, id),
   });
 }

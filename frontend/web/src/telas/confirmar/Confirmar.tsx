@@ -65,8 +65,13 @@ export function Confirmar() {
       },
       (erro: unknown) => {
         if (!ativo) return;
-        if (erro instanceof ErroApi && (erro.status === 410 || erro.status === 422)) setEstado({ tipo: 'invalido' });
-        else setEstado({ tipo: 'erro', mensagem: erro instanceof ErroApi ? erro.message : MENSAGEM_REDE });
+        if (erro instanceof ErroApi && (erro.status === 410 || erro.status === 422))
+          setEstado({ tipo: 'invalido' });
+        else
+          setEstado({
+            tipo: 'erro',
+            mensagem: erro instanceof ErroApi ? erro.message : MENSAGEM_REDE,
+          });
       },
     );
     return () => {
@@ -117,7 +122,14 @@ export function Confirmar() {
   if (estado.tipo === 'erro') {
     return (
       <Casca titulo="Confirmando seu e-mail" estreita>
-        <Faixa tipo="erro" acao={<Botao variante="texto" onClick={tentarDeNovo}>Tentar de novo</Botao>}>
+        <Faixa
+          tipo="erro"
+          acao={
+            <Botao variante="texto" onClick={tentarDeNovo}>
+              Tentar de novo
+            </Botao>
+          }
+        >
           {estado.mensagem}
         </Faixa>
       </Casca>
@@ -138,7 +150,12 @@ export function Confirmar() {
   return (
     <Casca titulo="Link inválido ou vencido" estreita>
       <Faixa tipo="atencao">{TEXTO_LINK_INVALIDO}</Faixa>
-      <form className={`${estilos.formulario} ${estilos['acima-3']}`} noValidate aria-busy={reenviando || undefined} onSubmit={reenviar}>
+      <form
+        className={`${estilos.formulario} ${estilos['acima-3']}`}
+        noValidate
+        aria-busy={reenviando || undefined}
+        onSubmit={reenviar}
+      >
         {falhaReenvio ? <Faixa tipo="erro">{falhaReenvio}</Faixa> : null}
         <Campo
           id="email"

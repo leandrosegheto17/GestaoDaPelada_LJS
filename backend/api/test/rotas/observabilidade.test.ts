@@ -62,7 +62,11 @@ describe('Sentry no Worker', () => {
     const r = await worker.fetch(new Request('https://app.test/api/health'), env(), ctx);
     expect(r.status).toBe(200);
     expect(await r.json()).toEqual({ status: 'ok', versao: 'sha-observabilidade' });
-    const comErro = await criarWorker(appComErro()).fetch(new Request('https://app.test/api/teste/erro'), env(), ctx);
+    const comErro = await criarWorker(appComErro()).fetch(
+      new Request('https://app.test/api/teste/erro'),
+      env(),
+      ctx,
+    );
     expect(comErro.status).toBe(500);
     expect(espiao).not.toHaveBeenCalled();
   });
@@ -81,7 +85,11 @@ describe('Sentry no Worker', () => {
     const { embrulhar, registro } = embrulharFalso();
     const w = criarWorker(appComErro(), embrulhar);
     const dsn = 'https://chave@o0.ingest.exemplo.test/1';
-    const r = await w.fetch(new Request('https://app.test/api/health'), env({ SENTRY_DSN: dsn }), ctx);
+    const r = await w.fetch(
+      new Request('https://app.test/api/health'),
+      env({ SENTRY_DSN: dsn }),
+      ctx,
+    );
     expect(r.status).toBe(200);
     expect(registro.passaram).toBe(1);
     const opcoes = registro.opcoes[0];

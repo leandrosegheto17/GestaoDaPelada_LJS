@@ -14,7 +14,12 @@ import { hojeEmSaoPaulo } from '../../dados/hoje.ts';
 import { usePedirPrevias, usePrevia } from '../../dados/previas.ts';
 import listas from '../../componentes/Lista.module.css';
 import { rotaDoGrupo } from '../grupos/Grupos.tsx';
-import { BlocoPrevia, erroDePeriodo, recusaDaPrevia, textoRodadasConfirmadas } from './PeriodosJogador.tsx';
+import {
+  BlocoPrevia,
+  erroDePeriodo,
+  recusaDaPrevia,
+  textoRodadasConfirmadas,
+} from './PeriodosJogador.tsx';
 
 /**
  * Corrigir as datas de um período e alterar a data de início, na ficha do jogador (GEL-71 a GEL-82,
@@ -38,10 +43,14 @@ import { BlocoPrevia, erroDePeriodo, recusaDaPrevia, textoRodadasConfirmadas } f
  */
 
 export const TEXTO_DATAS_CORRIGIDAS = 'Datas corrigidas.';
-export const textoInicioAlterado = (data: string) => `Data de início alterada para ${formatarData(data)}.`;
-export const TEXTO_NADA_A_CORRIGIR = 'Nada a corrigir: a data de entrada é a data de início da pontuação (use Alterar data de início).';
-export const AJUDA_INICIO = 'A pontuação do jogador conta a partir desta data. Nada é apagado: voltar a data devolve os pontos.';
-export const textoInicioAtual = (apelido: string, data: string) => `Data de início atual de ${apelido}: ${formatarData(data)}.`;
+export const textoInicioAlterado = (data: string) =>
+  `Data de início alterada para ${formatarData(data)}.`;
+export const TEXTO_NADA_A_CORRIGIR =
+  'Nada a corrigir: a data de entrada é a data de início da pontuação (use Alterar data de início).';
+export const AJUDA_INICIO =
+  'A pontuação do jogador conta a partir desta data. Nada é apagado: voltar a data devolve os pontos.';
+export const textoInicioAtual = (apelido: string, data: string) =>
+  `Data de início atual de ${apelido}: ${formatarData(data)}.`;
 
 export function textoDoPeriodo(apelido: string, periodo: PeriodoItem, indice: number): string {
   const intervalo = `${formatarData(periodo.inicio)} → ${periodo.fim === null ? 'atual' : formatarData(periodo.fim)}`;
@@ -53,12 +62,16 @@ export function textoDoPeriodo(apelido: string, periodo: PeriodoItem, indice: nu
 
 export function ajudaSaida(proximoRetorno: string | null): string {
   const base = 'Ele deixa de aparecer nas partidas a partir desta data.';
-  return proximoRetorno === null ? base : `${base} Não pode ser depois do próximo retorno (${formatarData(proximoRetorno)}).`;
+  return proximoRetorno === null
+    ? base
+    : `${base} Não pode ser depois do próximo retorno (${formatarData(proximoRetorno)}).`;
 }
 
 export function ajudaRetornoCorrecao(saidaAnterior: string | null): string {
   const base = 'Ele volta a aparecer nas partidas a partir desta data.';
-  return saidaAnterior === null ? base : `${base} Não pode ser antes da saída anterior (${formatarData(saidaAnterior)}).`;
+  return saidaAnterior === null
+    ? base
+    : `${base} Não pode ser antes da saída anterior (${formatarData(saidaAnterior)}).`;
 }
 
 export function CorrigirPeriodo({
@@ -92,7 +105,9 @@ export function CorrigirPeriodo({
   if (comSaida) dadosPrevia.saida = saida;
   const datasValidas = (!comRetorno || ehDataReal(retorno)) && (!comSaida || ehDataReal(saida));
   const { estado, tentarDeNovo } = usePrevia(
-    aberto && (comRetorno || comSaida) && datasValidas ? () => previas.periodo(periodo.id, dadosPrevia) : null,
+    aberto && (comRetorno || comSaida) && datasValidas
+      ? () => previas.periodo(periodo.id, dadosPrevia)
+      : null,
     `${aberto ? 'aberto' : 'fechado'}|${retorno}|${saida}`,
   );
   const recusa = recusaDaPrevia(estado);
@@ -104,7 +119,12 @@ export function CorrigirPeriodo({
         <span className={listas['item__meta']} id={idExpl}>
           {TEXTO_NADA_A_CORRIGIR}
         </span>
-        <Botao variante="secundario" aria-disabled="true" aria-describedby={`${idTitulo} ${idExpl}`} onClick={() => undefined}>
+        <Botao
+          variante="secundario"
+          aria-disabled="true"
+          aria-describedby={`${idTitulo} ${idExpl}`}
+          onClick={() => undefined}
+        >
           Corrigir datas
         </Botao>
       </>
@@ -182,7 +202,11 @@ export function CorrigirPeriodo({
               <Botao variante="secundario" autoFocus onClick={() => setAberto(false)}>
                 Cancelar
               </Botao>
-              <Botao carregando={corrigir.isPending} disabled={estado.tipo !== 'pronta'} onClick={confirmar}>
+              <Botao
+                carregando={corrigir.isPending}
+                disabled={estado.tipo !== 'pronta'}
+                onClick={confirmar}
+              >
                 Confirmar novas datas
               </Botao>
             </>
@@ -211,7 +235,11 @@ export function CorrigirPeriodo({
               onChange={(e) => setSaida(e.target.value)}
             />
           ) : null}
-          <BlocoPrevia estado={estado} tentarDeNovo={tentarDeNovo} mostrar={(p) => <PreviaPeriodos previa={p} />} />
+          <BlocoPrevia
+            estado={estado}
+            tentarDeNovo={tentarDeNovo}
+            mostrar={(p) => <PreviaPeriodos previa={p} />}
+          />
         </Dialogo>
       ) : null}
     </>
@@ -281,7 +309,11 @@ export function AlterarInicio({
               <Botao variante="secundario" autoFocus onClick={() => setAberto(false)}>
                 Cancelar
               </Botao>
-              <Botao carregando={alterar.isPending} disabled={estado.tipo !== 'pronta'} onClick={confirmar}>
+              <Botao
+                carregando={alterar.isPending}
+                disabled={estado.tipo !== 'pronta'}
+                onClick={confirmar}
+              >
                 Confirmar nova data
               </Botao>
             </>
@@ -298,7 +330,11 @@ export function AlterarInicio({
             value={data}
             onChange={(e) => setData(e.target.value)}
           />
-          <BlocoPrevia estado={estado} tentarDeNovo={tentarDeNovo} mostrar={(p) => <PreviaInicio previa={p} />} />
+          <BlocoPrevia
+            estado={estado}
+            tentarDeNovo={tentarDeNovo}
+            mostrar={(p) => <PreviaInicio previa={p} />}
+          />
         </Dialogo>
       ) : null}
     </>

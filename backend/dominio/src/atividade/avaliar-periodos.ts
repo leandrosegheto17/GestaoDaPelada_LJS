@@ -38,7 +38,8 @@ export interface EntradaAvaliacao {
   hoje: Data;
 }
 
-export type ResultadoAvaliacao = { ok: true; periodos: Periodo[]; alterado: boolean } | FalhaPeriodo;
+export type ResultadoAvaliacao =
+  { ok: true; periodos: Periodo[]; alterado: boolean } | FalhaPeriodo;
 
 export const MENSAGEM_SEM_SAIDA = 'Este período não tem data de saída.';
 export const MENSAGEM_INICIO_DO_PRIMEIRO =
@@ -65,22 +66,27 @@ function mudancasDe(periodos: readonly Periodo[], operacao: OperacaoPeriodo): Mu
     return [{ indice, campo: 'saida', valor: operacao.saida }];
   }
   if (operacao.tipo === 'reativar') {
-    if (periodos.some((p) => p.fim === null)) throw new EstadoDePeriodoInvalido('O jogador já tem período aberto.');
+    if (periodos.some((p) => p.fim === null))
+      throw new EstadoDePeriodoInvalido('O jogador já tem período aberto.');
     return [{ indice: periodos.length, campo: 'retorno', valor: operacao.retorno }];
   }
   const indice = periodos.findIndex((p) => p.id === operacao.periodoId);
   if (indice < 0) throw new EstadoDePeriodoInvalido('Período inexistente.');
   const mudancas: Mudanca[] = [];
-  if (operacao.saida !== undefined) mudancas.push({ indice, campo: 'saida', valor: operacao.saida });
-  if (operacao.retorno !== undefined) mudancas.push({ indice, campo: 'retorno', valor: operacao.retorno });
+  if (operacao.saida !== undefined)
+    mudancas.push({ indice, campo: 'saida', valor: operacao.saida });
+  if (operacao.retorno !== undefined)
+    mudancas.push({ indice, campo: 'retorno', valor: operacao.retorno });
   return mudancas;
 }
 
 /** Falha de campo que não se corrige (GEL-72, GEL-73), ou nulo. Só na correção. */
 function naoCorrigivel(periodos: readonly Periodo[], m: Mudanca): FalhaPeriodo | null {
   const periodo = periodos[m.indice];
-  if (m.campo === 'saida' && periodo?.fim === null) return falha('nao-corrigivel', MENSAGEM_SEM_SAIDA, 'saida');
-  if (m.campo === 'retorno' && m.indice === 0) return falha('nao-corrigivel', MENSAGEM_INICIO_DO_PRIMEIRO, 'retorno');
+  if (m.campo === 'saida' && periodo?.fim === null)
+    return falha('nao-corrigivel', MENSAGEM_SEM_SAIDA, 'saida');
+  if (m.campo === 'retorno' && m.indice === 0)
+    return falha('nao-corrigivel', MENSAGEM_INICIO_DO_PRIMEIRO, 'retorno');
   return null;
 }
 

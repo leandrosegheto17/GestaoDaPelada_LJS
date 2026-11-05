@@ -32,8 +32,10 @@ export const AVISOS_ENTRAR: Readonly<Record<string, { tipo: TipoFaixa; texto: st
   'senha-alterada': { tipo: 'sucesso', texto: 'Senha alterada. Entre com a nova senha.' },
 };
 
-export const TEXTO_NAO_CONFIRMADO = 'Confirme seu e-mail para entrar. Enviamos o link quando você criou a conta.';
-export const TEXTO_REENVIADO = 'Se houver uma conta com esse e-mail, enviamos um novo link de confirmação.';
+export const TEXTO_NAO_CONFIRMADO =
+  'Confirme seu e-mail para entrar. Enviamos o link quando você criou a conta.';
+export const TEXTO_REENVIADO =
+  'Se houver uma conta com esse e-mail, enviamos um novo link de confirmação.';
 export const AJUDA_IPHONE = 'No iPhone, o app instalado e o Safari pedem login separadamente.';
 
 type Estado =
@@ -86,7 +88,12 @@ export function Entrar() {
   return (
     <Casca titulo="Entrar" estreita>
       {aviso ? <Faixa tipo={aviso.tipo}>{aviso.texto}</Faixa> : null}
-      <form className={estilos.formulario} noValidate aria-busy={enviando || undefined} onSubmit={entrar}>
+      <form
+        className={estilos.formulario}
+        noValidate
+        aria-busy={enviando || undefined}
+        onSubmit={entrar}
+      >
         <Campo
           id="email"
           rotulo="E-mail"
@@ -96,7 +103,13 @@ export function Entrar() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-        <CampoSenha id="senha" rotulo="Senha" autoComplete="current-password" value={senha} onChange={(e) => setSenha(e.target.value)} />
+        <CampoSenha
+          id="senha"
+          rotulo="Senha"
+          autoComplete="current-password"
+          value={senha}
+          onChange={(e) => setSenha(e.target.value)}
+        />
         <p className={estilosCampo['campo__ajuda']}>{AJUDA_IPHONE}</p>
         {estado.tipo === 'erro' ? <Faixa tipo="erro">{estado.mensagem}</Faixa> : null}
         {estado.tipo === 'nao-confirmado' ? (
@@ -106,9 +119,16 @@ export function Entrar() {
             ) : (
               <Faixa tipo="atencao">{TEXTO_NAO_CONFIRMADO}</Faixa>
             )}
-            {typeof estado.reenvio === 'object' ? <Faixa tipo="erro">{estado.reenvio.erro}</Faixa> : null}
+            {typeof estado.reenvio === 'object' ? (
+              <Faixa tipo="erro">{estado.reenvio.erro}</Faixa>
+            ) : null}
             {estado.reenvio !== 'enviado' ? (
-              <Botao variante="secundario" bloco carregando={estado.reenvio === 'enviando'} onClick={() => void reenviar()}>
+              <Botao
+                variante="secundario"
+                bloco
+                carregando={estado.reenvio === 'enviando'}
+                onClick={() => void reenviar()}
+              >
                 {estado.reenvio === 'enviando' ? 'Enviando…' : 'Enviar outro link'}
               </Botao>
             ) : null}

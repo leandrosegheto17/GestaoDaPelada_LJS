@@ -1,7 +1,11 @@
 import type pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { comoApp } from '../isolamento/apoio.ts';
-import { abrirCenarioGrupos, comoConta, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  comoConta,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * Migração das policies restritivas do financeiro (T9; FIN-38, FIN-39, FIN-42), no banco migrado, como `pelada_app`.
@@ -74,7 +78,11 @@ describe('app_acessa_financeiro', () => {
   });
 
   it('FIN-42: SECURITY DEFINER, search_path fixo, sem EXECUTE para PUBLIC e EXECUTE só para pelada_app', async () => {
-    const r = await aberto.db.query<{ definer: boolean; config: string[] | null; executores: string[] }>(
+    const r = await aberto.db.query<{
+      definer: boolean;
+      config: string[] | null;
+      executores: string[];
+    }>(
       `SELECT p.prosecdef AS definer, p.proconfig AS config,
               coalesce(array(SELECT coalesce(r.rolname::text, 'PUBLIC')
                                FROM aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) a
@@ -83,7 +91,11 @@ describe('app_acessa_financeiro', () => {
                               ORDER BY 1), '{}') AS executores
          FROM pg_proc p WHERE p.oid = 'app_acessa_financeiro(uuid)'::regprocedure`,
     );
-    expect(r.rows[0]).toEqual({ definer: true, config: ['search_path=public, pg_temp'], executores: ['pelada_app'] });
+    expect(r.rows[0]).toEqual({
+      definer: true,
+      config: ['search_path=public, pg_temp'],
+      executores: ['pelada_app'],
+    });
   });
 });
 
@@ -114,7 +126,9 @@ describe('policies restritivas do financeiro', () => {
     await expect(
       comoConta(db, cenario.contaO, (d) => inserirLancamento(d, cenario.grupoG, cenario.contaO)),
     ).rejects.toMatchObject({ code: '42501' });
-    const r = await comoConta(db, cenario.contaC, (d) => inserirLancamento(d, cenario.grupoG, cenario.contaC));
+    const r = await comoConta(db, cenario.contaC, (d) =>
+      inserirLancamento(d, cenario.grupoG, cenario.contaC),
+    );
     expect(r.rowCount).toBe(1);
   });
 

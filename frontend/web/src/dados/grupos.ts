@@ -44,7 +44,9 @@ export function caminhoGrupo(grupoId: string): string {
 export async function invalidarGrupos(consultas: QueryClient, grupoId?: string): Promise<void> {
   await Promise.all([
     consultas.invalidateQueries({ queryKey: CHAVE_GRUPOS, exact: true }),
-    grupoId === undefined ? Promise.resolve() : consultas.invalidateQueries({ queryKey: chaveGrupo(grupoId) }),
+    grupoId === undefined
+      ? Promise.resolve()
+      : consultas.invalidateQueries({ queryKey: chaveGrupo(grupoId) }),
     consultas.invalidateQueries({ queryKey: CHAVE_SESSAO }),
   ]);
 }
@@ -93,7 +95,8 @@ export function useArquivarGrupo(grupoId: string) {
   const api = useCliente();
   const consultas = useQueryClient();
   return useMutation({
-    mutationFn: (dados: ArquivarCorpo) => api.post<unknown>(`${caminhoGrupo(grupoId)}/arquivar`, dados),
+    mutationFn: (dados: ArquivarCorpo) =>
+      api.post<unknown>(`${caminhoGrupo(grupoId)}/arquivar`, dados),
     onSuccess: () => invalidarGrupos(consultas, grupoId),
   });
 }

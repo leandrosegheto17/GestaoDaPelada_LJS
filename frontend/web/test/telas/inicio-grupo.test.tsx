@@ -14,7 +14,14 @@ import {
   textoStatusEscalacao,
 } from '../../src/telas/grupo/InicioGrupo.tsx';
 import { esperarSemViolacoes } from '../apoio/axe.ts';
-import { abrirTela, erroApi, json, pendente, SESSAO_ANA, type Manipulador } from '../apoio/tela.tsx';
+import {
+  abrirTela,
+  erroApi,
+  json,
+  pendente,
+  SESSAO_ANA,
+  type Manipulador,
+} from '../apoio/tela.tsx';
 
 /**
  * Início do grupo (T60; GEL-20, GEL-114), de `t09-inicio--sucesso.html` e `t09-inicio--sem-jogadores.html` do
@@ -80,7 +87,9 @@ describe('textos das contagens', () => {
 describe('tela Início do grupo (t09)', () => {
   it('GEL-20, PAR-134 a PAR-136: mostra o nome e os 7 itens do mockup do GET /api/grupos/:grupoId; axe sem violação', async () => {
     const { container } = abrir({ 'GET /api/grupos/g-quinta': () => json(200, QUINTA) });
-    expect(await screen.findByRole('heading', { level: 1, name: 'Início do admin: Pelada de Quinta' })).toBeTruthy();
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Início do admin: Pelada de Quinta' }),
+    ).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Trocar grupo' }).getAttribute('href')).toBe('/app');
 
     const lista = screen.getByRole('list', { name: 'Gerenciar' });
@@ -102,7 +111,8 @@ describe('tela Início do grupo (t09)', () => {
 
   it('GEL-20: as contagens seguem a resposta (outros números)', async () => {
     abrir({
-      'GET /api/grupos/g-quinta': () => json(200, { ...QUINTA, jogadoresAtivos: 1, habilidades: 2, admins: 3 }),
+      'GET /api/grupos/g-quinta': () =>
+        json(200, { ...QUINTA, jogadoresAtivos: 1, habilidades: 2, admins: 3 }),
     });
     const lista = await screen.findByRole('list', { name: 'Gerenciar' });
     expect(within(lista).getByText('1 ativo')).toBeTruthy();
@@ -111,24 +121,27 @@ describe('tela Início do grupo (t09)', () => {
   });
 
   it('GEL-114: sem jogadores, o Dia de jogo pede o cadastro; axe sem violação', async () => {
-    const { container } = abrir({
-      'GET /api/grupos/g-domingo': () =>
-        json(200, {
-          ...QUINTA,
-          id: 'g-domingo',
-          nome: 'Racha de Domingo',
-          diaSemana: 'domingo',
-          frequencia: 'quinzenal',
-          horario: '09:00',
-          jogadoresAtivos: 0,
-          admins: 2,
-        }),
-    }, '/app/grupos/g-domingo');
+    const { container } = abrir(
+      {
+        'GET /api/grupos/g-domingo': () =>
+          json(200, {
+            ...QUINTA,
+            id: 'g-domingo',
+            nome: 'Racha de Domingo',
+            diaSemana: 'domingo',
+            frequencia: 'quinzenal',
+            horario: '09:00',
+            jogadoresAtivos: 0,
+            admins: 2,
+          }),
+      },
+      '/app/grupos/g-domingo',
+    );
     const dia = await screen.findByRole('region', { name: 'Dia de jogo' });
     expect(within(dia).getByText(TEXTO_SEM_JOGADORES)).toBeTruthy();
-    expect(within(dia).getByRole('link', { name: 'Cadastrar jogadores' }).getAttribute('href')).toBe(
-      '/app/grupos/g-domingo/jogadores/novo',
-    );
+    expect(
+      within(dia).getByRole('link', { name: 'Cadastrar jogadores' }).getAttribute('href'),
+    ).toBe('/app/grupos/g-domingo/jogadores/novo');
     const lista = screen.getByRole('list', { name: 'Gerenciar' });
     expect(within(lista).getByText('Nenhum cadastrado')).toBeTruthy();
     expect(within(lista).getByText('Domingo, quinzenal · 09:00 · link do ranking')).toBeTruthy();
@@ -143,7 +156,8 @@ describe('tela Início do grupo (t09)', () => {
 
     let falhar = true;
     const { container } = abrir({
-      'GET /api/grupos/g-quinta': () => (falhar ? erroApi(503, 'email_indisponivel') : json(200, QUINTA)),
+      'GET /api/grupos/g-quinta': () =>
+        falhar ? erroApi(503, 'email_indisponivel') : json(200, QUINTA),
     });
     expect(await screen.findByRole('button', { name: 'Tentar de novo' })).toBeTruthy();
     await esperarSemViolacoes(container);
@@ -166,8 +180,12 @@ describe('início do grupo com partidas (partidas-e-ranking T64)', () => {
     expect(diaAbreviado('2026-10-17')).toBe('sáb, 17/10');
     expect(textoPartidasDoMes(3, '2026-10')).toBe('3 em outubro');
     expect(textoPartidasDoMes(0, '2026-10')).toBe('Nenhuma em outubro');
-    expect(textoPontuacao({ pesosPadrao: true, pesosVigentesDesde: '2026-01-01' })).toBe('Pesos padrão');
-    expect(textoPontuacao({ pesosPadrao: false, pesosVigentesDesde: '2026-09-01' })).toBe('Vigente desde 01/09/2026');
+    expect(textoPontuacao({ pesosPadrao: true, pesosVigentesDesde: '2026-01-01' })).toBe(
+      'Pesos padrão',
+    );
+    expect(textoPontuacao({ pesosPadrao: false, pesosVigentesDesde: '2026-09-01' })).toBe(
+      'Vigente desde 01/09/2026',
+    );
     expect(textoUso(12)).toBe('Esta semana: 12 aparelhos');
   });
 
@@ -180,7 +198,8 @@ describe('início do grupo com partidas (partidas-e-ranking T64)', () => {
 
   it('PAR-133: com partida na data sugerida, o botão diz "Editar partida de qui, 15/10" e abre /partidas/2026-10-15', async () => {
     abrir({
-      'GET /api/grupos/g-quinta': () => json(200, { ...QUINTA, dataSugeridaPartida: '2026-10-15', partidaNaDataSugerida: true }),
+      'GET /api/grupos/g-quinta': () =>
+        json(200, { ...QUINTA, dataSugeridaPartida: '2026-10-15', partidaNaDataSugerida: true }),
     });
     const dia = await screen.findByRole('region', { name: 'Dia de jogo' });
     const botao = within(dia).getByRole('link', { name: 'Editar partida de qui, 15/10' });
@@ -191,24 +210,32 @@ describe('início do grupo com partidas (partidas-e-ranking T64)', () => {
   it('PAR-134: sem partidas no mês, "Nenhuma em outubro"', async () => {
     abrir({ 'GET /api/grupos/g-quinta': () => json(200, { ...QUINTA, partidasNoMes: 0 }) });
     const lista = await screen.findByRole('list', { name: 'Gerenciar' });
-    expect(within(lista).getByRole('link', { name: /Partidas/ }).textContent).toBe('PartidasNenhuma em outubro');
+    expect(within(lista).getByRole('link', { name: /Partidas/ }).textContent).toBe(
+      'PartidasNenhuma em outubro',
+    );
   });
 
   it('PAR-135: pesos padrão mostra "Pesos padrão"', async () => {
     abrir({ 'GET /api/grupos/g-quinta': () => json(200, { ...QUINTA, pesosPadrao: true }) });
     const lista = await screen.findByRole('list', { name: 'Gerenciar' });
-    expect(within(lista).getByRole('link', { name: /Pontuação/ }).textContent).toBe('PontuaçãoPesos padrão');
+    expect(within(lista).getByRole('link', { name: /Pontuação/ }).textContent).toBe(
+      'PontuaçãoPesos padrão',
+    );
   });
 
   it('PAR-136: 1 aparelho mostra "Esta semana: 1 aparelho"; 0 mostra "Sem uso registrado"', async () => {
     abrir({ 'GET /api/grupos/g-quinta': () => json(200, { ...QUINTA, aparelhosNaSemana: 1 }) });
     let lista = await screen.findByRole('list', { name: 'Gerenciar' });
-    expect(within(lista).getByRole('link', { name: /Uso do app/ }).textContent).toBe('Uso do appEsta semana: 1 aparelho');
+    expect(within(lista).getByRole('link', { name: /Uso do app/ }).textContent).toBe(
+      'Uso do appEsta semana: 1 aparelho',
+    );
     cleanup();
 
     abrir({ 'GET /api/grupos/g-quinta': () => json(200, { ...QUINTA, aparelhosNaSemana: 0 }) });
     lista = await screen.findByRole('list', { name: 'Gerenciar' });
-    expect(within(lista).getByRole('link', { name: /Uso do app/ }).textContent).toBe('Uso do appSem uso registrado');
+    expect(within(lista).getByRole('link', { name: /Uso do app/ }).textContent).toBe(
+      'Uso do appSem uso registrado',
+    );
   });
 
   // simulador T51 (autorização de 2026-11-04 no STATE.md; SIM-08 substitui a omissão da PAR-160): o item Simulador
@@ -225,14 +252,18 @@ describe('início do grupo com partidas (partidas-e-ranking T64)', () => {
   it('PAR-36, SIM-73: o aviso da escalação confirmada aparece no início', async () => {
     const t = abrir({ 'GET /api/grupos/g-quinta': () => json(200, QUINTA) });
     await screen.findByRole('list', { name: 'Gerenciar' });
-    await t.roteador.navigate('/app/grupos/g-quinta', { state: { aviso: 'Escalação de 22/10 confirmada.' } });
+    await t.roteador.navigate('/app/grupos/g-quinta', {
+      state: { aviso: 'Escalação de 22/10 confirmada.' },
+    });
     expect(await screen.findByText('Escalação de 22/10 confirmada.')).toBeDefined();
   });
 
   it('PAR-36: o aviso da navegação aparece no início ("Partida de dd/mm salva.")', async () => {
     const t = abrir({ 'GET /api/grupos/g-quinta': () => json(200, QUINTA) });
     await screen.findByRole('list', { name: 'Gerenciar' });
-    await t.roteador.navigate('/app/grupos/g-quinta', { state: { aviso: 'Partida de 22/10 salva.' } });
+    await t.roteador.navigate('/app/grupos/g-quinta', {
+      state: { aviso: 'Partida de 22/10 salva.' },
+    });
     expect(await screen.findByText('Partida de 22/10 salva.')).toBeDefined();
   });
 });
@@ -242,7 +273,9 @@ describe('item Simulador no início do grupo (simulador T51)', () => {
     expect(textoItemSimulador('2026-10-22')).toBe('Simulador: qui, 22/10');
     expect(textoItemSimulador('2026-10-25')).toBe('Simulador: dom, 25/10');
     expect(textoStatusEscalacao('2026-10-22', true)).toBe('Escalação de 22/10 confirmada');
-    expect(textoStatusEscalacao('2026-10-22', false)).toBe('Nenhuma escalação confirmada para 22/10');
+    expect(textoStatusEscalacao('2026-10-22', false)).toBe(
+      'Nenhuma escalação confirmada para 22/10',
+    );
   });
 
   it('SIM-84: o item "Simulador: qui, 22/10" abre /app/grupos/g-quinta/simulador', async () => {
@@ -257,7 +290,12 @@ describe('item Simulador no início do grupo (simulador T51)', () => {
   it('SIM-08: o item usa o próximo dia de jogo, não a data sugerida da partida', async () => {
     abrir({
       'GET /api/grupos/g-quinta': () =>
-        json(200, { ...QUINTA, dataSugeridaPartida: '2026-10-15', partidaNaDataSugerida: true, proximoDiaDeJogo: '2026-10-22' }),
+        json(200, {
+          ...QUINTA,
+          dataSugeridaPartida: '2026-10-15',
+          partidaNaDataSugerida: true,
+          proximoDiaDeJogo: '2026-10-22',
+        }),
     });
     const dia = await screen.findByRole('region', { name: 'Dia de jogo' });
     expect(within(dia).getByRole('link', { name: 'Editar partida de qui, 15/10' })).toBeTruthy();
@@ -265,7 +303,9 @@ describe('item Simulador no início do grupo (simulador T51)', () => {
   });
 
   it('SIM-08: com escalação, "Escalação de 22/10 confirmada" abaixo do item; axe sem violação', async () => {
-    const { container } = abrir({ 'GET /api/grupos/g-quinta': () => json(200, { ...QUINTA, escalacaoNoProximoDia: true }) });
+    const { container } = abrir({
+      'GET /api/grupos/g-quinta': () => json(200, { ...QUINTA, escalacaoNoProximoDia: true }),
+    });
     const dia = await screen.findByRole('region', { name: 'Dia de jogo' });
     const status = within(dia).getByText('Escalação de 22/10 confirmada');
     expect(within(dia).queryByText('Nenhuma escalação confirmada para 22/10')).toBeNull();
@@ -276,7 +316,9 @@ describe('item Simulador no início do grupo (simulador T51)', () => {
   });
 
   it('SIM-08: sem escalação, "Nenhuma escalação confirmada para 22/10"', async () => {
-    abrir({ 'GET /api/grupos/g-quinta': () => json(200, { ...QUINTA, escalacaoNoProximoDia: false }) });
+    abrir({
+      'GET /api/grupos/g-quinta': () => json(200, { ...QUINTA, escalacaoNoProximoDia: false }),
+    });
     const dia = await screen.findByRole('region', { name: 'Dia de jogo' });
     expect(within(dia).getByText('Nenhuma escalação confirmada para 22/10')).toBeTruthy();
     expect(within(dia).queryByText('Escalação de 22/10 confirmada')).toBeNull();

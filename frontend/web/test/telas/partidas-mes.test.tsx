@@ -1,6 +1,10 @@
 import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
-import { PaginaPartidas, textoContagem, tituloDaPartida } from '../../src/telas/partidas/PaginaPartidas.tsx';
+import {
+  PaginaPartidas,
+  textoContagem,
+  tituloDaPartida,
+} from '../../src/telas/partidas/PaginaPartidas.tsx';
 import { esperarSemViolacoes } from '../apoio/axe.ts';
 import { abrirTela, json, pendente, SESSAO_ANA, type Manipulador } from '../apoio/tela.tsx';
 
@@ -23,7 +27,11 @@ function mes(extra: Record<string, unknown> = {}) {
     hoje: '2026-10-22',
     navegacao: { mesAnterior: '2026-09', mesSeguinte: null },
     partidas: [
-      { data: '2026-10-15', choveu: false, contagem: { presentes: 15, lesionados: 0, expulsos: 1 } },
+      {
+        data: '2026-10-15',
+        choveu: false,
+        contagem: { presentes: 15, lesionados: 0, expulsos: 1 },
+      },
       { data: '2026-10-08', choveu: true, contagem: { presentes: 15, lesionados: 0, expulsos: 1 } },
     ],
     ...extra,
@@ -31,7 +39,15 @@ function mes(extra: Record<string, unknown> = {}) {
 }
 
 function abrir(api: Record<string, Manipulador>, caminho = '/app/grupos/g-quinta/partidas') {
-  return abrirTela(caminho, { 'GET /api/sessao': () => json(200, SESSAO_ANA), 'GET /api/grupos/g-quinta': () => pendente(), ...api }, rotas);
+  return abrirTela(
+    caminho,
+    {
+      'GET /api/sessao': () => json(200, SESSAO_ANA),
+      'GET /api/grupos/g-quinta': () => pendente(),
+      ...api,
+    },
+    rotas,
+  );
 }
 
 function metaDe(titulo: string): string {
@@ -59,7 +75,9 @@ describe('Partidas do mês (t10)', () => {
   it('PAR-42: da mais recente para a mais antiga, cada linha abre a edição da partida', async () => {
     abrir({ [API]: () => json(200, mes()) });
     await screen.findByText('Quinta, 15/10/2026');
-    const links = screen.getAllByRole('link').filter((l) => l.getAttribute('href')?.includes('/partidas/2026-'));
+    const links = screen
+      .getAllByRole('link')
+      .filter((l) => l.getAttribute('href')?.includes('/partidas/2026-'));
     expect(links.map((l) => l.getAttribute('href'))).toEqual([
       '/app/grupos/g-quinta/partidas/2026-10-15',
       '/app/grupos/g-quinta/partidas/2026-10-08',
@@ -68,7 +86,9 @@ describe('Partidas do mês (t10)', () => {
 
   it('PAR-43: mês vazio mostra "Nenhuma partida neste mês." e "Nova partida"', async () => {
     abrir({ [API]: () => json(200, mes({ partidas: [] })) });
-    expect(await screen.findByRole('heading', { name: 'Nenhuma partida neste mês.' })).toBeDefined();
+    expect(
+      await screen.findByRole('heading', { name: 'Nenhuma partida neste mês.' }),
+    ).toBeDefined();
     const nova = screen.getByRole('link', { name: 'Nova partida' });
     expect(nova.getAttribute('href')).toBe('/app/grupos/g-quinta/partidas/nova');
   });
@@ -82,7 +102,9 @@ describe('Partidas do mês (t10)', () => {
   it('navegação: "Mês seguinte" desabilitado com nulo; "Mês anterior" troca o ?mes=', async () => {
     const t = abrir({ [API]: () => json(200, mes()) });
     await screen.findByRole('heading', { name: 'outubro de 2026' });
-    expect((screen.getByRole('button', { name: 'Mês seguinte' }) as HTMLButtonElement).disabled).toBe(true);
+    expect(
+      (screen.getByRole('button', { name: 'Mês seguinte' }) as HTMLButtonElement).disabled,
+    ).toBe(true);
     fireEvent.click(screen.getByRole('button', { name: 'Mês anterior, setembro de 2026' }));
     await waitFor(() => expect(t.local()).toBe('/app/grupos/g-quinta/partidas?mes=2026-09'));
   });
@@ -90,7 +112,9 @@ describe('Partidas do mês (t10)', () => {
   it('o "Início" volta ao início do grupo', async () => {
     abrir({ [API]: () => json(200, mes()) });
     await screen.findByText('Quinta, 15/10/2026');
-    expect(screen.getByRole('link', { name: 'Início' }).getAttribute('href')).toBe('/app/grupos/g-quinta');
+    expect(screen.getByRole('link', { name: 'Início' }).getAttribute('href')).toBe(
+      '/app/grupos/g-quinta',
+    );
   });
 
   it('axe sem violações', async () => {

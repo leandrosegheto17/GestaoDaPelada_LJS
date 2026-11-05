@@ -32,7 +32,9 @@ async function alterarFinanceiro(
   opcoes: OpcoesAlterarFinanceiro = {},
 ): Promise<ResultadoAlterarFinanceiro> {
   if (!opcoes.pularChecagemDaPropriaConta) {
-    const propria = await sql<{ propria: boolean }>`SELECT ${alvoId}::uuid = app_conta_id() AS propria`.execute(db);
+    const propria = await sql<{
+      propria: boolean;
+    }>`SELECT ${alvoId}::uuid = app_conta_id() AS propria`.execute(db);
     if (propria.rows[0]?.propria === true) return { resultado: 'propria_conta' };
   }
 
@@ -42,7 +44,8 @@ async function alterarFinanceiro(
        FOR UPDATE`.execute(db);
   const vinculo = atual.rows[0];
   if (!vinculo) return { resultado: 'nao_encontrado' };
-  if (vinculo.acessa_financeiro === valor) return { resultado: 'ok', mudou: false, lista: await admins.listar(db, grupoId) };
+  if (vinculo.acessa_financeiro === valor)
+    return { resultado: 'ok', mudou: false, lista: await admins.listar(db, grupoId) };
 
   const r = await sql`
     UPDATE vinculos_admin SET acessa_financeiro = ${valor}

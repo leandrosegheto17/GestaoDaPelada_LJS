@@ -68,10 +68,10 @@ async function criarAvulso(): Promise<void> {
 }
 
 async function darAcessoAO(): Promise<void> {
-  await aberto.db.query('UPDATE vinculos_admin SET acessa_financeiro = true WHERE grupo_id = $1 AND conta_id = $2', [
-    aberto.cenario.grupoG,
-    aberto.cenario.contaO,
-  ]);
+  await aberto.db.query(
+    'UPDATE vinculos_admin SET acessa_financeiro = true WHERE grupo_id = $1 AND conta_id = $2',
+    [aberto.cenario.grupoG, aberto.cenario.contaO],
+  );
 }
 
 const ESCRITAS: Escrita[] = [
@@ -79,7 +79,11 @@ const ESCRITAS: Escrita[] = [
     acao: 'financeiro_config_alterada',
     metodo: 'PUT',
     caminho: () => `${g()}/financeiro/config`,
-    corpo: () => ({ mensalidadeCentavos: 6000, saldoInicialCentavos: -2500, dataSaldoInicial: '2026-01-01' }),
+    corpo: () => ({
+      mensalidadeCentavos: 6000,
+      saldoInicialCentavos: -2500,
+      dataSaldoInicial: '2026-01-01',
+    }),
     status: 200,
   },
   {
@@ -99,14 +103,24 @@ const ESCRITAS: Escrita[] = [
     acao: 'lancamento_criado',
     metodo: 'POST',
     caminho: () => `${g()}/financeiro/lancamentos`,
-    corpo: () => ({ tipo: 'saida', data: '2026-10-12', descricao: DESCRICAO, valorCentavos: 15000 }),
+    corpo: () => ({
+      tipo: 'saida',
+      data: '2026-10-12',
+      descricao: DESCRICAO,
+      valorCentavos: 15000,
+    }),
     status: 201,
   },
   {
     acao: 'lancamento_editado',
     metodo: 'PUT',
     caminho: () => `${g()}/financeiro/lancamentos/${avulso}`,
-    corpo: () => ({ tipo: 'saida', data: '2026-10-03', descricao: `${DESCRICAO} 2`, valorCentavos: 5432 }),
+    corpo: () => ({
+      tipo: 'saida',
+      data: '2026-10-03',
+      descricao: `${DESCRICAO} 2`,
+      valorCentavos: 5432,
+    }),
     preparar: criarAvulso,
     status: 200,
   },
@@ -147,11 +161,23 @@ function enviar(e: Escrita): Promise<Response> {
 async function retrato(): Promise<string> {
   const { db, cenario } = aberto;
   const partes = await Promise.all([
-    db.query('SELECT mensalidade_centavos, saldo_inicial_centavos, data_saldo_inicial::text FROM config_financeira WHERE grupo_id = $1', [cenario.grupoG]),
-    db.query('SELECT id, tipo, data::text, descricao, valor_centavos FROM lancamentos WHERE grupo_id = $1 ORDER BY id', [cenario.grupoG]),
-    db.query('SELECT jogador_id, mes, lancamento_id FROM pagamentos_mes WHERE grupo_id = $1 ORDER BY jogador_id, mes', [cenario.grupoG]),
+    db.query(
+      'SELECT mensalidade_centavos, saldo_inicial_centavos, data_saldo_inicial::text FROM config_financeira WHERE grupo_id = $1',
+      [cenario.grupoG],
+    ),
+    db.query(
+      'SELECT id, tipo, data::text, descricao, valor_centavos FROM lancamentos WHERE grupo_id = $1 ORDER BY id',
+      [cenario.grupoG],
+    ),
+    db.query(
+      'SELECT jogador_id, mes, lancamento_id FROM pagamentos_mes WHERE grupo_id = $1 ORDER BY jogador_id, mes',
+      [cenario.grupoG],
+    ),
     db.query('SELECT count(*)::int AS n FROM auditoria WHERE grupo_id = $1', [cenario.grupoG]),
-    db.query('SELECT conta_id, acessa_financeiro FROM vinculos_admin WHERE grupo_id = $1 ORDER BY conta_id', [cenario.grupoG]),
+    db.query(
+      'SELECT conta_id, acessa_financeiro FROM vinculos_admin WHERE grupo_id = $1 ORDER BY conta_id',
+      [cenario.grupoG],
+    ),
   ]);
   return JSON.stringify(partes.map((p) => p.rows));
 }
@@ -173,7 +199,12 @@ async function falharAuditoria(acao: AcaoDoFinanceiro): Promise<() => Promise<vo
 
 /** As linhas de auditoria do financeiro de G, como texto (sem `momento`) e com o `resumo` à parte. */
 async function linhasDoFinanceiro() {
-  const r = await aberto.db.query<{ texto: string; acao: string; resumo: unknown; autor_conta_id: string }>(
+  const r = await aberto.db.query<{
+    texto: string;
+    acao: string;
+    resumo: unknown;
+    autor_conta_id: string;
+  }>(
     // Sem `momento` (microssegundos) e sem o `id` sequencial: os dois poderiam conter "1987" por acaso.
     `SELECT (to_jsonb(a) - 'momento' - 'id')::text AS texto, a.acao, a.resumo, a.autor_conta_id
        FROM auditoria a
@@ -187,12 +218,15 @@ async function linhasDoFinanceiro() {
 function folhasProibidas(valor: unknown, caminho = 'resumo'): string[] {
   if (valor === null || typeof valor === 'number' || typeof valor === 'boolean') return [];
   if (typeof valor === 'string') {
-    const ok = RE_UUID_INTEIRO.test(valor) || RE_DATA.test(valor) || RE_MES.test(valor) || TIPOS.has(valor);
+    const ok =
+      RE_UUID_INTEIRO.test(valor) || RE_DATA.test(valor) || RE_MES.test(valor) || TIPOS.has(valor);
     return ok ? [] : [`${caminho} = ${JSON.stringify(valor)}`];
   }
   if (Array.isArray(valor)) return valor.flatMap((v, i) => folhasProibidas(v, `${caminho}[${i}]`));
   if (typeof valor === 'object') {
-    return Object.entries(valor as Record<string, unknown>).flatMap(([k, v]) => folhasProibidas(v, `${caminho}.${k}`));
+    return Object.entries(valor as Record<string, unknown>).flatMap(([k, v]) =>
+      folhasProibidas(v, `${caminho}.${k}`),
+    );
   }
   return [`${caminho}: tipo ${typeof valor}`];
 }
@@ -208,7 +242,9 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await aberto?.db.query('DROP TRIGGER IF EXISTS teste_falhar_auditoria ON auditoria').catch(() => undefined);
+  await aberto?.db
+    .query('DROP TRIGGER IF EXISTS teste_falhar_auditoria ON auditoria')
+    .catch(() => undefined);
   await aberto?.fechar();
 });
 
@@ -255,7 +291,8 @@ describe('auditoria sem dado pessoal (FIN-44)', () => {
     for (const e of ESCRITAS) {
       await e.preparar?.();
       const r = await enviar(e);
-      if (r.status !== e.status) throw new Error(`${e.acao}: esperava ${e.status}, veio ${r.status}: ${await r.text()}`);
+      if (r.status !== e.status)
+        throw new Error(`${e.acao}: esperava ${e.status}, veio ${r.status}: ${await r.text()}`);
     }
   });
 

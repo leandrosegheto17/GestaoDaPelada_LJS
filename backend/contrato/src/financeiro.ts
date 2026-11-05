@@ -22,7 +22,7 @@ const MENSAGEM_DATA_INVALIDA = 'Informe uma data válida.';
 const MENSAGEM_VALOR = 'Informe um valor inteiro em centavos dentro do limite.';
 
 /** Inteiro seguro na faixa, em centavos (também usado pelo contrato dos lançamentos, T8). */
-export const centavos =(min: number, max: number) =>
+export const centavos = (min: number, max: number) =>
   z
     .number({ error: MENSAGEM_VALOR })
     .int(MENSAGEM_VALOR)
@@ -45,8 +45,14 @@ export const mesFinanceiro = z
 /** `PUT .../financeiro/config`: mensalidade obrigatória no corpo (nulo explícito = sem mensalidade). */
 export const configFinanceiraCorpo = z
   .object({
-    mensalidadeCentavos: centavos(LIMITES_FINANCEIRO.valorMin, LIMITES_FINANCEIRO.valorMax).nullable(),
-    saldoInicialCentavos: centavos(LIMITES_FINANCEIRO.saldoInicialMin, LIMITES_FINANCEIRO.saldoInicialMax),
+    mensalidadeCentavos: centavos(
+      LIMITES_FINANCEIRO.valorMin,
+      LIMITES_FINANCEIRO.valorMax,
+    ).nullable(),
+    saldoInicialCentavos: centavos(
+      LIMITES_FINANCEIRO.saldoInicialMin,
+      LIMITES_FINANCEIRO.saldoInicialMax,
+    ),
     dataSaldoInicial: dataFinanceira,
   })
   .strict();
@@ -76,7 +82,9 @@ export type TipoLancamento = z.infer<typeof tipoLancamento>;
 export const idResposta = z.string().min(1);
 
 /** Pagamento na lista do mês: só jogadores ativos no mês (FIN-12). */
-export const pagamentoDoMes = z.object({ jogadorId: idResposta, apelido: z.string(), pagou: z.boolean() }).strict();
+export const pagamentoDoMes = z
+  .object({ jogadorId: idResposta, apelido: z.string(), pagou: z.boolean() })
+  .strict();
 
 /** Lançamento na lista do mês; `mensalidade` marca o vinculado a um pagamento (FIN-14). */
 export const lancamentoDoMes = z
@@ -105,7 +113,9 @@ export const mesFinanceiroResposta = z
   .object({
     mes: mesFinanceiro,
     hoje: dataFinanceira,
-    navegacao: z.object({ mesAnterior: mesFinanceiro.nullable(), mesSeguinte: mesFinanceiro.nullable() }).strict(),
+    navegacao: z
+      .object({ mesAnterior: mesFinanceiro.nullable(), mesSeguinte: mesFinanceiro.nullable() })
+      .strict(),
     config: configFinanceiraResposta.nullable(),
     saldoAtualCentavos: saldoResposta.nullable(),
     resumoMes: resumoDoMes.nullable(),

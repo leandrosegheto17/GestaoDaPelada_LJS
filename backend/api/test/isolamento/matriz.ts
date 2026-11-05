@@ -46,7 +46,10 @@ export const MATRIZ: readonly CasoMatriz[] = [
  * `ENABLE` ou sem `FORCE ROW LEVEL SECURITY`, sem caso na matriz, ou caso da matriz sem
  * tabela no catálogo. Lista vazia = coberto.
  */
-export async function problemasDeCobertura(db: pg.Client, matriz: readonly CasoMatriz[] = MATRIZ): Promise<string[]> {
+export async function problemasDeCobertura(
+  db: pg.Client,
+  matriz: readonly CasoMatriz[] = MATRIZ,
+): Promise<string[]> {
   const tabelas = await tabelasComGrupo(db);
   const flags = await db.query<{ tabela: string; habilitada: boolean; forcada: boolean }>(
     `SELECT c.relname::text AS tabela, c.relrowsecurity AS habilitada, c.relforcerowsecurity AS forcada
@@ -64,7 +67,8 @@ export async function problemasDeCobertura(db: pg.Client, matriz: readonly CasoM
     if (!f?.forcada) problemas.push(`${tabela}: sem FORCE ROW LEVEL SECURITY`);
     const caso = casos.get(tabela);
     if (!caso) problemas.push(`${tabela}: sem caso na matriz`);
-    else if (caso.coluna !== coluna) problemas.push(`${tabela}: a matriz usa a coluna ${caso.coluna}, o catálogo ${coluna}`);
+    else if (caso.coluna !== coluna)
+      problemas.push(`${tabela}: a matriz usa a coluna ${caso.coluna}, o catálogo ${coluna}`);
   }
   const doCatalogo = new Set(tabelas.map((t) => t.tabela));
   for (const { tabela } of matriz) {

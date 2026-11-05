@@ -10,7 +10,10 @@ const CRYPT = ['cry', 'pt('].join('');
 describe('checagem sem-e-dono', () => {
   it(`ACE-63: arquivo de exemplo em rotas/ com a coluna de dono reprova`, () => {
     const p = checarDonoEHash([
-      { caminho: 'backend/api/src/entrada/rotas/exemplo.ts', conteudo: `// ok\nconst x = linha.${DONO};\n` },
+      {
+        caminho: 'backend/api/src/entrada/rotas/exemplo.ts',
+        conteudo: `// ok\nconst x = linha.${DONO};\n`,
+      },
     ]);
     expect(p).toHaveLength(1);
     expect(p[0]).toMatch(/^backend\/api\/src\/entrada\/rotas\/exemplo\.ts:2: cita a coluna/);
@@ -38,7 +41,11 @@ describe('checagem sem-e-dono', () => {
   });
 
   it('ACE-63: a coluna de dono num nome maior (outra palavra) não reprova', () => {
-    expect(checarDonoEHash([{ caminho: 'backend/api/src/entrada/x.ts', conteudo: `const ${DONO}s_x = 1;` }])).toEqual([]);
+    expect(
+      checarDonoEHash([
+        { caminho: 'backend/api/src/entrada/x.ts', conteudo: `const ${DONO}s_x = 1;` },
+      ]),
+    ).toEqual([]);
   });
 
   it(`crypt( num repositório reprova`, () => {
@@ -55,7 +62,10 @@ describe('checagem sem-e-dono', () => {
   it('biblioteca de hash de senha na API ou no front reprova', () => {
     expect(
       checarDonoEHash([
-        { caminho: 'backend/api/src/infraestrutura/x.ts', conteudo: `import bcrypt from 'bcryptjs';` },
+        {
+          caminho: 'backend/api/src/infraestrutura/x.ts',
+          conteudo: `import bcrypt from 'bcryptjs';`,
+        },
         { caminho: 'frontend/web/src/x.ts', conteudo: `import { hash } from "argon2";` },
       ]),
     ).toHaveLength(2);
@@ -64,7 +74,10 @@ describe('checagem sem-e-dono', () => {
   it('crypto.subtle e decrypt( não são o crypt do bcrypt', () => {
     expect(
       checarDonoEHash([
-        { caminho: 'backend/api/src/infraestrutura/x.ts', conteudo: `await crypto.subtle.digest('SHA-256', b);\ndecrypt(x);` },
+        {
+          caminho: 'backend/api/src/infraestrutura/x.ts',
+          conteudo: `await crypto.subtle.digest('SHA-256', b);\ndecrypt(x);`,
+        },
       ]),
     ).toEqual([]);
   });
@@ -72,7 +85,10 @@ describe('checagem sem-e-dono', () => {
   it('fora das pastas conferidas (testes, scripts) nada reprova', () => {
     expect(
       checarDonoEHash([
-        { caminho: 'backend/api/test/isolamento/cenario-conta.ts', conteudo: `${CRYPT}$2, gen_salt('bf', 4)) ${DONO}` },
+        {
+          caminho: 'backend/api/test/isolamento/cenario-conta.ts',
+          conteudo: `${CRYPT}$2, gen_salt('bf', 4)) ${DONO}`,
+        },
         { caminho: 'backend/scripts/src/seed.ts', conteudo: DONO },
       ]),
     ).toEqual([]);

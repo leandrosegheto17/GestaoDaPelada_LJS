@@ -43,7 +43,10 @@ export const CAMPOS_PROIBIDOS_PUBLICO = [
 /** Os caminhos (`linhas.0.jogadorId`) dos campos proibidos achados em qualquer nível de `valor`. */
 export function camposProibidosEm(valor: unknown, caminho = ''): string[] {
   const proibidos: readonly string[] = CAMPOS_PROIBIDOS_PUBLICO;
-  if (Array.isArray(valor)) return valor.flatMap((item, i) => camposProibidosEm(item, caminho ? `${caminho}.${i}` : `${i}`));
+  if (Array.isArray(valor))
+    return valor.flatMap((item, i) =>
+      camposProibidosEm(item, caminho ? `${caminho}.${i}` : `${i}`),
+    );
   if (valor === null || typeof valor !== 'object') return [];
   return Object.entries(valor).flatMap(([chave, filho]) => {
     const aqui = caminho ? `${caminho}.${chave}` : chave;
@@ -56,7 +59,10 @@ export const MENSAGEM_MES_FORA_DO_HISTORICO = 'Mês fora do histórico do grupo.
 
 /** Query de `GET /api/publico/:slug/ranking` e `/pdf` (PAR-65, PAR-100): sem `mes`, o mês de hoje. */
 export const consultaMesPublico = z.strictObject({
-  mes: z.string({ error: MENSAGEM_MES_PUBLICO }).regex(FORMATO_MES, MENSAGEM_MES_PUBLICO).optional(),
+  mes: z
+    .string({ error: MENSAGEM_MES_PUBLICO })
+    .regex(FORMATO_MES, MENSAGEM_MES_PUBLICO)
+    .optional(),
 });
 export type ConsultaMesPublico = z.infer<typeof consultaMesPublico>;
 
@@ -71,7 +77,9 @@ export type SituacaoRodada = (typeof SITUACOES_RODADA)[number];
 /** Rodada: pontos nulos se e só se `fora`. */
 export const rodadaPublica = z
   .strictObject({ situacao: z.enum(SITUACOES_RODADA), pontos: inteiro.nullable() })
-  .refine((r) => (r.situacao === 'fora') === (r.pontos === null), { error: 'Pontos nulos só na rodada "–".' });
+  .refine((r) => (r.situacao === 'fora') === (r.pontos === null), {
+    error: 'Pontos nulos só na rodada "–".',
+  });
 export type RodadaPublica = z.infer<typeof rodadaPublica>;
 
 /** Linha do ranking e do PDF (PAR-70, PAR-95): `posicao` é a colocação, nunca a posição em campo. */
@@ -87,7 +95,13 @@ export type LinhaPublica = z.infer<typeof linhaPublica>;
 /** `GET /api/publico/:slug/ranking` (PAR-64, PAR-70): uma rodada por partida do mês em cada linha. */
 export const rankingPublico = z
   .strictObject({
-    grupo: z.strictObject({ nome: z.string(), slug: z.string(), diaSemana, frequencia, horario: z.string() }),
+    grupo: z.strictObject({
+      nome: z.string(),
+      slug: z.string(),
+      diaSemana,
+      frequencia,
+      horario: z.string(),
+    }),
     mes: mesTexto,
     hoje: dataTexto,
     geradoEm: z.iso.datetime({ offset: true }),

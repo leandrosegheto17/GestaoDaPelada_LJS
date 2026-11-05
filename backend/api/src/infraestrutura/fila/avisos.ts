@@ -13,7 +13,10 @@ import { mensagemAviso, type MensagemAviso } from '@pelada/contrato/fila-avisos'
 
 /** O que o projeto usa do binding de produtor da Cloudflare Queues. */
 export interface FilaAvisos {
-  send(corpo: MensagemAviso, opcoes?: { contentType?: 'json'; delaySeconds?: number }): Promise<void>;
+  send(
+    corpo: MensagemAviso,
+    opcoes?: { contentType?: 'json'; delaySeconds?: number },
+  ): Promise<void>;
 }
 
 export class ErroFilaIndisponivel extends Error {
@@ -40,8 +43,16 @@ export async function agendarAviso(
   const corpo = mensagemAviso.parse(mensagem);
   const fila = env.FILA_AVISOS;
   if (!fila) throw new ErroFilaIndisponivel();
-  const atraso = opcoes.aposSegundos === undefined ? undefined : Math.min(Math.max(0, Math.ceil(opcoes.aposSegundos)), ATRASO_MAXIMO_S);
-  await fila.send(corpo, atraso === undefined || atraso === 0 ? { contentType: 'json' } : { contentType: 'json', delaySeconds: atraso });
+  const atraso =
+    opcoes.aposSegundos === undefined
+      ? undefined
+      : Math.min(Math.max(0, Math.ceil(opcoes.aposSegundos)), ATRASO_MAXIMO_S);
+  await fila.send(
+    corpo,
+    atraso === undefined || atraso === 0
+      ? { contentType: 'json' }
+      : { contentType: 'json', delaySeconds: atraso },
+  );
 }
 
 /** Fila em memória dos testes: guarda cada mensagem e o atraso pedido. */
@@ -54,7 +65,11 @@ export function filaMemoria(): FilaMemoria {
   return {
     enviadas,
     async send(corpo, opcoes) {
-      enviadas.push(opcoes?.delaySeconds === undefined ? { corpo } : { corpo, delaySeconds: opcoes.delaySeconds });
+      enviadas.push(
+        opcoes?.delaySeconds === undefined
+          ? { corpo }
+          : { corpo, delaySeconds: opcoes.delaySeconds },
+      );
     },
   };
 }

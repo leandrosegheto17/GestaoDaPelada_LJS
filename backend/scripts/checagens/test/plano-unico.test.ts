@@ -14,16 +14,24 @@ const FUNCAO = ['plano', 'Efetivo'].join('');
 describe('checagem plano-unico', () => {
   it(`PLA-01: arquivo de prova em backend/api/src com situacao === '${ATIVO}' reprova`, () => {
     const p = checarPlanoUnico([
-      { caminho: 'backend/api/src/aplicacao/plano/prova.ts', conteudo: `// ok\nif (situacao === '${ATIVO}') liberar();\n` },
+      {
+        caminho: 'backend/api/src/aplicacao/plano/prova.ts',
+        conteudo: `// ok\nif (situacao === '${ATIVO}') liberar();\n`,
+      },
     ]);
     expect(p).toHaveLength(1);
-    expect(p[0]).toMatch(/^backend\/api\/src\/aplicacao\/plano\/prova\.ts:2: compara a situação comercial/);
+    expect(p[0]).toMatch(
+      /^backend\/api\/src\/aplicacao\/plano\/prova\.ts:2: compara a situação comercial/,
+    );
   });
 
   it('PLA-01: o mesmo em backend/dominio/src/plano/ passa', () => {
     expect(
       checarPlanoUnico([
-        { caminho: 'backend/dominio/src/plano/prova.ts', conteudo: `if (situacao === '${ATIVO}') liberar();\n` },
+        {
+          caminho: 'backend/dominio/src/plano/prova.ts',
+          conteudo: `if (situacao === '${ATIVO}') liberar();\n`,
+        },
       ]),
     ).toEqual([]);
   });
@@ -41,7 +49,10 @@ describe('checagem plano-unico', () => {
 
   it(`PLA-01: '${CANCELADO}' e '${USO_PROPRIO}' comparados reprovam também no front, inclusive em case`, () => {
     const p = checarPlanoUnico([
-      { caminho: 'frontend/web/src/telas/plano/x.tsx', conteudo: `const c = s === '${CANCELADO}';\n` },
+      {
+        caminho: 'frontend/web/src/telas/plano/x.tsx',
+        conteudo: `const c = s === '${CANCELADO}';\n`,
+      },
       { caminho: 'backend/api/src/x.ts', conteudo: `switch (s) {\n  case '${USO_PROPRIO}':\n}\n` },
       { caminho: 'backend/api/src/y.ts', conteudo: `if ('${CANCELADO}' !== s) {}\n` },
     ]);
@@ -61,7 +72,12 @@ describe('checagem plano-unico', () => {
 
   it(`PLA-01: no backend, situacaoComercial !== '${TRIAL}' reprova`, () => {
     expect(
-      checarPlanoUnico([{ caminho: 'backend/api/src/x.ts', conteudo: `if (g.situacaoComercial !== '${TRIAL}') x();\n` }]),
+      checarPlanoUnico([
+        {
+          caminho: 'backend/api/src/x.ts',
+          conteudo: `if (g.situacaoComercial !== '${TRIAL}') x();\n`,
+        },
+      ]),
     ).toHaveLength(1);
   });
 
@@ -79,21 +95,31 @@ describe('checagem plano-unico', () => {
   it(`PLA-01: ler a coluna ${COLUNA} sem filtrar passa`, () => {
     expect(
       checarPlanoUnico([
-        { caminho: 'backend/api/src/infraestrutura/db/repositorios/plano.ts', conteudo: `sql\`SELECT ${COLUNA}, trial_inicio FROM x\`;\n` },
+        {
+          caminho: 'backend/api/src/infraestrutura/db/repositorios/plano.ts',
+          conteudo: `sql\`SELECT ${COLUNA}, trial_inicio FROM x\`;\n`,
+        },
       ]),
     ).toEqual([]);
   });
 
   it(`PLA-01: ${FUNCAO} reimplementado fora do domínio reprova; importado passa`, () => {
     expect(
-      checarPlanoUnico([{ caminho: 'backend/api/src/x.ts', conteudo: `export function ${FUNCAO}(s: string) {}\n` }]),
-    ).toHaveLength(1);
-    expect(
-      checarPlanoUnico([{ caminho: 'frontend/web/src/x.ts', conteudo: `const ${FUNCAO} = () => 'free';\n` }]),
+      checarPlanoUnico([
+        { caminho: 'backend/api/src/x.ts', conteudo: `export function ${FUNCAO}(s: string) {}\n` },
+      ]),
     ).toHaveLength(1);
     expect(
       checarPlanoUnico([
-        { caminho: 'backend/api/src/x.ts', conteudo: `import { ${FUNCAO} } from '@pelada/dominio';\n${FUNCAO}(a, b, c, d);\n` },
+        { caminho: 'frontend/web/src/x.ts', conteudo: `const ${FUNCAO} = () => 'free';\n` },
+      ]),
+    ).toHaveLength(1);
+    expect(
+      checarPlanoUnico([
+        {
+          caminho: 'backend/api/src/x.ts',
+          conteudo: `import { ${FUNCAO} } from '@pelada/dominio';\n${FUNCAO}(a, b, c, d);\n`,
+        },
       ]),
     ).toEqual([]);
   });

@@ -26,7 +26,10 @@ let foraDaEscalacao = '';
 let saiuAntes = '';
 
 const DATA = '2026-03-12';
-const app = criarApp({ fabricaBanco: fabricaComoApp().fabrica, relogio: relogioFixo('2026-03-14T15:00:00Z') });
+const app = criarApp({
+  fabricaBanco: fabricaComoApp().fabrica,
+  relogio: relogioFixo('2026-03-14T15:00:00Z'),
+});
 
 async function sessao(conta: string): Promise<string> {
   const { token, hash } = await gerarToken();
@@ -39,9 +42,16 @@ async function sessao(conta: string): Promise<string> {
 }
 
 async function pedir(caminho: string): Promise<Response> {
-  const headers = new Headers({ cookie: `${NOME_COOKIE_SESSAO}=${await sessao(aberto.cenario.contaC)}` });
+  const headers = new Headers({
+    cookie: `${NOME_COOKIE_SESSAO}=${await sessao(aberto.cenario.contaC)}`,
+  });
   const ctx = contextoFalso();
-  const r = await app.request(`/api/grupos/${aberto.cenario.grupoG}${caminho}`, { method: 'GET', headers }, envAcesso(aberto.url), ctx);
+  const r = await app.request(
+    `/api/grupos/${aberto.cenario.grupoG}${caminho}`,
+    { method: 'GET', headers },
+    envAcesso(aberto.url),
+    ctx,
+  );
   await ctx.esperar();
   return r;
 }
@@ -54,11 +64,10 @@ async function novoJogador(apelido: string, fim: string | null = null): Promise<
     [cenario.grupoG, apelido, cenario.contaC],
   );
   const id = r.rows[0]!.id;
-  await db.query(`INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, '2026-01-01', $3)`, [
-    id,
-    cenario.grupoG,
-    fim,
-  ]);
+  await db.query(
+    `INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, '2026-01-01', $3)`,
+    [id, cenario.grupoG, fim],
+  );
   return id;
 }
 
@@ -87,7 +96,8 @@ beforeAll(async () => {
   aberto = await abrirCenarioGrupos();
   const { cenario } = aberto;
   const novos: string[] = [];
-  for (let i = 1; i <= 16; i++) novos.push(await novoJogador(`Escalado ${String(i).padStart(2, '0')}`));
+  for (let i = 1; i <= 16; i++)
+    novos.push(await novoJogador(`Escalado ${String(i).padStart(2, '0')}`));
   saiuAntes = await novoJogador('Saiu Antes', '2026-03-10');
   // 19 na escalação: Toninho, Bira, 16 criados e o que saiu antes da data (o último, em "não entra").
   escalados = [cenario.idsG.jogadorAtivo, cenario.idsG.jogadorHistorico, ...novos, saiuAntes];

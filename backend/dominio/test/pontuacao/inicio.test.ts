@@ -40,7 +40,9 @@ describe('inicioDaContagem', () => {
   });
 
   it('PAR-57: X antes de qualquer período dá S', () => {
-    expect(inicioDaContagem(S, [{ inicio: '2026-03-01' }, { inicio: '2026-08-01' }], '2026-02-10')).toBe(S);
+    expect(
+      inicioDaContagem(S, [{ inicio: '2026-03-01' }, { inicio: '2026-08-01' }], '2026-02-10'),
+    ).toBe(S);
   });
 
   it('PAR-57: com três períodos vale o mais recente com início até X, em qualquer ordem', () => {

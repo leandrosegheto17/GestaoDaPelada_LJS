@@ -8,7 +8,12 @@ import { NOME_COOKIE_SESSAO } from '../../src/infraestrutura/sessao/cookie.ts';
 import { gerarToken } from '../../src/infraestrutura/sessao/token.ts';
 import { conviteDeTeste, envAcesso } from '../acesso/apoio.ts';
 import { contextoFalso } from '../db/requisicao.ts';
-import { abrirCenarioGrupos, arquivar, reativar, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  arquivar,
+  reativar,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * `exigirGrupoAtivo` (T22; GEL-26, SEC-004, SEC-007), contra o cenário de grupos (C criadora de G, O outra admin), com
@@ -65,7 +70,12 @@ async function sessao(conta: string): Promise<string> {
   return token;
 }
 
-async function pedir(caminho: string, token: string, metodo: string, corpo?: unknown): Promise<Response> {
+async function pedir(
+  caminho: string,
+  token: string,
+  metodo: string,
+  corpo?: unknown,
+): Promise<Response> {
   const headers = new Headers({ 'x-pelada': '1', cookie: `${NOME_COOKIE_SESSAO}=${token}` });
   if (corpo !== undefined) headers.set('content-type', 'application/json');
   const ctx = contextoFalso();
@@ -103,35 +113,53 @@ describe('exigirGrupoAtivo com o grupo arquivado', () => {
     expect(chamadas).toBe(antes);
   });
 
-  it.each(['POST', 'PUT', 'DELETE'])('GEL-26: %s numa rota do grupo arquivado dá 409', async (metodo) => {
-    const { cenario } = aberto;
-    await arquivar(aberto.db, cenario.grupoG);
-    const r = await pedir(`/grupos/${cenario.grupoG}/teste`, await sessao(cenario.contaC), metodo);
-    expect(r.status).toBe(409);
-    expect(await r.json()).toMatchObject({ codigo: 'grupo_arquivado' });
-  });
+  it.each(['POST', 'PUT', 'DELETE'])(
+    'GEL-26: %s numa rota do grupo arquivado dá 409',
+    async (metodo) => {
+      const { cenario } = aberto;
+      await arquivar(aberto.db, cenario.grupoG);
+      const r = await pedir(
+        `/grupos/${cenario.grupoG}/teste`,
+        await sessao(cenario.contaC),
+        metodo,
+      );
+      expect(r.status).toBe(409);
+      expect(await r.json()).toMatchObject({ codigo: 'grupo_arquivado' });
+    },
+  );
 
   it('GEL-26: convidar admin no grupo arquivado dá 409 grupo_arquivado', async () => {
     const { cenario } = aberto;
     await arquivar(aberto.db, cenario.grupoG);
-    const r = await pedir(`/grupos/${cenario.grupoG}/admins/convites`, await sessao(cenario.contaC), 'POST', {
-      email: 'nova-admin@exemplo.test',
-    });
+    const r = await pedir(
+      `/grupos/${cenario.grupoG}/admins/convites`,
+      await sessao(cenario.contaC),
+      'POST',
+      {
+        email: 'nova-admin@exemplo.test',
+      },
+    );
     expect(r.status).toBe(409);
     expect(await r.json()).toMatchObject({ codigo: 'grupo_arquivado' });
-    const convites = await aberto.db.query(`SELECT 1 FROM convites_admin WHERE email = 'nova-admin@exemplo.test'`);
+    const convites = await aberto.db.query(
+      `SELECT 1 FROM convites_admin WHERE email = 'nova-admin@exemplo.test'`,
+    );
     expect(convites.rowCount).toBe(0);
   });
 
   it('GEL-26: remover admin no grupo arquivado dá 409 e a outra admin continua', async () => {
     const { cenario } = aberto;
     await arquivar(aberto.db, cenario.grupoG);
-    const r = await pedir(`/grupos/${cenario.grupoG}/admins/${cenario.contaO}`, await sessao(cenario.contaC), 'DELETE');
+    const r = await pedir(
+      `/grupos/${cenario.grupoG}/admins/${cenario.contaO}`,
+      await sessao(cenario.contaC),
+      'DELETE',
+    );
     expect(r.status).toBe(409);
-    const vinculo = await aberto.db.query('SELECT 1 FROM vinculos_admin WHERE grupo_id = $1 AND conta_id = $2', [
-      cenario.grupoG,
-      cenario.contaO,
-    ]);
+    const vinculo = await aberto.db.query(
+      'SELECT 1 FROM vinculos_admin WHERE grupo_id = $1 AND conta_id = $2',
+      [cenario.grupoG, cenario.contaO],
+    );
     expect(vinculo.rowCount).toBe(1);
   });
 
@@ -164,7 +192,10 @@ describe('exigirGrupoAtivo com o grupo arquivado', () => {
       'DELETE',
     );
     expect(r.status).toBe(204);
-    const cancelado = await aberto.db.query('SELECT cancelado_em FROM convites_admin WHERE id = $1', [convite.rows[0]!.id]);
+    const cancelado = await aberto.db.query(
+      'SELECT cancelado_em FROM convites_admin WHERE id = $1',
+      [convite.rows[0]!.id],
+    );
     expect(cancelado.rows[0]?.cancelado_em).not.toBeNull();
   });
 });

@@ -42,9 +42,13 @@ describe('tipos do plano (PLA-30)', () => {
       async (url) => {
         const linhas = await catalogo(url);
         for (const tabela of PLANO) {
-          const doBanco = new Map(linhas.filter((l) => l.tabela === tabela).map((l) => [l.coluna, l.tipo]));
+          const doBanco = new Map(
+            linhas.filter((l) => l.tabela === tabela).map((l) => [l.coluna, l.tipo]),
+          );
           expect(doBanco.size, tabela).toBeGreaterThan(0);
-          expect(Object.keys(COLUNAS_TIPADAS[tabela]).sort(), tabela).toEqual([...doBanco.keys()].sort());
+          expect(Object.keys(COLUNAS_TIPADAS[tabela]).sort(), tabela).toEqual(
+            [...doBanco.keys()].sort(),
+          );
           for (const [coluna, tipo] of Object.entries(COLUNAS_TIPADAS[tabela])) {
             expect(doBanco.get(coluna), `${tabela}.${coluna}`).toBe(tipo);
           }
@@ -59,7 +63,10 @@ describe('tipos do plano (PLA-30)', () => {
       async (url) => {
         const linhas = await catalogo(url);
         for (const tabela of PLANO) {
-          const doBanco = linhas.filter((l) => l.tabela === tabela && l.anulavel).map((l) => l.coluna).sort();
+          const doBanco = linhas
+            .filter((l) => l.tabela === tabela && l.anulavel)
+            .map((l) => l.coluna)
+            .sort();
           expect([...(COLUNAS_ANULAVEIS[tabela] ?? [])].sort(), tabela).toEqual(doBanco);
         }
       },

@@ -24,7 +24,9 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export const exigirVinculo: MiddlewareHandler<Ambiente> = async (c, next) => {
   const grupoId = c.req.param('grupoId') ?? '';
   if (!UUID.test(grupoId)) return c.json(corpoDoErro('nao_encontrado'), 404);
-  const r = await sql<{ id: string }>`SELECT id FROM grupos WHERE id = ${grupoId}`.execute(c.var.db);
+  const r = await sql<{ id: string }>`SELECT id FROM grupos WHERE id = ${grupoId}`.execute(
+    c.var.db,
+  );
   if (r.rows.length === 0) return c.json(corpoDoErro('nao_encontrado'), 404);
   await next();
 };

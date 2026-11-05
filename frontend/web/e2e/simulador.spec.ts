@@ -20,8 +20,28 @@ const CABECALHO = { 'X-Pelada': '1' };
 const DIAS = ['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'] as const;
 
 const APELIDOS = [
-  'Alemão', 'Bigode', 'Cabeça', 'Careca', 'Dudu', 'Fumaça', 'Gil', 'Japa', 'Léo', 'Marcão', 'Neném',
-  'Paulinho', 'Rato', 'Serginho', 'Tico', 'Toninho', 'Vini', 'Xandão', 'Zé', 'Baixinho', 'Cebola', 'Dentinho',
+  'Alemão',
+  'Bigode',
+  'Cabeça',
+  'Careca',
+  'Dudu',
+  'Fumaça',
+  'Gil',
+  'Japa',
+  'Léo',
+  'Marcão',
+  'Neném',
+  'Paulinho',
+  'Rato',
+  'Serginho',
+  'Tico',
+  'Toninho',
+  'Vini',
+  'Xandão',
+  'Zé',
+  'Baixinho',
+  'Cebola',
+  'Dentinho',
 ] as const;
 
 function sufixo(): string {
@@ -58,7 +78,11 @@ interface MensagemDev {
   texto: string;
 }
 
-async function linkDoEmail(request: APIRequestContext, para: string, tipo: string): Promise<string> {
+async function linkDoEmail(
+  request: APIRequestContext,
+  para: string,
+  tipo: string,
+): Promise<string> {
   let link: string | undefined;
   await expect
     .poll(
@@ -66,7 +90,10 @@ async function linkDoEmail(request: APIRequestContext, para: string, tipo: strin
         const r = await request.get('/api/dev/emails');
         expect(r.status()).toBe(200);
         const { mensagens } = (await r.json()) as { mensagens: MensagemDev[] };
-        link = mensagens.filter((m) => m.para === para && m.tipo === tipo).at(-1)?.texto.match(/https?:\/\/\S+#t=[A-Za-z0-9_%-]+/)?.[0];
+        link = mensagens
+          .filter((m) => m.para === para && m.tipo === tipo)
+          .at(-1)
+          ?.texto.match(/https?:\/\/\S+#t=[A-Za-z0-9_%-]+/)?.[0];
         return link;
       },
       { timeout: 10_000 },
@@ -120,7 +147,11 @@ async function criarGrupoDeHoje(pagina: Page, nome: string): Promise<{ id: strin
   return (await r.json()) as { id: string; slug: string };
 }
 
-async function criarJogadores(pagina: Page, grupoId: string, quantos: number): Promise<Map<string, string>> {
+async function criarJogadores(
+  pagina: Page,
+  grupoId: string,
+  quantos: number,
+): Promise<Map<string, string>> {
   const ids = new Map<string, string>();
   const entrada = diasAntes(hoje(), 30);
   for (const apelido of APELIDOS.slice(0, quantos)) {
@@ -142,7 +173,9 @@ function cartao(pagina: Page, nome: string) {
 /** Apelidos de um cartão de time, na ordem da tela (o selo "movido" fica de fora). */
 async function apelidosDoTime(pagina: Page, nome: string): Promise<string[]> {
   const botoes = cartao(pagina, nome).getByRole('button');
-  const textos = await botoes.evaluateAll((els) => els.map((e) => e.querySelector('span')?.textContent ?? e.textContent ?? ''));
+  const textos = await botoes.evaluateAll((els) =>
+    els.map((e) => e.querySelector('span')?.textContent ?? e.textContent ?? ''),
+  );
   return textos.map((t) => t.trim());
 }
 
@@ -153,7 +186,9 @@ async function jornadaDoisTimes(pagina: Page, grupoId: string): Promise<void> {
   // 1. no início, o item "Simulador: <dia>, dd/mm" do próximo dia de jogo (SIM-08, SIM-84).
   await pagina.goto(`/app/grupos/${grupoId}`);
   const dia = pagina.getByRole('region', { name: 'Dia de jogo' });
-  await expect(dia.getByText(`Nenhuma escalação confirmada para ${diaMes(dataHoje)}`)).toBeVisible();
+  await expect(
+    dia.getByText(`Nenhuma escalação confirmada para ${diaMes(dataHoje)}`),
+  ).toBeVisible();
   await dia.getByRole('link', { name: new RegExp(`^Simulador: .+, ${diaMes(dataHoje)}$`) }).click();
   await expect(pagina).toHaveURL(new RegExp(`/app/grupos/${grupoId}/simulador$`));
 
@@ -169,8 +204,14 @@ async function jornadaDoisTimes(pagina: Page, grupoId: string): Promise<void> {
   const timeAInicial = await apelidosDoTime(pagina, 'Time A');
   const movido = timeAInicial[0] ?? '';
   expect(movido).not.toBe('');
-  const avaliar = pagina.waitForResponse((r) => r.url().endsWith(`/api/grupos/${grupoId}/simulador/avaliar`) && r.request().method() === 'POST');
-  await cartao(pagina, 'Time A').getByRole('button', { name: new RegExp(`^${movido}`) }).click();
+  const avaliar = pagina.waitForResponse(
+    (r) =>
+      r.url().endsWith(`/api/grupos/${grupoId}/simulador/avaliar`) &&
+      r.request().method() === 'POST',
+  );
+  await cartao(pagina, 'Time A')
+    .getByRole('button', { name: new RegExp(`^${movido}`) })
+    .click();
   await pagina.getByRole('button', { name: 'Titular do Time B' }).click();
   expect((await avaliar).status()).toBe(200);
   expect(await apelidosDoTime(pagina, 'Time B')).toContain(movido);
@@ -184,18 +225,28 @@ async function jornadaDoisTimes(pagina: Page, grupoId: string): Promise<void> {
   await expect.poll(() => apelidosDoTime(pagina, 'Time A')).toEqual(timeAInicial);
 
   // De novo o ajuste, e 4. confirmar (SIM-67).
-  const avaliarDeNovo = pagina.waitForResponse((r) => r.url().endsWith('/simulador/avaliar') && r.request().method() === 'POST');
-  await cartao(pagina, 'Time A').getByRole('button', { name: new RegExp(`^${movido}`) }).click();
+  const avaliarDeNovo = pagina.waitForResponse(
+    (r) => r.url().endsWith('/simulador/avaliar') && r.request().method() === 'POST',
+  );
+  await cartao(pagina, 'Time A')
+    .getByRole('button', { name: new RegExp(`^${movido}`) })
+    .click();
   await pagina.getByRole('button', { name: 'Titular do Time B' }).click();
   await avaliarDeNovo;
-  const escalacao = pagina.waitForResponse((r) => r.url().endsWith(`/api/grupos/${grupoId}/escalacoes`) && r.request().method() === 'POST');
+  const escalacao = pagina.waitForResponse(
+    (r) => r.url().endsWith(`/api/grupos/${grupoId}/escalacoes`) && r.request().method() === 'POST',
+  );
   await pagina.getByRole('button', { name: 'Confirmar escalação' }).click();
   expect((await escalacao).ok()).toBe(true);
 
   // Resultado: o início com a faixa e, abaixo do item Simulador, a linha da escalação (SIM-73, SIM-08).
   await expect(pagina).toHaveURL(new RegExp(`/app/grupos/${grupoId}$`));
-  await expect(pagina.getByText(`Escalação de ${diaMes(dataHoje)} confirmada.`, { exact: true })).toBeVisible();
-  await expect(dia.getByText(`Escalação de ${diaMes(dataHoje)} confirmada`, { exact: true })).toBeVisible();
+  await expect(
+    pagina.getByText(`Escalação de ${diaMes(dataHoje)} confirmada.`, { exact: true }),
+  ).toBeVisible();
+  await expect(
+    dia.getByText(`Escalação de ${diaMes(dataHoje)} confirmada`, { exact: true }),
+  ).toBeVisible();
 }
 
 test('J-22: montar os times e confirmar a escalação (2 times)', async ({ browser }) => {
@@ -207,7 +258,9 @@ test('J-22: montar os times e confirmar a escalação (2 times)', async ({ brows
   await jornadaDoisTimes(pagina, grupo.id);
 
   // A escalação gravada é a composição ajustada: GET partidas/nova vem pré-marcado (SIM-67, SIM-75).
-  const nova = (await (await pagina.request.get(`/api/grupos/${grupo.id}/partidas/nova?data=${hoje()}`)).json()) as {
+  const nova = (await (
+    await pagina.request.get(`/api/grupos/${grupo.id}/partidas/nova?data=${hoje()}`)
+  ).json()) as {
     preMarcadaPelaEscalacao: boolean;
     jogadores: Array<{ apelido: string; situacao: string }>;
   };
@@ -227,7 +280,9 @@ test('J-23: dividir em 3 ou mais times', async ({ browser }) => {
   await pagina.goto(`/app/grupos/${grupo.id}/simulador`);
   await pagina.getByRole('radio', { name: '3 ou mais times' }).check();
   await pagina.getByLabel('Jogadores por time').fill('4');
-  await expect(pagina.getByText('5 times de 4 + 1 time incompleto de 2', { exact: true })).toBeVisible();
+  await expect(
+    pagina.getByText('5 times de 4 + 1 time incompleto de 2', { exact: true }),
+  ).toBeVisible();
 
   // 2. sugerir (SIM-47): 6 cartões, o último "Incompleto (2 de 4)" (SIM-30, SIM-38).
   await pagina.getByRole('button', { name: 'Sugerir times' }).click();
@@ -236,10 +291,15 @@ test('J-23: dividir em 3 ou mais times', async ({ browser }) => {
   await expect(cartoes.last()).toContainText('Incompleto (2 de 4)');
 
   // 3. confirmar (SIM-67).
-  const escalacao = pagina.waitForResponse((r) => r.url().endsWith(`/api/grupos/${grupo.id}/escalacoes`) && r.request().method() === 'POST');
+  const escalacao = pagina.waitForResponse(
+    (r) =>
+      r.url().endsWith(`/api/grupos/${grupo.id}/escalacoes`) && r.request().method() === 'POST',
+  );
   await pagina.getByRole('button', { name: 'Confirmar escalação' }).click();
   expect((await escalacao).ok()).toBe(true);
-  await expect(pagina.getByText(`Escalação de ${diaMes(hoje())} confirmada.`, { exact: true })).toBeVisible();
+  await expect(
+    pagina.getByText(`Escalação de ${diaMes(hoje())} confirmada.`, { exact: true }),
+  ).toBeVisible();
 
   // Resultado: o painel "Uso do app" conta 1 escalação na semana (T30).
   const uso = (await (await pagina.request.get(`/api/grupos/${grupo.id}/uso`)).json()) as {
@@ -260,12 +320,23 @@ test('J-24: lançar a partida pré-marcada pela escalação', async ({ browser }
   await jornadaDoisTimes(pagina, grupo.id);
 
   // 1. "Lançar partida de <dia>, dd/mm": a faixa e todos da escalação presentes (SIM-75, SIM-77).
-  await pagina.getByRole('region', { name: 'Dia de jogo' }).getByRole('link', { name: /^Lançar partida de / }).click();
+  await pagina
+    .getByRole('region', { name: 'Dia de jogo' })
+    .getByRole('link', { name: /^Lançar partida de / })
+    .click();
   await expect(pagina).toHaveURL(/\/partidas\/nova/);
-  await expect(pagina.getByText(`Pré-marcado pela escalação de ${diaMes(dataHoje)} (inclui quem ficou como “não entra”).`)).toBeVisible();
-  await expect(pagina.getByText('Presentes 16 · Lesionados 0 · Expulsos 0 · Ausentes 1')).toBeVisible();
+  await expect(
+    pagina.getByText(
+      `Pré-marcado pela escalação de ${diaMes(dataHoje)} (inclui quem ficou como “não entra”).`,
+    ),
+  ).toBeVisible();
+  await expect(
+    pagina.getByText('Presentes 16 · Lesionados 0 · Expulsos 0 · Ausentes 1'),
+  ).toBeVisible();
   const situacao = (apelido: string, nome: 'Ausente' | 'Presente') =>
-    pagina.getByRole('group', { name: `Situação de ${apelido}` }).getByRole('radio', { name: nome });
+    pagina
+      .getByRole('group', { name: `Situação de ${apelido}` })
+      .getByRole('radio', { name: nome });
   await expect(situacao('Gil', 'Presente')).toBeChecked();
   await expect(situacao('Dudu', 'Ausente')).toBeChecked();
 
@@ -275,12 +346,15 @@ test('J-24: lançar a partida pré-marcada pela escalação', async ({ browser }
   await expect(pagina.getByText(`Partida de ${diaMes(dataHoje)} salva.`)).toBeVisible();
 
   // Resultado: a partida gravada com as marcações finais, e o ranking a mostra (PAR-17).
-  const ranking = (await (await pagina.request.get(`/api/publico/${grupo.slug}/ranking`)).json()) as {
+  const ranking = (await (
+    await pagina.request.get(`/api/publico/${grupo.slug}/ranking`)
+  ).json()) as {
     partidas: Array<{ data: string }>;
     linhas: Array<{ apelido: string; rodadas: Array<{ situacao: string }> }>;
   };
   expect(ranking.partidas.map((p) => p.data)).toContain(dataHoje);
-  const ultima = (a: string) => ranking.linhas.find((l) => l.apelido === a)?.rodadas.at(-1)?.situacao;
+  const ultima = (a: string) =>
+    ranking.linhas.find((l) => l.apelido === a)?.rodadas.at(-1)?.situacao;
   expect(ultima('Gil')).toBe('falta');
   expect(ultima('Alemão')).toBe('presente');
   await pagina.context().close();

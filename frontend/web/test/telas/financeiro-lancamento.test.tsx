@@ -12,7 +12,12 @@ import { abrirTela, json, pendente, SESSAO_ANA, type Manipulador } from '../apoi
  */
 
 function resposta(nome: string): unknown {
-  return JSON.parse(readFileSync(fileURLToPath(new URL(`../../../../.specs/mockup/respostas/${nome}`, import.meta.url)), 'utf8'));
+  return JSON.parse(
+    readFileSync(
+      fileURLToPath(new URL(`../../../../.specs/mockup/respostas/${nome}`, import.meta.url)),
+      'utf8',
+    ),
+  );
 }
 
 const OUTUBRO = resposta('financeiro-2026-10.json');
@@ -34,12 +39,23 @@ function abrirNovo(api: Record<string, Manipulador> = {}) {
   return abrir(`${BASE}/lancamentos/novo`, api);
 }
 
-function abrirEdicao(lancamento: Record<string, unknown> = ALUGUEL, api: Record<string, Manipulador> = {}) {
-  return abrir(`${BASE}/lancamentos/l-aluguel`, { [`GET ${API}/lancamentos/l-aluguel`]: () => json(200, lancamento), ...api });
+function abrirEdicao(
+  lancamento: Record<string, unknown> = ALUGUEL,
+  api: Record<string, Manipulador> = {},
+) {
+  return abrir(`${BASE}/lancamentos/l-aluguel`, {
+    [`GET ${API}/lancamentos/l-aluguel`]: () => json(200, lancamento),
+    ...api,
+  });
 }
 
 function erro422(mensagens: Record<string, string>): Response {
-  return json(422, { erro: 'Corrija os campos indicados.', codigo: 'dados_invalidos', campos: Object.keys(mensagens).sort(), mensagens });
+  return json(422, {
+    erro: 'Corrija os campos indicados.',
+    codigo: 'dados_invalidos',
+    campos: Object.keys(mensagens).sort(),
+    mensagens,
+  });
 }
 
 afterEach(() => {
@@ -64,13 +80,24 @@ describe('Lançamento (t23)', () => {
   });
 
   it('FIN-32: a data do novo vem da API, não do relógio do aparelho', async () => {
-    abrirNovo({ [`GET ${API}/mes`]: () => json(200, { ...(OUTUBRO as object), hoje: '2026-10-03' }) });
-    await waitFor(() => expect((screen.getByLabelText('Data') as HTMLInputElement).value).toBe('2026-10-03'));
+    abrirNovo({
+      [`GET ${API}/mes`]: () => json(200, { ...(OUTUBRO as object), hoje: '2026-10-03' }),
+    });
+    await waitFor(() =>
+      expect((screen.getByLabelText('Data') as HTMLInputElement).value).toBe('2026-10-03'),
+    );
   });
 
   it('FIN-25: salvar o novo envia o corpo em centavos e volta ao financeiro', async () => {
     const { chamadasA, local } = abrirNovo({
-      [`POST ${API}/lancamentos`]: () => json(201, { ...ALUGUEL, id: 'l-novo', tipo: 'saida', descricao: 'Bola nova', valorCentavos: 12050 }),
+      [`POST ${API}/lancamentos`]: () =>
+        json(201, {
+          ...ALUGUEL,
+          id: 'l-novo',
+          tipo: 'saida',
+          descricao: 'Bola nova',
+          valorCentavos: 12050,
+        }),
     });
     fireEvent.click(await screen.findByRole('radio', { name: 'Saída' }));
     fireEvent.change(screen.getByLabelText('Descrição'), { target: { value: 'Bola nova' } });
@@ -98,22 +125,38 @@ describe('Lançamento (t23)', () => {
   it('FIN-47: 422 com 2 campos mostra "Corrija 2 campos: Descrição, Valor" e a mensagem em cada campo; axe sem violação', async () => {
     const { container } = abrirNovo({
       [`POST ${API}/lancamentos`]: () =>
-        erro422({ descricao: 'A descrição precisa ter de 1 a 80 caracteres.', valorCentavos: 'Informe um valor inteiro em centavos dentro do limite.' }),
+        erro422({
+          descricao: 'A descrição precisa ter de 1 a 80 caracteres.',
+          valorCentavos: 'Informe um valor inteiro em centavos dentro do limite.',
+        }),
     });
     fireEvent.change(await screen.findByLabelText('Valor (R$)'), { target: { value: '0,00' } });
     fireEvent.click(screen.getByRole('button', { name: 'Salvar' }));
     const resumo = await screen.findByRole('alert');
     expect(resumo.textContent).toContain('Corrija 2 campos:');
-    expect(within(resumo).getAllByRole('link').map((a) => a.textContent)).toEqual(['Descrição', 'Valor']);
+    expect(
+      within(resumo)
+        .getAllByRole('link')
+        .map((a) => a.textContent),
+    ).toEqual(['Descrição', 'Valor']);
     const descricao = screen.getByLabelText('Descrição');
     const valor = screen.getByLabelText('Valor (R$)');
     expect(descricao.getAttribute('aria-invalid')).toBe('true');
     expect(valor.getAttribute('aria-invalid')).toBe('true');
     // A mensagem fica no próprio campo, ligada à entrada por `aria-describedby`.
-    const idErroDescricao = (descricao.getAttribute('aria-describedby') ?? '').split(' ').find((id) => id.endsWith('-erro')) ?? '';
-    expect(document.getElementById(idErroDescricao)?.textContent).toBe('A descrição precisa ter de 1 a 80 caracteres.');
-    expect(descricao.closest('div')?.textContent).toContain('A descrição precisa ter de 1 a 80 caracteres.');
-    expect(valor.closest('div')?.textContent).toContain('Informe um valor inteiro em centavos dentro do limite.');
+    const idErroDescricao =
+      (descricao.getAttribute('aria-describedby') ?? '')
+        .split(' ')
+        .find((id) => id.endsWith('-erro')) ?? '';
+    expect(document.getElementById(idErroDescricao)?.textContent).toBe(
+      'A descrição precisa ter de 1 a 80 caracteres.',
+    );
+    expect(descricao.closest('div')?.textContent).toContain(
+      'A descrição precisa ter de 1 a 80 caracteres.',
+    );
+    expect(valor.closest('div')?.textContent).toContain(
+      'Informe um valor inteiro em centavos dentro do limite.',
+    );
     await esperarSemViolacoes(container);
   });
 
@@ -123,7 +166,9 @@ describe('Lançamento (t23)', () => {
     expect(screen.getByRole('heading', { name: 'Editar lançamento' })).toBeTruthy();
     expect((screen.getByRole('radio', { name: 'Saída' }) as HTMLInputElement).checked).toBe(true);
     expect((screen.getByLabelText('Data') as HTMLInputElement).value).toBe('2026-10-05');
-    expect((screen.getByLabelText('Descrição') as HTMLInputElement).value).toBe('Aluguel da quadra outubro');
+    expect((screen.getByLabelText('Descrição') as HTMLInputElement).value).toBe(
+      'Aluguel da quadra outubro',
+    );
     expect(screen.getByText('25 de 80')).toBeTruthy();
     expect((screen.getByLabelText('Valor (R$)') as HTMLInputElement).value).toBe('800,00');
     expect(screen.getByRole('button', { name: 'Excluir' })).toBeTruthy();
@@ -136,7 +181,9 @@ describe('Lançamento (t23)', () => {
   });
 
   it('FIN-27: salvar a edição envia PUT no id', async () => {
-    const { chamadasA, local } = abrirEdicao(ALUGUEL, { [`PUT ${API}/lancamentos/l-aluguel`]: () => json(200, { ...ALUGUEL, valorCentavos: 85000 }) });
+    const { chamadasA, local } = abrirEdicao(ALUGUEL, {
+      [`PUT ${API}/lancamentos/l-aluguel`]: () => json(200, { ...ALUGUEL, valorCentavos: 85000 }),
+    });
     fireEvent.change(await screen.findByLabelText('Valor (R$)'), { target: { value: '850' } });
     fireEvent.click(screen.getByRole('button', { name: 'Salvar' }));
     await waitFor(() => expect(local()).toBe(BASE));
@@ -149,38 +196,59 @@ describe('Lançamento (t23)', () => {
   });
 
   it('FIN-32: Excluir mostra o texto exato do diálogo; Cancelar não chama a API', async () => {
-    const { chamadasA } = abrirEdicao(ALUGUEL, { [`DELETE ${API}/lancamentos/l-aluguel`]: () => json(204) });
+    const { chamadasA } = abrirEdicao(ALUGUEL, {
+      [`DELETE ${API}/lancamentos/l-aluguel`]: () => json(204),
+    });
     fireEvent.click(await screen.findByRole('button', { name: 'Excluir' }));
     const dialogo = screen.getByRole('alertdialog', { name: 'Excluir lançamento?' });
-    expect(within(dialogo).getByText('“Aluguel da quadra outubro” (R$ 800,00) sai do caixa.')).toBeTruthy();
+    expect(
+      within(dialogo).getByText('“Aluguel da quadra outubro” (R$ 800,00) sai do caixa.'),
+    ).toBeTruthy();
     fireEvent.click(within(dialogo).getByRole('button', { name: 'Cancelar' }));
     expect(screen.queryByRole('alertdialog')).toBeNull();
     expect(chamadasA('DELETE', `${API}/lancamentos/l-aluguel`)).toHaveLength(0);
   });
 
   it('FIN-29: confirmar a exclusão faz DELETE e volta ao financeiro', async () => {
-    const { chamadasA, local } = abrirEdicao(ALUGUEL, { [`DELETE ${API}/lancamentos/l-aluguel`]: () => json(204) });
+    const { chamadasA, local } = abrirEdicao(ALUGUEL, {
+      [`DELETE ${API}/lancamentos/l-aluguel`]: () => json(204),
+    });
     fireEvent.click(await screen.findByRole('button', { name: 'Excluir' }));
-    fireEvent.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Excluir lançamento' }));
+    fireEvent.click(
+      within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Excluir lançamento' }),
+    );
     await waitFor(() => expect(local()).toBe(BASE));
     expect(chamadasA('DELETE', `${API}/lancamentos/l-aluguel`)).toHaveLength(1);
   });
 
   it('FIN-30: 409 lancamento_vinculado mostra a orientação e fica na tela', async () => {
-    const orientacao = 'Esta entrada é a mensalidade de Toninho 10/2026. Desmarque o pagamento no mês para removê-la.';
-    const mensalidade = { ...ALUGUEL, tipo: 'entrada', descricao: 'Mensalidade Toninho 10/2026', valorCentavos: 7500, mensalidade: true };
+    const orientacao =
+      'Esta entrada é a mensalidade de Toninho 10/2026. Desmarque o pagamento no mês para removê-la.';
+    const mensalidade = {
+      ...ALUGUEL,
+      tipo: 'entrada',
+      descricao: 'Mensalidade Toninho 10/2026',
+      valorCentavos: 7500,
+      mensalidade: true,
+    };
     const { local } = abrirEdicao(mensalidade, {
-      [`DELETE ${API}/lancamentos/l-aluguel`]: () => json(409, { erro: orientacao, codigo: 'lancamento_vinculado' }),
+      [`DELETE ${API}/lancamentos/l-aluguel`]: () =>
+        json(409, { erro: orientacao, codigo: 'lancamento_vinculado' }),
     });
     fireEvent.click(await screen.findByRole('button', { name: 'Excluir' }));
-    fireEvent.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Excluir lançamento' }));
+    fireEvent.click(
+      within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Excluir lançamento' }),
+    );
     expect(await screen.findByText(orientacao)).toBeTruthy();
     expect(screen.queryByRole('alertdialog')).toBeNull();
     expect(local()).toBe(`${BASE}/lancamentos/l-aluguel`);
   });
 
   it('lançamento inexistente mostra "Lançamento não encontrado."', async () => {
-    abrir(`${BASE}/lancamentos/l-outro`, { [`GET ${API}/lancamentos/l-outro`]: () => json(404, { erro: 'Não encontrado.', codigo: 'nao_encontrado' }) });
+    abrir(`${BASE}/lancamentos/l-outro`, {
+      [`GET ${API}/lancamentos/l-outro`]: () =>
+        json(404, { erro: 'Não encontrado.', codigo: 'nao_encontrado' }),
+    });
     expect(await screen.findByText('Lançamento não encontrado.')).toBeTruthy();
   });
 });

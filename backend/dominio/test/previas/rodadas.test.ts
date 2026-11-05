@@ -53,13 +53,20 @@ describe('avisoDasRodadas', () => {
 
   it('PAR-116: os textos são os da spec', () => {
     expect(AVISO_UMA_FALTA).toBe('Ela vale 0 ponto até você lançar a presença em Editar partida.');
-    expect(AVISO_VARIAS_FALTAS).toBe('Elas valem 0 ponto até você lançar a presença em Editar partida.');
+    expect(AVISO_VARIAS_FALTAS).toBe(
+      'Elas valem 0 ponto até você lançar a presença em Editar partida.',
+    );
   });
 });
 
 describe('previaDosPeriodos', () => {
   const gil = (comPartidaDia1 = false) => {
-    const datas = ['2026-09-24', ...(comPartidaDia1 ? ['2026-10-01'] : []), '2026-10-08', '2026-10-15'];
+    const datas = [
+      '2026-09-24',
+      ...(comPartidaDia1 ? ['2026-10-01'] : []),
+      '2026-10-08',
+      '2026-10-15',
+    ];
     return {
       jogadores: [
         jogador('a', 'Ana'),
@@ -112,7 +119,12 @@ describe('previaDosPeriodos', () => {
     expect(r.rodadasQuePassamAConstar).toEqual([{ data: '2026-10-08', situacao: 'falta' }]);
     expect(r.rodadasQueDeixamDeConstar).toEqual([]);
     expect(r.aviso).toBe(AVISO_UMA_FALTA);
-    expect(r).toMatchObject({ acumuladoAntes: 2, acumuladoDepois: 0, posicaoAntes: null, posicaoDepois: 6 });
+    expect(r).toMatchObject({
+      acumuladoAntes: 2,
+      acumuladoDepois: 0,
+      posicaoAntes: null,
+      posicaoDepois: 6,
+    });
   });
 
   it('PAR-114: saída antecipada faz a falta do intervalo deixar de constar, sem aviso', () => {
@@ -128,7 +140,9 @@ describe('previaDosPeriodos', () => {
     const reativado = gil(true);
     const historico = {
       ...reativado,
-      jogadores: reativado.jogadores.map((j) => (j.id === 'g' ? { ...j, periodos: retornoEm8 } : j)),
+      jogadores: reativado.jogadores.map((j) =>
+        j.id === 'g' ? { ...j, periodos: retornoEm8 } : j,
+      ),
     };
     const r = previaDosPeriodos(
       historico,
@@ -203,7 +217,12 @@ describe('previaDoInicio', () => {
 
   it('PAR-111: data igual à atual não muda nada', () => {
     const kim = jogador('k', 'Kim', { inicioPontuacao: '2026-09-01' });
-    const r = previaDoInicio({ ...base, jogadores: [...base.jogadores, kim] }, 'k', '2026-09-01', HOJE);
+    const r = previaDoInicio(
+      { ...base, jogadores: [...base.jogadores, kim] },
+      'k',
+      '2026-09-01',
+      HOJE,
+    );
     expect(r.acumuladoDepois).toBe(r.acumuladoAntes);
     expect(r.posicaoDepois).toBe(r.posicaoAntes);
     expect(r.rodadasQuePassamAConstar).toBe(0);

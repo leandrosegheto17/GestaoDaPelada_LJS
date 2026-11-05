@@ -1,6 +1,12 @@
 import { rankingPublico, type RankingPublico } from '@pelada/contrato/publico';
 import { CHAVE_DISPENSA } from '../useModoInstalacao.ts';
-import { CHAVE_DISPOSITIVO, chavesLocais, gravarLocal, lerLocal, removerLocal } from './armazenamento-local.ts';
+import {
+  CHAVE_DISPOSITIVO,
+  chavesLocais,
+  gravarLocal,
+  lerLocal,
+  removerLocal,
+} from './armazenamento-local.ts';
 
 /**
  * Guardado local do ranking público (partidas-e-ranking T72; PAR-148, PAR-154; P23 de `BC:35`), em `localStorage`:
@@ -28,14 +34,21 @@ export function chavePermitida(chave: string): boolean {
 }
 
 /** Grava o ranking carregado; `mesPedido` ausente (sem `?mes=`) grava também a chave do mês atual (PAR-148). */
-export function guardarRanking(slug: string, mesPedido: string | undefined, dados: RankingPublico): void {
+export function guardarRanking(
+  slug: string,
+  mesPedido: string | undefined,
+  dados: RankingPublico,
+): void {
   const texto = JSON.stringify(dados);
   gravarLocal(chaveRanking(slug, dados.mes), texto);
   if (mesPedido === undefined) gravarLocal(chaveRanking(slug, undefined), texto);
 }
 
 /** O guardado do slug e mês pedidos (`undefined`: o atual), validado pelo contrato; inválido é removido (PAR-154). */
-export function lerRankingGuardado(slug: string, mesPedido: string | undefined): RankingPublico | null {
+export function lerRankingGuardado(
+  slug: string,
+  mesPedido: string | undefined,
+): RankingPublico | null {
   const chave = chaveRanking(slug, mesPedido);
   const texto = lerLocal(chave);
   if (texto === null) return null;
@@ -47,7 +60,11 @@ export function lerRankingGuardado(slug: string, mesPedido: string | undefined):
     return null;
   }
   const lido = rankingPublico.safeParse(bruto);
-  if (!lido.success || lido.data.grupo.slug !== slug || (mesPedido !== undefined && lido.data.mes !== mesPedido)) {
+  if (
+    !lido.success ||
+    lido.data.grupo.slug !== slug ||
+    (mesPedido !== undefined && lido.data.mes !== mesPedido)
+  ) {
     removerLocal(chave);
     return null;
   }

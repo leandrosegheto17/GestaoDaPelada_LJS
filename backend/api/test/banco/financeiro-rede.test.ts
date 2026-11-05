@@ -62,7 +62,13 @@ async function linhasDeG(contexto: { conta?: string; slug?: string }): Promise<n
   });
 }
 
-const inserirLancamento = (d: pg.Client, grupo: string, conta: string, valor = 1_000, descricao = 'Bolas') =>
+const inserirLancamento = (
+  d: pg.Client,
+  grupo: string,
+  conta: string,
+  valor = 1_000,
+  descricao = 'Bolas',
+) =>
   d.query(
     `INSERT INTO lancamentos (grupo_id, tipo, data, descricao, valor_centavos, criado_por, criado_em, alterado_por, alterado_em)
      VALUES ($1, 'saida', '2026-01-10', $4, $3, $2, now(), $2, now()) RETURNING id`,
@@ -74,7 +80,9 @@ describe('rede do financeiro: constraints das 3 tabelas (a)', () => {
     const { db, cenario } = aberto;
     for (const valor of [0, 100_000_000]) {
       await expect(
-        comoConta(db, cenario.contaC, (d) => inserirLancamento(d, cenario.grupoG, cenario.contaC, valor)),
+        comoConta(db, cenario.contaC, (d) =>
+          inserirLancamento(d, cenario.grupoG, cenario.contaC, valor),
+        ),
       ).rejects.toMatchObject({ code: '23514' });
     }
   });
@@ -82,7 +90,9 @@ describe('rede do financeiro: constraints das 3 tabelas (a)', () => {
   it('FIN-13: valor_centavos 1 e 99.999.999 aceitos', async () => {
     const { db, cenario } = aberto;
     for (const valor of [1, 99_999_999]) {
-      const r = await comoConta(db, cenario.contaC, (d) => inserirLancamento(d, cenario.grupoG, cenario.contaC, valor));
+      const r = await comoConta(db, cenario.contaC, (d) =>
+        inserirLancamento(d, cenario.grupoG, cenario.contaC, valor),
+      );
       expect(r.rowCount).toBe(1);
     }
   });
@@ -90,7 +100,9 @@ describe('rede do financeiro: constraints das 3 tabelas (a)', () => {
   it('FIN-13: descrição só com espaços recusada', async () => {
     const { db, cenario } = aberto;
     await expect(
-      comoConta(db, cenario.contaC, (d) => inserirLancamento(d, cenario.grupoG, cenario.contaC, 1_000, '   ')),
+      comoConta(db, cenario.contaC, (d) =>
+        inserirLancamento(d, cenario.grupoG, cenario.contaC, 1_000, '   '),
+      ),
     ).rejects.toMatchObject({ code: '23514' });
   });
 
@@ -98,7 +110,9 @@ describe('rede do financeiro: constraints das 3 tabelas (a)', () => {
     const { db, cenario } = aberto;
     await expect(
       comoConta(db, cenario.contaC, (d) =>
-        d.query('UPDATE config_financeira SET mensalidade_centavos = 0 WHERE grupo_id = $1', [cenario.grupoG]),
+        d.query('UPDATE config_financeira SET mensalidade_centavos = 0 WHERE grupo_id = $1', [
+          cenario.grupoG,
+        ]),
       ),
     ).rejects.toMatchObject({ code: '23514' });
   });
@@ -132,7 +146,9 @@ describe('rede do financeiro: constraints das 3 tabelas (a)', () => {
   it('FIN-30: apagar o lançamento de um pagamento dá 23503', async () => {
     const { db, cenario } = aberto;
     await expect(
-      comoConta(db, cenario.contaC, (d) => d.query('DELETE FROM lancamentos WHERE id = $1', [cenario.idsG.lancamento])),
+      comoConta(db, cenario.contaC, (d) =>
+        d.query('DELETE FROM lancamentos WHERE id = $1', [cenario.idsG.lancamento]),
+      ),
     ).rejects.toMatchObject({ code: '23503' });
   });
 });
@@ -189,10 +205,10 @@ describe('rede do financeiro: acessa_financeiro da própria conta fechado pela T
   it('FIN-41 (depois da T10): O não muda a própria acessa_financeiro para verdadeiro (zero linhas)', async () => {
     const { db, cenario } = aberto;
     const r = await comoConta(db, cenario.contaO, (d) =>
-      d.query('UPDATE vinculos_admin SET acessa_financeiro = true WHERE conta_id = $1 AND grupo_id = $2', [
-        cenario.contaO,
-        cenario.grupoG,
-      ]),
+      d.query(
+        'UPDATE vinculos_admin SET acessa_financeiro = true WHERE conta_id = $1 AND grupo_id = $2',
+        [cenario.contaO, cenario.grupoG],
+      ),
     );
     expect(r.rowCount).toBe(0);
   });

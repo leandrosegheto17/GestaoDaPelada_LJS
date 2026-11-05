@@ -1,5 +1,12 @@
 import { Hono } from 'hono';
-import { cadastroCorpo, corpoDoErro, emailCorpo, MENSAGENS, TERMOS_VERSAO, tokenCorpo } from '@pelada/contrato';
+import {
+  cadastroCorpo,
+  corpoDoErro,
+  emailCorpo,
+  MENSAGENS,
+  TERMOS_VERSAO,
+  tokenCorpo,
+} from '@pelada/contrato';
 import type { Ambiente } from '../ambiente.ts';
 import { comBanco } from '../middlewares/com-banco.ts';
 import { enviarEmailDeConta, limiteEmailsDia } from '../../aplicacao/acesso/enviar-email.ts';
@@ -7,7 +14,14 @@ import { contas, links } from '../../infraestrutura/db/repositorios/contas.ts';
 import { remetenteDoAmbiente } from '../../infraestrutura/email/caixa-dev.ts';
 import { emailAvisoCadastro, emailConfirmacao } from '../../infraestrutura/email/modelos.ts';
 import { gerarToken, hashToken } from '../../infraestrutura/sessao/token.ts';
-import { comFabrica, contarPedidoDeEmail, emailIndisponivel, hex, lerCorpo, type OpcoesRotas } from './apoio-acesso.ts';
+import {
+  comFabrica,
+  contarPedidoDeEmail,
+  emailIndisponivel,
+  hex,
+  lerCorpo,
+  type OpcoesRotas,
+} from './apoio-acesso.ts';
 
 /**
  * Rotas de cadastro e confirmação (T25; ACE-01 a ACE-08, ACE-50, ACE-58, ACE-68), da tabela do
@@ -28,7 +42,13 @@ export function rotasConta(opcoes: OpcoesRotas = {}): Hono<Ambiente> {
     const { nome, email, senha } = corpo.dados;
 
     const { token, hash } = await gerarToken();
-    const r = await contas.cadastrar(c.var.db, { email, nome, senha, termosVersao: TERMOS_VERSAO, tokenHash: hash });
+    const r = await contas.cadastrar(c.var.db, {
+      email,
+      nome,
+      senha,
+      termosVersao: TERMOS_VERSAO,
+      tokenHash: hash,
+    });
     // [LACUNA] o aviso de cadastro duplicado não tem o nome do dono (a função não o devolve, e o
     // nome do corpo é de quem tentou); o rascunho saúda pelo próprio endereço.
     const nova = r.situacao === 'nova';
@@ -64,12 +84,21 @@ export function rotasConta(opcoes: OpcoesRotas = {}): Hono<Ambiente> {
     const { token, hash } = await gerarToken();
     const r = await links.pedir(c.var.db, email, 'confirmacao', hash);
     if (r.enviar) {
-      const conteudo = emailConfirmacao({ urlPublica: c.env.URL_PUBLICA, nome: r.nome ?? email, token });
+      const conteudo = emailConfirmacao({
+        urlPublica: c.env.URL_PUBLICA,
+        nome: r.nome ?? email,
+        token,
+      });
       const envio = await enviarEmailDeConta(c.var.db, remetenteDoAmbiente(c.env), {
         enviar: true,
         categoria: 'cadastro',
         limiteDia: limiteEmailsDia(c.env.LIMITE_EMAILS_DIA),
-        mensagem: { tipo: 'confirmacao', para: email, ...conteudo, idempotencia: `confirmacao:${hex(hash)}` },
+        mensagem: {
+          tipo: 'confirmacao',
+          para: email,
+          ...conteudo,
+          idempotencia: `confirmacao:${hex(hash)}`,
+        },
       });
       if (envio === 'indisponivel') return emailIndisponivel(c);
     }

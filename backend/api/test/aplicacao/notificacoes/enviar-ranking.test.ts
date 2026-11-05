@@ -9,7 +9,11 @@ import {
 import type { Env } from '../../../src/entrada/ambiente.ts';
 import { bancoSemContexto, type AbrirBanco } from '../../../src/entrada/consumidor-avisos.ts';
 import { filaMemoria, type FilaMemoria } from '../../../src/infraestrutura/fila/avisos.ts';
-import { servicoPushFalso, TTL_RANKING, type ServicoPushFalso } from '../../../src/infraestrutura/push/enviar.ts';
+import {
+  servicoPushFalso,
+  TTL_RANKING,
+  type ServicoPushFalso,
+} from '../../../src/infraestrutura/push/enviar.ts';
 import { topicoDoGrupo } from '../../../src/infraestrutura/push/topico.ts';
 import { envCom, fabricaComoApp } from '../../db/requisicao.ts';
 import { abrirCenario, type CenarioAberto } from '../../isolamento/apoio.ts';
@@ -30,17 +34,34 @@ let servico: ServicoPushFalso;
 
 const HOJE_SP = `(now() AT TIME ZONE 'America/Sao_Paulo')::date`;
 
-async function chavesVapid(): Promise<Pick<Env, 'VAPID_PUBLICA' | 'VAPID_PRIVADA' | 'VAPID_ASSUNTO'>> {
-  const par = (await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign'])) as CryptoKeyPair;
+async function chavesVapid(): Promise<
+  Pick<Env, 'VAPID_PUBLICA' | 'VAPID_PRIVADA' | 'VAPID_ASSUNTO'>
+> {
+  const par = (await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, [
+    'sign',
+  ])) as CryptoKeyPair;
   const jwk = (await crypto.subtle.exportKey('jwk', par.privateKey)) as JsonWebKey;
-  const publica = new Uint8Array((await crypto.subtle.exportKey('raw', par.publicKey)) as ArrayBuffer);
-  return { VAPID_PUBLICA: paraBase64url(publica), VAPID_PRIVADA: jwk.d ?? '', VAPID_ASSUNTO: 'mailto:avisos@exemplo.com' };
+  const publica = new Uint8Array(
+    (await crypto.subtle.exportKey('raw', par.publicKey)) as ArrayBuffer,
+  );
+  return {
+    VAPID_PUBLICA: paraBase64url(publica),
+    VAPID_PRIVADA: jwk.d ?? '',
+    VAPID_ASSUNTO: 'mailto:avisos@exemplo.com',
+  };
 }
 
 async function chavesAssinante(): Promise<{ p256dh: string; auth: string }> {
-  const par = (await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveBits'])) as CryptoKeyPair;
-  const publica = new Uint8Array((await crypto.subtle.exportKey('raw', par.publicKey)) as ArrayBuffer);
-  return { p256dh: paraBase64url(publica), auth: paraBase64url(crypto.getRandomValues(new Uint8Array(16))) };
+  const par = (await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, [
+    'deriveBits',
+  ])) as CryptoKeyPair;
+  const publica = new Uint8Array(
+    (await crypto.subtle.exportKey('raw', par.publicKey)) as ArrayBuffer,
+  );
+  return {
+    p256dh: paraBase64url(publica),
+    auth: paraBase64url(crypto.getRandomValues(new Uint8Array(16))),
+  };
 }
 
 const ENDPOINT = (i: number) => `https://fcm.googleapis.com/fcm/send/t18-${i}`;
@@ -52,12 +73,10 @@ async function assinaturas(n: number): Promise<string[]> {
   const endpoints: string[] = [];
   for (let i = 1; i <= n; i += 1) {
     const { p256dh, auth } = await chavesAssinante();
-    await db.query('INSERT INTO push_ranking (grupo_id, endpoint, p256dh, auth) VALUES ($1, $2, $3, $4)', [
-      cenario.grupoA,
-      ENDPOINT(i),
-      p256dh,
-      auth,
-    ]);
+    await db.query(
+      'INSERT INTO push_ranking (grupo_id, endpoint, p256dh, auth) VALUES ($1, $2, $3, $4)',
+      [cenario.grupoA, ENDPOINT(i), p256dh, auth],
+    );
     endpoints.push(ENDPOINT(i));
   }
   return endpoints;
@@ -74,7 +93,10 @@ async function linhas(): Promise<Array<{ endpoint: string; enviado: boolean }>> 
 type Situacao = 'uso_proprio' | 'trial' | 'ativo' | 'inadimplente' | 'cancelado';
 
 /** Plano do grupo A: situação e, no trial, o início `diasAtras` dias antes de hoje (São Paulo). */
-async function plano(situacao: Situacao, opcoes: { diasAtras?: number; arquivado?: boolean } = {}): Promise<void> {
+async function plano(
+  situacao: Situacao,
+  opcoes: { diasAtras?: number; arquivado?: boolean } = {},
+): Promise<void> {
   await aberto.db.query(
     `UPDATE grupos
         SET situacao_comercial = $2,
@@ -97,7 +119,10 @@ function mensagem(): MensagemRanking {
 }
 
 function enviar(m: MensagemRanking, env: Env = envBase, abrir: AbrirBanco = banco) {
-  return criarEnviarRanking({ fetch: servico.fetch, reportar: () => undefined })(m, { env, banco: abrir });
+  return criarEnviarRanking({ fetch: servico.fetch, reportar: () => undefined })(m, {
+    env,
+    banco: abrir,
+  });
 }
 
 beforeAll(async () => {
@@ -187,7 +212,12 @@ describe('enviarRanking', () => {
   it('NOT-61: sem as variáveis VAPID, nenhum fetch e o banco nem é aberto', async () => {
     await assinaturas(2);
     const abrir = vi.fn(banco) as unknown as AbrirBanco;
-    const semVapid = { ...envBase, VAPID_PUBLICA: undefined, VAPID_PRIVADA: '', VAPID_ASSUNTO: undefined } as Env;
+    const semVapid = {
+      ...envBase,
+      VAPID_PUBLICA: undefined,
+      VAPID_PRIVADA: '',
+      VAPID_ASSUNTO: undefined,
+    } as Env;
     await expect(enviar(mensagem(), semVapid, abrir)).resolves.toEqual({ acao: 'concluir' });
     expect(servico.pedidos).toHaveLength(0);
     expect(abrir).not.toHaveBeenCalled();
@@ -212,7 +242,9 @@ describe('enviarRanking', () => {
         throw new Error('queda no meio do lote');
       },
     });
-    await expect(caso(mensagem(), { env: envBase, banco })).rejects.toThrow('queda no meio do lote');
+    await expect(caso(mensagem(), { env: envBase, banco })).rejects.toThrow(
+      'queda no meio do lote',
+    );
     expect(await linhas()).toEqual([
       { endpoint: um, enviado: true },
       { endpoint: dois, enviado: false },
@@ -231,17 +263,22 @@ describe('enviarRanking: retentativa e retomada (T19)', () => {
 
   /** Ids das assinaturas do grupo A, em ordem. */
   async function idsDoGrupo(): Promise<string[]> {
-    const r = await aberto.db.query<{ id: string }>('SELECT id::text FROM push_ranking WHERE grupo_id = $1 ORDER BY id', [
-      aberto.cenario.grupoA,
-    ]);
+    const r = await aberto.db.query<{ id: string }>(
+      'SELECT id::text FROM push_ranking WHERE grupo_id = $1 ORDER BY id',
+      [aberto.cenario.grupoA],
+    );
     return r.rows.map((l) => l.id);
   }
 
   /** A próxima mensagem da fila, já como ranking. */
   function proxima(): { corpo: MensagemRanking; delaySeconds?: number } {
     const item = fila.enviadas.shift();
-    if (item === undefined || item.corpo.tipo !== 'ranking') throw new Error('Nenhuma mensagem de ranking na fila.');
-    return { corpo: item.corpo, ...(item.delaySeconds === undefined ? {} : { delaySeconds: item.delaySeconds }) };
+    if (item === undefined || item.corpo.tipo !== 'ranking')
+      throw new Error('Nenhuma mensagem de ranking na fila.');
+    return {
+      corpo: item.corpo,
+      ...(item.delaySeconds === undefined ? {} : { delaySeconds: item.delaySeconds }),
+    };
   }
 
   it('NOT-34: 41 assinaturas: 40 agora e a continuação a partir do id da 40.ª, que manda só a 41.ª', async () => {
@@ -287,7 +324,12 @@ describe('enviarRanking: retentativa e retomada (T19)', () => {
 
     // A nova tentativa manda só à que ficou pendente.
     await enviar(nova.corpo, env);
-    expect(servico.pedidos.map((p) => p.url)).toEqual([ENDPOINT(1), ENDPOINT(2), ENDPOINT(3), ENDPOINT(2)]);
+    expect(servico.pedidos.map((p) => p.url)).toEqual([
+      ENDPOINT(1),
+      ENDPOINT(2),
+      ENDPOINT(3),
+      ENDPOINT(2),
+    ]);
     expect((await linhas()).every((l) => l.enviado)).toBe(true);
     expect(fila.enviadas).toEqual([]);
   });

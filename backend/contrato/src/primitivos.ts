@@ -24,11 +24,7 @@ export function bytesUtf8(texto: string): number {
 }
 
 /** E-mail guardado em minúsculas e sem espaços nas pontas (ACE-05); até 254 caracteres (ACE-03). */
-export const email = z
-  .string()
-  .trim()
-  .toLowerCase()
-  .pipe(z.email().max(LIMITES.emailMax));
+export const email = z.string().trim().toLowerCase().pipe(z.email().max(LIMITES.emailMax));
 
 /** Nome de 2 a 60 caracteres, sem os espaços das pontas (ACE-03). */
 export const nome = z.string().trim().min(LIMITES.nomeMin).max(LIMITES.nomeMax);

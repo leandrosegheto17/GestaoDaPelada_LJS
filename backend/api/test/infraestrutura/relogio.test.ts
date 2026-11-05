@@ -42,7 +42,9 @@ describe('criarApp({ relogio })', () => {
   }
 
   const extras = (api: Hono<Ambiente>) => {
-    api.get('/teste-relogio', (c) => c.json({ hoje: c.var.relogio.hoje(), agora: c.var.relogio.agoraIso() }));
+    api.get('/teste-relogio', (c) =>
+      c.json({ hoje: c.var.relogio.hoje(), agora: c.var.relogio.agoraIso() }),
+    );
   };
 
   it('GEL-32: as rotas usam o relógio falso', async () => {

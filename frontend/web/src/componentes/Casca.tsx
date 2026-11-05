@@ -31,15 +31,29 @@ export interface PropsCasca {
   children?: ReactNode;
 }
 
-export function Casca({ titulo, grupo, centralizada = false, estreita = false, ocupada = false, acoes, children }: PropsCasca) {
+export function Casca({
+  titulo,
+  grupo,
+  centralizada = false,
+  estreita = false,
+  ocupada = false,
+  acoes,
+  children,
+}: PropsCasca) {
   const classeMain = centralizada
     ? estilos['tela-mensagem']
-    : [estilos.conteudo, grupo ? estilos['conteudo--admin'] : '', estreita ? estilos['conteudo--estreito'] : '']
+    : [
+        estilos.conteudo,
+        grupo ? estilos['conteudo--admin'] : '',
+        estreita ? estilos['conteudo--estreito'] : '',
+      ]
         .filter(Boolean)
         .join(' ');
   return (
     <>
-      <header className={[estilos.barra, grupo ? estilos['barra--admin'] : ''].filter(Boolean).join(' ')}>
+      <header
+        className={[estilos.barra, grupo ? estilos['barra--admin'] : ''].filter(Boolean).join(' ')}
+      >
         {grupo ? (
           <div className={estilos['barra__grupo']}>
             <span className={estilos['barra__nome']}>{grupo.nome}</span>

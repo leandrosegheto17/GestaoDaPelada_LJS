@@ -42,7 +42,13 @@ describe('ativos do mockup', () => {
     expect(nomes).toContain('/src/estilos/tokens.css');
     expect(nomes.filter((n) => n.endsWith('.woff2'))).toHaveLength(14);
     expect(nomes).toContain('/public/fontes/OFL.txt');
-    for (const icone of ['icone-192.png', 'icone-512.png', 'icone-512-maskable.png', 'apple-touch-180.png', 'icone.svg']) {
+    for (const icone of [
+      'icone-192.png',
+      'icone-512.png',
+      'icone-512-maskable.png',
+      'apple-touch-180.png',
+      'icone.svg',
+    ]) {
       expect(nomes).toContain(`/public/icones/${icone}`);
     }
   });

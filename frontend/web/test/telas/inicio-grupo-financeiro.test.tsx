@@ -1,6 +1,10 @@
 import { cleanup, screen, within } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
-import { InicioGrupo, TEXTO_CAIXA_NAO_CONFIGURADO, textoSaldo } from '../../src/telas/grupo/InicioGrupo.tsx';
+import {
+  InicioGrupo,
+  TEXTO_CAIXA_NAO_CONFIGURADO,
+  textoSaldo,
+} from '../../src/telas/grupo/InicioGrupo.tsx';
 import { esperarSemViolacoes } from '../apoio/axe.ts';
 import { abrirTela, json, SESSAO_ANA, type Manipulador } from '../apoio/tela.tsx';
 
@@ -38,7 +42,11 @@ const QUINTA = {
 };
 
 function abrir(api: Record<string, Manipulador>) {
-  return abrirTela('/app/grupos/g-quinta', { 'GET /api/sessao': () => json(200, SESSAO_ANA), ...api }, rotas);
+  return abrirTela(
+    '/app/grupos/g-quinta',
+    { 'GET /api/sessao': () => json(200, SESSAO_ANA), ...api },
+    rotas,
+  );
 }
 
 afterEach(() => {
@@ -56,7 +64,9 @@ describe('textoSaldo', () => {
 
 describe('item Financeiro no início (t09)', () => {
   it('FIN-34: com saldo 124550, item "Financeiro" com "Saldo R$ 1.245,50" e link para o financeiro; axe sem violação', async () => {
-    const { container } = abrir({ 'GET /api/grupos/g-quinta': () => json(200, { ...QUINTA, saldoFinanceiroCentavos: 124550 }) });
+    const { container } = abrir({
+      'GET /api/grupos/g-quinta': () => json(200, { ...QUINTA, saldoFinanceiroCentavos: 124550 }),
+    });
     const lista = await screen.findByRole('list', { name: 'Gerenciar' });
     const item = within(lista).getByRole('link', { name: /Financeiro/ });
     expect(item.textContent).toBe('FinanceiroSaldo R$ 1.245,50');
@@ -67,9 +77,13 @@ describe('item Financeiro no início (t09)', () => {
   });
 
   it('FIN-34: saldo nulo (caixa sem configuração) mostra "Caixa não configurado"', async () => {
-    abrir({ 'GET /api/grupos/g-quinta': () => json(200, { ...QUINTA, saldoFinanceiroCentavos: null }) });
+    abrir({
+      'GET /api/grupos/g-quinta': () => json(200, { ...QUINTA, saldoFinanceiroCentavos: null }),
+    });
     const lista = await screen.findByRole('list', { name: 'Gerenciar' });
-    expect(within(lista).getByRole('link', { name: /Financeiro/ }).textContent).toBe(`Financeiro${TEXTO_CAIXA_NAO_CONFIGURADO}`);
+    expect(within(lista).getByRole('link', { name: /Financeiro/ }).textContent).toBe(
+      `Financeiro${TEXTO_CAIXA_NAO_CONFIGURADO}`,
+    );
   });
 
   it('FIN-34: sem a chave saldoFinanceiroCentavos, nenhum item Financeiro', async () => {
@@ -79,6 +93,10 @@ describe('item Financeiro no início (t09)', () => {
     // partidas-e-ranking T64 (autorização de 2026-11-04 da financeiro no STATE.md): os 7 itens do mockup do módulo,
     // nenhum deles Financeiro.
     expect(within(lista).getAllByRole('link')).toHaveLength(7);
-    expect(within(lista).getAllByRole('link').map((a) => a.textContent)).not.toContain(expect.stringMatching(/^Financeiro/));
+    expect(
+      within(lista)
+        .getAllByRole('link')
+        .map((a) => a.textContent),
+    ).not.toContain(expect.stringMatching(/^Financeiro/));
   });
 });

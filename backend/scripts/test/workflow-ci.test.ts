@@ -20,7 +20,8 @@ describe('ci.yml', () => {
   });
 
   it('FUN-40: tem os jobs qualidade, testes e banco', () => {
-    for (const nome of ['qualidade', 'testes', 'banco']) expect(Object.keys(wf.jobs)).toContain(nome);
+    for (const nome of ['qualidade', 'testes', 'banco'])
+      expect(Object.keys(wf.jobs)).toContain(nome);
   });
 
   it('FUN-40: os jobs testes e banco usam o serviço postgres:18', () => {
@@ -34,10 +35,18 @@ describe('ci.yml', () => {
     expect(q).toMatch(/pnpm lint\b/);
     expect(q).toMatch(/pnpm format:check\b/);
     expect(q).toMatch(/pnpm typecheck\b/);
-    for (const checagem of ['actions-por-sha', 'wrangler-unico', 'env-example', 'sem-url-absoluta', 'migracao-aditiva']) {
+    for (const checagem of [
+      'actions-por-sha',
+      'wrangler-unico',
+      'env-example',
+      'sem-url-absoluta',
+      'migracao-aditiva',
+    ]) {
       expect(q).toContain(`checagens/${checagem}.ts`);
     }
-    expect((wf.jobs.qualidade?.steps ?? []).some((p) => p.uses?.startsWith('gitleaks/gitleaks-action@'))).toBe(true);
+    expect(
+      (wf.jobs.qualidade?.steps ?? []).some((p) => p.uses?.startsWith('gitleaks/gitleaks-action@')),
+    ).toBe(true);
   });
 
   it('FUN-40: o job testes roda a suíte e os testes das checagens', () => {
@@ -85,9 +94,13 @@ describe('ci.yml: job web', () => {
   const runsWeb = runs(web);
 
   it('FUN-40: o job web tem build, e2e e a comparação visual, nessa ordem', () => {
-    const iBuild = passosWeb.findIndex((p) => /pnpm --filter @pelada\/web build\b/.test(p.run ?? ''));
+    const iBuild = passosWeb.findIndex((p) =>
+      /pnpm --filter @pelada\/web build\b/.test(p.run ?? ''),
+    );
     const iE2e = passosWeb.findIndex((p) => /playwright test\b/.test(p.run ?? ''));
-    const iVisual = passosWeb.findIndex((p) => /pnpm --filter @pelada\/web visual\b/.test(p.run ?? ''));
+    const iVisual = passosWeb.findIndex((p) =>
+      /pnpm --filter @pelada\/web visual\b/.test(p.run ?? ''),
+    );
     expect(iBuild).toBeGreaterThanOrEqual(0);
     expect(iE2e).toBeGreaterThan(iBuild);
     expect(iVisual).toBeGreaterThan(iE2e);

@@ -42,7 +42,9 @@ export function classificarDoisTimes<A extends AptoOrdenado>(
   const fimReservas = fimTitulares + vagasDeReserva(n, k);
   return {
     titulares: ordenados.slice(0, fimTitulares),
-    reservasQueEntram: ordenados.slice(fimTitulares, fimReservas).map((apto) => ({ apto, jogaSo2oTempo: apto.so1oTempo })),
+    reservasQueEntram: ordenados
+      .slice(fimTitulares, fimReservas)
+      .map((apto) => ({ apto, jogaSo2oTempo: apto.so1oTempo })),
     naoEntra: ordenados.slice(fimReservas),
   };
 }

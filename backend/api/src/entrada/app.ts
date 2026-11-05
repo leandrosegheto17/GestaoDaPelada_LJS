@@ -6,7 +6,11 @@ import { semCache, semSniff } from './middlewares/cabecalhos.ts';
 import { travarFinanceiro } from './middlewares/financeiro.ts';
 import { limitarEscritasDeGrupo } from './middlewares/limite-escrita.ts';
 import { limitarRotasDeAcesso } from './middlewares/limite-taxa.ts';
-import { recursoLiberadoPeloPlano, travarRecursosDoPlano, type RecursoLiberado } from './middlewares/recurso.ts';
+import {
+  recursoLiberadoPeloPlano,
+  travarRecursosDoPlano,
+  type RecursoLiberado,
+} from './middlewares/recurso.ts';
 import { carregarSessao } from './middlewares/sessao.ts';
 import { protegerRotasDeGrupo } from './middlewares/vinculo.ts';
 import { rotasAdmins } from './rotas/admins.ts';
@@ -75,7 +79,10 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
     c.set('relogio', relogio);
     c.set('recursoLiberado', recursoLiberado);
     // Cliente do Asaas da requisição (planos-e-cobranca T33): o dos testes ou o HTTP com a config do Worker.
-    c.set('asaas', opcoes.asaas ?? asaasHttp({ ASAAS_URL: c.env.ASAAS_URL, ASAAS_API_KEY: c.env.ASAAS_API_KEY }));
+    c.set(
+      'asaas',
+      opcoes.asaas ?? asaasHttp({ ASAAS_URL: c.env.ASAAS_URL, ASAAS_API_KEY: c.env.ASAAS_API_KEY }),
+    );
     await next();
   });
 
@@ -140,7 +147,8 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
   api.notFound((c) => c.json({ erro: 'Rota não encontrada.' }, 404));
   api.onError((erro, c) => {
     // Banco fora: 503 com mensagem fixa, sem a URL nem o erro do driver (FUN-16).
-    if (erro instanceof ErroBancoIndisponivel) return c.json({ erro: MENSAGEM_BANCO_INDISPONIVEL }, 503);
+    if (erro instanceof ErroBancoIndisponivel)
+      return c.json({ erro: MENSAGEM_BANCO_INDISPONIVEL }, 503);
     return c.json({ erro: 'Erro interno.' }, 500);
   });
 

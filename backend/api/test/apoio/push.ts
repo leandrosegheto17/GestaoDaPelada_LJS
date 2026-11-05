@@ -14,17 +14,36 @@ function b(texto: string): Uint8Array<ArrayBuffer> {
   return new Uint8Array(bytes);
 }
 
-async function hkdf(sal: Uint8Array<ArrayBuffer>, ikm: Uint8Array<ArrayBuffer>, info: string | Uint8Array<ArrayBuffer>, bytes: number) {
+async function hkdf(
+  sal: Uint8Array<ArrayBuffer>,
+  ikm: Uint8Array<ArrayBuffer>,
+  info: string | Uint8Array<ArrayBuffer>,
+  bytes: number,
+) {
   const chave = await crypto.subtle.importKey('raw', ikm, 'HKDF', false, ['deriveBits']);
   const infoBytes = typeof info === 'string' ? new TextEncoder().encode(info) : info;
-  return new Uint8Array(await crypto.subtle.deriveBits({ name: 'HKDF', hash: 'SHA-256', salt: sal, info: infoBytes }, chave, bytes * 8));
+  return new Uint8Array(
+    await crypto.subtle.deriveBits(
+      { name: 'HKDF', hash: 'SHA-256', salt: sal, info: infoBytes },
+      chave,
+      bytes * 8,
+    ),
+  );
 }
 
 export async function chavesVapidDeTeste(): Promise<ChavesVapid> {
-  const par = (await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, ['sign'])) as CryptoKeyPair;
+  const par = (await crypto.subtle.generateKey({ name: 'ECDSA', namedCurve: 'P-256' }, true, [
+    'sign',
+  ])) as CryptoKeyPair;
   const jwk = (await crypto.subtle.exportKey('jwk', par.privateKey)) as JsonWebKey;
-  const publica = new Uint8Array((await crypto.subtle.exportKey('raw', par.publicKey)) as ArrayBuffer);
-  return { publica: paraBase64url(publica), privada: jwk.d ?? '', assunto: 'mailto:avisos@exemplo.com' };
+  const publica = new Uint8Array(
+    (await crypto.subtle.exportKey('raw', par.publicKey)) as ArrayBuffer,
+  );
+  return {
+    publica: paraBase64url(publica),
+    privada: jwk.d ?? '',
+    assunto: 'mailto:avisos@exemplo.com',
+  };
 }
 
 /** Um assinante com a chave privada guardada, para decifrar o que receber. */
@@ -35,8 +54,12 @@ export interface AssinanteDeTeste {
 }
 
 export async function assinanteDeTeste(): Promise<AssinanteDeTeste> {
-  const par = (await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveBits'])) as CryptoKeyPair;
-  const publica = new Uint8Array((await crypto.subtle.exportKey('raw', par.publicKey)) as ArrayBuffer);
+  const par = (await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, [
+    'deriveBits',
+  ])) as CryptoKeyPair;
+  const publica = new Uint8Array(
+    (await crypto.subtle.exportKey('raw', par.publicKey)) as ArrayBuffer,
+  );
   const jwk = (await crypto.subtle.exportKey('jwk', par.privateKey)) as JsonWebKey;
   return {
     p256dh: paraBase64url(publica),
@@ -46,7 +69,10 @@ export async function assinanteDeTeste(): Promise<AssinanteDeTeste> {
 }
 
 /** O texto do payload que o assinante recebeu. Lança se o corpo não é um registro `aes128gcm` dele. */
-export async function decifrarPush(corpo: Uint8Array, assinante: AssinanteDeTeste): Promise<string> {
+export async function decifrarPush(
+  corpo: Uint8Array,
+  assinante: AssinanteDeTeste,
+): Promise<string> {
   const sal = new Uint8Array(corpo.subarray(0, 16));
   const idlen = corpo[20] ?? 0;
   if (idlen !== 65) throw new Error('cabeçalho aes128gcm inesperado');
@@ -61,14 +87,28 @@ export async function decifrarPush(corpo: Uint8Array, assinante: AssinanteDeTest
     false,
     ['deriveBits'],
   );
-  const publica = await crypto.subtle.importKey('raw', asPublica, { name: 'ECDH', namedCurve: 'P-256' }, false, []);
-  const ecdh = new Uint8Array(await crypto.subtle.deriveBits({ name: 'ECDH', public: publica }, privada, 256));
-  const info = new Uint8Array([...new TextEncoder().encode('WebPush: info\0'), ...ua, ...asPublica]);
+  const publica = await crypto.subtle.importKey(
+    'raw',
+    asPublica,
+    { name: 'ECDH', namedCurve: 'P-256' },
+    false,
+    [],
+  );
+  const ecdh = new Uint8Array(
+    await crypto.subtle.deriveBits({ name: 'ECDH', public: publica }, privada, 256),
+  );
+  const info = new Uint8Array([
+    ...new TextEncoder().encode('WebPush: info\0'),
+    ...ua,
+    ...asPublica,
+  ]);
   const ikm = await hkdf(b(assinante.auth), ecdh, info, 32);
   const cek = await hkdf(sal, ikm, 'Content-Encoding: aes128gcm\0', 16);
   const nonce = await hkdf(sal, ikm, 'Content-Encoding: nonce\0', 12);
   const chave = await crypto.subtle.importKey('raw', cek, 'AES-GCM', false, ['decrypt']);
-  const registro = new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: nonce }, chave, cifrado));
+  const registro = new Uint8Array(
+    await crypto.subtle.decrypt({ name: 'AES-GCM', iv: nonce }, chave, cifrado),
+  );
   let fim = registro.length - 1;
   while (fim >= 0 && registro[fim] === 0) fim -= 1;
   if (registro[fim] !== 0x02) throw new Error('delimitador do último registro ausente');

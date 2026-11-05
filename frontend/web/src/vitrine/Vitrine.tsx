@@ -50,6 +50,7 @@ export const TELAS_VITRINE = {
 
 export function Vitrine() {
   const { id } = useParams();
-  const Tela = id && Object.hasOwn(TELAS_VITRINE, id) ? TELAS_VITRINE[id as keyof typeof TELAS_VITRINE] : null;
+  const Tela =
+    id && Object.hasOwn(TELAS_VITRINE, id) ? TELAS_VITRINE[id as keyof typeof TELAS_VITRINE] : null;
   return Tela ? <Tela /> : <NaoEncontrada />;
 }

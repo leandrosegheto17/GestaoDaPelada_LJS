@@ -10,8 +10,10 @@ import estilos from './CaixaSelecao.module.css';
  * ligado por `aria-describedby`.
  */
 
-export interface PropsCaixaSelecao
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'className' | 'id' | 'type' | 'defaultChecked' | 'children'> {
+export interface PropsCaixaSelecao extends Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  'className' | 'id' | 'type' | 'defaultChecked' | 'children'
+> {
   id: string;
   /** Rótulo; pode ter links. */
   children: ReactNode;
@@ -40,11 +42,22 @@ function IconeErro() {
   );
 }
 
-export function CaixaSelecao({ id, children, erro, ref, 'aria-describedby': descricaoExtra, ...resto }: PropsCaixaSelecao) {
+export function CaixaSelecao({
+  id,
+  children,
+  erro,
+  ref,
+  'aria-describedby': descricaoExtra,
+  ...resto
+}: PropsCaixaSelecao) {
   const idErro = erro ? `${id}-erro` : undefined;
   const descricao = [descricaoExtra, idErro].filter(Boolean).join(' ') || undefined;
   return (
-    <div className={[estilosCampo.campo, erro ? estilosCampo['campo--erro'] : ''].filter(Boolean).join(' ')}>
+    <div
+      className={[estilosCampo.campo, erro ? estilosCampo['campo--erro'] : '']
+        .filter(Boolean)
+        .join(' ')}
+    >
       <label className={estilos.caixa}>
         <input
           {...resto}

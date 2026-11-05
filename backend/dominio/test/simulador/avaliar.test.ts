@@ -1,7 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import type { Apto } from '../../src/simulador/base.ts';
 import { avaliar, type ComposicaoEntrada } from '../../src/simulador/avaliar.ts';
-import { sugerir, type EntradaSimulador, type SugestaoDois, type SugestaoVarios } from '../../src/simulador/sugerir.ts';
+import {
+  sugerir,
+  type EntradaSimulador,
+  type SugestaoDois,
+  type SugestaoVarios,
+} from '../../src/simulador/sugerir.ts';
 import { aptosFixos, DATA, historicoFixo } from './apoio.ts';
 
 /**
@@ -17,8 +22,20 @@ import { aptosFixos, DATA, historicoFixo } from './apoio.ts';
 
 const historico = historicoFixo();
 const APTOS = aptosFixos(19);
-const ENTRADA_DOIS: EntradaSimulador = { formato: 'dois_times', data: DATA, n: 7, k: 2, aptos: APTOS };
-const ENTRADA_VARIOS: EntradaSimulador = { formato: 'varios_times', data: DATA, n: 4, k: 'ilimitado', aptos: aptosFixos(22) };
+const ENTRADA_DOIS: EntradaSimulador = {
+  formato: 'dois_times',
+  data: DATA,
+  n: 7,
+  k: 2,
+  aptos: APTOS,
+};
+const ENTRADA_VARIOS: EntradaSimulador = {
+  formato: 'varios_times',
+  data: DATA,
+  n: 4,
+  k: 'ilimitado',
+  aptos: aptosFixos(22),
+};
 
 function sugestaoDois(): SugestaoDois {
   const s = sugerir(ENTRADA_DOIS, historico);
@@ -37,13 +54,22 @@ function so1oDe(aptos: readonly Apto[]) {
   return (id: string) => ({ id, so1oTempo: mapa.get(id) ?? false });
 }
 
-function entradaDe(s: SugestaoDois, aptos: readonly Apto[] = APTOS): ComposicaoEntrada & { formato: 'dois_times' } {
+function entradaDe(
+  s: SugestaoDois,
+  aptos: readonly Apto[] = APTOS,
+): ComposicaoEntrada & { formato: 'dois_times' } {
   const j = so1oDe(aptos);
   return {
     formato: 'dois_times',
     times: [
-      { titulares: s.composicao.times[0].titulares.map(j), entram: s.composicao.times[0].entram.map(j) },
-      { titulares: s.composicao.times[1].titulares.map(j), entram: s.composicao.times[1].entram.map(j) },
+      {
+        titulares: s.composicao.times[0].titulares.map(j),
+        entram: s.composicao.times[0].entram.map(j),
+      },
+      {
+        titulares: s.composicao.times[1].titulares.map(j),
+        entram: s.composicao.times[1].entram.map(j),
+      },
     ],
     naoEntra: [...s.composicao.naoEntra],
   };
@@ -53,7 +79,12 @@ describe('avaliar em 2 times', () => {
   it('SIM-62: avaliar a própria sugestão devolve os mesmos indicadores e avisos de sugerir', () => {
     const s = sugestaoDois();
     const r = avaliar(ENTRADA_DOIS, entradaDe(s), historico);
-    expect(r).toMatchObject({ ok: true, indicadores: s.indicadores, avisos: s.avisos, composicao: s.composicao });
+    expect(r).toMatchObject({
+      ok: true,
+      indicadores: s.indicadores,
+      avisos: s.avisos,
+      composicao: s.composicao,
+    });
   });
 
   it('SIM-62: mover um titular de A para B muda somas e pares e mantém o resto da composição', () => {
@@ -78,7 +109,9 @@ describe('avaliar em 2 times', () => {
     expect(r.composicao.times[0].entram).toEqual(s.composicao.times[0].entram);
     expect(r.composicao.times[1].entram).toEqual(s.composicao.times[1].entram);
     expect(r.composicao.naoEntra).toEqual(s.composicao.naoEntra);
-    expect(r.avisos.map((a) => a.texto)).toContain('A composição difere da prevista: confira Time A e Time B.');
+    expect(r.avisos.map((a) => a.texto)).toContain(
+      'A composição difere da prevista: confira Time A e Time B.',
+    );
   });
 
   it('SIM-62: o "só 1º" marcado na composição vale mais que o da entrada', () => {
@@ -88,7 +121,10 @@ describe('avaliar em 2 times', () => {
     const ajustada: ComposicaoEntrada = {
       ...comp,
       times: [
-        { titulares: [{ ...marcado, so1oTempo: true }, ...comp.times[0].titulares.slice(1)], entram: comp.times[0].entram },
+        {
+          titulares: [{ ...marcado, so1oTempo: true }, ...comp.times[0].titulares.slice(1)],
+          entram: comp.times[0].entram,
+        },
         comp.times[1],
       ],
     };
@@ -99,7 +135,10 @@ describe('avaliar em 2 times', () => {
 
   it('SIM-63: jogador repetido dá "Há jogador repetido na composição."', () => {
     const comp = entradaDe(sugestaoDois());
-    const repetido: ComposicaoEntrada = { ...comp, naoEntra: [...comp.naoEntra, comp.times[0].titulares[0]!.id] };
+    const repetido: ComposicaoEntrada = {
+      ...comp,
+      naoEntra: [...comp.naoEntra, comp.times[0].titulares[0]!.id],
+    };
     expect(avaliar(ENTRADA_DOIS, repetido, historico)).toEqual({
       ok: false,
       campo: 'composicao',
@@ -120,21 +159,35 @@ describe('avaliar em 2 times', () => {
   it('SIM-63: repetido é conferido antes de fora dos aptos', () => {
     const comp = entradaDe(sugestaoDois());
     const ambos: ComposicaoEntrada = { ...comp, naoEntra: [...comp.naoEntra, 'x', 'x'] };
-    expect(avaliar(ENTRADA_DOIS, ambos, historico)).toMatchObject({ mensagem: 'Há jogador repetido na composição.' });
+    expect(avaliar(ENTRADA_DOIS, ambos, historico)).toMatchObject({
+      mensagem: 'Há jogador repetido na composição.',
+    });
   });
 });
 
 describe('avaliar em 3 ou mais times', () => {
   it('SIM-62: avaliar a própria sugestão devolve os mesmos indicadores e avisos', () => {
     const s = sugestaoVarios();
-    const r = avaliar(ENTRADA_VARIOS, { formato: 'varios_times', times: s.times }, historicoFixo(22));
-    expect(r).toMatchObject({ ok: true, indicadores: s.indicadores, avisos: s.avisos, times: s.times, incompleto: 5 });
+    const r = avaliar(
+      ENTRADA_VARIOS,
+      { formato: 'varios_times', times: s.times },
+      historicoFixo(22),
+    );
+    expect(r).toMatchObject({
+      ok: true,
+      indicadores: s.indicadores,
+      avisos: s.avisos,
+      times: s.times,
+      incompleto: 5,
+    });
   });
 
   it('SIM-63: jogador fora dos aptos em 3 ou mais é recusado', () => {
     const s = sugestaoVarios();
     const times = s.times.map((t, i) => (i === 0 ? [...t.slice(1), 'de-outro-grupo'] : t));
-    expect(avaliar(ENTRADA_VARIOS, { formato: 'varios_times', times }, historicoFixo(22))).toMatchObject({
+    expect(
+      avaliar(ENTRADA_VARIOS, { formato: 'varios_times', times }, historicoFixo(22)),
+    ).toMatchObject({
       ok: false,
       mensagem: 'Há jogador fora dos aptos na composição.',
     });

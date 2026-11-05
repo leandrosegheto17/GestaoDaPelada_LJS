@@ -17,7 +17,9 @@ const AJUDA = 'Este grupo não está disponível no momento. Fale com o admin do
 describe('GrupoIndisponivel', () => {
   it('PAR-94: /g/Nao_Valido mostra "Grupo indisponível" sem nenhuma requisição', async () => {
     const t = abrirTela('/g/Nao_Valido', {}, rotas);
-    expect(await screen.findByRole('heading', { level: 1, name: 'Grupo indisponível' })).toBeDefined();
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Grupo indisponível' }),
+    ).toBeDefined();
     expect(screen.getByText(AJUDA)).toBeDefined();
     expect(t.chamadas.filter((c) => c.caminho.startsWith('/api/publico/'))).toEqual([]);
   });
@@ -25,10 +27,15 @@ describe('GrupoIndisponivel', () => {
   it('PAR-94: 404 da API mostra o mesmo texto', async () => {
     const t = abrirTela(
       '/g/grupo-que-nao-existe',
-      { 'GET /api/publico/grupo-que-nao-existe/ranking': () => erroApi(404, 'nao_encontrado', 'Não encontrado.') },
+      {
+        'GET /api/publico/grupo-que-nao-existe/ranking': () =>
+          erroApi(404, 'nao_encontrado', 'Não encontrado.'),
+      },
       rotas,
     );
-    expect(await screen.findByRole('heading', { level: 1, name: 'Grupo indisponível' })).toBeDefined();
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Grupo indisponível' }),
+    ).toBeDefined();
     expect(screen.getByText(AJUDA)).toBeDefined();
     expect(t.chamadasA('GET', '/api/publico/grupo-que-nao-existe/ranking')).toHaveLength(1);
     expect(screen.queryByText('Sem conexão')).toBeNull();

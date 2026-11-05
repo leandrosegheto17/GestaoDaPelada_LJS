@@ -1,8 +1,19 @@
 import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
-import { AVISOS_ENTRAR, TEXTO_NAO_CONFIRMADO, TEXTO_REENVIADO } from '../../src/telas/entrar/Entrar.tsx';
+import {
+  AVISOS_ENTRAR,
+  TEXTO_NAO_CONFIRMADO,
+  TEXTO_REENVIADO,
+} from '../../src/telas/entrar/Entrar.tsx';
 import { esperarSemViolacoes } from '../apoio/axe.ts';
-import { abrirTela, erroApi, json, pendente, SESSAO_ANA, type Manipulador } from '../apoio/tela.tsx';
+import {
+  abrirTela,
+  erroApi,
+  json,
+  pendente,
+  SESSAO_ANA,
+  type Manipulador,
+} from '../apoio/tela.tsx';
 
 afterEach(() => {
   cleanup();
@@ -28,9 +39,15 @@ describe('tela Entrar', () => {
     expect(await screen.findByRole('heading', { level: 1, name: 'Entrar' })).toBeTruthy();
     expect((screen.getByLabelText('E-mail') as HTMLInputElement).type).toBe('email');
     expect((screen.getByLabelText('Senha') as HTMLInputElement).type).toBe('password');
-    expect(screen.getByText('No iPhone, o app instalado e o Safari pedem login separadamente.')).toBeTruthy();
-    expect(screen.getByRole('link', { name: 'Esqueci a senha' }).getAttribute('href')).toBe('/entrar/esqueci');
-    expect(screen.getByRole('link', { name: 'Criar conta' }).getAttribute('href')).toBe('/cadastro');
+    expect(
+      screen.getByText('No iPhone, o app instalado e o Safari pedem login separadamente.'),
+    ).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Esqueci a senha' }).getAttribute('href')).toBe(
+      '/entrar/esqueci',
+    );
+    expect(screen.getByRole('link', { name: 'Criar conta' }).getAttribute('href')).toBe(
+      '/cadastro',
+    );
     await esperarSemViolacoes(container);
   });
 
@@ -47,7 +64,10 @@ describe('tela Entrar', () => {
     preencher();
     enviar();
     await waitFor(() => expect(local()).toBe('/app'));
-    expect(chamadasA('POST', '/api/sessao/entrar')[0]?.corpo).toEqual({ email: 'ana@exemplo.test', senha: 'SenhaForte123' });
+    expect(chamadasA('POST', '/api/sessao/entrar')[0]?.corpo).toEqual({
+      email: 'ana@exemplo.test',
+      senha: 'SenhaForte123',
+    });
   });
 
   it('ACE-09: o carregando desabilita o botão com "Entrando…" e marca o formulário; axe sem violação', async () => {
@@ -82,17 +102,27 @@ describe('tela Entrar', () => {
   it('ACE-13: 429 bloqueado_temporariamente mostra a mensagem do bloqueio; axe sem violação', async () => {
     const { container } = abrirTela(
       '/entrar',
-      recusando(() => erroApi(429, 'bloqueado_temporariamente', 'Muitas tentativas. Tente de novo em 15 minutos.')),
+      recusando(() =>
+        erroApi(
+          429,
+          'bloqueado_temporariamente',
+          'Muitas tentativas. Tente de novo em 15 minutos.',
+        ),
+      ),
     );
     await screen.findByLabelText('E-mail');
     preencher();
     enviar();
-    expect((await screen.findByRole('alert')).textContent).toBe('Muitas tentativas. Tente de novo em 15 minutos.');
+    expect((await screen.findByRole('alert')).textContent).toBe(
+      'Muitas tentativas. Tente de novo em 15 minutos.',
+    );
     await esperarSemViolacoes(container);
   });
 
   it('falha de rede mostra a mensagem de conexão', async () => {
-    abrirTela('/entrar', { 'POST /api/sessao/entrar': () => Promise.reject(new TypeError('Failed to fetch')) });
+    abrirTela('/entrar', {
+      'POST /api/sessao/entrar': () => Promise.reject(new TypeError('Failed to fetch')),
+    });
     await screen.findByLabelText('E-mail');
     preencher();
     enviar();
@@ -102,9 +132,12 @@ describe('tela Entrar', () => {
   it('ACE-12: 403 email_nao_confirmado mostra o aviso e "Enviar outro link", que chama POST /api/conta/reenviar-confirmacao', async () => {
     const { container, chamadasA } = abrirTela(
       '/entrar',
-      recusando(() => erroApi(403, 'email_nao_confirmado', 'Confirme o seu e-mail antes de entrar.'), {
-        'POST /api/conta/reenviar-confirmacao': () => json(200, { mensagem: 'ok' }),
-      }),
+      recusando(
+        () => erroApi(403, 'email_nao_confirmado', 'Confirme o seu e-mail antes de entrar.'),
+        {
+          'POST /api/conta/reenviar-confirmacao': () => json(200, { mensagem: 'ok' }),
+        },
+      ),
     );
     await screen.findByLabelText('E-mail');
     preencher();
@@ -115,7 +148,9 @@ describe('tela Entrar', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Enviar outro link' }));
     expect(await screen.findByText(TEXTO_REENVIADO)).toBeTruthy();
-    expect(chamadasA('POST', '/api/conta/reenviar-confirmacao').map((c) => c.corpo)).toEqual([{ email: 'ana@exemplo.test' }]);
+    expect(chamadasA('POST', '/api/conta/reenviar-confirmacao').map((c) => c.corpo)).toEqual([
+      { email: 'ana@exemplo.test' },
+    ]);
     expect(screen.queryByRole('button', { name: 'Enviar outro link' })).toBeNull();
     await esperarSemViolacoes(container);
   });
@@ -125,14 +160,20 @@ describe('tela Entrar', () => {
       '/entrar',
       recusando(() => erroApi(403, 'email_nao_confirmado'), {
         'POST /api/conta/reenviar-confirmacao': () =>
-          erroApi(503, 'email_indisponivel', 'Não conseguimos enviar o e-mail agora. Tente de novo em alguns minutos.'),
+          erroApi(
+            503,
+            'email_indisponivel',
+            'Não conseguimos enviar o e-mail agora. Tente de novo em alguns minutos.',
+          ),
       }),
     );
     await screen.findByLabelText('E-mail');
     preencher();
     enviar();
     fireEvent.click(await screen.findByRole('button', { name: 'Enviar outro link' }));
-    expect((await screen.findByRole('alert')).textContent).toMatch(/Não conseguimos enviar o e-mail agora/);
+    expect((await screen.findByRole('alert')).textContent).toMatch(
+      /Não conseguimos enviar o e-mail agora/,
+    );
     expect(screen.getByRole('button', { name: 'Enviar outro link' })).toBeTruthy();
   });
 
@@ -146,7 +187,9 @@ describe('tela Entrar', () => {
       const faixa = await screen.findByRole('status');
       expect(faixa.textContent).toBe(esperado);
       expect(AVISOS_ENTRAR[aviso]?.texto).toBe(esperado);
-      expect(faixa.className).toContain(aviso === 'sessao-expirada' ? 'faixa--info' : 'faixa--sucesso');
+      expect(faixa.className).toContain(
+        aviso === 'sessao-expirada' ? 'faixa--info' : 'faixa--sucesso',
+      );
       await esperarSemViolacoes(container);
     });
   }

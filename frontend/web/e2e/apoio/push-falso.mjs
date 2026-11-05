@@ -39,8 +39,10 @@ export async function iniciarPushFalso(opcoes = {}) {
   const servidor = createServer(async (req, res) => {
     const url = new URL(req.url ?? '/', 'http://localhost');
 
-    if (req.method === 'GET' && url.pathname === '/saude') return responderJson(res, 200, { ok: true });
-    if (req.method === 'GET' && url.pathname === '/teste/recebidas') return responderJson(res, 200, { recebidas });
+    if (req.method === 'GET' && url.pathname === '/saude')
+      return responderJson(res, 200, { ok: true });
+    if (req.method === 'GET' && url.pathname === '/teste/recebidas')
+      return responderJson(res, 200, { recebidas });
     if (req.method === 'POST' && url.pathname === '/teste/limpar') {
       recebidas.length = 0;
       respostas.length = 0;
@@ -66,7 +68,9 @@ export async function iniciarPushFalso(opcoes = {}) {
         topic: req.headers['topic'] ?? null,
         urgency: req.headers['urgency'] ?? null,
         contentEncoding: req.headers['content-encoding'] ?? null,
-        comAutorizacao: typeof req.headers['authorization'] === 'string' && req.headers['authorization'].startsWith('vapid '),
+        comAutorizacao:
+          typeof req.headers['authorization'] === 'string' &&
+          req.headers['authorization'].startsWith('vapid '),
         bytes: corpo.length,
       });
       res.writeHead(respostas.shift() ?? 201);

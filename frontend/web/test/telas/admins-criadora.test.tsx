@@ -14,11 +14,31 @@ const SESSAO_MARQUINHOS = {
   id: 'c-marq',
   nome: 'Marquinhos',
   email: 'marquinhos@exemplo.com.br',
-  grupos: [{ id: 'g-quinta', nome: 'Pelada de Quinta', slug: 'pelada-de-quinta', acessaFinanceiro: false }],
+  grupos: [
+    { id: 'g-quinta', nome: 'Pelada de Quinta', slug: 'pelada-de-quinta', acessaFinanceiro: false },
+  ],
 };
-const ANA = { id: 'c-ana', nome: 'Ana', email: 'ana@exemplo.test', acessaFinanceiro: true, criador: true };
-const MARQUINHOS = { id: 'c-marq', nome: 'Marquinhos', email: 'marquinhos@exemplo.com.br', acessaFinanceiro: false, criador: false };
-const BIA = { id: 'c-bia', nome: 'Bia', email: 'bia@exemplo.test', acessaFinanceiro: false, criador: false };
+const ANA = {
+  id: 'c-ana',
+  nome: 'Ana',
+  email: 'ana@exemplo.test',
+  acessaFinanceiro: true,
+  criador: true,
+};
+const MARQUINHOS = {
+  id: 'c-marq',
+  nome: 'Marquinhos',
+  email: 'marquinhos@exemplo.com.br',
+  acessaFinanceiro: false,
+  criador: false,
+};
+const BIA = {
+  id: 'c-bia',
+  nome: 'Bia',
+  email: 'bia@exemplo.test',
+  acessaFinanceiro: false,
+  criador: false,
+};
 
 const BASE = '/api/grupos/g-quinta/admins';
 
@@ -56,9 +76,13 @@ describe('admins: a criadora não é removida (SEC-001)', () => {
       [`DELETE ${BASE}/c-ana`]: () => erroApi(409, 'criadora_nao_removivel'),
     });
     fireEvent.click(await screen.findByRole('button', { name: 'Remover Ana' }));
-    fireEvent.click(within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remover do grupo' }));
+    fireEvent.click(
+      within(screen.getByRole('alertdialog')).getByRole('button', { name: 'Remover do grupo' }),
+    );
     expect((await screen.findByRole('alert')).textContent).toBe(TEXTO_CRIADORA_NAO_REMOVIVEL);
-    expect(TEXTO_CRIADORA_NAO_REMOVIVEL).toBe('Quem criou o grupo não pode ser removida por outra admin.');
+    expect(TEXTO_CRIADORA_NAO_REMOVIVEL).toBe(
+      'Quem criou o grupo não pode ser removida por outra admin.',
+    );
     expect(screen.getByRole('list', { name: 'Admins' })).toBeTruthy();
     expect(screen.getByText('Ana')).toBeTruthy();
   });

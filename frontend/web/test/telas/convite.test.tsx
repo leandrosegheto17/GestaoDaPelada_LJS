@@ -5,9 +5,23 @@ import { esperarSemViolacoes } from '../apoio/axe.ts';
 import { abrirTela, erroApi, json, pendente, type Manipulador } from '../apoio/tela.tsx';
 
 const TOKEN = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJ-_01234';
-const CONVITE = { email: 'rodrigo@exemplo.com.br', grupoNome: 'Pelada de Quinta', contaExiste: false };
-const SESSAO_RODRIGO = { id: 'c-rod', nome: 'Rodrigo', email: 'rodrigo@exemplo.com.br', grupos: [] };
-const SESSAO_LEANDRO = { id: 'c-lea', nome: 'Leandro', email: 'leandro@exemplo.com.br', grupos: [] };
+const CONVITE = {
+  email: 'rodrigo@exemplo.com.br',
+  grupoNome: 'Pelada de Quinta',
+  contaExiste: false,
+};
+const SESSAO_RODRIGO = {
+  id: 'c-rod',
+  nome: 'Rodrigo',
+  email: 'rodrigo@exemplo.com.br',
+  grupos: [],
+};
+const SESSAO_LEANDRO = {
+  id: 'c-lea',
+  nome: 'Leandro',
+  email: 'leandro@exemplo.com.br',
+  grupos: [],
+};
 
 function comFragmento(hash = `#t=${TOKEN}`) {
   window.history.replaceState(null, '', `/convite${hash}`);
@@ -78,7 +92,9 @@ describe('tela Convite', () => {
     await esperarSemViolacoes(container);
     fireEvent.click(aceitar);
     await waitFor(() => expect(local()).toBe('/app/grupos/g-quinta/admins'));
-    expect(chamadasA('POST', '/api/convites/aceitar').map((c) => c.corpo)).toEqual([{ token: TOKEN }]);
+    expect(chamadasA('POST', '/api/convites/aceitar').map((c) => c.corpo)).toEqual([
+      { token: TOKEN },
+    ]);
   });
 
   it('ACE-35: logado em outro e-mail, mostra o aviso de outro e-mail sem oferecer aceitar; axe sem violação', async () => {
@@ -86,7 +102,9 @@ describe('tela Convite', () => {
     const aviso = await screen.findByText(/Este convite foi enviado para outro e-mail/);
     expect(aviso.textContent).toContain('Você está conectado como leandro@exemplo.com.br.');
     expect(screen.getByRole('button', { name: 'Sair e entrar com outra conta' })).toBeTruthy();
-    expect(screen.getByRole('link', { name: 'Voltar aos meus grupos' }).getAttribute('href')).toBe('/app');
+    expect(screen.getByRole('link', { name: 'Voltar aos meus grupos' }).getAttribute('href')).toBe(
+      '/app',
+    );
     expect(screen.queryByRole('button', { name: 'Aceitar e abrir o grupo' })).toBeNull();
     expect(chamadasA('POST', '/api/convites/aceitar')).toHaveLength(0);
     await esperarSemViolacoes(container);
@@ -95,7 +113,8 @@ describe('tela Convite', () => {
   it('ACE-35: 403 convite_de_outro_email no aceitar mostra o estado outro e-mail', async () => {
     abrir({
       'GET /api/sessao': () => json(200, SESSAO_RODRIGO),
-      'POST /api/convites/aceitar': () => erroApi(403, 'convite_de_outro_email', 'Este convite foi enviado para outro e-mail.'),
+      'POST /api/convites/aceitar': () =>
+        erroApi(403, 'convite_de_outro_email', 'Este convite foi enviado para outro e-mail.'),
     });
     fireEvent.click(await screen.findByRole('button', { name: 'Aceitar e abrir o grupo' }));
     expect(await screen.findByText(/Este convite foi enviado para outro e-mail/)).toBeTruthy();
@@ -118,10 +137,16 @@ describe('tela Convite', () => {
 
   it('ACE-36: 410 no ler mostra o convite inválido; axe sem violação', async () => {
     comFragmento();
-    const { container } = abrirTela('/convite', { 'POST /api/convites/ler': () => erroApi(410, 'link_invalido') });
-    expect(await screen.findByRole('heading', { level: 1, name: 'Convite inválido ou vencido' })).toBeTruthy();
+    const { container } = abrirTela('/convite', {
+      'POST /api/convites/ler': () => erroApi(410, 'link_invalido'),
+    });
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Convite inválido ou vencido' }),
+    ).toBeTruthy();
     expect(screen.getByRole('status').textContent).toBe(TEXTO_CONVITE_INVALIDO);
-    expect(screen.getByRole('link', { name: 'Ir para entrar' }).getAttribute('href')).toBe('/entrar');
+    expect(screen.getByRole('link', { name: 'Ir para entrar' }).getAttribute('href')).toBe(
+      '/entrar',
+    );
     await esperarSemViolacoes(container);
   });
 
@@ -131,19 +156,25 @@ describe('tela Convite', () => {
       'POST /api/convites/aceitar': () => erroApi(410, 'link_invalido'),
     });
     fireEvent.click(await screen.findByRole('button', { name: 'Aceitar e abrir o grupo' }));
-    expect(await screen.findByRole('heading', { level: 1, name: 'Convite inválido ou vencido' })).toBeTruthy();
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Convite inválido ou vencido' }),
+    ).toBeTruthy();
   });
 
   it('ACE-36: sem fragmento, mostra o convite inválido sem chamar a API', async () => {
     comFragmento('');
     const { chamadasA } = abrirTela('/convite');
-    expect(await screen.findByRole('heading', { level: 1, name: 'Convite inválido ou vencido' })).toBeTruthy();
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Convite inválido ou vencido' }),
+    ).toBeTruthy();
     expect(chamadasA('POST', '/api/convites/ler')).toHaveLength(0);
   });
 
   it('[LACUNA] sem sessão e com conta no e-mail do convite, pede para entrar', async () => {
     comFragmento();
-    abrirTela('/convite', { 'POST /api/convites/ler': () => json(200, { ...CONVITE, contaExiste: true }) });
+    abrirTela('/convite', {
+      'POST /api/convites/ler': () => json(200, { ...CONVITE, contaExiste: true }),
+    });
     expect(await screen.findByText(/Já existe uma conta com rodrigo@exemplo.com.br/)).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Entrar' }).getAttribute('href')).toBe('/entrar');
     expect(screen.queryByLabelText('Seu nome')).toBeNull();

@@ -37,12 +37,18 @@ export function ordenarPorRanking<T extends Rankeavel>(
   jogadores: readonly T[],
   acumulados: ReadonlyMap<string, number>,
 ): Colocado<T>[] {
-  const itens = jogadores.map((jogador) => ({ jogador, acumulado: acumulados.get(jogador.id) ?? 0 }));
+  const itens = jogadores.map((jogador) => ({
+    jogador,
+    acumulado: acumulados.get(jogador.id) ?? 0,
+  }));
   type Item = (typeof itens)[number];
   const criterios = (a: Item, b: Item): number =>
-    b.acumulado - a.acumulado || ano(a.jogador) - ano(b.jogador) || porChave(a.jogador.apelido, b.jogador.apelido);
+    b.acumulado - a.acumulado ||
+    ano(a.jogador) - ano(b.jogador) ||
+    porChave(a.jogador.apelido, b.jogador.apelido);
   const estavel = (a: Item, b: Item): number =>
-    compararApelido(a.jogador.apelido, b.jogador.apelido) || (a.jogador.id < b.jogador.id ? -1 : a.jogador.id > b.jogador.id ? 1 : 0);
+    compararApelido(a.jogador.apelido, b.jogador.apelido) ||
+    (a.jogador.id < b.jogador.id ? -1 : a.jogador.id > b.jogador.id ? 1 : 0);
   itens.sort((a, b) => criterios(a, b) || estavel(a, b));
 
   const colocados: Colocado<T>[] = [];

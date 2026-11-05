@@ -20,10 +20,12 @@ import { abrirTela, json, pendente, SESSAO_ANA, type Manipulador } from '../apoi
  */
 
 function resposta(nome: string): Record<string, unknown> {
-  return JSON.parse(readFileSync(fileURLToPath(new URL(`../../../../.specs/mockup/respostas/${nome}`, import.meta.url)), 'utf8')) as Record<
-    string,
-    unknown
-  >;
+  return JSON.parse(
+    readFileSync(
+      fileURLToPath(new URL(`../../../../.specs/mockup/respostas/${nome}`, import.meta.url)),
+      'utf8',
+    ),
+  ) as Record<string, unknown>;
 }
 
 const CONTEXTO = 'GET /api/grupos/g-quinta/simulador/contexto';
@@ -60,8 +62,12 @@ describe('formatos do resultado', () => {
   it('SIM-74: dia abreviado e cabeçalho com K e com K ilimitado', () => {
     expect(diaAbreviado('2026-10-22')).toBe('qui, 22/10');
     expect(diaAbreviado('2026-10-25')).toBe('dom, 25/10');
-    expect(cabecalhoDois('2026-10-22', 7, 2)).toBe('qui, 22/10 · 2 times de 7 · até 2 substituições por time');
-    expect(cabecalhoDois('2026-10-22', 7, 'ilimitado')).toBe('qui, 22/10 · 2 times de 7 · sem limite de substituições');
+    expect(cabecalhoDois('2026-10-22', 7, 2)).toBe(
+      'qui, 22/10 · 2 times de 7 · até 2 substituições por time',
+    );
+    expect(cabecalhoDois('2026-10-22', 7, 'ilimitado')).toBe(
+      'qui, 22/10 · 2 times de 7 · sem limite de substituições',
+    );
   });
 
   it('SIM-41: nível 6845 de soma aparece como "68,5"; idade com uma casa; média nula vira "—"', () => {
@@ -90,13 +96,17 @@ describe('Simulador: resultado em 2 times (t13)', () => {
     abrir(() => json(200, resposta('simulador-sugestao-dois.json')));
     await sugerirTimes();
     expect(await screen.findByRole('heading', { name: TITULO_RESULTADO })).toBeDefined();
-    expect(screen.getByText('qui, 22/10 · 2 times de 7 · até 2 substituições por time')).toBeDefined();
+    expect(
+      screen.getByText('qui, 22/10 · 2 times de 7 · até 2 substituições por time'),
+    ).toBeDefined();
   });
 
   it('SIM-74: K ilimitado mostra "sem limite de substituições"', async () => {
     abrir(() => json(200, { ...resposta('simulador-sugestao-dois.json'), k: 'ilimitado' }));
     await sugerirTimes();
-    expect(await screen.findByText('qui, 22/10 · 2 times de 7 · sem limite de substituições')).toBeDefined();
+    expect(
+      await screen.findByText('qui, 22/10 · 2 times de 7 · sem limite de substituições'),
+    ).toBeDefined();
   });
 
   it('SIM-26: titulares com "só 1º tempo" e "sai no intervalo", reservas, trocas "A → B" e "Não entra" à parte com a nota', async () => {
@@ -106,7 +116,9 @@ describe('Simulador: resultado em 2 times (t13)', () => {
     expect(within(timeA).getByRole('heading', { name: 'Titulares' })).toBeDefined();
     expect(within(timeA).getByRole('heading', { name: 'Entram no 2º tempo' })).toBeDefined();
     expect(within(timeA).getByText('Pedrão → Cabeça')).toBeDefined();
-    expect(within(within(timeA).getByRole('button', { name: /Rafinha/ })).getByText('sai no intervalo')).toBeDefined();
+    expect(
+      within(within(timeA).getByRole('button', { name: /Rafinha/ })).getByText('sai no intervalo'),
+    ).toBeDefined();
     const timeB = screen.getByRole('region', { name: 'Time B' });
     const juninho = within(timeB).getByRole('button', { name: /Juninho/ });
     expect(within(juninho).getByText('só 1º tempo')).toBeDefined();

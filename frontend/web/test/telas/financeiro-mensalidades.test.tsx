@@ -5,7 +5,11 @@ import { createMemoryRouter, RouterProvider } from 'react-router';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { LancamentoDoMes } from '@pelada/contrato/financeiro';
 import { ordemDaLista } from '../../src/telas/financeiro/FinanceiroMes.tsx';
-import { GrupoMensalidades, intervaloDeDatas, rotuloMensalidades } from '../../src/telas/financeiro/GrupoMensalidades.tsx';
+import {
+  GrupoMensalidades,
+  intervaloDeDatas,
+  rotuloMensalidades,
+} from '../../src/telas/financeiro/GrupoMensalidades.tsx';
 import { abrirTela, json, pendente, SESSAO_ANA } from '../apoio/tela.tsx';
 
 /**
@@ -14,7 +18,12 @@ import { abrirTela, json, pendente, SESSAO_ANA } from '../apoio/tela.tsx';
  */
 
 const OUTUBRO = JSON.parse(
-  readFileSync(fileURLToPath(new URL('../../../../.specs/mockup/respostas/financeiro-2026-10.json', import.meta.url)), 'utf8'),
+  readFileSync(
+    fileURLToPath(
+      new URL('../../../../.specs/mockup/respostas/financeiro-2026-10.json', import.meta.url),
+    ),
+    'utf8',
+  ),
 ) as { lancamentos: LancamentoDoMes[] };
 
 const MENSALIDADES = OUTUBRO.lancamentos.filter((l) => l.mensalidade);
@@ -26,7 +35,11 @@ function montar(mensalidades: readonly LancamentoDoMes[]) {
         path: '/',
         element: (
           <ul>
-            <GrupoMensalidades mes="2026-10" mensalidades={mensalidades} base="/app/grupos/g-quinta" />
+            <GrupoMensalidades
+              mes="2026-10"
+              mensalidades={mensalidades}
+              base="/app/grupos/g-quinta"
+            />
           </ul>
         ),
       },
@@ -85,7 +98,9 @@ describe('GrupoMensalidades (FIN-15)', () => {
 
 describe('a linha na lista do mês', () => {
   it('FIN-15: a linha agrupada fica depois do Aluguel (05/10), como no mockup', () => {
-    const ordem = ordemDaLista(OUTUBRO.lancamentos).map((l) => (l === 'mensalidades' ? l : l.descricao));
+    const ordem = ordemDaLista(OUTUBRO.lancamentos).map((l) =>
+      l === 'mensalidades' ? l : l.descricao,
+    );
     expect(ordem).toEqual(['Bolas novas (2)', 'Aluguel da quadra outubro', 'mensalidades']);
   });
 
@@ -96,7 +111,9 @@ describe('a linha na lista do mês', () => {
       'GET /api/grupos/g-quinta/financeiro/mes': () => json(200, OUTUBRO),
     });
     expect(await screen.findByRole('button', { name: /16 mensalidades de 10\/2026/ })).toBeTruthy();
-    expect(screen.getByText('As mensalidades do mês aparecem numa linha só; toque para ver cada uma.')).toBeTruthy();
+    expect(
+      screen.getByText('As mensalidades do mês aparecem numa linha só; toque para ver cada uma.'),
+    ).toBeTruthy();
     expect(screen.queryByText('Mensalidade Léo Baiano 10/2026')).toBeNull();
   });
 });

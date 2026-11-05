@@ -6,16 +6,30 @@ import type { MovimentoCaixa } from '../../src/caixa/saldos.ts';
 /** Resumo do mês e "não pagaram" (T4; FIN-11, FIN-12, FIN-13, FIN-16). Os ativos chegam já filtrados e ordenados (T2). */
 
 const ativos = (n: number): AtivoNoMes[] =>
-  Array.from({ length: n }, (_, i) => ({ jogadorId: `j${String(i + 1).padStart(2, '0')}`, apelido: `Jogador ${i + 1}` }));
+  Array.from({ length: n }, (_, i) => ({
+    jogadorId: `j${String(i + 1).padStart(2, '0')}`,
+    apelido: `Jogador ${i + 1}`,
+  }));
 
-const entrada = (data: string, valorCentavos: number): MovimentoCaixa => ({ tipo: 'entrada', data, valorCentavos });
-const saida = (data: string, valorCentavos: number): MovimentoCaixa => ({ tipo: 'saida', data, valorCentavos });
+const entrada = (data: string, valorCentavos: number): MovimentoCaixa => ({
+  tipo: 'entrada',
+  data,
+  valorCentavos,
+});
+const saida = (data: string, valorCentavos: number): MovimentoCaixa => ({
+  tipo: 'saida',
+  data,
+  valorCentavos,
+});
 
 describe('resumoDoMes', () => {
   it('FIN-11: 20 ativos, 16 pagos, mensalidade 7.500 e saída 90.000 (Independent Test de S:90)', () => {
     const elenco = ativos(20);
     const pagos = elenco.slice(0, 16).map((a) => a.jogadorId);
-    const lancamentos = [...pagos.map(() => entrada('2026-10-05', 7_500)), saida('2026-10-10', 90_000)];
+    const lancamentos = [
+      ...pagos.map(() => entrada('2026-10-05', 7_500)),
+      saida('2026-10-10', 90_000),
+    ];
 
     const { resumo, pagamentos } = resumoDoMes(lancamentos, elenco, pagos, '2026-10');
 
@@ -37,7 +51,12 @@ describe('resumoDoMes', () => {
       saida('2026-11-01', 9_999),
     ];
     const { resumo } = resumoDoMes(lancamentos, [], [], '2026-10');
-    expect(resumo).toEqual({ entradasCentavos: 7_500, saidasCentavos: 500, resultadoCentavos: 7_000, naoPagaram: 0 });
+    expect(resumo).toEqual({
+      entradasCentavos: 7_500,
+      saidasCentavos: 500,
+      resultadoCentavos: 7_000,
+      naoPagaram: 0,
+    });
   });
 
   it('FIN-11: resultado negativo quando as saídas passam das entradas', () => {
@@ -85,7 +104,9 @@ describe('resumoDoMes', () => {
 
   it('FIN-13: soma acima do teto de entrada continua exata', () => {
     const lancamentos = Array.from({ length: 200 }, () => entrada('2026-10-02', 99_999_999));
-    expect(resumoDoMes(lancamentos, [], [], '2026-10').resumo.entradasCentavos).toBe(19_999_999_800);
+    expect(resumoDoMes(lancamentos, [], [], '2026-10').resumo.entradasCentavos).toBe(
+      19_999_999_800,
+    );
   });
 
   it('FIN-13: estouro do inteiro seguro lança', () => {

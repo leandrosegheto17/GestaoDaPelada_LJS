@@ -43,14 +43,20 @@ export function resumoDoMes(
   pagos: readonly string[],
   mes: MesCaixa,
 ): { resumo: ResumoDoMes; pagamentos: PagamentoDoMes[] } {
-  const { entradasCentavos, saidasCentavos } = totais(lancamentos.filter((l) => noMes(l.data, mes)));
+  const { entradasCentavos, saidasCentavos } = totais(
+    lancamentos.filter((l) => noMes(l.data, mes)),
+  );
   const marcados = new Set(pagos);
   const vistos = new Set<string>();
   const pagamentos: PagamentoDoMes[] = [];
   for (const ativo of ativos) {
     if (vistos.has(ativo.jogadorId)) continue;
     vistos.add(ativo.jogadorId);
-    pagamentos.push({ jogadorId: ativo.jogadorId, apelido: ativo.apelido, pagou: marcados.has(ativo.jogadorId) });
+    pagamentos.push({
+      jogadorId: ativo.jogadorId,
+      apelido: ativo.apelido,
+      pagou: marcados.has(ativo.jogadorId),
+    });
   }
   return {
     resumo: {

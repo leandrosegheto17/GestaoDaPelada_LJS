@@ -20,7 +20,10 @@ export function inicioDaContagem(
   let atual: Data | undefined;
   for (const periodo of periodos) {
     if (compararDatas(periodo.inicio, primeiro) < 0) primeiro = periodo.inicio;
-    if (compararDatas(periodo.inicio, em) <= 0 && (atual === undefined || compararDatas(periodo.inicio, atual) > 0)) {
+    if (
+      compararDatas(periodo.inicio, em) <= 0 &&
+      (atual === undefined || compararDatas(periodo.inicio, atual) > 0)
+    ) {
       atual = periodo.inicio;
     }
   }

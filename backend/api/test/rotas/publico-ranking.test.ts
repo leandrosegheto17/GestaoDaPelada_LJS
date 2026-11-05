@@ -13,7 +13,13 @@ import { NOME_COOKIE_SESSAO } from '../../src/infraestrutura/sessao/cookie.ts';
 import { gerarToken } from '../../src/infraestrutura/sessao/token.ts';
 import { envAcesso } from '../acesso/apoio.ts';
 import { contextoFalso, fabricaComoApp } from '../db/requisicao.ts';
-import { abrirCenarioGrupos, arquivar, NOME_G, reativar, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  arquivar,
+  NOME_G,
+  reativar,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * `GET /api/publico/:slug/ranking?mes=` (partidas-e-ranking T45; PAR-64 a PAR-66, PAR-76, PAR-77, PAR-90, PAR-93), com
@@ -41,7 +47,12 @@ async function ranking(slug: string, consulta = '', conta?: string): Promise<Res
   const headers = new Headers();
   if (conta) headers.set('cookie', `${NOME_COOKIE_SESSAO}=${await sessao(conta)}`);
   const ctx = contextoFalso();
-  const r = await app.request(`/api/publico/${slug}/ranking${consulta}`, { method: 'GET', headers }, envAcesso(aberto.url), ctx);
+  const r = await app.request(
+    `/api/publico/${slug}/ranking${consulta}`,
+    { method: 'GET', headers },
+    envAcesso(aberto.url),
+    ctx,
+  );
   await ctx.esperar();
   return r;
 }
@@ -54,11 +65,10 @@ beforeAll(async () => {
      VALUES ($1, '2026-03-12', true, $2, now(), $2, now()) RETURNING id`,
     [cenario.grupoG, cenario.contaC],
   );
-  await db.query(`INSERT INTO presencas (partida_id, jogador_id, grupo_id, situacao) VALUES ($1, $2, $3, 'presente')`, [
-    p.rows[0]!.id,
-    cenario.idsG.jogadorAtivo,
-    cenario.grupoG,
-  ]);
+  await db.query(
+    `INSERT INTO presencas (partida_id, jogador_id, grupo_id, situacao) VALUES ($1, $2, $3, 'presente')`,
+    [p.rows[0]!.id, cenario.idsG.jogadorAtivo, cenario.grupoG],
+  );
 });
 
 afterAll(async () => {
@@ -103,17 +113,22 @@ describe('GET /api/publico/:slug/ranking', () => {
   });
 
   it('PAR-64: mes=2026-01 traz a partida de 08/01 e a navegação a partir do primeiro mês', async () => {
-    const corpo = rankingPublico.parse(await (await ranking(aberto.cenario.slugG, '?mes=2026-01')).json());
+    const corpo = rankingPublico.parse(
+      await (await ranking(aberto.cenario.slugG, '?mes=2026-01')).json(),
+    );
     expect(corpo.partidas).toEqual([{ data: '2026-01-08', choveu: false }]);
     expect(corpo.navegacao).toEqual({ mesAnterior: null, mesSeguinte: '2026-02' });
   });
 
-  it.each(['2026-1', '2026-13', 'marco', ''])('PAR-65: mes=%j responde 422 "Mês inválido."', async (mes) => {
-    const r = await ranking(aberto.cenario.slugG, `?mes=${encodeURIComponent(mes)}`);
-    expect(r.status).toBe(422);
-    expect(await r.json()).toMatchObject({ mensagens: { mes: MENSAGEM_MES_PUBLICO } });
-    expect(MENSAGEM_MES_PUBLICO).toBe('Mês inválido.');
-  });
+  it.each(['2026-1', '2026-13', 'marco', ''])(
+    'PAR-65: mes=%j responde 422 "Mês inválido."',
+    async (mes) => {
+      const r = await ranking(aberto.cenario.slugG, `?mes=${encodeURIComponent(mes)}`);
+      expect(r.status).toBe(422);
+      expect(await r.json()).toMatchObject({ mensagens: { mes: MENSAGEM_MES_PUBLICO } });
+      expect(MENSAGEM_MES_PUBLICO).toBe('Mês inválido.');
+    },
+  );
 
   it.each([
     ['antes da primeira partida', '2025-12'],

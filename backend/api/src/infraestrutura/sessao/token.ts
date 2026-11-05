@@ -77,7 +77,11 @@ function gruposIpv6(ip: string): number[] | null {
  */
 export function chaveIp(ip: string | null | undefined, prefixo: 64 | 48 = 64): string {
   if (!ip) return SEM_IP;
-  const limpo = ip.trim().toLowerCase().replace(/^\[|\]$/g, '').replace(/%.*$/, '');
+  const limpo = ip
+    .trim()
+    .toLowerCase()
+    .replace(/^\[|\]$/g, '')
+    .replace(/%.*$/, '');
   if (IPV4.test(limpo)) return limpo;
   if (!limpo.includes(':')) return SEM_IP;
   const grupos = gruposIpv6(limpo);

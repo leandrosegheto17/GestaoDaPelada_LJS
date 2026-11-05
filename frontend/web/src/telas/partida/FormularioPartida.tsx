@@ -19,7 +19,12 @@ import estilos from './partida.module.css';
  * não grava `ausente` (PAR-23).
  */
 
-const OPCOES: ReadonlyArray<{ valor: SituacaoMarcacao; letra: string; nome: string; classe: string }> = [
+const OPCOES: ReadonlyArray<{
+  valor: SituacaoMarcacao;
+  letra: string;
+  nome: string;
+  classe: string;
+}> = [
   { valor: 'ausente', letra: 'A', nome: 'Ausente', classe: 'op-a' },
   { valor: 'presente', letra: 'P', nome: 'Presente', classe: 'op-p' },
   { valor: 'lesionado', letra: 'L', nome: 'Lesionado', classe: 'op-l' },
@@ -56,7 +61,10 @@ export function textoSalvar(presentes: number): string {
 }
 
 /** As marcações do corpo: só P, L e E, na ordem da lista. */
-export function marcacoesDoCorpo(jogadores: readonly JogadorDaPartida[], situacoes: Situacoes): Marcacao[] {
+export function marcacoesDoCorpo(
+  jogadores: readonly JogadorDaPartida[],
+  situacoes: Situacoes,
+): Marcacao[] {
   return jogadores
     .map((j) => ({ jogadorId: j.id, situacao: situacoes[j.id] ?? 'ausente' }))
     .filter((m) => m.situacao !== 'ausente');
@@ -69,7 +77,9 @@ function semAcento(texto: string): string {
     .toLocaleLowerCase('pt-BR');
 }
 
-function situacoesIniciais(jogadores: readonly JogadorDaPartida[]): Record<string, SituacaoMarcacao> {
+function situacoesIniciais(
+  jogadores: readonly JogadorDaPartida[],
+): Record<string, SituacaoMarcacao> {
   return Object.fromEntries(jogadores.map((j) => [j.id, j.situacao]));
 }
 
@@ -88,13 +98,26 @@ export interface PropsFormularioPartida {
   avisoAposData?: ReactNode;
 }
 
-export function FormularioPartida({ campoData, choveuInicial, jogadores, semLista, salvando, aoSalvar, acoesExtras, avisoAposData }: PropsFormularioPartida) {
+export function FormularioPartida({
+  campoData,
+  choveuInicial,
+  jogadores,
+  semLista,
+  salvando,
+  aoSalvar,
+  acoesExtras,
+  avisoAposData,
+}: PropsFormularioPartida) {
   const [choveu, setChoveu] = useState(choveuInicial);
-  const [situacoes, setSituacoes] = useState<Record<string, SituacaoMarcacao>>(() => situacoesIniciais(jogadores ?? []));
+  const [situacoes, setSituacoes] = useState<Record<string, SituacaoMarcacao>>(() =>
+    situacoesIniciais(jogadores ?? []),
+  );
   const [busca, setBusca] = useState('');
 
   const comLista = jogadores !== undefined && jogadores.length > 0;
-  const contagem = contar(Object.fromEntries((jogadores ?? []).map((j) => [j.id, situacoes[j.id] ?? 'ausente'])));
+  const contagem = contar(
+    Object.fromEntries((jogadores ?? []).map((j) => [j.id, situacoes[j.id] ?? 'ausente'])),
+  );
   const visiveis = useMemo(() => {
     const termo = semAcento(busca.trim());
     if (!jogadores) return [];
@@ -121,7 +144,12 @@ export function FormularioPartida({ campoData, choveuInicial, jogadores, semList
         {campoData}
         <label className={fin.interruptor}>
           <span>Choveu?</span>
-          <input type="checkbox" role="switch" checked={choveu} onChange={(e) => setChoveu(e.target.checked)} />
+          <input
+            type="checkbox"
+            role="switch"
+            checked={choveu}
+            onChange={(e) => setChoveu(e.target.checked)}
+          />
           <span className={fin['interruptor__trilho']} aria-hidden="true" />
           <span className={fin['interruptor__estado']} aria-hidden="true">
             {choveu ? 'Sim' : 'Não'}

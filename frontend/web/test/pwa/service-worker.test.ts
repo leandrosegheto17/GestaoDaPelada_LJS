@@ -63,7 +63,9 @@ describe('service worker', () => {
   });
 
   it('FUN-35: navegação sem rede numa rota fora do cache responde offline.html', async () => {
-    const pagina = new Response('<h1>Sem conexão</h1>', { headers: { 'Content-Type': 'text/html' } });
+    const pagina = new Response('<h1>Sem conexão</h1>', {
+      headers: { 'Content-Type': 'text/html' },
+    });
     const doCache = vi.fn(async (url: string) => (url === PAGINA_OFFLINE ? pagina : undefined));
     const resposta = await responderNavegacao(new Request('https://app.test/grupos/abc'), {
       buscar: () => Promise.reject(new TypeError('Failed to fetch')),

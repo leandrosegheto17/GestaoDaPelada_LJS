@@ -35,7 +35,8 @@ import { comFabrica, lerCorpo, type OpcoesRotas } from './apoio-acesso.ts';
  *   o cookie; termos e campos fora dos limites dão 422 antes de qualquer consulta.
  */
 
-export const MENSAGEM_CONTA_EXISTENTE = 'Já existe uma conta com este e-mail. Entre para aceitar o convite.';
+export const MENSAGEM_CONTA_EXISTENTE =
+  'Já existe uma conta com este e-mail. Entre para aceitar o convite.';
 
 export function rotasConvites(opcoes: OpcoesRotas = {}): Hono<Ambiente> {
   const rotas = new Hono<Ambiente>();
@@ -47,7 +48,11 @@ export function rotasConvites(opcoes: OpcoesRotas = {}): Hono<Ambiente> {
     if (!corpo.ok) return c.json(invalido, 410);
     const lido = await convites.ler(c.var.db, await hashToken(corpo.dados.token));
     if (!lido) return c.json(invalido, 410);
-    const resposta: ConviteLido = { email: lido.email, grupoNome: lido.grupoNome, contaExiste: lido.contaExiste };
+    const resposta: ConviteLido = {
+      email: lido.email,
+      grupoNome: lido.grupoNome,
+      contaExiste: lido.contaExiste,
+    };
     return c.json(resposta, 200);
   });
 
@@ -56,7 +61,8 @@ export function rotasConvites(opcoes: OpcoesRotas = {}): Hono<Ambiente> {
     if (!corpo.ok) return c.json(invalido, 410);
     const r = await convites.aceitar(c.var.db, await hashToken(corpo.dados.token));
     if (r.resultado === 'ok') return c.json({ grupoId: r.grupoId }, 200);
-    if (r.resultado === 'convite_de_outro_email') return c.json(corpoDoErro('convite_de_outro_email'), 403);
+    if (r.resultado === 'convite_de_outro_email')
+      return c.json(corpoDoErro('convite_de_outro_email'), 403);
     return c.json(invalido, 410);
   });
 

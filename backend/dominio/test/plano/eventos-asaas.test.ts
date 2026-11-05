@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { efeitoDoEvento, type AssinaturaGravada, type EventoAsaas } from '../../src/plano/eventos-asaas.ts';
+import {
+  efeitoDoEvento,
+  type AssinaturaGravada,
+  type EventoAsaas,
+} from '../../src/plano/eventos-asaas.ts';
 
 /**
  * Máquina de estado dos eventos do Asaas (T4; PLA-44 a PLA-49, PLA-51).
@@ -53,7 +57,11 @@ describe('efeitoDoEvento: pagamento', () => {
       dataCriacao: '2026-12-04 08:00:00',
       cobranca: { id: 'pay_2', valorReais: 9.9, vencimento: '2026-12-04' },
     });
-    expect(efeitoDoEvento(e, ATIVA)).toEqual({ tipo: 'ativar', pagoAte: '2027-01-04', cobrancaId: 'pay_2' });
+    expect(efeitoDoEvento(e, ATIVA)).toEqual({
+      tipo: 'ativar',
+      pagoAte: '2027-01-04',
+      cobrancaId: 'pay_2',
+    });
   });
 
   it('PLA-44: pagamento atrasado volta de inadimplente (assinatura segue ativa, AD-096)', () => {
@@ -61,23 +69,42 @@ describe('efeitoDoEvento: pagamento', () => {
       dataCriacao: '2026-12-10 08:00:00',
       cobranca: { id: 'pay_2', valorReais: 9.9, vencimento: '2026-12-04' },
     });
-    expect(efeitoDoEvento(e, ATIVA)).toEqual({ tipo: 'ativar', pagoAte: '2027-01-04', cobrancaId: 'pay_2' });
+    expect(efeitoDoEvento(e, ATIVA)).toEqual({
+      tipo: 'ativar',
+      pagoAte: '2027-01-04',
+      cobrancaId: 'pay_2',
+    });
   });
 
   it('PLA-44: CONFIRMED e depois RECEIVED da mesma cobrança não aplicam duas vezes', () => {
-    expect(efeitoDoEvento(evento('PAYMENT_RECEIVED'), ATIVA)).toEqual({ tipo: 'nenhum', motivo: 'ja_aplicado' });
+    expect(efeitoDoEvento(evento('PAYMENT_RECEIVED'), ATIVA)).toEqual({
+      tipo: 'nenhum',
+      motivo: 'ja_aplicado',
+    });
   });
 
   it('PLA-51: valor divergente não ativa', () => {
-    const e = evento('PAYMENT_RECEIVED', { cobranca: { id: 'pay_1', valorReais: 5, vencimento: '2026-11-04' } });
+    const e = evento('PAYMENT_RECEIVED', {
+      cobranca: { id: 'pay_1', valorReais: 5, vencimento: '2026-11-04' },
+    });
     expect(efeitoDoEvento(e, AGUARDANDO)).toEqual({ tipo: 'nenhum', motivo: 'valor_divergente' });
   });
 
   it('PLA-51: valor ausente ou com mais de 2 casas conta como divergente', () => {
-    const semValor = evento('PAYMENT_CONFIRMED', { cobranca: { id: 'pay_1', valorReais: null, vencimento: '2026-11-04' } });
-    const tresCasas = evento('PAYMENT_CONFIRMED', { cobranca: { id: 'pay_1', valorReais: 9.901, vencimento: '2026-11-04' } });
-    expect(efeitoDoEvento(semValor, AGUARDANDO)).toEqual({ tipo: 'nenhum', motivo: 'valor_divergente' });
-    expect(efeitoDoEvento(tresCasas, AGUARDANDO)).toEqual({ tipo: 'nenhum', motivo: 'valor_divergente' });
+    const semValor = evento('PAYMENT_CONFIRMED', {
+      cobranca: { id: 'pay_1', valorReais: null, vencimento: '2026-11-04' },
+    });
+    const tresCasas = evento('PAYMENT_CONFIRMED', {
+      cobranca: { id: 'pay_1', valorReais: 9.901, vencimento: '2026-11-04' },
+    });
+    expect(efeitoDoEvento(semValor, AGUARDANDO)).toEqual({
+      tipo: 'nenhum',
+      motivo: 'valor_divergente',
+    });
+    expect(efeitoDoEvento(tresCasas, AGUARDANDO)).toEqual({
+      tipo: 'nenhum',
+      motivo: 'valor_divergente',
+    });
   });
 
   it('PLA-44: pagamento sem cobrança ou sem vencimento não ativa', () => {
@@ -85,8 +112,13 @@ describe('efeitoDoEvento: pagamento', () => {
       tipo: 'nenhum',
       motivo: 'incompleto',
     });
-    const semVencimento = evento('PAYMENT_RECEIVED', { cobranca: { id: 'pay_1', valorReais: 9.9, vencimento: null } });
-    expect(efeitoDoEvento(semVencimento, AGUARDANDO)).toEqual({ tipo: 'nenhum', motivo: 'incompleto' });
+    const semVencimento = evento('PAYMENT_RECEIVED', {
+      cobranca: { id: 'pay_1', valorReais: 9.9, vencimento: null },
+    });
+    expect(efeitoDoEvento(semVencimento, AGUARDANDO)).toEqual({
+      tipo: 'nenhum',
+      motivo: 'incompleto',
+    });
   });
 
   it('pagamento de assinatura cancelada não reativa (lacuna, conservador)', () => {
@@ -94,7 +126,10 @@ describe('efeitoDoEvento: pagamento', () => {
       dataCriacao: '2026-12-04 08:00:00',
       cobranca: { id: 'pay_2', valorReais: 9.9, vencimento: '2026-12-04' },
     });
-    expect(efeitoDoEvento(e, CANCELADA)).toEqual({ tipo: 'nenhum', motivo: 'assinatura_cancelada' });
+    expect(efeitoDoEvento(e, CANCELADA)).toEqual({
+      tipo: 'nenhum',
+      motivo: 'assinatura_cancelada',
+    });
   });
 });
 
@@ -128,7 +163,9 @@ describe('efeitoDoEvento: atraso', () => {
 describe('efeitoDoEvento: cancelamento', () => {
   it.each(['SUBSCRIPTION_DELETED', 'SUBSCRIPTION_INACTIVATED'])('PLA-46: %s → cancelar', (tipo) => {
     expect(efeitoDoEvento(evento(tipo, { cobranca: null }), ATIVA)).toEqual({ tipo: 'cancelar' });
-    expect(efeitoDoEvento(evento(tipo, { cobranca: null }), AGUARDANDO)).toEqual({ tipo: 'cancelar' });
+    expect(efeitoDoEvento(evento(tipo, { cobranca: null }), AGUARDANDO)).toEqual({
+      tipo: 'cancelar',
+    });
   });
 
   it('PLA-46: assinatura já cancelada não cancela de novo', () => {
@@ -147,10 +184,15 @@ describe('efeitoDoEvento: estorno', () => {
     },
   );
 
-  it.each(['PAYMENT_REFUNDED', 'PAYMENT_CHARGEBACK_REQUESTED'])('PLA-47: %s de outra cobrança → nenhum', (tipo) => {
-    const e = evento(tipo, { cobranca: { id: 'pay_0', valorReais: 9.9, vencimento: '2026-10-04' } });
-    expect(efeitoDoEvento(e, ATIVA)).toEqual({ tipo: 'nenhum', motivo: 'outra_cobranca' });
-  });
+  it.each(['PAYMENT_REFUNDED', 'PAYMENT_CHARGEBACK_REQUESTED'])(
+    'PLA-47: %s de outra cobrança → nenhum',
+    (tipo) => {
+      const e = evento(tipo, {
+        cobranca: { id: 'pay_0', valorReais: 9.9, vencimento: '2026-10-04' },
+      });
+      expect(efeitoDoEvento(e, ATIVA)).toEqual({ tipo: 'nenhum', motivo: 'outra_cobranca' });
+    },
+  );
 
   it('PLA-47: estorno em aguardando_pagamento (sem cobrança do Pro) → nenhum', () => {
     expect(efeitoDoEvento(evento('PAYMENT_REFUNDED'), AGUARDANDO).tipo).toBe('nenhum');
@@ -172,12 +214,18 @@ describe('efeitoDoEvento: ordem e tipos', () => {
   });
 
   it('PLA-48: SUBSCRIPTION_DELETED mais antigo que o último aplicado não cancela', () => {
-    const e = evento('SUBSCRIPTION_DELETED', { dataCriacao: '2026-11-01 00:00:00', cobranca: null });
+    const e = evento('SUBSCRIPTION_DELETED', {
+      dataCriacao: '2026-11-01 00:00:00',
+      cobranca: null,
+    });
     expect(efeitoDoEvento(e, ATIVA)).toEqual({ tipo: 'nenhum', motivo: 'fora_de_ordem' });
   });
 
   it('PLA-48: mesma dateCreated do último aplicado ainda aplica', () => {
-    const e = evento('SUBSCRIPTION_DELETED', { dataCriacao: '2026-11-04 10:00:00', cobranca: null });
+    const e = evento('SUBSCRIPTION_DELETED', {
+      dataCriacao: '2026-11-04 10:00:00',
+      cobranca: null,
+    });
     expect(efeitoDoEvento(e, ATIVA)).toEqual({ tipo: 'cancelar' });
   });
 
@@ -186,11 +234,17 @@ describe('efeitoDoEvento: ordem e tipos', () => {
     expect(efeitoDoEvento(e, ATIVA)).toEqual({ tipo: 'nenhum', motivo: 'fora_de_ordem' });
   });
 
-  it.each(['PAYMENT_CREATED', 'PAYMENT_UPDATED', 'SUBSCRIPTION_CREATED', 'EVENTO_NOVO_DO_ASAAS', ''])(
-    'PLA-49: tipo %s → nao_tratado',
-    (tipo) => {
-      expect(efeitoDoEvento(evento(tipo), AGUARDANDO)).toEqual({ tipo: 'nenhum', motivo: 'nao_tratado' });
-      expect(efeitoDoEvento(evento(tipo), ATIVA)).toEqual({ tipo: 'nenhum', motivo: 'nao_tratado' });
-    },
-  );
+  it.each([
+    'PAYMENT_CREATED',
+    'PAYMENT_UPDATED',
+    'SUBSCRIPTION_CREATED',
+    'EVENTO_NOVO_DO_ASAAS',
+    '',
+  ])('PLA-49: tipo %s → nao_tratado', (tipo) => {
+    expect(efeitoDoEvento(evento(tipo), AGUARDANDO)).toEqual({
+      tipo: 'nenhum',
+      motivo: 'nao_tratado',
+    });
+    expect(efeitoDoEvento(evento(tipo), ATIVA)).toEqual({ tipo: 'nenhum', motivo: 'nao_tratado' });
+  });
 });

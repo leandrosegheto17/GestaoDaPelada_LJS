@@ -29,12 +29,19 @@ describe('ehDataReal', () => {
     expect(ehDataReal('2028-02-29')).toBe(true);
   });
 
-  it.each(['2026-00-10', '2026-10-00', '2026-1-05', '2026-10-15T00:00', ' 2026-10-15', '', null, 20261015, '2100-02-29'])(
-    'PAR-19: %s não é data real',
-    (valor) => {
-      expect(ehDataReal(valor)).toBe(false);
-    },
-  );
+  it.each([
+    '2026-00-10',
+    '2026-10-00',
+    '2026-1-05',
+    '2026-10-15T00:00',
+    ' 2026-10-15',
+    '',
+    null,
+    20261015,
+    '2100-02-29',
+  ])('PAR-19: %s não é data real', (valor) => {
+    expect(ehDataReal(valor)).toBe(false);
+  });
 
   it('PAR-19: 2000-02-29 é data real (múltiplo de 400)', () => {
     expect(ehDataReal('2000-02-29')).toBe(true);

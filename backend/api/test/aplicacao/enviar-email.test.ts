@@ -8,7 +8,11 @@ import {
   tetoDaCategoria,
   type PedidoEnvio,
 } from '../../src/aplicacao/acesso/enviar-email.ts';
-import { remetenteMemoria, remetenteResend, type Mensagem } from '../../src/infraestrutura/email/resend.ts';
+import {
+  remetenteMemoria,
+  remetenteResend,
+  type Mensagem,
+} from '../../src/infraestrutura/email/resend.ts';
 import { fabricaComoApp } from '../db/requisicao.ts';
 import { abrirCenarioConta, type CenarioContaAberto } from '../isolamento/cenario-conta.ts';
 import { outraConexao } from '../banco/apoio-conta.ts';
@@ -38,7 +42,9 @@ beforeEach(async () => {
 const HOJE = `(now() AT TIME ZONE 'America/Sao_Paulo')::date`;
 
 async function totalHoje(): Promise<number> {
-  const r = await aberto.db.query<{ total: number }>(`SELECT total FROM envios_email_dia WHERE dia = ${HOJE}`);
+  const r = await aberto.db.query<{ total: number }>(
+    `SELECT total FROM envios_email_dia WHERE dia = ${HOJE}`,
+  );
   return r.rows[0]?.total ?? 0;
 }
 
@@ -129,13 +135,21 @@ describe('enviarEmailDeConta', () => {
   it('ACE-72: com 80 envios no dia, cadastro e convite dão indisponivel e recuperação envia', async () => {
     await definirTotalHoje(80);
     const remetente = remetenteMemoria();
-    expect(await enviarConfirmando(remetente, pedido({ categoria: 'cadastro' }))).toBe('indisponivel');
+    expect(await enviarConfirmando(remetente, pedido({ categoria: 'cadastro' }))).toBe(
+      'indisponivel',
+    );
     expect(
-      await enviarConfirmando(remetente, pedido({ categoria: 'cadastro', mensagem: { ...MENSAGEM, tipo: 'convite' } })),
+      await enviarConfirmando(
+        remetente,
+        pedido({ categoria: 'cadastro', mensagem: { ...MENSAGEM, tipo: 'convite' } }),
+      ),
     ).toBe('indisponivel');
     expect(remetente.mensagens).toEqual([]);
     expect(
-      await enviarConfirmando(remetente, pedido({ categoria: 'recuperacao', mensagem: { ...MENSAGEM, tipo: 'recuperacao' } })),
+      await enviarConfirmando(
+        remetente,
+        pedido({ categoria: 'recuperacao', mensagem: { ...MENSAGEM, tipo: 'recuperacao' } }),
+      ),
     ).toBe('enviado');
     expect(await totalHoje()).toBe(81);
   });
@@ -148,7 +162,9 @@ describe('enviarEmailDeConta', () => {
 
   it('ACE-72: com 100 envios, nem a recuperação sai', async () => {
     await definirTotalHoje(100);
-    expect(await enviarConfirmando(remetenteMemoria(), pedido({ categoria: 'recuperacao' }))).toBe('indisponivel');
+    expect(await enviarConfirmando(remetenteMemoria(), pedido({ categoria: 'recuperacao' }))).toBe(
+      'indisponivel',
+    );
   });
 
   it('ACE-75: trava da cota presa por mais de 2 s dá indisponivel sem chamar o remetente', async () => {
@@ -176,7 +192,9 @@ describe('registrarOrigem', () => {
     const resultados: boolean[] = [];
     for (let i = 0; i < 21; i += 1) {
       // Endereços diferentes do mesmo /48 (2001:db8:1::/48).
-      resultados.push(await registrarOrigem(aberto.url, `2001:db8:1:${(i + 1).toString(16)}::1`, { fabrica }));
+      resultados.push(
+        await registrarOrigem(aberto.url, `2001:db8:1:${(i + 1).toString(16)}::1`, { fabrica }),
+      );
     }
     expect(resultados.slice(0, 20).every(Boolean)).toBe(true);
     expect(resultados[20]).toBe(false);
@@ -194,7 +212,9 @@ describe('registrarOrigem', () => {
     await comDb(aberto.url, null, async () => {
       await registrarOrigem(aberto.url, '198.51.100.1', { fabrica });
     });
-    const r = await aberto.db.query<{ n: number }>('SELECT count(*)::int AS n FROM pedidos_email_origem');
+    const r = await aberto.db.query<{ n: number }>(
+      'SELECT count(*)::int AS n FROM pedidos_email_origem',
+    );
     expect(r.rows[0]?.n).toBe(1);
   });
 });

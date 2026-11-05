@@ -65,7 +65,10 @@ async function ler(db: Db, grupoId: string, id: string): Promise<LancamentoLido 
      WHERE l.grupo_id = ${grupoId} AND l.id = ${id}`.execute(db);
   const l = r.rows[0];
   if (!l) return null;
-  const nomes = await sql<{ id: string; nome: string }>`SELECT id, nome FROM contas_nomes_do_grupo(${grupoId})`.execute(db);
+  const nomes = await sql<{
+    id: string;
+    nome: string;
+  }>`SELECT id, nome FROM contas_nomes_do_grupo(${grupoId})`.execute(db);
   const nome = nomes.rows.find((n) => n.id === l.alterado_por)?.nome ?? CONTA_EXCLUIDA;
   const vinculado = l.jogador_id !== null && l.apelido !== null && l.mes !== null;
   return {
@@ -75,7 +78,9 @@ async function ler(db: Db, grupoId: string, id: string): Promise<LancamentoLido 
     descricao: l.descricao,
     valorCentavos: Number(l.valor_centavos),
     mensalidade: vinculado,
-    vinculo: vinculado ? { jogadorId: l.jogador_id as string, apelido: l.apelido as string, mes: l.mes as string } : null,
+    vinculo: vinculado
+      ? { jogadorId: l.jogador_id as string, apelido: l.apelido as string, mes: l.mes as string }
+      : null,
     alteradoPor: nome,
     alteradoEm: new Date(l.alterado_em).toISOString(),
   };
@@ -104,7 +109,12 @@ export type ResultadoEditarLancamento =
   | { resultado: 'ok'; lancamento: LancamentoLido }
   | { resultado: 'nao_encontrado' | 'mensalidade_nao_e_saida' };
 
-async function editar(db: Db, grupoId: string, id: string, dados: LancamentoCorpo): Promise<ResultadoEditarLancamento> {
+async function editar(
+  db: Db,
+  grupoId: string,
+  id: string,
+  dados: LancamentoCorpo,
+): Promise<ResultadoEditarLancamento> {
   const atual = await sql<{ valor_centavos: number; vinculado: boolean }>`
     SELECT l.valor_centavos,
            EXISTS (SELECT 1 FROM pagamentos_mes p WHERE p.lancamento_id = l.id AND p.grupo_id = l.grupo_id) AS vinculado
@@ -124,7 +134,10 @@ async function editar(db: Db, grupoId: string, id: string, dados: LancamentoCorp
     acao: 'lancamento_editado',
     entidade: 'lancamento',
     entidadeId: id,
-    resumo: { antes: { valorCentavos: Number(antes.valor_centavos) }, depois: { valorCentavos: dados.valorCentavos } },
+    resumo: {
+      antes: { valorCentavos: Number(antes.valor_centavos) },
+      depois: { valorCentavos: dados.valorCentavos },
+    },
   });
   const editado = await ler(db, grupoId, id);
   if (!editado) throw new Error('Lançamento editado e não encontrado');

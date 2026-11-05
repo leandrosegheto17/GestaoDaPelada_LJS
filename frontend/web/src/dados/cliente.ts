@@ -37,7 +37,12 @@ export class ErroApi extends Error {
   /** O corpo JSON da resposta como veio (os erros de plano da AD-091 não têm `codigo`). */
   readonly corpo: unknown;
 
-  constructor(status: number, corpo: Partial<CorpoErro> | undefined, mensagemPadrao: string, bruto?: unknown) {
+  constructor(
+    status: number,
+    corpo: Partial<CorpoErro> | undefined,
+    mensagemPadrao: string,
+    bruto?: unknown,
+  ) {
     super(corpo?.erro ?? mensagemPadrao);
     this.status = status;
     this.codigo = corpo?.codigo;
@@ -61,7 +66,12 @@ export interface OpcoesRequisicao {
 }
 
 export interface ClienteApi {
-  requisitar<T>(metodo: Metodo, caminho: string, corpo?: unknown, opcoes?: OpcoesRequisicao): Promise<T>;
+  requisitar<T>(
+    metodo: Metodo,
+    caminho: string,
+    corpo?: unknown,
+    opcoes?: OpcoesRequisicao,
+  ): Promise<T>;
   get<T>(caminho: string): Promise<T>;
   post<T>(caminho: string, corpo?: unknown): Promise<T>;
   put<T>(caminho: string, corpo?: unknown): Promise<T>;
@@ -98,7 +108,9 @@ function corpoDeErro(valor: unknown): Partial<CorpoErro> | undefined {
   return {
     codigo: v.codigo,
     erro: typeof v.erro === 'string' ? v.erro : MENSAGENS_ERRO[v.codigo],
-    campos: Array.isArray(v.campos) ? v.campos.filter((c): c is string => typeof c === 'string') : undefined,
+    campos: Array.isArray(v.campos)
+      ? v.campos.filter((c): c is string => typeof c === 'string')
+      : undefined,
     grupos: Array.isArray(v.grupos) ? (v.grupos as CorpoErro['grupos']) : undefined,
   };
 }
@@ -109,8 +121,17 @@ function ehErroDePlano(valor: unknown): boolean {
   return typeof erro === 'string' && ERROS_DE_PLANO.has(erro);
 }
 
-export function criarCliente({ consultas, navegar, fetch: buscar = globalThis.fetch.bind(globalThis) }: DependenciasCliente): ClienteApi {
-  async function requisitar<T>(metodo: Metodo, caminho: string, corpo?: unknown, opcoes: OpcoesRequisicao = {}): Promise<T> {
+export function criarCliente({
+  consultas,
+  navegar,
+  fetch: buscar = globalThis.fetch.bind(globalThis),
+}: DependenciasCliente): ClienteApi {
+  async function requisitar<T>(
+    metodo: Metodo,
+    caminho: string,
+    corpo?: unknown,
+    opcoes: OpcoesRequisicao = {},
+  ): Promise<T> {
     const cabecalhos: Record<string, string> = { Accept: 'application/json' };
     if (!METODOS_LEITURA.has(metodo)) cabecalhos[CABECALHO_PELADA] = '1';
     if (corpo !== undefined) cabecalhos['Content-Type'] = 'application/json';
@@ -131,7 +152,11 @@ export function criarCliente({ consultas, navegar, fetch: buscar = globalThis.fe
     if (resposta.ok) return dados as T;
 
     const erro = corpoDeErro(dados);
-    if (resposta.status === 401 && erro?.codigo === 'sessao_expirada' && !opcoes.semTratarExpiracao) {
+    if (
+      resposta.status === 401 &&
+      erro?.codigo === 'sessao_expirada' &&
+      !opcoes.semTratarExpiracao
+    ) {
       consultas.clear();
       navegar(DESTINO_SESSAO_EXPIRADA);
     }

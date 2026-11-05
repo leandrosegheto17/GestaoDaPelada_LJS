@@ -1,7 +1,11 @@
 import type pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { comoApp, type Contexto } from '../isolamento/apoio.ts';
-import { abrirCenarioGrupos, criarGrupoComoConta, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  criarGrupoComoConta,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * Funções de leitura do plano (planos-e-cobranca T12; PLA-07, PLA-17, PLA-25; AD-088), como `pelada_app`.
@@ -18,7 +22,14 @@ let g2: string;
 
 beforeAll(async () => {
   aberto = await abrirCenarioGrupos();
-  g2 = (await criarGrupoComoConta(aberto.db, aberto.cenario.contaC, 'Pelada de Sábado', 'pelada-de-sabado')).id;
+  g2 = (
+    await criarGrupoComoConta(
+      aberto.db,
+      aberto.cenario.contaC,
+      'Pelada de Sábado',
+      'pelada-de-sabado',
+    )
+  ).id;
 });
 
 afterAll(async () => {
@@ -57,7 +68,11 @@ describe('plano_do_grupo', () => {
     const linhas = await planoDo({ conta: cenario.contaC }, cenario.grupoG);
     // G1 tem 2 períodos abertos (jogador ativo e com histórico) e a assinatura cancelada `sub_g` com pago_ate 2026-01-05.
     expect(linhas).toEqual([
-      expect.objectContaining({ criado_por: cenario.contaC, pago_ate: '2026-01-05', jogadores_ativos: 2 }),
+      expect.objectContaining({
+        criado_por: cenario.contaC,
+        pago_ate: '2026-01-05',
+        jogadores_ativos: 2,
+      }),
     ]);
   });
 
@@ -74,7 +89,10 @@ describe('plano_do_grupo', () => {
       );
       await db.query('SET LOCAL ROLE pelada_app');
       await db.query(`SELECT set_config('app.conta_id', $1, true)`, [cenario.contaC]);
-      const r = await db.query<{ pago_ate: string }>('SELECT pago_ate::text FROM plano_do_grupo($1)', [cenario.grupoG]);
+      const r = await db.query<{ pago_ate: string }>(
+        'SELECT pago_ate::text FROM plano_do_grupo($1)',
+        [cenario.grupoG],
+      );
       expect(r.rows).toEqual([{ pago_ate: '2026-03-05' }]);
     } finally {
       await db.query('ROLLBACK');

@@ -8,6 +8,8 @@ import { paraBase64url } from '@pelada/contrato/push';
 export const TAMANHO_TOPICO = 32;
 
 export async function topicoDoGrupo(grupoId: string): Promise<string> {
-  const hash = new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(grupoId)));
+  const hash = new Uint8Array(
+    await crypto.subtle.digest('SHA-256', new TextEncoder().encode(grupoId)),
+  );
   return paraBase64url(hash).slice(0, TAMANHO_TOPICO);
 }

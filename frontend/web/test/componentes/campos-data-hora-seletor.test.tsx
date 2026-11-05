@@ -2,7 +2,11 @@ import { cleanup, fireEvent, render, screen, within } from '@testing-library/rea
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { CampoData } from '../../src/componentes/CampoData.tsx';
 import { CampoHora } from '../../src/componentes/CampoHora.tsx';
-import { CampoSeletor, OPCOES_DIA_SEMANA, OPCOES_FREQUENCIA } from '../../src/componentes/CampoSeletor.tsx';
+import {
+  CampoSeletor,
+  OPCOES_DIA_SEMANA,
+  OPCOES_FREQUENCIA,
+} from '../../src/componentes/CampoSeletor.tsx';
 import { esperarSemViolacoes } from '../apoio/axe.ts';
 
 afterEach(() => {
@@ -12,7 +16,13 @@ afterEach(() => {
 describe('CampoData', () => {
   it('GEL-115: estado normal é input date com min e max; axe sem violação', async () => {
     const { container } = render(
-      <CampoData id="entrada" rotulo="Data de entrada" min="2026-01-01" max="2026-10-22" defaultValue="2026-10-22" />,
+      <CampoData
+        id="entrada"
+        rotulo="Data de entrada"
+        min="2026-01-01"
+        max="2026-10-22"
+        defaultValue="2026-10-22"
+      />,
     );
     const entrada = screen.getByLabelText('Data de entrada') as HTMLInputElement;
     expect(entrada.type).toBe('date');
@@ -24,7 +34,9 @@ describe('CampoData', () => {
   });
 
   it('GEL-115: com erro, o erro está ligado por aria-describedby; axe sem violação', async () => {
-    const { container } = render(<CampoData id="entrada" rotulo="Data de entrada" erro="Informe a data de entrada." />);
+    const { container } = render(
+      <CampoData id="entrada" rotulo="Data de entrada" erro="Informe a data de entrada." />,
+    );
     const entrada = screen.getByLabelText('Data de entrada');
     expect(entrada.getAttribute('aria-invalid')).toBe('true');
     expect(entrada.getAttribute('aria-describedby')).toBe('entrada-erro');
@@ -57,7 +69,15 @@ describe('CampoHora', () => {
 describe('CampoSeletor', () => {
   it('mostra as opções de dia da semana, na ordem do contrato, e devolve o valor escolhido', () => {
     const aoMudar = vi.fn();
-    render(<CampoSeletor id="dia" rotulo="Dia da semana" opcoes={OPCOES_DIA_SEMANA} valor="quinta" aoMudar={aoMudar} />);
+    render(
+      <CampoSeletor
+        id="dia"
+        rotulo="Dia da semana"
+        opcoes={OPCOES_DIA_SEMANA}
+        valor="quinta"
+        aoMudar={aoMudar}
+      />,
+    );
     const seletor = screen.getByLabelText('Dia da semana') as HTMLSelectElement;
     expect(seletor.tagName).toBe('SELECT');
     expect(Array.from(seletor.options).map((o) => o.textContent)).toEqual([
@@ -104,7 +124,11 @@ describe('CampoSeletor', () => {
     );
     const grupo = screen.getByRole('radiogroup', { name: 'Frequência' });
     const radios = within(grupo).getAllByRole('radio') as HTMLInputElement[];
-    expect(radios.map((r) => r.labels?.[0]?.textContent)).toEqual(['Semanal', 'Quinzenal', 'Mensal']);
+    expect(radios.map((r) => r.labels?.[0]?.textContent)).toEqual([
+      'Semanal',
+      'Quinzenal',
+      'Mensal',
+    ]);
     expect(radios.map((r) => r.checked)).toEqual([true, false, false]);
     fireEvent.click(within(grupo).getByLabelText('Mensal'));
     expect(aoMudar).toHaveBeenCalledWith('mensal');
@@ -112,7 +136,13 @@ describe('CampoSeletor', () => {
 
   it('GEL-115: lista no estado normal e com erro; axe sem violação', async () => {
     const { container, rerender } = render(
-      <CampoSeletor id="dia" rotulo="Dia da semana" opcoes={OPCOES_DIA_SEMANA} valor="quinta" aoMudar={() => {}} />,
+      <CampoSeletor
+        id="dia"
+        rotulo="Dia da semana"
+        opcoes={OPCOES_DIA_SEMANA}
+        valor="quinta"
+        aoMudar={() => {}}
+      />,
     );
     expect(screen.getByLabelText('Dia da semana').getAttribute('aria-invalid')).toBeNull();
     await esperarSemViolacoes(container);

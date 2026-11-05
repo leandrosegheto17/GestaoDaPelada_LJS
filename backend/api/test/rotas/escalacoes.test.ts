@@ -1,13 +1,22 @@
 import { Buffer } from 'node:buffer';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { escalacaoResposta, MENSAGEM_APTOS_INATIVOS, MENSAGEM_REPETIDO_NA_COMPOSICAO } from '@pelada/contrato';
+import {
+  escalacaoResposta,
+  MENSAGEM_APTOS_INATIVOS,
+  MENSAGEM_REPETIDO_NA_COMPOSICAO,
+} from '@pelada/contrato';
 import { criarApp } from '../../src/entrada/app.ts';
 import { relogioFixo } from '../../src/infraestrutura/relogio.ts';
 import { NOME_COOKIE_SESSAO } from '../../src/infraestrutura/sessao/cookie.ts';
 import { gerarToken } from '../../src/infraestrutura/sessao/token.ts';
 import { envAcesso } from '../acesso/apoio.ts';
 import { contextoFalso, fabricaComoApp } from '../db/requisicao.ts';
-import { abrirCenarioGrupos, arquivar, reativar, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  arquivar,
+  reativar,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * `POST /api/grupos/:grupoId/escalacoes` (T37 da simulador; SIM-67, SIM-71, SIM-72, SIM-93), com o app real como
@@ -61,7 +70,10 @@ async function novoJogador(grupo: string, apelido: string): Promise<string> {
     [grupo, apelido, conta],
   );
   const id = r.rows[0]!.id;
-  await db.query(`INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio) VALUES ($1, $2, '2026-01-01')`, [id, grupo]);
+  await db.query(
+    `INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio) VALUES ($1, $2, '2026-01-01')`,
+    [id, grupo],
+  );
   return id;
 }
 
@@ -75,15 +87,29 @@ function doisTimes(ids = ativos) {
     k: 1,
     composicao: {
       times: [
-        { titulares: [{ id: a1, so1oTempo: false }, { id: a2, so1oTempo: true }], entramNo2oTempo: [{ id: r1, so1oTempo: false }] },
-        { titulares: [{ id: b1, so1oTempo: false }, { id: b2, so1oTempo: false }], entramNo2oTempo: [{ id: r2, so1oTempo: false }] },
+        {
+          titulares: [
+            { id: a1, so1oTempo: false },
+            { id: a2, so1oTempo: true },
+          ],
+          entramNo2oTempo: [{ id: r1, so1oTempo: false }],
+        },
+        {
+          titulares: [
+            { id: b1, so1oTempo: false },
+            { id: b2, so1oTempo: false },
+          ],
+          entramNo2oTempo: [{ id: r2, so1oTempo: false }],
+        },
       ],
       naoEntra: [fora1, fora2],
     },
   };
 }
 
-async function linhas(): Promise<Array<{ formato: string; n: number; k: number | null; confirmada_por: string }>> {
+async function linhas(): Promise<
+  Array<{ formato: string; n: number; k: number | null; confirmada_por: string }>
+> {
   const r = await aberto.db.query(
     'SELECT formato, n, k, confirmada_por FROM escalacoes WHERE grupo_id = $1 AND data = $2',
     [aberto.cenario.grupoG, DATA],
@@ -95,7 +121,8 @@ beforeAll(async () => {
   aberto = await abrirCenarioGrupos();
   const { cenario } = aberto;
   const novos = [];
-  for (const apelido of ['Ana', 'Caio', 'Duda', 'Edu', 'Fábio', 'Gil']) novos.push(await novoJogador(cenario.grupoG, apelido));
+  for (const apelido of ['Ana', 'Caio', 'Duda', 'Edu', 'Fábio', 'Gil'])
+    novos.push(await novoJogador(cenario.grupoG, apelido));
   ativos = [cenario.idsG.jogadorAtivo, cenario.idsG.jogadorHistorico, ...novos];
   deH = await novoJogador(cenario.grupoH, 'Do Outro Grupo');
 });
@@ -110,11 +137,14 @@ beforeEach(async () => {
 
 afterEach(async () => {
   const { db, cenario } = aberto;
-  await db.query('DELETE FROM escalacoes WHERE grupo_id = $1 AND data = $2', [cenario.grupoG, DATA]);
-  await db.query(`DELETE FROM eventos_uso WHERE grupo_id = $1 AND tipo = 'escalacao_confirmada' AND data_partida = $2`, [
+  await db.query('DELETE FROM escalacoes WHERE grupo_id = $1 AND data = $2', [
     cenario.grupoG,
     DATA,
   ]);
+  await db.query(
+    `DELETE FROM eventos_uso WHERE grupo_id = $1 AND tipo = 'escalacao_confirmada' AND data_partida = $2`,
+    [cenario.grupoG, DATA],
+  );
 });
 
 describe('POST …/escalacoes', () => {
@@ -122,7 +152,9 @@ describe('POST …/escalacoes', () => {
     const r = await confirmar(doisTimes());
     expect(r.status).toBe(201);
     expect(escalacaoResposta.parse(await r.json())).toEqual({ data: DATA, confirmadaEm: AGORA });
-    expect(await linhas()).toEqual([{ formato: 'dois_times', n: 2, k: 1, confirmada_por: aberto.cenario.contaC }]);
+    expect(await linhas()).toEqual([
+      { formato: 'dois_times', n: 2, k: 1, confirmada_por: aberto.cenario.contaC },
+    ]);
   });
 
   it('SIM-67: 3 ou mais times grava com k nulo', async () => {
@@ -130,7 +162,13 @@ describe('POST …/escalacoes', () => {
       formato: 'varios_times',
       data: DATA,
       n: 3,
-      composicao: { times: [{ jogadores: ativos.slice(0, 3) }, { jogadores: ativos.slice(3, 6) }, { jogadores: ativos.slice(6) }] },
+      composicao: {
+        times: [
+          { jogadores: ativos.slice(0, 3) },
+          { jogadores: ativos.slice(3, 6) },
+          { jogadores: ativos.slice(6) },
+        ],
+      },
     });
     expect(r.status).toBe(201);
     expect(await linhas()).toMatchObject([{ formato: 'varios_times', n: 3, k: null }]);
@@ -141,7 +179,9 @@ describe('POST …/escalacoes', () => {
     repetido[7] = repetido[0]!;
     const r = await confirmar(doisTimes(repetido));
     expect(r.status).toBe(422);
-    expect(await r.json()).toMatchObject({ mensagens: { composicao: MENSAGEM_REPETIDO_NA_COMPOSICAO } });
+    expect(await r.json()).toMatchObject({
+      mensagens: { composicao: MENSAGEM_REPETIDO_NA_COMPOSICAO },
+    });
     expect(await linhas()).toEqual([]);
   });
 
@@ -176,7 +216,10 @@ describe('POST …/escalacoes', () => {
 
   it('SIM-71: o jogador que só é ativo depois da data é recusado', async () => {
     const tarde = await novoJogador(aberto.cenario.grupoG, 'Entra Depois');
-    await aberto.db.query(`UPDATE periodos_ativos SET inicio = '2026-04-01' WHERE jogador_id = $1`, [tarde]);
+    await aberto.db.query(
+      `UPDATE periodos_ativos SET inicio = '2026-04-01' WHERE jogador_id = $1`,
+      [tarde],
+    );
     const comTarde = [...ativos];
     comTarde[7] = tarde;
     const r = await confirmar(doisTimes(comTarde));
@@ -194,7 +237,13 @@ describe('POST …/escalacoes', () => {
       composicao: {
         times: [
           { titulares: [{ id: a1, so1oTempo: false }], entramNo2oTempo: [] },
-          { titulares: [{ id: b1, so1oTempo: false }, { id: b2, so1oTempo: false }], entramNo2oTempo: [{ id: r1, so1oTempo: true }] },
+          {
+            titulares: [
+              { id: b1, so1oTempo: false },
+              { id: b2, so1oTempo: false },
+            ],
+            entramNo2oTempo: [{ id: r1, so1oTempo: true }],
+          },
         ],
         naoEntra: [fora1, fora2, fora3, fora4],
       },

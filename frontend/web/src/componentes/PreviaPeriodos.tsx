@@ -28,7 +28,9 @@ function pontos(n: number): string {
 }
 
 export function textoAcumulado(antes: number, depois: number): string {
-  return antes === depois ? `Acumulado de ${pontos(antes)} não muda.` : `Acumulado de ${pontos(antes)} passa a ${depois}.`;
+  return antes === depois
+    ? `Acumulado de ${pontos(antes)} não muda.`
+    : `Acumulado de ${pontos(antes)} passa a ${depois}.`;
 }
 
 /** As quatro frases de posição (PAR-117); as duas nulas não acontecem (o jogador nunca está no ranking): vazio. */
@@ -71,12 +73,16 @@ export function textoRodadas(datas: readonly string[], verbo: VerboRodadas): str
  */
 export function textoPreviaInicio(p: PreviaInicioResposta): string {
   const partes: string[] = [];
-  if (p.acumuladoAntes !== p.acumuladoDepois) partes.push(`Acumulado de ${pontos(p.acumuladoAntes)} passa a ${p.acumuladoDepois}`);
+  if (p.acumuladoAntes !== p.acumuladoDepois)
+    partes.push(`Acumulado de ${pontos(p.acumuladoAntes)} passa a ${p.acumuladoDepois}`);
   if (p.posicaoAntes !== null && p.posicaoDepois !== null && p.posicaoAntes !== p.posicaoDepois) {
-    partes.push(`${partes.length === 0 ? 'Posição' : 'posição'} de ${p.posicaoAntes} para ${p.posicaoDepois}`);
+    partes.push(
+      `${partes.length === 0 ? 'Posição' : 'posição'} de ${p.posicaoAntes} para ${p.posicaoDepois}`,
+    );
   }
   const k = p.rodadasQuePassamAConstar;
-  const rodadas = k === 0 ? '' : k === 1 ? '1 rodada passa a constar.' : `${k} rodadas passam a constar.`;
+  const rodadas =
+    k === 0 ? '' : k === 1 ? '1 rodada passa a constar.' : `${k} rodadas passam a constar.`;
   if (partes.length === 0 && rodadas === '') return 'Acumulado e posição não mudam.';
   return [partes.length > 0 ? `${partes.join('; ')}.` : '', rodadas].filter(Boolean).join(' ');
 }
@@ -90,7 +96,10 @@ export function PreviaPeriodos({ previa }: { previa: PreviaResposta }) {
     previa.rodadasQueDeixamDeConstar.map((r) => r.data),
     'deixam',
   );
-  const cenario = [textoAcumulado(previa.acumuladoAntes, previa.acumuladoDepois), textoPosicao(previa.posicaoAntes, previa.posicaoDepois)]
+  const cenario = [
+    textoAcumulado(previa.acumuladoAntes, previa.acumuladoDepois),
+    textoPosicao(previa.posicaoAntes, previa.posicaoDepois),
+  ]
     .filter(Boolean)
     .join(' ');
   return (

@@ -3,7 +3,11 @@ import * as dominio from '../src/index.ts';
 import { calcularPdf } from '../src/pdf/calcular.ts';
 import { PESOS_PADRAO, type ConfigPesos, type SituacaoGravada } from '../src/pontuacao/pesos.ts';
 import { compararCenarios } from '../src/previas/comparar.ts';
-import { calcularRanking, type EntradaRanking, type PresencaDoRanking } from '../src/ranking/calcular.ts';
+import {
+  calcularRanking,
+  type EntradaRanking,
+  type PresencaDoRanking,
+} from '../src/ranking/calcular.ts';
 import { datasSemanais, jogador, partida } from './apoio/historico.ts';
 
 /**
@@ -93,22 +97,31 @@ describe('desempenho do domínio', () => {
       { inicio: '2024-10-01', fim: '2025-08-01' },
       { inicio: '2025-08-07', fim: null },
     ];
-    expect(mediana(() => compararCenarios(historico, 'j00', periodosDepois, hoje))).toBeLessThan(ORCAMENTO_MS);
+    expect(mediana(() => compararCenarios(historico, 'j00', periodosDepois, hoje))).toBeLessThan(
+      ORCAMENTO_MS,
+    );
   });
 });
 
 describe('exportações da pontuação', () => {
-  it.each(['acumuladoAte', 'acumuladoComInicial', 'acumuladoDoJogador', 'compararJogador', 'prepararHistorico'])(
-    'PAR-61: o index.ts não exporta a interna %s',
-    (nome) => {
-      expect((dominio as Record<string, unknown>)[nome]).toBeUndefined();
-    },
-  );
+  it.each([
+    'acumuladoAte',
+    'acumuladoComInicial',
+    'acumuladoDoJogador',
+    'compararJogador',
+    'prepararHistorico',
+  ])('PAR-61: o index.ts não exporta a interna %s', (nome) => {
+    expect((dominio as Record<string, unknown>)[nome]).toBeUndefined();
+  });
 
-  it.each(['acumuladoPorInicio', 'calcularRanking', 'calcularPdf', 'compararCenarios', 'previaDosPeriodos', 'previaDoInicio'])(
-    'PAR-62: o index.ts exporta a API pública %s',
-    (nome) => {
-      expect(typeof (dominio as Record<string, unknown>)[nome]).toBe('function');
-    },
-  );
+  it.each([
+    'acumuladoPorInicio',
+    'calcularRanking',
+    'calcularPdf',
+    'compararCenarios',
+    'previaDosPeriodos',
+    'previaDoInicio',
+  ])('PAR-62: o index.ts exporta a API pública %s', (nome) => {
+    expect(typeof (dominio as Record<string, unknown>)[nome]).toBe('function');
+  });
 });

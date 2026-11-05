@@ -28,7 +28,13 @@ async function desfeito<T>(fn: (d: pg.Client) => Promise<T>): Promise<T> {
   }
 }
 
-const inserirAssinatura = (d: pg.Client, grupo: string, conta: string, sub: string, situacao: string) =>
+const inserirAssinatura = (
+  d: pg.Client,
+  grupo: string,
+  conta: string,
+  sub: string,
+  situacao: string,
+) =>
   d.query(
     `INSERT INTO assinaturas (grupo_id, asaas_cliente_id, asaas_assinatura_id, valor_centavos, situacao, criada_por, criada_em)
      VALUES ($1, 'cus_t10', $2, 990, $3, $4, now())`,
@@ -47,8 +53,20 @@ describe('assinaturas: uma vigente por grupo', () => {
     const { cenario } = aberto;
     await expect(
       desfeito(async (d) => {
-        await inserirAssinatura(d, cenario.grupoA, cenario.contaA, 'sub_t10_1', 'aguardando_pagamento');
-        await inserirAssinatura(d, cenario.grupoA, cenario.contaA, 'sub_t10_2', 'aguardando_pagamento');
+        await inserirAssinatura(
+          d,
+          cenario.grupoA,
+          cenario.contaA,
+          'sub_t10_1',
+          'aguardando_pagamento',
+        );
+        await inserirAssinatura(
+          d,
+          cenario.grupoA,
+          cenario.contaA,
+          'sub_t10_2',
+          'aguardando_pagamento',
+        );
       }),
     ).rejects.toMatchObject({ code: '23505' });
   });
@@ -63,7 +81,13 @@ describe('assinaturas: uma vigente por grupo', () => {
            VALUES ($1, 'cus_t10', 'sub_t10_ativa', 990, 'ativa', '2026-12-05', $2, now())`,
           [cenario.grupoA, cenario.contaA],
         );
-        await inserirAssinatura(d, cenario.grupoA, cenario.contaA, 'sub_t10_3', 'aguardando_pagamento');
+        await inserirAssinatura(
+          d,
+          cenario.grupoA,
+          cenario.contaA,
+          'sub_t10_3',
+          'aguardando_pagamento',
+        );
       }),
     ).rejects.toMatchObject({ code: '23505' });
   });
@@ -71,9 +95,23 @@ describe('assinaturas: uma vigente por grupo', () => {
   it('PLA-33: depois de cancelada, uma nova aguardando_pagamento entra', async () => {
     const { cenario } = aberto;
     const linhas = await desfeito(async (d) => {
-      await inserirAssinatura(d, cenario.grupoA, cenario.contaA, 'sub_t10_4', 'aguardando_pagamento');
-      await d.query(`UPDATE assinaturas SET situacao = 'cancelada' WHERE asaas_assinatura_id = 'sub_t10_4'`);
-      const r = await inserirAssinatura(d, cenario.grupoA, cenario.contaA, 'sub_t10_5', 'aguardando_pagamento');
+      await inserirAssinatura(
+        d,
+        cenario.grupoA,
+        cenario.contaA,
+        'sub_t10_4',
+        'aguardando_pagamento',
+      );
+      await d.query(
+        `UPDATE assinaturas SET situacao = 'cancelada' WHERE asaas_assinatura_id = 'sub_t10_4'`,
+      );
+      const r = await inserirAssinatura(
+        d,
+        cenario.grupoA,
+        cenario.contaA,
+        'sub_t10_5',
+        'aguardando_pagamento',
+      );
       return r.rowCount;
     });
     expect(linhas).toBe(1);
@@ -82,8 +120,20 @@ describe('assinaturas: uma vigente por grupo', () => {
   it('PLA-33: grupos diferentes têm cada um a sua vigente', async () => {
     const { cenario } = aberto;
     const linhas = await desfeito(async (d) => {
-      await inserirAssinatura(d, cenario.grupoA, cenario.contaA, 'sub_t10_6', 'aguardando_pagamento');
-      const r = await inserirAssinatura(d, cenario.grupoB, cenario.contaB, 'sub_t10_7', 'aguardando_pagamento');
+      await inserirAssinatura(
+        d,
+        cenario.grupoA,
+        cenario.contaA,
+        'sub_t10_6',
+        'aguardando_pagamento',
+      );
+      const r = await inserirAssinatura(
+        d,
+        cenario.grupoB,
+        cenario.contaB,
+        'sub_t10_7',
+        'aguardando_pagamento',
+      );
       return r.rowCount;
     });
     expect(linhas).toBe(1);
@@ -105,7 +155,9 @@ describe('assinaturas: uma vigente por grupo', () => {
   it('PLA-30: situação fora da lista é recusada', async () => {
     const { cenario } = aberto;
     await expect(
-      desfeito((d) => inserirAssinatura(d, cenario.grupoA, cenario.contaA, 'sub_t10_x', 'inadimplente')),
+      desfeito((d) =>
+        inserirAssinatura(d, cenario.grupoA, cenario.contaA, 'sub_t10_x', 'inadimplente'),
+      ),
     ).rejects.toMatchObject({ code: '23514' });
   });
 });
@@ -137,7 +189,8 @@ describe('eventos_asaas', () => {
       'recebido_em',
       'efeito',
     ]);
-    for (const proibida of colunas) expect(proibida).not.toMatch(/email|nome|cpf|documento|telefone|grupo/i);
+    for (const proibida of colunas)
+      expect(proibida).not.toMatch(/email|nome|cpf|documento|telefone|grupo/i);
   });
 
   it('PLA-41: assinaturas não tem coluna de CPF nem de cartão', async () => {

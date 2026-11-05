@@ -7,7 +7,11 @@ import { NOME_COOKIE_SESSAO } from '../../src/infraestrutura/sessao/cookie.ts';
 import { gerarToken } from '../../src/infraestrutura/sessao/token.ts';
 import { envAcesso } from '../acesso/apoio.ts';
 import { contextoFalso, fabricaComoApp } from '../db/requisicao.ts';
-import { abrirCenarioGrupos, reativar, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  reativar,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * `POST /api/grupos/:grupoId/simulador/sugerir` (T35 da simulador; SIM-17, SIM-47, SIM-53 a SIM-56, SIM-60, SIM-80),
@@ -26,7 +30,10 @@ let deH = '';
 let partidaAnterior = '';
 
 const DATA = '2026-03-05';
-const app = criarApp({ fabricaBanco: fabricaComoApp().fabrica, relogio: relogioFixo('2026-03-03T15:00:00Z') });
+const app = criarApp({
+  fabricaBanco: fabricaComoApp().fabrica,
+  relogio: relogioFixo('2026-03-03T15:00:00Z'),
+});
 
 async function sessao(conta: string): Promise<string> {
   const { token, hash } = await gerarToken();
@@ -63,10 +70,10 @@ async function novoJogador(grupo: string, apelido: string, conta: string): Promi
     [grupo, apelido, conta],
   );
   const id = r.rows[0]!.id;
-  await aberto.db.query(`INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio) VALUES ($1, $2, '2026-01-01')`, [
-    id,
-    grupo,
-  ]);
+  await aberto.db.query(
+    `INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio) VALUES ($1, $2, '2026-01-01')`,
+    [id, grupo],
+  );
   return id;
 }
 
@@ -79,16 +86,18 @@ async function partida(data: string, presentes: readonly string[]): Promise<stri
   );
   const id = r.rows[0]!.id;
   for (const jogador of presentes) {
-    await db.query(`INSERT INTO presencas (partida_id, jogador_id, grupo_id, situacao) VALUES ($1, $2, $3, 'presente')`, [
-      id,
-      jogador,
-      cenario.grupoG,
-    ]);
+    await db.query(
+      `INSERT INTO presencas (partida_id, jogador_id, grupo_id, situacao) VALUES ($1, $2, $3, 'presente')`,
+      [id, jogador, cenario.grupoG],
+    );
   }
   return id;
 }
 
-const dois = (ids: readonly string[], extra: Partial<{ n: number; k: number | 'ilimitado' }> = {}) => ({
+const dois = (
+  ids: readonly string[],
+  extra: Partial<{ n: number; k: number | 'ilimitado' }> = {},
+) => ({
   formato: 'dois_times',
   data: DATA,
   n: 7,
@@ -99,7 +108,8 @@ const dois = (ids: readonly string[], extra: Partial<{ n: number; k: number | 'i
 
 async function contagens(): Promise<number[]> {
   const { db, cenario } = aberto;
-  const um = async (sql: string) => (await db.query<{ n: number }>(sql, [cenario.grupoG])).rows[0]?.n ?? -1;
+  const um = async (sql: string) =>
+    (await db.query<{ n: number }>(sql, [cenario.grupoG])).rows[0]?.n ?? -1;
   return [
     await um('SELECT count(*)::int AS n FROM escalacoes WHERE grupo_id = $1'),
     await um('SELECT count(*)::int AS n FROM eventos_uso WHERE grupo_id = $1'),
@@ -112,11 +122,17 @@ beforeAll(async () => {
   aberto = await abrirCenarioGrupos();
   const { cenario } = aberto;
   const novos: string[] = [];
-  for (let i = 1; i <= 17; i++) novos.push(await novoJogador(cenario.grupoG, `Sim ${String(i).padStart(2, '0')}`, cenario.contaC));
+  for (let i = 1; i <= 17; i++)
+    novos.push(
+      await novoJogador(cenario.grupoG, `Sim ${String(i).padStart(2, '0')}`, cenario.contaC),
+    );
   ativos = [cenario.idsG.jogadorAtivo, cenario.idsG.jogadorHistorico, ...novos];
   deH = await novoJogador(cenario.grupoH, 'Do Outro Grupo', cenario.contaB);
   // Uma partida antes da data, com metade presente: a ordem de prioridade não fica só nos desempates.
-  partidaAnterior = await partida('2026-02-26', ativos.filter((_, i) => i % 2 === 1));
+  partidaAnterior = await partida(
+    '2026-02-26',
+    ativos.filter((_, i) => i % 2 === 1),
+  );
 });
 
 afterAll(async () => {
@@ -152,11 +168,19 @@ describe('POST …/simulador/sugerir', () => {
   });
 
   it('SIM-47: 3 ou mais times sem ordem de prioridade', async () => {
-    const r = await sugerir({ formato: 'varios_times', data: DATA, n: 4, aptos: ativos.slice(0, 18).map((id) => ({ id })) });
+    const r = await sugerir({
+      formato: 'varios_times',
+      data: DATA,
+      n: 4,
+      aptos: ativos.slice(0, 18).map((id) => ({ id })),
+    });
     expect(r.status).toBe(200);
     const corpo = sugerirResposta.parse(await r.json());
     expect(corpo).not.toHaveProperty('ordemPrioridade');
-    expect(corpo.formato === 'varios_times' && corpo.times.map((t) => [t.jogadores.length, t.incompleto])).toEqual([
+    expect(
+      corpo.formato === 'varios_times' &&
+        corpo.times.map((t) => [t.jogadores.length, t.incompleto]),
+    ).toEqual([
       [4, false],
       [4, false],
       [4, false],
@@ -187,7 +211,12 @@ describe('POST …/simulador/sugerir', () => {
   });
 
   it('SIM-56: 8 aptos, 3+, N = 4: 422 com a descrição da prévia em aptos', async () => {
-    const r = await sugerir({ formato: 'varios_times', data: DATA, n: 4, aptos: ativos.slice(0, 8).map((id) => ({ id })) });
+    const r = await sugerir({
+      formato: 'varios_times',
+      data: DATA,
+      n: 4,
+      aptos: ativos.slice(0, 8).map((id) => ({ id })),
+    });
     expect(r.status).toBe(422);
     expect(await r.json()).toMatchObject({
       mensagens: { aptos: 'Com 8 aptos e N = 4 não há 3 times. Use N menor ou o formato 2 times.' },
@@ -220,7 +249,13 @@ describe('POST …/simulador/sugerir', () => {
     const doSimulador = linhas.filter((l) => l.includes('simulador_sugerir'));
     expect(doSimulador).toHaveLength(1);
     const linha = doSimulador[0] ?? '';
-    expect(JSON.parse(linha)).toEqual({ evento: 'simulador_sugerir', formato: 'dois_times', n: 7, k: 2, aptos: 19 });
+    expect(JSON.parse(linha)).toEqual({
+      evento: 'simulador_sugerir',
+      formato: 'dois_times',
+      n: 7,
+      k: 2,
+      aptos: 19,
+    });
     for (const proibido of [...ativos, aberto.cenario.grupoG, 'Toninho', 'Bira', 'Sim 01']) {
       expect(linha).not.toContain(proibido);
     }
@@ -248,7 +283,9 @@ describe('POST …/simulador/sugerir', () => {
     // de `ativos`) ficam à frente dos ausentes; Toninho e Bira ficam fora da conta (têm o histórico do cenário).
     const novos = new Set(ativos.slice(2));
     const presentes = new Set(ativos.filter((id, i) => i % 2 === 1 && novos.has(id)));
-    const ordem = (com.formato === 'dois_times' ? com.ordemPrioridade : []).filter((id) => novos.has(id));
+    const ordem = (com.formato === 'dois_times' ? com.ordemPrioridade : []).filter((id) =>
+      novos.has(id),
+    );
     expect(ordem.slice(0, presentes.size).every((id) => presentes.has(id))).toBe(true);
     expect(partidaAnterior).toBeTruthy();
   });

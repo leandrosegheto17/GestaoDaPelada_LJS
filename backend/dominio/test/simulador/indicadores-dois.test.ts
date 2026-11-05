@@ -16,7 +16,12 @@ import { indicadoresDoisTimes, indicadoresDoTime } from '../../src/simulador/ind
 
 const DATA = '2026-10-22';
 
-function apto(id: string, nivel: number, anoNascimento: number | null = 1990, so1oTempo = false): Apto {
+function apto(
+  id: string,
+  nivel: number,
+  anoNascimento: number | null = 1990,
+  so1oTempo = false,
+): Apto {
   return { id, apelido: id.toUpperCase(), nivel, semNota: false, anoNascimento, so1oTempo };
 }
 
@@ -36,7 +41,11 @@ const POSICOES = new Map(['t1', 't2', 't3', 't4', 'r1', 'r2'].map((id, i) => [id
 describe('indicadoresDoTime', () => {
   it('SIM-39: no 2º tempo, quem sai no intervalo deixa a soma e quem entra é somado', () => {
     // Titulares t1, t2, t3 ("só 1º"), t4; entram r1 e r2: saem t3 e t4 (o pior); pares t3 → r1, t4 → r2.
-    const ind = indicadoresDoTime({ titulares: ['t1', 't2', 't3', 't4'], entram: ['r1', 'r2'] }, ELENCO, POSICOES);
+    const ind = indicadoresDoTime(
+      { titulares: ['t1', 't2', 't3', 't4'], entram: ['r1', 'r2'] },
+      ELENCO,
+      POSICOES,
+    );
     expect(ind.saem).toEqual(['t3', 't4']);
     expect(ind.nivelSoma1oTempo).toBe(700 + 650 + 600 + 500);
     expect(ind.nivelSoma2oTempo).toBe(700 + 650 + 550 + 450);
@@ -63,20 +72,35 @@ describe('indicadoresDoTime', () => {
 
   it('SIM-39: time sem ninguém no 2º tempo tem nível médio nulo', () => {
     const elenco = montarElenco([apto('a', 600, 1990, true), apto('b', 500, 1990, true)], DATA);
-    const ind = indicadoresDoTime({ titulares: ['a', 'b'], entram: [] }, elenco, new Map([['a', 0], ['b', 1]]));
+    const ind = indicadoresDoTime(
+      { titulares: ['a', 'b'], entram: [] },
+      elenco,
+      new Map([
+        ['a', 0],
+        ['b', 1],
+      ]),
+    );
     expect(ind.jogadores2oTempo).toBe(0);
     expect(ind.nivelSoma2oTempo).toBe(0);
     expect(ind.nivelMedio2oTempo).toBeNull();
   });
 
   it('SIM-39: composição ajustada fora de ordem é reordenada pela prioridade antes de derivar quem sai', () => {
-    const ind = indicadoresDoTime({ titulares: ['t4', 't1', 't2'], entram: ['r1'] }, ELENCO, POSICOES);
+    const ind = indicadoresDoTime(
+      { titulares: ['t4', 't1', 't2'], entram: ['r1'] },
+      ELENCO,
+      POSICOES,
+    );
     expect(ind.saem).toEqual(['t4']);
   });
 
   it('SIM-95: idade média ignora quem não tem ano', () => {
     // Titulares t1 (36), t2 (sem ano), t3 (30), t4 (36) e entram r1 (40), r2 (sem ano): (36 + 30 + 36 + 40) / 4.
-    const ind = indicadoresDoTime({ titulares: ['t1', 't2', 't3', 't4'], entram: ['r1', 'r2'] }, ELENCO, POSICOES);
+    const ind = indicadoresDoTime(
+      { titulares: ['t1', 't2', 't3', 't4'], entram: ['r1', 'r2'] },
+      ELENCO,
+      POSICOES,
+    );
     expect(ind.idadeMedia).toBe(3550);
   });
 

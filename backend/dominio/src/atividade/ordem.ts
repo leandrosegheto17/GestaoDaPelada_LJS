@@ -20,7 +20,11 @@ function falha(regra: FalhaPeriodo['regra'], mensagem: string, campo: CampoPerio
  * Saída igual ao início do período (período vazio) e retorno igual à saída anterior (sair e voltar no mesmo dia,
  * GEL-61) valem. Devolve a primeira falha, ou nulo.
  */
-export function verificarOrdem(periodos: readonly Periodo[], indice: number, campo: CampoPeriodo): FalhaPeriodo | null {
+export function verificarOrdem(
+  periodos: readonly Periodo[],
+  indice: number,
+  campo: CampoPeriodo,
+): FalhaPeriodo | null {
   const atual = periodos[indice];
   if (!atual) throw new Error(`Período ${indice} inexistente`);
   const anterior = periodos[indice - 1];
@@ -65,7 +69,10 @@ export function verificarOrdem(periodos: readonly Periodo[], indice: number, cam
 export const MENSAGEM_SOBREPOSICAO = 'Os períodos não podem se sobrepor.';
 
 /** Algum par de períodos com dia em comum (GEL-67), ou mais de um aberto. Devolve a falha, ou nulo. */
-export function verificarSobreposicao(periodos: readonly Periodo[], campo: CampoPeriodo): FalhaPeriodo | null {
+export function verificarSobreposicao(
+  periodos: readonly Periodo[],
+  campo: CampoPeriodo,
+): FalhaPeriodo | null {
   for (let i = 0; i < periodos.length; i++) {
     for (let j = i + 1; j < periodos.length; j++) {
       const a = periodos[i];

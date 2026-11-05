@@ -108,7 +108,9 @@ describe('asaas_evento_registrar', () => {
     const r = await comoApp(db, semContexto, async (d) => {
       const registro = await registrar(d, 'evt_t15_desconhecida', 'sub_nao_existe');
       await d.query('RESET ROLE');
-      const n = await d.query<{ n: number }>(`SELECT count(*)::int AS n FROM eventos_asaas WHERE id = 'evt_t15_desconhecida'`);
+      const n = await d.query<{ n: number }>(
+        `SELECT count(*)::int AS n FROM eventos_asaas WHERE id = 'evt_t15_desconhecida'`,
+      );
       return { registro, n: n.rows[0]?.n };
     });
     expect(r.registro).toEqual([
@@ -137,7 +139,9 @@ describe('asaas_evento_registrar', () => {
     const data = await comoApp(db, semContexto, async (d) => {
       await registrar(d, 'evt_t15_data', 'sub_g', '05/11/2026 10:00');
       await d.query('RESET ROLE');
-      const r = await d.query<{ data: string | null }>(`SELECT data_criacao::text AS data FROM eventos_asaas WHERE id = 'evt_t15_data'`);
+      const r = await d.query<{ data: string | null }>(
+        `SELECT data_criacao::text AS data FROM eventos_asaas WHERE id = 'evt_t15_data'`,
+      );
       return r.rows[0]?.data;
     });
     expect(data).toBeNull();
@@ -169,11 +173,17 @@ describe('asaas_evento_registrar', () => {
     ['com slug no contexto', 'slug'],
   ] as const)('PLA-13: %s, 42501 e nada gravado', async (_nome, tipo) => {
     const { db, cenario } = aberto;
-    const contexto: Contexto = tipo === 'conta' ? { conta: cenario.contaC } : { slug: cenario.slugG };
-    await expect(comoApp(db, contexto, (d) => registrar(d, `evt_t15_${tipo}`, 'sub_g'))).rejects.toMatchObject({
+    const contexto: Contexto =
+      tipo === 'conta' ? { conta: cenario.contaC } : { slug: cenario.slugG };
+    await expect(
+      comoApp(db, contexto, (d) => registrar(d, `evt_t15_${tipo}`, 'sub_g')),
+    ).rejects.toMatchObject({
       code: '42501',
     });
-    const n = await db.query<{ n: number }>('SELECT count(*)::int AS n FROM eventos_asaas WHERE id = $1', [`evt_t15_${tipo}`]);
+    const n = await db.query<{ n: number }>(
+      'SELECT count(*)::int AS n FROM eventos_asaas WHERE id = $1',
+      [`evt_t15_${tipo}`],
+    );
     expect(n.rows[0]?.n).toBe(0);
   });
 });

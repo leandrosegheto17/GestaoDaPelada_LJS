@@ -60,8 +60,14 @@ export interface ResultadoSalvarConfig {
  * SPEC_DEVIATION: sem `contaId` e `agora` na assinatura (a tarefa os previa): a autora vem de `app_conta_id()` e o
  * momento de `now()`, como em `auditoria.registrar`, e `config_financeira` não tem colunas de autoria.
  */
-async function salvarConfig(db: Db, grupoId: string, dados: ConfigFinanceira): Promise<ResultadoSalvarConfig> {
-  await sql`SELECT pg_advisory_xact_lock(hashtextextended(${`financeiro_config:${grupoId}`}, 0))`.execute(db);
+async function salvarConfig(
+  db: Db,
+  grupoId: string,
+  dados: ConfigFinanceira,
+): Promise<ResultadoSalvarConfig> {
+  await sql`SELECT pg_advisory_xact_lock(hashtextextended(${`financeiro_config:${grupoId}`}, 0))`.execute(
+    db,
+  );
   const antes = await lerConfig(db, grupoId);
 
   await sql`

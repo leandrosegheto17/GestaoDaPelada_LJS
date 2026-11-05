@@ -21,7 +21,10 @@ const HISTORICO = historicoGrande(40, 104);
 const APTOS = aptosGrandes(30);
 
 const CENARIOS: [string, EntradaSimulador][] = [
-  ['2 times de 11, K ilimitado', { formato: 'dois_times', data: DATA, n: 11, k: 'ilimitado', aptos: APTOS }],
+  [
+    '2 times de 11, K ilimitado',
+    { formato: 'dois_times', data: DATA, n: 11, k: 'ilimitado', aptos: APTOS },
+  ],
   ['6 times de 5', { formato: 'varios_times', data: DATA, n: 5, k: 'ilimitado', aptos: APTOS }],
 ];
 

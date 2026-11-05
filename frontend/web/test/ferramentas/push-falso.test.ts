@@ -56,7 +56,10 @@ describe('push falso', () => {
 
   it('NOT-63: responde na ordem os status pedidos e volta a 201 depois', async () => {
     falso = await iniciarPushFalso();
-    await fetch(`${falso.base}/teste/responder`, { method: 'POST', body: JSON.stringify({ status: [503, 410] }) });
+    await fetch(`${falso.base}/teste/responder`, {
+      method: 'POST',
+      body: JSON.stringify({ status: [503, 410] }),
+    });
     expect((await enviar('/push/a')).status).toBe(503);
     expect((await enviar('/push/a')).status).toBe(410);
     expect((await enviar('/push/a')).status).toBe(201);

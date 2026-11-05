@@ -24,7 +24,8 @@ describe('rotas do financeiro', () => {
       // As leituras da API ficam pendentes: a rota e a guarda bastam aqui; cada tela tem o próprio teste.
       const api = { 'GET /api/sessao': () => json(200, SESSAO_ANA) };
       const pendentes = new Proxy(api as Record<string, () => Response | Promise<Response>>, {
-        get: (alvo, chave: string) => alvo[chave] ?? (chave.startsWith('GET ') ? () => pendente() : undefined),
+        get: (alvo, chave: string) =>
+          alvo[chave] ?? (chave.startsWith('GET ') ? () => pendente() : undefined),
       });
       const { tela, local } = abrirTela(caminho, pendentes);
       await waitFor(() => expect(tela()).toBe(esperada));
@@ -38,7 +39,9 @@ describe('rotas do financeiro', () => {
   }
 
   it('FIN-47: a rota antiga do mockup (/admin/…/financeiro) não existe no app', async () => {
-    const { tela } = abrirTela('/admin/g-quinta/financeiro', { 'GET /api/sessao': () => json(200, SESSAO_ANA) });
+    const { tela } = abrirTela('/admin/g-quinta/financeiro', {
+      'GET /api/sessao': () => json(200, SESSAO_ANA),
+    });
     await waitFor(() => expect(tela()).toBe('nao-encontrada'));
   });
 });

@@ -20,7 +20,10 @@ import { abrirCenarioGrupos, type CenarioGruposAberto } from '../isolamento/cena
  */
 
 let aberto: CenarioGruposAberto;
-const app = criarApp({ fabricaBanco: fabricaComoApp().fabrica, relogio: relogioFixo('2026-11-05T15:00:00Z') });
+const app = criarApp({
+  fabricaBanco: fabricaComoApp().fabrica,
+  relogio: relogioFixo('2026-11-05T15:00:00Z'),
+});
 
 const TELEFONE = '11987654321';
 const ANO = 1987;
@@ -29,7 +32,14 @@ const RE_UUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi
 const RE_UUID_INTEIRO = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const RE_DATA = /^\d{4}-\d{2}-\d{2}$/;
 /** Os nomes de campo que um evento pode citar (`jogador_editado` e afins, SEC-008). */
-const NOMES_DE_CAMPO = new Set(['apelido', 'anoNascimento', 'posicao', 'telefone', 'pontuacaoInicial', 'nome']);
+const NOMES_DE_CAMPO = new Set([
+  'apelido',
+  'anoNascimento',
+  'posicao',
+  'telefone',
+  'pontuacaoInicial',
+  'nome',
+]);
 
 let jogadorId = '';
 
@@ -44,7 +54,10 @@ async function sessao(conta: string): Promise<string> {
 }
 
 async function pedir(caminho: string, metodo: string, corpo?: unknown): Promise<Response> {
-  const headers = new Headers({ 'x-pelada': '1', cookie: `${NOME_COOKIE_SESSAO}=${await sessao(aberto.cenario.contaC)}` });
+  const headers = new Headers({
+    'x-pelada': '1',
+    cookie: `${NOME_COOKIE_SESSAO}=${await sessao(aberto.cenario.contaC)}`,
+  });
   if (corpo !== undefined) headers.set('content-type', 'application/json');
   const ctx = contextoFalso();
   const r = await app.request(
@@ -59,7 +72,8 @@ async function pedir(caminho: string, metodo: string, corpo?: unknown): Promise<
 
 async function esperarStatus(r: Promise<Response>, status: number): Promise<Response> {
   const resposta = await r;
-  if (resposta.status !== status) throw new Error(`esperava ${status}, veio ${resposta.status}: ${await resposta.text()}`);
+  if (resposta.status !== status)
+    throw new Error(`esperava ${status}, veio ${resposta.status}: ${await resposta.text()}`);
   return resposta;
 }
 
@@ -83,7 +97,9 @@ function folhasProibidas(valor: unknown, caminho = 'resumo'): string[] {
   }
   if (Array.isArray(valor)) return valor.flatMap((v, i) => folhasProibidas(v, `${caminho}[${i}]`));
   if (typeof valor === 'object') {
-    return Object.entries(valor as Record<string, unknown>).flatMap(([k, v]) => folhasProibidas(v, `${caminho}.${k}`));
+    return Object.entries(valor as Record<string, unknown>).flatMap(([k, v]) =>
+      folhasProibidas(v, `${caminho}.${k}`),
+    );
   }
   return [`${caminho}: tipo ${typeof valor}`];
 }
@@ -104,17 +120,41 @@ beforeAll(async () => {
   );
   jogadorId = ((await criado.json()) as { id: string }).id;
 
-  const outros = { apelido: 'Marcador Editado', anoNascimento: 1990, posicao: 'zagueiro', telefone: '11912345678', pontuacaoInicial: 4 };
+  const outros = {
+    apelido: 'Marcador Editado',
+    anoNascimento: 1990,
+    posicao: 'zagueiro',
+    telefone: '11912345678',
+    pontuacaoInicial: 4,
+  };
   await esperarStatus(pedir(`/jogadores/${jogadorId}`, 'PATCH', outros), 200);
-  await esperarStatus(pedir(`/jogadores/${jogadorId}`, 'PATCH', { ...outros, anoNascimento: ANO, telefone: TELEFONE }), 200);
-  await esperarStatus(pedir(`/jogadores/${jogadorId}/inativar`, 'POST', { data: '2026-10-01' }), 200);
-  await esperarStatus(pedir(`/jogadores/${jogadorId}/reativar`, 'POST', { data: '2026-10-10' }), 200);
+  await esperarStatus(
+    pedir(`/jogadores/${jogadorId}`, 'PATCH', {
+      ...outros,
+      anoNascimento: ANO,
+      telefone: TELEFONE,
+    }),
+    200,
+  );
+  await esperarStatus(
+    pedir(`/jogadores/${jogadorId}/inativar`, 'POST', { data: '2026-10-01' }),
+    200,
+  );
+  await esperarStatus(
+    pedir(`/jogadores/${jogadorId}/reativar`, 'POST', { data: '2026-10-10' }),
+    200,
+  );
 
-  const ficha = (await (await esperarStatus(pedir(`/jogadores/${jogadorId}`, 'GET'), 200)).json()) as {
+  const ficha = (await (
+    await esperarStatus(pedir(`/jogadores/${jogadorId}`, 'GET'), 200)
+  ).json()) as {
     periodos: Array<{ id: string }>;
   };
   const primeiro = ficha.periodos[0]!.id;
-  await esperarStatus(pedir(`/jogadores/${jogadorId}/periodos/${primeiro}`, 'PATCH', { saida: '2026-09-30' }), 200);
+  await esperarStatus(
+    pedir(`/jogadores/${jogadorId}/periodos/${primeiro}`, 'PATCH', { saida: '2026-09-30' }),
+    200,
+  );
   await esperarStatus(pedir(`/jogadores/${jogadorId}/inicio`, 'PUT', { data: '2026-02-01' }), 200);
   await esperarStatus(pedir(`/jogadores/${jogadorId}`, 'DELETE'), 204);
 });

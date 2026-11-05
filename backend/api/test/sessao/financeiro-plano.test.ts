@@ -3,7 +3,11 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { criarApp, type OpcoesApp } from '../../src/entrada/app.ts';
-import { MENSAGEM_PLANO_PRO, recursoLiberadoPeloPlano, type RecursoLiberado } from '../../src/entrada/middlewares/recurso.ts';
+import {
+  MENSAGEM_PLANO_PRO,
+  recursoLiberadoPeloPlano,
+  type RecursoLiberado,
+} from '../../src/entrada/middlewares/recurso.ts';
 import { relogioDoSistema } from '../../src/infraestrutura/relogio.ts';
 import { comDb } from '../repositorios/apoio.ts';
 import { NOME_COOKIE_SESSAO } from '../../src/infraestrutura/sessao/cookie.ts';
@@ -46,7 +50,11 @@ function montar(opcoes: Pick<OpcoesApp, 'recursoLiberado'> = {}) {
   });
 }
 
-async function pedir(app: ReturnType<typeof criarApp>, conta: string, metodo: string): Promise<Response> {
+async function pedir(
+  app: ReturnType<typeof criarApp>,
+  conta: string,
+  metodo: string,
+): Promise<Response> {
   const { token, hash } = await gerarToken();
   await aberto.db.query(
     `INSERT INTO sessoes (token_hash, conta_id, escopo, criada_em, ultimo_uso_em, expira_em)
@@ -82,8 +90,12 @@ describe('recurso financeiro no ponto único (FIN-45)', () => {
   it('FIN-45: com o plano em Pro (trial do cenário), G e H têm o financeiro liberado', async () => {
     const { cenario } = aberto;
     const pontoUnico = recursoLiberadoPeloPlano(relogioDoSistema());
-    expect(await comDb(aberto.url, cenario.contaC, (db) => pontoUnico(db, cenario.grupoG, 'financeiro'))).toBe(true);
-    expect(await comDb(aberto.url, cenario.contaB, (db) => pontoUnico(db, cenario.grupoH, 'financeiro'))).toBe(true);
+    expect(
+      await comDb(aberto.url, cenario.contaC, (db) => pontoUnico(db, cenario.grupoG, 'financeiro')),
+    ).toBe(true);
+    expect(
+      await comDb(aberto.url, cenario.contaB, (db) => pontoUnico(db, cenario.grupoH, 'financeiro')),
+    ).toBe(true);
   });
 
   it('FIN-45: com G em inadimplente, o padrão nega o financeiro de G', async () => {
@@ -92,18 +104,20 @@ describe('recurso financeiro no ponto único (FIN-45)', () => {
       'SELECT situacao_comercial AS s, trial_inicio::text AS t FROM grupos WHERE id = $1',
       [cenario.grupoG],
     );
-    await db.query(`UPDATE grupos SET situacao_comercial = 'inadimplente', trial_inicio = NULL WHERE id = $1`, [
-      cenario.grupoG,
-    ]);
+    await db.query(
+      `UPDATE grupos SET situacao_comercial = 'inadimplente', trial_inicio = NULL WHERE id = $1`,
+      [cenario.grupoG],
+    );
     try {
       const pontoUnico = recursoLiberadoPeloPlano(relogioDoSistema());
-      expect(await comDb(aberto.url, cenario.contaC, (d) => pontoUnico(d, cenario.grupoG, 'financeiro'))).toBe(false);
+      expect(
+        await comDb(aberto.url, cenario.contaC, (d) => pontoUnico(d, cenario.grupoG, 'financeiro')),
+      ).toBe(false);
     } finally {
-      await db.query('UPDATE grupos SET situacao_comercial = $2, trial_inicio = $3::date WHERE id = $1', [
-        cenario.grupoG,
-        antes.rows[0]?.s,
-        antes.rows[0]?.t ?? null,
-      ]);
+      await db.query(
+        'UPDATE grupos SET situacao_comercial = $2, trial_inicio = $3::date WHERE id = $1',
+        [cenario.grupoG, antes.rows[0]?.s, antes.rows[0]?.t ?? null],
+      );
     }
   });
 
@@ -117,26 +131,45 @@ describe('recurso financeiro no ponto único (FIN-45)', () => {
   it('FIN-45: as rotas e o middleware do financeiro não leem situacao_comercial (a decisão é só do ponto único)', () => {
     const raiz = join(import.meta.dirname, '../../src/entrada');
     const arquivos = [
-      ...readdirSync(join(raiz, 'rotas')).filter((f) => f.startsWith('financeiro')).map((f) => join(raiz, 'rotas', f)),
+      ...readdirSync(join(raiz, 'rotas'))
+        .filter((f) => f.startsWith('financeiro'))
+        .map((f) => join(raiz, 'rotas', f)),
       join(raiz, 'middlewares', 'financeiro.ts'),
     ];
-    const comLeitura = arquivos.filter((f) => readFileSync(f, 'utf8').includes('situacao_comercial'));
+    const comLeitura = arquivos.filter((f) =>
+      readFileSync(f, 'utf8').includes('situacao_comercial'),
+    );
     expect(comLeitura).toEqual([]);
   });
 });
 
 describe('ponto em "somente leitura" (FIN-50)', () => {
-  it.each(ESCRITAS)('FIN-50: %s responde 403 plano_pro com o recurso financeiro, sem chamar a rota', async (metodo) => {
-    const antes = chamadas;
-    const r = await pedir(montar({ recursoLiberado: somenteLeitura }), aberto.cenario.contaC, metodo);
-    expect(r.status).toBe(403);
-    expect(await r.json()).toEqual({ erro: 'plano_pro', recurso: 'financeiro', mensagem: MENSAGEM_PLANO_PRO });
-    expect(chamadas).toBe(antes);
-  });
+  it.each(ESCRITAS)(
+    'FIN-50: %s responde 403 plano_pro com o recurso financeiro, sem chamar a rota',
+    async (metodo) => {
+      const antes = chamadas;
+      const r = await pedir(
+        montar({ recursoLiberado: somenteLeitura }),
+        aberto.cenario.contaC,
+        metodo,
+      );
+      expect(r.status).toBe(403);
+      expect(await r.json()).toEqual({
+        erro: 'plano_pro',
+        recurso: 'financeiro',
+        mensagem: MENSAGEM_PLANO_PRO,
+      });
+      expect(chamadas).toBe(antes);
+    },
+  );
 
   it.each(['GET', 'HEAD'])('FIN-50: %s passa sem consultar a trava', async (metodo) => {
     pedidosDaTrava.length = 0;
-    const r = await pedir(montar({ recursoLiberado: somenteLeitura }), aberto.cenario.contaC, metodo);
+    const r = await pedir(
+      montar({ recursoLiberado: somenteLeitura }),
+      aberto.cenario.contaC,
+      metodo,
+    );
     expect(r.status).toBe(200);
     expect(pedidosDaTrava).toEqual([]);
   });
@@ -149,7 +182,11 @@ describe('ponto em "somente leitura" (FIN-50)', () => {
 
   it('FIN-33, AD-077: admin sem acesso recebe 403 sem_permissao_financeiro antes da trava de plano', async () => {
     pedidosDaTrava.length = 0;
-    const r = await pedir(montar({ recursoLiberado: somenteLeitura }), aberto.cenario.contaO, 'POST');
+    const r = await pedir(
+      montar({ recursoLiberado: somenteLeitura }),
+      aberto.cenario.contaO,
+      'POST',
+    );
     expect(r.status).toBe(403);
     expect(await r.json()).toMatchObject({ codigo: 'sem_permissao_financeiro' });
     expect(pedidosDaTrava).toEqual([]);

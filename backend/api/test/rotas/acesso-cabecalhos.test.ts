@@ -1,7 +1,11 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { Env, LimiteDeTaxa } from '../../src/entrada/ambiente.ts';
 import { criarApp } from '../../src/entrada/app.ts';
-import { criarWorker, type EmbrulharSentry, type Manipulador } from '../../src/entrada/observabilidade.ts';
+import {
+  criarWorker,
+  type EmbrulharSentry,
+  type Manipulador,
+} from '../../src/entrada/observabilidade.ts';
 
 /**
  * Sem cache e sem segredo no log nas rotas de acesso (T31; ACE-21, ACE-53). Roda no `workerd`,
@@ -46,14 +50,30 @@ interface Caso {
 /** Todas as rotas de /api/sessao e /api/conta, com corpos que levam os marcadores. */
 const ROTAS: Caso[] = [
   { metodo: 'GET', caminho: '/api/sessao' },
-  { metodo: 'POST', caminho: '/api/sessao/entrar', corpo: { email: 'ana@exemplo.test', senha: SENHA } },
+  {
+    metodo: 'POST',
+    caminho: '/api/sessao/entrar',
+    corpo: { email: 'ana@exemplo.test', senha: SENHA },
+  },
   { metodo: 'POST', caminho: '/api/sessao/sair' },
   { metodo: 'POST', caminho: '/api/sessao/esqueci-senha', corpo: { email: 'ana@exemplo.test' } },
   { metodo: 'POST', caminho: '/api/sessao/nova-senha', corpo: { token: TOKEN, senha: SENHA } },
-  { metodo: 'POST', caminho: '/api/conta', corpo: { nome: 'Ana', email: 'ana@exemplo.test', senha: SENHA, termos: true } },
+  {
+    metodo: 'POST',
+    caminho: '/api/conta',
+    corpo: { nome: 'Ana', email: 'ana@exemplo.test', senha: SENHA, termos: true },
+  },
   { metodo: 'POST', caminho: '/api/conta/confirmar', corpo: { token: TOKEN } },
-  { metodo: 'POST', caminho: '/api/conta/reenviar-confirmacao', corpo: { email: 'ana@exemplo.test' } },
-  { metodo: 'POST', caminho: '/api/conta/senha', corpo: { senhaAtual: SENHA, senhaNova: `${SENHA}-nova` } },
+  {
+    metodo: 'POST',
+    caminho: '/api/conta/reenviar-confirmacao',
+    corpo: { email: 'ana@exemplo.test' },
+  },
+  {
+    metodo: 'POST',
+    caminho: '/api/conta/senha',
+    corpo: { senhaAtual: SENHA, senhaNova: `${SENHA}-nova` },
+  },
   { metodo: 'POST', caminho: '/api/conta/excluir', corpo: { senha: SENHA } },
 ];
 
@@ -90,28 +110,44 @@ describe('ACE-53: Cache-Control no-store nas rotas de acesso', () => {
     expect(r.headers.get('cache-control')).toBe('no-store');
   });
 
-  it.each(ROTAS.filter((c) => c.metodo === 'POST'))('$caminho: no-store no 422 de corpo inválido', async (caso) => {
-    const r = await app.fetch(requisicao(caso, { corpoCru: '{nao json', comCookie: false }), env(), ctx as never);
-    expect(r.headers.get('cache-control')).toBe('no-store');
-  });
+  it.each(ROTAS.filter((c) => c.metodo === 'POST'))(
+    '$caminho: no-store no 422 de corpo inválido',
+    async (caso) => {
+      const r = await app.fetch(
+        requisicao(caso, { corpoCru: '{nao json', comCookie: false }),
+        env(),
+        ctx as never,
+      );
+      expect(r.headers.get('cache-control')).toBe('no-store');
+    },
+  );
 
-  it.each(ROTAS)('$metodo $caminho: no-store no 429 do limitador e no 500 forçado', async (caso) => {
-    const negado = await app.fetch(
-      requisicao(caso, { comCookie: false }),
-      env({ LIMITE_ENTRAR: nega, LIMITE_ESCRITA: nega, LIMITE_PUBLICO: nega }),
-      ctx as never,
-    );
-    expect(negado.headers.get('cache-control')).toBe('no-store');
-    const erro = await app.fetch(requisicao(caso), env({ HYPERDRIVE: hyperdriveQueLanca } as Partial<Env>), ctx as never);
-    expect(erro.headers.get('cache-control')).toBe('no-store');
-  });
+  it.each(ROTAS)(
+    '$metodo $caminho: no-store no 429 do limitador e no 500 forçado',
+    async (caso) => {
+      const negado = await app.fetch(
+        requisicao(caso, { comCookie: false }),
+        env({ LIMITE_ENTRAR: nega, LIMITE_ESCRITA: nega, LIMITE_PUBLICO: nega }),
+        ctx as never,
+      );
+      expect(negado.headers.get('cache-control')).toBe('no-store');
+      const erro = await app.fetch(
+        requisicao(caso),
+        env({ HYPERDRIVE: hyperdriveQueLanca } as Partial<Env>),
+        ctx as never,
+      );
+      expect(erro.headers.get('cache-control')).toBe('no-store');
+    },
+  );
 });
 
 /** Captura todas as linhas de log do console durante `fn`. */
 async function capturarLogs(fn: () => Promise<void>): Promise<string[]> {
   const linhas: string[] = [];
   const guardar = (...args: unknown[]) => {
-    linhas.push(args.map((a) => (typeof a === 'string' ? a : JSON.stringify(a) ?? String(a))).join(' '));
+    linhas.push(
+      args.map((a) => (typeof a === 'string' ? a : (JSON.stringify(a) ?? String(a)))).join(' '),
+    );
   };
   for (const metodo of ['log', 'info', 'warn', 'error', 'debug'] as const) {
     vi.spyOn(console, metodo).mockImplementation(guardar);
@@ -133,7 +169,11 @@ describe('ACE-21: nada de senha, token ou corpo no log', () => {
     const app = criarApp();
     const linhas = await capturarLogs(async () => {
       for (const caso of ROTAS) {
-        const r = await app.fetch(requisicao(caso), env({ HYPERDRIVE: hyperdriveQueLanca } as Partial<Env>), ctx as never);
+        const r = await app.fetch(
+          requisicao(caso),
+          env({ HYPERDRIVE: hyperdriveQueLanca } as Partial<Env>),
+          ctx as never,
+        );
         expect(r.status).toBe(500);
         const corpo = await r.text();
         for (const m of MARCADORES) expect(corpo).not.toContain(m);
@@ -169,7 +209,14 @@ describe('ACE-21: nada de senha, token ou corpo no log', () => {
     const manipulador: Manipulador = { fetch: (r, e, c) => app.fetch(r, e, c as never) };
     const w = criarWorker(manipulador, embrulhar);
     for (const caso of ROTAS) {
-      await w.fetch(requisicao(caso), env({ SENTRY_DSN: 'https://chave@sentry.exemplo.test/1', HYPERDRIVE: hyperdriveQueLanca } as Partial<Env>), ctx);
+      await w.fetch(
+        requisicao(caso),
+        env({
+          SENTRY_DSN: 'https://chave@sentry.exemplo.test/1',
+          HYPERDRIVE: hyperdriveQueLanca,
+        } as Partial<Env>),
+        ctx,
+      );
     }
     expect(eventos).toHaveLength(ROTAS.length);
     for (const evento of eventos) for (const m of MARCADORES) expect(evento).not.toContain(m);

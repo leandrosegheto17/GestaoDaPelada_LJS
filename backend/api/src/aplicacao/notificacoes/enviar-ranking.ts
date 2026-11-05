@@ -1,6 +1,12 @@
 import { LOTE_MAXIMO, TENTATIVA_MAXIMA, type MensagemRanking } from '@pelada/contrato/fila-avisos';
 import { hostsPushDev } from '@pelada/contrato/push';
-import { payloadRanking, planoEfetivo, planoLibera, serializarPayload, type Data } from '@pelada/dominio';
+import {
+  payloadRanking,
+  planoEfetivo,
+  planoLibera,
+  serializarPayload,
+  type Data,
+} from '@pelada/dominio';
 import type { CasoDeUso, Desfecho } from '../../entrada/consumidor-avisos.ts';
 import { push, type AssinaturaDoLote } from '../../infraestrutura/db/repositorios/push.ts';
 import type { Db } from '../../infraestrutura/db/repositorios/tipos.ts';
@@ -81,7 +87,8 @@ async function lerPendentes(db: Db, mensagem: MensagemRanking): Promise<Pendente
       const pagina = await push.loteRanking(db, grupoId, apos, LOTE_MAXIMO, criadoEm);
       for (const a of pagina) if (alvo.has(a.id)) achadas.push(a);
       const ultimo = pagina[pagina.length - 1];
-      if (pagina.length < LOTE_MAXIMO || ultimo === undefined || comparaId(ultimo.id, maior) >= 0) break;
+      if (pagina.length < LOTE_MAXIMO || ultimo === undefined || comparaId(ultimo.id, maior) >= 0)
+        break;
       apos = ultimo.id;
     }
     return { lote: achadas };
@@ -118,7 +125,11 @@ export function criarEnviarRanking(opcoes: OpcoesEnviarRanking = {}): CasoDeUso<
     if (preparo === null || preparo.lote.length === 0) return CONCLUIR;
 
     const payload = serializarPayload(
-      payloadRanking({ nomeGrupo: preparo.grupo.nome, slug: preparo.grupo.slug, dataPartida: mensagem.dataPartida as Data }),
+      payloadRanking({
+        nomeGrupo: preparo.grupo.nome,
+        slug: preparo.grupo.slug,
+        dataPartida: mensagem.dataPartida as Data,
+      }),
     );
     const topico = await topicoDoGrupo(grupoId);
     const cache = novoCacheVapid();

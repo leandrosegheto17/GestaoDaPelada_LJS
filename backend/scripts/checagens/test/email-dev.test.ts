@@ -10,7 +10,9 @@ const NOME = ['EMAIL', 'DEV'].join('_');
 describe('checagem email-dev', () => {
   it('ACE-52: um wrangler.jsonc com a variável em vars reprova, com a linha', () => {
     const exemplo = `{\n  "vars": {\n    "VERSAO": "local",\n    "${NOME}": "1"\n  }\n}\n`;
-    expect(checarEmailDev(exemplo)).toEqual([`wrangler.jsonc:4: define ${NOME}; ela só vale no .env local e no e2e`]);
+    expect(checarEmailDev(exemplo)).toEqual([
+      `wrangler.jsonc:4: define ${NOME}; ela só vale no .env local e no e2e`,
+    ]);
   });
 
   it('ACE-52: a variável em qualquer outro lugar do JSON também reprova', () => {

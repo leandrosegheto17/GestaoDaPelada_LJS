@@ -49,7 +49,10 @@ describe('tipos de escalacoes (SIM-67)', () => {
     await bancoDeTeste(
       async (url) => {
         const linhas = await catalogo(url);
-        const doBanco = linhas.filter((l) => l.anulavel).map((l) => l.coluna).sort();
+        const doBanco = linhas
+          .filter((l) => l.anulavel)
+          .map((l) => l.coluna)
+          .sort();
         expect([...(COLUNAS_ANULAVEIS.escalacoes ?? [])].sort()).toEqual(doBanco);
       },
       { migrado: true },

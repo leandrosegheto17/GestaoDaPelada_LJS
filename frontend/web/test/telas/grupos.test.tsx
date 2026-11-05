@@ -10,7 +10,12 @@ const SESSAO_LEANDRO = {
   email: 'leandro@exemplo.com.br',
   grupos: [
     { id: 'g-quinta', nome: 'Pelada de Quinta', slug: 'pelada-de-quinta', acessaFinanceiro: true },
-    { id: 'g-domingo', nome: 'Racha de Domingo', slug: 'racha-de-domingo', acessaFinanceiro: false },
+    {
+      id: 'g-domingo',
+      nome: 'Racha de Domingo',
+      slug: 'racha-de-domingo',
+      acessaFinanceiro: false,
+    },
   ],
 };
 const SESSAO_SEM_GRUPOS = { ...SESSAO_LEANDRO, grupos: [] };
@@ -34,7 +39,9 @@ describe('tela Seus grupos e menu da conta', () => {
   });
 
   it('ACE-57: sem grupos, o estado vazio do t08; axe sem violação', async () => {
-    const { container } = abrirTela('/app', { 'GET /api/sessao': () => json(200, SESSAO_SEM_GRUPOS) });
+    const { container } = abrirTela('/app', {
+      'GET /api/sessao': () => json(200, SESSAO_SEM_GRUPOS),
+    });
     expect(await screen.findByRole('heading', { level: 2, name: TITULO_VAZIO })).toBeTruthy();
     expect(screen.getByText(TEXTO_VAZIO)).toBeTruthy();
     expect(screen.queryByRole('list', { name: 'Seus grupos' })).toBeNull();
@@ -46,9 +53,15 @@ describe('tela Seus grupos e menu da conta', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Menu da conta' }));
     const folha = screen.getByRole('dialog', { name: 'Leandro' });
     expect(folha.getAttribute('aria-modal')).toBe('true');
-    expect(within(folha).getByRole('link', { name: 'Minha conta' }).getAttribute('href')).toBe('/app/conta');
-    expect(within(folha).getByRole('link', { name: 'Privacidade' }).getAttribute('href')).toBe('/privacidade');
-    expect(within(folha).getByRole('link', { name: 'Termos de uso' }).getAttribute('href')).toBe('/termos');
+    expect(within(folha).getByRole('link', { name: 'Minha conta' }).getAttribute('href')).toBe(
+      '/app/conta',
+    );
+    expect(within(folha).getByRole('link', { name: 'Privacidade' }).getAttribute('href')).toBe(
+      '/privacidade',
+    );
+    expect(within(folha).getByRole('link', { name: 'Termos de uso' }).getAttribute('href')).toBe(
+      '/termos',
+    );
     expect(within(folha).getByRole('button', { name: 'Sair' })).toBeTruthy();
     await esperarSemViolacoes(container);
   });

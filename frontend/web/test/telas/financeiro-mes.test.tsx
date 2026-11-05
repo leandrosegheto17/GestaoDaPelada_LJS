@@ -17,7 +17,12 @@ import { abrirTela, json, pendente, SESSAO_ANA } from '../apoio/tela.tsx';
  */
 
 function resposta(nome: string): unknown {
-  return JSON.parse(readFileSync(fileURLToPath(new URL(`../../../../.specs/mockup/respostas/${nome}`, import.meta.url)), 'utf8'));
+  return JSON.parse(
+    readFileSync(
+      fileURLToPath(new URL(`../../../../.specs/mockup/respostas/${nome}`, import.meta.url)),
+      'utf8',
+    ),
+  );
 }
 
 const OUTUBRO = resposta('financeiro-2026-10.json') as { lancamentos: unknown[] };
@@ -57,7 +62,9 @@ describe('Financeiro do mês (t22)', () => {
     expect(await screen.findByText('− R$ 800,00')).toBeTruthy();
     expect(screen.getByText('− R$ 100,00')).toBeTruthy();
     const aluguel = screen.getByText('Aluguel da quadra outubro').closest('a') as HTMLElement;
-    expect(aluguel.getAttribute('href')).toMatch(/^\/app\/grupos\/g-quinta\/financeiro\/lancamentos\//);
+    expect(aluguel.getAttribute('href')).toMatch(
+      /^\/app\/grupos\/g-quinta\/financeiro\/lancamentos\//,
+    );
     expect(aluguel.textContent).toContain('05/10 ·');
     expect(aluguel.textContent).toContain('Saída');
   });
@@ -65,7 +72,9 @@ describe('Financeiro do mês (t22)', () => {
   it('FIN-07: o mês seguinte fica desabilitado no mês de hoje; o anterior leva a ?mes=2026-09', async () => {
     const { local } = abrir(() => json(200, OUTUBRO));
     const anterior = await screen.findByRole('button', { name: 'Mês anterior, setembro de 2026' });
-    expect((screen.getByRole('button', { name: 'Mês seguinte' }) as HTMLButtonElement).disabled).toBe(true);
+    expect(
+      (screen.getByRole('button', { name: 'Mês seguinte' }) as HTMLButtonElement).disabled,
+    ).toBe(true);
     fireEvent.click(anterior);
     await waitFor(() => expect(local()).toBe(`${CAMINHO}?mes=2026-09`));
   });
@@ -73,7 +82,10 @@ describe('Financeiro do mês (t22)', () => {
   it('FIN-07: ?mes=2026-07 pede o mês ao endereço e mostra os dois botões ativos', async () => {
     const { chamadasA } = abrir(() => json(200, JULHO), `${CAMINHO}?mes=2026-07`);
     expect(await screen.findByRole('heading', { name: 'julho de 2026' })).toBeTruthy();
-    expect((screen.getByRole('button', { name: 'Mês seguinte, agosto de 2026' }) as HTMLButtonElement).disabled).toBe(false);
+    expect(
+      (screen.getByRole('button', { name: 'Mês seguinte, agosto de 2026' }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(false);
     expect(chamadasA('GET', '/api/grupos/g-quinta/financeiro/mes')).toHaveLength(1);
   });
 
@@ -94,7 +106,9 @@ describe('Financeiro do mês (t22)', () => {
     abrir(() => json(403, { erro: TEXTO_SEM_ACESSO_AJUDA, codigo: 'sem_permissao_financeiro' }));
     expect(await screen.findByRole('heading', { name: TEXTO_SEM_ACESSO })).toBeTruthy();
     expect(screen.getByText(TEXTO_SEM_ACESSO_AJUDA)).toBeTruthy();
-    expect(screen.getByRole('link', { name: 'Voltar' }).getAttribute('href')).toBe('/app/grupos/g-quinta');
+    expect(screen.getByRole('link', { name: 'Voltar' }).getAttribute('href')).toBe(
+      '/app/grupos/g-quinta',
+    );
   });
 
   it('FIN-09: 422 do mês fora do histórico mostra a mensagem e o caminho ao mês atual', async () => {
@@ -109,14 +123,20 @@ describe('Financeiro do mês (t22)', () => {
       `${CAMINHO}?mes=2025-01`,
     );
     expect(await screen.findByText('Mês fora do histórico do caixa.')).toBeTruthy();
-    expect(screen.getByRole('link', { name: 'Ir para o mês atual' }).getAttribute('href')).toBe(CAMINHO);
+    expect(screen.getByRole('link', { name: 'Ir para o mês atual' }).getAttribute('href')).toBe(
+      CAMINHO,
+    );
   });
 
   it.each([
     ['sucesso', () => json(200, OUTUBRO), 'R$ 1.245,50'],
     ['vazio-config', () => json(200, SEM_CONFIG), TEXTO_SEM_CONFIG],
     ['vazio-mes', () => json(200, JULHO), 'julho de 2026'],
-    ['sem-permissao', () => json(403, { erro: 'x', codigo: 'sem_permissao_financeiro' }), TEXTO_SEM_ACESSO],
+    [
+      'sem-permissao',
+      () => json(403, { erro: 'x', codigo: 'sem_permissao_financeiro' }),
+      TEXTO_SEM_ACESSO,
+    ],
   ])('FIN-46: axe sem violação no estado %s', async (_estado, mes, marca) => {
     const { container } = abrir(mes);
     await screen.findAllByText(marca);

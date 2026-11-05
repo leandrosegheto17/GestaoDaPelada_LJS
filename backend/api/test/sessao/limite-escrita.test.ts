@@ -18,7 +18,10 @@ import { abrirCenarioGrupos, type CenarioGruposAberto } from '../isolamento/cena
 let aberto: CenarioGruposAberto;
 
 /** Binding falso: `cota` por chave, com contagens iniciais opcionais; guarda as chaves recebidas. */
-function bindingPorChave(cota: number, jaUsadas: Record<string, number> = {}): LimiteDeTaxa & { chaves: string[] } {
+function bindingPorChave(
+  cota: number,
+  jaUsadas: Record<string, number> = {},
+): LimiteDeTaxa & { chaves: string[] } {
   const usadas = new Map<string, number>(Object.entries(jaUsadas));
   const chaves: string[] = [];
   return {
@@ -59,7 +62,11 @@ function montar(escrita: LimiteDeTaxa) {
     const ctx = contextoFalso();
     const r = await app.request(
       `/api${caminho}`,
-      { method: p.metodo ?? 'POST', headers, ...(p.corpo !== undefined ? { body: JSON.stringify(p.corpo) } : {}) },
+      {
+        method: p.metodo ?? 'POST',
+        headers,
+        ...(p.corpo !== undefined ? { body: JSON.stringify(p.corpo) } : {}),
+      },
       envAcesso(aberto.url, { LIMITE_ESCRITA: escrita }),
       ctx,
     );
@@ -68,10 +75,18 @@ function montar(escrita: LimiteDeTaxa) {
   };
 }
 
-const NOVO_GRUPO = { nome: 'Pelada do Limite', diaSemana: 'sabado', frequencia: 'semanal', horario: '09:00' };
+const NOVO_GRUPO = {
+  nome: 'Pelada do Limite',
+  diaSemana: 'sabado',
+  frequencia: 'semanal',
+  horario: '09:00',
+};
 
 async function gruposCriadosPor(conta: string): Promise<number> {
-  const r = await aberto.db.query<{ n: string }>('SELECT count(*) AS n FROM grupos WHERE criado_por = $1', [conta]);
+  const r = await aberto.db.query<{ n: string }>(
+    'SELECT count(*) AS n FROM grupos WHERE criado_por = $1',
+    [conta],
+  );
   return Number(r.rows[0]?.n ?? 0);
 }
 
@@ -109,8 +124,16 @@ describe('LIMITE_ESCRITA por conta', () => {
     const { cenario } = aberto;
     const escrita = bindingPorChave(1);
     const pedir = montar(escrita);
-    await pedir(`/grupos/${cenario.grupoG}`, { metodo: 'PATCH', token: await sessao(cenario.contaC), corpo: {} });
-    const daOutra = await pedir(`/grupos/${cenario.grupoG}`, { metodo: 'PATCH', token: await sessao(cenario.contaO), corpo: {} });
+    await pedir(`/grupos/${cenario.grupoG}`, {
+      metodo: 'PATCH',
+      token: await sessao(cenario.contaC),
+      corpo: {},
+    });
+    const daOutra = await pedir(`/grupos/${cenario.grupoG}`, {
+      metodo: 'PATCH',
+      token: await sessao(cenario.contaO),
+      corpo: {},
+    });
     expect(daOutra.status).not.toBe(429);
     expect(escrita.chaves).toEqual([chaveConta(cenario.contaC), chaveConta(cenario.contaO)]);
   });
@@ -120,42 +143,66 @@ describe('LIMITE_ESCRITA por conta', () => {
     const escrita = bindingPorChave(0);
     const pedir = montar(escrita);
     const token = await sessao(cenario.contaC);
-    for (const caminho of ['/grupos', `/grupos/${cenario.grupoG}`, `/grupos/${cenario.grupoG}/jogadores`]) {
+    for (const caminho of [
+      '/grupos',
+      `/grupos/${cenario.grupoG}`,
+      `/grupos/${cenario.grupoG}/jogadores`,
+    ]) {
       const r = await pedir(caminho, { metodo: 'GET', token });
       expect(r.status).not.toBe(429);
     }
     expect(escrita.chaves).toEqual([]);
   });
 
-  it.each(['POST', 'PUT', 'PATCH', 'DELETE'])('SEC-003: %s sob /api/grupos/:grupoId acima da cota dá 429 sem chamar a rota', async (metodo) => {
-    const { cenario } = aberto;
-    const pedir = montar(bindingPorChave(0));
-    const nomeAntes = await aberto.db.query<{ nome: string }>('SELECT nome FROM grupos WHERE id = $1', [cenario.grupoG]);
-    const r = await pedir(`/grupos/${cenario.grupoG}`, {
-      metodo,
-      token: await sessao(cenario.contaC),
-      corpo: { nome: 'Nome que não pode ser gravado' },
-    });
-    expect(r.status).toBe(429);
-    expect(r.headers.get('retry-after')).toBe('60');
-    const nomeDepois = await aberto.db.query<{ nome: string }>('SELECT nome FROM grupos WHERE id = $1', [cenario.grupoG]);
-    expect(nomeDepois.rows[0]?.nome).toBe(nomeAntes.rows[0]?.nome);
-  });
+  it.each(['POST', 'PUT', 'PATCH', 'DELETE'])(
+    'SEC-003: %s sob /api/grupos/:grupoId acima da cota dá 429 sem chamar a rota',
+    async (metodo) => {
+      const { cenario } = aberto;
+      const pedir = montar(bindingPorChave(0));
+      const nomeAntes = await aberto.db.query<{ nome: string }>(
+        'SELECT nome FROM grupos WHERE id = $1',
+        [cenario.grupoG],
+      );
+      const r = await pedir(`/grupos/${cenario.grupoG}`, {
+        metodo,
+        token: await sessao(cenario.contaC),
+        corpo: { nome: 'Nome que não pode ser gravado' },
+      });
+      expect(r.status).toBe(429);
+      expect(r.headers.get('retry-after')).toBe('60');
+      const nomeDepois = await aberto.db.query<{ nome: string }>(
+        'SELECT nome FROM grupos WHERE id = $1',
+        [cenario.grupoG],
+      );
+      expect(nomeDepois.rows[0]?.nome).toBe(nomeAntes.rows[0]?.nome);
+    },
+  );
 
-  it.each(['POST', 'PUT', 'PATCH', 'DELETE'])('SEC-003: %s numa rota funda do grupo (jogadores) também conta', async (metodo) => {
-    const { cenario } = aberto;
-    const escrita = bindingPorChave(0);
-    const pedir = montar(escrita);
-    const r = await pedir(`/grupos/${cenario.grupoG}/jogadores`, { metodo, token: await sessao(cenario.contaC), corpo: {} });
-    expect(r.status).toBe(429);
-    expect(escrita.chaves).toEqual([chaveConta(cenario.contaC)]);
-  });
+  it.each(['POST', 'PUT', 'PATCH', 'DELETE'])(
+    'SEC-003: %s numa rota funda do grupo (jogadores) também conta',
+    async (metodo) => {
+      const { cenario } = aberto;
+      const escrita = bindingPorChave(0);
+      const pedir = montar(escrita);
+      const r = await pedir(`/grupos/${cenario.grupoG}/jogadores`, {
+        metodo,
+        token: await sessao(cenario.contaC),
+        corpo: {},
+      });
+      expect(r.status).toBe(429);
+      expect(escrita.chaves).toEqual([chaveConta(cenario.contaC)]);
+    },
+  );
 
   it('SEC-003: uma escrita conta uma vez só, mesmo no caminho do próprio grupo', async () => {
     const { cenario } = aberto;
     const escrita = bindingPorChave(10);
     const pedir = montar(escrita);
-    await pedir(`/grupos/${cenario.grupoG}`, { metodo: 'PATCH', token: await sessao(cenario.contaC), corpo: {} });
+    await pedir(`/grupos/${cenario.grupoG}`, {
+      metodo: 'PATCH',
+      token: await sessao(cenario.contaC),
+      corpo: {},
+    });
     expect(escrita.chaves).toHaveLength(1);
   });
 
@@ -163,7 +210,11 @@ describe('LIMITE_ESCRITA por conta', () => {
     const { cenario } = aberto;
     const escrita = bindingPorChave(0);
     const pedir = montar(escrita);
-    const r = await pedir('/grupos', { token: await sessao(cenario.contaC), corpo: NOVO_GRUPO, semPelada: true });
+    const r = await pedir('/grupos', {
+      token: await sessao(cenario.contaC),
+      corpo: NOVO_GRUPO,
+      semPelada: true,
+    });
     expect(r.status).toBe(403);
     expect(escrita.chaves).toEqual([]);
   });

@@ -33,17 +33,31 @@ function responder(c: Context<Ambiente>, r: ResultadoAssinar): Response {
     }
     case 'assinatura_pendente':
       return c.json(
-        { erro: 'assinatura_pendente', faturaUrl: r.faturaUrl, mensagem: MENSAGENS_ERRO_PLANO.assinatura_pendente },
+        {
+          erro: 'assinatura_pendente',
+          faturaUrl: r.faturaUrl,
+          mensagem: MENSAGENS_ERRO_PLANO.assinatura_pendente,
+        },
         409,
       );
     case 'assinatura_ativa':
-      return c.json({ erro: 'assinatura_ativa', faturaUrl: r.faturaUrl, mensagem: MENSAGENS_ERRO_PLANO.assinatura_ativa }, 409);
+      return c.json(
+        {
+          erro: 'assinatura_ativa',
+          faturaUrl: r.faturaUrl,
+          mensagem: MENSAGENS_ERRO_PLANO.assinatura_ativa,
+        },
+        409,
+      );
     case 'so_quem_criou':
       return c.json(corpoDoErro('so_quem_criou'), 403);
     case 'nao_encontrado':
       return c.json(corpoDoErro('nao_encontrado'), 404);
     case 'pagamento_indisponivel':
-      return c.json({ erro: 'pagamento_indisponivel', mensagem: MENSAGEM_PAGAMENTO_INDISPONIVEL }, 502);
+      return c.json(
+        { erro: 'pagamento_indisponivel', mensagem: MENSAGEM_PAGAMENTO_INDISPONIVEL },
+        502,
+      );
   }
 }
 

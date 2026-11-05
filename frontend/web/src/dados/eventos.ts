@@ -18,7 +18,11 @@ export function caminhoEventos(slug: string): string {
 }
 
 /** Envia o evento e engole a falha (PAR-126): a promessa nunca rejeita. */
-export async function enviarEvento(api: ClienteApi, slug: string, corpo: EventoPublicoCorpo): Promise<void> {
+export async function enviarEvento(
+  api: ClienteApi,
+  slug: string,
+  corpo: EventoPublicoCorpo,
+): Promise<void> {
   try {
     await api.post<unknown>(caminhoEventos(slug), corpo);
   } catch {
@@ -47,5 +51,8 @@ export function useEventoRankingAberto(slug: string, carregou: boolean): void {
 /** A função que envia `pdf_exportado` com o mês do PDF entregue (PAR-125). */
 export function useEnviarPdfExportado(slug: string): (mes: string) => Promise<void> {
   const api = useCliente();
-  return useCallback((mes: string) => enviarEvento(api, slug, { tipo: 'pdf_exportado', mes }), [api, slug]);
+  return useCallback(
+    (mes: string) => enviarEvento(api, slug, { tipo: 'pdf_exportado', mes }),
+    [api, slug],
+  );
 }

@@ -23,7 +23,10 @@ async function abrirControlada(page: Page): Promise<void> {
   await page.waitForFunction(() => navigator.serviceWorker.controller !== null);
 }
 
-test('FUN-37: o manifest parseado tem os campos de FUN-33 e os ícones 192 e 512 respondem', async ({ page, request }) => {
+test('FUN-37: o manifest parseado tem os campos de FUN-33 e os ícones 192 e 512 respondem', async ({
+  page,
+  request,
+}) => {
   await page.goto('/');
   const href = await page.locator('link[rel="manifest"]').getAttribute('href');
   expect(href, 'link rel=manifest ausente no index.html do build').toBeTruthy();
@@ -46,12 +49,17 @@ test('FUN-37: o manifest parseado tem os campos de FUN-33 e os ícones 192 e 512
   }
 });
 
-test('FUN-37: depois do registro, navigator.serviceWorker.controller existe na página', async ({ page }) => {
+test('FUN-37: depois do registro, navigator.serviceWorker.controller existe na página', async ({
+  page,
+}) => {
   await abrirControlada(page);
   expect(await page.evaluate(() => navigator.serviceWorker.controller?.state)).toBeTruthy();
 });
 
-test('FUN-37: sem rede, uma rota fora do cache mostra a página offline', async ({ page, context }) => {
+test('FUN-37: sem rede, uma rota fora do cache mostra a página offline', async ({
+  page,
+  context,
+}) => {
   await abrirControlada(page);
   await context.setOffline(true);
   try {

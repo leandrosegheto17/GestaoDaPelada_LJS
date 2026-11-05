@@ -73,7 +73,8 @@ export function usePartidasDoMes(grupoId: string, mes?: string) {
   const api = useCliente();
   return useQuery<PartidasDoMes>({
     queryKey: chaveMesPartidas(grupoId, mes),
-    queryFn: async () => partidasDoMes.parse(await api.get<unknown>(caminhoMesPartidas(grupoId, mes))),
+    queryFn: async () =>
+      partidasDoMes.parse(await api.get<unknown>(caminhoMesPartidas(grupoId, mes))),
     retry: false,
     enabled: grupoId !== '',
   });
@@ -83,7 +84,8 @@ export function usePartidaNova(grupoId: string, data?: string) {
   const api = useCliente();
   return useQuery<PartidaNova>({
     queryKey: chavePartidaNova(grupoId, data),
-    queryFn: async () => partidaNova.parse(await api.get<unknown>(caminhoPartidaNova(grupoId, data))),
+    queryFn: async () =>
+      partidaNova.parse(await api.get<unknown>(caminhoPartidaNova(grupoId, data))),
     retry: false,
     enabled: grupoId !== '',
   });
@@ -93,7 +95,8 @@ export function usePartida(grupoId: string, data: string) {
   const api = useCliente();
   return useQuery<PartidaResposta>({
     queryKey: chavePartida(grupoId, data),
-    queryFn: async () => partidaResposta.parse(await api.get<unknown>(caminhoPartida(grupoId, data))),
+    queryFn: async () =>
+      partidaResposta.parse(await api.get<unknown>(caminhoPartida(grupoId, data))),
     retry: false,
     enabled: grupoId !== '' && data !== '',
   });
@@ -103,7 +106,8 @@ export function useLancarPartida(grupoId: string) {
   const api = useCliente();
   const consultas = useQueryClient();
   return useMutation({
-    mutationFn: async (corpo: PartidaCorpo) => partidaResposta.parse(await api.post<unknown>(caminhoPartidas(grupoId), corpo)),
+    mutationFn: async (corpo: PartidaCorpo) =>
+      partidaResposta.parse(await api.post<unknown>(caminhoPartidas(grupoId), corpo)),
     onSuccess: async (lancada) => {
       await invalidarPartidas(consultas, grupoId);
       consultas.setQueryData(chavePartida(grupoId, lancada.data), lancada);
@@ -115,7 +119,8 @@ export function useEditarPartida(grupoId: string, data: string) {
   const api = useCliente();
   const consultas = useQueryClient();
   return useMutation({
-    mutationFn: async (corpo: PartidaCorpo) => partidaResposta.parse(await api.put<unknown>(caminhoPartida(grupoId, data), corpo)),
+    mutationFn: async (corpo: PartidaCorpo) =>
+      partidaResposta.parse(await api.put<unknown>(caminhoPartida(grupoId, data), corpo)),
     onSuccess: async (editada) => {
       await invalidarPartidas(consultas, grupoId);
       consultas.setQueryData(chavePartida(grupoId, data), editada);

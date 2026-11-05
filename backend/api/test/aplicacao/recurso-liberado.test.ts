@@ -1,6 +1,9 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { RECURSOS_PRO } from '@pelada/dominio';
-import { estadoDoPlano, recursoLiberadoPeloPlano } from '../../src/aplicacao/plano/recurso-liberado.ts';
+import {
+  estadoDoPlano,
+  recursoLiberadoPeloPlano,
+} from '../../src/aplicacao/plano/recurso-liberado.ts';
 import { relogioFixo } from '../../src/infraestrutura/relogio.ts';
 import { abrirCenarioGrupos, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
 import { comDb } from '../repositorios/apoio.ts';
@@ -39,15 +42,21 @@ afterAll(async () => {
 
 /** Como superusuário (o CHECK `grupos_trial` exige `trial_inicio` só em `trial`). */
 async function situacaoDeG(situacao: string, trialInicio: string | null): Promise<void> {
-  await aberto.db.query('UPDATE grupos SET situacao_comercial = $2, trial_inicio = $3::date WHERE id = $1', [
-    aberto.cenario.grupoG,
-    situacao,
-    trialInicio,
-  ]);
+  await aberto.db.query(
+    'UPDATE grupos SET situacao_comercial = $2, trial_inicio = $3::date WHERE id = $1',
+    [aberto.cenario.grupoG, situacao, trialInicio],
+  );
 }
 
-async function liberado(conta: string, grupo: string, recurso: (typeof RECURSOS_PRO)[number], agora: string) {
-  return comDb(aberto.url, conta, (db) => recursoLiberadoPeloPlano(relogioFixo(agora))(db, grupo, recurso));
+async function liberado(
+  conta: string,
+  grupo: string,
+  recurso: (typeof RECURSOS_PRO)[number],
+  agora: string,
+) {
+  return comDb(aberto.url, conta, (db) =>
+    recursoLiberadoPeloPlano(relogioFixo(agora))(db, grupo, recurso),
+  );
 }
 
 describe('recursoLiberadoPeloPlano', () => {
@@ -56,48 +65,68 @@ describe('recursoLiberadoPeloPlano', () => {
     // Trial de 2026-11-01: último dia Pro 2026-11-14; 2026-11-15 00:00 de São Paulo já é Free.
     await situacaoDeG('trial', '2026-11-01');
     for (const recurso of RECURSOS_PRO) {
-      expect(await liberado(cenario.contaC, cenario.grupoG, recurso, '2026-11-15T03:00:00Z')).toBe(false);
+      expect(await liberado(cenario.contaC, cenario.grupoG, recurso, '2026-11-15T03:00:00Z')).toBe(
+        false,
+      );
     }
   });
 
   it('PLA-07: trial no último dia ainda libera', async () => {
     const { cenario } = aberto;
     await situacaoDeG('trial', '2026-11-01');
-    expect(await liberado(cenario.contaC, cenario.grupoG, 'simulador', '2026-11-15T02:59:00Z')).toBe(true);
+    expect(
+      await liberado(cenario.contaC, cenario.grupoG, 'simulador', '2026-11-15T02:59:00Z'),
+    ).toBe(true);
   });
 
   it('PLA-07: uso_proprio libera o simulador e o financeiro', async () => {
     const { cenario } = aberto;
     await situacaoDeG('uso_proprio', null);
-    expect(await liberado(cenario.contaC, cenario.grupoG, 'simulador', '2026-11-15T03:00:00Z')).toBe(true);
-    expect(await liberado(cenario.contaC, cenario.grupoG, 'financeiro', '2026-11-15T03:00:00Z')).toBe(true);
+    expect(
+      await liberado(cenario.contaC, cenario.grupoG, 'simulador', '2026-11-15T03:00:00Z'),
+    ).toBe(true);
+    expect(
+      await liberado(cenario.contaC, cenario.grupoG, 'financeiro', '2026-11-15T03:00:00Z'),
+    ).toBe(true);
   });
 
   it('PLA-07: ativo libera o simulador', async () => {
     const { cenario } = aberto;
     await situacaoDeG('ativo', null);
-    expect(await liberado(cenario.contaC, cenario.grupoG, 'simulador', '2027-06-01T12:00:00Z')).toBe(true);
+    expect(
+      await liberado(cenario.contaC, cenario.grupoG, 'simulador', '2027-06-01T12:00:00Z'),
+    ).toBe(true);
   });
 
   it('PLA-24: inadimplente nega o financeiro e o simulador', async () => {
     const { cenario } = aberto;
     await situacaoDeG('inadimplente', null);
-    expect(await liberado(cenario.contaC, cenario.grupoG, 'financeiro', '2026-11-15T03:00:00Z')).toBe(false);
-    expect(await liberado(cenario.contaC, cenario.grupoG, 'simulador', '2026-11-15T03:00:00Z')).toBe(false);
+    expect(
+      await liberado(cenario.contaC, cenario.grupoG, 'financeiro', '2026-11-15T03:00:00Z'),
+    ).toBe(false);
+    expect(
+      await liberado(cenario.contaC, cenario.grupoG, 'simulador', '2026-11-15T03:00:00Z'),
+    ).toBe(false);
   });
 
   it('PLA-28: a admin convidada recebe o mesmo resultado da criadora', async () => {
     const { cenario } = aberto;
     await situacaoDeG('inadimplente', null);
-    expect(await liberado(cenario.contaO, cenario.grupoG, 'simulador', '2026-11-15T03:00:00Z')).toBe(false);
+    expect(
+      await liberado(cenario.contaO, cenario.grupoG, 'simulador', '2026-11-15T03:00:00Z'),
+    ).toBe(false);
     await situacaoDeG('uso_proprio', null);
-    expect(await liberado(cenario.contaO, cenario.grupoG, 'simulador', '2026-11-15T03:00:00Z')).toBe(true);
+    expect(
+      await liberado(cenario.contaO, cenario.grupoG, 'simulador', '2026-11-15T03:00:00Z'),
+    ).toBe(true);
   });
 
   it('PLA-07: a conta B recebe false para G, mesmo com G em cortesia', async () => {
     const { cenario } = aberto;
     await situacaoDeG('uso_proprio', null);
-    expect(await liberado(cenario.contaB, cenario.grupoG, 'simulador', '2026-11-15T03:00:00Z')).toBe(false);
+    expect(
+      await liberado(cenario.contaB, cenario.grupoG, 'simulador', '2026-11-15T03:00:00Z'),
+    ).toBe(false);
   });
 });
 
@@ -105,7 +134,9 @@ describe('estadoDoPlano', () => {
   it('PLA-07: devolve o plano e a linha da tabela de recursos', async () => {
     const { cenario } = aberto;
     await situacaoDeG('trial', '2026-11-01');
-    const estado = await comDb(aberto.url, cenario.contaC, (db) => estadoDoPlano(db, cenario.grupoG, '2026-11-15'));
+    const estado = await comDb(aberto.url, cenario.contaC, (db) =>
+      estadoDoPlano(db, cenario.grupoG, '2026-11-15'),
+    );
     expect(estado).toMatchObject({
       plano: 'free',
       situacaoComercial: 'trial',
@@ -118,12 +149,18 @@ describe('estadoDoPlano', () => {
   it('PLA-70: trial_inicio no futuro segue trial', async () => {
     const { cenario } = aberto;
     await situacaoDeG('trial', '2026-12-01');
-    const estado = await comDb(aberto.url, cenario.contaC, (db) => estadoDoPlano(db, cenario.grupoG, '2026-11-15'));
+    const estado = await comDb(aberto.url, cenario.contaC, (db) =>
+      estadoDoPlano(db, cenario.grupoG, '2026-11-15'),
+    );
     expect(estado?.plano).toBe('trial');
   });
 
   it('PLA-07: grupo não visível devolve nulo', async () => {
     const { cenario } = aberto;
-    expect(await comDb(aberto.url, cenario.contaB, (db) => estadoDoPlano(db, cenario.grupoG, '2026-11-15'))).toBeNull();
+    expect(
+      await comDb(aberto.url, cenario.contaB, (db) =>
+        estadoDoPlano(db, cenario.grupoG, '2026-11-15'),
+      ),
+    ).toBeNull();
   });
 });

@@ -25,7 +25,14 @@ export const NOME_G = 'Pelada de Quinta';
 export const SLUG_G = 'pelada-de-quinta';
 
 /** As habilidades iniciais, na ordem do GEL-02. */
-export const HABILIDADES_INICIAIS = ['Visão de Jogo', 'Passe', 'Preparo Físico', 'Drible', 'Chute', 'Desarme'] as const;
+export const HABILIDADES_INICIAIS = [
+  'Visão de Jogo',
+  'Passe',
+  'Preparo Físico',
+  'Drible',
+  'Chute',
+  'Desarme',
+] as const;
 
 export interface IdsG {
   /** Jogador com período aberto desde 2026-01-01. */
@@ -113,7 +120,12 @@ export async function criarGrupoComoConta(
   );
 }
 
-async function jogador(db: pg.Client, grupo: string, apelido: string, conta: string): Promise<string> {
+async function jogador(
+  db: pg.Client,
+  grupo: string,
+  apelido: string,
+  conta: string,
+): Promise<string> {
   return umId(
     db,
     `INSERT INTO jogadores (grupo_id, apelido, posicao, criado_por, criado_em, alterado_por, alterado_em)
@@ -128,8 +140,11 @@ export async function completarCenarioGrupos(
   base: CenarioConta,
   opcoes: OpcoesCenarioGrupos = {},
 ): Promise<CenarioGrupos> {
-  const faltam = base.tabelas.filter((t) => t.tabela !== 'grupos' && !PREENCHIDAS_EM_G.has(t.tabela)).map((t) => t.tabela);
-  if (faltam.length > 0) throw new Error(`Cenário de grupos sem linha para tabela com grupo_id: ${faltam.join(', ')}`);
+  const faltam = base.tabelas
+    .filter((t) => t.tabela !== 'grupos' && !PREENCHIDAS_EM_G.has(t.tabela))
+    .map((t) => t.tabela);
+  if (faltam.length > 0)
+    throw new Error(`Cenário de grupos sem linha para tabela com grupo_id: ${faltam.join(', ')}`);
 
   const contaC = base.contaA;
   const contaO = await umId(
@@ -154,12 +169,15 @@ export async function completarCenarioGrupos(
     [jogadorAtivo, jogadorInativo, jogadorHistorico, grupoG],
   );
 
-  const habilidade = await umId(db, `SELECT id FROM habilidades WHERE grupo_id = $1 ORDER BY ordem LIMIT 1`, [grupoG]);
-  await db.query(`INSERT INTO notas (jogador_id, habilidade_id, grupo_id, valor) VALUES ($1, $2, $3, 7)`, [
-    jogadorHistorico,
-    habilidade,
-    grupoG,
-  ]);
+  const habilidade = await umId(
+    db,
+    `SELECT id FROM habilidades WHERE grupo_id = $1 ORDER BY ordem LIMIT 1`,
+    [grupoG],
+  );
+  await db.query(
+    `INSERT INTO notas (jogador_id, habilidade_id, grupo_id, valor) VALUES ($1, $2, $3, 7)`,
+    [jogadorHistorico, habilidade, grupoG],
+  );
   await db.query(
     `INSERT INTO config_pesos (grupo_id, vigente_desde, presenca_sem_chuva, presenca_com_chuva,
        lesionado_sem_chuva, lesionado_com_chuva, expulso, registrado_por, registrado_em)
@@ -172,11 +190,10 @@ export async function completarCenarioGrupos(
      VALUES ($1, '2026-01-08', $2, now(), $2, now()) RETURNING id`,
     [grupoG, contaC],
   );
-  await db.query(`INSERT INTO presencas (partida_id, jogador_id, grupo_id, situacao) VALUES ($1, $2, $3, 'presente')`, [
-    partida,
-    jogadorHistorico,
-    grupoG,
-  ]);
+  await db.query(
+    `INSERT INTO presencas (partida_id, jogador_id, grupo_id, situacao) VALUES ($1, $2, $3, 'presente')`,
+    [partida, jogadorHistorico, grupoG],
+  );
   await db.query(
     `INSERT INTO eventos_uso (grupo_id, tipo, momento, data_partida) VALUES ($1, 'partida_lancada', now(), '2026-01-08')`,
     [grupoG],
@@ -220,9 +237,10 @@ export async function completarCenarioGrupos(
      VALUES ($1, 'https://fcm.googleapis.com/fcm/send/semente-g', 'p256dh-g', 'auth-g')`,
     [grupoG],
   );
-  await db.query(`INSERT INTO avisos_cobranca (id_externo, tipo, grupo_id) VALUES ('pay_aviso_g', 'cobranca_gerada', $1)`, [
-    grupoG,
-  ]);
+  await db.query(
+    `INSERT INTO avisos_cobranca (id_externo, tipo, grupo_id) VALUES ('pay_aviso_g', 'cobranca_gerada', $1)`,
+    [grupoG],
+  );
 
   return {
     ...base,
@@ -241,7 +259,9 @@ export async function comCenarioGrupos<T>(
   fn: (db: pg.Client, cenario: CenarioGrupos, banco: Banco) => Promise<T>,
   opcoes: OpcoesCenarioGrupos = {},
 ): Promise<T> {
-  return comCenarioConta(async (db, base, banco) => fn(db, await completarCenarioGrupos(db, base, opcoes), banco));
+  return comCenarioConta(async (db, base, banco) =>
+    fn(db, await completarCenarioGrupos(db, base, opcoes), banco),
+  );
 }
 
 export interface CenarioGruposAberto extends Omit<CenarioContaAberto, 'cenario'> {
@@ -249,7 +269,9 @@ export interface CenarioGruposAberto extends Omit<CenarioContaAberto, 'cenario'>
 }
 
 /** `abrirCenarioConta` com o cenário de grupos, para `beforeAll`/`afterAll`. Falha na criação fecha o banco. */
-export async function abrirCenarioGrupos(opcoes: OpcoesCenarioGrupos = {}): Promise<CenarioGruposAberto> {
+export async function abrirCenarioGrupos(
+  opcoes: OpcoesCenarioGrupos = {},
+): Promise<CenarioGruposAberto> {
   const aberto = await abrirCenarioConta();
   try {
     const cenario = await completarCenarioGrupos(aberto.db, aberto.cenario, opcoes);
@@ -281,7 +303,10 @@ export async function comoConta<T>(
 }
 
 /** Roda `fn` como superusuário (o `postgres` do cluster local), numa transação desfeita ao fim. */
-export async function comoSuperusuario<T>(db: pg.Client, fn: (db: pg.Client) => Promise<T>): Promise<T> {
+export async function comoSuperusuario<T>(
+  db: pg.Client,
+  fn: (db: pg.Client) => Promise<T>,
+): Promise<T> {
   await db.query('BEGIN');
   try {
     return await fn(db);

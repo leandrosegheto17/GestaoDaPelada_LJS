@@ -43,10 +43,10 @@ async function colunas(tabela: string): Promise<string[]> {
 }
 
 const assinar = (d: pg.Client, grupo: string, endpoint: string) =>
-  d.query(`INSERT INTO push_ranking (grupo_id, endpoint, p256dh, auth) VALUES ($1, $2, 'chave', 'segredo')`, [
-    grupo,
-    endpoint,
-  ]);
+  d.query(
+    `INSERT INTO push_ranking (grupo_id, endpoint, p256dh, auth) VALUES ($1, $2, 'chave', 'segredo')`,
+    [grupo, endpoint],
+  );
 
 const ENDPOINT = 'https://fcm.googleapis.com/fcm/send/t7';
 
@@ -84,9 +84,10 @@ describe('push_ranking', () => {
     const total = await desfeito(async (d) => {
       await assinar(d, cenario.grupoA, ENDPOINT);
       await assinar(d, cenario.grupoB, ENDPOINT);
-      const r = await d.query<{ n: number }>(`SELECT count(*)::int AS n FROM push_ranking WHERE endpoint = $1`, [
-        ENDPOINT,
-      ]);
+      const r = await d.query<{ n: number }>(
+        `SELECT count(*)::int AS n FROM push_ranking WHERE endpoint = $1`,
+        [ENDPOINT],
+      );
       return r.rows[0]?.n;
     });
     expect(total).toBe(2);
@@ -95,7 +96,9 @@ describe('push_ranking', () => {
   it('NOT-50: endpoint vazio ou acima de 1024 caracteres é recusado (23514)', async () => {
     const { cenario } = aberto;
     for (const endpoint of ['', 'https://fcm.googleapis.com/' + 'a'.repeat(1024)]) {
-      await expect(desfeito((d) => assinar(d, cenario.grupoA, endpoint))).rejects.toMatchObject({ code: '23514' });
+      await expect(desfeito((d) => assinar(d, cenario.grupoA, endpoint))).rejects.toMatchObject({
+        code: '23514',
+      });
     }
   });
 
@@ -118,10 +121,10 @@ describe('push_conta', () => {
   it('NOT-45: o mesmo endpoint duas vezes na mesma conta dá 23505; em outra conta, não', async () => {
     const { cenario } = aberto;
     const inserir = (d: pg.Client, conta: string) =>
-      d.query(`INSERT INTO push_conta (conta_id, endpoint, p256dh, auth) VALUES ($1, $2, 'chave', 'segredo')`, [
-        conta,
-        ENDPOINT,
-      ]);
+      d.query(
+        `INSERT INTO push_conta (conta_id, endpoint, p256dh, auth) VALUES ($1, $2, 'chave', 'segredo')`,
+        [conta, ENDPOINT],
+      );
     await expect(
       desfeito(async (d) => {
         await inserir(d, cenario.contaA);
@@ -131,9 +134,10 @@ describe('push_conta', () => {
     const total = await desfeito(async (d) => {
       await inserir(d, cenario.contaA);
       await inserir(d, cenario.contaB);
-      const r = await d.query<{ n: number }>(`SELECT count(*)::int AS n FROM push_conta WHERE endpoint = $1`, [
-        ENDPOINT,
-      ]);
+      const r = await d.query<{ n: number }>(
+        `SELECT count(*)::int AS n FROM push_conta WHERE endpoint = $1`,
+        [ENDPOINT],
+      );
       return r.rows[0]?.n;
     });
     expect(total).toBe(2);
@@ -154,16 +158,22 @@ describe('push_conta', () => {
 
 describe('avisos_cobranca', () => {
   it('NOT-57: tem só id externo, tipo, grupo e momento', async () => {
-    expect(await colunas('avisos_cobranca')).toEqual(['id_externo', 'tipo', 'grupo_id', 'enviado_em']);
+    expect(await colunas('avisos_cobranca')).toEqual([
+      'id_externo',
+      'tipo',
+      'grupo_id',
+      'enviado_em',
+    ]);
   });
 
   it('NOT-57: tipo fora dos 3 é recusado (23514)', async () => {
     const { cenario } = aberto;
     await expect(
       desfeito((d) =>
-        d.query(`INSERT INTO avisos_cobranca (id_externo, tipo, grupo_id) VALUES ('pay_t7', 'outro', $1)`, [
-          cenario.grupoA,
-        ]),
+        d.query(
+          `INSERT INTO avisos_cobranca (id_externo, tipo, grupo_id) VALUES ('pay_t7', 'outro', $1)`,
+          [cenario.grupoA],
+        ),
       ),
     ).rejects.toMatchObject({ code: '23514' });
   });
@@ -171,10 +181,10 @@ describe('avisos_cobranca', () => {
   it('NOT-39: a chave (id externo, tipo) não repete (23505); outro tipo da mesma cobrança entra', async () => {
     const { cenario } = aberto;
     const gravar = (d: pg.Client, tipo: string) =>
-      d.query(`INSERT INTO avisos_cobranca (id_externo, tipo, grupo_id) VALUES ('pay_t7', $1, $2)`, [
-        tipo,
-        cenario.grupoA,
-      ]);
+      d.query(
+        `INSERT INTO avisos_cobranca (id_externo, tipo, grupo_id) VALUES ('pay_t7', $1, $2)`,
+        [tipo, cenario.grupoA],
+      );
     await expect(
       desfeito(async (d) => {
         await gravar(d, 'pagamento_confirmado');
@@ -231,13 +241,17 @@ describe('RLS e grants das três tabelas', () => {
 
 describe('migração aditiva', () => {
   it('NOT-49: os arquivos das notificações têm timestamp maior que o da última migração de antes da feature', () => {
-    const nomes = readdirSync(PASTA_MIGRACOES).filter((n) => /notificacoes-tabelas|push-ranking-funcoes|push-conta-funcoes/.test(n));
+    const nomes = readdirSync(PASTA_MIGRACOES).filter((n) =>
+      /notificacoes-tabelas|push-ranking-funcoes|push-conta-funcoes/.test(n),
+    );
     expect(nomes).toHaveLength(3);
     for (const nome of nomes) expect(Number(nome.split('_')[0])).toBeGreaterThan(ULTIMA_ANTERIOR);
   });
 
   it('NOT-49: a migração das tabelas só cria objetos novos (nenhum DROP, nem ALTER de tabela que já existia)', () => {
-    const arquivo = readdirSync(PASTA_MIGRACOES).find((n) => n.endsWith('_notificacoes-tabelas.sql'));
+    const arquivo = readdirSync(PASTA_MIGRACOES).find((n) =>
+      n.endsWith('_notificacoes-tabelas.sql'),
+    );
     expect(arquivo).toBeDefined();
     const sql = readFileSync(join(PASTA_MIGRACOES, arquivo ?? ''), 'utf8')
       .split('\n')
@@ -245,6 +259,7 @@ describe('migração aditiva', () => {
       .join('\n');
     expect(sql).not.toMatch(/\bDROP\b/i);
     const alteradas = [...sql.matchAll(/ALTER TABLE\s+(\w+)/gi)].map((m) => m[1]);
-    for (const tabela of alteradas) expect(['push_ranking', 'push_conta', 'avisos_cobranca']).toContain(tabela);
+    for (const tabela of alteradas)
+      expect(['push_ranking', 'push_conta', 'avisos_cobranca']).toContain(tabela);
   });
 });

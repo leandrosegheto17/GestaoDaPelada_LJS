@@ -30,8 +30,12 @@ let nomeC: string;
 beforeAll(async () => {
   aberto = await abrirCenarioGrupos();
   const { db, cenario } = aberto;
-  await db.query(`DELETE FROM config_pesos WHERE grupo_id = $1 AND vigente_desde <> '2026-01-01'`, [cenario.grupoG]);
-  const r = await db.query<{ nome: string }>('SELECT nome FROM contas WHERE id = $1', [cenario.contaC]);
+  await db.query(`DELETE FROM config_pesos WHERE grupo_id = $1 AND vigente_desde <> '2026-01-01'`, [
+    cenario.grupoG,
+  ]);
+  const r = await db.query<{ nome: string }>('SELECT nome FROM contas WHERE id = $1', [
+    cenario.contaC,
+  ]);
   nomeC = r.rows[0]?.nome ?? '';
 });
 
@@ -41,8 +45,12 @@ afterAll(async () => {
 
 afterEach(async () => {
   const { db, cenario } = aberto;
-  await db.query(`DELETE FROM config_pesos WHERE grupo_id = $1 AND vigente_desde <> '2026-01-01'`, [cenario.grupoG]);
-  await db.query(`DELETE FROM auditoria WHERE acao IN ('pesos_configurados', 'pesos_substituidos')`);
+  await db.query(`DELETE FROM config_pesos WHERE grupo_id = $1 AND vigente_desde <> '2026-01-01'`, [
+    cenario.grupoG,
+  ]);
+  await db.query(
+    `DELETE FROM auditoria WHERE acao IN ('pesos_configurados', 'pesos_substituidos')`,
+  );
   await db.query('DROP TRIGGER IF EXISTS falha_teste_par05 ON auditoria');
   await db.query('DROP FUNCTION IF EXISTS falha_teste_par05()');
 });
@@ -78,12 +86,16 @@ async function auditoriasDePesos() {
 }
 
 const salvarComo = (conta: string, p: PesosCorpo = NOVOS) =>
-  comDb(aberto.url, conta, (db) => pesos.salvar(db, aberto.cenario.grupoG, p, HOJE), { confirmar: true });
+  comDb(aberto.url, conta, (db) => pesos.salvar(db, aberto.cenario.grupoG, p, HOJE), {
+    confirmar: true,
+  });
 
 describe('pesos.painel', () => {
   it('PAR-01: com uma configuração, ela é a vigente, com o nome de quem registrou, e o histórico vem vazio', async () => {
     const { cenario } = aberto;
-    const p = await comDb(aberto.url, cenario.contaO, (db) => pesos.painel(db, cenario.grupoG, HOJE));
+    const p = await comDb(aberto.url, cenario.contaO, (db) =>
+      pesos.painel(db, cenario.grupoG, HOJE),
+    );
     expect(p).toEqual({
       hoje: HOJE,
       vigente: {
@@ -104,8 +116,14 @@ describe('pesos.painel', () => {
     const { cenario } = aberto;
     await configurar('2026-03-10', cenario.contaO, [2, 2, 1, 1, -1, -1]);
     await configurar('2026-06-01', cenario.contaC, [5, 5, 2, 2, -3, -3]);
-    const p = await comDb(aberto.url, cenario.contaC, (db) => pesos.painel(db, cenario.grupoG, HOJE));
-    expect(p?.vigente).toMatchObject({ vigenteDesde: '2026-06-01', presencaSemChuva: 5, registradoPor: nomeC });
+    const p = await comDb(aberto.url, cenario.contaC, (db) =>
+      pesos.painel(db, cenario.grupoG, HOJE),
+    );
+    expect(p?.vigente).toMatchObject({
+      vigenteDesde: '2026-06-01',
+      presencaSemChuva: 5,
+      registradoPor: nomeC,
+    });
     expect(p?.historico.map((h) => [h.vigenteDesde, h.vigenteAte, h.registradoPor])).toEqual([
       ['2026-03-10', '2026-05-31', 'Outra Admin'],
       ['2026-01-01', '2026-03-09', nomeC],
@@ -115,13 +133,17 @@ describe('pesos.painel', () => {
   it('PAR-02: virada de mês e de ano: a véspera de 2026-03-01 é 2026-02-28', async () => {
     const { cenario } = aberto;
     await configurar('2026-03-01', cenario.contaC, [2, 2, 1, 1, -1, -1]);
-    const p = await comDb(aberto.url, cenario.contaC, (db) => pesos.painel(db, cenario.grupoG, HOJE));
+    const p = await comDb(aberto.url, cenario.contaC, (db) =>
+      pesos.painel(db, cenario.grupoG, HOJE),
+    );
     expect(p?.historico.map((h) => h.vigenteAte)).toEqual(['2026-02-28']);
   });
 
   it('PAR-01: a conta de outro grupo recebe painel nulo', async () => {
     const { cenario } = aberto;
-    expect(await comDb(aberto.url, cenario.contaB, (db) => pesos.painel(db, cenario.grupoG, HOJE))).toBeNull();
+    expect(
+      await comDb(aberto.url, cenario.contaB, (db) => pesos.painel(db, cenario.grupoG, HOJE)),
+    ).toBeNull();
   });
 });
 
@@ -133,7 +155,9 @@ describe('pesos.salvar', () => {
       { vigente: '2026-01-01', pesos: [3, 4, 1, 2, -1, -1], autora: cenario.contaC },
       { vigente: HOJE, pesos: [2, 3, 1, 1, -2, -4], autora: cenario.contaO },
     ]);
-    expect((await auditoriasDePesos()).map((a) => [a.acao, a.autor])).toEqual([['pesos_configurados', cenario.contaO]]);
+    expect((await auditoriasDePesos()).map((a) => [a.acao, a.autor])).toEqual([
+      ['pesos_configurados', cenario.contaO],
+    ]);
   });
 
   it('PAR-04: salvar duas vezes no mesmo dia deixa uma linha e audita pesos_substituidos', async () => {
@@ -142,8 +166,13 @@ describe('pesos.salvar', () => {
     const segundo = await salvarComo(cenario.contaO, { ...NOVOS, presencaSemChuva: 7 });
     expect(segundo).toEqual({ substituiu: true });
     const deHoje = (await linhasDeG()).filter((l) => l.vigente === HOJE);
-    expect(deHoje).toEqual([{ vigente: HOJE, pesos: [7, 3, 1, 1, -2, -4], autora: cenario.contaO }]);
-    expect((await auditoriasDePesos()).map((a) => a.acao)).toEqual(['pesos_configurados', 'pesos_substituidos']);
+    expect(deHoje).toEqual([
+      { vigente: HOJE, pesos: [7, 3, 1, 1, -2, -4], autora: cenario.contaO },
+    ]);
+    expect((await auditoriasDePesos()).map((a) => a.acao)).toEqual([
+      'pesos_configurados',
+      'pesos_substituidos',
+    ]);
   });
 
   it('PAR-09: a configuração de ontem nunca muda', async () => {

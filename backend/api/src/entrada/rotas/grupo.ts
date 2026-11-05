@@ -67,7 +67,9 @@ export function rotasGrupo(): Hono<Ambiente> {
     };
     // Saldo do caixa só para quem tem acesso ao financeiro; sem acesso, a chave não vai (FIN-34, AD-079).
     const saldo = await financeiroMes.saldoDoGrupo(c.var.db, grupoId, hoje);
-    const resposta: DetalheDoGet = saldo.acessa ? { ...comInicio, saldoFinanceiroCentavos: saldo.saldoCentavos } : comInicio;
+    const resposta: DetalheDoGet = saldo.acessa
+      ? { ...comInicio, saldoFinanceiroCentavos: saldo.saldoCentavos }
+      : comInicio;
     return c.json(resposta, 200);
   });
 

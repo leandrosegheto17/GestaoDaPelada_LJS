@@ -38,7 +38,8 @@ const cancelar = (d: pg.Client, endpoint: string, auth: string) =>
 const estado = (d: pg.Client, endpoint: string, auth: string) =>
   d.query<{ r: string }>('SELECT push_conta_estado($1, $2) AS r', [endpoint, auth]);
 
-const totalDe = (d: pg.Client, conta: string) => contar(d, 'SELECT 1 FROM push_conta WHERE conta_id = $1', [conta]);
+const totalDe = (d: pg.Client, conta: string) =>
+  contar(d, 'SELECT 1 FROM push_conta WHERE conta_id = $1', [conta]);
 
 /** Insere, como superusuário, `n` assinaturas da conta com endpoints `t9-fixo-<i>`. */
 async function encher(db: pg.Client, conta: string, n: number): Promise<void> {
@@ -82,8 +83,12 @@ describe('push_conta_assinar', () => {
 
   it('NOT-45: sem conta no contexto (nem com slug), recusa com 42501', async () => {
     const { db, cenario } = aberto;
-    await expect(comoApp(db, {}, (d) => assinar(d, EP('sem')))).rejects.toMatchObject({ code: '42501' });
-    await expect(comoApp(db, { slug: cenario.slugA }, (d) => assinar(d, EP('slug')))).rejects.toMatchObject({
+    await expect(comoApp(db, {}, (d) => assinar(d, EP('sem')))).rejects.toMatchObject({
+      code: '42501',
+    });
+    await expect(
+      comoApp(db, { slug: cenario.slugA }, (d) => assinar(d, EP('slug'))),
+    ).rejects.toMatchObject({
       code: '42501',
     });
     expect(await contar(db, 'SELECT 1 FROM push_conta')).toBe(0);
@@ -115,7 +120,9 @@ describe('push_conta_assinar', () => {
   it('NOT-55: conta excluída chamando as três funções é recusada (42501)', async () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
-      await db.query(`UPDATE contas SET excluida_em = now() WHERE id = $1`, [cenario.contaSemVinculo]);
+      await db.query(`UPDATE contas SET excluida_em = now() WHERE id = $1`, [
+        cenario.contaSemVinculo,
+      ]);
       await comoAppAqui(db, cenario.contaSemVinculo);
       for (const sql of [
         `SELECT push_conta_assinar('${EP('x')}', 'c', 's')`,
@@ -170,8 +177,13 @@ describe('push_conta_cancelar e push_conta_estado', () => {
 
   it('NOT-45: sem conta no contexto, cancelar e estado recusam (42501)', async () => {
     const { db, cenario } = aberto;
-    for (const chamar of [(d: pg.Client) => cancelar(d, EP('c'), 'segredo'), (d: pg.Client) => estado(d, EP('c'), 'segredo')]) {
-      await expect(comoApp(db, { slug: cenario.slugA }, chamar)).rejects.toMatchObject({ code: '42501' });
+    for (const chamar of [
+      (d: pg.Client) => cancelar(d, EP('c'), 'segredo'),
+      (d: pg.Client) => estado(d, EP('c'), 'segredo'),
+    ]) {
+      await expect(comoApp(db, { slug: cenario.slugA }, chamar)).rejects.toMatchObject({
+        code: '42501',
+      });
     }
   });
 });
@@ -195,7 +207,9 @@ describe('limpeza na exclusão da conta (trigger em contas.excluida_em, AD-102)'
   async function excluirA(db: pg.Client): Promise<string> {
     const { cenario } = aberto;
     await comoAppAqui(db, cenario.contaA);
-    const r = await umaLinha<{ resultado: string }>(db, 'SELECT * FROM conta_excluir($1)', [cenario.senhaA]);
+    const r = await umaLinha<{ resultado: string }>(db, 'SELECT * FROM conta_excluir($1)', [
+      cenario.senhaA,
+    ]);
     await comoSuper(db);
     return r.resultado;
   }
@@ -246,7 +260,9 @@ describe('limpeza na exclusão da conta (trigger em contas.excluida_em, AD-102)'
       expect(await totalDe(db, cenario.contaB)).toBe(1);
       // Uma linha que nasce depois não some com um novo UPDATE de excluida_em já preenchida.
       await encher(db, cenario.contaA, 1);
-      await db.query(`UPDATE contas SET excluida_em = now() + interval '1 second' WHERE id = $1`, [cenario.contaA]);
+      await db.query(`UPDATE contas SET excluida_em = now() + interval '1 second' WHERE id = $1`, [
+        cenario.contaA,
+      ]);
       expect(await totalDe(db, cenario.contaA)).toBe(1);
     });
   });

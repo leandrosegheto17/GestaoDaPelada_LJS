@@ -17,7 +17,8 @@ const {
 export const ruleName = 'pelada/so-tokens';
 
 export const messages = ruleMessages(ruleName, {
-  rejected: (prop, valor) => `"${prop}: ${valor}" é literal; use um token de tokens.css (var(--…)).`,
+  rejected: (prop, valor) =>
+    `"${prop}: ${valor}" é literal; use um token de tokens.css (var(--…)).`,
 });
 
 const PROPRIEDADES = new Set(['font', 'font-family', 'box-shadow', 'text-shadow']);
@@ -37,7 +38,13 @@ const regra = (primaria) => (raiz, resultado) => {
     const valor = decl.value.trim();
     if (PALAVRAS_LIVRES.has(valor.toLowerCase())) return;
     if (/var\(\s*--/.test(valor)) return;
-    report({ ruleName, result: resultado, node: decl, message: messages.rejected(decl.prop, valor), word: valor });
+    report({
+      ruleName,
+      result: resultado,
+      node: decl,
+      message: messages.rejected(decl.prop, valor),
+      word: valor,
+    });
   });
 };
 

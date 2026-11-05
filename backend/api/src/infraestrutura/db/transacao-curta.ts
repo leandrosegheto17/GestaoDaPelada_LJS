@@ -28,9 +28,10 @@ export async function transacaoCurta<T>(
     ...(opcoes.fabrica ? { fabrica: opcoes.fabrica } : {}),
     aoAbrir: async (consultar) => {
       await consultar('BEGIN');
-      await consultar(`SELECT set_config('app.conta_id', $1, true), set_config('app.slug_publico', '', true)`, [
-        opcoes.conta ?? '',
-      ]);
+      await consultar(
+        `SELECT set_config('app.conta_id', $1, true), set_config('app.slug_publico', '', true)`,
+        [opcoes.conta ?? ''],
+      );
     },
   });
   try {

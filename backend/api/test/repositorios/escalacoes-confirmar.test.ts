@@ -1,6 +1,9 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import type { Escalada } from '@pelada/contrato';
-import { escalacoes, type EscalacaoParaGravar } from '../../src/infraestrutura/db/repositorios/escalacoes.ts';
+import {
+  escalacoes,
+  type EscalacaoParaGravar,
+} from '../../src/infraestrutura/db/repositorios/escalacoes.ts';
 import { abrirCenarioGrupos, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
 import { comDb } from './apoio.ts';
 
@@ -33,7 +36,10 @@ afterEach(async () => {
   await db.query('DROP TRIGGER IF EXISTS falha_teste_sim70 ON eventos_uso');
   await db.query('DROP TRIGGER IF EXISTS falha_teste_sim70_escalacao ON escalacoes');
   await db.query('DROP FUNCTION IF EXISTS falha_teste_sim70()');
-  await db.query('DELETE FROM escalacoes WHERE grupo_id = $1 AND data = ANY($2::date[])', [cenario.grupoG, DATAS]);
+  await db.query('DELETE FROM escalacoes WHERE grupo_id = $1 AND data = ANY($2::date[])', [
+    cenario.grupoG,
+    DATAS,
+  ]);
   await db.query(
     `DELETE FROM eventos_uso WHERE grupo_id = $1 AND tipo = 'escalacao_confirmada' AND data_partida = ANY($2::date[])`,
     [cenario.grupoG, DATAS],
@@ -50,8 +56,20 @@ function doisTimes(): Escalada {
     formato: 'dois_times',
     composicao: {
       times: [
-        { titulares: [{ id: a1!, so1oTempo: false }, { id: a2!, so1oTempo: true }], entramNo2oTempo: [{ id: r1!, so1oTempo: false }] },
-        { titulares: [{ id: b1!, so1oTempo: false }, { id: b2!, so1oTempo: false }], entramNo2oTempo: [{ id: r2!, so1oTempo: false }] },
+        {
+          titulares: [
+            { id: a1!, so1oTempo: false },
+            { id: a2!, so1oTempo: true },
+          ],
+          entramNo2oTempo: [{ id: r1!, so1oTempo: false }],
+        },
+        {
+          titulares: [
+            { id: b1!, so1oTempo: false },
+            { id: b2!, so1oTempo: false },
+          ],
+          entramNo2oTempo: [{ id: r2!, so1oTempo: false }],
+        },
       ],
       naoEntra: [fora!],
     },
@@ -62,15 +80,26 @@ function variosTimes(): Escalada {
   const todos = ids(10);
   return {
     formato: 'varios_times',
-    composicao: { times: [{ jogadores: todos.slice(0, 4) }, { jogadores: todos.slice(4, 8) }, { jogadores: todos.slice(8) }] },
+    composicao: {
+      times: [
+        { jogadores: todos.slice(0, 4) },
+        { jogadores: todos.slice(4, 8) },
+        { jogadores: todos.slice(8) },
+      ],
+    },
   };
 }
 
 function confirmarComo(e: EscalacaoParaGravar, momento = MOMENTO_1, confirmar = true) {
   const { cenario } = aberto;
-  return comDb(aberto.url, cenario.contaC, (db) => escalacoes.confirmar(db, cenario.grupoG, e, cenario.contaC, momento), {
-    confirmar,
-  });
+  return comDb(
+    aberto.url,
+    cenario.contaC,
+    (db) => escalacoes.confirmar(db, cenario.grupoG, e, cenario.contaC, momento),
+    {
+      confirmar,
+    },
+  );
 }
 
 interface LinhaGravada {
@@ -117,7 +146,12 @@ describe('escalacoes.confirmar', () => {
     expect(r).toEqual({ data: DATA, confirmadaEm: MOMENTO_1 });
     const [linha, ...resto] = await linhas();
     expect(resto).toEqual([]);
-    expect(linha).toMatchObject({ formato: 'dois_times', n: 2, k: 1, confirmada_por: aberto.cenario.contaC });
+    expect(linha).toMatchObject({
+      formato: 'dois_times',
+      n: 2,
+      k: 1,
+      confirmada_por: aberto.cenario.contaC,
+    });
     expect(linha?.composicao).toEqual(escalada.composicao);
     expect(linha?.confirmada_em.toISOString()).toBe(MOMENTO_1);
   });
@@ -163,14 +197,20 @@ describe('escalacoes.confirmar', () => {
     await confirmarComo({ data: DATA, n: 2, k: 1, escalada });
     const [evento, ...resto] = await eventos();
     expect(resto).toEqual([]);
-    expect(evento).toMatchObject({ grupo_id: aberto.cenario.grupoG, dispositivo_id: null, mes_exportado: null });
+    expect(evento).toMatchObject({
+      grupo_id: aberto.cenario.grupoG,
+      dispositivo_id: null,
+      mes_exportado: null,
+    });
     expect((evento?.['momento'] as Date).toISOString()).toBe(MOMENTO_1);
     // Nenhum id de jogador da composição aparece no evento.
     const texto = JSON.stringify(evento);
     const jogadoresDaComposicao =
       escalada.formato === 'dois_times'
         ? [
-            ...escalada.composicao.times.flatMap((t) => [...t.titulares, ...t.entramNo2oTempo].map((j) => j.id)),
+            ...escalada.composicao.times.flatMap((t) =>
+              [...t.titulares, ...t.entramNo2oTempo].map((j) => j.id),
+            ),
             ...escalada.composicao.naoEntra,
           ]
         : [];
@@ -183,7 +223,9 @@ describe('escalacoes.confirmar', () => {
       BEGIN RAISE EXCEPTION 'falha forçada (SIM-70)'; END $$`);
     await db.query(`CREATE TRIGGER falha_teste_sim70 BEFORE INSERT ON eventos_uso FOR EACH ROW
       WHEN (NEW.tipo = 'escalacao_confirmada') EXECUTE FUNCTION falha_teste_sim70()`);
-    await expect(confirmarComo({ data: DATA, n: 2, k: 1, escalada: doisTimes() })).rejects.toThrow(/falha forçada/);
+    await expect(confirmarComo({ data: DATA, n: 2, k: 1, escalada: doisTimes() })).rejects.toThrow(
+      /falha forçada/,
+    );
     expect(await linhas()).toEqual([]);
     expect(await eventos()).toEqual([]);
   });
@@ -194,7 +236,9 @@ describe('escalacoes.confirmar', () => {
       BEGIN RAISE EXCEPTION 'falha forçada (SIM-70)'; END $$`);
     await db.query(`CREATE TRIGGER falha_teste_sim70_escalacao BEFORE INSERT ON escalacoes FOR EACH ROW
       EXECUTE FUNCTION falha_teste_sim70()`);
-    await expect(confirmarComo({ data: DATA, n: 2, k: 1, escalada: doisTimes() })).rejects.toThrow(/falha forçada/);
+    await expect(confirmarComo({ data: DATA, n: 2, k: 1, escalada: doisTimes() })).rejects.toThrow(
+      /falha forçada/,
+    );
     expect(await linhas()).toEqual([]);
     expect(await eventos()).toEqual([]);
   });
@@ -207,9 +251,9 @@ describe('escalacoes.confirmar', () => {
       BEGIN RAISE EXCEPTION 'falha forçada (SIM-70)'; END $$`);
     await db.query(`CREATE TRIGGER falha_teste_sim70 BEFORE INSERT ON eventos_uso FOR EACH ROW
       WHEN (NEW.tipo = 'escalacao_confirmada') EXECUTE FUNCTION falha_teste_sim70()`);
-    await expect(confirmarComo({ data: DATA, n: 2, k: 0, escalada: doisTimes() }, MOMENTO_2)).rejects.toThrow(
-      /falha forçada/,
-    );
+    await expect(
+      confirmarComo({ data: DATA, n: 2, k: 0, escalada: doisTimes() }, MOMENTO_2),
+    ).rejects.toThrow(/falha forçada/);
     const gravadas = await linhas();
     expect(gravadas).toHaveLength(1);
     expect(gravadas[0]?.composicao).toEqual(primeira.composicao);
@@ -234,7 +278,13 @@ describe('escalacoes.confirmar', () => {
       aberto.url,
       cenario.contaC,
       async (db) => {
-        const r = await escalacoes.confirmar(db, cenario.grupoG, { data: DATA, n: 2, k: 1, escalada: primeira }, cenario.contaC, MOMENTO_1);
+        const r = await escalacoes.confirmar(
+          db,
+          cenario.grupoG,
+          { data: DATA, n: 2, k: 1, escalada: primeira },
+          cenario.contaC,
+          MOMENTO_1,
+        );
         gravouA();
         await travaA;
         return r;
@@ -270,7 +320,14 @@ describe('escalacoes.confirmar', () => {
       comDb(
         aberto.url,
         cenario.contaB,
-        (db) => escalacoes.confirmar(db, cenario.grupoG, { data: DATA, n: 2, k: 1, escalada: doisTimes() }, cenario.contaB, MOMENTO_1),
+        (db) =>
+          escalacoes.confirmar(
+            db,
+            cenario.grupoG,
+            { data: DATA, n: 2, k: 1, escalada: doisTimes() },
+            cenario.contaB,
+            MOMENTO_1,
+          ),
         { confirmar: true },
       ),
     ).rejects.toMatchObject({ code: '42501' });

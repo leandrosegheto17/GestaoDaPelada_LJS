@@ -20,7 +20,10 @@ export async function numaTransacao<T>(db: pg.Client, fn: () => Promise<T>): Pro
 /** Passa a rodar como `pelada_app` com a conta dada (ou sem conta), até o fim da transação ou `comoSuper`. */
 export async function comoAppAqui(db: pg.Client, conta: string | null = null): Promise<void> {
   await db.query('SET LOCAL ROLE pelada_app');
-  await db.query(`SELECT set_config('app.conta_id', $1, true), set_config('app.slug_publico', '', true)`, [conta ?? '']);
+  await db.query(
+    `SELECT set_config('app.conta_id', $1, true), set_config('app.slug_publico', '', true)`,
+    [conta ?? ''],
+  );
 }
 
 /** Volta ao superusuário da conexão (sem RLS) dentro da transação. */
@@ -29,7 +32,11 @@ export async function comoSuper(db: pg.Client): Promise<void> {
 }
 
 /** Primeira linha de uma consulta, ou erro se não houver. */
-export async function umaLinha<T extends pg.QueryResultRow>(db: pg.Client, sql: string, valores: unknown[] = []): Promise<T> {
+export async function umaLinha<T extends pg.QueryResultRow>(
+  db: pg.Client,
+  sql: string,
+  valores: unknown[] = [],
+): Promise<T> {
   const r = await db.query<T>(sql, valores);
   const linha = r.rows[0];
   if (!linha) throw new Error(`Consulta sem linha: ${sql}`);

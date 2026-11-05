@@ -10,9 +10,14 @@ import { entradasAtivas, type MapaTelas } from '../../e2e/ferramentas/telas-reai
  */
 
 const MAPA = JSON.parse(
-  readFileSync(fileURLToPath(new URL('../../../../.specs/mockup/telas.json', import.meta.url)), 'utf8'),
+  readFileSync(
+    fileURLToPath(new URL('../../../../.specs/mockup/telas.json', import.meta.url)),
+    'utf8',
+  ),
 ) as MapaTelas;
-const ATIVAS = JSON.parse(readFileSync(fileURLToPath(new URL('../../e2e/telas-ativas.json', import.meta.url)), 'utf8')) as {
+const ATIVAS = JSON.parse(
+  readFileSync(fileURLToPath(new URL('../../e2e/telas-ativas.json', import.meta.url)), 'utf8'),
+) as {
   telas: { id: string; estado: string }[];
 };
 
@@ -22,7 +27,9 @@ describe('telas ativas de grupos e elenco', () => {
   const ativos = ATIVAS.telas.map((t) => `${t.id} ${t.estado}`);
 
   it('GEL-116: todo estado real das telas do módulo está ativo', () => {
-    const esperados = (MAPA.telas ?? []).filter((t) => t.real === true && DO_MODULO.includes(t.id)).map((t) => `${t.id} ${t.estado}`);
+    const esperados = (MAPA.telas ?? [])
+      .filter((t) => t.real === true && DO_MODULO.includes(t.id))
+      .map((t) => `${t.id} ${t.estado}`);
     expect(esperados.length).toBeGreaterThanOrEqual(40);
     for (const e of esperados) expect(ativos).toContain(e);
   });
@@ -35,7 +42,11 @@ describe('telas ativas de grupos e elenco', () => {
   it('GEL-116, AD-029: da T09 entram só o menu da conta da CA e os estados que as features seguintes ativaram', () => {
     // A AD-029 deixava a T09 fora "até existirem partidas, uso e financeiro": a partidas-e-ranking (T76) ativa a
     // `sem-jogadores` e o financeiro (T46, AD-118), a `sucesso`. Nenhum outro estado da T09 entra.
-    expect(ativos.filter((a) => a.startsWith('T09 ')).sort()).toEqual(['T09 menu-conta', 'T09 sem-jogadores', 'T09 sucesso']);
+    expect(ativos.filter((a) => a.startsWith('T09 ')).sort()).toEqual([
+      'T09 menu-conta',
+      'T09 sem-jogadores',
+      'T09 sucesso',
+    ]);
   });
 
   it('GEL-116: sem entrada repetida e todas existem no telas.json', () => {

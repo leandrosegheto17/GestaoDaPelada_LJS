@@ -14,7 +14,12 @@ import { NOME_COOKIE_SESSAO } from '../../src/infraestrutura/sessao/cookie.ts';
 import { gerarToken } from '../../src/infraestrutura/sessao/token.ts';
 import { envAcesso } from '../acesso/apoio.ts';
 import { contextoFalso, fabricaComoApp } from '../db/requisicao.ts';
-import { abrirCenarioGrupos, arquivar, reativar, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  arquivar,
+  reativar,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * `POST /api/grupos/:grupoId/partidas` (partidas-e-ranking T40; PAR-19 a PAR-26), com o app real como `pelada_app` e o
@@ -29,7 +34,10 @@ let duda: string;
 let deOutroGrupo: string;
 
 const DATA = '2026-03-12';
-const app = criarApp({ fabricaBanco: fabricaComoApp().fabrica, relogio: relogioFixo('2026-03-14T15:00:00Z') });
+const app = criarApp({
+  fabricaBanco: fabricaComoApp().fabrica,
+  relogio: relogioFixo('2026-03-14T15:00:00Z'),
+});
 
 async function sessao(conta: string): Promise<string> {
   const { token, hash } = await gerarToken();
@@ -66,16 +74,24 @@ async function ativo(grupo: string, apelido: string, conta: string): Promise<str
     [grupo, apelido, conta],
   );
   const id = r.rows[0]!.id;
-  await db.query(`INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, '2026-01-01', NULL)`, [id, grupo]);
+  await db.query(
+    `INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, '2026-01-01', NULL)`,
+    [id, grupo],
+  );
   return id;
 }
 
 async function partidasNaData(data = DATA): Promise<number> {
-  const r = await aberto.db.query('SELECT 1 FROM partidas WHERE grupo_id = $1 AND data = $2', [aberto.cenario.grupoG, data]);
+  const r = await aberto.db.query('SELECT 1 FROM partidas WHERE grupo_id = $1 AND data = $2', [
+    aberto.cenario.grupoG,
+    data,
+  ]);
   return r.rowCount ?? 0;
 }
 
-async function presencasNaData(data = DATA): Promise<Array<{ jogador_id: string; situacao: string }>> {
+async function presencasNaData(
+  data = DATA,
+): Promise<Array<{ jogador_id: string; situacao: string }>> {
   const r = await aberto.db.query<{ jogador_id: string; situacao: string }>(
     `SELECT pr.jogador_id, pr.situacao FROM presencas pr JOIN partidas p ON p.id = pr.partida_id
       WHERE p.grupo_id = $1 AND p.data = $2 ORDER BY pr.jogador_id`,
@@ -122,8 +138,15 @@ describe('POST …/partidas: lançamento', () => {
     });
     expect(r.status).toBe(201);
     const corpo = partidaResposta.parse(await r.json());
-    const nome = (await aberto.db.query<{ nome: string }>('SELECT nome FROM contas WHERE id = $1', [contaC])).rows[0]!.nome;
-    expect(corpo).toMatchObject({ data: DATA, hoje: '2026-03-14', choveu: true, alteradaPor: nome });
+    const nome = (
+      await aberto.db.query<{ nome: string }>('SELECT nome FROM contas WHERE id = $1', [contaC])
+    ).rows[0]!.nome;
+    expect(corpo).toMatchObject({
+      data: DATA,
+      hoje: '2026-03-14',
+      choveu: true,
+      alteradaPor: nome,
+    });
     expect(corpo.alteradaPor.length).toBeGreaterThan(0);
     expect(corpo.jogadores.find((j) => j.id === duda)?.situacao).toBe('expulso');
     expect(corpo.jogadores.find((j) => j.id === caco)?.situacao).toBe('presente');
@@ -131,7 +154,9 @@ describe('POST …/partidas: lançamento', () => {
     const gravadas = await presencasNaData();
     expect(gravadas).toHaveLength(4);
     expect(gravadas.filter((p) => p.situacao === 'presente')).toHaveLength(3);
-    expect(gravadas.filter((p) => p.situacao === 'expulso')).toEqual([{ jogador_id: duda, situacao: 'expulso' }]);
+    expect(gravadas.filter((p) => p.situacao === 'expulso')).toEqual([
+      { jogador_id: duda, situacao: 'expulso' },
+    ]);
   });
 
   it('PAR-23: marcação ausente e ativo sem marcação não gravam presença', async () => {
@@ -180,7 +205,9 @@ describe('POST …/partidas: recusas', () => {
       marcacoes: [{ jogadorId: aberto.cenario.idsG.jogadorInativo, situacao: 'presente' }],
     });
     expect(r.status).toBe(422);
-    expect(await r.json()).toMatchObject({ mensagens: { 'marcacoes.0.jogadorId': MENSAGEM_JOGADOR_INATIVO } });
+    expect(await r.json()).toMatchObject({
+      mensagens: { 'marcacoes.0.jogadorId': MENSAGEM_JOGADOR_INATIVO },
+    });
     expect(await partidasNaData()).toBe(0);
   });
 
@@ -188,9 +215,15 @@ describe('POST …/partidas: recusas', () => {
     ['inexistente (uuid)', '00000000-0000-4000-8000-000000000000'],
     ['inexistente (não é uuid)', 'nao-e-uuid'],
   ])('PAR-24: jogador %s recebe a mesma mensagem no mesmo campo', async (_nome, jogadorId) => {
-    const r = await lancar({ data: DATA, choveu: false, marcacoes: [{ jogadorId, situacao: 'presente' }] });
+    const r = await lancar({
+      data: DATA,
+      choveu: false,
+      marcacoes: [{ jogadorId, situacao: 'presente' }],
+    });
     expect(r.status).toBe(422);
-    expect(await r.json()).toMatchObject({ mensagens: { 'marcacoes.0.jogadorId': MENSAGEM_JOGADOR_INATIVO } });
+    expect(await r.json()).toMatchObject({
+      mensagens: { 'marcacoes.0.jogadorId': MENSAGEM_JOGADOR_INATIVO },
+    });
     expect(await partidasNaData()).toBe(0);
   });
 
@@ -216,15 +249,20 @@ describe('POST …/partidas: recusas', () => {
       marcacoes: [{ jogadorId: aberto.cenario.idsG.jogadorAtivo, situacao: 'machucado' }],
     });
     expect(r.status).toBe(422);
-    expect(await r.json()).toMatchObject({ mensagens: { 'marcacoes.0.situacao': MENSAGEM_SITUACAO } });
+    expect(await r.json()).toMatchObject({
+      mensagens: { 'marcacoes.0.situacao': MENSAGEM_SITUACAO },
+    });
     expect(await partidasNaData()).toBe(0);
   });
 
-  it.each(['2026-02-30', '12/03/2026'])('PAR-19: data %j responde 422 no campo data', async (data) => {
-    const r = await lancar({ data, choveu: false, marcacoes: [] });
-    expect(r.status).toBe(422);
-    expect(await r.json()).toMatchObject({ mensagens: { data: MENSAGEM_DATA_INVALIDA } });
-  });
+  it.each(['2026-02-30', '12/03/2026'])(
+    'PAR-19: data %j responde 422 no campo data',
+    async (data) => {
+      const r = await lancar({ data, choveu: false, marcacoes: [] });
+      expect(r.status).toBe(422);
+      expect(await r.json()).toMatchObject({ mensagens: { data: MENSAGEM_DATA_INVALIDA } });
+    },
+  );
 
   it('PAR-20: data de amanhã responde 422 "A data não pode ser no futuro." sem gravar', async () => {
     const r = await lancar({ data: '2026-03-15', choveu: false, marcacoes: [] });
@@ -234,7 +272,11 @@ describe('POST …/partidas: recusas', () => {
   });
 
   it('PAR-21: lançar de novo a mesma data responde 409 partida_ja_existe com dataExistente', async () => {
-    const corpo = { data: DATA, choveu: false, marcacoes: [{ jogadorId: caco, situacao: 'presente' }] };
+    const corpo = {
+      data: DATA,
+      choveu: false,
+      marcacoes: [{ jogadorId: caco, situacao: 'presente' }],
+    };
     expect((await lancar(corpo)).status).toBe(201);
     const r = await lancar({ ...corpo, choveu: true });
     expect(r.status).toBe(409);
@@ -254,7 +296,12 @@ describe('POST …/partidas: recusas', () => {
   });
 
   it('PAR-22: campo a mais no corpo é recusado', async () => {
-    const r = await lancar({ data: DATA, choveu: false, marcacoes: [], grupoId: aberto.cenario.grupoH });
+    const r = await lancar({
+      data: DATA,
+      choveu: false,
+      marcacoes: [],
+      grupoId: aberto.cenario.grupoH,
+    });
     expect(r.status).toBe(422);
     expect(await partidasNaData()).toBe(0);
   });

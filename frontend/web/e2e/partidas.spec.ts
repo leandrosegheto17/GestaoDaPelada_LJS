@@ -1,4 +1,11 @@
-import { devices, expect, test, type APIRequestContext, type Browser, type Page } from '@playwright/test';
+import {
+  devices,
+  expect,
+  test,
+  type APIRequestContext,
+  type Browser,
+  type Page,
+} from '@playwright/test';
 import { URL_BASE } from '../playwright.config.ts';
 
 /**
@@ -17,7 +24,18 @@ import { URL_BASE } from '../playwright.config.ts';
 
 const SENHA = 'SenhaForte123';
 const CABECALHO = { 'X-Pelada': '1' };
-const CAMPOS_PROIBIDOS = ['id', 'jogadorId', 'grupoId', 'telefone', 'anoNascimento', 'posicaoEmCampo', 'notas', 'periodos', 'pontuacaoInicial', 'email'];
+const CAMPOS_PROIBIDOS = [
+  'id',
+  'jogadorId',
+  'grupoId',
+  'telefone',
+  'anoNascimento',
+  'posicaoEmCampo',
+  'notas',
+  'periodos',
+  'pontuacaoInicial',
+  'email',
+];
 
 function sufixo(): string {
   return `${Date.now()}${Math.floor(Math.random() * 1e4)}`;
@@ -55,7 +73,11 @@ interface MensagemDev {
   texto: string;
 }
 
-async function linkDoEmail(request: APIRequestContext, para: string, tipo: string): Promise<string> {
+async function linkDoEmail(
+  request: APIRequestContext,
+  para: string,
+  tipo: string,
+): Promise<string> {
   let link: string | undefined;
   await expect
     .poll(
@@ -63,7 +85,10 @@ async function linkDoEmail(request: APIRequestContext, para: string, tipo: strin
         const r = await request.get('/api/dev/emails');
         expect(r.status()).toBe(200);
         const { mensagens } = (await r.json()) as { mensagens: MensagemDev[] };
-        link = mensagens.filter((m) => m.para === para && m.tipo === tipo).at(-1)?.texto.match(/https?:\/\/\S+#t=[A-Za-z0-9_%-]+/)?.[0];
+        link = mensagens
+          .filter((m) => m.para === para && m.tipo === tipo)
+          .at(-1)
+          ?.texto.match(/https?:\/\/\S+#t=[A-Za-z0-9_%-]+/)?.[0];
         return link;
       },
       { timeout: 10_000 },
@@ -108,7 +133,10 @@ async function contaNova(pagina: Page, nome: string, prefixo: string): Promise<s
   return email;
 }
 
-async function criarGrupoPelaApi(pagina: Page, nome: string): Promise<{ id: string; slug: string }> {
+async function criarGrupoPelaApi(
+  pagina: Page,
+  nome: string,
+): Promise<{ id: string; slug: string }> {
   const r = await pagina.request.post('/api/grupos', {
     headers: CABECALHO,
     data: { nome, diaSemana: 'quinta', frequencia: 'semanal', horario: '20:00' },
@@ -117,7 +145,12 @@ async function criarGrupoPelaApi(pagina: Page, nome: string): Promise<{ id: stri
   return (await r.json()) as { id: string; slug: string };
 }
 
-async function criarJogadorPelaApi(pagina: Page, grupoId: string, apelido: string, dataEntrada: string): Promise<string> {
+async function criarJogadorPelaApi(
+  pagina: Page,
+  grupoId: string,
+  apelido: string,
+  dataEntrada: string,
+): Promise<string> {
   const r = await pagina.request.post(`/api/grupos/${grupoId}/jogadores`, {
     headers: CABECALHO,
     data: { apelido, anoNascimento: 1990, posicao: 'meia', dataEntrada },
@@ -128,10 +161,20 @@ async function criarJogadorPelaApi(pagina: Page, grupoId: string, apelido: strin
 
 type Situacao = 'ausente' | 'presente' | 'lesionado' | 'expulso';
 
-async function partidaPelaApi(pagina: Page, grupoId: string, data: string, choveu: boolean, marcacoes: Array<[string, Situacao]>) {
+async function partidaPelaApi(
+  pagina: Page,
+  grupoId: string,
+  data: string,
+  choveu: boolean,
+  marcacoes: Array<[string, Situacao]>,
+) {
   const r = await pagina.request.post(`/api/grupos/${grupoId}/partidas`, {
     headers: CABECALHO,
-    data: { data, choveu, marcacoes: marcacoes.map(([jogadorId, situacao]) => ({ jogadorId, situacao })) },
+    data: {
+      data,
+      choveu,
+      marcacoes: marcacoes.map(([jogadorId, situacao]) => ({ jogadorId, situacao })),
+    },
   });
   expect(r.status()).toBe(201);
 }
@@ -139,10 +182,20 @@ async function partidaPelaApi(pagina: Page, grupoId: string, data: string, chove
 interface RankingJson {
   mes: string;
   partidas: Array<{ data: string; choveu: boolean }>;
-  linhas: Array<{ posicao: number; apelido: string; ptsInicial: number; ptsFinal: number; rodadas: Array<{ situacao: string; pontos: number | null }> }>;
+  linhas: Array<{
+    posicao: number;
+    apelido: string;
+    ptsInicial: number;
+    ptsFinal: number;
+    rodadas: Array<{ situacao: string; pontos: number | null }>;
+  }>;
 }
 
-async function rankingPublico(request: APIRequestContext, slug: string, mes?: string): Promise<{ status: number; corpo: RankingJson; bruto: unknown }> {
+async function rankingPublico(
+  request: APIRequestContext,
+  slug: string,
+  mes?: string,
+): Promise<{ status: number; corpo: RankingJson; bruto: unknown }> {
   const r = await request.get(`/api/publico/${slug}/ranking${mes ? `?mes=${mes}` : ''}`);
   const bruto = (await r.json()) as unknown;
   return { status: r.status(), corpo: bruto as RankingJson, bruto };
@@ -152,11 +205,20 @@ async function rankingPublico(request: APIRequestContext, slug: string, mes?: st
 function camposProibidos(valor: unknown, caminho = ''): string[] {
   if (Array.isArray(valor)) return valor.flatMap((v, i) => camposProibidos(v, `${caminho}.${i}`));
   if (valor === null || typeof valor !== 'object') return [];
-  return Object.entries(valor).flatMap(([k, v]) => [...(CAMPOS_PROIBIDOS.includes(k) ? [`${caminho}.${k}`] : []), ...camposProibidos(v, `${caminho}.${k}`)]);
+  return Object.entries(valor).flatMap(([k, v]) => [
+    ...(CAMPOS_PROIBIDOS.includes(k) ? [`${caminho}.${k}`] : []),
+    ...camposProibidos(v, `${caminho}.${k}`),
+  ]);
 }
 
-function situacao(pagina: Page, apelido: string, nome: 'Ausente' | 'Presente' | 'Lesionado' | 'Expulso') {
-  return pagina.getByRole('group', { name: `Situação de ${apelido}` }).getByRole('radio', { name: nome });
+function situacao(
+  pagina: Page,
+  apelido: string,
+  nome: 'Ausente' | 'Presente' | 'Lesionado' | 'Expulso',
+) {
+  return pagina
+    .getByRole('group', { name: `Situação de ${apelido}` })
+    .getByRole('radio', { name: nome });
 }
 
 test('J-15: lançar a partida da semana e ver no ranking', async ({ browser }) => {
@@ -192,7 +254,9 @@ test('J-15: lançar a partida da semana e ver no ranking', async ({ browser }) =
   await expect(ver).toHaveAttribute('href', `/g/${grupo.slug}`);
   const anonimo = await aparelho(browser, true);
   await anonimo.goto(`/g/${grupo.slug}`);
-  await expect(anonimo.getByRole('columnheader', { name: `${dataSalva}, com chuva` })).toBeVisible();
+  await expect(
+    anonimo.getByRole('columnheader', { name: `${dataSalva}, com chuva` }),
+  ).toBeVisible();
 
   // Resultado: pontos pelos pesos com chuva, ordem pelo acumulado e o JSON público sem campo proibido (PAR-64, PAR-76).
   const { status, corpo, bruto } = await rankingPublico(anonimo.request, grupo.slug);
@@ -228,14 +292,20 @@ test('J-16: corrigir e excluir uma partida', async ({ browser }) => {
   await pagina.goto(`/app/grupos/${grupo.id}/partidas/${dataPartida}`);
   await situacao(pagina, 'Toninho', 'Lesionado').check();
   await pagina.getByRole('button', { name: /^Salvar partida/ }).click();
-  await expect(pagina.getByText(/^Última alteração: Jornada Dezesseis, \d{2}\/\d{2} \d{2}:\d{2}$/)).toBeVisible();
+  await expect(
+    pagina.getByText(/^Última alteração: Jornada Dezesseis, \d{2}\/\d{2} \d{2}:\d{2}$/),
+  ).toBeVisible();
   let ranking = (await rankingPublico(pagina.request, grupo.slug, mes)).corpo;
-  expect(ranking.linhas.find((l) => l.apelido === 'Toninho')?.rodadas.at(-1)?.situacao).toBe('lesionado');
+  expect(ranking.linhas.find((l) => l.apelido === 'Toninho')?.rodadas.at(-1)?.situacao).toBe(
+    'lesionado',
+  );
 
   // 3. excluir e confirmar (PAR-50, PAR-53).
   await pagina.goto(`/app/grupos/${grupo.id}/partidas/${dataPartida}`);
   await pagina.getByRole('button', { name: 'Excluir partida' }).click();
-  const dialogo = pagina.getByRole('alertdialog', { name: `Excluir a partida de ${diaMes(dataPartida)}?` });
+  const dialogo = pagina.getByRole('alertdialog', {
+    name: `Excluir a partida de ${diaMes(dataPartida)}?`,
+  });
   await dialogo.getByRole('button', { name: 'Excluir partida' }).click();
   await expect(pagina.getByText(`Partida de ${diaMes(dataPartida)} excluída.`)).toBeVisible();
 
@@ -275,11 +345,16 @@ test('J-17: trocar os pesos sem mudar o passado', async ({ browser }) => {
 
   // 4. a partida de ontem com chuva mantém o peso antigo (PAR-09, PAR-56).
   const ranking = (await rankingPublico(pagina.request, grupo.slug, ontem.slice(0, 7))).corpo;
-  expect(ranking.linhas.find((l) => l.apelido === 'Toninho')?.rodadas.at(-1)).toEqual({ situacao: 'presente', pontos: 1 });
+  expect(ranking.linhas.find((l) => l.apelido === 'Toninho')?.rodadas.at(-1)).toEqual({
+    situacao: 'presente',
+    pontos: 1,
+  });
 
   // Resultado: o início mostra "Vigente desde dd/mm/aaaa".
   await pagina.goto(`/app/grupos/${grupo.id}`);
-  await expect(pagina.getByRole('list', { name: 'Gerenciar' })).toContainText(`Vigente desde ${naTela(hoje())}`);
+  await expect(pagina.getByRole('list', { name: 'Gerenciar' })).toContainText(
+    `Vigente desde ${naTela(hoje())}`,
+  );
   await pagina.context().close();
 });
 
@@ -309,7 +384,9 @@ test('J-18: ver meses anteriores e exportar o PDF', async ({ browser }) => {
   // 2. o mês anterior não tem partidas: PTS inicial igual ao final e a mesma ordem (PAR-85, PAR-87, PAR-88, PAR-89).
   await jogador.getByRole('button', { name: /^Mês anterior/ }).click();
   await expect(jogador).toHaveURL(new RegExp(`\\?mes=${mesDoMeio}$`));
-  await expect(jogador.getByRole('cell', { name: 'Nenhuma partida registrada neste mês' })).toBeVisible();
+  await expect(
+    jogador.getByRole('cell', { name: 'Nenhuma partida registrada neste mês' }),
+  ).toBeVisible();
   expect(await jogador.getByRole('rowheader').allTextContents()).toEqual(ordemAtual);
   const doMeio = (await rankingPublico(jogador.request, grupo.slug, mesDoMeio)).corpo;
   for (const l of doMeio.linhas) expect(l.ptsInicial).toBe(l.ptsFinal);
@@ -324,7 +401,9 @@ test('J-18: ver meses anteriores e exportar o PDF', async ({ browser }) => {
   await expect(jogador.getByText('PDF baixado.')).toBeVisible();
 
   // Resultado: guardado no aparelho para abrir sem conexão (PAR-148; o offline em si é o T78).
-  const chaves = await jogador.evaluate(() => Object.keys(window.localStorage).filter((k) => k.startsWith('pelada:ranking:')));
+  const chaves = await jogador.evaluate(() =>
+    Object.keys(window.localStorage).filter((k) => k.startsWith('pelada:ranking:')),
+  );
   expect(chaves).toContain(`pelada:ranking:${grupo.slug}:${dataHoje.slice(0, 7)}`);
   await jogador.context().close();
 });
@@ -339,22 +418,32 @@ test('J-19: grupo arquivado fica indisponível e volta ao reativar', async ({ br
   await expect(jogador.getByRole('heading', { level: 1, name: nome })).toBeVisible();
 
   // 1. a criadora arquiva (PAR-90).
-  const arquivar = await criadora.request.post(`/api/grupos/${grupo.id}/arquivar`, { headers: CABECALHO, data: { nomeConfirmacao: nome } });
+  const arquivar = await criadora.request.post(`/api/grupos/${grupo.id}/arquivar`, {
+    headers: CABECALHO,
+    data: { nomeConfirmacao: nome },
+  });
   expect(arquivar.ok()).toBe(true);
 
   // 2. o jogador abre o link e um slug que não existe: a mesma tela e o mesmo 404 (PAR-91 a PAR-94).
   await jogador.goto(`/g/${grupo.slug}`);
-  await expect(jogador.getByRole('heading', { level: 1, name: 'Grupo indisponível' })).toBeVisible();
+  await expect(
+    jogador.getByRole('heading', { level: 1, name: 'Grupo indisponível' }),
+  ).toBeVisible();
   const arquivado = await jogador.request.get(`/api/publico/${grupo.slug}/ranking`);
   const inexistente = await jogador.request.get('/api/publico/nao-existe/ranking');
   expect(arquivado.status()).toBe(404);
   expect(inexistente.status()).toBe(404);
   expect(await arquivado.json()).toEqual(await inexistente.json());
   await jogador.goto('/g/nao-existe');
-  await expect(jogador.getByRole('heading', { level: 1, name: 'Grupo indisponível' })).toBeVisible();
+  await expect(
+    jogador.getByRole('heading', { level: 1, name: 'Grupo indisponível' }),
+  ).toBeVisible();
 
   // 3 e 4. a criadora reativa e o ranking volta pelo mesmo slug.
-  const reativar = await criadora.request.post(`/api/grupos/${grupo.id}/reativar`, { headers: CABECALHO, data: {} });
+  const reativar = await criadora.request.post(`/api/grupos/${grupo.id}/reativar`, {
+    headers: CABECALHO,
+    data: {},
+  });
   expect(reativar.ok()).toBe(true);
   await jogador.goto(`/g/${grupo.slug}`);
   await expect(jogador.getByRole('heading', { level: 1, name: nome })).toBeVisible();
@@ -385,15 +474,20 @@ test('J-20: reativar um jogador vendo o efeito nos pontos', async ({ browser }) 
   await partidaPelaApi(pagina, grupo.id, d2, false, [[beto, 'presente']]);
 
   // 1 e 2. Reativar com retorno antes das duas partidas (PAR-109, PAR-117, PAR-159).
-  const periodos = async () => (await pagina.request.get(`/api/grupos/${grupo.id}/jogadores/${gil}/periodos`)).text();
+  const periodos = async () =>
+    (await pagina.request.get(`/api/grupos/${grupo.id}/jogadores/${gil}/periodos`)).text();
   const periodosAntes = await periodos();
   await pagina.goto(ficha);
   await pagina.getByRole('button', { name: 'Reativar', exact: true }).click();
   const reativar = pagina.getByRole('dialog', { name: 'Reativar Gil' });
-  await expect(reativar).toContainText('Volta a aparecer no ranking e nas partidas; a data de início não muda.');
+  await expect(reativar).toContainText(
+    'Volta a aparecer no ranking e nas partidas; a data de início não muda.',
+  );
   await expect(reativar).not.toContainText('os pontos não mudam');
   await reativar.getByLabel('Data de retorno').fill(diasAntes(dataHoje, 12));
-  await expect(reativar).toContainText(`2 rodadas passam a constar: ${diaMes(d1)} e ${diaMes(d2)}.`);
+  await expect(reativar).toContainText(
+    `2 rodadas passam a constar: ${diaMes(d1)} e ${diaMes(d2)}.`,
+  );
 
   // Nada muda no banco antes de confirmar (PAR-113, PAR-114).
   expect(await periodos()).toBe(periodosAntes);
@@ -421,7 +515,10 @@ test('J-21: painel de uso do app', async ({ browser }) => {
 
   // 2. o ranking público aberto num aparelho (PAR-123, PAR-124, PAR-127).
   const jogador = await aparelho(browser, true);
-  const evento = jogador.waitForResponse((r) => r.url().endsWith(`/api/publico/${grupo.slug}/eventos`) && r.request().method() === 'POST');
+  const evento = jogador.waitForResponse(
+    (r) =>
+      r.url().endsWith(`/api/publico/${grupo.slug}/eventos`) && r.request().method() === 'POST',
+  );
   await jogador.goto(`/g/${grupo.slug}`);
   expect((await evento).status()).toBe(204);
 
@@ -430,7 +527,9 @@ test('J-21: painel de uso do app', async ({ browser }) => {
 
   // 4. "Uso do app" (PAR-144, PAR-155 a PAR-158) e o início com o aparelho da semana (PAR-132, PAR-136).
   await admin.goto(`/app/grupos/${grupo.id}`);
-  await expect(admin.getByRole('list', { name: 'Gerenciar' })).toContainText('Esta semana: 1 aparelho');
+  await expect(admin.getByRole('list', { name: 'Gerenciar' })).toContainText(
+    'Esta semana: 1 aparelho',
+  );
   await admin.getByRole('link', { name: /Uso do app/ }).click();
   await expect(admin).toHaveURL(new RegExp(`/app/grupos/${grupo.id}/uso$`));
   await expect(admin.getByRole('heading', { level: 1, name: 'Uso do app' })).toBeVisible();

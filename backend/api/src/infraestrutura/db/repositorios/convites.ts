@@ -37,9 +37,21 @@ export type ResultadoCriarConvite =
   | { resultado: 'sem_vinculo' | 'ja_e_admin' };
 
 /** `convite_criar` (`1792843620000_conta-convites.sql:13`): convite de 7 dias; grava a auditoria. */
-async function criar(db: Db, grupoId: string, email: string, tokenHash: Uint8Array): Promise<ResultadoCriarConvite> {
-  const r = await sql<{ resultado: string; convite_id: string | null; expira_em: Date | null; enviar: boolean }>`
-    SELECT resultado, convite_id, expira_em, enviar FROM convite_criar(${grupoId}, ${email}, ${bytea(tokenHash)})`.execute(db);
+async function criar(
+  db: Db,
+  grupoId: string,
+  email: string,
+  tokenHash: Uint8Array,
+): Promise<ResultadoCriarConvite> {
+  const r = await sql<{
+    resultado: string;
+    convite_id: string | null;
+    expira_em: Date | null;
+    enviar: boolean;
+  }>`
+    SELECT resultado, convite_id, expira_em, enviar FROM convite_criar(${grupoId}, ${email}, ${bytea(tokenHash)})`.execute(
+    db,
+  );
   const linha = r.rows[0];
   if (!linha) throw new Error('convite_criar sem resultado');
   if (linha.resultado === 'ok') {
@@ -64,12 +76,13 @@ async function ler(db: Db, tokenHash: Uint8Array): Promise<ConviteLido | null> {
   const r = await sql<{ email: string; grupo_nome: string; conta_existe: boolean }>`
     SELECT email, grupo_nome, conta_existe FROM convite_ler(${bytea(tokenHash)})`.execute(db);
   const linha = r.rows[0];
-  return linha ? { email: linha.email, grupoNome: linha.grupo_nome, contaExiste: linha.conta_existe } : null;
+  return linha
+    ? { email: linha.email, grupoNome: linha.grupo_nome, contaExiste: linha.conta_existe }
+    : null;
 }
 
 export type ResultadoAceitar =
-  | { resultado: 'ok'; grupoId: string }
-  | { resultado: 'link_invalido' | 'convite_de_outro_email' };
+  { resultado: 'ok'; grupoId: string } | { resultado: 'link_invalido' | 'convite_de_outro_email' };
 
 /** `convite_aceitar` (`1792844460000_convites-grupo-arquivado.sql:25`), com a conta da sessão. */
 async function aceitar(db: Db, tokenHash: Uint8Array): Promise<ResultadoAceitar> {
@@ -77,7 +90,10 @@ async function aceitar(db: Db, tokenHash: Uint8Array): Promise<ResultadoAceitar>
     SELECT resultado, grupo_id FROM convite_aceitar(${bytea(tokenHash)})`.execute(db);
   const linha = r.rows[0];
   if (linha?.resultado === 'ok') return { resultado: 'ok', grupoId: linha.grupo_id ?? '' };
-  return { resultado: linha?.resultado === 'convite_de_outro_email' ? 'convite_de_outro_email' : 'link_invalido' };
+  return {
+    resultado:
+      linha?.resultado === 'convite_de_outro_email' ? 'convite_de_outro_email' : 'link_invalido',
+  };
 }
 
 export interface DadosCadastroConvite {
@@ -97,10 +113,15 @@ export type ResultadoCadastroConvite =
 async function cadastrar(db: Db, d: DadosCadastroConvite): Promise<ResultadoCadastroConvite> {
   const r = await sql<{ resultado: string; conta_id: string | null; grupo_id: string | null }>`
     SELECT resultado, conta_id, grupo_id
-      FROM convite_cadastrar(${bytea(d.tokenHash)}, ${d.nome}, ${d.senha}, ${d.termosVersao}, ${bytea(d.tokenSessaoHash)})`.execute(db);
+      FROM convite_cadastrar(${bytea(d.tokenHash)}, ${d.nome}, ${d.senha}, ${d.termosVersao}, ${bytea(d.tokenSessaoHash)})`.execute(
+    db,
+  );
   const linha = r.rows[0];
-  if (linha?.resultado === 'ok') return { resultado: 'ok', contaId: linha.conta_id ?? '', grupoId: linha.grupo_id ?? '' };
-  return { resultado: linha?.resultado === 'conta_existente' ? 'conta_existente' : 'link_invalido' };
+  if (linha?.resultado === 'ok')
+    return { resultado: 'ok', contaId: linha.conta_id ?? '', grupoId: linha.grupo_id ?? '' };
+  return {
+    resultado: linha?.resultado === 'conta_existente' ? 'conta_existente' : 'link_invalido',
+  };
 }
 
 /**
@@ -113,7 +134,11 @@ async function cancelar(db: Db, grupoId: string, id: string): Promise<boolean> {
      WHERE grupo_id = ${grupoId} AND id = ${id} AND usado_em IS NULL AND cancelado_em IS NULL
     RETURNING id`.execute(db);
   if (r.rows.length === 0) return false;
-  await registrar(db, grupoId, { acao: 'cancelar_convite', entidade: 'convite_admin', entidadeId: id });
+  await registrar(db, grupoId, {
+    acao: 'cancelar_convite',
+    entidade: 'convite_admin',
+    entidadeId: id,
+  });
   return true;
 }
 
@@ -141,7 +166,10 @@ export interface ListaAdmins {
 
 /** Admins (`admins_listar`, `1792843680000_conta-admins-listar.sql:8`) e convites pendentes do grupo (ACE-37). */
 async function listar(db: Db, grupoId: string): Promise<ListaAdmins> {
-  const admins = await sql<Admin>`SELECT id, nome, email, acessa_financeiro FROM admins_listar(${grupoId})`.execute(db);
+  const admins =
+    await sql<Admin>`SELECT id, nome, email, acessa_financeiro FROM admins_listar(${grupoId})`.execute(
+      db,
+    );
   const pendentes = await sql<ConvitePendente>`
     SELECT id, email, expira_em FROM convites_admin
      WHERE grupo_id = ${grupoId} AND usado_em IS NULL AND cancelado_em IS NULL AND expira_em > now()
@@ -174,8 +202,14 @@ async function remover(db: Db, grupoId: string, contaId: string): Promise<Result
   if (!g) return 'nao_encontrado';
   if (g.criadora === true && g.propria !== true) return 'criadora_nao_removivel';
   if (contas.length <= 1) return 'ultimo_admin';
-  await sql`DELETE FROM vinculos_admin WHERE grupo_id = ${grupoId} AND conta_id = ${contaId}`.execute(db);
-  await registrar(db, grupoId, { acao: 'remover_admin', entidade: 'vinculo_admin', entidadeId: contaId });
+  await sql`DELETE FROM vinculos_admin WHERE grupo_id = ${grupoId} AND conta_id = ${contaId}`.execute(
+    db,
+  );
+  await registrar(db, grupoId, {
+    acao: 'remover_admin',
+    entidade: 'vinculo_admin',
+    entidadeId: contaId,
+  });
   return 'ok';
 }
 

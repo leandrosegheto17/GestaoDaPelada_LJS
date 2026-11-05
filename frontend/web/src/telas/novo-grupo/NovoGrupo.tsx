@@ -4,7 +4,11 @@ import { useNavigate } from 'react-router';
 import { Botao } from '../../componentes/Botao.tsx';
 import { Campo } from '../../componentes/Campo.tsx';
 import { CampoHora } from '../../componentes/CampoHora.tsx';
-import { CampoSeletor, OPCOES_DIA_SEMANA, OPCOES_FREQUENCIA } from '../../componentes/CampoSeletor.tsx';
+import {
+  CampoSeletor,
+  OPCOES_DIA_SEMANA,
+  OPCOES_FREQUENCIA,
+} from '../../componentes/CampoSeletor.tsx';
 import { Faixa } from '../../componentes/Faixa.tsx';
 import { LinkVoltar } from '../../componentes/LinkVoltar.tsx';
 import { CascaConta } from '../../componentes/MenuConta.tsx';
@@ -118,7 +122,12 @@ export function CamposGrupo({
 export function NovoGrupo() {
   const navegar = useNavigate();
   const criar = useCriarGrupo();
-  const [dados, setDados] = useState<FormularioGrupo>({ nome: '', diaSemana: '', horario: '', frequencia: 'semanal' });
+  const [dados, setDados] = useState<FormularioGrupo>({
+    nome: '',
+    diaSemana: '',
+    horario: '',
+    frequencia: 'semanal',
+  });
   const [erros, setErros] = useState<ErrosGrupo>({});
   const [falha, setFalha] = useState<string | null>(null);
 
@@ -141,7 +150,8 @@ export function NovoGrupo() {
         onError: (erro) => {
           const porCampo = errosDoGrupo(erro);
           setErros(porCampo);
-          if (Object.keys(porCampo).length === 0) setFalha(erro instanceof ErroApi ? erro.message : MENSAGEM_REDE);
+          if (Object.keys(porCampo).length === 0)
+            setFalha(erro instanceof ErroApi ? erro.message : MENSAGEM_REDE);
         },
       },
     );
@@ -151,7 +161,12 @@ export function NovoGrupo() {
     <CascaConta estreita>
       <LinkVoltar para="/app">Seus grupos</LinkVoltar>
       <h1 className={estilos['titulo-pagina']}>Novo grupo</h1>
-      <form className={estilos.formulario} noValidate aria-busy={criar.isPending || undefined} onSubmit={enviar}>
+      <form
+        className={estilos.formulario}
+        noValidate
+        aria-busy={criar.isPending || undefined}
+        onSubmit={enviar}
+      >
         <ResumoErros erros={resumoDoGrupo(erros)} />
         {falha ? <Faixa tipo="erro">{falha}</Faixa> : null}
         <CamposGrupo dados={dados} erros={erros} mudar={mudar} />

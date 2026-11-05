@@ -54,8 +54,12 @@ async function semear(): Promise<void> {
 }
 
 async function restantes(): Promise<{ ranking: string[]; avisos: string[] }> {
-  const r = await aberto.db.query<{ endpoint: string }>('SELECT endpoint FROM push_ranking ORDER BY endpoint');
-  const a = await aberto.db.query<{ id_externo: string }>('SELECT id_externo FROM avisos_cobranca ORDER BY id_externo');
+  const r = await aberto.db.query<{ endpoint: string }>(
+    'SELECT endpoint FROM push_ranking ORDER BY endpoint',
+  );
+  const a = await aberto.db.query<{ id_externo: string }>(
+    'SELECT id_externo FROM avisos_cobranca ORDER BY id_externo',
+  );
   return {
     ranking: r.rows.map((l) => l.endpoint.replace('https://fcm.googleapis.com/fcm/send/t26-', '')),
     avisos: a.rows.map((l) => l.id_externo),
@@ -78,7 +82,10 @@ describe('limpeza diária', () => {
 
   it('NOT-56: rodar de novo no mesmo dia não apaga mais nada', async () => {
     await limparNotificacoes(env, { fabrica: fabricaComoApp().fabrica });
-    await expect(limparNotificacoes(env, { fabrica: fabricaComoApp().fabrica })).resolves.toEqual({ ranking: 0, avisos: 0 });
+    await expect(limparNotificacoes(env, { fabrica: fabricaComoApp().fabrica })).resolves.toEqual({
+      ranking: 0,
+      avisos: 0,
+    });
   });
 
   it('NOT-56, NOT-57: o handler scheduled do Worker faz a mesma limpeza', async () => {

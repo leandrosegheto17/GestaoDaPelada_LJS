@@ -1,7 +1,11 @@
 import type pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { comoApp, type Contexto } from './apoio.ts';
-import { abrirCenarioGrupos, type CenarioGrupos, type CenarioGruposAberto } from './cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  type CenarioGrupos,
+  type CenarioGruposAberto,
+} from './cenario-grupos.ts';
 
 /**
  * Matriz política × comando do financeiro, colunas UPDATE e DELETE, e as células de `vinculos_admin.acessa_financeiro`
@@ -44,7 +48,8 @@ const ALTERAR: Record<Tabela, string> = {
   pagamentos_mes: 'UPDATE pagamentos_mes SET lancamento_id = NULL',
 };
 
-const MOVER_PARA_H = (tabela: Tabela): string => `UPDATE ${tabela} SET grupo_id = $1 WHERE grupo_id = $2`;
+const MOVER_PARA_H = (tabela: Tabela): string =>
+  `UPDATE ${tabela} SET grupo_id = $1 WHERE grupo_id = $2`;
 
 /** Conteúdo de G nas 3 tabelas, como texto JSON ordenado. Exige superusuário. */
 async function foto(db: pg.Client, grupo: string): Promise<Record<Tabela, string>> {
@@ -80,7 +85,9 @@ function semEfeito(t: Tentativa): void {
   expect(t.linhas === 0 || t.codigo === '42501', `resultado ${JSON.stringify(t)}`).toBe(true);
 }
 
-const CELULAS = TABELAS.flatMap((tabela) => (['X', 'P', 'N'] as const).map((ator) => [tabela, ator] as const));
+const CELULAS = TABELAS.flatMap((tabela) =>
+  (['X', 'P', 'N'] as const).map((ator) => [tabela, ator] as const),
+);
 
 describe('FIN-40: UPDATE das 3 tabelas', () => {
   it.each(CELULAS)('FIN-40: %s × %s: UPDATE sem WHERE não afeta G', async (tabela, ator) => {
@@ -90,34 +97,57 @@ describe('FIN-40: UPDATE das 3 tabelas', () => {
     expect(await foto(db, cenario.grupoG)).toEqual(antes);
   });
 
-  it.each(CELULAS)('FIN-40: %s × %s: UPDATE com WHERE grupo_id = G não afeta G', async (tabela, ator) => {
-    const { db, cenario } = aberto;
-    const antes = await foto(db, cenario.grupoG);
-    semEfeito(await tentar(contexto(ator, cenario), `${ALTERAR[tabela]} WHERE grupo_id = $1`, [cenario.grupoG]));
-    expect(await foto(db, cenario.grupoG)).toEqual(antes);
-  });
+  it.each(CELULAS)(
+    'FIN-40: %s × %s: UPDATE com WHERE grupo_id = G não afeta G',
+    async (tabela, ator) => {
+      const { db, cenario } = aberto;
+      const antes = await foto(db, cenario.grupoG);
+      semEfeito(
+        await tentar(contexto(ator, cenario), `${ALTERAR[tabela]} WHERE grupo_id = $1`, [
+          cenario.grupoG,
+        ]),
+      );
+      expect(await foto(db, cenario.grupoG)).toEqual(antes);
+    },
+  );
 
-  it.each(CELULAS)('FIN-40: %s × %s: mover a linha de G para H não afeta G', async (tabela, ator) => {
-    const { db, cenario } = aberto;
-    const antes = await foto(db, cenario.grupoG);
-    semEfeito(await tentar(contexto(ator, cenario), MOVER_PARA_H(tabela), [cenario.grupoH, cenario.grupoG]));
-    expect(await foto(db, cenario.grupoG)).toEqual(antes);
-  });
+  it.each(CELULAS)(
+    'FIN-40: %s × %s: mover a linha de G para H não afeta G',
+    async (tabela, ator) => {
+      const { db, cenario } = aberto;
+      const antes = await foto(db, cenario.grupoG);
+      semEfeito(
+        await tentar(contexto(ator, cenario), MOVER_PARA_H(tabela), [
+          cenario.grupoH,
+          cenario.grupoG,
+        ]),
+      );
+      expect(await foto(db, cenario.grupoG)).toEqual(antes);
+    },
+  );
 
   it.each(TABELAS)('FIN-40: %s × C (controle): a criadora com acesso altera G', async (tabela) => {
     const { contaC } = aberto.cenario;
-    const t = await tentar({ conta: contaC }, `${ALTERAR[tabela]} WHERE grupo_id = $1`, [aberto.cenario.grupoG]);
+    const t = await tentar({ conta: contaC }, `${ALTERAR[tabela]} WHERE grupo_id = $1`, [
+      aberto.cenario.grupoG,
+    ]);
     expect(t).toEqual({ linhas: expect.any(Number) as number, codigo: null });
     expect(t.linhas).toBeGreaterThan(0);
   });
 
-  it.each(TABELAS)('FIN-40: %s × C: a criadora com acesso não move a linha de G para H (WITH CHECK)', async (tabela) => {
-    const { db, cenario } = aberto;
-    const antes = await foto(db, cenario.grupoG);
-    const t = await tentar({ conta: cenario.contaC }, MOVER_PARA_H(tabela), [cenario.grupoH, cenario.grupoG]);
-    expect(t.codigo).toBe('42501');
-    expect(await foto(db, cenario.grupoG)).toEqual(antes);
-  });
+  it.each(TABELAS)(
+    'FIN-40: %s × C: a criadora com acesso não move a linha de G para H (WITH CHECK)',
+    async (tabela) => {
+      const { db, cenario } = aberto;
+      const antes = await foto(db, cenario.grupoG);
+      const t = await tentar({ conta: cenario.contaC }, MOVER_PARA_H(tabela), [
+        cenario.grupoH,
+        cenario.grupoG,
+      ]);
+      expect(t.codigo).toBe('42501');
+      expect(await foto(db, cenario.grupoG)).toEqual(antes);
+    },
+  );
 });
 
 describe('FIN-40: DELETE das 3 tabelas', () => {
@@ -128,19 +158,30 @@ describe('FIN-40: DELETE das 3 tabelas', () => {
     expect(await foto(db, cenario.grupoG)).toEqual(antes);
   });
 
-  it.each(CELULAS)('FIN-40: %s × %s: DELETE com WHERE grupo_id = G não afeta G', async (tabela, ator) => {
-    const { db, cenario } = aberto;
-    const antes = await foto(db, cenario.grupoG);
-    semEfeito(await tentar(contexto(ator, cenario), `DELETE FROM ${tabela} WHERE grupo_id = $1`, [cenario.grupoG]));
-    expect(await foto(db, cenario.grupoG)).toEqual(antes);
-  });
+  it.each(CELULAS)(
+    'FIN-40: %s × %s: DELETE com WHERE grupo_id = G não afeta G',
+    async (tabela, ator) => {
+      const { db, cenario } = aberto;
+      const antes = await foto(db, cenario.grupoG);
+      semEfeito(
+        await tentar(contexto(ator, cenario), `DELETE FROM ${tabela} WHERE grupo_id = $1`, [
+          cenario.grupoG,
+        ]),
+      );
+      expect(await foto(db, cenario.grupoG)).toEqual(antes);
+    },
+  );
 
   it('FIN-40: C (controle) apaga pagamentos, lançamentos e configuração de G, nessa ordem (a FK protege o vinculado)', async () => {
     const { db, cenario } = aberto;
     const contagens = await comoApp(db, { conta: cenario.contaC }, async (d) => {
       const apagar = async (tabela: Tabela) =>
         (await d.query(`DELETE FROM ${tabela} WHERE grupo_id = $1`, [cenario.grupoG])).rowCount;
-      return [await apagar('pagamentos_mes'), await apagar('lancamentos'), await apagar('config_financeira')];
+      return [
+        await apagar('pagamentos_mes'),
+        await apagar('lancamentos'),
+        await apagar('config_financeira'),
+      ];
     });
     expect(contagens.every((n) => (n ?? 0) > 0)).toBe(true);
   });
@@ -151,7 +192,9 @@ describe('FIN-41: células de vinculos_admin.acessa_financeiro', () => {
     const { db, cenario } = aberto;
     for (const conta of [cenario.contaC, cenario.contaO]) {
       const n = await comoApp(db, { conta }, async (d) => {
-        const r = await d.query('SELECT 1 FROM vinculos_admin WHERE grupo_id = $1', [cenario.grupoG]);
+        const r = await d.query('SELECT 1 FROM vinculos_admin WHERE grupo_id = $1', [
+          cenario.grupoG,
+        ]);
         return r.rowCount;
       });
       expect(n).toBe(2);
@@ -163,23 +206,37 @@ describe('FIN-41: células de vinculos_admin.acessa_financeiro', () => {
     const sql = `INSERT INTO vinculos_admin (conta_id, grupo_id, acessa_financeiro, criado_por, criado_em)
                  VALUES ($1, $2, true, $3, now())`;
     expect((await tentar({ conta: contaO }, sql, [contaB, grupoG, contaO])).codigo).toBe('42501');
-    expect(await tentar({ conta: contaC }, sql, [contaB, grupoG, contaC])).toEqual({ linhas: 1, codigo: null });
+    expect(await tentar({ conta: contaC }, sql, [contaB, grupoG, contaC])).toEqual({
+      linhas: 1,
+      codigo: null,
+    });
   });
 
   it('FIN-41: UPDATE: N altera outro admin (zero linhas); C altera a própria (zero linhas); C altera outro (aceito)', async () => {
     const { contaC, contaO, grupoG } = aberto.cenario;
-    const sql = 'UPDATE vinculos_admin SET acessa_financeiro = $3 WHERE conta_id = $1 AND grupo_id = $2';
-    expect(await tentar({ conta: contaO }, sql, [contaC, grupoG, false])).toEqual({ linhas: 0, codigo: null });
-    expect(await tentar({ conta: contaC }, sql, [contaC, grupoG, false])).toEqual({ linhas: 0, codigo: null });
-    expect(await tentar({ conta: contaC }, sql, [contaO, grupoG, true])).toEqual({ linhas: 1, codigo: null });
+    const sql =
+      'UPDATE vinculos_admin SET acessa_financeiro = $3 WHERE conta_id = $1 AND grupo_id = $2';
+    expect(await tentar({ conta: contaO }, sql, [contaC, grupoG, false])).toEqual({
+      linhas: 0,
+      codigo: null,
+    });
+    expect(await tentar({ conta: contaC }, sql, [contaC, grupoG, false])).toEqual({
+      linhas: 0,
+      codigo: null,
+    });
+    expect(await tentar({ conta: contaC }, sql, [contaO, grupoG, true])).toEqual({
+      linhas: 1,
+      codigo: null,
+    });
   });
 
   it('FIN-41: DELETE inalterado: a criadora remove o vínculo de outro admin (remoção de admin da CA)', async () => {
     const { contaC, contaO, grupoG } = aberto.cenario;
-    const t = await tentar({ conta: contaC }, 'DELETE FROM vinculos_admin WHERE conta_id = $1 AND grupo_id = $2', [
-      contaO,
-      grupoG,
-    ]);
+    const t = await tentar(
+      { conta: contaC },
+      'DELETE FROM vinculos_admin WHERE conta_id = $1 AND grupo_id = $2',
+      [contaO, grupoG],
+    );
     expect(t).toEqual({ linhas: 1, codigo: null });
   });
 });

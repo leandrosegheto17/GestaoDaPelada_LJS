@@ -56,12 +56,20 @@ export interface OpcoesComBanco {
  */
 function reportarFalhaPadrao(): void {
   void import('@sentry/cloudflare')
-    .then((Sentry) => Sentry.captureMessage('apos_commit_erro', { level: 'error', tags: { motivo: 'tarefa_falhou' } }))
+    .then((Sentry) =>
+      Sentry.captureMessage('apos_commit_erro', {
+        level: 'error',
+        tags: { motivo: 'tarefa_falhou' },
+      }),
+    )
     .catch(() => undefined);
 }
 
 /** Roda as tarefas em ordem; a que lança é reportada e as outras seguem. Nunca rejeita. */
-async function rodarTarefas(tarefas: ReadonlyArray<() => unknown>, reportar: () => void): Promise<void> {
+async function rodarTarefas(
+  tarefas: ReadonlyArray<() => unknown>,
+  reportar: () => void,
+): Promise<void> {
   for (const tarefa of tarefas) {
     try {
       await tarefa();
@@ -76,7 +84,11 @@ async function rodarTarefas(tarefas: ReadonlyArray<() => unknown>, reportar: () 
 }
 
 /** Agenda as tarefas para depois da resposta (`waitUntil`); sem contexto de execução, só dispara. */
-function agendarTarefas(c: Context, tarefas: ReadonlyArray<() => unknown>, reportar: () => void): void {
+function agendarTarefas(
+  c: Context,
+  tarefas: ReadonlyArray<() => unknown>,
+  reportar: () => void,
+): void {
   if (tarefas.length === 0) return;
   const andamento = rodarTarefas(tarefas, reportar);
   let ctx: { waitUntil(p: Promise<unknown>): void } | undefined;

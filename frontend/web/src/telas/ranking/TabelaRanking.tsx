@@ -112,9 +112,22 @@ export interface PropsTabelaRanking {
 
 export const TEXTO_MES_SEM_PARTIDAS = 'Nenhuma partida registrada neste mês';
 
-function TabelaMesSemPartidas({ linhas, legenda, nomeMes }: { linhas: readonly LinhaPublica[]; legenda: string; nomeMes: string }) {
+function TabelaMesSemPartidas({
+  linhas,
+  legenda,
+  nomeMes,
+}: {
+  linhas: readonly LinhaPublica[];
+  legenda: string;
+  nomeMes: string;
+}) {
   return (
-    <div className={estilos['tabela-rolagem']} role="region" aria-label="Tabela do ranking" tabIndex={0}>
+    <div
+      className={estilos['tabela-rolagem']}
+      role="region"
+      aria-label="Tabela do ranking"
+      tabIndex={0}
+    >
       <table className={estilos.ranking}>
         <caption className="sr">{legenda}</caption>
         <thead>
@@ -141,7 +154,9 @@ function TabelaMesSemPartidas({ linhas, legenda, nomeMes }: { linhas: readonly L
               <th scope="row" className={estilos['c-nome']}>
                 {linha.apelido}
               </th>
-              <td className={`${estilos['c-pts']} ${estilos['c-pts--inicial']}`}>{linha.ptsInicial}</td>
+              <td className={`${estilos['c-pts']} ${estilos['c-pts--inicial']}`}>
+                {linha.ptsInicial}
+              </td>
               {i === 0 ? (
                 <td className={estilos['ranking__sem-partidas']} rowSpan={linhas.length}>
                   {TEXTO_MES_SEM_PARTIDAS}
@@ -199,7 +214,9 @@ export function TabelaRanking({ partidas, linhas, legenda, nomeMes }: PropsTabel
               <th scope="row" className={estilos['c-nome']}>
                 {linha.apelido}
               </th>
-              <td className={`${estilos['c-pts']} ${estilos['c-pts--inicial']}`}>{linha.ptsInicial}</td>
+              <td className={`${estilos['c-pts']} ${estilos['c-pts--inicial']}`}>
+                {linha.ptsInicial}
+              </td>
               {linha.rodadas.map((rodada, i) => (
                 <td key={partidas[i]?.data ?? i} className={estilos['c-partida']}>
                   <Marca

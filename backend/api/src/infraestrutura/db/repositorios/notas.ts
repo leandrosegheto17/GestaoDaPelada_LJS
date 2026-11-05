@@ -12,7 +12,8 @@ import type { Db } from './tipos.ts';
  * do design (`GSEG:120`).
  */
 
-export type ResultadoSalvarNota = { resultado: 'ok'; nivel: Nivel } | { resultado: 'nao_encontrado' };
+export type ResultadoSalvarNota =
+  { resultado: 'ok'; nivel: Nivel } | { resultado: 'nao_encontrado' };
 
 async function salvar(
   db: Db,
@@ -23,14 +24,18 @@ async function salvar(
 ): Promise<ResultadoSalvarNota> {
   const donos = await sql<{ jogador: boolean; habilidade: boolean }>`
     SELECT EXISTS (SELECT 1 FROM jogadores WHERE grupo_id = ${grupoId} AND id = ${jogadorId}) AS jogador,
-           EXISTS (SELECT 1 FROM habilidades WHERE grupo_id = ${grupoId} AND id = ${habilidadeId}) AS habilidade`.execute(db);
+           EXISTS (SELECT 1 FROM habilidades WHERE grupo_id = ${grupoId} AND id = ${habilidadeId}) AS habilidade`.execute(
+    db,
+  );
   const d = donos.rows[0];
   if (!d?.jogador || !d.habilidade) return { resultado: 'nao_encontrado' };
 
   if (nota === null) {
     await sql`
       DELETE FROM notas
-       WHERE grupo_id = ${grupoId} AND jogador_id = ${jogadorId} AND habilidade_id = ${habilidadeId}`.execute(db);
+       WHERE grupo_id = ${grupoId} AND jogador_id = ${jogadorId} AND habilidade_id = ${habilidadeId}`.execute(
+      db,
+    );
   } else {
     await sql`
       INSERT INTO notas (jogador_id, habilidade_id, grupo_id, valor)

@@ -17,9 +17,10 @@ let jogadorDeH: string;
 
 beforeAll(async () => {
   aberto = await abrirCenarioGrupos();
-  const r = await aberto.db.query<{ id: string }>('SELECT id FROM jogadores WHERE grupo_id = $1 LIMIT 1', [
-    aberto.cenario.grupoH,
-  ]);
+  const r = await aberto.db.query<{ id: string }>(
+    'SELECT id FROM jogadores WHERE grupo_id = $1 LIMIT 1',
+    [aberto.cenario.grupoH],
+  );
   jogadorDeH = r.rows[0]?.id ?? '';
 });
 
@@ -49,13 +50,19 @@ describe('jogadores.travarVarios', () => {
     const { cenario } = aberto;
     const a = cenario.idsG.jogadorAtivo;
     const b = cenario.idsG.jogadorHistorico;
-    const ids = await comDb(aberto.url, cenario.contaC, (db) => jogadores.travarVarios(db, cenario.grupoG, [b, a, b]));
+    const ids = await comDb(aberto.url, cenario.contaC, (db) =>
+      jogadores.travarVarios(db, cenario.grupoG, [b, a, b]),
+    );
     expect(ids).toEqual([a, b].sort());
   });
 
   it('PAR-29: lista vazia não trava nada', async () => {
     const { cenario } = aberto;
-    expect(await comDb(aberto.url, cenario.contaC, (db) => jogadores.travarVarios(db, cenario.grupoG, []))).toEqual([]);
+    expect(
+      await comDb(aberto.url, cenario.contaC, (db) =>
+        jogadores.travarVarios(db, cenario.grupoG, []),
+      ),
+    ).toEqual([]);
   });
 
   it('PAR-29: enquanto a transação está aberta, a linha fica travada; depois, livre', async () => {
@@ -75,7 +82,10 @@ describe('jogadores.travarVarios', () => {
     expect(jogadorDeH, 'o cenário precisa de jogador em H').toBeTruthy();
     let livreDurante: boolean | undefined;
     const ids = await comDb(aberto.url, cenario.contaC, async (db) => {
-      const r = await jogadores.travarVarios(db, cenario.grupoG, [jogadorDeH, cenario.idsG.jogadorAtivo]);
+      const r = await jogadores.travarVarios(db, cenario.grupoG, [
+        jogadorDeH,
+        cenario.idsG.jogadorAtivo,
+      ]);
       livreDurante = await livre(jogadorDeH);
       return r;
     });
@@ -130,7 +140,9 @@ describe('jogadores.ativosNaData', () => {
 
   it('PAR-27: em 2026-01-08, Bira e Toninho, em ordem de apelido', async () => {
     const { cenario } = aberto;
-    const r = await comDb(aberto.url, cenario.contaC, (db) => jogadores.ativosNaData(db, cenario.grupoG, '2026-01-08'));
+    const r = await comDb(aberto.url, cenario.contaC, (db) =>
+      jogadores.ativosNaData(db, cenario.grupoG, '2026-01-08'),
+    );
     expect(r).toEqual([
       { id: cenario.idsG.jogadorHistorico, apelido: 'Bira' },
       { id: cenario.idsG.jogadorAtivo, apelido: 'Toninho' },
@@ -139,9 +151,11 @@ describe('jogadores.ativosNaData', () => {
 
   it('PAR-27: a conta de outro grupo não vê os ativos de G', async () => {
     const { cenario } = aberto;
-    expect(await comDb(aberto.url, cenario.contaB, (db) => jogadores.ativosNaData(db, cenario.grupoG, '2026-01-08'))).toEqual(
-      [],
-    );
+    expect(
+      await comDb(aberto.url, cenario.contaB, (db) =>
+        jogadores.ativosNaData(db, cenario.grupoG, '2026-01-08'),
+      ),
+    ).toEqual([]);
   });
 });
 
@@ -165,7 +179,9 @@ describe('jogadores.lerParaPrevia', () => {
     try {
       await db.query('SELECT id FROM jogadores WHERE id = $1 FOR UPDATE', [id]);
       const lido = await Promise.race([
-        comDb(aberto.url, cenario.contaC, (d) => jogadores.lerParaPrevia(d, cenario.grupoG, id)).then(() => 'leu'),
+        comDb(aberto.url, cenario.contaC, (d) =>
+          jogadores.lerParaPrevia(d, cenario.grupoG, id),
+        ).then(() => 'leu'),
         espera(2000).then(() => 'esperou'),
       ]);
       expect(lido).toBe('leu');
@@ -177,7 +193,9 @@ describe('jogadores.lerParaPrevia', () => {
   it('PAR-27: jogador de outro grupo devolve nulo', async () => {
     const { cenario } = aberto;
     expect(
-      await comDb(aberto.url, cenario.contaC, (db) => jogadores.lerParaPrevia(db, cenario.grupoG, jogadorDeH)),
+      await comDb(aberto.url, cenario.contaC, (db) =>
+        jogadores.lerParaPrevia(db, cenario.grupoG, jogadorDeH),
+      ),
     ).toBeNull();
   });
 });

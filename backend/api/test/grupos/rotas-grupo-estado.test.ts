@@ -4,7 +4,13 @@ import { MENSAGEM_NOME_CONFIRMACAO } from '@pelada/contrato';
 import { MENSAGEM_NOME_NAO_CONFERE } from '../../src/entrada/rotas/grupo-estado.ts';
 import { gerarToken } from '../../src/infraestrutura/sessao/token.ts';
 import { cliente } from '../acesso/apoio.ts';
-import { abrirCenarioGrupos, arquivar, NOME_G, reativar, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  arquivar,
+  NOME_G,
+  reativar,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * `POST /api/grupos/:grupoId/arquivar` e `…/reativar` (T30; GEL-22 a GEL-24, GEL-28, GEL-29), com o app real como
@@ -24,9 +30,10 @@ async function sessao(conta: string): Promise<string> {
 }
 
 async function arquivadoEm(): Promise<Date | null> {
-  const r = await aberto.db.query<{ arquivado_em: Date | null }>('SELECT arquivado_em FROM grupos WHERE id = $1', [
-    aberto.cenario.grupoG,
-  ]);
+  const r = await aberto.db.query<{ arquivado_em: Date | null }>(
+    'SELECT arquivado_em FROM grupos WHERE id = $1',
+    [aberto.cenario.grupoG],
+  );
   return r.rows[0]?.arquivado_em ?? null;
 }
 
@@ -46,7 +53,10 @@ function arquivarComo(token: string, nomeConfirmacao: unknown) {
 }
 
 function reativarComo(token: string) {
-  return cliente(aberto.url)(`/grupos/${aberto.cenario.grupoG}/reativar`, { metodo: 'POST', sessao: token });
+  return cliente(aberto.url)(`/grupos/${aberto.cenario.grupoG}/reativar`, {
+    metodo: 'POST',
+    sessao: token,
+  });
 }
 
 beforeAll(async () => {
@@ -81,7 +91,11 @@ describe('POST /api/grupos/:grupoId/arquivar', () => {
       const antes = (await eventos('grupo_arquivado')).length;
       const r = await arquivarComo(await sessao(cenario.contaC), nome);
       expect(r.status).toBe(422);
-      const erro = (await r.json()) as { codigo: string; campos: string[]; mensagens: Record<string, string> };
+      const erro = (await r.json()) as {
+        codigo: string;
+        campos: string[];
+        mensagens: Record<string, string>;
+      };
       expect(erro.codigo).toBe('dados_invalidos');
       expect(erro.campos).toEqual(['nomeConfirmacao']);
       expect(erro.mensagens.nomeConfirmacao).toBe(MENSAGEM_NOME_NAO_CONFERE);
@@ -135,7 +149,13 @@ describe('POST /api/grupos/:grupoId/reativar', () => {
     const antes = (await eventos('grupo_reativado')).length;
     const r = await reativarComo(await sessao(cenario.contaC));
     expect(r.status).toBe(200);
-    expect(await r.json()).toMatchObject({ id: cenario.grupoG, slug: cenario.slugG, jogadoresAtivos: 2, habilidades: 6, admins: 2 });
+    expect(await r.json()).toMatchObject({
+      id: cenario.grupoG,
+      slug: cenario.slugG,
+      jogadoresAtivos: 2,
+      habilidades: 6,
+      admins: 2,
+    });
     expect(await arquivadoEm()).toBeNull();
     const depois = await eventos('grupo_reativado');
     expect(depois).toHaveLength(antes + 1);

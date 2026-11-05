@@ -57,9 +57,13 @@ describe('tipos da partidas-e-ranking (PAR-62)', () => {
       async (url) => {
         const linhas = await catalogo(url);
         for (const tabela of DA_FEATURE) {
-          const doBanco = new Map(linhas.filter((l) => l.tabela === tabela).map((l) => [l.coluna, l.tipo]));
+          const doBanco = new Map(
+            linhas.filter((l) => l.tabela === tabela).map((l) => [l.coluna, l.tipo]),
+          );
           expect(doBanco.size, `${tabela} existe no banco`).toBeGreaterThan(0);
-          expect(Object.keys(COLUNAS_TIPADAS[tabela]).sort(), tabela).toEqual([...doBanco.keys()].sort());
+          expect(Object.keys(COLUNAS_TIPADAS[tabela]).sort(), tabela).toEqual(
+            [...doBanco.keys()].sort(),
+          );
           for (const [coluna, tipo] of Object.entries(COLUNAS_TIPADAS[tabela])) {
             expect(doBanco.get(coluna), `${tabela}.${coluna}`).toBe(tipo);
           }
@@ -74,7 +78,10 @@ describe('tipos da partidas-e-ranking (PAR-62)', () => {
       async (url) => {
         const linhas = await catalogo(url);
         for (const tabela of DA_FEATURE) {
-          const doBanco = linhas.filter((l) => l.tabela === tabela && l.anulavel).map((l) => l.coluna).sort();
+          const doBanco = linhas
+            .filter((l) => l.tabela === tabela && l.anulavel)
+            .map((l) => l.coluna)
+            .sort();
           expect([...(COLUNAS_ANULAVEIS[tabela] ?? [])].sort(), tabela).toEqual(doBanco);
         }
       },
@@ -93,7 +100,9 @@ describe('tipos da partidas-e-ranking (PAR-62)', () => {
     expectTypeOf<Updateable<TabelaPartidas>>().not.toHaveProperty('data');
     expectTypeOf<Updateable<TabelaPartidas>>().not.toHaveProperty('grupo_id');
 
-    expectTypeOf<Insertable<TabelaPresencas>['situacao']>().toEqualTypeOf<'presente' | 'lesionado' | 'expulso'>();
+    expectTypeOf<Insertable<TabelaPresencas>['situacao']>().toEqualTypeOf<
+      'presente' | 'lesionado' | 'expulso'
+    >();
 
     expectTypeOf<Selectable<TabelaConfigPesos>['expulso']>().toEqualTypeOf<number>();
     expectTypeOf<Updateable<TabelaConfigPesos>>().toHaveProperty('expulso_com_chuva');

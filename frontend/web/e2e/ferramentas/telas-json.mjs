@@ -19,9 +19,12 @@ export function mockupsAusentes(mapa, pastaDoMapa, existe = existsSync) {
   for (const [lista, valor] of Object.entries(mapa)) {
     if (!Array.isArray(valor)) continue;
     for (const entrada of valor) {
-      if (typeof entrada !== 'object' || entrada === null || typeof entrada.mockup !== 'string') continue;
+      if (typeof entrada !== 'object' || entrada === null || typeof entrada.mockup !== 'string')
+        continue;
       if (!existe(resolve(pastaDoMapa, entrada.mockup))) {
-        ausentes.push(`${lista}: ${entrada.id ?? '?'} ${entrada.estado ?? '?'} → ${entrada.mockup}`);
+        ausentes.push(
+          `${lista}: ${entrada.id ?? '?'} ${entrada.estado ?? '?'} → ${entrada.mockup}`,
+        );
       }
     }
   }

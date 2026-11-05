@@ -18,10 +18,16 @@ const MENSAGEM: Mensagem = {
   html: `<a href="https://app.test/entrar/nova-senha#t=${TOKEN}">Criar senha</a>`,
   idempotencia: 'recuperacao-123',
 };
-const CONFIG = { RESEND_API_KEY: 're_chave_de_teste', RESEND_REMETENTE: 'Pelada <nao-responda@exemplo.com>' };
+const CONFIG = {
+  RESEND_API_KEY: 're_chave_de_teste',
+  RESEND_REMETENTE: 'Pelada <nao-responda@exemplo.com>',
+};
 
 function resposta(status: number, corpo: unknown = {}): Response {
-  return new Response(JSON.stringify(corpo), { status, headers: { 'content-type': 'application/json' } });
+  return new Response(JSON.stringify(corpo), {
+    status,
+    headers: { 'content-type': 'application/json' },
+  });
 }
 
 function comLog() {
@@ -32,7 +38,13 @@ function comLog() {
 /** Nada do que é pessoal ou secreto aparece no log. */
 function esperaLogLimpo(linhas: Array<Record<string, string | number>>): void {
   const texto = JSON.stringify(linhas);
-  for (const proibido of [MENSAGEM.para, MENSAGEM.assunto, TOKEN, 'nova-senha', CONFIG.RESEND_API_KEY]) {
+  for (const proibido of [
+    MENSAGEM.para,
+    MENSAGEM.assunto,
+    TOKEN,
+    'nova-senha',
+    CONFIG.RESEND_API_KEY,
+  ]) {
     expect(texto).not.toContain(proibido);
   }
 }
@@ -68,8 +80,12 @@ describe('remetenteResend', () => {
     [422, 'invalid_parameter'],
   ])('ACE-52: status %i vira falhou e o log tem só o status e o código', async (status, codigo) => {
     const log = comLog();
-    const buscar = vi.fn(async () => resposta(status, { name: codigo, message: `falhou para ${MENSAGEM.para}` }));
-    expect(await remetenteResend(CONFIG, { fetch: buscar, registrar: log.registrar }).enviar(MENSAGEM)).toBe('falhou');
+    const buscar = vi.fn(async () =>
+      resposta(status, { name: codigo, message: `falhou para ${MENSAGEM.para}` }),
+    );
+    expect(
+      await remetenteResend(CONFIG, { fetch: buscar, registrar: log.registrar }).enviar(MENSAGEM),
+    ).toBe('falhou');
     expect(log.linhas).toEqual([{ evento: 'email_falhou', tipo: 'recuperacao', status, codigo }]);
     esperaLogLimpo(log.linhas);
   });
@@ -78,7 +94,9 @@ describe('remetenteResend', () => {
     const log = comLog();
     const buscar = vi.fn(async () => new Response('<html>erro</html>', { status: 502 }));
     await remetenteResend(CONFIG, { fetch: buscar, registrar: log.registrar }).enviar(MENSAGEM);
-    expect(log.linhas).toEqual([{ evento: 'email_falhou', tipo: 'recuperacao', status: 502, codigo: 'desconhecido' }]);
+    expect(log.linhas).toEqual([
+      { evento: 'email_falhou', tipo: 'recuperacao', status: 502, codigo: 'desconhecido' },
+    ]);
   });
 
   it('ACE-52: rede caída (fetch lança) vira falhou', async () => {
@@ -86,8 +104,12 @@ describe('remetenteResend', () => {
     const buscar = vi.fn(async () => {
       throw new TypeError(`falha de rede ao enviar para ${MENSAGEM.para}`);
     });
-    expect(await remetenteResend(CONFIG, { fetch: buscar, registrar: log.registrar }).enviar(MENSAGEM)).toBe('falhou');
-    expect(log.linhas).toEqual([{ evento: 'email_falhou', tipo: 'recuperacao', status: 0, codigo: 'rede' }]);
+    expect(
+      await remetenteResend(CONFIG, { fetch: buscar, registrar: log.registrar }).enviar(MENSAGEM),
+    ).toBe('falhou');
+    expect(log.linhas).toEqual([
+      { evento: 'email_falhou', tipo: 'recuperacao', status: 0, codigo: 'rede' },
+    ]);
     esperaLogLimpo(log.linhas);
   });
 
@@ -99,23 +121,34 @@ describe('remetenteResend', () => {
       (_url: string, init: RequestInit) =>
         new Promise<Response>((_resolver, rejeitar) => {
           sinal = init.signal ?? undefined;
-          init.signal?.addEventListener('abort', () => rejeitar(new DOMException('abortado', 'AbortError')));
+          init.signal?.addEventListener('abort', () =>
+            rejeitar(new DOMException('abortado', 'AbortError')),
+          );
         }),
     );
-    const envio = remetenteResend(CONFIG, { fetch: buscar as unknown as typeof fetch, registrar: log.registrar }).enviar(MENSAGEM);
+    const envio = remetenteResend(CONFIG, {
+      fetch: buscar as unknown as typeof fetch,
+      registrar: log.registrar,
+    }).enviar(MENSAGEM);
     await vi.advanceTimersByTimeAsync(TEMPO_LIMITE_MS - 1);
     expect(sinal?.aborted).toBe(false);
     await vi.advanceTimersByTimeAsync(1);
     expect(await envio).toBe('falhou');
     expect(sinal?.aborted).toBe(true);
-    expect(log.linhas).toEqual([{ evento: 'email_falhou', tipo: 'recuperacao', status: 0, codigo: 'tempo_esgotado' }]);
+    expect(log.linhas).toEqual([
+      { evento: 'email_falhou', tipo: 'recuperacao', status: 0, codigo: 'tempo_esgotado' },
+    ]);
     expect(TEMPO_LIMITE_MS).toBe(10_000);
   });
 
   it('ACE-75: resposta em 9,9 s ainda vale', async () => {
     vi.useFakeTimers();
-    const buscar = vi.fn(() => new Promise<Response>((resolver) => setTimeout(() => resolver(resposta(200)), 9_900)));
-    const envio = remetenteResend(CONFIG, { fetch: buscar as unknown as typeof fetch }).enviar(MENSAGEM);
+    const buscar = vi.fn(
+      () => new Promise<Response>((resolver) => setTimeout(() => resolver(resposta(200)), 9_900)),
+    );
+    const envio = remetenteResend(CONFIG, { fetch: buscar as unknown as typeof fetch }).enviar(
+      MENSAGEM,
+    );
     await vi.advanceTimersByTimeAsync(9_900);
     expect(await envio).toBe('enviado');
   });
@@ -123,9 +156,10 @@ describe('remetenteResend', () => {
   it('ACE-52: sem RESEND_API_KEY, falha sem chamar a rede', async () => {
     const buscar = vi.fn(async () => resposta(200));
     const log = comLog();
-    const r = await remetenteResend({ RESEND_REMETENTE: CONFIG.RESEND_REMETENTE }, { fetch: buscar, registrar: log.registrar }).enviar(
-      MENSAGEM,
-    );
+    const r = await remetenteResend(
+      { RESEND_REMETENTE: CONFIG.RESEND_REMETENTE },
+      { fetch: buscar, registrar: log.registrar },
+    ).enviar(MENSAGEM);
     expect(r).toBe('falhou');
     expect(buscar).not.toHaveBeenCalled();
     expect(log.linhas[0]).toMatchObject({ codigo: 'sem_configuracao' });
@@ -133,7 +167,10 @@ describe('remetenteResend', () => {
 
   it('ACE-21: o sucesso não gera log nenhum', async () => {
     const log = comLog();
-    await remetenteResend(CONFIG, { fetch: vi.fn(async () => resposta(200)), registrar: log.registrar }).enviar(MENSAGEM);
+    await remetenteResend(CONFIG, {
+      fetch: vi.fn(async () => resposta(200)),
+      registrar: log.registrar,
+    }).enviar(MENSAGEM);
     expect(log.linhas).toEqual([]);
   });
 });

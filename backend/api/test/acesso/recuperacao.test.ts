@@ -1,7 +1,14 @@
 import { MENSAGENS } from '@pelada/contrato';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { abrirCenarioConta, type CenarioContaAberto } from '../isolamento/cenario-conta.ts';
-import { cliente, emailsPara, limparCaixa, tokenDoCookie, tokenDoEmail, URL_PUBLICA_TESTE } from './apoio.ts';
+import {
+  cliente,
+  emailsPara,
+  limparCaixa,
+  tokenDoCookie,
+  tokenDoEmail,
+  URL_PUBLICA_TESTE,
+} from './apoio.ts';
 
 /**
  * Rotas de recuperação de senha (T27; ACE-22 a ACE-25, ACE-76). Cada caso usa uma conta própria
@@ -32,13 +39,17 @@ const NOVA = 'senha nova 456789';
 async function novaConta(confirmada = true): Promise<string> {
   n += 1;
   const email = `recuperacao-${n}@exemplo.test`;
-  await aberto.db.query(`INSERT INTO contas (email, nome, senha_hash, criada_em) VALUES ($1, 'Pessoa Rec', 'x', now())`, [
-    email,
-  ]);
+  await aberto.db.query(
+    `INSERT INTO contas (email, nome, senha_hash, criada_em) VALUES ($1, 'Pessoa Rec', 'x', now())`,
+    [email],
+  );
   if (confirmada) {
     await aberto.db.query('SELECT conta_definir_senha($1, $2, false)', [email, SENHA]);
   } else {
-    await aberto.db.query(`UPDATE contas SET senha_hash = crypt($2, gen_salt('bf', 4)) WHERE email = $1`, [email, SENHA]);
+    await aberto.db.query(
+      `UPDATE contas SET senha_hash = crypt($2, gen_salt('bf', 4)) WHERE email = $1`,
+      [email, SENHA],
+    );
   }
   return email;
 }
@@ -57,7 +68,9 @@ describe('POST /api/sessao/esqueci-senha', () => {
   it('ACE-22, ACE-23: 200 com a mesma mensagem nos dois casos; só a conta existente recebe o e-mail', async () => {
     const email = await novaConta();
     const comConta = await pedir('/sessao/esqueci-senha', { corpo: { email } });
-    const semConta = await pedir('/sessao/esqueci-senha', { corpo: { email: 'ninguem@exemplo.test' } });
+    const semConta = await pedir('/sessao/esqueci-senha', {
+      corpo: { email: 'ninguem@exemplo.test' },
+    });
     expect(comConta.status).toBe(200);
     expect(semConta.status).toBe(200);
     expect(await comConta.json()).toEqual({
@@ -74,14 +87,20 @@ describe('POST /api/sessao/esqueci-senha', () => {
     const primeiro = await pedirLink(email);
     await aberto.db.query(`UPDATE envios_email SET enviado_em = now() - interval '61 seconds'`);
     const segundo = await pedirLink(email);
-    expect((await pedir('/sessao/nova-senha', { corpo: { token: primeiro, senha: NOVA } })).status).toBe(410);
-    expect((await pedir('/sessao/nova-senha', { corpo: { token: segundo, senha: NOVA } })).status).toBe(200);
+    expect(
+      (await pedir('/sessao/nova-senha', { corpo: { token: primeiro, senha: NOVA } })).status,
+    ).toBe(410);
+    expect(
+      (await pedir('/sessao/nova-senha', { corpo: { token: segundo, senha: NOVA } })).status,
+    ).toBe(200);
   });
 
   it('ACE-23: o link vale por 1 h', async () => {
     const email = await novaConta();
     const token = await pedirLink(email);
-    await aberto.db.query(`UPDATE links_conta SET expira_em = now() - interval '1 second' WHERE tipo = 'recuperacao'`);
+    await aberto.db.query(
+      `UPDATE links_conta SET expira_em = now() - interval '1 second' WHERE tipo = 'recuperacao'`,
+    );
     expect((await pedir('/sessao/nova-senha', { corpo: { token, senha: NOVA } })).status).toBe(410);
   });
 });
@@ -141,7 +160,9 @@ describe('POST /api/sessao/nova-senha', () => {
     }
     expect((await entrar(email, SENHA)).status).toBe(200);
     expect((await pedir('/sessao/nova-senha', { corpo: { token, senha: NOVA } })).status).toBe(200);
-    expect((await pedir('/sessao/nova-senha', { corpo: { token, senha: 'outra senha 999' } })).status).toBe(410);
+    expect(
+      (await pedir('/sessao/nova-senha', { corpo: { token, senha: 'outra senha 999' } })).status,
+    ).toBe(410);
     expect((await entrar(email, NOVA)).status).toBe(200);
   });
 

@@ -8,7 +8,10 @@ import {
 } from '@pelada/contrato';
 import type { Ambiente } from '../ambiente.ts';
 import { lerCorpoDoGrupo, respostaDeCampo } from '../corpo.ts';
-import { lancamentos, type LancamentoLido } from '../../infraestrutura/db/repositorios/financeiro/lancamentos.ts';
+import {
+  lancamentos,
+  type LancamentoLido,
+} from '../../infraestrutura/db/repositorios/financeiro/lancamentos.ts';
 import { lancamentosExcluir } from '../../infraestrutura/db/repositorios/financeiro/lancamentos-excluir.ts';
 
 /**
@@ -71,7 +74,8 @@ export function rotasFinanceiroLancamentos(): Hono<Ambiente> {
     if (!corpo.ok) return corpo.resposta;
     const r = await lancamentos.editar(c.var.db, c.req.param('grupoId'), id, corpo.dados);
     if (r.resultado === 'nao_encontrado') return c.json(naoEncontrado, 404);
-    if (r.resultado === 'mensalidade_nao_e_saida') return respostaDeCampo(c, 'tipo', MENSAGEM_MENSALIDADE_ENTRADA);
+    if (r.resultado === 'mensalidade_nao_e_saida')
+      return respostaDeCampo(c, 'tipo', MENSAGEM_MENSALIDADE_ENTRADA);
     return c.json(paraResposta(r.lancamento), 200);
   });
 
@@ -81,7 +85,13 @@ export function rotasFinanceiroLancamentos(): Hono<Ambiente> {
     const r = await lancamentosExcluir.excluir(c.var.db, c.req.param('grupoId'), id);
     if (r.resultado === 'nao_encontrado') return c.json(naoEncontrado, 404);
     if (r.resultado === 'vinculado') {
-      return c.json({ erro: mensagemLancamentoVinculado(r.apelido, r.mes), codigo: 'lancamento_vinculado' as const }, 409);
+      return c.json(
+        {
+          erro: mensagemLancamentoVinculado(r.apelido, r.mes),
+          codigo: 'lancamento_vinculado' as const,
+        },
+        409,
+      );
     }
     return c.body(null, 204);
   });

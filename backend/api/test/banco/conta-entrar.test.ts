@@ -1,7 +1,14 @@
 import type pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { comCliente } from '../apoio/banco.ts';
-import { abrirCenarioConta, IP_HASH_1, IP_HASH_2, novoToken, sha256, type CenarioContaAberto } from '../isolamento/cenario-conta.ts';
+import {
+  abrirCenarioConta,
+  IP_HASH_1,
+  IP_HASH_2,
+  novoToken,
+  sha256,
+  type CenarioContaAberto,
+} from '../isolamento/cenario-conta.ts';
 import { comoAppAqui, comoSuper, contar, numaTransacao, umaLinha } from './apoio-conta.ts';
 
 /**
@@ -37,15 +44,32 @@ interface Entrada {
   bloqueado_ate: Date | null;
 }
 
-async function entrar(db: pg.Client, email: string, senha: string, ip: Buffer = IP_HASH_1, sessao = novoToken()): Promise<Entrada> {
+async function entrar(
+  db: pg.Client,
+  email: string,
+  senha: string,
+  ip: Buffer = IP_HASH_1,
+  sessao = novoToken(),
+): Promise<Entrada> {
   await comoAppAqui(db);
-  const r = await umaLinha<Entrada>(db, 'SELECT * FROM conta_entrar($1, $2, $3, $4)', [email, senha, ip, sessao.hash]);
+  const r = await umaLinha<Entrada>(db, 'SELECT * FROM conta_entrar($1, $2, $3, $4)', [
+    email,
+    senha,
+    ip,
+    sessao.hash,
+  ]);
   await comoSuper(db);
   return r;
 }
 
 /** Grava `n` falhas do par, todas `atras` (expressão de intervalo) antes de agora, como superusuário. */
-async function falhas(db: pg.Client, email: string, ip: Buffer, n: number, atras = "interval '1 minute'"): Promise<void> {
+async function falhas(
+  db: pg.Client,
+  email: string,
+  ip: Buffer,
+  n: number,
+  atras = "interval '1 minute'",
+): Promise<void> {
   for (let i = 0; i < n; i++) {
     await db.query(
       `INSERT INTO tentativas_login (email, ip_hash, momento, sucesso) VALUES ($1, $2, now() - ${atras}, false)`,
@@ -59,7 +83,12 @@ describe('conta_entrar: sucesso e sessão', () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
       const r = await entrar(db, cenario.emailA, cenario.senhaA);
-      expect(r).toEqual({ resultado: 'ok', conta_id: cenario.contaA, nome: 'Conta A', bloqueado_ate: null });
+      expect(r).toEqual({
+        resultado: 'ok',
+        conta_id: cenario.contaA,
+        nome: 'Conta A',
+        bloqueado_ate: null,
+      });
     });
   });
 
@@ -82,7 +111,9 @@ describe('conta_entrar: sucesso e sessão', () => {
         [sessao.hash],
       );
       expect(s).toEqual({ conta_id: cenario.contaA, escopo: 'completo', validade: '12:00:00' });
-      expect(await contar(db, 'SELECT 1 FROM sessoes WHERE token_hash = $1', [sessao.token])).toBe(0);
+      expect(await contar(db, 'SELECT 1 FROM sessoes WHERE token_hash = $1', [sessao.token])).toBe(
+        0,
+      );
       expect(sessao.hash.equals(sha256(sessao.token))).toBe(true);
     });
   });
@@ -91,9 +122,13 @@ describe('conta_entrar: sucesso e sessão', () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
       await entrar(db, cenario.emailA, 'senha errada');
-      const r = await db.query<{ linha: string }>('SELECT row_to_json(t)::text AS linha FROM tentativas_login t');
+      const r = await db.query<{ linha: string }>(
+        'SELECT row_to_json(t)::text AS linha FROM tentativas_login t',
+      );
       expect(r.rows.map((l) => l.linha).join()).not.toContain('senha errada');
-      expect(await contar(db, 'SELECT 1 FROM tentativas_login WHERE ip_hash = $1', [IP_HASH_1])).toBe(1);
+      expect(
+        await contar(db, 'SELECT 1 FROM tentativas_login WHERE ip_hash = $1', [IP_HASH_1]),
+      ).toBe(1);
     });
   });
 });
@@ -123,15 +158,24 @@ describe('conta_entrar: recusas', () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
       const r = await entrar(db, cenario.emailNaoConfirmada, cenario.senhaNaoConfirmada);
-      expect(r).toEqual({ resultado: 'nao_confirmado', conta_id: null, nome: null, bloqueado_ate: null });
-      expect(await contar(db, 'SELECT 1 FROM sessoes WHERE conta_id = $1', [cenario.contaNaoConfirmada])).toBe(0);
+      expect(r).toEqual({
+        resultado: 'nao_confirmado',
+        conta_id: null,
+        nome: null,
+        bloqueado_ate: null,
+      });
+      expect(
+        await contar(db, 'SELECT 1 FROM sessoes WHERE conta_id = $1', [cenario.contaNaoConfirmada]),
+      ).toBe(0);
     });
   });
 
   it('ACE-12: conta não confirmada com a senha errada devolve invalida (não revela a situação)', async () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
-      expect((await entrar(db, cenario.emailNaoConfirmada, 'senha errada')).resultado).toBe('invalida');
+      expect((await entrar(db, cenario.emailNaoConfirmada, 'senha errada')).resultado).toBe(
+        'invalida',
+      );
     });
   });
 });
@@ -152,8 +196,16 @@ describe('conta_entrar: bloqueio pelo par e-mail e IP', () => {
     await numaTransacao(db, async () => {
       await falhas(db, cenario.emailA, IP_HASH_1, 5, "interval '2 minutes'");
       const r = await entrar(db, cenario.emailA, cenario.senhaA);
-      const esperado = await umaLinha<{ ate: Date }>(db, `SELECT now() - interval '2 minutes' + interval '15 minutes' AS ate`);
-      expect(r).toEqual({ resultado: 'bloqueado', conta_id: null, nome: null, bloqueado_ate: esperado.ate });
+      const esperado = await umaLinha<{ ate: Date }>(
+        db,
+        `SELECT now() - interval '2 minutes' + interval '15 minutes' AS ate`,
+      );
+      expect(r).toEqual({
+        resultado: 'bloqueado',
+        conta_id: null,
+        nome: null,
+        bloqueado_ate: esperado.ate,
+      });
       expect(await contar(db, 'SELECT 1 FROM sessoes')).toBe(0);
       expect(await contar(db, 'SELECT 1 FROM tentativas_login WHERE sucesso')).toBe(0);
     });
@@ -171,7 +223,13 @@ describe('conta_entrar: bloqueio pelo par e-mail e IP', () => {
   it('ACE-13: com a 5.ª falha há 15 min menos 1 s, ainda bloqueado', async () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
-      await falhas(db, cenario.emailA, IP_HASH_1, 5, "(interval '15 minutes' - interval '1 second')");
+      await falhas(
+        db,
+        cenario.emailA,
+        IP_HASH_1,
+        5,
+        "(interval '15 minutes' - interval '1 second')",
+      );
       expect((await entrar(db, cenario.emailA, cenario.senhaA)).resultado).toBe('bloqueado');
     });
   });
@@ -179,7 +237,13 @@ describe('conta_entrar: bloqueio pelo par e-mail e IP', () => {
   it('ACE-13: com a 5.ª falha há 15 min mais 1 s, a senha certa entra', async () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
-      await falhas(db, cenario.emailA, IP_HASH_1, 5, "(interval '15 minutes' + interval '1 second')");
+      await falhas(
+        db,
+        cenario.emailA,
+        IP_HASH_1,
+        5,
+        "(interval '15 minutes' + interval '1 second')",
+      );
       expect((await entrar(db, cenario.emailA, cenario.senhaA)).resultado).toBe('ok');
     });
   });
@@ -206,7 +270,9 @@ describe('conta_entrar: bloqueio pelo par e-mail e IP', () => {
     const { db, cenario } = aberto;
     await numaTransacao(db, async () => {
       await falhas(db, cenario.emailA, IP_HASH_1, 5);
-      expect((await entrar(db, cenario.emailA, cenario.senhaA, IP_HASH_1)).resultado).toBe('bloqueado');
+      expect((await entrar(db, cenario.emailA, cenario.senhaA, IP_HASH_1)).resultado).toBe(
+        'bloqueado',
+      );
       expect((await entrar(db, cenario.emailA, cenario.senhaA, IP_HASH_2)).resultado).toBe('ok');
     });
   });
@@ -222,17 +288,21 @@ describe('conta_entrar: bloqueio pelo par e-mail e IP', () => {
 
 describe('conta_entrar: concorrência', () => {
   /** Uma tentativa numa conexão própria, confirmada (COMMIT) ao fim. */
-  async function tentativaConfirmada(url: string, email: string, senha: string, ip: Buffer): Promise<string> {
+  async function tentativaConfirmada(
+    url: string,
+    email: string,
+    senha: string,
+    ip: Buffer,
+  ): Promise<string> {
     return comCliente(url, async (c) => {
       await c.query('BEGIN');
       try {
         await c.query('SET LOCAL ROLE pelada_app');
-        const r = await umaLinha<{ resultado: string }>(c, 'SELECT resultado FROM conta_entrar($1, $2, $3, $4)', [
-          email,
-          senha,
-          ip,
-          novoToken().hash,
-        ]);
+        const r = await umaLinha<{ resultado: string }>(
+          c,
+          'SELECT resultado FROM conta_entrar($1, $2, $3, $4)',
+          [email, senha, ip, novoToken().hash],
+        );
         await c.query('COMMIT');
         return r.resultado;
       } catch (erro) {
@@ -258,7 +328,11 @@ describe('conta_entrar: concorrência', () => {
         tentativaConfirmada(url, email, 'errada 2', ip),
       ]);
       expect(resultados).toEqual(['invalida', 'invalida']);
-      expect(await contar(db, 'SELECT 1 FROM tentativas_login WHERE email = $1 AND NOT sucesso', [email])).toBe(5);
+      expect(
+        await contar(db, 'SELECT 1 FROM tentativas_login WHERE email = $1 AND NOT sucesso', [
+          email,
+        ]),
+      ).toBe(5);
       expect(await tentativaConfirmada(url, email, 'errada 3', ip)).toBe('bloqueado');
     } finally {
       await limpar(email);

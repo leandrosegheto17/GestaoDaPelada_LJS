@@ -52,22 +52,34 @@ const ECDSA = { name: 'ECDSA', namedCurve: 'P-256' } as const;
 const ASSINATURA = { name: 'ECDSA', hash: 'SHA-256' } as const;
 const codificador = new TextEncoder();
 
-const texto64 = (valor: unknown): string => paraBase64url(codificador.encode(JSON.stringify(valor)));
+const texto64 = (valor: unknown): string =>
+  paraBase64url(codificador.encode(JSON.stringify(valor)));
 
 /** Chave de assinatura pronta, já conferida contra a pública. */
 async function chaveDeAssinatura(chaves: ChavesVapid): Promise<CryptoKey> {
   const publica = deBase64url(chaves.publica);
   const privada = deBase64url(chaves.privada);
-  if (!publica || publica.length !== 65 || publica[0] !== 0x04 || !privada || privada.length !== 32) {
+  if (
+    !publica ||
+    publica.length !== 65 ||
+    publica[0] !== 0x04 ||
+    !privada ||
+    privada.length !== 32
+  ) {
     throw new ErroChavesVapid('Chaves VAPID inválidas.');
   }
   if (chaves.assunto.trim() === '') throw new ErroChavesVapid('VAPID_ASSUNTO vazio.');
   try {
-    const assinar = await crypto.subtle.importKey('jwk', jwkP256(publica, privada), ECDSA, false, ['sign']);
-    const verificar = await crypto.subtle.importKey('jwk', jwkP256(publica), ECDSA, false, ['verify']);
+    const assinar = await crypto.subtle.importKey('jwk', jwkP256(publica, privada), ECDSA, false, [
+      'sign',
+    ]);
+    const verificar = await crypto.subtle.importKey('jwk', jwkP256(publica), ECDSA, false, [
+      'verify',
+    ]);
     const prova = codificador.encode('pelada-vapid-par');
     const assinatura = await crypto.subtle.sign(ASSINATURA, assinar, prova);
-    if (!(await crypto.subtle.verify(ASSINATURA, verificar, assinatura, prova))) throw new Error('par');
+    if (!(await crypto.subtle.verify(ASSINATURA, verificar, assinatura, prova)))
+      throw new Error('par');
     return assinar;
   } catch {
     throw new ErroChavesVapid('A chave privada VAPID não casa com a pública.');
@@ -105,9 +117,15 @@ export async function cabecalhoVapid(
   }
 
   const cabecalho = texto64({ typ: 'JWT', alg: 'ES256' });
-  const corpo = texto64({ aud: origem, exp: Math.floor(agora.getTime() / 1000) + VALIDADE_JWT_S, sub: chaves.assunto });
+  const corpo = texto64({
+    aud: origem,
+    exp: Math.floor(agora.getTime() / 1000) + VALIDADE_JWT_S,
+    sub: chaves.assunto,
+  });
   const assinado = `${cabecalho}.${corpo}`;
-  const assinatura = new Uint8Array(await crypto.subtle.sign(ASSINATURA, chave, codificador.encode(assinado)));
+  const assinatura = new Uint8Array(
+    await crypto.subtle.sign(ASSINATURA, chave, codificador.encode(assinado)),
+  );
   const valor = `vapid t=${assinado}.${paraBase64url(assinatura)}, k=${chaves.publica}`;
   cache.porOrigem.set(origem, valor);
   return valor;

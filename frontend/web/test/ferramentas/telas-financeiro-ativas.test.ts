@@ -15,8 +15,12 @@ import { entradasAtivas, type MapaTelas } from '../../e2e/ferramentas/telas-reai
  */
 
 const RAIZ_MOCKUP = new URL('../../../../.specs/mockup/', import.meta.url);
-const MAPA = JSON.parse(readFileSync(fileURLToPath(new URL('telas.json', RAIZ_MOCKUP)), 'utf8')) as MapaTelas;
-const ATIVAS = JSON.parse(readFileSync(fileURLToPath(new URL('../../e2e/telas-ativas.json', import.meta.url)), 'utf8')) as {
+const MAPA = JSON.parse(
+  readFileSync(fileURLToPath(new URL('telas.json', RAIZ_MOCKUP)), 'utf8'),
+) as MapaTelas;
+const ATIVAS = JSON.parse(
+  readFileSync(fileURLToPath(new URL('../../e2e/telas-ativas.json', import.meta.url)), 'utf8'),
+) as {
   telas: { id: string; estado: string }[];
 };
 const WEB = join(import.meta.dirname, '..', '..');
@@ -41,21 +45,28 @@ describe('telas ativas do financeiro', () => {
 
   it('FIN-47: as 12 telas do financeiro estão ativas, em PC e celular', () => {
     for (const e of DO_FINANCEIRO) expect(ativos).toContain(e);
-    const entradas = entradasAtivas(MAPA, ATIVAS).filter((t) => ['T22', 'T23', 'T24'].includes(t.id));
+    const entradas = entradasAtivas(MAPA, ATIVAS).filter((t) =>
+      ['T22', 'T23', 'T24'].includes(t.id),
+    );
     expect(entradas).toHaveLength(12);
-    for (const t of entradas) expect((t as { viewports?: string[] }).viewports).toEqual(['pc', 'celular']);
+    for (const t of entradas)
+      expect((t as { viewports?: string[] }).viewports).toEqual(['pc', 'celular']);
   });
 
   it('FIN-34, AD-118: a t09 sucesso está ativa com o mockup do projeto e o grupo com saldo; a sem-financeiro fica fora', () => {
     expect(ativos).toContain('T09 sucesso');
     expect(ativos).not.toContain('T09 sem-financeiro');
-    const t09 = entradasAtivas(MAPA, ATIVAS).find((t) => t.id === 'T09' && t.estado === 'sucesso') as {
+    const t09 = entradasAtivas(MAPA, ATIVAS).find(
+      (t) => t.id === 'T09' && t.estado === 'sucesso',
+    ) as {
       mockup: string;
       respostas: { url: string; arquivo: string }[];
     };
     expect(t09.mockup).toBe('telas/t09-inicio--sucesso.html');
     const grupo = t09.respostas.find((r) => r.url === '**/api/grupos/g-quinta');
-    const corpo = JSON.parse(readFileSync(fileURLToPath(new URL(grupo?.arquivo ?? '', RAIZ_MOCKUP)), 'utf8')) as {
+    const corpo = JSON.parse(
+      readFileSync(fileURLToPath(new URL(grupo?.arquivo ?? '', RAIZ_MOCKUP)), 'utf8'),
+    ) as {
       saldoFinanceiroCentavos?: number;
     };
     expect(corpo.saldoFinanceiroCentavos).toBe(124550);

@@ -109,9 +109,11 @@ describe.each(MATRIZ)('FUN-17: escrita em $tabela', (caso) => {
 
   it('FUN-17: UPDATE da conta B com WHERE no grupo A afeta zero linhas', async () => {
     const { db, cenario } = aberto;
-    const t = await tentar(cenario.contaB, `UPDATE ${q(db, tab)} SET ${e.alterar} WHERE ${q(db, col)} = $1`, [
-      cenario.grupoA,
-    ]);
+    const t = await tentar(
+      cenario.contaB,
+      `UPDATE ${q(db, tab)} SET ${e.alterar} WHERE ${q(db, col)} = $1`,
+      [cenario.grupoA],
+    );
     if (e.altera) esperaZero(t);
     else esperaRecusa(t, SEM_GRANT);
   });
@@ -132,16 +134,20 @@ describe.each(MATRIZ)('FUN-17: escrita em $tabela', (caso) => {
     const { db, cenario } = aberto;
     // Sem WHERE de propósito: com WHERE sobre colunas, o Postgres também confere a linha nova
     // contra a policy de SELECT, e a recusa não provaria o WITH CHECK da policy de UPDATE.
-    const t = await tentar(cenario.contaB, `UPDATE ${q(db, tab)} SET ${q(db, col)} = $1`, [cenario.grupoA]);
+    const t = await tentar(cenario.contaB, `UPDATE ${q(db, tab)} SET ${q(db, col)} = $1`, [
+      cenario.grupoA,
+    ]);
     expect(t.erro?.code, t.erro?.message ?? `afetou ${t.linhas} linha(s)`).toBe('42501');
     expect(t.observado).toEqual(antesA);
   });
 
   it('FUN-17: controle, o mesmo UPDATE pela conta A altera o grupo A', async () => {
     const { db, cenario } = aberto;
-    const t = await tentar(cenario.contaA, `UPDATE ${q(db, tab)} SET ${e.alterar} WHERE ${q(db, col)} = $1`, [
-      cenario.grupoA,
-    ]);
+    const t = await tentar(
+      cenario.contaA,
+      `UPDATE ${q(db, tab)} SET ${e.alterar} WHERE ${q(db, col)} = $1`,
+      [cenario.grupoA],
+    );
     if (!e.altera) {
       expect(t.erro?.code).toBe('42501');
       return;
@@ -153,7 +159,9 @@ describe.each(MATRIZ)('FUN-17: escrita em $tabela', (caso) => {
 
   it('FUN-17: DELETE da conta B com WHERE no grupo A afeta zero linhas', async () => {
     const { db, cenario } = aberto;
-    const t = await tentar(cenario.contaB, `DELETE FROM ${q(db, tab)} WHERE ${q(db, col)} = $1`, [cenario.grupoA]);
+    const t = await tentar(cenario.contaB, `DELETE FROM ${q(db, tab)} WHERE ${q(db, col)} = $1`, [
+      cenario.grupoA,
+    ]);
     if (e.apaga) esperaZero(t);
     else esperaRecusa(t, SEM_GRANT);
   });
@@ -174,7 +182,11 @@ describe.each(MATRIZ)('FUN-17: escrita em $tabela', (caso) => {
 
 describe('FUN-17: a matriz de escrita pega um WITH CHECK aberto', () => {
   /** Troca a policy, tenta como a conta B e desfaz tudo na mesma transação. */
-  async function comPolicyAberta(alteracao: string, sql: string, valores: unknown[]): Promise<number> {
+  async function comPolicyAberta(
+    alteracao: string,
+    sql: string,
+    valores: unknown[],
+  ): Promise<number> {
     const { db, cenario } = aberto;
     await db.query('BEGIN');
     try {
@@ -189,8 +201,18 @@ describe('FUN-17: a matriz de escrita pega um WITH CHECK aberto', () => {
 
   it('FUN-17: com WITH CHECK (true) em habilidades_inserir, o INSERT de B no grupo A passa; revertido, volta a ser recusado', async () => {
     const { cenario } = aberto;
-    const [sql, valores] = escritaDe({ tabela: 'habilidades' }).inserir(cenario.grupoA, cenario.contaB, idsA);
-    expect(await comPolicyAberta('ALTER POLICY habilidades_inserir ON habilidades WITH CHECK (true)', sql, valores)).toBe(1);
+    const [sql, valores] = escritaDe({ tabela: 'habilidades' }).inserir(
+      cenario.grupoA,
+      cenario.contaB,
+      idsA,
+    );
+    expect(
+      await comPolicyAberta(
+        'ALTER POLICY habilidades_inserir ON habilidades WITH CHECK (true)',
+        sql,
+        valores,
+      ),
+    ).toBe(1);
     esperaRecusa(await tentar(cenario.contaB, sql, valores), RLS);
   });
 
@@ -200,7 +222,11 @@ describe('FUN-17: a matriz de escrita pega um WITH CHECK aberto', () => {
     const sql = 'UPDATE convites_admin SET grupo_id = $1';
     const valores = [cenario.grupoA];
     expect(
-      await comPolicyAberta('ALTER POLICY convites_admin_alterar ON convites_admin WITH CHECK (true)', sql, valores),
+      await comPolicyAberta(
+        'ALTER POLICY convites_admin_alterar ON convites_admin WITH CHECK (true)',
+        sql,
+        valores,
+      ),
     ).toBeGreaterThanOrEqual(1);
     const t = await tentar(cenario.contaB, sql, valores);
     expect(t.erro?.code).toBe('42501');

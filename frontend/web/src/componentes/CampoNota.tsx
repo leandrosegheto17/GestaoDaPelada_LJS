@@ -21,7 +21,14 @@ export interface PropsCampoNota {
   desabilitado?: boolean;
 }
 
-export function CampoNota({ id, rotulo, valor, aoMudar, erro, desabilitado = false }: PropsCampoNota) {
+export function CampoNota({
+  id,
+  rotulo,
+  valor,
+  aoMudar,
+  erro,
+  desabilitado = false,
+}: PropsCampoNota) {
   const idErro = erro ? `${id}-erro` : undefined;
   return (
     <>
@@ -30,7 +37,11 @@ export function CampoNota({ id, rotulo, valor, aoMudar, erro, desabilitado = fal
       </label>
       <select
         id={id}
-        className={[estilosCampo['campo__entrada'], estilos['campo__entrada--nota'], erro ? estilos.erro : '']
+        className={[
+          estilosCampo['campo__entrada'],
+          estilos['campo__entrada--nota'],
+          erro ? estilos.erro : '',
+        ]
           .filter(Boolean)
           .join(' ')}
         value={valor === null ? '' : String(valor)}

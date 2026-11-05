@@ -35,7 +35,8 @@ export function diaAbreviado(data: string): string {
  * [LACUNA] a spec escreve "até K substituições" sem o singular; com K = 1 o rascunho mantém o texto da spec.
  */
 export function cabecalhoDois(data: string, n: number, k: number | 'ilimitado'): string {
-  const limite = k === 'ilimitado' ? 'sem limite de substituições' : `até ${k} substituições por time`;
+  const limite =
+    k === 'ilimitado' ? 'sem limite de substituições' : `até ${k} substituições por time`;
   return `${diaAbreviado(data)} · 2 times de ${n} · ${limite}`;
 }
 
@@ -44,9 +45,13 @@ export function umaCasa(valor: number | null): string {
   return valor === null ? '—' : exibirNivel(valor, false);
 }
 
-export type ResultadoDoisNaTela = Omit<ResultadoDois, 'ordemPrioridade'> & { ordemPrioridade?: string[] };
+export type ResultadoDoisNaTela = Omit<ResultadoDois, 'ordemPrioridade'> & {
+  ordemPrioridade?: string[];
+};
 
-type JogadorDaTela = ResultadoDois['times'][number]['titulares'][number] | ResultadoDois['times'][number]['entramNo2oTempo'][number];
+type JogadorDaTela =
+  | ResultadoDois['times'][number]['titulares'][number]
+  | ResultadoDois['times'][number]['entramNo2oTempo'][number];
 
 interface PropsResultadoDois {
   resultado: ResultadoDoisNaTela;
@@ -63,10 +68,30 @@ interface PropsResultadoDois {
 
 function Selos({ j }: { j: JogadorDaTela & { saiNoIntervalo?: boolean } }) {
   const selos: ReactNode[] = [];
-  if (j.so1oTempo) selos.push(<span key="so1o" className={`${estilos.selo} ${estilos['selo--info']}`}>só 1º tempo</span>);
-  if (j.saiNoIntervalo) selos.push(<span key="sai" className={`${estilos.selo} ${estilos['selo--atencao']}`}>sai no intervalo</span>);
-  if (j.semNota) selos.push(<span key="nota" className={`${estilos.selo} ${estilos['selo--atencao']}`}>sem nota</span>);
-  if (j.semAno) selos.push(<span key="ano" className={`${estilos.selo} ${estilos['selo--neutro']}`}>{TEXTO_SEM_ANO}</span>);
+  if (j.so1oTempo)
+    selos.push(
+      <span key="so1o" className={`${estilos.selo} ${estilos['selo--info']}`}>
+        só 1º tempo
+      </span>,
+    );
+  if (j.saiNoIntervalo)
+    selos.push(
+      <span key="sai" className={`${estilos.selo} ${estilos['selo--atencao']}`}>
+        sai no intervalo
+      </span>,
+    );
+  if (j.semNota)
+    selos.push(
+      <span key="nota" className={`${estilos.selo} ${estilos['selo--atencao']}`}>
+        sem nota
+      </span>,
+    );
+  if (j.semAno)
+    selos.push(
+      <span key="ano" className={`${estilos.selo} ${estilos['selo--neutro']}`}>
+        {TEXTO_SEM_ANO}
+      </span>,
+    );
   return selos.length > 0 ? <span className={estilos['jogador-time__selos']}>{selos}</span> : null;
 }
 
@@ -86,7 +111,12 @@ export function ListaJogadores({
       {jogadores.map((j) => (
         <li key={j.id}>
           <button
-            className={[estilos['jogador-time'], movidos?.has(j.id) ? estilos['jogador-time--movido'] : ''].filter(Boolean).join(' ')}
+            className={[
+              estilos['jogador-time'],
+              movidos?.has(j.id) ? estilos['jogador-time--movido'] : '',
+            ]
+              .filter(Boolean)
+              .join(' ')}
             type="button"
             aria-haspopup="dialog"
             onClick={() => aoTocar?.(j.id)}
@@ -109,7 +139,12 @@ export function MontandoTimes() {
       </p>
       <div className={`${estilos.times} ${estilos['times--dois']}`} aria-hidden="true">
         {['a', 'b'].map((t) => (
-          <div key={t} className={[estilos['cartao-time'], t === 'b' ? estilos['cartao-time--b'] : ''].filter(Boolean).join(' ')}>
+          <div
+            key={t}
+            className={[estilos['cartao-time'], t === 'b' ? estilos['cartao-time--b'] : '']
+              .filter(Boolean)
+              .join(' ')}
+          >
             <span className={`${estilos.esqueleto} ${estilos['esqueleto--titulo']}`} />
             {[1, 2, 3, 4, 5].map((i) => (
               <span key={i} className={`${estilos.esqueleto} ${estilos['esqueleto--linha']}`} />
@@ -121,17 +156,28 @@ export function MontandoTimes() {
   );
 }
 
-export function ResultadoDoisTimes({ resultado, recalculando = false, aoTocarJogador, movidos, antes, acoes }: PropsResultadoDois) {
+export function ResultadoDoisTimes({
+  resultado,
+  recalculando = false,
+  aoTocarJogador,
+  movidos,
+  antes,
+  acoes,
+}: PropsResultadoDois) {
   const apelidos = new Map<string, string>();
-  for (const t of resultado.times) for (const j of [...t.titulares, ...t.entramNo2oTempo]) apelidos.set(j.id, j.apelido);
+  for (const t of resultado.times)
+    for (const j of [...t.titulares, ...t.entramNo2oTempo]) apelidos.set(j.id, j.apelido);
   for (const j of resultado.naoEntra) apelidos.set(j.id, j.apelido);
   const apelido = (id: string) => apelidos.get(id) ?? id;
   const [a, b] = resultado.times;
-  const numero = (v: string) => (recalculando ? <span className={estilos.recalculando}>recalculando…</span> : v);
+  const numero = (v: string) =>
+    recalculando ? <span className={estilos.recalculando}>recalculando…</span> : v;
 
   return (
     <>
-      <p className={`${estilos.paragrafo} ${estilos['texto-sec']}`}>{cabecalhoDois(resultado.data, resultado.n, resultado.k)}</p>
+      <p className={`${estilos.paragrafo} ${estilos['texto-sec']}`}>
+        {cabecalhoDois(resultado.data, resultado.n, resultado.k)}
+      </p>
       {antes}
       {resultado.avisos.length > 0 ? (
         <div role="status">
@@ -155,13 +201,21 @@ export function ResultadoDoisTimes({ resultado, recalculando = false, aoTocarJog
           <tr>
             <th scope="row">Nível no 1º tempo (soma · média)</th>
             {[a, b].map((t) => (
-              <td key={t.nome}>{numero(`${umaCasa(t.indicadores.nivelSoma1oTempo)} · ${umaCasa(t.indicadores.nivelMedio1oTempo)}`)}</td>
+              <td key={t.nome}>
+                {numero(
+                  `${umaCasa(t.indicadores.nivelSoma1oTempo)} · ${umaCasa(t.indicadores.nivelMedio1oTempo)}`,
+                )}
+              </td>
             ))}
           </tr>
           <tr>
             <th scope="row">Nível no 2º tempo (soma · média)</th>
             {[a, b].map((t) => (
-              <td key={t.nome}>{numero(`${umaCasa(t.indicadores.nivelSoma2oTempo)} · ${umaCasa(t.indicadores.nivelMedio2oTempo)}`)}</td>
+              <td key={t.nome}>
+                {numero(
+                  `${umaCasa(t.indicadores.nivelSoma2oTempo)} · ${umaCasa(t.indicadores.nivelMedio2oTempo)}`,
+                )}
+              </td>
             ))}
           </tr>
           <tr>
@@ -184,7 +238,9 @@ export function ResultadoDoisTimes({ resultado, recalculando = false, aoTocarJog
           return (
             <section
               key={t.nome}
-              className={[estilos['cartao-time'], i === 1 ? estilos['cartao-time--b'] : ''].filter(Boolean).join(' ')}
+              className={[estilos['cartao-time'], i === 1 ? estilos['cartao-time--b'] : '']
+                .filter(Boolean)
+                .join(' ')}
               aria-labelledby={idTitulo}
             >
               <h2 id={idTitulo} className={estilos['cartao-time__titulo']}>
@@ -195,7 +251,11 @@ export function ResultadoDoisTimes({ resultado, recalculando = false, aoTocarJog
               {t.entramNo2oTempo.length > 0 ? (
                 <>
                   <h3 className={estilos['cartao-time__grupo']}>Entram no 2º tempo</h3>
-                  <ListaJogadores jogadores={t.entramNo2oTempo} aoTocar={aoTocarJogador} movidos={movidos} />
+                  <ListaJogadores
+                    jogadores={t.entramNo2oTempo}
+                    aoTocar={aoTocarJogador}
+                    movidos={movidos}
+                  />
                 </>
               ) : null}
               {t.trocas.length > 0 || t.saiSemPar.length > 0 || t.entraSemPar.length > 0 ? (
@@ -203,7 +263,9 @@ export function ResultadoDoisTimes({ resultado, recalculando = false, aoTocarJog
                   <h3 className={estilos['cartao-time__grupo']}>Trocas no intervalo</h3>
                   <ul className={estilos.pares}>
                     {t.trocas.map((tr) => (
-                      <li key={`${tr.sai}-${tr.entra}`}>{`${apelido(tr.sai)} → ${apelido(tr.entra)}`}</li>
+                      <li
+                        key={`${tr.sai}-${tr.entra}`}
+                      >{`${apelido(tr.sai)} → ${apelido(tr.entra)}`}</li>
                     ))}
                     {/* [LACUNA] a spec (SIM-25) não dá o texto de quem sai ou entra sem par; o rascunho usa "sem par". */}
                     {t.saiSemPar.map((id) => (
@@ -224,7 +286,12 @@ export function ResultadoDoisTimes({ resultado, recalculando = false, aoTocarJog
           <h2 id="nao-entra" className={estilos.subtitulo}>
             Não entra
           </h2>
-          <ListaJogadores jogadores={resultado.naoEntra} aoTocar={aoTocarJogador} movidos={movidos} classeExtra={estilos.lista} />
+          <ListaJogadores
+            jogadores={resultado.naoEntra}
+            aoTocar={aoTocarJogador}
+            movidos={movidos}
+            classeExtra={estilos.lista}
+          />
           <p className={estilos['campo__ajuda']}>{TEXTO_NAO_ENTRA_NOTA}</p>
         </section>
       ) : null}

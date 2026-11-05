@@ -24,7 +24,9 @@ const formatoData = new Intl.DateTimeFormat('en-CA', {
 
 /** A data (`AAAA-MM-DD`) do instante no calendário de São Paulo. */
 export function dataEmSaoPaulo(instante: Date): string {
-  const partes = Object.fromEntries(formatoData.formatToParts(instante).map((p) => [p.type, p.value]));
+  const partes = Object.fromEntries(
+    formatoData.formatToParts(instante).map((p) => [p.type, p.value]),
+  );
   return `${partes['year']}-${partes['month']}-${partes['day']}`;
 }
 

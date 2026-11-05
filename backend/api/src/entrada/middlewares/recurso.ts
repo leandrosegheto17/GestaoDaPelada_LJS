@@ -54,7 +54,10 @@ export function exigirRecursoNaEscrita(recurso: RecursoPro): MiddlewareHandler<A
  * Caminhos que passam pela trava do simulador (SIM-68): todas as rotas do simulador e a de escalação. O meta-teste
  * confere que toda rota registrada sob esses caminhos responde 403 com o recurso negado.
  */
-export const CAMINHOS_DO_SIMULADOR = ['/grupos/:grupoId/simulador/*', '/grupos/:grupoId/escalacoes'] as const;
+export const CAMINHOS_DO_SIMULADOR = [
+  '/grupos/:grupoId/simulador/*',
+  '/grupos/:grupoId/escalacoes',
+] as const;
 
 /** Liga a trava do simulador nos caminhos dele; chamado pelo `criarApp` depois da cadeia das rotas de grupo. */
 export function travarRecursosDoPlano(api: Hono<Ambiente>): void {

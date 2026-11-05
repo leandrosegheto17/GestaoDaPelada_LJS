@@ -1,6 +1,9 @@
 import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
-import { ERRO_SENHAS_DIFERENTES, TEXTO_LINK_VENCIDO } from '../../src/telas/nova-senha/NovaSenha.tsx';
+import {
+  ERRO_SENHAS_DIFERENTES,
+  TEXTO_LINK_VENCIDO,
+} from '../../src/telas/nova-senha/NovaSenha.tsx';
 import { esperarSemViolacoes } from '../apoio/axe.ts';
 import { abrirTela, erroApi, json, pendente } from '../apoio/tela.tsx';
 
@@ -25,7 +28,9 @@ describe('tela Nova senha', () => {
   it('ACE-56: com o token, mostra o formulário e apaga o fragmento; axe sem violação', async () => {
     comFragmento(`#t=${TOKEN}`);
     const { container } = abrirTela('/entrar/nova-senha');
-    expect(await screen.findByRole('heading', { level: 1, name: 'Crie uma nova senha' })).toBeTruthy();
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Crie uma nova senha' }),
+    ).toBeTruthy();
     await screen.findByLabelText('Nova senha');
     expect(window.location.hash).toBe('');
     await esperarSemViolacoes(container);
@@ -39,8 +44,12 @@ describe('tela Nova senha', () => {
     await screen.findByLabelText('Nova senha');
     preencher();
     await waitFor(() => expect(local()).toBe('/entrar?aviso=senha-alterada'));
-    expect(chamadasA('POST', '/api/sessao/nova-senha').map((c) => c.corpo)).toEqual([{ token: TOKEN, senha: 'NovaSenha123' }]);
-    expect((await screen.findByRole('status')).textContent).toBe('Senha alterada. Entre com a nova senha.');
+    expect(chamadasA('POST', '/api/sessao/nova-senha').map((c) => c.corpo)).toEqual([
+      { token: TOKEN, senha: 'NovaSenha123' },
+    ]);
+    expect((await screen.findByRole('status')).textContent).toBe(
+      'Senha alterada. Entre com a nova senha.',
+    );
   });
 
   it('ACE-24: senhas diferentes marcam a confirmação com "As senhas não conferem." e não chamam a API; axe sem violação', async () => {
@@ -50,7 +59,9 @@ describe('tela Nova senha', () => {
     preencher('Senha12345', 'Senha1234');
     const resumo = await screen.findByRole('alert');
     expect(resumo.textContent).toContain('Corrija 1 campo:');
-    expect(screen.getByRole('link', { name: 'Confirmar nova senha' }).getAttribute('href')).toBe('#conf');
+    expect(screen.getByRole('link', { name: 'Confirmar nova senha' }).getAttribute('href')).toBe(
+      '#conf',
+    );
     expect(document.getElementById('conf-erro')?.textContent).toBe(ERRO_SENHAS_DIFERENTES);
     expect(chamadasA('POST', '/api/sessao/nova-senha')).toHaveLength(0);
     await esperarSemViolacoes(container);
@@ -69,14 +80,21 @@ describe('tela Nova senha', () => {
   it('ACE-25: 410 mostra o estado inválido com "Pedir novo link"; axe sem violação', async () => {
     comFragmento(`#t=${TOKEN}`);
     const { container } = abrirTela('/entrar/nova-senha', {
-      'POST /api/sessao/nova-senha': () => erroApi(410, 'link_invalido', 'Link inválido ou vencido.'),
+      'POST /api/sessao/nova-senha': () =>
+        erroApi(410, 'link_invalido', 'Link inválido ou vencido.'),
     });
     await screen.findByLabelText('Nova senha');
     preencher();
-    expect(await screen.findByRole('heading', { level: 1, name: 'Link inválido ou vencido' })).toBeTruthy();
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Link inválido ou vencido' }),
+    ).toBeTruthy();
     expect(screen.getByRole('status').textContent).toBe(TEXTO_LINK_VENCIDO);
-    expect(screen.getByRole('link', { name: 'Pedir novo link' }).getAttribute('href')).toBe('/entrar/esqueci');
-    expect(screen.getByRole('link', { name: 'Voltar para entrar' }).getAttribute('href')).toBe('/entrar');
+    expect(screen.getByRole('link', { name: 'Pedir novo link' }).getAttribute('href')).toBe(
+      '/entrar/esqueci',
+    );
+    expect(screen.getByRole('link', { name: 'Voltar para entrar' }).getAttribute('href')).toBe(
+      '/entrar',
+    );
     await esperarSemViolacoes(container);
   });
 
@@ -87,7 +105,9 @@ describe('tela Nova senha', () => {
     it(`ACE-25: ${nome}, mostra o estado inválido sem chamar a API`, async () => {
       comFragmento(hash);
       const { chamadasA } = abrirTela('/entrar/nova-senha');
-      expect(await screen.findByRole('heading', { level: 1, name: 'Link inválido ou vencido' })).toBeTruthy();
+      expect(
+        await screen.findByRole('heading', { level: 1, name: 'Link inválido ou vencido' }),
+      ).toBeTruthy();
       expect(chamadasA('POST', '/api/sessao/nova-senha')).toHaveLength(0);
     });
   }
@@ -97,6 +117,8 @@ describe('tela Nova senha', () => {
     abrirTela('/entrar/nova-senha', { 'POST /api/sessao/nova-senha': () => pendente() });
     await screen.findByLabelText('Nova senha');
     preencher();
-    expect(((await screen.findByRole('button', { name: 'Salvando…' })) as HTMLButtonElement).disabled).toBe(true);
+    expect(
+      ((await screen.findByRole('button', { name: 'Salvando…' })) as HTMLButtonElement).disabled,
+    ).toBe(true);
   });
 });

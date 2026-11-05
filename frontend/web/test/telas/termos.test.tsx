@@ -11,7 +11,11 @@ afterEach(() => {
 
 const PAGINAS = [
   ['/termos', 'Termos de uso', ['O serviço', 'Sua conta', 'Encerramento']],
-  ['/privacidade', 'Privacidade', ['O que guardamos', 'E-mails', 'Quem vê', 'Como excluir seus dados']],
+  [
+    '/privacidade',
+    'Privacidade',
+    ['O que guardamos', 'E-mails', 'Quem vê', 'Como excluir seus dados'],
+  ],
 ] as const;
 
 describe('páginas de termos e privacidade', () => {
@@ -22,7 +26,9 @@ describe('páginas de termos e privacidade', () => {
       expect(local()).toBe(caminho);
       expect(screen.getByText(`Versão ${TERMOS_VERSAO}`)).toBeTruthy();
       expect(TERMOS_VERSAO).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-      expect(screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)).toEqual([...secoes]);
+      expect(screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)).toEqual([
+        ...secoes,
+      ]);
     });
 
     it(`ACE-58: ${caminho} também abre com sessão`, async () => {

@@ -17,7 +17,8 @@ export const MENSAGEM_CACHE_LIGADO =
   'O cache do Hyperdrive está ligado. Desligue com `wrangler hyperdrive update <id> --caching-disabled` (FUN-18).';
 export const MENSAGEM_SEM_CACHING =
   'A configuração do Hyperdrive não diz se o cache está desligado (falta `caching.disabled`). Confira o id e a saída do wrangler (FUN-18).';
-export const MENSAGEM_JSON_INVALIDO = 'A saída do wrangler não é um JSON válido de configuração do Hyperdrive (FUN-18).';
+export const MENSAGEM_JSON_INVALIDO =
+  'A saída do wrangler não é um JSON válido de configuração do Hyperdrive (FUN-18).';
 
 function objeto(v: unknown): v is Record<string, unknown> {
   return typeof v === 'object' && v !== null && !Array.isArray(v);
@@ -33,7 +34,8 @@ export function conferirSemCache(json: string): Resultado {
   }
   if (!objeto(config)) return { ok: false, mensagem: MENSAGEM_JSON_INVALIDO };
   const caching = config.caching;
-  if (!objeto(caching) || !('disabled' in caching)) return { ok: false, mensagem: MENSAGEM_SEM_CACHING };
+  if (!objeto(caching) || !('disabled' in caching))
+    return { ok: false, mensagem: MENSAGEM_SEM_CACHING };
   if (caching.disabled !== true) return { ok: false, mensagem: MENSAGEM_CACHE_LIGADO };
   return { ok: true };
 }
@@ -50,9 +52,13 @@ async function lerEntradaPadrao(): Promise<string> {
 async function lerConfiguracao(id: string | undefined): Promise<string> {
   if (!id) return lerEntradaPadrao();
   const [cmd, ...args] = COMANDO_WRANGLER;
-  const { stdout } = await promisify(execFile)(cmd as string, [...args, 'hyperdrive', 'get', id, '--json'], {
-    shell: process.platform === 'win32',
-  });
+  const { stdout } = await promisify(execFile)(
+    cmd as string,
+    [...args, 'hyperdrive', 'get', id, '--json'],
+    {
+      shell: process.platform === 'win32',
+    },
+  );
   return stdout;
 }
 

@@ -24,7 +24,12 @@ interface Chamada {
 
 const CHAVE = 'chave-falsa-do-neon';
 
-function branch(id: string, name: string, created_at: string, extra: Partial<BranchNeon> = {}): BranchNeon {
+function branch(
+  id: string,
+  name: string,
+  created_at: string,
+  extra: Partial<BranchNeon> = {},
+): BranchNeon {
   return { id, name, created_at, ...extra };
 }
 
@@ -35,13 +40,23 @@ function neonFalso(branches: BranchNeon[], falhar?: { metodo: string; status: nu
     const metodo = init?.method ?? 'GET';
     const corpo = typeof init?.body === 'string' ? JSON.parse(init.body) : undefined;
     const cabecalhos = new Headers(init?.headers);
-    chamadas.push({ metodo, url, corpo, autorizacao: cabecalhos.get('Authorization') ?? undefined });
-    if (falhar?.metodo === metodo) return new Response(JSON.stringify({ message: 'erro' }), { status: falhar.status });
+    chamadas.push({
+      metodo,
+      url,
+      corpo,
+      autorizacao: cabecalhos.get('Authorization') ?? undefined,
+    });
+    if (falhar?.metodo === metodo)
+      return new Response(JSON.stringify({ message: 'erro' }), { status: falhar.status });
     if (metodo === 'GET') return Response.json({ branches });
     if (metodo === 'POST') {
       const pedido = corpo as { branch: { name: string; parent_id: string } };
       return Response.json(
-        { branch: branch('br-nova', pedido.branch.name, '2026-11-05T12:00:00Z', { parent_id: pedido.branch.parent_id }) },
+        {
+          branch: branch('br-nova', pedido.branch.name, '2026-11-05T12:00:00Z', {
+            parent_id: pedido.branch.parent_id,
+          }),
+        },
         { status: 201 },
       );
     }
@@ -56,7 +71,12 @@ const DEV = branch('br-dev', 'dev', '2026-02-01T00:00:00Z');
 describe('branch de restauração no Neon', () => {
   it('FUN-42: cria a branch com o pai main e o nome do run_id', async () => {
     const { buscar, chamadas } = neonFalso([MAIN, DEV]);
-    const r = await criarBranchRestauracao({ apiKey: CHAVE, projeto: 'proj-abc', runId: '987654', buscar });
+    const r = await criarBranchRestauracao({
+      apiKey: CHAVE,
+      projeto: 'proj-abc',
+      runId: '987654',
+      buscar,
+    });
 
     const post = chamadas.find((c) => c.metodo === 'POST');
     expect(post?.url).toBe(`${API_NEON}/projects/proj-abc/branches`);
@@ -68,9 +88,15 @@ describe('branch de restauração no Neon', () => {
   });
 
   it('FUN-42: o pai é a main mesmo quando a dev é mais nova ou é a padrão', async () => {
-    const { buscar, chamadas } = neonFalso([branch('br-main', 'main', '2026-01-01T00:00:00Z'), branch('br-dev', 'dev', '2026-03-01T00:00:00Z', { default: true })]);
+    const { buscar, chamadas } = neonFalso([
+      branch('br-main', 'main', '2026-01-01T00:00:00Z'),
+      branch('br-dev', 'dev', '2026-03-01T00:00:00Z', { default: true }),
+    ]);
     await criarBranchRestauracao({ apiKey: CHAVE, projeto: 'p', runId: '1', buscar });
-    expect((chamadas.find((c) => c.metodo === 'POST')?.corpo as { branch: { parent_id: string } }).branch.parent_id).toBe('br-main');
+    expect(
+      (chamadas.find((c) => c.metodo === 'POST')?.corpo as { branch: { parent_id: string } }).branch
+        .parent_id,
+    ).toBe('br-main');
   });
 
   it('FUN-42: com 4 branches de restauração, apaga as 2 mais antigas e nunca main, dev nem outra', async () => {
@@ -87,7 +113,9 @@ describe('branch de restauração no Neon', () => {
     const r = await criarBranchRestauracao({ apiKey: CHAVE, projeto: 'p', runId: '4', buscar });
 
     // Depois de criar a restauracao-4 são 4 de restauração: ficam a 4 e a 3.
-    const apagadas = chamadas.filter((c) => c.metodo === 'DELETE').map((c) => c.url.split('/').pop());
+    const apagadas = chamadas
+      .filter((c) => c.metodo === 'DELETE')
+      .map((c) => c.url.split('/').pop());
     expect(apagadas.sort()).toEqual(['br-r1', 'br-r2']);
     expect(r.apagadas.sort()).toEqual(['restauracao-1', 'restauracao-2']);
     for (const intocavel of ['br-main', 'br-dev', 'br-outra', 'br-prot', 'br-r3', 'br-nova']) {
@@ -107,7 +135,10 @@ describe('branch de restauração no Neon', () => {
 
   for (const metodo of ['GET', 'POST', 'DELETE']) {
     it(`FUN-42: erro da API no ${metodo} interrompe com ErroNeon, sem a chave na mensagem`, async () => {
-      const existentes = [MAIN, ...[1, 2, 3].map((n) => branch(`br-r${n}`, `restauracao-${n}`, `2026-11-0${n}T00:00:00Z`))];
+      const existentes = [
+        MAIN,
+        ...[1, 2, 3].map((n) => branch(`br-r${n}`, `restauracao-${n}`, `2026-11-0${n}T00:00:00Z`)),
+      ];
       const { buscar } = neonFalso(existentes, { metodo, status: 500 });
       const promessa = criarBranchRestauracao({ apiKey: CHAVE, projeto: 'p', runId: '9', buscar });
       await expect(promessa).rejects.toThrow(ErroNeon);
@@ -118,15 +149,21 @@ describe('branch de restauração no Neon', () => {
 
   it('FUN-42: sem a branch main no projeto, interrompe sem criar nada', async () => {
     const { buscar, chamadas } = neonFalso([DEV]);
-    await expect(criarBranchRestauracao({ apiKey: CHAVE, projeto: 'p', runId: '1', buscar })).rejects.toThrow(/main/);
+    await expect(
+      criarBranchRestauracao({ apiKey: CHAVE, projeto: 'p', runId: '1', buscar }),
+    ).rejects.toThrow(/main/);
     expect(chamadas.some((c) => c.metodo === 'POST')).toBe(false);
   });
 
   it('FUN-42: na linha de comando, sem as variáveis, sai com código diferente de 0', () => {
-    const r = spawnSync(process.execPath, [join(import.meta.dirname, '..', 'restauracao-neon.ts')], {
-      env: { PATH: process.env.PATH ?? '' },
-      encoding: 'utf8',
-    });
+    const r = spawnSync(
+      process.execPath,
+      [join(import.meta.dirname, '..', 'restauracao-neon.ts')],
+      {
+        env: { PATH: process.env.PATH ?? '' },
+        encoding: 'utf8',
+      },
+    );
     expect(r.status).not.toBe(0);
     expect(r.stderr).toMatch(/NEON_API_KEY/);
   });

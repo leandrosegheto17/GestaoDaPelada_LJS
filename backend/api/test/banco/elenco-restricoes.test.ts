@@ -1,6 +1,10 @@
 import type pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { abrirCenarioGrupos, comoConta, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  comoConta,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * Regras do elenco que o banco já garante (T5; GEL-35, GEL-37, GEL-50, GEL-84, GEL-85, GEL-91, GEL-93, GEL-112).
@@ -29,7 +33,11 @@ function comoC<T>(fn: (d: pg.Client) => Promise<T>): Promise<T> {
 }
 
 /** Executa o comando num savepoint e devolve o erro (ou null), para seguir na mesma transação. */
-async function erroDe(d: pg.Client, sql: string, valores: unknown[] = []): Promise<{ code?: string; constraint?: string } | null> {
+async function erroDe(
+  d: pg.Client,
+  sql: string,
+  valores: unknown[] = [],
+): Promise<{ code?: string; constraint?: string } | null> {
   await d.query('SAVEPOINT passo');
   try {
     await d.query(sql, valores);
@@ -56,10 +64,10 @@ async function novoJogador(d: pg.Client, apelido: string): Promise<string> {
   );
   const id = r.rows[0]?.id;
   if (!id) throw new Error('jogador sem id');
-  await d.query(`INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio) VALUES ($1, $2, '2026-02-01')`, [
-    id,
-    cenario.grupoG,
-  ]);
+  await d.query(
+    `INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio) VALUES ($1, $2, '2026-02-01')`,
+    [id, cenario.grupoG],
+  );
   return id;
 }
 
@@ -72,7 +80,12 @@ describe('GEL-84, GEL-85: exclusão de jogador', () => {
       expect(r.rowCount).toBe(1);
       await d.query('RESET ROLE');
       expect(await contar(d, 'SELECT 1 FROM periodos_ativos WHERE jogador_id = $1', [id])).toBe(0);
-      expect(await contar(d, 'SELECT 1 FROM jogadores WHERE grupo_id = $1 AND id = $2', [cenario.grupoG, id])).toBe(0);
+      expect(
+        await contar(d, 'SELECT 1 FROM jogadores WHERE grupo_id = $1 AND id = $2', [
+          cenario.grupoG,
+          id,
+        ]),
+      ).toBe(0);
     });
   });
 
@@ -81,20 +94,18 @@ describe('GEL-84, GEL-85: exclusão de jogador', () => {
     [
       'presença',
       (d, j) =>
-        d.query(`INSERT INTO presencas (partida_id, jogador_id, grupo_id, situacao) VALUES ($1, $2, $3, 'presente')`, [
-          aberto.cenario.idsG.partida,
-          j,
-          aberto.cenario.grupoG,
-        ]),
+        d.query(
+          `INSERT INTO presencas (partida_id, jogador_id, grupo_id, situacao) VALUES ($1, $2, $3, 'presente')`,
+          [aberto.cenario.idsG.partida, j, aberto.cenario.grupoG],
+        ),
     ],
     [
       'nota',
       (d, j) =>
-        d.query(`INSERT INTO notas (jogador_id, habilidade_id, grupo_id, valor) VALUES ($1, $2, $3, 6)`, [
-          j,
-          aberto.cenario.idsG.habilidade,
-          aberto.cenario.grupoG,
-        ]),
+        d.query(
+          `INSERT INTO notas (jogador_id, habilidade_id, grupo_id, valor) VALUES ($1, $2, $3, 6)`,
+          [j, aberto.cenario.idsG.habilidade, aberto.cenario.grupoG],
+        ),
     ],
     [
       'pagamento',
@@ -106,15 +117,22 @@ describe('GEL-84, GEL-85: exclusão de jogador', () => {
     ],
   ];
 
-  it.each(HISTORICOS)('GEL-85: jogador com %s não é apagado (23503) e nada some', async (_tipo, historico) => {
-    await comoC(async (d) => {
-      const id = await novoJogador(d, 'Com Histórico');
-      await historico(d, id);
-      expect(await erroDe(d, 'DELETE FROM jogadores WHERE id = $1', [id])).toMatchObject({ code: '23503' });
-      expect(await contar(d, 'SELECT 1 FROM jogadores WHERE id = $1', [id])).toBe(1);
-      expect(await contar(d, 'SELECT 1 FROM periodos_ativos WHERE jogador_id = $1', [id])).toBe(1);
-    });
-  });
+  it.each(HISTORICOS)(
+    'GEL-85: jogador com %s não é apagado (23503) e nada some',
+    async (_tipo, historico) => {
+      await comoC(async (d) => {
+        const id = await novoJogador(d, 'Com Histórico');
+        await historico(d, id);
+        expect(await erroDe(d, 'DELETE FROM jogadores WHERE id = $1', [id])).toMatchObject({
+          code: '23503',
+        });
+        expect(await contar(d, 'SELECT 1 FROM jogadores WHERE id = $1', [id])).toBe(1);
+        expect(await contar(d, 'SELECT 1 FROM periodos_ativos WHERE jogador_id = $1', [id])).toBe(
+          1,
+        );
+      });
+    },
+  );
 });
 
 describe('GEL-35, GEL-91: unicidade sem caixa, com acento contando', () => {
@@ -141,7 +159,11 @@ describe('GEL-35, GEL-91: unicidade sem caixa, com acento contando', () => {
 
   it('GEL-91: "Passe" e "passe" colidem em habilidades_nome_grupo', async () => {
     await comoC(async (d) => {
-      expect(await erroDe(d, `INSERT INTO habilidades (grupo_id, nome) VALUES ($1, 'passe')`, [aberto.cenario.grupoG])).toEqual({
+      expect(
+        await erroDe(d, `INSERT INTO habilidades (grupo_id, nome) VALUES ($1, 'passe')`, [
+          aberto.cenario.grupoG,
+        ]),
+      ).toEqual({
         code: '23505',
         constraint: 'habilidades_nome_grupo',
       });
@@ -150,7 +172,11 @@ describe('GEL-35, GEL-91: unicidade sem caixa, com acento contando', () => {
 
   it('GEL-91: "Visao de Jogo" não colide com "Visão de Jogo"', async () => {
     await comoC(async (d) => {
-      expect(await erroDe(d, `INSERT INTO habilidades (grupo_id, nome) VALUES ($1, 'Visao de Jogo')`, [aberto.cenario.grupoG])).toBeNull();
+      expect(
+        await erroDe(d, `INSERT INTO habilidades (grupo_id, nome) VALUES ($1, 'Visao de Jogo')`, [
+          aberto.cenario.grupoG,
+        ]),
+      ).toBeNull();
     });
   });
 });
@@ -164,14 +190,15 @@ describe('GEL-93: apagar a habilidade apaga as notas dela', () => {
         [cenario.grupoG, cenario.idsG.habilidade],
       );
       const outraId = outra.rows[0]?.id;
-      await d.query(`INSERT INTO notas (jogador_id, habilidade_id, grupo_id, valor) VALUES ($1, $2, $3, 4)`, [
-        cenario.idsG.jogadorHistorico,
-        outraId,
-        cenario.grupoG,
-      ]);
+      await d.query(
+        `INSERT INTO notas (jogador_id, habilidade_id, grupo_id, valor) VALUES ($1, $2, $3, 4)`,
+        [cenario.idsG.jogadorHistorico, outraId, cenario.grupoG],
+      );
       const r = await d.query('DELETE FROM habilidades WHERE id = $1', [cenario.idsG.habilidade]);
       expect(r.rowCount).toBe(1);
-      expect(await contar(d, 'SELECT 1 FROM notas WHERE habilidade_id = $1', [cenario.idsG.habilidade])).toBe(0);
+      expect(
+        await contar(d, 'SELECT 1 FROM notas WHERE habilidade_id = $1', [cenario.idsG.habilidade]),
+      ).toBe(0);
       expect(await contar(d, 'SELECT 1 FROM notas WHERE habilidade_id = $1', [outraId])).toBe(1);
     });
   });
@@ -182,7 +209,9 @@ describe('GEL-37, GEL-50, GEL-112: posição, período aberto e DELETE de perío
     const { cenario } = aberto;
     await comoC(async (d) => {
       expect(
-        await erroDe(d, `UPDATE jogadores SET posicao = 'defensor' WHERE id = $1`, [cenario.idsG.jogadorAtivo]),
+        await erroDe(d, `UPDATE jogadores SET posicao = 'defensor' WHERE id = $1`, [
+          cenario.idsG.jogadorAtivo,
+        ]),
       ).toEqual({ code: '23514', constraint: 'jogadores_posicao_check' });
     });
   });
@@ -192,7 +221,12 @@ describe('GEL-37, GEL-50, GEL-112: posição, período aberto e DELETE de perío
     async (posicao) => {
       const { cenario } = aberto;
       await comoC(async (d) => {
-        expect(await erroDe(d, 'UPDATE jogadores SET posicao = $2 WHERE id = $1', [cenario.idsG.jogadorAtivo, posicao])).toBeNull();
+        expect(
+          await erroDe(d, 'UPDATE jogadores SET posicao = $2 WHERE id = $1', [
+            cenario.idsG.jogadorAtivo,
+            posicao,
+          ]),
+        ).toBeNull();
       });
     },
   );
@@ -201,10 +235,11 @@ describe('GEL-37, GEL-50, GEL-112: posição, período aberto e DELETE de perío
     const { cenario } = aberto;
     await comoC(async (d) => {
       expect(
-        await erroDe(d, `INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio) VALUES ($1, $2, '2026-03-01')`, [
-          cenario.idsG.jogadorAtivo,
-          cenario.grupoG,
-        ]),
+        await erroDe(
+          d,
+          `INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio) VALUES ($1, $2, '2026-03-01')`,
+          [cenario.idsG.jogadorAtivo, cenario.grupoG],
+        ),
       ).toEqual({ code: '23505', constraint: 'periodos_um_aberto' });
     });
   });
@@ -225,7 +260,11 @@ describe('GEL-37, GEL-50, GEL-112: posição, período aberto e DELETE de perío
   it('GEL-112: DELETE FROM periodos_ativos como pelada_app é recusado (sem grant)', async () => {
     const { cenario } = aberto;
     await comoC(async (d) => {
-      expect(await erroDe(d, 'DELETE FROM periodos_ativos WHERE jogador_id = $1', [cenario.idsG.jogadorInativo])).toMatchObject({
+      expect(
+        await erroDe(d, 'DELETE FROM periodos_ativos WHERE jogador_id = $1', [
+          cenario.idsG.jogadorInativo,
+        ]),
+      ).toMatchObject({
         code: '42501',
       });
     });

@@ -1,4 +1,8 @@
-import { email as esquemaEmail, nome as esquemaNome, senha as esquemaSenha } from '@pelada/contrato/primitivos';
+import {
+  email as esquemaEmail,
+  nome as esquemaNome,
+  senha as esquemaSenha,
+} from '@pelada/contrato/primitivos';
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router';
 import { Botao } from '../../componentes/Botao.tsx';
@@ -41,7 +45,8 @@ export const ERROS_CAMPO: Readonly<Record<CampoCadastro, string>> = {
 };
 
 export const ERRO_SENHA_CURTA = 'A senha precisa ter pelo menos 8 caracteres.';
-export const TEXTO_ENVIADO = 'Enviamos um link de confirmação para o seu e-mail. Ele vale por 24 horas.';
+export const TEXTO_ENVIADO =
+  'Enviamos um link de confirmação para o seu e-mail. Ele vale por 24 horas.';
 
 const ORDEM: readonly CampoCadastro[] = ['nome', 'email', 'senha', 'termos'];
 
@@ -58,14 +63,17 @@ function validar(d: Dados): Erros {
   const erros: Erros = {};
   if (!esquemaNome.safeParse(d.nome).success) erros.nome = ERROS_CAMPO.nome;
   if (!esquemaEmail.safeParse(d.email).success) erros.email = ERROS_CAMPO.email;
-  if (!esquemaSenha.safeParse(d.senha).success) erros.senha = d.senha.length < 8 ? ERRO_SENHA_CURTA : ERROS_CAMPO.senha;
+  if (!esquemaSenha.safeParse(d.senha).success)
+    erros.senha = d.senha.length < 8 ? ERRO_SENHA_CURTA : ERROS_CAMPO.senha;
   if (!d.termos) erros.termos = ERROS_CAMPO.termos;
   return erros;
 }
 
 function errosDaApi(erro: ErroApi): Erros {
   const erros: Erros = {};
-  for (const c of erro.campos) if ((ORDEM as readonly string[]).includes(c)) erros[c as CampoCadastro] = ERROS_CAMPO[c as CampoCadastro];
+  for (const c of erro.campos)
+    if ((ORDEM as readonly string[]).includes(c))
+      erros[c as CampoCadastro] = ERROS_CAMPO[c as CampoCadastro];
   if (erro.codigo === 'termos_obrigatorios') erros.termos = ERROS_CAMPO.termos;
   return erros;
 }
@@ -97,7 +105,8 @@ export function Cadastro() {
   const [enviando, setEnviando] = useState(false);
   const [enviado, setEnviado] = useState(false);
 
-  const mudar = <K extends keyof Dados>(campo: K, valor: Dados[K]) => setDados((d) => ({ ...d, [campo]: valor }));
+  const mudar = <K extends keyof Dados>(campo: K, valor: Dados[K]) =>
+    setDados((d) => ({ ...d, [campo]: valor }));
 
   async function criar(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -108,7 +117,12 @@ export function Cadastro() {
     if (Object.keys(encontrados).length > 0) return;
     setEnviando(true);
     try {
-      await api.post('/api/conta', { nome: dados.nome, email: dados.email, senha: dados.senha, termos: true });
+      await api.post('/api/conta', {
+        nome: dados.nome,
+        email: dados.email,
+        senha: dados.senha,
+        termos: true,
+      });
       setEnviado(true);
     } catch (erro) {
       const daApi = erro instanceof ErroApi ? errosDaApi(erro) : {};
@@ -123,7 +137,9 @@ export function Cadastro() {
     return (
       <Casca titulo="Verifique seu e-mail" estreita>
         <Faixa tipo="info">{TEXTO_ENVIADO}</Faixa>
-        <p className={`${estilos.paragrafo} ${estilos['acima-3']}`}>Não chegou? Confira a caixa de spam ou peça outro link.</p>
+        <p className={`${estilos.paragrafo} ${estilos['acima-3']}`}>
+          Não chegou? Confira a caixa de spam ou peça outro link.
+        </p>
         <LinkBotao para="/confirmar" variante="secundario" bloco>
           Enviar outro link
         </LinkBotao>
@@ -141,8 +157,15 @@ export function Cadastro() {
         Voltar para entrar
       </Link>
       <h1 className={estilos['titulo-pagina']}>Criar conta</h1>
-      <p className={estilos.paragrafo}>Organize presença, times e ranking da sua pelada. Grátis para começar.</p>
-      <form className={estilos.formulario} noValidate aria-busy={enviando || undefined} onSubmit={criar}>
+      <p className={estilos.paragrafo}>
+        Organize presença, times e ranking da sua pelada. Grátis para começar.
+      </p>
+      <form
+        className={estilos.formulario}
+        noValidate
+        aria-busy={enviando || undefined}
+        onSubmit={criar}
+      >
         <ResumoErros erros={resumo} />
         {falha ? <Faixa tipo="erro">{falha}</Faixa> : null}
         <Campo
@@ -174,8 +197,14 @@ export function Cadastro() {
           value={dados.senha}
           onChange={(e) => mudar('senha', e.target.value)}
         />
-        <CaixaSelecao id="termos" checked={dados.termos} erro={erros.termos} onChange={(e) => mudar('termos', e.target.checked)}>
-          Li e aceito os <Link to="/termos">termos de uso</Link> e a <Link to="/privacidade">política de privacidade</Link>
+        <CaixaSelecao
+          id="termos"
+          checked={dados.termos}
+          erro={erros.termos}
+          onChange={(e) => mudar('termos', e.target.checked)}
+        >
+          Li e aceito os <Link to="/termos">termos de uso</Link> e a{' '}
+          <Link to="/privacidade">política de privacidade</Link>
         </CaixaSelecao>
         <Botao type="submit" bloco carregando={enviando}>
           {enviando ? 'Criando conta…' : 'Criar conta'}

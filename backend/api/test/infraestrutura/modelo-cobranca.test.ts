@@ -24,7 +24,9 @@ const BASE: DadosEmailCobranca = {
 
 /** Os links (href) do HTML e as URLs do texto. */
 function links(conteudo: { texto: string; html: string }): string[] {
-  const doHtml = [...conteudo.html.matchAll(/href="([^"]+)"/g)].map((m) => (m[1] ?? '').replace(/&amp;/g, '&'));
+  const doHtml = [...conteudo.html.matchAll(/href="([^"]+)"/g)].map((m) =>
+    (m[1] ?? '').replace(/&amp;/g, '&'),
+  );
   const doTexto = [...conteudo.texto.matchAll(/https?:\/\/\S+/g)].map((m) => m[0]);
   return [...doHtml, ...doTexto];
 }
@@ -34,19 +36,22 @@ describe('emailCobranca', () => {
     ['cobranca_gerada', 'Cobrança gerada'],
     ['pagamento_confirmado', 'Pagamento confirmado'],
     ['pagamento_atrasado', 'Pagamento em atraso'],
-  ] as const)('NOT-40: %s tem o tipo em texto claro, o valor, o vencimento e só o link de Meu plano', (tipo, titulo) => {
-    const c = emailCobranca({ ...BASE, tipo });
-    expect(TITULO_DO_AVISO[tipo]).toBe(titulo);
-    expect(c.assunto).toBe(`${titulo}: Pelada de Quinta`);
-    for (const parte of [c.texto, c.html]) {
-      expect(parte).toContain(titulo);
-      expect(parte).toContain('Pelada de Quinta');
-      expect(parte).toContain('R$ 9,90');
-      expect(parte).toContain('10/11/2026');
-    }
-    expect(links(c)).toEqual([MEU_PLANO, MEU_PLANO]);
-    expect(`${c.texto}${c.html}`.toLowerCase()).not.toContain('asaas');
-  });
+  ] as const)(
+    'NOT-40: %s tem o tipo em texto claro, o valor, o vencimento e só o link de Meu plano',
+    (tipo, titulo) => {
+      const c = emailCobranca({ ...BASE, tipo });
+      expect(TITULO_DO_AVISO[tipo]).toBe(titulo);
+      expect(c.assunto).toBe(`${titulo}: Pelada de Quinta`);
+      for (const parte of [c.texto, c.html]) {
+        expect(parte).toContain(titulo);
+        expect(parte).toContain('Pelada de Quinta');
+        expect(parte).toContain('R$ 9,90');
+        expect(parte).toContain('10/11/2026');
+      }
+      expect(links(c)).toEqual([MEU_PLANO, MEU_PLANO]);
+      expect(`${c.texto}${c.html}`.toLowerCase()).not.toContain('asaas');
+    },
+  );
 
   it.each([
     [1, 'R$ 0,01'],

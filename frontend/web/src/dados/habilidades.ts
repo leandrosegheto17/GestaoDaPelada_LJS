@@ -44,7 +44,8 @@ export function useHabilidades(grupoId: string) {
   const api = useCliente();
   return useQuery<ListaHabilidades>({
     queryKey: chaveHabilidades(grupoId),
-    queryFn: async () => listaHabilidades.parse(await api.get<unknown>(caminhoHabilidades(grupoId))),
+    queryFn: async () =>
+      listaHabilidades.parse(await api.get<unknown>(caminhoHabilidades(grupoId))),
     retry: false,
     enabled: grupoId !== '',
   });
@@ -54,7 +55,8 @@ export function useCriarHabilidade(grupoId: string) {
   const api = useCliente();
   const consultas = useQueryClient();
   return useMutation({
-    mutationFn: (dados: HabilidadeCorpo) => api.post<HabilidadeItem>(caminhoHabilidades(grupoId), dados),
+    mutationFn: (dados: HabilidadeCorpo) =>
+      api.post<HabilidadeItem>(caminhoHabilidades(grupoId), dados),
     onSuccess: () =>
       Promise.all([
         consultas.invalidateQueries({ queryKey: chaveHabilidades(grupoId), exact: true }),
@@ -78,7 +80,8 @@ export function useExcluirHabilidade(grupoId: string) {
   const api = useCliente();
   const consultas = useQueryClient();
   return useMutation({
-    mutationFn: (id: string) => api.delete<undefined>(`${caminhoHabilidades(grupoId)}/${encodeURIComponent(id)}`),
+    mutationFn: (id: string) =>
+      api.delete<undefined>(`${caminhoHabilidades(grupoId)}/${encodeURIComponent(id)}`),
     onSuccess: () => consultas.invalidateQueries({ queryKey: chaveGrupo(grupoId) }),
   });
 }

@@ -72,7 +72,9 @@ vi.mock('workbox-expiration', () => ({
 describe('ehRankingPublico', () => {
   it('PAR-153: só a rota do ranking público casa', () => {
     expect(ehRankingPublico(url('/api/publico/pelada-de-quinta/ranking'), ORIGEM)).toBe(true);
-    expect(ehRankingPublico(url('/api/publico/pelada-de-quinta/ranking?mes=2026-10'), ORIGEM)).toBe(true);
+    expect(ehRankingPublico(url('/api/publico/pelada-de-quinta/ranking?mes=2026-10'), ORIGEM)).toBe(
+      true,
+    );
   });
 
   it('PAR-153: /pdf, /eventos, /api/grupos/..., /api/sessao e outra origem não casam', () => {
@@ -89,35 +91,68 @@ describe('ehRankingPublico', () => {
       `/api/publico/${'a'.repeat(65)}/ranking`,
       '/g/pelada-de-quinta',
     ]) {
-      expect({ caminho, casa: ehRankingPublico(url(caminho), ORIGEM) }).toEqual({ caminho, casa: false });
+      expect({ caminho, casa: ehRankingPublico(url(caminho), ORIGEM) }).toEqual({
+        caminho,
+        casa: false,
+      });
     }
-    expect(ehRankingPublico(url('/api/publico/pelada-de-quinta/ranking', 'https://outro.exemplo'), ORIGEM)).toBe(false);
-    expect(ehRankingPublico(url('/api/publico/pelada-de-quinta/ranking', 'http://gestaodapelada-v2.exemplo.workers.dev'), ORIGEM)).toBe(false);
+    expect(
+      ehRankingPublico(
+        url('/api/publico/pelada-de-quinta/ranking', 'https://outro.exemplo'),
+        ORIGEM,
+      ),
+    ).toBe(false);
+    expect(
+      ehRankingPublico(
+        url(
+          '/api/publico/pelada-de-quinta/ranking',
+          'http://gestaodapelada-v2.exemplo.workers.dev',
+        ),
+        ORIGEM,
+      ),
+    ).toBe(false);
   });
 
   it('PAR-153: a resposta do cache leva X-Pelada-Cache: 1, com o mesmo status e corpo', async () => {
-    const guardada = new Response('{"ok":true}', { status: 200, headers: { 'Content-Type': 'application/json' } });
-    const usada = await marcarRespostaDoCache.cachedResponseWillBeUsed({ cachedResponse: guardada });
+    const guardada = new Response('{"ok":true}', {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+    const usada = await marcarRespostaDoCache.cachedResponseWillBeUsed({
+      cachedResponse: guardada,
+    });
     expect(usada?.headers.get(CABECALHO_DO_CACHE)).toBe('1');
     expect(usada?.headers.get('Content-Type')).toBe('application/json');
     expect(await usada?.text()).toBe('{"ok":true}');
-    expect(await marcarRespostaDoCache.cachedResponseWillBeUsed({ cachedResponse: null })).toBeNull();
+    expect(
+      await marcarRespostaDoCache.cachedResponseWillBeUsed({ cachedResponse: null }),
+    ).toBeNull();
   });
 });
 
 describe('navegação do ranking sem rede (T78)', () => {
   const semRede = () => Promise.reject(new TypeError('Failed to fetch'));
   const shell = new Response('<div id="raiz"></div>', { headers: { 'Content-Type': 'text/html' } });
-  const offline = new Response('<h1>Sem conexão</h1>', { headers: { 'Content-Type': 'text/html' } });
-  const doCache = vi.fn(async (u: string) => (u === SHELL ? shell : u === PAGINA_OFFLINE ? offline : undefined));
+  const offline = new Response('<h1>Sem conexão</h1>', {
+    headers: { 'Content-Type': 'text/html' },
+  });
+  const doCache = vi.fn(async (u: string) =>
+    u === SHELL ? shell : u === PAGINA_OFFLINE ? offline : undefined,
+  );
 
   it('PAR-149: /g/:slug sem rede recebe o shell do precache (o app mostra o guardado)', async () => {
-    const r = await responderNavegacao(new Request(`${ORIGEM}/g/pelada-de-quinta?mes=2026-10`), { buscar: semRede, doCache });
+    const r = await responderNavegacao(new Request(`${ORIGEM}/g/pelada-de-quinta?mes=2026-10`), {
+      buscar: semRede,
+      doCache,
+    });
     expect(r).toBe(shell);
   });
 
   it('PAR-149: outra rota sem rede segue com a página offline (FUN-35)', async () => {
-    const r = await responderNavegacao(new Request(`${ORIGEM}/app/grupos/g-quinta`), { buscar: semRede, doCache });
+    const r = await responderNavegacao(new Request(`${ORIGEM}/app/grupos/g-quinta`), {
+      buscar: semRede,
+      doCache,
+    });
     expect(r).toBe(offline);
     expect(ehNavegacaoDoRanking(`${ORIGEM}/g/pelada-de-quinta`)).toBe(true);
     expect(ehNavegacaoDoRanking(`${ORIGEM}/g/pelada-de-quinta/outra`)).toBe(false);
@@ -146,14 +181,24 @@ describe('sw.ts', () => {
   });
 
   it('PAR-153: a rota do ranking casa só o GET do ranking da mesma origem', () => {
-    const casar = registro.rotas[1]?.casar as (o: { url: URL; request: { method: string } }) => boolean;
+    const casar = registro.rotas[1]?.casar as (o: {
+      url: URL;
+      request: { method: string };
+    }) => boolean;
     const get = { method: 'GET' };
     expect(casar({ url: url('/api/publico/pelada-de-quinta/ranking'), request: get })).toBe(true);
-    expect(casar({ url: url('/api/publico/pelada-de-quinta/ranking'), request: { method: 'POST' } })).toBe(false);
+    expect(
+      casar({ url: url('/api/publico/pelada-de-quinta/ranking'), request: { method: 'POST' } }),
+    ).toBe(false);
     expect(casar({ url: url('/api/publico/pelada-de-quinta/pdf'), request: get })).toBe(false);
     expect(casar({ url: url('/api/publico/pelada-de-quinta/eventos'), request: get })).toBe(false);
     expect(casar({ url: url('/api/grupos/g-quinta'), request: get })).toBe(false);
-    expect(casar({ url: url('/api/publico/pelada-de-quinta/ranking', 'https://outro.exemplo'), request: get })).toBe(false);
+    expect(
+      casar({
+        url: url('/api/publico/pelada-de-quinta/ranking', 'https://outro.exemplo'),
+        request: get,
+      }),
+    ).toBe(false);
   });
 
   it('PAR-153: rede primeiro, cache próprio, só 200 e no máximo 50 entradas', () => {

@@ -66,7 +66,9 @@ export async function detectarEstado(c: pg.ClientBase, arquivos: string[]): Prom
       registradas: [],
       diferencas: [
         `tabelas sem pgmigrations: ${tabelas.join(', ')}`,
-        ...(legado.length > 0 ? [`controle de migração do legado presente: ${legado.join(', ')}`] : []),
+        ...(legado.length > 0
+          ? [`controle de migração do legado presente: ${legado.join(', ')}`]
+          : []),
       ],
     };
   }
@@ -77,12 +79,15 @@ export async function detectarEstado(c: pg.ClientBase, arquivos: string[]): Prom
 
   const conhecidas = new Set(arquivos);
   for (const nome of registradas) {
-    if (!conhecidas.has(nome)) diferencas.push(`registrada na pgmigrations e sem arquivo na v2: ${nome}`);
+    if (!conhecidas.has(nome))
+      diferencas.push(`registrada na pgmigrations e sem arquivo na v2: ${nome}`);
   }
   if (diferencas.length === 0) {
     registradas.forEach((nome, i) => {
       if (arquivos[i] !== nome) {
-        diferencas.push(`ordem diferente na posição ${i + 1}: registrada ${nome}, esperada ${arquivos[i]}`);
+        diferencas.push(
+          `ordem diferente na posição ${i + 1}: registrada ${nome}, esperada ${arquivos[i]}`,
+        );
       }
     });
   }

@@ -1,7 +1,12 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { configFinanceiraResposta } from '@pelada/contrato';
 import { MENSAGEM_DATA_SALDO_FUTURA } from '../../src/entrada/rotas/financeiro-config.ts';
-import { abrirCenarioGrupos, arquivar, reativar, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  arquivar,
+  reativar,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 import { auditorias, configDe, pedir, restaurarCaixa } from './apoio-financeiro.ts';
 
 /**
@@ -15,11 +20,20 @@ import { auditorias, configDe, pedir, restaurarCaixa } from './apoio-financeiro.
 
 let aberto: CenarioGruposAberto;
 
-const VALIDO = { mensalidadeCentavos: 6000, saldoInicialCentavos: -1500, dataSaldoInicial: '2026-02-01' };
-const ORIGINAL = { mensalidade_centavos: 5000, saldo_inicial_centavos: 0, data_saldo_inicial: '2026-01-01' };
+const VALIDO = {
+  mensalidadeCentavos: 6000,
+  saldoInicialCentavos: -1500,
+  dataSaldoInicial: '2026-02-01',
+};
+const ORIGINAL = {
+  mensalidade_centavos: 5000,
+  saldo_inicial_centavos: 0,
+  data_saldo_inicial: '2026-01-01',
+};
 
 const caminho = () => `/grupos/${aberto.cenario.grupoG}/financeiro/config`;
-const salvar = (corpo: unknown, conta = aberto.cenario.contaC) => pedir(aberto, { metodo: 'PUT', caminho: caminho(), conta, corpo });
+const salvar = (corpo: unknown, conta = aberto.cenario.contaC) =>
+  pedir(aberto, { metodo: 'PUT', caminho: caminho(), conta, corpo });
 const auditadas = () => auditorias(aberto, aberto.cenario.grupoG, 'financeiro_config_alterada');
 
 beforeAll(async () => {
@@ -106,7 +120,9 @@ describe('PUT …/financeiro/config', () => {
     const { mensalidadeCentavos: _sem, ...semMensalidade } = VALIDO;
     const r = await salvar(semMensalidade);
     expect(r.status).toBe(422);
-    expect(await r.json()).toMatchObject({ campos: expect.arrayContaining(['mensalidadeCentavos']) });
+    expect(await r.json()).toMatchObject({
+      campos: expect.arrayContaining(['mensalidadeCentavos']),
+    });
   });
 
   it('FIN-03: JSON inválido dá 422 no campo corpo', async () => {

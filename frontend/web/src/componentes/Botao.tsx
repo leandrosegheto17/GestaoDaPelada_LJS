@@ -10,11 +10,13 @@ import estilos from './Botao.module.css';
  * `texto-destrutivo` leva também as classes do `texto` (`botao--texto botao--texto-destrutivo`).
  */
 
-export type VarianteBotao = 'principal' | 'secundario' | 'texto' | 'destrutivo' | 'texto-destrutivo';
+export type VarianteBotao =
+  'principal' | 'secundario' | 'texto' | 'destrutivo' | 'texto-destrutivo';
 
 /** Classes de uma variante (o `LinkBotao` usa as mesmas). */
 export function classesDaVariante(variante: VarianteBotao): string[] {
-  if (variante === 'texto-destrutivo') return [estilos['botao--texto'] ?? '', estilos['botao--texto-destrutivo'] ?? ''];
+  if (variante === 'texto-destrutivo')
+    return [estilos['botao--texto'] ?? '', estilos['botao--texto-destrutivo'] ?? ''];
   return [estilos[`botao--${variante}`] ?? ''];
 }
 

@@ -18,7 +18,10 @@ let aberto: CenarioGruposAberto;
 const criados: string[] = [];
 
 const HOJE = '2026-11-05';
-const app = criarApp({ fabricaBanco: fabricaComoApp().fabrica, relogio: relogioFixo('2026-11-05T15:00:00Z') });
+const app = criarApp({
+  fabricaBanco: fabricaComoApp().fabrica,
+  relogio: relogioFixo('2026-11-05T15:00:00Z'),
+});
 
 async function sessao(conta: string): Promise<string> {
   const { token, hash } = await gerarToken();
@@ -30,8 +33,16 @@ async function sessao(conta: string): Promise<string> {
   return token;
 }
 
-async function pedir(caminho: string, conta: string, metodo = 'GET', corpo?: unknown): Promise<Response> {
-  const headers = new Headers({ 'x-pelada': '1', cookie: `${NOME_COOKIE_SESSAO}=${await sessao(conta)}` });
+async function pedir(
+  caminho: string,
+  conta: string,
+  metodo = 'GET',
+  corpo?: unknown,
+): Promise<Response> {
+  const headers = new Headers({
+    'x-pelada': '1',
+    cookie: `${NOME_COOKIE_SESSAO}=${await sessao(conta)}`,
+  });
   if (corpo !== undefined) headers.set('content-type', 'application/json');
   const ctx = contextoFalso();
   const r = await app.request(
@@ -44,7 +55,11 @@ async function pedir(caminho: string, conta: string, metodo = 'GET', corpo?: unk
   return r;
 }
 
-async function novoJogador(apelido: string, fim: string | null = null, grupo = aberto.cenario.grupoG): Promise<string> {
+async function novoJogador(
+  apelido: string,
+  fim: string | null = null,
+  grupo = aberto.cenario.grupoG,
+): Promise<string> {
   const { db, cenario } = aberto;
   const r = await db.query<{ id: string }>(
     `INSERT INTO jogadores (grupo_id, apelido, ano_nascimento, posicao, pontuacao_inicial, inicio_pontuacao, criado_por,
@@ -53,16 +68,20 @@ async function novoJogador(apelido: string, fim: string | null = null, grupo = a
     [grupo, apelido, grupo === cenario.grupoH ? cenario.contaB : cenario.contaC],
   );
   const id = r.rows[0]!.id;
-  await db.query(`INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, '2026-09-01', $3)`, [
-    id,
-    grupo,
-    fim,
-  ]);
+  await db.query(
+    `INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim) VALUES ($1, $2, '2026-09-01', $3)`,
+    [id, grupo, fim],
+  );
   criados.push(id);
   return id;
 }
 
-function acao(nome: 'inativar' | 'reativar', id: string, corpo: unknown = {}, conta = aberto.cenario.contaC) {
+function acao(
+  nome: 'inativar' | 'reativar',
+  id: string,
+  corpo: unknown = {},
+  conta = aberto.cenario.contaC,
+) {
   return pedir(`/grupos/${aberto.cenario.grupoG}/jogadores/${id}/${nome}`, conta, 'POST', corpo);
 }
 
@@ -114,7 +133,10 @@ describe('POST …/jogadores/:id/inativar', () => {
     const id = await novoJogador('Rota Já Saiu', '2026-10-01');
     const r = await acao('inativar', id, { data: '2026-10-20' });
     expect(r.status).toBe(409);
-    expect(await r.json()).toMatchObject({ codigo: 'ja_inativo', erro: 'O jogador já está inativo.' });
+    expect(await r.json()).toMatchObject({
+      codigo: 'ja_inativo',
+      erro: 'O jogador já está inativo.',
+    });
     expect(await periodos(id)).toEqual([{ inicio: '2026-09-01', fim: '2026-10-01' }]);
   });
 
@@ -124,7 +146,9 @@ describe('POST …/jogadores/:id/inativar', () => {
     expect(r.status).toBe(422);
     const corpo = (await r.json()) as { campos: string[]; mensagens: Record<string, string> };
     expect(corpo.campos).toEqual(['data']);
-    expect(corpo.mensagens['data']).toBe('A saída não pode ser antes do início deste período (01/09/2026).');
+    expect(corpo.mensagens['data']).toBe(
+      'A saída não pode ser antes do início deste período (01/09/2026).',
+    );
     expect(await periodos(id)).toEqual([{ inicio: '2026-09-01', fim: null }]);
   });
 
@@ -170,20 +194,32 @@ describe('POST …/jogadores/:id/reativar', () => {
     expect(r.status).toBe(422);
     const corpo = (await r.json()) as { campos: string[]; mensagens: Record<string, string> };
     expect(corpo.campos).toEqual(['data']);
-    expect(corpo.mensagens['data']).toBe('O retorno não pode ser antes da saída anterior (01/10/2026).');
+    expect(corpo.mensagens['data']).toBe(
+      'O retorno não pode ser antes da saída anterior (01/10/2026).',
+    );
   });
 });
 
 describe('GEL-44: jogador de fora do grupo', () => {
-  it.each(['inativar', 'reativar'] as const)('GEL-44: %s de um jogador de H, pelo grupo G, dá 404 e nada muda', async (nome) => {
-    const id = await novoJogador('Rota de H', nome === 'inativar' ? null : '2026-10-01', aberto.cenario.grupoH);
-    const r = await acao(nome, id, { data: '2026-10-20' });
-    expect(r.status).toBe(404);
-    expect(await periodos(id)).toHaveLength(1);
-  });
+  it.each(['inativar', 'reativar'] as const)(
+    'GEL-44: %s de um jogador de H, pelo grupo G, dá 404 e nada muda',
+    async (nome) => {
+      const id = await novoJogador(
+        'Rota de H',
+        nome === 'inativar' ? null : '2026-10-01',
+        aberto.cenario.grupoH,
+      );
+      const r = await acao(nome, id, { data: '2026-10-20' });
+      expect(r.status).toBe(404);
+      expect(await periodos(id)).toHaveLength(1);
+    },
+  );
 
-  it.each(['inativar', 'reativar'] as const)('GEL-44: %s com id que não é uuid dá 404', async (nome) => {
-    const r = await acao(nome, 'nao-e-uuid', {});
-    expect(r.status).toBe(404);
-  });
+  it.each(['inativar', 'reativar'] as const)(
+    'GEL-44: %s com id que não é uuid dá 404',
+    async (nome) => {
+      const r = await acao(nome, 'nao-e-uuid', {});
+      expect(r.status).toBe(404);
+    },
+  );
 });

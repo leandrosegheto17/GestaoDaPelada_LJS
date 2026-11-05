@@ -1,4 +1,9 @@
-import { remetenteMemoria, remetenteResend, type Remetente, type RemetenteMemoria } from './resend.ts';
+import {
+  remetenteMemoria,
+  remetenteResend,
+  type Remetente,
+  type RemetenteMemoria,
+} from './resend.ts';
 
 /**
  * Caixa de e-mails de desenvolvimento (T17; ACE-52). Com `EMAIL_DEV=1` (só no `.env` local e no

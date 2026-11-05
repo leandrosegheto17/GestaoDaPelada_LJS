@@ -77,13 +77,24 @@ export function jwkP256(publica: Uint8Array, privada?: Uint8Array): JsonWebKey {
   return jwk;
 }
 
-async function hkdf(sal: Uint8Array<ArrayBuffer>, ikm: Uint8Array<ArrayBuffer>, info: Uint8Array<ArrayBuffer>, bytes: number) {
+async function hkdf(
+  sal: Uint8Array<ArrayBuffer>,
+  ikm: Uint8Array<ArrayBuffer>,
+  info: Uint8Array<ArrayBuffer>,
+  bytes: number,
+) {
   const chave = await crypto.subtle.importKey('raw', ikm, 'HKDF', false, ['deriveBits']);
-  const bits = await crypto.subtle.deriveBits({ name: 'HKDF', hash: 'SHA-256', salt: sal, info }, chave, bytes * 8);
+  const bits = await crypto.subtle.deriveBits(
+    { name: 'HKDF', hash: 'SHA-256', salt: sal, info },
+    chave,
+    bytes * 8,
+  );
   return new Uint8Array(bits);
 }
 
-async function parEfemero(opcoes: OpcoesCifra): Promise<{ privada: CryptoKey; publica: Uint8Array<ArrayBuffer> }> {
+async function parEfemero(
+  opcoes: OpcoesCifra,
+): Promise<{ privada: CryptoKey; publica: Uint8Array<ArrayBuffer> }> {
   if (opcoes.efemera) {
     const privada = await crypto.subtle.importKey(
       'jwk',
@@ -95,7 +106,9 @@ async function parEfemero(opcoes: OpcoesCifra): Promise<{ privada: CryptoKey; pu
     return { privada, publica: juntar(opcoes.efemera.publica) };
   }
   const par = (await crypto.subtle.generateKey(P256, true, ['deriveBits'])) as CryptoKeyPair;
-  const publica = new Uint8Array((await crypto.subtle.exportKey('raw', par.publicKey)) as ArrayBuffer);
+  const publica = new Uint8Array(
+    (await crypto.subtle.exportKey('raw', par.publicKey)) as ArrayBuffer,
+  );
   return { privada: par.privateKey, publica };
 }
 
@@ -107,11 +120,18 @@ export async function cifrarPayload(
 ): Promise<Uint8Array<ArrayBuffer>> {
   const uaPublica = deBase64url(assinante.p256dh);
   const segredo = deBase64url(assinante.auth);
-  if (!uaPublica || uaPublica.length !== 65 || uaPublica[0] !== 0x04 || !segredo || segredo.length !== 16) {
+  if (
+    !uaPublica ||
+    uaPublica.length !== 65 ||
+    uaPublica[0] !== 0x04 ||
+    !segredo ||
+    segredo.length !== 16
+  ) {
     throw new ErroChaveAssinante('Chave do assinante inválida.');
   }
   const claro = codificador.encode(texto);
-  if (claro.length > PAYLOAD_MAX_BYTES) throw new ErroPayloadGrande(`Payload acima de ${PAYLOAD_MAX_BYTES} bytes.`);
+  if (claro.length > PAYLOAD_MAX_BYTES)
+    throw new ErroPayloadGrande(`Payload acima de ${PAYLOAD_MAX_BYTES} bytes.`);
 
   let chaveUa: CryptoKey;
   try {
@@ -124,7 +144,9 @@ export async function cifrarPayload(
   const sal = opcoes.sal ? juntar(opcoes.sal) : crypto.getRandomValues(new Uint8Array(16));
 
   // RFC 8291 §3.3 e §3.4: segredo ECDH, IKM com o `auth` como sal e "WebPush: info" || 0x00 || ua || as.
-  const ecdh = new Uint8Array(await crypto.subtle.deriveBits({ name: 'ECDH', public: chaveUa }, efemera.privada, 256));
+  const ecdh = new Uint8Array(
+    await crypto.subtle.deriveBits({ name: 'ECDH', public: chaveUa }, efemera.privada, 256),
+  );
   const infoChave = juntar(codificador.encode('WebPush: info\0'), uaPublica, efemera.publica);
   const ikm = await hkdf(juntar(segredo), ecdh, infoChave, 32);
 
@@ -135,7 +157,9 @@ export async function cifrarPayload(
   // Registro único e último: texto || 0x02 (RFC 8188 §2; RFC 8291 §4).
   const registro = juntar(claro, new Uint8Array([0x02]));
   const chaveAes = await crypto.subtle.importKey('raw', cek, 'AES-GCM', false, ['encrypt']);
-  const cifrado = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv: nonce }, chaveAes, registro));
+  const cifrado = new Uint8Array(
+    await crypto.subtle.encrypt({ name: 'AES-GCM', iv: nonce }, chaveAes, registro),
+  );
 
   // Cabeçalho do RFC 8188 §2.1: sal, rs em 4 bytes big-endian, idlen e a chave pública efêmera.
   const rs = new Uint8Array(4);

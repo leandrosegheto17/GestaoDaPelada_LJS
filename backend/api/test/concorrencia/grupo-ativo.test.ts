@@ -7,7 +7,11 @@ import { gerarToken } from '../../src/infraestrutura/sessao/token.ts';
 import { envAcesso } from '../acesso/apoio.ts';
 import { comoAppAqui, outraConexao } from '../banco/apoio-conta.ts';
 import { contextoFalso, fabricaComoApp } from '../db/requisicao.ts';
-import { abrirCenarioGrupos, reativar, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  reativar,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * Corrida entre a escrita no grupo e o arquivamento (T25; SEC-007). A escrita é uma requisição de verdade pelo
@@ -74,7 +78,11 @@ const app = criarApp({
       if (!e) return c.json({ erro: 'escrita sem chave' }, 500);
       e.passou.disparar();
       await e.liberar.promessa;
-      await c.var.db.updateTable('grupos').set({ nome: e.nome }).where('id', '=', c.req.param('grupoId')).execute();
+      await c.var.db
+        .updateTable('grupos')
+        .set({ nome: e.nome })
+        .where('id', '=', c.req.param('grupoId'))
+        .execute();
       return c.json({ ok: true }, 200);
     });
   },
@@ -98,7 +106,12 @@ async function patch(grupo: string, token: string, chave: string): Promise<Respo
     cookie: `${NOME_COOKIE_SESSAO}=${token}`,
   });
   const ctx = contextoFalso();
-  const r = await app.request(`/api/grupos/${grupo}/teste-corrida`, { method: 'PATCH', headers, body: '{}' }, envAcesso(aberto.url), ctx);
+  const r = await app.request(
+    `/api/grupos/${grupo}/teste-corrida`,
+    { method: 'PATCH', headers, body: '{}' },
+    envAcesso(aberto.url),
+    ctx,
+  );
   await ctx.esperar();
   return r;
 }
@@ -146,12 +159,17 @@ async function comPrazo<T>(p: Promise<T>, o_que: string): Promise<T> {
 }
 
 async function nomeDe(grupo: string): Promise<string | undefined> {
-  const r = await aberto.db.query<{ nome: string }>('SELECT nome FROM grupos WHERE id = $1', [grupo]);
+  const r = await aberto.db.query<{ nome: string }>('SELECT nome FROM grupos WHERE id = $1', [
+    grupo,
+  ]);
   return r.rows[0]?.nome;
 }
 
 async function arquivadoEm(grupo: string): Promise<Date | null | undefined> {
-  const r = await aberto.db.query<{ arquivado_em: Date | null }>('SELECT arquivado_em FROM grupos WHERE id = $1', [grupo]);
+  const r = await aberto.db.query<{ arquivado_em: Date | null }>(
+    'SELECT arquivado_em FROM grupos WHERE id = $1',
+    [grupo],
+  );
   return r.rows[0]?.arquivado_em;
 }
 
@@ -184,10 +202,12 @@ describe('SEC-007: escrita em curso e arquivamento', () => {
       await arquivador.query('BEGIN');
       await comoAppAqui(arquivador, cenario.contaC);
       const pidArquivador = await pidDe(arquivador);
-      const travou = arquivador.query('SELECT id FROM grupos WHERE id = $1 FOR UPDATE', [cenario.grupoG]).then((r) => {
-        ordem.push('arquivar travou a linha');
-        return r;
-      });
+      const travou = arquivador
+        .query('SELECT id FROM grupos WHERE id = $1 FOR UPDATE', [cenario.grupoG])
+        .then((r) => {
+          ordem.push('arquivar travou a linha');
+          return r;
+        });
 
       // Sem o FOR KEY SHARE da escrita, o FOR UPDATE não esperaria e este laço estouraria o prazo.
       const limite = Date.now() + PRAZO_MS;
@@ -200,7 +220,9 @@ describe('SEC-007: escrita em curso e arquivamento', () => {
       e.liberar.disparar();
       const r = await comPrazo(resposta, 'a escrita responder');
       await comPrazo(travou, 'o arquivar travar a linha');
-      await arquivador.query('UPDATE grupos SET arquivado_em = now() WHERE id = $1', [cenario.grupoG]);
+      await arquivador.query('UPDATE grupos SET arquivado_em = now() WHERE id = $1', [
+        cenario.grupoG,
+      ]);
       await arquivador.query('COMMIT');
 
       expect(r.status).toBe(200);
@@ -225,7 +247,9 @@ describe('SEC-007: escrita em curso e arquivamento', () => {
       await comoAppAqui(arquivador, cenario.contaC);
       const pidArquivador = await pidDe(arquivador);
       await arquivador.query('SELECT id FROM grupos WHERE id = $1 FOR UPDATE', [cenario.grupoG]);
-      await arquivador.query('UPDATE grupos SET arquivado_em = now() WHERE id = $1', [cenario.grupoG]);
+      await arquivador.query('UPDATE grupos SET arquivado_em = now() WHERE id = $1', [
+        cenario.grupoG,
+      ]);
 
       const antes = chamadasDaRota;
       const resposta = patch(cenario.grupoG, await sessao(cenario.contaC), 'dois');
@@ -254,7 +278,10 @@ describe('SEC-007: dois PATCH simultâneos do mesmo grupo', () => {
       const r1 = patch(cenario.grupoG, await sessao(cenario.contaC), 'p1');
       const r2 = patch(cenario.grupoG, await sessao(cenario.contaO), 'p2');
       // Os dois já leram o grupo ativo com FOR KEY SHARE, e as duas transações estão abertas.
-      await comPrazo(Promise.all([um.passou.promessa, dois.passou.promessa]), 'os dois PATCH passarem pela cadeia');
+      await comPrazo(
+        Promise.all([um.passou.promessa, dois.passou.promessa]),
+        'os dois PATCH passarem pela cadeia',
+      );
 
       um.liberar.disparar();
       // Com FOR KEY SHARE o primeiro grava sem esperar o segundo; com FOR SHARE ficaria parado aqui.

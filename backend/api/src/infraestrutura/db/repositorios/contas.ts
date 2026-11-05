@@ -31,7 +31,9 @@ export interface ResultadoCadastro {
 async function cadastrar(db: Db, d: DadosCadastro): Promise<ResultadoCadastro> {
   const r = await sql<{ situacao: 'nova' | 'existente'; conta_id: string; enviar: boolean }>`
     SELECT situacao, conta_id, enviar
-      FROM conta_cadastrar(${d.email}, ${d.nome}, ${d.senha}, ${d.termosVersao}, ${bytea(d.tokenHash)})`.execute(db);
+      FROM conta_cadastrar(${d.email}, ${d.nome}, ${d.senha}, ${d.termosVersao}, ${bytea(d.tokenHash)})`.execute(
+    db,
+  );
   const linha = r.rows[0];
   if (!linha) throw new Error('conta_cadastrar sem resultado');
   return { situacao: linha.situacao, contaId: linha.conta_id, enviar: linha.enviar };
@@ -54,9 +56,16 @@ export type ResultadoEntrar =
 
 /** `conta_entrar` (`1792844040000_conta-entrar-teto-conta.sql:22`). */
 async function entrar(db: Db, d: DadosEntrar): Promise<ResultadoEntrar> {
-  const r = await sql<{ resultado: string; conta_id: string | null; nome: string | null; bloqueado_ate: Date | null }>`
+  const r = await sql<{
+    resultado: string;
+    conta_id: string | null;
+    nome: string | null;
+    bloqueado_ate: Date | null;
+  }>`
     SELECT resultado, conta_id, nome, bloqueado_ate
-      FROM conta_entrar(${d.email}, ${d.senha}, ${bytea(d.ipHash)}, ${bytea(d.tokenHash)})`.execute(db);
+      FROM conta_entrar(${d.email}, ${d.senha}, ${bytea(d.ipHash)}, ${bytea(d.tokenHash)})`.execute(
+    db,
+  );
   const linha = r.rows[0];
   if (!linha) throw new Error('conta_entrar sem resultado');
   switch (linha.resultado) {
@@ -83,7 +92,9 @@ export type ResultadoTrocarSenha = 'ok' | 'senha_incorreta' | 'bloqueado';
 /** `conta_trocar_senha` (`1792843800000_conta-senha-bloqueio.sql:53`): verdadeiro, falso ou nulo (bloqueado). */
 async function trocarSenha(db: Db, d: DadosTrocarSenha): Promise<ResultadoTrocarSenha> {
   const r = await sql<{ ok: boolean | null }>`
-    SELECT conta_trocar_senha(${d.senhaAtual}, ${d.senhaNova}, ${bytea(d.tokenHash)}) AS ok`.execute(db);
+    SELECT conta_trocar_senha(${d.senhaAtual}, ${d.senhaNova}, ${bytea(d.tokenHash)}) AS ok`.execute(
+    db,
+  );
   const ok = r.rows[0]?.ok;
   if (ok === null || ok === undefined) return 'bloqueado';
   return ok ? 'ok' : 'senha_incorreta';
@@ -100,7 +111,8 @@ async function excluir(db: Db, senha: string): Promise<ResultadoExcluir> {
   const linha = r.rows[0];
   if (!linha) throw new Error('conta_excluir sem resultado');
   if (linha.resultado === 'unico_admin') return { resultado: 'unico_admin', grupos: linha.grupos };
-  if (linha.resultado === 'ok' || linha.resultado === 'bloqueado') return { resultado: linha.resultado };
+  if (linha.resultado === 'ok' || linha.resultado === 'bloqueado')
+    return { resultado: linha.resultado };
   return { resultado: 'senha_incorreta' };
 }
 
@@ -129,7 +141,9 @@ export interface Eu {
  */
 async function eu(db: Db): Promise<Eu | null> {
   const conta = await sql<{ id: string; nome: string; email: string }>`
-    SELECT id, nome, email FROM contas WHERE id = app_conta_id() AND excluida_em IS NULL`.execute(db);
+    SELECT id, nome, email FROM contas WHERE id = app_conta_id() AND excluida_em IS NULL`.execute(
+    db,
+  );
   const linha = conta.rows[0];
   if (!linha) return null;
   const grupos = await sql<GrupoDaConta>`
@@ -156,11 +170,22 @@ export interface ResultadoPedirLink {
 }
 
 /** `link_pedir_com_confirmacao` (`1792843920000_conta-esqueci-nao-confirmada.sql:9`). */
-async function pedir(db: Db, email: string, tipo: TipoLink, tokenHash: Uint8Array): Promise<ResultadoPedirLink> {
+async function pedir(
+  db: Db,
+  email: string,
+  tipo: TipoLink,
+  tokenHash: Uint8Array,
+): Promise<ResultadoPedirLink> {
   const r = await sql<{ enviar: boolean; nome: string | null; confirmada: boolean }>`
-    SELECT enviar, nome, confirmada FROM link_pedir_com_confirmacao(${email}, ${tipo}, ${bytea(tokenHash)})`.execute(db);
+    SELECT enviar, nome, confirmada FROM link_pedir_com_confirmacao(${email}, ${tipo}, ${bytea(tokenHash)})`.execute(
+    db,
+  );
   const linha = r.rows[0];
-  return { enviar: linha?.enviar ?? false, nome: linha?.nome ?? null, confirmada: linha?.confirmada ?? false };
+  return {
+    enviar: linha?.enviar ?? false,
+    nome: linha?.nome ?? null,
+    confirmada: linha?.confirmada ?? false,
+  };
 }
 
 /**
@@ -178,7 +203,9 @@ async function confirmar(db: Db, tokenHash: Uint8Array): Promise<string | null> 
  * link, encerra as sessões e zera as falhas (ACE-24, ACE-76). Falso para link inválido (ACE-25).
  */
 async function novaSenha(db: Db, tokenHash: Uint8Array, senha: string): Promise<boolean> {
-  const r = await sql<{ ok: boolean | null }>`SELECT link_nova_senha(${bytea(tokenHash)}, ${senha}) AS ok`.execute(db);
+  const r = await sql<{
+    ok: boolean | null;
+  }>`SELECT link_nova_senha(${bytea(tokenHash)}, ${senha}) AS ok`.execute(db);
   return r.rows[0]?.ok === true;
 }
 

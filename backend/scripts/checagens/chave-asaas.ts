@@ -22,7 +22,9 @@ export function checarChaveAsaas(arquivos: readonly Arquivo[]): string[] {
     if (conteudo.includes('\u0000')) continue;
     conteudo.split('\n').forEach((linha, i) => {
       if (RE_CHAVE_ASAAS.test(linha)) {
-        problemas.push(`${caminho}:${i + 1}: parece uma chave da API do Asaas; segredo só no secret do Worker (PLA-37)`);
+        problemas.push(
+          `${caminho}:${i + 1}: parece uma chave da API do Asaas; segredo só no secret do Worker (PLA-37)`,
+        );
       }
     });
   }

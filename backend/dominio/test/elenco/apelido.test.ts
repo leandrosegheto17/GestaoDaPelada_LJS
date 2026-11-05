@@ -3,7 +3,12 @@ import { chaveBusca, compararApelido, formatarData } from '../../src/elenco/apel
 
 describe('apelido', () => {
   it('GEL-47: ["Zé", "ana", "Álvaro", "Bia"] ordena em Álvaro, ana, Bia, Zé', () => {
-    expect(['Zé', 'ana', 'Álvaro', 'Bia'].sort(compararApelido)).toEqual(['Álvaro', 'ana', 'Bia', 'Zé']);
+    expect(['Zé', 'ana', 'Álvaro', 'Bia'].sort(compararApelido)).toEqual([
+      'Álvaro',
+      'ana',
+      'Bia',
+      'Zé',
+    ]);
   });
 
   it('GEL-47: apelidos iguais sem acento e sem caixa têm ordem estável pelo texto original', () => {

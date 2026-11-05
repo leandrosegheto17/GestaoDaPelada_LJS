@@ -71,7 +71,11 @@ describe('grupo_criar de 7 parâmetros', () => {
       expect(id).toBeTruthy();
       await d.query('RESET ROLE');
       expect(await pesosDe(d, id)).toEqual([
-        { vigente_desde: '2026-03-15', pesos: [1, 1, 1, 1, -1, -1], registrado_por: cenario.contaC },
+        {
+          vigente_desde: '2026-03-15',
+          pesos: [1, 1, 1, 1, -1, -1],
+          registrado_por: cenario.contaC,
+        },
       ]);
       expect(await contar(d, 'SELECT 1 FROM vinculos_admin WHERE grupo_id = $1', [id])).toBe(1);
       expect(await contar(d, 'SELECT 1 FROM habilidades WHERE grupo_id = $1', [id])).toBe(2);
@@ -95,7 +99,9 @@ describe('grupo_criar de 7 parâmetros', () => {
   it('PAR-15: sem conta na sessão, recusa', async () => {
     const { db } = aberto;
     await comoApp(db, {}, async (d) => {
-      await expect(criar7(d, 'racha-sem-conta', '2026-03-15')).rejects.toMatchObject({ code: '42501' });
+      await expect(criar7(d, 'racha-sem-conta', '2026-03-15')).rejects.toMatchObject({
+        code: '42501',
+      });
     });
   });
 
@@ -134,14 +140,17 @@ describe('grupo_criar de 7 parâmetros', () => {
 // delegação vira "não existe mais", e a regra do relógio passa a exigir zero funções (autorizado, `## Autorizações`).
 describe('grupo_criar de 6 parâmetros (removida, AD-037)', () => {
   it('SIM-67: a assinatura de 6 parâmetros não existe; chamar com 6 argumentos falha (42883)', async () => {
-    const r = await aberto.db.query<{ existe: boolean }>(`SELECT to_regprocedure($1) IS NOT NULL AS existe`, [
-      ASSINATURA_6,
-    ]);
+    const r = await aberto.db.query<{ existe: boolean }>(
+      `SELECT to_regprocedure($1) IS NOT NULL AS existe`,
+      [ASSINATURA_6],
+    );
     expect(r.rows[0]?.existe).toBe(false);
     const { db, cenario } = aberto;
     await comoApp(db, { conta: cenario.contaC }, async (d) => {
       await expect(
-        d.query(`SELECT id FROM grupo_criar('Racha Antigo', 'quinta', 'semanal', '20:00', 'racha-antigo', ARRAY['Passe']::text[])`),
+        d.query(
+          `SELECT id FROM grupo_criar('Racha Antigo', 'quinta', 'semanal', '20:00', 'racha-antigo', ARRAY['Passe']::text[])`,
+        ),
       ).rejects.toMatchObject({ code: '42883' });
     });
   });
@@ -151,7 +160,11 @@ describe('proteções da assinatura', () => {
   it.each([ASSINATURA_7])(
     'PAR-15: %s é SECURITY DEFINER, com search_path fixo e EXECUTE só para pelada_app',
     async (assinatura) => {
-      const r = await aberto.db.query<{ definer: boolean; config: string[] | null; executores: string[] }>(
+      const r = await aberto.db.query<{
+        definer: boolean;
+        config: string[] | null;
+        executores: string[];
+      }>(
         `SELECT p.prosecdef AS definer, p.proconfig AS config,
                 coalesce(array(SELECT coalesce(r.rolname::text, 'PUBLIC')
                                  FROM aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) a
@@ -161,7 +174,11 @@ describe('proteções da assinatura', () => {
            FROM pg_proc p WHERE p.oid = $1::regprocedure`,
         [assinatura],
       );
-      expect(r.rows[0]).toEqual({ definer: true, config: ['search_path=public, pg_temp'], executores: ['pelada_app'] });
+      expect(r.rows[0]).toEqual({
+        definer: true,
+        config: ['search_path=public, pg_temp'],
+        executores: ['pelada_app'],
+      });
     },
   );
 

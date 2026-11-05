@@ -15,7 +15,8 @@ import { OPCOES_POSICAO } from '../jogadores/posicoes.ts';
  * que foi digitado e mostra a mensagem de cada campo do 422.
  */
 
-export type CampoJogador = 'apelido' | 'anoNascimento' | 'posicao' | 'telefone' | 'dataEntrada' | 'pontuacaoInicial';
+export type CampoJogador =
+  'apelido' | 'anoNascimento' | 'posicao' | 'telefone' | 'dataEntrada' | 'pontuacaoInicial';
 
 export const CAMPOS_JOGADOR: readonly { campo: CampoJogador; id: string; rotulo: string }[] = [
   { campo: 'apelido', id: 'apelido', rotulo: 'Apelido' },

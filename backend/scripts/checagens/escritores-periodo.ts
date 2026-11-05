@@ -22,16 +22,30 @@ const TABELA = ['periodos', 'ativos'].join('_');
 const COLUNA = ['inicio', 'pontuacao'].join('_');
 
 export const PASTAS_CONFERIDAS: readonly string[] = ['backend/api/src/', 'frontend/web/src/'];
-export const ESCRITORES_PERMITIDOS: readonly string[] = ['backend/api/src/infraestrutura/db/repositorios/jogadores.ts'];
+export const ESCRITORES_PERMITIDOS: readonly string[] = [
+  'backend/api/src/infraestrutura/db/repositorios/jogadores.ts',
+];
 export const PASTA_MIGRACOES = 'backend/api/src/infraestrutura/db/migracoes/';
 
 /** Padrões sobre o arquivo inteiro (o SQL e o objeto do Kysely cruzam linhas). */
 const PROIBIDOS: ReadonlyArray<[string, RegExp]> = [
-  [`escrita SQL em ${TABELA}`, new RegExp(`\\b(INSERT\\s+INTO|UPDATE|DELETE\\s+FROM)\\s+${TABELA}\\b`, 'gi')],
-  [`escrita Kysely em ${TABELA}`, new RegExp(`\\b(insertInto|updateTable|deleteFrom)\\s*\\(\\s*['"\`]${TABELA}['"\`]`, 'g')],
+  [
+    `escrita SQL em ${TABELA}`,
+    new RegExp(`\\b(INSERT\\s+INTO|UPDATE|DELETE\\s+FROM)\\s+${TABELA}\\b`, 'gi'),
+  ],
+  [
+    `escrita Kysely em ${TABELA}`,
+    new RegExp(`\\b(insertInto|updateTable|deleteFrom)\\s*\\(\\s*['"\`]${TABELA}['"\`]`, 'g'),
+  ],
   [`${COLUNA} num SET`, new RegExp(`\\b${COLUNA}\\s*=(?!=)`, 'g')],
-  [`${COLUNA} num INSERT de jogadores`, new RegExp(`INSERT\\s+INTO\\s+jogadores\\s*\\([^)]*\\b${COLUNA}\\b`, 'gi')],
-  [`${COLUNA} num set/values do Kysely`, new RegExp(`\\.(set|values)\\s*\\(\\s*\\{[^}]*\\b${COLUNA}\\b`, 'g')],
+  [
+    `${COLUNA} num INSERT de jogadores`,
+    new RegExp(`INSERT\\s+INTO\\s+jogadores\\s*\\([^)]*\\b${COLUNA}\\b`, 'gi'),
+  ],
+  [
+    `${COLUNA} num set/values do Kysely`,
+    new RegExp(`\\.(set|values)\\s*\\(\\s*\\{[^}]*\\b${COLUNA}\\b`, 'g'),
+  ],
   [`${COLUNA} num set do Kysely`, new RegExp(`\\.set\\s*\\(\\s*['"\`]${COLUNA}['"\`]`, 'g')],
 ];
 

@@ -12,7 +12,12 @@ import { comDb } from './apoio.ts';
  * configuração depois de hoje fora da vigente.
  */
 
-const DADOS = { nome: 'Pelada do Início', diaSemana: 'quarta', frequencia: 'semanal', horario: '19:00' } as const;
+const DADOS = {
+  nome: 'Pelada do Início',
+  diaSemana: 'quarta',
+  frequencia: 'semanal',
+  horario: '19:00',
+} as const;
 
 let aberto: CenarioGruposAberto;
 
@@ -55,7 +60,9 @@ describe('grupos.ler com hoje', () => {
 
   it('PAR-132: em G no sábado 2026-01-10, a sugerida é a quinta 2026-01-08, que tem partida', async () => {
     const { url, cenario } = aberto;
-    const d = await comDb(url, cenario.contaC, (db) => grupos.ler(db, cenario.grupoG, '2026-01-10'));
+    const d = await comDb(url, cenario.contaC, (db) =>
+      grupos.ler(db, cenario.grupoG, '2026-01-10'),
+    );
     expect(d).toMatchObject({
       dataSugeridaPartida: '2026-01-08',
       partidaNaDataSugerida: true,
@@ -67,13 +74,21 @@ describe('grupos.ler com hoje', () => {
 
   it('PAR-132: em G na quinta 2026-01-15, a sugerida é hoje, sem partida', async () => {
     const { url, cenario } = aberto;
-    const d = await comDb(url, cenario.contaC, (db) => grupos.ler(db, cenario.grupoG, '2026-01-15'));
-    expect(d).toMatchObject({ dataSugeridaPartida: '2026-01-15', partidaNaDataSugerida: false, partidasNoMes: 1 });
+    const d = await comDb(url, cenario.contaC, (db) =>
+      grupos.ler(db, cenario.grupoG, '2026-01-15'),
+    );
+    expect(d).toMatchObject({
+      dataSugeridaPartida: '2026-01-15',
+      partidaNaDataSugerida: false,
+      partidasNoMes: 1,
+    });
   });
 
   it('PAR-132: em fevereiro, G não tem partida no mês', async () => {
     const { url, cenario } = aberto;
-    const d = await comDb(url, cenario.contaC, (db) => grupos.ler(db, cenario.grupoG, '2026-02-10'));
+    const d = await comDb(url, cenario.contaC, (db) =>
+      grupos.ler(db, cenario.grupoG, '2026-02-10'),
+    );
     expect(d?.partidasNoMes).toBe(0);
   });
 
@@ -87,10 +102,14 @@ describe('grupos.ler com hoje', () => {
       [cenario.grupoG],
     );
     try {
-      const d = await comDb(url, cenario.contaC, (dbApp) => grupos.ler(dbApp, cenario.grupoG, '2026-01-10'));
+      const d = await comDb(url, cenario.contaC, (dbApp) =>
+        grupos.ler(dbApp, cenario.grupoG, '2026-01-10'),
+      );
       expect(d?.aparelhosNaSemana).toBe(2);
     } finally {
-      await db.query(`DELETE FROM eventos_uso WHERE grupo_id = $1 AND tipo = 'ranking_aberto'`, [cenario.grupoG]);
+      await db.query(`DELETE FROM eventos_uso WHERE grupo_id = $1 AND tipo = 'ranking_aberto'`, [
+        cenario.grupoG,
+      ]);
     }
   });
 
@@ -104,7 +123,9 @@ describe('grupos.ler com hoje', () => {
   it('SIM-08: grupo de quinta numa terça com escalação da quinta: escalacaoNoProximoDia verdadeiro; sem, falso', async () => {
     const { url, db, cenario } = aberto;
     // 2026-03-03 é terça; a quinta seguinte é 2026-03-05. Escalação gravada como owner, apagada no finally.
-    const antes = await comDb(url, cenario.contaC, (dbApp) => grupos.ler(dbApp, cenario.grupoG, '2026-03-03'));
+    const antes = await comDb(url, cenario.contaC, (dbApp) =>
+      grupos.ler(dbApp, cenario.grupoG, '2026-03-03'),
+    );
     expect(antes).toMatchObject({ proximoDiaDeJogo: '2026-03-05', escalacaoNoProximoDia: false });
     await db.query(
       `INSERT INTO escalacoes (grupo_id, data, formato, n, k, composicao, confirmada_por, confirmada_em)
@@ -112,24 +133,37 @@ describe('grupos.ler com hoje', () => {
       [cenario.grupoG, cenario.contaC],
     );
     try {
-      const d = await comDb(url, cenario.contaC, (dbApp) => grupos.ler(dbApp, cenario.grupoG, '2026-03-03'));
+      const d = await comDb(url, cenario.contaC, (dbApp) =>
+        grupos.ler(dbApp, cenario.grupoG, '2026-03-03'),
+      );
       expect(d).toMatchObject({ proximoDiaDeJogo: '2026-03-05', escalacaoNoProximoDia: true });
       // Escalação de outra data não conta para o próximo dia.
-      const quintaSeguinte = await comDb(url, cenario.contaC, (dbApp) => grupos.ler(dbApp, cenario.grupoG, '2026-03-06'));
-      expect(quintaSeguinte).toMatchObject({ proximoDiaDeJogo: '2026-03-12', escalacaoNoProximoDia: false });
+      const quintaSeguinte = await comDb(url, cenario.contaC, (dbApp) =>
+        grupos.ler(dbApp, cenario.grupoG, '2026-03-06'),
+      );
+      expect(quintaSeguinte).toMatchObject({
+        proximoDiaDeJogo: '2026-03-12',
+        escalacaoNoProximoDia: false,
+      });
     } finally {
-      await db.query(`DELETE FROM escalacoes WHERE grupo_id = $1 AND data = '2026-03-05'`, [cenario.grupoG]);
+      await db.query(`DELETE FROM escalacoes WHERE grupo_id = $1 AND data = '2026-03-05'`, [
+        cenario.grupoG,
+      ]);
     }
   });
 
   it('SIM-08: na própria quinta, o próximo dia de jogo é hoje', async () => {
     const { url, cenario } = aberto;
-    const d = await comDb(url, cenario.contaC, (db) => grupos.ler(db, cenario.grupoG, '2026-03-05'));
+    const d = await comDb(url, cenario.contaC, (db) =>
+      grupos.ler(db, cenario.grupoG, '2026-03-05'),
+    );
     expect(d?.proximoDiaDeJogo).toBe('2026-03-05');
   });
 
   it('PAR-132: a conta de outro grupo recebe nulo', async () => {
     const { url, cenario } = aberto;
-    expect(await comDb(url, cenario.contaB, (db) => grupos.ler(db, cenario.grupoG, '2026-01-10'))).toBeNull();
+    expect(
+      await comDb(url, cenario.contaB, (db) => grupos.ler(db, cenario.grupoG, '2026-01-10')),
+    ).toBeNull();
   });
 });

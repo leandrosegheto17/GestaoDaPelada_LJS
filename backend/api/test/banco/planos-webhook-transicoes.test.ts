@@ -66,10 +66,10 @@ async function caso<T, R>(
     );
     await antesDaChamada(db);
     await db.query('SET LOCAL ROLE pelada_app');
-    await db.query(`SELECT set_config('app.conta_id', $1, true), set_config('app.slug_publico', $2, true)`, [
-      contexto.conta ?? '',
-      contexto.slug ?? '',
-    ]);
+    await db.query(
+      `SELECT set_config('app.conta_id', $1, true), set_config('app.slug_publico', $2, true)`,
+      [contexto.conta ?? '', contexto.slug ?? ''],
+    );
     const r = await fn(db);
     await db.query('RESET ROLE');
     return await conferir(db, r);
@@ -79,15 +79,26 @@ async function caso<T, R>(
 }
 
 const ativar = (d: pg.Client, sub = 'sub_t16') =>
-  d.query<{ ok: boolean }>(`SELECT plano_ativar($1, '2026-12-30', 'pay_t16', '2026-11-05 10:00:00', 'evt_t16') AS ok`, [sub]);
+  d.query<{ ok: boolean }>(
+    `SELECT plano_ativar($1, '2026-12-30', 'pay_t16', '2026-11-05 10:00:00', 'evt_t16') AS ok`,
+    [sub],
+  );
 const inadimplente = (d: pg.Client, sub = 'sub_t16') =>
-  d.query<{ ok: boolean }>(`SELECT plano_inadimplente($1, '2026-11-05 10:00:00', 'evt_t16') AS ok`, [sub]);
+  d.query<{ ok: boolean }>(
+    `SELECT plano_inadimplente($1, '2026-11-05 10:00:00', 'evt_t16') AS ok`,
+    [sub],
+  );
 const cancelado = (d: pg.Client, sub = 'sub_t16') =>
-  d.query<{ ok: boolean }>(`SELECT plano_cancelado($1, '2026-11-05 10:00:00', 'evt_t16') AS ok`, [sub]);
+  d.query<{ ok: boolean }>(`SELECT plano_cancelado($1, '2026-11-05 10:00:00', 'evt_t16') AS ok`, [
+    sub,
+  ]);
 
 async function estado(d: pg.Client) {
   const { cenario } = aberto;
-  const g = await d.query('SELECT situacao_comercial, trial_inicio::text FROM grupos WHERE id = $1', [cenario.grupoG]);
+  const g = await d.query(
+    'SELECT situacao_comercial, trial_inicio::text FROM grupos WHERE id = $1',
+    [cenario.grupoG],
+  );
   const a = await d.query(
     `SELECT situacao, pago_ate::text, cobranca_pro_id,
             to_char(ultimo_evento_em AT TIME ZONE 'America/Sao_Paulo', 'YYYY-MM-DD HH24:MI:SS') AS ultimo
@@ -114,15 +125,23 @@ describe('plano_ativar', () => {
     expect(r).toEqual({
       ok: true,
       grupo: { situacao_comercial: 'ativo', trial_inicio: null },
-      assinatura: { situacao: 'ativa', pago_ate: '2026-12-30', cobranca_pro_id: 'pay_t16', ultimo: '2026-11-05 10:00:00' },
+      assinatura: {
+        situacao: 'ativa',
+        pago_ate: '2026-12-30',
+        cobranca_pro_id: 'pay_t16',
+        ultimo: '2026-11-05 10:00:00',
+      },
       efeito: 'ativar',
     });
   });
 
-  it.each(['inadimplente', 'cancelado'] as const)('PLA-44: grupo %s com assinatura ativa volta a ativo', async (g) => {
-    const r = await caso(g, 'ativa', {}, ativar, async (d) => (await estado(d)).grupo);
-    expect(r).toEqual({ situacao_comercial: 'ativo', trial_inicio: null });
-  });
+  it.each(['inadimplente', 'cancelado'] as const)(
+    'PLA-44: grupo %s com assinatura ativa volta a ativo',
+    async (g) => {
+      const r = await caso(g, 'ativa', {}, ativar, async (d) => (await estado(d)).grupo);
+      expect(r).toEqual({ situacao_comercial: 'ativo', trial_inicio: null });
+    },
+  );
 
   it('PLA-44: falha forçada na auditoria desfaz grupo, assinatura e efeito', async () => {
     const r = await caso(
@@ -144,13 +163,20 @@ describe('plano_ativar', () => {
     );
     expect(r).toEqual({
       grupo: { situacao_comercial: 'trial', trial_inicio: '2026-11-01' },
-      assinatura: { situacao: 'aguardando_pagamento', pago_ate: null, cobranca_pro_id: null, ultimo: null },
+      assinatura: {
+        situacao: 'aguardando_pagamento',
+        pago_ate: null,
+        cobranca_pro_id: null,
+        ultimo: null,
+      },
       efeito: null,
     });
   });
 
   it('PLA-14: ativar audita plano_ativado com infraestrutura, sem conta, e antes e depois', async () => {
-    const linhas = await caso('trial', 'aguardando_pagamento', {}, ativar, (d) => auditoriaDe(d, 'plano_ativado'));
+    const linhas = await caso('trial', 'aguardando_pagamento', {}, ativar, (d) =>
+      auditoriaDe(d, 'plano_ativado'),
+    );
     expect(linhas).toEqual([
       {
         autor_tipo: 'infraestrutura',
@@ -162,17 +188,26 @@ describe('plano_ativar', () => {
   });
 
   it('PLA-44: assinatura desconhecida devolve false e nada muda', async () => {
-    const r = await caso('trial', 'aguardando_pagamento', {}, (d) => ativar(d, 'sub_nao_existe'), async (d, res) => ({
-      ok: res.rows[0]?.ok,
-      ...(await estado(d)),
-    }));
+    const r = await caso(
+      'trial',
+      'aguardando_pagamento',
+      {},
+      (d) => ativar(d, 'sub_nao_existe'),
+      async (d, res) => ({
+        ok: res.rows[0]?.ok,
+        ...(await estado(d)),
+      }),
+    );
     expect(r.ok).toBe(false);
     expect(r.grupo).toEqual({ situacao_comercial: 'trial', trial_inicio: '2026-11-01' });
     expect(r.efeito).toBeNull();
   });
 
   it('PLA-44: assinatura cancelada não é reativada (false)', async () => {
-    const r = await caso('cancelado', 'cancelada', {}, ativar, async (d, res) => ({ ok: res.rows[0]?.ok, ...(await estado(d)) }));
+    const r = await caso('cancelado', 'cancelada', {}, ativar, async (d, res) => ({
+      ok: res.rows[0]?.ok,
+      ...(await estado(d)),
+    }));
     expect(r.ok).toBe(false);
     expect(r.grupo).toEqual({ situacao_comercial: 'cancelado', trial_inicio: null });
   });
@@ -189,20 +224,38 @@ describe('plano_inadimplente', () => {
     const r = await caso('ativo', 'ativa', {}, inadimplente, async (d) => estado(d));
     expect(r).toEqual({
       grupo: { situacao_comercial: 'inadimplente', trial_inicio: null },
-      assinatura: { situacao: 'ativa', pago_ate: '2026-11-30', cobranca_pro_id: 'pay_t16_antiga', ultimo: '2026-11-05 10:00:00' },
+      assinatura: {
+        situacao: 'ativa',
+        pago_ate: '2026-11-30',
+        cobranca_pro_id: 'pay_t16_antiga',
+        ultimo: '2026-11-05 10:00:00',
+      },
       efeito: 'inadimplente',
     });
   });
 
   it('PLA-47: estorno (a mesma função) não mexe na cobrança que deu o Pro', async () => {
-    const r = await caso('ativo', 'ativa', {}, inadimplente, async (d) => (await estado(d)).assinatura);
+    const r = await caso(
+      'ativo',
+      'ativa',
+      {},
+      inadimplente,
+      async (d) => (await estado(d)).assinatura,
+    );
     expect(r).toMatchObject({ situacao: 'ativa', cobranca_pro_id: 'pay_t16_antiga' });
   });
 
   it('PLA-14: audita plano_inadimplente com infraestrutura e antes e depois', async () => {
-    const linhas = await caso('ativo', 'ativa', {}, inadimplente, (d) => auditoriaDe(d, 'plano_inadimplente'));
+    const linhas = await caso('ativo', 'ativa', {}, inadimplente, (d) =>
+      auditoriaDe(d, 'plano_inadimplente'),
+    );
     expect(linhas).toEqual([
-      { autor_tipo: 'infraestrutura', autor_conta_id: null, entidade: 'assinatura', resumo: { antes: 'ativo', depois: 'inadimplente' } },
+      {
+        autor_tipo: 'infraestrutura',
+        autor_conta_id: null,
+        entidade: 'assinatura',
+        resumo: { antes: 'ativo', depois: 'inadimplente' },
+      },
     ]);
   });
 });
@@ -212,7 +265,12 @@ describe('plano_cancelado', () => {
     const r = await caso('ativo', 'ativa', {}, cancelado, async (d) => estado(d));
     expect(r).toEqual({
       grupo: { situacao_comercial: 'cancelado', trial_inicio: null },
-      assinatura: { situacao: 'cancelada', pago_ate: '2026-11-30', cobranca_pro_id: 'pay_t16_antiga', ultimo: '2026-11-05 10:00:00' },
+      assinatura: {
+        situacao: 'cancelada',
+        pago_ate: '2026-11-30',
+        cobranca_pro_id: 'pay_t16_antiga',
+        ultimo: '2026-11-05 10:00:00',
+      },
       efeito: 'cancelar',
     });
   });
@@ -224,13 +282,18 @@ describe('plano_cancelado', () => {
   });
 
   it('PLA-46: já cancelada: false e nada muda', async () => {
-    const r = await caso('cancelado', 'cancelada', {}, cancelado, async (d, res) => ({ ok: res.rows[0]?.ok, ...(await estado(d)) }));
+    const r = await caso('cancelado', 'cancelada', {}, cancelado, async (d, res) => ({
+      ok: res.rows[0]?.ok,
+      ...(await estado(d)),
+    }));
     expect(r.ok).toBe(false);
     expect(r.efeito).toBeNull();
   });
 
   it('PLA-14: audita plano_cancelado com infraestrutura e antes e depois', async () => {
-    const linhas = await caso('ativo', 'ativa', {}, cancelado, (d) => auditoriaDe(d, 'plano_cancelado'));
+    const linhas = await caso('ativo', 'ativa', {}, cancelado, (d) =>
+      auditoriaDe(d, 'plano_cancelado'),
+    );
     expect(linhas).toEqual([
       {
         autor_tipo: 'infraestrutura',
@@ -247,17 +310,24 @@ describe('PLA-13: as transições só sem conta e sem slug', () => {
     ['plano_ativar', ativar],
     ['plano_inadimplente', inadimplente],
     ['plano_cancelado', cancelado],
-    ['asaas_evento_sem_efeito', (d: pg.Client) => d.query(`SELECT asaas_evento_sem_efeito('evt_t16', 'nao_tratado')`)],
+    [
+      'asaas_evento_sem_efeito',
+      (d: pg.Client) => d.query(`SELECT asaas_evento_sem_efeito('evt_t16', 'nao_tratado')`),
+    ],
   ] as const;
 
   it.each(chamadas)('PLA-13: %s com conta no contexto dá 42501', async (_nome, fn) => {
-    await expect(caso('ativo', 'ativa', { conta: aberto.cenario.contaC }, fn, async () => undefined)).rejects.toMatchObject({
+    await expect(
+      caso('ativo', 'ativa', { conta: aberto.cenario.contaC }, fn, async () => undefined),
+    ).rejects.toMatchObject({
       code: '42501',
     });
   });
 
   it.each(chamadas)('PLA-13: %s com slug no contexto dá 42501', async (_nome, fn) => {
-    await expect(caso('ativo', 'ativa', { slug: aberto.cenario.slugG }, fn, async () => undefined)).rejects.toMatchObject({
+    await expect(
+      caso('ativo', 'ativa', { slug: aberto.cenario.slugG }, fn, async () => undefined),
+    ).rejects.toMatchObject({
       code: '42501',
     });
   });
@@ -270,9 +340,15 @@ describe('asaas_evento_sem_efeito', () => {
       'ativa',
       {},
       (d) => d.query(`SELECT asaas_evento_sem_efeito('evt_t16', 'nao_tratado')`),
-      async (d) => ({ ...(await estado(d)), auditoria: (
-        await d.query(`SELECT 1 FROM auditoria WHERE grupo_id = $1 AND autor_tipo = 'infraestrutura'`, [aberto.cenario.grupoG])
-      ).rowCount }),
+      async (d) => ({
+        ...(await estado(d)),
+        auditoria: (
+          await d.query(
+            `SELECT 1 FROM auditoria WHERE grupo_id = $1 AND autor_tipo = 'infraestrutura'`,
+            [aberto.cenario.grupoG],
+          )
+        ).rowCount,
+      }),
     );
     expect(r.efeito).toBe('nenhum:nao_tratado');
     expect(r.grupo).toEqual({ situacao_comercial: 'ativo', trial_inicio: null });

@@ -25,7 +25,8 @@ import {
 /** PAR-116: exatamente uma rodada que passa a constar é falta. */
 export const AVISO_UMA_FALTA = 'Ela vale 0 ponto até você lançar a presença em Editar partida.';
 /** PAR-116: duas ou mais rodadas que passam a constar são falta. */
-export const AVISO_VARIAS_FALTAS = 'Elas valem 0 ponto até você lançar a presença em Editar partida.';
+export const AVISO_VARIAS_FALTAS =
+  'Elas valem 0 ponto até você lançar a presença em Editar partida.';
 
 export interface RodadaQuePassaAConstar {
   data: Data;
@@ -72,7 +73,13 @@ function rodadasDeTodosOsMeses(
   }
   const porId = new Map<string, Rodada>();
   for (const [mes, doMes] of porMes) {
-    const rodadas = rodadasNoMes(jogador, presencas, doMes, preparado.resolver, periodoDoMes(hoje, mes));
+    const rodadas = rodadasNoMes(
+      jogador,
+      presencas,
+      doMes,
+      preparado.resolver,
+      periodoDoMes(hoje, mes),
+    );
     doMes.forEach((p, i) => porId.set(p.id, rodadas[i] as Rodada));
   }
   return partidas.map((p) => porId.get(p.id) as Rodada);
@@ -89,7 +96,9 @@ function diferencaDasRodadas(
   depois: JogadorDoRanking,
   hoje: Data,
 ): { passam: RodadaQuePassaAConstar[]; deixam: RodadaQueDeixaDeConstar[] } {
-  const partidas = emOrdemDeData(historico.partidas.filter((p) => compararDatas(p.data, hoje) <= 0));
+  const partidas = emOrdemDeData(
+    historico.partidas.filter((p) => compararDatas(p.data, hoje) <= 0),
+  );
   const rodadasAntes = rodadasDeTodosOsMeses(antes, preparado, partidas, hoje);
   const rodadasDepois = rodadasDeTodosOsMeses(depois, preparado, partidas, hoje);
   const passam: RodadaQuePassaAConstar[] = [];
@@ -132,11 +141,21 @@ export function previaDosPeriodos(
  * GEL-77 a GEL-82), então o recuo para antes do primeiro período alinha o início dele à nova data (GEL-81, PAR-115).
  * Data recusada lança com a mensagem da gravação; quem chama valida antes e devolve o 422 (PAR-112).
  */
-export function previaDoInicio(historico: HistoricoDoGrupo, jogadorId: string, novaData: Data, hoje: Data): PreviaDoInicio {
+export function previaDoInicio(
+  historico: HistoricoDoGrupo,
+  jogadorId: string,
+  novaData: Data,
+  hoje: Data,
+): PreviaDoInicio {
   const preparado = prepararHistorico(historico);
   const antes = jogadorDoHistorico(historico, jogadorId);
   const ordenados = [...antes.periodos].sort((a, b) => compararDatas(a.inicio, b.inicio));
-  const avaliacao = avaliarInicio({ periodos: ordenados, inicioPontuacao: antes.inicioPontuacao ?? null, novaData, hoje });
+  const avaliacao = avaliarInicio({
+    periodos: ordenados,
+    inicioPontuacao: antes.inicioPontuacao ?? null,
+    novaData,
+    hoje,
+  });
   if (!avaliacao.ok) throw new Error(avaliacao.mensagem);
   // Data igual à atual não grava (GEL-82): o cenário de depois é o de antes.
   const depois: JogadorDoRanking = avaliacao.alterado

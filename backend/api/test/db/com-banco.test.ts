@@ -30,9 +30,12 @@ function montar(espiada: FabricaEspiada = fabricaEspiada()) {
     registrarExtras: (api) => {
       api.use(
         '/teste/banco/*',
-        comBanco((c) => ({ conta: c.req.header('x-conta') ?? null, slug: c.req.header('x-slug') ?? null }), {
-          fabrica: espiada.fabrica,
-        }),
+        comBanco(
+          (c) => ({ conta: c.req.header('x-conta') ?? null, slug: c.req.header('x-slug') ?? null }),
+          {
+            fabrica: espiada.fabrica,
+          },
+        ),
       );
       api.get('/teste/banco/nada', (c) => c.json({ ok: true }));
       api.get('/teste/banco/contexto', async (c) => {
@@ -66,7 +69,9 @@ function montar(espiada: FabricaEspiada = fabricaEspiada()) {
 const nomeUnico = () => `pelada_teste_${randomBytes(4).toString('hex')}`;
 
 /** Banco de teste com a tabela `marcas`, a URL marcada com um application_name e um cliente admin. */
-async function comMarcas(fn: (urlApp: string, admin: pg.Client, nome: string) => Promise<void>): Promise<void> {
+async function comMarcas(
+  fn: (urlApp: string, admin: pg.Client, nome: string) => Promise<void>,
+): Promise<void> {
   await bancoDeTeste(async (url) => {
     await comCliente(url, async (admin) => {
       await admin.query('CREATE TABLE marcas (v text NOT NULL)');
@@ -197,7 +202,9 @@ describe('comBanco', () => {
     it(`FUN-16: status ${status} devolvido pela rota desfaz a escrita`, async () => {
       await comMarcas(async (urlApp, admin) => {
         const { app } = montar();
-        const r = await pedir(app, urlApp, `/api/teste/banco/escreve?fim=${status}`, { method: 'POST' });
+        const r = await pedir(app, urlApp, `/api/teste/banco/escreve?fim=${status}`, {
+          method: 'POST',
+        });
         expect(r.status).toBe(status);
         expect(await marcas(admin)).toEqual([]);
       });
@@ -238,7 +245,9 @@ describe('comBanco', () => {
     await comMarcas(async (urlApp, admin) => {
       const { app, espiada } = montar();
       const malicioso = `x', true); INSERT INTO marcas (v) VALUES ('injetado'); --`;
-      const r = await pedir(app, urlApp, '/api/teste/banco/contexto', { headers: { 'x-conta': malicioso } });
+      const r = await pedir(app, urlApp, '/api/teste/banco/contexto', {
+        headers: { 'x-conta': malicioso },
+      });
       expect(await r.json()).toEqual({ conta: malicioso, slug: '' });
       expect(espiada.consultas[1]).not.toContain('injetado');
       expect(await marcas(admin)).toEqual([]);

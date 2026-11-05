@@ -33,7 +33,11 @@ export interface OpcoesTocar {
  * Toca a sessão do hash dado e devolve a conta dela, ou nulo. Abre e fecha a própria conexão.
  * Banco fora: `ErroBancoIndisponivel` (o `onError` responde 503).
  */
-export async function tocar(urlBanco: string, tokenHash: Uint8Array, opcoes: OpcoesTocar = {}): Promise<string | null> {
+export async function tocar(
+  urlBanco: string,
+  tokenHash: Uint8Array,
+  opcoes: OpcoesTocar = {},
+): Promise<string | null> {
   const cliente = criarCliente(urlBanco, {
     ...(opcoes.fabrica ? { fabrica: opcoes.fabrica } : {}),
     aoAbrir: async (consultar) => {
@@ -41,9 +45,10 @@ export async function tocar(urlBanco: string, tokenHash: Uint8Array, opcoes: Opc
     },
   });
   try {
-    const r = await cliente.consultar<{ conta: string | null }>('SELECT sessao_tocar($1) AS conta', [
-      Buffer.from(tokenHash),
-    ]);
+    const r = await cliente.consultar<{ conta: string | null }>(
+      'SELECT sessao_tocar($1) AS conta',
+      [Buffer.from(tokenHash)],
+    );
     await cliente.consultar('COMMIT');
     return r.rows[0]?.conta ?? null;
   } catch (erro) {

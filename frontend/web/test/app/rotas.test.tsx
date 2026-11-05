@@ -24,7 +24,9 @@ describe('rotas da fundação', () => {
 
   it('FUN-31: /qualquer mostra o 404', async () => {
     abrir('/qualquer/coisa');
-    expect(await screen.findByRole('heading', { level: 1, name: 'Página não encontrada' })).toBeTruthy();
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Página não encontrada' }),
+    ).toBeTruthy();
   });
 
   for (const [id, verificar] of [
@@ -42,14 +44,18 @@ describe('rotas da fundação', () => {
     it(`FUN-38: sem VITE_VITRINE, /_vitrine/${id} cai no 404`, async () => {
       vi.stubEnv('VITE_VITRINE', '');
       abrir(`/_vitrine/${id}`);
-      expect(await screen.findByRole('heading', { level: 1, name: 'Página não encontrada' })).toBeTruthy();
+      expect(
+        await screen.findByRole('heading', { level: 1, name: 'Página não encontrada' }),
+      ).toBeTruthy();
     });
   }
 
   it('FUN-38: com VITE_VITRINE=1, um id de vitrine que não existe cai no 404', async () => {
     vi.stubEnv('VITE_VITRINE', '1');
     abrir('/_vitrine/nao-existe');
-    expect(await screen.findByRole('heading', { level: 1, name: 'Página não encontrada' })).toBeTruthy();
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Página não encontrada' }),
+    ).toBeTruthy();
   });
 
   it('FUN-38: com VITE_VITRINE=1, a vitrine de erro de rede segue o mockup (título e grupo)', async () => {

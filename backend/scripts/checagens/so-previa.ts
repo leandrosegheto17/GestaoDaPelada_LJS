@@ -39,7 +39,9 @@ export const ASAAS_URL_SANDBOX = 'https://api-sandbox.asaas.com/v3';
 function asaasForaDoSandbox(linha: string): boolean {
   if (!/\bASAAS_URL\b/.test(linha)) return false;
   if (!linha.includes(ASAAS_URL_SANDBOX)) return true;
-  const enderecos = [...linha.matchAll(/https?:\/\/[^\s"'`,)}]+/g)].map((m) => m[0].replace(/\/+$/, ''));
+  const enderecos = [...linha.matchAll(/https?:\/\/[^\s"'`,)}]+/g)].map((m) =>
+    m[0].replace(/\/+$/, ''),
+  );
   return enderecos.some((e) => e !== ASAAS_URL_SANDBOX);
 }
 
@@ -57,15 +59,22 @@ export function checarSoPrevia(arquivos: readonly Arquivo[]): string[] {
     conteudo.split('\n').forEach((linha, i) => {
       if (rotaPermitida(caminho, linha) && !/--(?:routes?|domain)\b/i.test(linha)) {
         if (/gestaodapelada(?!-v2)/i.test(linha.replace(DOMINIO_PERMITIDO, ''))) {
-          problemas.push(`${caminho}:${i + 1}: cita o Worker gestaodapelada sem -v2; o único alvo é a prévia gestaodapelada-v2`);
+          problemas.push(
+            `${caminho}:${i + 1}: cita o Worker gestaodapelada sem -v2; o único alvo é a prévia gestaodapelada-v2`,
+          );
         }
         return;
       }
       for (const [oque, re] of PROIBIDOS) {
-        if (re.test(linha)) problemas.push(`${caminho}:${i + 1}: cita ${oque}; o único alvo é a prévia gestaodapelada-v2`);
+        if (re.test(linha))
+          problemas.push(
+            `${caminho}:${i + 1}: cita ${oque}; o único alvo é a prévia gestaodapelada-v2`,
+          );
       }
       if (/(?<![\w-])api\.asaas\.com/i.test(linha)) {
-        problemas.push(`${caminho}:${i + 1}: cita a API de produção do Asaas; só o sandbox até haver AD de produção (PLA-38)`);
+        problemas.push(
+          `${caminho}:${i + 1}: cita a API de produção do Asaas; só o sandbox até haver AD de produção (PLA-38)`,
+        );
       } else if (asaasForaDoSandbox(linha)) {
         problemas.push(`${caminho}:${i + 1}: ASAAS_URL diferente de ${ASAAS_URL_SANDBOX} (PLA-38)`);
       }
@@ -75,7 +84,10 @@ export function checarSoPrevia(arquivos: readonly Arquivo[]): string[] {
 }
 
 export function arquivosReais(raiz = RAIZ): Arquivo[] {
-  return ARQUIVOS.map((caminho) => ({ caminho, conteudo: readFileSync(join(raiz, caminho), 'utf8') }));
+  return ARQUIVOS.map((caminho) => ({
+    caminho,
+    conteudo: readFileSync(join(raiz, caminho), 'utf8'),
+  }));
 }
 
 if (import.meta.main) {

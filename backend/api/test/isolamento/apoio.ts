@@ -128,28 +128,29 @@ const PREENCHER: ReadonlyArray<readonly [string, (db: pg.Client, s: Semente) => 
   [
     'periodos_ativos',
     async (db, s) => {
-      await db.query(`INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio) VALUES ($1, $2, '2026-01-01')`, [
-        s.ids.jogador,
-        s.grupo,
-      ]);
+      await db.query(
+        `INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio) VALUES ($1, $2, '2026-01-01')`,
+        [s.ids.jogador, s.grupo],
+      );
     },
   ],
   [
     'habilidades',
     async (db, s) => {
-      s.ids.habilidade = await umId(db, `INSERT INTO habilidades (grupo_id, nome) VALUES ($1, 'Chute') RETURNING id`, [
-        s.grupo,
-      ]);
+      s.ids.habilidade = await umId(
+        db,
+        `INSERT INTO habilidades (grupo_id, nome) VALUES ($1, 'Chute') RETURNING id`,
+        [s.grupo],
+      );
     },
   ],
   [
     'notas',
     async (db, s) => {
-      await db.query(`INSERT INTO notas (jogador_id, habilidade_id, grupo_id, valor) VALUES ($1, $2, $3, 5)`, [
-        s.ids.jogador,
-        s.ids.habilidade,
-        s.grupo,
-      ]);
+      await db.query(
+        `INSERT INTO notas (jogador_id, habilidade_id, grupo_id, valor) VALUES ($1, $2, $3, 5)`,
+        [s.ids.jogador, s.ids.habilidade, s.grupo],
+      );
     },
   ],
   [
@@ -272,7 +273,12 @@ const PREENCHER: ReadonlyArray<readonly [string, (db: pg.Client, s: Semente) => 
     async (db, s) => {
       await db.query(
         `INSERT INTO push_ranking (grupo_id, endpoint, p256dh, auth) VALUES ($1, $2, $3, $4)`,
-        [s.grupo, `https://fcm.googleapis.com/fcm/send/semente-${s.marca}`, `p256dh-${s.marca}`, `auth-${s.marca}`],
+        [
+          s.grupo,
+          `https://fcm.googleapis.com/fcm/send/semente-${s.marca}`,
+          `p256dh-${s.marca}`,
+          `auth-${s.marca}`,
+        ],
       );
     },
   ],
@@ -288,13 +294,19 @@ const PREENCHER: ReadonlyArray<readonly [string, (db: pg.Client, s: Semente) => 
 ];
 
 async function criarConta(db: pg.Client, email: string, nome: string): Promise<string> {
-  return umId(db, `INSERT INTO contas (email, nome, senha_hash, criada_em) VALUES ($1, $2, 'x', now()) RETURNING id`, [
-    email,
-    nome,
-  ]);
+  return umId(
+    db,
+    `INSERT INTO contas (email, nome, senha_hash, criada_em) VALUES ($1, $2, 'x', now()) RETURNING id`,
+    [email, nome],
+  );
 }
 
-async function criarGrupo(db: pg.Client, nome: string, slug: string, conta: string): Promise<string> {
+async function criarGrupo(
+  db: pg.Client,
+  nome: string,
+  slug: string,
+  conta: string,
+): Promise<string> {
   return umId(
     db,
     `INSERT INTO grupos (nome, slug, dia_semana, frequencia, horario, criado_por, criado_em)
@@ -344,7 +356,9 @@ export interface Banco {
  * Banco de teste migrado com o cenário, entregue a `fn` com um cliente do superusuário.
  * O cliente fecha e o banco é removido no `finally`, mesmo quando `fn` lança erro.
  */
-export async function comCenario<T>(fn: (db: pg.Client, cenario: Cenario, banco: Banco) => Promise<T>): Promise<T> {
+export async function comCenario<T>(
+  fn: (db: pg.Client, cenario: Cenario, banco: Banco) => Promise<T>,
+): Promise<T> {
   return bancoDeTeste(
     (url, nome) => comCliente(url, async (db) => fn(db, await criarCenario(db), { url, nome })),
     { migrado: true },

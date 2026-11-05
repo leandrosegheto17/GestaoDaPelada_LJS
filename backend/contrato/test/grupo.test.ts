@@ -16,10 +16,18 @@ import {
 
 /** Contrato do grupo (T16; GEL-03 a GEL-07, GEL-19, SEC-005). */
 
-const VALIDO = { nome: 'Pelada de Quinta', diaSemana: 'quinta', frequencia: 'semanal', horario: '20:30' };
+const VALIDO = {
+  nome: 'Pelada de Quinta',
+  diaSemana: 'quinta',
+  frequencia: 'semanal',
+  horario: '20:30',
+};
 
 /** Mensagens da falha, por campo. */
-function mensagens(resultado: { success: boolean; error?: { issues: { path: PropertyKey[]; message: string }[] } }) {
+function mensagens(resultado: {
+  success: boolean;
+  error?: { issues: { path: PropertyKey[]; message: string }[] };
+}) {
   const porCampo: Record<string, string[]> = {};
   for (const problema of resultado.error?.issues ?? []) {
     const campo = String(problema.path[0] ?? '');
@@ -53,22 +61,35 @@ describe('dadosGrupo', () => {
   it('GEL-03: nome ausente ou que não é texto dá a mesma mensagem', () => {
     const { nome: _n, ...semNome } = VALIDO;
     expect(mensagens(dadosGrupo.safeParse(semNome))).toEqual({ nome: [MENSAGEM_NOME_GRUPO] });
-    expect(mensagens(dadosGrupo.safeParse({ ...VALIDO, nome: 123 }))).toEqual({ nome: [MENSAGEM_NOME_GRUPO] });
-  });
-
-  it.each(['Quinta', 'terça', 'feriado', '', null])('GEL-04: dia da semana %j recusado no campo diaSemana', (dia) => {
-    expect(mensagens(dadosGrupo.safeParse({ ...VALIDO, diaSemana: dia }))).toEqual({ diaSemana: [MENSAGEM_DIA_SEMANA] });
-  });
-
-  it.each(['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'])('GEL-04: %s aceito', (dia) => {
-    expect(dadosGrupo.safeParse({ ...VALIDO, diaSemana: dia }).success).toBe(true);
-  });
-
-  it.each(['diaria', 'Semanal', 'anual', undefined])('GEL-05: frequência %j recusada no campo frequencia', (f) => {
-    expect(mensagens(dadosGrupo.safeParse({ ...VALIDO, frequencia: f }))).toEqual({
-      frequencia: [MENSAGEM_FREQUENCIA],
+    expect(mensagens(dadosGrupo.safeParse({ ...VALIDO, nome: 123 }))).toEqual({
+      nome: [MENSAGEM_NOME_GRUPO],
     });
   });
+
+  it.each(['Quinta', 'terça', 'feriado', '', null])(
+    'GEL-04: dia da semana %j recusado no campo diaSemana',
+    (dia) => {
+      expect(mensagens(dadosGrupo.safeParse({ ...VALIDO, diaSemana: dia }))).toEqual({
+        diaSemana: [MENSAGEM_DIA_SEMANA],
+      });
+    },
+  );
+
+  it.each(['domingo', 'segunda', 'terca', 'quarta', 'quinta', 'sexta', 'sabado'])(
+    'GEL-04: %s aceito',
+    (dia) => {
+      expect(dadosGrupo.safeParse({ ...VALIDO, diaSemana: dia }).success).toBe(true);
+    },
+  );
+
+  it.each(['diaria', 'Semanal', 'anual', undefined])(
+    'GEL-05: frequência %j recusada no campo frequencia',
+    (f) => {
+      expect(mensagens(dadosGrupo.safeParse({ ...VALIDO, frequencia: f }))).toEqual({
+        frequencia: [MENSAGEM_FREQUENCIA],
+      });
+    },
+  );
 
   it.each(['semanal', 'quinzenal', 'mensal'])('GEL-05: %s aceita', (f) => {
     expect(dadosGrupo.safeParse({ ...VALIDO, frequencia: f }).success).toBe(true);
@@ -76,18 +97,27 @@ describe('dadosGrupo', () => {
 
   it('GEL-06: horário ausente dá "Informe o horário."', () => {
     const { horario: _h, ...semHorario } = VALIDO;
-    expect(mensagens(dadosGrupo.safeParse(semHorario))).toEqual({ horario: [MENSAGEM_HORARIO_AUSENTE] });
+    expect(mensagens(dadosGrupo.safeParse(semHorario))).toEqual({
+      horario: [MENSAGEM_HORARIO_AUSENTE],
+    });
     expect(MENSAGEM_HORARIO_AUSENTE).toBe('Informe o horário.');
   });
 
   it('GEL-06: horário vazio também pede o horário', () => {
-    expect(mensagens(dadosGrupo.safeParse({ ...VALIDO, horario: '' }))).toEqual({ horario: [MENSAGEM_HORARIO_AUSENTE] });
+    expect(mensagens(dadosGrupo.safeParse({ ...VALIDO, horario: '' }))).toEqual({
+      horario: [MENSAGEM_HORARIO_AUSENTE],
+    });
   });
 
-  it.each(['24:00', '7:30', '12:60', '12h30', '1230', ' 20:30'])('GEL-06: %j dá "Horário inválido."', (h) => {
-    expect(mensagens(dadosGrupo.safeParse({ ...VALIDO, horario: h }))).toEqual({ horario: [MENSAGEM_HORARIO_INVALIDO] });
-    expect(MENSAGEM_HORARIO_INVALIDO).toBe('Horário inválido.');
-  });
+  it.each(['24:00', '7:30', '12:60', '12h30', '1230', ' 20:30'])(
+    'GEL-06: %j dá "Horário inválido."',
+    (h) => {
+      expect(mensagens(dadosGrupo.safeParse({ ...VALIDO, horario: h }))).toEqual({
+        horario: [MENSAGEM_HORARIO_INVALIDO],
+      });
+      expect(MENSAGEM_HORARIO_INVALIDO).toBe('Horário inválido.');
+    },
+  );
 
   it.each(['00:00', '07:30', '23:59'])('GEL-06: %s aceito', (h) => {
     expect(dadosGrupo.safeParse({ ...VALIDO, horario: h }).success).toBe(true);
@@ -104,7 +134,10 @@ describe('dadosGrupo', () => {
 
   it('GEL-19: a edição usa as mesmas regras e mensagens da criação', () => {
     const r = editarGrupoCorpo.safeParse({ ...VALIDO, nome: 'AB', horario: '7:30' });
-    expect(mensagens(r)).toEqual({ nome: [MENSAGEM_NOME_GRUPO], horario: [MENSAGEM_HORARIO_INVALIDO] });
+    expect(mensagens(r)).toEqual({
+      nome: [MENSAGEM_NOME_GRUPO],
+      horario: [MENSAGEM_HORARIO_INVALIDO],
+    });
   });
 });
 
@@ -115,7 +148,9 @@ describe('textoVisivel (SEC-005)', () => {
     ['inversão de direção U+202E', 'Grupo‮Invertido'],
     ['quebra de linha', 'Grupo\nQuebrado'],
   ])('SEC-005: %s no nome do grupo é recusado', (_nome, nome) => {
-    expect(mensagens(dadosGrupo.safeParse({ ...VALIDO, nome }))).toEqual({ nome: [MENSAGEM_TEXTO_INVISIVEL] });
+    expect(mensagens(dadosGrupo.safeParse({ ...VALIDO, nome }))).toEqual({
+      nome: [MENSAGEM_TEXTO_INVISIVEL],
+    });
   });
 
   it('SEC-005: só invisíveis não passam como nome de 3 caracteres', () => {
@@ -139,7 +174,9 @@ describe('textoVisivel (SEC-005)', () => {
 
 describe('arquivarCorpo e respostas', () => {
   it('GEL-22: arquivar recebe o nome de confirmação como veio, sem trim', () => {
-    expect(arquivarCorpo.parse({ nomeConfirmacao: ' Pelada ' })).toEqual({ nomeConfirmacao: ' Pelada ' });
+    expect(arquivarCorpo.parse({ nomeConfirmacao: ' Pelada ' })).toEqual({
+      nomeConfirmacao: ' Pelada ',
+    });
   });
 
   it('GEL-22: arquivar recusa campo a mais e confirmação ausente', () => {
@@ -148,8 +185,18 @@ describe('arquivarCorpo e respostas', () => {
   });
 
   it('GEL-27: a lista separa ativos e arquivados', () => {
-    const item = { id: 'g1', nome: 'Pelada', slug: 'pelada', diaSemana: 'quinta', frequencia: 'semanal', horario: '20:30' };
-    expect(gruposResposta.parse({ ativos: [item], arquivados: [] })).toEqual({ ativos: [item], arquivados: [] });
+    const item = {
+      id: 'g1',
+      nome: 'Pelada',
+      slug: 'pelada',
+      diaSemana: 'quinta',
+      frequencia: 'semanal',
+      horario: '20:30',
+    };
+    expect(gruposResposta.parse({ ativos: [item], arquivados: [] })).toEqual({
+      ativos: [item],
+      arquivados: [],
+    });
     expect(gruposResposta.safeParse({ ativos: [item] }).success).toBe(false);
   });
 });

@@ -39,7 +39,11 @@ describe('Faixa', () => {
       </>,
     );
     const faixas = screen.getAllByRole('status');
-    expect(faixas.map((f) => f.className.includes('faixa--atencao') || f.className.includes('faixa--info'))).toEqual([true, true]);
+    expect(
+      faixas.map(
+        (f) => f.className.includes('faixa--atencao') || f.className.includes('faixa--info'),
+      ),
+    ).toEqual([true, true]);
     expect(faixas[1]!.querySelector('strong')?.textContent).toBe('Confirme seu e-mail para entrar');
   });
 
@@ -62,7 +66,11 @@ describe('TelaMensagem', () => {
   it('ACE-56: mostra título, texto e ação, e o foco vai ao título', async () => {
     const { container } = render(
       <main>
-        <TelaMensagem icone="sucesso" titulo="E-mail confirmado" acao={<a href="/entrar">Entrar</a>}>
+        <TelaMensagem
+          icone="sucesso"
+          titulo="E-mail confirmado"
+          acao={<a href="/entrar">Entrar</a>}
+        >
           Agora você já pode entrar.
         </TelaMensagem>
       </main>,
@@ -170,7 +178,11 @@ describe('Lista', () => {
     const { container } = render(
       <MemoryRouter>
         <Lista rotulo="Seus grupos">
-          <ItemLista titulo="Pelada de Quinta" meta="Quintas, 20h" para="/app/grupos/g-quinta/admins" />
+          <ItemLista
+            titulo="Pelada de Quinta"
+            meta="Quintas, 20h"
+            para="/app/grupos/g-quinta/admins"
+          />
           <ItemLista titulo="Ana" meta="ana@exemplo.test" />
         </Lista>
       </MemoryRouter>,

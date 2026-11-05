@@ -38,7 +38,9 @@ afterAll(async () => {
 });
 
 async function gruposVistos(db: pg.Client, caso: CasoMatriz): Promise<string[]> {
-  const r = await db.query<{ g: string }>(`SELECT ${q(db, caso.coluna)}::text AS g FROM ${q(db, caso.tabela)}`);
+  const r = await db.query<{ g: string }>(
+    `SELECT ${q(db, caso.coluna)}::text AS g FROM ${q(db, caso.tabela)}`,
+  );
   return [...new Set(r.rows.map((l) => l.g))].sort();
 }
 
@@ -65,7 +67,9 @@ describe.each(porGrupo)('FUN-14: SELECT em $tabela com só o slug', (caso) => {
 
   it('FUN-14: com um slug que não existe, devolve zero linhas', async () => {
     const { db } = aberto;
-    expect(await comoApp(db, { slug: 'grupo-que-nao-existe' }, (d) => gruposVistos(d, caso))).toEqual([]);
+    expect(
+      await comoApp(db, { slug: 'grupo-que-nao-existe' }, (d) => gruposVistos(d, caso)),
+    ).toEqual([]);
   });
 });
 
@@ -79,7 +83,9 @@ describe.each(porGrupo)('FUN-15: SELECT em $tabela sem contexto', (caso) => {
 describe.each(semGrant)('FUN-14, FUN-15: SELECT em $tabela, sem grant para pelada_app', (caso) => {
   it.each(CONTEXTOS)('FUN-14, FUN-15: %s recebe erro de permissão', async (_nome, contexto) => {
     const { db, cenario } = aberto;
-    await expect(comoApp(db, contexto(cenario), (d) => gruposVistos(d, caso))).rejects.toMatchObject({
+    await expect(
+      comoApp(db, contexto(cenario), (d) => gruposVistos(d, caso)),
+    ).rejects.toMatchObject({
       code: '42501',
       message: expect.stringContaining(`permission denied for table ${caso.tabela}`),
     });
@@ -89,7 +95,11 @@ describe.each(semGrant)('FUN-14, FUN-15: SELECT em $tabela, sem grant para pelad
 describe('FUN-15: tabelas de conta sem contexto', () => {
   it.each(['contas', 'sessoes'])('FUN-15: %s devolve zero linhas sem conta', async (tabela) => {
     const { db } = aberto;
-    const n = await comoApp(db, {}, async (d) => (await d.query(`SELECT id FROM ${q(d, tabela)}`)).rowCount);
+    const n = await comoApp(
+      db,
+      {},
+      async (d) => (await d.query(`SELECT id FROM ${q(d, tabela)}`)).rowCount,
+    );
     expect(n).toBe(0);
   });
 });
@@ -123,7 +133,9 @@ describe.each(MATRIZ)('FUN-14, FUN-15: escrita em $tabela sem conta', (caso) => 
 
     it('FUN-14: UPDATE com WHERE no grupo A afeta zero linhas', async () => {
       const { db, cenario } = aberto;
-      const t = await como(`UPDATE ${q(db, tab)} SET ${e.alterar} WHERE ${q(db, col)} = $1`, [cenario.grupoA]);
+      const t = await como(`UPDATE ${q(db, tab)} SET ${e.alterar} WHERE ${q(db, col)} = $1`, [
+        cenario.grupoA,
+      ]);
       if (e.altera) esperaZero(t);
       else esperaRecusa(t, SEM_GRANT);
     });

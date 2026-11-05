@@ -21,12 +21,17 @@ import { exigirRecursoNaEscrita } from './recurso.ts';
 
 /** Corpo do 403, na forma de `CorpoErro` (`{ erro: mensagem, codigo }`). */
 export function corpoSemPermissaoFinanceiro() {
-  return { erro: MENSAGENS_ERRO_FINANCEIRO.sem_permissao_financeiro, codigo: 'sem_permissao_financeiro' as const };
+  return {
+    erro: MENSAGENS_ERRO_FINANCEIRO.sem_permissao_financeiro,
+    codigo: 'sem_permissao_financeiro' as const,
+  };
 }
 
 export const exigirFinanceiro: MiddlewareHandler<Ambiente> = async (c, next) => {
   const grupoId = c.req.param('grupoId') ?? '';
-  const r = await sql<{ ok: boolean }>`SELECT app_acessa_financeiro(${grupoId}::uuid) AS ok`.execute(c.var.db);
+  const r = await sql<{
+    ok: boolean;
+  }>`SELECT app_acessa_financeiro(${grupoId}::uuid) AS ok`.execute(c.var.db);
   if (r.rows[0]?.ok !== true) return c.json(corpoSemPermissaoFinanceiro(), 403);
   c.set('acessaFinanceiro', true);
   await next();

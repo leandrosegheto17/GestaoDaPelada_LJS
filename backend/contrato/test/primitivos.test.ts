@@ -79,10 +79,13 @@ describe('token', () => {
     expect(token.safeParse('A'.repeat(42) + '_').success).toBe(true);
   });
 
-  it.each(['A'.repeat(42), 'A'.repeat(44), `${'A'.repeat(42)}=`, `${'A'.repeat(42)}+`, `${'A'.repeat(42)}/`])(
-    'ACE-10: "%s" não é token',
-    (v) => {
-      expect(token.safeParse(v).success).toBe(false);
-    },
-  );
+  it.each([
+    'A'.repeat(42),
+    'A'.repeat(44),
+    `${'A'.repeat(42)}=`,
+    `${'A'.repeat(42)}+`,
+    `${'A'.repeat(42)}/`,
+  ])('ACE-10: "%s" não é token', (v) => {
+    expect(token.safeParse(v).success).toBe(false);
+  });
 });

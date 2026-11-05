@@ -62,7 +62,9 @@ export function PreviaSimulador({ estado, aoTentarDeNovo }: PropsPrevia) {
       {calculando ? (
         <p className={`${estilos.previa} ${estilos.recalculando}`}>{TEXTO_CALCULANDO_PREVIA}</p>
       ) : (
-        <p className={estilos.previa}>{estado.tipo === 'pronta' ? estado.previa.descricao : null}</p>
+        <p className={estilos.previa}>
+          {estado.tipo === 'pronta' ? estado.previa.descricao : null}
+        </p>
       )}
     </div>
   );

@@ -18,7 +18,8 @@ export const URL_RESEND = 'https://api.resend.com/emails';
 export const TEMPO_LIMITE_MS = 10_000;
 
 /** `aviso_cobranca`: o aviso de cobrança à criadora do grupo (notificacoes T24; NOT-38, NOT-41). */
-export type TipoEmail = 'confirmacao' | 'recuperacao' | 'convite' | 'aviso_cadastro' | 'aviso_cobranca';
+export type TipoEmail =
+  'confirmacao' | 'recuperacao' | 'convite' | 'aviso_cadastro' | 'aviso_cobranca';
 
 export interface Mensagem {
   tipo: TipoEmail;
@@ -56,7 +57,12 @@ export interface OpcoesResend {
 async function codigoDoErro(resposta: Response): Promise<string> {
   try {
     const corpo: unknown = await resposta.json();
-    if (typeof corpo === 'object' && corpo !== null && 'name' in corpo && typeof corpo.name === 'string') {
+    if (
+      typeof corpo === 'object' &&
+      corpo !== null &&
+      'name' in corpo &&
+      typeof corpo.name === 'string'
+    ) {
       return /^[a-z_]{1,64}$/.test(corpo.name) ? corpo.name : 'desconhecido';
     }
   } catch {

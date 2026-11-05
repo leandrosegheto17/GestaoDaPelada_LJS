@@ -2,7 +2,14 @@
  * Mês no histórico e navegação entre meses (T12; PAR-41, PAR-66, PAR-84, PAR-85, PAR-86).
  */
 import type { Data } from '../atividade/datas.ts';
-import { compararDatas, compararMeses, mesAnterior, mesDe, mesSeguinte, type Mes } from '../datas.ts';
+import {
+  compararDatas,
+  compararMeses,
+  mesAnterior,
+  mesDe,
+  mesSeguinte,
+  type Mes,
+} from '../datas.ts';
 
 export interface LimitesDeMes {
   /** Mês da primeira partida do grupo; nulo sem partidas. */
@@ -19,7 +26,8 @@ export interface Navegacao {
 /** Do mês da primeira partida do grupo ao mês de hoje. */
 export function limitesDeMes(partidas: readonly { data: Data }[], hoje: Data): LimitesDeMes {
   let primeira: Data | null = null;
-  for (const p of partidas) if (primeira === null || compararDatas(p.data, primeira) < 0) primeira = p.data;
+  for (const p of partidas)
+    if (primeira === null || compararDatas(p.data, primeira) < 0) primeira = p.data;
   return { primeiro: primeira === null ? null : mesDe(primeira), ultimo: mesDe(hoje) };
 }
 

@@ -40,7 +40,11 @@ export function destinoDoGrupo(grupoId: string): string {
   return `/app/grupos/${encodeURIComponent(grupoId)}/admins`;
 }
 
-type Leitura = { tipo: 'carregando' } | { tipo: 'invalido' } | { tipo: 'erro'; mensagem: string } | { tipo: 'lido'; convite: ConviteLido };
+type Leitura =
+  | { tipo: 'carregando' }
+  | { tipo: 'invalido' }
+  | { tipo: 'erro'; mensagem: string }
+  | { tipo: 'lido'; convite: ConviteLido };
 
 type CampoCadastro = 'nome' | 'senha' | 'termos';
 
@@ -110,7 +114,11 @@ export function Convite() {
       (erro: unknown) => {
         if (!ativo) return;
         if (erro instanceof ErroApi && erro.status === 410) setLeitura({ tipo: 'invalido' });
-        else setLeitura({ tipo: 'erro', mensagem: erro instanceof ErroApi ? erro.message : MENSAGEM_REDE });
+        else
+          setLeitura({
+            tipo: 'erro',
+            mensagem: erro instanceof ErroApi ? erro.message : MENSAGEM_REDE,
+          });
       },
     );
     return () => {
@@ -125,7 +133,8 @@ export function Convite() {
 
   function tratarFalha(erro: unknown) {
     if (erro instanceof ErroApi && erro.status === 410) setLeitura({ tipo: 'invalido' });
-    else if (erro instanceof ErroApi && erro.codigo === 'convite_de_outro_email') setOutroEmail(true);
+    else if (erro instanceof ErroApi && erro.codigo === 'convite_de_outro_email')
+      setOutroEmail(true);
     else setFalha(erro instanceof ErroApi ? erro.message : MENSAGEM_REDE);
   }
 
@@ -134,7 +143,9 @@ export function Convite() {
     setFalha(null);
     setEnviando(true);
     try {
-      const r = await api.post<{ grupoId: string }>('/api/convites/aceitar', { token: token.current });
+      const r = await api.post<{ grupoId: string }>('/api/convites/aceitar', {
+        token: token.current,
+      });
       await abrirGrupo(r.grupoId);
     } catch (erro) {
       tratarFalha(erro);
@@ -149,18 +160,25 @@ export function Convite() {
     setFalha(null);
     const encontrados: Partial<Record<CampoCadastro, string>> = {};
     if (!esquemaNome.safeParse(nome).success) encontrados.nome = ERROS_CAMPO.nome;
-    if (!esquemaSenha.safeParse(senha).success) encontrados.senha = senha.length < 8 ? ERRO_SENHA_CURTA : ERROS_CAMPO.senha;
+    if (!esquemaSenha.safeParse(senha).success)
+      encontrados.senha = senha.length < 8 ? ERRO_SENHA_CURTA : ERROS_CAMPO.senha;
     if (!termos) encontrados.termos = ERROS_CAMPO.termos;
     setErros(encontrados);
     if (Object.keys(encontrados).length > 0) return;
     setEnviando(true);
     try {
-      const r = await api.post<{ grupoId: string }>('/api/convites/cadastrar', { token: token.current, nome, senha, termos: true });
+      const r = await api.post<{ grupoId: string }>('/api/convites/cadastrar', {
+        token: token.current,
+        nome,
+        senha,
+        termos: true,
+      });
       await abrirGrupo(r.grupoId);
     } catch (erro) {
       if (erro instanceof ErroApi && erro.status === 422 && erro.campos.length > 0) {
         const daApi: Partial<Record<CampoCadastro, string>> = {};
-        for (const c of erro.campos) if (c === 'nome' || c === 'senha' || c === 'termos') daApi[c] = ERROS_CAMPO[c];
+        for (const c of erro.campos)
+          if (c === 'nome' || c === 'senha' || c === 'termos') daApi[c] = ERROS_CAMPO[c];
         setErros(daApi);
       } else {
         tratarFalha(erro);
@@ -197,7 +215,9 @@ export function Convite() {
   if (ativa && (outroEmail || ativa.email.toLowerCase() !== convite.email.toLowerCase())) {
     return (
       <Casca titulo="Convite" estreita>
-        <Faixa tipo="atencao">Este convite foi enviado para outro e-mail. Você está conectado como {ativa.email}.</Faixa>
+        <Faixa tipo="atencao">
+          Este convite foi enviado para outro e-mail. Você está conectado como {ativa.email}.
+        </Faixa>
         <p className={`${estilos.paragrafo} ${estilos['acima-3']}`}>
           Saia e entre com a conta do e-mail convidado, ou peça um novo convite para este e-mail.
         </p>
@@ -228,7 +248,8 @@ export function Convite() {
       <Casca titulo="Convite" estreita>
         <Convidado grupoNome={convite.grupoNome} />
         <p className={estilos.paragrafo}>
-          Já existe uma conta com {convite.email}. Entre com ela e abra o link do convite de novo para aceitar.
+          Já existe uma conta com {convite.email}. Entre com ela e abra o link do convite de novo
+          para aceitar.
         </p>
         <LinkBotao para="/entrar" variante="principal" bloco>
           Entrar
@@ -237,16 +258,32 @@ export function Convite() {
     );
   }
 
-  const resumo = (['nome', 'senha', 'termos'] as const).filter((c) => erros[c]).map((c) => ({ id: c, rotulo: ROTULOS[c] }));
+  const resumo = (['nome', 'senha', 'termos'] as const)
+    .filter((c) => erros[c])
+    .map((c) => ({ id: c, rotulo: ROTULOS[c] }));
 
   return (
     <Casca titulo="Convite" estreita>
       <Convidado grupoNome={convite.grupoNome} />
-      <p className={estilos.paragrafo}>Crie sua conta para aceitar. O e-mail já está confirmado pelo convite.</p>
-      <form className={estilos.formulario} noValidate aria-busy={enviando || undefined} onSubmit={cadastrar}>
+      <p className={estilos.paragrafo}>
+        Crie sua conta para aceitar. O e-mail já está confirmado pelo convite.
+      </p>
+      <form
+        className={estilos.formulario}
+        noValidate
+        aria-busy={enviando || undefined}
+        onSubmit={cadastrar}
+      >
         <ResumoErros erros={resumo} />
         {falha ? <Faixa tipo="erro">{falha}</Faixa> : null}
-        <Campo id="nome" rotulo={ROTULOS.nome} autoComplete="name" erro={erros.nome} value={nome} onChange={(e) => setNome(e.target.value)} />
+        <Campo
+          id="nome"
+          rotulo={ROTULOS.nome}
+          autoComplete="name"
+          erro={erros.nome}
+          value={nome}
+          onChange={(e) => setNome(e.target.value)}
+        />
         <Campo
           id="email"
           rotulo="E-mail"
@@ -268,8 +305,14 @@ export function Convite() {
           value={senha}
           onChange={(e) => setSenha(e.target.value)}
         />
-        <CaixaSelecao id="termos" checked={termos} erro={erros.termos} onChange={(e) => setTermos(e.target.checked)}>
-          Li e aceito os <Link to="/termos">termos de uso</Link> e a <Link to="/privacidade">política de privacidade</Link>
+        <CaixaSelecao
+          id="termos"
+          checked={termos}
+          erro={erros.termos}
+          onChange={(e) => setTermos(e.target.checked)}
+        >
+          Li e aceito os <Link to="/termos">termos de uso</Link> e a{' '}
+          <Link to="/privacidade">política de privacidade</Link>
         </CaixaSelecao>
         <Botao type="submit" bloco carregando={enviando}>
           {enviando ? 'Criando conta…' : 'Criar conta e aceitar'}

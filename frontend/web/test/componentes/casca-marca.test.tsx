@@ -49,7 +49,9 @@ describe('Casca', () => {
   });
 
   it('FUN-31: axe sem violações, com e sem título', async () => {
-    const { container, rerender } = render(<Casca titulo="Partidas" grupo={{ nome: 'Pelada', trocarHref: '/g' }} />);
+    const { container, rerender } = render(
+      <Casca titulo="Partidas" grupo={{ nome: 'Pelada', trocarHref: '/g' }} />,
+    );
     await esperarSemViolacoes(container);
     rerender(
       <Casca centralizada>
@@ -77,7 +79,9 @@ describe('Marca', () => {
   }
 
   it('FUN-31: com rótulo, o leitor de tela lê o rótulo e não o número solto', () => {
-    const { container } = render(<Marca situacao="lesionado" valor={1} rotulo="Lesionado, 1 ponto" />);
+    const { container } = render(
+      <Marca situacao="lesionado" valor={1} rotulo="Lesionado, 1 ponto" />,
+    );
     expect(container.textContent).toContain('Lesionado, 1 ponto');
     expect(container.querySelector('[aria-hidden="true"]')?.textContent).toBe('1');
   });

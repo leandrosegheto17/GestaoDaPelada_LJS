@@ -7,7 +7,12 @@ import { NOME_COOKIE_SESSAO } from '../../src/infraestrutura/sessao/cookie.ts';
 import { gerarToken } from '../../src/infraestrutura/sessao/token.ts';
 import { envAcesso } from '../acesso/apoio.ts';
 import { contextoFalso, fabricaComoApp } from '../db/requisicao.ts';
-import { abrirCenarioGrupos, arquivar, reativar, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  arquivar,
+  reativar,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 
 /**
  * `GET` e `POST /api/grupos/:grupoId/pesos` (partidas-e-ranking T38; PAR-01, PAR-03, PAR-06, PAR-07, PAR-08), com o
@@ -18,7 +23,10 @@ import { abrirCenarioGrupos, arquivar, reativar, type CenarioGruposAberto } from
 let aberto: CenarioGruposAberto;
 
 const HOJE = '2026-03-14';
-const app = criarApp({ fabricaBanco: fabricaComoApp().fabrica, relogio: relogioFixo('2026-03-14T15:00:00Z') });
+const app = criarApp({
+  fabricaBanco: fabricaComoApp().fabrica,
+  relogio: relogioFixo('2026-03-14T15:00:00Z'),
+});
 
 const VALIDO = {
   presencaSemChuva: 5,
@@ -39,8 +47,15 @@ async function sessao(conta: string): Promise<string> {
   return token;
 }
 
-async function pedir(metodo: 'GET' | 'POST', conta = aberto.cenario.contaC, corpo?: unknown): Promise<Response> {
-  const headers = new Headers({ 'x-pelada': '1', cookie: `${NOME_COOKIE_SESSAO}=${await sessao(conta)}` });
+async function pedir(
+  metodo: 'GET' | 'POST',
+  conta = aberto.cenario.contaC,
+  corpo?: unknown,
+): Promise<Response> {
+  const headers = new Headers({
+    'x-pelada': '1',
+    cookie: `${NOME_COOKIE_SESSAO}=${await sessao(conta)}`,
+  });
   if (corpo !== undefined) headers.set('content-type', 'application/json');
   const ctx = contextoFalso();
   const r = await app.request(
@@ -54,10 +69,10 @@ async function pedir(metodo: 'GET' | 'POST', conta = aberto.cenario.contaC, corp
 }
 
 async function configsDeHoje(): Promise<number> {
-  const r = await aberto.db.query('SELECT 1 FROM config_pesos WHERE grupo_id = $1 AND vigente_desde = $2', [
-    aberto.cenario.grupoG,
-    HOJE,
-  ]);
+  const r = await aberto.db.query(
+    'SELECT 1 FROM config_pesos WHERE grupo_id = $1 AND vigente_desde = $2',
+    [aberto.cenario.grupoG, HOJE],
+  );
   return r.rowCount ?? 0;
 }
 
@@ -74,7 +89,10 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
-  await aberto.db.query('DELETE FROM config_pesos WHERE grupo_id = $1 AND vigente_desde = $2', [aberto.cenario.grupoG, HOJE]);
+  await aberto.db.query('DELETE FROM config_pesos WHERE grupo_id = $1 AND vigente_desde = $2', [
+    aberto.cenario.grupoG,
+    HOJE,
+  ]);
 });
 
 describe('GET /api/grupos/:grupoId/pesos', () => {
@@ -101,7 +119,10 @@ describe('POST /api/grupos/:grupoId/pesos', () => {
     const painel = pesosPainel.parse(await r.json());
     expect(painel.hoje).toBe(HOJE);
     expect(painel.vigente).toMatchObject({ ...VALIDO, vigenteDesde: HOJE });
-    expect(painel.historico[0]).toMatchObject({ vigenteDesde: '2026-01-01', vigenteAte: '2026-03-13' });
+    expect(painel.historico[0]).toMatchObject({
+      vigenteDesde: '2026-01-01',
+      vigenteAte: '2026-03-13',
+    });
     expect(await configsDeHoje()).toBe(1);
   });
 
@@ -119,7 +140,10 @@ describe('POST /api/grupos/:grupoId/pesos', () => {
   });
 
   it('PAR-08: qualquer outro campo também é recusado sem gravar', async () => {
-    const r = await pedir('POST', aberto.cenario.contaC, { ...VALIDO, grupoId: aberto.cenario.grupoH });
+    const r = await pedir('POST', aberto.cenario.contaC, {
+      ...VALIDO,
+      grupoId: aberto.cenario.grupoH,
+    });
     expect(r.status).toBe(422);
     expect(await configsDeHoje()).toBe(0);
   });

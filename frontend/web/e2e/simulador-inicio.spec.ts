@@ -48,9 +48,15 @@ const VIEWPORTS = [
 ] as const;
 
 async function prepararApi(pagina: Page, grupoId: string, escalacaoNoProximoDia: boolean) {
-  await pagina.route('**/api/sessao', (rota) => rota.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(SESSAO) }));
+  await pagina.route('**/api/sessao', (rota) =>
+    rota.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(SESSAO) }),
+  );
   await pagina.route(`**/api/grupos/${grupoId}`, (rota) =>
-    rota.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(grupo(grupoId, escalacaoNoProximoDia)) }),
+    rota.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(grupo(grupoId, escalacaoNoProximoDia)),
+    }),
   );
 }
 
@@ -84,7 +90,9 @@ for (const vp of VIEWPORTS) {
 
         const c = await caixa(item);
         const l = await caixa(linha);
-        expect(l.y, 'o topo da linha fica abaixo da base do item').toBeGreaterThanOrEqual(c.y + c.height);
+        expect(l.y, 'o topo da linha fica abaixo da base do item').toBeGreaterThanOrEqual(
+          c.y + c.height,
+        );
         expect(Math.abs(l.x - c.x), 'a linha na mesma coluna do item').toBeLessThanOrEqual(4);
       });
     }

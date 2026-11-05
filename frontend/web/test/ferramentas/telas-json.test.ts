@@ -32,8 +32,16 @@ describe('mockups do telas.json', () => {
   it('GEL-116: um caminho inválido de exemplo reprova', () => {
     const mapa = {
       telas: [
-        { id: 'T08', estado: 'sucesso', mockup: '../features/grupos-e-elenco/mockup/telas/t08-grupos--sucesso.html' },
-        { id: 'T99', estado: 'inexistente', mockup: '../features/grupos-e-elenco/mockup/telas/nao-existe.html' },
+        {
+          id: 'T08',
+          estado: 'sucesso',
+          mockup: '../features/grupos-e-elenco/mockup/telas/t08-grupos--sucesso.html',
+        },
+        {
+          id: 'T99',
+          estado: 'inexistente',
+          mockup: '../features/grupos-e-elenco/mockup/telas/nao-existe.html',
+        },
       ],
       revisaoManual: [{ id: 'T98', estado: 'x', mockup: 'telas/tambem-nao-existe.html' }],
       viewports: { pc: { width: 1 } },
@@ -45,7 +53,10 @@ describe('mockups do telas.json', () => {
   });
 
   it('GEL-116: entrada sem mockup e listas que não são de telas são ignoradas', () => {
-    const mapa = { telas: [{ id: 'T00', estado: 'sem' }], respostas: [{ url: '**/api/x', arquivo: 'y.json' }] };
+    const mapa = {
+      telas: [{ id: 'T00', estado: 'sem' }],
+      respostas: [{ url: '**/api/x', arquivo: 'y.json' }],
+    };
     expect(mockupsAusentes(mapa, PASTA, () => false)).toEqual([]);
   });
 });

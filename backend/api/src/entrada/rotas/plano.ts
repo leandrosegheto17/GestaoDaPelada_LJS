@@ -38,7 +38,10 @@ export function rotasPlano(): Hono<Ambiente> {
     const resposta: PlanoResposta = {
       plano: estado.plano,
       situacao: estado.situacaoComercial,
-      trialFimEm: estado.plano === 'trial' && estado.trialInicio !== null ? ultimoDiaDoTrial(estado.trialInicio) : null,
+      trialFimEm:
+        estado.plano === 'trial' && estado.trialInicio !== null
+          ? ultimoDiaDoTrial(estado.trialInicio)
+          : null,
       pagoAte: estado.pagoAte,
       jogadoresAtivos: estado.jogadoresAtivos,
       limiteJogadores: limite === 20 ? 20 : null,

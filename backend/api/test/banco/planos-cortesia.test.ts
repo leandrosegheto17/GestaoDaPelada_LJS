@@ -25,7 +25,10 @@ const ARQUIVO = new URL(
 function migracaoCom(slug: string): string {
   const texto = readFileSync(ARQUIVO, 'utf8');
   const corpo = texto.split('-- Down Migration')[0]?.replace('-- Up Migration', '') ?? '';
-  const trocado = corpo.replace(/SLUG_GRUPO_TESTE constant text := '[^']*';/, `SLUG_GRUPO_TESTE constant text := '${slug}';`);
+  const trocado = corpo.replace(
+    /SLUG_GRUPO_TESTE constant text := '[^']*';/,
+    `SLUG_GRUPO_TESTE constant text := '${slug}';`,
+  );
   if (trocado === corpo) throw new Error('constante SLUG_GRUPO_TESTE não encontrada na migração');
   return trocado;
 }
@@ -68,14 +71,18 @@ async function foto(d: pg.Client): Promise<string> {
   );
   const contagens: Record<string, number> = {};
   for (const { tabela } of tabelas.rows) {
-    const r = await d.query<{ n: number }>(`SELECT count(*)::int AS n FROM ${JSON.stringify(tabela)}`);
+    const r = await d.query<{ n: number }>(
+      `SELECT count(*)::int AS n FROM ${JSON.stringify(tabela)}`,
+    );
     contagens[tabela] = r.rows[0]?.n ?? -1;
   }
   return JSON.stringify({ grupos: g.rows, contagens });
 }
 
 async function hojeEmSp(d: pg.Client): Promise<string> {
-  const r = await d.query<{ hoje: string }>(`SELECT (now() AT TIME ZONE 'America/Sao_Paulo')::date::text AS hoje`);
+  const r = await d.query<{ hoje: string }>(
+    `SELECT (now() AT TIME ZONE 'America/Sao_Paulo')::date::text AS hoje`,
+  );
   return r.rows[0]?.hoje ?? '';
 }
 
@@ -109,7 +116,9 @@ describe('migração da cortesia', () => {
     const r = await desfeito(async (d) => {
       const antes = await situacoes(d);
       await d.query('SAVEPOINT antes');
-      await expect(d.query(migracaoCom('slug-que-nao-existe'))).rejects.toMatchObject({ code: 'P0001' });
+      await expect(d.query(migracaoCom('slug-que-nao-existe'))).rejects.toMatchObject({
+        code: 'P0001',
+      });
       await d.query('ROLLBACK TO SAVEPOINT antes');
       return { antes, depois: await situacoes(d) };
     });
@@ -117,7 +126,9 @@ describe('migração da cortesia', () => {
   });
 
   it('PLA-11: a mensagem do aborto diz que nada foi alterado', async () => {
-    await expect(desfeito((d) => d.query(migracaoCom('slug-que-nao-existe')))).rejects.toThrow(/nada foi alterado/);
+    await expect(desfeito((d) => d.query(migracaoCom('slug-que-nao-existe')))).rejects.toThrow(
+      /nada foi alterado/,
+    );
   });
 
   it('PLA-11: com grupos vazio, termina sem erro e sem escrita (AD-113)', async () => {
@@ -145,7 +156,9 @@ describe('migração da cortesia', () => {
   it('PLA-11: grupo ativo não muda; grupo uso_proprio arquivado passa a trial', async () => {
     const { cenario } = aberto;
     const r = await desfeito(async (d) => {
-      await d.query(`UPDATE grupos SET situacao_comercial = 'ativo' WHERE id = $1`, [cenario.grupoB]);
+      await d.query(`UPDATE grupos SET situacao_comercial = 'ativo' WHERE id = $1`, [
+        cenario.grupoB,
+      ]);
       await d.query('UPDATE grupos SET arquivado_em = now() WHERE id = $1', [cenario.grupoA]);
       await d.query(migracaoCom(cenario.slugG));
       return situacoes(d);

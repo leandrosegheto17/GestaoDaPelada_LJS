@@ -16,7 +16,10 @@ import { formarPares, saidaNoIntervalo } from '../../src/simulador/intervalo.ts'
 
 /** Titulares t1 (melhor) … tq (pior), com os "só 1º" marcados. */
 function titulares(quantos: number, so1o: readonly number[] = []): AptoOrdenado[] {
-  return Array.from({ length: quantos }, (_, i) => ({ id: `t${i + 1}`, so1oTempo: so1o.includes(i + 1) }));
+  return Array.from({ length: quantos }, (_, i) => ({
+    id: `t${i + 1}`,
+    so1oTempo: so1o.includes(i + 1),
+  }));
 }
 
 describe('saidaNoIntervalo', () => {

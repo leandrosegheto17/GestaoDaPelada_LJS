@@ -1,10 +1,18 @@
 import { QueryClient } from '@tanstack/react-query';
 import { describe, expect, it, vi } from 'vitest';
-import { criarCliente, DESTINO_SESSAO_EXPIRADA, ErroApi, MENSAGEM_REDE } from '../../src/dados/cliente.ts';
+import {
+  criarCliente,
+  DESTINO_SESSAO_EXPIRADA,
+  ErroApi,
+  MENSAGEM_REDE,
+} from '../../src/dados/cliente.ts';
 
 function json(status: number, corpo?: unknown): Response {
   if (corpo === undefined) return new Response(null, { status });
-  return new Response(JSON.stringify(corpo), { status, headers: { 'Content-Type': 'application/json' } });
+  return new Response(JSON.stringify(corpo), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
+  });
 }
 
 function montar(resposta: Response | (() => Promise<Response>)) {
@@ -20,7 +28,12 @@ function montar(resposta: Response | (() => Promise<Response>)) {
 }
 
 function cabecalhos(init: RequestInit): Record<string, string> {
-  return Object.fromEntries(Object.entries((init.headers ?? {}) as Record<string, string>).map(([k, v]) => [k.toLowerCase(), v]));
+  return Object.fromEntries(
+    Object.entries((init.headers ?? {}) as Record<string, string>).map(([k, v]) => [
+      k.toLowerCase(),
+      v,
+    ]),
+  );
 }
 
 describe('cliente HTTP', () => {
@@ -70,9 +83,13 @@ describe('cliente HTTP', () => {
   });
 
   it('ACE-20: com semTratarExpiracao, o 401 sessao_expirada só vira ErroApi (a guarda decide)', async () => {
-    const { cliente, consultas, navegar } = montar(json(401, { erro: 'x', codigo: 'sessao_expirada' }));
+    const { cliente, consultas, navegar } = montar(
+      json(401, { erro: 'x', codigo: 'sessao_expirada' }),
+    );
     consultas.setQueryData(['outra'], 1);
-    await expect(cliente.requisitar('GET', '/api/sessao', undefined, { semTratarExpiracao: true })).rejects.toMatchObject({
+    await expect(
+      cliente.requisitar('GET', '/api/sessao', undefined, { semTratarExpiracao: true }),
+    ).rejects.toMatchObject({
       status: 401,
       codigo: 'sessao_expirada',
     });
@@ -81,16 +98,25 @@ describe('cliente HTTP', () => {
   });
 
   it('ACE-20: 401 sem_sessao não limpa o cache nem navega (a guarda decide)', async () => {
-    const { cliente, consultas, navegar } = montar(json(401, { erro: 'Entre para continuar.', codigo: 'sem_sessao' }));
+    const { cliente, consultas, navegar } = montar(
+      json(401, { erro: 'Entre para continuar.', codigo: 'sem_sessao' }),
+    );
     consultas.setQueryData(['outra'], 1);
-    await expect(cliente.get('/api/sessao')).rejects.toMatchObject({ status: 401, codigo: 'sem_sessao' });
+    await expect(cliente.get('/api/sessao')).rejects.toMatchObject({
+      status: 401,
+      codigo: 'sem_sessao',
+    });
     expect(consultas.getQueryData(['outra'])).toBe(1);
     expect(navegar).not.toHaveBeenCalled();
   });
 
   it('ACE-20: 401 credenciais_invalidas no entrar não navega', async () => {
-    const { cliente, navegar } = montar(json(401, { erro: 'E-mail ou senha incorretos.', codigo: 'credenciais_invalidas' }));
-    await expect(cliente.post('/api/sessao', { email: 'a@x.test', senha: 'x' })).rejects.toMatchObject({
+    const { cliente, navegar } = montar(
+      json(401, { erro: 'E-mail ou senha incorretos.', codigo: 'credenciais_invalidas' }),
+    );
+    await expect(
+      cliente.post('/api/sessao', { email: 'a@x.test', senha: 'x' }),
+    ).rejects.toMatchObject({
       codigo: 'credenciais_invalidas',
       message: 'E-mail ou senha incorretos.',
     });
@@ -98,7 +124,13 @@ describe('cliente HTTP', () => {
   });
 
   it('erro padrão tipado: 422 traz código e campos; 409 traz os grupos', async () => {
-    const r422 = montar(json(422, { erro: 'Confira os campos destacados.', codigo: 'dados_invalidos', campos: ['email', 'senha'] }));
+    const r422 = montar(
+      json(422, {
+        erro: 'Confira os campos destacados.',
+        codigo: 'dados_invalidos',
+        campos: ['email', 'senha'],
+      }),
+    );
     await expect(r422.cliente.post('/api/conta', {})).rejects.toMatchObject({
       status: 422,
       codigo: 'dados_invalidos',
@@ -106,7 +138,11 @@ describe('cliente HTTP', () => {
     });
     const grupos = [{ id: 'g1', nome: 'Pelada' }];
     const r409 = montar(json(409, { erro: 'x', codigo: 'unico_admin', grupos }));
-    await expect(r409.cliente.delete('/api/conta', { senha: 's' })).rejects.toMatchObject({ status: 409, codigo: 'unico_admin', grupos });
+    await expect(r409.cliente.delete('/api/conta', { senha: 's' })).rejects.toMatchObject({
+      status: 409,
+      codigo: 'unico_admin',
+      grupos,
+    });
   });
 
   it('resposta de erro sem corpo do contrato vira ErroApi sem código, com mensagem padrão', async () => {
@@ -120,7 +156,10 @@ describe('cliente HTTP', () => {
 
   it('falha de rede vira ErroApi com status 0 e a mensagem de conexão', async () => {
     const { cliente, navegar } = montar(() => Promise.reject(new TypeError('Failed to fetch')));
-    await expect(cliente.get('/api/x')).rejects.toMatchObject({ status: 0, message: MENSAGEM_REDE });
+    await expect(cliente.get('/api/x')).rejects.toMatchObject({
+      status: 0,
+      message: MENSAGEM_REDE,
+    });
     expect(navegar).not.toHaveBeenCalled();
   });
 

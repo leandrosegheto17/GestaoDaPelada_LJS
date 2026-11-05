@@ -50,7 +50,11 @@ export type Reportar = (relato: RelatoPush) => void;
 const reportarPadrao: Reportar = (relato) => {
   Sentry.captureMessage('push_erro', {
     level: 'warning',
-    tags: { push_host: relato.host, push_status: String(relato.status), push_motivo: relato.motivo },
+    tags: {
+      push_host: relato.host,
+      push_status: String(relato.status),
+      push_motivo: relato.motivo,
+    },
   });
 };
 
@@ -85,7 +89,9 @@ function classificar(resposta: Response, agora: Date): ResultadoPush {
   if (s === 404 || s === 410) return { classe: 'revogada' };
   if (s === 429 || (s >= 500 && s <= 599)) {
     const aposSegundos = segundosDoRetryAfter(resposta.headers.get('retry-after'), agora);
-    return aposSegundos === undefined ? { classe: 'tentarDeNovo' } : { classe: 'tentarDeNovo', aposSegundos };
+    return aposSegundos === undefined
+      ? { classe: 'tentarDeNovo' }
+      : { classe: 'tentarDeNovo', aposSegundos };
   }
   return { classe: 'erro' };
 }
@@ -110,12 +116,18 @@ export async function enviarPush(
     corpo = await cifrarPayload(payload, { p256dh: assinatura.p256dh, auth: assinatura.auth });
   } catch (erro) {
     if (erro instanceof ErroPayloadGrande) reportar({ host, status: 0, motivo: 'payload_grande' });
-    else if (erro instanceof ErroChaveAssinante) reportar({ host, status: 0, motivo: 'chave_invalida' });
+    else if (erro instanceof ErroChaveAssinante)
+      reportar({ host, status: 0, motivo: 'chave_invalida' });
     else throw erro;
     return { classe: 'erro' };
   }
 
-  const autorizacao = await cabecalhoVapid(assinatura.endpoint, opcoes.vapid, agora, opcoes.cache ?? novoCacheVapid());
+  const autorizacao = await cabecalhoVapid(
+    assinatura.endpoint,
+    opcoes.vapid,
+    agora,
+    opcoes.cache ?? novoCacheVapid(),
+  );
 
   const controle = new AbortController();
   const relogio = setTimeout(() => controle.abort(), opcoes.tempoLimiteMs ?? TEMPO_LIMITE_PUSH_MS);
@@ -158,7 +170,9 @@ export interface ServicoPushFalso {
   fetch: typeof fetch;
   readonly pedidos: PedidoRecebido[];
   /** Próximas respostas, na ordem; acabou a fila, responde 201. */
-  responder(...respostas: Array<number | { status: number; cabecalhos?: Record<string, string> }>): void;
+  responder(
+    ...respostas: Array<number | { status: number; cabecalhos?: Record<string, string> }>
+  ): void;
 }
 
 export function servicoPushFalso(): ServicoPushFalso {
