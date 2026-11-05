@@ -1347,6 +1347,9 @@ T78 → T79
 **Depends on**: T32
 **Reuses**: `BD:205-207`; `B:74` e `B:475-478`
 **Requirement**: PAR-127, PAR-155, PAR-156, PAR-157, PAR-158, PAR-132
+**Status**: rascunhada
+**Nota do rascunho**: `partidaLancada(db, grupoId, data)` usa o momento da transação; `partidas.lancar` (T30) passou a chamá-la no lugar do INSERT direto. `escalacoesConfirmadas` é 0. Testes em `backend/api/test/repositorios/eventos.test.ts`.
+**Lacunas**: semana que só tem `escalacao_confirmada` (a simulador grava): não aparece, porque só os três tipos desta feature formam semana (interpretação conservadora). O `/executar` pergunta antes de levar ao verde.
 
 **Done when**:
 

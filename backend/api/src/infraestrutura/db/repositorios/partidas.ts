@@ -2,6 +2,7 @@ import { sql } from 'kysely';
 import type { PartidaCorpo } from '@pelada/contrato';
 import { validarMarcacoes, type ContagemDaPartida, type PresencaMarcada } from '@pelada/dominio';
 import { auditoria } from './convites.ts';
+import { eventos } from './eventos.ts';
 import { jogadores } from './jogadores.ts';
 import type { Db } from './tipos.ts';
 
@@ -74,9 +75,7 @@ function resumoDaPartida(data: string, choveu: boolean, contagem: ContagemDaPart
  *   espera o outro, o 23505 de `partidas_grupo_id_data_key` vira `partida_ja_existe` (PAR-21, PAR-30); o SAVEPOINT
  *   deixa a transação da requisição utilizável;
  * - falha depois das presenças (evento ou auditoria): o erro sobe e a transação desfaz tudo (PAR-28).
- *
- * SPEC_DEVIATION: o evento `partida_lancada` é gravado aqui por INSERT direto (com conta, pela RLS da T23), porque
- * `eventos.partidaLancada` nasce na T33; a T33 pode trocar este INSERT pela chamada, sem mudar o comportamento.
+ * O evento vai por `eventos.partidaLancada` (T33; até a T33, era um INSERT direto igual).
  */
 async function lancar(db: Db, grupoId: string, dados: PartidaCorpo): Promise<ResultadoLancar> {
   const v = await travarEValidar(db, grupoId, dados.data, dados.marcacoes);
@@ -100,9 +99,7 @@ async function lancar(db: Db, grupoId: string, dados: PartidaCorpo): Promise<Res
   if (!id) throw new Error('INSERT de partida sem id');
 
   await inserirPresencas(db, grupoId, id, v.presencas);
-  await sql`
-    INSERT INTO eventos_uso (grupo_id, tipo, momento, data_partida)
-    VALUES (${grupoId}, 'partida_lancada', now(), ${dados.data}::date)`.execute(db);
+  await eventos.partidaLancada(db, grupoId, dados.data);
   await auditoria.registrar(db, grupoId, {
     acao: 'partida_lancada',
     entidade: 'partida',
