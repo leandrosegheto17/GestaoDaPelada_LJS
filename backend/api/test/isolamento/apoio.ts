@@ -239,7 +239,7 @@ const PREENCHER: ReadonlyArray<readonly [string, (db: pg.Client, s: Semente) => 
     async (db, s) => {
       await db.query(
         `INSERT INTO auditoria (autor_tipo, autor_conta_id, acao, entidade, entidade_id, grupo_id, momento)
-         VALUES ('conta', $1, 'teste', 'grupo', $2::text, $2, now())`,
+         VALUES ('conta', $1, 'teste', 'grupo', $2::uuid::text, $2::uuid, now())`,
         [s.conta, s.grupo],
       );
     },
