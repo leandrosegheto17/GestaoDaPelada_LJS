@@ -1,6 +1,7 @@
 import type { Kysely } from 'kysely';
 import type { Banco } from '../infraestrutura/db/transacao.ts';
 import type { Relogio } from '../infraestrutura/relogio.ts';
+import type { RecursoLiberado } from './middlewares/recurso.ts';
 
 /**
  * Bindings do Worker (wrangler.jsonc). Tipos mínimos escritos aqui, para não depender dos
@@ -52,6 +53,8 @@ export interface Variaveis {
   relogio: Relogio;
   /** A cadeia das rotas de grupo já rodou nesta requisição (T22). */
   grupoProtegido?: boolean;
+  /** Ponto único da regra de plano, posto pelo `criarApp` (T32 da simulador; SIM-68, AD-049). */
+  recursoLiberado: RecursoLiberado;
 }
 
 export interface Ambiente {

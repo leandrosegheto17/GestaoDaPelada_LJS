@@ -1176,6 +1176,8 @@ T53 → T54
 **Depends on**: T31
 **Reuses**: Cadeia `exigirVinculo` → `exigirGrupoAtivo` (`CA:795`, `GE:901`); assinatura de PLA-07 (`.specs/features/planos-e-cobranca/spec.md:79`); AD-049, AD-062
 **Requirement**: SIM-68
+**Status**: rascunhada
+**Nota do rascunho**: rascunhada antes das T30 e T31 (que dependem dos repositórios da `partidas-e-ranking`). `recursoLiberado(db, grupoId, recurso)` (o `Db` da requisição vai junto, porque a versão da feature 7 lê a situação no banco), injetável por `criarApp({ recursoLiberado })` e lido em `c.var.recursoLiberado`; `travarRecursosDoPlano(api)` liga `exigirRecurso('simulador')` em `/grupos/:grupoId/simulador/*` e `/grupos/:grupoId/escalacoes`, depois de `protegerRotasDeGrupo`. Corpo do 403 na forma da AD-091 (`{ erro: 'plano_pro', recurso, mensagem }`), sem importar o `plano.ts` da feature 7. Teste em `backend/api/test/sessao/recurso.test.ts`; o meta-teste pede as 5 rotas das T33 a T37 e fica vermelho até elas existirem.
 
 **Done when**:
 

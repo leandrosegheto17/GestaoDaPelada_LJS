@@ -4,6 +4,7 @@ import { exigirCabecalhoPelada } from './middlewares/cabecalho-pelada.ts';
 import { semCache, semSniff } from './middlewares/cabecalhos.ts';
 import { limitarEscritasDeGrupo } from './middlewares/limite-escrita.ts';
 import { limitarRotasDeAcesso } from './middlewares/limite-taxa.ts';
+import { recursoLiberadoPadrao, travarRecursosDoPlano, type RecursoLiberado } from './middlewares/recurso.ts';
 import { carregarSessao } from './middlewares/sessao.ts';
 import { protegerRotasDeGrupo } from './middlewares/vinculo.ts';
 import { rotasAdmins } from './rotas/admins.ts';
@@ -37,6 +38,8 @@ export interface OpcoesApp {
   fabricaBanco?: NonNullable<OpcoesCliente['fabrica']>;
   /** Só para os testes: relógio falso (T19). Sem ele, o do sistema. */
   relogio?: Relogio;
+  /** Só para os testes: trava de plano falsa (T32 da simulador; SIM-68). Sem ela, a que libera tudo (AD-049). */
+  recursoLiberado?: RecursoLiberado;
 }
 
 /**
@@ -46,10 +49,12 @@ export interface OpcoesApp {
 export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
   const api = new Hono<Ambiente>().basePath('/api');
   const relogio = opcoes.relogio ?? relogioDoSistema();
+  const recursoLiberado = opcoes.recursoLiberado ?? recursoLiberadoPadrao;
 
-  // O relógio da requisição antes de tudo: só ele lê a data de regra (T19; GEL-32).
+  // O relógio da requisição antes de tudo: só ele lê a data de regra (T19; GEL-32). A trava de plano junto (SIM-68).
   api.use('*', async (c, next) => {
     c.set('relogio', relogio);
+    c.set('recursoLiberado', recursoLiberado);
     await next();
   });
 
@@ -65,6 +70,8 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
   api.use('*', limitarEscritasDeGrupo);
   // Rotas de grupo: sessão, transação com a conta e vínculo sob a RLS (ACE-41, T21).
   protegerRotasDeGrupo(api, opcoes.fabricaBanco ? { fabrica: opcoes.fabricaBanco } : {});
+  // Trava de recurso do plano depois do vínculo e do grupo ativo (SIM-68, AD-077).
+  travarRecursosDoPlano(api);
 
   api.route('/', health);
   // Só responde com EMAIL_DEV=1; sem ela, 404 como rota inexistente (T17).
