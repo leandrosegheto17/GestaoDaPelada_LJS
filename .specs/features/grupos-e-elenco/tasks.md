@@ -649,6 +649,8 @@ T73 → T74 → T75
 **Depends on**: T10
 **Reuses**: regras de `GS:232-235`; interface de `GD:121`
 **Requirement**: GEL-61, GEL-63, GEL-64
+**Status**: rascunhada
+Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a spec não diz se vale; o rascunho o aceita e o trata como sem dia nenhum, sem sobreposição (`[LACUNA]` em `backend/dominio/src/atividade/datas.ts`, `sobrepoem`).
 
 **Done when**:
 
