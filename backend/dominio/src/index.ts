@@ -83,3 +83,4 @@ export {
   type SituacaoGravada,
 } from './pontuacao/pesos.ts';
 export { criarResolvedorDePesos, MENSAGEM_SEM_PESOS, type ResolvedorDePesos } from './pontuacao/resolvedor.ts';
+export { inicioDaContagem } from './pontuacao/inicio.ts';

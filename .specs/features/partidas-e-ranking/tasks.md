@@ -547,6 +547,7 @@ T78 → T79
 **Depends on**: T3
 **Reuses**: `B:231` (PAR-57), Assumption `B:60` (saiu e voltou, vale o legado); tipos e intervalo [início, fim) de `GE:626` (T11 da grupos-e-elenco)
 **Requirement**: PAR-57
+**Status**: rascunhada
 
 **Done when**:
 
