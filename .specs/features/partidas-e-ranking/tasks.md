@@ -519,6 +519,7 @@ T78 → T79
 **Depends on**: T2
 **Reuses**: `B:230` (PAR-56) e casos limite `B:490-491`; `BD:159`
 **Requirement**: PAR-56
+**Status**: rascunhada
 
 **Done when**:
 

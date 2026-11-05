@@ -82,3 +82,4 @@ export {
   type PresencaDoJogador,
   type SituacaoGravada,
 } from './pontuacao/pesos.ts';
+export { criarResolvedorDePesos, MENSAGEM_SEM_PESOS, type ResolvedorDePesos } from './pontuacao/resolvedor.ts';
