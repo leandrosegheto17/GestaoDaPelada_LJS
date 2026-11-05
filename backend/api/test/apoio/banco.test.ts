@@ -48,6 +48,7 @@ describe('bancoDeTeste', () => {
       bancoDeTeste(async (url, nome) => {
         criado = nome;
         aberta = new pg.Client({ connectionString: url });
+        aberta.on('error', () => undefined); // o DROP ... WITH (FORCE) derruba esta conexão de propósito
         await aberta.connect();
         throw new Error('falha de propÃ³sito');
       }),
