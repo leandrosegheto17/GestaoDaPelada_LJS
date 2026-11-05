@@ -11,7 +11,7 @@ import type { Db } from '../tipos.ts';
  * Lançamento vinculado a um pagamento (a entrada da mensalidade) não se apaga por aqui: devolve `vinculado` com o
  * apelido e o mês, para a rota montar o 409 `lancamento_vinculado` (a saída é pela desmarcação do pagamento, T19). A
  * FK `ON DELETE RESTRICT` de `pagamentos_mes` é a segunda barreira: se a checagem passar e o `DELETE` ainda assim der
- * 23503 (um pagamento marcado entre a conferência e o apagar), um `SAVEPOINT` desfaz só o `DELETE` e o resultado é o
+ * 23001 (RESTRICT; ou 23503) (um pagamento marcado entre a conferência e o apagar), um `SAVEPOINT` desfaz só o `DELETE` e o resultado é o
  * mesmo `vinculado`, sem deixar a transação abortada.
  */
 
@@ -69,7 +69,9 @@ async function excluir(
     await sql`DELETE FROM lancamentos WHERE grupo_id = ${grupoId} AND id = ${id}`.execute(db);
   } catch (erro) {
     await sql`ROLLBACK TO SAVEPOINT excluir_lancamento`.execute(db);
-    if ((erro as { code?: string }).code === '23503') {
+    // `ON DELETE RESTRICT` dá 23001 (restrict_violation); `NO ACTION` daria 23503. Os dois valem como "vinculado".
+    const codigo = (erro as { code?: string }).code;
+    if (codigo === '23001' || codigo === '23503') {
       const v = await vinculoDe(db, grupoId, id);
       if (v) return { resultado: 'vinculado', apelido: v.apelido, mes: v.mes };
     }

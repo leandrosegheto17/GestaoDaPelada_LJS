@@ -114,7 +114,10 @@ describe('seed: caixa do exemplo', () => {
       expect(mes.pagamentos.map(({ apelido, pagou }) => ({ apelido, pagou }))).toEqual(
         RESPOSTA.pagamentos.map(({ apelido, pagou }) => ({ apelido, pagou })),
       );
-      expect(mes.lancamentos.map(semId)).toEqual(RESPOSTA.lancamentos.map(semId));
+      // A lista do mockup não está em ordem de data (as duas saídas vêm antes das mensalidades de 01/10); a spec manda
+      // do mais recente ao mais antigo (FIN-14). Ordena-se o mockup por data decrescente, estável (empate = ordem do mockup).
+      const doMaisRecente = [...RESPOSTA.lancamentos].sort((a, b) => b.data.localeCompare(a.data));
+      expect(mes.lancamentos.map(semId)).toEqual(doMaisRecente.map(semId));
     });
   });
 

@@ -172,18 +172,19 @@ describe('FIN-40: DELETE das 3 tabelas', () => {
     },
   );
 
-  it('FIN-40: C (controle) apaga pagamentos, lançamentos e configuração de G, nessa ordem (a FK protege o vinculado)', async () => {
+  it('FIN-40: C (controle) apaga pagamentos e lançamentos de G, nessa ordem (a FK protege o vinculado); a configuração nem a criadora apaga (sem grant de DELETE)', async () => {
     const { db, cenario } = aberto;
     const contagens = await comoApp(db, { conta: cenario.contaC }, async (d) => {
       const apagar = async (tabela: Tabela) =>
         (await d.query(`DELETE FROM ${tabela} WHERE grupo_id = $1`, [cenario.grupoG])).rowCount;
-      return [
-        await apagar('pagamentos_mes'),
-        await apagar('lancamentos'),
-        await apagar('config_financeira'),
-      ];
+      return [await apagar('pagamentos_mes'), await apagar('lancamentos')];
     });
     expect(contagens.every((n) => (n ?? 0) > 0)).toBe(true);
+    await expect(
+      comoApp(db, { conta: cenario.contaC }, (d) =>
+        d.query('DELETE FROM config_financeira WHERE grupo_id = $1', [cenario.grupoG]),
+      ),
+    ).rejects.toMatchObject({ code: '42501' });
   });
 });
 

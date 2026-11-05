@@ -87,7 +87,7 @@ describe('lancamentosExcluir.excluir', () => {
     ).toBe(0);
   });
 
-  it('FIN-30: com a checagem pulada (simulação da corrida), o 23503 da FK vira o mesmo vinculado', async () => {
+  it('FIN-30: com a checagem pulada (simulação da corrida), o 23001 da FK vira o mesmo vinculado', async () => {
     const { cenario } = aberto;
     expect(await excluir(cenario.idsG.lancamento, { pularChecagemDoVinculo: true })).toEqual({
       resultado: 'vinculado',

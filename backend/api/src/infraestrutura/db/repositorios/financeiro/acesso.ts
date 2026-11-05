@@ -45,7 +45,15 @@ async function alterarFinanceiro(
      WHERE grupo_id = ${grupoId} AND conta_id = ${alvoId}
        FOR UPDATE`.execute(db);
   const vinculo = atual.rows[0];
-  if (!vinculo) return { resultado: 'nao_encontrado' };
+  if (!vinculo) {
+    // `FOR UPDATE` também respeita a policy de UPDATE: para quem não tem acesso (ou para a própria conta) a linha some.
+    // Um SELECT simples separa "o banco recusou" de "não existe".
+    const existe = await sql`
+      SELECT 1 FROM vinculos_admin WHERE grupo_id = ${grupoId} AND conta_id = ${alvoId}`.execute(
+      db,
+    );
+    return { resultado: existe.rows.length > 0 ? 'sem_permissao' : 'nao_encontrado' };
+  }
   if (vinculo.acessa_financeiro === valor)
     return { resultado: 'ok', mudou: false, lista: await admins.listar(db, grupoId) };
 

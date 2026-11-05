@@ -143,13 +143,13 @@ describe('rede do financeiro: constraints das 3 tabelas (a)', () => {
     ).rejects.toMatchObject({ code: '23505' });
   });
 
-  it('FIN-30: apagar o lançamento de um pagamento dá 23503', async () => {
+  it('FIN-30: apagar o lançamento de um pagamento dá 23001 (RESTRICT)', async () => {
     const { db, cenario } = aberto;
     await expect(
       comoConta(db, cenario.contaC, (d) =>
         d.query('DELETE FROM lancamentos WHERE id = $1', [cenario.idsG.lancamento]),
       ),
-    ).rejects.toMatchObject({ code: '23503' });
+    ).rejects.toMatchObject({ code: '23001' });
   });
 });
 
