@@ -783,6 +783,7 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T15
 **Reuses**: primitivos zod da CA (`CA:550`, T11) e `.strict()` dos schemas de acesso (`CA:574`, T12); formas de `GD:138`; mensagens de `GS:83-87`; regra de `GSEG:94`
 **Requirement**: GEL-03, GEL-04, GEL-05, GEL-06, GEL-07, GEL-19, SEC-005
+**Status**: rascunhada
 
 **Done when**:
 

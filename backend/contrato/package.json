@@ -9,7 +9,8 @@
     ".": "./src/index.ts",
     "./sentry": "./src/sentry.ts",
     "./primitivos": "./src/primitivos.ts",
-    "./acesso": "./src/acesso.ts"
+    "./acesso": "./src/acesso.ts",
+    "./grupo": "./src/grupo.ts"
   },
   "scripts": {
     "lint": "eslint .",
