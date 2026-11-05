@@ -466,6 +466,7 @@ T73 → T74 → T75
 **Depends on**: T3
 **Reuses**: `M:1792844400000_grupos-grants-coluna.sql:6-7`; `M:1792844520000_grupos-arquivar-so-criadora.sql:8-24`; trigger do slug em `M:1792843200000_linha-de-base.sql:82-93`
 **Requirement**: GEL-16, GEL-24, SEC-009
+**Status**: rascunhada
 
 **Done when**:
 
