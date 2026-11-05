@@ -1179,6 +1179,8 @@ Lacunas: como na T29, as rotas reais de arquivar e reativar vêm antes das extra
 **Depends on**: T30
 **Reuses**: lista de rotas do `app.routes` usada na suíte da CA (`CA:1070`); cenário de T0
 **Requirement**: GEL-25, GEL-26
+**Status**: rascunhada
+SPEC_DEVIATION: o teste fica em `backend/api/test/grupos/grupo-arquivado.test.ts`, não em `test/rotas/` (que roda no `workerd`, sem o Postgres), como os testes das rotas de acesso.
 
 **Done when**:
 
