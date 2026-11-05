@@ -1497,6 +1497,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T42
 **Reuses**: `corrigirPeriodo` e `alterarInicio` (T40, T41); tabela de `GD:175-176`
 **Requirement**: GEL-71, GEL-72, GEL-73, GEL-74, GEL-75, GEL-77, GEL-78, GEL-79, GEL-80, GEL-82
+**Status**: rascunhada
 
 **Done when**:
 
