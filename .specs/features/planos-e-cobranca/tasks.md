@@ -1226,6 +1226,8 @@ T56 → T57
 **Depends on**: T33
 **Reuses**: T29, T31, T14; rota de T33
 **Requirement**: PLA-55, PLA-56
+**Status**: rascunhada
+**Nota do rascunho**: rota `DELETE` em `entrada/rotas/assinatura.ts` (mesma cadeia do POST); código novo `sem_assinatura` (409) no contrato (`erroSemAssinatura`, `MENSAGENS_ERRO_PLANO`). `SUBSCRIPTION_DELETED` gravado antes da `assinatura_cancelar` (P0002 depois da remoção) responde 204. Teste em `backend/api/test/rotas/assinatura-cancelar.test.ts`.
 
 **Done when**:
 

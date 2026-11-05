@@ -158,6 +158,14 @@ export const erroAssinaturaAtiva = z
   })
   .strict();
 
+/** 409 de cancelar sem assinatura ativa nem pendente (PLA-55, T34). */
+export const erroSemAssinatura = z
+  .object({
+    erro: z.literal('sem_assinatura'),
+    mensagem: z.string().optional(),
+  })
+  .strict();
+
 /** 502 quando o Asaas falha, demora ou responde 429 (PLA-36, PLA-56). */
 export const erroPagamentoIndisponivel = z
   .object({
@@ -171,6 +179,7 @@ export const CODIGOS_ERRO_PLANO = [
   'somente_leitura',
   'assinatura_pendente',
   'assinatura_ativa',
+  'sem_assinatura',
   'pagamento_indisponivel',
 ] as const;
 export type CodigoErroPlano = (typeof CODIGOS_ERRO_PLANO)[number];
@@ -180,5 +189,6 @@ export const MENSAGENS_ERRO_PLANO: Readonly<Record<CodigoErroPlano, string>> = {
   somente_leitura: 'O grupo está somente leitura no plano Free.',
   assinatura_pendente: 'Já há uma assinatura aguardando o pagamento.',
   assinatura_ativa: 'O grupo já tem uma assinatura ativa.',
+  sem_assinatura: 'O grupo não tem assinatura para cancelar.',
   pagamento_indisponivel: MENSAGEM_PAGAMENTO_INDISPONIVEL,
 };

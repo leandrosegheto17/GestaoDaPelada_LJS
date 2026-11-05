@@ -10,6 +10,7 @@ import {
 import type { Ambiente } from '../ambiente.ts';
 import { lerCorpoDoGrupo } from '../corpo.ts';
 import { assinar, type ResultadoAssinar } from '../../aplicacao/plano/assinar.ts';
+import { cancelar, type ResultadoCancelar } from '../../aplicacao/plano/cancelar.ts';
 
 /**
  * `POST /api/grupos/:grupoId/assinatura` (planos-e-cobranca T33; PLA-30 a PLA-33, PLA-60; AD-091). A cadeia das rotas
@@ -61,6 +62,33 @@ function responder(c: Context<Ambiente>, r: ResultadoAssinar): Response {
   }
 }
 
+/**
+ * `DELETE /api/grupos/:grupoId/assinatura` (T34; PLA-55, PLA-56; AD-115), na mesma cadeia do POST:
+ * - 204: assinatura removida no Asaas e gravada `cancelada` (grupo `cancelado` se era a ativa; sem mudança se era a
+ *   pendente);
+ * - 403 `so_quem_criou`; 409 `sem_assinatura`; 502 `pagamento_indisponivel`, com o grupo como estava (PLA-56).
+ */
+function responderCancelar(c: Context<Ambiente>, r: ResultadoCancelar): Response {
+  switch (r.resultado) {
+    case 'cancelada':
+      return c.body(null, 204);
+    case 'sem_assinatura':
+      return c.json(
+        { erro: 'sem_assinatura', mensagem: MENSAGENS_ERRO_PLANO.sem_assinatura },
+        409,
+      );
+    case 'so_quem_criou':
+      return c.json(corpoDoErro('so_quem_criou'), 403);
+    case 'nao_encontrado':
+      return c.json(corpoDoErro('nao_encontrado'), 404);
+    case 'pagamento_indisponivel':
+      return c.json(
+        { erro: 'pagamento_indisponivel', mensagem: MENSAGEM_PAGAMENTO_INDISPONIVEL },
+        502,
+      );
+  }
+}
+
 export function rotasAssinatura(): Hono<Ambiente> {
   const rotas = new Hono<Ambiente>();
 
@@ -77,6 +105,16 @@ export function rotasAssinatura(): Hono<Ambiente> {
       hoje: c.var.relogio.hoje(),
     });
     return responder(c, r);
+  });
+
+  rotas.delete('/grupos/:grupoId/assinatura', async (c) => {
+    const conta = c.var.contaId;
+    if (conta === undefined) return c.json(corpoDoErro('nao_encontrado'), 404);
+    const r = await cancelar(c.var.db, c.var.asaas, {
+      grupoId: c.req.param('grupoId'),
+      conta,
+    });
+    return responderCancelar(c, r);
   });
 
   return rotas;
