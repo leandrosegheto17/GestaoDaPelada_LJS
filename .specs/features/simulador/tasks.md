@@ -732,6 +732,8 @@ T53 → T54
 **Depends on**: T14
 **Reuses**: `L:backend/dominio/src/simulador/sugerir.ts`; exportação pública do domínio (`PR:840`); `S:133`, `S:226-228`
 **Requirement**: SIM-19, SIM-47, SIM-48, SIM-49
+**Status**: rascunhada
+**Nota do rascunho**: `sugerir(entrada, historico)` devolve `valida: false` com a prévia e a descrição quando faltam aptos (a rota faz o 422). O `index.ts` exporta também `idadeNaData` e os tipos de resultado (a rota e o contrato usam); o `avaliar` entra na T16. Apoio de teste em `backend/dominio/test/simulador/apoio.ts` (elenco e histórico fixos, embaralhamento sem aleatoriedade).
 
 **Done when**:
 

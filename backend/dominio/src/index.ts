@@ -189,3 +189,27 @@ export {
   type PayloadPush,
   type TipoAvisoCobranca,
 } from './notificacoes/payload.ts';
+
+// simulador (SIM-47, SIM-50): prévia, sugestão e próximo dia de jogo, sem relógio, sorteio nem I/O.
+export {
+  idadeNaData,
+  proximoDiaDeJogo,
+  type Apto,
+  type Formato,
+  type Limite,
+} from './simulador/base.ts';
+export { calcularPrevia, type Previa } from './simulador/previa.ts';
+export { descreverPrevia } from './simulador/descricao.ts';
+export type { ComposicaoDois, TimeDois } from './simulador/chave-dois.ts';
+export type { Aviso, TipoAviso } from './simulador/avisos.ts';
+export type { IndicadoresTimeDois } from './simulador/indicadores-dois.ts';
+export type { IndicadoresTimeVarios } from './simulador/indicadores-varios.ts';
+export type { HistoricoSim } from './simulador/prioridade.ts';
+export {
+  sugerir,
+  type EntradaSimulador,
+  type Sugestao,
+  type SugestaoDois,
+  type SugestaoInvalida,
+  type SugestaoVarios,
+} from './simulador/sugerir.ts';
