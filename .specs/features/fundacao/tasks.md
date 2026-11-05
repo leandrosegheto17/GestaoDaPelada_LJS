@@ -1170,7 +1170,7 @@ T81 ‚Üí T82
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-21, FUN-20
 **Status**: rascunhada
-**Nota do rascunho**: o design cita `@cloudflare/vitest-plugin`; o rascunho usa `@cloudflare/vitest-pool-workers` (plugin `cloudflareTest`, Vitest 4) e sobrepıe os assets com a SPA de `backend/api/test/rotas/spa` pela opÁ„o `miniflare.assets`. O /executar confere o nome do pacote e a sobreposiÁ„o na vers„o instalada.
+**Nota do rascunho**: o design cita `@cloudflare/vitest-plugin`; o rascunho usa `@cloudflare/vitest-pool-workers` (plugin `cloudflareTest`, Vitest 4) e sobrep√µe os assets com a SPA de `backend/api/test/rotas/spa` pela op√ß√£o `miniflare.assets`. O /executar confere o nome do pacote e a sobreposi√ß√£o na vers√£o instalada.
 
 **Done when**:
 
