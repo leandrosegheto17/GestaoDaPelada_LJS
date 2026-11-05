@@ -175,3 +175,17 @@ export {
   type LinhaPdf,
   type ProjecaoPdf,
 } from './pdf/calcular.ts';
+
+// notificacoes (NOT-25, NOT-43): payloads do push, sem relógio nem I/O.
+export {
+  diaEMes,
+  NOME_DO_TIPO,
+  payloadCobranca,
+  payloadRanking,
+  serializarPayload,
+  TITULO_RANKING,
+  type EntradaCobranca,
+  type EntradaRanking,
+  type PayloadPush,
+  type TipoAvisoCobranca,
+} from './notificacoes/payload.ts';

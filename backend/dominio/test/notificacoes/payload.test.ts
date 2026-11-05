@@ -11,7 +11,8 @@ import {
 
 /** Payloads dos avisos por push (T5; NOT-25, NOT-43). */
 
-const NOME_LONGO = `${'Pelada dos Amigos ⚽🏆 '.repeat(6)}`.slice(0, 120);
+/** 120 caracteres (pontos de código), com emoji; cortado por ponto de código para não partir um par substituto. */
+const NOME_LONGO = [...'Pelada dos Amigos ⚽🏆 '.repeat(7)].slice(0, 120).join('');
 
 /**
  * Campos proibidos de PAR-76 (`PR:931`): id de jogador, telefone, ano, idade, posição, notas, nível, períodos,

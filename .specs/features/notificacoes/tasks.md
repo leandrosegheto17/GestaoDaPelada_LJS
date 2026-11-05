@@ -402,6 +402,8 @@ T39 → T40 → T41
 **Depends on**: T4
 **Reuses**: datas do domínio (`PR:457`); campos proibidos de PAR-76 (`PR:913`); S-05
 **Requirement**: NOT-25, NOT-28, NOT-43, NOT-66
+**Status**: rascunhada
+**Nota do rascunho**: `topicoDoGrupo` fica em `backend/api/src/infraestrutura/push/topico.ts`; o tamanho cifrado e o tópico são testados em `backend/api/test/infraestrutura/push/payload.test.ts` (workerd). O payload de cobrança não tem `texto` (NOT-43: "só o título ... e o caminho"); o service worker (T34) trata a ausência. A lista de PAR-76 não é importada (o `CAMPOS_PROIBIDOS_PUBLICO` nasce na T19 da feature 4): o teste confere a lista exata de chaves.
 
 **Done when**:
 
