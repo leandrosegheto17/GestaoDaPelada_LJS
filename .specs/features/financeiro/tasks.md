@@ -593,6 +593,8 @@ T47 → T48
 **Depends on**: T11
 **Reuses**: Matrizes de leitura e escrita da fundação (`F:981`, `F:1007`); `comoApp` (`F:909`); molde da matriz da GE (`GE:372`)
 **Requirement**: FIN-38, FIN-39, FIN-40
+**Status**: rascunhada
+**Nota do rascunho**: a evidência (sabotagens) está listada no topo do teste; o /executar roda e registra aqui.
 
 **Done when**:
 
