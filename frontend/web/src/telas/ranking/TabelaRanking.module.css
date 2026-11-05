@@ -1,0 +1,113 @@
+/* Tabela do ranking (PAR-79, PAR-80), de .specs/mockup/base.css:171-190. A marca da rodada é a do guia (Marca.module.css). */
+
+.tabela-rolagem {
+  overflow-x: auto;
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-linha);
+  border-radius: var(--raio);
+}
+
+.ranking {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.ranking th,
+.ranking td {
+  padding: 0 var(--esp-1);
+  height: 46px;
+  text-align: center;
+  border-bottom: 1px solid var(--cor-linha);
+  background: var(--cor-superficie);
+}
+
+.ranking tbody tr:nth-child(even) > * {
+  background: var(--cor-zebra);
+}
+
+.ranking tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.ranking thead th {
+  height: 44px;
+  font-size: var(--texto-tabela-cabecalho);
+  font-weight: var(--peso-forte);
+  color: var(--cor-texto-sec);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.ranking abbr {
+  text-decoration: none;
+}
+
+.c-pos {
+  width: 34px;
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  font-family: var(--fonte-titulo);
+  font-size: var(--texto-xl);
+  font-weight: var(--peso-forte);
+}
+
+.c-nome {
+  position: sticky;
+  left: 34px;
+  z-index: 1;
+  min-width: 104px;
+  max-width: 132px;
+  text-align: left !important;
+  font-weight: var(--peso-semi);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: var(--sombra-coluna-fixa);
+}
+
+.ranking thead .c-nome {
+  box-shadow: none;
+}
+
+.c-pts {
+  width: 44px;
+  font-family: var(--fonte-titulo);
+  font-size: var(--texto-pontos);
+  font-weight: var(--peso-extra);
+  color: var(--cor-texto);
+}
+
+.c-pts--inicial {
+  color: var(--cor-texto-sec);
+  font-weight: var(--peso-forte);
+}
+
+.ranking thead th.c-pts {
+  white-space: normal;
+  line-height: 1.1;
+  width: 52px;
+}
+
+.c-partida {
+  width: 46px;
+}
+
+.c-partida .icone-tempo {
+  display: block;
+  margin: 2px auto 0;
+}
+
+.icone-tempo--chuva {
+  color: var(--cor-chuva);
+}
+
+.icone-tempo--sol {
+  color: var(--cor-sol);
+}
+
+.ranking tbody tr:nth-child(-n + 3) .c-pos {
+  color: var(--cor-verde);
+}

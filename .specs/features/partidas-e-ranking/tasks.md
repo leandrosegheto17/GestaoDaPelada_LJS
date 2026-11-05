@@ -1957,6 +1957,7 @@ T78 → T79
 **Depends on**: T54
 **Reuses**: `.specs/mockup/telas/t01-ranking--sucesso.html`; componentes base (`F:1424`); `B:266-267`
 **Requirement**: PAR-79, PAR-80
+**Status**: rascunhada
 
 **Done when**:
 
