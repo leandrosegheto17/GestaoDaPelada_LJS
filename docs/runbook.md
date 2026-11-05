@@ -167,7 +167,10 @@ O plano original previa um environment `previa` sobre a branch `dev` do Neon; pe
 | `RESEND_API_KEY`   | Chave da API do Resend (começa por `re_`), para os e-mails de conta          |
 | `RESEND_REMETENTE` | Remetente dos e-mails de conta, ex. `Pelada <nao-responda@<domínio verificado>>` |
 
-`LIMITE_EMAILS_DIA` é opcional (padrão 100) e `EMAIL_DEV` nunca existe no Worker publicado: sem ela, `GET /api/dev/emails` responde 404.
+| `ASAAS_API_KEY`    | Chave da API do Asaas **sandbox**, para criar cliente e assinatura (PLA-37)  |
+| `ASAAS_WEBHOOK_TOKEN` | `authToken` do webhook do Asaas: 32 a 255 caracteres, diferente da chave  |
+
+`LIMITE_EMAILS_DIA` é opcional (padrão 100) e `EMAIL_DEV` nunca existe no Worker publicado: sem ela, `GET /api/dev/emails` responde 404. `ASAAS_URL` não é secret: é a variável do `wrangler.jsonc`, fixa no sandbox (`https://api-sandbox.asaas.com/v3`).
 
 ### E-mails de conta (Resend)
 
@@ -192,6 +195,34 @@ pnpm --filter @pelada/api exec wrangler secret list --config ../../wrangler.json
 **Quando a cota acaba:** as rotas de e-mail respondem 503 `email_indisponivel` até o dia virar; nada se perde, e a pessoa pode pedir de novo depois. Se acontecer com frequência: confira no painel do Resend se há envio fora do normal (abuso do cadastro); se o uso for legítimo, troque para um plano pago do Resend e suba `LIMITE_EMAILS_DIA` para o novo teto (`wrangler secret put LIMITE_EMAILS_DIA`, ou `--var` no `deploy.yml`), sempre abaixo do limite do plano.
 
 **Resend fora do ar ou lento:** sem resposta em 10 s, a rota responde 503 sem gastar a cota; o log registra só o tipo do e-mail, o status e o código de erro, nunca o destinatário nem o conteúdo.
+
+### Pagamentos (Asaas sandbox)
+
+A assinatura do Pro (R$ 9,90/mês por grupo) é cobrada pelo Asaas, **só no sandbox** enquanto não houver AD de produção (AD-061, PLA-38): o `wrangler.jsonc` fixa `ASAAS_URL` no sandbox e a checagem `so-previa` reprova o endereço de produção e qualquer `ASAAS_URL` vinda de `vars`, `secrets` ou shell no `deploy.yml`. Trocar para produção pede uma AD nova em `.specs/STATE.md`, a mudança da checagem e chaves novas: não basta trocar a variável.
+
+**Passos do usuário, uma vez (`/preparar` Nível 2)** (nenhum valor vai para o repositório nem para esta página):
+
+1. No sandbox do Asaas (`https://sandbox.asaas.com`), gere a chave de API em *Integrações > Chave de API*.
+2. Gere um token aleatório de 32 a 255 caracteres para o webhook, **diferente da chave** (ex.: `openssl rand -base64 48`).
+3. Grave os dois secrets no Worker da prévia (`gestaodapelada-v2`); o valor é pedido no terminal:
+
+```bash
+pnpm --filter @pelada/api exec wrangler secret put ASAAS_API_KEY --config ../../wrangler.jsonc
+pnpm --filter @pelada/api exec wrangler secret put ASAAS_WEBHOOK_TOKEN --config ../../wrangler.jsonc
+pnpm --filter @pelada/api exec wrangler secret list --config ../../wrangler.jsonc   # só os nomes
+```
+
+4. No painel do sandbox, em *Integrações > Webhooks*, crie o webhook: URL `<URL_PUBLICA>/api/webhooks/asaas`, o mesmo token do passo 2 em *Token de autenticação* (o Asaas o manda no header `asaas-access-token`), envio **sequencial**, com os eventos de cobrança (`PAYMENT_*`) e de assinatura (`SUBSCRIPTION_*`) ligados.
+5. Confira: em Meu plano de um grupo de teste, assine com um CPF de teste; abra a fatura e, no painel do sandbox, marque a cobrança como recebida (*Cobranças > a cobrança > Confirmar recebimento*, ou "Simular pagamento"). Em até um minuto Meu plano mostra Pro com o `pagoAte` de um mês depois do vencimento.
+
+**Fila pausada.** O Asaas pausa a fila do webhook depois de **15 falhas seguidas** (qualquer resposta que não seja 200: Worker fora, token trocado, 5xx). Com a fila pausada, nenhum pagamento confirma o Pro e os eventos parados **somem depois de 14 dias**. Para retomar (PLA-72):
+
+1. Corrija a causa: confira a saúde (`/api/health`), o log do Worker (`wrangler tail`; o webhook registra só o tipo do evento e o status, nunca dado pessoal) e se o token do painel é o mesmo de `ASAAS_WEBHOOK_TOKEN`.
+2. No painel, em *Integrações > Webhooks*, reative a fila e mande reprocessar os eventos pendentes, antes dos 14 dias.
+3. Os eventos chegam fora de ordem e alguns repetidos: o app grava cada `id` uma vez só (repetido responde 200 sem efeito) e um evento mais antigo que o último aplicado na assinatura não regride a situação (PLA-48). Não é preciso reprocessar em ordem.
+4. Confira em Meu plano dos grupos afetados que a situação bate com a do painel do Asaas.
+
+**Asaas fora do ar, lento ou em 429:** sem resposta em 10 s, ou com erro, assinar e cancelar respondem 502 "Não foi possível falar com o sistema de pagamento. Tente de novo em instantes.", sem gravar nada e sem repetir sozinho; o log registra só a operação e o status, nunca CPF, nome, e-mail ou a chave.
 
 ### Conferir e criar
 

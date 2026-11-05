@@ -1749,6 +1749,8 @@ T56 → T57
 **Depends on**: T56
 **Reuses**: runbook de `F:2063` e `F:2087`, estendido em `CA:1708`; S:50-53
 **Requirement**: PLA-72, PLA-37
+**Status**: rascunhada
+**Lacunas**: escrita antes das T9 a T56 (a pedido do usuário, só o independente): os nomes de menu do painel do sandbox do Asaas (Integrações > Webhooks, Simular pagamento) são PREMISSA e devem ser conferidos no /preparar Nível 2
 
 **Done when**:
 

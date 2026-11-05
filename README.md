@@ -43,6 +43,14 @@ curl -s http://127.0.0.1:8787/api/dev/emails   # mensagens enviadas desde que o 
 
 A caixa some quando o Worker reinicia.
 
+### Pagamentos (Asaas)
+
+A assinatura do Pro fala com o Asaas, **só o sandbox** (`ASAAS_URL` do `wrangler.jsonc`; a checagem `so-previa` recusa outro endereço até haver AD de produção). A chave (`ASAAS_API_KEY`) e o token do webhook (`ASAAS_WEBHOOK_TOKEN`) são secrets do Worker e nunca vão para o repositório (checagem `chave-asaas` e `gitleaks`).
+
+- **Testes de API:** usam o `asaasMemoria()` (`backend/api/src/infraestrutura/asaas/memoria.ts`), sem rede, com falhas programáveis.
+- **e2e:** o `playwright.config.ts` sobe o Asaas falso (`frontend/web/e2e/apoio/asaas-falso.mjs`, porta 8789) antes do Worker e passa ao Worker `ASAAS_URL`, `ASAAS_API_KEY` e `ASAAS_WEBHOOK_TOKEN` falsos por `--var`. O falso responde às 4 rotas do Asaas que a API usa, serve uma fatura de mentira e dispara o webhook no Worker com o token (`POST /teste/webhook {"event":"PAYMENT_RECEIVED","subscription":"sub_…"}`).
+- **À mão, sem Asaas de verdade:** `node frontend/web/e2e/apoio/asaas-falso.mjs` e suba a API com `--var ASAAS_URL:http://127.0.0.1:8789/v3 --var ASAAS_API_KEY:qualquer --var ASAAS_WEBHOOK_TOKEN:<token>`; para o webhook do falso chegar ao Worker, defina `ASAAS_FALSO_WEBHOOK=http://127.0.0.1:8787/api/webhooks/asaas` e `ASAAS_FALSO_TOKEN` com o mesmo token.
+
 ### Conta do dono
 
 `pnpm --filter @pelada/scripts dono -- --email <e-mail do dono>` cria a conta do dono ou troca a senha dela. A senha é pedida no terminal duas vezes, sem eco, e nunca aparece na tela nem no log. O alvo padrão é o banco local (`DATABASE_URL_MIGRACAO`); `--alvo previa` e `--alvo producao` usam o Neon, e o de produção só segue depois de você digitar o e-mail do dono e a palavra `producao`. Banco remoto sem `--alvo` explícito é recusado antes de conectar. O e-mail do dono é o que o banco aceita (CHECK `contas_dono_email`); outro falha lá.
@@ -73,6 +81,10 @@ O `.env.example` lista todas, com obrigatoriedade, formato e se é segredo. Segr
 | `RESEND_REMETENTE`       | Remetente dos e-mails de conta, de domínio verificado no Resend               |
 | `LIMITE_EMAILS_DIA`      | Teto diário de e-mails de conta (padrão 100, o do Resend Free)                |
 | `EMAIL_DEV`              | `1` liga a caixa de e-mails em memória e `GET /api/dev/emails` (só local e e2e) |
+| `ASAAS_API_KEY`          | Chave da API do Asaas sandbox, secret do Worker (segredo)                     |
+| `ASAAS_WEBHOOK_TOKEN`    | `authToken` do webhook do Asaas, 32 a 255 caracteres, secret do Worker (segredo) |
+| `ASAAS_URL`              | URL base do Asaas; só `https://api-sandbox.asaas.com/v3` até haver AD de produção |
+| `ASAAS_FALSO_PORTA`, `ASAAS_FALSO_WEBHOOK`, `ASAAS_FALSO_TOKEN` | Porta, webhook do Worker e token do Asaas falso do e2e (sem segredo) |
 | `SEED_SENHA_ADMIN`       | Senha da conta admin criada pelo `pnpm seed`; obrigatória nele (segredo)      |
 | `NEON_URL_BACKUP`        | Role somente leitura do Neon, usada pelo `backup.yml` (secret do GitHub)      |
 | `BACKUP_CHAVE`           | Chave pública `age` do backup (secret do GitHub)                              |
