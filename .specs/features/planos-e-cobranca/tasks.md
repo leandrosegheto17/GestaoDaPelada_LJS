@@ -984,6 +984,9 @@ T56 → T57
 **Depends on**: T24
 **Reuses**: FIN-50 (`FIN:184`); SIM-68 (`SIM:273`); `recursoLiberado` ligado (T21); S-02, S-03
 **Requirement**: PLA-23, PLA-24, PLA-28
+**Status**: rascunhada
+**Nota do rascunho**: só teste; as rotas já passam pelo ponto único (`travarRecursosDoPlano` e `travarFinanceiro`), sem desvio. A escalação confirmada é lida pela pré-marcação de `GET …/partidas/nova` (fora da trava do simulador), que o teste usa como prova de "segue legível".
+**Lacunas**: a AD-092 diz que o simulador trava só os 4 POST e que as leituras seguem abertas, mas a trava da `simulador` (`CAMINHOS_DO_SIMULADOR`, `/simulador/*`) e o meta-teste de SIM-68 (`sessao/recurso.test.ts`) também travam `GET …/simulador/contexto`. O rascunho mantém a trava como está (mais restritiva, sem mudar teste existente); o /executar decide com o usuário se o GET do contexto deve abrir no Free.
 
 **Done when**:
 
