@@ -92,6 +92,10 @@ O `.env.example` lista todas, com obrigatoriedade, formato e se é segredo. Segr
 | `ASAAS_URL`                                                     | URL base do Asaas; só `https://api-sandbox.asaas.com/v3` até haver AD de produção                      |
 | `ASAAS_FALSO_PORTA`, `ASAAS_FALSO_WEBHOOK`, `ASAAS_FALSO_TOKEN` | Porta, webhook do Worker e token do Asaas falso do e2e (sem segredo)                                   |
 | `SEED_SENHA_ADMIN`                                              | Senha da conta admin criada pelo `pnpm seed`; obrigatória nele (segredo)                               |
+| `VAPID_PUBLICA`, `VAPID_ASSUNTO`                                | Chave pública e contato (`mailto:` ou `https`) do push; sem as três VAPID o push fica desligado        |
+| `VAPID_PRIVADA`                                                 | Chave privada do push, par da `VAPID_PUBLICA` (`pnpm vapid:gerar`), secret do Worker (segredo)         |
+| `PUSH_HOSTS_DEV`                                                | Hosts do push falso (`localhost:porta`), só `.env` local e e2e                                         |
+| `SESSAO_MEDICAO`                                                | Sessão de uma admin da prévia para o `medir-simulador disparar`, só na hora (segredo)                  |
 | `NEON_URL_BACKUP`                                               | Role somente leitura do Neon, usada pelo `backup.yml` (secret do GitHub)                               |
 | `BACKUP_CHAVE`                                                  | Chave pública `age` do backup (secret do GitHub)                                                       |
 | `DATABASE_URL_RESTAURACAO`                                      | Banco local vazio do `pnpm restaurar`, quando o terceiro argumento falta                               |

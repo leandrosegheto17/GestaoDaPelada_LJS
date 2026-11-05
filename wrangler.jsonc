@@ -15,7 +15,7 @@
   "assets": {
     "directory": "frontend/web/dist",
     "not_found_handling": "single-page-application",
-    "run_worker_first": ["/api/*"],
+    "run_worker_first": ["/api/*"]
   },
 
   // Limites por minuto (FUN-26). O namespace_id é só um número único por binding na conta.
@@ -23,7 +23,7 @@
     { "name": "LIMITE_ENTRAR", "namespace_id": "2001", "simple": { "limit": 10, "period": 60 } },
     { "name": "LIMITE_PUBLICO", "namespace_id": "2002", "simple": { "limit": 60, "period": 60 } },
     { "name": "LIMITE_WEBHOOK", "namespace_id": "2003", "simple": { "limit": 60, "period": 60 } },
-    { "name": "LIMITE_ESCRITA", "namespace_id": "2004", "simple": { "limit": 60, "period": 60 } },
+    { "name": "LIMITE_ESCRITA", "namespace_id": "2004", "simple": { "limit": 60, "period": 60 } }
   ],
 
   // Hyperdrive da prévia, sobre a main do Neon (AD-119), com cache desligado (FUN-18).
@@ -34,8 +34,8 @@
     {
       "binding": "HYPERDRIVE",
       "id": "e06363bd85874f1eaffc6382da6d394b",
-      "localConnectionString": "postgres://pelada_app@127.0.0.1:5432/pelada",
-    },
+      "localConnectionString": "postgres://pelada_app@127.0.0.1:5432/pelada"
+    }
   ],
 
   // Fila dos avisos (notificacoes T16; NOT-22, AD-098): a rota só enfileira depois do COMMIT e o mesmo Worker consome,
@@ -43,7 +43,7 @@
   // pelo usuário no /preparar Nível 2 (`wrangler queues create avisos`).
   "queues": {
     "producers": [{ "binding": "FILA_AVISOS", "queue": "avisos" }],
-    "consumers": [{ "queue": "avisos", "max_batch_size": 1, "max_retries": 2 }],
+    "consumers": [{ "queue": "avisos", "max_batch_size": 1, "max_retries": 2 }]
   },
 
   // Limpeza diária das notificações às 06:00 UTC (notificacoes T26; NOT-56, NOT-57). O plano Free aceita até 5 Crons.
@@ -55,6 +55,6 @@
   "vars": {
     "VERSAO": "local",
     "URL_PUBLICA": "",
-    "ASAAS_URL": "https://api-sandbox.asaas.com/v3",
-  },
+    "ASAAS_URL": "https://api-sandbox.asaas.com/v3"
+  }
 }
