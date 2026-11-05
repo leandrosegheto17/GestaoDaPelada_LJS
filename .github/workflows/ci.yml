@@ -57,6 +57,9 @@ jobs:
   testes:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      # Senha fictícia só do CI: o /api/health não toca o banco, mas o wrangler dev exige a URL do Hyperdrive local com senha.
+      PELADA_APP_SENHA: senha-ficticia-do-ci
     services:
       postgres:
         image: postgres:18
@@ -128,6 +131,9 @@ jobs:
   web:
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    env:
+      # Senha fictícia só do CI: o /api/health não toca o banco, mas o wrangler dev exige a URL do Hyperdrive local com senha.
+      PELADA_APP_SENHA: senha-ficticia-do-ci
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

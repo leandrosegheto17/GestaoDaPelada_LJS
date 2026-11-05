@@ -5,6 +5,7 @@ import { semCache, semSniff } from './middlewares/cabecalhos.ts';
 import { limitarRotasDeAcesso } from './middlewares/limite-taxa.ts';
 import { carregarSessao } from './middlewares/sessao.ts';
 import { protegerRotasDeGrupo } from './middlewares/vinculo.ts';
+import { rotasAdmins } from './rotas/admins.ts';
 import { rotasConta } from './rotas/conta.ts';
 import { rotasConvites } from './rotas/convites.ts';
 import { devEmails } from './rotas/dev-emails.ts';
@@ -53,6 +54,7 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
   api.route('/', rotasRecuperacao(rotasAcesso));
   api.route('/', rotasMinhaConta(rotasAcesso));
   api.route('/', rotasConvites(rotasAcesso));
+  api.route('/', rotasAdmins(rotasAcesso));
   opcoes.registrarExtras?.(api);
 
   api.notFound((c) => c.json({ erro: 'Rota não encontrada.' }, 404));

@@ -1091,6 +1091,8 @@ T57 → T58
 **Depends on**: T29
 **Reuses**: `admins.*` e `convites.*` (T23); envio de T24; tabela de `ljs:.specs/features/conta-e-acesso/design.md:167-170`
 **Requirement**: ACE-31, ACE-32, ACE-37, ACE-38, ACE-39, ACE-40, ACE-41, ACE-42
+**Status**: rascunhada
+**Nota do rascunho**: as rotas só declaram os handlers; sessão, `comBanco` e vínculo vêm de `protegerRotasDeGrupo` (T21). Convidar conta o pedido por origem (ACE-73) e lê o nome do grupo para o e-mail. `id` e `contaId` que não são uuid dão 404 sem consulta.
 
 **Done when**:
 

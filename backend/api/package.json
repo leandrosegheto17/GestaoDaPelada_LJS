@@ -23,7 +23,7 @@
     "pg": "^8.23.1"
   },
   "devDependencies": {
-    "@cloudflare/vitest-pool-workers": "^0.10.0",
+    "@cloudflare/vitest-pool-workers": "^0.13.0",
     "@pelada/scripts": "workspace:*",
     "@types/node": "^26.0.0",
     "@types/pg": "^8.23.1",
