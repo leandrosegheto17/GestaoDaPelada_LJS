@@ -71,11 +71,12 @@ describe('wrangler.jsonc da prévia', () => {
     }
   });
 
-  it('FUN-27: Hyperdrive com o marcador PREENCHER e conexão local sem senha', () => {
+  it('FUN-27: Hyperdrive com o id real (hex de 32 caracteres, sem o marcador) e conexão local sem senha', () => {
     expect(config.hyperdrive).toHaveLength(1);
     const [h] = config.hyperdrive;
     expect(h?.binding).toBe('HYPERDRIVE');
-    expect(h?.id).toBe('PREENCHER');
+    expect(h?.id).toMatch(/^[0-9a-f]{32}$/);
+    expect(h?.id).not.toBe('PREENCHER');
     const local = new URL(h?.localConnectionString ?? '');
     expect(local.hostname).toBe('127.0.0.1');
     expect(local.username).toBe('pelada_app');

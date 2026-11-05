@@ -2311,6 +2311,8 @@ T81 → T82
 **Depends on**: T76
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-27
+**Status**: rascunhada
+**Nota do rascunho**: ação do usuário no console do Neon; nada a escrever. Pela AD-119 o deploy opera na `main`; a `dev` serve à comparação da T80 (AD-120 registra que ela já foi criada em 2026-11-04).
 
 **Done when**:
 
@@ -2335,6 +2337,8 @@ T81 → T82
 **Depends on**: T77
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-27, FUN-18
+**Status**: rascunhada
+**Nota do rascunho**: ação do usuário na Cloudflare e no GitHub; nada a escrever. Além dos secrets listados, o `deploy.yml` da T70 usa `BACKUP_CHAVE` e o opcional `VITE_SENTRY_DSN` no environment `producao` (lista completa no `docs/runbook.md`, seção Segredos).
 
 **Done when**:
 
@@ -2359,6 +2363,8 @@ T81 → T82
 **Depends on**: T78
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-27
+**Status**: rascunhada
+**Nota do rascunho**: id `e06363bd85874f1eaffc6382da6d394b`, o Hyperdrive existente da AD-032 (registrado em `.specs/preparacao.md`). O teste `FUN-27` existente de `test/wrangler.test.ts` esperava o marcador `PREENCHER`: passou a exigir hex de 32 caracteres e recusar o marcador, como a tarefa pede (mesma força, mais estrito); o `/executar` confirma a aprovação dessa mudança de teste existente. Além do `id`, o `wrangler.jsonc` só teve os dois comentários do bloco corrigidos (marcador e "branch dev", desatualizados pela AD-119).
 
 **Done when**:
 

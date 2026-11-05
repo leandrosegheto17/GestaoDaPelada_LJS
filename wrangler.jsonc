@@ -24,14 +24,14 @@
     { "name": "LIMITE_ESCRITA", "namespace_id": "2004", "simple": { "limit": 60, "period": 60 } }
   ],
 
-  // Hyperdrive da prévia, sobre a branch dev do Neon, com cache desligado (FUN-18).
-  // O id real entra na T79; até lá fica o marcador. Local: o wrangler dev usa o localConnectionString,
+  // Hyperdrive da prévia, sobre a main do Neon (AD-119), com cache desligado (FUN-18).
+  // Id do Hyperdrive existente (AD-032, AD-119; T79). Local: o wrangler dev usa o localConnectionString,
   // sem senha aqui; o pnpm dev passa a URL com a senha do .env por
   // CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE.
   "hyperdrive": [
     {
       "binding": "HYPERDRIVE",
-      "id": "PREENCHER",
+      "id": "e06363bd85874f1eaffc6382da6d394b",
       "localConnectionString": "postgres://pelada_app@127.0.0.1:5432/pelada"
     }
   ],
