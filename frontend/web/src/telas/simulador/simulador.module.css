@@ -302,3 +302,27 @@
     align-items: start;
   }
 }
+
+/* Prévia, base.css:50, :83, :257 e :264. */
+.cartao {
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-linha);
+  border-radius: var(--raio);
+  padding: var(--esp-4);
+}
+
+.campo__ajuda {
+  font-size: var(--texto-sm);
+  color: var(--cor-texto-sec);
+}
+
+.previa {
+  font-family: var(--fonte-titulo);
+  font-size: var(--texto-xl);
+  font-weight: var(--peso-forte);
+}
+
+.recalculando {
+  color: var(--cor-texto-sec);
+  font-style: italic;
+}

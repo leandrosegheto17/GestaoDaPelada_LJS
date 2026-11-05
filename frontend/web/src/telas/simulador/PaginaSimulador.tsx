@@ -9,10 +9,11 @@ import { LinkBotao } from '../../componentes/LinkBotao.tsx';
 import { LinkVoltar } from '../../componentes/LinkVoltar.tsx';
 import { ErroApi } from '../../dados/cliente.ts';
 import { useGrupo } from '../../dados/grupos.ts';
-import { useContextoSimulador } from '../../dados/simulador.ts';
+import { useContextoSimulador, usePreviaSimulador } from '../../dados/simulador.ts';
 import acesso from '../acesso.module.css';
 import { rotaDoGrupo } from '../grupos/Grupos.tsx';
-import { EntradasSimulador, entradasIniciais, type Entradas } from './EntradasSimulador.tsx';
+import { corpoDaPrevia, EntradasSimulador, entradasIniciais, type Entradas } from './EntradasSimulador.tsx';
+import { ID_PREVIA_ERRO, podeSugerir, PreviaSimulador, previaInvalida } from './PreviaSimulador.tsx';
 import estilos from './simulador.module.css';
 
 /**
@@ -21,7 +22,9 @@ import estilos from './simulador.module.css';
  * - abre no contexto da API (data sugerida, ativos com nível); trocar a data relê os ativos dessa data (SIM-02) e
  *   mantém formato, N e K; os aptos voltam a ser todos os ativos da nova data;
  * - sem ativos na data: "Sem jogadores", "Cadastre jogadores para usar o simulador." e "Cadastrar jogadores" (SIM-07);
- * - a prévia (T46), o resultado (T47, T48) e as ações (T49, T50) entram nas tarefas seguintes.
+ * - a prévia (T46; SIM-14, SIM-15) é pedida à API com debounce a cada mudança de formato, N, K ou aptos; "Sugerir
+ *   times" só fica ativo com ela válida;
+ * - o resultado (T47, T48) e as ações (T49, T50) entram nas tarefas seguintes.
  */
 
 export const TEXTO_SEM_JOGADORES = 'Sem jogadores';
@@ -53,6 +56,10 @@ export function PaginaSimulador() {
     setDataDasEntradas(dataDoCtx);
   }
 
+  // A prévia não depende da data (SIM-09): mudar só a data não pede outra.
+  const corpoPrevia = ctx && entradas ? corpoDaPrevia(entradas, ctx) : null;
+  const previa = usePreviaSimulador(grupoId, corpoPrevia);
+
   function trocarData(valor: string) {
     if (entradas) setEntradas({ ...entradas, data: valor });
     if (dataCompletaNoCampo(valor)) setDataConsultada(valor);
@@ -83,10 +90,16 @@ export function PaginaSimulador() {
         entradas={entradas}
         aoMudar={setEntradas}
         aoTrocarData={trocarData}
+        previa={<PreviaSimulador estado={previa.estado} aoTentarDeNovo={previa.tentarDeNovo} />}
         acao={
           <div className={estilos['barra-acao']}>
-            {/* O envio e o estado desabilitado vêm com a prévia (T46) e o resultado (T47). */}
-            <Botao variante="principal" type="button">
+            {/* O envio vem com o resultado (T47). */}
+            <Botao
+              variante="principal"
+              type="button"
+              disabled={!podeSugerir(previa.estado)}
+              aria-describedby={previaInvalida(previa.estado) ? ID_PREVIA_ERRO : undefined}
+            >
               Sugerir times
             </Botao>
           </div>

@@ -1572,6 +1572,8 @@ T53 → T54
 **Depends on**: T45
 **Reuses**: `.specs/mockup/telas/t12-simulador--{insuficiente,calculando}.html`; T45
 **Requirement**: SIM-14, SIM-15
+**Status**: rascunhada
+**Nota do rascunho**: `PreviaSimulador` com `podeSugerir` e `previaInvalida`; a página pede a prévia por `usePreviaSimulador` (debounce do `usePrevia`, 300 ms) com o `corpoDaPrevia` das entradas. Teste com temporizador falso só de `setTimeout` em `test/telas/simulador-previa.test.tsx`.
 
 **Done when**:
 
