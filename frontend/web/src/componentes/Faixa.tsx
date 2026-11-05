@@ -12,10 +12,10 @@ export type TipoFaixa = 'sucesso' | 'erro' | 'atencao' | 'info';
 export interface PropsFaixa {
   tipo: TipoFaixa;
   /** Título em negrito, antes do texto (`faixa__texto strong`). */
-  titulo?: string;
-  children?: ReactNode;
+  titulo?: string | undefined;
+  children?: ReactNode | undefined;
   /** Ação à direita (ex.: "Reenviar link"). */
-  acao?: ReactNode;
+  acao?: ReactNode | undefined;
 }
 
 function Icone({ tipo }: { tipo: TipoFaixa }) {

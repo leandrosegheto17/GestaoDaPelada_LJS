@@ -16,10 +16,10 @@ import estilos from './EstadoErro.module.css';
 export const TEXTO_ERRO_REDE = 'Não foi possível carregar. Verifique a conexão.';
 
 export interface PropsEstadoErro {
-  formato?: 'faixa' | 'tela';
+  formato?: 'faixa' | 'tela' | undefined;
   /** Título (só no formato tela). */
-  titulo?: string;
-  mensagem?: string;
+  titulo?: string | undefined;
+  mensagem?: string | undefined;
   aoTentarDeNovo?: () => void;
 }
 

@@ -12,23 +12,23 @@ export const NOME_DO_APP = 'Gestão da Pelada';
 export interface GrupoDaBarra {
   nome: string;
   /** Endereço do link "Trocar grupo"; ausente, o link não aparece. */
-  trocarHref?: string;
+  trocarHref?: string | undefined;
 }
 
 export interface PropsCasca {
   /** Título da página (`h1.titulo-pagina`). Ausente: a página põe o próprio título. */
-  titulo?: string;
+  titulo?: string | undefined;
   /** Barra do admin com o grupo; ausente, a barra pública com o nome do app. */
-  grupo?: GrupoDaBarra;
+  grupo?: GrupoDaBarra | undefined;
   /** Conteúdo centralizado na tela (mensagens: indisponível, offline, em breve). */
-  centralizada?: boolean;
+  centralizada?: boolean | undefined;
   /** Coluna estreita dos formulários de acesso (`conteudo--estreito`, `t04-entrar--vazio`). */
-  estreita?: boolean;
+  estreita?: boolean | undefined;
   /** Marca a área principal como ocupada (carregando). */
-  ocupada?: boolean;
+  ocupada?: boolean | undefined;
   /** Ações à direita da barra (`barra__acoes`: o menu da conta, T50). */
-  acoes?: ReactNode;
-  children?: ReactNode;
+  acoes?: ReactNode | undefined;
+  children?: ReactNode | undefined;
 }
 
 export function Casca({

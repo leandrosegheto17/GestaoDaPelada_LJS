@@ -17,12 +17,12 @@ export function Lista({ rotulo, children }: { rotulo?: string; children: ReactNo
 
 export interface PropsItemLista {
   titulo: ReactNode;
-  meta?: ReactNode;
+  meta?: ReactNode | undefined;
   /** Rota do app; o item vira link. */
-  para?: string;
-  lateral?: ReactNode;
+  para?: string | undefined;
+  lateral?: ReactNode | undefined;
   /** Seta à direita (`item__seta`), no item que abre outra tela (T50). */
-  seta?: boolean;
+  seta?: boolean | undefined;
 }
 
 function Seta() {

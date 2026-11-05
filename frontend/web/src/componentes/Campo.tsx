@@ -20,13 +20,13 @@ export interface PropsCampo extends Omit<
 > {
   id: string;
   rotulo: string;
-  ajuda?: ReactNode;
+  ajuda?: ReactNode | undefined;
   /** Mensagem de erro do campo; vazia ou ausente, sem erro. */
-  erro?: string;
-  somenteLeitura?: boolean;
+  erro?: string | undefined;
+  somenteLeitura?: boolean | undefined;
   /** Conteúdo ao lado da entrada, na mesma linha (o botão do `CampoSenha`). */
-  lateral?: ReactNode;
-  ref?: Ref<HTMLInputElement>;
+  lateral?: ReactNode | undefined;
+  ref?: Ref<HTMLInputElement> | undefined;
 }
 
 function IconeErro() {

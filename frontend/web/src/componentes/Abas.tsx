@@ -14,7 +14,7 @@ export interface Aba<C extends string = string> {
   chave: C;
   rotulo: string;
   /** Contagem mostrada entre parênteses; ausente, sem contagem. */
-  contagem?: number;
+  contagem?: number | undefined;
 }
 
 export interface PropsAbas<C extends string> {
@@ -24,7 +24,7 @@ export interface PropsAbas<C extends string> {
   ativa: C;
   aoMudar: (chave: C) => void;
   /** Id do painel que as abas controlam. */
-  idPainel?: string;
+  idPainel?: string | undefined;
   /** Prefixo dos ids das abas. */
   id: string;
 }

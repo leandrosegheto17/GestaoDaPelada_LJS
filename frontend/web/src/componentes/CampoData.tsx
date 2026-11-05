@@ -8,9 +8,9 @@ import { Campo, type PropsCampo } from './Campo.tsx';
 
 export type PropsCampoData = Omit<PropsCampo, 'type' | 'lateral' | 'min' | 'max'> & {
   /** Data mínima, `aaaa-mm-dd`. */
-  min?: string;
+  min?: string | undefined;
   /** Data máxima, `aaaa-mm-dd` (ex.: hoje, na data de entrada). */
-  max?: string;
+  max?: string | undefined;
 };
 
 export function CampoData(props: PropsCampoData) {

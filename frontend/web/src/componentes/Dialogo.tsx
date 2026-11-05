@@ -18,12 +18,12 @@ import estilos from './Dialogo.module.css';
 
 export interface PropsDialogo {
   titulo: string;
-  descricao?: ReactNode;
+  descricao?: ReactNode | undefined;
   aoFechar: () => void;
-  alerta?: boolean;
-  formato?: 'dialogo' | 'folha';
-  children?: ReactNode;
-  acoes?: ReactNode;
+  alerta?: boolean | undefined;
+  formato?: 'dialogo' | 'folha' | undefined;
+  children?: ReactNode | undefined;
+  acoes?: ReactNode | undefined;
 }
 
 const FOCAVEIS =

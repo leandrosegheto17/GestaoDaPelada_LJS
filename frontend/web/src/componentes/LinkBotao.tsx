@@ -10,10 +10,10 @@ import { classesDaVariante, type VarianteBotao } from './Botao.tsx';
 
 export interface PropsLinkBotao {
   para: string;
-  variante?: VarianteBotao;
-  bloco?: boolean;
+  variante?: VarianteBotao | undefined;
+  bloco?: boolean | undefined;
   /** Classe extra de layout (ex.: `acima-3`). */
-  classe?: string;
+  classe?: string | undefined;
   children: ReactNode;
 }
 

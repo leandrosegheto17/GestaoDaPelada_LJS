@@ -9,8 +9,8 @@ import estilos from './EsqueletoLista.module.css';
 export const LINHAS_PADRAO = 6;
 
 export interface PropsEsqueletoLista {
-  linhas?: number;
-  rotulo?: string;
+  linhas?: number | undefined;
+  rotulo?: string | undefined;
 }
 
 export function EsqueletoLista({

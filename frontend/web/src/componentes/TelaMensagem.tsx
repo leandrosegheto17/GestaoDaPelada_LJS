@@ -13,8 +13,8 @@ export type IconeTelaMensagem = 'sucesso' | 'erro' | 'email';
 export interface PropsTelaMensagem {
   icone: IconeTelaMensagem;
   titulo: string;
-  children?: ReactNode;
-  acao?: ReactNode;
+  children?: ReactNode | undefined;
+  acao?: ReactNode | undefined;
 }
 
 function Icone({ tipo }: { tipo: IconeTelaMensagem }) {

@@ -143,13 +143,13 @@ function DialogoData({
   texto: string;
   id: string;
   rotulo: string;
-  ajuda?: string;
+  ajuda?: string | undefined;
   rotuloAcao: string;
   enviando: boolean;
   aoFechar: () => void;
   aoConfirmar: (data: string) => void;
-  erroCampo?: string;
-  falha?: string;
+  erroCampo?: string | undefined;
+  falha?: string | undefined;
   /** Com prévia (reativar, T66): o botão só habilita com a prévia pronta, e `aoConfirmarComPrevia` recebe a prévia. */
   pedirPrevia?: (data: string) => Promise<PreviaResposta>;
   aoConfirmarComPrevia?: (data: string, previa: PreviaResposta) => void;

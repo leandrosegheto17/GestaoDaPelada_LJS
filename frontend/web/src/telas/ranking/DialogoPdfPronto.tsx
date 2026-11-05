@@ -18,7 +18,7 @@ export interface PropsDialogoPdfPronto {
   aoCompartilhar: () => void;
   aoFalhar: (erro: unknown) => void;
   aoFechar: () => void;
-  navegador?: NavegadorCompartilha;
+  navegador?: NavegadorCompartilha | undefined;
 }
 
 export function textoPdfPronto(mesPorExtenso: string, grupo: string): string {

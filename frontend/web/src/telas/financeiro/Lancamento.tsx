@@ -177,7 +177,7 @@ function Formulario({
 }: {
   grupoId: string;
   inicial: FormularioLancamento;
-  lancamento?: LancamentoResposta;
+  lancamento?: LancamentoResposta | undefined;
 }) {
   const navegar = useNavigate();
   const criar = useCriarLancamento(grupoId);

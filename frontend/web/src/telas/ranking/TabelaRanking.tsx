@@ -107,7 +107,7 @@ export interface PropsTabelaRanking {
    * julho)", "Pts final (fim de julho)" e "Nenhuma partida registrada neste mês" no lugar das colunas de partida,
    * de `t01-ranking--vazio-mes.html:34-38`.
    */
-  nomeMes?: string;
+  nomeMes?: string | undefined;
 }
 
 export const TEXTO_MES_SEM_PARTIDAS = 'Nenhuma partida registrada neste mês';

@@ -20,7 +20,7 @@ export interface PropsMarca {
   situacao: Situacao;
   valor: string | number;
   /** Texto para leitor de tela (ex.: "Presente, 1 ponto"). Ausente: a marca é decorativa. */
-  rotulo?: string;
+  rotulo?: string | undefined;
 }
 
 export function Marca({ situacao, valor, rotulo }: PropsMarca) {

@@ -17,8 +17,8 @@ export interface PropsCaixaSelecao extends Omit<
   id: string;
   /** Rótulo; pode ter links. */
   children: ReactNode;
-  erro?: string;
-  ref?: Ref<HTMLInputElement>;
+  erro?: string | undefined;
+  ref?: Ref<HTMLInputElement> | undefined;
 }
 
 function IconeErro() {

@@ -89,13 +89,13 @@ export interface PropsFormularioPartida {
   choveuInicial: boolean;
   /** Ausente: a lista ainda carrega ou não há ativos; `semLista` ocupa o lugar dela e o envio fica desabilitado. */
   jogadores: readonly JogadorDaPartida[] | undefined;
-  semLista?: ReactNode;
+  semLista?: ReactNode | undefined;
   salvando: boolean;
   aoSalvar: (dados: { choveu: boolean; marcacoes: Marcacao[] }) => void;
   /** Conteúdo depois do botão de salvar, na barra de ação (o "Excluir partida" da edição). */
-  acoesExtras?: ReactNode;
+  acoesExtras?: ReactNode | undefined;
   /** Aviso logo abaixo da data e do "Choveu?" (a faixa de pré-marcação da simulador T52, SIM-77). */
-  avisoAposData?: ReactNode;
+  avisoAposData?: ReactNode | undefined;
 }
 
 export function FormularioPartida({

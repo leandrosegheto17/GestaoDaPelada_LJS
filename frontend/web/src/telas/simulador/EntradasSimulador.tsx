@@ -91,9 +91,9 @@ interface PropsEntradas {
   aoMudar: (e: Entradas) => void;
   aoTrocarData: (data: string) => void;
   /** A prévia da API (T46). */
-  previa?: ReactNode;
+  previa?: ReactNode | undefined;
   /** A barra com "Sugerir times" (T46, T47). */
-  acao?: ReactNode;
+  acao?: ReactNode | undefined;
 }
 
 interface PropsNumero {
@@ -104,9 +104,9 @@ interface PropsNumero {
   max: number;
   rotuloMenos: string;
   rotuloMais: string;
-  desabilitado?: boolean;
+  desabilitado?: boolean | undefined;
   aoMudar: (v: number) => void;
-  lateral?: ReactNode;
+  lateral?: ReactNode | undefined;
 }
 
 function CampoNumero({

@@ -46,7 +46,7 @@ export function umaCasa(valor: number | null): string {
 }
 
 export type ResultadoDoisNaTela = Omit<ResultadoDois, 'ordemPrioridade'> & {
-  ordemPrioridade?: string[];
+  ordemPrioridade?: string[] | undefined;
 };
 
 type JogadorDaTela =
@@ -56,14 +56,14 @@ type JogadorDaTela =
 interface PropsResultadoDois {
   resultado: ResultadoDoisNaTela;
   /** Os números estão sendo recalculados (T49). */
-  recalculando?: boolean;
+  recalculando?: boolean | undefined;
   /** Toque num jogador (abre a folha de mover, T49). */
   aoTocarJogador?: (id: string) => void;
   /** Ids movidos à mão, destacados (T49). */
-  movidos?: ReadonlySet<string>;
+  movidos?: ReadonlySet<string> | undefined;
   /** Faixa de falha do recálculo e as ações (T49, T50). */
-  antes?: ReactNode;
-  acoes?: ReactNode;
+  antes?: ReactNode | undefined;
+  acoes?: ReactNode | undefined;
 }
 
 function Selos({ j }: { j: JogadorDaTela & { saiNoIntervalo?: boolean } }) {
@@ -103,8 +103,8 @@ export function ListaJogadores({
 }: {
   jogadores: ReadonlyArray<JogadorDaTela & { saiNoIntervalo?: boolean }>;
   aoTocar?: (id: string) => void;
-  movidos?: ReadonlySet<string>;
-  classeExtra?: string;
+  movidos?: ReadonlySet<string> | undefined;
+  classeExtra?: string | undefined;
 }) {
   return (
     <ul className={[estilos['jogadores-time'], classeExtra].filter(Boolean).join(' ')}>

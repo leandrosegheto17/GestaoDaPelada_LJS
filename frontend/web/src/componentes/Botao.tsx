@@ -21,12 +21,12 @@ export function classesDaVariante(variante: VarianteBotao): string[] {
 }
 
 export interface PropsBotao extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className'> {
-  variante?: VarianteBotao;
+  variante?: VarianteBotao | undefined;
   /** Ocupa a largura toda (`botao--bloco`). */
-  bloco?: boolean;
-  carregando?: boolean;
+  bloco?: boolean | undefined;
+  carregando?: boolean | undefined;
   /** React 19: `ref` é uma prop comum; vai para o `<button>` (o EstadoErro foca o botão). */
-  ref?: Ref<HTMLButtonElement>;
+  ref?: Ref<HTMLButtonElement> | undefined;
 }
 
 export function Botao({

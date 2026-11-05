@@ -70,7 +70,7 @@ function Plano({
   id: string;
   nome: string;
   preco: string;
-  destaque?: string;
+  destaque?: string | undefined;
   itens: string[];
 }) {
   return (

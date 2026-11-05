@@ -17,8 +17,8 @@ export interface PropsCampoNota {
   /** Nota atual; `null` sem nota. */
   valor: number | null;
   aoMudar: (nota: number | null) => void;
-  erro?: string;
-  desabilitado?: boolean;
+  erro?: string | undefined;
+  desabilitado?: boolean | undefined;
 }
 
 export function CampoNota({

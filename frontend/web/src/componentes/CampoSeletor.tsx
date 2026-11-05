@@ -56,12 +56,12 @@ export interface PropsCampoSeletor<V extends string> {
   /** Valor escolhido; `''` quando nenhum. */
   valor: V | '';
   aoMudar: (valor: V) => void;
-  variante?: 'lista' | 'segmentado';
+  variante?: 'lista' | 'segmentado' | undefined;
   /** Texto da opção vazia da `lista` (ex.: "Escolha"); ausente, sem opção vazia. */
-  opcaoVazia?: string;
-  ajuda?: string;
-  erro?: string;
-  desabilitado?: boolean;
+  opcaoVazia?: string | undefined;
+  ajuda?: string | undefined;
+  erro?: string | undefined;
+  desabilitado?: boolean | undefined;
 }
 
 function IconeErro() {

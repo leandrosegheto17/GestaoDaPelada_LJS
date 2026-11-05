@@ -283,9 +283,9 @@ function BotaoExportar({
   pdf,
   bloco = false,
 }: {
-  classe?: string;
+  classe?: string | undefined;
   pdf: ExportarPdf;
-  bloco?: boolean;
+  bloco?: boolean | undefined;
 }) {
   const preparando = pdf.estado.tipo === 'preparando';
   return (

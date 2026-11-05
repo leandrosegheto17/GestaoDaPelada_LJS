@@ -24,11 +24,11 @@ export function rotuloIncompleto(jogadores: number, n: number): string {
 
 interface PropsResultadoVarios {
   resultado: ResultadoVarios;
-  recalculando?: boolean;
+  recalculando?: boolean | undefined;
   aoTocarJogador?: (id: string) => void;
-  movidos?: ReadonlySet<string>;
-  antes?: ReactNode;
-  acoes?: ReactNode;
+  movidos?: ReadonlySet<string> | undefined;
+  antes?: ReactNode | undefined;
+  acoes?: ReactNode | undefined;
 }
 
 export function ResultadoVariosTimes({
