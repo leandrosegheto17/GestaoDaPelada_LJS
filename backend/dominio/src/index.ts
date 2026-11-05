@@ -84,3 +84,15 @@ export {
 } from './pontuacao/pesos.ts';
 export { criarResolvedorDePesos, MENSAGEM_SEM_PESOS, type ResolvedorDePesos } from './pontuacao/resolvedor.ts';
 export { inicioDaContagem } from './pontuacao/inicio.ts';
+
+// planos-e-cobranca (PLA-01 a PLA-06): plano efetivo, recursos e preço, sem relógio nem I/O.
+export {
+  DIAS_DE_TRIAL,
+  fimDoTrial,
+  planoEfetivo,
+  PLANOS,
+  SITUACOES_COMERCIAIS,
+  ultimoDiaDoTrial,
+  type Plano,
+  type SituacaoComercial,
+} from './plano/plano-efetivo.ts';

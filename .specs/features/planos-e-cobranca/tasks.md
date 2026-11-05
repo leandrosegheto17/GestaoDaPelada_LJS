@@ -335,6 +335,8 @@ T56 → T57
 **Depends on**: T0
 **Reuses**: regra de domínio sem relógio (`GE:527`, AD-028); datas do domínio de `PR:457` (`backend/dominio/src/datas.ts`); AD-087; S:39
 **Requirement**: PLA-01, PLA-02, PLA-03, PLA-04, PLA-70, PLA-71
+**Status**: rascunhada
+**Lacunas**: trialFimEm de PLA-08 pode ser o último dia Pro (14/11) ou o primeiro dia Free (15/11); o domínio expõe os dois (fimDoTrial e ultimoDiaDoTrial) e a T24 escolhe
 
 **Done when**:
 
