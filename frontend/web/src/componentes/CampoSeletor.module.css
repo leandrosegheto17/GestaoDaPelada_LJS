@@ -1,0 +1,51 @@
+/* Controle segmentado (GEL-115), de .specs/mockup/base.css:97-105. */
+
+.segmentado {
+  display: flex;
+  border: 2px solid var(--cor-texto);
+  border-radius: var(--raio);
+  overflow: hidden;
+  padding: 0;
+  margin: 0;
+}
+
+.segmentado legend {
+  padding: 0;
+}
+
+.segmentado__opcao {
+  flex: 1;
+  display: flex;
+}
+
+.segmentado__entrada {
+  position: absolute;
+  opacity: 0;
+}
+
+.segmentado__texto {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--alvo-toque);
+  padding: 0 var(--esp-2);
+  text-align: center;
+  font-weight: var(--peso-semi);
+  background: var(--cor-superficie);
+  cursor: pointer;
+}
+
+.segmentado__opcao + .segmentado__opcao .segmentado__texto {
+  border-left: 2px solid var(--cor-texto);
+}
+
+.segmentado__entrada:checked + .segmentado__texto {
+  background: var(--cor-texto);
+  color: var(--cor-superficie);
+}
+
+.segmentado__entrada:focus-visible + .segmentado__texto {
+  outline: var(--foco-largura) solid var(--cor-foco);
+  outline-offset: -6px;
+}

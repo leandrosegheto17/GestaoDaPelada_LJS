@@ -1828,6 +1828,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T55
 **Reuses**: molde de `Campo` da CA (`CA:1238`, T39); marcação de `.specs/mockup/telas/t27-novo-grupo--vazio.html` e de `t16-jogador--novo.html`; Stylelint de tokens (`F:1374`)
 **Requirement**: GEL-115
+**Status**: rascunhada
 
 **Done when**:
 
