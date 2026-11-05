@@ -560,15 +560,15 @@ T81 → T82
 **Depends on**: T10
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-47, FUN-49
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste `FUN-47`: dump de um banco de teste com 2 grupos, decifrado com a chave privada de teste, passa em `pg_restore --list`
-- [ ] Teste `FUN-49`: URL inválida faz o script sair com código diferente de 0 e não deixa nenhum `.age`
-- [ ] Teste `FUN-49`: chave pública inválida faz o script sair com código diferente de 0 e não deixa arquivo parcial
-- [ ] O teste roda dentro de um container `postgres:18` com `age` instalado; o comando fica documentado no teste
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-47`: dump de um banco de teste com 2 grupos, decifrado com a chave privada de teste, passa em `pg_restore --list`
+- [x] Teste `FUN-49`: URL inválida faz o script sair com código diferente de 0 e não deixa nenhum `.age`
+- [x] Teste `FUN-49`: chave pública inválida faz o script sair com código diferente de 0 e não deixa arquivo parcial
+- [x] O teste roda dentro de um container `postgres:18` com `age` instalado; o comando fica documentado no teste
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -586,16 +586,16 @@ T81 → T82
 **Depends on**: T11
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-47, FUN-49
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: SHAs das actions tirados da versão anterior (`b65b7d8`); o /executar confere. O gitleaks local fica para o /executar.
 
 **Done when**:
 
-- [ ] Teste `FUN-47` lê o YAML: cron `0 7 * * *`, `workflow_dispatch`, `environment: backup` (AD-013), `retention-days: 30`
-- [ ] Teste `FUN-49`: o passo do dump não usa `continue-on-error` nem `|| true`, e o upload tem `if-no-files-found: error`
-- [ ] Teste: todo `uses:` está fixado por SHA de 40 caracteres
-- [ ] Nenhum segredo literal no arquivo (gitleaks local limpo)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-47` lê o YAML: cron `0 7 * * *`, `workflow_dispatch`, `environment: backup` (AD-013), `retention-days: 30`
+- [x] Teste `FUN-49`: o passo do dump não usa `continue-on-error` nem `|| true`, e o upload tem `if-no-files-found: error`
+- [x] Teste: todo `uses:` está fixado por SHA de 40 caracteres
+- [x] Nenhum segredo literal no arquivo (gitleaks local limpo)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -613,15 +613,15 @@ T81 → T82
 **Depends on**: T12
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-50
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: `pg_restore` sem `--no-acl`; os grants exigem as roles `pelada_*` no cluster local (criadas pelo `pnpm migrar`). O runbook (T73) diz isso.
 
 **Done when**:
 
-- [ ] Teste `FUN-50`: dump cifrado de um banco de teste, restaurado num banco vazio, dá contagem de linhas igual por tabela
-- [ ] Teste `FUN-50`: recusa restaurar num host fora da lista de permitidos (trava de host)
-- [ ] Teste `FUN-50`: recusa restaurar num banco que já tem tabelas
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-50`: dump cifrado de um banco de teste, restaurado num banco vazio, dá contagem de linhas igual por tabela
+- [x] Teste `FUN-50`: recusa restaurar num host fora da lista de permitidos (trava de host)
+- [x] Teste `FUN-50`: recusa restaurar num banco que já tem tabelas
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
