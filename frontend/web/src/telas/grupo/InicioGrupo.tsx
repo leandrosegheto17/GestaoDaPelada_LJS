@@ -40,7 +40,10 @@ export function caminhoDoRanking(slug: string): string {
  * - Financeiro (financeiro T43; FIN-34, AD-079), de `.specs/mockup/telas/t09-inicio--sucesso.html:21`: o item
  *   "Financeiro" com "Saldo R$ …" (ou "Caixa não configurado" com o saldo nulo), link para o t22, só quando a resposta
  *   traz a chave `saldoFinanceiroCentavos`; sem a chave (quem não acessa o financeiro), nenhum item (o PAR-160 vale aí,
- *   autorização de 2026-11-04 da `financeiro` no `STATE.md`). Fica por último, depois de "Uso do app".
+ *   autorização de 2026-11-04 da `financeiro` no `STATE.md`). Fica por último, depois de "Uso do app";
+ * - Meu plano (planos-e-cobranca T47; PLA-59): o item "Meu plano" para todo admin, numa lista "Plano" própria depois
+ *   de "Gerenciar". [LACUNA] sem mockup do item; fica fora de "Gerenciar" porque os testes da GEL-114 e da FIN-34
+ *   fixam aquela lista (7 itens, Financeiro por último) e mudá-los pede aprovação.
  *
  * O mês do item Partidas é o de hoje em São Paulo (`partidasNoMes` conta o mês de hoje, PAR-132).
  */
@@ -63,6 +66,12 @@ export function textoAdmins(n: number): string {
 }
 
 export const TEXTO_CAIXA_NAO_CONFIGURADO = 'Caixa não configurado';
+
+/**
+ * Meta do item "Meu plano" (planos-e-cobranca T47; PLA-59). [LACUNA] a spec não define a meta do item; fica um texto
+ * fixo, sem ler o plano no início do grupo (evita uma consulta a mais na tela mais aberta).
+ */
+export const TEXTO_META_MEU_PLANO = 'Plano, assinatura e recursos';
 
 const DIAS_ABREVIADOS = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'] as const;
 
@@ -218,6 +227,11 @@ export function InicioGrupo() {
               para={`${base}/financeiro`}
             />
           ) : null}
+        </Lista>
+        {/* Meu plano (planos-e-cobranca T47; PLA-59): para todo admin, criadora ou convidada. */}
+        <h2 className={estilos.subtitulo}>Plano</h2>
+        <Lista rotulo="Plano">
+          <ItemLista titulo="Meu plano" meta={TEXTO_META_MEU_PLANO} para={`${base}/plano`} />
         </Lista>
       </>
     );

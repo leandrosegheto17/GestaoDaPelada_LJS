@@ -30,6 +30,7 @@ import { Habilidades } from '../telas/habilidades/Habilidades.tsx';
 import { ConfigCaixa } from '../telas/financeiro/ConfigCaixa.tsx';
 import { FinanceiroMes } from '../telas/financeiro/FinanceiroMes.tsx';
 import { Lancamento } from '../telas/financeiro/Lancamento.tsx';
+import { MeuPlano } from '../telas/plano/MeuPlano.tsx';
 
 /**
  * Rotas (FUN-31, FUN-38; conta e acesso, T42):
@@ -52,6 +53,7 @@ import { Lancamento } from '../telas/financeiro/Lancamento.tsx';
  *   sessão; e, sob a `GuardaApp`, as partidas do mês, nova partida, partida por data, pontuação e uso do app;
  *   `partidas/nova` vem antes de `partidas/:data` só por clareza;
  * - simulador (simulador T51; SIM-84): `/app/grupos/:grupoId/simulador`, sob a `GuardaApp`;
+ * - Meu plano (planos-e-cobranca T47; PLA-59, AD-063): `/app/grupos/:grupoId/plano`, sob a `GuardaApp`;
  * - `/_vitrine/:id` só com `VITE_VITRINE=1`, e `*` com o 404.
  *
  * `handle.tela` identifica cada tela (o teste das rotas confere por ele).
@@ -161,6 +163,8 @@ export function criarRotas(): RouteObject[] {
           element: <PaginaSimulador />,
           handle: { tela: 'simulador' },
         },
+        // Meu plano (planos-e-cobranca T47; PLA-59, AD-063): plano, assinatura e recursos do grupo.
+        { path: 'grupos/:grupoId/plano', element: <MeuPlano />, handle: { tela: 'meu-plano' } },
         { path: '*', element: <NaoEncontrada />, handle: { tela: 'nao-encontrada' } },
       ],
     },

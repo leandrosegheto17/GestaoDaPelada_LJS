@@ -1579,6 +1579,8 @@ T56 → T57
 **Depends on**: T46
 **Reuses**: estender `rotas.tsx` (`GE:2068`, T69); `InicioGrupo.tsx` (`GE:1847`, ampliada em `PR:2073`)
 **Requirement**: PLA-59
+**Status**: rascunhada
+**Lacunas**: o item "Meu plano" fica numa lista "Plano" própria, depois de "Gerenciar": os testes da GEL-114 (`inicio-grupo.test.tsx:99`) e da FIN-34 (`inicio-grupo-financeiro.test.tsx:75,95`) fixam aquela lista e mudá-los pede aprovação. A meta do item é fixa ("Plano, assinatura e recursos"), sem ler o plano no início. Teste em `frontend/web/test/app/rotas-plano.test.tsx`.
 
 **Done when**:
 
