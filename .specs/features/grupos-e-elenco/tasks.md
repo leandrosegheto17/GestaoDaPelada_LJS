@@ -2006,6 +2006,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T62
 **Reuses**: `R-23` (`t16-jogador--novo.html`) e `R-16` (`t16-jogador--erro.html`); campos de T56
 **Requirement**: GEL-31, GEL-33, GEL-34, GEL-39, GEL-114, GEL-118
+**Status**: rascunhada
 
 **Done when**:
 
