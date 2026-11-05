@@ -1736,6 +1736,8 @@ T53 → T54
 **Depends on**: T51
 **Reuses**: Estender `PaginaNovaPartida` (`PR:1974`, T60); `telas/t11-partida--pre-marcada.html` (T44); `Faixa` (`CA:1286`)
 **Requirement**: SIM-77
+**Status**: rascunhada
+**Nota do rascunho**: a faixa fica dentro do formulário, abaixo da data e do "Choveu?" (como a t11 `pre-marcada`), por uma prop opcional `avisoAposData` do `FormularioPartida`; só aparece com a lista da data na tela. Teste em `test/telas/partida-nova-pre-marcada.test.tsx` (o `partida-nova.test.tsx` não muda).
 
 **Done when**:
 

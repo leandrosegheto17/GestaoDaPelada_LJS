@@ -26,7 +26,8 @@ import pagina from './partida.module.css';
  * mockup do módulo `t11-partida--nova.html` (R-04) e de `.specs/mockup/telas/t11-partida--{carregando,vazio,
  * data-futura,duplicada,erro-salvar}.html`:
  * - abre na data sugerida pela API, com "Choveu?" em Não e as situações que ela devolveu (todas ausentes, ou as da
- *   escalação confirmada; SIM-75);
+ *   escalação confirmada; SIM-75); com `preMarcadaPelaEscalacao`, a faixa "Pré-marcado pela escalação de dd/mm (inclui
+ *   quem ficou como “não entra”)." abaixo da data (simulador T52; SIM-77, `t11-partida--pre-marcada.html:22`);
  * - trocar a data mostra "Carregando os jogadores ativos em dd/mm…" e recarrega a lista (PAR-32); data no futuro fica
  *   no campo, "A data não pode ser no futuro.", sem consultar;
  * - sem ativos na data: "Ninguém estava ativo nessa data." (PAR-33);
@@ -55,6 +56,11 @@ export function dataCompleta(data: string): string {
 
 export function textoCarregandoJogadores(data: string): string {
   return `Carregando os jogadores ativos em ${diaMes(data)}…`;
+}
+
+/** Faixa da t11 pré-marcada (simulador T52; SIM-77), de `t11-partida--pre-marcada.html:22`. */
+export function textoPreMarcada(data: string): string {
+  return `Pré-marcado pela escalação de ${diaMes(data)} (inclui quem ficou como “não entra”).`;
 }
 
 export function avisoPartidaSalva(data: string): string {
@@ -182,6 +188,15 @@ export function PaginaNovaPartida() {
       );
     }
 
+    // Pré-marcação pela escalação confirmada (simulador T52; SIM-75, SIM-77): só com a lista da data na tela; as
+    // marcações continuam editáveis antes de salvar.
+    const preMarcada = jogadores !== undefined && jogadores.length > 0 && consulta.data?.preMarcadaPelaEscalacao === true;
+    const avisoPreMarcada = preMarcada ? (
+      <div className={pagina['acima-3']}>
+        <Faixa tipo="info">{textoPreMarcada(dataAtual)}</Faixa>
+      </div>
+    ) : null;
+
     return (
       <>
         {falha ? (
@@ -204,6 +219,7 @@ export function PaginaNovaPartida() {
           choveuInicial={consulta.data?.choveu ?? false}
           jogadores={jogadores}
           semLista={semLista}
+          avisoAposData={avisoPreMarcada}
           salvando={lancar.isPending}
           aoSalvar={({ choveu, marcacoes }) => enviar({ data: dataAtual, choveu, marcacoes })}
         />

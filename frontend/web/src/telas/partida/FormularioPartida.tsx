@@ -84,9 +84,11 @@ export interface PropsFormularioPartida {
   aoSalvar: (dados: { choveu: boolean; marcacoes: Marcacao[] }) => void;
   /** Conteúdo depois do botão de salvar, na barra de ação (o "Excluir partida" da edição). */
   acoesExtras?: ReactNode;
+  /** Aviso logo abaixo da data e do "Choveu?" (a faixa de pré-marcação da simulador T52, SIM-77). */
+  avisoAposData?: ReactNode;
 }
 
-export function FormularioPartida({ campoData, choveuInicial, jogadores, semLista, salvando, aoSalvar, acoesExtras }: PropsFormularioPartida) {
+export function FormularioPartida({ campoData, choveuInicial, jogadores, semLista, salvando, aoSalvar, acoesExtras, avisoAposData }: PropsFormularioPartida) {
   const [choveu, setChoveu] = useState(choveuInicial);
   const [situacoes, setSituacoes] = useState<Record<string, SituacaoMarcacao>>(() => situacoesIniciais(jogadores ?? []));
   const [busca, setBusca] = useState('');
@@ -126,6 +128,7 @@ export function FormularioPartida({ campoData, choveuInicial, jogadores, semList
           </span>
         </label>
       </div>
+      {avisoAposData}
       {comLista ? (
         <>
           <p className={estilos['contagem-fixa']} aria-live="polite">

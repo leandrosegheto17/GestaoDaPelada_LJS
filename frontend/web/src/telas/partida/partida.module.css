@@ -133,6 +133,11 @@
   margin-top: var(--esp-4);
 }
 
+/* Faixa de pré-marcação depois da data (t11-partida--pre-marcada.html:22, `acima-3`; simulador T52). */
+.acima-3 {
+  margin-top: var(--esp-3);
+}
+
 @media (min-width: 1024px) {
   .lista-situacao--duas {
     display: grid;
