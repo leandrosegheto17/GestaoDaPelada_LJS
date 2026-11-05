@@ -1762,6 +1762,9 @@ T53 → T54
 **Depends on**: T52
 **Reuses**: Lista de telas ativas (`CA:1633`, `PR:2369`); runner com `sequencia`, `pendente` e `abortar` (`PR:2344`); Stylelint de tokens (`F:1374`)
 **Requirement**: SIM-85, SIM-26, SIM-38, SIM-86
+**Status**: rascunhada
+**Nota do rascunho**: o `telas.json` só tinha a t12 `vazio` do simulador; as 14 entradas novas (com `respostas`, `passos` e o `recorte` que o comentário de cada mockup indica) nascem aqui, e a t12 `vazio` e a t11 `pre-marcada` ganham `real: true`. A t09 `sucesso` já é comparada inteira pela T46 da `financeiro` (AD-118): em vez do recorte do "Dia de jogo", a `financeiro-grupo-quinta.json` ganha os campos do início e do simulador (`escalacaoNoProximoDia: true`), para a tela inteira mostrar o Simulador e a escalação do mockup. Teste em `test/ferramentas/telas-simulador-ativas.test.ts`.
+**Lacunas**: os valores de N dos `passos` (4, 8, 11) e os seletores `.cartao`, `.comparativo` e `.folha` do lado do app vêm dos mockups; o `/executar` confere na primeira rodada do `visual`.
 
 **Done when**:
 

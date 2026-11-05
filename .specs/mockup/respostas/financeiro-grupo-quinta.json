@@ -10,5 +10,13 @@
   "habilidades": 6,
   "admins": 2,
   "souCriador": true,
+  "dataSugeridaPartida": "2026-10-22",
+  "partidaNaDataSugerida": false,
+  "partidasNoMes": 3,
+  "pesosVigentesDesde": "2026-09-01",
+  "pesosPadrao": false,
+  "aparelhosNaSemana": 9,
+  "proximoDiaDeJogo": "2026-10-22",
+  "escalacaoNoProximoDia": true,
   "saldoFinanceiroCentavos": 124550
 }

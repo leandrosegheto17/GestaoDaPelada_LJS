@@ -1,5 +1,5 @@
 {
-  "_leia": "Telas reais do .specs/mockup/telas.json (entradas com real: true) que entram na comparação visual (T54, AD-021): uma linha { id, estado } por estado. O runner é o e2e/visual.mjs. Telas públicas de acesso: T55; telas com sessão: T56 (sem as T08 sucesso e vazio, que usam o mockup da grupos-e-elenco e passam para a T71 de lá, AD-031). Telas de grupos e elenco: T71 da grupos-e-elenco (T08 com sucesso e vazio, T15, T16, T17, T20 e T27; sem as T09, AD-029). Financeiro: T46 da financeiro (T22, T23 e T24, e a T09 sucesso com o mockup do projeto, AD-118, que fecha a AD-029; a T09 sem-financeiro fica fora). Partidas e ranking: T76 da partidas-e-ranking (T01 sucesso, vazio, vazio-mes, carregando e erro, T03, T09 sem-jogadores com o relógio congelado da AD-044, T10, T11 nova, edicao, carregando, vazio, data-futura e duplicada, T18 e T21).",
+  "_leia": "Telas reais do .specs/mockup/telas.json (entradas com real: true) que entram na comparação visual (T54, AD-021): uma linha { id, estado } por estado. O runner é o e2e/visual.mjs. Telas públicas de acesso: T55; telas com sessão: T56 (sem as T08 sucesso e vazio, que usam o mockup da grupos-e-elenco e passam para a T71 de lá, AD-031). Telas de grupos e elenco: T71 da grupos-e-elenco (T08 com sucesso e vazio, T15, T16, T17, T20 e T27; sem as T09, AD-029). Financeiro: T46 da financeiro (T22, T23 e T24, e a T09 sucesso com o mockup do projeto, AD-118, que fecha a AD-029; a T09 sem-financeiro fica fora). Partidas e ranking: T76 da partidas-e-ranking (T01 sucesso, vazio, vazio-mes, carregando e erro, T03, T09 sem-jogadores com o relógio congelado da AD-044, T10, T11 nova, edicao, carregando, vazio, data-futura e duplicada, T18 e T21). Simulador: T53 da simulador (T12 vazio, dois-times, tres-times, insuficiente e calculando, T13 sucesso, carregando, recalculando, erro-recalcular, erro-confirmar, mover, trocar e refazer, T14 sucesso e mover, T11 pre-marcada; a T09 sucesso, que agora mostra o Simulador e a escalação, já é comparada inteira pela do financeiro, AD-118).",
   "telas": [
     { "id": "T04", "estado": "vazio" },
     { "id": "T04", "estado": "sessao-expirada" },
@@ -108,6 +108,22 @@
     { "id": "T11", "estado": "duplicada" },
     { "id": "T18", "estado": "sucesso" },
     { "id": "T21", "estado": "sucesso" },
-    { "id": "T21", "estado": "vazio" }
+    { "id": "T21", "estado": "vazio" },
+    { "id": "T12", "estado": "vazio" },
+    { "id": "T12", "estado": "dois-times" },
+    { "id": "T12", "estado": "tres-times" },
+    { "id": "T12", "estado": "insuficiente" },
+    { "id": "T12", "estado": "calculando" },
+    { "id": "T13", "estado": "sucesso" },
+    { "id": "T13", "estado": "carregando" },
+    { "id": "T13", "estado": "recalculando" },
+    { "id": "T13", "estado": "erro-recalcular" },
+    { "id": "T13", "estado": "erro-confirmar" },
+    { "id": "T13", "estado": "mover" },
+    { "id": "T13", "estado": "trocar" },
+    { "id": "T13", "estado": "refazer" },
+    { "id": "T14", "estado": "sucesso" },
+    { "id": "T14", "estado": "mover" },
+    { "id": "T11", "estado": "pre-marcada" }
   ]
 }
