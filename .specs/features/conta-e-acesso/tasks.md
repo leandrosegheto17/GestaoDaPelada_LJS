@@ -1404,6 +1404,8 @@ T57 → T58
 **Depends on**: T41
 **Reuses**: estender `rotas.tsx` da fundação (`F:1545`, página provisória da AD-007); rotas de `telas.json:137-187` (AD-017 proposta)
 **Requirement**: ACE-28, ACE-58
+**Status**: rascunhada
+**Nota do rascunho**: as telas ainda não existem: as rotas usam as telas provisórias de `src/paginas/acesso/provisorias.tsx`, e cada tarefa de tela (T43 a T53) troca a sua entrada em `rotas.tsx` pelo componente real. O marcador por tela é o `handle.tela` da rota, que não muda com a tela real. Só `/entrar` e `/cadastro` passam pela `GuardaPublica`; `/confirmar`, `/entrar/esqueci`, `/entrar/nova-senha` e `/convite` ficam sem guarda (o convite tem estado para quem já entrou, e o `#t=` não pode se perder num redirecionamento). `/app/*` desconhecida cai no 404 dentro da guarda.
 
 **Done when**:
 
