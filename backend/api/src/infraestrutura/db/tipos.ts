@@ -3,8 +3,9 @@ import type { ColumnType, Generated } from 'kysely';
 /**
  * Tipos Kysely das tabelas da grupos-e-elenco (T21; GEL-112), do modelo de `GD:220-236` e das migrações (linha de base
  * e `1792844*`). Só o que as rotas da feature leem ou escrevem: `grupos` completo, o elenco (`jogadores`,
- * `periodos_ativos`, `habilidades`, `notas`) e, só leitura, `partidas`, `presencas` e `pagamentos_mes` (o histórico
- * que impede excluir, GEL-85, e as presenças das regras de período, GEL-68).
+ * `periodos_ativos`, `habilidades`, `notas`) e, só leitura, `partidas` e `presencas` (as presenças das regras de
+ * período, GEL-68). `pagamentos_mes` nasceu só leitura (o histórico que impede excluir, GEL-85); o financeiro (T11) a
+ * torna gravável junto de `config_financeira` e `lancamentos`.
  *
  * `COLUNAS_TIPADAS` repete as colunas com o tipo do catálogo (`udt_name`) para o teste conferir contra o banco
  * migrado; o `satisfies` amarra as duas listas no typecheck.
@@ -90,10 +91,38 @@ export interface TabelaPresencas {
   situacao: SoLeitura<'presente' | 'lesionado' | 'expulso'>;
 }
 
+/**
+ * Financeiro (T11; FIN-13): as 3 tabelas são graváveis. Valores em centavos como `number` (`int4`, nunca decimal);
+ * datas como texto `AAAA-MM-DD`; `lancamento_id` é anulável (marcar sem mensalidade grava só o pagamento, FIN-17).
+ * Autoria e instantes não mudam depois de gravados, exceto `alterado_*` nos lançamentos.
+ */
+export interface TabelaConfigFinanceira {
+  grupo_id: ColumnType<string, string, never>;
+  mensalidade_centavos: ColumnType<number | null, number | null, number | null>;
+  saldo_inicial_centavos: ColumnType<number, number, number>;
+  data_saldo_inicial: Data;
+}
+
+export interface TabelaLancamentos {
+  id: Generated<string>;
+  grupo_id: ColumnType<string, string, never>;
+  tipo: ColumnType<'entrada' | 'saida', 'entrada' | 'saida', 'entrada' | 'saida'>;
+  data: Data;
+  descricao: ColumnType<string, string, string>;
+  valor_centavos: ColumnType<number, number, number>;
+  criado_por: ColumnType<string, string, never>;
+  criado_em: ColumnType<Date, Date | string, never>;
+  alterado_por: ColumnType<string, string, string>;
+  alterado_em: Instante;
+}
+
 export interface TabelaPagamentosMes {
-  grupo_id: SoLeitura<string>;
-  jogador_id: SoLeitura<string>;
-  mes: SoLeitura<string>;
+  grupo_id: ColumnType<string, string, never>;
+  jogador_id: ColumnType<string, string, never>;
+  mes: ColumnType<string, string, never>;
+  lancamento_id: ColumnType<string | null, string | null | undefined, string | null>;
+  marcado_por: ColumnType<string, string, never>;
+  marcado_em: ColumnType<Date, Date | string, never>;
 }
 
 /** Tabelas tipadas do Kysely da requisição. As outras continuam pelo `sql` do Kysely. */
@@ -106,6 +135,8 @@ export interface Banco {
   partidas: TabelaPartidas;
   presencas: TabelaPresencas;
   pagamentos_mes: TabelaPagamentosMes;
+  config_financeira: TabelaConfigFinanceira;
+  lancamentos: TabelaLancamentos;
 }
 
 type Colunas<T> = { readonly [K in keyof T]-?: string };
@@ -144,7 +175,32 @@ export const COLUNAS_TIPADAS = {
   notas: { jogador_id: 'uuid', habilidade_id: 'uuid', grupo_id: 'uuid', valor: 'int2' },
   partidas: { id: 'uuid', grupo_id: 'uuid', data: 'date', choveu: 'bool' },
   presencas: { partida_id: 'uuid', jogador_id: 'uuid', grupo_id: 'uuid', situacao: 'text' },
-  pagamentos_mes: { grupo_id: 'uuid', jogador_id: 'uuid', mes: 'text' },
+  pagamentos_mes: {
+    grupo_id: 'uuid',
+    jogador_id: 'uuid',
+    mes: 'text',
+    lancamento_id: 'uuid',
+    marcado_por: 'uuid',
+    marcado_em: 'timestamptz',
+  },
+  config_financeira: {
+    grupo_id: 'uuid',
+    mensalidade_centavos: 'int4',
+    saldo_inicial_centavos: 'int4',
+    data_saldo_inicial: 'date',
+  },
+  lancamentos: {
+    id: 'uuid',
+    grupo_id: 'uuid',
+    tipo: 'text',
+    data: 'date',
+    descricao: 'text',
+    valor_centavos: 'int4',
+    criado_por: 'uuid',
+    criado_em: 'timestamptz',
+    alterado_por: 'uuid',
+    alterado_em: 'timestamptz',
+  },
 } as const satisfies { readonly [T in keyof Banco]: Colunas<Banco[T]> };
 
 /** Colunas que o tipo declara anuláveis (`| null` na leitura); o teste confere `is_nullable`. */
@@ -152,4 +208,6 @@ export const COLUNAS_ANULAVEIS: Readonly<Partial<Record<keyof Banco, readonly st
   grupos: ['trial_inicio', 'arquivado_em'],
   jogadores: ['ano_nascimento', 'posicao', 'telefone', 'inicio_pontuacao'],
   periodos_ativos: ['fim'],
+  pagamentos_mes: ['lancamento_id'],
+  config_financeira: ['mensalidade_centavos'],
 };

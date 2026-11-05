@@ -568,6 +568,7 @@ T47 → T48
 **Depends on**: T10
 **Reuses**: Estender `tipos.ts` (`GE:878`, `PR:1013`); colunas de `M:1792843200000_linha-de-base.sql:233-269`
 **Requirement**: FIN-13
+**Status**: rascunhada
 
 **Done when**:
 
