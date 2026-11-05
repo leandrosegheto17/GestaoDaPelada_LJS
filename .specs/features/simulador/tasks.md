@@ -450,6 +450,8 @@ T53 → T54
 **Depends on**: T4
 **Reuses**: `inicioDaContagem` (`PR:534`) e `acumuladoPorInicio` (`PR:558`) pelo `index.ts` da pontuação (a regra de lint de `PR:1758` proíbe as internas); `vespera` (`PR:457`); `compararApelido` (`GE:575`); regra de `L:backend/dominio/src/simulador/prioridade.ts`; `S:130-133`, Independent Test `S:136`
 **Requirement**: SIM-16, SIM-17, SIM-18
+**Status**: rascunhada
+**Nota do rascunho**: rascunhada depois da T14, quando a função única de acumulado (`pontuacao/acumulado.ts`, T5 da partidas-e-ranking) já estava commitada. Não há `index.ts` da pontuação: usa `acumuladoPorInicio` direto e os tipos do histórico de `ranking/calcular.ts` (`JogadorDoRanking`, `PartidaDoRanking`, `PresencaDoRanking`). O apelido compara só pela `chaveBusca` (o `compararApelido` desempata pelo texto original, e SIM-16 pede o id).
 
 **Done when**:
 
