@@ -49,6 +49,17 @@ O `.env.example` lista todas, com obrigatoriedade, formato e se é segredo. Segr
 | `URL_PUBLICA`            | URL https do app, injetada por `--var` no deploy                              |
 | `NEON_URL_BACKUP`        | Role somente leitura do Neon, usada pelo `backup.yml` (secret do GitHub)      |
 | `BACKUP_CHAVE`           | Chave pública `age` do backup (secret do GitHub)                              |
+| `DATABASE_URL_RESTAURACAO` | Banco local vazio do `pnpm restaurar`, quando o terceiro argumento falta |
+| `NEON_URL_DEV_MIGRACAO` | Role dona da branch `dev` do Neon, só no seu `.env`, para `pnpm esquema:comparar --alvo dev` (segredo) |
+| `PELADA_PERMITIR_HOST_REMOTO` | `1` confirma migração ou comparação contra host remoto (o `deploy.yml` define) |
+| `WORKER_TESTE_SENHA` | Senha da role dos testes do Worker; vazia, a suíte gera uma aleatória (segredo) |
+| `NEON_URL_MIGRACAO` | Role `pelada_owner` da `main` do Neon, no environment `producao` (segredo) |
+| `NEON_API_KEY` | Chave da API do Neon para a branch de restauração, no environment `producao` (segredo) |
+| `NEON_PROJECT_ID` | Projeto do Neon, no environment `producao` (segredo) |
+| `CLOUDFLARE_API_TOKEN` | Token da Cloudflare só com permissão de Workers, no environment `producao` (segredo) |
+| `CLOUDFLARE_ACCOUNT_ID` | Conta da Cloudflare, no environment `producao` (segredo) |
+| `PELADA_SAUDE_TENTATIVAS` | Tentativas da verificação de saúde pós-deploy (padrão 10) |
+| `PELADA_SAUDE_ESPERA_MS` | Espera entre as tentativas da verificação de saúde, em ms (padrão 3000) |
 
 ## Testes e checagens
 
@@ -86,7 +97,7 @@ As migrações (SQL) ficam em `backend/api/src/infraestrutura/db/migracoes/` e r
 
 ## Deploy da prévia
 
-Só o workflow manual `deploy` (Actions > `deploy` > Run workflow, na `main`) publica. Ele faz o build, cria um ponto de volta no Neon, gera um dump cifrado, migra e publica o Worker `gestaodapelada-v2` no endereço padrão da Cloudflare (sem domínio próprio), conferindo `GET /api/health`. Detalhes, falhas e restauração: [`docs/runbook.md`](docs/runbook.md).
+Só o workflow manual `deploy` (Actions > `deploy` > Run workflow, na `main`), no environment `producao` do GitHub (AD-119), publica. Ele faz o build, cria um ponto de volta no Neon, gera um dump cifrado, migra e publica o Worker `gestaodapelada-v2` no endereço padrão da Cloudflare (sem domínio próprio), conferindo `GET /api/health`. Detalhes, falhas e restauração: [`docs/runbook.md`](docs/runbook.md).
 
 ## Backup
 

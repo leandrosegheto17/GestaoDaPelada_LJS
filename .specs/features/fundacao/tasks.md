@@ -2258,6 +2258,8 @@ T81 → T82
 **Depends on**: T74
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-51
+**Status**: rascunhada
+**Nota do rascunho**: o `README.md` já existia na `main` (commits `d257824` e `ef2d0e3`): o rascunho só acrescentou à tabela as 11 variáveis do `.env.example` que faltavam (inclusive a `DATABASE_URL_RESTAURACAO` da T66) e o environment `producao` (AD-119) no deploy. Acrescentado `test/readme.test.ts`: as cinco seções, cada variável do `.env.example` citada e os comandos até `http://localhost:5173`. O Prettier vai realinhar a tabela (`pnpm format` no `/executar`).
 
 **Done when**:
 
