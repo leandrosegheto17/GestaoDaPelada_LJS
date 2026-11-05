@@ -1169,6 +1169,8 @@ T47 → T48
 **Depends on**: T32
 **Reuses**: Molde da auditoria sem dado pessoal (`GE:1584`); prova do `comBanco` (`F:1203`)
 **Requirement**: FIN-21, FIN-43, FIN-44
+**Status**: rascunhada
+**Nota do rascunho**: a falha forçada é uma trigger de teste `BEFORE INSERT ON auditoria` só para a ação da vez, criada como superusuário e removida no `finally` (e no `afterAll`). O `SET LOCAL` antes da primeira consulta é provado pelo autor de cada evento (`autor_conta_id` = C, de `app_conta_id()`) e pelas escritas passarem pela RLS do financeiro; a prova direta do `comBanco` segue em `F:1203`. O texto da linha sai sem `momento` e sem o `id` sequencial antes da busca dos marcadores.
 
 **Done when**:
 
