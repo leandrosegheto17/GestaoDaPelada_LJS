@@ -1880,6 +1880,8 @@ T81 → T82
 **Depends on**: T60
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-38
+**Status**: rascunhada
+**Nota do rascunho**: os tipos ficam em `comparar.d.mts`, ao lado, para o teste em TypeScript importar o `.mjs`. O limite de 1% é inclusivo (exatamente 1% passa), caso acrescentado ao teste. Tamanhos diferentes não são comparados: o runner da T62 tira o print do viewport, não da página inteira, para os dois lados terem o mesmo tamanho. Dependências novas sem instalar: `pixelmatch`, `pngjs` e `@types/pngjs`.
 
 **Done when**:
 
