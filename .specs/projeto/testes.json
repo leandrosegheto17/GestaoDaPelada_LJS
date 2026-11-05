@@ -1,3 +1,5 @@
 {
-  "comando": "docker compose up -d --wait && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:checagens && pnpm --filter @pelada/web e2e && pnpm --filter @pelada/web visual"
+  "comando": "docker compose up -d --wait && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:checagens && pnpm --filter @pelada/web e2e && pnpm --filter @pelada/web visual",
+  "dispensado": true,
+  "motivo": "Primeira publicação da prévia em 2026-11-05, aprovada pelo usuário: a fundação só passou pela passada de rascunho (sem /executar nem /validar) e ainda não há usuários reais. Remover 'dispensado' e 'motivo' ao fechar a execução da fundação."
 }

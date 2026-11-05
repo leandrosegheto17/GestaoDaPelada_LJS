@@ -28,7 +28,7 @@ Faça um item por vez, **mostrando o que vai fazer e o resultado**. Marque `[x]`
 1. **Repositório e remoto:** `git init` se faltar, branch base definida, remoto configurado. Criar o repositório remoto ou dar `push` é ação externa: confirmação específica.
 2. **Ambiente local reproduzível:** `docker compose` (ou equivalente) que sobe com um comando, banco com a carga inicial. O que for do projeto (porta, comando de subida) vai no `CLAUDE.md` da raiz do projeto.
 3. **Esqueleto ponta a ponta:** a menor fatia que atravessa todas as camadas e roda.
-4. **Comando de teste:** grave `.specs/projeto/testes.json` (a trava usa) e um teste que roda.
+4. **Comando de teste:** grave `.specs/projeto/testes.json` (a trava usa) e um teste que roda, com **reporter mínimo** (ex.: `--reporter=dot`), para a saída verde ocupar uma linha.
 5. **CI:** pipeline que roda a suíte em cada push/PR; confira uma execução verde.
 6. **Pré-voo:** `python .claude/scripts/preparar-ambiente.py` sem pendência.
 7. **Hook de commit:** o `commit-msg` instalado (`instalar.py`) ou conferido.

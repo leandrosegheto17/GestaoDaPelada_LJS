@@ -29,6 +29,16 @@
             "timeout": 600
           }
         ]
+      },
+      {
+        "matcher": "PowerShell",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/.claude/scripts/trava-testes.py\"",
+            "timeout": 600
+          }
+        ]
       }
     ],
     "SessionStart": [
