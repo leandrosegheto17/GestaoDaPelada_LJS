@@ -195,8 +195,8 @@ describe('auditoria como pelada_app', () => {
   const inserir = (grupo: string, conta: string) => (d: pg.Client) =>
     d.query(
       `INSERT INTO auditoria (autor_tipo, autor_conta_id, acao, entidade, entidade_id, grupo_id, momento)
-       VALUES ('conta', $1, 'teste', 'grupo', $2::text, $2, now())`,
-      [conta, grupo],
+       VALUES ('conta', $1, 'teste', 'grupo', $3, $2, now())`,
+      [conta, grupo, grupo],
     );
 
   it('ACE-46: INSERT da conta A na auditoria do grupo A é aceito', async () => {
@@ -219,21 +219,19 @@ describe('auditoria como pelada_app', () => {
     ).rejects.toMatchObject(PERMISSAO);
   });
 
-  it('ACE-46: UPDATE na auditoria é recusado, mesmo no próprio grupo', async () => {
+  it('ACE-46: UPDATE na auditoria é recusado, mesmo sem WHERE', async () => {
     const { db, cenario } = aberto;
     await expect(
       comoApp(db, { conta: cenario.contaA }, (d) =>
-        d.query(`UPDATE auditoria SET acao = 'apagada' WHERE grupo_id = $1`, [cenario.grupoA]),
+        d.query(`UPDATE auditoria SET acao = 'apagada'`),
       ),
     ).rejects.toMatchObject(PERMISSAO);
   });
 
-  it('ACE-46: DELETE na auditoria é recusado, mesmo no próprio grupo', async () => {
+  it('ACE-46: DELETE na auditoria é recusado, mesmo sem WHERE', async () => {
     const { db, cenario } = aberto;
     await expect(
-      comoApp(db, { conta: cenario.contaA }, (d) =>
-        d.query('DELETE FROM auditoria WHERE grupo_id = $1', [cenario.grupoA]),
-      ),
+      comoApp(db, { conta: cenario.contaA }, (d) => d.query('DELETE FROM auditoria')),
     ).rejects.toMatchObject(PERMISSAO);
   });
 });
