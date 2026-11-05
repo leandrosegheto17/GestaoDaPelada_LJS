@@ -6,6 +6,7 @@ import { Faixa } from '../../componentes/Faixa.tsx';
 import { LinkBotao } from '../../componentes/LinkBotao.tsx';
 import { ItemLista, Lista } from '../../componentes/Lista.tsx';
 import { ErroApi } from '../../dados/cliente.ts';
+import { formatarReais } from '../../dados/dinheiro.ts';
 import { useGrupo } from '../../dados/grupos.ts';
 import estilos from '../acesso.module.css';
 import modulo from '../grupos-elenco.module.css';
@@ -23,6 +24,9 @@ import { textoRecorrencia } from '../grupos/recorrencia.ts';
  * - sem "Pontuação" (decisão de `GD:5-6`). Partidas, Dia de jogo com partida, Uso do app e
  *   Financeiro são das features seguintes, que estendem esta tela (GEL-116: a t09 fica fora da
  *   comparação visual até lá, AD-029).
+ * - Financeiro (financeiro T43; FIN-34, AD-079), de `.specs/mockup/telas/t09-inicio--sucesso.html:21`: o item
+ *   "Financeiro" com "Saldo R$ …" (ou "Caixa não configurado" com o saldo nulo), link para o t22, só quando a resposta
+ *   traz a chave `saldoFinanceiroCentavos`; sem a chave (quem não acessa o financeiro), nenhum item.
  */
 
 export const TEXTO_SEM_JOGADORES = 'Cadastre os jogadores para lançar partidas.';
@@ -40,6 +44,13 @@ export function textoHabilidades(n: number): string {
 
 export function textoAdmins(n: number): string {
   return n === 1 ? '1 admin' : `${n} admins`;
+}
+
+export const TEXTO_CAIXA_NAO_CONFIGURADO = 'Caixa não configurado';
+
+/** "Saldo R$ 1.245,50"; nulo (caixa sem configuração) → "Caixa não configurado". */
+export function textoSaldo(centavos: number | null): string {
+  return centavos === null ? TEXTO_CAIXA_NAO_CONFIGURADO : `Saldo ${formatarReais(centavos)}`;
 }
 
 export function InicioGrupo() {
@@ -76,6 +87,9 @@ export function InicioGrupo() {
           <ItemLista titulo="Habilidades" meta={textoHabilidades(g.habilidades)} para={`${base}/habilidades`} />
           <ItemLista titulo="Admins" meta={textoAdmins(g.admins)} para={`${base}/admins`} />
           <ItemLista titulo="Dados do grupo" meta={`${textoRecorrencia(g)} · link do ranking`} para={`${base}/dados`} />
+          {g.saldoFinanceiroCentavos !== undefined ? (
+            <ItemLista titulo="Financeiro" meta={textoSaldo(g.saldoFinanceiroCentavos)} para={`${base}/financeiro`} />
+          ) : null}
         </Lista>
       </>
     );

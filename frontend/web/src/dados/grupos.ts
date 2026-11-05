@@ -1,5 +1,5 @@
+import { grupoDetalheComSaldo, type GrupoDetalheComSaldo } from '@pelada/contrato/financeiro';
 import {
-  grupoDetalhe,
   gruposResposta,
   type ArquivarCorpo,
   type CriarGrupoResposta,
@@ -14,7 +14,8 @@ import { useCliente } from './ContextoCliente.tsx';
 /**
  * Dados de grupos no front (grupos-e-elenco T53; GEL-01, GEL-18, GEL-22, GEL-27), sobre o cliente HTTP da CA (T36):
  * - `useGrupos()`: `GET /api/grupos`, os ativos e os arquivados que a conta criou (GEL-27), conferidos pelo contrato;
- * - `useGrupo(id)`: `GET /api/grupos/:grupoId` (`grupoDetalhe`);
+ * - `useGrupo(id)`: `GET /api/grupos/:grupoId` (`grupoDetalheComSaldo`: o `grupoDetalhe` com o saldo do caixa, só para
+ *   quem acessa o financeiro, financeiro T43, FIN-34, AD-079);
  * - mutações `criarGrupo`, `editarGrupo`, `arquivarGrupo` e `reativarGrupo`. Toda escrita invalida a lista, o grupo e
  *   a sessão: a sessão lista os grupos ativos da conta (`GET /api/sessao`, T24), e arquivar ou reativar muda essa lista
  *   (GEL-22, GEL-28).
@@ -50,9 +51,9 @@ export function useGrupos() {
 
 export function useGrupo(grupoId: string) {
   const api = useCliente();
-  return useQuery<GrupoDetalhe>({
+  return useQuery<GrupoDetalheComSaldo>({
     queryKey: chaveGrupo(grupoId),
-    queryFn: async () => grupoDetalhe.parse(await api.get<unknown>(caminhoGrupo(grupoId))),
+    queryFn: async () => grupoDetalheComSaldo.parse(await api.get<unknown>(caminhoGrupo(grupoId))),
     retry: false,
     enabled: grupoId !== '',
   });

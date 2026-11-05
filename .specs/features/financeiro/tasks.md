@@ -1430,6 +1430,8 @@ T47 → T48
 **Depends on**: T42
 **Reuses**: Estender a tela de `GE:1847` e `PR:2073`; item de `.specs/mockup/telas/t09-inicio--sucesso.html:31`
 **Requirement**: FIN-34, FIN-46
+**Status**: rascunhada
+**Nota do rascunho**: o teste `PAR-160` e a extensão da t09 pela `partidas-e-ranking` ainda não existem no front (o `inicio-grupo.test.tsx` só tem os testes da GE, e o `GEL-20` lista os 4 itens sem a chave, o que segue valendo): nenhum teste existente foi mudado; os casos novos ficam em `frontend/web/test/telas/inicio-grupo-financeiro.test.tsx`. Quando o /executar levar a `PAR-160` ao verde, ela passa a exigir "sem Financeiro" só sem a chave (autorização de 2026-11-04). O `useGrupo` (`dados/grupos.ts`) passa a conferir pelo `grupoDetalheComSaldo` (o `grupoDetalhe` é `.strict()` e recusaria a chave); quando o GET adotar o `grupoDetalheComPartidas`, o parser segue a forma estendida (nota da T30).
 
 **Done when**:
 
