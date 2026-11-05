@@ -651,6 +651,8 @@ T39 → T40 → T41
 **Depends on**: T13
 **Reuses**: repositórios que chamam função (`CA:820`, `PR:1289`); T8 a T11
 **Requirement**: NOT-05, NOT-17, NOT-45
+**Status**: rascunhada
+**Nota do rascunho**: os ids de assinatura (`bigint`) circulam como texto e os arrays vão como literal `{1,2}` com `::bigint[]`. Só `loteRanking` e `destinoCobranca` devolvem as chaves, para a infraestrutura de envio; as rotas usam os seis primeiros métodos, que só devolvem texto de estado.
 
 **Done when**:
 
