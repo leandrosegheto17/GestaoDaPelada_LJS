@@ -5,6 +5,12 @@ import { VERSAO_TESTE } from './test/rotas/constantes.ts';
 const URL_TESTE =
   process.env.DATABASE_URL_TESTE ?? 'postgres://postgres:postgres@127.0.0.1:5432/pelada';
 
+// O miniflare recusa o `localConnectionString` sem senha do `wrangler.jsonc` versionado (FUN-04). Como no
+// `pnpm dev`, a senha entra só aqui, pela variável do wrangler ou pela `PELADA_APP_SENHA`.
+const HYPERDRIVE_TESTE =
+  process.env.CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE ??
+  `postgres://pelada_app:${encodeURIComponent(process.env.PELADA_APP_SENHA || 'sem-senha')}@127.0.0.1:5432/pelada`;
+
 export default defineConfig({
   test: {
     projects: [
@@ -31,6 +37,7 @@ export default defineConfig({
             wrangler: { configPath: '../../wrangler.jsonc' },
             miniflare: {
               bindings: { VERSAO: VERSAO_TESTE },
+              hyperdrives: { HYPERDRIVE: HYPERDRIVE_TESTE },
               assets: { directory: './test/rotas/spa' },
             },
           }),
