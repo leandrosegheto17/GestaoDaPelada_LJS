@@ -1037,6 +1037,8 @@ T57 → T58
 **Depends on**: T27
 **Reuses**: `contas.trocarSenha` e `contas.excluir` (T22); tabela de `ljs:.specs/features/conta-e-acesso/design.md:162-163`
 **Requirement**: ACE-26, ACE-27, ACE-28, ACE-29, ACE-30, ACE-70
+**Status**: rascunhada
+**Nota do rascunho**: as duas rotas rodam em `transacaoCurta` com a conta da sessão (a falha da senha atual fica gravada no 401, ACE-70). Bloqueado: 429 `bloqueado_temporariamente`; senha errada na troca e na exclusão: 401 `senha_atual_incorreta`; exclusão `ok` vence o cookie.
 
 **Done when**:
 
