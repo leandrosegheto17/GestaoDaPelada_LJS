@@ -704,6 +704,7 @@ T78 → T79
 **Depends on**: T9
 **Reuses**: `B:258-260` (PAR-71 a PAR-73), `B:62` (presença fora de período conta), casos `B:486`, `B:497`
 **Requirement**: PAR-71, PAR-72, PAR-73, PAR-60
+**Status**: rascunhada
 
 **Done when**:
 

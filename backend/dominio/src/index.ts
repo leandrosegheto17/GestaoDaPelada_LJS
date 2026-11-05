@@ -140,3 +140,10 @@ export {
   type MotivoSemEfeito,
   type SituacaoAssinatura,
 } from './plano/eventos-asaas.ts';
+export {
+  rodadasDoJogador,
+  type JogadorDaRodada,
+  type PartidaDaRodada,
+  type Rodada,
+  type SituacaoRodada,
+} from './ranking/rodadas.ts';
