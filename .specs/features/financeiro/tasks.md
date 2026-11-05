@@ -514,6 +514,8 @@ T47 → T48
 **Depends on**: T8
 **Reuses**: Gerador e checagem aditiva (`F:883`, `F:858`); molde de função de visibilidade `grupos_visiveis()` (`M:1792844280000_grupos-visiveis-arquivado.sql:9-22`); laço das policies herdadas (`M:1792843320000_rls.sql:32-61`); AD-052
 **Requirement**: FIN-38, FIN-39, FIN-42
+**Status**: rascunhada
+**Nota do rascunho**: migração `1792845300000_financeiro-rls.sql`, com folga para as migrações das features 4 e 5 (ainda não escritas): o /executar confere que o timestamp é maior que a última delas. Testes em `backend/api/test/banco/financeiro-rls-migracao.test.ts` e `backend/scripts/checagens/test/migracao-aditiva-financeiro.test.ts` (este já cita a migração da T10).
 
 **Done when**:
 

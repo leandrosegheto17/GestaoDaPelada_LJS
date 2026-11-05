@@ -1929,6 +1929,8 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T59
 **Reuses**: `R-09` e `R-10` (`t09-inicio--*.html` do módulo); decisão de `GD:5-6` (t09 sem "Pontuação")
 **Requirement**: GEL-20, GEL-114
+**Status**: rascunhada
+**Lacunas**: o mockup só mostra "Nenhum cadastrado" para o grupo novo; com jogadores só inativos (`jogadoresAtivos` = 0), a tela usa o mesmo texto e o Dia de jogo pede o cadastro (`InicioGrupo.tsx`, `[LACUNA]`).
 
 **Done when**:
 

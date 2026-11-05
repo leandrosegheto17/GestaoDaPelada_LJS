@@ -159,21 +159,22 @@ describe('rede do financeiro: conta de outro grupo (b)', () => {
   });
 });
 
-describe('rede do financeiro: SEC-003 vigente (c)', () => {
-  it('FIN-38 (antes; T9 inverte): o slug de G lê as linhas de G nas 3 tabelas', async () => {
-    const linhas = await linhasDeG({ slug: aberto.cenario.slugG });
-    expect(linhas.every((n) => n > 0)).toBe(true);
+// Item (c) invertido pela T9 (`1792845300000_financeiro-rls.sql`): o SEC-003 deixou de valer. Mesmos atores e mesmas
+// consultas; a asserção passa de "lê/insere" para "zero linhas/recusado", tão estrita quanto antes.
+describe('rede do financeiro: SEC-003 fechado pela T9 (c)', () => {
+  it('FIN-38 (depois da T9): o slug de G vê zero linhas de G nas 3 tabelas', async () => {
+    expect(await linhasDeG({ slug: aberto.cenario.slugG })).toEqual([0, 0, 0]);
   });
 
-  it('FIN-39 (antes; T9 inverte): O, sem acesso ao financeiro, lê as linhas de G', async () => {
-    const linhas = await linhasDeG({ conta: aberto.cenario.contaO });
-    expect(linhas.every((n) => n > 0)).toBe(true);
+  it('FIN-39 (depois da T9): O, sem acesso ao financeiro, vê zero linhas de G', async () => {
+    expect(await linhasDeG({ conta: aberto.cenario.contaO })).toEqual([0, 0, 0]);
   });
 
-  it('FIN-39 (antes; T9 inverte): O, sem acesso ao financeiro, insere lançamento em G', async () => {
+  it('FIN-39 (depois da T9): O, sem acesso ao financeiro, não insere lançamento em G', async () => {
     const { db, cenario } = aberto;
-    const r = await comoConta(db, cenario.contaO, (d) => inserirLancamento(d, cenario.grupoG, cenario.contaO));
-    expect(r.rowCount).toBe(1);
+    await expect(
+      comoConta(db, cenario.contaO, (d) => inserirLancamento(d, cenario.grupoG, cenario.contaO)),
+    ).rejects.toMatchObject({ code: '42501' });
   });
 
   it('FIN-39: C, com acesso, lê as linhas de G (controle; fica verde)', async () => {

@@ -69,12 +69,6 @@
   font-size: var(--texto-sm);
 }
 
-/* Contagens do início do grupo, de t09-inicio--sucesso.html. */
-.contagens {
-  margin: 0 0 var(--esp-4);
-  color: var(--cor-texto-sec);
-}
-
 @media (min-width: 600px) {
   .barra-acao {
     position: static;
@@ -100,4 +94,25 @@
   .duas-colunas {
     grid-template-columns: 1fr 1fr;
   }
+}
+
+/* Dia de jogo do início do grupo (t09-inicio--sem-jogadores.html), de base.css:251-253. */
+.dia-de-jogo {
+  background: var(--cor-superficie);
+  border: 2px solid var(--cor-verde);
+  border-radius: var(--raio);
+  padding: var(--esp-4);
+  display: grid;
+  gap: var(--esp-3);
+}
+
+.dia-de-jogo__titulo {
+  margin: 0;
+  font-size: var(--texto-xl);
+  text-transform: uppercase;
+  color: var(--cor-verde);
+}
+
+.dia-de-jogo p {
+  margin: 0;
 }
