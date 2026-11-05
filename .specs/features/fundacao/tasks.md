@@ -1827,6 +1827,8 @@ T81 → T82
 **Depends on**: T58
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-29, FUN-22
+**Status**: rascunhada
+**Nota do rascunho**: compara com os valores de `test/apoio/cabecalhos.ts` (T57) em `/`, `offline.html`, manifest, um ícone e no fallback da SPA, e acrescenta um caso que lê o console da página: violação de CSP reprova. `/api/health` e `/api/rota-inexistente` conferem `no-store` e `nosniff`. Se o `wrangler dev` não aplicar o `_headers` no fallback da SPA, o `/executar` registra a diferença em vez de enfraquecer o teste.
 
 **Done when**:
 
