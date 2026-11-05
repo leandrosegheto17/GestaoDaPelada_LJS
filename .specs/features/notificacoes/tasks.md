@@ -812,6 +812,8 @@ T39 → T40 → T41
 **Depends on**: T19
 **Reuses**: bench do domínio (`PR:840`); T18, T19
 **Requirement**: NOT-34
+**Status**: rascunhada
+**Nota do rascunho**: o teste do `workerd` (`limites.test.ts`) simula o repositório (`vi.spyOn(push, …)`) e conta cada abertura de banco, cada envio à fila, cada `fetch` e cada relato ao Sentry como subrequisição; com 40 aceitas são 42. O bench de CPU ficou em `backend/api/test/infraestrutura/push-cpu.test.ts` (projeto `banco`, Node), fora da pasta `push/`, que roda no `workerd`. Risco para o `/executar` avaliar: 40 respostas 400, 403 ou 413 dariam 40 relatos ao Sentry (82 subrequisições com o resto); o teste não cobre esse pior caso, que a spec não define.
 
 **Done when**:
 
