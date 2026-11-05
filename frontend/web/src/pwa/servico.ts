@@ -1,3 +1,5 @@
+import { tratarClique, tratarPush, type EscopoNotificacoes } from './notificacao.ts';
+
 /**
  * Regras do service worker (FUN-34, FUN-35, design C6), separadas do `sw.ts` para os testes
  * rodarem sem um `ServiceWorkerGlobalScope`. O `sw.ts` só liga estas funções ao Workbox.
@@ -115,18 +117,30 @@ export interface AlvoDeEventos {
   addEventListener(tipo: string, ouvinte: (evento: unknown) => void): void;
 }
 
-/** `push`: vazio até a feature `notificacoes` (FUN-34). */
-export function aoReceberPush(_evento: unknown): void {
-  // Sem ação na fundação.
+/** `push` (FUN-34; preenchido pela notificacoes T34, NOT-35, NOT-36, NOT-66): mostra a notificação do payload. */
+export function aoReceberPush(evento: unknown, escopo?: EscopoNotificacoes): void {
+  tratarPush(evento, escopo);
 }
 
-/** `notificationclick`: vazio até a feature `notificacoes` (FUN-34). */
-export function aoClicarNotificacao(_evento: unknown): void {
-  // Sem ação na fundação.
+/** `notificationclick` (FUN-34; notificacoes T34, NOT-37, NOT-48): foca ou abre só caminho seguro. */
+export function aoClicarNotificacao(evento: unknown, escopo?: EscopoNotificacoes): void {
+  tratarClique(evento, escopo);
 }
 
-/** Registra os handlers de `push` e `notificationclick` (FUN-34). */
-export function registrarEventos(alvo: AlvoDeEventos): void {
-  alvo.addEventListener('push', aoReceberPush);
-  alvo.addEventListener('notificationclick', aoClicarNotificacao);
+/** O próprio alvo como escopo de notificações, quando ele é o `self` do SW (tem `registration` e `clients`). */
+function escopoDe(alvo: AlvoDeEventos): EscopoNotificacoes | undefined {
+  const a = alvo as Partial<EscopoNotificacoes>;
+  return a.registration && a.clients && a.location ? (alvo as EscopoNotificacoes) : undefined;
+}
+
+/**
+ * Registra os handlers de `push` e `notificationclick` (FUN-34). Sem escopo (o alvo falso do teste da fundação), os
+ * handlers não fazem nada e não lançam.
+ */
+export function registrarEventos(
+  alvo: AlvoDeEventos,
+  escopo: EscopoNotificacoes | undefined = escopoDe(alvo),
+): void {
+  alvo.addEventListener('push', (evento) => aoReceberPush(evento, escopo));
+  alvo.addEventListener('notificationclick', (evento) => aoClicarNotificacao(evento, escopo));
 }

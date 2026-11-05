@@ -1195,6 +1195,8 @@ T39 → T40 → T41
 **Depends on**: T33
 **Reuses**: estender o SW da fundação (`F:1595`) e da `partidas-e-ranking` (`PR:2246`); ícones do manifest (`F:1571`)
 **Requirement**: NOT-35, NOT-36, NOT-37, NOT-48, NOT-66
+**Status**: rascunhada
+**Nota do rascunho**: as regras ficam em `frontend/web/src/pwa/notificacao.ts` (puras, como o `servico.ts`), e os handlers vazios de `servico.ts` passam a chamá-las com o `self` como escopo; o `sw.ts` não mudou. O tipo do push vai no `data` da notificação: ranking (título `TITULO_RANKING` e caminho `/g/<slug>?mes=`) só abre `/g/`; cobrança (caminho `/app/grupos/<uuid>/plano`) só abre `/app/`; o resto é a genérica e abre `/`. O teste FUN-34 da fundação não muda: sem escopo e com evento vazio, os handlers não fazem nada. Testes em `frontend/web/test/pwa/notificacao.test.ts`.
 
 **Done when**:
 
