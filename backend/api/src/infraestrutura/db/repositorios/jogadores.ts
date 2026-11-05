@@ -1,7 +1,9 @@
 import { sql } from 'kysely';
-import type { CorrigirPeriodoCorpo, DataCorpo, JogadorCorpo } from '@pelada/contrato';
+import type { CorrigirPeriodoCorpo, DataCorpo, InicioCorpo, JogadorCorpo } from '@pelada/contrato';
 import {
+  avaliarInicio,
   avaliarPeriodos,
+  type RegraInicio,
   type CampoPeriodo,
   type OperacaoPeriodo,
   type Periodo,
@@ -230,4 +232,62 @@ async function corrigirPeriodo(
   return { resultado: 'ok', alterado: true };
 }
 
-export const jogadores = { criar, inativar, reativar, corrigirPeriodo };
+export type ResultadoAlterarInicio =
+  | { resultado: 'ok'; alterado: boolean }
+  | { resultado: 'nao_encontrado' }
+  | { resultado: 'invalido'; regra: RegraInicio; campo: 'data'; mensagem: string };
+
+/**
+ * Altera a data de início da pontuação (GEL-77): com a mesma trava, avalia no domínio (GEL-78 a GEL-82), grava
+ * `inicio_pontuacao`, move o início do primeiro período quando a data recua para antes dele (GEL-81, sem mexer nos
+ * encerrados) e audita `jogador_inicio_alterado` com a data anterior e a nova. Data igual à atual não grava nem audita
+ * (GEL-82). Com a criação, é o único escritor de `inicio_pontuacao` (GEL-83, checagem da T45).
+ *
+ * Casos limite (Domínio: sim), listados antes do código:
+ * - recuo para antes do primeiro período: grava a data e move o início do primeiro período para ela;
+ * - avanço dentro do primeiro período: grava só `inicio_pontuacao`; o período fica como está;
+ * - data igual à atual: `ok` com `alterado: false`, sem `UPDATE` nem auditoria;
+ * - primeiro período aberto: sem saída, só valem o piso e o futuro;
+ * - depois da saída do primeiro período, antes do piso ou no futuro: `invalido` com a mensagem do domínio;
+ * - jogador de outro grupo: `nao_encontrado`;
+ * - erro depois do `UPDATE`: sobe, e a transação da requisição desfaz tudo (GEL-109).
+ */
+async function alterarInicio(
+  db: Db,
+  grupoId: string,
+  id: string,
+  dados: InicioCorpo,
+  hoje: string,
+): Promise<ResultadoAlterarInicio> {
+  const estado = await travarParaPeriodo(db, grupoId, id);
+  if (!estado) return { resultado: 'nao_encontrado' };
+
+  const r = avaliarInicio({
+    periodos: estado.periodos,
+    inicioPontuacao: estado.inicioPontuacao,
+    novaData: dados.data,
+    hoje,
+  });
+  if (!r.ok) return { resultado: 'invalido', regra: r.regra, campo: r.campo, mensagem: r.mensagem };
+  if (!r.alterado) return { resultado: 'ok', alterado: false };
+
+  await sql`
+    UPDATE jogadores SET inicio_pontuacao = ${r.inicioPontuacao}::date, alterado_por = app_conta_id(), alterado_em = now()
+     WHERE grupo_id = ${grupoId} AND id = ${id}`.execute(db);
+  const primeiroAntes = estado.periodos[0];
+  const primeiroDepois = r.periodos[0];
+  if (primeiroAntes && primeiroDepois && primeiroDepois.inicio !== primeiroAntes.inicio) {
+    await sql`
+      UPDATE periodos_ativos SET inicio = ${primeiroDepois.inicio}::date
+       WHERE grupo_id = ${grupoId} AND jogador_id = ${id} AND id = ${primeiroAntes.id}`.execute(db);
+  }
+  await auditoria.registrar(db, grupoId, {
+    acao: 'jogador_inicio_alterado',
+    entidade: 'jogador',
+    entidadeId: id,
+    resumo: { anterior: r.anterior, nova: r.inicioPontuacao },
+  });
+  return { resultado: 'ok', alterado: true };
+}
+
+export const jogadores = { criar, inativar, reativar, corrigirPeriodo, alterarInicio };

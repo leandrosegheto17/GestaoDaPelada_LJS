@@ -1445,6 +1445,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T40
 **Reuses**: trava de T38; avaliação do início (T15); regras de `GS:274-280`
 **Requirement**: GEL-77, GEL-81, GEL-82, GEL-83
+**Status**: rascunhada
 
 **Done when**:
 
