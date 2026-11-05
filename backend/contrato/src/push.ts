@@ -34,7 +34,8 @@ export const LIMITE_CORPO_PUSH_BYTES = 4096;
 
 /** Mensagens das recusas das rotas de push (T28 a T31). */
 export const MENSAGEM_PUSH_INDISPONIVEL = 'Os avisos não estão disponíveis para este grupo.';
-export const MENSAGEM_LIMITE_ASSINATURAS = 'Este grupo já tem o máximo de aparelhos recebendo avisos.';
+export const MENSAGEM_LIMITE_ASSINATURAS =
+  'Este grupo já tem o máximo de aparelhos recebendo avisos.';
 
 /** Corpo das recusas `push_indisponivel` (403, 503) e `limite_assinaturas` (409). */
 export interface ErroPush {

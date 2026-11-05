@@ -109,9 +109,17 @@ describe('caracterização: rotas de partida (S-07)', () => {
   });
 
   it('NOT-20: PUT de partida responde 200 com a partida relida', async () => {
-    const r = await pedir('PUT', `/partidas/${DATA_DO_CENARIO}`, corpoDaPartida(DATA_DO_CENARIO, true));
+    const r = await pedir(
+      'PUT',
+      `/partidas/${DATA_DO_CENARIO}`,
+      corpoDaPartida(DATA_DO_CENARIO, true),
+    );
     expect(r.status).toBe(200);
-    expect(await r.json()).toMatchObject({ data: DATA_DO_CENARIO, choveu: true, hoje: '2026-03-14' });
+    expect(await r.json()).toMatchObject({
+      data: DATA_DO_CENARIO,
+      choveu: true,
+      hoje: '2026-03-14',
+    });
   });
 
   it('NOT-20: DELETE de partida responde 204 sem corpo e a partida some', async () => {
@@ -195,9 +203,10 @@ describe('caracterização: webhook do Asaas (S-03)', () => {
 
   async function estado() {
     const { db, cenario } = aberto;
-    const g = await db.query<{ s: string }>('SELECT situacao_comercial AS s FROM grupos WHERE id = $1', [
-      cenario.grupoH,
-    ]);
+    const g = await db.query<{ s: string }>(
+      'SELECT situacao_comercial AS s FROM grupos WHERE id = $1',
+      [cenario.grupoH],
+    );
     const a = await db.query<{ situacao: string; pago_ate: string | null; ultimo: string | null }>(
       `SELECT situacao, pago_ate::text AS pago_ate, ultimo_evento_em::text AS ultimo
          FROM assinaturas WHERE asaas_assinatura_id = $1`,
@@ -260,7 +269,9 @@ describe('caracterização: webhook do Asaas (S-03)', () => {
   it('NOT-38: evento anterior ao último aplicado (obsoleto, PLA-48) responde 200 e não muda nada', async () => {
     await preparar('ativo', 'ativa');
     const antes = await estado();
-    const r = await enviar(pagamento('evt_t0not_obsoleto', 'PAYMENT_OVERDUE', '2026-11-01 08:00:00'));
+    const r = await enviar(
+      pagamento('evt_t0not_obsoleto', 'PAYMENT_OVERDUE', '2026-11-01 08:00:00'),
+    );
     expect(r.status).toBe(200);
     expect(await estado()).toEqual(antes);
   });
@@ -338,7 +349,11 @@ describe('caracterização: recursoLiberado para push (S-01)', () => {
 
   const liberado = (contexto: { conta?: string; slug?: string }) =>
     comContexto(contexto, (db) =>
-      recursoLiberadoPeloPlano(relogioFixo('2026-11-20T15:00:00Z'))(db, aberto.cenario.grupoG, 'push'),
+      recursoLiberadoPeloPlano(relogioFixo('2026-11-20T15:00:00Z'))(
+        db,
+        aberto.cenario.grupoG,
+        'push',
+      ),
     );
 
   beforeAll(async () => {

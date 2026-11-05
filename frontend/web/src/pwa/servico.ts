@@ -130,7 +130,9 @@ export function aoClicarNotificacao(evento: unknown, escopo?: EscopoNotificacoes
 /** O próprio alvo como escopo de notificações, quando ele é o `self` do SW (tem `registration` e `clients`). */
 function escopoDe(alvo: AlvoDeEventos): EscopoNotificacoes | undefined {
   const a = alvo as Partial<EscopoNotificacoes>;
-  return a.registration && a.clients && a.location ? (alvo as EscopoNotificacoes) : undefined;
+  return a.registration && a.clients && a.location
+    ? (alvo as unknown as EscopoNotificacoes)
+    : undefined;
 }
 
 /**

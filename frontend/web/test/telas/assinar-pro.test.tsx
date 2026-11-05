@@ -18,7 +18,8 @@ const PLANO = {
   assinatura: null,
 };
 const FATURA = 'https://sandbox.asaas.com/i/pay_000001';
-const MENSAGEM_502 = 'Não foi possível falar com o sistema de pagamento. Tente de novo em instantes.';
+const MENSAGEM_502 =
+  'Não foi possível falar com o sistema de pagamento. Tente de novo em instantes.';
 
 let abrir: ReturnType<typeof vi.spyOn>;
 
@@ -96,7 +97,8 @@ describe('Assinar Pro', () => {
     const { container } = montar(() => json(201, { faturaUrl: FATURA }));
     await screen.findByLabelText('CPF');
     const campos = Array.from(container.querySelectorAll('form input')).map(
-      (i) => `${i.getAttribute('id')} ${i.getAttribute('autocomplete') ?? ''} ${i.getAttribute('name') ?? ''}`,
+      (i) =>
+        `${i.getAttribute('id')} ${i.getAttribute('autocomplete') ?? ''} ${i.getAttribute('name') ?? ''}`,
     );
     expect(campos).toHaveLength(2);
     expect(campos.join(' ')).not.toMatch(/cc-|cart|card|validade|cvv/i);

@@ -292,11 +292,7 @@ export function AcoesSituacao({
             Inativar
           </Botao>
         ) : (
-          <Botao
-            variante="secundario"
-            disabled={somenteLeitura}
-            onClick={() => abrir('reativar')}
-          >
+          <Botao variante="secundario" disabled={somenteLeitura} onClick={() => abrir('reativar')}>
             Reativar
           </Botao>
         )}

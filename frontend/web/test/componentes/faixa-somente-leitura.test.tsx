@@ -1,6 +1,9 @@
 import { cleanup, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
-import { FaixaSomenteLeitura, TITULO_SOMENTE_LEITURA } from '../../src/componentes/FaixaSomenteLeitura.tsx';
+import {
+  FaixaSomenteLeitura,
+  TITULO_SOMENTE_LEITURA,
+} from '../../src/componentes/FaixaSomenteLeitura.tsx';
 import { esperarSemViolacoes } from '../apoio/axe.ts';
 import { abrirTela, json, pendente } from '../apoio/tela.tsx';
 
@@ -57,7 +60,9 @@ describe('FaixaSomenteLeitura', () => {
   it('PLA-22: sem motivo, a faixa não aparece', async () => {
     const { chamadasA } = montar(() => json(200, { ...PLANO_FREE, somenteLeitura: null }));
     await waitFor(() => expect(chamadasA('GET', '/api/grupos/g1/plano')).toHaveLength(1));
-    await waitFor(() => expect(screen.getByRole('heading', { name: 'Tela do grupo' })).toBeDefined());
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Tela do grupo' })).toBeDefined(),
+    );
     expect(screen.queryByRole('status')).toBeNull();
     expect(screen.queryByText(TITULO_SOMENTE_LEITURA)).toBeNull();
   });

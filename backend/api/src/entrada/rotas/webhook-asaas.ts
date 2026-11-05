@@ -100,7 +100,10 @@ function centavosDoValor(valor: unknown): number | null {
 }
 
 /** A mensagem `cobranca` do evento já processado, ou `null` quando não há aviso. */
-export function avisoDoWebhook(corpo: AsaasEventoCorpo, resultado: unknown): MensagemCobranca | null {
+export function avisoDoWebhook(
+  corpo: AsaasEventoCorpo,
+  resultado: unknown,
+): MensagemCobranca | null {
   const aviso = AVISO_DO_EVENTO[corpo.event];
   if (aviso === undefined) return null;
   if (!ehResultadoComGrupo(resultado)) return null;
@@ -158,7 +161,10 @@ export function rotasWebhookAsaas(opcoes: OpcoesWebhookAsaas = {}): Hono<Ambient
     async (c, next) => {
       const recebido = c.req.header(HEADER_TOKEN_ASAAS);
       if (!(await tokenDoWebhookConfere(recebido, c.env.ASAAS_WEBHOOK_TOKEN))) {
-        registrar({ evento: 'webhook_asaas_recusado', comHeader: recebido !== undefined ? 'sim' : 'nao' });
+        registrar({
+          evento: 'webhook_asaas_recusado',
+          comHeader: recebido !== undefined ? 'sim' : 'nao',
+        });
         return c.json({ erro: 'nao_autorizado' }, 401);
       }
       await next();

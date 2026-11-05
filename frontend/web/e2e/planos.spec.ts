@@ -269,7 +269,10 @@ test('J-30 (PLA-57, PLA-59): a admin convidada vê o plano sem os botões', asyn
 
   // PLA-59: o início do grupo mostra "Meu plano" também para a convidada, e ele abre a tela.
   await o.goto(`/app/grupos/${grupo.id}`);
-  await o.getByRole('list', { name: 'Plano' }).getByRole('link', { name: /Meu plano/ }).click();
+  await o
+    .getByRole('list', { name: 'Plano' })
+    .getByRole('link', { name: /Meu plano/ })
+    .click();
   await expect(o).toHaveURL(new RegExp(`/app/grupos/${grupo.id}/plano$`));
 
   // PLA-57: o plano aparece, com o texto e sem assinar nem cancelar.

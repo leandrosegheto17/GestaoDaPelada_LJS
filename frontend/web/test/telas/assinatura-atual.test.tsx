@@ -7,7 +7,8 @@ import { abrirTela, json, type Manipulador } from '../apoio/tela.tsx';
 /** Meu plano: aguardando e cancelar (planos-e-cobranca T46; PLA-54, PLA-55, PLA-56; AD-115). */
 
 const FATURA = 'https://sandbox.asaas.com/i/pay_000002';
-const MENSAGEM_502 = 'Não foi possível falar com o sistema de pagamento. Tente de novo em instantes.';
+const MENSAGEM_502 =
+  'Não foi possível falar com o sistema de pagamento. Tente de novo em instantes.';
 const BASE = {
   plano: 'trial',
   situacao: 'trial',
@@ -93,7 +94,9 @@ describe('Assinatura atual', () => {
       'DELETE /api/grupos/g1/assinatura': () => json(204),
     });
     fireEvent.click(await screen.findByRole('button', { name: 'Cancelar assinatura' }));
-    fireEvent.click(within(await screen.findByRole('alertdialog')).getByRole('button', { name: 'Voltar' }));
+    fireEvent.click(
+      within(await screen.findByRole('alertdialog')).getByRole('button', { name: 'Voltar' }),
+    );
     expect(screen.queryByRole('alertdialog')).toBeNull();
     expect(chamadasA('DELETE', '/api/grupos/g1/assinatura')).toHaveLength(0);
   });

@@ -184,13 +184,25 @@ describe('DELETE …/assinatura', () => {
       auditorias: 1,
     });
 
-    const noDia = await pedir(cenario.grupoH, 'GET', cenario.contaB, '/plano', '2026-12-05T15:00:00Z');
+    const noDia = await pedir(
+      cenario.grupoH,
+      'GET',
+      cenario.contaB,
+      '/plano',
+      '2026-12-05T15:00:00Z',
+    );
     expect(planoResposta.parse(await noDia.json())).toMatchObject({
       plano: 'pro',
       situacao: 'cancelado',
       pagoAte: PAGO_ATE,
     });
-    const depois = await pedir(cenario.grupoH, 'GET', cenario.contaB, '/plano', '2026-12-06T15:00:00Z');
+    const depois = await pedir(
+      cenario.grupoH,
+      'GET',
+      cenario.contaB,
+      '/plano',
+      '2026-12-06T15:00:00Z',
+    );
     expect(planoResposta.parse(await depois.json())).toMatchObject({ plano: 'free' });
   });
 

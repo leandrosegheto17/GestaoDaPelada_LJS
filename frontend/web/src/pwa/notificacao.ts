@@ -45,7 +45,8 @@ export interface NotificacaoMontada {
 }
 
 const RANKING = /^\/g\/([a-z0-9-]{1,64})(?:\?mes=\d{4}-\d{2})?$/;
-const COBRANCA = /^\/app\/grupos\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\/plano$/;
+const COBRANCA =
+  /^\/app\/grupos\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\/plano$/;
 
 function opcoes(tag: string, dados: DadosNotificacao, texto?: string): OpcoesNotificacao {
   return {
@@ -104,7 +105,12 @@ export function destinoDoClique(dados: unknown, origem: string): string {
   if (!prefixo) return CAMINHO_PADRAO;
   if (!caminho.startsWith(prefixo) || caminho.includes('//') || caminho.includes('\\'))
     return CAMINHO_PADRAO;
-  if (caminho.split(/[?#]/)[0]!.split('/').some((s) => s === '..' || s === '.'))
+  if (
+    caminho
+      .split(/[?#]/)[0]!
+      .split('/')
+      .some((s) => s === '..' || s === '.')
+  )
     return CAMINHO_PADRAO;
   let url: URL;
   try {

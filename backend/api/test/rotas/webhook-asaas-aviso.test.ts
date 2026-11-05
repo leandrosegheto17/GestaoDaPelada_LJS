@@ -115,9 +115,10 @@ function esperado(
 
 async function estado() {
   const { db, cenario } = aberto;
-  const g = await db.query<{ s: string }>('SELECT situacao_comercial AS s FROM grupos WHERE id = $1', [
-    cenario.grupoH,
-  ]);
+  const g = await db.query<{ s: string }>(
+    'SELECT situacao_comercial AS s FROM grupos WHERE id = $1',
+    [cenario.grupoH],
+  );
   const a = await db.query<{ situacao: string; pago_ate: string | null }>(
     `SELECT situacao, pago_ate::text AS pago_ate FROM assinaturas WHERE asaas_assinatura_id = $1`,
     [SUB],
@@ -181,7 +182,8 @@ describe('aviso de cobrança no webhook (T22)', () => {
   it('NOT-38: PAYMENT_RECEIVED enfileira pagamento_confirmado', async () => {
     await preparar('trial', 'aguardando_pagamento');
     expect(
-      (await enviar(pagamento('evt_t22_recebido', 'PAYMENT_RECEIVED', '2026-11-05 12:00:00'))).status,
+      (await enviar(pagamento('evt_t22_recebido', 'PAYMENT_RECEIVED', '2026-11-05 12:00:00')))
+        .status,
     ).toBe(200);
     expect(fila.enviadas).toEqual([{ corpo: esperado('pagamento_confirmado') }]);
   });
@@ -205,7 +207,9 @@ describe('aviso de cobrança no webhook (T22)', () => {
     );
     expect(r.status).toBe(200);
     expect(fila.enviadas).toEqual([
-      { corpo: esperado('pagamento_atrasado', { idExterno: 'pay_t22_2', vencimento: '2026-12-05' }) },
+      {
+        corpo: esperado('pagamento_atrasado', { idExterno: 'pay_t22_2', vencimento: '2026-12-05' }),
+      },
     ]);
   });
 
@@ -294,7 +298,9 @@ describe('aviso de cobrança no webhook (T22)', () => {
   it('NOT-40: vencimento fora de AAAA-MM-DD não enfileira', async () => {
     await preparar('trial', 'aguardando_pagamento');
     await enviar(
-      pagamento('evt_t22_sem_data', 'PAYMENT_CREATED', '2026-11-05 12:00:00', { dueDate: '05/11/2026' }),
+      pagamento('evt_t22_sem_data', 'PAYMENT_CREATED', '2026-11-05 12:00:00', {
+        dueDate: '05/11/2026',
+      }),
     );
     expect(fila.enviadas).toEqual([]);
   });
