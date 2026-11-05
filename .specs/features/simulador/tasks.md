@@ -532,6 +532,9 @@ T53 → T54
 **Depends on**: T7
 **Reuses**: `chaveDe` de `L:backend/dominio/src/simulador/distribuicao-dois.ts:61-106`; `mediaInteira` e `idadeNaData` (T2); `S:169-170`, `S:346`
 **Requirement**: SIM-29, SIM-30, SIM-51, SIM-95
+**Status**: rascunhada
+**Nota do rascunho**: a chave recebe o elenco em vetores indexados pela ordem de prioridade (`elencoDois`); `TimeDois` e `ComposicaoDois` nascem aqui.
+**Lacunas**: idade média nula num dos times (ninguém com ano) contra outro com idade: o critério (4) vale 0 (`chave-dois.ts`, `[LACUNA]`).
 
 **Done when**:
 
