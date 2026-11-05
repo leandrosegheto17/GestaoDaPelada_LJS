@@ -15,6 +15,7 @@ import estilos from '../acesso.module.css';
 import modulo from '../grupos-elenco.module.css';
 import { rotaDoGrupo } from '../grupos/Grupos.tsx';
 import fin from './financeiro.module.css';
+import { ListaPagamentos } from './ListaPagamentos.tsx';
 
 /**
  * Financeiro do mês (`/app/grupos/:grupoId/financeiro[?mes=AAAA-MM]`, t22; FIN-07, FIN-08, FIN-15, FIN-33, FIN-46), de
@@ -23,7 +24,7 @@ import fin from './financeiro.module.css';
  *   navegação da API fica desabilitado (FIN-07);
  * - saldo atual, entradas, saídas, resultado e "Não pagaram N jogadores" (FIN-11, FIN-15), em reais por
  *   `formatarReais` (saída e resultado negativo com "−");
- * - pagamentos do mês (cada ativo com "Pagou" ou "Não pagou"; marcar e desmarcar são da T39) e lançamentos do mês com o
+ * - pagamentos do mês com o interruptor de marcar e desmarcar (`ListaPagamentos`, T39) e lançamentos do mês com o
  *   link de edição (a linha agrupada das mensalidades é da T40); "Nenhum lançamento neste mês." sem lançamentos;
  * - ações "Configurar caixa" e "Novo lançamento";
  * - sem configuração: "Caixa não configurado" com "Configurar caixa" (FIN-08);
@@ -130,7 +131,17 @@ export function ItemLancamento({ l, base }: { l: LancamentoDoMes; base: string }
   );
 }
 
-function Mes({ dados, base, aoIr }: { dados: MesFinanceiroResposta; base: string; aoIr: (mes: string) => void }) {
+function Mes({
+  grupoId,
+  dados,
+  base,
+  aoIr,
+}: {
+  grupoId: string;
+  dados: MesFinanceiroResposta;
+  base: string;
+  aoIr: (mes: string) => void;
+}) {
   const { config, resumoMes, saldoAtualCentavos } = dados;
   if (config === null || resumoMes === null || saldoAtualCentavos === null) {
     return (
@@ -173,11 +184,7 @@ function Mes({ dados, base, aoIr }: { dados: MesFinanceiroResposta; base: string
           <h2 id="pag" className={estilos.subtitulo}>
             {titulo}
           </h2>
-          <Lista>
-            {dados.pagamentos.map((p) => (
-              <ItemLista key={p.jogadorId} titulo={p.apelido} lateral={<span className={modulo['item-lado']}>{p.pagou ? 'Pagou' : 'Não pagou'}</span>} />
-            ))}
-          </Lista>
+          <ListaPagamentos grupoId={grupoId} dados={dados} />
         </section>
         <section aria-labelledby="lan">
           <h2 id="lan" className={estilos.subtitulo}>
@@ -251,7 +258,7 @@ export function FinanceiroMes() {
       }
       return <EstadoErro aoTentarDeNovo={() => void consulta.refetch()} />;
     }
-    return <Mes dados={consulta.data} base={base} aoIr={(m) => setBusca({ mes: m })} />;
+    return <Mes grupoId={grupoId} dados={consulta.data} base={base} aoIr={(m) => setBusca({ mes: m })} />;
   }
 
   const semConfig = consulta.isSuccess && consulta.data.config === null;

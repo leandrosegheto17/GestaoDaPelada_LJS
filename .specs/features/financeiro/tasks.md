@@ -1325,6 +1325,8 @@ T47 → T48
 **Depends on**: T38
 **Reuses**: `t22-financeiro--{desmarcar,erro-pagamento}.html`; `Dialogo` e `Faixa` (`CA:1286`)
 **Requirement**: FIN-24
+**Status**: rascunhada
+**Nota do rascunho**: `ListaPagamentos` entra na t22 no lugar da lista simples da T38. A entrada do diálogo sai do lançamento do mês com `mensalidade` e a descrição "Mensalidade <apelido> MM/AAAA"; sem ele, a mensalidade configurada. Lacunas: a resposta do mês não liga pagamento a lançamento, e a spec não define o texto do diálogo para pagamento sem entrada (sai só o título) nem a mensagem da falha ao desmarcar (sai a mensagem da API na faixa); ver `[LACUNA]` em `ListaPagamentos.tsx`.
 
 **Done when**:
 
