@@ -10,3 +10,5 @@ export * from './publico.ts';
 export * from './push.ts';
 export * from './plano.ts';
 export * from './asaas.ts';
+export * from './simulador.ts';
+export * from './escalacao.ts';

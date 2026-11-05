@@ -945,6 +945,8 @@ T53 → T54
 **Depends on**: T22
 **Reuses**: `L:backend/contrato/src/simulador/escalacao.ts`; `L:backend/api/src/aplicacao/simulador/composicao.ts:4-11`; `S:272`, `S:345`
 **Requirement**: SIM-67, SIM-82, SIM-94
+**Status**: rascunhada
+**Nota do rascunho**: `composicaoDois`, `composicaoVarios`, `Escalada` e `idsDaComposicao` ficaram no `simulador.ts` (T22); aqui `composicaoGravada` os reúne por formato. O `index.ts` e o `package.json` do contrato passam a exportar `simulador` e `escalacao`.
 
 **Done when**:
 

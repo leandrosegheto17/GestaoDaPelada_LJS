@@ -13,6 +13,8 @@
     "./grupo": "./src/grupo.ts",
     "./elenco": "./src/elenco.ts",
     "./periodos": "./src/periodos.ts",
+    "./simulador": "./src/simulador.ts",
+    "./escalacao": "./src/escalacao.ts",
     "./pesos": "./src/pesos.ts",
     "./partidas": "./src/partidas.ts",
     "./publico": "./src/publico.ts",
