@@ -427,6 +427,8 @@ T81 → T82
 **Depends on**: T5
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-54
+**Status**: rascunhada
+**Nota do rascunho**: o `testes.json` tinha o comando final da versão removida; volta ao da T6 e cresce nas T10, T24, T58 e T62. A `trava-testes.py --rodar` fica para o /executar.
 
 **Done when**:
 
