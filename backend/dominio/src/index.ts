@@ -166,3 +166,12 @@ export {
   type ResultadoRanking,
 } from './ranking/calcular.ts';
 export { limitesDeMes, mesNoHistorico, navegacaoDeMes, type LimitesDeMes, type Navegacao } from './ranking/navegacao.ts';
+export {
+  calcularPdf,
+  escolherColunasPdf,
+  MAX_COLUNAS_PDF,
+  type ColunaPdf,
+  type ColunasPdf,
+  type LinhaPdf,
+  type ProjecaoPdf,
+} from './pdf/calcular.ts';

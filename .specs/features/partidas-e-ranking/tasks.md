@@ -784,6 +784,7 @@ T78 → T79
 **Depends on**: T12
 **Reuses**: `B:322-325` (PAR-96 a PAR-99), `B:63-64`, casos `B:498-499`
 **Requirement**: PAR-96, PAR-97, PAR-98, PAR-99
+**Status**: rascunhada
 
 **Done when**:
 
