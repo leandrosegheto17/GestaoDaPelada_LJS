@@ -591,6 +591,8 @@ T53 → T54
 **Depends on**: T9
 **Reuses**: `L:backend/dominio/src/simulador/distribuicao-varios.ts:10` (60 aptos), `:70-82` (vaivém); `S:186-190`, Independent Test `S:193`
 **Requirement**: SIM-33, SIM-34, SIM-35, SIM-37
+**Status**: rascunhada
+**Nota do rascunho**: `montarVariosTimes(elenco, n)` recebe o elenco (T2) e devolve `{ times, incompleto }`; `MAX_APTOS_SIMULADOR` (60) nasce aqui.
 
 **Done when**:
 
