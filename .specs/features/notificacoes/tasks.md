@@ -1166,6 +1166,8 @@ T39 → T40 → T41
 **Depends on**: T32
 **Reuses**: ensaio da `partidas-e-ranking` (`PR:1684`); restauração (`F:584`); `lerEsquema` e referência (`F:736`, `F:784`); zero DDL (`F:834`); AD-033, AD-073
 **Requirement**: NOT-49
+**Status**: rascunhada
+**Nota do rascunho**: o `ensaio-migracao.ts` já existia (financeiro T15 em diante); ganhou o passo 9 (`conferirPush`: com a `notificacoes-tabelas` aplicada, as 3 tabelas existem e estão vazias depois da segunda execução, pela contagem crua) e a linha no relatório impresso. Teste do ensaio sobre um dump simulado em `backend/scripts/test/ensaio-migracao-notificacoes.test.ts`, no molde do da planos-e-cobranca. Falta o ensaio real com o backup cifrado da produção (pausa para o usuário) e a `Evidência` abaixo, que são do `/executar`.
 
 **Done when**:
 

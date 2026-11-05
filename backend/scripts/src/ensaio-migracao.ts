@@ -39,6 +39,10 @@ import { exigirHostPermitido, HOSTS_LOCAIS } from './host.ts';
  *    depois, sem nome (só id e slug). Quando a `planos-cortesia` é aplicada no ensaio, dos grupos que eram
  *    `uso_proprio` só o do slug do grupo de teste continua `uso_proprio`; os demais ficam `trial` com a data do ensaio
  *    (São Paulo); quem já tinha outra situação não muda. Nenhuma tabela muda de contagem (passo 2).
+ * 9. tabelas do push (notificacoes T33; NOT-49; AD-033, AD-073): quando a `notificacoes-tabelas` é aplicada no ensaio,
+ *    `push_ranking`, `push_conta` e `avisos_cobranca` existem e estão vazias depois de migrar e depois da segunda
+ *    execução (as migrações não semeiam assinatura nem aviso). Sem a migração no ensaio, nada a conferir. As funções,
+ *    a trigger da exclusão de conta, os grants e as policies delas são conferidos pela referência do passo 3.
  */
 
 export class ErroEnsaio extends Error {
@@ -110,6 +114,42 @@ export interface MudancaDoEsquema {
   novas: string[];
 }
 
+/** Sufixo da migração das tabelas do push (notificacoes T7). */
+const MIGRACAO_NOTIFICACOES = '_notificacoes-tabelas';
+
+/** As 3 tabelas da notificacoes, que nascem vazias (NOT-49). */
+export const TABELAS_DO_PUSH = ['push_ranking', 'push_conta', 'avisos_cobranca'] as const;
+
+export interface PushNoEnsaio {
+  /** A `notificacoes-tabelas` foi aplicada neste ensaio. */
+  aplicada: boolean;
+  /** Linhas de cada tabela do push depois da segunda execução (vazio sem a migração). */
+  linhas: Record<string, number>;
+  /** O que destoa do passo 9; vazio = ok. */
+  problemas: string[];
+}
+
+/** O passo 9 sobre a contagem depois da segunda execução. */
+export function conferirPush(
+  aplicadas: readonly string[],
+  contagem: Record<string, number>,
+): PushNoEnsaio {
+  const aplicada = aplicadas.some((n) => n.replace(/\.sql$/, '').endsWith(MIGRACAO_NOTIFICACOES));
+  if (!aplicada) return { aplicada, linhas: {}, problemas: [] };
+  const linhas: Record<string, number> = {};
+  const problemas: string[] = [];
+  for (const tabela of TABELAS_DO_PUSH) {
+    const n = contagem[tabela];
+    if (n === undefined) {
+      problemas.push(`${tabela}: não existe depois de migrar`);
+      continue;
+    }
+    linhas[tabela] = n;
+    if (n !== 0) problemas.push(`${tabela}: ${n} linhas, esperado vazia`);
+  }
+  return { aplicada, linhas, problemas };
+}
+
 export interface RelatorioEnsaio {
   aplicadas: string[];
   antes: Record<string, number>;
@@ -122,6 +162,7 @@ export interface RelatorioEnsaio {
   pesos: PesosNoEnsaio;
   mudancaDoEsquema: MudancaDoEsquema;
   planos: PlanosNoEnsaio;
+  push: PushNoEnsaio;
   ok: boolean;
 }
 
@@ -347,6 +388,9 @@ export async function ensaiar(url: string, opcoes: OpcoesEnsaio = {}): Promise<R
   if (JSON.stringify(depoisDaSegunda) !== JSON.stringify(depois))
     tabelasAlteradas.push('segunda execução mudou linhas');
 
+  // A contagem crua (sem `semIgnoradas`): as tabelas do push precisam aparecer mesmo vazias.
+  const push = conferirPush(aplicadas, await contarLinhas(url));
+
   const amostra = await escolherAmostra(url);
   const ok =
     tabelasAlteradas.length === 0 &&
@@ -355,7 +399,8 @@ export async function ensaiar(url: string, opcoes: OpcoesEnsaio = {}): Promise<R
     segundaExecucao.length === 0 &&
     amostraOk(amostra) &&
     pesosOk(pesos, aplicadas) &&
-    planos.problemas.length === 0;
+    planos.problemas.length === 0 &&
+    push.problemas.length === 0;
   return {
     aplicadas,
     antes,
@@ -367,6 +412,7 @@ export async function ensaiar(url: string, opcoes: OpcoesEnsaio = {}): Promise<R
     pesos,
     mudancaDoEsquema: mudanca,
     planos,
+    push,
     ok,
   };
 }
@@ -447,6 +493,14 @@ function imprimir(r: RelatorioEnsaio): void {
       `  ${g.grupoId}: ${g.antes} → ${g.depois}${g.trialInicioDepois ? ` (${g.trialInicioDepois})` : ''}`,
     );
   for (const problema of pl.problemas) console.log(`  ! ${problema}`);
+  console.log(
+    r.push.aplicada
+      ? `Tabelas do push: ${Object.entries(r.push.linhas)
+          .map(([t, n]) => `${t} ${n}`)
+          .join(', ')}`
+      : 'Tabelas do push: a notificacoes-tabelas não foi aplicada neste ensaio',
+  );
+  for (const problema of r.push.problemas) console.log(`  ! ${problema}`);
   console.log(r.ok ? 'Ensaio ok.' : 'Ensaio com problemas: não faça o deploy da prévia.');
 }
 
