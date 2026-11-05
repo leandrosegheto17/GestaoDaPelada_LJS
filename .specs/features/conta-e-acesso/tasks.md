@@ -1591,6 +1591,9 @@ T57 → T58
 **Depends on**: T48
 **Reuses**: `.specs/mockup/telas/t31-convite--*.html` (5 estados); `Campo` somente leitura (T39); destino da AD-022 proposta
 **Requirement**: ACE-33, ACE-34, ACE-35, ACE-36, ACE-56
+**Status**: rascunhada
+**Nota do rascunho**: o token é lido num ref e o `ler` fica guardado em outro (StrictMode). O estado vem da leitura e de `useSessao()`: com sessão no e-mail do convite, aceitar; com sessão em outro e-mail (ou 403 no aceitar), o aviso com "Sair e entrar com outra conta" (`POST /api/sessao/sair` e ida a `/entrar`); sem sessão, o cadastro com o e-mail travado. Validação e textos de erro reaproveitam os do `Cadastro` (T44). Depois de aceitar ou cadastrar, invalida a sessão e vai a `/app/grupos/:grupoId/admins` (AD-022).
+**Lacunas**: sem sessão e com conta já existente no e-mail do convite, o mockup não tem estado; o rascunho pede para entrar com essa conta e abrir o link de novo (o token não sobrevive ao login). O 409 do `cadastrar` (conta criada entre o ler e o cadastrar) só mostra a mensagem da API na faixa de erro.
 
 **Done when**:
 

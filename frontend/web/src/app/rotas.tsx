@@ -2,14 +2,13 @@ import type { RouteObject } from 'react-router';
 import { NaoEncontrada, PaginaProvisoria } from '../paginas/Mensagens.tsx';
 import {
   AdminsGrupo,
-  Convite,
   InicioApp,
   MinhaConta,
   MinhaSenha,
 } from '../paginas/acesso/provisorias.tsx';
 import { GuardaApp, GuardaPublica } from './guarda.tsx';
-import { Privacidade } from '../telas/termos/Termos.tsx';
-import { Termos } from '../telas/termos/Termos.tsx';
+import { Convite } from '../telas/convite/Convite.tsx';
+import { Privacidade, Termos } from '../telas/termos/Termos.tsx';
 import { NovaSenha } from '../telas/nova-senha/NovaSenha.tsx';
 import { Esqueci } from '../telas/esqueci/Esqueci.tsx';
 import { Confirmar } from '../telas/confirmar/Confirmar.tsx';
