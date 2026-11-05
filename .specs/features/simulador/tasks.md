@@ -699,6 +699,8 @@ T53 → T54
 **Depends on**: T13
 **Reuses**: `L:backend/dominio/src/simulador/avisos.ts:61-73` (N alternativos) e textos de `L:backend/api/src/aplicacao/simulador/textos-avisos.ts`; `S:208-212`, Independent Test `S:214`
 **Requirement**: SIM-42, SIM-43, SIM-44, SIM-45, SIM-46, SIM-90
+**Status**: rascunhada
+**Nota do rascunho**: duas funções, `avisosDoisTimes` e `avisosVariosTimes`, devolvendo `{ tipo, texto }`. O exemplo "2 'só 1º' e 1 reserva … com o plural" dá 1 jogador pela regra de SIM-42 (titulares "só 1º" − reservas); o teste do plural usa 3 e 1.
 
 **Done when**:
 
