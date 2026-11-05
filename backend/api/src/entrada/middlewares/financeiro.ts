@@ -2,6 +2,7 @@ import type { Hono, MiddlewareHandler } from 'hono';
 import { sql } from 'kysely';
 import { MENSAGENS_ERRO_FINANCEIRO } from '@pelada/contrato';
 import type { Ambiente } from '../ambiente.ts';
+import { exigirRecursoNaEscrita } from './recurso.ts';
 
 /**
  * Permissão do financeiro (financeiro T23; FIN-33; AD-077). Ordem na cadeia de `/api/grupos/:grupoId/*`:
@@ -37,7 +38,12 @@ export const CAMINHOS_DO_FINANCEIRO = [
   '/grupos/:grupoId/admins/:contaId/financeiro',
 ] as const;
 
-/** Liga `exigirFinanceiro` nos caminhos do financeiro; chamado pelo `criarApp` depois da cadeia das rotas de grupo. */
+/**
+ * Liga `exigirFinanceiro` e, depois dele, a trava de plano nas escritas (`exigirRecursoNaEscrita('financeiro')`, T24)
+ * nos caminhos do financeiro; chamado pelo `criarApp` depois da cadeia das rotas de grupo.
+ */
 export function travarFinanceiro(api: Hono<Ambiente>): void {
-  for (const caminho of CAMINHOS_DO_FINANCEIRO) api.use(caminho, exigirFinanceiro);
+  for (const caminho of CAMINHOS_DO_FINANCEIRO) {
+    api.use(caminho, exigirFinanceiro, exigirRecursoNaEscrita('financeiro'));
+  }
 }

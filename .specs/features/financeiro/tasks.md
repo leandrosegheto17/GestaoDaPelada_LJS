@@ -925,6 +925,8 @@ T47 → T48
 **Depends on**: T23
 **Reuses**: `recursoLiberado` da `simulador` (SIM-68, `SIM:273`; caminho e injeção no `tasks.md` dela, conferir ao abrir o lote: se não existir, criá-lo aqui e registrar no commit); contrato da feature 7 (`.specs/features/planos-e-cobranca/spec.md:79`, `:135`); AD-051
 **Requirement**: FIN-45, FIN-50
+**Status**: rascunhada
+**Nota do rascunho**: `SPEC_DEVIATION`: sem arquivo `middlewares/plano.ts`; o ponto único da simulador mora em `middlewares/recurso.ts`, e lá entraram o recurso `financeiro` no `RecursoPro` e o `exigirRecursoNaEscrita`. O `travarFinanceiro` (T23) liga os dois em sequência nos caminhos do financeiro. O "rg situacao_comercial" virou um teste que lê `rotas/financeiro*` e `middlewares/financeiro.ts`.
 
 **Done when**:
 

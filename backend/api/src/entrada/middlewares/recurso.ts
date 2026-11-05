@@ -15,8 +15,8 @@ import type { Ambiente } from '../ambiente.ts';
  * trava (403 `plano_pro`), antes da rota. Corpo do 403 na forma da AD-091: `{ erro: 'plano_pro', recurso, mensagem }`.
  */
 
-/** Recursos do plano Pro que já têm trava na API. A `financeiro` acrescenta o dela (AD-074). */
-export type RecursoPro = 'simulador';
+/** Recursos do plano Pro que já têm trava na API. O `financeiro` trava só as escritas (AD-074, financeiro T24). */
+export type RecursoPro = 'simulador' | 'financeiro';
 
 export type RecursoLiberado = (db: Db, grupoId: string, recurso: RecursoPro) => Promise<boolean>;
 
@@ -32,6 +32,23 @@ export function exigirRecurso(recurso: RecursoPro): MiddlewareHandler<Ambiente> 
     const liberado = await c.var.recursoLiberado(c.var.db, grupoId, recurso);
     if (!liberado) return c.json({ erro: 'plano_pro', recurso, mensagem: MENSAGEM_PLANO_PRO }, 403);
     await next();
+  };
+}
+
+/**
+ * A mesma trava, só nas escritas (financeiro T24; FIN-45, FIN-50; AD-074): GET e HEAD passam sem consultar o ponto
+ * único, e o grupo em "somente leitura" continua lendo o caixa. Nas outras, recurso negado responde 403 `plano_pro`
+ * com o recurso, antes da rota e sem gravar nada.
+ */
+export function exigirRecursoNaEscrita(recurso: RecursoPro): MiddlewareHandler<Ambiente> {
+  const travar = exigirRecurso(recurso);
+  return async (c, next) => {
+    const metodo = c.req.method.toUpperCase();
+    if (metodo === 'GET' || metodo === 'HEAD') {
+      await next();
+      return;
+    }
+    return travar(c, next);
   };
 }
 
