@@ -1565,6 +1565,8 @@ T57 → T58
 **Depends on**: T47
 **Reuses**: `.specs/mockup/telas/t33-termos--pagina.html` e `t07-privacidade--pagina.html`; `TERMOS_VERSAO` (T12)
 **Requirement**: ACE-58, ACE-60
+**Status**: rascunhada
+**Nota do rascunho**: as duas páginas em `src/telas/termos/Termos.tsx` (`Termos` e `Privacidade`), com o texto do mockup marcado como RASCUNHO do agente para revisão do usuário (não é texto jurídico revisado). `TEXTO_EM_RASCUNHO = true` liga o selo; ao aprovar, o usuário troca para `false` e atualiza `TERMOS_VERSAO`. O "Voltar" de termos vai a `/cadastro` (mockup) e o de privacidade a `/` (o mockup vai ao ranking, que ainda não existe).
 
 **Done when**:
 

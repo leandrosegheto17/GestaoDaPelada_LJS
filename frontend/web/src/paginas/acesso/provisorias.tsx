@@ -11,8 +11,6 @@ function Pendente({ titulo }: { titulo: string }) {
 }
 
 export const Convite = () => <Pendente titulo="Convite" />;
-export const Termos = () => <Pendente titulo="Termos de uso" />;
-export const Privacidade = () => <Pendente titulo="Aviso de privacidade" />;
 export const InicioApp = () => <Pendente titulo="Seus grupos" />;
 export const MinhaConta = () => <Pendente titulo="Minha conta" />;
 export const MinhaSenha = () => <Pendente titulo="Minha senha" />;
