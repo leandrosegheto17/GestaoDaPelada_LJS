@@ -1352,6 +1352,9 @@ T53 → T54
 **Depends on**: T37
 **Reuses**: Estender `GET partidas/nova` (`PR:1436`, T39); T24, T29; `L:backend/api/src/aplicacao/partidas/nova.ts:51-58`
 **Requirement**: SIM-75, SIM-76, SIM-78, SIM-88
+**Status**: rascunhada
+**Nota do rascunho**: a rota usa `escalacoes.idsNaData` (T29) sobre os `ativosNaData` de antes: só ativos aparecem (SIM-88), `presente` quem está na escalação. O teste existente de `PR:1436` (`partidas-leitura.test.ts:84`) já espera `preMarcadaPelaEscalacao: false` sem escalação e continua valendo sem mudança. Testes novos em `test/rotas/partidas-pre-marcada.test.ts`.
+**Lacunas**: escalação válida sem nenhum id ativo na data: a marca fica verdadeira com todos `ausente` (a escalação existe); a Base não diz. O /executar confirma.
 
 **Done when**:
 

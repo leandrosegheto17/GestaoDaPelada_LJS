@@ -19,6 +19,7 @@ import { compararApelido, compararDatas, compararMeses, dataSugeridaPartida, mes
 import type { Ambiente } from '../ambiente.ts';
 import { erroDeCampos, mensagensDoZod, respostaDeCampo, type Leitura } from '../corpo.ts';
 import { grupos } from '../../infraestrutura/db/repositorios/grupos.ts';
+import { escalacoes } from '../../infraestrutura/db/repositorios/escalacoes.ts';
 import { jogadores } from '../../infraestrutura/db/repositorios/jogadores.ts';
 import { partidas } from '../../infraestrutura/db/repositorios/partidas.ts';
 
@@ -39,7 +40,11 @@ import { partidas } from '../../infraestrutura/db/repositorios/partidas.ts';
  * - navegação do mês da primeira partida ao de hoje, nula nos dois lados sem partida (PAR-41);
  * - mês antes da primeira partida (não há link para ele, mas a URL pode pedir): lista vazia, sem `mesAnterior`.
  *
- * `preMarcadaPelaEscalacao` (contrato da simulador, SIM-75): falso aqui; a pré-marcação pela escalação é da simulador.
+ * Pré-marcação pela escalação (simulador T38; SIM-75, SIM-76, SIM-78, SIM-88): com escalação válida na data, os
+ * ativos que estão nela vêm `presente` e os demais `ausente`, com `preMarcadaPelaEscalacao` verdadeiro; sem escalação
+ * ou com escalação inválida (SIM-94), todos `ausente` e falso. A edição (`GET …/partidas/:data`) não muda (SIM-78).
+ * [LACUNA] escalação válida em que nenhum id é ativo na data: a Base não diz; aqui a marca fica verdadeira (a escalação
+ * existe) com todos `ausente`. O /executar confirma.
  */
 
 /**
@@ -104,15 +109,23 @@ export function rotasPartidas(): Hono<Ambiente> {
     if (await partidas.ler(c.var.db, grupoId, data)) return respostaPartidaJaExiste(c, data);
 
     const ativos = await jogadores.ativosNaData(c.var.db, grupoId, data);
+    // Pré-marcação pela escalação da data (simulador T38; SIM-75, SIM-76, SIM-88): só os ativos na data entram, então
+    // o jogador da escalação inativado depois dela não aparece; sem escalação ou com JSON inválido, como antes.
+    const escalados = await escalacoes.idsNaData(c.var.db, grupoId, data);
+    const naEscalacao = new Set(escalados ?? []);
     const resposta: PartidaNova = {
       data,
       dataSugerida,
       hoje,
       choveu: false,
-      preMarcadaPelaEscalacao: false,
+      preMarcadaPelaEscalacao: escalados !== null,
       jogadores: [...ativos]
         .sort((a, b) => compararApelido(a.apelido, b.apelido) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
-        .map((j) => ({ id: j.id, apelido: j.apelido, situacao: 'ausente' as const })),
+        .map((j) => ({
+          id: j.id,
+          apelido: j.apelido,
+          situacao: naEscalacao.has(j.id) ? ('presente' as const) : ('ausente' as const),
+        })),
     };
     return c.json(resposta, 200);
   });
