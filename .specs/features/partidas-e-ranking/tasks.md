@@ -2302,6 +2302,8 @@ T78 → T79
 **Depends on**: T67
 **Reuses**: `.specs/mockup/telas/p01-pdf--{sucesso,mes-vazio}.html` e `telas.json:286-288`; fontes TTF em `public/fontes/pdf/` (`BD:276-277`); T50
 **Requirement**: PAR-103, PAR-104
+**Status**: rascunhada
+**Nota do rascunho**: a folha é um modelo puro em `pdf/folha.ts` (`montarFolha`: elementos por página, em pt; ajuste de 8,5 a 7 pt; cabeçalho, tabela com meses, divisas, marcas com "L", "E", tracejado e "–", legenda e rodapé) e `pdf/gerar-pdf.ts` só a desenha com o `jspdf` de `import()` dinâmico (`carregarJspdf`, `preCarregarJspdf`). Sem as TTF, Helvetica com os caracteres fora do WinAnsi em ASCII. Pendências para o `/executar`: (1) as TTF de `public/fontes/pdf/` (`Barlow-Regular`, `Barlow-SemiBold`, `BarlowCondensed-Bold`, `BarlowCondensed-ExtraBold`) não existem na v2; baixar das mesmas fontes do `.specs/mockup/fontes/baixar-fontes.mjs` (OFL) antes da T77; (2) o `jspdf` entrou no `package.json` como `4.2.1` (a do legado), sem `pnpm install`: a T50 confere o audit e o advisory e fixa a versão final.
 
 **Done when**:
 
