@@ -13,6 +13,7 @@
     "test": "vitest run --dir test && pnpm -r test",
     "restaurar": "node --env-file-if-exists=.env backend/scripts/ops/restaurar-backup.ts",
     "migrar": "node --env-file-if-exists=.env backend/scripts/src/migrar.ts",
+    "seed": "node --env-file-if-exists=.env backend/scripts/src/seed.ts",
     "esquema:gerar": "node --env-file-if-exists=.env backend/scripts/src/esquema-gerar.ts",
     "test:checagens": "pnpm --filter @pelada/scripts exec vitest run checagens",
     "migracao:nova": "node backend/scripts/src/migracao-nova.ts"
