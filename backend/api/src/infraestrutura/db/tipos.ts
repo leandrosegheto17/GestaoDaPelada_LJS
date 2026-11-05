@@ -125,6 +125,27 @@ export interface TabelaPagamentosMes {
   marcado_em: ColumnType<Date, Date | string, never>;
 }
 
+/**
+ * Escalação confirmada (T26 da simulador; SIM-67), de `M:1792843200000_linha-de-base.sql:216-228`. Gravável pelo
+ * `INSERT … ON CONFLICT (grupo_id, data) DO UPDATE` (SIM-69): `grupo_id` e `data` nunca mudam. `k` nulo = ilimitado em
+ * 2 times e sempre nulo em 3+. `composicao` é `jsonb`: lida como `unknown` (a forma é conferida por `lerComposicao` do
+ * contrato, SIM-94) e escrita como o texto do JSON.
+ *
+ * O tipo `escalacao_confirmada` de `eventos_uso` não entra aqui: `eventos_uso` é tipada pela T80 da partidas-e-ranking
+ * (só inserção); até lá o INSERT do evento usa o `sql` do Kysely.
+ */
+export interface TabelaEscalacoes {
+  id: Generated<string>;
+  grupo_id: ColumnType<string, string, never>;
+  data: ColumnType<string, string, never>;
+  formato: 'dois_times' | 'varios_times';
+  n: number;
+  k: number | null;
+  composicao: ColumnType<unknown, string, string>;
+  confirmada_por: string;
+  confirmada_em: Instante;
+}
+
 /** Tabelas tipadas do Kysely da requisição. As outras continuam pelo `sql` do Kysely. */
 export interface Banco {
   grupos: TabelaGrupos;
@@ -137,6 +158,7 @@ export interface Banco {
   pagamentos_mes: TabelaPagamentosMes;
   config_financeira: TabelaConfigFinanceira;
   lancamentos: TabelaLancamentos;
+  escalacoes: TabelaEscalacoes;
 }
 
 type Colunas<T> = { readonly [K in keyof T]-?: string };
@@ -201,6 +223,17 @@ export const COLUNAS_TIPADAS = {
     alterado_por: 'uuid',
     alterado_em: 'timestamptz',
   },
+  escalacoes: {
+    id: 'uuid',
+    grupo_id: 'uuid',
+    data: 'date',
+    formato: 'text',
+    n: 'int2',
+    k: 'int2',
+    composicao: 'jsonb',
+    confirmada_por: 'uuid',
+    confirmada_em: 'timestamptz',
+  },
 } as const satisfies { readonly [T in keyof Banco]: Colunas<Banco[T]> };
 
 /** Colunas que o tipo declara anuláveis (`| null` na leitura); o teste confere `is_nullable`. */
@@ -210,4 +243,5 @@ export const COLUNAS_ANULAVEIS: Readonly<Partial<Record<keyof Banco, readonly st
   periodos_ativos: ['fim'],
   pagamentos_mes: ['lancamento_id'],
   config_financeira: ['mensalidade_centavos'],
+  escalacoes: ['k'],
 };

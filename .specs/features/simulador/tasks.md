@@ -1024,6 +1024,8 @@ T53 → T54
 **Depends on**: T25
 **Reuses**: Estender `tipos.ts` (`GE:878`, `PR:1013`); colunas `M:1792843200000_linha-de-base.sql:194-228`
 **Requirement**: SIM-67
+**Status**: rascunhada
+**Nota do rascunho**: rascunhada antes da T25 (que depende da T1 e da migração da `partidas-e-ranking`). Só `escalacoes`: `eventos_uso` é tipada pela T80 da `partidas-e-ranking`, ainda não rascunhada; o INSERT do evento (T28) usa o `sql` do Kysely até lá. Teste próprio em `backend/api/test/banco/escalacoes-tipos.test.ts` (molde `financeiro-tipos.test.ts`).
 
 **Done when**:
 
