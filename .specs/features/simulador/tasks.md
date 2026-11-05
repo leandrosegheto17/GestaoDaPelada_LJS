@@ -475,6 +475,8 @@ T53 → T54
 **Depends on**: T5
 **Reuses**: `vagasDeReserva` de `L:backend/dominio/src/simulador/classificacao.ts:32-46`; `S:148-150`, `S:340`
 **Requirement**: SIM-21, SIM-22, SIM-23, SIM-89
+**Status**: rascunhada
+**Nota do rascunho**: a T5 (ordem de prioridade) ainda não foi rascunhada (depende da pontuação da partidas-e-ranking); `classificarDoisTimes` recebe a lista já ordenada e é genérica no tipo do apto.
 
 **Done when**:
 
