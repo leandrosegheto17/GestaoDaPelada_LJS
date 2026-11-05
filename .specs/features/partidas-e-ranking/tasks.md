@@ -1804,6 +1804,8 @@ T78 → T79
 **Depends on**: T81
 **Reuses**: `BD:315-318`; `vite-plugin-pwa` com `injectManifest` (`FD:123`)
 **Requirement**: PAR-141
+**Status**: rascunhada
+**Nota do rascunho**: sem arquivo a escrever: a tarefa é só rodar `pnpm audit --prod`, `pnpm audit` e `pnpm why deepmerge`, decidir e registrar a `Evidência`, tudo no `/executar` (o rascunho não roda nada).
 
 **Done when**:
 
