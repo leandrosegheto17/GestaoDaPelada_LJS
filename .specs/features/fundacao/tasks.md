@@ -2417,6 +2417,8 @@ T81 → T82
 **Depends on**: T80
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-40, FUN-54
+**Status**: rascunhada
+**Nota do rascunho**: push e conferência do `ci.yml` são ações externas, com confirmação, do `/executar`. O `testes.json` já roda lint, format, typecheck, testes, checagens, e2e (o script `e2e` faz o build antes, T58) e visual (T62); o `/executar` decide se o build do web entra como passo próprio para espelhar o job `web` do CI.
 
 **Done when**:
 
