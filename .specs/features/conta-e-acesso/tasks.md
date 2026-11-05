@@ -1145,6 +1145,8 @@ T57 → T58
 **Depends on**: T31
 **Reuses**: cenário de T0; `app.routes` do Hono da fundação (`F:1106`)
 **Requirement**: ACE-41, ACE-48
+**Status**: rascunhada
+**Nota do rascunho**: a tabela é por `MÉTODO caminho` do `app.routes` (sem os middlewares `ALL`). Rotas sem sessão (agem por token ou e-mail), `/health` e `/dev/emails` ficam como "não se aplica" com motivo; `GET /api/sessao`, sair, trocar senha, excluir, aceitar convite e as 4 de admins têm caso com a conta B e um retrato do grupo e da conta de A antes e depois. Também reprova linha da tabela sem rota.
 
 **Done when**:
 

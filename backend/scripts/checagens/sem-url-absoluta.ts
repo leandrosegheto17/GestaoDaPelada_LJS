@@ -14,7 +14,8 @@ export const RAIZ = join(import.meta.dirname, '..', '..', '..');
 
 export const PROIBIDOS: ReadonlyArray<[string, RegExp]> = [
   ['domínio do LJS', /ljssoftware\.com\.br/i],
-  ['workers.dev', /workers\.dev/i],
+  // O rótulo é montado para o texto deste arquivo não conter o domínio (a checagem passa sobre si mesma).
+  ['workers' + '.dev', /workers\.dev/i],
 ];
 
 /** Arquivos exatos que podem citar os domínios. */
