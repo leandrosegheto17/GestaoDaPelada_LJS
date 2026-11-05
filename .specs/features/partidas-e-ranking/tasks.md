@@ -1206,6 +1206,9 @@ T78 → T79
 **Depends on**: T27
 **Reuses**: Repositório de auditoria (`CA:844`); `BD:193-194`; `B:110-114`
 **Requirement**: PAR-01, PAR-02, PAR-03, PAR-04, PAR-05, PAR-09, PAR-142
+**Status**: rascunhada
+**Nota do rascunho**: `pesos.salvar` devolve `{ substituiu }` pelo `xmax` da linha do `ON CONFLICT`; `entidade` da auditoria é `config_pesos` com `entidade_id` = hoje. Testes em `backend/api/test/repositorios/pesos.test.ts` (G fica só com a configuração de 2026-01-01 do cenário, sem depender do relógio).
+**Lacunas**: (1) configuração com `vigente_desde` depois de hoje: o painel a ignora e o salvar não a toca (interpretação conservadora); (2) autora sem nome em `contas_nomes_do_grupo`: `registradoPor` vazio, sem rótulo inventado. O `/executar` pergunta antes de levar ao verde.
 
 **Done when**:
 
