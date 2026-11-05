@@ -1485,6 +1485,8 @@ T47 → T48
 **Depends on**: T44
 **Reuses**: Formato das entradas `real` (`telas.json:193`, AD-021); runner com `passos` e campos novos (`CA:1609`, `PR:2344`); AD-054
 **Requirement**: FIN-47
+**Status**: rascunhada
+**Nota do rascunho**: as 12 entradas (`telas.json:124-135`) passam a `real` com `acesso-sessao-leandro.json`, `elenco-grupo-quinta.json` e a resposta do mês; as 5 de `revisaoManual` (desmarcar, erro-pagamento, t23 erro e excluir, t24 erro) saem de lá e viram `passos`. O 422 do t23 ganhou `respostas/financeiro-erro-lancamento.json` no formato da API (o `adaptarCorpo` não converte `campos` em objeto do formato antigo, então o `erro-validacao-lancamento.json` não marcaria os campos), com os textos do mockup. O t24 `erro` é o erro de reais do próprio formulário ("mil"), sem API, como o mockup; o `erro-validacao-config.json` não é usado. Teste em `frontend/web/test/ferramentas/telas-financeiro.test.ts`.
 
 **Done when**:
 

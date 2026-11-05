@@ -1,0 +1,1 @@
+{ "erro": "Corrija os campos indicados.", "codigo": "dados_invalidos", "campos": ["descricao", "valorCentavos"], "mensagens": { "descricao": "Informe a descrição.", "valorCentavos": "O valor precisa ser maior que zero." } }
