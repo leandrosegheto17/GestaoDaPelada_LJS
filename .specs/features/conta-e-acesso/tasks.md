@@ -300,6 +300,7 @@ T57 → T58
 **Depends on**: T0
 **Reuses**: molde da matriz de leitura e escrita da fundação (`F:981`, `F:1007`); policies e grants em `M:1792843380000_conta-tabelas.sql:69-81`
 **Requirement**: ACE-43, ACE-44, ACE-45
+**Status**: rascunhada
 
 **Done when**:
 
