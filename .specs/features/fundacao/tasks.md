@@ -1801,6 +1801,8 @@ T81 → T82
 **Depends on**: T57
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-37
+**Status**: rascunhada
+**Nota do rascunho**: o `webServer` sobe o `wrangler dev` do `wrangler.jsonc` da raiz (pelo pacote `@pelada/api`) na porta fixa 8788, em `127.0.0.1`; o script `e2e` faz o build antes (`pnpm build && playwright test`), e o `testes.json` ganhou `pnpm --filter @pelada/web e2e` no fim. A senha de `pelada_app` vem do `.env` da raiz, por `process.loadEnvFile`, só para o Hyperdrive local. Dependência nova sem instalar: `@playwright/test`; o `/executar` roda `pnpm install` e `playwright install chromium`, e confere se o CI (T67/T68) precisa do mesmo passo.
 
 **Done when**:
 
