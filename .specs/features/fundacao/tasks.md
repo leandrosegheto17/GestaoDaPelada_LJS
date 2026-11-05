@@ -2443,6 +2443,8 @@ T81 → T82
 **Depends on**: T81
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-41, FUN-42, FUN-27, FUN-37
+**Status**: rascunhada
+**Nota do rascunho**: disparar o `deploy.yml`, conferir a saúde e instalar o PWA no celular são ações externas, com confirmação específica, do `/executar`. O registro (data, SHA e URL da prévia) entra no `docs/runbook.md` com os números reais.
 
 **Done when**:
 
