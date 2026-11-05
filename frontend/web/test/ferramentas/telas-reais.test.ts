@@ -76,8 +76,9 @@ describe('entradasAtivas', () => {
 
   it('ACE-55: estado que não existe, ou entrada sem real: true, falha com mensagem clara', () => {
     expect(() => entradasAtivas(MAPA, { telas: [{ id: 'T25', estado: 'inexistente' }] })).toThrow('T25 inexistente');
-    // T01 sucesso é uma entrada do mockup sem `real: true` (rota de outra feature).
-    expect(() => entradasAtivas(MAPA, { telas: [{ id: 'T01', estado: 'sucesso' }] })).toThrow('real: true');
+    // T01 instalar-iphone é uma entrada do mockup sem `real: true` (a T01 sucesso passou a real na partidas-e-ranking
+    // T75, com o telas.json do LJS; a escolhida segue sem `real`, como a P26 do LJS).
+    expect(() => entradasAtivas(MAPA, { telas: [{ id: 'T01', estado: 'instalar-iphone' }] })).toThrow('real: true');
   });
 
   it('ACE-55: todas as entradas do telas-ativas.json existem no telas.json', () => {

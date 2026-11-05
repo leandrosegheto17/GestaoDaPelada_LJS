@@ -2486,6 +2486,8 @@ T78 → T79
 **Depends on**: T74
 **Reuses**: Runner estendido na conta-e-acesso (`CA:1609`) e comparador (`F:1764`); `reuso.md` R-20 a R-36; `BC:39-40` (P27, P28)
 **Requirement**: PAR-146
+**Status**: rascunhada
+**Nota do rascunho**: o `git apply --check` do patch (R-20 a R-36) **não** ficou limpo só no `telas.json` (a v2 mudou nele as entradas do financeiro, T45 e T46 de lá). Os outros 16 arquivos foram aplicados e conferem com `cmp` contra `c6dc82c`. O `telas.json` foi refeito como manda o `reuso.md` ("refaça só as linhas afetadas"): o de `c6dc82c` com as 3 mudanças da v2 por cima (as 12 entradas `real` da T22 à T24, a T09 `sucesso` com o mockup do projeto e o `financeiro-grupo-quinta.json`, AD-118, e as 5 linhas de `revisaoManual` que o financeiro tirou); JSON válido e todo arquivo citado existe. Por isso o `cmp` do `telas.json` com `c6dc82c` não vale: o desvio são essas 3 mudanças. Runner: `ocultar` (`visibility: hidden` nos dois lados, como o LJS), `userAgent` (contexto próprio do app) e relógio congelado em `RELOGIO_VISUAL` (`page.clock.setFixedTime`, AD-044) em `e2e/ferramentas/telas-reais.mjs` e `e2e/visual.mjs`; `pendente`, `abortar`, `sequencia` e `aguardarMs` já existiam. Teste existente mudado sob a autorização de 2026-11-04 (telas ativas, T75): `test/ferramentas/telas-reais.test.ts:80` passa de T01 `sucesso` (agora real) para T01 `instalar-iphone`, mantendo o `toThrow('real: true')`.
 
 **Done when**:
 

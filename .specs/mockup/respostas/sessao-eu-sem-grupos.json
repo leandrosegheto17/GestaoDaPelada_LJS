@@ -2,6 +2,5 @@
   "conta": { "id": "c-paulo", "nome": "Paulo", "email": "paulo@exemplo.com.br", "eDono": false },
   "escopo": "completo",
   "avisoPrivacidadeVisto": true,
-  "enderecoNovo": null,
   "grupos": []
 }

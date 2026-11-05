@@ -18,7 +18,27 @@ import { join } from 'node:path';
  * - `recorte`: compara só o seletor (ou a caixa que envolve a lista de seletores) nas duas
  *   imagens. No app, cada `.classe` do seletor vale também para o nome do CSS Module do build
  *   visual (`<classe>--m-<hash>`, `vite.config.ts`); ver `seletorDoApp`.
+ * - `ocultar` (partidas-e-ranking T75; o do `telas.json` e o da entrada): seletores escondidos
+ *   com `visibility: hidden` nos dois lados (o espaço fica), como no runner do LJS.
+ * - `userAgent` (T75): user agent só do lado do app (o visual abre um contexto próprio).
+ * - Relógio congelado (T75, AD-044): o app abre com `Date` fixo em `RELOGIO_VISUAL` (o "hoje" do
+ *   mockup), ou no `relogio` da entrada; o mockup é estático e não precisa.
  */
+
+/** "Agora" do mockup para o app (AD-044): a t09 `sem-jogadores` mostra outubro em qualquer data real. */
+export const RELOGIO_VISUAL = '2026-10-16T12:00:00-03:00';
+
+/** Seletores a esconder numa entrada: os globais do `telas.json` e os da entrada. */
+export function ocultarDe(mapa, entrada) {
+  return [...(mapa.ocultar ?? []), ...(entrada.ocultar ?? [])];
+}
+
+/** CSS que esconde os seletores (lado do app com os seletores reescritos para o CSS Module). */
+export function cssOcultar(seletores, lado = 'mockup') {
+  if (!seletores || seletores.length === 0) return '';
+  const lista = lado === 'app' ? seletores.map(seletorDoApp) : seletores;
+  return `${lista.join(', ')} { visibility: hidden !important; }`;
+}
 
 /** Separador do nome das classes de CSS Module no build visual (`vite.config.ts`). */
 export const SUFIXO_MODULO = '--m-';
@@ -130,14 +150,17 @@ async function caixaDe(pagina, seletores) {
  * Print de uma tela: abre a `url`, roda os passos e o `esperar`, carrega as fontes e tira o
  * print do viewport, ou só do `recorte` (seletor ou lista de seletores, já no formato da página).
  */
-export async function printTela(pagina, url, viewport, { passos, esperar, recorte, css } = {}) {
+export async function printTela(pagina, url, viewport, { passos, esperar, recorte, css, ocultar, relogio } = {}) {
   await pagina.setViewportSize(viewport);
+  // AD-044: o relógio fica parado antes de a página carregar (Date.now e new Date()).
+  if (relogio) await pagina.clock.setFixedTime(new Date(relogio));
   await pagina.goto(url, { waitUntil: 'load' });
   // Resposta `pendente` nunca chega: a rede não fica ociosa, então a espera tem teto.
   await pagina.waitForLoadState('networkidle', { timeout: 3000 }).catch(() => undefined);
   await executarPassos(pagina, passos);
   if (esperar) await pagina.locator(esperar).first().waitFor({ state: 'visible' });
   if (css) await pagina.addStyleTag({ content: css });
+  if (ocultar) await pagina.addStyleTag({ content: ocultar });
   await pagina.evaluate(() => document.fonts.ready);
   const opcoes = { animations: 'disabled', caret: 'hide' };
   if (!recorte) return pagina.screenshot(opcoes);

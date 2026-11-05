@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { chromium } from '@playwright/test';
 import { compararPng, LIMITE_PADRAO, porcentagem } from './ferramentas/comparar.mjs';
-import { aplicarRespostas, entradasAtivas, printTela, recorteDe } from './ferramentas/telas-reais.mjs';
+import { aplicarRespostas, cssOcultar, entradasAtivas, ocultarDe, printTela, recorteDe, RELOGIO_VISUAL } from './ferramentas/telas-reais.mjs';
 
 /**
  * Comparação visual das telas de vitrine com o mockup (FUN-38).
@@ -19,6 +19,8 @@ import { aplicarRespostas, entradasAtivas, printTela, recorteDe } from './ferram
  * 4. Telas reais (T54, AD-021): as entradas do `telas.json` listadas em `e2e/telas-ativas.json`
  *    abrem a `rota` do app com as `respostas` interceptadas, rodam os `passos` e o `esperar` e
  *    comparam o viewport, ou só o `recorte` (ver `ferramentas/telas-reais.mjs`).
+ *    Com `ocultar` (escondido nos dois lados), `userAgent` (contexto próprio do app) e o relógio
+ *    do app congelado em `RELOGIO_VISUAL` (partidas-e-ranking T75, AD-044).
  * 5. Controle: a mesma comparação com um componente deslocado de propósito tem de reprovar; se
  *    passar, o comparador não está enxergando a diferença e o runner reprova.
  *
@@ -149,17 +151,25 @@ async function principal() {
 
     for (const c of reais) {
       // Página nova por tela: as rotas falsas e o estado do app não passam de uma para a outra.
+      // `userAgent` (T75): contexto próprio só para o lado do app.
+      const contextoApp = c.entrada.userAgent
+        ? await navegador.newContext({ serviceWorkers: 'block', deviceScaleFactor: 1, userAgent: c.entrada.userAgent })
+        : contexto;
       const paginaMockup = await contexto.newPage();
-      const paginaApp = await contexto.newPage();
+      const paginaApp = await contextoApp.newPage();
+      const ocultar = ocultarDe(mapa, c.entrada);
       try {
         await aplicarRespostas(paginaApp, c.entrada, { mockup: MOCKUP, globais: mapa.respostas ?? [] });
         const mockup = await printTela(paginaMockup, pathToFileURL(join(MOCKUP, c.entrada.mockup)).href, c.viewport, {
           recorte: recorteDe(c.entrada, 'mockup'),
+          ocultar: cssOcultar(ocultar, 'mockup'),
         });
         const app = await printTela(paginaApp, `${URL_BASE}${c.entrada.rota}`, c.viewport, {
           passos: c.entrada.passos,
           esperar: c.entrada.esperar,
           recorte: recorteDe(c.entrada, 'app'),
+          ocultar: cssOcultar(ocultar, 'app'),
+          relogio: c.entrada.relogio ?? RELOGIO_VISUAL,
         });
         const r = compararPng(mockup, app, { limite: c.limite });
         writeFileSync(join(SAIDA, `${c.nome}--mockup.png`), mockup);
@@ -173,6 +183,7 @@ async function principal() {
       } finally {
         await paginaMockup.close();
         await paginaApp.close();
+        if (contextoApp !== contexto) await contextoApp.close();
       }
     }
 
@@ -195,14 +206,18 @@ async function principal() {
       const paginaApp = await contexto.newPage();
       try {
         await aplicarRespostas(paginaApp, real.entrada, { mockup: MOCKUP, globais: mapa.respostas ?? [] });
+        const ocultar = ocultarDe(mapa, real.entrada);
         const m = await printTela(paginaMockup, pathToFileURL(join(MOCKUP, real.entrada.mockup)).href, real.viewport, {
           recorte: recorteDe(real.entrada, 'mockup'),
+          ocultar: cssOcultar(ocultar, 'mockup'),
         });
         const d = await printTela(paginaApp, `${URL_BASE}${real.entrada.rota}`, real.viewport, {
           passos: real.entrada.passos,
           esperar: real.entrada.esperar,
           recorte: recorteDe(real.entrada, 'app'),
           css: DEFORMACAO,
+          ocultar: cssOcultar(ocultar, 'app'),
+          relogio: real.entrada.relogio ?? RELOGIO_VISUAL,
         });
         const rr = compararPng(m, d, { limite: real.limite });
         if (rr.passou) {

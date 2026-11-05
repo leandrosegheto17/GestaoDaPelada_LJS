@@ -2,7 +2,16 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
 import { compararPng } from './ferramentas/comparar.mjs';
-import { aplicarRespostas, entradasAtivas, executarPassos, printTela, type MapaTelas } from './ferramentas/telas-reais.mjs';
+import {
+  aplicarRespostas,
+  cssOcultar,
+  entradasAtivas,
+  executarPassos,
+  ocultarDe,
+  printTela,
+  RELOGIO_VISUAL,
+  type MapaTelas,
+} from './ferramentas/telas-reais.mjs';
 
 /**
  * Runner visual com telas reais (T54; ACE-54, ACE-55; AD-021), contra o build servido pelo
@@ -65,4 +74,45 @@ test('ACE-54: recorte compara só o seletor indicado nas duas imagens', async ({
   const r = compararPng(recorteA, recorteB);
   expect(r.passou).toBe(true);
   expect(r.diferentes).toBe(0);
+});
+
+test('PAR-146: ocultar esconde o seletor nas duas imagens', async ({ page }) => {
+  const viewport = { width: 400, height: 300 };
+  const pagina = (texto: string) =>
+    `data:text/html,${encodeURIComponent(`<body style="margin:0"><p style="font:40px sans-serif">Igual</p><p class="variavel" style="font:40px sans-serif;color:red">${texto}</p></body>`)}`;
+
+  const semOcultar = compararPng(await printTela(page, pagina('AAAA'), viewport), await printTela(page, pagina('BBBBBBBB'), viewport));
+  expect(semOcultar.passou).toBe(false);
+
+  const css = cssOcultar(ocultarDe({ viewports: {}, ocultar: ['.variavel'] }, { id: 'X', estado: 'y', mockup: 'm' }));
+  const a = await printTela(page, pagina('AAAA'), viewport, { ocultar: css });
+  const b = await printTela(page, pagina('BBBBBBBB'), viewport, { ocultar: css });
+  const r = compararPng(a, b);
+  expect(r.passou).toBe(true);
+  expect(r.diferentes).toBe(0);
+});
+
+test('PAR-151: abortar derruba a requisição (falha de rede, não um status)', async ({ page }) => {
+  // A t01 erro só vira real na T76; aqui basta a entrada do telas.json.
+  const t01 = (MAPA.telas ?? []).find((t) => t.id === 'T01' && t.estado === 'erro');
+  if (!t01) throw new Error('T01 erro');
+  await aplicarRespostas(page, t01, { mockup: MOCKUP, globais: MAPA.respostas ?? [] });
+  await page.goto('/');
+  const r = await page.evaluate(async () => {
+    try {
+      const resposta = await fetch('/api/publico/pelada-de-quinta/ranking');
+      return `status ${resposta.status}`;
+    } catch (erro) {
+      return `falhou: ${(erro as Error).name}`;
+    }
+  });
+  expect(r).toBe('falhou: TypeError');
+});
+
+test('PAR-146, AD-044: com o relógio congelado em 2026-10-16, a t09 sem-jogadores mostra "Nenhuma em outubro"', async ({ page }) => {
+  const t09 = entrada('T09', 'sem-jogadores');
+  await aplicarRespostas(page, t09, { mockup: MOCKUP, globais: MAPA.respostas ?? [] });
+  await printTela(page, t09.rota ?? '/', { width: 390, height: 844 }, { relogio: RELOGIO_VISUAL });
+  await expect(page.getByText('Nenhuma em outubro')).toBeVisible();
+  expect(await page.evaluate(() => new Date().toISOString().slice(0, 10))).toBe('2026-10-16');
 });

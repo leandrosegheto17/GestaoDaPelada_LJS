@@ -9,5 +9,8 @@
   "jogadoresAtivos": 0,
   "habilidades": 6,
   "admins": 2,
-  "souCriador": false
+  "souCriador": false,
+  "partidasNoMes": 0,
+  "pesosPadrao": true,
+  "aparelhosNaSemana": 0
 }
