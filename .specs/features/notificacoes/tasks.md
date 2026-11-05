@@ -543,6 +543,8 @@ T39 → T40 → T41
 **Depends on**: T9
 **Reuses**: T8; S-01
 **Requirement**: NOT-29, NOT-30, NOT-69
+**Status**: rascunhada
+**Nota do rascunho**: `push_ranking_resultado` recebe o grupo do lote como primeiro parâmetro (`p_grupo`, SPEC_DEVIATION no SQL) para que o id de outro grupo seja ignorado. `push_envio_grupo` devolve só nome, slug e arquivado: S-01 ainda não foi conferida (a T0 não rodou); se não valer, o `/executar` acrescenta as entradas do `planoEfetivo`. A função de apoio `push_exigir_sem_contexto` concentra a recusa com conta ou slug (42501).
 
 **Done when**:
 
@@ -568,6 +570,8 @@ T39 → T40 → T41
 **Depends on**: T10
 **Reuses**: par `_em` e wrapper (`M:1792843860000_conta-teto-emails.sql:26`, `:43`); T10; AD-070, AD-105
 **Requirement**: NOT-38, NOT-39, NOT-56, NOT-57
+**Status**: rascunhada
+**Nota do rascunho**: `push_conta_resultado` também recebe a conta (`p_conta`) como primeiro parâmetro. `aviso_cobranca_destino` devolve uma linha com `assinaturas` em jsonb. `notificacoes_limpar_em` devolve `(ranking, avisos)` com as linhas apagadas e só limpa `push_ranking` e `avisos_cobranca`, como a spec manda (NOT-56 não cita `push_conta`).
 
 **Done when**:
 
