@@ -1222,6 +1222,8 @@ T39 → T40 → T41
 **Depends on**: T34
 **Reuses**: T34; cabeçalho `X-Pelada` do cliente HTTP (`CA:1169`)
 **Requirement**: NOT-19
+**Status**: rascunhada
+**Nota do rascunho**: um registro de SW tem um único `PushSubscription`, então o IndexedDB (`pelada-push`, loja `destinos`) guarda por endpoint a lista de destinos (cada slug e a conta, NOT-70); o front grava e tira destinos pelo `adicionarDestino` e `removerDestino` na T36. O handler vai em `registrarTrocaDeAssinatura`, ligado pelo `sw.ts` fora do `registrarEventos` (o teste FUN-34 compara a lista exata de eventos). Um destino só passa para o endpoint novo com o `POST` 2xx. Testes em `frontend/web/test/pwa/sw-assinatura.test.ts`.
 
 **Done when**:
 
