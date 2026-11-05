@@ -1906,6 +1906,9 @@ T81 → T82
 **Depends on**: T61, T49, T50, T52
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-38
+**Status**: rascunhada
+**Lacunas**: ajuste visual até 1% depende de rodar o runner; o rascunho não sabe a diferença atual das 3 telas.
+**Nota do rascunho**: o runner faz o build com `VITE_VITRINE=1` em `test-results/vitrine-build` (ignorado pelo git, ESLint e Prettier), serve com `vite preview` na porta 4174 e tira o print do viewport, sem service worker. O segundo critério (componente deformado reprova) virou um **controle automático** a cada rodada: o runner desloca o `main` 40px numa tela e reprova se a comparação passar. O ajuste de CSS e componentes até 1% fica para o `/executar`, com a suíte à frente. Pontos a conferir: o `servidor.kill()` com `shell: true` pode não derrubar o `vite preview` no Windows; o anel de foco do botão "Tentar de novo" (T49) no print da vitrine de erro de rede, que o mockup estático não tem.
 
 **Done when**:
 
