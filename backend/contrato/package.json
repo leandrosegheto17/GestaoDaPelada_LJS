@@ -14,6 +14,7 @@
     "./elenco": "./src/elenco.ts",
     "./periodos": "./src/periodos.ts",
     "./pesos": "./src/pesos.ts",
+    "./partidas": "./src/partidas.ts",
     "./push": "./src/push.ts",
     "./plano": "./src/plano.ts",
     "./asaas": "./src/asaas.ts"
