@@ -1514,6 +1514,8 @@ T57 → T58
 **Depends on**: T45
 **Reuses**: `.specs/mockup/telas/t05-esqueci--*.html` (3 estados)
 **Requirement**: ACE-22, ACE-56
+**Status**: rascunhada
+**Nota do rascunho**: componente novo `LinkVoltar` (link "Voltar" com a seta do mockup), usado aqui; o `Cadastro` (T44) ainda tem a seta própria. E-mail inválido é marcado no campo antes de chamar a API.
 
 **Done when**:
 

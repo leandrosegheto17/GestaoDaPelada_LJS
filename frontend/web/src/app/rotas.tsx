@@ -3,7 +3,6 @@ import { NaoEncontrada, PaginaProvisoria } from '../paginas/Mensagens.tsx';
 import {
   AdminsGrupo,
   Convite,
-  Esqueci,
   InicioApp,
   MinhaConta,
   MinhaSenha,
@@ -12,6 +11,7 @@ import {
   Termos,
 } from '../paginas/acesso/provisorias.tsx';
 import { GuardaApp, GuardaPublica } from './guarda.tsx';
+import { Esqueci } from '../telas/esqueci/Esqueci.tsx';
 import { Confirmar } from '../telas/confirmar/Confirmar.tsx';
 import { Cadastro } from '../telas/cadastro/Cadastro.tsx';
 import { Entrar } from '../telas/entrar/Entrar.tsx';
