@@ -182,3 +182,16 @@ h4 {
 p {
   margin: 0;
 }
+
+/* Texto só para leitor de tela (.specs/mockup/base.css:12). */
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}

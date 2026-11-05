@@ -1,0 +1,57 @@
+/* Marca de presença (FUN-31), de .specs/mockup/base.css:191-201. */
+
+.marca {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tamanho-marca);
+  height: var(--tamanho-marca);
+  border-radius: var(--raio-sm);
+  font-weight: var(--peso-forte);
+  font-size: var(--texto-marca);
+  font-variant-numeric: tabular-nums;
+}
+
+.marca--l::after,
+.marca--e::after {
+  position: absolute;
+  top: 1px;
+  right: 2px;
+  font-size: var(--texto-canto);
+  line-height: 1;
+  font-weight: var(--peso-extra);
+}
+
+.marca--l::after {
+  content: 'L';
+}
+
+.marca--e::after {
+  content: 'E';
+}
+
+.marca--p {
+  background: var(--cor-p-fundo);
+  color: var(--cor-p-texto);
+}
+
+.marca--l {
+  background: var(--cor-l-fundo);
+  color: var(--cor-l-texto);
+}
+
+.marca--e {
+  background: var(--cor-e-fundo);
+  color: var(--cor-e-texto);
+}
+
+.marca--f {
+  border: 1px dashed var(--cor-f-texto);
+  background: var(--cor-f-fundo);
+  color: var(--cor-f-texto);
+}
+
+.marca--x {
+  color: var(--cor-texto-sec);
+}

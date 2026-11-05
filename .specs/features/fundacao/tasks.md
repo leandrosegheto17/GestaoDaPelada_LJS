@@ -1511,6 +1511,8 @@ T81 → T82
 **Depends on**: T46
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-31
+**Status**: rascunhada
+**Nota do rascunho**: `Marca` é a marca de presença do mockup (`.marca` P/L/E/F/X de `base.css:191-201`; a galeria a chama "Marca presente/lesionado/expulso/falta"), não o nome do app; o nome do app fica na barra pública da `Casca`. O axe roda com `axe-core` no jsdom (`test/apoio/axe.ts`), sem `color-contrast` e `region`, que o jsdom não avalia. O Vitest processa os CSS Modules com nomes não escopados, para os testes conferirem as classes do mockup. `.sr` entrou no `global.css`.
 
 **Done when**:
 

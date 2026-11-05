@@ -17,5 +17,7 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     include: ['test/**/*.test.{ts,tsx}'],
+    // CSS Modules com os nomes do mockup, para os testes conferirem as classes.
+    css: { include: [/\.module\.css$/], modules: { classNameStrategy: 'non-scoped' } },
   },
 });
