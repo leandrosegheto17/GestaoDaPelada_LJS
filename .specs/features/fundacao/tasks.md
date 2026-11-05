@@ -2176,6 +2176,8 @@ T81 → T82
 **Depends on**: T71
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-42
+**Status**: rascunhada
+**Nota do rascunho**: o SHA esperado vem do `GITHUB_SHA` do job; tentativas e espera de `PELADA_SAUDE_TENTATIVAS` e `PELADA_SAUDE_ESPERA_MS` (já no `.env.example`). Erro de rede, status diferente de 200 e versão diferente contam como tentativa falha e esperam a próxima. Tipos em `verificar-saude.d.mts`, ao lado, para o teste em TypeScript. O teste sobe um servidor HTTP local em porta livre e fecha no `afterEach`.
 
 **Done when**:
 
