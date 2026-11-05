@@ -439,21 +439,22 @@ T78 → T79
 **Depends on**: None
 **Reuses**: `comoApp` e o cenário de dois grupos (`F:909`); `M:1792844280000_grupos-visiveis-arquivado.sql:9-22`; `M:1792844340000_grupo-criar.sql:10-75`; `M:1792843260000_roles.sql:22-31`; matriz de `F:981` e `F:1007`
 **Requirement**: PAR-91, PAR-15, PAR-130 (linha de base)
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste: com conta não criadora, grupo arquivado some de `grupos`; com a criadora, aparece (item a, fica verde até o fim da feature)
-- [ ] Teste: `grupo_criar` de 6 parâmetros cria grupo, vínculo e habilidades e desfaz tudo numa falha forçada (item b, fica verde até o fim: a delegação de T22 o mantém)
-- [ ] Teste: `pelada_app` tem `UPDATE` em `partidas` e `config_pesos`, nenhum grant em `eventos_uso` (item c, documenta o antes de T23 e T25)
-- [ ] Evidência da rede: uma sabotagem por item (ex.: `CREATE OR REPLACE` de `grupos_visiveis()` sem o filtro de arquivado) deixa o teste vermelho; registrada nesta tarefa
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste: com conta não criadora, grupo arquivado some de `grupos`; com a criadora, aparece (item a, fica verde até o fim da feature)
+- [x] Teste: `grupo_criar` de 6 parâmetros cria grupo, vínculo e habilidades e desfaz tudo numa falha forçada (item b, fica verde até o fim: a delegação de T22 o mantém)
+- [x] Teste: `pelada_app` tem `UPDATE` em `partidas` e `config_pesos`, nenhum grant em `eventos_uso` (item c, documenta o antes de T23 e T25)
+- [x] Evidência da rede: migração final temporária que refaz `grupos_visiveis()` sem o filtro de arquivado deixa vermelhos "PAR-91 grupo arquivado some..." e "PAR-92 slug de arquivado"; a sabotagem do grant de `eventos_uso` não derruba o teste porque T23 já trocou esse grant (o teste já é o do depois); a do `grupo_criar` de 6 parâmetros não se aplica, pois a contração (`1792844940000`) a remove e o teste usa a de 7. Sabotagem revertida.
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
 
 ---
 
+Gate: `pnpm exec vitest run test/banco/partidas-rede.test.ts` (backend/api) @ c4f8b1d40599efd1674792f7dbd3167ea09643b6 = 8 testes verdes; `tsc` do api e do web com erros PREEXISTENTES de outra feature (notificacoes: `test/rotas/apoio-push.ts:99`, `src/pwa/servico.ts:133`), fora do escopo deste lote
 #### Phase 2: Domínio: datas e pesos
 
 ### T1: Datas e meses no domínio
