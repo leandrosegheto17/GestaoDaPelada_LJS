@@ -1320,6 +1320,8 @@ T78 → T79
 **Depends on**: T31
 **Reuses**: `BD:195-197`; `contas_nomes_do_grupo` (T24)
 **Requirement**: PAR-37, PAR-41, PAR-44
+**Status**: rascunhada
+**Nota do rascunho**: `ler` devolve a partida sem `hoje` (a rota acrescenta) e ordena os jogadores em JS, pelo apelido sem acento (`NFD`) nem caixa; `alteradaEm` em ISO. Testes em `backend/api/test/repositorios/partidas-ler.test.ts`.
 
 **Done when**:
 

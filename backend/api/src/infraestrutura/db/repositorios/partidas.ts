@@ -183,4 +183,102 @@ async function excluir(db: Db, grupoId: string, data: string): Promise<Resultado
   return { resultado: 'ok' };
 }
 
-export const partidas = { lancar, editar, excluir };
+// ---------------------------------------------------------------- leituras (T32)
+
+export interface PartidaDoMesLida {
+  data: string;
+  choveu: boolean;
+  contagem: ContagemDaPartida;
+}
+
+/**
+ * As partidas do mês `AAAA-MM`, da mais recente para a mais antiga, com as contagens de presentes, lesionados e
+ * expulsos (PAR-37). A navegação e o `hoje` são da rota (PAR-41).
+ */
+async function doMes(db: Db, grupoId: string, mes: string): Promise<PartidaDoMesLida[]> {
+  const r = await sql<{ data: string; choveu: boolean; presentes: number; lesionados: number; expulsos: number }>`
+    SELECT p.data::text AS data, p.choveu,
+           count(*) FILTER (WHERE pr.situacao = 'presente')::int AS presentes,
+           count(*) FILTER (WHERE pr.situacao = 'lesionado')::int AS lesionados,
+           count(*) FILTER (WHERE pr.situacao = 'expulso')::int AS expulsos
+      FROM partidas p
+      LEFT JOIN presencas pr ON pr.partida_id = p.id AND pr.grupo_id = p.grupo_id
+     WHERE p.grupo_id = ${grupoId}
+       AND p.data >= (${mes} || '-01')::date
+       AND p.data < (${mes} || '-01')::date + interval '1 month'
+     GROUP BY p.id, p.data, p.choveu
+     ORDER BY p.data DESC`.execute(db);
+  return r.rows.map((l) => ({
+    data: l.data,
+    choveu: l.choveu,
+    contagem: { presentes: l.presentes, lesionados: l.lesionados, expulsos: l.expulsos },
+  }));
+}
+
+export interface JogadorDaPartidaLido {
+  id: string;
+  apelido: string;
+  situacao: 'ausente' | 'presente' | 'lesionado' | 'expulso';
+}
+
+export interface PartidaLida {
+  data: string;
+  choveu: boolean;
+  /** Nome da conta que fez a última alteração (`contas_nomes_do_grupo`, AD-036). */
+  alteradaPor: string;
+  /** ISO 8601. */
+  alteradaEm: string;
+  jogadores: JogadorDaPartidaLido[];
+}
+
+/** Apelido sem acento nem caixa, para a ordem da tela (PAR-44). */
+function chaveDeOrdem(apelido: string): string {
+  return apelido.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
+}
+
+/**
+ * A partida da data para a tela de edição (PAR-44): chuva, autor da última alteração pelo nome, e os jogadores ativos
+ * na data mais quem já tem presença gravada nela (mesmo que hoje não esteja mais ativo na data), cada um com a
+ * situação gravada ou `ausente`, pelo apelido sem acento nem caixa. Nula quando não há partida (PAR-45).
+ */
+async function ler(db: Db, grupoId: string, data: string): Promise<PartidaLida | null> {
+  const p = await sql<{ id: string; choveu: boolean; alterada_por: string; alterada_em: Date }>`
+    SELECT id, choveu, alterada_por, alterada_em FROM partidas
+     WHERE grupo_id = ${grupoId} AND data = ${data}::date`.execute(db);
+  const partida = p.rows[0];
+  if (!partida) return null;
+
+  const j = await sql<JogadorDaPartidaLido>`
+    SELECT j.id, j.apelido, coalesce(pr.situacao, 'ausente') AS situacao
+      FROM jogadores j
+      LEFT JOIN presencas pr ON pr.partida_id = ${partida.id} AND pr.jogador_id = j.id AND pr.grupo_id = j.grupo_id
+     WHERE j.grupo_id = ${grupoId}
+       AND (pr.jogador_id IS NOT NULL
+            OR EXISTS (SELECT 1 FROM periodos_ativos pa
+                        WHERE pa.grupo_id = j.grupo_id AND pa.jogador_id = j.id
+                          AND pa.inicio <= ${data}::date AND (pa.fim IS NULL OR pa.fim > ${data}::date)))`.execute(db);
+
+  const autoras = await sql<{ id: string; nome: string }>`
+    SELECT id, nome FROM contas_nomes_do_grupo(${grupoId})`.execute(db);
+  const alteradaPor = autoras.rows.find((a) => a.id === partida.alterada_por)?.nome ?? '';
+
+  const jogadoresOrdenados = [...j.rows].sort(
+    (a, b) => chaveDeOrdem(a.apelido).localeCompare(chaveDeOrdem(b.apelido)) || a.id.localeCompare(b.id),
+  );
+  return {
+    data,
+    choveu: partida.choveu,
+    alteradaPor,
+    alteradaEm: new Date(partida.alterada_em).toISOString(),
+    jogadores: jogadoresOrdenados,
+  };
+}
+
+/** Mês (`AAAA-MM`) da primeira partida do grupo, ou nulo sem partida: o limite da navegação (PAR-41). */
+async function mesDaPrimeira(db: Db, grupoId: string): Promise<string | null> {
+  const r = await sql<{ mes: string | null }>`
+    SELECT to_char(min(data), 'YYYY-MM') AS mes FROM partidas WHERE grupo_id = ${grupoId}`.execute(db);
+  return r.rows[0]?.mes ?? null;
+}
+
+export const partidas = { lancar, editar, excluir, doMes, ler, mesDaPrimeira };
