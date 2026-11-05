@@ -1471,6 +1471,8 @@ T56 → T57
 **Depends on**: T42
 **Reuses**: `Faixa` (`CA:1286`, T41); T41; AD-064
 **Requirement**: PLA-22
+**Status**: rascunhada
+**Nota do rascunho**: `SPEC_DEVIATION`: sem provedor `PlanoDoGrupo`, porque as rotas de `app/rotas.tsx` são planas (não há layout de grupo); `useSomenteLeitura(grupoId)` em `dados/somente-leitura.ts` lê o `usePlano` e o cache do TanStack Query divide a consulta. Plano carregando ou com erro = editável (a API recusa de qualquer jeito, PLA-21).
 
 **Done when**:
 
