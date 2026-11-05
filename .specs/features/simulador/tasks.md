@@ -1167,6 +1167,9 @@ T53 → T54
 **Depends on**: T30
 **Reuses**: Estender `grupos.ler` (`GE:1003`, ampliado em `PR:1314`); T2
 **Requirement**: SIM-08
+**Status**: rascunhada
+**Nota do rascunho**: os 2 campos entram em `DadosDoInicio` (só com `hoje`, como os da `partidas-e-ranking`), com `proximoDiaDeJogo` de `@pelada/dominio` (T2) e um `EXISTS` em `escalacoes` (grupo e data). Testes em `test/repositorios/grupos-inicio.test.ts`.
+**Lacunas**: escalação gravada com JSON inválido conta como existente no item do início (só a linha é consultada); a SIM-94 fala da pré-marcação. O /executar confirma.
 
 **Done when**:
 

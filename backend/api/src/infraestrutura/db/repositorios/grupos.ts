@@ -1,6 +1,13 @@
 import { sql } from 'kysely';
 import type { DadosGrupo, DiaSemana, Frequencia } from '@pelada/contrato';
-import { dataSugeridaPartida, ehPesosPadrao, HABILIDADES_INICIAIS, mesDe, slugBase } from '@pelada/dominio';
+import {
+  dataSugeridaPartida,
+  ehPesosPadrao,
+  HABILIDADES_INICIAIS,
+  mesDe,
+  proximoDiaDeJogo,
+  slugBase,
+} from '@pelada/dominio';
 import { eventos } from './eventos.ts';
 import type { Db } from './tipos.ts';
 
@@ -92,6 +99,10 @@ export interface DadosDoInicio {
   pesosPadrao: boolean;
   /** Aparelhos distintos com `ranking_aberto` na semana de hoje. */
   aparelhosNaSemana: number;
+  /** O próximo dia de jogo a partir de hoje, hoje incluso (simulador T31; SIM-08, AD-086). */
+  proximoDiaDeJogo: string;
+  /** Há escalação confirmada para o próximo dia de jogo (SIM-08). */
+  escalacaoNoProximoDia: boolean;
 }
 
 export type DetalheGrupoComInicio = DetalheGrupo & DadosDoInicio;
@@ -129,7 +140,15 @@ interface LinhaPesosInicio {
  */
 async function dadosDoInicio(db: Db, grupoId: string, dia: DiaSemana, hoje: string): Promise<DadosDoInicio> {
   const sugerida = dataSugeridaPartida(hoje, dia);
+  const proximo = proximoDiaDeJogo(hoje, dia);
   const mes = mesDe(hoje);
+  // Só a existência da linha (SIM-08): a composição gravada não é lida aqui, então JSON inválido também conta como
+  // escalação no próximo dia. [LACUNA] a SIM-94 diz que escalação inválida é inexistente para a pré-marcação; para o
+  // item do início a Base não diz. Interpretação do rascunho: existência da linha; o /executar confirma.
+  const escalacao = await sql<{ existe: boolean }>`
+    SELECT EXISTS (SELECT 1 FROM escalacoes WHERE grupo_id = ${grupoId} AND data = ${proximo}::date) AS existe`.execute(
+    db,
+  );
   const p = await sql<{ no_mes: number; na_sugerida: boolean }>`
     SELECT count(*) FILTER (WHERE data >= (${mes} || '-01')::date
                               AND data < (${mes} || '-01')::date + interval '1 month')::int AS no_mes,
@@ -158,6 +177,8 @@ async function dadosDoInicio(db: Db, grupoId: string, dia: DiaSemana, hoje: stri
     pesosVigentesDesde: vigente.vigente_desde,
     pesosPadrao: ehPesosPadrao(comoDominio),
     aparelhosNaSemana: await eventos.aparelhosDaSemana(db, grupoId, hoje),
+    proximoDiaDeJogo: proximo,
+    escalacaoNoProximoDia: escalacao.rows[0]?.existe === true,
   };
 }
 
