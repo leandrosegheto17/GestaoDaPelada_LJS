@@ -1852,6 +1852,8 @@ T81 → T82
 **Depends on**: T59
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-37, FUN-33, FUN-35
+**Status**: rascunhada
+**Nota do rascunho**: o SW (T54) chama `skipWaiting` mas não `clients.claim`: o teste espera o `ready` e recarrega antes de conferir o `controller`. Além dos três critérios, confere que `/` abre o shell sem rede. Os ícones vêm do próprio manifest servido. Se o `wrangler dev` em `127.0.0.1` não deixar o SW registrar, o `/executar` investiga (contexto seguro) em vez de pular o teste.
 
 **Done when**:
 
