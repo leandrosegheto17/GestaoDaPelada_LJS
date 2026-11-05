@@ -2222,6 +2222,8 @@ T78 → T79
 **Depends on**: T64
 **Reuses**: Mockup do módulo `t16-jogador--{reativar-previa,corrigir-previa,inicio-recuar,inicio-avancar}.html` (R-09, R-11, R-12, R-19); `Faixa` (`CA:1286`)
 **Requirement**: PAR-117, PAR-118, PAR-119
+**Status**: rascunhada
+**Lacunas**: a spec não diz o texto da prévia de início quando nada muda (acumulado, posição e rodadas); o rascunho usa "Acumulado e posição não mudam.". Posição nula antes e depois (jogador fora do ranking nos dois cenários) não tem frase: a parte sai.
 
 **Done when**:
 

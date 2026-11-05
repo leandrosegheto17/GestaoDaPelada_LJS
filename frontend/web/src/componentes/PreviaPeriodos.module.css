@@ -1,0 +1,6 @@
+/* Parágrafos da prévia (PAR-117 a PAR-119), o `paragrafo` de .specs/mockup/base.css (o mesmo de acesso.module.css:17). */
+
+.paragrafo {
+  margin: 0 0 var(--esp-3);
+  overflow-wrap: anywhere;
+}
