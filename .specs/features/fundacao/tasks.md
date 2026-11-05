@@ -1300,6 +1300,8 @@ T81 → T82
 **Depends on**: T38
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-18
+**Status**: rascunhada
+**Nota do rascunho**: o comando aceita o `<id>` (roda `pnpm --filter @pelada/api exec wrangler hyperdrive get <id> --json`) ou o JSON na entrada padrão. O `/executar` confere se a versão instalada do wrangler tem `--json` no `hyperdrive get` e o formato `caching.disabled`.
 
 **Done when**:
 
