@@ -872,6 +872,8 @@ T47 → T48
 **Depends on**: T21
 **Reuses**: `admins.listar` e `auditoria.registrar` (`CA:844`); trava do banco (T10); regra de `L:backend/api/src/aplicacao/grupos/admins/financeiro.ts:6-30`
 **Requirement**: FIN-35, FIN-36
+**Status**: rascunhada
+**Nota do rascunho**: `SPEC_DEVIATION`: `acessoFinanceiro.alterarFinanceiro(db, grupoId, alvoId, valor, opcoes)`, sem `contaId` (a própria conta é `app_conta_id()`), e mora em `financeiro/acesso.ts`, não em `admins` (`convites.ts`), para não editar o arquivo da CA. Resultado extra `sem_permissao` quando o banco (T10) afeta zero linhas; `pularChecagemDaPropriaConta` existe só para o teste FIN-41. `numAffectedRows` do Kysely `sql` é a contagem usada: o /executar confere que vem preenchido no driver do projeto.
 
 **Done when**:
 
