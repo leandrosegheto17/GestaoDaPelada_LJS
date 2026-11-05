@@ -9,6 +9,7 @@ import { protegerRotasDeGrupo } from './middlewares/vinculo.ts';
 import { rotasAdmins } from './rotas/admins.ts';
 import { rotasConta } from './rotas/conta.ts';
 import { rotasConvites } from './rotas/convites.ts';
+import { rotasGrupos } from './rotas/grupos.ts';
 import { devEmails } from './rotas/dev-emails.ts';
 import { health } from './rotas/health.ts';
 import { rotasMinhaConta } from './rotas/minha-conta.ts';
@@ -68,6 +69,8 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
   api.route('/', rotasMinhaConta(rotasAcesso));
   api.route('/', rotasConvites(rotasAcesso));
   api.route('/', rotasAdmins(rotasAcesso));
+  // Grupos (grupos-e-elenco T28 em diante).
+  api.route('/', rotasGrupos(rotasAcesso));
   opcoes.registrarExtras?.(api);
 
   api.notFound((c) => c.json({ erro: 'Rota não encontrada.' }, 404));

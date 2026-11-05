@@ -1097,6 +1097,7 @@ Lacunas: (1) arquivar um grupo já arquivado com o nome errado: a spec não diz 
 **Depends on**: T27
 **Reuses**: `exigirSessao` (`CA:770`, T20); leitor de corpo (T20); `URL_PUBLICA` de `F:1081`; tabela de `GD:165-167`
 **Requirement**: GEL-01, GEL-03, GEL-04, GEL-05, GEL-06, GEL-07, GEL-08, GEL-09, GEL-10, GEL-17, GEL-27
+**Status**: rascunhada
 
 **Done when**:
 
