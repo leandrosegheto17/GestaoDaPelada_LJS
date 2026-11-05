@@ -1598,6 +1598,9 @@ T53 → T54
 **Depends on**: T46
 **Reuses**: `.specs/mockup/telas/t13-resultado-dois--{sucesso,carregando}.html`; `respostas/simulador-sugestao-dois.json` (T44); `exibirNivel` (`GE:1726`)
 **Requirement**: SIM-20, SIM-26, SIM-41, SIM-74, SIM-86
+**Status**: rascunhada
+**Nota do rascunho**: `ResultadoDoisTimes` (com `ListaJogadores`, `MontandoTimes`, `cabecalhoDois`, `umaCasa`) e a página ligada ao `sugerir`: pendente mostra "Montando os times…" no título e no `status`; pronto, "Times sugeridos". No resultado, o voltar é o botão "Simulador" (às entradas). Teste em `test/telas/simulador-resultado-dois.test.tsx`, com as respostas do mockup (T44).
+**Lacunas**: singular de "até 1 substituições" (rascunho: o texto da spec); texto de quem sai ou entra sem par (SIM-25; rascunho: "X → sem par" e "sem par → Y"); falha do `sugerir` (rascunho: `EstadoErro` com "Tentar de novo"). O /executar confirma.
 
 **Done when**:
 

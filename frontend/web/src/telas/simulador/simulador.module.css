@@ -326,3 +326,225 @@
   color: var(--cor-texto-sec);
   font-style: italic;
 }
+
+/* Resultado (t13, t14), base.css:48-49, :144, :160, :218-221, :258-282 e :350-354. */
+.paragrafo {
+  margin: 0 0 var(--esp-3);
+  overflow-wrap: anywhere;
+}
+
+.secao {
+  margin-top: var(--esp-6);
+  padding-top: var(--esp-4);
+  border-top: 1px solid var(--cor-linha);
+}
+
+.lista {
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-linha);
+  border-radius: var(--raio);
+}
+
+.selo--info {
+  background: var(--cor-info-fundo);
+  color: var(--cor-info-texto);
+}
+
+.avisos {
+  list-style: none;
+  margin: 0 0 var(--esp-3);
+  padding: 0;
+  display: grid;
+  gap: var(--esp-2);
+}
+
+.avisos li {
+  display: flex;
+  gap: var(--esp-2);
+  align-items: flex-start;
+  padding: var(--esp-3);
+  border-radius: var(--raio-sm);
+  background: var(--cor-atencao-fundo);
+  color: var(--cor-atencao-texto);
+  font-size: var(--texto-sm);
+}
+
+.comparativo {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-linha);
+  border-radius: var(--raio);
+  font-variant-numeric: tabular-nums;
+  margin-bottom: var(--esp-4);
+}
+
+.comparativo th,
+.comparativo td {
+  padding: var(--esp-2) var(--esp-3);
+  border-bottom: 1px solid var(--cor-linha);
+  text-align: right;
+}
+
+.comparativo th[scope='row'] {
+  text-align: left;
+  font-weight: var(--peso-medio);
+  color: var(--cor-texto-sec);
+}
+
+.comparativo thead th {
+  font-family: var(--fonte-titulo);
+  font-size: var(--texto-lg);
+  text-transform: uppercase;
+}
+
+.times {
+  display: grid;
+  gap: var(--esp-3);
+}
+
+.cartao-time {
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-linha);
+  border-top: 6px solid var(--cor-verde);
+  border-radius: var(--raio);
+  padding: var(--esp-3) var(--esp-4);
+}
+
+.cartao-time--b {
+  border-top-color: var(--cor-amarelo);
+}
+
+.cartao-time--incompleto {
+  border-top-style: dashed;
+}
+
+.cartao-time__titulo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-2);
+  font-size: var(--texto-2xl);
+  text-transform: uppercase;
+  margin-bottom: var(--esp-2);
+}
+
+.cartao-time__grupo {
+  font-family: var(--fonte-texto);
+  font-size: var(--texto-sm);
+  font-weight: var(--peso-forte);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--cor-texto-sec);
+  margin: var(--esp-3) 0 var(--esp-1);
+}
+
+.jogadores-time {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.jogador-time {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-2);
+  width: 100%;
+  min-height: var(--alvo-toque);
+  padding: 0 var(--esp-2);
+  border: 0;
+  border-bottom: 1px solid var(--cor-linha);
+  background: transparent;
+  color: var(--cor-texto);
+  font: inherit;
+  font-weight: var(--peso-semi);
+  text-align: left;
+  cursor: pointer;
+}
+
+.jogador-time__selos {
+  display: flex;
+  gap: var(--esp-1);
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.jogador-time--movido {
+  background: var(--cor-info-fundo);
+}
+
+.pares {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: var(--texto-md);
+}
+
+.pares li {
+  padding: var(--esp-1) 0;
+}
+
+.recolhivel {
+  margin-top: var(--esp-4);
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-linha);
+  border-radius: var(--raio);
+  padding: 0 var(--esp-4);
+}
+
+.recolhivel summary {
+  min-height: var(--alvo-toque);
+  display: flex;
+  align-items: center;
+  font-weight: var(--peso-semi);
+  cursor: pointer;
+}
+
+.recolhivel ol {
+  margin: 0 0 var(--esp-3);
+  padding-left: var(--esp-6);
+}
+
+.esqueleto {
+  display: block;
+  background: var(--cor-esqueleto);
+  border-radius: var(--raio-sm);
+  animation: pulsar 1.4s ease-in-out infinite;
+}
+
+.esqueleto--linha {
+  height: 16px;
+  margin: var(--esp-2) 0;
+}
+
+.esqueleto--titulo {
+  height: 28px;
+  width: 60%;
+  margin: var(--esp-2) 0 var(--esp-4);
+}
+
+@keyframes pulsar {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .esqueleto {
+    animation: none;
+  }
+}
+
+@media (min-width: 600px) {
+  .times--dois,
+  .times--varios {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (min-width: 1024px) {
+  .times--varios {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

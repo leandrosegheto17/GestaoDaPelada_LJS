@@ -1,3 +1,4 @@
+import type { SugerirResposta } from '@pelada/contrato/simulador';
 import { useState } from 'react';
 import { useParams } from 'react-router';
 import { Botao } from '../../componentes/Botao.tsx';
@@ -9,11 +10,12 @@ import { LinkBotao } from '../../componentes/LinkBotao.tsx';
 import { LinkVoltar } from '../../componentes/LinkVoltar.tsx';
 import { ErroApi } from '../../dados/cliente.ts';
 import { useGrupo } from '../../dados/grupos.ts';
-import { useContextoSimulador, usePreviaSimulador } from '../../dados/simulador.ts';
+import { useContextoSimulador, usePreviaSimulador, useSugerir } from '../../dados/simulador.ts';
 import acesso from '../acesso.module.css';
 import { rotaDoGrupo } from '../grupos/Grupos.tsx';
-import { corpoDaPrevia, EntradasSimulador, entradasIniciais, type Entradas } from './EntradasSimulador.tsx';
+import { corpoDaPrevia, corpoDoSugerir, EntradasSimulador, entradasIniciais, type Entradas } from './EntradasSimulador.tsx';
 import { ID_PREVIA_ERRO, podeSugerir, PreviaSimulador, previaInvalida } from './PreviaSimulador.tsx';
+import { MontandoTimes, ResultadoDoisTimes, TEXTO_MONTANDO } from './ResultadoDoisTimes.tsx';
 import estilos from './simulador.module.css';
 
 /**
@@ -24,16 +26,19 @@ import estilos from './simulador.module.css';
  * - sem ativos na data: "Sem jogadores", "Cadastre jogadores para usar o simulador." e "Cadastrar jogadores" (SIM-07);
  * - a prévia (T46; SIM-14, SIM-15) é pedida à API com debounce a cada mudança de formato, N, K ou aptos; "Sugerir
  *   times" só fica ativo com ela válida;
- * - o resultado (T47, T48) e as ações (T49, T50) entram nas tarefas seguintes.
+ * - "Sugerir times" (T47; SIM-47, SIM-86) chama `sugerir` com as entradas e a data; pendente, "Montando os times…";
+ *   com a resposta, "Times sugeridos" com o resultado de 2 times (t13); o de 3 ou mais é da T48;
+ * - o ajuste manual (T49) e as ações do resultado (T50) entram nas tarefas seguintes.
  */
 
 export const TEXTO_SEM_JOGADORES = 'Sem jogadores';
+export const TEXTO_SEM_JOGADORES_AJUDA = 'Cadastre jogadores para usar o simulador.';
+export const TITULO_RESULTADO = 'Times sugeridos';
 
 /** Data completa no campo (`aaaa-mm-dd`); a tela do simulador não importa o domínio (SIM-15). */
 function dataCompletaNoCampo(valor: string): boolean {
   return /^\d{4}-\d{2}-\d{2}$/.test(valor);
 }
-export const TEXTO_SEM_JOGADORES_AJUDA = 'Cadastre jogadores para usar o simulador.';
 
 export function PaginaSimulador() {
   const { grupoId = '' } = useParams();
@@ -60,9 +65,36 @@ export function PaginaSimulador() {
   const corpoPrevia = ctx && entradas ? corpoDaPrevia(entradas, ctx) : null;
   const previa = usePreviaSimulador(grupoId, corpoPrevia);
 
+  const sugerirTimes = useSugerir(grupoId);
+  /** Na tela de resultado: a sugestão pedida (pendente, com erro ou pronta). */
+  const [noResultado, setNoResultado] = useState(false);
+  const [sugestao, setSugestao] = useState<SugerirResposta | null>(null);
+
+  function pedirSugestao() {
+    if (!ctx || !entradas) return;
+    setNoResultado(true);
+    setSugestao(null);
+    sugerirTimes.mutate(corpoDoSugerir(entradas, ctx), { onSuccess: (s) => setSugestao(s) });
+  }
+
+  function voltarAsEntradas() {
+    setNoResultado(false);
+  }
+
   function trocarData(valor: string) {
     if (entradas) setEntradas({ ...entradas, data: valor });
     if (dataCompletaNoCampo(valor)) setDataConsultada(valor);
+  }
+
+  function resultado() {
+    if (sugerirTimes.isPending || (!sugestao && !sugerirTimes.isError)) return <MontandoTimes />;
+    if (!sugestao) {
+      // [LACUNA] a spec não define a falha do `sugerir`; o rascunho usa o estado de erro padrão, com "Tentar de novo".
+      return <EstadoErro aoTentarDeNovo={pedirSugestao} />;
+    }
+    if (sugestao.formato === 'dois_times') return <ResultadoDoisTimes resultado={sugestao} />;
+    // O resultado de 3 ou mais times é da T48.
+    return null;
   }
 
   function conteudo() {
@@ -93,12 +125,12 @@ export function PaginaSimulador() {
         previa={<PreviaSimulador estado={previa.estado} aoTentarDeNovo={previa.tentarDeNovo} />}
         acao={
           <div className={estilos['barra-acao']}>
-            {/* O envio vem com o resultado (T47). */}
             <Botao
               variante="principal"
               type="button"
               disabled={!podeSugerir(previa.estado)}
               aria-describedby={previaInvalida(previa.estado) ? ID_PREVIA_ERRO : undefined}
+              onClick={pedirSugestao}
             >
               Sugerir times
             </Botao>
@@ -108,10 +140,18 @@ export function PaginaSimulador() {
     );
   }
 
+  const titulo = !noResultado ? 'Simulador' : sugestao ? TITULO_RESULTADO : sugerirTimes.isError ? 'Simulador' : TEXTO_MONTANDO;
+
   return (
-    <Casca grupo={{ nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' }} titulo="Simulador">
-      <LinkVoltar para={base}>Início</LinkVoltar>
-      {conteudo()}
+    <Casca grupo={{ nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' }} titulo={titulo}>
+      {noResultado ? (
+        <Botao variante="texto" onClick={voltarAsEntradas}>
+          Simulador
+        </Botao>
+      ) : (
+        <LinkVoltar para={base}>Início</LinkVoltar>
+      )}
+      {noResultado ? resultado() : conteudo()}
     </Casca>
   );
 }
