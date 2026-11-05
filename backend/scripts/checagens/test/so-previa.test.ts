@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { arquivosReais, checarSoPrevia } from '../so-previa.ts';
+import { arquivosReais, checarSoPrevia, DOMINIO_PERMITIDO } from '../so-previa.ts';
 
 const jsonc = (conteudo: string) => [{ caminho: 'wrangler.jsonc', conteudo }];
 const deploy = (conteudo: string) => [{ caminho: '.github/workflows/deploy.yml', conteudo }];
@@ -32,6 +32,44 @@ describe('checagem so-previa', () => {
     expect(checarSoPrevia(deploy('        routes: x.com/*\n'))).toHaveLength(1);
     expect(checarSoPrevia(deploy('run: wrangler x --route x.com/*\n'))).toHaveLength(1);
     expect(checarSoPrevia(deploy('run: wrangler x --domain app.x.com\n'))).toHaveLength(1);
+  });
+
+  describe('AD-121: o único domínio próprio permitido', () => {
+    const rota = (pattern: string, resto = '') =>
+      jsonc(`  "routes": [{ "pattern": "${pattern}", "custom_domain": true${resto} }],
+`);
+
+    it('FUN-28: a rota do domínio permitido passa no wrangler.jsonc', () => {
+      expect(checarSoPrevia(rota(DOMINIO_PERMITIDO))).toEqual([]);
+    });
+
+    it('FUN-28: outro domínio, ou o permitido com sufixo ou prefixo, reprova', () => {
+      expect(checarSoPrevia(rota('outro.ljssoftware.com.br'))).not.toHaveLength(0);
+      expect(checarSoPrevia(rota(`${DOMINIO_PERMITIDO}.evil.com`))).not.toHaveLength(0);
+      expect(checarSoPrevia(rota(`x.${DOMINIO_PERMITIDO}`))).not.toHaveLength(0);
+      expect(checarSoPrevia(rota(`${DOMINIO_PERMITIDO}/*`))).not.toHaveLength(0);
+    });
+
+    it('FUN-28: um segundo pattern na mesma linha reprova', () => {
+      const linha = `  "routes": [{ "pattern": "${DOMINIO_PERMITIDO}", "custom_domain": true }, { "pattern": "x.com", "custom_domain": true }],
+`;
+      expect(checarSoPrevia(jsonc(linha))).not.toHaveLength(0);
+    });
+
+    it('FUN-28: o domínio permitido não vale no deploy.yml nem como opção do wrangler', () => {
+      expect(checarSoPrevia(deploy(`run: wrangler x --domain ${DOMINIO_PERMITIDO}
+`))).not.toHaveLength(0);
+      expect(checarSoPrevia(deploy(`        routes: ${DOMINIO_PERMITIDO}
+`))).not.toHaveLength(0);
+      expect(checarSoPrevia(deploy(`# custom_domain: ${DOMINIO_PERMITIDO}
+`))).not.toHaveLength(0);
+    });
+
+    it('FUN-28: a rota permitida não esconde o Worker gestaodapelada sem -v2', () => {
+      const linha = `  "routes": [{ "pattern": "${DOMINIO_PERMITIDO}", "custom_domain": true }], "name": "gestaodapelada",
+`;
+      expect(checarSoPrevia(jsonc(linha))).not.toHaveLength(0);
+    });
   });
 
   it('FUN-28: environment: producao passa (AD-119)', () => {

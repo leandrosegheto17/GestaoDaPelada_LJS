@@ -14,6 +14,7 @@ interface Wrangler {
   name: string;
   main: string;
   workers_dev: boolean;
+  routes: Array<{ pattern: string; custom_domain?: boolean }>;
   compatibility_flags: string[];
   assets: { directory: string; not_found_handling: string; run_worker_first: string[] };
   ratelimits: Limite[];
@@ -62,11 +63,12 @@ describe('wrangler.jsonc da prévia', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it('FUN-27: Worker gestaodapelada-v2 no workers.dev, sem routes nem domínio próprio', () => {
+  it('FUN-27: Worker gestaodapelada-v2 no workers.dev e só com o domínio da AD-121', () => {
     expect(config.name).toBe('gestaodapelada-v2');
     expect(config.workers_dev).toBe(true);
+    expect(config.routes).toEqual([{ pattern: 'gestaodapelada.ljssoftware.com.br', custom_domain: true }]);
     const todas = chaves(config);
-    for (const proibida of ['routes', 'route', 'custom_domain', 'zone_name', 'zone_id']) {
+    for (const proibida of ['route', 'zone_name', 'zone_id']) {
       expect(todas, proibida).not.toContain(proibida);
     }
   });

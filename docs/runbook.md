@@ -231,7 +231,7 @@ Antes de qualquer troca:
 A troca:
 
 3. **Desligar o Worker do LJS**: no painel da Cloudflare, remova as rotas e o domínio do Worker antigo (ou desative-o), para ele parar de escrever na `main`.
-4. **Domínio**: uma decisão nova (uma AD) define se a v2 ganha domínio próprio. Enquanto não houver, a guarda `so-previa` (FUN-28) continua reprovando `routes` e `custom_domain`, e a v2 segue só no endereço padrão da Cloudflare.
+4. **Domínio**: a AD-121 dá à v2 um domínio próprio, `gestaodapelada.ljssoftware.com.br`, por uma rota `custom_domain` no `wrangler.jsonc`, além do endereço padrão da Cloudflare. A guarda `so-previa` (FUN-28) aceita só essa rota e continua reprovando qualquer outra. Antes do deploy, o Worker do LJS precisa largar o hostname (passo 3), senão o `wrangler deploy` recusa o domínio. O secret `URL_PUBLICA` do environment `producao` passa a ser `https://gestaodapelada.ljssoftware.com.br`.
 5. **Hyperdrive de produção**: o da prévia já aponta para a `main` (AD-119). Se a AD do domínio pedir um Hyperdrive separado, crie-o como na seção [Hyperdrive](#hyperdrive), sempre com `--caching-disabled`.
 6. **Deploy**: dispare o `deploy` (seção [Deploy da prévia](#deploy-da-prévia)) e confira a saúde.
 
