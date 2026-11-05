@@ -2591,6 +2591,8 @@ T78 → T79
 **Depends on**: T78
 **Reuses**: Jornadas de acesso (`CA:1683`); `pnpm dev` (`F:1812`)
 **Requirement**: PAR-22, PAR-46, PAR-50, PAR-03, PAR-84, PAR-95, PAR-90, PAR-109, PAR-155
+**Status**: rascunhada
+**Nota do rascunho**: J-15 a J-21 (as jornadas da feature já estão numeradas em `.specs/projeto/jornadas.md:96-138`), uma por teste com o nome dela, no molde de `e2e/elenco.spec.ts` (contas, grupos e dados próprios, datas relativas ao hoje de São Paulo). SPEC_DEVIATION no topo do arquivo: auditoria e ausência de IP não são visíveis por tela ou API (ficam nos testes de repositório e banco); o passo sem conexão da J-18 é o T78. Rótulos tirados das telas (`FormularioPartida`, `PaginaPontuacao`, `InicioGrupo`); o que não deu para conferir sem rodar (ex.: o texto da prévia no plural, a forma do JSON de `pesos` e de `periodos`) fica para o `/executar`.
 
 **Done when**:
 
