@@ -1954,6 +1954,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T60
 **Reuses**: `R-27` a `R-33` (`t20-grupo--*.html` do módulo); `Dialogo` (`CA:1286`, T41)
 **Requirement**: GEL-18, GEL-19, GEL-22, GEL-23, GEL-114, GEL-118
+**Status**: rascunhada
 
 **Done when**:
 

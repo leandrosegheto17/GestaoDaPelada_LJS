@@ -116,3 +116,27 @@
 .dia-de-jogo p {
   margin: 0;
 }
+
+/* Cartão do link do ranking (t20-grupo--sucesso.html), de base.css:20 e :50. */
+.cartao {
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-linha);
+  border-radius: var(--raio);
+  padding: var(--esp-4);
+}
+
+.sem-topo {
+  margin-top: 0;
+}
+
+/* Selo "Link copiado" (t20-grupo--link-copiado.html). */
+.selo-sucesso {
+  display: inline-flex;
+  margin: var(--esp-2) 0 0;
+  padding: 2px var(--esp-2);
+  border-radius: var(--raio-pilula);
+  font-size: var(--texto-sm);
+  font-weight: var(--peso-semi);
+  background: var(--cor-sucesso-fundo);
+  color: var(--cor-sucesso-texto);
+}
