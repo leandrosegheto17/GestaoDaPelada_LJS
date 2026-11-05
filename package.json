@@ -10,7 +10,8 @@
     "lint": "eslint test eslint.config.mjs && pnpm -r lint",
     "format:check": "prettier --check .",
     "typecheck": "pnpm -r typecheck && tsc --noEmit -p .",
-    "test": "vitest run --dir test && pnpm -r test"
+    "test": "vitest run --dir test && pnpm -r test",
+    "restaurar": "node --env-file-if-exists=.env backend/scripts/ops/restaurar-backup.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

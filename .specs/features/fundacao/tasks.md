@@ -613,6 +613,8 @@ T81 → T82
 **Depends on**: T12
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-50
+**Status**: rascunhada
+**Nota do rascunho**: `pg_restore` sem `--no-acl`; os grants exigem as roles `pelada_*` no cluster local (criadas pelo `pnpm migrar`). O runbook (T73) diz isso.
 
 **Done when**:
 

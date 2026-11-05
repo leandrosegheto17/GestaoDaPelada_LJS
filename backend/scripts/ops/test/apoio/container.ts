@@ -50,12 +50,22 @@ function esperar(ms: number): void {
 }
 
 export class ContainerAge {
-  private constructor(readonly id: string) {}
+  private constructor(
+    readonly id: string,
+    /** Porta do Postgres do container publicada em 127.0.0.1, quando pedida. */
+    readonly portaHost: number | undefined,
+  ) {}
 
-  static iniciar(): ContainerAge {
+  static iniciar(opcoes: { publicarPorta?: boolean } = {}): ContainerAge {
     docker(['build', '-q', '-t', IMAGEM, '-'], { input: DOCKERFILE, stdio: ['pipe', 'pipe', 'pipe'] });
-    const id = docker(['run', '-d', '--rm', '-e', 'POSTGRES_PASSWORD=postgres', IMAGEM]).trim();
-    const c = new ContainerAge(id);
+    const porta = opcoes.publicarPorta ? ['-p', '127.0.0.1::5432'] : [];
+    const id = docker(['run', '-d', '--rm', ...porta, '-e', 'POSTGRES_PASSWORD=postgres', IMAGEM]).trim();
+    let portaHost: number | undefined;
+    if (opcoes.publicarPorta) {
+      const linha = docker(['port', id, '5432/tcp']).split('\n')[0] ?? '';
+      portaHost = Number(linha.slice(linha.lastIndexOf(':') + 1));
+    }
+    const c = new ContainerAge(id, portaHost);
     for (let i = 0; i < 120; i++) {
       if (c.sh('pg_isready -U postgres -h 127.0.0.1').codigo === 0) return c;
       esperar(500);
