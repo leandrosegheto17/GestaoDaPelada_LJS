@@ -729,6 +729,8 @@ T47 → T48
 **Depends on**: T16
 **Reuses**: Domínio T2 a T5; leitura de períodos de `jogadores-leitura.ts` (`GE:1179`); regra de `L:backend/api/src/aplicacao/financeiro/mes.ts:20-89`
 **Requirement**: FIN-07, FIN-08, FIN-10, FIN-11, FIN-12, FIN-13, FIN-14
+**Status**: rascunhada
+**Nota do rascunho**: o repositório sai como `financeiroMes.lerMes(db, grupoId, mes, hoje)`; o mês chega validado pela rota (FIN-09, T26). Importa `@pelada/dominio` (`ativosNoMes`, `resumoDoMes`, `saldoAtual`, `navegacao`) e o tipo de `@pelada/contrato` (`MesFinanceiroResposta`): o /executar precisa acrescentar as exportações do caixa no `index.ts` do domínio e `./financeiro` no `exports` e no `index.ts` do contrato (ver notas de T1 a T8). O estouro do inteiro seguro é provado no domínio (T1); aqui não há teste de estouro, que exigiria ~90 milhões de linhas.
 
 **Done when**:
 
