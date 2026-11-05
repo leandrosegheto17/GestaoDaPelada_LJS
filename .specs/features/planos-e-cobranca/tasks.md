@@ -849,6 +849,8 @@ T56 → T57
 **Depends on**: T19
 **Reuses**: molde de repositório que chama função (`eventos.registrarPublico`, `PR:1289`); T12
 **Requirement**: PLA-07, PLA-17
+**Status**: rascunhada
+**Nota do rascunho**: `plano.ler` devolve `DadosDoPlano` e `gruposDaCriadora` devolve `GrupoDaCriadoraComPlano` (estende o `GrupoDaCriadora` do domínio); `criadoEm` sai em ISO UTC com microssegundos pelo `to_char`, para a ordem do texto ser a do tempo.
 
 **Done when**:
 
