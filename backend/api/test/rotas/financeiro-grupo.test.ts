@@ -1,7 +1,7 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
-import { grupoDetalhe, grupoDetalheComSaldo } from '@pelada/contrato';
+import { grupoDetalhe } from '@pelada/contrato';
 import { abrirCenarioGrupos, reativar, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
-import { pedir, restaurarCaixa } from './apoio-financeiro.ts';
+import { pedir, restaurarCaixa, saldoDe } from './apoio-financeiro.ts';
 
 /**
  * Saldo no `GET /api/grupos/:grupoId` (financeiro T30; FIN-34; AD-079), com o app real como `pelada_app` e o relógio
@@ -43,14 +43,13 @@ describe('GET /api/grupos/:grupoId com o saldo do caixa', () => {
   it('FIN-34: a criadora recebe o saldo atual', async () => {
     const r = await detalhe(aberto.cenario.contaC);
     expect(r.status).toBe(200);
-    expect(grupoDetalheComSaldo.parse(await r.json()).saldoFinanceiroCentavos).toBe(5000);
+    expect(await saldoDe(r)).toBe(5000);
   });
 
   it('FIN-34, FIN-10: saída desconta; lançamento depois de hoje não conta', async () => {
     await lancar('saida', '2026-10-10', 1500);
     await lancar('entrada', '2026-10-16', 99999);
-    const corpo = grupoDetalheComSaldo.parse(await (await detalhe(aberto.cenario.contaC)).json());
-    expect(corpo.saldoFinanceiroCentavos).toBe(3500);
+    expect(await saldoDe(await detalhe(aberto.cenario.contaC))).toBe(3500);
   });
 
   it('FIN-34: sem configuração, a chave vem com null', async () => {
@@ -65,8 +64,8 @@ describe('GET /api/grupos/:grupoId com o saldo do caixa', () => {
     expect(r.status).toBe(200);
     const corpo = (await r.json()) as Record<string, unknown>;
     expect('saldoFinanceiroCentavos' in corpo).toBe(false);
-    // O formato sem a chave é exatamente o detalhe da grupos-e-elenco.
-    expect(grupoDetalhe.safeParse(corpo).success).toBe(true);
+    // O resto do detalhe vem igual (o GET também traz o início do grupo da partidas-e-ranking, T43).
+    expect(corpo).toMatchObject({ id: aberto.cenario.grupoG, souCriador: false });
   });
 
   it('FIN-34: a convidada que ganha o acesso passa a ver o saldo', async () => {
@@ -74,8 +73,7 @@ describe('GET /api/grupos/:grupoId com o saldo do caixa', () => {
       aberto.cenario.grupoG,
       aberto.cenario.contaO,
     ]);
-    const corpo = grupoDetalheComSaldo.parse(await (await detalhe(aberto.cenario.contaO)).json());
-    expect(corpo.saldoFinanceiroCentavos).toBe(5000);
+    expect(await saldoDe(await detalhe(aberto.cenario.contaO))).toBe(5000);
   });
 
   it('o PATCH do grupo continua respondendo o detalhe sem a chave do saldo', async () => {

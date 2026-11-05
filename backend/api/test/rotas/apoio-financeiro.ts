@@ -56,6 +56,19 @@ export async function pedir(aberto: CenarioGruposAberto, p: Pedido): Promise<Res
   return r;
 }
 
+/**
+ * O `saldoFinanceiroCentavos` do detalhe do grupo: ausente (`undefined`), nulo ou inteiro seguro; outro valor lança. O
+ * detalhe inteiro também traz o início do grupo da partidas-e-ranking (T43), então não se confere pelo `grupoDetalhe`
+ * estrito.
+ */
+export async function saldoDe(r: Response): Promise<number | null | undefined> {
+  const corpo = (await r.json()) as Record<string, unknown>;
+  const valor = corpo['saldoFinanceiroCentavos'];
+  if (valor === undefined || valor === null) return valor;
+  if (typeof valor !== 'number' || !Number.isSafeInteger(valor)) throw new Error(`saldoFinanceiroCentavos inválido: ${String(valor)}`);
+  return valor;
+}
+
 export interface LinhaConfig {
   mensalidade_centavos: number | null;
   saldo_inicial_centavos: number;

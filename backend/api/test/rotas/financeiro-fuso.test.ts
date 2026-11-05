@@ -1,7 +1,7 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
-import { grupoDetalheComSaldo, mesFinanceiroResposta } from '@pelada/contrato';
+import { mesFinanceiroResposta } from '@pelada/contrato';
 import { abrirCenarioGrupos, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
-import { appFinanceiro, pedir, restaurarCaixa } from './apoio-financeiro.ts';
+import { appFinanceiro, pedir, restaurarCaixa, saldoDe } from './apoio-financeiro.ts';
 
 /**
  * Virada de mês no fuso de São Paulo (financeiro T34; FIN-49), com o app real como `pelada_app` e dois relógios fixos:
@@ -82,7 +82,7 @@ describe('virada de mês em São Paulo (FIN-49)', () => {
 
     // O mesmo fim do saldo no início do grupo (FIN-34).
     const detalhe = (app: App) => pedir(aberto, { metodo: 'GET', caminho: g(), conta: cenario.contaC, app });
-    expect(grupoDetalheComSaldo.parse(await (await detalhe(ANTES_DA_VIRADA)).json()).saldoFinanceiroCentavos).toBe(5000);
-    expect(grupoDetalheComSaldo.parse(await (await detalhe(DEPOIS_DA_VIRADA)).json()).saldoFinanceiroCentavos).toBe(6000);
+    expect(await saldoDe(await detalhe(ANTES_DA_VIRADA))).toBe(5000);
+    expect(await saldoDe(await detalhe(DEPOIS_DA_VIRADA))).toBe(6000);
   });
 });
