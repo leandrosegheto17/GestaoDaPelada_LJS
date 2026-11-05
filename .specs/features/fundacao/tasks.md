@@ -300,6 +300,8 @@ T81 → T82
 **Depends on**: None
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-01
+**Status**: rascunhada
+**Nota do rascunho**: ação do usuário; nada a escrever. O /executar confere a máquina.
 
 **Done when**:
 
