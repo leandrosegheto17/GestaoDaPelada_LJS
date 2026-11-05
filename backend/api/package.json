@@ -5,12 +5,16 @@
   "engines": {
     "node": ">=26 <27"
   },
+  "exports": {
+    "./migrar": "./src/infraestrutura/db/migrar.ts"
+  },
   "scripts": {
     "lint": "eslint .",
     "typecheck": "tsc --noEmit -p .",
     "test": "vitest run"
   },
   "dependencies": {
+    "node-pg-migrate": "^9.0.0",
     "pg": "^8.23.1"
   },
   "devDependencies": {

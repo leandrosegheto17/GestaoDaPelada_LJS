@@ -723,6 +723,8 @@ T81 → T82
 **Depends on**: T16
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-07, FUN-08
+**Status**: rascunhada
+**Nota do rascunho**: `fileParallelism: false` no vitest da api, porque as roles são do cluster e o `CREATE ROLE` das migrações disputa entre bancos de teste. `bancoDeTeste` ganhou a opção `migrado`.
 
 **Done when**:
 

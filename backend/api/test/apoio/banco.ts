@@ -1,5 +1,6 @@
 import { randomBytes } from 'node:crypto';
 import pg from 'pg';
+import { migrar } from '../../src/infraestrutura/db/migrar.ts';
 import { exigirHostPermitido, HOSTS_TESTE } from '@pelada/scripts/host';
 
 export const URL_TESTE_PADRAO = 'postgres://postgres:postgres@127.0.0.1:5432/pelada';
@@ -7,6 +8,8 @@ export const URL_TESTE_PADRAO = 'postgres://postgres:postgres@127.0.0.1:5432/pel
 export interface OpcoesBancoDeTeste {
   /** URL do cluster de teste; padrão: DATABASE_URL_TESTE. */
   urlBase?: string;
+  /** Aplica as migrações da v2 antes de entregar o banco. */
+  migrado?: boolean;
 }
 
 function urlDoBanco(urlBase: string, nome: string): string {
@@ -38,7 +41,9 @@ export async function bancoDeTeste<T>(
   const nome = `teste_${randomBytes(6).toString('hex')}`;
   await comAdmin(urlBase, (c) => c.query(`CREATE DATABASE ${nome}`));
   try {
-    return await fn(urlDoBanco(urlBase, nome), nome);
+    const url = urlDoBanco(urlBase, nome);
+    if (opcoes.migrado) await migrar(url);
+    return await fn(url, nome);
   } finally {
     await comAdmin(urlBase, (c) => c.query(`DROP DATABASE IF EXISTS ${nome} WITH (FORCE)`));
   }
