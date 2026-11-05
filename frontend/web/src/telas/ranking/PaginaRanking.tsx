@@ -10,12 +10,15 @@ import { TelaMensagem } from '../../componentes/TelaMensagem.tsx';
 import { ErroApi } from '../../dados/cliente.ts';
 import { useEventoRankingAberto } from '../../dados/eventos.ts';
 import { useMesDaUrl, useRankingPublico } from '../../dados/publico.ts';
+import { TEXTO_PDF_BAIXADO } from '../../pdf/entregar.ts';
 import estilos from '../acesso.module.css';
 import { nomeDoMes } from '../financeiro/FinanceiroMes.tsx';
 import { textoRecorrencia } from '../grupos/recorrencia.ts';
 import { ehSlugValido, GrupoIndisponivel } from './GrupoIndisponivel.tsx';
 import pagina from './ranking.module.css';
 import { TabelaRanking } from './TabelaRanking.tsx';
+import { DialogoPdfPronto } from './DialogoPdfPronto.tsx';
+import { TEXTO_ERRO_PDF, TEXTO_PREPARANDO_PDF, usarExportarPdf, type ExportarPdf } from './usarExportarPdf.ts';
 
 /**
  * Ranking público (`/g/:slug[?mes=AAAA-MM]`, t01; partidas-e-ranking T56; PAR-79, PAR-81, PAR-82, PAR-88, PAR-89,
@@ -193,19 +196,60 @@ function Rodape() {
   );
 }
 
-function BotaoExportar({ classe }: { classe?: string }) {
-  // A geração do PDF e o aviso Pro entram na T70; aqui só o botão do mockup.
+/** "Exportar PDF" (T70): "Preparando PDF…" enquanto a projeção e o arquivo não ficam prontos (t01 pdf-preparando). */
+function BotaoExportar({ classe, pdf, bloco = false }: { classe?: string; pdf: ExportarPdf; bloco?: boolean }) {
+  const preparando = pdf.estado.tipo === 'preparando';
   return (
     <span className={classe}>
-      <Botao variante="principal">
-        <IconeExportar />
-        Exportar PDF
+      <Botao variante="principal" bloco={bloco} carregando={preparando} onClick={pdf.exportar}>
+        {preparando ? (
+          TEXTO_PREPARANDO_PDF
+        ) : (
+          <>
+            <IconeExportar />
+            Exportar PDF
+          </>
+        )}
       </Botao>
     </span>
   );
 }
 
-function Ranking({ dados, aoIr }: { dados: RankingPublico; aoIr: (mes: string) => void }) {
+/** Faixas e diálogo do PDF (t01 pdf-erro, pdf-baixado, pdf-compartilhar). */
+function AvisosDoPdf({ pdf }: { pdf: ExportarPdf }) {
+  const { estado } = pdf;
+  if (estado.tipo === 'erro') {
+    return (
+      <Faixa
+        tipo="erro"
+        acao={
+          <Botao variante="texto" onClick={pdf.exportar}>
+            Tentar de novo
+          </Botao>
+        }
+      >
+        {TEXTO_ERRO_PDF}
+      </Faixa>
+    );
+  }
+  if (estado.tipo === 'baixado') return <Faixa tipo="sucesso">{TEXTO_PDF_BAIXADO}</Faixa>;
+  if (estado.tipo === 'dialogo') {
+    return (
+      <DialogoPdfPronto
+        arquivo={estado.arquivo}
+        mesPorExtenso={estado.mesPorExtenso}
+        grupo={estado.grupo}
+        aoBaixar={pdf.baixarDoDialogo}
+        aoCompartilhar={pdf.compartilhado}
+        aoFalhar={pdf.falhou}
+        aoFechar={pdf.fecharDialogo}
+      />
+    );
+  }
+  return null;
+}
+
+function Ranking({ dados, aoIr, pdf }: { dados: RankingPublico; aoIr: (mes: string) => void; pdf: ExportarPdf }) {
   if (dados.linhas.length === 0) {
     return (
       <>
@@ -227,7 +271,7 @@ function Ranking({ dados, aoIr }: { dados: RankingPublico; aoIr: (mes: string) =
     <>
       <div className={pagina.ferramentas}>
         <NavegacaoMes dados={dados} aoIr={aoIr} />
-        <BotaoExportar classe={pagina.topo} />
+        <BotaoExportar classe={pagina.topo} pdf={pdf} />
       </div>
       <p className={pagina['resumo-mes']}>
         {semPartidas ? (
@@ -257,6 +301,7 @@ function RankingDoSlug({ slug }: { slug: string }) {
   // PAR-124: uma vez por slug a cada carregamento da página, não a cada mês (T67).
   useEventoRankingAberto(slug, consulta.isSuccess);
   const [aviso, setAviso] = useState<string | null>(null);
+  const pdf = usarExportarPdf(slug, consulta.data?.mes ?? mes);
 
   const erro = consulta.error;
   const mesRecusado = erro instanceof ErroApi && erro.status === 422 && mes !== undefined;
@@ -304,12 +349,13 @@ function RankingDoSlug({ slug }: { slug: string }) {
       <Cabecalho dados={dados} />
       <main id="conteudo" className={casca.conteudo} aria-busy={dados ? undefined : true}>
         {aviso ? <Faixa tipo="erro">{aviso}</Faixa> : null}
-        {dados ? <Ranking dados={dados} aoIr={aoIr} /> : <EsqueletoLista rotulo={TEXTO_CARREGANDO} />}
+        <AvisosDoPdf pdf={pdf} />
+        {dados ? <Ranking dados={dados} aoIr={aoIr} pdf={pdf} /> : <EsqueletoLista rotulo={TEXTO_CARREGANDO} />}
         {dados ? <Rodape /> : null}
       </main>
       {dados && dados.linhas.length > 0 ? (
         <div className={pagina['barra-celular']}>
-          <BotaoExportar />
+          <BotaoExportar pdf={pdf} bloco />
         </div>
       ) : null}
     </>

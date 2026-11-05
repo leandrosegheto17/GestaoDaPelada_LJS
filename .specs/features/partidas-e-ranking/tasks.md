@@ -2354,6 +2354,8 @@ T78 → T79
 **Depends on**: T69
 **Reuses**: `.specs/mockup/telas/t01-ranking--{pdf-preparando,pdf-erro}.html`; `BC:33` (P21)
 **Requirement**: PAR-102, PAR-107, PAR-125
+**Status**: rascunhada
+**Nota do rascunho**: `usarExportarPdf(slug, mes)` com os estados `ocioso`, `preparando`, `erro`, `baixado` (faixa some em 4 s) e `dialogo`; os dois "Exportar PDF" da t01 (topo e barra do celular, como no mockup) usam o mesmo estado, e a `PaginaRanking` mostra as faixas e o `DialogoPdfPronto`. Sem o pré-carregamento ocioso (o PAR-102 o permite, não o exige). O teste troca o `jspdf` por um documento falso com `vi.mock` e conta o import; os testes existentes da t01 não mudam (o `/pdf` só é lido no toque).
 
 **Done when**:
 
