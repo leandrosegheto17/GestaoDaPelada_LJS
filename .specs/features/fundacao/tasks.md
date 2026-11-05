@@ -1671,6 +1671,8 @@ T81 → T82
 **Depends on**: T52
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-33
+**Status**: rascunhada
+**Nota do rascunho**: as cores do manifest são literais (o manifest não lê CSS) e o teste as compara com `--cor-verde` e `--cor-fundo` de `tokens.css`. Dependências novas no `package.json` sem instalar (`vite-plugin-pwa`, `workbox-precaching`, `workbox-routing`): o `/executar` roda `pnpm install`, confere a compatibilidade do `vite-plugin-pwa` com o Vite 8 e confere no `dist` o `manifest.webmanifest` (terceiro critério, sem teste automatizado). O build só fecha depois da T54, que cria o `src/pwa/sw.ts` citado no `vite.config.ts`.
 
 **Done when**:
 
