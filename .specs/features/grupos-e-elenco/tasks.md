@@ -444,10 +444,10 @@ T73 → T74 → T75
 
 **Done when**:
 
-- [ ] Casos limite listados antes do teste: duas transações abertas ao mesmo tempo; a primeira confirma depois da segunda calcular o sufixo; três colisões seguidas; colisão em restrição que não é o slug
-- [ ] Teste `GEL-15`: as duas criações confirmam, com `base` e `base-2`
-- [ ] Teste `GEL-15`: violação que não é `grupos_slug_key` sobe o erro na primeira tentativa
-- [ ] Evidência da rede: a função sem o bloco `EXCEPTION` deixa o teste vermelho (registrar aqui)
+- [x] Casos limite listados antes do teste: duas transações abertas ao mesmo tempo; a primeira confirma depois da segunda calcular o sufixo; três colisões seguidas; colisão em restrição que não é o slug
+- [x] Teste `GEL-15`: as duas criações confirmam, com `base` e `base-2`
+- [x] Teste `GEL-15`: violação que não é `grupos_slug_key` sobe o erro na primeira tentativa
+- [x] Evidência da rede: `grupo_criar` vigente (`1792845540000_planos-grupo-criar-trial.sql:65-70`) sem o bloco `EXCEPTION`: `GEL-15: as duas criações confirmam` fica vermelho com `grupos_slug_key` (revertido, 2026-11-05)
 - [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
@@ -470,10 +470,10 @@ T73 → T74 → T75
 
 **Done when**:
 
-- [ ] Teste `GEL-16`: `UPDATE grupos SET slug` falha pelo grant e, como owner, pela trigger
-- [ ] Teste `GEL-24`: `UPDATE grupos SET criado_por` como `pelada_app` é recusado
-- [ ] Teste `SEC-009`: O muda `arquivado_em` de G ativo e recebe 42501; C arquiva e reativa; `UPDATE` de `nome` por O passa
-- [ ] Evidência da rede: `GRANT UPDATE ON grupos TO pelada_app` e `DROP TRIGGER grupos_arquivado_so_criadora` deixam testes vermelhos (registrar aqui)
+- [x] Teste `GEL-16`: `UPDATE grupos SET slug` falha pelo grant e, como owner, pela trigger
+- [x] Teste `GEL-24`: `UPDATE grupos SET criado_por` como `pelada_app` é recusado
+- [x] Teste `SEC-009`: O muda `arquivado_em` de G ativo e recebe 42501; C arquiva e reativa; `UPDATE` de `nome` por O passa
+- [x] Evidência da rede: o `GRANT UPDATE ON grupos TO pelada_app` deixa 4 testes vermelhos (GEL-16, GEL-24) e o `DROP TRIGGER grupos_arquivado_so_criadora` deixa `SEC-009 ... O muda arquivado_em` vermelho (revertidos, 2026-11-05)
 - [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
@@ -496,11 +496,11 @@ T73 → T74 → T75
 
 **Done when**:
 
-- [ ] Testes `GEL-84`, `GEL-85`: jogador sem histórico é apagado com os períodos; com presença, com nota ou com pagamento, 23503 e nada apagado (3 casos)
-- [ ] Testes `GEL-35`, `GEL-91`: "Toninho" e "toninho" colidem (23505 em `jogadores_apelido_grupo`); "José" e "Jose" não; idem `habilidades_nome_grupo`
-- [ ] Teste `GEL-93`: apagar a habilidade apaga as notas dela e não as de outra
-- [ ] Testes `GEL-37`, `GEL-50`, `GEL-112`: posição `defensor` recusada; segundo período aberto recusado; `DELETE FROM periodos_ativos` recusado
-- [ ] Evidência da rede: `GRANT DELETE ON periodos_ativos TO pelada_app` deixa o teste vermelho (registrar aqui)
+- [x] Testes `GEL-84`, `GEL-85`: jogador sem histórico é apagado com os períodos; com presença, com nota ou com pagamento, 23503 e nada apagado (3 casos)
+- [x] Testes `GEL-35`, `GEL-91`: "Toninho" e "toninho" colidem (23505 em `jogadores_apelido_grupo`); "José" e "Jose" não; idem `habilidades_nome_grupo`
+- [x] Teste `GEL-93`: apagar a habilidade apaga as notas dela e não as de outra
+- [x] Testes `GEL-37`, `GEL-50`, `GEL-112`: posição `defensor` recusada; segundo período aberto recusado; `DELETE FROM periodos_ativos` recusado
+- [x] Evidência da rede: `GRANT DELETE ON periodos_ativos TO pelada_app` deixa `GEL-112: DELETE FROM periodos_ativos ... é recusado` vermelho (revertido, 2026-11-05)
 - [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
@@ -523,8 +523,8 @@ T73 → T74 → T75
 
 **Done when**:
 
-- [ ] Teste `GEL-112`: as 3 funções conferidas pelo catálogo; uma função de teste sem `search_path` reprova
-- [ ] Evidência da rede: `GRANT EXECUTE ON FUNCTION grupo_criar(...) TO PUBLIC` deixa vermelho (registrar aqui)
+- [x] Teste `GEL-112`: as 3 funções conferidas pelo catálogo; uma função de teste sem `search_path` reprova
+- [x] Evidência da rede: `GRANT EXECUTE ON FUNCTION grupo_criar(...) TO PUBLIC` deixa o `GEL-112 ... grupo_criar conferida pelo catálogo` vermelho (revertido, 2026-11-05)
 - [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
