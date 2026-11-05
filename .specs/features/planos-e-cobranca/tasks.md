@@ -1312,6 +1312,8 @@ T56 → T57
 **Depends on**: T36
 **Reuses**: molde de concorrência de `GE:976` (T25); T35, T36
 **Requirement**: PLA-43, PLA-48, PLA-72, PLA-73, PLA-74
+**Status**: rascunhada
+**Nota do rascunho**: o paralelo usa `comDb` com conta nula (o contexto da rota do webhook) e espera a trava em `pg_stat_activity`; as sequências usam a rota real. O PLA-74 lê `GET …/plano` com o relógio no dia 16 antes e depois do pagamento e compara as contagens de `jogadores`, `periodos_ativos` e `partidas` do grupo.
 
 **Done when**:
 
