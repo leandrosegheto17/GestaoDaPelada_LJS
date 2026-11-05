@@ -1,0 +1,16 @@
+/* Nota de habilidade (GEL-115), de .specs/mockup/base.css:22 e :145. */
+
+.rotulo {
+  flex: 1;
+  min-width: 0;
+  font-weight: var(--peso-semi);
+}
+
+.campo__entrada--nota {
+  width: 88px;
+  flex: 0 0 auto;
+}
+
+.erro {
+  border-color: var(--cor-erro-texto);
+}

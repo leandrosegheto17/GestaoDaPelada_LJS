@@ -1852,6 +1852,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T56
 **Reuses**: molde de T56; marcação de `.specs/mockup/telas/t15-jogadores--sucesso.html` e `t16-jogador--edicao.html`
 **Requirement**: GEL-115
+**Status**: rascunhada
 
 **Done when**:
 

@@ -1,0 +1,14 @@
+/* Busca da lista (GEL-115), de .specs/mockup/base.css:140-141. */
+
+.ferramentas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2);
+  align-items: center;
+  margin: var(--esp-3) 0;
+}
+
+.campo {
+  flex: 1;
+  min-width: 180px;
+}

@@ -1,0 +1,38 @@
+/* Abas no visual do controle segmentado (GEL-115), de .specs/mockup/base.css:97-105. */
+
+.abas {
+  display: flex;
+  border: 2px solid var(--cor-texto);
+  border-radius: var(--raio);
+  overflow: hidden;
+}
+
+.aba {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--alvo-toque);
+  padding: 0 var(--esp-2);
+  border: 0;
+  text-align: center;
+  font: inherit;
+  font-weight: var(--peso-semi);
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  cursor: pointer;
+}
+
+.aba + .aba {
+  border-left: 2px solid var(--cor-texto);
+}
+
+.aba[aria-selected='true'] {
+  background: var(--cor-texto);
+  color: var(--cor-superficie);
+}
+
+.aba:focus-visible {
+  outline: var(--foco-largura) solid var(--cor-foco);
+  outline-offset: -6px;
+}
