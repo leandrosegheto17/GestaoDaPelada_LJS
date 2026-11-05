@@ -683,6 +683,8 @@ T57 → T58
 **Depends on**: T14
 **Reuses**: decisão de `ljs:.specs/features/conta-e-acesso/design.md:176-187` (`fetch` direto, sem SDK); escrito do zero
 **Requirement**: ACE-21, ACE-52, ACE-75
+**Status**: rascunhada
+**Nota do rascunho**: casos limite listados no topo do código; sem lacuna. O remetente em memória tem `falharProximos(n)` para provar o ACE-52 nas rotas.
 
 **Done when**:
 
