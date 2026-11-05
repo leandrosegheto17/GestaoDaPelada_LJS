@@ -50,6 +50,8 @@ export interface Variaveis {
   tokenHash?: Uint8Array;
   /** Relógio da requisição, posto pelo `criarApp` antes de tudo (T19; GEL-32). */
   relogio: Relogio;
+  /** A cadeia das rotas de grupo já rodou nesta requisição (T22). */
+  grupoProtegido?: boolean;
 }
 
 export interface Ambiente {

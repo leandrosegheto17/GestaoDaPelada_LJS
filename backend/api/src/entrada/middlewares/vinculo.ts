@@ -1,9 +1,10 @@
-import type { Hono, MiddlewareHandler } from 'hono';
+import type { Context, Hono, MiddlewareHandler, Next } from 'hono';
 import { sql } from 'kysely';
 import { corpoDoErro } from '@pelada/contrato';
 import type { Ambiente } from '../ambiente.ts';
 import type { OpcoesCliente } from '../../infraestrutura/db/cliente.ts';
 import { comBanco } from './com-banco.ts';
+import { exigirGrupoAtivo } from './grupo-ativo.ts';
 import { exigirSessao } from './sessao.ts';
 
 /**
@@ -35,10 +36,50 @@ export interface OpcoesRotasDeGrupo {
   fabrica?: NonNullable<OpcoesCliente['fabrica']>;
 }
 
+/** Caminho do próprio grupo (`GET` e `PATCH /api/grupos/:grupoId`, T29), relativo a /api. */
+export const ROTA_DO_GRUPO = '/grupos/:grupoId';
+
+/** Roda os middlewares em sequência, como o Hono: quem responde sem chamar `next` encerra a cadeia. */
+function encadear(passos: ReadonlyArray<MiddlewareHandler<Ambiente>>): MiddlewareHandler<Ambiente> {
+  return async (c: Context<Ambiente>, next: Next) => {
+    const passo = async (i: number): Promise<Response | void> => {
+      const atual = passos[i];
+      if (!atual) {
+        await next();
+        return;
+      }
+      return atual(c, async () => {
+        const r = await passo(i + 1);
+        if (r instanceof Response) c.res = r;
+      });
+    };
+    return passo(0);
+  };
+}
+
 /**
  * Cadeia das rotas de grupo em `criarApp`, antes delas: sessão (401), transação com a conta da
- * sessão e vínculo (404). As rotas de `/api/grupos/:grupoId/*` só declaram o handler.
+ * sessão, vínculo (404) e grupo ativo nas escritas (409 `grupo_arquivado`, T22). As rotas de
+ * `/api/grupos/:grupoId` e `/api/grupos/:grupoId/*` só declaram o handler.
+ *
+ * A cadeia é registrada nos dois caminhos e roda uma vez por requisição: se o roteador casar os
+ * dois padrões no mesmo caminho, a segunda passagem só segue (uma transação só, T22).
  */
 export function protegerRotasDeGrupo(api: Hono<Ambiente>, opcoes: OpcoesRotasDeGrupo = {}): void {
-  api.use(ROTAS_DE_GRUPO, exigirSessao, comBanco(undefined, opcoes.fabrica ? { fabrica: opcoes.fabrica } : {}), exigirVinculo);
+  const cadeia = encadear([
+    exigirSessao,
+    comBanco(undefined, opcoes.fabrica ? { fabrica: opcoes.fabrica } : {}),
+    exigirVinculo,
+    exigirGrupoAtivo,
+  ]);
+  const umaVez: MiddlewareHandler<Ambiente> = async (c, next) => {
+    if (c.var.grupoProtegido) {
+      await next();
+      return;
+    }
+    c.set('grupoProtegido', true);
+    return cadeia(c, next);
+  };
+  api.use(ROTA_DO_GRUPO, umaVez);
+  api.use(ROTAS_DE_GRUPO, umaVez);
 }

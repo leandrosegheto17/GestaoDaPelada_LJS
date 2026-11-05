@@ -937,6 +937,7 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T21
 **Reuses**: estender a cadeia do `exigirVinculo` (`CA:795`, T21); decisão de `GD:181` e a nota de `GS:145` (arquivar também passa); exceção de `GSEG:160` (SEC-004); `FOR KEY SHARE` de `GSEG:163` (`FOR SHARE` dava deadlock)
 **Requirement**: GEL-26, SEC-004, SEC-007
+**Status**: rascunhada
 
 **Done when**:
 
