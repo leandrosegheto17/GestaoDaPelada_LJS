@@ -20,7 +20,7 @@
 -- SPEC_DEVIATION: timestamp escolhido à mão (1792845780000), conferido pelo /executar (S-04).
 DO $$
 DECLARE
-  SLUG_GRUPO_TESTE constant text := '__SLUG_GRUPO_TESTE__';
+  SLUG_GRUPO_TESTE constant text := 'turma-do-rola';
   v_hoje constant date := (now() AT TIME ZONE 'America/Sao_Paulo')::date;
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM grupos) THEN

@@ -553,7 +553,7 @@ T56 → T57
 
 **Done when**:
 
-- [ ] Slug registrado nesta tarefa: `SLUG_GRUPO_TESTE = <valor informado pelo usuário nesta pausa>`
+- [ ] Slug registrado nesta tarefa: `SLUG_GRUPO_TESTE = turma-do-rola` (informado pelo usuário em 2026-11-05 para o primeiro deploy da prévia, a partir da cópia local `neondb_copia`; não conferido na `main` do Neon)
 - [ ] O slug casa com `^[a-z0-9-]{1,64}$` e o usuário confirmou que é o grupo dele
 - [ ] Gate passa, sem teste removido ou enfraquecido
 

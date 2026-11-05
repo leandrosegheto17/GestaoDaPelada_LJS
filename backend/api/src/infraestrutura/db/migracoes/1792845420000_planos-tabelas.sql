@@ -8,7 +8,7 @@
 --   23505). Sem `grupo_id` (o grupo vem pela assinatura) e sem nenhuma coluna de pessoa (PLA-41): nem e-mail, nem nome,
 --   nem CPF. `cobranca_id`, `evento` e `data_criacao` em toda linha, para a `notificacoes` (S-07).
 -- Escrita só pelas funções `SECURITY DEFINER` das T14 a T16 (PLA-13): `pelada_app` não tem INSERT, UPDATE nem DELETE
--- nas duas, e não tem nem SELECT em `eventos_asaas`. `pelada_backup` (o grupo de `pelada_backup_ro`) lê as duas: o
+-- nas duas, e não tem nem SELECT em `eventos_asaas`. `pelada_backup_ro` lê as duas (`pelada_backup` não existe depois de `1792844220000_roles-padronizadas.sql`): o
 -- `GRANT SELECT ON ALL TABLES` de `1792843260000_roles.sql:35` só valeu para as tabelas de então, e sem a policy o
 -- `pg_dump` com FORCE sai vazio e com exit 0 (AD-010).
 -- SPEC_DEVIATION: o timestamp (1792845420000) segue a última migração do financeiro (1792845360000) com o passo de
@@ -67,6 +67,6 @@ GRANT SELECT ON assinaturas TO pelada_app;
 
 -- eventos_asaas: nenhuma policy nem grant para pelada_app.
 
-CREATE POLICY assinaturas_backup ON assinaturas FOR SELECT TO pelada_backup USING (true);
-CREATE POLICY eventos_asaas_backup ON eventos_asaas FOR SELECT TO pelada_backup USING (true);
-GRANT SELECT ON assinaturas, eventos_asaas TO pelada_backup;
+CREATE POLICY assinaturas_backup ON assinaturas FOR SELECT TO pelada_backup_ro USING (true);
+CREATE POLICY eventos_asaas_backup ON eventos_asaas FOR SELECT TO pelada_backup_ro USING (true);
+GRANT SELECT ON assinaturas, eventos_asaas TO pelada_backup_ro;
