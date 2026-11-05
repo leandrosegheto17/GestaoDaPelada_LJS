@@ -521,6 +521,8 @@ T56 → T57
 **Depends on**: T7
 **Reuses**: molde das checagens da fundação (`F:1251`, `backend/scripts/checagens/`)
 **Requirement**: PLA-01
+**Status**: rascunhada
+**Lacunas**: no front, 'trial' e 'ativo' são também o plano efetivo e a situação do jogador: lá a checagem só pega uso_proprio, inadimplente e cancelado; no backend pega qualquer situacao… comparada
 
 **Done when**:
 
