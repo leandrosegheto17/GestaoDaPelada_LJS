@@ -1233,6 +1233,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T32
 **Reuses**: interface de `GD:151` e a decisão de `GD:287` (duas consultas e cálculo no domínio); `calcularNivel` (T10)
 **Requirement**: GEL-46, GEL-50, GEL-102
+**Status**: rascunhada
 
 **Done when**:
 
