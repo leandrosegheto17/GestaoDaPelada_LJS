@@ -924,6 +924,8 @@ T57 → T58
 **Depends on**: T23
 **Reuses**: funções de cota de T10; remetentes de T15; chave /48 de T13
 **Requirement**: ACE-51, ACE-52, ACE-72, ACE-73, ACE-75
+**Status**: rascunhada
+**Nota do rascunho**: casos limite listados no topo de `enviar-email.ts`. O caso de uso tem duas partes: `registrarOrigem(urlBanco, ip)`, que a rota chama ao chegar, em transação curta própria (o ACE-73 conta o pedido "mesmo que a rota depois o recuse", e a resposta 4xx desfaria o registro na transação da rota), e `enviarEmailDeConta(db, remetente, pedido)`, que reserva a cota sob `SAVEPOINT` e o desfaz quando o remetente falha ou a trava passa de 2 s (55P03). `categoriaDaRecuperacao(confirmada)` escolhe 80% ou 100% (ACE-73).
 
 **Done when**:
 
