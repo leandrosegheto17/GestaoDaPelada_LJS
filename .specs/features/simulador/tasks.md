@@ -1075,6 +1075,8 @@ T53 → T54
 **Depends on**: T27
 **Reuses**: `L:backend/api/src/aplicacao/simulador/confirmar-escalacao.ts`; INSERT de evento com conta de `PR:1212` (T30, `partida_lancada`); `ON CONFLICT` de `PR:1159` (T28); `c.var.db` (`FD:103`)
 **Requirement**: SIM-67, SIM-69, SIM-70, SIM-72, SIM-87
+**Status**: rascunhada
+**Nota do rascunho**: `escalacoes.confirmar(db, grupoId, { data, n, k?, escalada }, conta, momento)`; o momento vem do relógio (`agoraIso`). O INSERT do evento vai pelo `sql` do Kysely (sem `eventos_uso` nos tipos até a T80 da `partidas-e-ranking`), sem o molde de `PR:1212`, que ainda não existe. SIM-87 com duas conexões: a primeira segura a transação até a segunda aparecer em `pg_stat_activity` esperando lock.
 
 **Done when**:
 
