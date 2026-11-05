@@ -1678,6 +1678,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T49
 **Reuses**: estender a suíte da CA (`CA:1070`, T32; vale ela no lugar do `casos.ts` do LJS, AD-027 proposta); decisão de `GD:192`
 **Requirement**: GEL-106, GEL-107, GEL-108
+**Status**: rascunhada
 
 **Done when**:
 
