@@ -11,7 +11,7 @@ import { abrirCenarioGrupos, comoConta, criarGrupoComoConta, type CenarioGruposA
  * (b) o CHECK `grupos_trial` recusa `trial` sem data e data sem `trial`: fica verde até o fim;
  * (c) `pelada_app` não insere em `grupos` nem muda `situacao_comercial` e `trial_inicio`
  *     (`1792844400000_grupos-grants-coluna.sql:6-7`): fica verde até o fim;
- * (d) `grupo_criar` de 7 parâmetros grava `uso_proprio` e `trial_inicio` nulo: é o teste que a T13 troca, com motivo;
+ * (d) `grupo_criar` de 7 parâmetros gravava `uso_proprio` e `trial_inicio` nulo; desde a T13 grava `trial` (trocado);
  * (e) o `recursoLiberado` vigente libera todo grupo: é trocado pela T21 (o de FIN-45 e SIM-68 continua verde até lá).
  *
  * Evidência da rede (registrar na T0 do tasks.md, pelo /executar, uma sabotagem por item numa cópia):
@@ -122,16 +122,23 @@ describe('rede do plano: pelada_app sem escrita direta (c)', () => {
   });
 });
 
-// Item (d): trocado pela T13 (`grupo_criar` passa a gravar `trial` e `trial_inicio = p_hoje`), com motivo no commit.
-describe('rede do plano: grupo_criar antes da T13 (d)', () => {
-  it('PLA-10 (antes da T13): grupo criado pela grupo_criar nasce uso_proprio com trial_inicio nulo', async () => {
+// Item (d), trocado pela T13 (`1792845540000_planos-grupo-criar-trial.sql`): o grupo passa a nascer em trial. Mesma
+// chamada e mesma igualdade estrita das duas colunas; muda só o valor esperado (autorizado em `## Autorizações`).
+describe('rede do plano: grupo_criar depois da T13 (d)', () => {
+  it('PLA-10 (depois da T13): grupo criado pela grupo_criar nasce trial com trial_inicio = a data passada', async () => {
     const { db, cenario } = aberto;
     const novo = await criarGrupoComoConta(db, cenario.contaB, 'Pelada da Rede', 'pelada-da-rede');
-    const r = await db.query<{ situacao_comercial: string; trial_inicio: string | null }>(
-      'SELECT situacao_comercial, trial_inicio::text FROM grupos WHERE id = $1',
+    const r = await db.query<{ situacao_comercial: string; trial_inicio: string | null; hoje: string }>(
+      `SELECT situacao_comercial, trial_inicio::text, (now() AT TIME ZONE 'America/Sao_Paulo')::date::text AS hoje
+         FROM grupos WHERE id = $1`,
       [novo.id],
     );
-    expect(r.rows[0]).toEqual({ situacao_comercial: 'uso_proprio', trial_inicio: null });
+    const linha = r.rows[0];
+    expect(linha).toBeDefined();
+    expect({ situacao_comercial: linha?.situacao_comercial, trial_inicio: linha?.trial_inicio }).toEqual({
+      situacao_comercial: 'trial',
+      trial_inicio: linha?.hoje,
+    });
   });
 });
 

@@ -652,6 +652,8 @@ T56 → T57
 **Depends on**: T12
 **Reuses**: corpo vigente da `grupo_criar` de 7 parâmetros (`PR:987`, a partir de `M:1792844340000_grupo-criar.sql:10-75`; INSERT em `:47`, auditoria em `:68`); AD-087; AD-037
 **Requirement**: PLA-10, PLA-12, PLA-14
+**Status**: rascunhada
+**Nota do rascunho**: casos limite no topo da migração e do teste (p_hoje nulo, colisão de slug, falha no meio, p_hoje futuro); sem lacuna. Trocados, com autorização (`## Autorizações`, 2026-11-04): o caso (d) da T0 (`plano-caracterizacao.test.ts`) e a auditoria da rota `POST /grupos` (`test/grupos/rotas-grupos.test.ts`, GEL-10), que passa a esperar também `plano_trial_iniciado`.
 
 **Done when**:
 

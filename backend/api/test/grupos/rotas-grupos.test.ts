@@ -99,7 +99,11 @@ describe('POST /api/grupos', () => {
     const pedir = cliente(aberto.url);
     const r = await pedir('/grupos', { sessao: await sessao(cenario.contaB), corpo: { ...VALIDO, nome: 'Pelada Auditada' } });
     const { id } = (await r.json()) as { id: string };
-    expect(await auditoriaDe(id)).toEqual([{ acao: 'grupo_criado', autor: cenario.contaB }]);
+    // planos-e-cobranca T13 (PLA-14): a criação grava também a entrada no trial, com a mesma conta autora.
+    expect(await auditoriaDe(id)).toEqual([
+      { acao: 'grupo_criado', autor: cenario.contaB },
+      { acao: 'plano_trial_iniciado', autor: cenario.contaB },
+    ]);
   });
 
   it.each([
