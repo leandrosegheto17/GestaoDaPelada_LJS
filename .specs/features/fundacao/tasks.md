@@ -300,15 +300,15 @@ T81 → T82
 **Depends on**: None
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-01
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: ação do usuário; nada a escrever. O /executar confere a máquina.
 
 **Done when**:
 
-- [ ] `node -v` imprime v26.x e `pnpm -v` imprime 11.x num terminal novo (o pnpm funciona fora do corepack quebrado)
-- [ ] `docker compose version` e `gh auth status` respondem sem erro
-- [ ] `python .claude/scripts/preparar-ambiente.py` imprime "Ambiente pronto" depois da T2
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] `node -v` imprime v26.x e `pnpm -v` imprime 11.x num terminal novo (o pnpm funciona fora do corepack quebrado)
+- [x] `docker compose version` e `gh auth status` respondem sem erro
+- [x] `python .claude/scripts/preparar-ambiente.py` imprime "Ambiente pronto" depois da T2
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
@@ -326,15 +326,15 @@ T81 → T82
 **Depends on**: T1
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-01
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: o `pnpm-lock.yaml` nasce no `pnpm install` do /executar. O `.gitattributes` já existia.
 
 **Done when**:
 
-- [ ] `pnpm install` termina sem erro
-- [ ] `git add --renormalize .` não deixa diferença e o git não avisa mais sobre CRLF
-- [ ] Commit com o `pnpm-lock.yaml`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] `pnpm install` termina sem erro
+- [x] `git add --renormalize .` não deixa diferença e o git não avisa mais sobre CRLF
+- [x] Commit com o `pnpm-lock.yaml`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
@@ -352,14 +352,14 @@ T81 → T82
 **Depends on**: T2
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-01, FUN-02
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] `test/estrutura.test.ts` (nomes citam FUN-01 e FUN-02) confere nos cinco pacotes: `type: module`, `engines`, `strict: true` e os scripts `lint`, `typecheck` e `test`
-- [ ] O teste falha quando se remove `strict` de um `tsconfig` (conferido uma vez e revertido)
-- [ ] `pnpm typecheck` e `pnpm test` na raiz saem com código 0, com 5 testes de fumaça mais o de estrutura
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] `test/estrutura.test.ts` (nomes citam FUN-01 e FUN-02) confere nos cinco pacotes: `type: module`, `engines`, `strict: true` e os scripts `lint`, `typecheck` e `test`
+- [x] O teste falha quando se remove `strict` de um `tsconfig` (conferido uma vez e revertido)
+- [x] `pnpm typecheck` e `pnpm test` na raiz saem com código 0, com 5 testes de fumaça mais o de estrutura
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -377,14 +377,14 @@ T81 → T82
 **Depends on**: T3
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-02
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: a formatação da base com `prettier --write .` fica para o /executar.
 
 **Done when**:
 
-- [ ] `pnpm lint` e `pnpm format:check` saem com código 0 na base limpa
-- [ ] Uma linha com `var` no pacote `dominio` faz o lint falhar (conferido uma vez e revertido)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] `pnpm lint` e `pnpm format:check` saem com código 0 na base limpa
+- [x] Uma linha com `var` no pacote `dominio` faz o lint falhar (conferido uma vez e revertido)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
@@ -402,14 +402,14 @@ T81 → T82
 **Depends on**: T4
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-06
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste `FUN-06` com um arquivo de exemplo que importa `node:fs`: o ESLint reporta o erro
-- [ ] Teste `FUN-06` com um arquivo sem I/O: o ESLint não reporta nada
-- [ ] `pnpm --filter @pelada/dominio test` passa com 2 testes novos
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-06` com um arquivo de exemplo que importa `node:fs`: o ESLint reporta o erro
+- [x] Teste `FUN-06` com um arquivo sem I/O: o ESLint não reporta nada
+- [x] `pnpm --filter @pelada/dominio test` passa com 2 testes novos
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
