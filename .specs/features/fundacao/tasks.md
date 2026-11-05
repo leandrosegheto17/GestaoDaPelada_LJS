@@ -1378,6 +1378,8 @@ T81 → T82
 **Depends on**: T41
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-24, FUN-25
+**Status**: rascunhada
+**Nota do rascunho**: `@sentry/cloudflare` (`^10.0.0`) e `@pelada/contrato` entraram no `package.json` da API sem instalação; o `/executar` confere a versão atual e a assinatura do `withSentry` (tipada à mão em `EmbrulharSentry`). Sem DSN, a requisição nem passa pelo SDK; DSN vazio ou só com espaços conta como ausente.
 
 **Done when**:
 

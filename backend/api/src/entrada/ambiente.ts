@@ -21,6 +21,8 @@ export interface Env {
   VERSAO: string;
   /** URL pública do app, única fonte de endereço absoluto (FUN-23). */
   URL_PUBLICA: string;
+  /** DSN do Sentry (secret). Ausente: o Sentry fica desligado e nada sai (FUN-25). */
+  SENTRY_DSN?: string;
   HYPERDRIVE: HyperdriveBinding;
   LIMITE_ENTRAR: LimiteDeTaxa;
   LIMITE_PUBLICO: LimiteDeTaxa;
