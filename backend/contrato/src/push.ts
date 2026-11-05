@@ -29,6 +29,33 @@ export const LIMITES_PUSH = { endpointMax: 1024, p256dhBytes: 65, authBytes: 16 
 export const CODIGO_PUSH_INDISPONIVEL = 'push_indisponivel';
 export const CODIGO_LIMITE_ASSINATURAS = 'limite_assinaturas';
 
+/** Teto do corpo das rotas de push (notificacoes T28 a T31; NOT-67): acima dele, 413 antes de ler o JSON. */
+export const LIMITE_CORPO_PUSH_BYTES = 4096;
+
+/** Mensagens das recusas das rotas de push (T28 a T31). */
+export const MENSAGEM_PUSH_INDISPONIVEL = 'Os avisos não estão disponíveis para este grupo.';
+export const MENSAGEM_LIMITE_ASSINATURAS = 'Este grupo já tem o máximo de aparelhos recebendo avisos.';
+
+/** Corpo das recusas `push_indisponivel` (403, 503) e `limite_assinaturas` (409). */
+export interface ErroPush {
+  erro: string;
+  codigo: typeof CODIGO_PUSH_INDISPONIVEL | typeof CODIGO_LIMITE_ASSINATURAS;
+}
+
+/**
+ * `GET /api/publico/:slug/push` (T28; NOT-01, NOT-14, NOT-61; AD-103): se o controle aparece e a chave pública VAPID
+ * para o `subscribe`. Sem push, `chavePublica` é `null`. A chave privada nunca está aqui.
+ */
+export interface DisponibilidadePush {
+  disponivel: boolean;
+  chavePublica: string | null;
+}
+
+/** `POST …/push/estado` e a resposta do `POST …/push` (T28, T29; NOT-71). */
+export interface EstadoPush {
+  assinado: boolean;
+}
+
 export const MENSAGEM_ENDPOINT = 'Endereço de push não aceito.';
 export const MENSAGEM_CHAVE = 'Chave de push inválida.';
 

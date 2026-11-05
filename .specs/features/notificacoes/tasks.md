@@ -1027,6 +1027,8 @@ T39 → T40 → T41
 **Depends on**: T27
 **Reuses**: `contextoPublico` e `LIMITE_PUBLICO` (`PR:1386`, AD-045); `bodyLimit` de `POST eventos` (`PR:1634`); `recursoLiberado` (`PC:79`); AD-103
 **Requirement**: NOT-01, NOT-14, NOT-61, NOT-71
+**Status**: rascunhada
+**Nota do rascunho**: SPEC_DEVIATION: grupo arquivado responde o 404 do PAR-90 no `GET …/push` (a RLS do slug não o mostra e o PAR-90 pede o mesmo corpo de inexistente); o front esconde o controle quando o `GET` falha (T37). Contrato: `LIMITE_CORPO_PUSH_BYTES`, mensagens e os tipos `DisponibilidadePush`, `EstadoPush` e `ErroPush` em `backend/contrato/src/push.ts`. Testes em `backend/api/test/rotas/push-publico-estado.test.ts` com o apoio `apoio-push.ts`, no molde do `publico-pdf.test.ts` (Postgres local). As rotas novas só entram na suíte de isolamento de rotas na T32.
 
 **Done when**:
 

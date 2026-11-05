@@ -31,6 +31,7 @@ import { rotasPlano } from './rotas/plano.ts';
 import { rotasAssinatura } from './rotas/assinatura.ts';
 import { asaasHttp, type Asaas } from '../infraestrutura/asaas/cliente.ts';
 import { rotasPublico } from './rotas/publico.ts';
+import { rotasPublicoPush } from './rotas/publico-push.ts';
 import { rotasUso } from './rotas/uso.ts';
 import { rotasSimulador } from './rotas/simulador.ts';
 import { rotasFinanceiroConfig } from './rotas/financeiro-config.ts';
@@ -132,6 +133,8 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
   api.route('/', rotasPartidas());
   api.route('/', rotasUso());
   api.route('/', rotasPublico());
+  // Push do ranking pelo link público (notificacoes T28 em diante).
+  api.route('/', rotasPublicoPush());
   // Simulador (T33 em diante da simulador).
   api.route('/', rotasSimulador());
   // Financeiro (T25 em diante da financeiro).
