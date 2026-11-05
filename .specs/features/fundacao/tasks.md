@@ -1961,6 +1961,8 @@ T81 → T82
 **Depends on**: T63
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-40
+**Status**: rascunhada
+**Nota do rascunho**: lê `.github/workflows` e `.github/actions` (actions compostas também). Além da action local, passa a imagem `docker://` com digest `@sha256`; SHA em maiúsculas, curto ou de 41 caracteres reprova. Roda como linha de comando com `node backend/scripts/checagens/actions-por-sha.ts` (molde do `sem-url-absoluta.ts`).
 
 **Done when**:
 
