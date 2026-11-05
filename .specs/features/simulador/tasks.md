@@ -422,6 +422,7 @@ T53 → T54
 **Depends on**: T3
 **Reuses**: Textos de `S:111-114`; `L:backend/api/src/aplicacao/simulador/descricao.ts` (regra, escrita do zero no domínio)
 **Requirement**: SIM-10, SIM-11, SIM-12, SIM-13
+**Status**: rascunhada
 
 **Done when**:
 
