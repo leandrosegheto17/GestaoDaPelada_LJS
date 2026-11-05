@@ -1776,6 +1776,8 @@ T78 → T79
 **Depends on**: T48, T26
 **Reuses**: AD-033 e AD-032; restauração da fundação (`F:584`); `lerEsquema` e a referência do schema (`F:736`, `F:784`); migrar sobre banco já migrado (`F:834`); contagem de linhas de `F:2233`
 **Requirement**: PAR-13, PAR-14, PAR-91
+**Status**: rascunhada
+**Nota do rascunho**: o `backend/scripts/src/ensaio-migracao.ts` já existia (financeiro T15); a T81 o estende como ele previa: `config_pesos` em `podeGanhar` por padrão e o relatório `pesos` (grupos sem configuração antes e depois, linhas novas), que reprova quando as linhas novas não batem com os grupos que passaram a ter configuração ou quando, com a `pesos-padrao` aplicada, algum grupo fica sem. Testes em `backend/scripts/test/ensaio-migracao-partidas.test.ts` (dump simulado até antes das 6 migrações da feature). A `Evidência` do ensaio real, com o backup cifrado e a pausa para o usuário, fica para o `/executar`.
 
 **Done when**:
 

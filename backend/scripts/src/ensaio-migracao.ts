@@ -21,8 +21,10 @@ import { exigirHostPermitido, HOSTS_LOCAIS } from './host.ts';
  * 4. roda `migrar` de novo: nada a aplicar, contagem igual (zero DDL);
  * 5. amostra de 1 grupo (FIN-39): a conta com `acessa_financeiro` lê o caixa inteiro dele como `pelada_app`; uma conta
  *    do mesmo grupo sem acesso, quando existe, lê zero linhas.
- * Estende o ensaio da partidas-e-ranking (T81 dela), que ainda não existe no repositório: quando existir, as duas
- * verificações se juntam neste arquivo e `podeGanhar` leva `config_pesos`.
+ * 6. pesos padrão (partidas-e-ranking T81; PAR-13, PAR-14): `config_pesos` é a única tabela que as migrações enchem de
+ *    propósito (`podeGanhar` por padrão) e ganha exatamente uma linha por grupo que deixou de estar sem configuração;
+ *    quando a `pesos-padrao` é aplicada no ensaio, nenhum grupo pode ficar sem configuração.
+ * O schema conferido no passo 3 já inclui as funções, grants e a policy das migrações de partidas (PAR-91).
  */
 
 export class ErroEnsaio extends Error {
@@ -36,8 +38,23 @@ export interface OpcoesEnsaio {
   pasta?: string;
   /** Referência do schema; padrão: `esquema-producao.txt`. */
   referencia?: readonly string[];
-  /** Tabelas que as migrações em ensaio podem encher de propósito (só crescem). */
+  /** Tabelas que as migrações em ensaio podem encher de propósito (só crescem), além de `config_pesos`. */
   podeGanhar?: readonly string[];
+}
+
+/** Tabelas que as migrações da v2 enchem de propósito: os pesos padrão (partidas T21). */
+export const PODE_GANHAR_PADRAO = ['config_pesos'] as const;
+
+/** Sufixo da migração que cria os pesos padrão (partidas T21). */
+const MIGRACAO_PESOS_PADRAO = '_pesos-padrao';
+
+export interface PesosNoEnsaio {
+  /** Grupos sem linha em `config_pesos` antes de migrar. */
+  semConfigAntes: number;
+  /** Grupos sem linha em `config_pesos` depois de migrar. */
+  semConfigDepois: number;
+  /** Linhas que `config_pesos` ganhou. */
+  linhasNovas: number;
 }
 
 export interface AmostraAcesso {
@@ -59,7 +76,24 @@ export interface RelatorioEnsaio {
   esquema: Diferencas;
   segundaExecucao: string[];
   amostra: AmostraAcesso | null;
+  pesos: PesosNoEnsaio;
   ok: boolean;
+}
+
+async function gruposSemConfig(url: string): Promise<number> {
+  return comConexao(url, async (c) => {
+    const r = await c.query<{ n: number }>(
+      `SELECT count(*)::int AS n FROM grupos g WHERE NOT EXISTS (SELECT 1 FROM config_pesos p WHERE p.grupo_id = g.id)`,
+    );
+    return r.rows[0]?.n ?? 0;
+  });
+}
+
+/** Uma linha nova por grupo que passou a ter configuração; com a `pesos-padrao` aplicada, nenhum grupo fica sem. */
+function pesosOk(p: PesosNoEnsaio, aplicadas: readonly string[]): boolean {
+  const comPesosPadrao = aplicadas.some((n) => n.replace(/\.sql$/, '').endsWith(MIGRACAO_PESOS_PADRAO));
+  if (comPesosPadrao && p.semConfigDepois !== 0) return false;
+  return p.linhasNovas === p.semConfigAntes - p.semConfigDepois;
 }
 
 function semIgnoradas(contagem: Record<string, number>): Record<string, number> {
@@ -132,7 +166,7 @@ function amostraOk(a: AmostraAcesso | null): boolean {
 
 export async function ensaiar(url: string, opcoes: OpcoesEnsaio = {}): Promise<RelatorioEnsaio> {
   exigirHostPermitido(url, HOSTS_LOCAIS);
-  const podeGanhar = opcoes.podeGanhar ?? [];
+  const podeGanhar = [...PODE_GANHAR_PADRAO, ...(opcoes.podeGanhar ?? [])];
   const referencia = opcoes.referencia ?? lerReferencia();
 
   const antes = semIgnoradas(await contarLinhas(url));
@@ -141,9 +175,15 @@ export async function ensaiar(url: string, opcoes: OpcoesEnsaio = {}): Promise<R
       'O dump não tem linhas nas tabelas de negócio (pendência da AD-014): o ensaio não prova nada. Pare e decida com o usuário.',
     );
   }
+  const semConfigAntes = await gruposSemConfig(url);
 
   const aplicadas = await migrar(url, { pasta: opcoes.pasta });
   const depois = semIgnoradas(await contarLinhas(url));
+  const pesos: PesosNoEnsaio = {
+    semConfigAntes,
+    semConfigDepois: await gruposSemConfig(url),
+    linhasNovas: (depois.config_pesos ?? 0) - (antes.config_pesos ?? 0),
+  };
   const esquema = await compararEsquema(url, referencia);
 
   const segundaExecucao = await migrar(url, { pasta: opcoes.pasta });
@@ -157,8 +197,9 @@ export async function ensaiar(url: string, opcoes: OpcoesEnsaio = {}): Promise<R
     esquema.faltando.length === 0 &&
     esquema.sobrando.length === 0 &&
     segundaExecucao.length === 0 &&
-    amostraOk(amostra);
-  return { aplicadas, antes, depois, tabelasAlteradas, esquema, segundaExecucao, amostra, ok };
+    amostraOk(amostra) &&
+    pesosOk(pesos, aplicadas);
+  return { aplicadas, antes, depois, tabelasAlteradas, esquema, segundaExecucao, amostra, pesos, ok };
 }
 
 export const URL_BASE_ENSAIO = process.env.DATABASE_URL_TESTE ?? 'postgres://postgres:postgres@127.0.0.1:5432/pelada';
@@ -203,6 +244,10 @@ function imprimir(r: RelatorioEnsaio): void {
       ? `Amostra do grupo ${a.grupoId}: ${a.esperadas} linhas no caixa; conta com acesso leu ${a.lidasComAcesso}` +
           (a.lidasSemAcesso === undefined ? '; sem conta sem acesso para comparar' : `; conta sem acesso leu ${a.lidasSemAcesso}`)
       : 'Amostra: nenhum grupo ativo com caixa e conta com acesso',
+  );
+  const p = r.pesos;
+  console.log(
+    `Pesos padrão: ${p.semConfigAntes} grupos sem configuração antes, ${p.semConfigDepois} depois; config_pesos ganhou ${p.linhasNovas}`,
   );
   console.log(r.ok ? 'Ensaio ok.' : 'Ensaio com problemas: não faça o deploy da prévia.');
 }
