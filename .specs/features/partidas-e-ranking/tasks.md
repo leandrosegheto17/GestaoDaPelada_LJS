@@ -651,6 +651,7 @@ T78 → T79
 **Depends on**: T7
 **Reuses**: `B:158-162` (PAR-23 a PAR-27); intervalo [início, fim) de `GE:626`
 **Requirement**: PAR-23, PAR-24, PAR-25, PAR-27
+**Status**: rascunhada
 
 **Done when**:
 

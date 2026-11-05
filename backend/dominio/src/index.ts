@@ -114,3 +114,17 @@ export {
 } from './plano/recursos.ts';
 export { pagoAteDe } from './plano/pago-ate.ts';
 export { dataSugeridaPartida } from './partidas/data-sugerida.ts';
+export {
+  ativosNaData,
+  contagemDaPartida,
+  MENSAGEM_JOGADOR_INATIVO,
+  MENSAGEM_JOGADOR_REPETIDO,
+  MENSAGEM_SITUACAO,
+  SITUACOES_MARCACAO,
+  validarMarcacoes,
+  type ContagemDaPartida,
+  type Marcacao,
+  type PresencaMarcada,
+  type ResultadoMarcacoes,
+  type SituacaoMarcacao,
+} from './partidas/marcacoes.ts';
