@@ -1153,6 +1153,8 @@ Lacunas: o `PATCH /api/grupos/:grupoId` real é registrado antes das rotas extra
 **Depends on**: T29
 **Reuses**: `grupos.arquivar` e `grupos.reativar` (T27); tabela de `GD:170-171`
 **Requirement**: GEL-22, GEL-23, GEL-24, GEL-28, GEL-29
+**Status**: rascunhada
+Lacunas: como na T29, as rotas reais de arquivar e reativar vêm antes das extras de `backend/api/test/sessao/grupo-ativo.test.ts` (T22); o caso "reativar e arquivar passam no grupo arquivado" manda o arquivar sem corpo e passa a receber 422 da rota real. Teste da T22 não alterado no rascunho.
 
 **Done when**:
 
