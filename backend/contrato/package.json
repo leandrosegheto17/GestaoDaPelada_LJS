@@ -14,7 +14,8 @@
     "./elenco": "./src/elenco.ts",
     "./periodos": "./src/periodos.ts",
     "./push": "./src/push.ts",
-    "./plano": "./src/plano.ts"
+    "./plano": "./src/plano.ts",
+    "./asaas": "./src/asaas.ts"
   },
   "scripts": {
     "lint": "eslint .",

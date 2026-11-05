@@ -497,6 +497,7 @@ T56 → T57
 **Depends on**: T6
 **Reuses**: AD-060; S:52
 **Requirement**: PLA-50
+**Status**: rascunhada
 
 **Done when**:
 
