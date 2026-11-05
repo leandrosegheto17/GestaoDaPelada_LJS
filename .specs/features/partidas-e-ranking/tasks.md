@@ -1453,6 +1453,8 @@ T78 → T79
 **Depends on**: T36
 **Reuses**: `comBanco` com `app.slug_publico` (`F:1203`); `limiteTaxa` (`F:1153`) e binding `LIMITE_PUBLICO` (`F:1081`); chave de IP (`CA:746`); `carregarSessao` (`CA:770`); `BD:220-222`; AD-034
 **Requirement**: PAR-77, PAR-78, PAR-90
+**Status**: rascunhada
+**Nota do rascunho**: `protegerRotasPublicas(api)` em `contexto-publico.ts`, registrado em `criarApp` depois do `protegerRotasDeGrupo`, encadeia `limiteTaxa('LIMITE_PUBLICO')` (antes do slug: a cota é por IP, também no slug malformado), `contextoPublico` (apaga `contaId` e `tokenHash`, põe `slugPublico`, novo em `Variaveis`) e `comBanco(contextoDoSlug)`. As rotas de T45 a T47 só declaram o handler. Testes em `backend/api/test/rotas/contexto-publico.test.ts`, com uma rota de teste que devolve o contexto da RLS.
 
 **Done when**:
 

@@ -51,6 +51,8 @@ export interface Variaveis {
   tokenHash?: Uint8Array;
   /** Relógio da requisição, posto pelo `criarApp` antes de tudo (T19; GEL-32). */
   relogio: Relogio;
+  /** Slug da rota pública, posto pelo `contextoPublico` (partidas-e-ranking T37; AD-034). */
+  slugPublico?: string;
   /** A cadeia das rotas de grupo já rodou nesta requisição (T22). */
   grupoProtegido?: boolean;
   /** Ponto único da regra de plano, posto pelo `criarApp` (T32 da simulador; SIM-68, AD-049). */
