@@ -111,3 +111,11 @@
 .ranking tbody tr:nth-child(-n + 3) .c-pos {
   color: var(--cor-verde);
 }
+
+.ranking__sem-partidas {
+  font-size: var(--texto-sm);
+  color: var(--cor-texto-sec);
+  text-align: left !important;
+  padding: 0 var(--esp-3) !important;
+  white-space: normal;
+}

@@ -1984,6 +1984,8 @@ T78 → T79
 **Depends on**: T55
 **Reuses**: `.specs/mockup/telas/t01-ranking--{sucesso,vazio,vazio-mes,carregando,erro}.html`; `Faixa` (`CA:1286`); `BC:29` (P17)
 **Requirement**: PAR-79, PAR-81, PAR-82, PAR-88, PAR-89, PAR-161
+**Status**: rascunhada
+**Nota do rascunho**: o mês sem partidas (PAR-88) entrou na `TabelaRanking` (T55) como a variante `nomeMes`; o "Exportar PDF" é só o botão, sem ação, até a T70.
 
 **Done when**:
 

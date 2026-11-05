@@ -102,9 +102,64 @@ export interface PropsTabelaRanking {
   linhas: readonly LinhaPublica[];
   /** Legenda da tabela para leitor de tela (ex.: "Ranking geral da Pelada de Quinta, com os pontos de cada partida de outubro de 2026"). */
   legenda: string;
+  /**
+   * Nome do mês exibido ("julho"), usado só quando o mês não tem partidas (PAR-88, T56): "Pts inicial (início de
+   * julho)", "Pts final (fim de julho)" e "Nenhuma partida registrada neste mês" no lugar das colunas de partida,
+   * de `t01-ranking--vazio-mes.html:34-38`.
+   */
+  nomeMes?: string;
 }
 
-export function TabelaRanking({ partidas, linhas, legenda }: PropsTabelaRanking) {
+export const TEXTO_MES_SEM_PARTIDAS = 'Nenhuma partida registrada neste mês';
+
+function TabelaMesSemPartidas({ linhas, legenda, nomeMes }: { linhas: readonly LinhaPublica[]; legenda: string; nomeMes: string }) {
+  return (
+    <div className={estilos['tabela-rolagem']} role="region" aria-label="Tabela do ranking" tabIndex={0}>
+      <table className={estilos.ranking}>
+        <caption className="sr">{legenda}</caption>
+        <thead>
+          <tr>
+            <th scope="col" className={estilos['c-pos']}>
+              <abbr title="Posição">#</abbr>
+            </th>
+            <th scope="col" className={estilos['c-nome']}>
+              Jogador
+            </th>
+            <th scope="col" className={estilos['c-pts']}>
+              Pts inicial<span className="sr"> (início de {nomeMes})</span>
+            </th>
+            <th scope="col">Partidas do mês</th>
+            <th scope="col" className={estilos['c-pts']}>
+              Pts final<span className="sr"> (fim de {nomeMes})</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {linhas.map((linha, i) => (
+            <tr key={`${linha.posicao}-${linha.apelido}`}>
+              <td className={estilos['c-pos']}>{linha.posicao}</td>
+              <th scope="row" className={estilos['c-nome']}>
+                {linha.apelido}
+              </th>
+              <td className={`${estilos['c-pts']} ${estilos['c-pts--inicial']}`}>{linha.ptsInicial}</td>
+              {i === 0 ? (
+                <td className={estilos['ranking__sem-partidas']} rowSpan={linhas.length}>
+                  {TEXTO_MES_SEM_PARTIDAS}
+                </td>
+              ) : null}
+              <td className={estilos['c-pts']}>{linha.ptsFinal}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+export function TabelaRanking({ partidas, linhas, legenda, nomeMes }: PropsTabelaRanking) {
+  if (partidas.length === 0 && nomeMes !== undefined) {
+    return <TabelaMesSemPartidas linhas={linhas} legenda={legenda} nomeMes={nomeMes} />;
+  }
   return (
     <div
       className={estilos['tabela-rolagem']}
