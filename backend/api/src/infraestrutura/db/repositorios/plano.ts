@@ -1,5 +1,5 @@
 import { sql } from 'kysely';
-import type { Data, GrupoDaCriadora, SituacaoComercial } from '@pelada/dominio';
+import type { Data, GrupoDaCriadora, SituacaoAssinatura, SituacaoComercial } from '@pelada/dominio';
 import type { LinhaGrupoDaCriadora, LinhaPlanoDoGrupo } from '../tipos.ts';
 import type { Db } from './tipos.ts';
 
@@ -76,4 +76,25 @@ async function gruposDaCriadora(db: Db, grupoId: string): Promise<GrupoDaCriador
   }));
 }
 
-export const plano = { ler, gruposDaCriadora };
+/** A assinatura que Meu plano mostra (T24; PLA-08, AD-096). */
+export interface AssinaturaVigente {
+  situacao: SituacaoAssinatura;
+  faturaUrl: string | null;
+}
+
+/**
+ * A assinatura não cancelada mais recente do grupo ou, sem ela, a cancelada mais recente (a mesma ordem do `pago_ate`
+ * de `plano_do_grupo`, T12). `null` sem assinatura. Pela RLS de `assinaturas` (T11): só as do grupo com vínculo.
+ */
+async function assinaturaVigente(db: Db, grupoId: string): Promise<AssinaturaVigente | null> {
+  const r = await sql<{ situacao: SituacaoAssinatura; fatura_url: string | null }>`
+    SELECT situacao, fatura_url
+      FROM assinaturas
+     WHERE grupo_id = ${grupoId}::uuid
+     ORDER BY (situacao <> 'cancelada') DESC, criada_em DESC, id
+     LIMIT 1`.execute(db);
+  const l = r.rows[0];
+  return l === undefined ? null : { situacao: l.situacao, faturaUrl: l.fatura_url };
+}
+
+export const plano = { ler, gruposDaCriadora, assinaturaVigente };

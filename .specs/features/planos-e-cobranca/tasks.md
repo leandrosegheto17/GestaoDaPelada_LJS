@@ -957,6 +957,9 @@ T56 → T57
 **Depends on**: T23
 **Reuses**: `estadoDoPlano` (T21); `planoResposta` (T6); molde de rota de leitura `GE:1080` (T29); Relógio falso de `GE:831`
 **Requirement**: PLA-08, PLA-09, PLA-71
+**Status**: rascunhada
+**Nota do rascunho**: a rota fica em `entrada/rotas/plano.ts`, registrada no `criarApp`. O motivo de somente leitura foi extraído para `aplicacao/plano/somente-leitura.ts` (o middleware da T22 passa a usá-lo); a assinatura vigente sai de `plano.assinaturaVigente` (repositório da T20); a regra "fatura em aberto" (pendente, ou `inadimplente` com a assinatura ativa, AD-096) foi para o domínio (`plano/fatura.ts`, `mostraFaturaEmAberto`), porque compara a situação comercial (checagem da T8).
+**Lacunas**: `trialFimEm` é o último dia Pro (`ultimoDiaDoTrial`, "Trial Pro até", PLA-52) ou o primeiro dia Free (`trial_inicio` + 14, PLA-70)? O rascunho usa o último dia Pro.
 
 **Done when**:
 

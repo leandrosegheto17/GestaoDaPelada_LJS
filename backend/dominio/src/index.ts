@@ -113,6 +113,7 @@ export {
   type RecursosDoPlano,
 } from './plano/recursos.ts';
 export { pagoAteDe } from './plano/pago-ate.ts';
+export { mostraFaturaEmAberto } from './plano/fatura.ts';
 export { dataSugeridaPartida } from './partidas/data-sugerida.ts';
 export {
   ativosNaData,

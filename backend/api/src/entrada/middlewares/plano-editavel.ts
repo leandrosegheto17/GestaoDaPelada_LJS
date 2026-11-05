@@ -1,13 +1,8 @@
 import type { Context, MiddlewareHandler } from 'hono';
 import { MENSAGENS_ERRO_PLANO } from '@pelada/contrato';
-import {
-  planoEfetivo,
-  somenteLeitura,
-  type MotivoSomenteLeitura,
-  type OperacaoDeEscrita,
-} from '@pelada/dominio';
+import type { MotivoSomenteLeitura, OperacaoDeEscrita } from '@pelada/dominio';
 import { estadoDoPlano } from '../../aplicacao/plano/recurso-liberado.ts';
-import { plano as repositorioPlano } from '../../infraestrutura/db/repositorios/plano.ts';
+import { motivoSomenteLeitura } from '../../aplicacao/plano/somente-leitura.ts';
 import type { Ambiente } from '../ambiente.ts';
 import { ehPrevia } from './com-banco.ts';
 
@@ -95,17 +90,7 @@ export const exigirPlanoEditavel: MiddlewareHandler<Ambiente> = async (c, next) 
     await next();
     return;
   }
-  const daCriadora = await repositorioPlano.gruposDaCriadora(c.var.db, grupoId);
-  const gruposFreeDaCriadora = daCriadora
-    .filter((g) => planoEfetivo(g.situacaoComercial, g.trialInicio, g.pagoAte, hoje) === 'free')
-    .map((g) => ({ id: g.id, criadoEm: g.criadoEm }));
-  const motivo = somenteLeitura({
-    plano: estado.plano,
-    jogadoresAtivos: estado.jogadoresAtivos,
-    gruposFreeDaCriadora,
-    grupoId,
-    operacao,
-  });
+  const motivo = await motivoSomenteLeitura(c.var.db, grupoId, hoje, estado, operacao);
   if (motivo !== null) return respostaSomenteLeitura(c, motivo);
   await next();
 };
