@@ -965,6 +965,7 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T22
 **Reuses**: estender `limiteTaxa(binding)` (`F:1153`, estendido em `CA:746`) com a chave `conta:<id>`; binding de `F:1081` (FUN-26, 60 por minuto); decisão de `GSEG:75` e `GSEG:159`
 **Requirement**: SEC-003
+**Status**: rascunhada
 
 **Done when**:
 

@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import type { Ambiente } from './ambiente.ts';
 import { exigirCabecalhoPelada } from './middlewares/cabecalho-pelada.ts';
 import { semCache, semSniff } from './middlewares/cabecalhos.ts';
+import { limitarEscritasDeGrupo } from './middlewares/limite-escrita.ts';
 import { limitarRotasDeAcesso } from './middlewares/limite-taxa.ts';
 import { carregarSessao } from './middlewares/sessao.ts';
 import { protegerRotasDeGrupo } from './middlewares/vinculo.ts';
@@ -51,6 +52,8 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
   limitarRotasDeAcesso(api);
   // Sessão resolvida em transação própria, antes do `comBanco` de cada rota (ACE-47, T20).
   api.use('*', carregarSessao(opcoes.fabricaBanco ? { fabrica: opcoes.fabricaBanco } : {}));
+  // LIMITE_ESCRITA por conta nas escritas de /api/grupos*, antes da transação da rota (SEC-003, T23).
+  api.use('*', limitarEscritasDeGrupo);
   // Rotas de grupo: sessão, transação com a conta e vínculo sob a RLS (ACE-41, T21).
   protegerRotasDeGrupo(api, opcoes.fabricaBanco ? { fabrica: opcoes.fabricaBanco } : {});
 

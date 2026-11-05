@@ -1,4 +1,4 @@
-import type { Hono, MiddlewareHandler } from 'hono';
+import type { Context, Hono, MiddlewareHandler } from 'hono';
 import type { Ambiente, NomeLimite } from '../ambiente.ts';
 import { chaveIp, SEM_IP } from '../../infraestrutura/sessao/token.ts';
 
@@ -16,10 +16,20 @@ export const MENSAGEM_LIMITE = 'Muitas requisições. Tente de novo em instantes
  *
  * A chave é a do IP pela `chaveIp(ip, 64)` (T19; ACE-71): IPv4 inteiro, IPv6 pelo /64 (quem
  * tem um /64 troca de endereço à vontade dentro dele), e `sem-ip` sem o cabeçalho.
+ *
+ * `chaveDe` troca a chave (grupos-e-elenco T23; SEC-003: `conta:<id>` nas escritas de grupo).
+ * Quando devolve `undefined`, o limitador não se aplica à requisição e ela segue sem gastar cota.
  */
-export function limiteTaxa(binding: NomeLimite): MiddlewareHandler<Ambiente> {
+export function limiteTaxa(
+  binding: NomeLimite,
+  chaveDe: (c: Context<Ambiente>) => string | undefined = (c) => chaveIp(c.req.header('cf-connecting-ip'), 64),
+): MiddlewareHandler<Ambiente> {
   return async (c, next) => {
-    const chave = chaveIp(c.req.header('cf-connecting-ip'), 64);
+    const chave = chaveDe(c);
+    if (chave === undefined) {
+      await next();
+      return;
+    }
     const { success } = await c.env[binding].limit({ key: chave });
     if (!success) {
       return c.json({ erro: MENSAGEM_LIMITE }, 429, { 'Retry-After': String(ESPERA_SEGUNDOS) });
