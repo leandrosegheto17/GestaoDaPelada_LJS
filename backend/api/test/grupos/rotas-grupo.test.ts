@@ -57,8 +57,23 @@ describe('GET /api/grupos/:grupoId', () => {
     const r = await cliente(aberto.url)(`/grupos/${cenario.grupoG}`, { sessao: await sessao(cenario.contaC) });
     expect(r.status).toBe(200);
     const g = (await r.json()) as Record<string, unknown>;
+    // A criadora tem acesso ao financeiro: o detalhe traz também o saldo (financeiro T30, FIN-34; autorização de
+    // 2026-11-04 em `## Autorizações` do STATE.md). A lista continua exata.
     expect(Object.keys(g).sort()).toEqual(
-      ['admins', 'diaSemana', 'frequencia', 'habilidades', 'horario', 'id', 'jogadoresAtivos', 'linkPublico', 'nome', 'slug', 'souCriador'].sort(),
+      [
+        'admins',
+        'diaSemana',
+        'frequencia',
+        'habilidades',
+        'horario',
+        'id',
+        'jogadoresAtivos',
+        'linkPublico',
+        'nome',
+        'saldoFinanceiroCentavos',
+        'slug',
+        'souCriador',
+      ].sort(),
     );
     expect(g).toMatchObject({
       id: cenario.grupoG,

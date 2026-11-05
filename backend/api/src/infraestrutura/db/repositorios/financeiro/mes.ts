@@ -121,4 +121,24 @@ async function lerMes(db: Db, grupoId: string, mes: string, hoje: string): Promi
   };
 }
 
-export const financeiroMes = { lerMes };
+export type SaldoDoGrupo = { acessa: false } | { acessa: true; saldoCentavos: number | null };
+
+/**
+ * O saldo atual para o detalhe do grupo (financeiro T30; FIN-34; AD-079). Sem acesso ao financeiro (a mesma
+ * `app_acessa_financeiro` da RLS e do `exigirFinanceiro`), `acessa: false` e nada mais é lido: a rota omite a chave.
+ * Com acesso e sem configuração, saldo nulo. Senão, o `saldoAtual` do domínio sobre os lançamentos de
+ * `[data do saldo inicial, hoje]` (FIN-10, FIN-13).
+ */
+async function saldoDoGrupo(db: Db, grupoId: string, hoje: string): Promise<SaldoDoGrupo> {
+  const a = await sql<{ ok: boolean }>`SELECT app_acessa_financeiro(${grupoId}::uuid) AS ok`.execute(db);
+  if (a.rows[0]?.ok !== true) return { acessa: false };
+  const config = await configFinanceira.lerConfig(db, grupoId);
+  if (config === null) return { acessa: true, saldoCentavos: null };
+  const r = await sql<{ tipo: 'entrada' | 'saida'; data: string; valor_centavos: number }>`
+    SELECT tipo, data::text AS data, valor_centavos FROM lancamentos
+     WHERE grupo_id = ${grupoId} AND data >= ${config.dataSaldoInicial}::date AND data <= ${hoje}::date`.execute(db);
+  const movimentos: MovimentoCaixa[] = r.rows.map((l) => ({ tipo: l.tipo, data: l.data, valorCentavos: Number(l.valor_centavos) }));
+  return { acessa: true, saldoCentavos: saldoAtual(config, movimentos, hoje) };
+}
+
+export const financeiroMes = { lerMes, saldoDoGrupo };

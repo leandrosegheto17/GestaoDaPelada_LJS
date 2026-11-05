@@ -1089,6 +1089,8 @@ T47 → T48
 **Depends on**: T29
 **Reuses**: Rota de `GE:1080`, ampliada em `PR:1538`; contrato `grupoDetalhe` (`GE:753`); T17 (leitura do saldo)
 **Requirement**: FIN-34
+**Status**: rascunhada
+**Nota do rascunho**: `SPEC_DEVIATION`: o `grupoDetalhe` não muda (a partidas-e-ranking o deixou só para o PATCH, `previas.ts:56-60`); o campo vai no fragmento `campoSaldoDoGrupo` e no `grupoDetalheComSaldo` (`contrato/src/financeiro.ts`), e quando o GET passar a responder `grupoDetalheComPartidas` (`PR:1538`) ele estende o mesmo fragmento. O saldo vem de `financeiroMes.saldoDoGrupo` (acrescentado ao `mes.ts` da T17), que lê `app_acessa_financeiro` antes de tudo. Teste existente mudado com a autorização de 2026-11-04: `test/grupos/rotas-grupo.test.ts` (lista exata de chaves da criadora ganha `saldoFinanceiroCentavos`). O teste do `PAR-160` (`PR:2075`) ainda não existe no repositório.
 
 **Done when**:
 

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { grupoDetalhe } from './grupo.ts';
 
 /**
  * Contrato da configuração e do mês do caixa (T7; FIN-01, FIN-03, FIN-07, FIN-08, FIN-13, FIN-14). Todo valor em
@@ -117,3 +118,15 @@ export const mesFinanceiroResposta = z
     }
   });
 export type MesFinanceiroResposta = z.infer<typeof mesFinanceiroResposta>;
+
+/**
+ * Saldo no detalhe do grupo (T30; FIN-34; AD-079): inteiro, ou nulo sem configuração; a chave fica **ausente** para
+ * quem não tem acesso ao financeiro. Vale só para o `GET /api/grupos/:grupoId`; o PATCH segue com o `grupoDetalhe`.
+ * SPEC_DEVIATION: a tarefa manda mudar o `grupoDetalhe` (`GE:753`), mas a partidas-e-ranking o deixou só para o PATCH
+ * e pôs a forma do GET em `grupoDetalheComPartidas` (`previas.ts`); o campo vai num fragmento que a forma do GET
+ * estende (`grupoDetalheComSaldo` agora; `grupoDetalheComPartidas.extend(campoSaldoDoGrupo)` quando o GET passar a
+ * responder com ela, `PR:1538`).
+ */
+export const campoSaldoDoGrupo = { saldoFinanceiroCentavos: saldoResposta.nullable().optional() };
+export const grupoDetalheComSaldo = grupoDetalhe.extend(campoSaldoDoGrupo);
+export type GrupoDetalheComSaldo = z.infer<typeof grupoDetalheComSaldo>;
