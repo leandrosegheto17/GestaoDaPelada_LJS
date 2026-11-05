@@ -1231,6 +1231,8 @@ T53 → T54
 **Depends on**: T33
 **Reuses**: `lerCorpo` (`GE:854`); `READ ONLY` de `PR:1362` (T36); T3, T4, T21
 **Requirement**: SIM-09, SIM-83
+**Status**: rascunhada
+**Nota do rascunho**: `respostaDaPrevia(previa)` monta a resposta do contrato com a `descricao`. A transação `READ ONLY` pelo sufixo `/previa` (AD-035) é do `comBanco` da `partidas-e-ranking` (`PR:1362`, T36), ainda não rascunhada: esta rota não a reimplementa. Atenção para o /executar: em `READ ONLY` o `SELECT … FOR KEY SHARE` do `exigirGrupoAtivo` falha no Postgres; a T36 da `partidas-e-ranking` precisa tratar o sufixo. Teste em `backend/api/test/rotas/simulador-previa.test.ts`.
 
 **Done when**:
 
