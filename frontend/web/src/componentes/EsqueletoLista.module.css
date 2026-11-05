@@ -1,0 +1,35 @@
+/* Esqueleto de lista (FUN-31), de .specs/mockup/base.css:24,144,218-222. */
+
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-linha);
+  border-radius: var(--raio);
+}
+
+.esqueleto {
+  display: block;
+  background: var(--cor-esqueleto);
+  border-radius: var(--raio-sm);
+  animation: pulsar 1.4s ease-in-out infinite;
+}
+
+@keyframes pulsar {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.esqueleto--bloco {
+  height: 60px;
+  margin: 0 0 1px;
+  border-radius: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .esqueleto {
+    animation: none;
+  }
+}
