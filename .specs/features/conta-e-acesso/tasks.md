@@ -465,6 +465,8 @@ T57 → T58
 **Depends on**: T6
 **Reuses**: `M:1792844160000_conta-nova-senha-zera-falhas.sql:10` (`link_nova_senha` vigente); `M:1792843800000_conta-senha-bloqueio.sql:27-82` (`falhas_senha_atual`, `conta_trocar_senha`)
 **Requirement**: ACE-23, ACE-24, ACE-25, ACE-26, ACE-27, ACE-70, ACE-76
+**Status**: rascunhada
+**Nota do rascunho**: casos limite listados no topo do teste; sem lacuna.
 
 **Done when**:
 
