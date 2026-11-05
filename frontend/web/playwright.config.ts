@@ -40,7 +40,10 @@ export default defineConfig({
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {
-    command: `pnpm --filter @pelada/api exec wrangler dev --config ../../wrangler.jsonc --ip 127.0.0.1 --port ${PORTA_E2E}`,
+    // EMAIL_DEV=1: os e-mails vão para a caixa `GET /api/dev/emails` (T17), que as jornadas de
+    // acesso leem (T57); URL_PUBLICA local, para os links dos e-mails apontarem para cá. As duas
+    // só por --var: o wrangler.jsonc nunca leva EMAIL_DEV (checagem `email-dev`).
+    command: `pnpm --filter @pelada/api exec wrangler dev --config ../../wrangler.jsonc --ip 127.0.0.1 --port ${PORTA_E2E} --var EMAIL_DEV:1 --var URL_PUBLICA:${URL_BASE}`,
     url: `${URL_BASE}/api/health`,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

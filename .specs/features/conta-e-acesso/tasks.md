@@ -1813,6 +1813,9 @@ T57 → T58
 **Depends on**: T56
 **Reuses**: Playwright e servidor de e2e da fundação (`F:1691`); caixa de dev (T17); `pnpm dev` (`F:1812`)
 **Requirement**: ACE-01, ACE-06, ACE-09, ACE-24, ACE-28, ACE-33
+**Status**: rascunhada
+**Nota do rascunho**: o `wrangler dev` do e2e (`playwright.config.ts`) passou a subir com `--var EMAIL_DEV:1 --var URL_PUBLICA:<URL_BASE>`: sem a `URL_PUBLICA` local (vazia no `wrangler.jsonc`), o modelo de e-mail recusa montar o link. As jornadas leem o último e-mail do tipo e do destinatário em `GET /api/dev/emails` e abrem o caminho com o `#t=`. Cada jornada usa e-mails novos e um contexto de navegador por aparelho. A J-08 usa a conta e o grupo do seed (`admin@exemplo.test`, "Pelada Local", senha de `SEED_SENHA_ADMIN` do `.env`) e é pulada, com o motivo, sem a variável. A J-08 não cobre "A tenta se remover sozinho": a tela não oferece "Remover" para a própria conta (T53).
+**Lacunas**: o `LIMITE_ENTRAR` local é de 10 requisições por minuto por IP, e as quatro jornadas fazem mais que isso; cada aparelho manda um `cf-connecting-ip` próprio para separar as cotas, mas não está conferido que o `wrangler dev` respeita o cabeçalho vindo do cliente. Se não respeitar, o `/executar` decide (ex.: `LIMITE_ENTRAR` maior só no e2e).
 
 **Done when**:
 
