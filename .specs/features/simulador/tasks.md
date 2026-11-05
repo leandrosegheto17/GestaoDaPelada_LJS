@@ -503,6 +503,7 @@ T53 → T54
 **Depends on**: T6
 **Reuses**: `L:backend/dominio/src/simulador/classificacao.ts:52-60`; `S:151-152`, `S:340-341`, Independent Test `S:155`
 **Requirement**: SIM-24, SIM-25, SIM-89, SIM-90
+**Status**: rascunhada
 
 **Done when**:
 
