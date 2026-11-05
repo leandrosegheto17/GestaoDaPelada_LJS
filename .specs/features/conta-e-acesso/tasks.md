@@ -380,6 +380,8 @@ T57 → T58
 **Depends on**: T3
 **Reuses**: `M:1792843440000_conta-cadastro-e-links.sql:11` (`envio_permitido`), `:29` (`conta_cadastrar`); `M:1792843920000_conta-esqueci-nao-confirmada.sql:47` (`link_pedir`); `M:1792843740000_conta-confirmar-sem-sessao.sql:9` (`link_confirmar`)
 **Requirement**: ACE-01, ACE-04, ACE-05, ACE-06, ACE-07, ACE-08, ACE-23, ACE-51
+**Status**: rascunhada
+**Nota do rascunho**: o apoio dos testes de banco (transação desfeita, troca de role) nasce em `backend/api/test/banco/apoio-conta.ts`.
 
 **Done when**:
 
