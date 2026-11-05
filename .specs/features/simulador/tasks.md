@@ -817,6 +817,9 @@ T53 → T54
 **Depends on**: T17
 **Reuses**: Fixtures de `L:backend/dominio/test/simulador/apoio.ts` e `L:backend/dominio/test/simulador/sugerir.test.ts` como dado; Goal `S:25`; AD-046; molde de regressão `PR:584` (T6)
 **Requirement**: SIM-52
+**Status**: rascunhada
+**Nota do rascunho**: 7 casos (4 em 2 times, 3 em 3+) sobre o elenco e o histórico de `apoio.ts`; o esperado fica em `referencia-legado.json`, hoje com `null` em cada caso, e o teste do caso falha até a saída do legado ser registrada. Rodar o legado é do /executar (o rascunho não executa nada).
+**Lacunas**: os esperados dependem de rodar o legado `ece227e0`; a conversão da entrada (nível × 100, mesmo histórico) está no cabeçalho do teste. Divergência entre v2 e legado: parar e perguntar, como a tarefa manda.
 
 **Done when**:
 
