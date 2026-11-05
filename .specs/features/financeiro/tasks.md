@@ -1272,6 +1272,8 @@ T47 → T48
 **Depends on**: T36
 **Reuses**: Estender `rotas.tsx` (`GE:2068`, `PR:1926`); AD-054
 **Requirement**: FIN-47
+**Status**: rascunhada
+**Nota do rascunho**: as telas `FinanceiroMes`, `Lancamento` e `ConfigCaixa` nascem aqui como esqueleto (só a `Casca` com o título), para o roteador não importar arquivo de tarefa posterior; T38, T41 e T42 as completam. `handle.tela`: `financeiro`, `novo-lancamento`, `lancamento`, `config-caixa`. Teste em `frontend/web/test/app/rotas-financeiro.test.tsx`.
 
 **Done when**:
 

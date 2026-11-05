@@ -20,6 +20,9 @@ import { Jogadores } from '../telas/jogadores/Jogadores.tsx';
 import { NovoJogador } from '../telas/jogador/NovoJogador.tsx';
 import { FichaJogador } from '../telas/jogador/FichaJogador.tsx';
 import { Habilidades } from '../telas/habilidades/Habilidades.tsx';
+import { ConfigCaixa } from '../telas/financeiro/ConfigCaixa.tsx';
+import { FinanceiroMes } from '../telas/financeiro/FinanceiroMes.tsx';
+import { Lancamento } from '../telas/financeiro/Lancamento.tsx';
 
 /**
  * Rotas (FUN-31, FUN-38; conta e acesso, T42):
@@ -36,6 +39,8 @@ import { Habilidades } from '../telas/habilidades/Habilidades.tsx';
  *   do grupo, dados, jogadores, novo jogador, ficha e habilidades. `grupos/novo` vem antes de
  *   `grupos/:grupoId` só por clareza: o roteador já prefere o segmento fixo. Grupo ou jogador que a
  *   API não acha (404) mostra o não encontrado da própria tela;
+ * - financeiro (financeiro T37; FIN-47, AD-054): o mês do caixa, novo lançamento, lançamento e configurar caixa, em
+ *   `/app/grupos/:grupoId/financeiro…`. `lancamentos/novo` vem antes de `lancamentos/:lancamentoId` só por clareza;
  * - `/_vitrine/:id` só com `VITE_VITRINE=1`, e `*` com o 404.
  *
  * `handle.tela` identifica cada tela (o teste das rotas confere por ele).
@@ -80,6 +85,10 @@ export function criarRotas(): RouteObject[] {
         { path: 'grupos/:grupoId/jogadores/novo', element: <NovoJogador />, handle: { tela: 'novo-jogador' } },
         { path: 'grupos/:grupoId/jogadores/:jogadorId', element: <FichaJogador />, handle: { tela: 'jogador' } },
         { path: 'grupos/:grupoId/habilidades', element: <Habilidades />, handle: { tela: 'habilidades' } },
+        { path: 'grupos/:grupoId/financeiro', element: <FinanceiroMes />, handle: { tela: 'financeiro' } },
+        { path: 'grupos/:grupoId/financeiro/lancamentos/novo', element: <Lancamento />, handle: { tela: 'novo-lancamento' } },
+        { path: 'grupos/:grupoId/financeiro/lancamentos/:lancamentoId', element: <Lancamento />, handle: { tela: 'lancamento' } },
+        { path: 'grupos/:grupoId/financeiro/config', element: <ConfigCaixa />, handle: { tela: 'config-caixa' } },
         { path: '*', element: <NaoEncontrada />, handle: { tela: 'nao-encontrada' } },
       ],
     },
