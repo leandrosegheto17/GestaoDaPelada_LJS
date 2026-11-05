@@ -1809,6 +1809,9 @@ T56 → T57
 **Depends on**: T55
 **Reuses**: jornadas de `CA:1683`, `GE:2188`, `PR:2441`; seed (`GE:2164`); T30
 **Requirement**: PLA-53, PLA-54, PLA-57, PLA-15, PLA-20, PLA-44
+**Status**: rascunhada
+**Nota do rascunho**: J-27, J-30 e J-28 de `.specs/projeto/jornadas.md` em `frontend/web/e2e/planos.spec.ts`, cada uma com conta, grupo e jogadores próprios. O pagamento é o `POST /teste/webhook` do Asaas falso; a assinatura do grupo vem de `/teste/estado` pelo `externalReference`.
+**Lacunas**: o Worker do e2e não tem "relógio do servidor fixável" (o `relogio` só existe no `criarApp` dos testes da API). SPEC_DEVIATION: o grupo com 21 chega ao Free pelo estorno da cobrança que deu o Pro (`PAYMENT_REFUNDED` → `inadimplente`, PLA-47), não pelo fim do trial; o vencimento do trial fica provado nos testes do domínio e da API (T1, T24). Para provar a J-28 literal, falta uma tarefa de relógio de dev no Worker (como o `EMAIL_DEV`).
 
 **Done when**:
 
