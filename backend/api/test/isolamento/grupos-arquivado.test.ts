@@ -18,7 +18,7 @@ import { MATRIZ } from './matriz.ts';
  * Matriz do grupo arquivado por comando (T1; GEL-25, GEL-107, GEL-112). Caracteriza a `grupos_visiveis()` vigente
  * (`1792844280000_grupos-visiveis-arquivado.sql:9-20`) com G arquivado, como `pelada_app`: a criadora C vê e escreve;
  * a outra admin O vê zero linhas e não escreve, inclusive com UPDATE e DELETE sem WHERE; B continua sem ver G; o
- * slug público sem conta continua vendo G; reativado, O volta a ver.
+ * slug público sem conta não vê G (desde a T26 da partidas-e-ranking; antes via); reativado, O volta a ver.
  *
  * Evidência da rede (registrar na T1): com `grupos_visiveis()` trocada, no banco de teste, pela versão de
  * `1792843320000_rls.sql:17-24` (sem o filtro de arquivado), os testes de O ficam vermelhos.
@@ -181,14 +181,16 @@ describe('GEL-107: a conta B continua sem ver nem alterar G', () => {
   });
 });
 
-describe('GEL-112: o ramo do slug público não muda com G arquivado', () => {
-  it('GEL-112: sem conta, com o slug de G, a leitura de grupos devolve G', async () => {
+// Trocado pela T26 da partidas-e-ranking (1792844880000_grupos-visiveis-publico-ativo.sql; PAR-92; Autorizações de
+// 2026-11-04): o ramo do slug passou a esconder o grupo arquivado. Mesma consulta e lista exata; G sai do resultado.
+describe('GEL-112 e PAR-92: o slug público não vê G arquivado', () => {
+  it('PAR-92: sem conta, com o slug de G arquivado, a leitura de grupos devolve nada', async () => {
     const { db, cenario } = aberto;
     const ids = await comoApp(db, { slug: cenario.slugG }, async (d) => {
       const r = await d.query<{ id: string }>('SELECT id FROM grupos');
       return r.rows.map((l) => l.id);
     });
-    expect(ids).toEqual([cenario.grupoG]);
+    expect(ids).toEqual([]);
   });
 
   it('GEL-112: sem conta, com o slug de G, a escrita continua recusada', async () => {

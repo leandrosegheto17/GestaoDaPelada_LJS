@@ -132,8 +132,10 @@ describe('rede da partidas-e-ranking: grants atuais (c)', () => {
   });
 });
 
-describe('rede da partidas-e-ranking: ramo do slug (d, I-3)', () => {
-  it('PAR-91: slug de arquivado ainda é visível pelo ramo do slug (T26 inverte este teste)', async () => {
+// Item (d) invertido pela T26 (1792844880000_grupos-visiveis-publico-ativo.sql): o I-3 deixou de valer. Mesmo ator e
+// mesma consulta; a asserção passa de "vê G" para "vê nada", tão estrita quanto antes (lista exata).
+describe('rede da partidas-e-ranking: ramo do slug (d, I-3 fechado pela T26)', () => {
+  it('PAR-92 (depois da T26): slug de arquivado não vê o grupo pelo ramo do slug', async () => {
     const { cenario, db } = aberto;
     await arquivar(db, cenario.grupoG);
     try {
@@ -141,7 +143,7 @@ describe('rede da partidas-e-ranking: ramo do slug (d, I-3)', () => {
         const r = await d.query<{ id: string }>('SELECT id FROM grupos');
         return r.rows.map((l) => l.id);
       });
-      expect(vistos).toEqual([cenario.grupoG]);
+      expect(vistos).toEqual([]);
     } finally {
       await reativar(db, cenario.grupoG);
     }
