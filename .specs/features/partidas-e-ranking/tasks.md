@@ -1292,6 +1292,8 @@ T78 → T79
 **Depends on**: T30
 **Reuses**: `BD:202-204`; AD-038
 **Requirement**: PAR-46, PAR-48, PAR-49, PAR-50, PAR-51, PAR-142
+**Status**: rascunhada
+**Nota do rascunho**: `editar(db, grupoId, data, dados)` devolve `ok`, `nao_encontrada`, `data_alterada` (PAR-47, conferido também aqui) ou `invalido`; `excluir` devolve `ok` ou `nao_encontrada`. Testes em `backend/api/test/repositorios/partidas-editar.test.ts`; a serialização usa `jogadores.alterarInicio` segurando a trava do jogador.
 
 **Done when**:
 

@@ -112,4 +112,75 @@ async function lancar(db: Db, grupoId: string, dados: PartidaCorpo): Promise<Res
   return { resultado: 'ok', id, contagem: v.contagem };
 }
 
-export const partidas = { lancar };
+export type ResultadoEditar =
+  | { resultado: 'ok'; contagem: ContagemDaPartida }
+  | { resultado: 'nao_encontrada' }
+  | { resultado: 'data_alterada' }
+  | { resultado: 'invalido'; campos: Record<string, string> };
+
+/** A partida do grupo na data, travada (`FOR UPDATE`, AD-038); nula quando não há (PAR-45). */
+async function travarPartida(db: Db, grupoId: string, data: string): Promise<string | null> {
+  const r = await sql<{ id: string }>`
+    SELECT id FROM partidas WHERE grupo_id = ${grupoId} AND data = ${data}::date
+       FOR UPDATE`.execute(db);
+  return r.rows[0]?.id ?? null;
+}
+
+/**
+ * Edita a partida da data (PAR-46 a PAR-49): trava a partida, depois os marcados, valida contra os ativos **na data da
+ * partida** (PAR-48), troca a chuva e a autoria da alteração, apaga e insere as presenças e audita `partida_editada`
+ * com as contagens. Não grava evento de uso (PAR-49).
+ *
+ * Casos limite (Domínio: sim), listados antes do código:
+ * - sem partida na data: `nao_encontrada`, sem gravar (PAR-45);
+ * - `data` do corpo diferente da do caminho: `data_alterada`, sem gravar nem travar jogador (PAR-47);
+ * - jogador ativo hoje mas não na data da partida: `invalido` com a mensagem do inativo (PAR-48);
+ * - todas as marcações `ausente` (ou nenhuma): a partida fica sem presenças;
+ * - edição concorrente com uma correção de período do mesmo jogador: as duas travam a linha do jogador, então uma
+ *   espera a outra e valida sobre o resultado dela (AD-038);
+ * - falha depois da troca das presenças (auditoria): o erro sobe e a transação desfaz tudo.
+ * Um jogador com presença gravada que não está mais ativo na data não chega a existir: a correção de período que o
+ * tiraria da data é recusada pela grupos-e-elenco (GEL-68).
+ */
+async function editar(db: Db, grupoId: string, data: string, dados: PartidaCorpo): Promise<ResultadoEditar> {
+  const partidaId = await travarPartida(db, grupoId, data);
+  if (!partidaId) return { resultado: 'nao_encontrada' };
+  if (dados.data !== data) return { resultado: 'data_alterada' };
+
+  const v = await travarEValidar(db, grupoId, data, dados.marcacoes);
+  if (!v.ok) return { resultado: 'invalido', campos: v.campos };
+
+  await sql`
+    UPDATE partidas SET choveu = ${dados.choveu}, alterada_por = app_conta_id(), alterada_em = now()
+     WHERE grupo_id = ${grupoId} AND id = ${partidaId}`.execute(db);
+  await sql`DELETE FROM presencas WHERE grupo_id = ${grupoId} AND partida_id = ${partidaId}`.execute(db);
+  await inserirPresencas(db, grupoId, partidaId, v.presencas);
+  await auditoria.registrar(db, grupoId, {
+    acao: 'partida_editada',
+    entidade: 'partida',
+    entidadeId: partidaId,
+    resumo: resumoDaPartida(data, dados.choveu, v.contagem),
+  });
+  return { resultado: 'ok', contagem: v.contagem };
+}
+
+export type ResultadoExcluir = { resultado: 'ok' } | { resultado: 'nao_encontrada' };
+
+/**
+ * Exclui a partida da data (PAR-50, PAR-51): trava a partida, apaga (as presenças saem pelo `ON DELETE CASCADE`) e
+ * audita `partida_excluida` com a data. O evento `partida_lancada` já gravado fica (PAR-51).
+ */
+async function excluir(db: Db, grupoId: string, data: string): Promise<ResultadoExcluir> {
+  const partidaId = await travarPartida(db, grupoId, data);
+  if (!partidaId) return { resultado: 'nao_encontrada' };
+  await sql`DELETE FROM partidas WHERE grupo_id = ${grupoId} AND id = ${partidaId}`.execute(db);
+  await auditoria.registrar(db, grupoId, {
+    acao: 'partida_excluida',
+    entidade: 'partida',
+    entidadeId: partidaId,
+    resumo: { data },
+  });
+  return { resultado: 'ok' };
+}
+
+export const partidas = { lancar, editar, excluir };
