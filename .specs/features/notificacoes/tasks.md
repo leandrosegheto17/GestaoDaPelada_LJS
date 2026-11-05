@@ -837,6 +837,8 @@ T39 → T40 → T41
 **Depends on**: T20
 **Reuses**: rotas de partida (`PR:1461`, `PR:1487`), S-07; T15, T16; caracterização da T0
 **Requirement**: NOT-20, NOT-21, NOT-22, NOT-23
+**Status**: rascunhada
+**Nota do rascunho**: o `avisarRankingAtualizado` registra o `aposCommit` logo depois de o repositório gravar, antes da releitura; `criadoEm` é o `relogio.agoraIso()` da requisição. Sem a T0, o NOT-22 compara a resposta e a partida gravada de um lançamento com fila boa e de outro com fila que lança (fora o `alteradaEm`); o `/executar` confere contra a caracterização da T0 quando ela existir. Teste em `backend/api/test/rotas/partidas-aviso.test.ts` (`workerd`).
 
 **Done when**:
 

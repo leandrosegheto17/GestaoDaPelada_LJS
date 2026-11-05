@@ -22,6 +22,7 @@ import { grupos } from '../../infraestrutura/db/repositorios/grupos.ts';
 import { escalacoes } from '../../infraestrutura/db/repositorios/escalacoes.ts';
 import { jogadores } from '../../infraestrutura/db/repositorios/jogadores.ts';
 import { partidas } from '../../infraestrutura/db/repositorios/partidas.ts';
+import { agendarAviso } from '../../infraestrutura/fila/avisos.ts';
 
 /**
  * Rotas de partidas do grupo (partidas-e-ranking T39 em diante; `BD:229-233`, `BD:244-245`). A cadeia do grupo vem
@@ -86,6 +87,20 @@ export function respostaPartidaJaExiste(c: Context<Ambiente>, data: string): Res
   return c.json(corpo, 409);
 }
 
+/**
+ * Aviso de ranking atualizado (notificacoes T21; NOT-20 a NOT-23; AD-068, AD-069, AD-098): registrado só quando o
+ * repositório gravou, roda depois do `COMMIT` pelo `aposCommit` (T15) e só enfileira (T16). Transação desfeita (409,
+ * 422, erro, `COMMIT` que falha): a tarefa é descartada e nada sai. Fila que lança: o `aposCommit` reporta sem
+ * conteúdo e a resposta e a partida gravada não mudam. A exclusão não avisa (NOT-23).
+ */
+function avisarRankingAtualizado(c: Context<Ambiente>, grupoId: string, data: string): void {
+  const env = c.env;
+  const criadoEm = c.var.relogio.agoraIso();
+  c.var.aposCommit(() =>
+    agendarAviso(env, { tipo: 'ranking', grupoId, dataPartida: data, criadoEm, aposId: '0', tentativa: 1 }),
+  );
+}
+
 /** A data é depois de hoje (PAR-20). */
 export function ehFutura(data: string, hoje: string): boolean {
   return compararDatas(data, hoje) > 0;
@@ -146,6 +161,7 @@ export function rotasPartidas(): Hono<Ambiente> {
     const r = await partidas.lancar(c.var.db, grupoId, dados);
     if (r.resultado === 'invalido') return c.json(erroDeCampos(r.campos), 422);
     if (r.resultado === 'partida_ja_existe') return respostaPartidaJaExiste(c, dados.data);
+    avisarRankingAtualizado(c, grupoId, dados.data);
     return respostaDaPartida(c, grupoId, dados.data, 201);
   });
 
@@ -179,6 +195,7 @@ export function rotasPartidas(): Hono<Ambiente> {
     if (r.resultado === 'nao_encontrada') return c.json(naoEncontrada, 404);
     if (r.resultado === 'data_alterada') return respostaDeCampo(c, 'data', MENSAGEM_DATA_ALTERADA);
     if (r.resultado === 'invalido') return c.json(erroDeCampos(r.campos), 422);
+    avisarRankingAtualizado(c, grupoId, data);
     return respostaDaPartida(c, grupoId, data, 200);
   });
 
@@ -187,6 +204,7 @@ export function rotasPartidas(): Hono<Ambiente> {
     if (!ehDataDoCalendario(data)) return c.json(naoEncontrada, 404);
     const r = await partidas.excluir(c.var.db, c.req.param('grupoId'), data);
     if (r.resultado === 'nao_encontrada') return c.json(naoEncontrada, 404);
+    // Excluir não avisa (NOT-23, AD-069).
     return c.body(null, 204);
   });
 
