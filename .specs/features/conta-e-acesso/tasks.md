@@ -898,6 +898,8 @@ T57 → T58
 **Depends on**: T22
 **Reuses**: funções de T9; decisão de `ljs:.specs/features/conta-e-acesso/design.md:128` (último admin por `FOR UPDATE` na mesma transação)
 **Requirement**: ACE-39, ACE-40, ACE-42
+**Status**: rascunhada
+**Nota do rascunho**: `convites`, `admins` e `auditoria` em `convites.ts`. Criar, aceitar e cadastrar convite gravam a auditoria no próprio banco; cancelar (`cancelar_convite`) e remover (`remover_admin`, entidade `vinculo_admin`) gravam pelo `auditoria.registrar`. `admins.remover` devolve `ok`, `ultimo_admin` ou `nao_encontrado`.
 
 **Done when**:
 
