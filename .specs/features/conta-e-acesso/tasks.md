@@ -1379,6 +1379,8 @@ T57 → T58
 **Depends on**: T40
 **Reuses**: molde de `EstadoErro` da fundação (`F:1472`); marcação de `.specs/mockup/telas/t30-confirmar--invalido.html`, `t32-conta--excluir.html` e `t32-conta--excluida.html` (`.faixa--sucesso`)
 **Requirement**: ACE-56
+**Status**: rascunhada
+**Nota do rascunho**: um arquivo por componente (`Faixa.tsx`, `TelaMensagem.tsx`, `Dialogo.tsx`, `Lista.tsx` com `ItemLista`), cada um com CSS Module. `Faixa`: `role="alert"` só no erro; sucesso, atenção e info são `role="status"`. `Dialogo` é montado e desmontado por quem usa, foca o `autoFocus` (ou o primeiro focável), prende Tab, fecha com Esc e devolve o foco; `alerta` dá `role="alertdialog"`. `TelaMensagem` vai dentro da `Casca centralizada` e foca o título.
 
 **Done when**:
 

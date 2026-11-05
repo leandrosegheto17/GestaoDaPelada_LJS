@@ -1,0 +1,49 @@
+/* Faixa de mensagem (ACE-56), de .specs/mockup/base.css:23,68-75. */
+
+.icone {
+  flex-shrink: 0;
+}
+
+.faixa {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--esp-3);
+  padding: var(--esp-3) var(--esp-4);
+  border-radius: var(--raio);
+  margin: 0 0 var(--esp-3);
+  font-size: var(--texto-md);
+}
+
+.faixa--info {
+  background: var(--cor-info-fundo);
+  color: var(--cor-info-texto);
+}
+
+.faixa--sucesso {
+  background: var(--cor-sucesso-fundo);
+  color: var(--cor-sucesso-texto);
+}
+
+.faixa--atencao {
+  background: var(--cor-atencao-fundo);
+  color: var(--cor-atencao-texto);
+}
+
+.faixa--erro {
+  background: var(--cor-erro-fundo);
+  color: var(--cor-erro-texto);
+}
+
+.faixa a,
+.faixa .acao button {
+  color: inherit;
+}
+
+.faixa__texto {
+  flex: 1;
+  margin: 0;
+}
+
+.faixa__texto strong {
+  display: block;
+}

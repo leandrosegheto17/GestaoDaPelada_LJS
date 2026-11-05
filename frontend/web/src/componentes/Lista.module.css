@@ -1,0 +1,41 @@
+/* Lista e itens (ACE-56), de .specs/mockup/base.css:143-150. */
+
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-linha);
+  border-radius: var(--raio);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
+  padding: var(--esp-3) var(--esp-4);
+  border-bottom: 1px solid var(--cor-linha);
+  min-height: 60px;
+  text-decoration: none;
+  color: var(--cor-texto);
+}
+
+.lista > li:last-child > .item {
+  border-bottom: 0;
+}
+
+.item__principal {
+  flex: 1;
+  min-width: 0;
+}
+
+.item__titulo {
+  font-weight: var(--peso-semi);
+  display: block;
+}
+
+.item__meta {
+  display: block;
+  font-size: var(--texto-sm);
+  color: var(--cor-texto-sec);
+}

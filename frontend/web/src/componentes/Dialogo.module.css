@@ -1,0 +1,69 @@
+/* Diálogo (ACE-56), de .specs/mockup/base.css:235-241,347-348. */
+
+.veu {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: var(--cor-veu);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--esp-4);
+}
+
+.dialogo {
+  position: relative;
+  width: 100%;
+  max-width: 440px;
+  background: var(--cor-superficie);
+  border-radius: var(--raio);
+  box-shadow: var(--sombra-dialogo);
+  padding: var(--esp-6);
+}
+
+.dialogo__titulo {
+  font-size: var(--texto-2xl);
+  text-transform: uppercase;
+  margin: 0 0 var(--esp-3);
+}
+
+.dialogo__texto {
+  margin: 0 0 var(--esp-4);
+}
+
+.dialogo__acoes {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: var(--esp-2);
+  margin-top: var(--esp-4);
+}
+
+.dialogo__acoes button {
+  width: 100%;
+}
+
+.dialogo__fechar {
+  position: absolute;
+  top: var(--esp-2);
+  right: var(--esp-2);
+  width: var(--alvo-toque);
+  height: var(--alvo-toque);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (min-width: 600px) {
+  .dialogo__acoes {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+
+  .dialogo__acoes button {
+    width: auto;
+  }
+}

@@ -1,0 +1,26 @@
+/* Tela de mensagem (ACE-56), de .specs/mockup/base.css:228-232. A centralização é da Casca. */
+
+.vazio__icone {
+  color: var(--cor-verde);
+  margin-bottom: var(--esp-3);
+}
+
+.vazio__icone--erro {
+  color: var(--cor-erro-texto);
+}
+
+.vazio__titulo {
+  font-size: var(--texto-2xl);
+  text-transform: uppercase;
+  margin: 0 0 var(--esp-2);
+}
+
+.vazio__titulo:focus {
+  outline: none;
+}
+
+.vazio__texto {
+  color: var(--cor-texto-sec);
+  max-width: 420px;
+  margin: 0 auto var(--esp-6);
+}
