@@ -901,6 +901,8 @@ T56 → T57
 **Depends on**: T21
 **Reuses**: estender a cadeia do `exigirGrupoAtivo` (`GE:901`, com o modo `READ ONLY` das prévias de `PR:1362`, que passam); `somenteLeitura` (T5); AD-062
 **Requirement**: PLA-15, PLA-17, PLA-18, PLA-20, PLA-21
+**Status**: rascunhada
+**Nota do rascunho**: o middleware entra na cadeia de `protegerRotasDeGrupo` (`vinculo.ts`) logo depois do `exigirGrupoAtivo`. `operacaoNaTrava` classifica pelo caminho inteiro com duas listas (`ESCRITAS_NA_TRAVA` e `ESCRITAS_FORA_DA_TRAVA`); escrita em nenhuma das duas trava (conservador), e a T28 cobra a tabela. Inativar entra como `inativar_jogador` e o domínio libera. A lista da criadora só é lida quando o grupo está no Free; cada grupo dela passa pelo `planoEfetivo` para saber se é Free.
 
 **Done when**:
 

@@ -5,6 +5,7 @@ import type { Ambiente } from '../ambiente.ts';
 import type { OpcoesCliente } from '../../infraestrutura/db/cliente.ts';
 import { comBanco } from './com-banco.ts';
 import { exigirGrupoAtivo } from './grupo-ativo.ts';
+import { exigirPlanoEditavel } from './plano-editavel.ts';
 import { exigirSessao } from './sessao.ts';
 
 /**
@@ -71,6 +72,8 @@ export function protegerRotasDeGrupo(api: Hono<Ambiente>, opcoes: OpcoesRotasDeG
     comBanco(undefined, opcoes.fabrica ? { fabrica: opcoes.fabrica } : {}),
     exigirVinculo,
     exigirGrupoAtivo,
+    // Somente leitura do excedente do Free, na mesma transação (planos-e-cobranca T22; PLA-15, PLA-21, AD-092).
+    exigirPlanoEditavel,
   ]);
   const umaVez: MiddlewareHandler<Ambiente> = async (c, next) => {
     if (c.var.grupoProtegido) {
