@@ -439,6 +439,7 @@ T78 → T79
 **Depends on**: None
 **Reuses**: `comoApp` e o cenário de dois grupos (`F:909`); `M:1792844280000_grupos-visiveis-arquivado.sql:9-22`; `M:1792844340000_grupo-criar.sql:10-75`; `M:1792843260000_roles.sql:22-31`; matriz de `F:981` e `F:1007`
 **Requirement**: PAR-91, PAR-15, PAR-130 (linha de base)
+**Status**: rascunhada
 
 **Done when**:
 
