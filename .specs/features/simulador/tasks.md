@@ -1307,6 +1307,8 @@ T53 → T54
 **Depends on**: T36
 **Reuses**: Molde de `POST partidas` (`PR:1461`, T40); T23, T27, T28
 **Requirement**: SIM-67, SIM-71, SIM-72, SIM-93
+**Status**: rascunhada
+**Nota do rascunho**: rascunhada antes das T35 e T36 (que dependem do `historico.carregar` da `partidas-e-ranking`). `rotasEscalacoes()` em `rotas/escalacoes.ts`, montada pelo `rotasSimulador()` (sem mexer no `app.ts`). Ativo na data pelo `jogadoresLeitura.paraSimulador` (T27); molde `POST …/jogadores` (`rotas/jogadores.ts:22`), pois o `POST partidas` de `PR:1461` ainda não existe. Teste em `backend/api/test/rotas/escalacoes.test.ts`.
 
 **Done when**:
 

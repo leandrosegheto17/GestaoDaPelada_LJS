@@ -10,6 +10,7 @@ import { calcularPrevia, descreverPrevia, proximoDiaDeJogo, type NomeDiaDaSemana
 import type { Ambiente } from '../ambiente.ts';
 import { erroDeCampos, lerCorpoDoGrupo, mensagensDoZod } from '../corpo.ts';
 import { jogadoresLeitura } from '../../infraestrutura/db/repositorios/jogadores-leitura.ts';
+import { rotasEscalacoes } from './escalacoes.ts';
 
 /**
  * Rotas do simulador (T33 em diante da simulador). A cadeia do grupo vem antes (sessão 401, transação, vínculo 404,
@@ -62,6 +63,9 @@ export function rotasSimulador(): Hono<Ambiente> {
     const previa = calcularPrevia({ formato: corpo.dados.formato, n: corpo.dados.n, aptos: corpo.dados.aptos.length });
     return c.json(respostaDaPrevia(previa), 200);
   });
+
+  // A escalação confirmada (T37) mora no próprio arquivo e entra no app junto com as rotas do simulador.
+  rotas.route('/', rotasEscalacoes());
 
   return rotas;
 }
