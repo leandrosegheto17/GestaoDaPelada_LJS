@@ -1566,6 +1566,8 @@ T47 → T48
 **Depends on**: T47
 **Reuses**: Jornadas de `CA:1683`, `GE:2188` e `PR:2441`; `pnpm dev` (`F:1812`)
 **Requirement**: FIN-01, FIN-16, FIN-22, FIN-25, FIN-33, FIN-34, FIN-35, FIN-36
+**Status**: rascunhada
+**Nota do rascunho**: J-25 e J-26 (`jornadas.md:162-172`) em `e2e/financeiro.spec.ts`, no molde de `e2e/elenco.spec.ts` (ajudantes repetidos, contas e grupo próprios por jornada, convite pela caixa `/api/dev/emails`). `SPEC_DEVIATION`: as jornadas não usam o grupo do seed (T47), porque configurar o caixa e conceder o acesso mudam o estado e a segunda rodada acharia tudo feito. Os ativos da J-25 entram hoje (Toninho e Bigode), então "Não pagaram" sai de 2 para 1 e volta a 2; o inativo fora da conta é provado pelo `FIN-11` das camadas de baixo (T4, T17).
 
 **Done when**:
 
