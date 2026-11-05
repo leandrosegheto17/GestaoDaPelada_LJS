@@ -519,6 +519,8 @@ T57 → T58
 **Depends on**: T8
 **Reuses**: `M:1792843620000_conta-convites.sql:13` (`convite_criar`); versões vigentes de `convite_ler`, `convite_aceitar` e `convite_cadastrar` em `M:1792844460000_convites-grupo-arquivado.sql:11`, `:25`, `:61`; `M:1792843680000_conta-admins-listar.sql:8`
 **Requirement**: ACE-31, ACE-32, ACE-33, ACE-34, ACE-35, ACE-36, ACE-37, ACE-67
+**Status**: rascunhada
+**Nota do rascunho**: casos limite listados no topo do teste; sem lacuna. O aceite concorrente grava de verdade (COMMIT) e limpa no finally.
 
 **Done when**:
 
