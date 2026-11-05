@@ -1375,6 +1375,8 @@ T78 → T79
 **Depends on**: T33
 **Reuses**: Estender `grupos.criar(db, dados)` e `grupos.ler(db, grupoId)` da grupos-e-elenco (`GE:1003`), acrescentando o parâmetro `hoje`; `BC:26` (P14); `BD:212-213`
 **Requirement**: PAR-15, PAR-132
+**Status**: rascunhada
+**Nota do rascunho**: `POST /api/grupos` (`rotas/grupos.ts`) passou a mandar `c.var.relogio.hoje()`; as 5 chamadas de `grupos.criar` em `backend/api/test/repositorios/grupos.test.ts` ganharam `HOJE` (Autorizações de 2026-11-04). SPEC_DEVIATION: `hoje` de `grupos.ler` é opcional (sobrecarga), porque o PATCH e o arquivar do grupo respondem o `grupoDetalhe` estrito; só o GET (T43) pede os campos do início. Testes novos em `backend/api/test/repositorios/grupos-inicio.test.ts`.
 
 **Done when**:
 

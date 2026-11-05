@@ -12,6 +12,9 @@ import { comDb } from './apoio.ts';
 
 let aberto: CenarioGruposAberto;
 
+/** Hoje do relógio da requisição: os pesos padrão nascem vigentes desde ele (PAR-15, T34 da partidas-e-ranking). */
+const HOJE = '2026-11-05';
+
 const DADOS = { nome: 'Pelada do Repositório', diaSemana: 'quarta', frequencia: 'quinzenal', horario: '20:30' } as const;
 
 beforeAll(async () => {
@@ -30,7 +33,7 @@ describe('grupos.criar', () => {
   it('GEL-01: devolve id e slug, e o grupo nasce com criado_por, vínculo com financeiro e auditoria', async () => {
     const { url, cenario } = aberto;
     await comDb(url, cenario.contaB, async (db) => {
-      const criado = await grupos.criar(db, DADOS);
+      const criado = await grupos.criar(db, DADOS, HOJE);
       expect(criado.slug).toBe('pelada-do-repositorio');
       const detalhe = await grupos.ler(db, criado.id);
       expect(detalhe).toMatchObject({ nome: DADOS.nome, diaSemana: 'quarta', frequencia: 'quinzenal', horario: '20:30' });
@@ -44,7 +47,7 @@ describe('grupos.criar', () => {
   it('GEL-02: o grupo criado tem as 6 habilidades iniciais na ordem da spec', async () => {
     const { url, cenario } = aberto;
     const ordem = await comDb(url, cenario.contaB, async (db) => {
-      const criado = await grupos.criar(db, { ...DADOS, nome: 'Pelada das Habilidades' });
+      const criado = await grupos.criar(db, { ...DADOS, nome: 'Pelada das Habilidades' }, HOJE);
       const r = await db
         .selectFrom('habilidades')
         .select('nome')
@@ -60,20 +63,20 @@ describe('grupos.criar', () => {
   it('GEL-14: o slug de um grupo arquivado continua ocupado: o novo ganha -2', async () => {
     const { url, cenario } = aberto;
     await arquivar(aberto.db, cenario.grupoG);
-    const criado = await comDb(url, cenario.contaB, (db) => grupos.criar(db, { ...DADOS, nome: 'Pelada de Quinta' }));
+    const criado = await comDb(url, cenario.contaB, (db) => grupos.criar(db, { ...DADOS, nome: 'Pelada de Quinta' }, HOJE));
     expect(cenario.slugG).toBe('pelada-de-quinta');
     expect(criado.slug).toBe('pelada-de-quinta-2');
   });
 
   it('GEL-14: sem colisão, a base do slug vem do domínio (sem acento, minúsculas, hífens)', async () => {
     const { url, cenario } = aberto;
-    const criado = await comDb(url, cenario.contaB, (db) => grupos.criar(db, { ...DADOS, nome: 'Fute São João!' }));
+    const criado = await comDb(url, cenario.contaB, (db) => grupos.criar(db, { ...DADOS, nome: 'Fute São João!' }, HOJE));
     expect(criado.slug).toBe('fute-sao-joao');
   });
 
   it('GEL-01: sem conta na sessão, a grupo_criar recusa (42501) e nada é criado', async () => {
     const { url } = aberto;
-    await expect(comDb(url, null, (db) => grupos.criar(db, { ...DADOS, nome: 'Pelada Sem Conta' }))).rejects.toMatchObject({
+    await expect(comDb(url, null, (db) => grupos.criar(db, { ...DADOS, nome: 'Pelada Sem Conta' }, HOJE))).rejects.toMatchObject({
       code: '42501',
     });
     const r = await aberto.db.query(`SELECT 1 FROM grupos WHERE nome = 'Pelada Sem Conta'`);

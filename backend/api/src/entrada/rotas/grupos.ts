@@ -26,7 +26,8 @@ export function rotasGrupos(opcoes: OpcoesRotas = {}): Hono<Ambiente> {
   rotas.post('/grupos', exigirSessao, banco, async (c) => {
     const corpo = await lerCorpoDoGrupo(c, criarGrupoCorpo);
     if (!corpo.ok) return corpo.resposta;
-    const criado = await grupos.criar(c.var.db, corpo.dados);
+    // Os pesos padrão nascem vigentes desde hoje, do relógio da requisição (PAR-15, T34 da partidas-e-ranking).
+    const criado = await grupos.criar(c.var.db, corpo.dados, c.var.relogio.hoje());
     const resposta: CriarGrupoResposta = {
       id: criado.id,
       slug: criado.slug,
