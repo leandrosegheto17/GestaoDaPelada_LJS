@@ -321,6 +321,7 @@ T47 → T48
 **Depends on**: T1
 **Reuses**: Intervalo `[início, fim)` de `backend/dominio/src/atividade/datas.ts` (`GE:626`); `primeiroDia` e `ultimoDia` de `backend/dominio/src/datas.ts` (`PR:457`); `compararApelido` (`GE:575`); regra de `L:backend/dominio/src/atividade/atividade.ts:3-36`
 **Requirement**: FIN-12, FIN-11, FIN-19
+**Status**: rascunhada
 
 **Done when**:
 
