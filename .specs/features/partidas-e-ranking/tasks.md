@@ -759,6 +759,7 @@ T78 → T79
 **Depends on**: T11
 **Reuses**: `B:253` (PAR-66), `B:284-286` (PAR-84 a PAR-86), `B:189` (PAR-41), `B:65`
 **Requirement**: PAR-41, PAR-66, PAR-84, PAR-85, PAR-86
+**Status**: rascunhada
 
 **Done when**:
 

@@ -165,3 +165,4 @@ export {
   type PresencaDoRanking,
   type ResultadoRanking,
 } from './ranking/calcular.ts';
+export { limitesDeMes, mesNoHistorico, navegacaoDeMes, type LimitesDeMes, type Navegacao } from './ranking/navegacao.ts';
