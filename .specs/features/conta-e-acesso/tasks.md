@@ -1252,6 +1252,8 @@ T57 → T58
 **Depends on**: T35
 **Reuses**: TanStack Query do esqueleto da fundação (`F:1326`)
 **Requirement**: ACE-20, ACE-49
+**Status**: rascunhada
+**Nota do rascunho**: `criarCliente({ consultas, navegar })` com `ErroApi` (status, código, campos, grupos; status 0 na falha de rede) e o contexto `ProvedorCliente`/`useCliente` em `src/dados/ContextoCliente.tsx`; o `App` liga o cliente ao `QueryClient` e ao roteador. Só o 401 `sessao_expirada` navega; `sem_sessao` fica com a guarda (T37). Teste em `test/dados/` (molde dos testes da fundação, que ficam em `frontend/web/test/`).
 
 **Done when**:
 
