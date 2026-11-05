@@ -42,6 +42,7 @@ import { rotasFinanceiroLancamentos } from './rotas/financeiro-lancamentos.ts';
 import { devEmails } from './rotas/dev-emails.ts';
 import { health } from './rotas/health.ts';
 import { rotasMinhaConta } from './rotas/minha-conta.ts';
+import { rotasContaPush } from './rotas/conta-push.ts';
 import { rotasRecuperacao } from './rotas/recuperacao.ts';
 import { rotasSessao } from './rotas/sessao.ts';
 import {
@@ -117,6 +118,8 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
   api.route('/', rotasSessao(rotasAcesso));
   api.route('/', rotasRecuperacao(rotasAcesso));
   api.route('/', rotasMinhaConta(rotasAcesso));
+  // Push dos avisos de cobrança da organizadora (notificacoes T31; AD-106).
+  api.route('/', rotasContaPush(rotasAcesso));
   api.route('/', rotasConvites(rotasAcesso));
   api.route('/', rotasAdmins(rotasAcesso));
   // Grupos (grupos-e-elenco T28 em diante).

@@ -1,6 +1,7 @@
 import { paraBase64url } from '@pelada/contrato/push';
 import type { Env } from '../../src/entrada/ambiente.ts';
 import { criarApp, type OpcoesApp } from '../../src/entrada/app.ts';
+import { NOME_COOKIE_SESSAO } from '../../src/infraestrutura/sessao/cookie.ts';
 import { envAcesso } from '../acesso/apoio.ts';
 import { contextoFalso, fabricaComoApp } from '../db/requisicao.ts';
 
@@ -63,6 +64,8 @@ export interface PedidoPush {
   semPelada?: boolean;
   ip?: string;
   env?: Partial<Env>;
+  /** Token do cookie `__Host-sessao` (rotas da conta, T31). */
+  sessao?: string | null;
 }
 
 /** Cliente das rotas `/api…` com o env do teste (`base`) e o do pedido por cima. */
@@ -71,6 +74,7 @@ export function clientePush(url: string, base: Partial<Env>, opcoes: OpcoesApp =
   return async (caminho: string, p: PedidoPush = {}): Promise<Response> => {
     const headers = new Headers({ 'cf-connecting-ip': p.ip ?? '203.0.113.77' });
     if (!p.semPelada) headers.set('x-pelada', '1');
+    if (p.sessao) headers.set('cookie', `${NOME_COOKIE_SESSAO}=${p.sessao}`);
     let body: string | undefined;
     if (p.cru !== undefined) body = p.cru;
     else if (p.corpo !== undefined) body = JSON.stringify(p.corpo);

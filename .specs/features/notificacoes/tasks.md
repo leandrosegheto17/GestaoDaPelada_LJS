@@ -1111,6 +1111,8 @@ T39 → T40 → T41
 **Depends on**: T30
 **Reuses**: rotas de minha conta (`CA:971`); `exigirSessao` (`CA:770`); `LIMITE_ESCRITA` (`GE:928`); T9, T14; AD-103, AD-107
 **Requirement**: NOT-44, NOT-45, NOT-53, NOT-61
+**Status**: rascunhada
+**Nota do rascunho**: como minha conta, `/api/conta/*` não passa pelo `comBanco`: cada rota abre a `transacaoCurta` com a conta da sessão. O `LIMITE_ESCRITA` entra por rota, depois do `exigirSessao`, com a chave `conta:<id>` do `limitarEscritasDeGrupo` (que só vigia `/api/grupos*`); conta também o `POST …/estado`. `oferecer` lê `grupos` sob a RLS da conta (`criado_por = app_conta_id()` e não arquivado). SPEC_DEVIATION: o `POST` não recusa a não criadora (a tarefa não define); ela só receberia aviso se fosse criadora na hora do aviso. Testes em `backend/api/test/rotas/push-conta.test.ts`, com a sessão gravada pelo `sessaoDe` (`apoio-financeiro.ts`).
 
 **Done when**:
 
