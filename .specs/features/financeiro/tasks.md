@@ -618,6 +618,8 @@ T47 → T48
 **Depends on**: T12
 **Reuses**: T12; matriz de escrita da fundação (`F:1007`)
 **Requirement**: FIN-39, FIN-40, FIN-41
+**Status**: rascunhada
+**Nota do rascunho**: a evidência (sabotagens) está listada no topo do teste; o /executar roda e registra aqui. A célula de DELETE do controle C apaga pagamentos, lançamentos e configuração nessa ordem, porque a FK do lançamento vinculado é `ON DELETE RESTRICT`.
 
 **Done when**:
 
