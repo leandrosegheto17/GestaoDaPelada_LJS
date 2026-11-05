@@ -2095,6 +2095,8 @@ T81 → T82
 **Depends on**: T68
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-42
+**Status**: rascunhada
+**Nota do rascunho**: segue a AD-119: o pai é a `main` do Neon (produção), não a `dev`. API v2 do Neon (`GET` e `POST /projects/{id}/branches`, `DELETE /projects/{id}/branches/{branch_id}`); o nome é `restauracao-<GITHUB_RUN_ID>`. Mantém as 2 de restauração mais recentes contando a nova; nunca apaga `main`, `dev`, a branch padrão, uma protegida nem nome sem o prefixo. O erro da API leva só método, caminho e status (sem a chave). Conferir na documentação atual do Neon se o `POST` sem `endpoints` basta para a restauração (branch sem compute) e o formato de `created_at`.
 
 **Done when**:
 
