@@ -18,7 +18,8 @@
     "esquema:gerar": "node --env-file-if-exists=.env backend/scripts/src/esquema-gerar.ts",
     "esquema:comparar": "node --env-file-if-exists=.env backend/scripts/src/esquema-comparar.ts",
     "test:checagens": "pnpm --filter @pelada/scripts exec vitest run checagens",
-    "migracao:nova": "node backend/scripts/src/migracao-nova.ts"
+    "migracao:nova": "node backend/scripts/src/migracao-nova.ts",
+    "vapid:gerar": "node backend/scripts/src/vapid-gerar.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

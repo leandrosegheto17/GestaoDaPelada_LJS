@@ -7,7 +7,8 @@
   },
   "exports": {
     "./migrar": "./src/infraestrutura/db/migrar.ts",
-    "./esquema": "./src/infraestrutura/db/esquema.ts"
+    "./esquema": "./src/infraestrutura/db/esquema.ts",
+    "./push/vapid": "./src/infraestrutura/push/vapid.ts"
   },
   "scripts": {
     "lint": "eslint .",

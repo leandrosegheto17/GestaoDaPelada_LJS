@@ -374,6 +374,8 @@ T39 → T40 → T41
 **Depends on**: T3
 **Reuses**: checagem do `.env.example` (`F:1886`); variáveis só pelo nome (`CA:697`); `cabecalhoVapid` (T3) no teste
 **Requirement**: NOT-14, NOT-60
+**Status**: rascunhada
+**Nota do rascunho**: o `@pelada/api` passa a exportar `./push/vapid` para o teste do script usar o `cabecalhoVapid` (T3). O gitleaks fica para o gate do `/executar`.
 
 **Done when**:
 
