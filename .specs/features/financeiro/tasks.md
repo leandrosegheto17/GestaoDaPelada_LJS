@@ -403,6 +403,8 @@ T47 → T48
 **Depends on**: T4
 **Reuses**: `mesDe`, `mesAnterior`, `mesSeguinte`, `compararMeses` (`PR:457`); molde da navegação do ranking (`PR:738`); regra de `L:backend/api/src/aplicacao/financeiro/mes.ts:20-89`
 **Requirement**: FIN-07, FIN-09, FIN-18, FIN-49
+**Status**: rascunhada
+**Lacunas**: (1) outro mês sem configuração: tratado como fora do histórico (422); (2) data do saldo inicial em mês posterior ao de hoje: histórico só com o mês de hoje (`backend/dominio/src/caixa/mes.ts`).
 
 **Done when**:
 
