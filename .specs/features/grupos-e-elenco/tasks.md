@@ -1904,6 +1904,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T58
 **Reuses**: `R-34` a `R-36` (`t27-novo-grupo--*.html`); `ResumoErros` (`CA:1263`, T40); campos de T56
 **Requirement**: GEL-01, GEL-03, GEL-06, GEL-114, GEL-118
+**Status**: rascunhada
 
 **Done when**:
 

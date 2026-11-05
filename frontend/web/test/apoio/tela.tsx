@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render } from '@testing-library/react';
-import { createMemoryRouter, RouterProvider } from 'react-router';
+import { createMemoryRouter, RouterProvider, type RouteObject } from 'react-router';
 import { criarRotas, type HandleTela } from '../../src/app/rotas.tsx';
 import { criarCliente } from '../../src/dados/cliente.ts';
 import { ProvedorCliente } from '../../src/dados/ContextoCliente.tsx';
@@ -42,7 +42,11 @@ export const SESSAO_ANA = {
   grupos: [{ id: 'g-quinta', nome: 'Pelada de Quinta', slug: 'pelada-de-quinta', acessaFinanceiro: true }],
 };
 
-export function abrirTela(caminho: string, api: Record<string, Manipulador> = {}) {
+/**
+ * `rotas` troca as rotas reais por outras (telas cujas rotas só entram no app depois, grupos-e-elenco T69); sem
+ * ela, as rotas do app.
+ */
+export function abrirTela(caminho: string, api: Record<string, Manipulador> = {}, rotas: () => RouteObject[] = criarRotas) {
   const chamadas: Chamada[] = [];
   const fetch = (async (url: string | URL | Request, init?: RequestInit) => {
     const metodo = (init?.method ?? 'GET').toUpperCase();
@@ -56,7 +60,7 @@ export function abrirTela(caminho: string, api: Record<string, Manipulador> = {}
   }) as unknown as typeof globalThis.fetch;
 
   const consultas = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  const roteador = createMemoryRouter(criarRotas(), { initialEntries: [caminho] });
+  const roteador = createMemoryRouter(rotas(), { initialEntries: [caminho] });
   const cliente = criarCliente({ consultas, navegar: (d) => void roteador.navigate(d), fetch });
   const resultado = render(
     <QueryClientProvider client={consultas}>
