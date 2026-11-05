@@ -2513,6 +2513,8 @@ T78 → T79
 **Depends on**: T75
 **Reuses**: Lista de telas ativas (`CA:1633`); Stylelint de tokens (`F:1374`, AD-042)
 **Requirement**: PAR-145, PAR-146
+**Status**: rascunhada
+**Nota do rascunho**: as 18 entradas (todas já `real` no `telas.json` da T75) entram no `e2e/telas-ativas.json`; teste novo `test/ferramentas/telas-partidas-ativas.test.ts`. O PAR-145 é o `pnpm lint` (Stylelint de tokens) sobre os CSS novos (`ranking.module.css`), no gate. Teste existente mudado sob a autorização de 2026-11-04 (telas ativas, T76): `telas-grupos-elenco.test.ts:35` passava a exigir só `T09 menu-conta`; agora exige exatamente `menu-conta`, `sem-jogadores` (esta feature) e `sucesso` (financeiro T46, que já a tinha ativado sem mudar este teste), com a mesma igualdade exata. **Revisão manual pendente** (o `/executar` confere à mão contra o mockup e registra aqui): t01 `carregando-cache`, `sem-conexao`, `sem-conexao-admin`, `pdf-preparando`, `pdf-compartilhar`, `pdf-erro`, `pdf-baixado` e `instalar-iphone`; P01 é a T77; prévias da t16 (`reativar-previa`, `reativar-calculando`, `reativar-erro-rede`, `corrigir-previa`, `corrigir-saida`, `corrigir-calculando`, `inicio-*`) ficam com a grupos-e-elenco e a T66.
 
 **Done when**:
 

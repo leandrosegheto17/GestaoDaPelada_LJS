@@ -32,8 +32,10 @@ describe('telas ativas de grupos e elenco', () => {
     expect(ativos).toContain('T08 vazio');
   });
 
-  it('GEL-116, AD-029: nenhum estado da T09 do módulo entra, só o menu da conta da CA', () => {
-    expect(ativos.filter((a) => a.startsWith('T09 '))).toEqual(['T09 menu-conta']);
+  it('GEL-116, AD-029: da T09 entram só o menu da conta da CA e os estados que as features seguintes ativaram', () => {
+    // A AD-029 deixava a T09 fora "até existirem partidas, uso e financeiro": a partidas-e-ranking (T76) ativa a
+    // `sem-jogadores` e o financeiro (T46, AD-118), a `sucesso`. Nenhum outro estado da T09 entra.
+    expect(ativos.filter((a) => a.startsWith('T09 ')).sort()).toEqual(['T09 menu-conta', 'T09 sem-jogadores', 'T09 sucesso']);
   });
 
   it('GEL-116: sem entrada repetida e todas existem no telas.json', () => {
