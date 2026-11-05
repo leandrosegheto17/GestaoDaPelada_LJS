@@ -108,7 +108,7 @@ Nenhum critério fica fora. Mudam de sentido, pelas ADs propostas: ACE-45 (role 
 - **Comando da suíte** (o de `.specs/projeto/testes.json` ao fim da fundação, `F:72-78`): `docker compose up -d --wait && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:checagens && pnpm --filter @pelada/web build && pnpm --filter @pelada/web e2e && pnpm --filter @pelada/web visual`.
 - **Resultado hoje**: não roda. O `testes.json` atual é a dispensa temporária (sem código na v2) e a feature anterior, `fundacao`, ainda não foi executada.
 - **Resultado medido pelo /executar (2026-11-05, main @ c9ba38bf, banco `pelada_ace` local, 44 migrações aplicadas e seed ok)**: `lint` verde; `format:check` falha em 39 arquivos rascunhados de outras features (planos, notificações, grupos, partidas); `typecheck` falha em 1 erro (`frontend/web/src/pwa/servico.ts(133,55)` TS2352, notificações); `pnpm test` com 4 falhas por timeout de 5 s em `test/lint/*` (ex.: `sem-escrita-periodo.test.ts`), 46 passam.
-- **Falhas preexistentes**: feature anterior ainda não executada; a linha de base é o gate final da fundação. O `/executar` desta feature roda a suíte uma vez antes do lote 1 e registra aqui o resultado e as falhas encontradas.
+- **Falhas preexistentes**: feature anterior ainda não executada; (no lote 5: `@pelada/contrato` com 3 falhas de outras features em `publico.test.ts` e `simulador.test.ts`; `pnpm test:checagens` com 5 checagens falhando na base; o projeto `worker` do vitest do api não carrega `pg`, ver T17) a linha de base é o gate final da fundação. O `/executar` desta feature roda a suíte uma vez antes do lote 1 e registra aqui o resultado e as falhas encontradas.
 
 ## Test Coverage Matrix
 
@@ -692,16 +692,16 @@ T57 → T58
 **Depends on**: T14
 **Reuses**: decisão de `ljs:.specs/features/conta-e-acesso/design.md:176-187` (`fetch` direto, sem SDK); escrito do zero
 **Requirement**: ACE-21, ACE-52, ACE-75
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: casos limite listados no topo do código; sem lacuna. O remetente em memória tem `falharProximos(n)` para provar o ACE-52 nas rotas.
 
 **Done when**:
 
-- [ ] Casos limite listados antes do código: 2xx, 4xx, 429 de cota, 5xx, rede caída, resposta depois de 10 s
-- [ ] Testes `ACE-52`: com `fetch` falso devolvendo 500 ou 429, o resultado é `'falhou'` e o log tem o status sem destino, assunto nem corpo
-- [ ] Teste `ACE-75`: resposta que demora mais de 10 s é abortada e vira `'falhou'`
-- [ ] Teste `ACE-21`: nenhum log do remetente contém o link nem o token
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do código: 2xx, 4xx, 429 de cota, 5xx, rede caída, resposta depois de 10 s
+- [x] Testes `ACE-52`: com `fetch` falso devolvendo 500 ou 429, o resultado é `'falhou'` e o log tem o status sem destino, assunto nem corpo
+- [x] Teste `ACE-75`: resposta que demora mais de 10 s é abortada e vira `'falhou'`
+- [x] Teste `ACE-21`: nenhum log do remetente contém o link nem o token
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -719,16 +719,16 @@ T57 → T58
 **Depends on**: T15
 **Reuses**: `URL_PUBLICA` como única origem de URL (FUN-23, `F:1251`); fragmento de `ljs:.specs/features/conta-e-acesso/design.md:30-31`
 **Requirement**: ACE-04, ACE-23, ACE-31
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: o aviso de cadastro duplicado leva só o link de `/entrar/esqueci`, sem token.
 
 **Done when**:
 
-- [ ] Teste `ACE-23`: o link de recuperação começa por `URL_PUBLICA` e leva o token só depois de `#t=`
-- [ ] Teste `ACE-04`: o aviso de cadastro duplicado não tem link de confirmação
-- [ ] Teste `ACE-31`: o convite traz o nome do grupo e o link `/convite#t=`
-- [ ] A checagem de URL absoluta da fundação continua verde
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `ACE-23`: o link de recuperação começa por `URL_PUBLICA` e leva o token só depois de `#t=`
+- [x] Teste `ACE-04`: o aviso de cadastro duplicado não tem link de confirmação
+- [x] Teste `ACE-31`: o convite traz o nome do grupo e o link `/convite#t=`
+- [x] A checagem de URL absoluta da fundação continua verde
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -746,7 +746,7 @@ T57 → T58
 **Depends on**: T16
 **Reuses**: molde das checagens da fundação (`F:1251`, `backend/scripts/checagens/`) e a checagem do `.env.example` (`F:1886`)
 **Requirement**: ACE-52
-**Status**: rascunhada
+**Status**: bloqueada (2026-11-05): todo teste do projeto `worker` que importa `pg` falha ao carregar (`SyntaxError: Cannot use import statement outside a module` em `pg/lib/connection.js?mf_vitest_no_cjs_esm_shim`); é o ambiente de teste de rotas da fundação, que nunca rodou. A checagem `email-dev` passa (5 testes); falta o teste de `GET /api/dev/emails` (`test/rotas/dev-emails.test.ts`) e o gate full.
 **Nota do rascunho**: como o Hono monta o app sem o `env`, a rota existe sempre e responde o 404 padrão sem `EMAIL_DEV=1`. A checagem `email-dev` entra no ci.yml.
 
 **Done when**:
@@ -760,6 +760,8 @@ T57 → T58
 **Gate**: full
 
 ---
+
+**Gate** (T15 e T16): `vitest run` de `resend.test.ts` e `modelos.test.ts` @ 3236f2b1d277187f0f32324182a26becccdfb02d = 22 testes verdes. Vermelho por sabotagem do código, restaurado: sem `abort` aos 10 s (ACE-75, 1 teste) e `?t=` no lugar de `#t=` (ACE-23 e ACE-06, 4 testes). T17 não fechada (ver o bloqueio nela).
 
 #### Phase 6: Middlewares de entrada e sessão
 
