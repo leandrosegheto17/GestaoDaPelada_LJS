@@ -1,5 +1,6 @@
 import type { Kysely } from 'kysely';
 import type { Banco } from '../infraestrutura/db/transacao.ts';
+import type { Relogio } from '../infraestrutura/relogio.ts';
 
 /**
  * Bindings do Worker (wrangler.jsonc). Tipos mínimos escritos aqui, para não depender dos
@@ -47,6 +48,8 @@ export interface Variaveis {
   contaId?: string;
   /** SHA-256 do token da sessão atual, para encerrá-la no sair (T20, T26). */
   tokenHash?: Uint8Array;
+  /** Relógio da requisição, posto pelo `criarApp` antes de tudo (T19; GEL-32). */
+  relogio: Relogio;
 }
 
 export interface Ambiente {

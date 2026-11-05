@@ -18,12 +18,15 @@ import {
   MENSAGEM_BANCO_INDISPONIVEL,
   type OpcoesCliente,
 } from '../infraestrutura/db/cliente.ts';
+import { relogioDoSistema, type Relogio } from '../infraestrutura/relogio.ts';
 
 export interface OpcoesApp {
   /** Rotas extras sob /api, só para os testes (ex.: rota que lança erro). */
   registrarExtras?: (api: Hono<Ambiente>) => void;
   /** Só para os testes: fábrica de conexões da leitura da sessão (ex.: como `pelada_app`). */
   fabricaBanco?: NonNullable<OpcoesCliente['fabrica']>;
+  /** Só para os testes: relógio falso (T19). Sem ele, o do sistema. */
+  relogio?: Relogio;
 }
 
 /**
@@ -32,6 +35,13 @@ export interface OpcoesApp {
  */
 export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
   const api = new Hono<Ambiente>().basePath('/api');
+  const relogio = opcoes.relogio ?? relogioDoSistema();
+
+  // O relógio da requisição antes de tudo: só ele lê a data de regra (T19; GEL-32).
+  api.use('*', async (c, next) => {
+    c.set('relogio', relogio);
+    await next();
+  });
 
   // Antes de qualquer rota, para valer também no 404 e no 500 (FUN-22).
   api.use('*', semCache, semSniff);

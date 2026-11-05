@@ -864,6 +864,7 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T18
 **Reuses**: `criarApp` da fundação (`F:1106`); decisão de `GD:66-67` e `GD:296` (só o relógio injetado lê a data; o SQL não usa `now()` para regra de data)
 **Requirement**: GEL-32, GEL-52, GEL-55
+**Status**: rascunhada
 
 **Done when**:
 
