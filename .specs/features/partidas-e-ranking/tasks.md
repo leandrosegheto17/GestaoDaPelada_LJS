@@ -631,14 +631,14 @@ Gate (T4 a T6): pnpm --filter @pelada/dominio test (tarefas do lote verdes) + ts
 **Depends on**: T1
 **Reuses**: `B:152` (PAR-17), caso limite `B:502`; Independent Test `B:173`
 **Requirement**: PAR-17
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-17`: grupo de quinta, numa sexta, sugere a quinta anterior; numa quinta, sugere hoje
-- [ ] Teste `PAR-17`: virada de mês e de ano (quinta 2026-12-31 → sexta 2027-01-01)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-17`: grupo de quinta, numa sexta, sugere a quinta anterior; numa quinta, sugere hoje
+- [x] Teste `PAR-17`: virada de mês e de ano (quinta 2026-12-31 → sexta 2027-01-01)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -656,21 +656,23 @@ Gate (T4 a T6): pnpm --filter @pelada/dominio test (tarefas do lote verdes) + ts
 **Depends on**: T7
 **Reuses**: `B:158-162` (PAR-23 a PAR-27); intervalo [início, fim) de `GE:626`
 **Requirement**: PAR-23, PAR-24, PAR-25, PAR-27
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste `PAR-24`: os três casos dão "Jogador não está ativo nesta data." em `marcacoes.<i>.jogadorId`
-- [ ] Teste `PAR-25`: jogador repetido dá "Há jogador repetido nas marcações." em `marcacoes`
-- [ ] Teste `PAR-27`: jogador com período [início, fim) que termina na data não está ativo nela
-- [ ] Teste `PAR-23`: `ausente` não entra na lista de presenças a gravar
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PAR-24`: os três casos dão "Jogador não está ativo nesta data." em `marcacoes.<i>.jogadorId`
+- [x] Teste `PAR-25`: jogador repetido dá "Há jogador repetido nas marcações." em `marcacoes`
+- [x] Teste `PAR-27`: jogador com período [início, fim) que termina na data não está ativo nela
+- [x] Teste `PAR-23`: `ausente` não entra na lista de presenças a gravar
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
 
 ---
 
+
+Gate (T7 a T8): pnpm --filter @pelada/dominio test (tarefas do lote verdes) + tsc dominio @ de94793ce48bd15887ce1d2c5ec39c2b6d5907ef
 #### Phase 5: Domínio: ranking
 
 ### T9: Ordem e posição do ranking
