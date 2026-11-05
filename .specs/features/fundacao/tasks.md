@@ -697,6 +697,8 @@ T81 → T82
 **Depends on**: T15
 **Reuses**: R1 de `reuso.md`: `git -C ../GestaoDaPelada_LJS archive e557292 backend/api/src/infraestrutura/db/migracoes` e extrair só os `.sql`; o hash vem da origem, nunca da cópia
 **Requirement**: FUN-08, FUN-09
+**Status**: rascunhada
+**Nota do rascunho**: copiadas com `git show e557292:<arquivo>` (o `tar` do Git Bash é BusyBox, sem `--wildcards`); hash calculado sobre o blob da origem.
 
 **Done when**:
 
