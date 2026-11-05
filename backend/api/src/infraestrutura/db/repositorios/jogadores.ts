@@ -1,5 +1,13 @@
 import { sql } from 'kysely';
-import type { JogadorCorpo } from '@pelada/contrato';
+import type { DataCorpo, JogadorCorpo } from '@pelada/contrato';
+import {
+  avaliarPeriodos,
+  type CampoPeriodo,
+  type OperacaoPeriodo,
+  type Periodo,
+  type PresencaJogador,
+  type RegraPeriodo,
+} from '@pelada/dominio';
 import { auditoria } from './convites.ts';
 import type { Db } from './tipos.ts';
 
@@ -48,4 +56,93 @@ async function criar(db: Db, grupoId: string, dados: JogadorCorpo, hoje: string)
   return { resultado: 'ok', id };
 }
 
-export const jogadores = { criar };
+// ---------------------------------------------------------------- escritas de período
+
+/**
+ * Resultado das escritas de período (T38 a T40). `invalido` traz a primeira regra que falhou, na ordem do GEL-62, com
+ * o campo do domínio (`saida` ou `retorno`); a rota escolhe o nome do campo do corpo.
+ */
+export type ResultadoPeriodo =
+  | { resultado: 'ok'; alterado: boolean }
+  | { resultado: 'nao_encontrado' | 'ja_inativo' | 'ja_ativo' }
+  | { resultado: 'invalido'; regra: RegraPeriodo; campo: CampoPeriodo; mensagem: string };
+
+interface EstadoDoJogador {
+  inicioPontuacao: string | null;
+  /** Em ordem de início, cada um com `id`. */
+  periodos: Array<Periodo & { id: string }>;
+  presencas: PresencaJogador[];
+}
+
+/**
+ * Trava a linha do jogador do grupo (`FOR UPDATE`) e lê, já com a trava, os períodos e as presenças (com a data da
+ * partida). A segunda escrita concorrente do mesmo jogador espera aqui e é validada sobre o resultado da primeira
+ * (`GD:152`, GEL-110). Nulo quando o jogador não é do grupo (GEL-44).
+ */
+async function travarParaPeriodo(db: Db, grupoId: string, id: string): Promise<EstadoDoJogador | null> {
+  const j = await sql<{ inicio_pontuacao: string | null }>`
+    SELECT inicio_pontuacao::text AS inicio_pontuacao FROM jogadores
+     WHERE grupo_id = ${grupoId} AND id = ${id}
+       FOR UPDATE`.execute(db);
+  const linha = j.rows[0];
+  if (!linha) return null;
+  const periodos = await sql<Periodo & { id: string }>`
+    SELECT id, inicio::text AS inicio, fim::text AS fim FROM periodos_ativos
+     WHERE grupo_id = ${grupoId} AND jogador_id = ${id}
+     ORDER BY inicio, id`.execute(db);
+  const presencas = await sql<PresencaJogador>`
+    SELECT pt.data::text AS data, p.situacao
+      FROM presencas p
+      JOIN partidas pt ON pt.id = p.partida_id AND pt.grupo_id = p.grupo_id
+     WHERE p.grupo_id = ${grupoId} AND p.jogador_id = ${id}
+     ORDER BY pt.data`.execute(db);
+  return { inicioPontuacao: linha.inicio_pontuacao, periodos: periodos.rows, presencas: presencas.rows };
+}
+
+/** As regras do domínio sobre o estado travado; a falha vira `invalido`. */
+function avaliar(estado: EstadoDoJogador, operacao: OperacaoPeriodo, hoje: string) {
+  return avaliarPeriodos({
+    periodos: estado.periodos,
+    operacao,
+    presencas: estado.presencas,
+    inicioPontuacao: estado.inicioPontuacao,
+    hoje,
+  });
+}
+
+/**
+ * Inativa o jogador (GEL-51): encerra o período aberto na data de saída (hoje, sem ela, GEL-52) e audita
+ * `jogador_inativado` (C9 de `context.md:15`), tudo na transação da requisição (GEL-109). As regras de período são as
+ * do domínio (GEL-58, GEL-62 a GEL-69), inclusive a presença que sairia do período (GEL-68).
+ *
+ * Casos limite (Domínio: sim), listados antes do código:
+ * - sem data: a saída é hoje (do relógio da requisição);
+ * - saída igual ao início do período aberto: o domínio decide (período [início, fim), GEL-61);
+ * - saída antes de uma presença dentro do período: `invalido` com a regra `presenca` e a data mínima (GEL-68);
+ * - já inativo (sem período aberto): `ja_inativo`, sem gravar (GEL-53);
+ * - jogador de outro grupo: `nao_encontrado`;
+ * - erro depois do `UPDATE` (auditoria que falha): sobe, e a transação da requisição desfaz o período (GEL-109).
+ */
+async function inativar(db: Db, grupoId: string, id: string, dados: DataCorpo, hoje: string): Promise<ResultadoPeriodo> {
+  const estado = await travarParaPeriodo(db, grupoId, id);
+  if (!estado) return { resultado: 'nao_encontrado' };
+  const aberto = estado.periodos.find((p) => p.fim === null);
+  if (!aberto) return { resultado: 'ja_inativo' };
+
+  const saida = dados.data ?? hoje;
+  const r = avaliar(estado, { tipo: 'inativar', saida }, hoje);
+  if (!r.ok) return { resultado: 'invalido', regra: r.regra, campo: r.campo, mensagem: r.mensagem };
+
+  await sql`
+    UPDATE periodos_ativos SET fim = ${saida}::date
+     WHERE grupo_id = ${grupoId} AND jogador_id = ${id} AND id = ${aberto.id} AND fim IS NULL`.execute(db);
+  await auditoria.registrar(db, grupoId, {
+    acao: 'jogador_inativado',
+    entidade: 'jogador',
+    entidadeId: id,
+    resumo: { saida, periodoId: aberto.id },
+  });
+  return { resultado: 'ok', alterado: true };
+}
+
+export const jogadores = { criar, inativar };

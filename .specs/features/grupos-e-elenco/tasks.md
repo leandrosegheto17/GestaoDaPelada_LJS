@@ -1364,6 +1364,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T37
 **Reuses**: escrita de período de `GD:152` (trava antes da validação); `avaliarPeriodos` (T14); auditoria de inativar de C9 (`ljs:.specs/features/grupos-e-elenco/context.md:15`)
 **Requirement**: GEL-51, GEL-52, GEL-53, GEL-58, GEL-68, GEL-109
+**Status**: rascunhada
 
 **Done when**:
 
