@@ -953,6 +953,8 @@ T47 → T48
 **Depends on**: T24
 **Reuses**: Molde da rota de pesos (`PR:1412`); leitor de corpo (`GE:854`); relógio (`GE:831`); rota de `L:backend/api/src/aplicacao/financeiro/config.ts:7-42`
 **Requirement**: FIN-01, FIN-02, FIN-03, FIN-04
+**Status**: rascunhada
+**Nota do rascunho**: `rotasFinanceiroConfig()` ligada no `app.ts`. O "GET do mês reflete" fica no teste da T26 (a rota nasce lá); aqui o teste confere a linha gravada. `test/rotas/apoio-financeiro.ts` (app com relógio fixo em 2026-10-15, pedido com sessão, `restaurarCaixa`) é reaproveitado por T26 e T27.
 
 **Done when**:
 
