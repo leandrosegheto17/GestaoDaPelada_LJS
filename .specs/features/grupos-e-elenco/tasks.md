@@ -2292,6 +2292,8 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T73
 **Reuses**: jornadas da CA (`CA:1683`, T57) e a caixa de dev (`CA:697`, T17) para o convite da J-14; `pnpm dev` (`F:1812`)
 **Requirement**: GEL-01, GEL-22, GEL-28, GEL-31, GEL-51, GEL-54, GEL-97
+**Status**: rascunhada
+**Nota do rascunho**: cada jornada cria as próprias contas e o próprio grupo; o nome da J-11 leva sufixo único (SPEC_DEVIATION no spec: o banco do e2e guarda as rodadas anteriores e o sufixo livre mudaria o slug). O passo 4 da J-12 (saída antes de presença) depende de partidas (feature 4); no lugar, a recusa da saída depois do retorno seguinte. A auditoria sem telefone nem ano fica nos testes da API.
 
 **Done when**:
 
