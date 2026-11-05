@@ -2433,6 +2433,8 @@ T78 → T79
 **Depends on**: T72
 **Reuses**: `.specs/mockup/telas/t01-ranking--{sem-conexao,sem-conexao-admin,carregando-cache}.html`; `Faixa` (`CA:1286`)
 **Requirement**: PAR-149, PAR-150, PAR-151, PAR-152
+**Status**: rascunhada
+**Nota do rascunho**: `telas/ranking/FaixaSemConexao.tsx` traz `textoAtualizadoEm`, a faixa, a faixa "É preciso conexão para entrar.", o "atualizando…" e a `TelaSemConexao`. Na `PaginaRanking`, o guardado só entra em falha de rede (status 0) ou enquanto a consulta está pendente (PAR-152); 5xx e 422 seguem como antes (P24). Somente leitura = sem "Exportar PDF". A engrenagem sem rede (`status 0` ou `navigator.onLine` falso) não navega. `test/apoio/limpar-armazenamento.ts` entra como `setupFiles` do Vitest (limpa o `localStorage` depois de cada teste, P24): nenhuma asserção existente muda, só deixa de herdar o guardado de outro teste.
 
 **Done when**:
 

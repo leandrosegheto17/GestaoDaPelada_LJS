@@ -73,6 +73,20 @@
   color: var(--cor-texto);
 }
 
+/* Sem conexão (T73; .specs/mockup/base.css: .atualizando e .faixa--topo). */
+.atualizando {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-1);
+  font-size: var(--texto-sm);
+  color: var(--cor-texto-sec);
+}
+
+.faixa-topo > * {
+  border-radius: 0;
+  margin: 0;
+}
+
 .topo {
   display: none;
 }

@@ -1,16 +1,16 @@
 import type { RankingPublico } from '@pelada/contrato/publico';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type MouseEvent } from 'react';
 import { useParams } from 'react-router';
 import { Botao } from '../../componentes/Botao.tsx';
 import casca from '../../componentes/Casca.module.css';
 import { EsqueletoLista } from '../../componentes/EsqueletoLista.tsx';
 import { Faixa } from '../../componentes/Faixa.tsx';
 import { Marca } from '../../componentes/Marca.tsx';
-import { TelaMensagem } from '../../componentes/TelaMensagem.tsx';
 import { ErroApi } from '../../dados/cliente.ts';
 import { useEventoRankingAberto } from '../../dados/eventos.ts';
 import { useMesDaUrl, useRankingPublico } from '../../dados/publico.ts';
 import { TEXTO_PDF_BAIXADO } from '../../pdf/entregar.ts';
+import { lerRankingGuardado } from '../../pwa/armazenamento/ranking-guardado.ts';
 import estilos from '../acesso.module.css';
 import { nomeDoMes } from '../financeiro/FinanceiroMes.tsx';
 import { textoRecorrencia } from '../grupos/recorrencia.ts';
@@ -18,6 +18,7 @@ import { ehSlugValido, GrupoIndisponivel } from './GrupoIndisponivel.tsx';
 import pagina from './ranking.module.css';
 import { TabelaRanking } from './TabelaRanking.tsx';
 import { DialogoPdfPronto } from './DialogoPdfPronto.tsx';
+import { FaixaPrecisaConexao, FaixaSemConexao, IndicadorAtualizando, navegadorSemRede, TelaSemConexao } from './FaixaSemConexao.tsx';
 import { TEXTO_ERRO_PDF, TEXTO_PREPARANDO_PDF, usarExportarPdf, type ExportarPdf } from './usarExportarPdf.ts';
 
 /**
@@ -33,15 +34,15 @@ import { TEXTO_ERRO_PDF, TEXTO_PREPARANDO_PDF, usarExportarPdf, type ExportarPdf
  * - sem jogadores: "Nenhum jogador no ranking ainda." (PAR-81); carregando: "Carregando o ranking…" (PAR-82);
  * - 422 do mês (fora do histórico ou malformado; P17 de `BC:29`): volta ao mês de hoje tirando o `?mes=` por
  *   substituição e mostra a faixa de erro com a mensagem da API;
- * - falha de rede: "Sem conexão" com "Tentar de novo" (t01 erro).
+ * - falha de rede: com o ranking guardado, ele somente leitura com a faixa "Sem conexão, atualizado em …"; sem
+ *   guardado, "Sem conexão" com "Tentar de novo" (t01 erro); a engrenagem sem rede avisa (T73, `FaixaSemConexao`).
  * - 404 da API e slug malformado (este sem chamar a API): `GrupoIndisponivel` (t03, PAR-94, T57).
  */
 
 export const TEXTO_SEM_JOGADORES = 'Nenhum jogador no ranking ainda.';
 export const TEXTO_SEM_JOGADORES_AJUDA = 'Quando o admin cadastrar os jogadores, o ranking aparece aqui.';
 export const TEXTO_CARREGANDO = 'Carregando o ranking…';
-export const TEXTO_SEM_CONEXAO = 'Sem conexão';
-export const TEXTO_SEM_CONEXAO_AJUDA = 'Conecte-se para ver o ranking.';
+export { TEXTO_SEM_CONEXAO, TEXTO_SEM_CONEXAO_AJUDA } from './FaixaSemConexao.tsx';
 export const TEXTO_ORDEM = 'Ordem pelos pontos acumulados até hoje.';
 
 /** "1 partida", "3 partidas". */
@@ -95,7 +96,7 @@ function IconeTempo({ choveu }: { choveu: boolean }) {
   );
 }
 
-function Cabecalho({ dados }: { dados: RankingPublico | undefined }) {
+function Cabecalho({ dados, aoTocarAdmin }: { dados: RankingPublico | undefined; aoTocarAdmin: (e: MouseEvent<HTMLAnchorElement>) => void }) {
   return (
     <>
       <a className={pagina.pular} href="#conteudo">
@@ -107,7 +108,7 @@ function Cabecalho({ dados }: { dados: RankingPublico | undefined }) {
           {dados ? <p className={pagina['barra__sub']}>{textoRecorrencia(dados.grupo)}</p> : null}
         </div>
         <nav className={casca['barra__acoes']} aria-label="Acesso dos admins">
-          <a className={casca['botao-icone']} href="/app" aria-label="Área do admin">
+          <a className={casca['botao-icone']} href="/app" aria-label="Área do admin" onClick={aoTocarAdmin}>
             <IconeEngrenagem />
           </a>
         </nav>
@@ -249,7 +250,17 @@ function AvisosDoPdf({ pdf }: { pdf: ExportarPdf }) {
   return null;
 }
 
-function Ranking({ dados, aoIr, pdf }: { dados: RankingPublico; aoIr: (mes: string) => void; pdf: ExportarPdf }) {
+interface PropsRanking {
+  dados: RankingPublico;
+  aoIr: (mes: string) => void;
+  pdf: ExportarPdf;
+  /** Guardado sem rede (PAR-149): sem "Exportar PDF". */
+  somenteLeitura: boolean;
+  /** Guardado enquanto a rede responde (PAR-152). */
+  atualizando: boolean;
+}
+
+function Ranking({ dados, aoIr, pdf, somenteLeitura, atualizando }: PropsRanking) {
   if (dados.linhas.length === 0) {
     return (
       <>
@@ -271,7 +282,7 @@ function Ranking({ dados, aoIr, pdf }: { dados: RankingPublico; aoIr: (mes: stri
     <>
       <div className={pagina.ferramentas}>
         <NavegacaoMes dados={dados} aoIr={aoIr} />
-        <BotaoExportar classe={pagina.topo} pdf={pdf} />
+        {somenteLeitura ? null : <BotaoExportar classe={pagina.topo} pdf={pdf} />}
       </div>
       <p className={pagina['resumo-mes']}>
         {semPartidas ? (
@@ -281,6 +292,12 @@ function Ranking({ dados, aoIr, pdf }: { dados: RankingPublico; aoIr: (mes: stri
             <strong>{partidas(dados.resumoMes.partidas)}</strong> no mês, {dados.resumoMes.comChuva} com chuva. {TEXTO_ORDEM}
           </>
         )}
+        {atualizando ? (
+          <>
+            {' '}
+            <IndicadorAtualizando />
+          </>
+        ) : null}
       </p>
       <TabelaRanking partidas={dados.partidas} linhas={dados.linhas} legenda={legenda} nomeMes={nomeCurtoDoMes(dados.mes)} />
       {semPartidas ? null : <Legenda />}
@@ -319,41 +336,57 @@ function RankingDoSlug({ slug }: { slug: string }) {
     trocarMes(novo);
   };
 
+  // T73: falha de rede (status 0) usa o guardado do slug e mês pedidos (PAR-149); 5xx e 422 não (P24 de `BC:36`).
+  const semRede = erro instanceof ErroApi && erro.status === 0;
+  const guardado = !consulta.data && (consulta.isPending || semRede) ? lerRankingGuardado(slug, mes) : null;
+  const [precisaConexao, setPrecisaConexao] = useState(false);
+
+  // PAR-150: sem rede, a engrenagem não navega e mostra a faixa.
+  const aoTocarAdmin = (e: MouseEvent<HTMLAnchorElement>) => {
+    if (semRede || navegadorSemRede()) {
+      e.preventDefault();
+      setPrecisaConexao(true);
+    }
+  };
+
+  const tentarDeNovo = () => {
+    setPrecisaConexao(false);
+    void consulta.refetch();
+  };
+
   // 404 da API: slug que não existe ou grupo arquivado, a t03 (PAR-94, T57).
   if (erro instanceof ErroApi && erro.status === 404) return <GrupoIndisponivel />;
 
-  if (consulta.isError && !mesRecusado) {
+  // PAR-151: sem rede e sem guardado (ou outro erro que não seja o 422 do mês).
+  if (consulta.isError && !mesRecusado && !(semRede && guardado)) {
     return (
       <>
-        <Cabecalho dados={undefined} />
-        <main className={casca['tela-mensagem']}>
-          <TelaMensagem
-            icone="erro"
-            titulo={TEXTO_SEM_CONEXAO}
-            acao={
-              <Botao variante="secundario" onClick={() => void consulta.refetch()}>
-                Tentar de novo
-              </Botao>
-            }
-          >
-            <span role="alert">{TEXTO_SEM_CONEXAO_AJUDA}</span>
-          </TelaMensagem>
-        </main>
+        <Cabecalho dados={undefined} aoTocarAdmin={aoTocarAdmin} />
+        <TelaSemConexao aoTentar={tentarDeNovo} aviso={precisaConexao ? <FaixaPrecisaConexao /> : null} />
       </>
     );
   }
 
-  const dados = consulta.data;
+  const dados = consulta.data ?? guardado ?? undefined;
+  const somenteLeitura = !consulta.data && semRede && guardado !== null;
+  // PAR-152: o guardado aparece enquanto a rede responde, com "atualizando…".
+  const atualizando = !consulta.data && consulta.isPending && guardado !== null;
   return (
     <>
-      <Cabecalho dados={dados} />
+      <Cabecalho dados={dados} aoTocarAdmin={aoTocarAdmin} />
+      {somenteLeitura && guardado ? <FaixaSemConexao geradoEm={guardado.geradoEm} /> : null}
       <main id="conteudo" className={casca.conteudo} aria-busy={dados ? undefined : true}>
+        {precisaConexao ? <FaixaPrecisaConexao /> : null}
         {aviso ? <Faixa tipo="erro">{aviso}</Faixa> : null}
         <AvisosDoPdf pdf={pdf} />
-        {dados ? <Ranking dados={dados} aoIr={aoIr} pdf={pdf} /> : <EsqueletoLista rotulo={TEXTO_CARREGANDO} />}
+        {dados ? (
+          <Ranking dados={dados} aoIr={aoIr} pdf={pdf} somenteLeitura={somenteLeitura} atualizando={atualizando} />
+        ) : (
+          <EsqueletoLista rotulo={TEXTO_CARREGANDO} />
+        )}
         {dados ? <Rodape /> : null}
       </main>
-      {dados && dados.linhas.length > 0 ? (
+      {dados && dados.linhas.length > 0 && !somenteLeitura ? (
         <div className={pagina['barra-celular']}>
           <BotaoExportar pdf={pdf} bloco />
         </div>

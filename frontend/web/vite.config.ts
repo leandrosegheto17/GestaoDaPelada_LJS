@@ -49,6 +49,8 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     include: ['test/**/*.test.{ts,tsx}'],
+    // T73 (P24): o localStorage do jsdom não passa de um teste para outro.
+    setupFiles: ['test/apoio/limpar-armazenamento.ts'],
     // CSS Modules com os nomes do mockup, para os testes conferirem as classes.
     css: { include: [/\.module\.css$/], modules: { classNameStrategy: 'non-scoped' } },
   },
