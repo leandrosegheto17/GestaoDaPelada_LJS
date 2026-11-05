@@ -27,6 +27,7 @@ import {
   type FormularioJogador,
 } from './camposJogador.tsx';
 import { AlterarInicio, CorrigirPeriodo } from './CorrigirDatas.tsx';
+import { ExcluirJogador } from './ExcluirJogador.tsx';
 import { AcoesSituacao } from './PeriodosJogador.tsx';
 
 /**
@@ -40,8 +41,9 @@ import { AcoesSituacao } from './PeriodosJogador.tsx';
  *   (GEL-97); "–" apaga a nota (GEL-98);
  * - "Situação": "Ativo desde dd/mm/aaaa." e os períodos de atividade, do mais antigo ao atual,
  *   com Inativar ou Reativar (`AcoesSituacao`, T65) e "Corrigir datas" em cada período
- *   (`CorrigirPeriodo`, T66); "Alterar data de início" fica nos dados (`AlterarInicio`, T66).
- *   O aviso de sucesso fica no topo da ficha. A exclusão entra na T67, pelo encaixe `acaoExcluir`.
+ *   (`CorrigirPeriodo`, T66) e "Excluir jogador" (`ExcluirJogador`, T67); "Alterar data de
+ *   início" fica nos dados (`AlterarInicio`, T66). O aviso de sucesso e a recusa da exclusão
+ *   ficam no topo da ficha.
  */
 
 export const TEXTO_DADOS_SALVOS = 'Dados salvos.';
@@ -69,11 +71,6 @@ export function corpoDaEdicao(dados: FormularioJogador): Record<string, unknown>
   };
   if (dados.pontuacaoInicial.trim() !== '') corpo.pontuacaoInicial = numeroOuNulo(dados.pontuacaoInicial);
   return corpo;
-}
-
-export interface EncaixesFicha {
-  /** Botão "Excluir jogador" (T67), que recebe como abrir o diálogo de inativar. */
-  acaoExcluir?: (ficha: JogadorDetalhe, abrirInativar: () => void) => ReactNode;
 }
 
 function Dados({ grupoId, ficha, avisar }: { grupoId: string; ficha: JogadorDetalhe; avisar: (texto: string | null) => void }) {
@@ -193,13 +190,13 @@ function Notas({ grupoId, ficha }: { grupoId: string; ficha: JogadorDetalhe }) {
 function Situacao({
   grupoId,
   ficha,
-  encaixes,
   avisar,
+  alertar,
 }: {
   grupoId: string;
   ficha: JogadorDetalhe;
-  encaixes: EncaixesFicha;
   avisar: (texto: string | null) => void;
+  alertar: (conteudo: ReactNode | null) => void;
 }) {
   return (
     <section className={estilos.secao} aria-labelledby="s-sit">
@@ -233,7 +230,9 @@ function Situacao({
           grupoId={grupoId}
           ficha={ficha}
           avisar={avisar}
-          acaoExtra={encaixes.acaoExcluir ? (abrirInativar) => encaixes.acaoExcluir?.(ficha, abrirInativar) : undefined}
+          acaoExtra={(abrirInativar) => (
+            <ExcluirJogador grupoId={grupoId} ficha={ficha} abrirInativar={abrirInativar} alertar={alertar} />
+          )}
         />
       </div>
     </section>
@@ -260,12 +259,13 @@ function Carregando() {
   );
 }
 
-export function FichaJogador({ encaixes = {} }: { encaixes?: EncaixesFicha }) {
+export function FichaJogador() {
   const { grupoId = '', jogadorId = '' } = useParams();
   const grupo = useGrupo(grupoId);
   const ficha = useJogador(grupoId, jogadorId);
   const base = rotaDoGrupo(grupoId);
   const [aviso, setAviso] = useState<string | null>(null);
+  const [alerta, setAlerta] = useState<ReactNode | null>(null);
 
   function conteudo() {
     if (ficha.isPending) return <Carregando />;
@@ -286,9 +286,10 @@ export function FichaJogador({ encaixes = {} }: { encaixes?: EncaixesFicha }) {
       <>
         <h1 className={estilos['titulo-pagina']}>{f.apelido}</h1>
         {aviso ? <Faixa tipo="sucesso">{aviso}</Faixa> : null}
+        {alerta}
         <Dados key={`dados-${f.id}`} grupoId={grupoId} ficha={f} avisar={setAviso} />
         <Notas grupoId={grupoId} ficha={f} />
-        <Situacao grupoId={grupoId} ficha={f} encaixes={encaixes} avisar={setAviso} />
+        <Situacao grupoId={grupoId} ficha={f} avisar={setAviso} alertar={setAlerta} />
       </>
     );
   }

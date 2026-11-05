@@ -2110,6 +2110,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T66
 **Reuses**: `R-17` e `R-18` (`t16-jogador--excluir`, `--exclusao-recusada`); `Dialogo` (`CA:1286`)
 **Requirement**: GEL-86, GEL-87, GEL-114
+**Status**: rascunhada
 
 **Done when**:
 
