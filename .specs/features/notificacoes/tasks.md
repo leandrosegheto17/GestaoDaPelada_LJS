@@ -1053,6 +1053,8 @@ T39 → T40 → T41
 **Depends on**: T28
 **Reuses**: T28; `exigirCabecalhoPelada` (`CA:723`); chave de IP (`CA:746`); T1, T14; AD-065, AD-104
 **Requirement**: NOT-05, NOT-06, NOT-07, NOT-08, NOT-09, NOT-10, NOT-11, NOT-61, NOT-65, NOT-67
+**Status**: rascunhada
+**Nota do rascunho**: a ordem é a da tarefa (413, 422, 503, 404, 403, função); o 404 do grupo vem antes do 403 do plano porque o `recursoLiberado` precisa do id do grupo. A resposta de 201 e 200 é `{ assinado: true }`, sem ecoar endpoint nem chaves. O NOT-11 conta o IP como chave do limitador e procura o IP na linha (`row_to_json`) e no console capturado. Testes em `backend/api/test/rotas/push-publico-assinar.test.ts`.
 
 **Done when**:
 

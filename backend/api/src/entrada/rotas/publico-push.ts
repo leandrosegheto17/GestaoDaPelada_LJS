@@ -2,10 +2,16 @@ import { Hono, type Context } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
 import { corpoDoErro } from '@pelada/contrato';
 import {
+  CODIGO_LIMITE_ASSINATURAS,
+  CODIGO_PUSH_INDISPONIVEL,
+  criarAssinaturaPushCorpo,
   criarCancelarPushCorpo,
   hostsPushDev,
   LIMITE_CORPO_PUSH_BYTES,
+  MENSAGEM_LIMITE_ASSINATURAS,
+  MENSAGEM_PUSH_INDISPONIVEL,
   type DisponibilidadePush,
+  type ErroPush,
   type EstadoPush,
 } from '@pelada/contrato/push';
 import type { Ambiente } from '../ambiente.ts';
@@ -45,6 +51,12 @@ export function limiteCorpoPush() {
 /** Hosts do serviço de push falso, só no ambiente local e no e2e (T27; NOT-63). */
 export const hostsExtras = (c: Context<Ambiente>): string[] => hostsPushDev(c.env.PUSH_HOSTS_DEV);
 
+/** 403 (sem push pelo plano) ou 503 (sem VAPID) `push_indisponivel` (NOT-09, NOT-61). */
+export function respostaPushIndisponivel(c: Context<Ambiente>, status: 403 | 503): Response {
+  const erro: ErroPush = { erro: MENSAGEM_PUSH_INDISPONIVEL, codigo: CODIGO_PUSH_INDISPONIVEL };
+  return c.json(erro, status);
+}
+
 export function rotasPublicoPush(): Hono<Ambiente> {
   const rotas = new Hono<Ambiente>();
 
@@ -56,6 +68,51 @@ export function rotasPublicoPush(): Hono<Ambiente> {
     if (vapid !== null && (await c.var.recursoLiberado(c.var.db, grupo.id, 'push')))
       resposta = { disponivel: true, chavePublica: vapid.publica };
     return c.json(resposta, 200);
+  });
+
+  /**
+   * `POST …/push` (T29; NOT-05 a NOT-11, NOT-61, NOT-65, NOT-67; AD-065, AD-104), na ordem:
+   * 1. `X-Pelada` (403) e `LIMITE_PUBLICO` (429) já passaram no `criarApp`; o IP só foi chave do limitador;
+   * 2. corpo acima de 4 KB: 413; não JSON: 422; fora do `assinaturaPushCorpo` (campo a mais, não https, host fora da
+   *    lista, `p256dh` ou `auth` inválidos): 422 por campo (NOT-06, NOT-67);
+   * 3. sem VAPID: 503 `push_indisponivel` (NOT-61);
+   * 4. slug inexistente ou arquivado: 404 do PAR-90 (NOT-08);
+   * 5. `recursoLiberado(…, 'push')` falso: 403 `push_indisponivel` (NOT-09, AD-104);
+   * 6. `push_ranking_assinar`: `criada` 201, `atualizada` 200 (NOT-05, NOT-07, NOT-65), `limite` 409
+   *    `limite_assinaturas` (NOT-10), `nao_encontrado` 404 do PAR-90 (o grupo arquivado entre a leitura e a função).
+   * Toda recusa sai com status ≥ 400 e o `comBanco` desfaz: nada fica gravado. A resposta não ecoa endpoint nem chaves
+   * (NOT-54).
+   */
+  rotas.post('/publico/:slug/push', limiteCorpoPush(), async (c) => {
+    const corpo = await lerCorpoDoGrupo(c, criarAssinaturaPushCorpo(hostsExtras(c)));
+    if (!corpo.ok) return corpo.resposta;
+    if (chavesVapidDoAmbiente(c.env) === null) return respostaPushIndisponivel(c, 503);
+    const grupo = await grupoDoSlug(c);
+    if (grupo instanceof Response) return grupo;
+    if (!(await c.var.recursoLiberado(c.var.db, grupo.id, 'push')))
+      return respostaPushIndisponivel(c, 403);
+
+    const resultado = await push.assinarRanking(c.var.db, c.var.slugPublico ?? '', {
+      endpoint: corpo.dados.endpoint,
+      p256dh: corpo.dados.chaves.p256dh,
+      auth: corpo.dados.chaves.auth,
+    });
+    const assinado: EstadoPush = { assinado: true };
+    switch (resultado) {
+      case 'criada':
+        return c.json(assinado, 201);
+      case 'atualizada':
+        return c.json(assinado, 200);
+      case 'limite': {
+        const erro: ErroPush = {
+          erro: MENSAGEM_LIMITE_ASSINATURAS,
+          codigo: CODIGO_LIMITE_ASSINATURAS,
+        };
+        return c.json(erro, 409);
+      }
+      case 'nao_encontrado':
+        return c.json(corpoDoErro('nao_encontrado'), 404);
+    }
   });
 
   rotas.post('/publico/:slug/push/estado', limiteCorpoPush(), async (c) => {
