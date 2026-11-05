@@ -1370,17 +1370,17 @@ Gate (T30 a T32): vitest test/repositorios: todos os testes PAR-* verdes; 38 ver
 **Depends on**: T32
 **Reuses**: `BD:205-207`; `B:74` e `B:475-478`
 **Requirement**: PAR-127, PAR-155, PAR-156, PAR-157, PAR-158, PAR-132
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: `partidaLancada(db, grupoId, data)` usa o momento da transação; `partidas.lancar` (T30) passou a chamá-la no lugar do INSERT direto. `escalacoesConfirmadas` é 0. Testes em `backend/api/test/repositorios/eventos.test.ts`.
 **Lacunas**: semana que só tem `escalacao_confirmada` (a simulador grava): não aparece, porque só os três tipos desta feature formam semana (interpretação conservadora). O `/executar` pergunta antes de levar ao verde.
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-156`: evento de domingo 23:30 em São Paulo (segunda UTC) cai na semana do domingo
-- [ ] Teste `PAR-158`: partida de quinta 20:00 lançada no sábado 19:00 conta em 48 h; lançada na segunda, não ("2 (1)")
-- [ ] Teste `PAR-157`: dois `ranking_aberto` do mesmo aparelho contam 1
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-156`: evento de domingo 23:30 em São Paulo (segunda UTC) cai na semana do domingo
+- [x] Teste `PAR-158`: partida de quinta 20:00 lançada no sábado 19:00 conta em 48 h; lançada na segunda, não ("2 (1)")
+- [x] Teste `PAR-157`: dois `ranking_aberto` do mesmo aparelho contam 1
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1398,14 +1398,14 @@ Gate (T30 a T32): vitest test/repositorios: todos os testes PAR-* verdes; 38 ver
 **Depends on**: T33
 **Reuses**: Estender `grupos.criar(db, dados)` e `grupos.ler(db, grupoId)` da grupos-e-elenco (`GE:1003`), acrescentando o parâmetro `hoje`; `BC:26` (P14); `BD:212-213`
 **Requirement**: PAR-15, PAR-132
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: `POST /api/grupos` (`rotas/grupos.ts`) passou a mandar `c.var.relogio.hoje()`; as 5 chamadas de `grupos.criar` em `backend/api/test/repositorios/grupos.test.ts` ganharam `HOJE` (Autorizações de 2026-11-04). SPEC_DEVIATION: `hoje` de `grupos.ler` é opcional (sobrecarga), porque o PATCH e o arquivar do grupo respondem o `grupoDetalhe` estrito; só o GET (T43) pede os campos do início. Testes novos em `backend/api/test/repositorios/grupos-inicio.test.ts`.
 
 **Done when**:
 
-- [ ] Teste `PAR-15`: grupo criado pelo repositório tem pesos vigentes desde o `hoje` recebido
-- [ ] Teste `PAR-132`: grupo novo devolve `partidasNoMes` 0, `pesosPadrao` verdadeiro e `aparelhosNaSemana` 0
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PAR-15`: grupo criado pelo repositório tem pesos vigentes desde o `hoje` recebido
+- [x] Teste `PAR-132`: grupo novo devolve `partidasNoMes` 0, `pesosPadrao` verdadeiro e `aparelhosNaSemana` 0
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1423,20 +1423,22 @@ Gate (T30 a T32): vitest test/repositorios: todos os testes PAR-* verdes; 38 ver
 **Depends on**: T34
 **Reuses**: Escritas de período da grupos-e-elenco (`GE:1333`, `GE:1358`, `GE:1383`); `BC:27` (P15); T14
 **Requirement**: PAR-122
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: o histórico é lido depois do `avaliarPeriodos`/`avaliarInicio` e antes de gravar (o "antes" do cenário); reativar e corrigir usam `compararCenarios`, alterar o início usa `previaDoInicio`, as mesmas funções das prévias. Escrita sem mudança não lê nem audita. Testes novos em `backend/api/test/repositorios/jogadores-auditoria-cenarios.test.ts`; os de auditoria de `jogadores-reativar`, `jogadores-corrigir` e `jogadores-inicio` ganharam a exigência dos 4 campos (só acréscimo; Autorizações de 2026-11-04).
 
 **Done when**:
 
-- [ ] Teste `PAR-122`: reativar grava na auditoria os quatro valores, iguais aos da prévia do mesmo cenário
-- [ ] Os testes de auditoria existentes da grupos-e-elenco passam a esperar os 4 campos a mais (Pergunta 1), sem asserção removida
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PAR-122`: reativar grava na auditoria os quatro valores, iguais aos da prévia do mesmo cenário
+- [x] Os testes de auditoria existentes da grupos-e-elenco passam a esperar os 4 campos a mais (Pergunta 1), sem asserção removida
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
 
 ---
 
+
+Gate (T33 a T35): vitest test/repositorios: todos os testes PAR-* verdes; 38 vermelhos GEL/FIN/ACE/NOT/PLA de outras features, iguais na main (preexistentes) @ 76114315fb9ecf8ee38ace1fad18da1969da6924
 #### Phase 14: Middlewares: prévia somente leitura e contexto público
 
 ### T36: Transação somente leitura nas prévias
