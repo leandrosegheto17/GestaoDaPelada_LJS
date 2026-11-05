@@ -1005,6 +1005,8 @@ T47 → T48
 **Depends on**: T26
 **Reuses**: T18, T19; rotas de `L:backend/api/src/entrada/rotas/grupos/financeiro/pagamentos-desmarcar.ts:8-27`; molde de `POST partidas` (`PR:1461`)
 **Requirement**: FIN-16, FIN-17, FIN-18, FIN-19, FIN-20, FIN-22, FIN-23
+**Status**: rascunhada
+**Nota do rascunho**: `rotasFinanceiroPagamentos()` ligada no `app.ts`. No DELETE, o mês é conferido antes do id (422 tem precedência); id que não é uuid dá 404. O `restaurarCaixa` do apoio passou a repor o lançamento e o pagamento do cenário (Bira, 2026-01), que o teste de desmarcar apaga.
 
 **Done when**:
 

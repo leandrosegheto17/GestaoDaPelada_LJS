@@ -93,6 +93,19 @@ export async function restaurarCaixa(aberto: CenarioGruposAberto): Promise<void>
     cenario.idsG.lancamento,
   ]);
   await db.query('DELETE FROM lancamentos WHERE grupo_id = $1 AND id <> $2', [g, cenario.idsG.lancamento]);
+  // O lançamento e o pagamento do cenário (Bira, 2026-01) voltam iguais, mesmo se um teste os editou ou apagou.
+  await db.query(
+    `INSERT INTO lancamentos (id, grupo_id, tipo, data, descricao, valor_centavos, criado_por, criado_em, alterado_por, alterado_em)
+     VALUES ($1, $2, 'entrada', '2026-01-05', 'Mensalidade', 5000, $3, now(), $3, now())
+     ON CONFLICT (id) DO UPDATE SET tipo = 'entrada', data = '2026-01-05', descricao = 'Mensalidade', valor_centavos = 5000`,
+    [cenario.idsG.lancamento, g, cenario.contaC],
+  );
+  await db.query(
+    `INSERT INTO pagamentos_mes (grupo_id, jogador_id, mes, lancamento_id, marcado_por, marcado_em)
+     VALUES ($1, $2, '2026-01', $3, $4, now())
+     ON CONFLICT (jogador_id, mes) DO NOTHING`,
+    [g, cenario.idsG.jogadorHistorico, cenario.idsG.lancamento, cenario.contaC],
+  );
   await db.query(
     `INSERT INTO config_financeira (grupo_id, mensalidade_centavos, saldo_inicial_centavos, data_saldo_inicial)
      VALUES ($1, 5000, 0, '2026-01-01')
