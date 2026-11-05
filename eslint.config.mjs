@@ -63,7 +63,25 @@ export default tseslint.config(
           ],
           patterns: [
             { group: ['node:fs/*', 'fs/*', 'pg/*', 'hono/*'], message: 'FUN-06: o domínio não faz I/O.' },
+            // GEL-104 (AD-028): validação de entrada é do contrato; o domínio recebe dados já validados.
+            { group: ['zod', 'zod/*'], message: 'GEL-104: o domínio não usa zod; a validação é do contrato.' },
           ],
+        },
+      ],
+      // GEL-70 (AD-028): o domínio não lê o relógio; "hoje" chega como parâmetro.
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "CallExpression[callee.object.name='Date'][callee.property.name='now']",
+          message: 'GEL-70: o domínio não lê o relógio; receba "hoje" como parâmetro.',
+        },
+        {
+          selector: "NewExpression[callee.name='Date'][arguments.length=0]",
+          message: 'GEL-70: o domínio não lê o relógio; receba "hoje" como parâmetro.',
+        },
+        {
+          selector: "CallExpression[callee.object.name='performance'][callee.property.name='now']",
+          message: 'GEL-70: o domínio não lê o relógio; receba "hoje" como parâmetro.',
         },
       ],
     },

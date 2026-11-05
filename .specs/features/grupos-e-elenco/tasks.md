@@ -545,6 +545,7 @@ T73 → T74 → T75
 **Depends on**: T6
 **Reuses**: estender a regra `no-restricted-imports` da fundação (`F:385`, T5) com `no-restricted-syntax`; decisão de `GD:61` (lint do domínio impede I/O, relógio e zod) e AD-028 proposta
 **Requirement**: GEL-70, GEL-104
+**Status**: rascunhada
 
 **Done when**:
 
