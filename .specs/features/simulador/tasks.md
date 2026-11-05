@@ -367,6 +367,8 @@ T53 → T54
 **Depends on**: None
 **Reuses**: `diaDaSemana` e `ehDataReal` de `backend/dominio/src/datas.ts` (`PR:457`), sem duplicar; regra de domínio sem relógio (AD-028, `GE:527`); idade de `L:backend/api/src/aplicacao/simulador/entrada.ts:63` e `L:backend/dominio/src/elenco/idade.ts:4`; convenções `S:73-79`; AD-086
 **Requirement**: SIM-01, SIM-51, SIM-95
+**Status**: rascunhada
+**Nota do rascunho**: `diaDaSemana`, `NUMERO_DO_DIA` e `NomeDiaDaSemana` vêm de `backend/dominio/src/datas.ts` (já rascunhado pela T1 da partidas-e-ranking); `somarDias` de `atividade/datas.ts`. Além do pedido: `JogadorSim` (apto com idade), `montarElenco`, `jogadorDe` e `compararIds`, usados pelas tarefas seguintes.
 
 **Done when**:
 
