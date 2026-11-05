@@ -1643,6 +1643,8 @@ T78 → T79
 **Depends on**: T43
 **Reuses**: T33; `BD:235`
 **Requirement**: PAR-155
+**Status**: rascunhada
+**Nota do rascunho**: `rotasUso()` em `rotas/uso.ts`, registrada em `criarApp`. Teste em `backend/api/test/rotas/uso.test.ts`; o evento do cenário de grupos tem o momento real do banco, então o teste confere a ordem e as semanas que criou, não a lista inteira.
 
 **Done when**:
 
