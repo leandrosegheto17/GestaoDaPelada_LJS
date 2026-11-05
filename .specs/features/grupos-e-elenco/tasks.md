@@ -1285,6 +1285,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T34
 **Reuses**: interface de `GD:151`; regra de histórico de `GS:52` e C8 (`ljs:.specs/features/grupos-e-elenco/context.md:14`); eventos de `GSEG:164`
 **Requirement**: GEL-41, GEL-42, GEL-43, GEL-44, GEL-45, GEL-84, GEL-85, SEC-008
+**Status**: rascunhada
 
 **Done when**:
 
