@@ -11,7 +11,8 @@
     "format:check": "prettier --check .",
     "typecheck": "pnpm -r typecheck && tsc --noEmit -p .",
     "test": "vitest run --dir test && pnpm -r test",
-    "restaurar": "node --env-file-if-exists=.env backend/scripts/ops/restaurar-backup.ts"
+    "restaurar": "node --env-file-if-exists=.env backend/scripts/ops/restaurar-backup.ts",
+    "migrar": "node --env-file-if-exists=.env backend/scripts/src/migrar.ts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

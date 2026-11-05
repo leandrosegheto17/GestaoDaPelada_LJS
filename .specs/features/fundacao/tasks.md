@@ -750,6 +750,8 @@ T81 → T82
 **Depends on**: T17, T9, T8
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-07, FUN-55, FUN-19
+**Status**: rascunhada
+**Nota do rascunho**: a trava aceita a lista de teste (`postgres` do CI incluído), porque o CI migra no serviço `postgres`.
 
 **Done when**:
 

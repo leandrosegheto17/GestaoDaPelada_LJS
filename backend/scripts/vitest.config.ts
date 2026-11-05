@@ -7,7 +7,9 @@ export default defineConfig({
       DATABASE_URL_TESTE:
         process.env.DATABASE_URL_TESTE ?? 'postgres://postgres:postgres@127.0.0.1:5432/pelada',
     },
-    testTimeout: 30_000,
+    // As roles são do cluster: bancos de teste migrados em paralelo disputam o CREATE ROLE.
+    fileParallelism: false,
+    testTimeout: 60_000,
     hookTimeout: 60_000,
   },
 });
