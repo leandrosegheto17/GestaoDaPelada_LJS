@@ -845,6 +845,8 @@ T47 → T48
 **Depends on**: T20
 **Reuses**: FK de `M:1792843200000_linha-de-base.sql:267`; regra de `L:backend/api/src/aplicacao/financeiro/lancamentos/excluir.ts:5-36`
 **Requirement**: FIN-29, FIN-30
+**Status**: rascunhada
+**Nota do rascunho**: exportado como `lancamentosExcluir.excluir(db, grupoId, id, opcoes)`, sem `contaId` (autora de `app_conta_id()`). Devolve `vinculado` com apelido e mês; a rota (T28) monta o 409 com `mensagemLancamentoVinculado`. A opção `pularChecagemDoVinculo` existe só para o teste da corrida (23503 da FK).
 
 **Done when**:
 
