@@ -2163,6 +2163,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T68
 **Reuses**: estender `rotas.tsx` da CA (`CA:1309`, T42); rotas de `GD:202` e do `telas.json:188-227`
 **Requirement**: GEL-114
+**Status**: rascunhada
 
 **Done when**:
 

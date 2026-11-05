@@ -13,6 +13,13 @@ import { Esqueci } from '../telas/esqueci/Esqueci.tsx';
 import { Confirmar } from '../telas/confirmar/Confirmar.tsx';
 import { Cadastro } from '../telas/cadastro/Cadastro.tsx';
 import { Entrar } from '../telas/entrar/Entrar.tsx';
+import { NovoGrupo } from '../telas/novo-grupo/NovoGrupo.tsx';
+import { InicioGrupo } from '../telas/grupo/InicioGrupo.tsx';
+import { DadosGrupo } from '../telas/dados-grupo/DadosGrupo.tsx';
+import { Jogadores } from '../telas/jogadores/Jogadores.tsx';
+import { NovoJogador } from '../telas/jogador/NovoJogador.tsx';
+import { FichaJogador } from '../telas/jogador/FichaJogador.tsx';
+import { Habilidades } from '../telas/habilidades/Habilidades.tsx';
 
 /**
  * Rotas (FUN-31, FUN-38; conta e acesso, T42):
@@ -24,7 +31,11 @@ import { Entrar } from '../telas/entrar/Entrar.tsx';
  *   `/confirmar`, `/entrar/esqueci`, `/entrar/nova-senha` e `/convite` (o convite tem estado
  *   para quem já entrou, e os links de e-mail não podem perder o `#t=` num redirecionamento);
  * - `/entrar` e `/cadastro` passam pela `GuardaPublica`: quem já entrou vai a `/app` (ACE-65);
- * - `/app/*` passa pela `GuardaApp` (ACE-19, ACE-20). Rotas do `telas.json:137-187` (AD-017).
+ * - `/app/*` passa pela `GuardaApp` (ACE-19, ACE-20). Rotas do `telas.json:137-187` (AD-017);
+ *   as de grupos e elenco (grupos-e-elenco T69, GEL-114, `telas.json:188-227`): novo grupo, início
+ *   do grupo, dados, jogadores, novo jogador, ficha e habilidades. `grupos/novo` vem antes de
+ *   `grupos/:grupoId` só por clareza: o roteador já prefere o segmento fixo. Grupo ou jogador que a
+ *   API não acha (404) mostra o não encontrado da própria tela;
  * - `/_vitrine/:id` só com `VITE_VITRINE=1`, e `*` com o 404.
  *
  * `handle.tela` identifica cada tela (o teste das rotas confere por ele).
@@ -61,7 +72,14 @@ export function criarRotas(): RouteObject[] {
         { index: true, element: <Grupos />, handle: { tela: 'app' } },
         { path: 'conta', element: <MinhaConta />, handle: { tela: 'conta' } },
         { path: 'conta/senha', element: <MinhaSenha />, handle: { tela: 'senha' } },
+        { path: 'grupos/novo', element: <NovoGrupo />, handle: { tela: 'novo-grupo' } },
+        { path: 'grupos/:grupoId', element: <InicioGrupo />, handle: { tela: 'inicio-grupo' } },
+        { path: 'grupos/:grupoId/dados', element: <DadosGrupo />, handle: { tela: 'dados-grupo' } },
         { path: 'grupos/:grupoId/admins', element: <Admins />, handle: { tela: 'admins' } },
+        { path: 'grupos/:grupoId/jogadores', element: <Jogadores />, handle: { tela: 'jogadores' } },
+        { path: 'grupos/:grupoId/jogadores/novo', element: <NovoJogador />, handle: { tela: 'novo-jogador' } },
+        { path: 'grupos/:grupoId/jogadores/:jogadorId', element: <FichaJogador />, handle: { tela: 'jogador' } },
+        { path: 'grupos/:grupoId/habilidades', element: <Habilidades />, handle: { tela: 'habilidades' } },
         { path: '*', element: <NaoEncontrada />, handle: { tela: 'nao-encontrada' } },
       ],
     },
