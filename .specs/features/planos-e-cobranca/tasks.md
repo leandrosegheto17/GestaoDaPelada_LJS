@@ -600,6 +600,7 @@ T56 → T57
 **Depends on**: T10
 **Reuses**: `comoApp` e `bancoDeTeste` (`F:909`, `F:507`); molde da matriz de `CA:313` (T2)
 **Requirement**: PLA-13, PLA-35
+**Status**: rascunhada
 
 **Done when**:
 
