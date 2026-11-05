@@ -14,9 +14,11 @@ function abrir(caminho: string) {
 }
 
 describe('rotas da fundação', () => {
-  it('FUN-31: / mostra a página provisória', async () => {
+  // planos-e-cobranca T53 (autorizado em `## Autorizações` do STATE.md): a página provisória deu lugar à landing; a
+  // prova continua a mesma (a rota `/` renderiza a sua tela, com título e `main`).
+  it('FUN-31, PLA-64: / mostra a landing', async () => {
     abrir('/');
-    expect(await screen.findByRole('heading', { level: 1, name: 'Em breve' })).toBeTruthy();
+    expect(await screen.findByRole('heading', { level: 1, name: 'Gestão da Pelada' })).toBeTruthy();
     expect(screen.getByRole('main')).toBeTruthy();
   });
 

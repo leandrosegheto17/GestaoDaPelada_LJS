@@ -36,7 +36,7 @@ test('FUN-29: a página / carrega sem violar a CSP', async ({ page }) => {
     if (m.type() === 'error' && /Content Security Policy/i.test(m.text())) violacoes.push(m.text());
   });
   await page.goto('/');
-  await expect(page.getByRole('heading', { level: 1, name: 'Em breve' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Gestão da Pelada' })).toBeVisible();
   expect(violacoes).toEqual([]);
 });
 

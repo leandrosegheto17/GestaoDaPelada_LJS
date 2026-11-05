@@ -104,9 +104,11 @@ describe('rotas do app de acesso', () => {
     }
   });
 
-  it('ACE-28: /?aviso=conta-excluida mostra a página provisória com a faixa "Sua conta foi excluída"', async () => {
+  // planos-e-cobranca T53 (autorizado em `## Autorizações` do STATE.md): a faixa agora fica na landing (PLA-63), com as
+  // mesmas asserções sobre ela.
+  it('ACE-28, PLA-63: /?aviso=conta-excluida mostra a landing com a faixa "Sua conta foi excluída"', async () => {
     abrir('/?aviso=conta-excluida', false);
-    expect(await screen.findByRole('heading', { level: 1, name: 'Em breve' })).toBeTruthy();
+    expect(await screen.findByRole('heading', { level: 1, name: 'Gestão da Pelada' })).toBeTruthy();
     const faixa = screen.getByRole('status');
     expect(faixa.textContent).toBe(TEXTO_CONTA_EXCLUIDA);
     expect(TEXTO_CONTA_EXCLUIDA).toBe('Sua conta foi excluída.');
@@ -115,7 +117,7 @@ describe('rotas do app de acesso', () => {
 
   it('ACE-28: / sem o aviso não mostra a faixa', async () => {
     abrir('/', false);
-    await screen.findByRole('heading', { level: 1, name: 'Em breve' });
+    await screen.findByRole('heading', { level: 1, name: 'Gestão da Pelada' });
     expect(screen.queryByText(TEXTO_CONTA_EXCLUIDA)).toBeNull();
   });
 

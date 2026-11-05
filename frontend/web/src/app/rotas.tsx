@@ -1,5 +1,6 @@
 import type { RouteObject } from 'react-router';
-import { NaoEncontrada, PaginaProvisoria } from '../paginas/Mensagens.tsx';
+import { NaoEncontrada } from '../paginas/Mensagens.tsx';
+import { Landing } from '../telas/landing/Landing.tsx';
 import { Admins } from '../telas/admins/Admins.tsx';
 import { MinhaSenha } from '../telas/minha-senha/MinhaSenha.tsx';
 import { MinhaConta } from '../telas/minha-conta/MinhaConta.tsx';
@@ -15,8 +16,10 @@ import { Entrar } from '../telas/entrar/Entrar.tsx';
 
 /**
  * Rotas (FUN-31, FUN-38; conta e acesso, T42):
- * - `/` com a página provisória (AD-007), que mostra a faixa "Sua conta foi excluída" em
- *   `?aviso=conta-excluida` (ACE-28); a landing é da `planos-e-cobranca` (AD-023);
+ * - `/` com a landing (planos-e-cobranca T53; AD-023, AD-094), que mostra a faixa "Sua conta foi
+ *   excluída" em `?aviso=conta-excluida` (ACE-28, PLA-63). Fica sob a `GuardaPublica`: com sessão
+ *   vai a `/app` (PLA-64); carregando a sessão, ou com `GET /api/sessao` em erro, a landing
+ *   aparece inteira (PLA-65), porque ela não depende da API;
  * - telas públicas: `/termos` e `/privacidade` abrem com ou sem sessão (ACE-58), como
  *   `/confirmar`, `/entrar/esqueci`, `/entrar/nova-senha` e `/convite` (o convite tem estado
  *   para quem já entrou, e os links de e-mail não podem perder o `#t=` num redirecionamento);
@@ -37,7 +40,6 @@ export interface HandleTela {
 
 export function criarRotas(): RouteObject[] {
   const rotas: RouteObject[] = [
-    { path: '/', element: <PaginaProvisoria />, handle: { tela: 'inicio-publico' } },
     { path: '/termos', element: <Termos />, handle: { tela: 'termos' } },
     { path: '/privacidade', element: <Privacidade />, handle: { tela: 'privacidade' } },
     { path: '/confirmar', element: <Confirmar />, handle: { tela: 'confirmar' } },
@@ -47,6 +49,7 @@ export function criarRotas(): RouteObject[] {
     {
       element: <GuardaPublica />,
       children: [
+        { path: '/', element: <Landing />, handle: { tela: 'inicio-publico' } },
         { path: '/entrar', element: <Entrar />, handle: { tela: 'entrar' } },
         { path: '/cadastro', element: <Cadastro />, handle: { tela: 'cadastro' } },
       ],

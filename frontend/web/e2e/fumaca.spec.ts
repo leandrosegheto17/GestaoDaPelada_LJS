@@ -5,10 +5,11 @@ import { expect, test } from '@playwright/test';
  * `/api/health` responde pelo mesmo servidor.
  */
 
-test('FUN-37: / mostra a página provisória do build servido pelo Worker', async ({ page }) => {
+// planos-e-cobranca T53 (autorizado em `## Autorizações` do STATE.md): a página provisória deu lugar à landing.
+test('FUN-37: / mostra a landing do build servido pelo Worker', async ({ page }) => {
   const resposta = await page.goto('/');
   expect(resposta?.status()).toBe(200);
-  await expect(page.getByRole('heading', { level: 1, name: 'Em breve' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Gestão da Pelada' })).toBeVisible();
   await expect(page.getByRole('main')).toBeVisible();
   await expect(page).toHaveTitle('Gestão da Pelada');
 });

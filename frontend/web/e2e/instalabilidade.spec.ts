@@ -68,7 +68,7 @@ test('FUN-37: sem rede, / ainda abre o shell do cache', async ({ page, context }
   await context.setOffline(true);
   try {
     await page.goto('/');
-    await expect(page.getByRole('heading', { level: 1, name: 'Em breve' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Gestão da Pelada' })).toBeVisible();
   } finally {
     await context.setOffline(false);
   }

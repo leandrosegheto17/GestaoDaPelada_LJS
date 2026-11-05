@@ -1648,6 +1648,7 @@ T56 → T57
 **Depends on**: T52
 **Reuses**: `useSessao` e a guarda (`CA:1192`, T37); rotas de `CA:1309`
 **Requirement**: PLA-64, PLA-65
+**Status**: rascunhada
 
 **Done when**:
 
