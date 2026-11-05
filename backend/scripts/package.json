@@ -15,7 +15,8 @@
     "typecheck": "tsc --noEmit -p .",
     "test": "vitest run",
     "dono": "node --env-file-if-exists=../../.env src/dono.ts",
-    "ensaio": "node --env-file-if-exists=../../.env src/ensaio-migracao.ts"
+    "ensaio": "node --env-file-if-exists=../../.env src/ensaio-migracao.ts",
+    "medir-simulador": "node --env-file-if-exists=../../.env src/medir-simulador.ts"
   },
   "dependencies": {
     "@pelada/api": "workspace:*",

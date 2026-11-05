@@ -1488,6 +1488,9 @@ T53 → T54
 **Depends on**: T42
 **Reuses**: Assumption `S:55` e critério `S:240`; AD-117; entradas de T19; `URL_PUBLICA` como origem (`F:1251`)
 **Requirement**: SIM-61
+**Status**: rascunhada
+**Nota do rascunho**: duas etapas em `medir-simulador.ts`: `disparar <grupoId> --confirmo-previa` (só previa, sugerir e avaliar; contagens de escalações e eventos pela própria `GET uso`, sem acesso ao banco da produção) e `analisar <tail.jsonl>` (p99 nearest-rank e 1102 por `outcome`). `SESSAO_MEDICAO` no `.env.example`. A `Evidência` (deploy e medição com o usuário) é do /executar.
+**Lacunas**: método do p99 (rascunho: nearest-rank); 50 `sugerir` no total ou por configuração (rascunho: 50 de cada); nomes `cpuTime` e `outcome` do JSON do `wrangler tail` (PREMISSA, conferir com saída real). O /executar confirma.
 
 **Done when**:
 
