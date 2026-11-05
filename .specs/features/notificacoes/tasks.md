@@ -1000,6 +1000,8 @@ T39 → T40 → T41
 **Depends on**: T26
 **Reuses**: checagem do `EMAIL_DEV` (`CA:697`); T1; AD-109
 **Requirement**: NOT-63
+**Status**: rascunhada
+**Nota do rascunho**: `hostsPushDev` e a aceitação de `http(s)://localhost:<porta>` ficaram no contrato (`backend/contrato/src/push.ts`); a variável só aceita `localhost` ou `*.localhost`, e outro host nela é ignorado. Os casos de uso do ranking e da cobrança passam `hostsExtras` ao cliente de envio. A checagem vigia `wrangler.jsonc` e `deploy.yml` e entrou no `ci.yml`. O servidor falso mora em `frontend/web/e2e/apoio/push-falso.mjs` (teste em `frontend/web/test/ferramentas/`). Falta ligá-lo ao `playwright.config.ts` e passar `--var PUSH_HOSTS_DEV`, o que é da T41.
 
 **Done when**:
 

@@ -7,6 +7,7 @@ import {
   criarAssinaturaPushCorpo,
   deBase64url,
   endpointPushAceito,
+  hostsPushDev,
   MENSAGEM_CHAVE,
   MENSAGEM_ENDPOINT,
   paraBase64url,
@@ -158,5 +159,47 @@ describe('códigos de erro', () => {
   it('push_indisponivel e limite_assinaturas', () => {
     expect(CODIGO_PUSH_INDISPONIVEL).toBe('push_indisponivel');
     expect(CODIGO_LIMITE_ASSINATURAS).toBe('limite_assinaturas');
+  });
+});
+
+describe('PUSH_HOSTS_DEV (T27)', () => {
+  it('NOT-63: sem PUSH_HOSTS_DEV, localhost é recusado, com http ou https e com ou sem porta', () => {
+    for (const endpoint of ['http://localhost:8790/push/a', 'https://localhost/push/a', 'http://127.0.0.1:8790/push/a']) {
+      expect(endpointPushAceito(endpoint), endpoint).toBe(false);
+      expect(endpointPushAceito(endpoint, hostsPushDev(undefined)), endpoint).toBe(false);
+      expect(endpointPushAceito(endpoint, hostsPushDev('')), endpoint).toBe(false);
+    }
+  });
+
+  it('NOT-63: com ela, aceita http e https em localhost só no host e na porta listados', () => {
+    const extras = hostsPushDev(' localhost:8790 , Push-Falso.localhost ');
+    expect(extras).toEqual(['localhost:8790', 'push-falso.localhost']);
+    expect(endpointPushAceito('http://localhost:8790/push/a', extras)).toBe(true);
+    expect(endpointPushAceito('https://push-falso.localhost/x', extras)).toBe(true);
+    expect(endpointPushAceito('http://localhost:8791/push/a', extras)).toBe(false);
+    expect(endpointPushAceito('http://localhost/push/a', extras)).toBe(false);
+    expect(endpointPushAceito('http://usuario@localhost:8790/push/a', extras)).toBe(false);
+  });
+
+  it('NOT-63: aceita só em localhost: outro host na variável é ignorado', () => {
+    const extras = hostsPushDev('mal.example:8790,mal.example,127.0.0.1:8790,localhost.mal.example');
+    expect(extras).toEqual([]);
+    for (const endpoint of [
+      'http://mal.example:8790/x',
+      'https://mal.example/x',
+      'http://127.0.0.1:8790/x',
+      'https://localhost.mal.example/x',
+    ]) {
+      expect(endpointPushAceito(endpoint, ['mal.example:8790', 'mal.example', '127.0.0.1:8790', 'localhost.mal.example'])).toBe(
+        false,
+      );
+    }
+  });
+
+  it('NOT-63: os hosts reais continuam aceitos com a variável e o teto de 1024 vale para o de dev', () => {
+    const extras = hostsPushDev('localhost:8790');
+    expect(endpointPushAceito(ENDPOINT, extras)).toBe(true);
+    const base = 'http://localhost:8790/';
+    expect(endpointPushAceito(base + 'a'.repeat(1025 - base.length), extras)).toBe(false);
   });
 });

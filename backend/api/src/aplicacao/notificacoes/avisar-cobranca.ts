@@ -1,5 +1,6 @@
 import * as Sentry from '@sentry/cloudflare';
 import { TENTATIVA_MAXIMA, type MensagemCobranca, type TipoAvisoCobrancaFila } from '@pelada/contrato/fila-avisos';
+import { hostsPushDev } from '@pelada/contrato/push';
 import { payloadCobranca, serializarPayload } from '@pelada/dominio';
 import { enviarEmailDeConta, limiteEmailsDia } from '../acesso/enviar-email.ts';
 import { atrasoDaNovaTentativa } from './enviar-ranking.ts';
@@ -112,6 +113,7 @@ async function enviarPushDeCobranca(
         topico,
         ttl: TTL_COBRANCA,
         cache,
+        hostsExtras: hostsPushDev(env.PUSH_HOSTS_DEV),
         ...(opcoes.fetch ? { fetch: opcoes.fetch } : {}),
         ...(opcoes.reportarPush ? { reportar: opcoes.reportarPush } : {}),
       });

@@ -1,4 +1,5 @@
 import { LOTE_MAXIMO, TENTATIVA_MAXIMA, type MensagemRanking } from '@pelada/contrato/fila-avisos';
+import { hostsPushDev } from '@pelada/contrato/push';
 import { payloadRanking, planoEfetivo, planoLibera, serializarPayload, type Data } from '@pelada/dominio';
 import type { CasoDeUso, Desfecho } from '../../entrada/consumidor-avisos.ts';
 import { push, type AssinaturaDoLote } from '../../infraestrutura/db/repositorios/push.ts';
@@ -121,6 +122,7 @@ export function criarEnviarRanking(opcoes: OpcoesEnviarRanking = {}): CasoDeUso<
     );
     const topico = await topicoDoGrupo(grupoId);
     const cache = novoCacheVapid();
+    const hostsExtras = hostsPushDev(env.PUSH_HOSTS_DEV);
     const aceitos: string[] = [];
     const revogados: string[] = [];
     const deNovo: string[] = [];
@@ -134,6 +136,7 @@ export function criarEnviarRanking(opcoes: OpcoesEnviarRanking = {}): CasoDeUso<
           ttl: TTL_RANKING,
           agora,
           cache,
+          hostsExtras,
           ...(opcoes.fetch ? { fetch: opcoes.fetch } : {}),
           ...(opcoes.reportar ? { reportar: opcoes.reportar } : {}),
         });

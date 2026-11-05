@@ -49,6 +49,7 @@ jobs:
           node backend/scripts/checagens/sem-url-absoluta.ts
           node backend/scripts/checagens/migracao-aditiva.ts
           node backend/scripts/checagens/email-dev.ts
+          node backend/scripts/checagens/push-hosts-dev.ts
           node backend/scripts/checagens/sem-e-dono.ts
           node backend/scripts/checagens/escritores-periodo.ts
           node backend/scripts/checagens/plano-unico.ts

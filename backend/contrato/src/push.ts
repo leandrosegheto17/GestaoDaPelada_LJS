@@ -55,13 +55,52 @@ export function paraBase64url(bytes: Uint8Array): string {
 
 const IPV4 = /^\d{1,3}(?:\.\d{1,3}){3}$/;
 
+/**
+ * Entrada válida de `PUSH_HOSTS_DEV` (notificacoes T27; NOT-63): só `localhost` ou um subdomínio dele (RFC 6761, sempre
+ * a própria máquina), com porta opcional. Qualquer outro host na variável é ignorado: nem por engano ela abre a API
+ * para um serviço de push que não está na lista (AD-109).
+ */
+const HOST_DEV = /^(?:[a-z0-9-]+\.)*localhost(?::\d{1,5})?$/;
+
+/** `PUSH_HOSTS_DEV` (só no `.env` local e no e2e) em lista: separada por vírgula, em minúsculas, só as entradas válidas. */
+export function hostsPushDev(valor: string | undefined): string[] {
+  if (valor === undefined) return [];
+  return valor
+    .split(',')
+    .map((e) => e.trim().toLowerCase())
+    .filter((e) => HOST_DEV.test(e));
+}
+
+/** Só as entradas de dev válidas, mesmo que quem chama passe outra coisa. */
+const extrasValidos = (extras: readonly string[]): string[] =>
+  extras.map((e) => e.trim().toLowerCase()).filter((e) => HOST_DEV.test(e));
+
 /** Host na lista (AD-109). `extras` é o `PUSH_HOSTS_DEV`, que só existe no ambiente local (T27). */
 export function hostPushAceito(host: string, extras: readonly string[] = []): boolean {
   const h = host.toLowerCase();
   if (h === '' || IPV4.test(h) || h.startsWith('[')) return false;
   if ((HOSTS_PUSH_EXATOS as readonly string[]).includes(h)) return true;
-  if (extras.map((e) => e.toLowerCase()).includes(h)) return true;
+  if (extrasValidos(extras).some((e) => e === h)) return true;
   return SUFIXOS_PUSH.some((sufixo) => h.endsWith(sufixo) && h.length > sufixo.length);
+}
+
+/**
+ * O serviço de push falso do ambiente local e do e2e (T27): `http` ou `https` em `localhost` (ou subdomínio), com a
+ * porta, só quando `host:porta` está em `PUSH_HOSTS_DEV`. Sem a variável, `localhost` é recusado como qualquer host.
+ */
+function endpointDevAceito(endpoint: string, extras: readonly string[]): boolean {
+  const validos = extrasValidos(extras);
+  if (validos.length === 0) return false;
+  let url: URL;
+  try {
+    url = new URL(endpoint);
+  } catch {
+    return false;
+  }
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') return false;
+  if (url.username !== '' || url.password !== '') return false;
+  if (!HOST_DEV.test(url.hostname) || url.hostname.includes(':')) return false;
+  return validos.includes(url.host.toLowerCase());
 }
 
 /**
@@ -70,6 +109,7 @@ export function hostPushAceito(host: string, extras: readonly string[] = []): bo
  */
 export function endpointPushAceito(endpoint: string, extras: readonly string[] = []): boolean {
   if (endpoint.length > LIMITES_PUSH.endpointMax) return false;
+  if (endpointDevAceito(endpoint, extras)) return true;
   const cru = /^https:\/\/([^/?#]*)/i.exec(endpoint);
   if (!cru) return false;
   const autoridade = cru[1] ?? '';
