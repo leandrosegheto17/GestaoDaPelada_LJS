@@ -1063,6 +1063,9 @@ T57 → T58
 **Depends on**: T28
 **Reuses**: `convites.*` (T23); tabela de `ljs:.specs/features/conta-e-acesso/design.md:164-166`
 **Requirement**: ACE-33, ACE-34, ACE-35, ACE-36, ACE-50, ACE-67
+**Status**: rascunhada
+**Nota do rascunho**: casos limite no topo de `rotas/convites.ts`. Token ausente ou malformado responde 410. Aceitar responde 200 `{grupoId}`; cadastrar, 201 `{grupoId}` com o cookie da sessão nova.
+**Lacunas**: cadastrar pelo convite quando o e-mail ganhou conta depois do convite (`conta_existente`): a spec não define; o rascunho responde 409 com o código `dados_invalidos` e o texto "Já existe uma conta com este e-mail. Entre para aceitar o convite." (o contrato não tem código próprio).
 
 **Done when**:
 

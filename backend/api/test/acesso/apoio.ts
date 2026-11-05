@@ -100,3 +100,32 @@ export function hashDoTexto(token: string): Buffer {
 export function limparCaixa(): void {
   caixaDev.limpar();
 }
+
+export interface OpcoesConviteTeste {
+  /** Expressões SQL, ex.: `now() - interval '1 second'`. */
+  expiraEm?: string;
+  usadoEm?: string;
+  canceladoEm?: string;
+}
+
+/**
+ * Grava um convite de admin como superusuário com o hash do token em texto (o que a rota
+ * calcula) e devolve o token, para os testes das rotas de convite (T29, T30).
+ */
+export async function conviteDeTeste(
+  db: { query: (sql: string, valores?: unknown[]) => Promise<unknown> },
+  grupo: string,
+  email: string,
+  criadoPor: string,
+  opcoes: OpcoesConviteTeste = {},
+): Promise<string> {
+  const { gerarToken } = await import('../../src/infraestrutura/sessao/token.ts');
+  const { token, hash } = await gerarToken();
+  await db.query(
+    `INSERT INTO convites_admin (grupo_id, email, token_hash, criado_por, criado_em, expira_em, usado_em, cancelado_em)
+     VALUES ($1, $2, $3, $4, now(), ${opcoes.expiraEm ?? "now() + interval '7 days'"},
+             ${opcoes.usadoEm ?? 'NULL'}, ${opcoes.canceladoEm ?? 'NULL'})`,
+    [grupo, email, Buffer.from(hash), criadoPor],
+  );
+  return token;
+}

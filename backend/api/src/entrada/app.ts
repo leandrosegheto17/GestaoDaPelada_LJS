@@ -6,6 +6,7 @@ import { limitarRotasDeAcesso } from './middlewares/limite-taxa.ts';
 import { carregarSessao } from './middlewares/sessao.ts';
 import { protegerRotasDeGrupo } from './middlewares/vinculo.ts';
 import { rotasConta } from './rotas/conta.ts';
+import { rotasConvites } from './rotas/convites.ts';
 import { devEmails } from './rotas/dev-emails.ts';
 import { health } from './rotas/health.ts';
 import { rotasMinhaConta } from './rotas/minha-conta.ts';
@@ -51,6 +52,7 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
   api.route('/', rotasSessao(rotasAcesso));
   api.route('/', rotasRecuperacao(rotasAcesso));
   api.route('/', rotasMinhaConta(rotasAcesso));
+  api.route('/', rotasConvites(rotasAcesso));
   opcoes.registrarExtras?.(api);
 
   api.notFound((c) => c.json({ erro: 'Rota não encontrada.' }, 404));
