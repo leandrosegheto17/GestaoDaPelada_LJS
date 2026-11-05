@@ -1,6 +1,18 @@
+import { CacheableResponsePlugin } from 'workbox-cacheable-response';
+import { ExpirationPlugin } from 'workbox-expiration';
 import { cleanupOutdatedCaches, matchPrecache, precacheAndRoute } from 'workbox-precaching';
 import { NavigationRoute, registerRoute } from 'workbox-routing';
-import { FORA_DO_FALLBACK, precacheDoApp, registrarEventos, responderNavegacao } from './servico.ts';
+import { NetworkFirst } from 'workbox-strategies';
+import {
+  CACHE_RANKING_PUBLICO,
+  ehRankingPublico,
+  FORA_DO_FALLBACK,
+  marcarRespostaDoCache,
+  MAX_RANKINGS_GUARDADOS,
+  precacheDoApp,
+  registrarEventos,
+  responderNavegacao,
+} from './servico.ts';
 import type { AlvoDeEventos, EntradaPrecache } from './servico.ts';
 
 /**
@@ -10,10 +22,14 @@ import type { AlvoDeEventos, EntradaPrecache } from './servico.ts';
  * Ordem das rotas: o precache responde primeiro (o shell em `/` e os ativos do build); a
  * navegação que sobra vai à rede e, sem rede, recebe a página offline.
  *
+ * Ranking público (partidas-e-ranking T71; PAR-153): a única rota de `/api` registrada, com rede primeiro, guardando
+ * só respostas 200 e no máximo 50. Nenhuma outra rota de `/api` passa pelo SW.
+ *
  * Tipos mínimos locais em vez de `lib: webworker`, que colide com a `lib: DOM` do tsconfig.
  */
 declare const self: AlvoDeEventos & {
   __WB_MANIFEST: EntradaPrecache[];
+  location: { origin: string };
   skipWaiting(): Promise<void>;
 };
 
@@ -29,6 +45,19 @@ registerRoute(
       }),
     { denylist: FORA_DO_FALLBACK },
   ),
+);
+
+registerRoute(
+  ({ url, request }) => request.method === 'GET' && ehRankingPublico(url, self.location.origin),
+  new NetworkFirst({
+    cacheName: CACHE_RANKING_PUBLICO,
+    plugins: [
+      new CacheableResponsePlugin({ statuses: [200] }),
+      new ExpirationPlugin({ maxEntries: MAX_RANKINGS_GUARDADOS }),
+      marcarRespostaDoCache,
+    ],
+  }),
+  'GET',
 );
 
 registrarEventos(self);

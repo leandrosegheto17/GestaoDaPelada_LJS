@@ -53,6 +53,32 @@ export async function responderNavegacao(requisicao: Request, deps: Dependencias
   }
 }
 
+/**
+ * Única rota de `/api` que o service worker guarda (partidas-e-ranking T71; PAR-153; `BD:293-297`; G-17): o
+ * `GET /api/publico/:slug/ranking` da própria origem, com ou sem `?mes=`. PDF, eventos e toda rota de admin ficam
+ * sempre na rede.
+ */
+export const ROTA_RANKING_PUBLICO = /^\/api\/publico\/[a-z0-9-]{1,64}\/ranking$/;
+
+export const CACHE_RANKING_PUBLICO = 'ranking-publico';
+export const MAX_RANKINGS_GUARDADOS = 50;
+/** Cabeçalho que marca a resposta servida do cache do SW (sem rede). */
+export const CABECALHO_DO_CACHE = 'X-Pelada-Cache';
+
+export function ehRankingPublico(url: URL, origem: string): boolean {
+  return url.origin === origem && ROTA_RANKING_PUBLICO.test(url.pathname);
+}
+
+/** Plugin do Workbox: a resposta tirada do cache leva `X-Pelada-Cache: 1`. */
+export const marcarRespostaDoCache = {
+  cachedResponseWillBeUsed: async ({ cachedResponse }: { cachedResponse?: Response | null }): Promise<Response | null> => {
+    if (!cachedResponse) return null;
+    const cabecalhos = new Headers(cachedResponse.headers);
+    cabecalhos.set(CABECALHO_DO_CACHE, '1');
+    return new Response(cachedResponse.body, { status: cachedResponse.status, statusText: cachedResponse.statusText, headers: cabecalhos });
+  },
+};
+
 /** Navegações que não são da SPA e nunca recebem o fallback. */
 export const FORA_DO_FALLBACK: RegExp[] = [/^\/api\//];
 

@@ -2380,6 +2380,8 @@ T78 → T79
 **Depends on**: T70
 **Reuses**: Estender o SW da fundação (`F:1595`, `FD:123`); `BD:293-297`; `BC:34` (P22)
 **Requirement**: PAR-153
+**Status**: rascunhada
+**Nota do rascunho**: `ehRankingPublico`, `ROTA_RANKING_PUBLICO` e o plugin `marcarRespostaDoCache` (`X-Pelada-Cache: 1`, design C8) em `pwa/servico.ts`; o `sw.ts` registra a segunda rota (só `GET`, `NetworkFirst` no cache `ranking-publico`, 200 e 50 entradas). Dependências `workbox-strategies`, `workbox-cacheable-response` e `workbox-expiration` no `package.json` como as outras do Workbox (`^7.3.0`), sem instalar. Nenhum teste existente conta as rotas do SW na v2: `service-worker.test.ts` não muda; o teste novo `test/pwa/sw-rotas.test.ts` importa o `sw.ts` com o Workbox em dublês.
 
 **Done when**:
 
