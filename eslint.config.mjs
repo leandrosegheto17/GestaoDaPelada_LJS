@@ -2,6 +2,7 @@ import js from '@eslint/js';
 import prettier from 'eslint-config-prettier';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
+import pluginPelada from './eslint/plugin-pelada.mjs';
 
 const MODULOS_IO = [
   'pg',
@@ -124,6 +125,15 @@ export default tseslint.config(
     // Mesma exceção do LJS (`eslint.config.mjs` @ c6dc82c, `somaSoNaPontuacao`).
     files: ['backend/dominio/src/ranking/rodadas.ts'],
     rules: { 'no-restricted-syntax': ['error', ...SEM_RELOGIO, ...SOMA_SO_NA_PONTUACAO] },
+  },
+  {
+    // PAR-140 (T52; BD:309-314; AD-039): só o repositório de jogadores e as migrações escrevem `periodos_ativos`.
+    // Quem grava presença (`repositorios/partidas.ts`) só lê os períodos. `deleteFrom` e `inicio_pontuacao` seguem com
+    // a checagem `escritores-periodo` (GEL-83, GEL-111).
+    files: ['backend/api/src/**/*.ts'],
+    ignores: ['backend/api/src/infraestrutura/db/repositorios/jogadores.ts', 'backend/api/src/infraestrutura/db/migracoes/**'],
+    plugins: { pelada: pluginPelada },
+    rules: { 'pelada/sem-escrita-periodo': 'error' },
   },
   prettier,
 );

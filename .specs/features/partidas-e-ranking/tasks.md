@@ -1881,6 +1881,8 @@ T78 → T79
 **Depends on**: T51
 **Reuses**: Checagem `backend/scripts/checagens/escritores-periodo.ts` (`GE:1482`), que continua cobrindo `deleteFrom` e `inicio_pontuacao`; `BD:309-314`; AD-039
 **Requirement**: PAR-140
+**Status**: rascunhada
+**Nota do rascunho**: plugin escrito do zero em `eslint/plugin-pelada.mjs` (o do LJS só consultado, AD-002), ligado num bloco de `backend/api/src/**/*.ts` com `ignores` de `repositorios/jogadores.ts` e das migrações; o lint da raiz passa a cobrir a pasta `eslint`. Teste em `test/lint/sem-escrita-periodo.test.ts`, inclusive o "lint antes de ligar" como teste (zero achados em `backend/api/src`).
 
 **Done when**:
 
