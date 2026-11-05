@@ -2042,6 +2042,8 @@ T81 → T82
 **Depends on**: T66
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-40
+**Status**: rascunhada
+**Nota do rascunho**: SHAs das actions conferidos com `git ls-remote` em 2026-11-05 (commit da tag, não o objeto da tag): `actions/setup-node` v7.1.0, `pnpm/action-setup` v6.1.1, `gitleaks/gitleaks-action` v3.0.0; checkout e upload-artifact são os do `backup.yml`. O job `banco` migra do zero, migra de novo (zero DDL) e roda `test/migracoes` (impressão digital e estado) e `test/isolamento` do `@pelada/api`. As checagens rodam como linha de comando no job `qualidade` e como teste no job `testes`. Teste em `backend/scripts/test/workflow-ci.test.ts`, no molde do `workflow-backup.test.ts`. Conferir: se o `gitleaks-action` v3 pede licença ou outra variável; se o `pnpm/action-setup` lê o `packageManager` sem `version`.
 
 **Done when**:
 
