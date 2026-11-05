@@ -19,6 +19,10 @@ interface Wrangler {
   assets: { directory: string; not_found_handling: string; run_worker_first: string[] };
   ratelimits: Limite[];
   hyperdrive: { binding: string; id: string; localConnectionString: string }[];
+  queues?: {
+    producers: Array<{ binding: string; queue: string }>;
+    consumers: Array<{ queue: string; max_batch_size?: number; max_retries?: number }>;
+  };
   vars: Record<string, string>;
 }
 
@@ -88,5 +92,14 @@ describe('wrangler.jsonc da prévia', () => {
   it('FUN-23: VERSAO e URL_PUBLICA existem nas vars e URL_PUBLICA não traz endereço fixo', () => {
     expect(Object.keys(config.vars).sort()).toEqual(['URL_PUBLICA', 'VERSAO']);
     expect(config.vars.URL_PUBLICA).toBe('');
+  });
+
+  it('NOT-22: fila avisos com produtor FILA_AVISOS e consumidor de 1 mensagem por invocação e 2 novas entregas', () => {
+    expect(config.queues).toEqual({
+      producers: [{ binding: 'FILA_AVISOS', queue: 'avisos' }],
+      consumers: [{ queue: 'avisos', max_batch_size: 1, max_retries: 2 }],
+    });
+    // A fila não traz rota nem zona: o FUN-27 acima continua valendo com ela.
+    expect(chaves(config.queues)).not.toContain('route');
   });
 });

@@ -705,6 +705,8 @@ T39 → T40 → T41
 **Depends on**: T15
 **Reuses**: `wrangler.jsonc` e o teste dele (`F:1081`); contrato zod (`CA:550`); AD-098
 **Requirement**: NOT-22, NOT-43
+**Status**: rascunhada
+**Nota do rascunho**: os schemas zod ficam no contrato (`backend/contrato/src/fila-avisos.ts`, exportado em `./fila-avisos`), porque o `@pelada/api` não depende do zod; testes em `backend/contrato/test/fila-avisos.test.ts`. O `avisos.ts` tem só o produtor (`agendarAviso`, que confere a mensagem antes do `send`) e a `filaMemoria` dos testes; `FILA_AVISOS` é opcional no `Env`, e sem ele o `agendarAviso` lança (o `aposCommit` reporta). O teste do produtor fica em `backend/api/test/infraestrutura/fila/` (projeto `banco`, Node). O teste de config entrou em `test/wrangler.test.ts`, da raiz. `tentativa` vai de 1 a 3.
 
 **Done when**:
 

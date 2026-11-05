@@ -38,6 +38,14 @@
     }
   ],
 
+  // Fila dos avisos (notificacoes T16; NOT-22, AD-098): a rota só enfileira depois do COMMIT e o mesmo Worker consome,
+  // uma mensagem por invocação (NOT-34) e até 2 novas entregas de uma invocação que falhou. A fila `avisos` é criada
+  // pelo usuário no /preparar Nível 2 (`wrangler queues create avisos`).
+  "queues": {
+    "producers": [{ "binding": "FILA_AVISOS", "queue": "avisos" }],
+    "consumers": [{ "queue": "avisos", "max_batch_size": 1, "max_retries": 2 }]
+  },
+
   // Valores locais. No deploy, VERSAO (SHA do commit) e URL_PUBLICA chegam por --var (FUN-23, FUN-58).
   // ASAAS_URL: só o sandbox até haver AD de produção (PLA-38, checagem so-previa); a chave e o token do webhook
   // são secrets do Worker (ASAAS_API_KEY, ASAAS_WEBHOOK_TOKEN), nunca aqui.

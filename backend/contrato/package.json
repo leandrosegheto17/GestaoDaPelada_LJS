@@ -20,6 +20,7 @@
     "./publico": "./src/publico.ts",
     "./previas": "./src/previas.ts",
     "./push": "./src/push.ts",
+    "./fila-avisos": "./src/fila-avisos.ts",
     "./plano": "./src/plano.ts",
     "./asaas": "./src/asaas.ts",
     "./financeiro": "./src/financeiro.ts",

@@ -1,5 +1,6 @@
 import type { Kysely } from 'kysely';
 import type { Banco } from '../infraestrutura/db/transacao.ts';
+import type { FilaAvisos } from '../infraestrutura/fila/avisos.ts';
 import type { Relogio } from '../infraestrutura/relogio.ts';
 import type { RecursoLiberado } from './middlewares/recurso.ts';
 
@@ -34,6 +35,11 @@ export interface Env {
   /** `1` só no `.env` local e no e2e: e-mails na caixa em memória e `GET /api/dev/emails` (T17). */
   EMAIL_DEV?: string;
   HYPERDRIVE: HyperdriveBinding;
+  /**
+   * Produtor da fila `avisos` (notificacoes T16; NOT-22, AD-098). Opcional no tipo: sem a fila criada (ou nos testes
+   * que não a usam), o `agendarAviso` lança e o `aposCommit` só reporta.
+   */
+  FILA_AVISOS?: FilaAvisos;
   LIMITE_ENTRAR: LimiteDeTaxa;
   LIMITE_PUBLICO: LimiteDeTaxa;
   LIMITE_WEBHOOK: LimiteDeTaxa;
