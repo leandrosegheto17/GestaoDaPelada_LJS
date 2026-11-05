@@ -325,6 +325,7 @@ T57 → T58
 **Depends on**: T1
 **Reuses**: policies de `M:1792843380000_conta-tabelas.sql:55-101`; tabelas novas em `M:1792843800000_conta-senha-bloqueio.sql:8`, `M:1792843860000_conta-teto-emails.sql:7`, `M:1792843980000_conta-teto-emails-origem.sql:7`; role renomeada em `M:1792844220000_roles-padronizadas.sql:26` (AD-016 proposta)
 **Requirement**: ACE-45, ACE-46
+**Status**: rascunhada
 
 **Done when**:
 
