@@ -1829,6 +1829,8 @@ T78 → T79
 **Depends on**: T49
 **Reuses**: `BD:282-285`
 **Requirement**: PAR-102
+**Status**: rascunhada
+**Nota do rascunho**: só o teste, em `frontend/web/test/config/jspdf-sob-demanda.test.ts`: nenhum import estático do `jspdf` em `src/` e, no manifesto de um build do Vite feito pelo próprio teste (pasta temporária, `build.manifest`), nenhum chunk do carregamento inicial é do `jspdf`. O `package.json` não foi tocado: a versão só se fixa depois do `pnpm audit` e do GitHub Advisory, no `/executar` (o rascunho não instala nada).
 
 **Done when**:
 
