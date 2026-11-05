@@ -88,7 +88,7 @@ describe('FUN-13: a matriz de leitura pega uma policy aberta', () => {
     // A troca da policy e a leitura ficam na mesma transação, desfeita no fim: a policy
     // original volta sem depender de um ALTER de reversão.
     await db.query('BEGIN');
-    let aberta: { grupos: string[] } = { grupos: [] };
+    let aberta: { grupos: string[] };
     try {
       await db.query('ALTER POLICY jogadores_ler ON jogadores USING (true)');
       await db.query('SET LOCAL ROLE pelada_app');

@@ -26,6 +26,9 @@ export const ARQUIVOS_PERMITIDOS: ReadonlySet<string> = new Set([
   // wrangler.jsonc (T33, FUN-27) cita o endereço padrão no nome de um caso; mudar um teste
   // existente pede aprovação, então o /executar decide entre manter esta linha ou renomear o caso.
   'test/wrangler.test.ts',
+  // AD-121: a checagem so-previa guarda o único domínio próprio permitido, e o teste dela o cita.
+  'backend/scripts/checagens/so-previa.ts',
+  'backend/scripts/checagens/test/so-previa.test.ts',
 ]);
 
 /** Pastas cujo conteúdo pode citar os domínios (documentação e planejamento). */

@@ -1170,6 +1170,8 @@ T57 → T58
 **Depends on**: T32
 **Reuses**: molde da checagem de URL absoluta (`F:1251`)
 **Requirement**: ACE-63
+**Status**: rascunhada
+**Nota do rascunho**: a coluna de dono é conferida em `entrada/`, `aplicacao/` e `repositorios/`; `crypt(`, `scrypt(` e bibliotecas de hash de senha (bcrypt, argon2) em `backend/api/src/` fora de `migracoes/` e em `frontend/web/src/`. Testes e scripts ficam fora (o cenário de teste usa `crypt` no SQL). Entra no passo de checagens do `ci.yml`.
 
 **Done when**:
 
