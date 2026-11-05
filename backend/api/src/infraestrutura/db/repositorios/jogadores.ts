@@ -1,5 +1,5 @@
 import { sql } from 'kysely';
-import type { DataCorpo, JogadorCorpo } from '@pelada/contrato';
+import type { CorrigirPeriodoCorpo, DataCorpo, JogadorCorpo } from '@pelada/contrato';
 import {
   avaliarPeriodos,
   type CampoPeriodo,
@@ -181,4 +181,53 @@ async function reativar(db: Db, grupoId: string, id: string, dados: DataCorpo, h
   return { resultado: 'ok', alterado: true };
 }
 
-export const jogadores = { criar, inativar, reativar };
+/**
+ * Corrige a saída de um período encerrado e/ou o retorno de um período que não é o primeiro (GEL-71), com a mesma
+ * trava e as regras de período do domínio, e audita `jogador_periodo_corrigido` com as datas antes e depois. Datas
+ * iguais às atuais devolvem `alterado: false` sem gravar nem auditar (GEL-74).
+ *
+ * Casos limite (Domínio: sim), listados antes do código:
+ * - saída de período aberto: `invalido`, regra `nao-corrigivel` (GEL-72);
+ * - retorno do primeiro período: `invalido`, regra `nao-corrigivel`; o caminho é alterar a data de início (GEL-73);
+ * - datas iguais às atuais: `ok` com `alterado: false`, sem `UPDATE` nem auditoria (GEL-74);
+ * - período de outro jogador do mesmo grupo (ou inexistente): `nao_encontrado`, antes do domínio (GEL-75);
+ * - saída e retorno juntos: o domínio aplica as duas e avalia a saída primeiro (ordem do GEL-62);
+ * - erro depois do `UPDATE`: sobe, e a transação da requisição desfaz a correção (GEL-109).
+ */
+async function corrigirPeriodo(
+  db: Db,
+  grupoId: string,
+  id: string,
+  periodoId: string,
+  dados: CorrigirPeriodoCorpo,
+  hoje: string,
+): Promise<ResultadoPeriodo> {
+  const estado = await travarParaPeriodo(db, grupoId, id);
+  if (!estado) return { resultado: 'nao_encontrado' };
+  const indice = estado.periodos.findIndex((p) => p.id === periodoId);
+  const antes = estado.periodos[indice];
+  if (!antes) return { resultado: 'nao_encontrado' };
+
+  const r = avaliar(estado, { tipo: 'corrigir', periodoId, saida: dados.saida, retorno: dados.retorno }, hoje);
+  if (!r.ok) return { resultado: 'invalido', regra: r.regra, campo: r.campo, mensagem: r.mensagem };
+  if (!r.alterado) return { resultado: 'ok', alterado: false };
+
+  const depois = r.periodos[indice];
+  if (!depois) throw new Error('Período corrigido sumiu da avaliação');
+  await sql`
+    UPDATE periodos_ativos SET inicio = ${depois.inicio}::date, fim = ${depois.fim}::date
+     WHERE grupo_id = ${grupoId} AND jogador_id = ${id} AND id = ${periodoId}`.execute(db);
+  await auditoria.registrar(db, grupoId, {
+    acao: 'jogador_periodo_corrigido',
+    entidade: 'jogador',
+    entidadeId: id,
+    resumo: {
+      periodoId,
+      antes: { inicio: antes.inicio, fim: antes.fim },
+      depois: { inicio: depois.inicio, fim: depois.fim },
+    },
+  });
+  return { resultado: 'ok', alterado: true };
+}
+
+export const jogadores = { criar, inativar, reativar, corrigirPeriodo };

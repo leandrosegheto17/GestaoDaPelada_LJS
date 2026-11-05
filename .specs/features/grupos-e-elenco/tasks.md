@@ -1419,6 +1419,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T39
 **Reuses**: trava de T38; `avaliarPeriodos` com a operação corrigir (T14); regras de `GS:255-259`
 **Requirement**: GEL-71, GEL-72, GEL-73, GEL-74, GEL-75
+**Status**: rascunhada
 
 **Done when**:
 
