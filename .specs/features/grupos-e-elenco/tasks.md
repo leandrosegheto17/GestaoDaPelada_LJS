@@ -362,9 +362,9 @@ T73 → T74 → T75
 
 **Done when**:
 
-- [ ] Teste `GEL-112`: C e O enxergam G por `comoApp`; B enxerga só H; o cenário tem ao menos uma linha em `jogadores`, `periodos_ativos`, `habilidades`, `notas`, `presencas` e `pagamentos_mes`
+- [x] Teste `GEL-112`: C e O enxergam G por `comoApp`; B enxerga só H; o cenário tem ao menos uma linha em `jogadores`, `periodos_ativos`, `habilidades`, `notas`, `presencas` e `pagamentos_mes`
 - [ ] O banco `teste_*` é removido no `finally`, também quando a criação do cenário falha
-- [ ] Evidência da rede: com `grupo_criar` sabotada (sem o vínculo), o teste fica vermelho (registrar aqui)
+- [x] Evidência da rede: com `grupo_criar` vigente (`1792845540000_planos-grupo-criar-trial.sql:75`) sem o INSERT em `vinculos_admin`, o teste `GEL-112: a criadora C enxerga G` fica vermelho (sabotagem temporária revertida, 2026-11-05)
 - [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
@@ -387,10 +387,10 @@ T73 → T74 → T75
 
 **Done when**:
 
-- [ ] Testes `GEL-25`: linhas "G arquivado" da Test Coverage Matrix, uma por comando e por tabela, para C e para O
-- [ ] Teste `GEL-107`: B continua sem ver nem alterar G, arquivado ou não
-- [ ] Teste `GEL-112`: o ramo do slug público não muda com G arquivado
-- [ ] Evidência da rede: `grupos_visiveis()` trocada pela versão de `M:1792843320000_rls.sql:17-24` deixa os testes de O vermelhos (registrar aqui)
+- [x] Testes `GEL-25`: linhas "G arquivado" da Test Coverage Matrix, uma por comando e por tabela, para C e para O
+- [x] Teste `GEL-107`: B continua sem ver nem alterar G, arquivado ou não
+- [x] Teste `GEL-112`: o ramo do slug público não muda com G arquivado
+- [x] Evidência da rede: `grupos_visiveis()` trocada pela de `M:1792843320000_rls.sql:17-24` (CREATE OR REPLACE ao fim da última migração, revertido): 55 testes de `grupos-arquivado.test.ts` ficam vermelhos (2026-11-05)
 - [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
@@ -413,12 +413,12 @@ T73 → T74 → T75
 
 **Done when**:
 
-- [ ] Teste `GEL-01`: grupo, vínculo com `acessa_financeiro = true` e `criado_por` = conta do contexto
-- [ ] Teste `GEL-02`: as habilidades saem na ordem do array recebido
-- [ ] Teste `GEL-14`: com `pelada-de-quinta` (arquivado) e `pelada-de-quinta-2` ocupados, o novo é `pelada-de-quinta-3`
-- [ ] Testes `GEL-09`, `GEL-10`: habilidade de 1 caractere no array faz a função falhar sem grupo, vínculo, habilidade nem auditoria; no sucesso, uma linha `grupo_criado` com a conta autora
-- [ ] Teste `GEL-01`: sem `app.conta_id`, erro 42501; `INSERT INTO grupos` como `pelada_app` é recusado
-- [ ] Evidência da rede: a função sem o `WHILE EXISTS` deixa o teste de sufixo vermelho (registrar aqui)
+- [x] Teste `GEL-01`: grupo, vínculo com `acessa_financeiro = true` e `criado_por` = conta do contexto
+- [x] Teste `GEL-02`: as habilidades saem na ordem do array recebido
+- [x] Teste `GEL-14`: com `pelada-de-quinta` (arquivado) e `pelada-de-quinta-2` ocupados, o novo é `pelada-de-quinta-3`
+- [x] Testes `GEL-09`, `GEL-10`: habilidade de 1 caractere no array faz a função falhar sem grupo, vínculo, habilidade nem auditoria; no sucesso, uma linha `grupo_criado` com a conta autora
+- [x] Teste `GEL-01`: sem `app.conta_id`, erro 42501; `INSERT INTO grupos` como `pelada_app` é recusado
+- [x] Evidência da rede: `grupo_criar` vigente (`1792845540000_planos-grupo-criar-trial.sql:54-57`) sem o `WHILE EXISTS`: `GEL-14 ... o novo é pelada-de-quinta-3` fica vermelho (revertido, 2026-11-05)
 - [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
