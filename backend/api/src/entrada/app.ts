@@ -6,7 +6,7 @@ import { semCache, semSniff } from './middlewares/cabecalhos.ts';
 import { travarFinanceiro } from './middlewares/financeiro.ts';
 import { limitarEscritasDeGrupo } from './middlewares/limite-escrita.ts';
 import { limitarRotasDeAcesso } from './middlewares/limite-taxa.ts';
-import { recursoLiberadoPadrao, travarRecursosDoPlano, type RecursoLiberado } from './middlewares/recurso.ts';
+import { recursoLiberadoPeloPlano, travarRecursosDoPlano, type RecursoLiberado } from './middlewares/recurso.ts';
 import { carregarSessao } from './middlewares/sessao.ts';
 import { protegerRotasDeGrupo } from './middlewares/vinculo.ts';
 import { rotasAdmins } from './rotas/admins.ts';
@@ -49,7 +49,10 @@ export interface OpcoesApp {
   fabricaBanco?: NonNullable<OpcoesCliente['fabrica']>;
   /** Só para os testes: relógio falso (T19). Sem ele, o do sistema. */
   relogio?: Relogio;
-  /** Só para os testes: trava de plano falsa (T32 da simulador; SIM-68). Sem ela, a que libera tudo (AD-049). */
+  /**
+   * Só para os testes: trava de plano falsa (T32 da simulador; SIM-68). Sem ela, a que lê o plano do grupo com o
+   * relógio da requisição (planos-e-cobranca T21; PLA-07).
+   */
   recursoLiberado?: RecursoLiberado;
 }
 
@@ -60,7 +63,7 @@ export interface OpcoesApp {
 export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
   const api = new Hono<Ambiente>().basePath('/api');
   const relogio = opcoes.relogio ?? relogioDoSistema();
-  const recursoLiberado = opcoes.recursoLiberado ?? recursoLiberadoPadrao;
+  const recursoLiberado = opcoes.recursoLiberado ?? recursoLiberadoPeloPlano(relogio);
 
   // O relógio da requisição antes de tudo: só ele lê a data de regra (T19; GEL-32). A trava de plano junto (SIM-68).
   api.use('*', async (c, next) => {

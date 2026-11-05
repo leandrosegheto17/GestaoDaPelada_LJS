@@ -874,6 +874,9 @@ T56 → T57
 **Depends on**: T20
 **Reuses**: estender o `recursoLiberado` da `simulador` (SIM-68, `SIM:273`) e da `financeiro` (FIN-45, `FIN:183`), AD-049, S-01; Relógio (`GE:831`)
 **Requirement**: PLA-07, PLA-23, PLA-24, PLA-28
+**Status**: rascunhada
+**Nota do rascunho**: o ponto único é o da feature dona (S-01): `entrada/middlewares/recurso.ts` reexporta `RecursoLiberado` e `recursoLiberadoPeloPlano(relogio)`, que mora em `aplicacao/plano/recurso-liberado.ts` com o `estadoDoPlano`; o `criarApp` usa esse padrão com o relógio da requisição, e `recursoLiberadoPadrao` sai. `RecursoPro` passa a ser o do domínio (inclui `pdf` e `push`). Trocados com a mesma força: `sessao/recurso.test.ts`, `sessao/financeiro-plano.test.ts` e o item (e) de `banco/plano-caracterizacao.test.ts`.
+**Lacunas**: o cenário de grupos cria G em `trial` com `trial_inicio` = data real da execução; teste de rota com `relogioFixo` 14 dias ou mais depois da data em que a suíte roda passa a ver G no Free e pode receber 403 `plano_pro` (hoje nenhum foi conferido). O /executar decide: pôr G em `uso_proprio` no cenário ou ajustar os relógios.
 
 **Done when**:
 

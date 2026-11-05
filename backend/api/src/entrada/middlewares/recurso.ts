@@ -1,12 +1,12 @@
 import type { Hono, MiddlewareHandler } from 'hono';
-import type { Db } from '../../infraestrutura/db/repositorios/tipos.ts';
+import type { RecursoPro } from '@pelada/dominio';
 import type { Ambiente } from '../ambiente.ts';
 
 /**
  * Trava de recurso do plano (T32 da simulador; SIM-68, AD-049, AD-062, AD-091). `recursoLiberado` é o ponto único da
- * regra de plano na API (PLA-07 da `planos-e-cobranca`, `.specs/features/planos-e-cobranca/spec.md:79`): nesta feature
- * libera todo grupo, sem ler a situação comercial; a feature 7 troca só esta função. Recebe também o `Db` da transação
- * da requisição, porque a versão da feature 7 lê a situação no banco.
+ * regra de plano na API (PLA-07 da `planos-e-cobranca`, `.specs/features/planos-e-cobranca/spec.md:79`). Desde a T21
+ * da planos-e-cobranca o padrão do `criarApp` é o `recursoLiberadoPeloPlano` (`aplicacao/plano/recurso-liberado.ts`),
+ * que lê a situação comercial na transação da requisição e decide pelo domínio; antes, liberava todo grupo.
  *
  * O `criarApp({ recursoLiberado })` aceita outra função nos testes (como o relógio); a rota lê a da requisição em
  * `c.var.recursoLiberado`.
@@ -15,13 +15,11 @@ import type { Ambiente } from '../ambiente.ts';
  * trava (403 `plano_pro`), antes da rota. Corpo do 403 na forma da AD-091: `{ erro: 'plano_pro', recurso, mensagem }`.
  */
 
-/** Recursos do plano Pro que já têm trava na API. O `financeiro` trava só as escritas (AD-074, financeiro T24). */
-export type RecursoPro = 'simulador' | 'financeiro';
+/** Recursos do plano Pro (tabela do domínio, PLA-05). O `financeiro` trava só as escritas (AD-074, financeiro T24). */
+export type { RecursoPro };
 
-export type RecursoLiberado = (db: Db, grupoId: string, recurso: RecursoPro) => Promise<boolean>;
-
-/** Antes da `planos-e-cobranca`: todo grupo tem todo recurso (AD-049). */
-export const recursoLiberadoPadrao: RecursoLiberado = async () => true;
+export type { RecursoLiberado } from '../../aplicacao/plano/recurso-liberado.ts';
+export { recursoLiberadoPeloPlano } from '../../aplicacao/plano/recurso-liberado.ts';
 
 export const MENSAGEM_PLANO_PRO = 'Este recurso é do plano Pro.';
 

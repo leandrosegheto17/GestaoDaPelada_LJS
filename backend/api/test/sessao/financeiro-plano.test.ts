@@ -3,7 +3,9 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { criarApp, type OpcoesApp } from '../../src/entrada/app.ts';
-import { MENSAGEM_PLANO_PRO, recursoLiberadoPadrao, type RecursoLiberado } from '../../src/entrada/middlewares/recurso.ts';
+import { MENSAGEM_PLANO_PRO, recursoLiberadoPeloPlano, type RecursoLiberado } from '../../src/entrada/middlewares/recurso.ts';
+import { relogioDoSistema } from '../../src/infraestrutura/relogio.ts';
+import { comDb } from '../repositorios/apoio.ts';
 import { NOME_COOKIE_SESSAO } from '../../src/infraestrutura/sessao/cookie.ts';
 import { gerarToken } from '../../src/infraestrutura/sessao/token.ts';
 import { envAcesso } from '../acesso/apoio.ts';
@@ -74,10 +76,35 @@ afterAll(async () => {
 });
 
 describe('recurso financeiro no ponto único (FIN-45)', () => {
-  it('FIN-45: hoje todo grupo tem o financeiro liberado, sem consultar o banco', async () => {
-    const semBanco = new Proxy({}, { get: () => { throw new Error('consultou o banco'); } });
-    expect(await recursoLiberadoPadrao(semBanco as never, aberto.cenario.grupoG, 'financeiro')).toBe(true);
-    expect(await recursoLiberadoPadrao(semBanco as never, aberto.cenario.grupoH, 'financeiro')).toBe(true);
+  // Trocado pela T21 da planos-e-cobranca (autorizado em `## Autorizações` do STATE.md): o padrão passou a ler o plano
+  // no banco, então "sem consultar o banco" deixou de valer por desenho. Mesma força: G e H em Pro (trial recém criado
+  // pelo cenário) têm o financeiro; G em `inadimplente` não.
+  it('FIN-45: com o plano em Pro (trial do cenário), G e H têm o financeiro liberado', async () => {
+    const { cenario } = aberto;
+    const pontoUnico = recursoLiberadoPeloPlano(relogioDoSistema());
+    expect(await comDb(aberto.url, cenario.contaC, (db) => pontoUnico(db, cenario.grupoG, 'financeiro'))).toBe(true);
+    expect(await comDb(aberto.url, cenario.contaB, (db) => pontoUnico(db, cenario.grupoH, 'financeiro'))).toBe(true);
+  });
+
+  it('FIN-45: com G em inadimplente, o padrão nega o financeiro de G', async () => {
+    const { db, cenario } = aberto;
+    const antes = await db.query<{ s: string; t: string | null }>(
+      'SELECT situacao_comercial AS s, trial_inicio::text AS t FROM grupos WHERE id = $1',
+      [cenario.grupoG],
+    );
+    await db.query(`UPDATE grupos SET situacao_comercial = 'inadimplente', trial_inicio = NULL WHERE id = $1`, [
+      cenario.grupoG,
+    ]);
+    try {
+      const pontoUnico = recursoLiberadoPeloPlano(relogioDoSistema());
+      expect(await comDb(aberto.url, cenario.contaC, (d) => pontoUnico(d, cenario.grupoG, 'financeiro'))).toBe(false);
+    } finally {
+      await db.query('UPDATE grupos SET situacao_comercial = $2, trial_inicio = $3::date WHERE id = $1', [
+        cenario.grupoG,
+        antes.rows[0]?.s,
+        antes.rows[0]?.t ?? null,
+      ]);
+    }
   });
 
   it.each(['GET', ...ESCRITAS])('FIN-45: com o padrão, %s passa', async (metodo) => {

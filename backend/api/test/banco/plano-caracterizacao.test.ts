@@ -1,6 +1,8 @@
 import type pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { recursoLiberadoPadrao } from '../../src/entrada/middlewares/recurso.ts';
+import { recursoLiberadoPeloPlano } from '../../src/entrada/middlewares/recurso.ts';
+import { relogioDoSistema } from '../../src/infraestrutura/relogio.ts';
+import { comDb } from '../repositorios/apoio.ts';
 import { abrirCenarioGrupos, comoConta, criarGrupoComoConta, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
 
 /**
@@ -142,12 +144,35 @@ describe('rede do plano: grupo_criar depois da T13 (d)', () => {
   });
 });
 
-// Item (e): trocado pela T21 (o ponto único passa a ler o plano).
-describe('rede do plano: recursoLiberado antes da T21 (e)', () => {
-  it('PLA-07 (antes da T21): o recursoLiberado vigente libera todo grupo', async () => {
+// Item (e): trocado pela T21 (o ponto único passa a ler o plano; autorizado em `## Autorizações` do STATE.md). Mesma
+// força: os dois grupos de antes, cada um pela própria conta, seguem liberados em Pro (trial recém criado); e G em
+// `inadimplente` deixa de ser liberado, que é a troca prevista.
+describe('rede do plano: recursoLiberado depois da T21 (e)', () => {
+  it('PLA-07: o recursoLiberado vigente libera G e H em Pro', async () => {
     const { cenario } = aberto;
-    const db = {} as Parameters<typeof recursoLiberadoPadrao>[0];
-    expect(await recursoLiberadoPadrao(db, cenario.grupoG, 'simulador')).toBe(true);
-    expect(await recursoLiberadoPadrao(db, cenario.grupoH, 'financeiro')).toBe(true);
+    const pontoUnico = recursoLiberadoPeloPlano(relogioDoSistema());
+    expect(await comDb(aberto.url, cenario.contaC, (db) => pontoUnico(db, cenario.grupoG, 'simulador'))).toBe(true);
+    expect(await comDb(aberto.url, cenario.contaB, (db) => pontoUnico(db, cenario.grupoH, 'financeiro'))).toBe(true);
+  });
+
+  it('PLA-07: o recursoLiberado vigente nega G em inadimplente', async () => {
+    const { db, cenario } = aberto;
+    const antes = await db.query<{ s: string; t: string | null }>(
+      'SELECT situacao_comercial AS s, trial_inicio::text AS t FROM grupos WHERE id = $1',
+      [cenario.grupoG],
+    );
+    await db.query(`UPDATE grupos SET situacao_comercial = 'inadimplente', trial_inicio = NULL WHERE id = $1`, [
+      cenario.grupoG,
+    ]);
+    try {
+      const pontoUnico = recursoLiberadoPeloPlano(relogioDoSistema());
+      expect(await comDb(aberto.url, cenario.contaC, (d) => pontoUnico(d, cenario.grupoG, 'simulador'))).toBe(false);
+    } finally {
+      await db.query('UPDATE grupos SET situacao_comercial = $2, trial_inicio = $3::date WHERE id = $1', [
+        cenario.grupoG,
+        antes.rows[0]?.s,
+        antes.rows[0]?.t ?? null,
+      ]);
+    }
   });
 });
