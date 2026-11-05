@@ -11,7 +11,15 @@ import type { QueryClient } from '@tanstack/react-query';
  * - 401 `sessao_expirada`: limpa o cache de consultas (nada da conta fica na memória) e leva a
  *   `/entrar?aviso=sessao-expirada` (ACE-20). O 401 `sem_sessao` não navega: quem decide é a
  *   guarda de rota (T37).
+ * - 403 `plano_pro` ou `somente_leitura` (planos-e-cobranca T41; PLA-21, AD-091): o plano do grupo mudou desde a
+ *   última leitura; invalida as consultas do plano (`['plano', …]`) para a faixa e os avisos se atualizarem. Esses
+ *   erros vêm na forma `{"erro": <código>, …}` da AD-091, sem `codigo`: o corpo bruto fica em `ErroApi.corpo`.
  */
+
+/** Primeiro elemento das chaves de consulta do plano (`dados/plano.ts`). */
+export const PREFIXO_CHAVE_PLANO = 'plano';
+
+const ERROS_DE_PLANO = new Set(['plano_pro', 'somente_leitura']);
 
 export const DESTINO_SESSAO_EXPIRADA = '/entrar?aviso=sessao-expirada';
 export const CABECALHO_PELADA = 'X-Pelada';
@@ -26,13 +34,16 @@ export class ErroApi extends Error {
   readonly codigo: CodigoErro | undefined;
   readonly campos: readonly string[];
   readonly grupos: NonNullable<CorpoErro['grupos']>;
+  /** O corpo JSON da resposta como veio (os erros de plano da AD-091 não têm `codigo`). */
+  readonly corpo: unknown;
 
-  constructor(status: number, corpo: Partial<CorpoErro> | undefined, mensagemPadrao: string) {
+  constructor(status: number, corpo: Partial<CorpoErro> | undefined, mensagemPadrao: string, bruto?: unknown) {
     super(corpo?.erro ?? mensagemPadrao);
     this.status = status;
     this.codigo = corpo?.codigo;
     this.campos = corpo?.campos ?? [];
     this.grupos = corpo?.grupos ?? [];
+    this.corpo = bruto;
   }
 }
 
@@ -92,6 +103,12 @@ function corpoDeErro(valor: unknown): Partial<CorpoErro> | undefined {
   };
 }
 
+function ehErroDePlano(valor: unknown): boolean {
+  if (typeof valor !== 'object' || valor === null) return false;
+  const erro = (valor as Record<string, unknown>).erro;
+  return typeof erro === 'string' && ERROS_DE_PLANO.has(erro);
+}
+
 export function criarCliente({ consultas, navegar, fetch: buscar = globalThis.fetch.bind(globalThis) }: DependenciasCliente): ClienteApi {
   async function requisitar<T>(metodo: Metodo, caminho: string, corpo?: unknown, opcoes: OpcoesRequisicao = {}): Promise<T> {
     const cabecalhos: Record<string, string> = { Accept: 'application/json' };
@@ -118,7 +135,10 @@ export function criarCliente({ consultas, navegar, fetch: buscar = globalThis.fe
       consultas.clear();
       navegar(DESTINO_SESSAO_EXPIRADA);
     }
-    throw new ErroApi(resposta.status, erro, MENSAGEM_INESPERADA);
+    if (resposta.status === 403 && ehErroDePlano(dados)) {
+      void consultas.invalidateQueries({ queryKey: [PREFIXO_CHAVE_PLANO] });
+    }
+    throw new ErroApi(resposta.status, erro, MENSAGEM_INESPERADA, dados);
   }
 
   return {

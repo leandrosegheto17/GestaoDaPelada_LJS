@@ -1358,6 +1358,7 @@ T56 → T57
 **Depends on**: T40
 **Reuses**: cliente HTTP do front (`CA:1169`, T36); molde de `frontend/web/src/dados/grupos.ts` (`GE:1680`, T53)
 **Requirement**: PLA-21, PLA-54
+**Status**: rascunhada
 
 **Done when**:
 
