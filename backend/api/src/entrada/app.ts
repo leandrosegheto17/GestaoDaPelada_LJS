@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import type { Ambiente } from './ambiente.ts';
+import { semCache, semSniff } from './middlewares/cabecalhos.ts';
 import { health } from './rotas/health.ts';
 
 export interface OpcoesApp {
@@ -13,6 +14,9 @@ export interface OpcoesApp {
  */
 export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
   const api = new Hono<Ambiente>().basePath('/api');
+
+  // Antes de qualquer rota, para valer também no 404 e no 500 (FUN-22).
+  api.use('*', semCache, semSniff);
 
   api.route('/', health);
   opcoes.registrarExtras?.(api);
