@@ -2459,6 +2459,8 @@ T78 → T79
 **Depends on**: T73
 **Reuses**: Seed da fundação (`F:1055`) estendido pela grupos-e-elenco (`GE:2164`); `BC:37` (P25); `respostas/publico-ranking-2026-10.json` do mockup
 **Requirement**: PAR-62, PAR-79
+**Status**: rascunhada
+**Nota do rascunho**: o grupo do exemplo é o `pelada-de-quinta` do caixa (financeiro T47), que já nasce pela `grupo_criar` de 7 parâmetros e tem os 20 jogadores da t01; `semearRanking` grava os pesos (padrão desde 2026-02-05 e presença com chuva 2 desde 2026-09-01), a pontuação inicial, as 3 partidas e as presenças. Léo Baiano e Serginho ficam "–" pela `inicio_pontuacao` (08/10 e 15/10), sem mexer no período (SPEC_DEVIATION no `seed.ts`). O teste novo é `backend/api/test/rotas/publico-ranking-seed.test.ts` (rota real, relógio no `geradoEm` do mockup). O `seed.test.ts` da v2 não conta partidas: nenhum teste existente muda.
 
 **Done when**:
 

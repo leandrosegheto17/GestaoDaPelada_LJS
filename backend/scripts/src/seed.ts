@@ -107,6 +107,63 @@ export const LANCAMENTOS_CAIXA: readonly LancamentoSeed[] = [
   { tipo: 'entrada', data: '2026-09-30', descricao: 'Sobra do caixa de fevereiro a setembro', valorCentavos: 59550 },
 ];
 
+/**
+ * Ranking de exemplo (partidas-e-ranking T74; PAR-62, PAR-79; P25 de `BC:37`): no grupo do caixa, as 3 partidas de
+ * outubro de `.specs/mockup/respostas/publico-ranking-2026-10.json` (01, 08 com chuva e 15/10/2026), a pontuação
+ * inicial e a situação de cada jogador, para `GET /api/publico/pelada-de-quinta/ranking?mes=2026-10` com hoje em
+ * 2026-10-22 dar as linhas e os pontos do mockup (t01). Sem partida antes de outubro, o "Pts inicial" de outubro é a
+ * pontuação inicial do jogador.
+ *
+ * Pesos (`p01-pdf--sucesso.html`: "os pesos de chuva 2 só valem desde 01/09"): os padrão desde a data inicial do caixa
+ * e, desde 2026-09-01, a presença com chuva valendo 2. A configuração que a `grupo_criar` grava no dia do seed fica.
+ *
+ * Léo Baiano e Serginho ficam "–" antes da data de início (PAR-71): o período de todos começa na data do caixa (o
+ * financeiro conta a mensalidade por ele), e a data de início da pontuação deles é 08/10 e 15/10.
+ * SPEC_DEVIATION: no LJS (P25) o início vinha do período, em 01/10 para todos; aqui o financeiro já fixou o período.
+ */
+export const PESOS_EXEMPLO = [
+  { vigenteDesde: CAIXA_CONFIG.dataSaldoInicial, presencaSemChuva: 1, presencaComChuva: 1, lesionadoSemChuva: 1, lesionadoComChuva: 1, expulso: -1 },
+  { vigenteDesde: '2026-09-01', presencaSemChuva: 1, presencaComChuva: 2, lesionadoSemChuva: 1, lesionadoComChuva: 1, expulso: -1 },
+] as const;
+
+export const PARTIDAS_EXEMPLO = [
+  { data: '2026-10-01', choveu: false },
+  { data: '2026-10-08', choveu: true },
+  { data: '2026-10-15', choveu: false },
+] as const;
+
+type SituacaoExemplo = 'presente' | 'lesionado' | 'expulso' | 'falta' | 'fora';
+
+/** Por jogador: a pontuação inicial e a situação em cada partida de `PARTIDAS_EXEMPLO` (falta e "–" não gravam linha). */
+export const RANKING_EXEMPLO: Readonly<Record<(typeof JOGADORES_CAIXA)[number], { ptsInicial: number; rodadas: readonly SituacaoExemplo[] }>> = {
+  Toninho: { ptsInicial: 27, rodadas: ['presente', 'presente', 'presente'] },
+  Bigode: { ptsInicial: 26, rodadas: ['presente', 'presente', 'presente'] },
+  Careca: { ptsInicial: 27, rodadas: ['presente', 'lesionado', 'presente'] },
+  Juninho: { ptsInicial: 27, rodadas: ['presente', 'falta', 'presente'] },
+  Marcão: { ptsInicial: 26, rodadas: ['presente', 'presente', 'expulso'] },
+  Paulinho: { ptsInicial: 24, rodadas: ['falta', 'presente', 'presente'] },
+  'Zé Carlos': { ptsInicial: 24, rodadas: ['presente', 'presente', 'falta'] },
+  Dudu: { ptsInicial: 22, rodadas: ['presente', 'presente', 'presente'] },
+  Gordo: { ptsInicial: 20, rodadas: ['presente', 'presente', 'presente'] },
+  Tiago: { ptsInicial: 20, rodadas: ['presente', 'presente', 'presente'] },
+  Neném: { ptsInicial: 22, rodadas: ['presente', 'falta', 'falta'] },
+  Rafinha: { ptsInicial: 19, rodadas: ['falta', 'presente', 'presente'] },
+  Alemão: { ptsInicial: 19, rodadas: ['presente', 'falta', 'presente'] },
+  Pedrão: { ptsInicial: 16, rodadas: ['presente', 'presente', 'falta'] },
+  Cabeça: { ptsInicial: 17, rodadas: ['falta', 'falta', 'presente'] },
+  Vini: { ptsInicial: 14, rodadas: ['falta', 'presente', 'presente'] },
+  Japa: { ptsInicial: 14, rodadas: ['presente', 'falta', 'falta'] },
+  Fumaça: { ptsInicial: 11, rodadas: ['falta', 'falta', 'presente'] },
+  'Léo Baiano': { ptsInicial: 0, rodadas: ['fora', 'presente', 'presente'] },
+  Serginho: { ptsInicial: 0, rodadas: ['fora', 'fora', 'presente'] },
+};
+
+/** Data de início da pontuação de quem entrou no meio de outubro ("–" antes dela). */
+export const INICIO_PONTUACAO_EXEMPLO: Readonly<Partial<Record<(typeof JOGADORES_CAIXA)[number], string>>> = {
+  'Léo Baiano': '2026-10-08',
+  Serginho: '2026-10-15',
+};
+
 export interface ResultadoSeed {
   contaId: string;
   grupoId: string;
@@ -305,7 +362,63 @@ async function semearCaixa(
     }
   }
 
+  await semearRanking(c, grupoCaixaId, contaId);
+
   return { grupoCaixaId, contaConvidadaId };
+}
+
+/**
+ * O ranking de exemplo no grupo do caixa (T74). Rodar de novo não duplica: pesos e partidas são "se ainda não existe"
+ * (únicos por grupo e data), as presenças também, e pontuação inicial e data de início são regravadas com o mesmo valor.
+ */
+async function semearRanking(c: pg.Client, grupoId: string, contaId: string): Promise<void> {
+  for (const p of PESOS_EXEMPLO) {
+    await c.query(
+      `INSERT INTO config_pesos (grupo_id, vigente_desde, presenca_sem_chuva, presenca_com_chuva, lesionado_sem_chuva,
+                                 lesionado_com_chuva, expulso, registrado_por, registrado_em)
+       VALUES ($1, $2::date, $3, $4, $5, $6, $7, $8, ($2::date + time '12:00') AT TIME ZONE 'America/Sao_Paulo')
+       ON CONFLICT (grupo_id, vigente_desde) DO NOTHING`,
+      [grupoId, p.vigenteDesde, p.presencaSemChuva, p.presencaComChuva, p.lesionadoSemChuva, p.lesionadoComChuva, p.expulso, contaId],
+    );
+  }
+
+  const apelidos = Object.keys(RANKING_EXEMPLO) as Array<keyof typeof RANKING_EXEMPLO>;
+  await c.query(
+    `UPDATE jogadores j
+        SET pontuacao_inicial = n.pts, inicio_pontuacao = n.inicio
+       FROM unnest($2::text[], $3::int[], $4::date[]) AS n(apelido, pts, inicio)
+      WHERE j.grupo_id = $1 AND lower(j.apelido) = lower(n.apelido)`,
+    [
+      grupoId,
+      apelidos,
+      apelidos.map((a) => RANKING_EXEMPLO[a].ptsInicial),
+      apelidos.map((a) => INICIO_PONTUACAO_EXEMPLO[a] ?? null),
+    ],
+  );
+
+  for (const [i, partida] of PARTIDAS_EXEMPLO.entries()) {
+    // Lançada às 22:00 de São Paulo do dia da partida.
+    await c.query(
+      `INSERT INTO partidas (grupo_id, data, choveu, criada_por, criada_em, alterada_por, alterada_em)
+       SELECT $1, $2::date, $3, $4, m, $4, m
+         FROM (SELECT ($2::date + time '22:00') AT TIME ZONE 'America/Sao_Paulo' AS m) t
+       ON CONFLICT (grupo_id, data) DO NOTHING`,
+      [grupoId, partida.data, partida.choveu, contaId],
+    );
+    const presentes = apelidos.flatMap((a) => {
+      const situacao = RANKING_EXEMPLO[a].rodadas[i];
+      return situacao === 'presente' || situacao === 'lesionado' || situacao === 'expulso' ? [{ apelido: a, situacao }] : [];
+    });
+    await c.query(
+      `INSERT INTO presencas (partida_id, jogador_id, grupo_id, situacao)
+       SELECT pa.id, j.id, $1, n.situacao
+         FROM unnest($3::text[], $4::text[]) AS n(apelido, situacao)
+         JOIN jogadores j ON j.grupo_id = $1 AND lower(j.apelido) = lower(n.apelido)
+         JOIN partidas pa ON pa.grupo_id = $1 AND pa.data = $2::date
+       ON CONFLICT (partida_id, jogador_id) DO NOTHING`,
+      [grupoId, partida.data, presentes.map((p) => p.apelido), presentes.map((p) => p.situacao)],
+    );
+  }
 }
 
 export async function comandoSeed(
