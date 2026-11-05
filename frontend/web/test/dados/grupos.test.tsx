@@ -26,6 +26,15 @@ const DETALHE = {
   habilidades: 6,
   admins: 2,
   souCriador: true,
+  // Campos do início (PAR-132) e do simulador (SIM-08) da forma do GET (partidas-e-ranking T64): só preparação.
+  dataSugeridaPartida: '2026-10-22',
+  partidaNaDataSugerida: false,
+  partidasNoMes: 3,
+  pesosVigentesDesde: '2026-09-01',
+  pesosPadrao: false,
+  aparelhosNaSemana: 12,
+  proximoDiaDeJogo: '2026-10-22',
+  escalacaoNoProximoDia: false,
 };
 const DADOS = { nome: 'Pelada de Quinta', diaSemana: 'quinta', frequencia: 'semanal', horario: '20:00' } as const;
 

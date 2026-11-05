@@ -2192,6 +2192,9 @@ T78 → T79
 **Depends on**: T63
 **Reuses**: Mockup do módulo `t09-inicio--{sucesso,sem-jogadores}.html` (R-02, R-03); tela da grupos-e-elenco (`GE:1847`); `BC:31` (P19)
 **Requirement**: PAR-133, PAR-134, PAR-135, PAR-136, PAR-160, PAR-83
+**Status**: rascunhada
+**Nota do rascunho**: o `useGrupo` passa a ler `grupoDetalheComPartidas.extend(campoSaldoDoGrupo)` (`dados/grupos.ts`, como `contrato/financeiro.ts:131-134` previa), e as 5 fixtures do `GET /api/grupos/:grupoId` nos testes do web ganham os 8 campos da forma do GET (só preparação). Testes da t09 mudados sob as autorizações de 2026-11-04 (`partidas-e-ranking` e `financeiro`): a lista exata passa aos 7 itens do mockup, "sem Pontuação" passa a "Vigente desde 01/09/2026", e o "4 itens sem Financeiro" passa a 7 com nenhum Financeiro. O item "Financeiro" (FIN-34) continua quando a chave do saldo vem, por último. O mês do item Partidas é o de hoje em São Paulo (os testes fixam só o `Date`).
+**Lacunas**: o detalhe do grupo não traz `hoje`; o mês do item Partidas usa o relógio do aparelho em São Paulo, que pode divergir do relógio da API na virada do mês.
 
 **Done when**:
 

@@ -1,3 +1,4 @@
+import { diaDaSemana, mesDe } from '@pelada/dominio';
 import { Link, useLocation, useParams } from 'react-router';
 import { Casca, NOME_DO_APP } from '../../componentes/Casca.tsx';
 import estilosCasca from '../../componentes/Casca.module.css';
@@ -9,10 +10,12 @@ import { ItemLista, Lista } from '../../componentes/Lista.tsx';
 import { ErroApi } from '../../dados/cliente.ts';
 import { formatarReais } from '../../dados/dinheiro.ts';
 import { useGrupo } from '../../dados/grupos.ts';
+import { hojeEmSaoPaulo } from '../../dados/hoje.ts';
 import estilos from '../acesso.module.css';
 import modulo from '../grupos-elenco.module.css';
 import { rotaDoGrupo } from '../grupos/Grupos.tsx';
 import { textoRecorrencia } from '../grupos/recorrencia.ts';
+import { nomeCurtoDoMes } from '../ranking/PaginaRanking.tsx';
 
 /** `/g/<slug>`: o ranking público do grupo (PAR-83). */
 export function caminhoDoRanking(slug: string): string {
@@ -20,19 +23,22 @@ export function caminhoDoRanking(slug: string): string {
 }
 
 /**
- * Início do grupo (`/app/grupos/:grupoId`, t09; GEL-20, GEL-114), de `t09-inicio--sucesso.html` e
- * `t09-inicio--sem-jogadores.html` do mockup do módulo:
- * - barra com o nome do grupo e "Trocar grupo" (`/app`); título só para o leitor de tela;
- * - "Gerenciar" com Jogadores ("20 ativos"), Habilidades ("6 habilidades"), Admins ("1 admin") e
- *   Dados do grupo (a recorrência e "link do ranking"), contados do `GET /api/grupos/:grupoId`
- *   (`useGrupo`, T53);
- * - sem jogador ativo, o "Dia de jogo" pede o cadastro ("Cadastrar jogadores");
- * - sem "Pontuação" (decisão de `GD:5-6`). Partidas, Dia de jogo com partida, Uso do app e
- *   Financeiro são das features seguintes, que estendem esta tela (GEL-116: a t09 fica fora da
- *   comparação visual até lá, AD-029).
+ * Início do grupo (`/app/grupos/:grupoId`, t09; GEL-20, GEL-114; partidas-e-ranking T64: PAR-133 a PAR-136, PAR-160),
+ * de `t09-inicio--sucesso.html` e `t09-inicio--sem-jogadores.html` do mockup do módulo da partidas-e-ranking (R-02,
+ * R-03):
+ * - barra com o nome do grupo, "Trocar grupo" (`/app`) e "Ver ranking" (`/g/:slug`, T58); título só para o leitor de
+ *   tela; o aviso da navegação ("Partida de dd/mm salva.", T60);
+ * - "Dia de jogo": com jogador ativo, "Lançar partida de qui, 22/10" (abre o lançamento na data sugerida) ou "Editar
+ *   partida de qui, 15/10" quando a partida da data sugerida já existe (PAR-133); sem jogador ativo, o cadastro;
+ * - "Gerenciar", na ordem do mockup: Partidas ("N em <mês>"/"Nenhuma em <mês>", PAR-134), Jogadores, Habilidades,
+ *   Pontuação ("Pesos padrão"/"Vigente desde dd/mm/aaaa", PAR-135), Admins, Dados do grupo e Uso do app ("Esta semana:
+ *   N aparelhos", singular para 1, ou "Sem uso registrado", PAR-136); sem "Simulador" (PAR-160);
  * - Financeiro (financeiro T43; FIN-34, AD-079), de `.specs/mockup/telas/t09-inicio--sucesso.html:21`: o item
  *   "Financeiro" com "Saldo R$ …" (ou "Caixa não configurado" com o saldo nulo), link para o t22, só quando a resposta
- *   traz a chave `saldoFinanceiroCentavos`; sem a chave (quem não acessa o financeiro), nenhum item.
+ *   traz a chave `saldoFinanceiroCentavos`; sem a chave (quem não acessa o financeiro), nenhum item (o PAR-160 vale aí,
+ *   autorização de 2026-11-04 da `financeiro` no `STATE.md`). Fica por último, depois de "Uso do app".
+ *
+ * O mês do item Partidas é o de hoje em São Paulo (`partidasNoMes` conta o mês de hoje, PAR-132).
  */
 
 export const TEXTO_SEM_JOGADORES = 'Cadastre os jogadores para lançar partidas.';
@@ -53,6 +59,33 @@ export function textoAdmins(n: number): string {
 }
 
 export const TEXTO_CAIXA_NAO_CONFIGURADO = 'Caixa não configurado';
+
+const DIAS_ABREVIADOS = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'] as const;
+
+/** "2026-10-22" → "qui, 22/10". */
+export function diaAbreviado(data: string): string {
+  const [, mes, dia] = data.split('-');
+  return `${DIAS_ABREVIADOS[diaDaSemana(data)] ?? ''}, ${dia}/${mes}`;
+}
+
+/** "3 em outubro", "Nenhuma em outubro" (PAR-134). */
+export function textoPartidasDoMes(n: number, mes: string): string {
+  const nome = nomeCurtoDoMes(mes);
+  return n === 0 ? `Nenhuma em ${nome}` : `${n} em ${nome}`;
+}
+
+/** "Pesos padrão" ou "Vigente desde 01/09/2026" (PAR-135). */
+export function textoPontuacao(g: { pesosPadrao: boolean; pesosVigentesDesde: string }): string {
+  if (g.pesosPadrao) return 'Pesos padrão';
+  const [ano, mes, dia] = g.pesosVigentesDesde.split('-');
+  return `Vigente desde ${dia}/${mes}/${ano}`;
+}
+
+/** "Esta semana: 12 aparelhos", "Esta semana: 1 aparelho", "Sem uso registrado" (PAR-136). */
+export function textoUso(n: number): string {
+  if (n === 0) return 'Sem uso registrado';
+  return `Esta semana: ${n} ${n === 1 ? 'aparelho' : 'aparelhos'}`;
+}
 
 /** "Saldo R$ 1.245,50"; nulo (caixa sem configuração) → "Caixa não configurado". */
 export function textoSaldo(centavos: number | null): string {
@@ -75,25 +108,41 @@ export function InicioGrupo() {
       return <EstadoErro aoTentarDeNovo={() => void grupo.refetch()} />;
     }
     const g = grupo.data;
+    const temAtivos = g.jogadoresAtivos > 0;
     return (
       <>
-        {g.jogadoresAtivos === 0 ? (
-          <section className={modulo['dia-de-jogo']} aria-labelledby="t-dia">
-            <h2 id="t-dia" className={modulo['dia-de-jogo__titulo']}>
-              Dia de jogo
-            </h2>
-            <p>{TEXTO_SEM_JOGADORES}</p>
-            <LinkBotao para={`${base}/jogadores/novo`} variante="principal" bloco>
-              Cadastrar jogadores
-            </LinkBotao>
-          </section>
-        ) : null}
+        <section className={modulo['dia-de-jogo']} aria-labelledby="t-dia">
+          <h2 id="t-dia" className={modulo['dia-de-jogo__titulo']}>
+            Dia de jogo
+          </h2>
+          {temAtivos ? (
+            g.partidaNaDataSugerida ? (
+              <LinkBotao para={`${base}/partidas/${encodeURIComponent(g.dataSugeridaPartida)}`} variante="principal" bloco>
+                {`Editar partida de ${diaAbreviado(g.dataSugeridaPartida)}`}
+              </LinkBotao>
+            ) : (
+              <LinkBotao para={`${base}/partidas/nova`} variante="principal" bloco>
+                {`Lançar partida de ${diaAbreviado(g.dataSugeridaPartida)}`}
+              </LinkBotao>
+            )
+          ) : (
+            <>
+              <p>{TEXTO_SEM_JOGADORES}</p>
+              <LinkBotao para={`${base}/jogadores/novo`} variante="principal" bloco>
+                Cadastrar jogadores
+              </LinkBotao>
+            </>
+          )}
+        </section>
         <h2 className={estilos.subtitulo}>Gerenciar</h2>
         <Lista rotulo="Gerenciar">
+          <ItemLista titulo="Partidas" meta={textoPartidasDoMes(g.partidasNoMes, mesDe(hojeEmSaoPaulo()))} para={`${base}/partidas`} />
           <ItemLista titulo="Jogadores" meta={textoJogadores(g.jogadoresAtivos)} para={`${base}/jogadores`} />
           <ItemLista titulo="Habilidades" meta={textoHabilidades(g.habilidades)} para={`${base}/habilidades`} />
+          <ItemLista titulo="Pontuação" meta={textoPontuacao(g)} para={`${base}/pontuacao`} />
           <ItemLista titulo="Admins" meta={textoAdmins(g.admins)} para={`${base}/admins`} />
           <ItemLista titulo="Dados do grupo" meta={`${textoRecorrencia(g)} · link do ranking`} para={`${base}/dados`} />
+          <ItemLista titulo="Uso do app" meta={textoUso(g.aparelhosNaSemana)} para={`${base}/uso`} />
           {g.saldoFinanceiroCentavos !== undefined ? (
             <ItemLista titulo="Financeiro" meta={textoSaldo(g.saldoFinanceiroCentavos)} para={`${base}/financeiro`} />
           ) : null}

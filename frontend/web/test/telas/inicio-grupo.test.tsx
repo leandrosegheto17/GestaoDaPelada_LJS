@@ -1,6 +1,10 @@
 import { cleanup, fireEvent, screen, within } from '@testing-library/react';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  diaAbreviado,
+  textoPartidasDoMes,
+  textoPontuacao,
+  textoUso,
   InicioGrupo,
   TEXTO_SEM_JOGADORES,
   textoAdmins,
@@ -32,14 +36,30 @@ const QUINTA = {
   habilidades: 6,
   admins: 1,
   souCriador: true,
+  // Campos do início (PAR-132) e do simulador (SIM-08) da forma do GET (partidas-e-ranking T64): só preparação.
+  dataSugeridaPartida: '2026-10-22',
+  partidaNaDataSugerida: false,
+  partidasNoMes: 3,
+  pesosVigentesDesde: '2026-09-01',
+  pesosPadrao: false,
+  aparelhosNaSemana: 12,
+  proximoDiaDeJogo: '2026-10-22',
+  escalacaoNoProximoDia: false,
 };
 
 function abrir(api: Record<string, Manipulador>, caminho = '/app/grupos/g-quinta') {
   return abrirTela(caminho, { 'GET /api/sessao': () => json(200, SESSAO_ANA), ...api }, rotas);
 }
 
+// O item Partidas mostra o mês de hoje em São Paulo (PAR-134): o relógio fica em 22/10/2026, só o `Date`.
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date('2026-10-22T15:00:00.000Z'));
+});
+
 afterEach(() => {
   cleanup();
+  vi.useRealTimers();
 });
 
 describe('textos das contagens', () => {
@@ -56,20 +76,24 @@ describe('textos das contagens', () => {
 });
 
 describe('tela Início do grupo (t09)', () => {
-  it('GEL-20: mostra o nome e as contagens do GET /api/grupos/:grupoId, sem Pontuação; axe sem violação', async () => {
+  it('GEL-20, PAR-134 a PAR-136: mostra o nome e os 7 itens do mockup do GET /api/grupos/:grupoId; axe sem violação', async () => {
     const { container } = abrir({ 'GET /api/grupos/g-quinta': () => json(200, QUINTA) });
     expect(await screen.findByRole('heading', { level: 1, name: 'Início do admin: Pelada de Quinta' })).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Trocar grupo' }).getAttribute('href')).toBe('/app');
 
     const lista = screen.getByRole('list', { name: 'Gerenciar' });
     const itens = within(lista).getAllByRole('link');
+    // partidas-e-ranking T64 (P19, autorização de 2026-11-04 no STATE.md): a lista passa aos 7 itens do mockup do
+    // módulo; os 4 de antes continuam, com o mesmo texto e o mesmo destino.
     expect(itens.map((a) => [a.textContent, a.getAttribute('href')])).toEqual([
+      ['Partidas3 em outubro', '/app/grupos/g-quinta/partidas'],
       ['Jogadores20 ativos', '/app/grupos/g-quinta/jogadores'],
       ['Habilidades6 habilidades', '/app/grupos/g-quinta/habilidades'],
+      ['PontuaçãoVigente desde 01/09/2026', '/app/grupos/g-quinta/pontuacao'],
       ['Admins1 admin', '/app/grupos/g-quinta/admins'],
       ['Dados do grupoToda quinta · 20:00 · link do ranking', '/app/grupos/g-quinta/dados'],
+      ['Uso do appEsta semana: 12 aparelhos', '/app/grupos/g-quinta/uso'],
     ]);
-    expect(screen.queryByText('Pontuação')).toBeNull();
     expect(screen.queryByText(TEXTO_SEM_JOGADORES)).toBeNull();
     await esperarSemViolacoes(container);
   });
@@ -130,5 +154,72 @@ describe('tela Início do grupo (t09)', () => {
     abrir({ 'GET /api/grupos/g-quinta': () => erroApi(404, 'nao_encontrado') });
     expect(await screen.findByText('Grupo não encontrado.')).toBeTruthy();
     expect(screen.queryByRole('list', { name: 'Gerenciar' })).toBeNull();
+  });
+});
+
+describe('início do grupo com partidas (partidas-e-ranking T64)', () => {
+  it('textos: dia abreviado, partidas do mês, pontuação e uso', () => {
+    expect(diaAbreviado('2026-10-15')).toBe('qui, 15/10');
+    expect(diaAbreviado('2026-10-18')).toBe('dom, 18/10');
+    expect(diaAbreviado('2026-10-17')).toBe('sáb, 17/10');
+    expect(textoPartidasDoMes(3, '2026-10')).toBe('3 em outubro');
+    expect(textoPartidasDoMes(0, '2026-10')).toBe('Nenhuma em outubro');
+    expect(textoPontuacao({ pesosPadrao: true, pesosVigentesDesde: '2026-01-01' })).toBe('Pesos padrão');
+    expect(textoPontuacao({ pesosPadrao: false, pesosVigentesDesde: '2026-09-01' })).toBe('Vigente desde 01/09/2026');
+    expect(textoUso(12)).toBe('Esta semana: 12 aparelhos');
+  });
+
+  it('PAR-133: sem partida na data sugerida, "Lançar partida de qui, 22/10" abre o lançamento', async () => {
+    abrir({ 'GET /api/grupos/g-quinta': () => json(200, QUINTA) });
+    const dia = await screen.findByRole('region', { name: 'Dia de jogo' });
+    const botao = within(dia).getByRole('link', { name: 'Lançar partida de qui, 22/10' });
+    expect(botao.getAttribute('href')).toBe('/app/grupos/g-quinta/partidas/nova');
+  });
+
+  it('PAR-133: com partida na data sugerida, o botão diz "Editar partida de qui, 15/10" e abre /partidas/2026-10-15', async () => {
+    abrir({
+      'GET /api/grupos/g-quinta': () => json(200, { ...QUINTA, dataSugeridaPartida: '2026-10-15', partidaNaDataSugerida: true }),
+    });
+    const dia = await screen.findByRole('region', { name: 'Dia de jogo' });
+    const botao = within(dia).getByRole('link', { name: 'Editar partida de qui, 15/10' });
+    expect(botao.getAttribute('href')).toBe('/app/grupos/g-quinta/partidas/2026-10-15');
+    expect(within(dia).queryByRole('link', { name: /Lançar partida/ })).toBeNull();
+  });
+
+  it('PAR-134: sem partidas no mês, "Nenhuma em outubro"', async () => {
+    abrir({ 'GET /api/grupos/g-quinta': () => json(200, { ...QUINTA, partidasNoMes: 0 }) });
+    const lista = await screen.findByRole('list', { name: 'Gerenciar' });
+    expect(within(lista).getByRole('link', { name: /Partidas/ }).textContent).toBe('PartidasNenhuma em outubro');
+  });
+
+  it('PAR-135: pesos padrão mostra "Pesos padrão"', async () => {
+    abrir({ 'GET /api/grupos/g-quinta': () => json(200, { ...QUINTA, pesosPadrao: true }) });
+    const lista = await screen.findByRole('list', { name: 'Gerenciar' });
+    expect(within(lista).getByRole('link', { name: /Pontuação/ }).textContent).toBe('PontuaçãoPesos padrão');
+  });
+
+  it('PAR-136: 1 aparelho mostra "Esta semana: 1 aparelho"; 0 mostra "Sem uso registrado"', async () => {
+    abrir({ 'GET /api/grupos/g-quinta': () => json(200, { ...QUINTA, aparelhosNaSemana: 1 }) });
+    let lista = await screen.findByRole('list', { name: 'Gerenciar' });
+    expect(within(lista).getByRole('link', { name: /Uso do app/ }).textContent).toBe('Uso do appEsta semana: 1 aparelho');
+    cleanup();
+
+    abrir({ 'GET /api/grupos/g-quinta': () => json(200, { ...QUINTA, aparelhosNaSemana: 0 }) });
+    lista = await screen.findByRole('list', { name: 'Gerenciar' });
+    expect(within(lista).getByRole('link', { name: /Uso do app/ }).textContent).toBe('Uso do appSem uso registrado');
+  });
+
+  it('PAR-160: sem a chave do saldo, nenhum item "Simulador" nem "Financeiro"', async () => {
+    abrir({ 'GET /api/grupos/g-quinta': () => json(200, QUINTA) });
+    const lista = await screen.findByRole('list', { name: 'Gerenciar' });
+    expect(within(lista).queryByRole('link', { name: /Simulador/ })).toBeNull();
+    expect(within(lista).queryByRole('link', { name: /Financeiro/ })).toBeNull();
+  });
+
+  it('PAR-36: o aviso da navegação aparece no início ("Partida de dd/mm salva.")', async () => {
+    const t = abrir({ 'GET /api/grupos/g-quinta': () => json(200, QUINTA) });
+    await screen.findByRole('list', { name: 'Gerenciar' });
+    await t.roteador.navigate('/app/grupos/g-quinta', { state: { aviso: 'Partida de 22/10 salva.' } });
+    expect(await screen.findByText('Partida de 22/10 salva.')).toBeDefined();
   });
 });

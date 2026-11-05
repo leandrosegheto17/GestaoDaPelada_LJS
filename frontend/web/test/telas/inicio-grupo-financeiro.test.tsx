@@ -26,6 +26,15 @@ const QUINTA = {
   habilidades: 6,
   admins: 1,
   souCriador: true,
+  // Campos do início (PAR-132) e do simulador (SIM-08) da forma do GET (partidas-e-ranking T64): só preparação.
+  dataSugeridaPartida: '2026-10-22',
+  partidaNaDataSugerida: false,
+  partidasNoMes: 3,
+  pesosVigentesDesde: '2026-09-01',
+  pesosPadrao: false,
+  aparelhosNaSemana: 12,
+  proximoDiaDeJogo: '2026-10-22',
+  escalacaoNoProximoDia: false,
 };
 
 function abrir(api: Record<string, Manipulador>) {
@@ -67,6 +76,9 @@ describe('item Financeiro no início (t09)', () => {
     abrir({ 'GET /api/grupos/g-quinta': () => json(200, QUINTA) });
     const lista = await screen.findByRole('list', { name: 'Gerenciar' });
     expect(within(lista).queryByText('Financeiro')).toBeNull();
-    expect(within(lista).getAllByRole('link')).toHaveLength(4);
+    // partidas-e-ranking T64 (autorização de 2026-11-04 da financeiro no STATE.md): os 7 itens do mockup do módulo,
+    // nenhum deles Financeiro.
+    expect(within(lista).getAllByRole('link')).toHaveLength(7);
+    expect(within(lista).getAllByRole('link').map((a) => a.textContent)).not.toContain(expect.stringMatching(/^Financeiro/));
   });
 });
