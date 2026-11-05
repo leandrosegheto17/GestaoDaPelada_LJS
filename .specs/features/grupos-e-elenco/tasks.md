@@ -492,6 +492,7 @@ T73 → T74 → T75
 **Depends on**: T4
 **Reuses**: grants em `M:1792843260000_roles.sql:22-33`; `M:1792843200000_linha-de-base.sql:120` (`jogadores_apelido_grupo`), `:128-131` (cascade e `periodos_um_aberto`), `:141` (`habilidades_nome_grupo`), `:149-150` (FKs de `notas`), `:189`, `:266`, `:324-326` (posições)
 **Requirement**: GEL-35, GEL-37, GEL-50, GEL-84, GEL-85, GEL-91, GEL-93, GEL-112
+**Status**: rascunhada
 
 **Done when**:
 
