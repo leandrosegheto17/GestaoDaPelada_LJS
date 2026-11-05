@@ -40,17 +40,19 @@ export const CAMPOS_PROIBIDOS_PUBLICO = [
   'dispositivoId',
 ] as const;
 
-/** Os caminhos (`linhas.0.jogadorId`) dos campos proibidos achados em qualquer nível de `valor`. */
-export function camposProibidosEm(valor: unknown, caminho = ''): string[] {
+/** Os caminhos (`linhas.0.jogadorId`) dos campos proibidos achados em qualquer nível de `valor`, em ordem alfabética. */
+export function camposProibidosEm(valor: unknown): string[] {
+  return acharProibidos(valor, '').sort();
+}
+
+function acharProibidos(valor: unknown, caminho: string): string[] {
   const proibidos: readonly string[] = CAMPOS_PROIBIDOS_PUBLICO;
   if (Array.isArray(valor))
-    return valor.flatMap((item, i) =>
-      camposProibidosEm(item, caminho ? `${caminho}.${i}` : `${i}`),
-    );
+    return valor.flatMap((item, i) => acharProibidos(item, caminho ? `${caminho}.${i}` : `${i}`));
   if (valor === null || typeof valor !== 'object') return [];
   return Object.entries(valor).flatMap(([chave, filho]) => {
     const aqui = caminho ? `${caminho}.${chave}` : chave;
-    return [...(proibidos.includes(chave) ? [aqui] : []), ...camposProibidosEm(filho, aqui)];
+    return [...(proibidos.includes(chave) ? [aqui] : []), ...acharProibidos(filho, aqui)];
   });
 }
 
