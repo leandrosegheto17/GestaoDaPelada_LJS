@@ -1,0 +1,304 @@
+/* Simulador (t12, t13, t14; simulador T45), de .specs/mockup/base.css (as linhas citadas em cada bloco). */
+
+/* Formulário e campos, base.css:80-92. */
+.formulario {
+  display: grid;
+  gap: var(--esp-4);
+}
+
+.campo {
+  display: grid;
+  gap: var(--esp-1);
+}
+
+.campo__rotulo {
+  font-weight: var(--peso-semi);
+}
+
+.campo__entrada {
+  width: 100%;
+  min-height: var(--alvo-toque);
+  padding: 0 var(--esp-3);
+  border: 2px solid var(--cor-contorno);
+  border-radius: var(--raio-sm);
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  font: inherit;
+}
+
+.campo-numero {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-2);
+}
+
+.campo-numero .campo__entrada {
+  width: 72px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.campo-numero__botao {
+  width: var(--alvo-toque);
+  height: var(--alvo-toque);
+  border: 2px solid var(--cor-contorno);
+  border-radius: var(--raio-sm);
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  font-size: var(--texto-2xl);
+  font-weight: var(--peso-forte);
+  cursor: pointer;
+}
+
+.campo-numero__botao:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Caixa de seleção, base.css:60-61. */
+.caixa {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-2);
+  min-height: var(--alvo-toque);
+  cursor: pointer;
+}
+
+.caixa input {
+  width: 24px;
+  height: 24px;
+  accent-color: var(--cor-verde);
+  margin: 0;
+}
+
+/* Controle segmentado, base.css:98-105. */
+.segmentado {
+  display: flex;
+  border: 2px solid var(--cor-texto);
+  border-radius: var(--raio);
+  overflow: hidden;
+  padding: 0;
+  margin: 0;
+}
+
+.segmentado legend {
+  padding: 0;
+}
+
+.segmentado label {
+  flex: 1;
+  display: flex;
+}
+
+.segmentado input {
+  position: absolute;
+  opacity: 0;
+}
+
+.segmentado span {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--alvo-toque);
+  padding: 0 var(--esp-2);
+  text-align: center;
+  font-weight: var(--peso-semi);
+  background: var(--cor-superficie);
+  cursor: pointer;
+}
+
+.segmentado label + label span {
+  border-left: 2px solid var(--cor-texto);
+}
+
+.segmentado input:checked + span {
+  background: var(--cor-texto);
+  color: var(--cor-superficie);
+}
+
+.segmentado input:focus-visible + span {
+  outline: var(--foco-largura) solid var(--cor-foco);
+  outline-offset: -6px;
+}
+
+/* Interruptor "Só 1º", base.css:108-116. */
+.interruptor {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-2);
+  min-height: var(--alvo-toque);
+  cursor: pointer;
+  font-weight: var(--peso-semi);
+}
+
+.interruptor input {
+  position: absolute;
+  opacity: 0;
+}
+
+.interruptor__trilho {
+  position: relative;
+  width: 52px;
+  height: 30px;
+  border-radius: var(--raio-pilula);
+  border: 2px solid var(--cor-contorno);
+  background: var(--cor-superficie);
+  flex-shrink: 0;
+}
+
+.interruptor__trilho::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--cor-contorno);
+}
+
+.interruptor input:checked + .interruptor__trilho {
+  background: var(--cor-verde);
+  border-color: var(--cor-verde);
+}
+
+.interruptor input:checked + .interruptor__trilho::after {
+  left: 25px;
+  background: var(--cor-sobre-verde);
+}
+
+.interruptor input:focus-visible + .interruptor__trilho {
+  outline: var(--foco-largura) solid var(--cor-foco);
+  outline-offset: var(--foco-afastamento);
+}
+
+.interruptor__estado {
+  min-width: 28px;
+}
+
+.interruptor input:disabled + .interruptor__trilho {
+  opacity: 0.5;
+}
+
+/* Título de seção, base.css:47. */
+.subtitulo {
+  font-size: var(--texto-xl);
+  text-transform: uppercase;
+  letter-spacing: var(--espacamento-caixa-alta);
+  margin: var(--esp-6) 0 var(--esp-3);
+}
+
+.grupo-botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2);
+}
+
+/* Lista de aptos, base.css:144-151 e :256. */
+.lista-aptos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-linha);
+  border-radius: var(--raio);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
+  min-height: 56px;
+  padding: var(--esp-1) var(--esp-3);
+  border-bottom: 1px solid var(--cor-linha);
+}
+
+.item:last-child {
+  border-bottom: 0;
+}
+
+.item__principal {
+  flex: 1;
+  min-width: 0;
+}
+
+.item__lado {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-2);
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.texto-sec {
+  color: var(--cor-texto-sec);
+}
+
+/* Selos, base.css:155-158. */
+.selo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-1);
+  padding: 2px var(--esp-2);
+  border-radius: var(--raio-pilula);
+  font-size: var(--texto-sm);
+  font-weight: var(--peso-semi);
+  white-space: nowrap;
+}
+
+.selo--neutro {
+  background: var(--cor-f-fundo);
+  color: var(--cor-f-texto);
+}
+
+.selo--atencao {
+  background: var(--cor-atencao-fundo);
+  color: var(--cor-atencao-texto);
+}
+
+/* Barra de ação, base.css:212-214 e :336-337. */
+.barra-acao {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--esp-2);
+  padding: var(--esp-3) var(--esp-4) calc(var(--esp-3) + env(safe-area-inset-bottom));
+  background: var(--cor-superficie);
+  border-top: 1px solid var(--cor-linha);
+}
+
+.barra-acao > * {
+  width: 100%;
+  max-width: 440px;
+}
+
+@media (min-width: 600px) {
+  .barra-acao {
+    position: static;
+    align-items: flex-start;
+    padding: 0;
+    margin-top: var(--esp-6);
+    background: transparent;
+    border: 0;
+  }
+
+  .barra-acao > * {
+    width: auto;
+  }
+}
+
+/* Entradas e lista lado a lado no PC, base.css:356. */
+@media (min-width: 1024px) {
+  .lado-a-lado {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--esp-6);
+    align-items: start;
+  }
+}

@@ -1542,6 +1542,9 @@ T53 → T54
 **Depends on**: T44
 **Reuses**: `.specs/mockup/telas/t12-simulador--{vazio,dois-times,tres-times}.html`; `exibirNivel` (`GE:1726`); `CampoData` (`GE:1751`); molde de `PaginaNovaPartida` (`PR:1974`)
 **Requirement**: SIM-05, SIM-06, SIM-07, SIM-95
+**Status**: rascunhada
+**Nota do rascunho**: `dados/simulador.ts` (contexto, prévia e avaliar pelo `usePrevia` de `dados/previas.ts`, sugerir, confirmar); as entradas em `EntradasSimulador.tsx` (com `corpoDaPrevia` e `corpoDoSugerir`), a página em `PaginaSimulador.tsx`, o CSS em `simulador.module.css`. A rota no app é da T51. Teste em `test/telas/simulador-entradas.test.tsx`.
+**Lacunas**: N e K iniciais não definidos na spec (rascunho: 7 e 2, do mockup `t12-simulador--dois-times.html`). O /executar confirma.
 
 **Done when**:
 
