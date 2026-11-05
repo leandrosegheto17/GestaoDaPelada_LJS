@@ -13,3 +13,5 @@ export * from './plano.ts';
 export * from './asaas.ts';
 export * from './simulador.ts';
 export * from './escalacao.ts';
+export * from './financeiro.ts';
+export * from './financeiro-lancamentos.ts';

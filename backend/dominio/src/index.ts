@@ -195,13 +195,41 @@ export {
 } from './previas/rodadas.ts';
 
 // financeiro (FIN-09, FIN-18, FIN-49): meses do caixa usados pelas rotas (T26, T27). `mesNoHistorico` já é o do
-// ranking: o do caixa sai com outro nome. As demais exportações do caixa (T1 a T6) ficam para o /executar.
+// ranking: o do caixa sai com outro nome. Os repositórios do financeiro (mes.ts, pagamentos.ts) usam o resto.
 export {
+  limitesDoCaixa,
   MENSAGEM_MES_FORA_DO_HISTORICO,
   MENSAGEM_MES_FUTURO,
+  mesesDoCaixa,
   mesFuturo,
   mesNoHistorico as mesNoHistoricoDoCaixa,
+  navegacao,
+  type LimitesDoCaixa,
+  type NavegacaoDoCaixa,
 } from './caixa/mes.ts';
+export { ativoNoMes, ativosNoMes, type JogadorComPeriodos } from './caixa/atividade-mes.ts';
+export { entradaDaMensalidade, type EntradaDaMensalidade } from './caixa/mensalidade.ts';
+export {
+  resumoDoMes,
+  type AtivoNoMes,
+  type MesCaixa,
+  type PagamentoDoMes,
+  type ResumoDoMes,
+} from './caixa/resumo.ts';
+export {
+  saldoAtual,
+  totais,
+  type ConfigCaixa,
+  type DataCaixa,
+  type MovimentoCaixa,
+  type Totais,
+} from './caixa/saldos.ts';
+export {
+  ErroCentavosNaoInteiro,
+  ErroEstouroCentavos,
+  somarCentavos,
+  subtrairCentavos,
+} from './caixa/centavos.ts';
 
 // notificacoes (NOT-25, NOT-43): payloads do push, sem relógio nem I/O.
 export {
@@ -212,7 +240,7 @@ export {
   serializarPayload,
   TITULO_RANKING,
   type EntradaCobranca,
-  type EntradaRanking,
+  type EntradaRanking as EntradaPayloadRanking,
   type PayloadPush,
   type TipoAvisoCobranca,
 } from './notificacoes/payload.ts';
