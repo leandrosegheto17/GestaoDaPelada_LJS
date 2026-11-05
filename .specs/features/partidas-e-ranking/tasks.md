@@ -2062,6 +2062,7 @@ T78 → T79
 **Depends on**: T58
 **Reuses**: `.specs/mockup/telas/t10-partidas--{sucesso,vazio}.html`; `Lista` (`CA:1286`)
 **Requirement**: PAR-42, PAR-43
+**Status**: rascunhada
 
 **Done when**:
 
