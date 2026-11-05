@@ -193,6 +193,15 @@ export {
   type RodadaQuePassaAConstar,
 } from './previas/rodadas.ts';
 
+// financeiro (FIN-09, FIN-18, FIN-49): meses do caixa usados pelas rotas (T26, T27). `mesNoHistorico` já é o do
+// ranking: o do caixa sai com outro nome. As demais exportações do caixa (T1 a T6) ficam para o /executar.
+export {
+  MENSAGEM_MES_FORA_DO_HISTORICO,
+  MENSAGEM_MES_FUTURO,
+  mesFuturo,
+  mesNoHistorico as mesNoHistoricoDoCaixa,
+} from './caixa/mes.ts';
+
 // notificacoes (NOT-25, NOT-43): payloads do push, sem relógio nem I/O.
 export {
   diaEMes,

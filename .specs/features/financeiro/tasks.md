@@ -979,6 +979,8 @@ T47 → T48
 **Depends on**: T25
 **Reuses**: Molde de `GET partidas?mes` (`PR:1436`); `comBanco` (`F:1203`); T5
 **Requirement**: FIN-07, FIN-08, FIN-09, FIN-14
+**Status**: rascunhada
+**Nota do rascunho**: `rotasFinanceiroMes()` ligada no `app.ts`. O 422 de fora do histórico só vale **com configuração** (texto da tarefa); sem ela, qualquer mês bem formado dá 200 com os nulos (o `[LACUNA]` de `caixa/mes.ts:48` fica para o /executar decidir). O `index.ts` do domínio ganhou só `mesNoHistorico as mesNoHistoricoDoCaixa` (o nome já é do ranking), `mesFuturo` e as duas mensagens; o resto das exportações do caixa segue para o /executar (nota da T17). O teste também prova o reflexo do PUT da T25 (FIN-01).
 
 **Done when**:
 
