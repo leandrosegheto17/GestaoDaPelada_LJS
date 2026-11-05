@@ -1302,6 +1302,8 @@ T57 → T58
 **Depends on**: T37
 **Reuses**: decisão de `ljs:.specs/features/conta-e-acesso/design.md:200` (fragmento apagado logo depois de lido)
 **Requirement**: ACE-06, ACE-24
+**Status**: rascunhada
+**Nota do rascunho**: valida o token com o primitivo `token` do contrato (43 caracteres base64url); com `#t=` presente, o fragmento sai da barra mesmo quando o token é malformado. Sem `#t=`, nada muda.
 
 **Done when**:
 
