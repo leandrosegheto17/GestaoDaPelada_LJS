@@ -10,7 +10,8 @@ import { ehDataDoCalendario } from './elenco.ts';
  *   lote (NOT-69: uma assinatura com envio aceito depois dele não recebe de novo); `aposId` é o último id já percorrido
  *   (continuação do lote, T19) e `ids`, as assinaturas pendentes de uma nova tentativa (429 ou 5xx, T19).
  * - `cobranca`: o id externo da cobrança do Asaas, o tipo do aviso, o grupo, o valor em centavos inteiros e o
- *   vencimento (NOT-38, NOT-40, AD-105).
+ *   vencimento (NOT-38, NOT-40, AD-105); `pushIds`, só na nova tentativa do push de cobrança (429 ou 5xx, T25): o
+ *   e-mail já saiu e só essas assinaturas da criadora recebem o push de novo.
  * - `tentativa`: 1 no primeiro envio; até 2 novas tentativas (NOT-31, NOT-42), então de 1 a 3.
  *
  * Campo a mais em qualquer uma (inclusive `email`, `nome`, `endpoint`) é recusado: `.strict()` (NOT-43).
@@ -57,6 +58,7 @@ export const mensagemCobranca = z
     grupoId: z.uuid(),
     valorCentavos: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER),
     vencimento: dataDoCalendario,
+    pushIds: z.array(idAssinatura).min(1).max(LOTE_MAXIMO).optional(),
     tentativa,
   })
   .strict();

@@ -10,6 +10,9 @@ import type { Env } from '../../../src/entrada/ambiente.ts';
 import { bancoSemContexto, type AbrirBanco } from '../../../src/entrada/consumidor-avisos.ts';
 import { remetenteMemoria, type RemetenteMemoria } from '../../../src/infraestrutura/email/resend.ts';
 import { filaMemoria, type FilaMemoria } from '../../../src/infraestrutura/fila/avisos.ts';
+import { servicoPushFalso, TTL_COBRANCA, type ServicoPushFalso } from '../../../src/infraestrutura/push/enviar.ts';
+import { topicoDoGrupo } from '../../../src/infraestrutura/push/topico.ts';
+import { assinanteDeTeste, chavesVapidDeTeste, decifrarPush, type AssinanteDeTeste } from '../../apoio/push.ts';
 import { envCom, fabricaComoApp } from '../../db/requisicao.ts';
 import { abrirCenario, type CenarioAberto } from '../../isolamento/apoio.ts';
 
@@ -205,5 +208,139 @@ describe('avisarCobranca', () => {
     } finally {
       await aberto.db.query('UPDATE contas SET excluida_em = NULL WHERE id = $1', [contaA]);
     }
+  });
+});
+
+describe('avisarCobranca: push à criadora (T25)', () => {
+  let envPush: Env;
+  let servico: ServicoPushFalso;
+
+  beforeAll(async () => {
+    const v = await chavesVapidDeTeste();
+    envPush = { ...env, VAPID_PUBLICA: v.publica, VAPID_PRIVADA: v.privada, VAPID_ASSUNTO: v.assunto } as Env;
+  });
+
+  beforeEach(async () => {
+    servico = servicoPushFalso();
+    await aberto.db.query('DELETE FROM push_conta WHERE conta_id = $1', [aberto.cenario.contaA]);
+  });
+
+  /** Assinaturas de push da criadora (conta A), como superusuário, em ordem de id. */
+  async function assinar(n: number): Promise<Array<AssinanteDeTeste & { id: string; endpoint: string }>> {
+    const lista: Array<AssinanteDeTeste & { id: string; endpoint: string }> = [];
+    for (let i = 1; i <= n; i += 1) {
+      const a = await assinanteDeTeste();
+      const endpoint = `https://fcm.googleapis.com/fcm/send/t25-${i}`;
+      const r = await aberto.db.query<{ id: string }>(
+        'INSERT INTO push_conta (conta_id, endpoint, p256dh, auth) VALUES ($1, $2, $3, $4) RETURNING id::text',
+        [aberto.cenario.contaA, endpoint, a.p256dh, a.auth],
+      );
+      lista.push({ ...a, id: r.rows[0]?.id ?? '', endpoint });
+    }
+    return lista;
+  }
+
+  async function linhasDaConta(): Promise<Array<{ endpoint: string; enviado: boolean }>> {
+    const r = await aberto.db.query<{ endpoint: string; enviado: boolean }>(
+      'SELECT endpoint, ultimo_envio_em IS NOT NULL AS enviado FROM push_conta WHERE conta_id = $1 ORDER BY id',
+      [aberto.cenario.contaA],
+    );
+    return r.rows;
+  }
+
+  function avisarComPush(m: MensagemCobranca, comEnv: Env = envPush) {
+    const b = bancoSemContexto(comEnv, fabricaComoApp().fabrica);
+    return criarAvisarCobranca({
+      remetente,
+      reportar: (r) => relatos.push(r),
+      fetch: servico.fetch,
+      reportarPush: () => undefined,
+    })(m, { env: comEnv, banco: b });
+  }
+
+  it('NOT-46: sem assinatura, um e-mail e nenhum fetch', async () => {
+    await avisarComPush(mensagem());
+    expect(remetente.mensagens).toHaveLength(1);
+    expect(servico.pedidos).toHaveLength(0);
+  });
+
+  it('NOT-61: com assinatura e sem VAPID, só o e-mail', async () => {
+    await assinar(1);
+    await avisarComPush(mensagem(), env);
+    expect(remetente.mensagens).toHaveLength(1);
+    expect(servico.pedidos).toHaveLength(0);
+  });
+
+  it('NOT-48: com 2 assinaturas, 2 envios cifrados com VAPID e TTL de 48 h; 410 apaga a assinatura', async () => {
+    const [um, dois] = await assinar(2);
+    servico.responder(201, 410);
+    await avisarComPush(mensagem());
+
+    expect(servico.pedidos.map((p) => p.url)).toEqual([um?.endpoint, dois?.endpoint]);
+    for (const pedido of servico.pedidos) {
+      expect(pedido.cabecalhos.get('content-encoding')).toBe('aes128gcm');
+      expect(pedido.cabecalhos.get('authorization')).toMatch(/^vapid t=.+, k=.+$/);
+      expect(pedido.cabecalhos.get('ttl')).toBe(String(TTL_COBRANCA));
+      expect(pedido.cabecalhos.get('topic')).toBe(await topicoDoGrupo(aberto.cenario.grupoA));
+    }
+    expect(await linhasDaConta()).toEqual([{ endpoint: um?.endpoint, enviado: true }]);
+  });
+
+  it('NOT-43: o payload enviado tem só o título e o caminho de Meu plano, sem valor, e-mail nem nome', async () => {
+    const [um] = await assinar(1);
+    const nome = (await aberto.db.query<{ nome: string }>('SELECT nome FROM contas WHERE id = $1', [aberto.cenario.contaA]))
+      .rows[0]?.nome;
+    await avisarComPush(mensagem({ valorCentavos: 12345 }));
+    const [pedido] = servico.pedidos;
+    const texto = await decifrarPush(pedido?.corpo ?? new Uint8Array(), um as AssinanteDeTeste);
+    expect(JSON.parse(texto)).toEqual({
+      titulo: 'Pagamento atrasado: Grupo A',
+      caminho: `/app/grupos/${aberto.cenario.grupoA}/plano`,
+    });
+    for (const proibido of ['12345', '123,45', 'R$', emailCriadora, nome ?? '']) expect(texto).not.toContain(proibido);
+  });
+
+  it('NOT-48: 503 volta à fila só com o push: a nova tentativa não manda outro e-mail', async () => {
+    const [um, dois] = await assinar(2);
+    servico.responder(201, 503);
+    const m = mensagem();
+    await avisarComPush(m);
+
+    const nova = fila.enviadas.shift();
+    expect(nova).toEqual({ corpo: { ...m, pushIds: [dois?.id], tentativa: 2 }, delaySeconds: 60 });
+
+    await avisarComPush(nova?.corpo as MensagemCobranca);
+    expect(remetente.mensagens).toHaveLength(1);
+    expect(servico.pedidos.map((p) => p.url)).toEqual([um?.endpoint, dois?.endpoint, dois?.endpoint]);
+    expect((await linhasDaConta()).every((l) => l.enviado)).toBe(true);
+    expect(fila.enviadas).toEqual([]);
+  });
+
+  it('NOT-48: o push que segue em 503 desiste na 3.ª tentativa e mantém a assinatura', async () => {
+    await assinar(1);
+    servico.responder(503, 503, 503);
+    await avisarComPush(mensagem());
+    await avisarComPush(fila.enviadas.shift()?.corpo as MensagemCobranca);
+    const terceira = fila.enviadas.shift()?.corpo as MensagemCobranca;
+    expect(terceira.tentativa).toBe(3);
+    await avisarComPush(terceira);
+    expect(servico.pedidos).toHaveLength(3);
+    expect(fila.enviadas).toEqual([]);
+    expect(await linhasDaConta()).toHaveLength(1);
+  });
+
+  it('NOT-42: e-mail que falha não manda push', async () => {
+    await assinar(1);
+    remetente.falharProximos(1);
+    await avisarComPush(mensagem());
+    expect(servico.pedidos).toHaveLength(0);
+  });
+
+  it('NOT-39: a mesma mensagem duas vezes manda um push por aparelho', async () => {
+    await assinar(1);
+    const m = mensagem();
+    await avisarComPush(m);
+    await avisarComPush({ ...m });
+    expect(servico.pedidos).toHaveLength(1);
   });
 });

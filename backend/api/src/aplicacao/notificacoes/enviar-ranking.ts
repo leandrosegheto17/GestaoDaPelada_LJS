@@ -91,8 +91,8 @@ async function lerPendentes(db: Db, mensagem: MensagemRanking): Promise<Pendente
   return { lote, continuarApos: (lote[lote.length - 1] as AssinaturaDoLote).id };
 }
 
-/** O maior `Retry-After` pedido; sem nenhum, o padrão; nunca acima do teto. */
-function atrasoDaNovaTentativa(pedidos: ReadonlyArray<number | undefined>): number {
+/** O maior `Retry-After` pedido; sem nenhum, o padrão; nunca acima do teto. Também o do push de cobrança (T25). */
+export function atrasoDaNovaTentativa(pedidos: ReadonlyArray<number | undefined>): number {
   const informados = pedidos.filter((s): s is number => s !== undefined);
   const atraso = informados.length === 0 ? ATRASO_PADRAO_S : Math.max(...informados);
   return Math.min(Math.max(0, atraso), ATRASO_TETO_S);

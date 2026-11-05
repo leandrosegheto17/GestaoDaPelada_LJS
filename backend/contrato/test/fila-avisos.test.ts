@@ -63,6 +63,13 @@ describe('mensagem cobranca', () => {
     }
   });
 
+  it('NOT-48: a nova tentativa do push de cobrança leva só os ids das assinaturas, de 1 a 40', () => {
+    const nova = { ...COBRANCA, pushIds: ['7', '12'], tentativa: 2 };
+    expect(mensagemAviso.parse(nova)).toEqual(nova);
+    expect(mensagemAviso.safeParse({ ...COBRANCA, pushIds: [] }).success).toBe(false);
+    expect(mensagemAviso.safeParse({ ...COBRANCA, pushIds: ['abc'] }).success).toBe(false);
+  });
+
   it('NOT-43: a mensagem de cobrança recusa campo de e-mail ou de nome', () => {
     for (const extra of [
       { email: 'criadora@exemplo.com' },

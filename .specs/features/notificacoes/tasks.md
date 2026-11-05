@@ -950,6 +950,8 @@ T39 → T40 → T41
 **Depends on**: T24
 **Reuses**: T6, T19, T24; `payloadCobranca` (T5)
 **Requirement**: NOT-43, NOT-46, NOT-48
+**Status**: rascunhada
+**Nota do rascunho**: o push sai depois do `COMMIT` do e-mail, fora da transação. A nova tentativa do push é uma mensagem `cobranca` com o campo novo `pushIds` (contrato da T16 estendido), que pula o registro e o e-mail e manda só às assinaturas listadas que ainda existem; ela conta as tentativas do push a partir de 1. O atraso é o da T19 (`atrasoDaNovaTentativa`, agora exportado de `enviar-ranking.ts`). A decifra do lado do navegador para ler o payload no teste ficou em `backend/api/test/apoio/push.ts` (cópia do método do `cifra.test.ts`, que não foi alterado).
 
 **Done when**:
 
