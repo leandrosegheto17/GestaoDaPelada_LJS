@@ -38,7 +38,7 @@ afterEach(async () => {
 
 /** Grava um evento de G como superusuário. */
 async function evento(
-  tipo: 'ranking_aberto' | 'pdf_exportado' | 'partida_lancada',
+  tipo: 'ranking_aberto' | 'pdf_exportado' | 'partida_lancada' | 'escalacao_confirmada',
   momentoUtc: string,
   extra: { dispositivo?: string; mes?: string; data?: string } = {},
 ): Promise<void> {
@@ -128,6 +128,37 @@ describe('eventos.porSemana', () => {
     await evento('ranking_aberto', '2026-10-14T12:00:00Z', { dispositivo: X });
     const [s] = await comoC((db) => eventos.porSemana(db, cenario.grupoG));
     expect(s?.aparelhosRanking).toBe(1);
+  });
+
+  // Simulador T30: `escalacoesConfirmadas` deixa de ser 0 fixo. Os casos acima não têm escalação e continuam
+  // esperando 0, agora pela contagem real (autorizado, `## Autorizações`).
+  it('SIM-70: duas confirmações da mesma data na semana contam 2; outra semana conta à parte', async () => {
+    const { cenario } = aberto;
+    await evento('escalacao_confirmada', '2026-10-13T12:00:00Z', { data: '2026-10-15' }); // terça
+    await evento('escalacao_confirmada', '2026-10-14T12:00:00Z', { data: '2026-10-15' }); // quarta, a mesma data
+    await evento('escalacao_confirmada', '2026-10-19T03:30:00Z', { data: '2026-10-22' }); // segunda 00:30 em SP
+    await evento('ranking_aberto', '2026-10-13T12:00:00Z', { dispositivo: X });
+    const r = await comoC((db) => eventos.porSemana(db, cenario.grupoG));
+    expect(r.map((s) => [s.inicio, s.escalacoesConfirmadas, s.aparelhosRanking])).toEqual([
+      ['2026-10-19', 1, 0],
+      ['2026-10-12', 2, 1],
+    ]);
+  });
+
+  it('SIM-70: semana só com escalação aparece, com o resto zerado ([LACUNA] da T30)', async () => {
+    const { cenario } = aberto;
+    await evento('escalacao_confirmada', '2026-10-13T12:00:00Z', { data: '2026-10-15' });
+    expect(await comoC((db) => eventos.porSemana(db, cenario.grupoG))).toEqual([
+      {
+        inicio: '2026-10-12',
+        fim: '2026-10-18',
+        aparelhosRanking: 0,
+        pdfsExportados: 0,
+        partidasLancadas: 0,
+        partidasEm48h: 0,
+        escalacoesConfirmadas: 1,
+      },
+    ]);
   });
 
   it('PAR-155: sem evento, nenhuma semana; a conta de outro grupo não vê as semanas de G', async () => {

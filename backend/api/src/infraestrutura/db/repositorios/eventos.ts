@@ -13,10 +13,12 @@ import type { Db } from './tipos.ts';
  * - `partidasEm48h` (PAR-158): `partida_lancada` com momento até 48 h depois da data da partida mais o horário do
  *   grupo, em São Paulo; exatamente 48 h ainda conta; depois, não;
  * - só as semanas que têm evento aparecem (PAR-155), da mais recente para a mais antiga;
- * - `escalacoesConfirmadas` é 0 nesta feature (a simulador passa a contar).
+ * - `escalacoesConfirmadas` conta os `escalacao_confirmada` da semana (simulador T30; SIM-70, `S:281`): duas
+ *   confirmações da mesma data contam 2 (cada confirmação grava um evento, T28).
  *
- * [LACUNA] semana que só tem `escalacao_confirmada` (a simulador grava): a Base não diz se aparece com tudo zerado.
- * Interpretação conservadora: só os três tipos desta feature formam semana, e a simulador decide ao passar a contar.
+ * [LACUNA] semana que só tem `escalacao_confirmada`: a Base não diz se aparece com o resto zerado. Interpretação do
+ * simulador T30: aparece, porque confirmar a escalação é uso do app (o painel "Uso do app" do Independent Test de
+ * SIM-69/SIM-70 a mostra); o /executar confirma com o usuário.
  */
 
 /** Grava `partida_lancada` com a data da partida, com conta (PAR-28). O momento é o da transação. */
@@ -49,6 +51,7 @@ async function porSemana(db: Db, grupoId: string): Promise<SemanaDeUso[]> {
     pdfs: number;
     partidas: number;
     em48h: number;
+    escalacoes: number;
   }>`
     SELECT s.inicio::text AS inicio, (s.inicio + 6)::text AS fim,
            count(DISTINCT e.dispositivo_id) FILTER (WHERE e.tipo = 'ranking_aberto')::int AS aparelhos,
@@ -57,14 +60,15 @@ async function porSemana(db: Db, grupoId: string): Promise<SemanaDeUso[]> {
            count(*) FILTER (
              WHERE e.tipo = 'partida_lancada'
                AND e.momento <= ((e.data_partida + g.horario) AT TIME ZONE 'America/Sao_Paulo') + interval '48 hours'
-           )::int AS em48h
+           )::int AS em48h,
+           count(*) FILTER (WHERE e.tipo = 'escalacao_confirmada')::int AS escalacoes
       FROM eventos_uso e
       JOIN grupos g ON g.id = e.grupo_id
      CROSS JOIN LATERAL (
        SELECT date_trunc('week', e.momento AT TIME ZONE 'America/Sao_Paulo')::date AS inicio
      ) s
      WHERE e.grupo_id = ${grupoId}
-       AND e.tipo IN ('ranking_aberto', 'pdf_exportado', 'partida_lancada')
+       AND e.tipo IN ('ranking_aberto', 'pdf_exportado', 'partida_lancada', 'escalacao_confirmada')
      GROUP BY s.inicio
      ORDER BY s.inicio DESC`.execute(db);
   return r.rows.map((l) => ({
@@ -74,7 +78,7 @@ async function porSemana(db: Db, grupoId: string): Promise<SemanaDeUso[]> {
     pdfsExportados: l.pdfs,
     partidasLancadas: l.partidas,
     partidasEm48h: l.em48h,
-    escalacoesConfirmadas: 0,
+    escalacoesConfirmadas: l.escalacoes,
   }));
 }
 

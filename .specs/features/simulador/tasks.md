@@ -1141,6 +1141,9 @@ T53 → T54
 **Depends on**: T29
 **Reuses**: Estender `eventos.porSemana` (`PR:1289`, T33); Independent Test `S:281`
 **Requirement**: SIM-70
+**Status**: rascunhada
+**Nota do rascunho**: contagem por `FILTER (WHERE tipo = 'escalacao_confirmada')` e o tipo entra no `IN` que forma as semanas. `eventos.test.ts` ganha os casos SIM-70 (os demais continuam esperando 0, agora contado); em `rotas/uso.test.ts` a semana de 2026-03-02, que o `beforeAll` já semeia com uma escalação, passa a esperar 1.
+**Lacunas**: semana que só tem `escalacao_confirmada` (o `[LACUNA]` da `partidas-e-ranking` em `eventos.ts`): o rascunho a mostra, com o resto zerado, por ser uso do app; o /executar confirma.
 
 **Done when**:
 

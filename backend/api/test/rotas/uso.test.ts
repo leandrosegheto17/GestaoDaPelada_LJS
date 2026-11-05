@@ -58,7 +58,9 @@ afterAll(async () => {
 });
 
 describe('GET /api/grupos/:grupoId/uso', () => {
-  it('PAR-155: semanas só com evento, da mais recente para a mais antiga, com escalacoesConfirmadas 0', async () => {
+  // Simulador T30 (SIM-70): escalacoesConfirmadas passa a contar os eventos; a semana de 2026-03-02 tem um, as
+  // demais nenhum (autorizado, `## Autorizações`; mesmas asserções, com a contagem real).
+  it('PAR-155, SIM-70: semanas só com evento, da mais recente para a mais antiga, com as escalações contadas', async () => {
     const r = await uso();
     expect(r.status).toBe(200);
     const { semanas } = usoResposta.parse(await r.json());
@@ -67,7 +69,7 @@ describe('GET /api/grupos/:grupoId/uso', () => {
     expect([...inicios].sort().reverse()).toEqual(inicios);
     expect(inicios).not.toContain('2026-03-09');
     expect(inicios.indexOf('2026-03-02')).toBeLessThan(inicios.indexOf('2026-02-23'));
-    for (const s of semanas) expect(s.escalacoesConfirmadas).toBe(0);
+    for (const s of semanas) expect(s.escalacoesConfirmadas).toBe(s.inicio === '2026-03-02' ? 1 : 0);
 
     expect(semanas.find((s) => s.inicio === '2026-03-02')).toEqual({
       inicio: '2026-03-02',
@@ -76,7 +78,7 @@ describe('GET /api/grupos/:grupoId/uso', () => {
       pdfsExportados: 0,
       partidasLancadas: 0,
       partidasEm48h: 0,
-      escalacoesConfirmadas: 0,
+      escalacoesConfirmadas: 1,
     });
     expect(semanas.find((s) => s.inicio === '2026-02-23')).toMatchObject({ pdfsExportados: 1, aparelhosRanking: 0 });
   });
