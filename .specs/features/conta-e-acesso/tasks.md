@@ -791,6 +791,8 @@ T57 → T58
 **Depends on**: T18
 **Reuses**: estender `limiteTaxa(binding)` (`F:1153`); binding `LIMITE_ENTRAR` de FUN-26 (`F:1081`); `chaveIp` (T13)
 **Requirement**: ACE-50, ACE-70, ACE-71
+**Status**: rascunhada
+**Nota do rascunho**: `CHAVE_SEM_IP` passa a ser o `SEM_IP` da T13 (mesmo valor); as rotas ficam em `ROTAS_LIMITE_ENTRAR`, registradas por `limitarRotasDeAcesso(api)` antes das rotas, para valerem já antes de elas existirem.
 
 **Done when**:
 

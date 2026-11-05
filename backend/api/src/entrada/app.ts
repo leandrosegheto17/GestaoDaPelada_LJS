@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import type { Ambiente } from './ambiente.ts';
 import { exigirCabecalhoPelada } from './middlewares/cabecalho-pelada.ts';
 import { semCache, semSniff } from './middlewares/cabecalhos.ts';
+import { limitarRotasDeAcesso } from './middlewares/limite-taxa.ts';
 import { devEmails } from './rotas/dev-emails.ts';
 import { health } from './rotas/health.ts';
 import { ErroBancoIndisponivel, MENSAGEM_BANCO_INDISPONIVEL } from '../infraestrutura/db/cliente.ts';
@@ -22,6 +23,8 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
   api.use('*', semCache, semSniff);
   // Escrita sem `X-Pelada: 1` é recusada antes de qualquer limitador (ACE-49, T18).
   api.use('*', exigirCabecalhoPelada);
+  // LIMITE_ENTRAR nas rotas de acesso, antes da sessão e do banco (ACE-50, ACE-70, T19).
+  limitarRotasDeAcesso(api);
 
   api.route('/', health);
   // Só responde com EMAIL_DEV=1; sem ela, 404 como rota inexistente (T17).

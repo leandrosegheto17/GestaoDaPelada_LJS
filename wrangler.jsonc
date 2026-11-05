@@ -1,5 +1,6 @@
-// Worker da prévia (FUN-20, FUN-26, FUN-27; AD-004, AD-119): o único alvo publicado é o
-// gestaodapelada-v2 no endereço padrão da Cloudflare. Sem routes e sem domínio próprio.
+// Worker da prévia (FUN-20, FUN-26, FUN-27; AD-004, AD-119, AD-121): o único alvo publicado é o
+// gestaodapelada-v2, no endereço padrão da Cloudflare e no único domínio próprio permitido,
+// gestaodapelada.ljssoftware.com.br (AD-121). Qualquer outra rota ou domínio reprova na so-previa.
 // O deploy só acontece pelo .github/workflows/deploy.yml (FUN-45).
 {
   "$schema": "node_modules/wrangler/config-schema.json",
@@ -8,6 +9,7 @@
   "compatibility_date": "2026-10-01",
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
+  "routes": [{ "pattern": "gestaodapelada.ljssoftware.com.br", "custom_domain": true }],
 
   // O build do front é servido como SPA; só /api/* passa pelo Worker (Hono) antes dos assets.
   "assets": {
