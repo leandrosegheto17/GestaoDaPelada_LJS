@@ -1076,6 +1076,7 @@ T78 → T79
 **Requirement**: PAR-127, PAR-129, PAR-130, PAR-131
 **Status**: rascunhada
 **Nota do rascunho**: migração `1792844700000_eventos-uso.sql`; testes em `backend/api/test/banco/eventos-uso.test.ts`. Tipo fora de `ranking_aberto`/`pdf_exportado`, dispositivo e mês trocados ou momento nulo levantam `22023`; conta na sessão, `42501`. O teste (c) "nenhum grant em eventos_uso" da T0 passou a exigir exatamente SELECT e INSERT, como a T0 previa.
+**Lacunas**: a matriz de isolamento da fundação descreve `eventos_uso` como sem grant (`backend/api/test/isolamento/matriz.ts:28`, `leitura: 'sem-grant'`; `backend/api/test/isolamento/casos-escrita.ts:86`, `insere: false`). Depois desta migração, a conta lê e insere no próprio grupo e o slug não lê: os testes de leitura e escrita da matriz vão falhar. Trocar isso (um modo de leitura "só com conta" e `insere: true`) muda teste existente fora das Autorizações: o `/executar` pergunta antes. Não alterado no rascunho.
 
 **Done when**:
 
@@ -1126,6 +1127,8 @@ T78 → T79
 **Depends on**: T24
 **Reuses**: Grants atuais `M:1792843260000_roles.sql:22-31`; `BD:141-143`; matriz desta lista
 **Requirement**: PAR-09
+**Status**: rascunhada
+**Nota do rascunho**: migração `1792844820000_grants-partidas-pesos.sql`; testes em `backend/api/test/banco/grants-partidas-pesos.test.ts`. O teste (c) "pelada_app tem UPDATE em partidas e config_pesos" da T0 passou a exigir a lista exata dos privilégios de tabela, sem UPDATE, como a T0 previa.
 
 **Done when**:
 

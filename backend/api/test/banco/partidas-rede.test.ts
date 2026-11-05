@@ -115,9 +115,11 @@ describe('rede da partidas-e-ranking: grupo_criar de 6 parâmetros (b)', () => {
 });
 
 describe('rede da partidas-e-ranking: grants atuais (c)', () => {
-  it('PAR-130: pelada_app tem UPDATE em partidas e config_pesos', async () => {
-    expect(await privilegios('partidas')).toContain('UPDATE');
-    expect(await privilegios('config_pesos')).toContain('UPDATE');
+  // Trocado pela T25 (1792844820000_grants-partidas-pesos.sql): antes, UPDATE na tabela inteira; agora, sem UPDATE de
+  // tabela e com UPDATE só nas colunas que a edição muda (a lista exata está em grants-partidas-pesos.test.ts).
+  it('PAR-130: pelada_app não tem UPDATE de tabela em partidas nem em config_pesos (T25)', async () => {
+    expect(await privilegios('partidas')).toEqual(['DELETE', 'INSERT', 'SELECT']);
+    expect(await privilegios('config_pesos')).toEqual(['INSERT', 'SELECT']);
   });
 
   it('PAR-130: pelada_app tem SELECT, INSERT, UPDATE e DELETE em presencas', async () => {
