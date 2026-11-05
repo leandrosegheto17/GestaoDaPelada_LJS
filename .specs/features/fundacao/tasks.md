@@ -377,6 +377,8 @@ T81 → T82
 **Depends on**: T3
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-02
+**Status**: rascunhada
+**Nota do rascunho**: a formatação da base com `prettier --write .` fica para o /executar.
 
 **Done when**:
 
