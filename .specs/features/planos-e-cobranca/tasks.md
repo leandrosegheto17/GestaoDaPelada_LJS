@@ -363,6 +363,7 @@ T56 → T57
 **Depends on**: T1
 **Reuses**: centavos inteiros do financeiro (FIN, `FIN:7`); exportação pelo índice do domínio (`backend/dominio/src/index.ts`, `GE:726`)
 **Requirement**: PLA-05, PLA-06, PLA-62
+**Status**: rascunhada
 
 **Done when**:
 

@@ -97,3 +97,18 @@ export {
   type SituacaoComercial,
 } from './plano/plano-efetivo.ts';
 export { acumuladoPorInicio, type EntradaAcumulado } from './pontuacao/acumulado.ts';
+export {
+  centavosParaReais,
+  formatarPreco,
+  LIMITE_GRUPOS_FREE,
+  LIMITE_JOGADORES_FREE,
+  planoLibera,
+  PRECO_PRO_CENTAVOS,
+  reaisParaCentavos,
+  RECURSOS,
+  RECURSOS_POR_PLANO,
+  RECURSOS_PRO,
+  type Recurso,
+  type RecursoPro,
+  type RecursosDoPlano,
+} from './plano/recursos.ts';
