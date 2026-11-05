@@ -1,0 +1,218 @@
+import { randomBytes } from 'node:crypto';
+import { TABELAS_IGNORADAS, lerReferencia } from '@pelada/api/esquema';
+import { migrar } from '@pelada/api/migrar';
+import type pg from 'pg';
+import { contarLinhas, restaurarBackup } from '../ops/restaurar-backup.ts';
+import { comConexao, executarCli } from './conectar.ts';
+import { compararEsquema, type Diferencas } from './esquema-comparar.ts';
+import { exigirHostPermitido, HOSTS_LOCAIS } from './host.ts';
+
+/**
+ * Ensaio das migrações sobre um dump da produção (financeiro T15; FIN-42, FIN-39; AD-032, AD-033, AD-073).
+ * `pnpm --filter @pelada/scripts ensaio <backup.age> <chave-privada.txt>`: cria um banco `ensaio_*` no Postgres local,
+ * restaura nele o backup cifrado (decifrado pelo usuário com a chave que fica fora do repositório), roda `ensaiar` e
+ * apaga o banco no `finally`. Nada roda contra a `main` do Neon: o host precisa ser local.
+ *
+ * `ensaiar(url)` é o núcleo, sobre um banco já restaurado:
+ * 1. recusa o dump sem linhas nas tabelas de negócio (AD-014): o ensaio não provaria nada;
+ * 2. conta as linhas por tabela, aplica `migrar` e conta de novo: nenhuma tabela muda (as que as migrações de outras
+ *    features enchem de propósito vão em `podeGanhar` e só podem crescer);
+ * 3. compara o schema com a referência (`esquema-producao.txt`);
+ * 4. roda `migrar` de novo: nada a aplicar, contagem igual (zero DDL);
+ * 5. amostra de 1 grupo (FIN-39): a conta com `acessa_financeiro` lê o caixa inteiro dele como `pelada_app`; uma conta
+ *    do mesmo grupo sem acesso, quando existe, lê zero linhas.
+ * Estende o ensaio da partidas-e-ranking (T81 dela), que ainda não existe no repositório: quando existir, as duas
+ * verificações se juntam neste arquivo e `podeGanhar` leva `config_pesos`.
+ */
+
+export class ErroEnsaio extends Error {
+  override name = 'ErroEnsaio';
+}
+
+const TABELAS_DO_CAIXA = ['config_financeira', 'lancamentos', 'pagamentos_mes'] as const;
+
+export interface OpcoesEnsaio {
+  /** Pasta das migrações; padrão: as da v2. */
+  pasta?: string;
+  /** Referência do schema; padrão: `esquema-producao.txt`. */
+  referencia?: readonly string[];
+  /** Tabelas que as migrações em ensaio podem encher de propósito (só crescem). */
+  podeGanhar?: readonly string[];
+}
+
+export interface AmostraAcesso {
+  grupoId: string;
+  /** Linhas do caixa do grupo, contadas pelo dono do schema. */
+  esperadas: number;
+  /** Linhas que a conta com acesso leu como `pelada_app`. */
+  lidasComAcesso: number;
+  /** Linhas que uma conta do grupo sem acesso leu; ausente quando o grupo não tem conta assim. */
+  lidasSemAcesso?: number;
+}
+
+export interface RelatorioEnsaio {
+  aplicadas: string[];
+  antes: Record<string, number>;
+  depois: Record<string, number>;
+  /** Tabelas cuja contagem mudou sem estar em `podeGanhar`, ou que perderam linha. */
+  tabelasAlteradas: string[];
+  esquema: Diferencas;
+  segundaExecucao: string[];
+  amostra: AmostraAcesso | null;
+  ok: boolean;
+}
+
+function semIgnoradas(contagem: Record<string, number>): Record<string, number> {
+  const ignoradas: readonly string[] = TABELAS_IGNORADAS;
+  return Object.fromEntries(Object.entries(contagem).filter(([tabela]) => !ignoradas.includes(tabela)));
+}
+
+function alteradas(antes: Record<string, number>, depois: Record<string, number>, podeGanhar: readonly string[]): string[] {
+  const tabelas = new Set([...Object.keys(antes), ...Object.keys(depois)]);
+  const mudadas: string[] = [];
+  for (const tabela of tabelas) {
+    const a = antes[tabela] ?? 0;
+    const d = depois[tabela] ?? 0;
+    const permitido = podeGanhar.includes(tabela) ? d >= a : d === a;
+    if (!permitido) mudadas.push(`${tabela}: ${a} → ${d}`);
+  }
+  return mudadas.sort();
+}
+
+async function linhasDoCaixa(c: pg.Client, grupoId: string): Promise<number> {
+  let total = 0;
+  for (const tabela of TABELAS_DO_CAIXA) {
+    const r = await c.query<{ n: number }>(`SELECT count(*)::int AS n FROM ${tabela} WHERE grupo_id = $1`, [grupoId]);
+    total += r.rows[0]?.n ?? 0;
+  }
+  return total;
+}
+
+/** Linhas do caixa do grupo que a conta enxerga como `pelada_app`, numa transação desfeita ao fim. */
+async function lerComoApp(c: pg.Client, conta: string, grupoId: string): Promise<number> {
+  await c.query('BEGIN');
+  try {
+    await c.query('SET LOCAL ROLE pelada_app');
+    await c.query(`SELECT set_config('app.conta_id', $1, true)`, [conta]);
+    return await linhasDoCaixa(c, grupoId);
+  } finally {
+    await c.query('ROLLBACK').catch(() => undefined);
+  }
+}
+
+/** Um grupo ativo com caixa e uma conta com acesso; prefere um que também tenha conta sem acesso. */
+async function escolherAmostra(url: string): Promise<AmostraAcesso | null> {
+  return comConexao(url, async (c) => {
+    const r = await c.query<{ grupo_id: string; com_acesso: string; sem_acesso: string | null }>(
+      `SELECT grupo_id, com_acesso, sem_acesso
+         FROM (SELECT v.grupo_id, v.conta_id AS com_acesso,
+                      (SELECT o.conta_id FROM vinculos_admin o
+                        WHERE o.grupo_id = v.grupo_id AND NOT o.acessa_financeiro ORDER BY o.conta_id LIMIT 1) AS sem_acesso
+                 FROM vinculos_admin v JOIN grupos g ON g.id = v.grupo_id
+                WHERE v.acessa_financeiro AND g.arquivado_em IS NULL
+                  AND (EXISTS (SELECT 1 FROM lancamentos l WHERE l.grupo_id = v.grupo_id)
+                       OR EXISTS (SELECT 1 FROM config_financeira f WHERE f.grupo_id = v.grupo_id))) q
+        ORDER BY (sem_acesso IS NOT NULL) DESC, grupo_id, com_acesso
+        LIMIT 1`,
+    );
+    const linha = r.rows[0];
+    if (!linha) return null;
+    const esperadas = await linhasDoCaixa(c, linha.grupo_id);
+    const lidasComAcesso = await lerComoApp(c, linha.com_acesso, linha.grupo_id);
+    const amostra: AmostraAcesso = { grupoId: linha.grupo_id, esperadas, lidasComAcesso };
+    if (linha.sem_acesso) amostra.lidasSemAcesso = await lerComoApp(c, linha.sem_acesso, linha.grupo_id);
+    return amostra;
+  });
+}
+
+function amostraOk(a: AmostraAcesso | null): boolean {
+  if (!a) return false;
+  return a.esperadas > 0 && a.lidasComAcesso === a.esperadas && (a.lidasSemAcesso ?? 0) === 0;
+}
+
+export async function ensaiar(url: string, opcoes: OpcoesEnsaio = {}): Promise<RelatorioEnsaio> {
+  exigirHostPermitido(url, HOSTS_LOCAIS);
+  const podeGanhar = opcoes.podeGanhar ?? [];
+  const referencia = opcoes.referencia ?? lerReferencia();
+
+  const antes = semIgnoradas(await contarLinhas(url));
+  if ((antes.grupos ?? 0) === 0 || Object.values(antes).every((n) => n === 0)) {
+    throw new ErroEnsaio(
+      'O dump não tem linhas nas tabelas de negócio (pendência da AD-014): o ensaio não prova nada. Pare e decida com o usuário.',
+    );
+  }
+
+  const aplicadas = await migrar(url, { pasta: opcoes.pasta });
+  const depois = semIgnoradas(await contarLinhas(url));
+  const esquema = await compararEsquema(url, referencia);
+
+  const segundaExecucao = await migrar(url, { pasta: opcoes.pasta });
+  const depoisDaSegunda = semIgnoradas(await contarLinhas(url));
+  const tabelasAlteradas = alteradas(antes, depois, podeGanhar);
+  if (JSON.stringify(depoisDaSegunda) !== JSON.stringify(depois)) tabelasAlteradas.push('segunda execução mudou linhas');
+
+  const amostra = await escolherAmostra(url);
+  const ok =
+    tabelasAlteradas.length === 0 &&
+    esquema.faltando.length === 0 &&
+    esquema.sobrando.length === 0 &&
+    segundaExecucao.length === 0 &&
+    amostraOk(amostra);
+  return { aplicadas, antes, depois, tabelasAlteradas, esquema, segundaExecucao, amostra, ok };
+}
+
+export const URL_BASE_ENSAIO = process.env.DATABASE_URL_TESTE ?? 'postgres://postgres:postgres@127.0.0.1:5432/pelada';
+
+function urlDoBanco(base: string, banco: string): string {
+  const u = new URL(base);
+  u.pathname = `/${banco}`;
+  return u.toString();
+}
+
+/** Restaura o backup num banco `ensaio_*` vazio, ensaia e apaga o banco no `finally`. */
+export async function ensaiarBackup(
+  arquivo: string,
+  chavePrivada: string,
+  opcoes: OpcoesEnsaio = {},
+  base: string = URL_BASE_ENSAIO,
+): Promise<RelatorioEnsaio> {
+  exigirHostPermitido(base, HOSTS_LOCAIS);
+  const nome = `ensaio_${randomBytes(6).toString('hex')}`;
+  await comConexao(base, (c) => c.query(`CREATE DATABASE ${nome}`));
+  try {
+    const urlDestino = urlDoBanco(base, nome);
+    await restaurarBackup({ arquivo, chavePrivada, urlDestino });
+    return await ensaiar(urlDestino, opcoes);
+  } finally {
+    await comConexao(base, (c) => c.query(`DROP DATABASE IF EXISTS ${nome} WITH (FORCE)`));
+  }
+}
+
+function imprimir(r: RelatorioEnsaio): void {
+  console.log(`Migrações aplicadas (${r.aplicadas.length}): ${r.aplicadas.join(', ') || 'nenhuma'}`);
+  console.log('Linhas por tabela (antes → depois):');
+  for (const tabela of Object.keys(r.depois).sort()) console.log(`  ${tabela}: ${r.antes[tabela] ?? 0} → ${r.depois[tabela]}`);
+  if (r.tabelasAlteradas.length > 0) console.log(`Tabelas alteradas: ${r.tabelasAlteradas.join('; ')}`);
+  console.log(`Schema: faltando ${r.esquema.faltando.length}, sobrando ${r.esquema.sobrando.length}`);
+  for (const l of r.esquema.faltando) console.log(`  - ${l}`);
+  for (const l of r.esquema.sobrando) console.log(`  + ${l}`);
+  console.log(`Segunda execução: ${r.segundaExecucao.length === 0 ? 'nada a aplicar' : r.segundaExecucao.join(', ')}`);
+  const a = r.amostra;
+  console.log(
+    a
+      ? `Amostra do grupo ${a.grupoId}: ${a.esperadas} linhas no caixa; conta com acesso leu ${a.lidasComAcesso}` +
+          (a.lidasSemAcesso === undefined ? '; sem conta sem acesso para comparar' : `; conta sem acesso leu ${a.lidasSemAcesso}`)
+      : 'Amostra: nenhum grupo ativo com caixa e conta com acesso',
+  );
+  console.log(r.ok ? 'Ensaio ok.' : 'Ensaio com problemas: não faça o deploy da prévia.');
+}
+
+if (import.meta.main) {
+  await executarCli(async () => {
+    const [arquivo, chavePrivada] = process.argv.slice(2);
+    if (!arquivo || !chavePrivada) throw new ErroEnsaio('Uso: pnpm --filter @pelada/scripts ensaio <backup.age> <chave-privada.txt>');
+    const r = await ensaiarBackup(arquivo, chavePrivada);
+    imprimir(r);
+    if (!r.ok) process.exitCode = 1;
+  });
+}

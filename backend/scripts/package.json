@@ -13,7 +13,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit -p .",
     "test": "vitest run",
-    "dono": "node --env-file-if-exists=../../.env src/dono.ts"
+    "dono": "node --env-file-if-exists=../../.env src/dono.ts",
+    "ensaio": "node --env-file-if-exists=../../.env src/ensaio-migracao.ts"
   },
   "dependencies": {
     "@pelada/api": "workspace:*",

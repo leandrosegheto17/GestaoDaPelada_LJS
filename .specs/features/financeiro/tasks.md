@@ -671,6 +671,8 @@ T47 → T48
 **Depends on**: T14
 **Reuses**: Script do ensaio da `partidas-e-ranking` (`PR:1684`, estender); restauração da fundação (`F:584`); `lerEsquema` e referência (`F:736`, `F:784`); migrar sobre banco migrado (`F:834`); AD-033 e AD-073
 **Requirement**: FIN-42, FIN-39
+**Status**: rascunhada
+**Nota do rascunho**: o script e o teste dele foram escritos (`backend/scripts/src/ensaio-migracao.ts`, `backend/scripts/test/ensaio-migracao.test.ts`, script `ensaio` no `package.json`). O ensaio com o dump real da produção (pausa para o usuário decifrar o backup, `pnpm --filter @pelada/scripts ensaio <backup.age> <chave.txt>`) e a `Evidência` ficam para o /executar. O script da `partidas-e-ranking` (T81 dela) ainda não existe: este nasceu sozinho e `podeGanhar` aceita `config_pesos` quando as duas se juntarem.
 
 **Done when**:
 
