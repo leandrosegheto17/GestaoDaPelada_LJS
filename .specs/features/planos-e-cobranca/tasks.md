@@ -548,6 +548,8 @@ T56 → T57
 **Depends on**: T8
 **Reuses**: S:37 e S:59; AD-057; regra de ação externa da Retomada de `.specs/STATE.md`
 **Requirement**: PLA-11
+**Status**: rascunhada
+**Nota do rascunho**: ação do usuário (consulta só leitura na `main` do Neon); nada a escrever. O /executar faz a pausa e registra o `SLUG_GRUPO_TESTE`, que a migração da T17 lê como parâmetro.
 
 **Done when**:
 
