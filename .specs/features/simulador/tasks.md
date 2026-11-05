@@ -1051,6 +1051,8 @@ T53 → T54
 **Depends on**: T26
 **Reuses**: Estender `jogadores-leitura.ts` (`GE:1179`, duas consultas e nível no domínio); `ativosNaData` (`PR:1185`); `compararApelido` (`GE:575`)
 **Requirement**: SIM-01, SIM-02, SIM-03
+**Status**: rascunhada
+**Nota do rascunho**: `ativosNaData` é o do domínio (`partidas/marcacoes.ts`, já rascunhado), não um repositório de `PR:1185`: a 1ª consulta agrega os períodos de cada jogador (`json_agg`) e o domínio filtra; a 2ª lê as notas. Saída `{ id, apelido, anoNascimento, nivel, semNota }` (o ano vai para a idade média; a rota responde só `semAno`). Teste em `backend/api/test/repositorios/jogadores-simulador.test.ts`, com o SQL compilado registrado por um plugin.
 
 **Done when**:
 

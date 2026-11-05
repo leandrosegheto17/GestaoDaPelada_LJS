@@ -1,6 +1,6 @@
 import { sql } from 'kysely';
 import type { Posicao } from '@pelada/contrato';
-import { calcularNivel, compararApelido } from '@pelada/dominio';
+import { ativosNaData, calcularNivel, compararApelido } from '@pelada/dominio';
 import type { Db } from './tipos.ts';
 
 /**
@@ -141,4 +141,52 @@ async function ler(db: Db, grupoId: string, id: string): Promise<DetalheJogador 
   };
 }
 
-export const jogadoresLeitura = { listar, ler };
+/** Jogador apto do simulador (T27 da simulador; SIM-01 a SIM-03): só o que o sorteio usa, sem telefone nem posição. */
+export interface AptoDoSimulador {
+  id: string;
+  apelido: string;
+  /** Para a idade média (SIM-95); a resposta da rota leva só `semAno`. */
+  anoNascimento: number | null;
+  nivel: number;
+  semNota: boolean;
+}
+
+/**
+ * Os jogadores ativos na data, com o nível (T27 da simulador; SIM-01, SIM-02, SIM-03), em duas consultas: os jogadores
+ * com os períodos agregados, e as notas do grupo. "Ativo na data" é a regra única do domínio (`ativosNaData`, período
+ * [início, fim)); o nível sai de `calcularNivel` (550 e `semNota` sem nota). Ordem do apelido sem acento nem caixa.
+ * Nenhuma das consultas lê telefone ou posição.
+ */
+async function paraSimulador(db: Db, grupoId: string, data: string): Promise<AptoDoSimulador[]> {
+  const linhas = await sql<{
+    id: string;
+    apelido: string;
+    ano_nascimento: number | null;
+    periodos: Array<{ inicio: string; fim: string | null }>;
+  }>`
+    SELECT j.id, j.apelido, j.ano_nascimento,
+           json_agg(json_build_object('inicio', pa.inicio::text, 'fim', pa.fim::text)) AS periodos
+      FROM jogadores j
+      JOIN periodos_ativos pa ON pa.jogador_id = j.id AND pa.grupo_id = j.grupo_id
+     WHERE j.grupo_id = ${grupoId}
+     GROUP BY j.id, j.apelido, j.ano_nascimento`.execute(db);
+  const notas = await sql<{ jogador_id: string; valor: number }>`
+    SELECT jogador_id, valor FROM notas WHERE grupo_id = ${grupoId}`.execute(db);
+
+  const porJogador = new Map<string, number[]>();
+  for (const n of notas.rows) {
+    const lista = porJogador.get(n.jogador_id) ?? [];
+    lista.push(Number(n.valor));
+    porJogador.set(n.jogador_id, lista);
+  }
+  return ativosNaData(linhas.rows, data)
+    .map((l) => ({
+      id: l.id,
+      apelido: l.apelido,
+      anoNascimento: l.ano_nascimento === null ? null : Number(l.ano_nascimento),
+      ...calcularNivel(porJogador.get(l.id) ?? []),
+    }))
+    .sort((a, b) => compararApelido(a.apelido, b.apelido));
+}
+
+export const jogadoresLeitura = { listar, ler, paraSimulador };
