@@ -1350,6 +1350,8 @@ T47 → T48
 **Depends on**: T39
 **Reuses**: `t22-financeiro--sucesso.html` (linha agrupada); `formatarReais` (T35)
 **Requirement**: FIN-15
+**Status**: rascunhada
+**Nota do rascunho**: a linha é um botão com `aria-expanded` (o mockup a desenha como link para o t23; a tarefa manda abrir). Fica na posição da mensalidade mais antiga, antes do primeiro avulso de data anterior (`ordemDaLista`, `t22-financeiro--sucesso.html:52-54`). O item de lançamento e os auxiliares de data e valor saíram da `FinanceiroMes` para `ItemLancamento.tsx`, para não haver import circular.
 
 **Done when**:
 

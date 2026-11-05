@@ -6,7 +6,7 @@ import { EstadoErro } from '../../componentes/EstadoErro.tsx';
 import { Faixa } from '../../componentes/Faixa.tsx';
 import { LinkBotao } from '../../componentes/LinkBotao.tsx';
 import { LinkVoltar } from '../../componentes/LinkVoltar.tsx';
-import { ItemLista, Lista } from '../../componentes/Lista.tsx';
+import { Lista } from '../../componentes/Lista.tsx';
 import { TelaMensagem } from '../../componentes/TelaMensagem.tsx';
 import { formatarReais } from '../../dados/dinheiro.ts';
 import { erroDoFinanceiro, useMesFinanceiro } from '../../dados/financeiro.ts';
@@ -15,6 +15,8 @@ import estilos from '../acesso.module.css';
 import modulo from '../grupos-elenco.module.css';
 import { rotaDoGrupo } from '../grupos/Grupos.tsx';
 import fin from './financeiro.module.css';
+import { GrupoMensalidades, TEXTO_AJUDA_MENSALIDADES } from './GrupoMensalidades.tsx';
+import { ItemLancamento } from './ItemLancamento.tsx';
 import { ListaPagamentos } from './ListaPagamentos.tsx';
 
 /**
@@ -25,7 +27,8 @@ import { ListaPagamentos } from './ListaPagamentos.tsx';
  * - saldo atual, entradas, saídas, resultado e "Não pagaram N jogadores" (FIN-11, FIN-15), em reais por
  *   `formatarReais` (saída e resultado negativo com "−");
  * - pagamentos do mês com o interruptor de marcar e desmarcar (`ListaPagamentos`, T39) e lançamentos do mês com o
- *   link de edição (a linha agrupada das mensalidades é da T40); "Nenhum lançamento neste mês." sem lançamentos;
+ *   link de edição (`ItemLancamento`), as mensalidades numa linha agrupada (`GrupoMensalidades`, T40); "Nenhum
+ *   lançamento neste mês." sem lançamentos;
  * - ações "Configurar caixa" e "Novo lançamento";
  * - sem configuração: "Caixa não configurado" com "Configurar caixa" (FIN-08);
  * - 403 `sem_permissao_financeiro`: "Sem acesso" com "Voltar" para o início do grupo (FIN-33).
@@ -58,33 +61,30 @@ export function nomeDoMes(mes: string): string {
   return `${NOMES_DOS_MESES[Number(numero) - 1] ?? mes} de ${ano}`;
 }
 
-/** `2026-10-20` → "20/10". */
-export function diaEMes(data: string): string {
-  return `${data.slice(8, 10)}/${data.slice(5, 7)}`;
-}
-
 /** "1 jogador", "4 jogadores". */
 export function jogadores(n: number): string {
   return n === 1 ? '1 jogador' : `${n} jogadores`;
 }
 
-/** Valor do lançamento com o sinal: a saída com "−". */
-export function valorDoLancamento(l: Pick<LancamentoDoMes, 'tipo' | 'valorCentavos'>): string {
-  return formatarReais(l.tipo === 'saida' ? -l.valorCentavos : l.valorCentavos);
+/**
+ * Os avulsos na ordem da API (do mais recente ao mais antigo) com a linha agrupada das mensalidades (T40) no lugar da
+ * mais antiga delas: antes do primeiro avulso de data anterior (`t22-financeiro--sucesso.html:52-54`).
+ */
+export function ordemDaLista(lancamentos: readonly LancamentoDoMes[]): Array<LancamentoDoMes | 'mensalidades'> {
+  const avulsos = lancamentos.filter((l) => !l.mensalidade);
+  const mensalidades = lancamentos.filter((l) => l.mensalidade);
+  if (mensalidades.length === 0) return avulsos;
+  const maisAntiga = mensalidades.map((m) => m.data).sort()[0] ?? '';
+  const posicao = avulsos.findIndex((a) => a.data < maisAntiga);
+  const resultado: Array<LancamentoDoMes | 'mensalidades'> = [...avulsos];
+  resultado.splice(posicao === -1 ? avulsos.length : posicao, 0, 'mensalidades');
+  return resultado;
 }
 
 function Seta({ direcao }: { direcao: 'anterior' | 'seguinte' }) {
   return (
     <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
       <polyline points={direcao === 'anterior' ? '15 18 9 12 15 6' : '9 18 15 12 9 6'} />
-    </svg>
-  );
-}
-
-export function IconeTipo({ tipo }: { tipo: 'entrada' | 'saida' }) {
-  return (
-    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true" focusable="false">
-      <path d={tipo === 'saida' ? 'M12 5v14M19 12l-7 7-7-7' : 'M12 19V5M5 12l7-7 7 7'} />
     </svg>
   );
 }
@@ -113,21 +113,6 @@ function NavegacaoMes({ dados, aoIr }: { dados: MesFinanceiroResposta; aoIr: (me
         <Seta direcao="seguinte" />
       </button>
     </nav>
-  );
-}
-
-export function ItemLancamento({ l, base }: { l: LancamentoDoMes; base: string }) {
-  return (
-    <ItemLista
-      titulo={l.descricao}
-      meta={
-        <>
-          {diaEMes(l.data)} · <IconeTipo tipo={l.tipo} /> {l.tipo === 'saida' ? 'Saída' : 'Entrada'}
-        </>
-      }
-      lateral={<span className={modulo['item-lado']}>{valorDoLancamento(l)}</span>}
-      para={`${base}/financeiro/lancamentos/${encodeURIComponent(l.id)}`}
-    />
   );
 }
 
@@ -195,11 +180,23 @@ function Mes({
               <p className={estilos['vazio__texto']}>{TEXTO_SEM_LANCAMENTOS}</p>
             </div>
           ) : (
-            <Lista>
-              {dados.lancamentos.map((l) => (
-                <ItemLancamento key={l.id} l={l} base={base} />
-              ))}
-            </Lista>
+            <>
+              <Lista>
+                {ordemDaLista(dados.lancamentos).map((l) =>
+                  l === 'mensalidades' ? (
+                    <GrupoMensalidades
+                      key="mensalidades"
+                      mes={dados.mes}
+                      mensalidades={dados.lancamentos.filter((m) => m.mensalidade)}
+                      base={base}
+                    />
+                  ) : (
+                    <ItemLancamento key={l.id} l={l} base={base} />
+                  ),
+                )}
+              </Lista>
+              {dados.lancamentos.some((l) => l.mensalidade) ? <p className={fin.ajuda}>{TEXTO_AJUDA_MENSALIDADES}</p> : null}
+            </>
           )}
         </section>
       </div>

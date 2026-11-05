@@ -58,7 +58,8 @@ describe('Financeiro do mês (t22)', () => {
     expect(screen.getByText('− R$ 100,00')).toBeTruthy();
     const aluguel = screen.getByText('Aluguel da quadra outubro').closest('a') as HTMLElement;
     expect(aluguel.getAttribute('href')).toMatch(/^\/app\/grupos\/g-quinta\/financeiro\/lancamentos\//);
-    expect(within(aluguel).getByText(/Saída/)).toBeTruthy();
+    expect(aluguel.textContent).toContain('05/10 ·');
+    expect(aluguel.textContent).toContain('Saída');
   });
 
   it('FIN-07: o mês seguinte fica desabilitado no mês de hoje; o anterior leva a ?mes=2026-09', async () => {
