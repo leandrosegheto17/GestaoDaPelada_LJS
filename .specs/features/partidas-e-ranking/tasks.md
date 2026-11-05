@@ -468,15 +468,15 @@ Gate: `pnpm exec vitest run test/banco/partidas-rede.test.ts` (backend/api) @ c4
 **Depends on**: None
 **Reuses**: Regra de domínio sem I/O (`F:385`); convenção de datas de `B:98-100`; reusar `ehDataReal` e o intervalo [início, fim) de `backend/dominio/src/atividade/datas.ts` (`GE:626`), sem duplicar
 **Requirement**: PAR-19, PAR-39, PAR-65, PAR-84, PAR-85
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-19`: 2026-02-29 e 2026-13-01 não são datas reais; 2028-02-29 é
-- [ ] Teste `PAR-84`/`PAR-85`: `mesAnterior('2026-01')` = `2025-12`, `mesSeguinte('2026-12')` = `2027-01`
-- [ ] Teste: `diaDaSemana` de 2026-10-15 é quinta; `ultimoDia('2028-02')` = `2028-02-29`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-19`: 2026-02-29 e 2026-13-01 não são datas reais; 2028-02-29 é
+- [x] Teste `PAR-84`/`PAR-85`: `mesAnterior('2026-01')` = `2025-12`, `mesSeguinte('2026-12')` = `2027-01`
+- [x] Teste: `diaDaSemana` de 2026-10-15 é quinta; `ultimoDia('2028-02')` = `2028-02-29`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -494,15 +494,15 @@ Gate: `pnpm exec vitest run test/banco/partidas-rede.test.ts` (backend/api) @ c4
 **Depends on**: T1
 **Reuses**: Regras de `B:229` (PAR-55), `B:77` (rótulo Pesos padrão, P10) e `BD:159-160`
 **Requirement**: PAR-55, PAR-135, PAR-13
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-55`: expulso em partida com chuva usa `expulsoComChuva` (caso limite `B:496`)
-- [ ] Teste `PAR-55`: cada uma das 3 situações × chuva sim/não dá o peso certo
-- [ ] Teste `PAR-135`: `ehPesosPadrao` é falso com duas configurações, mesmo ambas padrão, e falso com uma não padrão
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-55`: expulso em partida com chuva usa `expulsoComChuva` (caso limite `B:496`)
+- [x] Teste `PAR-55`: cada uma das 3 situações × chuva sim/não dá o peso certo
+- [x] Teste `PAR-135`: `ehPesosPadrao` é falso com duas configurações, mesmo ambas padrão, e falso com uma não padrão
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -520,21 +520,23 @@ Gate: `pnpm exec vitest run test/banco/partidas-rede.test.ts` (backend/api) @ c4
 **Depends on**: T2
 **Reuses**: `B:230` (PAR-56) e casos limite `B:490-491`; `BD:159`
 **Requirement**: PAR-56
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-56`: partida no dia exato do `vigente_desde` usa a configuração nova
-- [ ] Teste `PAR-56`: pesos trocados no meio do mês pontuam cada partida pela sua vigência
-- [ ] Teste `PAR-56`: data anterior à primeira configuração usa a mais antiga; lista vazia lança
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-56`: partida no dia exato do `vigente_desde` usa a configuração nova
+- [x] Teste `PAR-56`: pesos trocados no meio do mês pontuam cada partida pela sua vigência
+- [x] Teste `PAR-56`: data anterior à primeira configuração usa a mais antiga; lista vazia lança
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
 
 ---
 
+
+Gate (T1 a T3): pnpm --filter @pelada/dominio test (T1-T3 verdes; falhas preexistentes de outras tasks: PAR-63 desempenho (T16), simulador/*) + tsc dominio @ 9ed802ade6f626bfa5a27006b51bd70272a2e0b5
 #### Phase 3: Domínio: função única de acumulado
 
 ### T4: Início da contagem
