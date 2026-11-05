@@ -2566,6 +2566,8 @@ T78 → T79
 **Depends on**: T77
 **Reuses**: Playwright e servidor de e2e (`F:1691`); Independent Test `B:463`
 **Requirement**: PAR-149, PAR-150, PAR-151, PAR-153
+**Status**: rascunhada
+**Nota do rascunho**: escrever o e2e mostrou duas lacunas das tarefas anteriores, corrigidas aqui com teste unitário: (1) sem rede, a navegação para `/g/:slug` recebia a `offline.html` (FUN-35) e o app nem abria: `responderNavegacao` passa a servir o shell do precache só para `/g/:slug` (`ehNavegacaoDoRanking`, `pwa/servico.ts`); as outras rotas seguem com a página offline; (2) sem rede, o SW responde o ranking do cache com 200, sem erro na consulta: a `PaginaRanking` passa a tratar `navigator.onLine` falso (`useNavegadorSemRede`, com os eventos `online` e `offline`) como somente leitura, com a faixa pela hora do `geradoEm` do que está na tela. O contexto novo sem guardado usa a rota abortada (sem SW), porque offline desde o início o navegador nem carrega a página.
 
 **Done when**:
 

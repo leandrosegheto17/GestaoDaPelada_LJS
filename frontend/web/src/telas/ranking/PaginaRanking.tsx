@@ -18,7 +18,14 @@ import { ehSlugValido, GrupoIndisponivel } from './GrupoIndisponivel.tsx';
 import pagina from './ranking.module.css';
 import { TabelaRanking } from './TabelaRanking.tsx';
 import { DialogoPdfPronto } from './DialogoPdfPronto.tsx';
-import { FaixaPrecisaConexao, FaixaSemConexao, IndicadorAtualizando, navegadorSemRede, TelaSemConexao } from './FaixaSemConexao.tsx';
+import {
+  FaixaPrecisaConexao,
+  FaixaSemConexao,
+  IndicadorAtualizando,
+  navegadorSemRede,
+  TelaSemConexao,
+  useNavegadorSemRede,
+} from './FaixaSemConexao.tsx';
 import { TEXTO_ERRO_PDF, TEXTO_PREPARANDO_PDF, usarExportarPdf, type ExportarPdf } from './usarExportarPdf.ts';
 
 /**
@@ -340,10 +347,11 @@ function RankingDoSlug({ slug }: { slug: string }) {
   const semRede = erro instanceof ErroApi && erro.status === 0;
   const guardado = !consulta.data && (consulta.isPending || semRede) ? lerRankingGuardado(slug, mes) : null;
   const [precisaConexao, setPrecisaConexao] = useState(false);
+  const navegadorOffline = useNavegadorSemRede();
 
   // PAR-150: sem rede, a engrenagem não navega e mostra a faixa.
   const aoTocarAdmin = (e: MouseEvent<HTMLAnchorElement>) => {
-    if (semRede || navegadorSemRede()) {
+    if (semRede || navegadorOffline || navegadorSemRede()) {
       e.preventDefault();
       setPrecisaConexao(true);
     }
@@ -368,13 +376,15 @@ function RankingDoSlug({ slug }: { slug: string }) {
   }
 
   const dados = consulta.data ?? guardado ?? undefined;
-  const somenteLeitura = !consulta.data && semRede && guardado !== null;
+  // PAR-149: o guardado depois de uma falha de rede, ou o que o service worker respondeu do cache com o navegador sem
+  // rede (T78): os dois são somente leitura, com a hora do `geradoEm` do que está na tela.
+  const somenteLeitura = dados !== undefined && ((!consulta.data && semRede && guardado !== null) || navegadorOffline);
   // PAR-152: o guardado aparece enquanto a rede responde, com "atualizando…".
   const atualizando = !consulta.data && consulta.isPending && guardado !== null;
   return (
     <>
       <Cabecalho dados={dados} aoTocarAdmin={aoTocarAdmin} />
-      {somenteLeitura && guardado ? <FaixaSemConexao geradoEm={guardado.geradoEm} /> : null}
+      {somenteLeitura && dados ? <FaixaSemConexao geradoEm={dados.geradoEm} /> : null}
       <main id="conteudo" className={casca.conteudo} aria-busy={dados ? undefined : true}>
         {precisaConexao ? <FaixaPrecisaConexao /> : null}
         {aviso ? <Faixa tipo="erro">{aviso}</Faixa> : null}

@@ -3,9 +3,13 @@ import { beforeAll, describe, expect, it, vi } from 'vitest';
 import {
   CABECALHO_DO_CACHE,
   CACHE_RANKING_PUBLICO,
+  ehNavegacaoDoRanking,
   ehRankingPublico,
   marcarRespostaDoCache,
   MAX_RANKINGS_GUARDADOS,
+  PAGINA_OFFLINE,
+  responderNavegacao,
+  SHELL,
 } from '../../src/pwa/servico.ts';
 
 /**
@@ -98,6 +102,26 @@ describe('ehRankingPublico', () => {
     expect(usada?.headers.get('Content-Type')).toBe('application/json');
     expect(await usada?.text()).toBe('{"ok":true}');
     expect(await marcarRespostaDoCache.cachedResponseWillBeUsed({ cachedResponse: null })).toBeNull();
+  });
+});
+
+describe('navegação do ranking sem rede (T78)', () => {
+  const semRede = () => Promise.reject(new TypeError('Failed to fetch'));
+  const shell = new Response('<div id="raiz"></div>', { headers: { 'Content-Type': 'text/html' } });
+  const offline = new Response('<h1>Sem conexão</h1>', { headers: { 'Content-Type': 'text/html' } });
+  const doCache = vi.fn(async (u: string) => (u === SHELL ? shell : u === PAGINA_OFFLINE ? offline : undefined));
+
+  it('PAR-149: /g/:slug sem rede recebe o shell do precache (o app mostra o guardado)', async () => {
+    const r = await responderNavegacao(new Request(`${ORIGEM}/g/pelada-de-quinta?mes=2026-10`), { buscar: semRede, doCache });
+    expect(r).toBe(shell);
+  });
+
+  it('PAR-149: outra rota sem rede segue com a página offline (FUN-35)', async () => {
+    const r = await responderNavegacao(new Request(`${ORIGEM}/app/grupos/g-quinta`), { buscar: semRede, doCache });
+    expect(r).toBe(offline);
+    expect(ehNavegacaoDoRanking(`${ORIGEM}/g/pelada-de-quinta`)).toBe(true);
+    expect(ehNavegacaoDoRanking(`${ORIGEM}/g/pelada-de-quinta/outra`)).toBe(false);
+    expect(ehNavegacaoDoRanking(`${ORIGEM}/grupos/abc`)).toBe(false);
   });
 });
 

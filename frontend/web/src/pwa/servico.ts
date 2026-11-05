@@ -44,6 +44,11 @@ export async function responderNavegacao(requisicao: Request, deps: Dependencias
   try {
     return await deps.buscar(requisicao);
   } catch {
+    // partidas-e-ranking T78 (PAR-149): o ranking público abre do shell, para mostrar o guardado sem rede.
+    if (ehNavegacaoDoRanking(requisicao.url)) {
+      const shell = await deps.doCache(SHELL);
+      if (shell) return shell;
+    }
     const offline = await deps.doCache(PAGINA_OFFLINE);
     if (offline) return offline;
     return new Response('Sem conexão.', {
@@ -64,6 +69,17 @@ export const CACHE_RANKING_PUBLICO = 'ranking-publico';
 export const MAX_RANKINGS_GUARDADOS = 50;
 /** Cabeçalho que marca a resposta servida do cache do SW (sem rede). */
 export const CABECALHO_DO_CACHE = 'X-Pelada-Cache';
+
+/** Navegação da página pública do ranking (`/g/:slug`), que sem rede recebe o shell e não a página offline. */
+export const NAVEGACAO_RANKING = /^\/g\/[a-z0-9-]{1,64}\/?$/;
+
+export function ehNavegacaoDoRanking(url: string): boolean {
+  try {
+    return NAVEGACAO_RANKING.test(new URL(url).pathname);
+  } catch {
+    return false;
+  }
+}
 
 export function ehRankingPublico(url: URL, origem: string): boolean {
   return url.origin === origem && ROTA_RANKING_PUBLICO.test(url.pathname);

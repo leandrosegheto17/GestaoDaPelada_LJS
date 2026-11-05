@@ -57,6 +57,24 @@ describe('com o ranking guardado', () => {
     expect(screen.queryByText('Conecte-se para ver o ranking.')).toBeNull();
   });
 
+  it('PAR-149: navegador sem rede com o ranking vindo do cache do service worker (200) também mostra a faixa', async () => {
+    vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+    abrirTela(`/g/${SLUG}`, { [API]: () => json(200, ranking()) }, rotas);
+    expect(await screen.findByText('Sem conexão, atualizado em 15/10 22:30')).toBeDefined();
+    expect(screen.getByRole('rowheader', { name: 'Toninho' })).toBeDefined();
+    expect(screen.queryByRole('button', { name: 'Exportar PDF' })).toBeNull();
+  });
+
+  it('PAR-149: a rede voltando (evento online) tira a faixa', async () => {
+    const online = vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+    abrirTela(`/g/${SLUG}`, { [API]: () => json(200, ranking()) }, rotas);
+    await screen.findByText('Sem conexão, atualizado em 15/10 22:30');
+    online.mockReturnValue(true);
+    window.dispatchEvent(new Event('online'));
+    await waitFor(() => expect(screen.queryByText(/Sem conexão, atualizado em/)).toBeNull());
+    expect(screen.getAllByRole('button', { name: 'Exportar PDF' }).length).toBeGreaterThan(0);
+  });
+
   it('PAR-149: o guardado é o do mês pedido; outro mês guardado não serve', async () => {
     guardar('2026-09', ranking('2026-09'));
     abrirTela(`/g/${SLUG}?mes=2026-09`, { [API]: semRede }, rotas);

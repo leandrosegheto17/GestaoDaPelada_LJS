@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Botao } from '../../componentes/Botao.tsx';
 import casca from '../../componentes/Casca.module.css';
 import { Faixa } from '../../componentes/Faixa.tsx';
@@ -39,6 +39,24 @@ export function textoAtualizadoEm(geradoEm: string): string {
 /** O navegador diz que está sem rede (`navigator.onLine` falso). */
 export function navegadorSemRede(): boolean {
   return typeof navigator !== 'undefined' && navigator.onLine === false;
+}
+
+/**
+ * `navigator.onLine` falso, atualizado pelos eventos `online` e `offline` (T78): sem rede, o service worker responde o
+ * ranking do cache com 200 (PAR-153), e a tela precisa da faixa mesmo sem erro na consulta (PAR-149).
+ */
+export function useNavegadorSemRede(): boolean {
+  const [semRede, setSemRede] = useState(navegadorSemRede);
+  useEffect(() => {
+    const atualizar = () => setSemRede(navegadorSemRede());
+    window.addEventListener('online', atualizar);
+    window.addEventListener('offline', atualizar);
+    return () => {
+      window.removeEventListener('online', atualizar);
+      window.removeEventListener('offline', atualizar);
+    };
+  }, []);
+  return semRede;
 }
 
 export function FaixaSemConexao({ geradoEm }: { geradoEm: string }) {
