@@ -32,7 +32,11 @@ export function caminhoDoRanking(slug: string): string {
  *   partida de qui, 15/10" quando a partida da data sugerida já existe (PAR-133); sem jogador ativo, o cadastro;
  * - "Gerenciar", na ordem do mockup: Partidas ("N em <mês>"/"Nenhuma em <mês>", PAR-134), Jogadores, Habilidades,
  *   Pontuação ("Pesos padrão"/"Vigente desde dd/mm/aaaa", PAR-135), Admins, Dados do grupo e Uso do app ("Esta semana:
- *   N aparelhos", singular para 1, ou "Sem uso registrado", PAR-136); sem "Simulador" (PAR-160);
+ *   N aparelhos", singular para 1, ou "Sem uso registrado", PAR-136);
+ * - Simulador (simulador T51; SIM-08, SIM-84; substitui a omissão da PAR-160): no "Dia de jogo", com jogador ativo,
+ *   o botão "Simulador: qui, 22/10" (próximo dia de jogo, abre `/simulador`) e, abaixo dele, "Escalação de 22/10
+ *   confirmada" ou "Nenhuma escalação confirmada para 22/10". O mockup põe o item no bloco "Dia de jogo"
+ *   (`t09-inicio--sucesso.html:19-20`), não na lista "Gerenciar";
  * - Financeiro (financeiro T43; FIN-34, AD-079), de `.specs/mockup/telas/t09-inicio--sucesso.html:21`: o item
  *   "Financeiro" com "Saldo R$ …" (ou "Caixa não configurado" com o saldo nulo), link para o t22, só quando a resposta
  *   traz a chave `saldoFinanceiroCentavos`; sem a chave (quem não acessa o financeiro), nenhum item (o PAR-160 vale aí,
@@ -66,6 +70,18 @@ const DIAS_ABREVIADOS = ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'] as co
 export function diaAbreviado(data: string): string {
   const [, mes, dia] = data.split('-');
   return `${DIAS_ABREVIADOS[diaDaSemana(data)] ?? ''}, ${dia}/${mes}`;
+}
+
+/** "Simulador: qui, 22/10" (SIM-08), do próximo dia de jogo. */
+export function textoItemSimulador(proximoDiaDeJogo: string): string {
+  return `Simulador: ${diaAbreviado(proximoDiaDeJogo)}`;
+}
+
+/** "Escalação de 22/10 confirmada" ou "Nenhuma escalação confirmada para 22/10" (SIM-08). */
+export function textoStatusEscalacao(proximoDiaDeJogo: string, confirmada: boolean): string {
+  const [, mes, dia] = proximoDiaDeJogo.split('-');
+  const ddmm = `${dia}/${mes}`;
+  return confirmada ? `Escalação de ${ddmm} confirmada` : `Nenhuma escalação confirmada para ${ddmm}`;
 }
 
 /** "3 em outubro", "Nenhuma em outubro" (PAR-134). */
@@ -116,15 +132,41 @@ export function InicioGrupo() {
             Dia de jogo
           </h2>
           {temAtivos ? (
-            g.partidaNaDataSugerida ? (
-              <LinkBotao para={`${base}/partidas/${encodeURIComponent(g.dataSugeridaPartida)}`} variante="principal" bloco>
-                {`Editar partida de ${diaAbreviado(g.dataSugeridaPartida)}`}
+            <>
+              {g.partidaNaDataSugerida ? (
+                <LinkBotao para={`${base}/partidas/${encodeURIComponent(g.dataSugeridaPartida)}`} variante="principal" bloco>
+                  {`Editar partida de ${diaAbreviado(g.dataSugeridaPartida)}`}
+                </LinkBotao>
+              ) : (
+                <LinkBotao para={`${base}/partidas/nova`} variante="principal" bloco>
+                  {`Lançar partida de ${diaAbreviado(g.dataSugeridaPartida)}`}
+                </LinkBotao>
+              )}
+              {/* Simulador (simulador T51; SIM-08, SIM-84), de `t09-inicio--sucesso.html:19-20`. */}
+              <LinkBotao para={`${base}/simulador`} variante="secundario" bloco>
+                {textoItemSimulador(g.proximoDiaDeJogo)}
               </LinkBotao>
-            ) : (
-              <LinkBotao para={`${base}/partidas/nova`} variante="principal" bloco>
-                {`Lançar partida de ${diaAbreviado(g.dataSugeridaPartida)}`}
-              </LinkBotao>
-            )
+              <p className={modulo['dia-de-jogo__status']}>
+                {g.escalacaoNoProximoDia ? (
+                  <svg
+                    className={modulo['dia-de-jogo__icone']}
+                    viewBox="0 0 24 24"
+                    width="18"
+                    height="18"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                ) : null}
+                {textoStatusEscalacao(g.proximoDiaDeJogo, g.escalacaoNoProximoDia)}
+              </p>
+            </>
           ) : (
             <>
               <p>{TEXTO_SEM_JOGADORES}</p>

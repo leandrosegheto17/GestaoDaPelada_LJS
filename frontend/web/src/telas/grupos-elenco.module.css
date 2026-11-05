@@ -117,6 +117,19 @@
   margin: 0;
 }
 
+/* Linha da escalação abaixo do item Simulador (t09-inicio--sucesso.html:20; simulador T51), de base.css:253. */
+.dia-de-jogo__status {
+  display: flex;
+  gap: var(--esp-2);
+  align-items: center;
+  font-size: var(--texto-sm);
+  color: var(--cor-texto-sec);
+}
+
+.dia-de-jogo__icone {
+  flex: none;
+}
+
 /* Cartão do link do ranking (t20-grupo--sucesso.html), de base.css:20 e :50. */
 .cartao {
   background: var(--cor-superficie);

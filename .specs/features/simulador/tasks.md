@@ -1709,6 +1709,8 @@ T53 → T54
 **Depends on**: T50
 **Reuses**: Rotas do app (`CA:1309`, `PR:1926`); tela de `PR:2073` (T64); asserção de posição no molde de `GE:2138`; `.specs/mockup/telas/t09-inicio--sucesso.html:19-20`
 **Requirement**: SIM-08, SIM-84
+**Status**: rascunhada
+**Nota do rascunho**: o item fica no bloco "Dia de jogo" (botão secundário abaixo do lançar, com a linha da escalação embaixo), como `t09-inicio--sucesso.html:19-20`, e só com jogador ativo (a t09 `sem-jogadores` não o mostra). Rota em `rotas.tsx` (`handle.tela` = `simulador`), teste em `test/app/rotas-simulador.test.tsx`; textos e estados em `test/telas/inicio-grupo.test.tsx`; posição em `e2e/simulador-inicio.spec.ts`.
 
 **Done when**:
 

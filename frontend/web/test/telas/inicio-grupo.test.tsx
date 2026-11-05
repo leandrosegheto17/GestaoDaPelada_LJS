@@ -10,6 +10,8 @@ import {
   textoAdmins,
   textoHabilidades,
   textoJogadores,
+  textoItemSimulador,
+  textoStatusEscalacao,
 } from '../../src/telas/grupo/InicioGrupo.tsx';
 import { esperarSemViolacoes } from '../apoio/axe.ts';
 import { abrirTela, erroApi, json, pendente, SESSAO_ANA, type Manipulador } from '../apoio/tela.tsx';
@@ -209,11 +211,22 @@ describe('início do grupo com partidas (partidas-e-ranking T64)', () => {
     expect(within(lista).getByRole('link', { name: /Uso do app/ }).textContent).toBe('Uso do appSem uso registrado');
   });
 
-  it('PAR-160: sem a chave do saldo, nenhum item "Simulador" nem "Financeiro"', async () => {
+  // simulador T51 (autorização de 2026-11-04 no STATE.md; SIM-08 substitui a omissão da PAR-160): o item Simulador
+  // passa a existir, no bloco "Dia de jogo" do mockup e não na lista "Gerenciar". A asserção do Financeiro fica igual.
+  it('PAR-160, SIM-08: sem a chave do saldo, nenhum "Financeiro"; o "Simulador" fica no Dia de jogo, fora do Gerenciar', async () => {
     abrir({ 'GET /api/grupos/g-quinta': () => json(200, QUINTA) });
     const lista = await screen.findByRole('list', { name: 'Gerenciar' });
     expect(within(lista).queryByRole('link', { name: /Simulador/ })).toBeNull();
     expect(within(lista).queryByRole('link', { name: /Financeiro/ })).toBeNull();
+    const dia = screen.getByRole('region', { name: 'Dia de jogo' });
+    expect(within(dia).getByRole('link', { name: 'Simulador: qui, 22/10' })).toBeTruthy();
+  });
+
+  it('PAR-36, SIM-73: o aviso da escalação confirmada aparece no início', async () => {
+    const t = abrir({ 'GET /api/grupos/g-quinta': () => json(200, QUINTA) });
+    await screen.findByRole('list', { name: 'Gerenciar' });
+    await t.roteador.navigate('/app/grupos/g-quinta', { state: { aviso: 'Escalação de 22/10 confirmada.' } });
+    expect(await screen.findByText('Escalação de 22/10 confirmada.')).toBeDefined();
   });
 
   it('PAR-36: o aviso da navegação aparece no início ("Partida de dd/mm salva.")', async () => {
@@ -221,5 +234,58 @@ describe('início do grupo com partidas (partidas-e-ranking T64)', () => {
     await screen.findByRole('list', { name: 'Gerenciar' });
     await t.roteador.navigate('/app/grupos/g-quinta', { state: { aviso: 'Partida de 22/10 salva.' } });
     expect(await screen.findByText('Partida de 22/10 salva.')).toBeDefined();
+  });
+});
+
+describe('item Simulador no início do grupo (simulador T51)', () => {
+  it('textos do item e da linha da escalação', () => {
+    expect(textoItemSimulador('2026-10-22')).toBe('Simulador: qui, 22/10');
+    expect(textoItemSimulador('2026-10-25')).toBe('Simulador: dom, 25/10');
+    expect(textoStatusEscalacao('2026-10-22', true)).toBe('Escalação de 22/10 confirmada');
+    expect(textoStatusEscalacao('2026-10-22', false)).toBe('Nenhuma escalação confirmada para 22/10');
+  });
+
+  it('SIM-84: o item "Simulador: qui, 22/10" abre /app/grupos/g-quinta/simulador', async () => {
+    abrir({ 'GET /api/grupos/g-quinta': () => json(200, QUINTA) });
+    const dia = await screen.findByRole('region', { name: 'Dia de jogo' });
+    const item = within(dia).getByRole('link', { name: 'Simulador: qui, 22/10' });
+    expect(item.getAttribute('href')).toBe('/app/grupos/g-quinta/simulador');
+    fireEvent.click(item);
+    expect(await screen.findByText('destino')).toBeTruthy();
+  });
+
+  it('SIM-08: o item usa o próximo dia de jogo, não a data sugerida da partida', async () => {
+    abrir({
+      'GET /api/grupos/g-quinta': () =>
+        json(200, { ...QUINTA, dataSugeridaPartida: '2026-10-15', partidaNaDataSugerida: true, proximoDiaDeJogo: '2026-10-22' }),
+    });
+    const dia = await screen.findByRole('region', { name: 'Dia de jogo' });
+    expect(within(dia).getByRole('link', { name: 'Editar partida de qui, 15/10' })).toBeTruthy();
+    expect(within(dia).getByRole('link', { name: 'Simulador: qui, 22/10' })).toBeTruthy();
+  });
+
+  it('SIM-08: com escalação, "Escalação de 22/10 confirmada" abaixo do item; axe sem violação', async () => {
+    const { container } = abrir({ 'GET /api/grupos/g-quinta': () => json(200, { ...QUINTA, escalacaoNoProximoDia: true }) });
+    const dia = await screen.findByRole('region', { name: 'Dia de jogo' });
+    const status = within(dia).getByText('Escalação de 22/10 confirmada');
+    expect(within(dia).queryByText('Nenhuma escalação confirmada para 22/10')).toBeNull();
+    // Ordem no documento: a linha vem depois do item (a posição na tela é do e2e `simulador-inicio.spec.ts`).
+    const item = within(dia).getByRole('link', { name: 'Simulador: qui, 22/10' });
+    expect(item.compareDocumentPosition(status) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    await esperarSemViolacoes(container);
+  });
+
+  it('SIM-08: sem escalação, "Nenhuma escalação confirmada para 22/10"', async () => {
+    abrir({ 'GET /api/grupos/g-quinta': () => json(200, { ...QUINTA, escalacaoNoProximoDia: false }) });
+    const dia = await screen.findByRole('region', { name: 'Dia de jogo' });
+    expect(within(dia).getByText('Nenhuma escalação confirmada para 22/10')).toBeTruthy();
+    expect(within(dia).queryByText('Escalação de 22/10 confirmada')).toBeNull();
+  });
+
+  it('SIM-08: sem jogador ativo, o Dia de jogo pede o cadastro e não mostra o Simulador (t09-inicio--sem-jogadores)', async () => {
+    abrir({ 'GET /api/grupos/g-quinta': () => json(200, { ...QUINTA, jogadoresAtivos: 0 }) });
+    const dia = await screen.findByRole('region', { name: 'Dia de jogo' });
+    expect(within(dia).getByText(TEXTO_SEM_JOGADORES)).toBeTruthy();
+    expect(within(dia).queryByRole('link', { name: /Simulador/ })).toBeNull();
   });
 });

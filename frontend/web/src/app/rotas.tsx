@@ -6,6 +6,7 @@ import { PaginaNovaPartida } from '../telas/partida/PaginaNovaPartida.tsx';
 import { PaginaEditarPartida } from '../telas/partida/PaginaEditarPartida.tsx';
 import { PaginaPontuacao } from '../telas/pontuacao/PaginaPontuacao.tsx';
 import { PaginaUso } from '../telas/uso/PaginaUso.tsx';
+import { PaginaSimulador } from '../telas/simulador/PaginaSimulador.tsx';
 import { Landing } from '../telas/landing/Landing.tsx';
 import { Admins } from '../telas/admins/Admins.tsx';
 import { MinhaSenha } from '../telas/minha-senha/MinhaSenha.tsx';
@@ -50,6 +51,7 @@ import { Lancamento } from '../telas/financeiro/Lancamento.tsx';
  * - partidas e ranking (partidas-e-ranking T58; PAR-143): `/g/:slug` (t01, t03) fora das guardas, aberto com ou sem
  *   sessão; e, sob a `GuardaApp`, as partidas do mês, nova partida, partida por data, pontuação e uso do app;
  *   `partidas/nova` vem antes de `partidas/:data` só por clareza;
+ * - simulador (simulador T51; SIM-84): `/app/grupos/:grupoId/simulador`, sob a `GuardaApp`;
  * - `/_vitrine/:id` só com `VITE_VITRINE=1`, e `*` com o 404.
  *
  * `handle.tela` identifica cada tela (o teste das rotas confere por ele).
@@ -105,6 +107,8 @@ export function criarRotas(): RouteObject[] {
         { path: 'grupos/:grupoId/partidas/:data', element: <PaginaEditarPartida />, handle: { tela: 'partida' } },
         { path: 'grupos/:grupoId/pontuacao', element: <PaginaPontuacao />, handle: { tela: 'pontuacao' } },
         { path: 'grupos/:grupoId/uso', element: <PaginaUso />, handle: { tela: 'uso' } },
+        // Simulador (simulador T51; SIM-84): entradas (t12) e resultado (t13, t14) na mesma rota.
+        { path: 'grupos/:grupoId/simulador', element: <PaginaSimulador />, handle: { tela: 'simulador' } },
         { path: '*', element: <NaoEncontrada />, handle: { tela: 'nao-encontrada' } },
       ],
     },
