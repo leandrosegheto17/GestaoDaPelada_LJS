@@ -14,10 +14,17 @@ type Cliente = pg.ClientBase;
 
 const FILTRO_TABELA = `n.nspname = 'public' AND c.relname <> ALL ($1::text[])`;
 
-async function linhas(cliente: Cliente, sql: string): Promise<string[]> {
-  const r = await cliente.query<{ l: string }>(sql, [TABELAS_IGNORADAS]);
+async function linhas(
+  cliente: Cliente,
+  sql: string,
+  parametros: unknown[] = [TABELAS_IGNORADAS],
+): Promise<string[]> {
+  const r = await cliente.query<{ l: string }>(sql, parametros);
   return r.rows.map((x) => x.l);
 }
+
+/** Nome do grantee de um aclexplode; 0 é PUBLIC. */
+const GRANTEE = `CASE WHEN a.grantee = 0 THEN 'PUBLIC' ELSE pg_get_userbyid(a.grantee) END`;
 
 /** Tabelas, views e sequências do schema public. */
 function relacoes(cliente: Cliente): Promise<string[]> {
@@ -92,6 +99,121 @@ function triggers(cliente: Cliente): Promise<string[]> {
   );
 }
 
+/** Funções do schema public, fora as de extensão: assinatura, segurança, config e hash do corpo. */
+function funcoes(cliente: Cliente): Promise<string[]> {
+  return linhas(
+    cliente,
+    `SELECT 'funcao ' || p.proname || '(' || pg_get_function_identity_arguments(p.oid) || ')'
+            || ' retorna ' || coalesce(pg_get_function_result(p.oid), '-')
+            || ' ' || l.lanname
+            || CASE WHEN p.prosecdef THEN ' security definer' ELSE ' security invoker' END
+            || ' ' || CASE p.provolatile WHEN 'i' THEN 'immutable' WHEN 's' THEN 'stable' ELSE 'volatile' END
+            || ' config=' || coalesce(array_to_string(p.proconfig, ';'), '')
+            || ' corpo=' || md5(coalesce(p.prosrc, '')) AS l
+       FROM pg_proc p
+       JOIN pg_namespace n ON n.oid = p.pronamespace
+       JOIN pg_language l ON l.oid = p.prolang
+      WHERE n.nspname = 'public'
+        AND NOT EXISTS (SELECT 1 FROM pg_depend d
+                         WHERE d.classid = 'pg_proc'::regclass AND d.objid = p.oid AND d.deptype = 'e')`,
+    [],
+  );
+}
+
+/** EXECUTE nas funções, inclusive o PUBLIC implícito (ACL nula), fora o dono. */
+function grantsDeFuncao(cliente: Cliente): Promise<string[]> {
+  return linhas(
+    cliente,
+    `SELECT 'grant funcao ' || p.proname || '(' || pg_get_function_identity_arguments(p.oid) || ') '
+            || ${GRANTEE} || ' ' || a.privilege_type AS l
+       FROM pg_proc p
+       JOIN pg_namespace n ON n.oid = p.pronamespace
+       CROSS JOIN LATERAL aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) a
+      WHERE n.nspname = 'public' AND a.grantee <> p.proowner
+        AND NOT EXISTS (SELECT 1 FROM pg_depend d
+                         WHERE d.classid = 'pg_proc'::regclass AND d.objid = p.oid AND d.deptype = 'e')`,
+    [],
+  );
+}
+
+function policies(cliente: Cliente): Promise<string[]> {
+  return linhas(
+    cliente,
+    `SELECT 'policy ' || p.tablename || '.' || p.policyname || ' ' || p.cmd || ' ' || p.permissive
+            || ' roles=' || array_to_string(ARRAY(SELECT r FROM unnest(p.roles) r ORDER BY 1), ',')
+            || ' using=' || coalesce(p.qual, '') || ' check=' || coalesce(p.with_check, '') AS l
+       FROM pg_policies p
+      WHERE p.schemaname = 'public' AND p.tablename <> ALL ($1::text[])`,
+  );
+}
+
+function rls(cliente: Cliente): Promise<string[]> {
+  return linhas(
+    cliente,
+    `SELECT 'rls ' || c.relname || ' enable=' || c.relrowsecurity::text
+            || ' force=' || c.relforcerowsecurity::text AS l
+       FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+      WHERE ${FILTRO_TABELA} AND c.relkind IN ('r', 'p')`,
+  );
+}
+
+/** Grants de tabela, view e sequência por role, fora o dono (que muda entre local e Neon). */
+function grantsDeTabela(cliente: Cliente): Promise<string[]> {
+  return linhas(
+    cliente,
+    `SELECT 'grant tabela ' || c.relname || ' ' || ${GRANTEE} || ' ' || a.privilege_type AS l
+       FROM pg_class c
+       JOIN pg_namespace n ON n.oid = c.relnamespace
+       CROSS JOIN LATERAL aclexplode(c.relacl) a
+      WHERE ${FILTRO_TABELA} AND c.relkind IN ('r', 'p', 'v', 'm', 'S') AND a.grantee <> c.relowner
+        AND NOT (c.relkind = 'S' AND c.relname LIKE 'pgmigrations%')`,
+  );
+}
+
+function grantsDeColuna(cliente: Cliente): Promise<string[]> {
+  return linhas(
+    cliente,
+    `SELECT 'grant coluna ' || c.relname || '.' || at.attname || ' ' || ${GRANTEE} || ' '
+            || a.privilege_type AS l
+       FROM pg_attribute at
+       JOIN pg_class c ON c.oid = at.attrelid
+       JOIN pg_namespace n ON n.oid = c.relnamespace
+       CROSS JOIN LATERAL aclexplode(at.attacl) a
+      WHERE ${FILTRO_TABELA} AND at.attnum > 0 AND NOT at.attisdropped AND a.grantee <> c.relowner`,
+  );
+}
+
+function grantsDoSchema(cliente: Cliente): Promise<string[]> {
+  return linhas(
+    cliente,
+    `SELECT 'grant schema public ' || ${GRANTEE} || ' ' || a.privilege_type AS l
+       FROM pg_namespace n
+       CROSS JOIN LATERAL aclexplode(coalesce(n.nspacl, acldefault('n', n.nspowner))) a
+      WHERE n.nspname = 'public' AND a.grantee <> n.nspowner`,
+    [],
+  );
+}
+
+/** Atributos das roles pelada_*. A senha nunca entra. */
+function roles(cliente: Cliente, opcoes: OpcoesLerEsquema): Promise<string[]> {
+  const login = opcoes.ignorarLogin ? `''` : `' login=' || r.rolcanlogin::text`;
+  return linhas(
+    cliente,
+    `SELECT 'role ' || r.rolname || ${login}
+            || ' superuser=' || r.rolsuper::text || ' createdb=' || r.rolcreatedb::text
+            || ' createrole=' || r.rolcreaterole::text || ' inherit=' || r.rolinherit::text
+            || ' replication=' || r.rolreplication::text || ' bypassrls=' || r.rolbypassrls::text
+            || ' connlimit=' || r.rolconnlimit::text AS l
+       FROM pg_roles r
+      WHERE r.rolname LIKE 'pelada\\_%'`,
+    [],
+  );
+}
+
+function extensoes(cliente: Cliente): Promise<string[]> {
+  return linhas(cliente, `SELECT 'extensao ' || e.extname AS l FROM pg_extension e`, []);
+}
+
 export interface OpcoesLerEsquema {
   /**
    * Ignora o atributo LOGIN das roles `pelada_*`. As roles são do cluster, e o seed local
@@ -100,9 +222,27 @@ export interface OpcoesLerEsquema {
   ignorarLogin?: boolean;
 }
 
-export async function lerEsquema(cliente: Cliente, _opcoes: OpcoesLerEsquema = {}): Promise<string[]> {
-  const categorias = [relacoes, colunas, restricoes, indices, triggers];
+type Categoria = (cliente: Cliente, opcoes: OpcoesLerEsquema) => Promise<string[]>;
+
+const CATEGORIAS: Categoria[] = [
+  relacoes,
+  colunas,
+  restricoes,
+  indices,
+  triggers,
+  funcoes,
+  grantsDeFuncao,
+  policies,
+  rls,
+  grantsDeTabela,
+  grantsDeColuna,
+  grantsDoSchema,
+  roles,
+  extensoes,
+];
+
+export async function lerEsquema(cliente: Cliente, opcoes: OpcoesLerEsquema = {}): Promise<string[]> {
   const tudo: string[] = [];
-  for (const categoria of categorias) tudo.push(...(await categoria(cliente)));
+  for (const categoria of CATEGORIAS) tudo.push(...(await categoria(cliente, opcoes)));
   return tudo.sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
 }

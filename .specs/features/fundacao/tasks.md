@@ -804,6 +804,8 @@ T81 → T82
 **Depends on**: T19
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-08
+**Status**: rascunhada
+**Nota do rascunho**: grants do dono ficam fora (o dono muda entre local e Neon). Opção `ignorarLogin` para a comparação com a referência (ver T21).
 
 **Done when**:
 
