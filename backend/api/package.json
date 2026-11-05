@@ -6,7 +6,8 @@
     "node": ">=26 <27"
   },
   "exports": {
-    "./migrar": "./src/infraestrutura/db/migrar.ts"
+    "./migrar": "./src/infraestrutura/db/migrar.ts",
+    "./esquema": "./src/infraestrutura/db/esquema.ts"
   },
   "scripts": {
     "lint": "eslint .",

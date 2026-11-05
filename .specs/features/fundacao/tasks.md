@@ -830,6 +830,9 @@ T81 → T82
 **Depends on**: T20
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-08
+**Status**: rascunhada
+**Nota do rascunho**: o `esquema-producao.txt` não foi gerado (nada roda no rascunho); o /executar roda `pnpm esquema:gerar` e confere o arquivo.
+**Lacunas**: o LOGIN das roles fica fora da comparação com a referência (`OPCOES_REFERENCIA`), porque as roles são do cluster e o seed local dá LOGIN (AD-009). Interpretação conservadora: só o LOGIN sai; o resto dos atributos continua comparado. O /executar confirma com o usuário.
 
 **Done when**:
 

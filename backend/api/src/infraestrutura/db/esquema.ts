@@ -1,4 +1,9 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import type pg from 'pg';
+
+/** Referência versionada: impressão digital de um banco vazio migrado só com as 23 (FUN-08). */
+export const ARQUIVO_REFERENCIA = join(import.meta.dirname, 'migracoes', 'esquema-producao.txt');
 
 /**
  * Impressão digital do schema `public` (FUN-08): uma linha por item, ordenada, lida do
@@ -245,4 +250,17 @@ export async function lerEsquema(cliente: Cliente, opcoes: OpcoesLerEsquema = {}
   const tudo: string[] = [];
   for (const categoria of CATEGORIAS) tudo.push(...(await categoria(cliente, opcoes)));
   return tudo.sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
+}
+
+/**
+ * Opções da referência: sem o LOGIN das roles, porque as roles são do cluster e o seed local
+ * dá LOGIN a elas (AD-009), enquanto o cluster novo do CI não.
+ * [LACUNA] O LOGIN fica fora da comparação com a referência; a paridade com a dev (T80) confere à parte.
+ */
+export const OPCOES_REFERENCIA: OpcoesLerEsquema = { ignorarLogin: true };
+
+export function lerReferencia(): string[] {
+  return readFileSync(ARQUIVO_REFERENCIA, 'utf8')
+    .split('\n')
+    .filter((l) => l !== '');
 }
