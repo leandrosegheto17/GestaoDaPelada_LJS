@@ -1170,6 +1170,9 @@ T56 → T57
 **Depends on**: T31
 **Reuses**: cliente (T29), memória (T30), repositório (T31); S:47-49; AD-114
 **Requirement**: PLA-29, PLA-33, PLA-35, PLA-36
+**Status**: rascunhada
+**Nota do rascunho**: ordem: `travarGrupo` → criadora (pelo `plano.ler`, sem chamar o Asaas) → `pendenteOuAtiva` (409 `assinatura_pendente` ou `assinatura_ativa`, sem chamar o Asaas) → cliente reaproveitado pelo `clienteDaConta` ou criado com o e-mail de `contas.eu` → assinatura (`description` = `descricaoDaAssinatura(nome do grupo)`) → primeira cobrança → `registrar`. A compensação (`removerAssinatura` uma vez) vale para a falha da primeira cobrança e também para a recusa do `registrar` depois de a assinatura existir no Asaas; a falha da remoção vai ao log com `assinaturaId` e `grupoId`.
+**Lacunas**: o cliente reaproveitado (AD-096) não recebe o nome e o CPF novos do formulário; se a pessoa digitar outro CPF, o Asaas segue com o do cliente antigo. O rascunho reaproveita sem atualizar.
 
 **Done when**:
 
