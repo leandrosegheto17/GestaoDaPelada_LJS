@@ -836,6 +836,7 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T17
 **Reuses**: formas de `GD:140-142`; mensagens de `GS:313`, `GS:335`
 **Requirement**: GEL-52, GEL-55, GEL-90, GEL-99, SEC-005
+**Status**: rascunhada
 
 **Done when**:
 
