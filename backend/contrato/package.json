@@ -10,7 +10,8 @@
     "./sentry": "./src/sentry.ts",
     "./primitivos": "./src/primitivos.ts",
     "./acesso": "./src/acesso.ts",
-    "./grupo": "./src/grupo.ts"
+    "./grupo": "./src/grupo.ts",
+    "./elenco": "./src/elenco.ts"
   },
   "scripts": {
     "lint": "eslint .",

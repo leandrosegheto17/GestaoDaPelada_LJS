@@ -809,6 +809,7 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T16
 **Reuses**: fábrica por `hoje` de `GD:139`; mensagens de `GS:165-175`; piso de `GSEG:66` com a mensagem de `GS:275`; `textoVisivel` (T16)
 **Requirement**: GEL-33, GEL-34, GEL-36, GEL-37, GEL-38, GEL-39, GEL-40, GEL-43, SEC-002, SEC-005
+**Status**: rascunhada
 
 **Done when**:
 
