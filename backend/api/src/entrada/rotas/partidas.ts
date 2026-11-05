@@ -3,6 +3,8 @@ import {
   consultaData,
   consultaMes,
   corpoDoErro,
+  ehDataDoCalendario,
+  MENSAGEM_DATA_ALTERADA,
   MENSAGEM_DATA_FUTURA,
   MENSAGEM_MES_FUTURO,
   mensagemPartidaJaExiste,
@@ -132,6 +134,47 @@ export function rotasPartidas(): Hono<Ambiente> {
     if (r.resultado === 'invalido') return c.json(erroDeCampos(r.campos), 422);
     if (r.resultado === 'partida_ja_existe') return respostaPartidaJaExiste(c, dados.data);
     return respostaDaPartida(c, grupoId, dados.data, 201);
+  });
+
+  /**
+   * Partida por data (T41; PAR-44 a PAR-50, `BD:232-234`), registradas depois de `…/partidas/nova` (a `nova` responde
+   * primeiro; e nem é data real). Nos três métodos, `:data` que não é data real `AAAA-MM-DD`, ou sem partida no grupo,
+   * responde 404 (PAR-45). A data do caminho é checada antes do corpo.
+   * - GET 200 com a partida para a tela de edição (PAR-44);
+   * - PUT: corpo pelo contrato; `data` do corpo diferente da do caminho, 422 "A data da partida não pode ser alterada."
+   *   (PAR-47); marcações contra os ativos na data da partida (PAR-48); 200 com a partida relida (PAR-46);
+   * - DELETE 204; a auditoria guarda `partida_excluida` e o evento de uso fica (PAR-50, PAR-51).
+   */
+  const naoEncontrada = corpoDoErro('nao_encontrado');
+
+  rotas.get('/grupos/:grupoId/partidas/:data', async (c) => {
+    const data = c.req.param('data');
+    if (!ehDataDoCalendario(data)) return c.json(naoEncontrada, 404);
+    const lida = await partidas.ler(c.var.db, c.req.param('grupoId'), data);
+    if (!lida) return c.json(naoEncontrada, 404);
+    const resposta: PartidaResposta = { ...lida, hoje: c.var.relogio.hoje() };
+    return c.json(resposta, 200);
+  });
+
+  rotas.put('/grupos/:grupoId/partidas/:data', async (c) => {
+    const data = c.req.param('data');
+    if (!ehDataDoCalendario(data)) return c.json(naoEncontrada, 404);
+    const corpo = await lerPartidaCorpo(c);
+    if (!corpo.ok) return corpo.resposta;
+    const grupoId = c.req.param('grupoId');
+    const r = await partidas.editar(c.var.db, grupoId, data, corpo.dados);
+    if (r.resultado === 'nao_encontrada') return c.json(naoEncontrada, 404);
+    if (r.resultado === 'data_alterada') return respostaDeCampo(c, 'data', MENSAGEM_DATA_ALTERADA);
+    if (r.resultado === 'invalido') return c.json(erroDeCampos(r.campos), 422);
+    return respostaDaPartida(c, grupoId, data, 200);
+  });
+
+  rotas.delete('/grupos/:grupoId/partidas/:data', async (c) => {
+    const data = c.req.param('data');
+    if (!ehDataDoCalendario(data)) return c.json(naoEncontrada, 404);
+    const r = await partidas.excluir(c.var.db, c.req.param('grupoId'), data);
+    if (r.resultado === 'nao_encontrada') return c.json(naoEncontrada, 404);
+    return c.body(null, 204);
   });
 
   rotas.get('/grupos/:grupoId/partidas', async (c) => {

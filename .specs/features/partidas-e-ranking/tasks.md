@@ -1562,6 +1562,8 @@ T78 → T79
 **Depends on**: T40
 **Reuses**: T31 e T32; `BD:232-234`
 **Requirement**: PAR-44, PAR-45, PAR-46, PAR-47, PAR-48, PAR-50
+**Status**: rascunhada
+**Nota do rascunho**: as três rotas em `rotas/partidas.ts`, depois da `…/partidas/nova`; a data do caminho é conferida (`ehDataDoCalendario`) antes do corpo, e o PUT usa o `lerPartidaCorpo` e o `respostaDaPartida` da T40. Testes em `backend/api/test/rotas/partidas-por-data.test.ts`.
 
 **Done when**:
 
