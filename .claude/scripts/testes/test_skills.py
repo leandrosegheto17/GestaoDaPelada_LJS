@@ -388,5 +388,30 @@ class TestSkills(unittest.TestCase):
                     self.assertTrue((SKILLS / nome / "SKILL.md").exists(), f"skill {nome} não existe")
 
 
+    def test_guarda_erro_e_seguranca_padrao_evitam_retrabalho(self):
+        """Linha de base 2026-11-04 (ControleFinanceiroTeste): os achados do /validar viraram regra antes do código."""
+        claude_md = (CLAUDE / "CLAUDE.md").read_text(encoding="utf-8")
+        for trecho in ("**Guarda, um teste por ramo:**", "cada método HTTP", "falha quando a guarda é removida",
+                       "**Critério de erro tem teste de erro.**", "gatilho de falha",
+                       "## Segurança padrão de app web", "`Sec-Fetch-Site`", "`Origin`", "`Host`",
+                       "Content-Security-Policy", "`Referrer-Policy: same-origin`", "**primeiro lote do servidor**"):
+            with self.subTest(trecho=trecho):
+                self.assertIn(trecho, claude_md)
+        # a regra de planejamento fica antes da Execução, onde o planejador a lê
+        self.assertLess(claude_md.index("## Segurança padrão de app web"), claude_md.index("## Execução"))
+
+
+    def test_sensor_do_verificador_nao_roda_a_suite_inteira_por_mutante(self):
+        """Medição 2026-11-04: ~10 de 18 min do verificador foram comando (suíte e e2e por mutante, cópia de node_modules, typecheck de 9 commits)."""
+        claude_md = (CLAUDE / "CLAUDE.md").read_text(encoding="utf-8")
+        verificador = (CLAUDE / "agents" / "verificador.md").read_text(encoding="utf-8")
+        for nome, texto in (("CLAUDE.md", claude_md), ("verificador.md", verificador)):
+            for trecho in ("só o teste do arquivo mutado", "e2e roda uma vez", "por junção", "nunca `cp -r node_modules`",
+                           "no máximo 3 commits"):
+                with self.subTest(arquivo=nome, trecho=trecho):
+                    self.assertIn(trecho, texto)
+        self.assertNotIn("fecha verde em cada commit de código", claude_md)
+
+
 if __name__ == "__main__":
     unittest.main()
