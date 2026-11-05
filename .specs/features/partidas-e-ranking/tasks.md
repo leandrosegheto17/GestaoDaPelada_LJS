@@ -1180,6 +1180,8 @@ T78 → T79
 **Depends on**: T26, T80
 **Reuses**: `c.var.db: Kysely` (`FD:103`); colunas `M:1792843200000_linha-de-base.sql:155-192`; `BD:190-192`
 **Requirement**: PAR-62, PAR-77
+**Status**: rascunhada
+**Nota do rascunho**: devolve o `HistoricoDoGrupo` do domínio (`backend/dominio/src/previas/comparar.ts:18`); as presenças vêm só das partidas até `ate`, e as configurações de pesos, todas. Testes em `backend/api/test/repositorios/historico.test.ts`, com um plugin do Kysely que conta as consultas e guarda o SQL.
 
 **Done when**:
 
