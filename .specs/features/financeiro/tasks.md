@@ -1510,6 +1510,9 @@ T47 → T48
 **Depends on**: T45
 **Reuses**: Lista de telas ativas (`CA:1657`, `PR:2369`); AD-118 e AD-029 (t09 `sucesso` entra, `sem-financeiro` fora); asserção espacial de `GE:2138`; Stylelint de tokens (`F:1374`)
 **Requirement**: FIN-46, FIN-47, FIN-51, FIN-34
+**Status**: rascunhada
+**Nota do rascunho**: as 12 telas e a T09 `sucesso` entram em `e2e/telas-ativas.json`; a entrada da T09 `sucesso` passa ao mockup do projeto (`telas/t09-inicio--sucesso.html`) com `respostas/financeiro-grupo-quinta.json` (o `elenco-grupo-quinta.json` com `saldoFinanceiroCentavos: 124550`). O mockup do projeto da t09 traz também Partidas, Dia de jogo e Uso do app: a comparação até 1% depende das telas da `partidas-e-ranking` e do `simulador` (e de as respostas deles entrarem na entrada da T09, se faltarem). Asserção espacial em `e2e/financeiro-erros-campo.spec.ts` (molde `e2e/erros-campo.spec.ts`); Stylelint e a lista ativa em `test/ferramentas/telas-financeiro-ativas.test.ts`.
+**Lacunas**: (1) ativar a T09 `sucesso` faz o teste existente `GEL-116, AD-029` (`frontend/web/test/ferramentas/telas-grupos-elenco.test.ts:35-36`, "só `T09 menu-conta`") falhar; a AD-118 fecha a AD-029, mas a autorização de 2026-11-04 da `financeiro` em `## Autorizações` não cita esse teste: o /executar pede a aprovação para ele passar a aceitar `['T09 menu-conta', 'T09 sucesso']` (mesma força), sem mudá-lo antes. (2) A revisão manual do t19 (PC e celular, contra `L:.md/mockup/telas/t19-admins--sucesso.html` e o guia; FIN-51) precisa da tela rodando: fica para o /executar registrar aqui com data e resultado, conferindo também o `SPEC_DEVIATION` da T44 (texto "Financeiro" só com o interruptor ligado).
 
 **Done when**:
 
