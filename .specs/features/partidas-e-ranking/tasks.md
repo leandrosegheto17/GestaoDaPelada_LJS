@@ -813,6 +813,7 @@ T78 → T79
 **Depends on**: T13
 **Reuses**: `B:352` (PAR-113), `BD:165`
 **Requirement**: PAR-109, PAR-110, PAR-113
+**Status**: rascunhada
 
 **Done when**:
 

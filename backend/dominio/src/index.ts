@@ -175,6 +175,12 @@ export {
   type LinhaPdf,
   type ProjecaoPdf,
 } from './pdf/calcular.ts';
+export {
+  compararCenarios,
+  MENSAGEM_JOGADOR_FORA_DO_HISTORICO,
+  type CenariosComparados,
+  type HistoricoDoGrupo,
+} from './previas/comparar.ts';
 
 // notificacoes (NOT-25, NOT-43): payloads do push, sem relógio nem I/O.
 export {
