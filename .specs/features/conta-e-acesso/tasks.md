@@ -1327,6 +1327,8 @@ T57 → T58
 **Depends on**: T38
 **Reuses**: molde dos componentes da fundação (`F:1448`, `Botao`); marcação de `.specs/mockup/telas/t04-entrar--vazio.html` e `.specs/mockup/base.css`; Stylelint de tokens (`F:1374`)
 **Requirement**: ACE-56
+**Status**: rascunhada
+**Nota do rascunho**: `Campo` e `CampoSenha` no mesmo arquivo, com `Campo.module.css` (só tokens). A ajuda e o erro entram no `aria-describedby` nessa ordem, como no mockup. O botão do `CampoSenha` mantém o rótulo "Mostrar" e alterna `aria-pressed` (o mockup só mostra o estado não pressionado).
 
 **Done when**:
 

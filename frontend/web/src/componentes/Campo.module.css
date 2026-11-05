@@ -1,0 +1,55 @@
+/* Campo (ACE-56), de .specs/mockup/base.css:23,81-89. */
+
+.campo {
+  display: grid;
+  gap: var(--esp-1);
+}
+
+.campo__rotulo {
+  font-weight: var(--peso-semi);
+}
+
+.campo__ajuda {
+  margin: 0;
+  font-size: var(--texto-sm);
+  color: var(--cor-texto-sec);
+}
+
+.campo__erro {
+  display: flex;
+  gap: var(--esp-1);
+  align-items: flex-start;
+  margin: 0;
+  font-size: var(--texto-sm);
+  font-weight: var(--peso-semi);
+  color: var(--cor-erro-texto);
+}
+
+.campo__entrada {
+  width: 100%;
+  min-height: var(--alvo-toque);
+  padding: 0 var(--esp-3);
+  border: 2px solid var(--cor-contorno);
+  border-radius: var(--raio-sm);
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  font: inherit;
+}
+
+.campo--erro .campo__entrada {
+  border-color: var(--cor-erro-texto);
+}
+
+.campo__linha {
+  display: flex;
+  gap: var(--esp-2);
+  align-items: center;
+}
+
+.campo__linha .campo__entrada {
+  flex: 1;
+}
+
+.icone {
+  flex-shrink: 0;
+}
