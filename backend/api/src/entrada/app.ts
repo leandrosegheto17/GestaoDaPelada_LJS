@@ -24,6 +24,8 @@ import { rotasPeriodosCorrecao } from './rotas/periodos-correcao.ts';
 import { rotasPartidas } from './rotas/partidas.ts';
 import { rotasPesos } from './rotas/pesos.ts';
 import { rotasPlano } from './rotas/plano.ts';
+import { rotasAssinatura } from './rotas/assinatura.ts';
+import { asaasHttp, type Asaas } from '../infraestrutura/asaas/cliente.ts';
 import { rotasPublico } from './rotas/publico.ts';
 import { rotasUso } from './rotas/uso.ts';
 import { rotasSimulador } from './rotas/simulador.ts';
@@ -55,6 +57,8 @@ export interface OpcoesApp {
    * relógio da requisição (planos-e-cobranca T21; PLA-07).
    */
   recursoLiberado?: RecursoLiberado;
+  /** Só para os testes: Asaas em memória (planos-e-cobranca T30, T33). Sem ele, o HTTP com `ASAAS_URL` e a chave. */
+  asaas?: Asaas;
 }
 
 /**
@@ -70,6 +74,8 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
   api.use('*', async (c, next) => {
     c.set('relogio', relogio);
     c.set('recursoLiberado', recursoLiberado);
+    // Cliente do Asaas da requisição (planos-e-cobranca T33): o dos testes ou o HTTP com a config do Worker.
+    c.set('asaas', opcoes.asaas ?? asaasHttp({ ASAAS_URL: c.env.ASAAS_URL, ASAAS_API_KEY: c.env.ASAAS_API_KEY }));
     await next();
   });
 
@@ -128,6 +134,7 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
   api.route('/', rotasFinanceiroLancamentos());
   // Planos e cobrança (T24 em diante da planos-e-cobranca).
   api.route('/', rotasPlano());
+  api.route('/', rotasAssinatura());
   opcoes.registrarExtras?.(api);
 
   api.notFound((c) => c.json({ erro: 'Rota não encontrada.' }, 404));

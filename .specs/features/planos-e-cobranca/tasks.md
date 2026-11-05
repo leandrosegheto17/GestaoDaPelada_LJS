@@ -1199,6 +1199,8 @@ T56 → T57
 **Depends on**: T32
 **Reuses**: `LIMITE_ESCRITA` por conta (`GE:928`, T23); `so_quem_criou` (`GE:854`); molde de rota de `GE:1105` (T30)
 **Requirement**: PLA-30, PLA-31, PLA-32, PLA-33, PLA-60
+**Status**: rascunhada
+**Nota do rascunho**: o `criarApp` ganha a opção `asaas` (dublê em memória nos testes) e, sem ela, monta `asaasHttp` com `ASAAS_URL` e `ASAAS_API_KEY` do Worker, posto em `c.var.asaas` (campo novo em `ambiente.ts`). A rota usa a cadeia de grupo (sessão, `LIMITE_ESCRITA`, vínculo, grupo ativo) e fica fora da trava de somente leitura. O teste do 429 usa o binding falso de `sessao/limite-escrita.test.ts`.
 
 **Done when**:
 

@@ -3,6 +3,7 @@ import type { Banco } from '../infraestrutura/db/transacao.ts';
 import type { FilaAvisos } from '../infraestrutura/fila/avisos.ts';
 import type { Relogio } from '../infraestrutura/relogio.ts';
 import type { RecursoLiberado } from './middlewares/recurso.ts';
+import type { Asaas } from '../infraestrutura/asaas/cliente.ts';
 
 /**
  * Bindings do Worker (wrangler.jsonc). Tipos mínimos escritos aqui, para não depender dos
@@ -40,6 +41,15 @@ export interface Env {
   VAPID_PRIVADA?: string;
   /** Contato do remetente dos avisos, `mailto:` ou URL (`sub` do JWT, NOT-27). */
   VAPID_ASSUNTO?: string;
+  /**
+   * Hosts do serviço de push falso, separados por vírgula (`localhost:8790`), só no `.env` local e no e2e (notificacoes
+   * T27; NOT-63). Nunca no `wrangler.jsonc` nem no deploy (checagem `push-hosts-dev`).
+   */
+  PUSH_HOSTS_DEV?: string;
+  /** Base da API do Asaas (variável; só o sandbox até AD de produção, T40, AD-061). */
+  ASAAS_URL?: string;
+  /** Chave da API do Asaas (secret, `$aact_…`). Ausente: toda chamada vira `falhou` e a rota responde 502. */
+  ASAAS_API_KEY?: string;
   HYPERDRIVE: HyperdriveBinding;
   /**
    * Produtor da fila `avisos` (notificacoes T16; NOT-22, AD-098). Opcional no tipo: sem a fila criada (ou nos testes
@@ -74,6 +84,8 @@ export interface Variaveis {
   grupoProtegido?: boolean;
   /** Ponto único da regra de plano, posto pelo `criarApp` (T32 da simulador; SIM-68, AD-049). */
   recursoLiberado: RecursoLiberado;
+  /** Cliente do Asaas da requisição, posto pelo `criarApp` (planos-e-cobranca T33); nos testes, o em memória (T30). */
+  asaas: Asaas;
   /** A conta da sessão tem acesso ao financeiro do grupo, posto pelo `exigirFinanceiro` (financeiro T23; FIN-33). */
   acessaFinanceiro?: boolean;
 }
