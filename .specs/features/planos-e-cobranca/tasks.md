@@ -473,6 +473,7 @@ T56 → T57
 **Depends on**: T5
 **Reuses**: primitivos do contrato (`CA:550`); códigos de erro de `backend/api/src/entrada/corpo.ts` (`GE:854`); AD-091
 **Requirement**: PLA-08, PLA-35
+**Status**: rascunhada
 
 **Done when**:
 

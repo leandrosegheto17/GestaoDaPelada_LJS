@@ -13,7 +13,8 @@
     "./grupo": "./src/grupo.ts",
     "./elenco": "./src/elenco.ts",
     "./periodos": "./src/periodos.ts",
-    "./push": "./src/push.ts"
+    "./push": "./src/push.ts",
+    "./plano": "./src/plano.ts"
   },
   "scripts": {
     "lint": "eslint .",
