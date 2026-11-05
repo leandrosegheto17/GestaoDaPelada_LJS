@@ -414,6 +414,8 @@ T56 → T57
 **Depends on**: T3
 **Reuses**: `pagoAteDe` (T3); `reaisParaCentavos` (T2); S:52 (ordem não garantida); AD-096 (inadimplente mantém a assinatura `ativa`)
 **Requirement**: PLA-44, PLA-45, PLA-46, PLA-47, PLA-48, PLA-49, PLA-51
+**Status**: rascunhada
+**Lacunas**: (1) 'cobrança mais recente' (PLA-45) não é guardada em assinaturas (AD-088): interpretada como a que vence no pagoAte ou depois; (2) pagamento confirmado de assinatura já cancelada: não reativa (conservador); (3) evento sem dateCreated com outro já aplicado: fora_de_ordem
 
 **Done when**:
 

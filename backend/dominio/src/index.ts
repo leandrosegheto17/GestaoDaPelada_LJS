@@ -129,3 +129,14 @@ export {
   type SituacaoMarcacao,
 } from './partidas/marcacoes.ts';
 export { ANO_SEM_INFORMACAO, ordenarPorRanking, type Colocado, type Rankeavel } from './ranking/ordenar.ts';
+export {
+  efeitoDoEvento,
+  EVENTOS_TRATADOS,
+  SITUACOES_ASSINATURA,
+  type AssinaturaGravada,
+  type CobrancaDoEvento,
+  type EfeitoDoEvento,
+  type EventoAsaas,
+  type MotivoSemEfeito,
+  type SituacaoAssinatura,
+} from './plano/eventos-asaas.ts';
