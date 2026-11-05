@@ -24,6 +24,8 @@ const ranking = () => ({
   resumoMes: { partidas: 1, comChuva: 0 },
   partidas: [{ data: '2026-10-15', choveu: false }],
   linhas: [linha([rodada])],
+  // planos-e-cobranca T27 (PLA-25, AD-095): campo novo obrigatório do contrato.
+  pdfLiberado: true,
 });
 
 const colunas = (n: number) =>
@@ -46,6 +48,14 @@ describe('rankingPublico', () => {
 
   it('PAR-76: a resposta válida não tem nenhum campo proibido', () => {
     expect(camposProibidosEm(ranking())).toEqual([]);
+  });
+
+  it('PLA-25: pdfLiberado é obrigatório e booleano (AD-095)', () => {
+    const { pdfLiberado: _fora, ...semCampo } = ranking();
+    void _fora;
+    expect(rankingPublico.safeParse(semCampo).success).toBe(false);
+    expect(rankingPublico.safeParse({ ...ranking(), pdfLiberado: 'sim' }).success).toBe(false);
+    expect(rankingPublico.parse({ ...ranking(), pdfLiberado: false }).pdfLiberado).toBe(false);
   });
 
   it.each([...CAMPOS_PROIBIDOS_PUBLICO])('PAR-76: o campo proibido %s é recusado em todos os níveis', (campo) => {

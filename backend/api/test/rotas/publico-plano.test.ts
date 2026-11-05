@@ -1,5 +1,5 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
-import { erroPlanoPro } from '@pelada/contrato';
+import { camposProibidosEm, erroPlanoPro, rankingPublico } from '@pelada/contrato';
 import { criarApp } from '../../src/entrada/app.ts';
 import { relogioFixo } from '../../src/infraestrutura/relogio.ts';
 import { envAcesso } from '../acesso/apoio.ts';
@@ -125,6 +125,23 @@ describe('pdf_exportado (PLA-26)', () => {
     await free();
     const r = await evento({ tipo: 'ranking_aberto', dispositivoId: crypto.randomUUID() });
     expect(r.status).toBe(204);
+  });
+});
+
+describe('pdfLiberado no ranking público (T27; PLA-25)', () => {
+  it('PLA-25: Free → pdfLiberado falso', async () => {
+    await free();
+    const r = await publico('/ranking?mes=2026-01');
+    expect(r.status).toBe(200);
+    const corpo = rankingPublico.parse(await r.json());
+    expect(corpo.pdfLiberado).toBe(false);
+    expect(camposProibidosEm(corpo)).toEqual([]);
+  });
+
+  it('PLA-25: trial → pdfLiberado verdadeiro', async () => {
+    await situacao('trial', '2026-11-10');
+    const corpo = rankingPublico.parse(await (await publico('/ranking?mes=2026-01')).json());
+    expect(corpo.pdfLiberado).toBe(true);
   });
 });
 

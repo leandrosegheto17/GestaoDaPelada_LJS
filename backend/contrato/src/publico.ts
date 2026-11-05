@@ -95,6 +95,11 @@ export const rankingPublico = z
     resumoMes: z.strictObject({ partidas: inteiro.min(0), comChuva: inteiro.min(0) }),
     partidas: z.array(z.strictObject({ data: dataTexto, choveu: z.boolean() })),
     linhas: z.array(linhaPublica),
+    /**
+     * O grupo tem o recurso `pdf` hoje (planos-e-cobranca T27; PLA-25, AD-095): a t01 esconde "Exportar PDF" no Free
+     * sem outra chamada. Ranking guardado no aparelho antes deste campo falha a validação e é descartado (PAR-154).
+     */
+    pdfLiberado: z.boolean(),
   })
   .refine((r) => r.linhas.every((l) => l.rodadas.length === r.partidas.length), {
     error: 'Cada linha tem uma rodada por partida do mês.',

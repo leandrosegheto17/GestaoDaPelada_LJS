@@ -1039,6 +1039,8 @@ T56 → T57
 **Depends on**: T26
 **Reuses**: estender `rankingPublico` (`PR:913`, T19) e a rota `PR:1584` (T45); `CAMPOS_PROIBIDOS_PUBLICO` continua valendo
 **Requirement**: PLA-25
+**Status**: rascunhada
+**Nota do rascunho**: `pdfLiberado` entra obrigatório no `rankingPublico`; o fixture `ranking()` de `backend/contrato/test/publico.test.ts` ganhou o campo (só acréscimo). Ficam para o /executar os objetos `RankingPublico` montados à mão no front (fixtures dos testes da t01 e do `ranking-guardado`), que deixam de compilar sem o campo; ranking guardado no aparelho antes do campo é descartado pela validação (PAR-154).
 
 **Done when**:
 

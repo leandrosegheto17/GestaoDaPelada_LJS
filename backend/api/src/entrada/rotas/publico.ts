@@ -82,6 +82,8 @@ export function rotasPublico(): Hono<Ambiente> {
       resumoMes: { partidas: r.resumoMes.partidas, comChuva: r.resumoMes.comChuva },
       partidas: r.partidas.map((p) => ({ data: p.data, choveu: p.choveu })),
       linhas: r.linhas.map(linhaPublicaDe),
+      // Recurso `pdf` pelo ponto único no contexto do slug (planos-e-cobranca T27; PLA-25, AD-095).
+      pdfLiberado: await c.var.recursoLiberado(c.var.db, grupo.id, 'pdf'),
     };
     return c.json(resposta, 200);
   });
