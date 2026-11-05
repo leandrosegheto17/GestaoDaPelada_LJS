@@ -675,6 +675,7 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T11
 **Reuses**: mensagens de `GS:236-238`; `formatarData` (T9)
 **Requirement**: GEL-65, GEL-66, GEL-67
+**Status**: rascunhada
 
 **Done when**:
 
