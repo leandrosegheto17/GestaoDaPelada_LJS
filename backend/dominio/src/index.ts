@@ -113,3 +113,4 @@ export {
   type RecursosDoPlano,
 } from './plano/recursos.ts';
 export { pagoAteDe } from './plano/pago-ate.ts';
+export { dataSugeridaPartida } from './partidas/data-sugerida.ts';

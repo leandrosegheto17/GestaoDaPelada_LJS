@@ -626,6 +626,7 @@ T78 → T79
 **Depends on**: T1
 **Reuses**: `B:152` (PAR-17), caso limite `B:502`; Independent Test `B:173`
 **Requirement**: PAR-17
+**Status**: rascunhada
 
 **Done when**:
 
