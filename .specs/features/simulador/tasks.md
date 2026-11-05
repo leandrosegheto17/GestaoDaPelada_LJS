@@ -837,6 +837,8 @@ T53 → T54
 **Depends on**: T18
 **Reuses**: `L:backend/dominio/test/simulador/sugerir.orcamento.test.ts:10` (limiar 4 ms); bench de `PR:840` (T16); `S:236`
 **Requirement**: SIM-57
+**Status**: rascunhada
+**Nota do rascunho**: rascunhada antes da T18 (que pede rodar o legado, fora do rascunho). A medição (`test/simulador/medir.ts`) usa `performance.now()` em `test/`, fora da regra sem relógio de `src/`; o elenco e o histórico grandes estão no `apoio.ts`. Os números são impressos para a Evidência.
 
 **Done when**:
 

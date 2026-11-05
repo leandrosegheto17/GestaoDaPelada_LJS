@@ -1,3 +1,4 @@
+import { somarDias } from '../../src/atividade/datas.ts';
 import { PESOS_PADRAO, type ConfigPesos } from '../../src/pontuacao/pesos.ts';
 import type { Apto } from '../../src/simulador/base.ts';
 import type { HistoricoSim } from '../../src/simulador/prioridade.ts';
@@ -54,6 +55,52 @@ export function historicoFixo(quantos = 22): HistoricoSim {
     inicioPontuacao: '2026-01-01',
   }));
   return { jogadores, partidas, presencas, configsPesos: CONFIGS };
+}
+
+/**
+ * Elenco e histórico grandes para medir CPU (T19, T20): `jogadores` jogadores com nível, idade e "sem nota" variados
+ * e `partidas` partidas semanais antes de 2026-10-22, cada uma com cerca de 3/4 do elenco presente.
+ */
+export function aptosGrandes(quantos: number): Apto[] {
+  return Array.from({ length: quantos }, (_, k) => {
+    const i = k + 1;
+    return {
+      id: `g${String(i).padStart(3, '0')}`,
+      apelido: `Jogador ${i}`,
+      nivel: i % 11 === 0 ? 550 : 300 + ((i * 197) % 700),
+      semNota: i % 11 === 0,
+      anoNascimento: i % 9 === 0 ? null : 1965 + ((i * 17) % 40),
+      so1oTempo: false,
+    };
+  });
+}
+
+export function historicoGrande(jogadores: number, partidas: number): HistoricoSim {
+  const elenco = aptosGrandes(jogadores);
+  // Semanal, para trás a partir de 2026-10-15.
+  const lista = Array.from({ length: partidas }, (_, p) => ({
+    id: `pg${p}`,
+    data: somarDias('2026-10-15', -7 * p),
+    choveu: p % 4 === 0,
+  }));
+  const presencas = lista.flatMap((partida, p) =>
+    elenco
+      .filter((_, k) => (k * 5 + p) % 4 !== 0)
+      .map((a) => ({ partidaId: partida.id, jogadorId: a.id, situacao: 'presente' as const })),
+  );
+  return {
+    jogadores: elenco.map((a, k) => ({
+      id: a.id,
+      apelido: a.apelido,
+      anoNascimento: a.anoNascimento,
+      periodos: [{ inicio: '2020-01-01', fim: null }],
+      pontuacaoInicial: k % 6,
+      inicioPontuacao: '2020-01-01',
+    })),
+    partidas: lista,
+    presencas,
+    configsPesos: [{ ...PESOS_PADRAO, presencaSemChuva: 3, presencaComChuva: 4, vigenteDesde: '2020-01-01' }],
+  };
 }
 
 /** Embaralhamento determinístico: inverte e intercala as metades. */
