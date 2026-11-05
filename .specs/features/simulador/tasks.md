@@ -1653,6 +1653,8 @@ T53 → T54
 **Depends on**: T48
 **Reuses**: `.specs/mockup/telas/t13-resultado-dois--{mover,trocar,recalculando,erro-recalcular}.html` e `t14-resultado-varios--mover.html`; `Dialogo` (`CA:1286`)
 **Requirement**: SIM-64, SIM-65
+**Status**: rascunhada
+**Nota do rascunho**: `MoverJogador.tsx`: regras puras (`moverNoDois`, `trocarNoDois`, `alternarSo1oNoDois`, `moverNoVarios`, `trocarNoVarios`, `corpoDoAvaliar`), o hook `useAjusteManual` (avaliar pelo `useAvaliar`, 300 ms) e a `FolhaMover` sobre o `Dialogo` em formato folha. A tela mostra a composição local com "recalculando…" até o `avaliar` responder; pronto, mostra a resposta dele (sem a ordem de prioridade, SIM-62). Teste em `test/telas/simulador-mover.test.tsx`.
 
 **Done when**:
 

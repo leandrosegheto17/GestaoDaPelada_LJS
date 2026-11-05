@@ -568,3 +568,31 @@
   font-weight: var(--peso-forte);
   text-align: right;
 }
+
+/* Opções da folha "Mover jogador", base.css:246-248. */
+.folha__opcoes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.folha__opcao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 var(--esp-3);
+  border: 0;
+  border-bottom: 1px solid var(--cor-linha);
+  background: transparent;
+  color: var(--cor-texto);
+  font: inherit;
+  font-weight: var(--peso-semi);
+  text-align: left;
+  cursor: pointer;
+}
+
+.folha__opcao[aria-current='true'] {
+  color: var(--cor-texto-sec);
+}

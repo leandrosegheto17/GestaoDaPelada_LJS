@@ -127,7 +127,7 @@ export function ResultadoDoisTimes({ resultado, recalculando = false, aoTocarJog
   for (const j of resultado.naoEntra) apelidos.set(j.id, j.apelido);
   const apelido = (id: string) => apelidos.get(id) ?? id;
   const [a, b] = resultado.times;
-  const numero = (v: string) => (recalculando ? <span className={estilos.recalculando}>recalculando</span> : v);
+  const numero = (v: string) => (recalculando ? <span className={estilos.recalculando}>recalculando…</span> : v);
 
   return (
     <>

@@ -32,7 +32,7 @@ interface PropsResultadoVarios {
 }
 
 export function ResultadoVariosTimes({ resultado, recalculando = false, aoTocarJogador, movidos, antes, acoes }: PropsResultadoVarios) {
-  const numero = (v: string) => (recalculando ? <span className={estilos.recalculando}>recalculando</span> : v);
+  const numero = (v: string) => (recalculando ? <span className={estilos.recalculando}>recalculando…</span> : v);
   return (
     <>
       <p className={`${estilos.paragrafo} ${estilos['texto-sec']}`}>{cabecalhoVarios(resultado.data, resultado.descricao)}</p>

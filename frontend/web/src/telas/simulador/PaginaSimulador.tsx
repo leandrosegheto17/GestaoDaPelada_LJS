@@ -1,4 +1,4 @@
-import type { SugerirResposta } from '@pelada/contrato/simulador';
+import type { SugerirCorpo, SugerirResposta } from '@pelada/contrato/simulador';
 import { useState } from 'react';
 import { useParams } from 'react-router';
 import { Botao } from '../../componentes/Botao.tsx';
@@ -16,6 +16,7 @@ import { rotaDoGrupo } from '../grupos/Grupos.tsx';
 import { corpoDaPrevia, corpoDoSugerir, EntradasSimulador, entradasIniciais, type Entradas } from './EntradasSimulador.tsx';
 import { ID_PREVIA_ERRO, podeSugerir, PreviaSimulador, previaInvalida } from './PreviaSimulador.tsx';
 import { MontandoTimes, ResultadoDoisTimes, TEXTO_MONTANDO } from './ResultadoDoisTimes.tsx';
+import { FalhaRecalcular, FolhaMover, useAjusteManual } from './MoverJogador.tsx';
 import { ResultadoVariosTimes } from './ResultadoVariosTimes.tsx';
 import estilos from './simulador.module.css';
 
@@ -29,7 +30,9 @@ import estilos from './simulador.module.css';
  *   times" só fica ativo com ela válida;
  * - "Sugerir times" (T47; SIM-47, SIM-86) chama `sugerir` com as entradas e a data; pendente, "Montando os times…";
  *   com a resposta, "Times sugeridos" com o resultado de 2 times (t13) ou de 3 ou mais (t14, T48);
- * - o ajuste manual (T49) e as ações do resultado (T50) entram nas tarefas seguintes.
+ * - tocar num jogador abre "Mover jogador" (T49; SIM-64, SIM-65): o movimento aparece na hora e o `avaliar` recalcula
+ *   300 ms depois; a falha mantém a composição;
+ * - as ações do resultado (T50) entram na tarefa seguinte.
  */
 
 export const TEXTO_SEM_JOGADORES = 'Sem jogadores';
@@ -70,12 +73,19 @@ export function PaginaSimulador() {
   /** Na tela de resultado: a sugestão pedida (pendente, com erro ou pronta). */
   const [noResultado, setNoResultado] = useState(false);
   const [sugestao, setSugestao] = useState<SugerirResposta | null>(null);
+  /** A entrada da sugestão na tela: o `avaliar` e a confirmação usam a mesma. */
+  const [entradaDaSugestao, setEntradaDaSugestao] = useState<SugerirCorpo | null>(null);
+  const ajuste = useAjusteManual(grupoId, entradaDaSugestao, sugestao);
+  /** O jogador com a folha "Mover jogador" aberta. */
+  const [aberto, setAberto] = useState<string | null>(null);
 
   function pedirSugestao() {
     if (!ctx || !entradas) return;
+    const corpo = corpoDoSugerir(entradas, ctx);
     setNoResultado(true);
     setSugestao(null);
-    sugerirTimes.mutate(corpoDoSugerir(entradas, ctx), { onSuccess: (s) => setSugestao(s) });
+    setEntradaDaSugestao(corpo);
+    sugerirTimes.mutate(corpo, { onSuccess: (s) => setSugestao(s) });
   }
 
   function voltarAsEntradas() {
@@ -93,8 +103,35 @@ export function PaginaSimulador() {
       // [LACUNA] a spec não define a falha do `sugerir`; o rascunho usa o estado de erro padrão, com "Tentar de novo".
       return <EstadoErro aoTentarDeNovo={pedirSugestao} />;
     }
-    if (sugestao.formato === 'dois_times') return <ResultadoDoisTimes resultado={sugestao} />;
-    return <ResultadoVariosTimes resultado={sugestao} />;
+    const naTela = ajuste.naTela ?? sugestao;
+    const comum = {
+      recalculando: ajuste.recalculando,
+      movidos: ajuste.movidos,
+      aoTocarJogador: setAberto,
+      antes: ajuste.falhou ? <FalhaRecalcular aoTentarDeNovo={ajuste.tentarDeNovo} /> : null,
+    };
+    const folha = aberto ? (
+      <FolhaMover
+        resultado={ajuste.composicaoAtual ?? naTela}
+        jogadorId={aberto}
+        aoMover={(destino) => {
+          ajuste.mover(aberto, destino);
+          setAberto(null);
+        }}
+        aoTrocar={(outro) => {
+          ajuste.trocar(aberto, outro);
+          setAberto(null);
+        }}
+        aoAlternarSo1o={() => ajuste.alternarSo1o(aberto)}
+        aoFechar={() => setAberto(null)}
+      />
+    ) : null;
+    return (
+      <>
+        {naTela.formato === 'dois_times' ? <ResultadoDoisTimes resultado={naTela} {...comum} /> : <ResultadoVariosTimes resultado={naTela} {...comum} />}
+        {folha}
+      </>
+    );
   }
 
   function conteudo() {
