@@ -966,6 +966,7 @@ T78 → T79
 **Depends on**: T19
 **Reuses**: `B:348-350`, `B:398`, `B:475`; `BD:181-182`; `grupoDetalhe` da grupos-e-elenco (`GE:753`)
 **Requirement**: PAR-109, PAR-110, PAR-111, PAR-132, PAR-155
+**Status**: rascunhada
 
 **Done when**:
 
