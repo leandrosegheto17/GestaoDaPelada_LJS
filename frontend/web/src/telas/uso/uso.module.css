@@ -1,0 +1,45 @@
+/* Uso do app (t21; PAR-144), de .specs/mockup/base.css:270, 277-279, 298 e 360-363: tabela no PC, cartões no celular. */
+
+.cartoes-semana {
+  display: none;
+}
+
+.semana {
+  font-family: var(--fonte-texto);
+  font-size: var(--texto-sm);
+  font-weight: var(--peso-forte);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--cor-texto-sec);
+  margin: var(--esp-3) 0 var(--esp-1);
+}
+
+.indicadores {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px var(--esp-3);
+  margin: var(--esp-3) 0 0;
+  font-size: var(--texto-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.indicadores dt {
+  color: var(--cor-texto-sec);
+}
+
+.indicadores dd {
+  margin: 0;
+  font-weight: var(--peso-forte);
+  text-align: right;
+}
+
+@media (max-width: 599px) {
+  .tabela {
+    display: none;
+  }
+
+  .cartoes-semana {
+    display: grid;
+    gap: var(--esp-2);
+  }
+}

@@ -2168,6 +2168,7 @@ T78 → T79
 **Depends on**: T62
 **Reuses**: `.specs/mockup/telas/t21-uso--{sucesso,vazio}.html`
 **Requirement**: PAR-144
+**Status**: rascunhada
 
 **Done when**:
 
