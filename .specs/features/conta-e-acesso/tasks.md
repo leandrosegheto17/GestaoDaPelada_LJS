@@ -710,6 +710,8 @@ T57 → T58
 **Depends on**: T15
 **Reuses**: `URL_PUBLICA` como única origem de URL (FUN-23, `F:1251`); fragmento de `ljs:.specs/features/conta-e-acesso/design.md:30-31`
 **Requirement**: ACE-04, ACE-23, ACE-31
+**Status**: rascunhada
+**Nota do rascunho**: o aviso de cadastro duplicado leva só o link de `/entrar/esqueci`, sem token.
 
 **Done when**:
 
