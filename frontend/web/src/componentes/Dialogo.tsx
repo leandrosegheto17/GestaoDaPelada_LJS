@@ -10,6 +10,10 @@ import estilos from './Dialogo.module.css';
  * Foco: ao abrir, vai ao elemento com `autoFocus` (como o "Cancelar" do mockup) ou, sem ele,
  * ao primeiro focável; Tab e Shift+Tab ficam presos no diálogo; Esc chama `aoFechar`; ao
  * fechar, o foco volta a quem o tinha antes. Quem usa monta e desmonta o diálogo.
+ *
+ * `formato="folha"` (T50, `t09-inicio--menu-conta.html`): o mesmo comportamento numa folha que
+ * sobe do pé da tela (`veu--folha`, `section.folha`, `folha__titulo`), sem o botão "Fechar" do
+ * canto; Esc ou o toque no véu fecham.
  */
 
 export interface PropsDialogo {
@@ -17,6 +21,7 @@ export interface PropsDialogo {
   descricao?: ReactNode;
   aoFechar: () => void;
   alerta?: boolean;
+  formato?: 'dialogo' | 'folha';
   children?: ReactNode;
   acoes?: ReactNode;
 }
@@ -28,7 +33,8 @@ function focaveis(raiz: HTMLElement): HTMLElement[] {
   return Array.from(raiz.querySelectorAll<HTMLElement>(FOCAVEIS));
 }
 
-export function Dialogo({ titulo, descricao, aoFechar, alerta = false, children, acoes }: PropsDialogo) {
+export function Dialogo({ titulo, descricao, aoFechar, alerta = false, formato = 'dialogo', children, acoes }: PropsDialogo) {
+  const folha = formato === 'folha';
   const base = useId();
   const idTitulo = `${base}-titulo`;
   const idTexto = `${base}-texto`;
@@ -65,16 +71,26 @@ export function Dialogo({ titulo, descricao, aoFechar, alerta = false, children,
   };
 
   return (
-    <div className={estilos.veu}>
+    <div
+      className={folha ? `${estilos.veu} ${estilos['veu--folha']}` : estilos.veu}
+      onClick={
+        folha
+          ? (e) => {
+              if (e.target === e.currentTarget) aoFechar();
+            }
+          : undefined
+      }
+    >
       <section
         ref={ref}
-        className={estilos.dialogo}
+        className={folha ? estilos.folha : estilos.dialogo}
         role={alerta ? 'alertdialog' : 'dialog'}
         aria-modal="true"
         aria-labelledby={idTitulo}
         aria-describedby={descricao ? idTexto : undefined}
         onKeyDown={aoTeclar}
       >
+        {folha ? null : (
         <button className={estilos['dialogo__fechar']} type="button" aria-label="Fechar" onClick={aoFechar}>
           <svg
             viewBox="0 0 24 24"
@@ -90,7 +106,8 @@ export function Dialogo({ titulo, descricao, aoFechar, alerta = false, children,
             <path d="M18 6 6 18M6 6l12 12" />
           </svg>
         </button>
-        <h2 id={idTitulo} className={estilos['dialogo__titulo']}>
+        )}
+        <h2 id={idTitulo} className={folha ? estilos['folha__titulo'] : estilos['dialogo__titulo']}>
           {titulo}
         </h2>
         {descricao ? (

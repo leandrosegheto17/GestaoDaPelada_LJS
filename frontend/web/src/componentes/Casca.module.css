@@ -95,3 +95,31 @@
   text-align: center;
   padding: var(--esp-6) var(--esp-4);
 }
+
+/* Ações da barra e botão de ícone (T50), de .specs/mockup/base.css:33,38-39. */
+.barra__acoes {
+  display: flex;
+  gap: var(--esp-2);
+  flex-shrink: 0;
+}
+
+.botao-icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--alvo-toque);
+  height: var(--alvo-toque);
+  border-radius: var(--raio);
+  border: 2px solid var(--cor-sobre-verde);
+  color: var(--cor-sobre-verde);
+  text-decoration: none;
+  font-family: var(--fonte-titulo);
+  font-size: var(--texto-2xl);
+  font-weight: var(--peso-extra);
+  background: transparent;
+  cursor: pointer;
+}
+
+.botao-icone--sem-borda {
+  border-color: transparent;
+}

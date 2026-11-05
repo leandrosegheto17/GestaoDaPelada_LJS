@@ -21,9 +21,31 @@ export interface PropsItemLista {
   /** Rota do app; o item vira link. */
   para?: string;
   lateral?: ReactNode;
+  /** Seta à direita (`item__seta`), no item que abre outra tela (T50). */
+  seta?: boolean;
 }
 
-export function ItemLista({ titulo, meta, para, lateral }: PropsItemLista) {
+function Seta() {
+  return (
+    <svg
+      className={estilos['item__seta']}
+      viewBox="0 0 24 24"
+      width="20"
+      height="20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <polyline points="9 18 15 12 9 6" />
+    </svg>
+  );
+}
+
+export function ItemLista({ titulo, meta, para, lateral, seta = false }: PropsItemLista) {
   const conteudo = (
     <>
       <span className={estilos['item__principal']}>
@@ -31,6 +53,7 @@ export function ItemLista({ titulo, meta, para, lateral }: PropsItemLista) {
         {meta ? <span className={estilos['item__meta']}>{meta}</span> : null}
       </span>
       {lateral}
+      {seta ? <Seta /> : null}
     </>
   );
   return (

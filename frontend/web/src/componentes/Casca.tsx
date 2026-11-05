@@ -26,10 +26,12 @@ export interface PropsCasca {
   estreita?: boolean;
   /** Marca a área principal como ocupada (carregando). */
   ocupada?: boolean;
+  /** Ações à direita da barra (`barra__acoes`: o menu da conta, T50). */
+  acoes?: ReactNode;
   children?: ReactNode;
 }
 
-export function Casca({ titulo, grupo, centralizada = false, estreita = false, ocupada = false, children }: PropsCasca) {
+export function Casca({ titulo, grupo, centralizada = false, estreita = false, ocupada = false, acoes, children }: PropsCasca) {
   const classeMain = centralizada
     ? estilos['tela-mensagem']
     : [estilos.conteudo, grupo ? estilos['conteudo--admin'] : '', estreita ? estilos['conteudo--estreito'] : '']
@@ -50,6 +52,11 @@ export function Casca({ titulo, grupo, centralizada = false, estreita = false, o
         ) : (
           <p className={estilos['barra__titulo']}>{NOME_DO_APP}</p>
         )}
+        {acoes ? (
+          <nav className={estilos['barra__acoes']} aria-label="Atalhos">
+            {acoes}
+          </nav>
+        ) : null}
       </header>
       <main className={classeMain} aria-busy={ocupada || undefined}>
         {titulo ? <h1 className={estilos['titulo-pagina']}>{titulo}</h1> : null}

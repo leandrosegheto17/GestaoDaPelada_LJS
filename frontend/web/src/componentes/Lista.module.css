@@ -39,3 +39,9 @@
   font-size: var(--texto-sm);
   color: var(--cor-texto-sec);
 }
+
+/* Seta do item que abre outra tela (T50), de .specs/mockup/base.css:152. */
+.item__seta {
+  flex-shrink: 0;
+  color: var(--cor-texto-sec);
+}

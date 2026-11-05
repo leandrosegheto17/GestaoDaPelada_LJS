@@ -98,3 +98,29 @@
   background: var(--cor-atencao-fundo);
   color: var(--cor-atencao-texto);
 }
+
+/* Estado vazio e selo neutro (T50), de .specs/mockup/base.css:156,227-230 (t08-grupos--vazio). */
+.selo--neutro {
+  background: var(--cor-f-fundo);
+  color: var(--cor-f-texto);
+}
+
+.vazio {
+  text-align: center;
+  padding: var(--esp-8) var(--esp-4);
+  background: var(--cor-superficie);
+  border: 1px dashed var(--cor-contorno);
+  border-radius: var(--raio);
+}
+
+.vazio__titulo {
+  font-size: var(--texto-2xl);
+  text-transform: uppercase;
+  margin: 0 0 var(--esp-2);
+}
+
+.vazio__texto {
+  color: var(--cor-texto-sec);
+  max-width: 420px;
+  margin: 0 auto var(--esp-4);
+}

@@ -67,3 +67,36 @@
     width: auto;
   }
 }
+
+/* Folha (T50), de .specs/mockup/base.css:243-248,345-346 (menu da conta, t09-inicio--menu-conta). */
+.veu--folha {
+  align-items: flex-end;
+  padding: 0;
+}
+
+.folha {
+  width: 100%;
+  background: var(--cor-superficie);
+  border-radius: var(--raio) var(--raio) 0 0;
+  box-shadow: var(--sombra-flutuante);
+  padding: var(--esp-4) var(--esp-4) calc(var(--esp-4) + env(safe-area-inset-bottom));
+}
+
+.folha__titulo {
+  font-size: var(--texto-xl);
+  text-transform: uppercase;
+  margin: 0 0 var(--esp-3);
+}
+
+@media (min-width: 600px) {
+  .veu--folha {
+    align-items: center;
+    padding: var(--esp-4);
+  }
+
+  .folha {
+    max-width: 440px;
+    border-radius: var(--raio);
+    box-shadow: var(--sombra-dialogo);
+  }
+}

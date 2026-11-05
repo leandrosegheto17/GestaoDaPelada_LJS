@@ -1621,6 +1621,8 @@ T57 → T58
 **Depends on**: T49
 **Reuses**: `.specs/mockup/telas/t08-grupos--sucesso.html`, `t08-grupos--vazio.html`, `t09-inicio--menu-conta.html`; `Casca` e `Barra` da fundação (`F:1424`)
 **Requirement**: ACE-17, ACE-18, ACE-56, ACE-57
+**Status**: rascunhada
+**Nota do rascunho**: os grupos vêm do `useSessao()` (a guarda já leu a sessão), com link para `/app/grupos/:grupoId/admins` (AD-022) e o selo "Sem acesso ao financeiro". O menu é `MenuConta` (`componentes/MenuConta.tsx`), com `CascaConta` (barra do admin com o nome do app e o botão "Menu da conta"); para isso a `Casca` ganhou `acoes`, o `Dialogo` ganhou `formato="folha"` (sem o "Fechar" do canto; Esc e o véu fecham) e o `ItemLista` ganhou `seta`.
 
 **Done when**:
 
