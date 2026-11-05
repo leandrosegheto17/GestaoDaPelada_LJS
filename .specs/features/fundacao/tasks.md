@@ -2230,6 +2230,8 @@ T81 → T82
 **Depends on**: T73
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-52
+**Status**: rascunhada
+**Nota do rascunho**: segue a AD-119: lista os secrets do environment `producao` (os da AD-119 mais `BACKUP_CHAVE` e o opcional `VITE_SENTRY_DSN`, que o `deploy.yml` da T70 usa) e do `backup`, sem valores, e registra que o `previa` do plano original não é usado. O Hyperdrive descrito é o da prévia sobre a `main` (não o de `dev`, que a T74 pedia antes da AD-119). O passo de produção traz dump cifrado e branch de restauração `antes-da-paridade` da `main` antes de desligar o Worker do LJS; o domínio fica para uma AD nova, com a guarda `so-previa` valendo até lá. Âncoras com acento no formato do GitHub (`#deploy-da-prévia`): o `/executar` confere os links na tela.
 
 **Done when**:
 

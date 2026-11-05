@@ -131,3 +131,108 @@ O backup da produção não é confiável até a revalidação do fim do projeto
    docker compose exec -T postgres dropdb -U postgres restauracao
    rm -r ./backup-baixado
    ```
+
+## Segredos
+
+Nenhum valor real vai para o repositório: o `.env.example` lista só os nomes, com obrigatoriedade, formato e se é segredo (checagem `env-example`, FUN-46), e o `gitleaks` roda no CI.
+
+### Environment `producao` do GitHub (deploy da prévia, AD-119)
+
+| Secret                  | O que é                                                                    |
+| ----------------------- | -------------------------------------------------------------------------- |
+| `NEON_URL_MIGRACAO`     | URL postgres da role `pelada_owner` da `main` do Neon (migração)           |
+| `NEON_URL_BACKUP`       | URL postgres da role `pelada_backup_ro` da `main` (dump antes do deploy)   |
+| `BACKUP_CHAVE`          | Chave pública `age` do dump antes do deploy (a mesma do backup diário)     |
+| `NEON_API_KEY`          | Chave da API do Neon, com o menor escopo possível (branch de restauração)  |
+| `NEON_PROJECT_ID`       | Identificador do projeto no Neon                                           |
+| `CLOUDFLARE_API_TOKEN`  | Token da API da Cloudflare só com permissão de Workers                     |
+| `CLOUDFLARE_ACCOUNT_ID` | ID da conta Cloudflare                                                     |
+| `URL_PUBLICA`           | URL https da prévia (o endereço padrão da Cloudflare do Worker)            |
+| `VITE_SENTRY_DSN`       | Opcional: Sentry do front; vazio desliga                                   |
+
+O plano original previa um environment `previa` sobre a branch `dev` do Neon; pela AD-119 ele não é usado.
+
+### Environment `backup` do GitHub (backup diário, AD-013)
+
+| Secret            | O que é                                                    |
+| ----------------- | ---------------------------------------------------------- |
+| `NEON_URL_BACKUP` | URL postgres da role `pelada_backup_ro` da `main` do Neon  |
+| `BACKUP_CHAVE`    | Chave pública `age`; a privada fica fora do GitHub         |
+
+### Secret do Worker (Cloudflare)
+
+| Secret       | O que é                                 |
+| ------------ | --------------------------------------- |
+| `SENTRY_DSN` | Opcional: Sentry do Worker; vazio desliga |
+
+### Conferir e criar
+
+```bash
+gh secret list --env producao
+gh secret list --env backup
+gh secret set NEON_API_KEY --env producao        # o valor é pedido no terminal, sem eco
+pnpm --filter @pelada/api exec wrangler secret put SENTRY_DSN --config ../../wrangler.jsonc
+```
+
+Esperado no `gh secret list`: os nomes das tabelas acima, sem valores.
+
+### Hyperdrive
+
+O Worker fala com o Neon pelo Hyperdrive, com o cache **desligado** (as consultas dependem do contexto da RLS da transação, FUN-18). Pela AD-119, o Hyperdrive da prévia aponta para a `main` do Neon pela role `pelada_app`.
+
+```bash
+pnpm --filter @pelada/api exec wrangler hyperdrive create gestaodapelada-v2 \
+  --connection-string "postgres://pelada_app:<senha>@<host-do-neon>/<banco>?sslmode=require" \
+  --caching-disabled
+node backend/scripts/ops/hyperdrive.ts <id>
+```
+
+Esperado: o `create` imprime o `id`, que vai para o `wrangler.jsonc` (`hyperdrive[0].id`); a checagem sai com código 0. Se disser que o cache está ligado: `wrangler hyperdrive update <id> --caching-disabled`.
+
+### Rotação
+
+Troque um segredo quando ele vazar, quando quem o tinha sair, ou uma vez por ano.
+
+1. Gere o valor novo na origem: senha da role no Neon (`ALTER ROLE ... PASSWORD`, pela role dona), chave nova na API do Neon, token novo na Cloudflare.
+2. Grave o valor novo no lugar que o usa: `gh secret set <NOME> --env producao` (ou `--env backup`), `wrangler hyperdrive update <id> --connection-string ...` para a senha de `pelada_app`, `wrangler secret put` para o Sentry.
+3. Dispare o que o usa e confira: `deploy` (saúde verde) ou `backup` (artefato gerado).
+4. Só então revogue o valor antigo na origem.
+
+Para a chave `age` do backup: gere o par novo (`age-keygen -o chave-nova.txt`), guarde a privada fora do GitHub junto da antiga (os backups antigos continuam cifrados com a antiga), troque `BACKUP_CHAVE` nos dois environments e rode o `backup` à mão.
+
+## Monitor do UptimeRobot
+
+Opcional, de custo zero (FUN-52). Um monitor HTTP(s) em `GET <URL_PUBLICA>/api/health`:
+
+1. UptimeRobot > Add New Monitor > tipo **HTTP(s)**.
+2. URL: `<URL_PUBLICA>/api/health`; intervalo: 5 minutos.
+3. Palavra-chave (tipo **Keyword**, se quiser conferir o corpo): `"status":"ok"`.
+4. Alerta por e-mail para o dono do app.
+
+Esperado: o monitor fica verde em poucos minutos. O `/api/health` não toca o banco: o monitor diz se o Worker está no ar, não se o Neon está.
+
+## Assumir a produção (paridade)
+
+Passo do `/preparar` Nível 2 (AD-030), feito uma vez, com confirmação para cada ação externa. Hoje a prévia já usa a `main` do Neon (AD-119); assumir a produção é trocar quem atende os usuários: sair do Worker do LJS para o `gestaodapelada-v2`.
+
+Antes de qualquer troca:
+
+1. **Dump cifrado da `main`**: rode o `backup` à mão e confira o artefato (seção [Restaurar um backup](#restaurar-um-backup), passos 2 e 3, num banco local).
+2. **Branch de restauração da `main`**: crie uma com nome próprio, fora da rotação do deploy:
+
+   ```bash
+   curl -s -X POST -H "Authorization: Bearer $NEON_API_KEY" -H "Content-Type: application/json" \
+     "https://console.neon.tech/api/v2/projects/$NEON_PROJECT_ID/branches" \
+     -d '{"branch": {"name": "antes-da-paridade", "parent_id": "<id-da-main>"}}'
+   ```
+
+   O nome não começa por `restauracao-`, então o deploy nunca a apaga.
+
+A troca:
+
+3. **Desligar o Worker do LJS**: no painel da Cloudflare, remova as rotas e o domínio do Worker antigo (ou desative-o), para ele parar de escrever na `main`.
+4. **Domínio**: uma decisão nova (uma AD) define se a v2 ganha domínio próprio. Enquanto não houver, a guarda `so-previa` (FUN-28) continua reprovando `routes` e `custom_domain`, e a v2 segue só no endereço padrão da Cloudflare.
+5. **Hyperdrive de produção**: o da prévia já aponta para a `main` (AD-119). Se a AD do domínio pedir um Hyperdrive separado, crie-o como na seção [Hyperdrive](#hyperdrive), sempre com `--caching-disabled`.
+6. **Deploy**: dispare o `deploy` (seção [Deploy da prévia](#deploy-da-prévia)) e confira a saúde.
+
+Se algo der errado: restaure a `main` a partir de `antes-da-paridade` (como em [A migração falhou](#a-migração-falhou-fun-44)) e religue o Worker do LJS.
