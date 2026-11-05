@@ -270,6 +270,9 @@ T39 → T40 → T41
 **Depends on**: none
 **Reuses**: método da skill `rede-de-protecao`; rotas de partida (`PR:1461`, `PR:1487`); webhook (`PC:176-187`); `conta_excluir` (`CA:470`, `M:1792843800000_conta-senha-bloqueio.sql:92`); `recursoLiberado` (`PC:79`)
 **Requirement**: NOT-20, NOT-38, NOT-55
+**Status**: rascunhada
+**Lacunas**: S-01 sem contexto (consumidor da fila) provavelmente não vale: `backend/api/src/aplicacao/plano/recurso-liberado.ts:29` devolve `false` para o grupo que o contexto não enxerga; o teste afirma `false`. Confirmado no verde, o `/executar` pergunta antes do lote 2 se a T10 e a T18 seguem o plano B da S-01.
+**Nota do rascunho**: escrita depois da T21 e da T22 (por isso a fila em memória nos casos de partida e de webhook). Teste em `backend/api/test/caracterizacao/notificacoes.test.ts` (projeto `banco`, Node). Evidência preliminar, por leitura, a confirmar no verde: S-01 vale para o slug (`recurso-liberado.ts:33`), sem contexto ver Lacunas; S-02 vale (`backend/dominio/src/plano/plano-efetivo.ts:56`); S-03 vale em parte (`backend/api/src/entrada/rotas/webhook-asaas.ts`, `comBanco` sem contexto; `aplicarEventoAsaas` devolve repetido, assinatura desconhecida, aplicado ou sem efeito com o efeito e o grupo em `backend/api/src/aplicacao/plano/webhook.ts:62`; valor e vencimento a T22 lê do corpo); S-04 vale (`backend/dominio/src/plano/eventos-asaas.ts:20`, `PAYMENT_CREATED` é `nao_tratado` e não obsoleto); S-05 vale (`frontend/web/src/telas/plano/MeuPlano.tsx:23`); S-06 vale (nenhuma migração redefine `conta_excluir` depois de `1792843800000_conta-senha-bloqueio.sql:149`); S-07 vale (`backend/api/src/entrada/rotas/partidas.ts:180`, `:215`).
 
 **Done when**:
 
