@@ -1224,6 +1224,8 @@ T57 → T58
 **Depends on**: T34
 **Reuses**: estender o seed da fundação (`F:1055`, FUN-05)
 **Requirement**: ACE-64
+**Status**: rascunhada
+**Nota do rascunho**: a conta nasce com um hash provisório que não é bcrypt e recebe a senha por `conta_definir_senha(email, senha, false)`, que também confirma o e-mail; `SEED_SENHA_ADMIN` validada pelos limites do script do dono (`validarSenha`). `CONTA_LOCAL` perde a senha fixa. Testes FUN-05 do `seed.test.ts` alterados com autorização do usuário (2026-11-05, `## Autorizações` do `STATE.md`): `envDe` ganha `SEED_SENHA_ADMIN` e o teste do bcrypt confere a senha do ambiente; nenhuma asserção removida. O `README.md` ainda cita conta e senha antigas do seed: fica para a T58.
 
 **Done when**:
 

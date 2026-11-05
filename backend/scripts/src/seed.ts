@@ -1,5 +1,6 @@
 import type pg from 'pg';
 import { comConexao, executarCli } from './conectar.ts';
+import { validarSenha } from './dono.ts';
 import { exigirHostPermitido, HOSTS_LOCAIS } from './host.ts';
 
 /**
@@ -8,14 +9,20 @@ import { exigirHostPermitido, HOSTS_LOCAIS } from './host.ts';
  * nas tabelas de conta e nasce sem login; define o LOGIN PASSWORD de `pelada_app` e de
  * `pelada_backup_ro` a partir do `.env`. Só aceita `localhost` e `127.0.0.1`.
  * Rodar de novo não duplica nada: cada inserção é "se ainda não existe".
+ *
+ * A conta admin (ACE-64) nasce confirmada e com a senha de `SEED_SENHA_ADMIN`, definida por
+ * `conta_definir_senha` (a mesma função do script do dono); sem a variável, o seed recusa antes
+ * de conectar. A senha nunca é impressa.
  */
 
 export class ErroSeed extends Error {
   override name = 'ErroSeed';
 }
 
-/** Conta de exemplo do ambiente local. A senha não é segredo: o banco só existe na máquina. */
-export const CONTA_LOCAL = { email: 'admin@exemplo.test', nome: 'Admin Local', senha: 'pelada-local' } as const;
+/** Conta admin do ambiente local; a senha vem de `SEED_SENHA_ADMIN` (ACE-64). */
+export const CONTA_LOCAL = { email: 'admin@exemplo.test', nome: 'Admin Local' } as const;
+/** Hash que não é bcrypt: a conta não entra até `conta_definir_senha` gravar o da senha. */
+const HASH_PROVISORIO = '!';
 export const GRUPO_LOCAL = { nome: 'Pelada Local', slug: 'pelada-local' } as const;
 export const JOGADORES_LOCAIS = ['Bigode', 'Canhota', 'Paredão', 'Xerife', 'Foguete', 'Maestro'] as const;
 
@@ -37,14 +44,15 @@ async function idDe(c: pg.Client, sql: string, valores: unknown[]): Promise<stri
   return id;
 }
 
-async function semear(c: pg.Client, senhaApp: string, senhaBackup: string): Promise<ResultadoSeed> {
+async function semear(c: pg.Client, senhaApp: string, senhaBackup: string, senhaAdmin: string): Promise<ResultadoSeed> {
   await c.query(
-    `INSERT INTO contas (email, nome, senha_hash, criada_em, email_confirmado_em)
-     VALUES ($1, $2, crypt($3, gen_salt('bf', 12)), now(), now())
+    `INSERT INTO contas (email, nome, senha_hash, criada_em)
+     VALUES ($1, $2, $3, now())
      ON CONFLICT (email) DO NOTHING`,
-    [CONTA_LOCAL.email, CONTA_LOCAL.nome, CONTA_LOCAL.senha],
+    [CONTA_LOCAL.email, CONTA_LOCAL.nome, HASH_PROVISORIO],
   );
-  const contaId = await idDe(c, 'SELECT id FROM contas WHERE email = $1', [CONTA_LOCAL.email]);
+  // Troca o hash, confirma o e-mail e encerra as sessões da conta (ACE-64); rodar de novo só troca a senha.
+  const contaId = await idDe(c, 'SELECT conta_definir_senha($1, $2, false) AS id', [CONTA_LOCAL.email, senhaAdmin]);
 
   await c.query(
     `INSERT INTO grupos (nome, slug, dia_semana, frequencia, horario, criado_por, criado_em)
@@ -97,11 +105,17 @@ export async function comandoSeed(
   exigirHostPermitido(url, HOSTS_LOCAIS);
   const senhaApp = exigir(env, 'PELADA_APP_SENHA');
   const senhaBackup = exigir(env, 'PELADA_BACKUP_RO_SENHA');
+  const senhaAdmin = exigir(env, 'SEED_SENHA_ADMIN');
+  try {
+    validarSenha(senhaAdmin);
+  } catch (erro) {
+    throw new ErroSeed(`SEED_SENHA_ADMIN inválida: ${erro instanceof Error ? erro.message : String(erro)}`);
+  }
 
   return comConexao(url, async (c) => {
     await c.query('BEGIN');
     try {
-      const r = await semear(c, senhaApp, senhaBackup);
+      const r = await semear(c, senhaApp, senhaBackup, senhaAdmin);
       await c.query('COMMIT');
       return r;
     } catch (erro) {
@@ -115,7 +129,7 @@ if (import.meta.main) {
   await executarCli(async () => {
     const r = await comandoSeed();
     console.log(
-      `Seed pronto: conta ${CONTA_LOCAL.email} (senha ${CONTA_LOCAL.senha}), grupo ${GRUPO_LOCAL.slug}, ${r.jogadores} jogadores.`,
+      `Seed pronto: conta ${CONTA_LOCAL.email} (senha de SEED_SENHA_ADMIN), grupo ${GRUPO_LOCAL.slug}, ${r.jogadores} jogadores.`,
     );
   });
 }

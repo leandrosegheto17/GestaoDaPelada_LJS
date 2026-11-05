@@ -4,6 +4,7 @@ import pg from 'pg';
 import { describe, expect, it, vi } from 'vitest';
 import { comConexao } from '../src/conectar.ts';
 import { comandoSeed, CONTA_LOCAL, GRUPO_LOCAL, JOGADORES_LOCAIS } from '../src/seed.ts';
+import { entrarComo } from './apoio/banco.ts';
 
 const URL_BASE = process.env.DATABASE_URL_TESTE ?? 'postgres://postgres:postgres@127.0.0.1:5432/pelada';
 const ROLES = ['pelada_app', 'pelada_backup_ro'] as const;
@@ -54,6 +55,7 @@ function envDe(url: string) {
     DATABASE_URL_MIGRACAO: url,
     PELADA_APP_SENHA: `app-${randomBytes(8).toString('hex')}`,
     PELADA_BACKUP_RO_SENHA: `backup-${randomBytes(8).toString('hex')}`,
+    SEED_SENHA_ADMIN: `admin-${randomBytes(8).toString('hex')}`,
   };
 }
 
@@ -99,12 +101,13 @@ describe('pnpm seed', () => {
 
   it('FUN-05: a senha da conta de exemplo é bcrypt e confere', async () => {
     await comBancoMigrado(async (url) => {
-      await comandoSeed(envDe(url));
+      const env = envDe(url);
+      await comandoSeed(env);
       const ok = await comConexao(url, async (c) =>
         (
           await c.query<{ ok: boolean; bcrypt: boolean }>(
             `SELECT crypt($2, senha_hash) = senha_hash AS ok, senha_hash LIKE '$2%' AS bcrypt FROM contas WHERE email = $1`,
-            [CONTA_LOCAL.email, CONTA_LOCAL.senha],
+            [CONTA_LOCAL.email, env.SEED_SENHA_ADMIN],
           )
         ).rows[0],
       );
@@ -188,5 +191,50 @@ describe('pnpm seed', () => {
       await expect(comandoSeed(envDe(url))).rejects.toThrow('falha de propósito');
       expect(await contagens(url)).toEqual({ contas: 0, grupos: 0, vinculos: 0, jogadores: 0, periodos: 0 });
     });
+  });
+});
+
+describe('pnpm seed: conta admin que entra', () => {
+  it('ACE-64: depois do seed, a conta tem email_confirmado_em e entra por conta_entrar com a senha do ambiente', async () => {
+    await comBancoMigrado(async (url) => {
+      const env = envDe(url);
+      const r = await comandoSeed(env);
+      const conta = await comConexao(url, async (c) =>
+        (
+          await c.query<{ id: string; confirmada: boolean; e_dono: boolean }>(
+            'SELECT id, email_confirmado_em IS NOT NULL AS confirmada, e_dono FROM contas WHERE email = $1',
+            [CONTA_LOCAL.email],
+          )
+        ).rows,
+      );
+      expect(conta).toEqual([{ id: r.contaId, confirmada: true, e_dono: false }]);
+      expect(await entrarComo(url, CONTA_LOCAL.email, env.SEED_SENHA_ADMIN)).toBe('ok');
+      expect(await entrarComo(url, CONTA_LOCAL.email, 'pelada-local')).toBe('invalida');
+    });
+  });
+
+  it('ACE-64: rodar de novo com outra SEED_SENHA_ADMIN troca a senha da mesma conta', async () => {
+    await comBancoMigrado(async (url) => {
+      const env = envDe(url);
+      const primeiro = await comandoSeed(env);
+      const nova = `admin-${randomBytes(8).toString('hex')}`;
+      const segundo = await comandoSeed({ ...env, SEED_SENHA_ADMIN: nova });
+      expect(segundo.contaId).toBe(primeiro.contaId);
+      expect(await entrarComo(url, CONTA_LOCAL.email, nova)).toBe('ok');
+      expect(await entrarComo(url, CONTA_LOCAL.email, env.SEED_SENHA_ADMIN)).toBe('invalida');
+    });
+  });
+
+  it('ACE-64: sem SEED_SENHA_ADMIN, ou com ela fora dos limites, sai com erro antes de conectar', async () => {
+    const conectar = vi.spyOn(pg.Client.prototype, 'connect');
+    try {
+      const { SEED_SENHA_ADMIN: _ignorada, ...semSenha } = envDe('postgres://postgres:postgres@127.0.0.1:5432/pelada');
+      await expect(comandoSeed(semSenha)).rejects.toThrow(/SEED_SENHA_ADMIN/);
+      await expect(comandoSeed({ ...semSenha, SEED_SENHA_ADMIN: '' })).rejects.toThrow(/SEED_SENHA_ADMIN/);
+      await expect(comandoSeed({ ...semSenha, SEED_SENHA_ADMIN: 'curta' })).rejects.toThrow(/SEED_SENHA_ADMIN inválida/);
+      expect(conectar).not.toHaveBeenCalled();
+    } finally {
+      conectar.mockRestore();
+    }
   });
 });
