@@ -1377,6 +1377,8 @@ T47 → T48
 **Depends on**: T40
 **Reuses**: `t23-lancamento--{novo,edicao,erro,excluir}.html`; `Campo`, `ResumoErros`, `Dialogo` (`CA:1239`, `CA:1263`, `CA:1286`); mensagem ao lado do campo (`GE:2138`); `CampoData` (`GE:1751`)
 **Requirement**: FIN-32, FIN-47
+**Status**: rascunhada
+**Nota do rascunho**: o tipo usa o `CampoSeletor` segmentado com a `legend` "Tipo" visível (no mockup ela é `sr`); se a comparação visual (T46) acusar, o /executar esconde a legenda. O valor passa por `lerReais` antes da API (texto inválido marca o campo sem chamar a API). Salvo ou excluído, volta a `/financeiro` (mês atual; a spec não diz o mês). A data do novo vem do `hoje` do `GET …/financeiro/mes` atual. Os auxiliares `reaisParaCampo`, `resumoDosErros` e `errosConhecidos` ficam exportados para a T42. Teste em `frontend/web/test/telas/financeiro-lancamento.test.tsx`.
 
 **Done when**:
 
