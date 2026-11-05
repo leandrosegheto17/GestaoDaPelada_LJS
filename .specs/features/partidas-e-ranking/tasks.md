@@ -1856,6 +1856,8 @@ T78 → T79
 **Depends on**: T50
 **Reuses**: ESLint da fundação (`F:362`) e o teste de regra por arquivo de exemplo (`F:385`); `BD:306-308`
 **Requirement**: PAR-61
+**Status**: rascunhada
+**Nota do rascunho**: listas `SEM_RELOGIO`, `ACUMULADO_SO_NA_PONTUACAO` e `SOMA_SO_NA_PONTUACAO` no `eslint.config.mjs` (o `no-restricted-syntax` de um bloco substitui o anterior, então o domínio repete a do relógio); exceções: `backend/dominio/src/pontuacao/**`, `backend/dominio/test/pontuacao/**` e `backend/dominio/src/ranking/rodadas.ts`, que chama `pontosDaPresenca` para o ponto de cada rodada (PAR-71), com `SPEC_DEVIATION` como no LJS. Teste em `test/lint/pontuacao-so-no-modulo.test.ts` (roda pelo `vitest run --dir test` da raiz).
 
 **Done when**:
 
