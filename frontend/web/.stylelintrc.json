@@ -1,0 +1,20 @@
+{
+  "plugins": ["./stylelint/so-tokens.mjs"],
+  "rules": {
+    "color-no-hex": true,
+    "color-named": "never",
+    "function-disallowed-list": ["rgb", "rgba", "hsl", "hsla", "hwb", "lab", "lch", "oklab", "oklch", "color"],
+    "pelada/so-tokens": true
+  },
+  "overrides": [
+    {
+      "files": ["src/estilos/tokens.css"],
+      "rules": {
+        "color-no-hex": null,
+        "color-named": null,
+        "function-disallowed-list": null,
+        "pelada/so-tokens": null
+      }
+    }
+  ]
+}

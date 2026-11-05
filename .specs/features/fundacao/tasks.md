@@ -1457,6 +1457,8 @@ T81 → T82
 **Depends on**: T44
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-32
+**Status**: rascunhada
+**Nota do rascunho**: cor literal pelas regras nativas (`color-no-hex`, `color-named`, `function-disallowed-list`); fonte e sombra pelo plugin `frontend/web/stylelint/so-tokens.mjs`, que deixa passar só o nome da fonte dentro de `@font-face` (necessário para o `global.css` da T46). `stylelint` `^16.25.0` sem instalação; o `/executar` confere a versão e a API de plugin.
 
 **Done when**:
 
