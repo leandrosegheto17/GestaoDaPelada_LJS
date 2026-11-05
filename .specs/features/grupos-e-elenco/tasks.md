@@ -1754,6 +1754,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T52
 **Reuses**: cliente HTTP da CA (`CA:1169`, T36) e `useSessao` (`CA:1192`, T37); contratos de T16
 **Requirement**: GEL-01, GEL-18, GEL-22, GEL-27
+**Status**: rascunhada
 
 **Done when**:
 

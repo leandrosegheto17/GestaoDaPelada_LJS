@@ -8,6 +8,7 @@ import { acumuladoPorInicio } from '../pontuacao/acumulado.ts';
 import { inicioDaContagem } from '../pontuacao/inicio.ts';
 import type { ConfigPesos, SituacaoGravada } from '../pontuacao/pesos.ts';
 import { criarResolvedorDePesos, type ResolvedorDePesos } from '../pontuacao/resolvedor.ts';
+import { limitesDeMes, navegacaoDeMes, type LimitesDeMes, type Navegacao } from './navegacao.ts';
 import { ordenarPorRanking } from './ordenar.ts';
 import { rodadasDoJogador, type PartidaDaRodada, type Rodada } from './rodadas.ts';
 
@@ -62,6 +63,8 @@ export interface ResultadoRanking {
   linhas: LinhaRanking[];
   partidas: PartidaDoMes[];
   resumoMes: { partidas: number; comChuva: number };
+  navegacao: Navegacao;
+  limites: LimitesDeMes;
 }
 
 /** Presença de um jogador com a data e a chuva da partida. */
@@ -165,9 +168,12 @@ export function calcularRanking(entrada: EntradaRanking): ResultadoRanking {
     return { jogadorId: jogador.id, apelido: jogador.apelido, posicao, ptsInicial, rodadas, ptsFinal };
   });
 
+  const limites = limitesDeMes(entrada.partidas, hoje);
   return {
     linhas,
     partidas: doMes.map(({ data, choveu }) => ({ data, choveu })),
     resumoMes: { partidas: doMes.length, comChuva: doMes.filter((p) => p.choveu).length },
+    navegacao: navegacaoDeMes(limites, mes),
+    limites,
   };
 }
