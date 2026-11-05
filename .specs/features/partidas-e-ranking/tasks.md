@@ -992,6 +992,8 @@ T78 → T79
 **Depends on**: T0
 **Reuses**: Gerador e checagem aditiva (`F:883`, `F:858`); tabela `M:1792843200000_linha-de-base.sql:155`; SQL de `BD:120-124`
 **Requirement**: PAR-13, PAR-14
+**Status**: rascunhada
+**Nota do rascunho**: migração `1792844580000_pesos-padrao.sql`; testes em `backend/api/test/banco/pesos-padrao.test.ts` (roda de novo o SQL da migração sobre grupos criados depois) e `backend/scripts/checagens/test/migracao-aditiva-partidas.test.ts` (as tarefas T22 a T26 acrescentam o sufixo delas). O código entrou no commit `f00bc55` de outra sessão (índice do git compartilhado).
 
 **Done when**:
 
