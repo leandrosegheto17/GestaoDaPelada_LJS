@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { montarElenco, type Apto } from '../../src/simulador/base.ts';
+import { montarElenco, type Apto, type Limite } from '../../src/simulador/base.ts';
 import {
   chaveDaComposicao,
   elencoDois,
   menorChave,
   type ComposicaoDois,
 } from '../../src/simulador/chave-dois.ts';
-import { classificarDoisTimes, type Limite } from '../../src/simulador/classificacao.ts';
+import { classificarDoisTimes } from '../../src/simulador/classificacao.ts';
 import { distribuirDoisTimes } from '../../src/simulador/distribuicao-dois.ts';
 
 /**

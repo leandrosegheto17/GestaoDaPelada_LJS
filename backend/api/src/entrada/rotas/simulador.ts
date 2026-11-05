@@ -8,9 +8,9 @@ import {
   avaliarCorpo,
   type AvaliarResposta,
   type ContextoResposta,
-  type PreviaResposta,
   type SugerirResposta,
 } from '@pelada/contrato';
+import type { PreviaResposta } from '@pelada/contrato/simulador';
 import {
   avaliar,
   calcularPrevia,

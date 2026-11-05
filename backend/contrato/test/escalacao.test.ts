@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import type { z } from 'zod';
 import {
   composicaoGravada,
   escalacaoCorpo,
@@ -12,7 +13,7 @@ import { idsDaComposicao } from '../src/simulador.ts';
 const u = (i: number): string => `00000000-0000-4000-8000-${String(i).padStart(12, '0')}`;
 const j = (i: number, so1oTempo = false) => ({ id: u(i), so1oTempo });
 
-const DOIS = {
+const DOIS: z.infer<typeof composicaoGravada.dois_times> = {
   times: [
     { titulares: [j(1), j(4)], entramNo2oTempo: [j(5, true)] },
     { titulares: [j(2), j(3)], entramNo2oTempo: [] },
