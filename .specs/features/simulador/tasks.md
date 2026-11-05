@@ -1205,6 +1205,8 @@ T53 → T54
 **Depends on**: T32
 **Reuses**: Molde de `GET partidas/nova` (`PR:1436`, T39); `Relogio` (`GE:831`); T21, T27
 **Requirement**: SIM-01, SIM-02, SIM-03, SIM-04
+**Status**: rascunhada
+**Nota do rascunho**: `rotasSimulador()` em `rotas/simulador.ts`, registrada no `criarApp` depois das rotas do elenco. Molde `GET …/jogadores` (`rotas/jogadores.ts:17`): o `GET partidas/nova` de `PR:1436` ainda não existe. Query lida por `consultaContexto` (strict); 422 pelo `erroDeCampos` no campo `data`. Teste em `backend/api/test/rotas/simulador-contexto.test.ts`.
 
 **Done when**:
 
