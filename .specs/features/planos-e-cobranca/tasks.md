@@ -573,6 +573,8 @@ T56 → T57
 **Depends on**: T9
 **Reuses**: gerador `pnpm migracao:nova` (`F:883`); policies em laço de `M:1792843320000_rls.sql:33-59` e `M:1792843380000_conta-tabelas.sql:54-64`; `pelada_backup_ro` (AD-016); checagem aditiva (`F:858`); AD-088
 **Requirement**: PLA-13, PLA-30, PLA-33, PLA-41, PLA-43
+**Status**: rascunhada
+**Nota do rascunho**: os cenários de isolamento (`test/isolamento/apoio.ts` e `cenario-grupos.ts`) ganham uma assinatura `cancelada` por grupo, porque toda tabela com `grupo_id` precisa de linha neles; cancelada para não ocupar o índice de vigente nem travar a T38.
 
 **Done when**:
 

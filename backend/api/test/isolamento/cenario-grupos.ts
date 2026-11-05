@@ -82,6 +82,7 @@ const PREENCHIDAS_EM_G = new Set([
   'pagamentos_mes',
   'auditoria',
   'convites_admin',
+  'assinaturas',
 ]);
 
 /** Cria G pela `grupo_criar`, como `pelada_app` com a conta C, e devolve id e slug. */
@@ -202,6 +203,13 @@ export async function completarCenarioGrupos(
   await db.query(
     `INSERT INTO convites_admin (grupo_id, email, token_hash, criado_por, criado_em, expira_em)
      VALUES ($1, 'convidado-g@exemplo.test', gen_random_bytes(32), $2, now(), now() + interval '1 day')`,
+    [grupoG, contaC],
+  );
+  // planos-e-cobranca T10: uma assinatura cancelada de G (não ocupa o índice de vigente; G segue `uso_proprio`).
+  await db.query(
+    `INSERT INTO assinaturas (grupo_id, asaas_cliente_id, asaas_assinatura_id, valor_centavos, situacao, pago_ate,
+       cobranca_pro_id, criada_por, criada_em)
+     VALUES ($1, 'cus_g', 'sub_g', 990, 'cancelada', '2026-01-05', 'pay_g', $2, now())`,
     [grupoG, contaC],
   );
 

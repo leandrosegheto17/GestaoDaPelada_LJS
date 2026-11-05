@@ -253,6 +253,19 @@ const PREENCHER: ReadonlyArray<readonly [string, (db: pg.Client, s: Semente) => 
       );
     },
   ],
+  [
+    // planos-e-cobranca T10: uma assinatura cancelada de cada grupo. Cancelada para não ocupar o índice de vigente nem
+    // travar arquivar e excluir conta (T38); o plano não muda: `grupos` segue com o default `uso_proprio`.
+    'assinaturas',
+    async (db, s) => {
+      await db.query(
+        `INSERT INTO assinaturas (grupo_id, asaas_cliente_id, asaas_assinatura_id, valor_centavos, situacao, pago_ate,
+           cobranca_pro_id, criada_por, criada_em)
+         VALUES ($1, $2, $3, 990, 'cancelada', '2026-02-05', $4, $5, now())`,
+        [s.grupo, `cus_${s.marca}`, `sub_${s.marca}`, `pay_${s.marca}`, s.conta],
+      );
+    },
+  ],
 ];
 
 async function criarConta(db: pg.Client, email: string, nome: string): Promise<string> {
