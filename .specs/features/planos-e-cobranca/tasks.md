@@ -308,6 +308,7 @@ T56 → T57
 **Depends on**: None
 **Reuses**: método da skill `rede-de-protecao`; cenário de `GE:348` (T0); `M:1792843200000_linha-de-base.sql:72-78`; `M:1792844400000_grupos-grants-coluna.sql:6-7`; `grupo_criar` de `PR:987`
 **Requirement**: PLA-12, PLA-13
+**Status**: rascunhada
 
 **Done when**:
 
