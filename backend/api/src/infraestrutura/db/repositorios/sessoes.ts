@@ -1,5 +1,16 @@
 import { Buffer } from 'node:buffer';
+import { sql } from 'kysely';
 import { criarCliente, type OpcoesCliente } from '../cliente.ts';
+import { bytea, type Db } from './tipos.ts';
+
+/**
+ * Encerra a sessão atual (sair, ACE-17), na transação da rota. A RLS de `sessoes` só deixa
+ * apagar as da própria conta (ACE-44). Verdadeiro se apagou.
+ */
+export async function encerrarAtual(db: Db, tokenHash: Uint8Array): Promise<boolean> {
+  const r = await sql`DELETE FROM sessoes WHERE token_hash = ${bytea(tokenHash)}`.execute(db);
+  return Number(r.numAffectedRows ?? 0n) > 0;
+}
 
 /**
  * Resolução da sessão antes do `comBanco` (T20; ACE-15, ACE-16, ACE-47, ACE-69). Decisão do

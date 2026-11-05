@@ -872,6 +872,8 @@ T57 → T58
 **Depends on**: T21
 **Reuses**: `c.var.db: Kysely<Banco>` da fundação (`FD:103`); assinaturas das funções em T4 a T8 (`M:` citados lá)
 **Requirement**: ACE-18
+**Status**: rascunhada
+**Nota do rascunho**: `contas` e `links` em `contas.ts`; `sessoes.encerrarAtual` em `sessoes.ts`, ao lado do `tocar` (T20); `Db` e `bytea()` em `repositorios/tipos.ts`. `links.pedir` chama `link_pedir_com_confirmacao` (devolve também `confirmada`, para o ACE-73 da T24). `links.confirmar` passa `NULL` no hash de sessão (a função não abre sessão desde `1792843740000`). Teste com o `comDb` novo de `test/repositorios/apoio.ts`.
 
 **Done when**:
 
