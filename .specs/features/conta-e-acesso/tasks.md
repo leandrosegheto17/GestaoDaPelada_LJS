@@ -275,15 +275,15 @@ T57 → T58
 **Depends on**: None
 **Reuses**: estender a fábrica de cenário e o `comoApp` da fundação (`F:909`, `FD:89`) e o `bancoDeTeste()` (`F:507`); senha por `conta_definir_senha` (`M:1792843560000_conta-senha-e-exclusao.sql:97`), chamada como `postgres` (AD-009)
 **Requirement**: ACE-43, ACE-45
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: o teste do cenário fica em `cenario-conta.test.ts`; a evidência da rede (sabotagem do `conta_definir_senha`) é do /executar.
 
 **Done when**:
 
-- [ ] Teste `ACE-43`: as contas A e B entram com a senha do cenário por `conta_entrar` e cada uma enxerga só o próprio grupo por `comoApp`
-- [ ] O banco `teste_*` é removido no `finally`, também quando a criação do cenário falha
-- [ ] Evidência da rede: com `conta_definir_senha` sabotada (hash fixo), o teste fica vermelho (registrar aqui)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `ACE-43`: as contas A e B entram com a senha do cenário por `conta_entrar` e cada uma enxerga só o próprio grupo por `comoApp`
+- [x] O banco `teste_*` é removido no `finally`, também quando a criação do cenário falha
+- [x] Evidência da rede: com `conta_definir_senha` sabotada (hash fixo), 2 testes `ACE-43` (A e B entram) ficaram vermelhos; migração restaurada, verde (2026-11-05)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -301,14 +301,14 @@ T57 → T58
 **Depends on**: T0
 **Reuses**: molde da matriz de leitura e escrita da fundação (`F:981`, `F:1007`); policies e grants em `M:1792843380000_conta-tabelas.sql:69-81`
 **Requirement**: ACE-43, ACE-44, ACE-45
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Testes `ACE-43`: linhas da Test Coverage Matrix para `contas` (4 comandos, sem `WHERE`, `WITH CHECK` do `id`, grant de coluna de `senha_hash`)
-- [ ] Testes `ACE-44`: linhas para `sessoes` (4 comandos, `DELETE` sem `WHERE` só apaga as de A)
-- [ ] Evidência da rede: `DROP POLICY contas_alterar` + `CREATE POLICY ... USING (true)` e um `GRANT SELECT (senha_hash)` deixam testes vermelhos (registrar aqui)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Testes `ACE-43`: linhas da Test Coverage Matrix para `contas` (4 comandos, sem `WHERE`, `WITH CHECK` do `id`, grant de coluna de `senha_hash`)
+- [x] Testes `ACE-44`: linhas para `sessoes` (4 comandos, `DELETE` sem `WHERE` só apaga as de A)
+- [x] Evidência da rede: `DROP POLICY contas_alterar` + `CREATE POLICY ... USING (true)` e um `GRANT SELECT (senha_hash)` deixaram 4 testes `ACE-43` vermelhos (grant de `senha_hash`, `SELECT *`, UPDATE sem WHERE, UPDATE sem contexto); migração restaurada, verde (2026-11-05)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -326,15 +326,15 @@ T57 → T58
 **Depends on**: T1
 **Reuses**: policies de `M:1792843380000_conta-tabelas.sql:55-101`; tabelas novas em `M:1792843800000_conta-senha-bloqueio.sql:8`, `M:1792843860000_conta-teto-emails.sql:7`, `M:1792843980000_conta-teto-emails-origem.sql:7`; role renomeada em `M:1792844220000_roles-padronizadas.sql:26` (AD-016 proposta)
 **Requirement**: ACE-45, ACE-46
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Testes `ACE-45`: `convites_admin` por comando, com o slug público sem conta vendo zero linhas e `UPDATE` que move o convite para o grupo de B recusado
-- [ ] Teste `ACE-46`: `pelada_app` insere em `auditoria` do próprio grupo e recebe recusa em UPDATE e DELETE
-- [ ] Testes `ACE-45`: nas 7 tabelas de apoio, os 4 comandos recusados para `pelada_app`; `pelada_backup_ro` lê todas e não escreve
-- [ ] Evidência da rede: `GRANT UPDATE ON auditoria TO pelada_app` deixa o teste vermelho (registrar aqui)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Testes `ACE-45`: `convites_admin` por comando, com o slug público sem conta vendo zero linhas e `UPDATE` que move o convite para o grupo de B recusado
+- [x] Teste `ACE-46`: `pelada_app` insere em `auditoria` do próprio grupo e recebe recusa em UPDATE e DELETE
+- [x] Testes `ACE-45`: nas 7 tabelas de apoio, os 4 comandos recusados para `pelada_app`; `pelada_backup_ro` lê todas e não escreve
+- [x] Evidência da rede: `GRANT UPDATE, DELETE ON auditoria TO pelada_app` deixou 2 testes `ACE-46` vermelhos (UPDATE e DELETE sem WHERE); só `GRANT UPDATE` com WHERE passava, por isso o WHERE saiu do teste (2026-11-05)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -352,21 +352,23 @@ T57 → T58
 **Depends on**: T2
 **Reuses**: estender o meta-teste da fundação (`F:957`) e ler o catálogo como o `lerEsquema` (`F:760`); fecha o risco de `FD:183`
 **Requirement**: ACE-43, ACE-45
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: a matriz de conta (tabela → arquivo de teste) fica no próprio meta-teste.
 
 **Done when**:
 
-- [ ] Teste `ACE-45`: uma tabela nova sem `FORCE` ou sem linha na matriz reprova (conferido com tabela criada no teste)
-- [ ] Teste `ACE-43`: as 20 funções `SECURITY DEFINER` têm `search_path = public, pg_temp`; uma função criada sem ele reprova
-- [ ] Teste `ACE-43`: `PUBLIC` sem `EXECUTE` em nenhuma; `pelada_app` sem `EXECUTE` em `conta_definir_senha`, `email_cota_reservar_em` e `email_origem_registrar_em`
-- [ ] Evidência da rede: `GRANT EXECUTE ON FUNCTION conta_definir_senha(...) TO pelada_app` deixa vermelho (registrar aqui)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `ACE-45`: uma tabela nova sem `FORCE` ou sem linha na matriz reprova (conferido com tabela criada no teste)
+- [x] Teste `ACE-43`: as 20 funções `SECURITY DEFINER` têm `search_path = public, pg_temp`; uma função criada sem ele reprova
+- [x] Teste `ACE-43`: `PUBLIC` sem `EXECUTE` em nenhuma; `pelada_app` sem `EXECUTE` em `conta_definir_senha`, `email_cota_reservar_em` e `email_origem_registrar_em`
+- [x] Evidência da rede: `GRANT EXECUTE ON FUNCTION conta_definir_senha(...) TO pelada_app` deixou 2 testes `ACE-43` vermelhos; restaurado, verde (2026-11-05)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
 
 ---
+
+**Gate**: `pnpm vitest run` nos 4 arquivos de isolamento de conta (DATABASE_URL_TESTE no Postgres privado) @ 5947d69f67ea91ab744bce85507b520995ce6dd0 = 158 testes verdes; typecheck do api só com o erro preexistente `test/rotas/apoio-push.ts(99,40)` (notificações)
 
 #### Phase 2: Rede de proteção: cadastro, entrar e sessão no banco
 
