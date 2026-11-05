@@ -2,7 +2,6 @@ import type { RouteObject } from 'react-router';
 import { NaoEncontrada, PaginaProvisoria } from '../paginas/Mensagens.tsx';
 import {
   AdminsGrupo,
-  Confirmar,
   Convite,
   Esqueci,
   InicioApp,
@@ -13,6 +12,7 @@ import {
   Termos,
 } from '../paginas/acesso/provisorias.tsx';
 import { GuardaApp, GuardaPublica } from './guarda.tsx';
+import { Confirmar } from '../telas/confirmar/Confirmar.tsx';
 import { Cadastro } from '../telas/cadastro/Cadastro.tsx';
 import { Entrar } from '../telas/entrar/Entrar.tsx';
 

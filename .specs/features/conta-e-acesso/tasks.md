@@ -1486,6 +1486,8 @@ T57 → T58
 **Depends on**: T44
 **Reuses**: `.specs/mockup/telas/t30-confirmar--*.html` (3 estados); `lerTokenDoFragmento` (T38); `TelaMensagem` (T41)
 **Requirement**: ACE-06, ACE-07, ACE-08, ACE-56
+**Status**: rascunhada
+**Nota do rascunho**: o token é lido uma vez num ref e o POST fica guardado em outro ref, para o StrictMode (efeito duplo) não gastar o link num segundo pedido. Sem token ou com token malformado, vai direto ao link inválido sem chamar a API. Falha que não é 410/422 mostra a faixa de erro com "Tentar de novo". SPEC_DEVIATION: a tarefa cita `TelaMensagem`, mas o mockup de t30 usa título, faixa e formulário na coluna estreita; vale o mockup. O destino do sucesso é `/entrar?aviso=email-confirmado` (ACE-06), não o `/app` do comentário do mockup.
 
 **Done when**:
 
