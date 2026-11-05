@@ -863,6 +863,8 @@ T53 → T54
 **Depends on**: T19
 **Reuses**: `MAX_APTOS_SIMULADOR` de `L:backend/dominio/src/simulador/distribuicao-varios.ts:10`; Assumption `S:56`; T19
 **Requirement**: SIM-58, SIM-59
+**Status**: rascunhada
+**Nota do rascunho**: 20 medições por combinação e função, com 5 de aquecimento (são 40 medições no teste). O teto de avaliações continua `[A ESCLARECER]`: só entra se a medição passar de 4 ms.
 
 **Done when**:
 
