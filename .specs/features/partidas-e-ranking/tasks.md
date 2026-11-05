@@ -904,14 +904,14 @@ Gate (T14 a T16): pnpm --filter @pelada/dominio test (verde; sem-io/sem-relogio 
 **Depends on**: None
 **Reuses**: Primitivos zod do contrato (`CA:550`); `B:110-117`; `BD:177`
 **Requirement**: PAR-01, PAR-06, PAR-07, PAR-08
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste `PAR-06`: 10,5, 11 e −11 recusados no campo do peso, com a mensagem
-- [ ] Teste `PAR-07`: peso ausente recusado no campo
-- [ ] Teste `PAR-08`: `vigenteDesde` no corpo é recusado
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PAR-06`: 10,5, 11 e −11 recusados no campo do peso, com a mensagem
+- [x] Teste `PAR-07`: peso ausente recusado no campo
+- [x] Teste `PAR-08`: `vigenteDesde` no corpo é recusado
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -929,14 +929,14 @@ Gate (T14 a T16): pnpm --filter @pelada/dominio test (verde; sem-io/sem-relogio 
 **Depends on**: T17
 **Reuses**: `CA:550`; `B:152-161`, `B:185-187`; `BD:178-179`
 **Requirement**: PAR-19, PAR-26, PAR-39
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste `PAR-19`: `data` que não é data real dá "Informe uma data válida."
-- [ ] Teste `PAR-26`: situação fora das 4 recusada no campo da marcação
-- [ ] Teste `PAR-39`: `mes` fora de `AAAA-MM` dá "Informe o mês como AAAA-MM."
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PAR-19`: `data` que não é data real dá "Informe uma data válida."
+- [x] Teste `PAR-26`: situação fora das 4 recusada no campo da marcação
+- [x] Teste `PAR-39`: `mes` fora de `AAAA-MM` dá "Informe o mês como AAAA-MM."
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -954,14 +954,14 @@ Gate (T14 a T16): pnpm --filter @pelada/dominio test (verde; sem-io/sem-relogio 
 **Depends on**: T18
 **Reuses**: `B:251`, `B:257`, `B:263` (PAR-76), `B:321`, `B:327`, `B:381`; `BD:179-182`
 **Requirement**: PAR-64, PAR-70, PAR-76, PAR-95, PAR-101, PAR-128
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste `PAR-76`: um campo de `CAMPOS_PROIBIDOS_PUBLICO` (id de jogador, telefone, ano, idade, posição, notas, nível, períodos, pontuação inicial, financeiro) em qualquer nível é recusado
-- [ ] Teste `PAR-101`: 13 colunas ou linha com rodadas ≠ colunas recusadas
-- [ ] Teste `PAR-128`: `ranking_aberto` com `mes`, tipo desconhecido e campo extra recusados
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PAR-76`: um campo de `CAMPOS_PROIBIDOS_PUBLICO` (id de jogador, telefone, ano, idade, posição, notas, nível, períodos, pontuação inicial, financeiro) em qualquer nível é recusado
+- [x] Teste `PAR-101`: 13 colunas ou linha com rodadas ≠ colunas recusadas
+- [x] Teste `PAR-128`: `ranking_aberto` com `mes`, tipo desconhecido e campo extra recusados
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -979,19 +979,21 @@ Gate (T14 a T16): pnpm --filter @pelada/dominio test (verde; sem-io/sem-relogio 
 **Depends on**: T19
 **Reuses**: `B:348-350`, `B:398`, `B:475`; `BD:181-182`; `grupoDetalhe` da grupos-e-elenco (`GE:753`)
 **Requirement**: PAR-109, PAR-110, PAR-111, PAR-132, PAR-155
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste `PAR-109`: `previaResposta` aceita `posicaoDepois` nula e recusa campo extra
-- [ ] Teste `PAR-132`: `grupoDetalhe` exige os 6 campos novos
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PAR-109`: `previaResposta` aceita `posicaoDepois` nula e recusa campo extra
+- [x] Teste `PAR-132`: `grupoDetalhe` exige os 6 campos novos
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
 
 ---
 
+
+Gate (T17 a T20): pnpm --filter @pelada/contrato test (verde; SIM-55 é da feature 5) + tsc contrato @ 5632662555446347da6b4dfa0990d348f83a9487
 #### Phase 9: Migrações: pesos padrão e grupo_criar
 
 ### T21: Migração: pesos padrão para os grupos sem configuração
