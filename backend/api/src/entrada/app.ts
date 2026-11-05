@@ -8,6 +8,7 @@ import { protegerRotasDeGrupo } from './middlewares/vinculo.ts';
 import { rotasConta } from './rotas/conta.ts';
 import { devEmails } from './rotas/dev-emails.ts';
 import { health } from './rotas/health.ts';
+import { rotasRecuperacao } from './rotas/recuperacao.ts';
 import { rotasSessao } from './rotas/sessao.ts';
 import {
   ErroBancoIndisponivel,
@@ -47,6 +48,7 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
   const rotasAcesso = opcoes.fabricaBanco ? { fabrica: opcoes.fabricaBanco } : {};
   api.route('/', rotasConta(rotasAcesso));
   api.route('/', rotasSessao(rotasAcesso));
+  api.route('/', rotasRecuperacao(rotasAcesso));
   opcoes.registrarExtras?.(api);
 
   api.notFound((c) => c.json({ erro: 'Rota não encontrada.' }, 404));

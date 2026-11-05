@@ -1009,6 +1009,8 @@ T57 → T58
 **Depends on**: T26
 **Reuses**: `links.pedir` e `links.novaSenha` (T22); envio de T24; tabela de `ljs:.specs/features/conta-e-acesso/design.md:160-161`
 **Requirement**: ACE-22, ACE-23, ACE-24, ACE-25, ACE-50, ACE-76
+**Status**: rascunhada
+**Nota do rascunho**: nova senha com token ausente ou malformado responde 410 `link_invalido`; senha fora dos limites, 422 sem usar o link. O esqueci escolhe a cota pela `categoriaDaRecuperacao(confirmada)` (ACE-73).
 
 **Done when**:
 
