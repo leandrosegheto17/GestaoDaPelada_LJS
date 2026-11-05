@@ -839,6 +839,7 @@ T78 → T79
 **Depends on**: T14
 **Reuses**: `B:350`, `B:353-355` (PAR-111, PAR-114 a PAR-116), caso `B:500`; avaliação da data de início com o recuo de `GE:726`
 **Requirement**: PAR-111, PAR-114, PAR-115, PAR-116
+**Status**: rascunhada
 
 **Done when**:
 

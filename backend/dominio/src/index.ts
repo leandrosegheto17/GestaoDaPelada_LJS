@@ -181,6 +181,17 @@ export {
   type CenariosComparados,
   type HistoricoDoGrupo,
 } from './previas/comparar.ts';
+export {
+  AVISO_UMA_FALTA,
+  AVISO_VARIAS_FALTAS,
+  avisoDasRodadas,
+  previaDoInicio,
+  previaDosPeriodos,
+  type PreviaDoInicio,
+  type PreviaDosPeriodos,
+  type RodadaQueDeixaDeConstar,
+  type RodadaQuePassaAConstar,
+} from './previas/rodadas.ts';
 
 // notificacoes (NOT-25, NOT-43): payloads do push, sem relógio nem I/O.
 export {
