@@ -788,6 +788,8 @@ T47 → T48
 **Depends on**: T18
 **Reuses**: T18; regra de `L:backend/api/src/aplicacao/financeiro/desmarcar-pagamento.ts:5-28`
 **Requirement**: FIN-22, FIN-23
+**Status**: rascunhada
+**Nota do rascunho**: exportado como `financeiroPagamentosDesmarcar.desmarcar(db, grupoId, jogadorId, mes)`, sem `contaId` (a autora da auditoria vem de `app_conta_id()`, como em T16 e T18).
 
 **Done when**:
 
