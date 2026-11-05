@@ -78,10 +78,8 @@ describe('checagem so-previa', () => {
 
   describe('PLA-38: ASAAS_URL só no sandbox', () => {
     it('PLA-38: ASAAS_URL com https://api.asaas.com/v3 reprova no wrangler.jsonc e no deploy.yml', () => {
-      expect(checarSoPrevia(jsonc('    "ASAAS_URL": "https://api.asaas.com/v3"
-'))).toHaveLength(1);
-      expect(checarSoPrevia(deploy('          --var "ASAAS_URL:https://api.asaas.com/v3"
-'))).toHaveLength(1);
+      expect(checarSoPrevia(jsonc('    "ASAAS_URL": "https://api.asaas.com/v3"\n'))).toHaveLength(1);
+      expect(checarSoPrevia(deploy('          --var "ASAAS_URL:https://api.asaas.com/v3"\n'))).toHaveLength(1);
     });
 
     it('PLA-38: a do sandbox passa', () => {
@@ -93,12 +91,9 @@ describe('checagem so-previa', () => {
     });
 
     it('PLA-38: ASAAS_URL vinda de vars, secrets ou variável de shell reprova (o valor não pode ser conferido)', () => {
-      expect(checarSoPrevia(deploy('          --var "ASAAS_URL:${{ vars.ASAAS_URL }}"
-'))).toHaveLength(1);
-      expect(checarSoPrevia(deploy('          ASAAS_URL: ${{ secrets.ASAAS_URL }}
-'))).toHaveLength(1);
-      expect(checarSoPrevia(deploy('          --var "ASAAS_URL:$ASAAS_URL"
-'))).toHaveLength(1);
+      expect(checarSoPrevia(deploy('          --var "ASAAS_URL:${{ vars.ASAAS_URL }}"\n'))).toHaveLength(1);
+      expect(checarSoPrevia(deploy('          ASAAS_URL: ${{ secrets.ASAAS_URL }}\n'))).toHaveLength(1);
+      expect(checarSoPrevia(deploy('          --var "ASAAS_URL:$ASAAS_URL"\n'))).toHaveLength(1);
     });
 
     it('PLA-38: o sandbox com outro endereço na mesma linha reprova; outro caminho do sandbox também', () => {
@@ -106,17 +101,13 @@ describe('checagem so-previa', () => {
         checarSoPrevia(jsonc(`    "ASAAS_URL": "${ASAAS_URL_SANDBOX}", "X": "https://api.asaas.com/v3"
 `)),
       ).toHaveLength(1);
-      expect(checarSoPrevia(jsonc('    "ASAAS_URL": "https://api-sandbox.asaas.com/v2"
-'))).toHaveLength(1);
-      expect(checarSoPrevia(jsonc('    "ASAAS_URL": "https://asaas.exemplo.com/v3"
-'))).toHaveLength(1);
+      expect(checarSoPrevia(jsonc('    "ASAAS_URL": "https://api-sandbox.asaas.com/v2"\n'))).toHaveLength(1);
+      expect(checarSoPrevia(jsonc('    "ASAAS_URL": "https://asaas.exemplo.com/v3"\n'))).toHaveLength(1);
     });
 
     it('PLA-38: o endereço de produção do Asaas reprova mesmo sem o nome ASAAS_URL', () => {
-      expect(checarSoPrevia(deploy('        run: curl https://api.asaas.com/v3/payments
-'))).toHaveLength(1);
-      expect(checarSoPrevia(deploy('        run: curl https://API.ASAAS.COM/v3
-'))).toHaveLength(1);
+      expect(checarSoPrevia(deploy('        run: curl https://api.asaas.com/v3/payments\n'))).toHaveLength(1);
+      expect(checarSoPrevia(deploy('        run: curl https://API.ASAAS.COM/v3\n'))).toHaveLength(1);
     });
   });
 
