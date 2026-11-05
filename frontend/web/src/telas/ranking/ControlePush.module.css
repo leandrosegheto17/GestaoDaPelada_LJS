@@ -1,0 +1,21 @@
+/* Controle de avisos (notificacoes T37, T38; NOT-72): só tokens do guia (AD-111). */
+
+.controle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--esp-2) var(--esp-3);
+  margin: var(--esp-4) 0;
+}
+
+.controle > [role='status'],
+.controle > [role='alert'],
+.controle > [role='note'] {
+  flex-basis: 100%;
+  margin: 0;
+}
+
+.texto {
+  margin: 0;
+  font-size: var(--texto-md);
+}

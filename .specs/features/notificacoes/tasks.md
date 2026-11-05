@@ -1276,6 +1276,8 @@ T39 → T40 → T41
 **Depends on**: T36
 **Reuses**: `PaginaRanking` (`PR:1878`); `Botao` (`F:1448`); `Faixa` (`CA:1286`); `AvisoInstalarIphone` (`F:1521`); tokens e componentes do guia (`.specs/mockup/index.html`, `tokens.css`, `base.css`, AD-111); AD-072
 **Requirement**: NOT-01, NOT-03, NOT-04, NOT-13, NOT-15, NOT-61, NOT-71, NOT-72
+**Status**: rascunhada
+**Nota do rascunho**: o controle vai na `PaginaRanking` depois do ranking e antes do rodapé, só com dados e fora do guardado sem rede. A parte comum com a T38 é o `ControleAvisos` (estados e ações de um destino), exportado do `ControlePush.tsx`; o `ControlePush` acrescenta o `GET …/push` e o caso do iOS. A `section` com `aria-label` "Avisos do ranking" é o contêiner que o NOT-03 confere (o `AvisoInstalarIphone` dentro dela, sem botão). Os textos que a spec não fixa (assinado, desligado, sem suporte) estão nas constantes do arquivo. Não conferido por teste aqui: o Stylelint de tokens e as entradas da t01 no `telas.json` (gate de lint e o `visual` do `/executar`). Testes existentes da t01 que contam as chamadas exatas da API podem ver o `GET …/push` a mais (responde 404 no servidor falso e o controle some). Testes em `frontend/web/test/telas/controle-push.test.tsx`.
 
 **Done when**:
 

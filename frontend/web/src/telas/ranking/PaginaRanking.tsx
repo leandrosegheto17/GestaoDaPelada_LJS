@@ -18,6 +18,7 @@ import { ehSlugValido, GrupoIndisponivel } from './GrupoIndisponivel.tsx';
 import pagina from './ranking.module.css';
 import { TabelaRanking } from './TabelaRanking.tsx';
 import { DialogoPdfPronto } from './DialogoPdfPronto.tsx';
+import { ControlePush } from './ControlePush.tsx';
 import {
   FaixaPrecisaConexao,
   FaixaSemConexao,
@@ -492,6 +493,8 @@ function RankingDoSlug({ slug }: { slug: string }) {
         ) : (
           <EsqueletoLista rotulo={TEXTO_CARREGANDO} />
         )}
+        {/* Avisos do ranking (notificacoes T37; NOT-01): só com push disponível; fora do guardado sem rede. */}
+        {dados && !somenteLeitura ? <ControlePush slug={slug} /> : null}
         {dados ? <Rodape /> : null}
       </main>
       {dados && dados.linhas.length > 0 && !somenteLeitura ? (
