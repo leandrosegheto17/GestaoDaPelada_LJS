@@ -1679,6 +1679,9 @@ T56 → T57
 **Depends on**: T50
 **Reuses**: `PaginaRanking` (`PR:1878`, T56) e `usarExportarPdf` (`PR:2222`, T70); T27
 **Requirement**: PLA-25
+**Status**: rascunhada
+**Nota do rascunho**: `mostrarExportar(dados, somenteLeitura)` em `PaginaRanking.tsx` decide os dois botões (topo e barra do celular). Teste em `frontend/web/test/telas/ranking-pdf-plano.test.tsx`.
+**Lacunas**: as fixtures dos testes existentes do ranking (`ranking-pdf`, `ranking-pagina`, `ranking-tabela`, `ranking-sem-conexao`, `ranking-indisponivel`, `pwa/ranking-guardado`) não trazem `pdfLiberado`, que o contrato da T27 exige; sem o campo, o `parse` falha. Acrescentar `pdfLiberado: true` muda testes existentes e pede a aprovação da regra de Testes (o `/executar` pergunta).
 
 **Done when**:
 

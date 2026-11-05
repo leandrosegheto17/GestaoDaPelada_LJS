@@ -49,7 +49,8 @@ import {
  *   substituição e mostra a faixa de erro com a mensagem da API;
  * - falha de rede: com o ranking guardado, ele somente leitura com a faixa "Sem conexão, atualizado em …"; sem
  *   guardado, "Sem conexão" com "Tentar de novo" (t01 erro); a engrenagem sem rede avisa (T73, `FaixaSemConexao`).
- * - 404 da API e slug malformado (este sem chamar a API): `GrupoIndisponivel` (t03, PAR-94, T57).
+ * - 404 da API e slug malformado (este sem chamar a API): `GrupoIndisponivel` (t03, PAR-94, T57);
+ * - "Exportar PDF" (no topo e na barra do celular) só com `pdfLiberado` verdadeiro (planos-e-cobranca T51; PLA-25).
  */
 
 export const TEXTO_SEM_JOGADORES = 'Nenhum jogador no ranking ainda.';
@@ -339,6 +340,17 @@ function AvisosDoPdf({ pdf }: { pdf: ExportarPdf }) {
   return null;
 }
 
+/**
+ * "Exportar PDF" aparece só com o PDF liberado pelo plano (planos-e-cobranca T51; PLA-25, T27: `pdfLiberado` vem na
+ * resposta) e fora do guardado sem rede (PAR-149).
+ */
+export function mostrarExportar(
+  dados: Pick<RankingPublico, 'pdfLiberado'>,
+  somenteLeitura: boolean,
+): boolean {
+  return dados.pdfLiberado && !somenteLeitura;
+}
+
 interface PropsRanking {
   dados: RankingPublico;
   aoIr: (mes: string) => void;
@@ -371,7 +383,9 @@ function Ranking({ dados, aoIr, pdf, somenteLeitura, atualizando }: PropsRanking
     <>
       <div className={pagina.ferramentas}>
         <NavegacaoMes dados={dados} aoIr={aoIr} />
-        {somenteLeitura ? null : <BotaoExportar classe={pagina.topo} pdf={pdf} />}
+        {mostrarExportar(dados, somenteLeitura) ? (
+          <BotaoExportar classe={pagina.topo} pdf={pdf} />
+        ) : null}
       </div>
       <p className={pagina['resumo-mes']}>
         {semPartidas ? (
@@ -497,7 +511,7 @@ function RankingDoSlug({ slug }: { slug: string }) {
         {dados && !somenteLeitura ? <ControlePush slug={slug} /> : null}
         {dados ? <Rodape /> : null}
       </main>
-      {dados && dados.linhas.length > 0 && !somenteLeitura ? (
+      {dados && dados.linhas.length > 0 && mostrarExportar(dados, somenteLeitura) ? (
         <div className={pagina['barra-celular']}>
           <BotaoExportar pdf={pdf} bloco />
         </div>
