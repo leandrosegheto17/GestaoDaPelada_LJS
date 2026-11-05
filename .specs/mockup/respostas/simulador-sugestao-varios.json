@@ -2,12 +2,199 @@
   "formato": "varios_times",
   "data": "2026-10-22",
   "n": 4,
-  "avisos": [ { "tipo": "sem_nota", "texto": "Léo Baiano e Serginho não têm nota: usamos nível 5,5." } ],
+  "descricao": "4 times de 4 + 1 time incompleto de 2",
+  "avisos": [
+    {
+      "tipo": "sem_nota",
+      "texto": "Léo Baiano e Serginho não têm nota: usamos nível 5,5."
+    }
+  ],
   "times": [
-    { "nome": "Time 1", "incompleto": false, "jogadores": [ { "id": "j-toninho", "apelido": "Toninho", "semNota": false }, { "id": "j-nenem", "apelido": "Neném", "semNota": false }, { "id": "j-vini", "apelido": "Vini", "semNota": false }, { "id": "j-serginho", "apelido": "Serginho", "semNota": true } ], "indicadores": { "jogadores": 4, "nivelMedio": 6.2, "nivelSoma": 24.9, "idadeMedia": 35.0 } },
-    { "nome": "Time 2", "incompleto": false, "jogadores": [ { "id": "j-bigode", "apelido": "Bigode", "semNota": false }, { "id": "j-gordo", "apelido": "Gordo", "semNota": false }, { "id": "j-cabeca", "apelido": "Cabeça", "semNota": false }, { "id": "j-japa", "apelido": "Japa", "semNota": false } ], "indicadores": { "jogadores": 4, "nivelMedio": 6.2, "nivelSoma": 24.6, "idadeMedia": 41.3 } },
-    { "nome": "Time 3", "incompleto": false, "jogadores": [ { "id": "j-careca", "apelido": "Careca", "semNota": false }, { "id": "j-juninho", "apelido": "Juninho", "semNota": false }, { "id": "j-pedrao", "apelido": "Pedrão", "semNota": false }, { "id": "j-leo", "apelido": "Léo Baiano", "semNota": true } ], "indicadores": { "jogadores": 4, "nivelMedio": 6.2, "nivelSoma": 24.8, "idadeMedia": 40.5 } },
-    { "nome": "Time 4", "incompleto": false, "jogadores": [ { "id": "j-marcao", "apelido": "Marcão", "semNota": false }, { "id": "j-paulinho", "apelido": "Paulinho", "semNota": false }, { "id": "j-alemao", "apelido": "Alemão", "semNota": false }, { "id": "j-dudu", "apelido": "Dudu", "semNota": false } ], "indicadores": { "jogadores": 4, "nivelMedio": 6.3, "nivelSoma": 25.2, "idadeMedia": 43.8 } },
-    { "nome": "Time 5", "incompleto": true, "jogadores": [ { "id": "j-ze", "apelido": "Zé Carlos", "semNota": false }, { "id": "j-rafinha", "apelido": "Rafinha", "semNota": false } ], "indicadores": { "jogadores": 2, "nivelMedio": 6.5, "nivelSoma": 13.0, "idadeMedia": 33.5 } }
+    {
+      "nome": "Time 1",
+      "incompleto": false,
+      "jogadores": [
+        {
+          "id": "j-toninho",
+          "apelido": "Toninho",
+          "nivel": 680,
+          "semNota": false,
+          "semAno": false
+        },
+        {
+          "id": "j-nenem",
+          "apelido": "Neném",
+          "nivel": 590,
+          "semNota": false,
+          "semAno": false
+        },
+        {
+          "id": "j-vini",
+          "apelido": "Vini",
+          "nivel": 670,
+          "semNota": false,
+          "semAno": false
+        },
+        {
+          "id": "j-serginho",
+          "apelido": "Serginho",
+          "nivel": 550,
+          "semNota": true,
+          "semAno": false
+        }
+      ],
+      "indicadores": {
+        "jogadores": 4,
+        "nivelSoma": 2490,
+        "nivelMedio": 620,
+        "idadeMedia": 3500
+      }
+    },
+    {
+      "nome": "Time 2",
+      "incompleto": false,
+      "jogadores": [
+        {
+          "id": "j-bigode",
+          "apelido": "Bigode",
+          "nivel": 690,
+          "semNota": false,
+          "semAno": false
+        },
+        {
+          "id": "j-gordo",
+          "apelido": "Gordo",
+          "nivel": 560,
+          "semNota": false,
+          "semAno": false
+        },
+        {
+          "id": "j-cabeca",
+          "apelido": "Cabeça",
+          "nivel": 580,
+          "semNota": false,
+          "semAno": false
+        },
+        {
+          "id": "j-japa",
+          "apelido": "Japa",
+          "nivel": 630,
+          "semNota": false,
+          "semAno": false
+        }
+      ],
+      "indicadores": {
+        "jogadores": 4,
+        "nivelSoma": 2460,
+        "nivelMedio": 620,
+        "idadeMedia": 4130
+      }
+    },
+    {
+      "nome": "Time 3",
+      "incompleto": false,
+      "jogadores": [
+        {
+          "id": "j-careca",
+          "apelido": "Careca",
+          "nivel": 640,
+          "semNota": false,
+          "semAno": false
+        },
+        {
+          "id": "j-juninho",
+          "apelido": "Juninho",
+          "nivel": 720,
+          "semNota": false,
+          "semAno": false
+        },
+        {
+          "id": "j-pedrao",
+          "apelido": "Pedrão",
+          "nivel": 570,
+          "semNota": false,
+          "semAno": false
+        },
+        {
+          "id": "j-leo",
+          "apelido": "Léo Baiano",
+          "nivel": 550,
+          "semNota": true,
+          "semAno": false
+        }
+      ],
+      "indicadores": {
+        "jogadores": 4,
+        "nivelSoma": 2480,
+        "nivelMedio": 620,
+        "idadeMedia": 4050
+      }
+    },
+    {
+      "nome": "Time 4",
+      "incompleto": false,
+      "jogadores": [
+        {
+          "id": "j-marcao",
+          "apelido": "Marcão",
+          "nivel": 660,
+          "semNota": false,
+          "semAno": false
+        },
+        {
+          "id": "j-paulinho",
+          "apelido": "Paulinho",
+          "nivel": 650,
+          "semNota": false,
+          "semAno": false
+        },
+        {
+          "id": "j-alemao",
+          "apelido": "Alemão",
+          "nivel": 610,
+          "semNota": false,
+          "semAno": false
+        },
+        {
+          "id": "j-dudu",
+          "apelido": "Dudu",
+          "nivel": 600,
+          "semNota": false,
+          "semAno": false
+        }
+      ],
+      "indicadores": {
+        "jogadores": 4,
+        "nivelSoma": 2520,
+        "nivelMedio": 630,
+        "idadeMedia": 4380
+      }
+    },
+    {
+      "nome": "Time 5",
+      "incompleto": true,
+      "jogadores": [
+        {
+          "id": "j-ze",
+          "apelido": "Zé Carlos",
+          "nivel": 600,
+          "semNota": false,
+          "semAno": false
+        },
+        {
+          "id": "j-rafinha",
+          "apelido": "Rafinha",
+          "nivel": 700,
+          "semNota": false,
+          "semAno": false
+        }
+      ],
+      "indicadores": {
+        "jogadores": 2,
+        "nivelSoma": 1300,
+        "nivelMedio": 650,
+        "idadeMedia": 3350
+      }
+    }
   ]
 }

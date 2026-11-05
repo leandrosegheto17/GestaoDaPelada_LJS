@@ -1517,6 +1517,8 @@ T53 → T54
 **Depends on**: None
 **Reuses**: Molde da P27 da `partidas-e-ranking` (respostas sem `enderecoNovo`, `PR:2344`); `.specs/mockup/respostas/simulador-*.json`; AD-047
 **Requirement**: SIM-85, SIM-15
+**Status**: rascunhada
+**Nota do rascunho**: respostas reescritas por conversão (nível × 100, `semAno` falso, ids na ordem e nas trocas, `descricao` da prévia, indicadores inteiros); a t12 vazio na rota do app com a sessão e o `elenco-grupo-domingo.json`; estado `T11 pre-marcada` em `telas` com `respostas/partida-nova-2026-10-22-pre-marcada.json` (19 presentes, Fumaça ausente). Não há entradas com rota da t13/t14 (só em `revisaoManual`). Teste em `test/ferramentas/telas-simulador.test.ts`.
 
 **Done when**:
 
