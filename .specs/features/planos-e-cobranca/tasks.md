@@ -1048,6 +1048,7 @@ T56 → T57
 **Depends on**: T28
 **Reuses**: molde do `remetenteResend` (`CA:647`, T15: `fetch` direto, 10 s, log só do status); `centavosParaReais` (T2); S:48-53; AD-058, AD-089
 **Requirement**: PLA-29, PLA-34, PLA-35, PLA-36, PLA-06
+**Status**: rascunhada
 
 **Done when**:
 
