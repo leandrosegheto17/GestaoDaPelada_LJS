@@ -23,6 +23,7 @@ interface Wrangler {
     producers: Array<{ binding: string; queue: string }>;
     consumers: Array<{ queue: string; max_batch_size?: number; max_retries?: number }>;
   };
+  triggers?: { crons: string[] };
   vars: Record<string, string>;
 }
 
@@ -101,5 +102,10 @@ describe('wrangler.jsonc da prévia', () => {
     });
     // A fila não traz rota nem zona: o FUN-27 acima continua valendo com ela.
     expect(chaves(config.queues)).not.toContain('route');
+  });
+
+  it('NOT-56, NOT-57: o Cron da limpeza roda uma vez por dia às 06:00 UTC, dentro dos 5 Crons do plano Free', () => {
+    expect(config.triggers).toEqual({ crons: ['0 6 * * *'] });
+    expect(config.triggers?.crons.length).toBeLessThanOrEqual(5);
   });
 });

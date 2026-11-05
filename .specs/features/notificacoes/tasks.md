@@ -976,6 +976,8 @@ T39 → T40 → T41
 **Depends on**: T25
 **Reuses**: `worker.ts` (`F:1106`); T11, T14; teste do `wrangler.jsonc` (`F:1081`)
 **Requirement**: NOT-56, NOT-57
+**Status**: rascunhada
+**Nota do rascunho**: `limparNotificacoes(env)` usa o mesmo `bancoSemContexto` do consumidor; o `worker.ts` ganhou o `scheduled` e o `criarWorker` passa a repassá-lo (pelo `withSentry` com DSN), como o `queue`. As linhas vencidas são semeadas como superusuário com `now() - interval`, sem a `notificacoes_limpar_em` (que só o owner executa), e a limpeza roda como `pelada_app`. Teste em `backend/api/test/aplicacao/notificacoes/limpar.test.ts`; o do Cron em `test/wrangler.test.ts`.
 
 **Done when**:
 

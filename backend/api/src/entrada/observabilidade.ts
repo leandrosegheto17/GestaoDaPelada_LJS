@@ -19,6 +19,8 @@ export interface Manipulador {
   fetch(requisicao: Request, env: Env, ctx: unknown): Response | Promise<Response>;
   /** Consumidor da fila `avisos` (notificacoes T17; AD-098). */
   queue?(lote: unknown, env: Env, ctx: unknown): Promise<void>;
+  /** Cron diário da limpeza das notificações (notificacoes T26; NOT-56, NOT-57). */
+  scheduled?(evento: unknown, env: Env, ctx: unknown): Promise<void>;
 }
 
 export type EmbrulharSentry = (opcoes: (env: Env) => OpcoesSentry, manipulador: Manipulador) => Manipulador;
@@ -46,9 +48,11 @@ export function sentryLigado(env: Env): boolean {
  */
 export function criarWorker(app: Manipulador, embrulhar: EmbrulharSentry = embrulharPadrao): Manipulador {
   const consumir = app.queue?.bind(app);
+  const agendado = app.scheduled?.bind(app);
   const comSentry = embrulhar(opcoesSentry, {
     fetch: (r, env, ctx) => app.fetch(r, env, ctx),
     ...(consumir ? { queue: (lote: unknown, env: Env, ctx: unknown) => consumir(lote, env, ctx) } : {}),
+    ...(agendado ? { scheduled: (evento: unknown, env: Env, ctx: unknown) => agendado(evento, env, ctx) } : {}),
   });
   const manipulador: Manipulador = {
     fetch: (requisicao, env, ctx) =>
@@ -58,6 +62,11 @@ export function criarWorker(app: Manipulador, embrulhar: EmbrulharSentry = embru
   if (consumir) {
     manipulador.queue = (lote, env, ctx) =>
       sentryLigado(env) && comSentry.queue ? comSentry.queue(lote, env, ctx) : consumir(lote, env, ctx);
+  }
+  // O Cron também (notificacoes T26).
+  if (agendado) {
+    manipulador.scheduled = (evento, env, ctx) =>
+      sentryLigado(env) && comSentry.scheduled ? comSentry.scheduled(evento, env, ctx) : agendado(evento, env, ctx);
   }
   return manipulador;
 }
