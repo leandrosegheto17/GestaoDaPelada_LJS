@@ -140,3 +140,22 @@
   background: var(--cor-sucesso-fundo);
   color: var(--cor-sucesso-texto);
 }
+
+/* Nível do jogador na ficha (t16-jogador--edicao.html), de base.css:287 (saldos__valor). */
+.nivel {
+  margin: 0 0 var(--esp-3);
+  font-family: var(--fonte-titulo);
+  font-size: var(--texto-4xl);
+  font-weight: var(--peso-extra);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Esqueleto do título da ficha carregando (base.css:221). */
+.esqueleto-titulo {
+  display: block;
+  height: 28px;
+  width: 60%;
+  margin: var(--esp-2) 0 var(--esp-4);
+  border-radius: var(--raio-sm);
+  background: var(--cor-esqueleto);
+}
