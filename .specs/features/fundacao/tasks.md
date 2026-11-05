@@ -1775,6 +1775,8 @@ T81 → T82
 **Depends on**: T56
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-29
+**Status**: rascunhada
+**Nota do rascunho**: os valores esperados ficam em `frontend/web/test/apoio/cabecalhos.ts`, usados também pelo e2e da T59. A CSP abre `connect-src` só para `https://*.ingest.sentry.io` (Sentry do front, T56). O `_headers` vale só para os assets estáticos; `/api/*` tem os cabeçalhos do Worker (FUN-22). O `/executar` confere no `dist` que o build copiou o arquivo (terceiro critério) e, na T59, que a CSP não quebra o `registerSW.js` e as fontes.
 
 **Done when**:
 

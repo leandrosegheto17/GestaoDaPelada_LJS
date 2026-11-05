@@ -1,0 +1,8 @@
+# Cabeçalhos de segurança dos assets do front (FUN-29), aplicados pela Cloudflare às respostas
+# dos arquivos estáticos. As respostas de /api/* têm os próprios cabeçalhos, postos pelo Worker
+# (FUN-22). A CSP não aceita script embutido nem eval; o connect-src abre só o Sentry (FUN-24).
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://*.ingest.sentry.io; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: same-origin
+  Strict-Transport-Security: max-age=63072000; includeSubDomains
