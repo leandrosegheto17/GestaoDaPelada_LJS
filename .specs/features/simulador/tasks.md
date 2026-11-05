@@ -675,6 +675,7 @@ T53 → T54
 **Depends on**: T12
 **Reuses**: `L:backend/dominio/src/simulador/indicadores.ts`; `mediaInteira` (T2); `S:206`
 **Requirement**: SIM-40, SIM-95
+**Status**: rascunhada
 
 **Done when**:
 
