@@ -1675,6 +1675,9 @@ T57 → T58
 **Depends on**: T51
 **Reuses**: `.specs/mockup/telas/t25-senha--*.html` (3 estados); `CampoSenha` (T39)
 **Requirement**: ACE-26, ACE-27, ACE-56
+**Status**: rascunhada
+**Nota do rascunho**: SPEC_DEVIATION: **Reuses** cita o `CampoSenha`, mas o mockup t25 não tem o botão "Mostrar" e a T56 compara a tela com ele; os campos usam o `Campo` com `type="password"`, como a Nova senha (T47). Validação antes de enviar como na T47 (com o `ResumoErros`); o 401 da API marca só o campo, sem o resumo, como no `t25-senha--erro`. O 204 limpa os campos e mostra a faixa de sucesso.
+**Lacunas**: senha atual vazia: o mockup não tem o texto; o rascunho mostra "Digite sua senha atual." sem chamar a API.
 
 **Done when**:
 

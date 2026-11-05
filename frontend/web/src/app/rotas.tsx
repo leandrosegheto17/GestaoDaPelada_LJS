@@ -1,6 +1,7 @@
 import type { RouteObject } from 'react-router';
 import { NaoEncontrada, PaginaProvisoria } from '../paginas/Mensagens.tsx';
-import { AdminsGrupo, MinhaSenha } from '../paginas/acesso/provisorias.tsx';
+import { AdminsGrupo } from '../paginas/acesso/provisorias.tsx';
+import { MinhaSenha } from '../telas/minha-senha/MinhaSenha.tsx';
 import { MinhaConta } from '../telas/minha-conta/MinhaConta.tsx';
 import { GuardaApp, GuardaPublica } from './guarda.tsx';
 import { Grupos } from '../telas/grupos/Grupos.tsx';
