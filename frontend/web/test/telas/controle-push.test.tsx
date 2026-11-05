@@ -195,10 +195,10 @@ describe('ControlePush (t01)', () => {
 
   it('NOT-03 (posição): no iOS fora do standalone, o aviso de instalação ocupa o contêiner do controle, sem botão nem pedido de permissão', async () => {
     const { pedirPermissao } = abrir({ ambiente: IPHONE_SAFARI });
-    const contêiner = await screen.findByRole('region', { name: 'Avisos do ranking' });
-    expect(within(contêiner).getByRole('note')).toBeTruthy();
-    expect(within(contêiner).getByText(TEXTO_AVISO)).toBeTruthy();
-    expect(within(contêiner).queryByRole('button', { name: TEXTO_RECEBER_RANKING })).toBeNull();
+    const regiao = await screen.findByRole('region', { name: 'Avisos do ranking' });
+    expect(within(regiao).getByRole('note')).toBeTruthy();
+    expect(within(regiao).getByText(TEXTO_AVISO)).toBeTruthy();
+    expect(within(regiao).queryByRole('button', { name: TEXTO_RECEBER_RANKING })).toBeNull();
     expect(screen.queryByRole('button', { name: TEXTO_RECEBER_RANKING })).toBeNull();
     expect(pedirPermissao).not.toHaveBeenCalled();
   });

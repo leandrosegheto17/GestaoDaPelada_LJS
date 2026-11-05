@@ -13,6 +13,7 @@ import { CascaConta } from '../../componentes/MenuConta.tsx';
 import { ErroApi, MENSAGEM_REDE } from '../../dados/cliente.ts';
 import { useCliente } from '../../dados/ContextoCliente.tsx';
 import { destinoDoGrupo } from '../convite/Convite.tsx';
+import { AvisosCobranca } from './AvisosCobranca.tsx';
 import estilos from '../acesso.module.css';
 
 /**
@@ -104,6 +105,9 @@ export function MinhaConta() {
           Trocar senha
         </LinkBotao>
       </section>
+
+      {/* Avisos de cobrança neste aparelho (notificacoes T38; NOT-44): só para a criadora, com suporte. */}
+      <AvisosCobranca />
 
       <section className={estilos.secao} aria-labelledby="exc">
         <h2 id="exc" className={estilos.subtitulo}>

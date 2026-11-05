@@ -1304,6 +1304,8 @@ T39 → T40 → T41
 **Depends on**: T37
 **Reuses**: `MinhaConta` (`CA:1534`); T36, T37; AD-072
 **Requirement**: NOT-44, NOT-72
+**Status**: rascunhada
+**Nota do rascunho**: a seção vai em Minha conta entre Segurança e Excluir conta, com o `ControleAvisos` da T37 e o destino `conta`. Em jsdom não há `PushManager`, então os testes existentes da t32 não veem a seção (e o `GET /api/conta/push` responde 404 no servidor falso deles). Não conferido por teste aqui: as entradas da t32 no `telas.json` (o `visual` do `/executar`). O mesmo commit troca o nome `contêiner` por `regiao` no teste da T37. Testes em `frontend/web/test/telas/avisos-cobranca.test.tsx`.
 
 **Done when**:
 
