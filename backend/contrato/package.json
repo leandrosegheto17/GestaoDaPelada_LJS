@@ -21,7 +21,9 @@
     "./previas": "./src/previas.ts",
     "./push": "./src/push.ts",
     "./plano": "./src/plano.ts",
-    "./asaas": "./src/asaas.ts"
+    "./asaas": "./src/asaas.ts",
+    "./financeiro": "./src/financeiro.ts",
+    "./financeiro-lancamentos": "./src/financeiro-lancamentos.ts"
   },
   "scripts": {
     "lint": "eslint .",

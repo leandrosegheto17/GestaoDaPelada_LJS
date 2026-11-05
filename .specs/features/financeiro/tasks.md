@@ -1248,6 +1248,8 @@ T47 → T48
 **Depends on**: T35
 **Reuses**: Cliente HTTP (`CA:1169`); molde de dados do elenco (`GE:1703`)
 **Requirement**: FIN-07
+**Status**: rascunhada
+**Nota do rascunho**: os códigos do financeiro não são do `CODIGOS_ERRO` da conta e acesso, então o `ErroApi.codigo` vem vazio; `erroDoFinanceiro(erro)` lê o corpo bruto (`ErroApi.corpo`), inclusive o `plano_pro` na forma da AD-091. O `package.json` do contrato ganhou `./financeiro` e `./financeiro-lancamentos` em `exports` (o `index.ts` raiz ainda não exporta o caixa, nota da T17). `[LACUNA]` para o /executar: o contrato exige `z.uuid()` nos ids de `pagamentoDoMes` e `lancamentoDoMes`, mas `.specs/mockup/respostas/financeiro-2026-10.json` usa `j-alemao` e afins; ou o contrato passa a `z.string().min(1)` como `grupo.ts:86`, ou a resposta do mockup troca os ids, antes das telas (T38) e da comparação visual (T46). O `useGrupo` (`dados/grupos.ts`) não mudou aqui: o GET do grupo ganhou o início da partidas-e-ranking e o saldo, e o parser dele é da T43.
 
 **Done when**:
 
