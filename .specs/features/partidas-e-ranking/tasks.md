@@ -1019,6 +1019,8 @@ T78 → T79
 **Depends on**: T21
 **Reuses**: Função atual `M:1792844340000_grupo-criar.sql:10-75`; desenho `BD:125-129`; AD-037
 **Requirement**: PAR-15, PAR-16
+**Status**: rascunhada
+**Nota do rascunho**: migração `1792844640000_grupo-criar-pesos.sql` (a de 6 parâmetros vira `LANGUAGE sql` delegando; `p_hoje` nulo levanta `22023`); testes em `backend/api/test/banco/grupo-criar-pesos.test.ts`, com a falha forçada por um trigger criado e desfeito na própria transação.
 
 **Done when**:
 

@@ -7,7 +7,7 @@ import { checarMigracoes, entradaDoRepositorio } from '../migracao-aditiva.ts';
  * Cada tarefa acrescenta o sufixo da sua migração a esta lista.
  */
 
-const DA_FEATURE = ['_pesos-padrao.sql'] as const;
+const DA_FEATURE = ['_pesos-padrao.sql', '_grupo-criar-pesos.sql'] as const;
 
 describe('migrações da partidas-e-ranking', () => {
   const e = entradaDoRepositorio();
