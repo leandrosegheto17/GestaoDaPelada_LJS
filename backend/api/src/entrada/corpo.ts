@@ -64,14 +64,18 @@ export function respostaDeCampo(c: Context<Ambiente>, campo: string, mensagem: s
 /**
  * Corpo JSON pelo schema do contrato, no formato das rotas de grupo (GS:70, GEL-118). JSON inválido: 422 com a
  * mensagem geral e o campo `corpo`.
+ *
+ * `preparar` muda o JSON antes do schema (grupos-e-elenco T37: o PATCH do jogador ignora a `dataEntrada`, GEL-41, e o
+ * corpo do contrato é `.strict()`).
  */
 export async function lerCorpoDoGrupo<S extends z.ZodType>(
   c: Context<Ambiente>,
   schema: S,
+  preparar: (bruto: unknown) => unknown = (bruto) => bruto,
 ): Promise<Leitura<z.infer<S>>> {
   const json = await lerJson(c);
   if (!json.ok) return { ok: false, resposta: c.json(erroDeCampos({ corpo: 'Envie um JSON válido.' }), 422) };
-  const r = schema.safeParse(json.bruto);
+  const r = schema.safeParse(preparar(json.bruto));
   if (!r.success) return { ok: false, resposta: c.json(erroDeCampos(mensagensDoZod(r.error)), 422) };
   return { ok: true, dados: r.data };
 }
