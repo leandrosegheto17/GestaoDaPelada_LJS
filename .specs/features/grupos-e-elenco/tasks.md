@@ -1878,6 +1878,8 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T57
 **Reuses**: estender a tela da CA (`CA:1509`, T50); estados de `R-02` a `R-08` (`t08-grupos--*.html` do módulo)
 **Requirement**: GEL-27, GEL-114, GEL-117
+**Status**: rascunhada
+**Lacunas**: os testes ACE-18 e ACE-57 da CA (`frontend/web/test/telas/grupos.test.tsx`) passam a falhar com a tela estendida: o link vai a `/app/grupos/:grupoId` (não mais `/admins`), a lista vem de `GET /api/grupos` (o teste só simula a sessão) e o texto do vazio muda (`t08-grupos--vazio`). Mudar teste existente pede aprovação: o rascunho não os tocou; o `/executar` pergunta antes de ajustá-los (mesma força, só a fonte e o destino). Os casos novos estão em `test/telas/grupos-modulo.test.tsx`.
 
 **Done when**:
 

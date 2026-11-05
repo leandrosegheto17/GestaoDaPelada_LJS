@@ -1,0 +1,103 @@
+/* Classes das telas de grupos e elenco (GEL-114, GEL-115), de .specs/mockup/base.css. */
+
+/* Barra de ação fixa no pé (celular) e em linha no fim do conteúdo (PC), de base.css:212-215 e :336-339. */
+.barra-acao {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--esp-2);
+  padding: var(--esp-3) var(--esp-4) calc(var(--esp-3) + env(safe-area-inset-bottom));
+  background: var(--cor-superficie);
+  border-top: 1px solid var(--cor-linha);
+}
+
+.barra-acao > * {
+  width: 100%;
+  max-width: 440px;
+}
+
+/* Espaço no fim do conteúdo para a barra fixa não cobrir o último item. */
+.reserva-barra {
+  height: calc(var(--altura-botao) + var(--esp-8));
+}
+
+.grupo-botoes {
+  display: flex;
+  gap: var(--esp-2);
+}
+
+.grupo-botoes > * {
+  flex: 1;
+}
+
+/* Item que quebra a linha com o botão (base.css:21). */
+.item-quebra {
+  flex-wrap: wrap;
+}
+
+/* Duas colunas no PC (base.css:95, :351). */
+.duas-colunas {
+  display: grid;
+  gap: var(--esp-4);
+}
+
+/* Zona de perigo (arquivar), de t20-grupo--sucesso.html. */
+.zona-perigo {
+  margin-top: var(--esp-6);
+  padding-top: var(--esp-4);
+  border-top: 1px solid var(--cor-linha);
+}
+
+/* Linha do link público com o botão de copiar, de t20-grupo--sucesso.html. */
+.linha-link {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2);
+  align-items: center;
+}
+
+.link-publico {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-family: var(--fonte-mono);
+  font-size: var(--texto-sm);
+}
+
+/* Contagens do início do grupo, de t09-inicio--sucesso.html. */
+.contagens {
+  margin: 0 0 var(--esp-4);
+  color: var(--cor-texto-sec);
+}
+
+@media (min-width: 600px) {
+  .barra-acao {
+    position: static;
+    align-items: flex-start;
+    padding: 0;
+    margin-top: var(--esp-6);
+    background: transparent;
+    border: 0;
+  }
+
+  .barra-acao > * {
+    width: auto;
+  }
+
+  .grupo-botoes > * {
+    flex: none;
+  }
+
+  .reserva-barra {
+    display: none;
+  }
+
+  .duas-colunas {
+    grid-template-columns: 1fr 1fr;
+  }
+}
