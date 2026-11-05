@@ -29,6 +29,13 @@ export const CODIGOS_ERRO = [
   'origem_recusada',
   'muitas_requisicoes',
   'nao_encontrado',
+  // grupos-e-elenco (T20; GS:143-145, GS:211-214, GS:295, SEC-001)
+  'grupo_arquivado',
+  'so_quem_criou',
+  'jogador_com_historico',
+  'ja_inativo',
+  'ja_ativo',
+  'criadora_nao_removivel',
 ] as const;
 
 export type CodigoErro = (typeof CODIGOS_ERRO)[number];
@@ -52,7 +59,16 @@ export const MENSAGENS_ERRO: Readonly<Record<CodigoErro, string>> = {
   origem_recusada: 'Requisição recusada.',
   muitas_requisicoes: 'Muitas tentativas. Tente de novo em alguns minutos.',
   nao_encontrado: 'Não encontrado.',
+  grupo_arquivado: 'Este grupo está arquivado. Reative o grupo para fazer alterações.',
+  so_quem_criou: 'Só quem criou o grupo pode fazer isso.',
+  jogador_com_historico: 'O jogador tem histórico de partidas e não pode ser excluído.',
+  ja_inativo: 'O jogador já está inativo.',
+  ja_ativo: 'O jogador já está ativo.',
+  criadora_nao_removivel: 'Quem criou o grupo não pode ser removida por outra admin.',
 };
+
+/** Mensagem geral do 422 de validação das rotas de grupo (GS:70, GEL-118). */
+export const MENSAGEM_CORRIJA_CAMPOS = 'Corrija os campos indicados.';
 
 /** Corpo de toda resposta de erro das rotas de acesso. */
 export const corpoErro = z
@@ -61,6 +77,13 @@ export const corpoErro = z
     codigo: z.enum(CODIGOS_ERRO),
     /** Campos inválidos (422 `dados_invalidos`). */
     campos: z.array(z.string()).optional(),
+    /**
+     * Mensagem de cada campo inválido, nas rotas de grupo (GEL-118). `campos` continua com os nomes, como nas rotas
+     * de acesso, para o front da conta e acesso seguir igual.
+     */
+    mensagens: z.record(z.string(), z.string()).optional(),
+    /** Ação sugerida no lugar da recusada (409 `jogador_com_historico`: `inativar`, GEL-85). */
+    sugestao: z.literal('inativar').optional(),
     /** Grupos em que a conta é a única admin (409 `unico_admin`). */
     grupos: z.array(z.object({ id: z.string(), nome: z.string() }).strict()).optional(),
   })
@@ -145,6 +168,6 @@ export function erroDeValidacao(erro: z.ZodError): CorpoErro {
 }
 
 /** Corpo de erro de um código, com a mensagem padrão. */
-export function corpoDoErro(codigo: CodigoErro, extra: Pick<CorpoErro, 'campos' | 'grupos'> = {}): CorpoErro {
+export function corpoDoErro(codigo: CodigoErro, extra: Pick<CorpoErro, 'campos' | 'grupos' | 'mensagens' | 'sugestao'> = {}): CorpoErro {
   return { erro: MENSAGENS_ERRO[codigo], codigo, ...extra };
 }

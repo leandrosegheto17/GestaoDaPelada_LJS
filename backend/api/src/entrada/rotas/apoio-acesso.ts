@@ -1,6 +1,5 @@
 import type { Context, MiddlewareHandler } from 'hono';
-import type { z } from 'zod';
-import { corpoDoErro, erroDeValidacao } from '@pelada/contrato';
+import { corpoDoErro } from '@pelada/contrato';
 import type { Ambiente } from '../ambiente.ts';
 import { registrarOrigem } from '../../aplicacao/acesso/enviar-email.ts';
 import type { OpcoesCliente } from '../../infraestrutura/db/cliente.ts';
@@ -21,23 +20,8 @@ export function comFabrica(opcoes: OpcoesRotas): { fabrica?: NonNullable<OpcoesC
   return opcoes.fabrica ? { fabrica: opcoes.fabrica } : {};
 }
 
-export type Leitura<T> = { ok: true; dados: T } | { ok: false; resposta: Response };
-
-/**
- * Lê o corpo JSON pelo schema do contrato. JSON inválido ou fora do schema: 422 com o código
- * (`termos_obrigatorios` ou `dados_invalidos`) e os campos (ACE-02, ACE-03).
- */
-export async function lerCorpo<S extends z.ZodType>(c: Context<Ambiente>, schema: S): Promise<Leitura<z.infer<S>>> {
-  let bruto: unknown;
-  try {
-    bruto = await c.req.json();
-  } catch {
-    return { ok: false, resposta: c.json(corpoDoErro('dados_invalidos'), 422) };
-  }
-  const r = schema.safeParse(bruto);
-  if (!r.success) return { ok: false, resposta: c.json(erroDeValidacao(r.error), 422) };
-  return { ok: true, dados: r.data };
-}
+// O leitor de corpo foi extraído para `entrada/corpo.ts` (T20), sem mudança de comportamento.
+export { lerCorpo, type Leitura } from '../corpo.ts';
 
 /** O IP da requisição na Cloudflare (`cf-connecting-ip`), ou nulo. */
 export function ipDa(c: Context<Ambiente>): string | null {

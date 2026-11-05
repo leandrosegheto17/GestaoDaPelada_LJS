@@ -888,6 +888,7 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T19
 **Reuses**: 422 `dados_invalidos` das rotas de acesso (`CA:895`, T25); forma de `GS:70-71`; tradução por constraint de `GD:155`
 **Requirement**: GEL-118
+**Status**: rascunhada
 
 **Done when**:
 
