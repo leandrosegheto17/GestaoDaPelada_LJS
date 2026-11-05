@@ -439,6 +439,8 @@ T73 → T74 → T75
 **Depends on**: T2
 **Reuses**: laço de `M:1792844340000_grupo-criar.sql:37-58` (`grupos_slug_key`, até 3 tentativas); `bancoDeTeste()` (`F:507`)
 **Requirement**: GEL-15
+**Status**: rascunhada
+**Nota do rascunho**: o caso de três colisões seguidas fica só listado (exige três transações em ordem exata); a evidência da rede é do /executar.
 
 **Done when**:
 
