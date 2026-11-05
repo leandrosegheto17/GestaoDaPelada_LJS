@@ -124,3 +124,10 @@
   max-width: 420px;
   margin: 0 auto var(--esp-4);
 }
+
+/* Seção da página (T51), de .specs/mockup/base.css:49 (t32-conta--sucesso). */
+.secao {
+  margin-top: var(--esp-6);
+  padding-top: var(--esp-4);
+  border-top: 1px solid var(--cor-linha);
+}

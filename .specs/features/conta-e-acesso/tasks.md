@@ -1648,6 +1648,9 @@ T57 → T58
 **Depends on**: T50
 **Reuses**: `.specs/mockup/telas/t32-conta--*.html` (5 estados); `Dialogo` (T41)
 **Requirement**: ACE-28, ACE-29, ACE-56
+**Status**: rascunhada
+**Nota do rascunho**: no 204 a tela navega a `/?aviso=conta-excluida` e só depois limpa o cache (limpar antes faria a `GuardaApp` reler a sessão e ir a `/entrar`). 401 marca o campo com "Senha incorreta." (comentário do `t32-conta--excluir`); 429 e rede vão numa faixa dentro do diálogo. O `Botao` ganhou as variantes `destrutivo` e `texto-destrutivo` (o `LinkBotao` usa as mesmas classes).
+**Lacunas**: senha vazia no diálogo: o mockup não tem o texto; o rascunho mostra "Digite sua senha." no campo sem chamar a API.
 
 **Done when**:
 

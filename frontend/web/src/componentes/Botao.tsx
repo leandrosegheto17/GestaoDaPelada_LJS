@@ -4,9 +4,19 @@ import estilos from './Botao.module.css';
 /**
  * Botão (FUN-31), de `.specs/mockup/base.css:55-64`. Carregando segue o mockup
  * (`t04-entrar--carregando`): `disabled`, `aria-busy` e o texto da ação em andamento.
+ *
+ * `destrutivo` e `texto-destrutivo` (T51, `t32-conta--excluir.html`, `t32-conta--sucesso.html`):
+ * o botão cheio da ação que não se desfaz e o link de texto em vermelho que a abre; o
+ * `texto-destrutivo` leva também as classes do `texto` (`botao--texto botao--texto-destrutivo`).
  */
 
-export type VarianteBotao = 'principal' | 'secundario' | 'texto';
+export type VarianteBotao = 'principal' | 'secundario' | 'texto' | 'destrutivo' | 'texto-destrutivo';
+
+/** Classes de uma variante (o `LinkBotao` usa as mesmas). */
+export function classesDaVariante(variante: VarianteBotao): string[] {
+  if (variante === 'texto-destrutivo') return [estilos['botao--texto'] ?? '', estilos['botao--texto-destrutivo'] ?? ''];
+  return [estilos[`botao--${variante}`] ?? ''];
+}
 
 export interface PropsBotao extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'className'> {
   variante?: VarianteBotao;
@@ -30,7 +40,7 @@ export function Botao({
 }: PropsBotao) {
   const classes = [
     estilos.botao,
-    estilos[`botao--${variante}`],
+    ...classesDaVariante(variante),
     bloco ? estilos['botao--bloco'] : '',
     carregando ? estilos['botao--carregando'] : '',
   ]

@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router';
 import estilos from './Botao.module.css';
-import type { VarianteBotao } from './Botao.tsx';
+import { classesDaVariante, type VarianteBotao } from './Botao.tsx';
 
 /**
  * Link do app com a aparência de botão (`a.botao` do mockup: "Esqueci a senha", "Voltar para
@@ -18,7 +18,7 @@ export interface PropsLinkBotao {
 }
 
 export function LinkBotao({ para, variante = 'texto', bloco = false, classe, children }: PropsLinkBotao) {
-  const classes = [estilos.botao, estilos[`botao--${variante}`], bloco ? estilos['botao--bloco'] : '', classe ?? '']
+  const classes = [estilos.botao, ...classesDaVariante(variante), bloco ? estilos['botao--bloco'] : '', classe ?? '']
     .filter(Boolean)
     .join(' ');
   return (

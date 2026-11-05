@@ -42,6 +42,15 @@
   letter-spacing: 0;
 }
 
+.botao--destrutivo {
+  background: var(--cor-destrutivo);
+  color: var(--cor-sobre-destrutivo);
+}
+
+.botao--texto-destrutivo {
+  color: var(--cor-erro-texto);
+}
+
 .botao--bloco {
   width: 100%;
 }
