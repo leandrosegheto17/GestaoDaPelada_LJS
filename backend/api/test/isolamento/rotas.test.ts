@@ -17,6 +17,10 @@ import { abrirCenarioGrupos, type CenarioGruposAberto } from './cenario-grupos.t
  * com o id de G dá 404 (GEL-107); nas que levam id de jogador, período ou habilidade, a conta C com G na rota e o id
  * de H também dá 404, e a conta B com H na rota e o id de G também (GEL-108). Cada caso confere que nada de G nem de H
  * mudou.
+ *
+ * financeiro T31 (FIN-31, FIN-33, FIN-37): as rotas do financeiro entram na tabela (`ROTAS_DO_FINANCEIRO`) com o
+ * mesmo 404 cruzado, agora conferindo também o caixa de G e de H; e cada uma, lida da lista do roteador, dá 403 para
+ * a admin de G sem acesso (O) e, com G arquivado, 409 nas escritas e 200 nas leituras da criadora e 404 para O.
  */
 
 let aberto: CenarioGruposAberto;
@@ -267,9 +271,166 @@ const ROTAS_DE_GRUPO: Record<string, Linha> = {
   }),
 };
 
+// ---------------------------------------------------------------- financeiro (financeiro T31)
+
+/**
+ * Rotas do financeiro (FIN-31, FIN-33, FIN-37). Cada uma tem um pedido válido para a conta da vez; o grupo da rota e os
+ * ids filhos (lançamento, jogador, conta alvo) vêm do grupo dado. Rota nova com `/financeiro` sem pedido aqui reprova
+ * (teste abaixo).
+ */
+interface IdsDoCaixa {
+  lancamento: string;
+  jogador: string;
+  /** A conta alvo do PATCH de acesso: um admin do grupo que não é a conta da sessão de C. */
+  conta: string;
+}
+
+interface PedidoDoCaixa {
+  metodo: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+  caminho: (ids: IdsDoCaixa) => string;
+  corpo?: unknown;
+  /** Leva id de lançamento ou de jogador: também C com ids de H (FIN-31). */
+  comFilho?: boolean;
+}
+
+const LANCAMENTO_VALIDO = { tipo: 'saida', data: '2026-02-10', descricao: 'Isolamento', valorCentavos: 100 };
+
+const PEDIDOS_DO_FINANCEIRO: Record<string, PedidoDoCaixa> = {
+  'PUT /api/grupos/:grupoId/financeiro/config': {
+    metodo: 'PUT',
+    caminho: () => '/financeiro/config',
+    corpo: { mensalidadeCentavos: 1, saldoInicialCentavos: 1, dataSaldoInicial: '2026-01-01' },
+  },
+  'GET /api/grupos/:grupoId/financeiro/mes': { metodo: 'GET', caminho: () => '/financeiro/mes' },
+  'POST /api/grupos/:grupoId/financeiro/pagamentos': {
+    metodo: 'POST',
+    caminho: () => '/financeiro/pagamentos',
+    corpo: { jogadorId: '00000000-0000-4000-8000-000000000000', mes: '2026-02' },
+  },
+  'DELETE /api/grupos/:grupoId/financeiro/pagamentos/:jogadorId/:mes': {
+    metodo: 'DELETE',
+    caminho: (i) => `/financeiro/pagamentos/${i.jogador}/2026-01`,
+    comFilho: true,
+  },
+  'POST /api/grupos/:grupoId/financeiro/lancamentos': {
+    metodo: 'POST',
+    caminho: () => '/financeiro/lancamentos',
+    corpo: LANCAMENTO_VALIDO,
+  },
+  'GET /api/grupos/:grupoId/financeiro/lancamentos/:id': {
+    metodo: 'GET',
+    caminho: (i) => `/financeiro/lancamentos/${i.lancamento}`,
+    comFilho: true,
+  },
+  'PUT /api/grupos/:grupoId/financeiro/lancamentos/:id': {
+    metodo: 'PUT',
+    caminho: (i) => `/financeiro/lancamentos/${i.lancamento}`,
+    corpo: { ...LANCAMENTO_VALIDO, tipo: 'entrada' },
+    comFilho: true,
+  },
+  'DELETE /api/grupos/:grupoId/financeiro/lancamentos/:id': {
+    metodo: 'DELETE',
+    caminho: (i) => `/financeiro/lancamentos/${i.lancamento}`,
+    comFilho: true,
+  },
+  'PATCH /api/grupos/:grupoId/admins/:contaId/financeiro': {
+    metodo: 'PATCH',
+    caminho: (i) => `/admins/${i.conta}/financeiro`,
+    corpo: { acessaFinanceiro: true },
+    comFilho: true,
+  },
+};
+
+/** Ids do caixa de H (criados no `beforeAll`). */
+const caixaDeH = { lancamento: '' };
+
+beforeAll(async () => {
+  const { db, cenario } = aberto;
+  const l = await db.query<{ id: string }>(
+    `INSERT INTO lancamentos (grupo_id, tipo, data, descricao, valor_centavos, criado_por, criado_em, alterado_por, alterado_em)
+     VALUES ($1, 'entrada', '2026-01-10', 'Caixa de H', 321, $2, now(), $2, now()) RETURNING id`,
+    [cenario.grupoH, cenario.contaB],
+  );
+  caixaDeH.lancamento = l.rows[0]!.id;
+  await db.query(
+    `INSERT INTO pagamentos_mes (grupo_id, jogador_id, mes, lancamento_id, marcado_por, marcado_em)
+     VALUES ($1, $2, '2026-01', NULL, $3, now())`,
+    [cenario.grupoH, deH.jogador, cenario.contaB],
+  );
+  // B passa a ter acesso ao financeiro de H: o "B com H na rota e ids de G" precisa chegar à rota (404), não parar no
+  // 403 do `exigirFinanceiro`.
+  await db.query('UPDATE vinculos_admin SET acessa_financeiro = true WHERE grupo_id = $1 AND conta_id = $2', [
+    cenario.grupoH,
+    cenario.contaB,
+  ]);
+});
+
+const idsDoCaixaDeG = (): IdsDoCaixa => ({
+  lancamento: aberto.cenario.idsG.lancamento,
+  jogador: aberto.cenario.idsG.jogadorHistorico,
+  conta: aberto.cenario.contaO,
+});
+const idsDoCaixaDeH = (): IdsDoCaixa => ({ lancamento: caixaDeH.lancamento, jogador: deH.jogador, conta: aberto.cenario.contaB });
+
+/** O caixa e os acessos de um grupo, para provar que nada mudou. */
+async function retratoDoCaixa(grupo: string): Promise<string> {
+  const { db } = aberto;
+  const partes = await Promise.all([
+    db.query('SELECT mensalidade_centavos, saldo_inicial_centavos, data_saldo_inicial::text FROM config_financeira WHERE grupo_id = $1', [grupo]),
+    db.query('SELECT id, tipo, data::text, descricao, valor_centavos FROM lancamentos WHERE grupo_id = $1 ORDER BY id', [grupo]),
+    db.query('SELECT jogador_id, mes, lancamento_id FROM pagamentos_mes WHERE grupo_id = $1 ORDER BY jogador_id, mes', [grupo]),
+    db.query('SELECT conta_id, acessa_financeiro FROM vinculos_admin WHERE grupo_id = $1 ORDER BY conta_id', [grupo]),
+  ]);
+  return JSON.stringify(partes.map((p) => p.rows));
+}
+
+let sessaoO = '';
+beforeAll(async () => {
+  sessaoO = await sessao(aberto.cenario.contaO);
+});
+
+function enviarAoCaixa(p: PedidoDoCaixa, grupo: string, ids: IdsDoCaixa, sessaoDaVez: string): Promise<Response> {
+  return pedir(`/grupos/${grupo}${p.caminho(ids)}`, {
+    metodo: p.metodo,
+    sessao: sessaoDaVez,
+    ...(p.corpo !== undefined ? { corpo: p.corpo } : {}),
+  });
+}
+
+/** FIN-31: B contra G (404) e, com filho, C com ids de H e B com ids de G (404); nada de G nem de H muda. */
+function casoDoCaixa(p: PedidoDoCaixa): Linha {
+  return {
+    caso: async () => {
+      const { cenario } = aberto;
+      const antesG = await retratoDoCaixa(cenario.grupoG);
+      const antesH = await retratoDoCaixa(cenario.grupoH);
+
+      const r = await enviarAoCaixa(p, cenario.grupoG, idsDoCaixaDeG(), sessaoB);
+      expect(r.status, 'FIN-31: B com o id de G').toBe(404);
+      expect(await r.text()).not.toContain('Mensalidade');
+
+      if (p.comFilho) {
+        const cComH = await enviarAoCaixa(p, cenario.grupoG, idsDoCaixaDeH(), sessaoA);
+        expect(cComH.status, 'FIN-31: C com G na rota e ids de H').toBe(404);
+        expect(await cComH.text()).not.toContain('Caixa de H');
+        const bComG = await enviarAoCaixa(p, cenario.grupoH, idsDoCaixaDeG(), sessaoB);
+        expect(bComG.status, 'FIN-31: B com H na rota e ids de G').toBe(404);
+      }
+
+      expect(await retratoDoCaixa(cenario.grupoG)).toBe(antesG);
+      expect(await retratoDoCaixa(cenario.grupoH)).toBe(antesH);
+    },
+  };
+}
+
+const ROTAS_DO_FINANCEIRO: Record<string, Linha> = Object.fromEntries(
+  Object.entries(PEDIDOS_DO_FINANCEIRO).map(([rota, p]) => [rota, casoDoCaixa(p)]),
+);
+
 /** Uma linha por rota do Hono (`MÉTODO caminho`). */
 const TABELA: Record<string, Linha> = {
   ...ROTAS_DE_GRUPO,
+  ...ROTAS_DO_FINANCEIRO,
   'GET /api/health': { naoSeAplica: 'rota pública de saúde, sem dado de conta nem de grupo' },
   'GET /api/dev/emails': { naoSeAplica: 'só existe com EMAIL_DEV=1, em dev e no e2e (T17)' },
   'POST /api/conta': { naoSeAplica: SEM_SESSAO },
@@ -375,6 +536,52 @@ describe('isolamento de rotas', () => {
   it('ACE-48: uma rota de teste nova sem caso reprova', () => {
     const app = criarApp({ registrarExtras: (api) => api.get('/teste/rota-nova', (c) => c.json({ ok: true })) });
     expect(rotasSemLinha(app, TABELA)).toEqual(['GET /api/teste/rota-nova']);
+  });
+
+  it('FIN-33: toda rota do financeiro registrada tem pedido na lista do financeiro', () => {
+    const doFinanceiro = rotasDoApp(criarApp()).filter((r) => r.includes('/financeiro'));
+    expect(doFinanceiro.length).toBeGreaterThanOrEqual(9);
+    expect(doFinanceiro.filter((r) => !(r in PEDIDOS_DO_FINANCEIRO))).toEqual([]);
+    const comNova = criarApp({ registrarExtras: (api) => api.get('/grupos/:grupoId/financeiro/nova', (c) => c.json({ ok: true })) });
+    expect(rotasDoApp(comNova).filter((r) => r.includes('/financeiro') && !(r in PEDIDOS_DO_FINANCEIRO))).toEqual([
+      'GET /api/grupos/:grupoId/financeiro/nova',
+    ]);
+  });
+
+  it.each(Object.entries(PEDIDOS_DO_FINANCEIRO))(
+    'FIN-33: %s com a admin de G sem acesso dá 403 sem_permissao_financeiro e nada muda',
+    async (_rota, p) => {
+      const { cenario } = aberto;
+      const antes = await retratoDoCaixa(cenario.grupoG);
+      // No PATCH de acesso, O tenta mudar o acesso de C.
+      const ids = { ...idsDoCaixaDeG(), conta: cenario.contaC };
+      const r = await enviarAoCaixa(p, cenario.grupoG, ids, sessaoO);
+      expect(r.status).toBe(403);
+      expect(await r.json()).toEqual({ erro: 'Você não tem acesso ao financeiro deste grupo.', codigo: 'sem_permissao_financeiro' });
+      expect(await retratoDoCaixa(cenario.grupoG)).toBe(antes);
+    },
+  );
+
+  it('FIN-37: com G arquivado, a criadora recebe 409 nas escritas e 200 nas leituras; a outra admin, 404 em tudo', async () => {
+    const { db, cenario } = aberto;
+    const antes = await retratoDoCaixa(cenario.grupoG);
+    await db.query('UPDATE grupos SET arquivado_em = now() WHERE id = $1', [cenario.grupoG]);
+    try {
+      for (const [rota, p] of Object.entries(PEDIDOS_DO_FINANCEIRO)) {
+        const daCriadora = await enviarAoCaixa(p, cenario.grupoG, idsDoCaixaDeG(), sessaoA);
+        if (p.metodo === 'GET') {
+          expect(daCriadora.status, `${rota}: leitura da criadora`).toBe(200);
+        } else {
+          expect(daCriadora.status, `${rota}: escrita da criadora`).toBe(409);
+          expect(await daCriadora.json()).toMatchObject({ codigo: 'grupo_arquivado' });
+        }
+        const daOutra = await enviarAoCaixa(p, cenario.grupoG, idsDoCaixaDeG(), sessaoO);
+        expect(daOutra.status, `${rota}: outra admin`).toBe(404);
+      }
+    } finally {
+      await db.query('UPDATE grupos SET arquivado_em = NULL WHERE id = $1', [cenario.grupoG]);
+    }
+    expect(await retratoDoCaixa(cenario.grupoG)).toBe(antes);
   });
 
   const casos = Object.entries(TABELA).filter((e): e is [string, { caso: () => Promise<void> }] => 'caso' in e[1]);

@@ -1117,6 +1117,8 @@ T47 → T48
 **Depends on**: T30
 **Reuses**: Suíte de isolamento da CA, estendida pela GE e pela PR (`CA:1070`, `GE:1607`, `PR:1658`); prova do arquivado (`GE:1131`)
 **Requirement**: FIN-31, FIN-33, FIN-37
+**Status**: rascunhada
+**Nota do rascunho**: `PEDIDOS_DO_FINANCEIRO` (9 rotas) alimenta a tabela do ACE-48 e os testes FIN-33 e FIN-37; o teste "toda rota com `/financeiro` tem pedido" falha com rota nova. B ganha acesso ao financeiro de H no `beforeAll`, para o "B com H na rota" chegar ao 404 da rota. As rotas do simulador e das escalações ainda não estão na tabela (são da `simulador`): o ACE-48 já falharia por elas, fora do escopo daqui.
 
 **Done when**:
 
