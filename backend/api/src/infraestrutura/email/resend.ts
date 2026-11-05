@@ -17,7 +17,8 @@ export const URL_RESEND = 'https://api.resend.com/emails';
 /** Tempo máximo de espera pelo Resend (ACE-75). */
 export const TEMPO_LIMITE_MS = 10_000;
 
-export type TipoEmail = 'confirmacao' | 'recuperacao' | 'convite' | 'aviso_cadastro';
+/** `aviso_cobranca`: o aviso de cobrança à criadora do grupo (notificacoes T24; NOT-38, NOT-41). */
+export type TipoEmail = 'confirmacao' | 'recuperacao' | 'convite' | 'aviso_cadastro' | 'aviso_cobranca';
 
 export interface Mensagem {
   tipo: TipoEmail;

@@ -920,6 +920,8 @@ T39 → T40 → T41
 **Depends on**: T23
 **Reuses**: `email_cota_reservar` (`CA:522`, `M:1792843860000_conta-teto-emails.sql:43`); `Remetente` e `remetenteMemoria` (`CA:647`); fluxo de `enviarEmailDeConta` (`CA:868`); T11, T14, T17; AD-108
 **Requirement**: NOT-38, NOT-39, NOT-41, NOT-42, NOT-47
+**Status**: rascunhada
+**Nota do rascunho**: o envio reaproveita o `enviarEmailDeConta` (savepoint da cota) na categoria `recuperacao`, que é a de 100%; o e-mail ganhou o `TipoEmail` `aviso_cobranca` (`resend.ts`). A nova tentativa é uma mensagem nova com `tentativa` + 1 e 8 h de atraso (como a T19), não o `retry()` da fila, para a 3.ª saber que é a última. Criadora excluída ou grupo inexistente encerra com o registro do aviso confirmado. `CASOS_PADRAO` liga `cobranca`. Teste em `backend/api/test/aplicacao/notificacoes/avisar-cobranca.test.ts`; o da criadora excluída grava e desfaz `excluida_em` direto (a trigger da T9 só age na passagem de nulo a preenchido).
 
 **Done when**:
 
