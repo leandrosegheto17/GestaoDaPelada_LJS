@@ -1748,6 +1748,8 @@ T81 → T82
 **Depends on**: T55, T41
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-24, FUN-25
+**Status**: rascunhada
+**Nota do rascunho**: mesmo molde do Worker (`opcoesSentry`, `sentryLigado`, `iniciar` trocável no teste); `release` vem de `VITE_VERSAO` (já no `.env.example`). Chamado no `main.tsx` antes do render. Dependências novas no `package.json` sem instalar: `@sentry/react` e `@pelada/contrato` (`workspace:*`). O tipo de `beforeSend` (`limparEvento`) pode precisar de ajuste para casar com o `BrowserOptions` do Sentry: o `/executar` confere no `typecheck`.
 
 **Done when**:
 
