@@ -1064,6 +1064,8 @@ T56 → T57
 **Depends on**: T27
 **Reuses**: meta-teste de rotas de `CA:1070` (T32); T22, T25, T26
 **Requirement**: PLA-28, PLA-15, PLA-18, PLA-19
+**Status**: rascunhada
+**Nota do rascunho**: a tabela tem 26 escritas (15 `somente_leitura`, 4 do simulador, 7 do financeiro) e o PDF público à parte; `FORA` lista as escritas sem trava (inativar, prévias, arquivar, reativar, admins, convites) e já reserva `POST` e `DELETE …/assinatura` (T33, T34). Nas situações normais o corpo é `{}` e os ids não existem: a rota responde 404 ou 422 e nada é gravado, o que dá a prova de PLA-18. Rotas de escrita sob o grupo criadas pela `notificacoes` (rascunhada em paralelo) entram no meta-teste e precisam de linha na tabela ou em `FORA` no /executar.
 
 **Done when**:
 
