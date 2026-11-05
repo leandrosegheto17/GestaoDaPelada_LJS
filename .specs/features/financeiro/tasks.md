@@ -759,6 +759,8 @@ T47 → T48
 **Depends on**: T17
 **Reuses**: `travarVarios` (`PR:1185`); tradutor de 23505 (`GE:854`); T6; regra de `L:backend/api/src/aplicacao/financeiro/marcar-pagamento.ts:7-63`
 **Requirement**: FIN-16, FIN-17, FIN-19, FIN-20, FIN-21
+**Status**: rascunhada
+**Nota do rascunho**: `SPEC_DEVIATION`: assinatura `financeiroPagamentos.marcar(db, grupoId, jogadorId, mes, hoje)`, sem `contaId` e `agora` (autora de `app_conta_id()`, momento de `now()`, como em T16). `travarVarios` (`PR:1185`) ainda não existe no repositório: o jogador é travado com `SELECT … FOR UPDATE` direto, o mesmo bloqueio dos escritores de período; o /executar troca por `travarVarios` se ele existir. O 23505 da PK é traduzido por `SAVEPOINT` (`ja_marcado`), depois da conferência por consulta, que a trava do jogador já garante.
 
 **Done when**:
 
