@@ -388,6 +388,7 @@ T56 → T57
 **Depends on**: T2
 **Reuses**: datas do domínio (`PR:457`); AD-096
 **Requirement**: PLA-44
+**Status**: rascunhada
 
 **Done when**:
 

@@ -112,3 +112,4 @@ export {
   type RecursoPro,
   type RecursosDoPlano,
 } from './plano/recursos.ts';
+export { pagoAteDe } from './plano/pago-ate.ts';
