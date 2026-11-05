@@ -1642,6 +1642,9 @@ T81 → T82
 **Depends on**: T51
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-38, FUN-31
+**Status**: rascunhada
+**Lacunas**: o teste da T43 (`frontend/web/test/app.test.tsx`) espera um `h1` "Gestão da Pelada"; com as rotas, `/` mostra a página provisória, cujo `h1` é "Em breve" (o nome do app fica na barra). O rascunho não mexeu no teste existente: o `/executar` pede aprovação para trocar a asserção pelo `h1` "Em breve", com a mesma força.
+**Nota do rascunho**: a vitrine entra por `import()` dentro do `if (import.meta.env.VITE_VITRINE === '1')`; o `/executar` confere no `dist` que o chunk não nasce sem a variável. A vitrine de erro de rede foca o botão ao abrir (T49): conferir na T62 se o anel de foco aparece no print.
 
 **Done when**:
 

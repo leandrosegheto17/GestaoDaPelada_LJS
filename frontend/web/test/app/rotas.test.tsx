@@ -1,0 +1,59 @@
+import { cleanup, render, screen } from '@testing-library/react';
+import { createMemoryRouter, RouterProvider } from 'react-router';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { criarRotas } from '../../src/app/rotas.tsx';
+
+afterEach(() => {
+  cleanup();
+  vi.unstubAllEnvs();
+});
+
+function abrir(caminho: string) {
+  const roteador = createMemoryRouter(criarRotas(), { initialEntries: [caminho] });
+  return render(<RouterProvider router={roteador} />);
+}
+
+describe('rotas da fundação', () => {
+  it('FUN-31: / mostra a página provisória', async () => {
+    abrir('/');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Em breve' })).toBeTruthy();
+    expect(screen.getByRole('main')).toBeTruthy();
+  });
+
+  it('FUN-31: /qualquer mostra o 404', async () => {
+    abrir('/qualquer/coisa');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Página não encontrada' })).toBeTruthy();
+  });
+
+  for (const [id, verificar] of [
+    ['erro-rede', () => screen.findByRole('alert')],
+    ['carregando-lista', () => screen.findByRole('status')],
+    ['indisponivel', () => screen.findByRole('heading', { level: 1, name: 'Grupo indisponível' })],
+  ] as const) {
+    it(`FUN-38: com VITE_VITRINE=1, /_vitrine/${id} renderiza`, async () => {
+      vi.stubEnv('VITE_VITRINE', '1');
+      abrir(`/_vitrine/${id}`);
+      expect(await verificar()).toBeTruthy();
+      expect(screen.queryByRole('heading', { name: 'Página não encontrada' })).toBeNull();
+    });
+
+    it(`FUN-38: sem VITE_VITRINE, /_vitrine/${id} cai no 404`, async () => {
+      vi.stubEnv('VITE_VITRINE', '');
+      abrir(`/_vitrine/${id}`);
+      expect(await screen.findByRole('heading', { level: 1, name: 'Página não encontrada' })).toBeTruthy();
+    });
+  }
+
+  it('FUN-38: com VITE_VITRINE=1, um id de vitrine que não existe cai no 404', async () => {
+    vi.stubEnv('VITE_VITRINE', '1');
+    abrir('/_vitrine/nao-existe');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Página não encontrada' })).toBeTruthy();
+  });
+
+  it('FUN-38: com VITE_VITRINE=1, a vitrine de erro de rede segue o mockup (título e grupo)', async () => {
+    vi.stubEnv('VITE_VITRINE', '1');
+    abrir('/_vitrine/erro-rede');
+    expect(await screen.findByRole('heading', { level: 1, name: 'Partidas' })).toBeTruthy();
+    expect(screen.getByRole('banner').textContent).toContain('Pelada de Quinta');
+  });
+});
