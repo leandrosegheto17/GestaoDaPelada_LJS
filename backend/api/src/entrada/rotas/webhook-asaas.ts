@@ -5,11 +5,10 @@ import type { Ambiente } from '../ambiente.ts';
 import { comBanco, SEM_CONTEXTO } from '../middlewares/com-banco.ts';
 import { limiteTaxa } from '../middlewares/limite-taxa.ts';
 import { MENSAGEM_CORPO_GRANDE } from './publico.ts';
-import { eventoDoCorpo } from '../../aplicacao/plano/evento-asaas.ts';
+import { aplicarEventoAsaas, type ReportarWebhook } from '../../aplicacao/plano/webhook.ts';
 import type { RegistroAsaas } from '../../infraestrutura/asaas/cliente.ts';
 import { tokenDoWebhookConfere } from '../../infraestrutura/asaas/token-webhook.ts';
 import type { OpcoesCliente } from '../../infraestrutura/db/cliente.ts';
-import { eventosAsaas } from '../../infraestrutura/db/repositorios/eventos-asaas.ts';
 import type { Db } from '../../infraestrutura/db/repositorios/tipos.ts';
 
 /**
@@ -20,8 +19,9 @@ import type { Db } from '../../infraestrutura/db/repositorios/tipos.ts';
  *    (PLA-39); a chave da API no header também é recusada (são segredos diferentes);
  * 3. corpo acima de 64 KiB: 413, antes de ler o JSON (PLA-40);
  * 4. JSON inválido ou sem `id`/`event`: 400; campo novo segue (contrato tolerante, PLA-50);
- * 5. transação sem conta e sem slug (a `asaas_evento_registrar` recusa outro contexto) e `processar`; 200 depois de
- *    gravar (PLA-41). Erro no processamento: 500 pelo `onError` e `ROLLBACK`, e o Asaas reenvia.
+ * 5. transação sem conta e sem slug (a `asaas_evento_registrar` recusa outro contexto) e `processar` (registrar e
+ *    aplicar, T36); 200 depois de gravar (PLA-41). Erro no processamento: 500 pelo `onError` e `ROLLBACK`, e o Asaas
+ *    reenvia.
  */
 
 export const LIMITE_CORPO_WEBHOOK_BYTES = 64 * 1024;
@@ -32,22 +32,24 @@ export const HEADER_TOKEN_ASAAS = 'asaas-access-token';
 /** O que a rota faz com o evento já validado, dentro da transação. */
 export type ProcessarEvento = (db: Db, corpo: AsaasEventoCorpo) => Promise<unknown>;
 
-/** Processamento da T35: só registra o evento (a aplicação do efeito vem na T36). */
-export const registrarEvento: ProcessarEvento = (db, corpo) =>
-  eventosAsaas.registrar(db, eventoDoCorpo(corpo));
-
 const registroPadrao: RegistroAsaas = (linha) => console.error(JSON.stringify(linha));
 
 export interface OpcoesWebhookAsaas {
   fabrica?: NonNullable<OpcoesCliente['fabrica']>;
+  /** Padrão: registrar e aplicar o efeito (`aplicarEventoAsaas`, T36). */
   processar?: ProcessarEvento;
+  /** Só para os testes: o relato ao Sentry do valor divergente (PLA-51). */
+  reportar?: ReportarWebhook;
   /** Só para os testes: o log do 401 (nunca com o valor recebido). */
   registrar?: RegistroAsaas;
 }
 
 export function rotasWebhookAsaas(opcoes: OpcoesWebhookAsaas = {}): Hono<Ambiente> {
   const rotas = new Hono<Ambiente>();
-  const processar = opcoes.processar ?? registrarEvento;
+  const processar: ProcessarEvento =
+    opcoes.processar ??
+    ((db, corpo) =>
+      aplicarEventoAsaas(db, corpo, opcoes.reportar ? { reportar: opcoes.reportar } : {}));
   const registrar = opcoes.registrar ?? registroPadrao;
 
   rotas.post(

@@ -30,6 +30,7 @@ import { rotasPesos } from './rotas/pesos.ts';
 import { rotasPlano } from './rotas/plano.ts';
 import { rotasAssinatura } from './rotas/assinatura.ts';
 import { rotasWebhookAsaas } from './rotas/webhook-asaas.ts';
+import type { ReportarWebhook } from '../aplicacao/plano/webhook.ts';
 import { asaasHttp, type Asaas } from '../infraestrutura/asaas/cliente.ts';
 import { rotasPublico } from './rotas/publico.ts';
 import { rotasPublicoPush } from './rotas/publico-push.ts';
@@ -66,6 +67,8 @@ export interface OpcoesApp {
   recursoLiberado?: RecursoLiberado;
   /** Só para os testes: Asaas em memória (planos-e-cobranca T30, T33). Sem ele, o HTTP com `ASAAS_URL` e a chave. */
   asaas?: Asaas;
+  /** Só para os testes: relato ao Sentry do valor divergente no webhook (planos-e-cobranca T36; PLA-51). */
+  reportarWebhook?: ReportarWebhook;
 }
 
 /**
@@ -150,7 +153,13 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
   api.route('/', rotasPlano());
   api.route('/', rotasAssinatura());
   // Webhook do Asaas: sem sessão, sem `X-Pelada`, autenticado pelo token (T35; AD-093).
-  api.route('/', rotasWebhookAsaas(rotasAcesso));
+  api.route(
+    '/',
+    rotasWebhookAsaas({
+      ...rotasAcesso,
+      ...(opcoes.reportarWebhook ? { reportar: opcoes.reportarWebhook } : {}),
+    }),
+  );
   opcoes.registrarExtras?.(api);
 
   api.notFound((c) => c.json({ erro: 'Rota não encontrada.' }, 404));

@@ -61,4 +61,45 @@ async function registrar(db: Db, e: EventoParaRegistrar): Promise<RegistroDoEven
   };
 }
 
-export const eventosAsaas = { registrar };
+/**
+ * Transições do plano pelo webhook (T16; PLA-44 a PLA-47), na mesma transação do `registrar`. Cada uma devolve `false`
+ * sem efeito (assinatura desconhecida ou já cancelada) e marca o `efeito` no evento quando aplica.
+ */
+async function ativar(
+  db: Db,
+  assinaturaId: string,
+  pagoAte: string,
+  cobrancaId: string,
+  dataEvento: string | null,
+  eventoId: string,
+): Promise<boolean> {
+  const r = await sql<{ ok: boolean }>`
+    SELECT plano_ativar(${assinaturaId}, ${pagoAte}::date, ${cobrancaId}, ${dataEvento}, ${eventoId}) AS ok`.execute(
+    db,
+  );
+  return r.rows[0]?.ok === true;
+}
+
+async function inadimplente(
+  db: Db,
+  assinaturaId: string,
+  dataEvento: string | null,
+  eventoId: string,
+): Promise<boolean> {
+  const r = await sql<{ ok: boolean }>`
+    SELECT plano_inadimplente(${assinaturaId}, ${dataEvento}, ${eventoId}) AS ok`.execute(db);
+  return r.rows[0]?.ok === true;
+}
+
+async function cancelado(
+  db: Db,
+  assinaturaId: string,
+  dataEvento: string | null,
+  eventoId: string,
+): Promise<boolean> {
+  const r = await sql<{ ok: boolean }>`
+    SELECT plano_cancelado(${assinaturaId}, ${dataEvento}, ${eventoId}) AS ok`.execute(db);
+  return r.rows[0]?.ok === true;
+}
+
+export const eventosAsaas = { registrar, ativar, inadimplente, cancelado };

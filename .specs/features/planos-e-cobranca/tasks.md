@@ -1282,6 +1282,9 @@ T56 → T57
 **Depends on**: T35
 **Reuses**: T4, T15, T16; Sentry do Worker (`F:1301`) com `limparEvento` (`F:1277`)
 **Requirement**: PLA-41, PLA-42, PLA-44, PLA-45, PLA-46, PLA-47, PLA-49, PLA-51
+**Status**: rascunhada
+**Nota do rascunho**: as três transições entram no repositório `eventosAsaas` (`ativar`, `inadimplente`, `cancelado`); a rota passa a usar `aplicarEventoAsaas` como `processar` padrão; o `criarApp` ganha `reportarWebhook` (só testes). O resultado devolve o efeito e o grupo, para a T22 da `notificacoes` (S-03). Teste em `backend/api/test/rotas/webhook-asaas-aplicar.test.ts`, com gatilho de falha na auditoria para o 500.
+**Lacunas**: o `efeito = 'nenhum:<motivo>'` do comentário da T10 não é gravado (só as funções de transição escrevem a coluna, e a `pelada_app` não tem UPDATE); o evento sem efeito fica com `efeito` nulo.
 
 **Done when**:
 
