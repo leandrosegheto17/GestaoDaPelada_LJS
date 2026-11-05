@@ -1618,6 +1618,8 @@ T78 → T79
 **Depends on**: T42
 **Reuses**: Rota `rotas/grupo.ts` da grupos-e-elenco (`GE:1080`); T34; `BC:28` (P16)
 **Requirement**: PAR-132
+**Status**: rascunhada
+**Nota do rascunho**: o GET em `rotas/grupo.ts` passa o hoje a `grupos.ler` e acrescenta os 6 campos, mantendo o saldo da financeiro (FIN-34). O contrato do GET (`grupoDetalheComPartidas`) já exige os 2 campos do simulador (SIM-08), que são da rota da simulador (`simulador/tasks.md:1356`): até lá a resposta é o contrato sem eles. O teste existente `backend/api/test/grupos/rotas-grupo.test.ts` passou a esperar as 6 chaves a mais na lista exata (autorização de 2026-11-04). Teste novo em `backend/api/test/rotas/grupo-inicio.test.ts` (sexta 13/03/2026).
 
 **Done when**:
 
