@@ -1007,16 +1007,16 @@ Gate (T17 a T20): pnpm --filter @pelada/contrato test (verde; SIM-55 é da featu
 **Depends on**: T0
 **Reuses**: Gerador e checagem aditiva (`F:883`, `F:858`); tabela `M:1792843200000_linha-de-base.sql:155`; SQL de `BD:120-124`
 **Requirement**: PAR-13, PAR-14
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: migração `1792844580000_pesos-padrao.sql`; testes em `backend/api/test/banco/pesos-padrao.test.ts` (roda de novo o SQL da migração sobre grupos criados depois) e `backend/scripts/checagens/test/migracao-aditiva-partidas.test.ts` (as tarefas T22 a T26 acrescentam o sufixo delas). O código entrou no commit `f00bc55` de outra sessão (índice do git compartilhado).
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-13`: grupo criado em 2026-10-01 02:30 UTC ganha `vigente_desde` 2026-09-30 (fuso de São Paulo)
-- [ ] Teste `PAR-14`: grupo que já tinha configuração fica intacto; rodar de novo não duplica
-- [ ] Teste `PAR-14`: a checagem de migração aditiva passa
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-13`: grupo criado em 2026-10-01 02:30 UTC ganha `vigente_desde` 2026-09-30 (fuso de São Paulo)
+- [x] Teste `PAR-14`: grupo que já tinha configuração fica intacto; rodar de novo não duplica
+- [x] Teste `PAR-14`: a checagem de migração aditiva passa
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1034,17 +1034,17 @@ Gate (T17 a T20): pnpm --filter @pelada/contrato test (verde; SIM-55 é da featu
 **Depends on**: T21
 **Reuses**: Função atual `M:1792844340000_grupo-criar.sql:10-75`; desenho `BD:125-129`; AD-037
 **Requirement**: PAR-15, PAR-16
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: migração `1792844640000_grupo-criar-pesos.sql` (a de 6 parâmetros vira `LANGUAGE sql` delegando; `p_hoje` nulo levanta `22023`); testes em `backend/api/test/banco/grupo-criar-pesos.test.ts`, com a falha forçada por um trigger criado e desfeito na própria transação.
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-15`: a de 7 parâmetros cria o grupo com a configuração padrão vigente desde `p_hoje` e a conta como `registrado_por`
-- [ ] Teste `PAR-16`: falha forçada no INSERT dos pesos desfaz grupo, vínculo e habilidades
-- [ ] Teste `PAR-15`: a de 6 parâmetros continua passando nos testes de T0 e agora cria os pesos; `p_hoje` nulo levanta erro
-- [ ] Teste: nenhuma outra função do schema usa `now()` para data (exceção única, AD-037)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-15`: a de 7 parâmetros cria o grupo com a configuração padrão vigente desde `p_hoje` e a conta como `registrado_por`
+- [x] Teste `PAR-16`: falha forçada no INSERT dos pesos desfaz grupo, vínculo e habilidades
+- [x] Teste `PAR-15`: a de 6 parâmetros continua passando nos testes de T0 e agora cria os pesos; `p_hoje` nulo levanta erro
+- [x] Teste: nenhuma outra função do schema usa `now()` para data (exceção única, AD-037)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1062,20 +1062,22 @@ Gate (T17 a T20): pnpm --filter @pelada/contrato test (verde; SIM-55 é da featu
 **Depends on**: T22
 **Reuses**: Estender `tipos.ts` da grupos-e-elenco (`GE:878`, que já tem `partidas` e `presencas` só leitura); colunas `M:1792843200000_linha-de-base.sql:155-207`
 **Requirement**: PAR-62
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: teste em `backend/api/test/banco/partidas-tipos.test.ts`; o erro de compilação do UPDATE é conferido por `@ts-expect-error` numa função que só o typecheck lê. O alias `SoLeitura` saiu do `tipos.ts` (ficou sem uso).
 
 **Done when**:
 
-- [ ] Teste: os tipos batem com o catálogo nas 4 tabelas
-- [ ] Teste: `eventos_uso` não aceita `updateTable` no tipo (erro de compilação conferido)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste: os tipos batem com o catálogo nas 4 tabelas
+- [x] Teste: `eventos_uso` não aceita `updateTable` no tipo (erro de compilação conferido)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
 
 ---
 
+
+Gate (T21 a T80): vitest dos testes de banco da feature (pesos-padrao, grupo-criar-*, partidas-*, eventos-uso, contas-nomes, grants, grupos-visiveis) verdes; test/migracoes da fundação (hash, migrar, estado, esquema*) vermelhos por fixarem 23 migrações e esquema-producao.txt, falha preexistente da fundação aceita pelo usuário @ e61d76766c19b918c93ea7354db7035bb2d7ff85
 #### Phase 10: Migrações: evento público, nomes, grants e grupos_visiveis
 
 ### T23: Migração: evento público e grants de eventos_uso
