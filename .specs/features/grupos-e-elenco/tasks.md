@@ -1070,6 +1070,8 @@ Lacunas: o lado do arquivar no teste trava a linha com `FOR UPDATE` antes do `UP
 **Depends on**: T26
 **Reuses**: decisão de `GD:150` e o risco de `GD:271` (vínculo com `FOR KEY SHARE`); `auditoria.registrar` (`CA:844`, T23); eventos de `GSEG:164`
 **Requirement**: GEL-18, GEL-22, GEL-23, GEL-24, GEL-28, GEL-29, GEL-30, SEC-008
+**Status**: rascunhada
+Lacunas: (1) arquivar um grupo já arquivado com o nome errado: a spec não diz se vale o 200 do GEL-29 ou o 422 do GEL-23; o rascunho confere o nome antes. (2) Dois arquivar simultâneos: cada um tem o `FOR KEY SHARE` do `exigirGrupoAtivo` e pede `FOR UPDATE`, então um cai em deadlock (500); a spec não define o resultado. SPEC_DEVIATION: o editar trava com `FOR NO KEY UPDATE`, não `FOR UPDATE` (`GD:150`), para dois PATCH não darem deadlock (`GSEG:163`).
 
 **Done when**:
 
