@@ -4,6 +4,8 @@ import type { Ambiente } from '../ambiente.ts';
 import { comUnicidade, lerCorpoDoGrupo, MENSAGEM_APELIDO_REPETIDO, respostaDeCampo } from '../corpo.ts';
 import { jogadores } from '../../infraestrutura/db/repositorios/jogadores.ts';
 import { jogadoresLeitura } from '../../infraestrutura/db/repositorios/jogadores-leitura.ts';
+import { conferirLimiteDeJogadores } from '../../aplicacao/plano/limite-jogadores.ts';
+import { respostaSomenteLeitura } from '../middlewares/plano-editavel.ts';
 
 /**
  * `GET` e `POST /api/grupos/:grupoId/jogadores` (T36; GEL-31, GEL-33, GEL-34, GEL-36, GEL-37, GEL-39, GEL-40, GEL-46,
@@ -24,6 +26,9 @@ export function rotasJogadores(): Hono<Ambiente> {
     const corpo = await lerCorpoDoGrupo(c, jogadorCorpo(hoje));
     if (!corpo.ok) return corpo.resposta;
     const grupoId = c.req.param('grupoId');
+    // Limite do Free com trava por grupo, na transação da rota (planos-e-cobranca T23; PLA-16, PLA-21).
+    const limite = await conferirLimiteDeJogadores(c.var.db, grupoId, hoje, 'cadastrar_jogador');
+    if (limite !== null) return respostaSomenteLeitura(c, limite);
     return comUnicidade(c, async () => {
       const r = await jogadores.criar(c.var.db, grupoId, corpo.dados, hoje);
       if (r.resultado === 'apelido_repetido') return respostaDeCampo(c, 'apelido', MENSAGEM_APELIDO_REPETIDO);

@@ -931,6 +931,8 @@ T56 → T57
 **Depends on**: T22
 **Reuses**: rotas de `GE:1256` (T36) e `GE:1409` (T42); `somenteLeitura` com `cadastrar_jogador` e `reativar_jogador` (T5); duas conexões de `GE:976` (T25)
 **Requirement**: PLA-16, PLA-21
+**Status**: rascunhada
+**Nota do rascunho**: `conferirLimiteDeJogadores` lê o plano, e só no Free pega `pg_advisory_xact_lock(hashtextextended('jogadores_ativos:<grupo>', 0))` e relê a contagem; a decisão é do `somenteLeitura` do domínio. Chamado nas rotas `POST …/jogadores` e `POST …/jogadores/:id/reativar`, depois da validação do corpo e antes da gravação. O 403 usa o `respostaSomenteLeitura` do middleware da T22.
 
 **Done when**:
 

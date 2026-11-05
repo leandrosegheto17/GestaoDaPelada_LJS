@@ -1,6 +1,11 @@
-import type { MiddlewareHandler } from 'hono';
+import type { Context, MiddlewareHandler } from 'hono';
 import { MENSAGENS_ERRO_PLANO } from '@pelada/contrato';
-import { planoEfetivo, somenteLeitura, type OperacaoDeEscrita } from '@pelada/dominio';
+import {
+  planoEfetivo,
+  somenteLeitura,
+  type MotivoSomenteLeitura,
+  type OperacaoDeEscrita,
+} from '@pelada/dominio';
 import { estadoDoPlano } from '../../aplicacao/plano/recurso-liberado.ts';
 import { plano as repositorioPlano } from '../../infraestrutura/db/repositorios/plano.ts';
 import type { Ambiente } from '../ambiente.ts';
@@ -72,6 +77,11 @@ export function operacaoNaTrava(metodo: string, caminho: string): OperacaoDeEscr
   return 'escrita';
 }
 
+/** 403 `somente_leitura` na forma de `erroSomenteLeitura` do contrato (T6); usado também pelas rotas da T23. */
+export function respostaSomenteLeitura(c: Context<Ambiente>, motivo: MotivoSomenteLeitura): Response {
+  return c.json({ erro: 'somente_leitura', motivo, mensagem: MENSAGENS_ERRO_PLANO.somente_leitura }, 403);
+}
+
 export const exigirPlanoEditavel: MiddlewareHandler<Ambiente> = async (c, next) => {
   const operacao = operacaoNaTrava(c.req.method, c.req.path);
   if (operacao === null) {
@@ -96,8 +106,6 @@ export const exigirPlanoEditavel: MiddlewareHandler<Ambiente> = async (c, next) 
     grupoId,
     operacao,
   });
-  if (motivo !== null) {
-    return c.json({ erro: 'somente_leitura', motivo, mensagem: MENSAGENS_ERRO_PLANO.somente_leitura }, 403);
-  }
+  if (motivo !== null) return respostaSomenteLeitura(c, motivo);
   await next();
 };

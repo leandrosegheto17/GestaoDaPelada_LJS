@@ -5,6 +5,8 @@ import type { Ambiente } from '../ambiente.ts';
 import { lerCorpoDoGrupo, respostaDeCampo } from '../corpo.ts';
 import { historico } from '../../infraestrutura/db/repositorios/historico.ts';
 import { jogadores, type EstadoDoJogador, type ResultadoPeriodo } from '../../infraestrutura/db/repositorios/jogadores.ts';
+import { conferirLimiteDeJogadores } from '../../aplicacao/plano/limite-jogadores.ts';
+import { respostaSomenteLeitura } from '../middlewares/plano-editavel.ts';
 
 /**
  * `POST /api/grupos/:grupoId/jogadores/:id/inativar` e `…/reativar` (T42; GEL-51 a GEL-56), da tabela de `GD:174`.
@@ -65,6 +67,16 @@ export function rotasPeriodos(): Hono<Ambiente> {
       if (!UUID.test(id)) return c.json(corpoDoErro('nao_encontrado'), 404);
       const corpo = await lerCorpoDoGrupo(c, dataCorpo);
       if (!corpo.ok) return corpo.resposta;
+      if (acao === 'reativar') {
+        // Limite do Free com trava por grupo, na transação da rota (planos-e-cobranca T23; PLA-16, PLA-21).
+        const limite = await conferirLimiteDeJogadores(
+          c.var.db,
+          c.req.param('grupoId'),
+          c.var.relogio.hoje(),
+          'reativar_jogador',
+        );
+        if (limite !== null) return respostaSomenteLeitura(c, limite);
+      }
       const r = await jogadores[acao](c.var.db, c.req.param('grupoId'), id, corpo.dados, c.var.relogio.hoje());
       return respostaDePeriodo(c, r, 'data');
     });
