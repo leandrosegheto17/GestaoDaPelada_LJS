@@ -866,7 +866,9 @@ T39 → T40 → T41
 **Depends on**: T21
 **Reuses**: rota do webhook (`PC:176-187`), S-03, S-04; T15, T16; centavos da `planos-e-cobranca` (PLA-51); AD-105
 **Requirement**: NOT-38, NOT-39, NOT-47
-**Nota do rascunho**: adiada (2026-11-05). A rota `POST /api/webhooks/asaas` que esta tarefa estende (S-03) nasce na T35 a T37 da `planos-e-cobranca`, que ainda não foram rascunhadas; pela mesma decisão da T0 e da T1 (só o que não depende da feature 7), a T22 fica para depois delas. A T23 e a T24 seguem, porque só consomem a mensagem `cobranca` da fila (T16).
+**Status**: rascunhada
+**Lacunas**: pagamento confirmado com valor divergente (PLA-51) ou de assinatura já cancelada não avisa (interpretação conservadora: não dizer que o Pro foi pago quando não foi); confirmar com o usuário.
+**Nota do rascunho**: rascunhada depois da T35 a T37 da `planos-e-cobranca`. `avisoDoWebhook` na própria rota: mapa S-04, só resultado `aplicado` ou `sem_efeito` com grupo (repetido e assinatura desconhecida ficam de fora) e sem os motivos `fora_de_ordem` (o "obsoleto" da S-03), `valor_divergente` e `assinatura_cancelada`; valor e vencimento que não cabem no contrato da fila: nada. `PAYMENT_RECEIVED` depois de `PAYMENT_CONFIRMED` enfileira duas vezes a mesma chave e o consumidor descarta a segunda (AD-105). Teste em `backend/api/test/rotas/webhook-asaas-aviso.test.ts` (`workerd`).
 
 **Done when**:
 
