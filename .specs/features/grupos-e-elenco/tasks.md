@@ -357,6 +357,8 @@ T73 → T74 → T75
 **Depends on**: None
 **Reuses**: estender o cenário da CA (`CA:265`, T0) e o `comoApp` e a fábrica da fundação (`F:909`); `bancoDeTeste()` (`F:507`); tabelas em `M:1792843200000_linha-de-base.sql:65`, `:106`, `:122`, `:135`, `:143`, `:182`, `:257`
 **Requirement**: GEL-112
+**Status**: rascunhada
+**Nota do rascunho**: o teste do cenário fica em `cenario-grupos.test.ts`; a evidência da rede (sabotagem da `grupo_criar`) é do /executar.
 
 **Done when**:
 
