@@ -9,3 +9,7 @@ playwright-report/
 .claude/
 .rascunho/
 .worktree/
+# Cópias byte a byte do mockup (FUN-30): o Prettier não pode reformatar.
+frontend/web/src/estilos/tokens.css
+frontend/web/public/fontes/
+frontend/web/public/icones/

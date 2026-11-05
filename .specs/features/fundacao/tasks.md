@@ -1431,6 +1431,8 @@ T81 → T82
 **Depends on**: T43
 **Reuses**: R2, R3 e R4 de `reuso.md`: `cp .specs/mockup/tokens.css frontend/web/src/estilos/tokens.css`; `cp .specs/mockup/fontes/*.woff2 .specs/mockup/fontes/OFL.txt frontend/web/public/fontes/`; `cp .specs/mockup/icones/*.png .specs/mockup/icones/icone.svg frontend/web/public/icones/`
 **Requirement**: FUN-30
+**Status**: rascunhada
+**Nota do rascunho**: os três `cp` do mapa rodaram (cópia, não execução de teste). A conferência manual "alterar um byte e reverter" fica para o `/executar`.
 
 **Done when**:
 
