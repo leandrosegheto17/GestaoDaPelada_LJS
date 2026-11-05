@@ -55,6 +55,8 @@ export interface Variaveis {
   grupoProtegido?: boolean;
   /** Ponto único da regra de plano, posto pelo `criarApp` (T32 da simulador; SIM-68, AD-049). */
   recursoLiberado: RecursoLiberado;
+  /** A conta da sessão tem acesso ao financeiro do grupo, posto pelo `exigirFinanceiro` (financeiro T23; FIN-33). */
+  acessaFinanceiro?: boolean;
 }
 
 export interface Ambiente {

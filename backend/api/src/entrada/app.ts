@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import type { Ambiente } from './ambiente.ts';
 import { exigirCabecalhoPelada } from './middlewares/cabecalho-pelada.ts';
 import { semCache, semSniff } from './middlewares/cabecalhos.ts';
+import { travarFinanceiro } from './middlewares/financeiro.ts';
 import { limitarEscritasDeGrupo } from './middlewares/limite-escrita.ts';
 import { limitarRotasDeAcesso } from './middlewares/limite-taxa.ts';
 import { recursoLiberadoPadrao, travarRecursosDoPlano, type RecursoLiberado } from './middlewares/recurso.ts';
@@ -73,6 +74,8 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
   protegerRotasDeGrupo(api, opcoes.fabricaBanco ? { fabrica: opcoes.fabricaBanco } : {});
   // Trava de recurso do plano depois do vínculo e do grupo ativo (SIM-68, AD-077).
   travarRecursosDoPlano(api);
+  // Permissão do financeiro depois do vínculo e do grupo ativo (FIN-33, AD-077).
+  travarFinanceiro(api);
 
   api.route('/', health);
   // Só responde com EMAIL_DEV=1; sem ela, 404 como rota inexistente (T17).

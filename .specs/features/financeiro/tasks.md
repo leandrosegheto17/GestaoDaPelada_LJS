@@ -900,6 +900,8 @@ T47 → T48
 **Depends on**: T22
 **Reuses**: `exigirVinculo` (`CA:795`); `exigirGrupoAtivo` (`GE:901`); regra de `L:backend/api/src/entrada/middlewares/grupo.ts:34-43`
 **Requirement**: FIN-33
+**Status**: rascunhada
+**Nota do rascunho**: lê o acesso por `app_acessa_financeiro` (T9), a mesma função da RLS. Ligado pelo `travarFinanceiro(api)` em `app.ts`, nos caminhos `…/financeiro/*` e `…/admins/:contaId/financeiro`; `acessaFinanceiro` entrou em `Variaveis` (`ambiente.ts`). O 403 é montado local (`corpoSemPermissaoFinanceiro`), porque `corpoDoErro` só aceita os códigos de `acesso.ts`.
 
 **Done when**:
 
