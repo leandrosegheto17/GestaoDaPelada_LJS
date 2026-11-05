@@ -107,7 +107,8 @@ async function criar(db: Db, grupoId: string, dados: LancamentoCorpo): Promise<L
 
 export type ResultadoEditarLancamento =
   | { resultado: 'ok'; lancamento: LancamentoLido }
-  | { resultado: 'nao_encontrado' | 'mensalidade_nao_e_saida' };
+  | { resultado: 'nao_encontrado' }
+  | { resultado: 'mensalidade_nao_e_saida' };
 
 async function editar(
   db: Db,

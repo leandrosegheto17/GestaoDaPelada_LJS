@@ -107,5 +107,6 @@ export class ErroEsquemaDivergente extends Error {
     super(
       `O banco não está vazio nem é gerenciado pela v2. Nada foi alterado. Diferenças:\n- ${diferencas.join('\n- ')}`,
     );
+    this.diferencas = diferencas;
   }
 }

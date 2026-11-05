@@ -22,6 +22,7 @@ export function kyselyDoCliente(cliente: ClienteRequisicao): Kysely<Banco> {
   const pool: PostgresPool = {
     connect: async () => conexao,
     end: async () => undefined,
+    options: {},
   };
   return new Kysely<Banco>({ dialect: new PostgresDialect({ pool }) });
 }

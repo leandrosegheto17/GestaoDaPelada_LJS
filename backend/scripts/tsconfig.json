@@ -4,5 +4,12 @@
     "strict": true,
     "types": ["node"]
   },
-  "include": ["src/**/*.ts", "test/**/*.ts", "ops/**/*.ts", "checagens/**/*.ts", "*.ts"]
+  "include": [
+    "src/**/*.ts",
+    "test/**/*.ts",
+    "ops/**/*.ts",
+    "checagens/**/*.ts",
+    "*.ts",
+    "../api/src/tipos-web.d.ts"
+  ]
 }

@@ -88,7 +88,7 @@ async function chaveDeAssinatura(chaves: ChavesVapid): Promise<CryptoKey> {
 
 /** Cache da invocação: a chave conferida uma vez e um cabeçalho por origem. */
 export interface CacheVapid {
-  chave?: Promise<CryptoKey>;
+  chave?: Promise<CryptoKey> | undefined;
   porOrigem: Map<string, string>;
 }
 

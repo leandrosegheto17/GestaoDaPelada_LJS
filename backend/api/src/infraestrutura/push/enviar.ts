@@ -186,7 +186,7 @@ export function servicoPushFalso(): ServicoPushFalso {
       corpo: new Uint8Array(await requisicao.arrayBuffer()),
     });
     const r = fila.shift() ?? { status: 201 };
-    return new Response(null, { status: r.status, headers: r.cabecalhos });
+    return new Response(null, { status: r.status, headers: r.cabecalhos ?? {} });
   };
   return {
     fetch: falso as typeof fetch,

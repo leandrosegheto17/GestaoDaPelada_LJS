@@ -109,7 +109,7 @@ export function urlDoAlvo(
 export interface Relatorio {
   diferencas: Diferencas;
   roles: Record<string, boolean>;
-  migracao?: ResultadoMigracao;
+  migracao?: ResultadoMigracao | undefined;
   ok: boolean;
 }
 

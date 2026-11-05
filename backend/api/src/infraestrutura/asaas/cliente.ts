@@ -58,8 +58,8 @@ export interface Asaas {
 }
 
 export interface ConfigAsaas {
-  ASAAS_URL?: string;
-  ASAAS_API_KEY?: string;
+  ASAAS_URL?: string | undefined;
+  ASAAS_API_KEY?: string | undefined;
 }
 
 /** Linha de log estruturada; só campos sem dado pessoal. */
@@ -114,7 +114,7 @@ export function asaasHttp(config: ConfigAsaas, opcoes: OpcoesAsaas = {}): Asaas 
           'Content-Type': 'application/json',
           'User-Agent': USER_AGENT_ASAAS,
         },
-        body: corpo === undefined ? undefined : JSON.stringify(corpo),
+        ...(corpo === undefined ? {} : { body: JSON.stringify(corpo) }),
         signal: controle.signal,
       });
       if (!resposta.ok)

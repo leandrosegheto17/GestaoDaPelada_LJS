@@ -60,7 +60,7 @@ async function chamar<T>(
       Accept: 'application/json',
       ...(corpo === undefined ? {} : { 'Content-Type': 'application/json' }),
     },
-    body: corpo === undefined ? undefined : JSON.stringify(corpo),
+    ...(corpo === undefined ? {} : { body: JSON.stringify(corpo) }),
   });
   if (!resposta.ok) {
     // Só o método, o caminho e o status: a mensagem não leva a chave nem o corpo da resposta.

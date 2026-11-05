@@ -77,7 +77,9 @@ async function criar(
  */
 export type ResultadoPeriodo =
   | { resultado: 'ok'; alterado: boolean }
-  | { resultado: 'nao_encontrado' | 'ja_inativo' | 'ja_ativo' }
+  | { resultado: 'nao_encontrado' }
+  | { resultado: 'ja_inativo' }
+  | { resultado: 'ja_ativo' }
   | { resultado: 'invalido'; regra: RegraPeriodo; campo: CampoPeriodo; mensagem: string };
 
 export interface EstadoDoJogador {

@@ -17,7 +17,8 @@ import type { Db } from './tipos.ts';
 
 export type ResultadoHabilidade =
   | { resultado: 'ok'; habilidade: HabilidadeItem }
-  | { resultado: 'nao_encontrada' | 'nome_repetido' };
+  | { resultado: 'nao_encontrada' }
+  | { resultado: 'nome_repetido' };
 
 async function listar(db: Db, grupoId: string): Promise<HabilidadeItem[]> {
   const r = await sql<HabilidadeItem>`

@@ -17,7 +17,9 @@ import type { Db } from '../tipos.ts';
 
 export type ResultadoAlterarFinanceiro =
   | { resultado: 'ok'; mudou: boolean; lista: ListaAdmins }
-  | { resultado: 'propria_conta' | 'nao_encontrado' | 'sem_permissao' };
+  | { resultado: 'propria_conta' }
+  | { resultado: 'nao_encontrado' }
+  | { resultado: 'sem_permissao' };
 
 export interface OpcoesAlterarFinanceiro {
   /** Só para teste: pula a recusa da própria conta, para provar que o banco ainda recusa (FIN-41). */

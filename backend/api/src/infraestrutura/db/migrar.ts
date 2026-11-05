@@ -8,7 +8,7 @@ export const TABELA_MIGRACOES = 'pgmigrations';
 
 export interface OpcoesMigrar {
   /** Pasta das migrações; padrão: as da v2. Os testes usam pastas de exemplo. */
-  pasta?: string;
+  pasta?: string | undefined;
   /** Saída do runner; padrão: silencioso. */
   log?: (mensagem: string) => void;
 }
