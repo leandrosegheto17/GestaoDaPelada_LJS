@@ -2266,6 +2266,8 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T72
 **Reuses**: estender o seed da CA (`CA:1143`, T35) e o da fundação (`F:1055`); decisão de `GD:211`
 **Requirement**: GEL-01, GEL-46
+**Status**: rascunhada
+**Nota do rascunho**: o seed não depende de `@pelada/dominio`; a lista de habilidades é copiada em `HABILIDADES_LOCAIS` e o teste confere contra o texto literal do GEL-02. Maestro é o inativo; Paredão, o ativo sem nota.
 
 **Done when**:
 

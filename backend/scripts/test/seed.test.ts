@@ -3,7 +3,14 @@ import { migrar } from '@pelada/api/migrar';
 import pg from 'pg';
 import { describe, expect, it, vi } from 'vitest';
 import { comConexao } from '../src/conectar.ts';
-import { comandoSeed, CONTA_LOCAL, GRUPO_LOCAL, JOGADORES_LOCAIS } from '../src/seed.ts';
+import {
+  comandoSeed,
+  CONTA_LOCAL,
+  GRUPO_LOCAL,
+  HABILIDADES_LOCAIS,
+  JOGADOR_INATIVO_LOCAL,
+  JOGADORES_LOCAIS,
+} from '../src/seed.ts';
 import { entrarComo } from './apoio/banco.ts';
 
 const URL_BASE = process.env.DATABASE_URL_TESTE ?? 'postgres://postgres:postgres@127.0.0.1:5432/pelada';
@@ -236,5 +243,89 @@ describe('pnpm seed: conta admin que entra', () => {
     } finally {
       conectar.mockRestore();
     }
+  });
+});
+
+describe('pnpm seed: grupo e elenco de exemplo', () => {
+  it('GEL-01: o grupo nasce pela grupo_criar, com vínculo com financeiro, criado_por, 6 habilidades na ordem do GEL-02 e grupo_criado', async () => {
+    await comBancoMigrado(async (url) => {
+      const env = envDe(url);
+      const r = await comandoSeed(env);
+      const dados = async () =>
+        comConexao(url, async (c) => ({
+          grupo: (
+            await c.query<{ criado_por: string; slug: string }>('SELECT criado_por, slug FROM grupos WHERE id = $1', [
+              r.grupoId,
+            ])
+          ).rows,
+          vinculo: (
+            await c.query<{ conta_id: string; acessa_financeiro: boolean }>(
+              'SELECT conta_id, acessa_financeiro FROM vinculos_admin WHERE grupo_id = $1',
+              [r.grupoId],
+            )
+          ).rows,
+          habilidades: (
+            await c.query<{ nome: string }>('SELECT nome FROM habilidades WHERE grupo_id = $1 ORDER BY ordem', [
+              r.grupoId,
+            ])
+          ).rows.map((l) => l.nome),
+          auditoria: (
+            await c.query<{ autor_conta_id: string; entidade_id: string }>(
+              `SELECT autor_conta_id, entidade_id FROM auditoria WHERE acao = 'grupo_criado' AND grupo_id = $1`,
+              [r.grupoId],
+            )
+          ).rows,
+        }));
+
+      const esperado = {
+        grupo: [{ criado_por: r.contaId, slug: GRUPO_LOCAL.slug }],
+        vinculo: [{ conta_id: r.contaId, acessa_financeiro: true }],
+        // Texto literal do GEL-02, não a constante do seed: a ordem errada no seed morre aqui.
+        habilidades: ['Visão de Jogo', 'Passe', 'Preparo Físico', 'Drible', 'Chute', 'Desarme'],
+        auditoria: [{ autor_conta_id: r.contaId, entidade_id: r.grupoId }],
+      };
+      expect(await dados()).toEqual(esperado);
+      expect([...HABILIDADES_LOCAIS]).toEqual(esperado.habilidades);
+
+      // Rodar de novo não cria outro grupo, nem habilidade, nem auditoria.
+      await comandoSeed(env);
+      expect(await dados()).toEqual(esperado);
+    });
+  });
+
+  it('GEL-46: há jogador ativo com notas, um ativo sem nota e um inativo com o período encerrado', async () => {
+    await comBancoMigrado(async (url) => {
+      const r = await comandoSeed(envDe(url));
+      const linhas = await comConexao(url, async (c) =>
+        (
+          await c.query<{ apelido: string; abertos: number; encerrados: number; notas: number }>(
+            `SELECT j.apelido,
+                    (SELECT count(*)::int FROM periodos_ativos p WHERE p.jogador_id = j.id AND p.fim IS NULL) AS abertos,
+                    (SELECT count(*)::int FROM periodos_ativos p WHERE p.jogador_id = j.id AND p.fim IS NOT NULL) AS encerrados,
+                    (SELECT count(*)::int FROM notas n WHERE n.jogador_id = j.id) AS notas
+               FROM jogadores j WHERE j.grupo_id = $1`,
+            [r.grupoId],
+          )
+        ).rows,
+      );
+      const ativos = linhas.filter((l) => l.abertos === 1);
+      const inativos = linhas.filter((l) => l.abertos === 0);
+
+      expect(ativos.some((l) => l.notas === HABILIDADES_LOCAIS.length)).toBe(true);
+      expect(ativos.some((l) => l.notas === 0)).toBe(true);
+      expect(inativos).toEqual([
+        expect.objectContaining({ apelido: JOGADOR_INATIVO_LOCAL, abertos: 0, encerrados: 1 }),
+      ]);
+      // Nenhuma nota fora da escala nem de outro grupo.
+      const fora = await comConexao(url, async (c) =>
+        (
+          await c.query<{ n: number }>(
+            'SELECT count(*)::int AS n FROM notas WHERE grupo_id <> $1 OR valor NOT BETWEEN 1 AND 10',
+            [r.grupoId],
+          )
+        ).rows[0]?.n,
+      );
+      expect(fora).toBe(0);
+    });
   });
 });
