@@ -1537,6 +1537,8 @@ T81 → T82
 **Depends on**: T47
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-31
+**Status**: rascunhada
+**Nota do rascunho**: além de primário e secundário, entrou a variante `texto` (`botao--texto`), que o `EstadoErro` (T49) usa no "Tentar de novo" do mockup. Carregando segue o mockup: `disabled` com `aria-busy`.
 
 **Done when**:
 
