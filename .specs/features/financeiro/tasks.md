@@ -1063,6 +1063,8 @@ T47 → T48
 **Depends on**: T28
 **Reuses**: Estender `rotas/admins.ts` da CA (`CA:1020`); `adminsResposta` (`CA:574`); rota de `L:backend/api/src/entrada/rotas/grupos/admins/financeiro.ts:12-44`
 **Requirement**: FIN-35, FIN-36
+**Status**: rascunhada
+**Nota do rascunho**: o PATCH usa o `lerCorpoDoGrupo` (422 com `mensagens`, como as demais rotas do financeiro), não o `lerCorpo` das rotas de acesso. O mapeamento da lista virou `adminsResposta(lista)` local, usado pelo GET (mesmo formato) e pelo PATCH. `sem_permissao` do repositório (banco recusou) vira 403 `sem_permissao_financeiro`.
 
 **Done when**:
 

@@ -1,9 +1,19 @@
 import { Hono } from 'hono';
 import { sql } from 'kysely';
-import { conviteCorpo, corpoDoErro, type AdminsResposta, type ConviteCriado } from '@pelada/contrato';
+import {
+  acessoFinanceiroCorpo,
+  conviteCorpo,
+  corpoDoErro,
+  MENSAGENS_ERRO_FINANCEIRO,
+  type AdminsResposta,
+  type ConviteCriado,
+} from '@pelada/contrato';
 import type { Ambiente } from '../ambiente.ts';
+import { lerCorpoDoGrupo } from '../corpo.ts';
+import { corpoSemPermissaoFinanceiro } from '../middlewares/financeiro.ts';
 import { enviarEmailDeConta, limiteEmailsDia } from '../../aplicacao/acesso/enviar-email.ts';
-import { admins, convites } from '../../infraestrutura/db/repositorios/convites.ts';
+import { admins, convites, type ListaAdmins } from '../../infraestrutura/db/repositorios/convites.ts';
+import { acessoFinanceiro } from '../../infraestrutura/db/repositorios/financeiro/acesso.ts';
 import { remetenteDoAmbiente } from '../../infraestrutura/email/caixa-dev.ts';
 import { emailConvite } from '../../infraestrutura/email/modelos.ts';
 import { gerarToken } from '../../infraestrutura/sessao/token.ts';
@@ -17,17 +27,46 @@ import { contarPedidoDeEmail, emailIndisponivel, hex, lerCorpo, type OpcoesRotas
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+/** A lista de admins e convites no formato do contrato (o GET e o PATCH do financeiro, FIN-35). */
+function adminsResposta(lista: ListaAdmins): AdminsResposta {
+  return {
+    admins: lista.admins.map((a) => ({ id: a.id, nome: a.nome, email: a.email, acessaFinanceiro: a.acessa_financeiro })),
+    convites: lista.convites.map((p) => ({ id: p.id, email: p.email, expiraEm: new Date(p.expira_em).toISOString() })),
+  };
+}
+
 export function rotasAdmins(opcoes: OpcoesRotas = {}): Hono<Ambiente> {
   const rotas = new Hono<Ambiente>();
   const naoEncontrado = corpoDoErro('nao_encontrado');
 
   rotas.get('/grupos/:grupoId/admins', async (c) => {
     const lista = await admins.listar(c.var.db, c.req.param('grupoId'));
-    const resposta: AdminsResposta = {
-      admins: lista.admins.map((a) => ({ id: a.id, nome: a.nome, email: a.email, acessaFinanceiro: a.acessa_financeiro })),
-      convites: lista.convites.map((p) => ({ id: p.id, email: p.email, expiraEm: new Date(p.expira_em).toISOString() })),
-    };
-    return c.json(resposta, 200);
+    return c.json(adminsResposta(lista), 200);
+  });
+
+  /**
+   * Conceder ou retirar o acesso ao financeiro de outro admin (financeiro T29; FIN-35, FIN-36). A cadeia vem antes,
+   * com o `exigirFinanceiro` (403 `sem_permissao_financeiro` para quem não tem acesso) e a trava de plano nas escritas
+   * (403 `plano_pro`), ligados pelo `travarFinanceiro` neste caminho. Corpo `{ acessaFinanceiro }` (T8). A própria
+   * conta: 409 `acao_na_propria_conta`; alvo que não é admin do grupo (ou id malformado): 404; valor igual: 200 sem
+   * gravar nem auditar. Responde 200 com a lista de admins, como o GET. O banco recusar (zero linhas, T10) só acontece
+   * com a checagem do repositório removida: 403, como o `exigirFinanceiro`.
+   */
+  rotas.patch('/grupos/:grupoId/admins/:contaId/financeiro', async (c) => {
+    const contaId = c.req.param('contaId');
+    if (!UUID.test(contaId)) return c.json(naoEncontrado, 404);
+    const corpo = await lerCorpoDoGrupo(c, acessoFinanceiroCorpo);
+    if (!corpo.ok) return corpo.resposta;
+    const r = await acessoFinanceiro.alterarFinanceiro(c.var.db, c.req.param('grupoId'), contaId, corpo.dados.acessaFinanceiro);
+    if (r.resultado === 'propria_conta') {
+      return c.json(
+        { erro: MENSAGENS_ERRO_FINANCEIRO.acao_na_propria_conta, codigo: 'acao_na_propria_conta' as const },
+        409,
+      );
+    }
+    if (r.resultado === 'nao_encontrado') return c.json(naoEncontrado, 404);
+    if (r.resultado === 'sem_permissao') return c.json(corpoSemPermissaoFinanceiro(), 403);
+    return c.json(adminsResposta(r.lista), 200);
   });
 
   // Convidar: convite de 7 dias e e-mail com o link (ACE-31); quem já é admin, 409 (ACE-32).
