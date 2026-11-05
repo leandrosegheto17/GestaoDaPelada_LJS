@@ -1,3 +1,6 @@
+import type { Kysely } from 'kysely';
+import type { Banco } from '../infraestrutura/db/transacao.ts';
+
 /**
  * Bindings do Worker (wrangler.jsonc). Tipos mínimos escritos aqui, para não depender dos
  * tipos globais do runtime no typecheck do pacote.
@@ -27,6 +30,12 @@ export interface Env {
 
 export type NomeLimite = 'LIMITE_ENTRAR' | 'LIMITE_PUBLICO' | 'LIMITE_WEBHOOK' | 'LIMITE_ESCRITA';
 
+export interface Variaveis {
+  /** Kysely da transação da requisição, posto pelo `comBanco` (FUN-16). Só existe nas rotas com ele. */
+  db: Kysely<Banco>;
+}
+
 export interface Ambiente {
   Bindings: Env;
+  Variables: Variaveis;
 }

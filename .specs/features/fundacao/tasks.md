@@ -1272,6 +1272,9 @@ T81 → T82
 **Depends on**: T37, T26
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-16
+**Status**: rascunhada
+**Lacunas**: COMMIT que falha depois de a rota responder 2xx: a spec não define a resposta; o rascunho responde 500 "Erro interno." (`com-banco.ts`, `[LACUNA]`).
+**Nota do rascunho**: `kysely` entrou no `package.json` da API (`^0.29.0`, versão do design) sem instalação; o `/executar` instala e confere a interface `PostgresPool` em `transacao.ts`. Os casos limite estão no topo de `com-banco.ts`. A BEGIN e o contexto rodam no `aoAbrir` do cliente (T37), isto é, só na primeira consulta.
 
 **Done when**:
 
