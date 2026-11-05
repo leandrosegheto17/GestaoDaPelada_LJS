@@ -630,6 +630,8 @@ T57 → T58
 **Depends on**: T12
 **Reuses**: decisão de `ljs:.specs/features/conta-e-acesso/design.md:141-142` (token e hash do IP); escrito do zero
 **Requirement**: ACE-10, ACE-71, ACE-73
+**Status**: rascunhada
+**Nota do rascunho**: o hash é o SHA-256 do texto do token (UTF-8); valor que não é IP também vira `sem-ip`.
 
 **Done when**:
 
