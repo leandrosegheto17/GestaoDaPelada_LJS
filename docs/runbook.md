@@ -161,9 +161,37 @@ O plano original previa um environment `previa` sobre a branch `dev` do Neon; pe
 
 ### Secret do Worker (Cloudflare)
 
-| Secret       | O que é                                 |
-| ------------ | --------------------------------------- |
-| `SENTRY_DSN` | Opcional: Sentry do Worker; vazio desliga |
+| Secret             | O que é                                                                      |
+| ------------------ | ---------------------------------------------------------------------------- |
+| `SENTRY_DSN`       | Opcional: Sentry do Worker; vazio desliga                                    |
+| `RESEND_API_KEY`   | Chave da API do Resend (começa por `re_`), para os e-mails de conta          |
+| `RESEND_REMETENTE` | Remetente dos e-mails de conta, ex. `Pelada <nao-responda@<domínio verificado>>` |
+
+`LIMITE_EMAILS_DIA` é opcional (padrão 100) e `EMAIL_DEV` nunca existe no Worker publicado: sem ela, `GET /api/dev/emails` responde 404.
+
+### E-mails de conta (Resend)
+
+Cadastro, reenvio da confirmação, recuperação de senha e convite de admin mandam e-mail pelo Resend. Sem `RESEND_API_KEY` e `RESEND_REMETENTE` no Worker, essas rotas respondem 503 `email_indisponivel` ("Não conseguimos enviar o e-mail agora."), sem gastar a cota; entrar, sair, trocar a senha e o resto do app continuam funcionando.
+
+**Passos do usuário, uma vez** (nenhum valor vai para o repositório nem para esta página):
+
+1. No painel do Resend, adicione e verifique o domínio do remetente (registros DNS que o Resend mostra). Sem domínio verificado, o Resend só entrega para o e-mail da própria conta.
+2. Crie uma chave de API com permissão só de envio (*Sending access*), restrita a esse domínio.
+3. Grave os dois secrets no Worker da prévia (`gestaodapelada-v2`); o valor é pedido no terminal:
+
+```bash
+pnpm --filter @pelada/api exec wrangler secret put RESEND_API_KEY --config ../../wrangler.jsonc
+pnpm --filter @pelada/api exec wrangler secret put RESEND_REMETENTE --config ../../wrangler.jsonc
+pnpm --filter @pelada/api exec wrangler secret list --config ../../wrangler.jsonc   # só os nomes
+```
+
+4. Confira: crie uma conta de teste em `/cadastro` e veja o e-mail chegar.
+
+**Cota.** O plano grátis do Resend manda 100 e-mails por dia. O app conta os envios no banco (`envios_email_dia`) e para antes: cadastro, reenvio e convite usam até 80% de `LIMITE_EMAILS_DIA` (padrão 100) e a recuperação de senha pode ir até 100%, para quem perdeu a senha ainda conseguir entrar. A contagem zera no dia seguinte.
+
+**Quando a cota acaba:** as rotas de e-mail respondem 503 `email_indisponivel` até o dia virar; nada se perde, e a pessoa pode pedir de novo depois. Se acontecer com frequência: confira no painel do Resend se há envio fora do normal (abuso do cadastro); se o uso for legítimo, troque para um plano pago do Resend e suba `LIMITE_EMAILS_DIA` para o novo teto (`wrangler secret put LIMITE_EMAILS_DIA`, ou `--var` no `deploy.yml`), sempre abaixo do limite do plano.
+
+**Resend fora do ar ou lento:** sem resposta em 10 s, a rota responde 503 sem gastar a cota; o log registra só o tipo do e-mail, o status e o código de erro, nunca o destinatário nem o conteúdo.
 
 ### Conferir e criar
 

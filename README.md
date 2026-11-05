@@ -23,7 +23,29 @@ pnpm seed                          # cria roles, uma conta e um grupo de teste
 pnpm dev                           # wrangler dev (API) + Vite (web)
 ```
 
-Antes de `pnpm seed` e `pnpm dev`, edite o `.env` e defina `PELADA_APP_SENHA` e `PELADA_BACKUP_RO_SENHA` (qualquer texto; ficam só na sua máquina). O seed cria a conta `seed@pelada.local` (senha `senha-local-123`) e o grupo `pelada-local`.
+Antes de `pnpm seed` e `pnpm dev`, edite o `.env` e defina `PELADA_APP_SENHA`, `PELADA_BACKUP_RO_SENHA` e `SEED_SENHA_ADMIN` (qualquer texto; a de `SEED_SENHA_ADMIN` com 8 a 72 caracteres; ficam só na sua máquina). Sem `SEED_SENHA_ADMIN`, o `pnpm seed` recusa e não cria nada.
+
+### Entrar local
+
+O seed cria a conta admin `admin@exemplo.test`, já confirmada, com a senha que você pôs em `SEED_SENHA_ADMIN`, e o grupo **Pelada Local** (`pelada-local`) com essa conta como admin. Com o `pnpm dev` no ar, abra `http://localhost:5173/entrar` e entre com esse e-mail e essa senha: o app vai a `/app` e lista o grupo. Rodar o `pnpm seed` de novo redefine a senha para o valor atual de `SEED_SENHA_ADMIN`.
+
+### E-mails em desenvolvimento
+
+Os e-mails de conta (confirmação, recuperação de senha, convite) saem pelo Resend. Em desenvolvimento, `EMAIL_DEV=1` troca o Resend por uma caixa em memória do Worker, que `GET /api/dev/emails` lista (com o link de cada mensagem). Sem `EMAIL_DEV=1`, essa rota responde 404, e a variável nunca vai para o `wrangler.jsonc` (checagem `email-dev`).
+
+- **e2e:** o `playwright.config.ts` já sobe o Worker com `--var EMAIL_DEV:1` e a `URL_PUBLICA` local; as jornadas de acesso leem os links dessa caixa.
+- **À mão:** o `pnpm dev` ainda não passa essas duas variáveis ao Worker (os links precisam da `URL_PUBLICA`, que é vazia no `wrangler.jsonc`). Para testar cadastro, recuperação ou convite local, suba a API assim, com o Vite à parte (`pnpm --filter @pelada/web dev`):
+
+```bash
+pnpm --filter @pelada/api exec wrangler dev --config ../../wrangler.jsonc --ip 127.0.0.1 --port 8787   --var EMAIL_DEV:1 --var URL_PUBLICA:http://localhost:5173
+curl -s http://127.0.0.1:8787/api/dev/emails   # mensagens enviadas desde que o Worker subiu
+```
+
+A caixa some quando o Worker reinicia.
+
+### Conta do dono
+
+`pnpm --filter @pelada/scripts dono -- --email <e-mail do dono>` cria a conta do dono ou troca a senha dela. A senha é pedida no terminal duas vezes, sem eco, e nunca aparece na tela nem no log. O alvo padrão é o banco local (`DATABASE_URL_MIGRACAO`); `--alvo previa` e `--alvo producao` usam o Neon, e o de produção só segue depois de você digitar o e-mail do dono e a palavra `producao`. Banco remoto sem `--alvo` explícito é recusado antes de conectar. O e-mail do dono é o que o banco aceita (CHECK `contas_dono_email`); outro falha lá.
 
 O `pnpm dev` abre o app em `http://localhost:5173`, a API em `http://localhost:8787` (rotas em `/api/*`) e usa o Postgres local pela role `pelada_app`. Para parar o banco: `docker compose down` (os dados ficam no volume; `docker compose down -v` apaga tudo).
 
@@ -47,6 +69,11 @@ O `.env.example` lista todas, com obrigatoriedade, formato e se é segredo. Segr
 | `SENTRY_DSN`             | Sentry do Worker; vazio desliga (secret do Worker)                            |
 | `VERSAO`                 | SHA publicado, injetado por `--var` no deploy                                 |
 | `URL_PUBLICA`            | URL https do app, injetada por `--var` no deploy                              |
+| `RESEND_API_KEY`         | Chave da API do Resend, secret do Worker (segredo)                            |
+| `RESEND_REMETENTE`       | Remetente dos e-mails de conta, de domínio verificado no Resend               |
+| `LIMITE_EMAILS_DIA`      | Teto diário de e-mails de conta (padrão 100, o do Resend Free)                |
+| `EMAIL_DEV`              | `1` liga a caixa de e-mails em memória e `GET /api/dev/emails` (só local e e2e) |
+| `SEED_SENHA_ADMIN`       | Senha da conta admin criada pelo `pnpm seed`; obrigatória nele (segredo)      |
 | `NEON_URL_BACKUP`        | Role somente leitura do Neon, usada pelo `backup.yml` (secret do GitHub)      |
 | `BACKUP_CHAVE`           | Chave pública `age` do backup (secret do GitHub)                              |
 | `DATABASE_URL_RESTAURACAO` | Banco local vazio do `pnpm restaurar`, quando o terceiro argumento falta |

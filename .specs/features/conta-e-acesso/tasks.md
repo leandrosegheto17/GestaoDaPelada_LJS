@@ -1841,6 +1841,9 @@ T57 → T58
 **Depends on**: T57
 **Reuses**: runbook e README da fundação (`F:2063`, `F:2113`)
 **Requirement**: ACE-52, ACE-61, ACE-64
+**Status**: rascunhada
+**Nota do rascunho**: SPEC_DEVIATION: a tarefa fala em secrets "no environment `previa`", mas pela AD-119 esse environment não é usado; `RESEND_API_KEY` e `RESEND_REMETENTE` ficam como secrets do Worker `gestaodapelada-v2` (`wrangler secret put`), na seção "Secret do Worker" do runbook, com a nova seção "E-mails de conta (Resend)" (domínio verificado, chave só de envio, cota de 100 por dia com 80% e 100%, o que fazer quando acaba, `LIMITE_EMAILS_DIA`). O README corrigiu a conta do seed (era `seed@pelada.local` com senha fixa; o seed da T35 cria `admin@exemplo.test` com `SEED_SENHA_ADMIN`) e ganhou "Entrar local", "E-mails em desenvolvimento", "Conta do dono" e as 5 variáveis novas na tabela.
+**Lacunas**: o `pnpm dev` (`scripts/dev.mjs`) não passa `EMAIL_DEV` nem `URL_PUBLICA` ao `wrangler dev`, então cadastro, recuperação e convite locais falham ao montar o link (a `URL_PUBLICA` do `wrangler.jsonc` é vazia). O README documenta o comando manual; mudar o `dev.mjs` fica para o `/executar` decidir (fora do escopo de documentação).
 
 **Done when**:
 
