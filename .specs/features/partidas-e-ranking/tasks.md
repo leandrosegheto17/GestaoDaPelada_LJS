@@ -1481,6 +1481,8 @@ T78 → T79
 **Depends on**: T37
 **Reuses**: `exigirVinculo` (`CA:795`); `lerCorpo` (`GE:854`) e `Relogio` (`GE:831`, `c.var.relogio`; o mês vem de `mesDe(relogio.hoje())`, T1); T17 e T28; tabela `BD:227-228`
 **Requirement**: PAR-01, PAR-03, PAR-06, PAR-07, PAR-08
+**Status**: rascunhada
+**Nota do rascunho**: `rotasPesos()` em `rotas/pesos.ts`, registrada em `criarApp`; o POST salva e relê o painel na mesma transação. Testes em `backend/api/test/rotas/pesos.test.ts` (relógio em 14/03/2026; o cenário de grupos já tem a configuração de 2026-01-01).
 
 **Done when**:
 

@@ -21,6 +21,7 @@ import { rotasJogadores } from './rotas/jogadores.ts';
 import { rotasNotas } from './rotas/notas.ts';
 import { rotasPeriodos } from './rotas/periodos.ts';
 import { rotasPeriodosCorrecao } from './rotas/periodos-correcao.ts';
+import { rotasPesos } from './rotas/pesos.ts';
 import { rotasSimulador } from './rotas/simulador.ts';
 import { rotasFinanceiroConfig } from './rotas/financeiro-config.ts';
 import { rotasFinanceiroMes } from './rotas/financeiro-mes.ts';
@@ -105,6 +106,8 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
   api.route('/', rotasPeriodosCorrecao());
   api.route('/', rotasHabilidades());
   api.route('/', rotasNotas());
+  // Partidas e ranking (T38 em diante da partidas-e-ranking).
+  api.route('/', rotasPesos());
   // Simulador (T33 em diante da simulador).
   api.route('/', rotasSimulador());
   // Financeiro (T25 em diante da financeiro).
