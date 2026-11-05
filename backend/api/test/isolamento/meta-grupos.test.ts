@@ -22,7 +22,8 @@ interface Regra {
 }
 
 const FUNCOES: readonly Regra[] = [
-  { assinatura: 'grupo_criar(text, text, text, time, text, text[])', definer: true },
+  // A de 6 parâmetros saiu na T25 do simulador (AD-037); a regra vale para a de 7.
+  { assinatura: 'grupo_criar(text, text, text, time, text, text[], date)', definer: true },
   { assinatura: 'grupos_visiveis()', definer: true },
   { assinatura: 'grupos_arquivado_so_criadora()', definer: false },
 ];

@@ -97,7 +97,9 @@ export async function criarGrupoComoConta(
     { conta },
     async (d) => {
       const r = await d.query<{ id: string; slug: string }>(
-        `SELECT id, slug FROM grupo_criar($1, 'quinta', 'semanal', '20:00', $2, $3::text[])`,
+        // De 7 parâmetros desde a T25 do simulador (AD-037), com a data que a de 6 usava.
+        `SELECT id, slug FROM grupo_criar($1, 'quinta', 'semanal', '20:00', $2, $3::text[],
+           (now() AT TIME ZONE 'America/Sao_Paulo')::date)`,
         [nome, slugBase, habilidades],
       );
       const linha = r.rows[0];

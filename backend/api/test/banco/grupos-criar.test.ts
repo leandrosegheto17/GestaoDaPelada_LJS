@@ -29,7 +29,9 @@ interface Criado {
 
 async function criar(d: pg.Client, nome: string, base: string, habilidades: readonly string[] = HABILIDADES_INICIAIS): Promise<Criado> {
   const r = await d.query<Criado>(
-    `SELECT id, slug FROM grupo_criar($1, 'sabado', 'semanal', '09:00', $2, $3::text[])`,
+    // De 7 parâmetros desde a T25 do simulador (AD-037), com a data que a de 6 usava.
+    `SELECT id, slug FROM grupo_criar($1, 'sabado', 'semanal', '09:00', $2, $3::text[],
+       (now() AT TIME ZONE 'America/Sao_Paulo')::date)`,
     [nome, base, habilidades],
   );
   const linha = r.rows[0];

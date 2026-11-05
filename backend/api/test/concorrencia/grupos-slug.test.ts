@@ -29,7 +29,9 @@ afterAll(async () => {
   await aberto?.fechar();
 });
 
-const CRIAR = `SELECT id, slug FROM grupo_criar($1, 'sabado', 'semanal', '09:00', $2, ARRAY['Passe']::text[])`;
+// grupo_criar de 7 parâmetros (a de 6 saiu na T25 do simulador, AD-037), com a data que a de 6 usava.
+const CRIAR = `SELECT id, slug FROM grupo_criar($1, 'sabado', 'semanal', '09:00', $2, ARRAY['Passe']::text[],
+                 (now() AT TIME ZONE 'America/Sao_Paulo')::date)`;
 
 /** Espera até a conexão de `pid` estar parada numa trava (ou estoura o prazo). */
 async function esperarTrava(observador: pg.Client, pid: number, prazoMs = 5000): Promise<void> {

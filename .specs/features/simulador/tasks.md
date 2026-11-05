@@ -1005,6 +1005,8 @@ T53 → T54
 **Depends on**: T1
 **Reuses**: Gerador e checagem aditiva (`F:883`, `F:858`: `DROP FUNCTION` não está na lista, sem exceção); função de 7 de `PR:987` (T22); meta-teste `GE:502` (T6); AD-037, AD-048
 **Requirement**: SIM-67 (AD-037)
+**Status**: rascunhada
+**Nota do rascunho**: `1792844940000_grupo-criar-contrair.sql` (folga da feature 5 entre a última da `partidas-e-ranking` e a primeira do `financeiro`). O seed passa a chamar a de 7 com `(now() AT TIME ZONE 'America/Sao_Paulo')::date` no SQL do próprio seed (a data que a de 6 calculava; lacuna da T1). Os testes da lista da T1 recebem o 7º argumento com essa mesma data, mesmas asserções; em `grupo-criar-pesos.test.ts` o caso da delegação vira "a de 6 não existe (42883)", o `it.each` fica só com a de 7 e a regra do relógio exige zero funções; a rede da T1 se inverte (só a de 7). A referência do schema (`migracoes/esquema-producao.txt`, `F:784`) não existe no repositório: o /executar a regenera (`esquema-gerar`) com a função a menos.
 
 **Done when**:
 

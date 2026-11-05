@@ -74,13 +74,14 @@ describe('rede da partidas-e-ranking: grupos_visiveis() com conta (a)', () => {
   });
 });
 
+// (b) desde a T25 do simulador chama a de 7 (a de 6 foi removida, AD-037), mesmas asserções.
 describe('rede da partidas-e-ranking: grupo_criar de 6 parâmetros (b)', () => {
   it('PAR-15: cria grupo, vínculo e as habilidades', async () => {
     const { cenario, db } = aberto;
     await comoApp(db, { conta: cenario.contaC }, async (d) => {
       const r = await d.query<{ id: string }>(
         `SELECT id FROM grupo_criar('Racha da Rede', 'quinta', 'semanal', '20:00', 'racha-da-rede',
-           ARRAY['Passe', 'Chute']::text[])`,
+           ARRAY['Passe', 'Chute']::text[], (now() AT TIME ZONE 'America/Sao_Paulo')::date)`,
       );
       const id = r.rows[0]?.id;
       expect(id).toBeTruthy();
@@ -104,7 +105,8 @@ describe('rede da partidas-e-ranking: grupo_criar de 6 parâmetros (b)', () => {
       await d.query('SAVEPOINT antes');
       await expect(
         d.query(
-          `SELECT id FROM grupo_criar('Racha Falho', 'quinta', 'semanal', '20:00', 'racha-falho', ARRAY['Passe', 'X']::text[])`,
+          `SELECT id FROM grupo_criar('Racha Falho', 'quinta', 'semanal', '20:00', 'racha-falho', ARRAY['Passe', 'X']::text[],
+             (now() AT TIME ZONE 'America/Sao_Paulo')::date)`,
         ),
       ).rejects.toMatchObject({ code: '23514' });
       await d.query('ROLLBACK TO SAVEPOINT antes');

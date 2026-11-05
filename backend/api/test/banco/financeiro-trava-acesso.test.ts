@@ -105,7 +105,8 @@ describe('INSERT direto de vínculo', () => {
     const { db, cenario } = aberto;
     const acessa = await comoConta(db, cenario.contaB, async (d) => {
       const g = await d.query<{ id: string }>(
-        `SELECT id FROM grupo_criar('Pelada Nova', 'sexta', 'semanal', '21:00', 'pelada-nova', ARRAY['Passe']::text[])`,
+        `SELECT id FROM grupo_criar('Pelada Nova', 'sexta', 'semanal', '21:00', 'pelada-nova', ARRAY['Passe']::text[],
+           (now() AT TIME ZONE 'America/Sao_Paulo')::date)`,
       );
       const r = await d.query<{ acessa_financeiro: boolean }>(
         'SELECT acessa_financeiro FROM vinculos_admin WHERE conta_id = $1 AND grupo_id = $2',

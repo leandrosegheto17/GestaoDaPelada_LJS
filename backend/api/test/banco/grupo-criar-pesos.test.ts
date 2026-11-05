@@ -7,9 +7,9 @@ import { abrirCenarioGrupos, type CenarioGruposAberto } from '../isolamento/cena
  * `grupo_criar` com os pesos padrão (T22; PAR-15, PAR-16; `BD:125-129`; AD-037), como `pelada_app` com a conta C.
  *
  * Casos limite: `p_hoje` nulo (erro, nada gravado); sessão sem conta (erro que já existia); falha forçada no INSERT dos
- * pesos (desfaz grupo, vínculo e habilidades); a de 6 parâmetros delega com a data de hoje em São Paulo; as duas
- * assinaturas com `SECURITY DEFINER`, `search_path` fixo e EXECUTE só para `pelada_app`; nenhuma outra função do
- * schema lê o relógio para uma data (a exceção única da AD-037).
+ * pesos (desfaz grupo, vínculo e habilidades); a de 6 parâmetros não existe mais (T25 do simulador); a de 7 com
+ * `SECURITY DEFINER`, `search_path` fixo e EXECUTE só para `pelada_app`; nenhuma função do schema lê o relógio para
+ * uma data (a exceção da AD-037 acabou com a remoção da de 6).
  */
 
 const ASSINATURA_7 = 'grupo_criar(text,text,text,time without time zone,text,text[],date)';
@@ -130,28 +130,25 @@ describe('grupo_criar de 7 parâmetros', () => {
   });
 });
 
-describe('grupo_criar de 6 parâmetros (delegação, AD-037)', () => {
-  it('PAR-15: cria os pesos padrão vigentes desde hoje em São Paulo', async () => {
+// A de 6 parâmetros saiu na T25 do simulador (`1792844940000_grupo-criar-contrair.sql`; AD-037, AD-048): o caso da
+// delegação vira "não existe mais", e a regra do relógio passa a exigir zero funções (autorizado, `## Autorizações`).
+describe('grupo_criar de 6 parâmetros (removida, AD-037)', () => {
+  it('SIM-67: a assinatura de 6 parâmetros não existe; chamar com 6 argumentos falha (42883)', async () => {
+    const r = await aberto.db.query<{ existe: boolean }>(`SELECT to_regprocedure($1) IS NOT NULL AS existe`, [
+      ASSINATURA_6,
+    ]);
+    expect(r.rows[0]?.existe).toBe(false);
     const { db, cenario } = aberto;
     await comoApp(db, { conta: cenario.contaC }, async (d) => {
-      const r = await d.query<{ id: string }>(
-        `SELECT id FROM grupo_criar('Racha Antigo', 'quinta', 'semanal', '20:00', 'racha-antigo', ARRAY['Passe']::text[])`,
-      );
-      const id = r.rows[0]?.id ?? '';
-      expect(id).toBeTruthy();
-      await d.query('RESET ROLE');
-      const hoje = await d.query<{ d: string }>(`SELECT ((now() AT TIME ZONE 'America/Sao_Paulo')::date)::text AS d`);
-      expect(await pesosDe(d, id)).toEqual([
-        { vigente_desde: hoje.rows[0]?.d, pesos: [1, 1, 1, 1, -1, -1], registrado_por: cenario.contaC },
-      ]);
-      expect(await contar(d, 'SELECT 1 FROM vinculos_admin WHERE grupo_id = $1', [id])).toBe(1);
-      expect(await contar(d, 'SELECT 1 FROM habilidades WHERE grupo_id = $1', [id])).toBe(1);
+      await expect(
+        d.query(`SELECT id FROM grupo_criar('Racha Antigo', 'quinta', 'semanal', '20:00', 'racha-antigo', ARRAY['Passe']::text[])`),
+      ).rejects.toMatchObject({ code: '42883' });
     });
   });
 });
 
-describe('proteções das duas assinaturas', () => {
-  it.each([ASSINATURA_7, ASSINATURA_6])(
+describe('proteções da assinatura', () => {
+  it.each([ASSINATURA_7])(
     'PAR-15: %s é SECURITY DEFINER, com search_path fixo e EXECUTE só para pelada_app',
     async (assinatura) => {
       const r = await aberto.db.query<{ definer: boolean; config: string[] | null; executores: string[] }>(
@@ -168,7 +165,7 @@ describe('proteções das duas assinaturas', () => {
     },
   );
 
-  it('PAR-15: nenhuma outra função do schema lê o relógio para uma data (exceção única, AD-037)', async () => {
+  it('PAR-15, SIM-67: nenhuma função do schema lê o relógio para uma data (fim da exceção da AD-037)', async () => {
     const r = await aberto.db.query<{ funcao: string }>(
       `SELECT p.oid::regprocedure::text AS funcao
          FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
@@ -176,6 +173,6 @@ describe('proteções das duas assinaturas', () => {
           AND p.prosrc ~* '(now\\(\\)\\s*(AT\\s+TIME\\s+ZONE|::\\s*date)|\\mcurrent_date\\M|\\mlocaltimestamp\\M)'
         ORDER BY 1`,
     );
-    expect(r.rows.map((l) => l.funcao)).toEqual([ASSINATURA_6]);
+    expect(r.rows.map((l) => l.funcao)).toEqual([]);
   });
 });

@@ -123,6 +123,12 @@ function exigir(env: Record<string, string | undefined>, nome: string): string {
   return v;
 }
 
+/**
+ * Hoje em São Paulo, o `p_hoje` da `grupo_criar` de 7 parâmetros: a mesma data que a de 6, removida na T25 do
+ * simulador (AD-037), calculava dentro do banco. Fica no SQL do seed, não numa função do schema (AD-015).
+ */
+const HOJE_SAO_PAULO = `(now() AT TIME ZONE 'America/Sao_Paulo')::date`;
+
 async function idDe(c: pg.Client, sql: string, valores: unknown[]): Promise<string> {
   const id = (await c.query<{ id: string }>(sql, valores)).rows[0]?.id;
   if (!id) throw new ErroSeed(`Seed sem id: ${sql}`);
@@ -144,7 +150,7 @@ async function semear(c: pg.Client, senhaApp: string, senhaBackup: string, senha
   const existente = (await c.query<{ id: string }>('SELECT id FROM grupos WHERE slug = $1', [GRUPO_LOCAL.slug])).rows[0];
   if (!existente) {
     await c.query(
-      `SELECT id FROM grupo_criar($1, 'sabado', 'semanal', '09:00'::time, $2, $3::text[])`,
+      `SELECT id FROM grupo_criar($1, 'sabado', 'semanal', '09:00'::time, $2, $3::text[], ${HOJE_SAO_PAULO})`,
       [GRUPO_LOCAL.nome, GRUPO_LOCAL.slug, [...HABILIDADES_LOCAIS]],
     );
   }
@@ -225,7 +231,7 @@ async function semearCaixa(
   const existente = (await c.query<{ id: string }>('SELECT id FROM grupos WHERE slug = $1', [GRUPO_CAIXA.slug])).rows[0];
   if (!existente) {
     await c.query(
-      `SELECT id FROM grupo_criar($1, 'quinta', 'semanal', '20:00'::time, $2, $3::text[])`,
+      `SELECT id FROM grupo_criar($1, 'quinta', 'semanal', '20:00'::time, $2, $3::text[], ${HOJE_SAO_PAULO})`,
       [GRUPO_CAIXA.nome, GRUPO_CAIXA.slug, [...HABILIDADES_LOCAIS]],
     );
   }
