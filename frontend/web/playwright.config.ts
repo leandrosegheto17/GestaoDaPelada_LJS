@@ -1,3 +1,4 @@
+import { generateKeyPairSync } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, devices } from '@playwright/test';
@@ -26,6 +27,37 @@ export const PORTA_ASAAS_FALSO = 8789;
 export const URL_ASAAS_FALSO = `http://127.0.0.1:${PORTA_ASAAS_FALSO}`;
 const CHAVE_ASAAS_E2E = 'chave-falsa-do-e2e';
 export const TOKEN_WEBHOOK_E2E = 'token-falso-do-webhook-do-e2e-com-32-caracteres';
+
+/**
+ * Push falso do e2e (notificacoes T27, T41; NOT-63): o Worker manda o aviso cifrado a ele, e só aceita o endpoint
+ * `http://localhost:<porta>` por `PUSH_HOSTS_DEV`, passada só aqui por `--var` (checagem `push-hosts-dev`).
+ */
+export const PORTA_PUSH_FALSO = 8790;
+export const URL_PUSH_FALSO = `http://localhost:${PORTA_PUSH_FALSO}`;
+
+/**
+ * Par VAPID gerado a cada execução, nunca escrito em arquivo (NOT-14): a pública vai também para a jornada, que confere
+ * o `applicationServerKey`. Gerado só uma vez por processo (o config é importado pelos specs).
+ */
+function parVapidDoE2e(): { publica: string; privada: string } {
+  const guardado = process.env.PELADA_E2E_VAPID_PUBLICA;
+  if (guardado && process.env.PELADA_E2E_VAPID_PRIVADA)
+    return { publica: guardado, privada: process.env.PELADA_E2E_VAPID_PRIVADA };
+  const { publicKey, privateKey } = generateKeyPairSync('ec', { namedCurve: 'P-256' });
+  const jwkPub = publicKey.export({ format: 'jwk' });
+  const jwkPriv = privateKey.export({ format: 'jwk' });
+  const ponto = Buffer.concat([
+    Buffer.from([0x04]),
+    Buffer.from(jwkPub.x ?? '', 'base64url'),
+    Buffer.from(jwkPub.y ?? '', 'base64url'),
+  ]);
+  const par = { publica: ponto.toString('base64url'), privada: jwkPriv.d ?? '' };
+  process.env.PELADA_E2E_VAPID_PUBLICA = par.publica;
+  process.env.PELADA_E2E_VAPID_PRIVADA = par.privada;
+  return par;
+}
+
+export const VAPID_E2E = parVapidDoE2e();
 
 function ambienteDoServidor(): Record<string, string> {
   const ambiente: Record<string, string> = {};
@@ -61,10 +93,18 @@ export default defineConfig({
       },
     },
     {
+      command: 'node e2e/apoio/push-falso.mjs',
+      url: `${URL_PUSH_FALSO}/saude`,
+      reuseExistingServer: !process.env.CI,
+      timeout: 30_000,
+      env: { PUSH_FALSO_PORTA: String(PORTA_PUSH_FALSO) },
+    },
+    {
       // EMAIL_DEV=1: os e-mails vão para a caixa `GET /api/dev/emails` (T17), que as jornadas de
       // acesso leem (T57); URL_PUBLICA local, para os links dos e-mails apontarem para cá. As duas
       // só por --var: o wrangler.jsonc nunca leva EMAIL_DEV (checagem `email-dev`).
-      command: `pnpm --filter @pelada/api exec wrangler dev --config ../../wrangler.jsonc --ip 127.0.0.1 --port ${PORTA_E2E} --var EMAIL_DEV:1 --var URL_PUBLICA:${URL_BASE} --var ASAAS_URL:${URL_ASAAS_FALSO}/v3 --var ASAAS_API_KEY:${CHAVE_ASAAS_E2E} --var ASAAS_WEBHOOK_TOKEN:${TOKEN_WEBHOOK_E2E}`,
+      // notificacoes T41: as VAPID do e2e e o PUSH_HOSTS_DEV do push falso, também só por --var.
+      command: `pnpm --filter @pelada/api exec wrangler dev --config ../../wrangler.jsonc --ip 127.0.0.1 --port ${PORTA_E2E} --var EMAIL_DEV:1 --var URL_PUBLICA:${URL_BASE} --var ASAAS_URL:${URL_ASAAS_FALSO}/v3 --var ASAAS_API_KEY:${CHAVE_ASAAS_E2E} --var ASAAS_WEBHOOK_TOKEN:${TOKEN_WEBHOOK_E2E} --var VAPID_PUBLICA:${VAPID_E2E.publica} --var VAPID_PRIVADA:${VAPID_E2E.privada} --var VAPID_ASSUNTO:mailto:avisos@exemplo.test --var PUSH_HOSTS_DEV:localhost:${PORTA_PUSH_FALSO}`,
       url: `${URL_BASE}/api/health`,
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,

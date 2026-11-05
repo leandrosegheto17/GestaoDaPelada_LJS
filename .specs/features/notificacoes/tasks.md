@@ -1382,6 +1382,8 @@ T39 → T40 → T41
 **Depends on**: T40
 **Reuses**: jornadas da `partidas-e-ranking` (`PR:2441`); Playwright e servidor de e2e (`F:1691`); T27
 **Requirement**: NOT-63, NOT-64
+**Status**: rascunhada
+**Nota do rascunho**: a J-34 já estava em `.specs/projeto/jornadas.md` (numerada no planejamento), então o arquivo não mudou. O `playwright.config.ts` ganhou o push falso como `webServer` (porta 8790) e, no `wrangler dev`, as VAPID do e2e (par gerado a cada execução pelo `generateKeyPairSync`, nunca em arquivo) e `PUSH_HOSTS_DEV`, só por `--var`. A página troca `Notification`, `PushManager` e `navigator.serviceWorker` por um gerente falso com chaves P-256 de verdade (a API cifra para elas). SPEC_DEVIATION: tocar na notificação e o texto dela ficam com os testes do SW (T34), porque o SW de verdade fica bloqueado nas jornadas. O NOT-63 confere os hosts que a página chamou; o que o Worker chama sai só para o push falso, provado pelo `PUSH_HOSTS_DEV`. Teste em `frontend/web/e2e/notificacoes.spec.ts`.
 
 **Done when**:
 
