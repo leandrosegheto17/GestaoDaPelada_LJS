@@ -578,6 +578,8 @@ T57 → T58
 **Depends on**: None
 **Reuses**: pacote `@pelada/contrato` da fundação (`F:338`, nomes em `F:18`); limites de `ljs:.specs/features/conta-e-acesso/spec.md:50` e `:76`
 **Requirement**: ACE-03, ACE-05, ACE-68
+**Status**: rascunhada
+**Nota do rascunho**: o `pnpm-lock.yaml` com o zod nasce no `pnpm install` do /executar.
 
 **Done when**:
 

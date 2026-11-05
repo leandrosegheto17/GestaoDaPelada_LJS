@@ -7,12 +7,16 @@
   },
   "exports": {
     ".": "./src/index.ts",
-    "./sentry": "./src/sentry.ts"
+    "./sentry": "./src/sentry.ts",
+    "./primitivos": "./src/primitivos.ts"
   },
   "scripts": {
     "lint": "eslint .",
     "typecheck": "tsc --noEmit -p .",
     "test": "vitest run"
+  },
+  "dependencies": {
+    "zod": "^4.6.6"
   },
   "devDependencies": {
     "@types/node": "^26.0.0",
