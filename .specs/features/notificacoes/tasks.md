@@ -348,6 +348,8 @@ T39 → T40 → T41
 **Depends on**: T2
 **Reuses**: RFC 8292 §2 e §3 (`S:240`); assinatura ECDSA em formato IEEE P1363 = JWS; relógio (`GE:831`)
 **Requirement**: NOT-27
+**Status**: rascunhada
+**Nota do rascunho**: a assinatura `cabecalhoVapid(endpoint, chaves, agora, cache?)` ganhou o `cache` opcional da invocação (chave conferida uma vez e um cabeçalho por origem). O par é conferido com assinar e verificar, porque a Web Crypto não promete recusar o JWK com `d` de outro par.
 
 **Done when**:
 
