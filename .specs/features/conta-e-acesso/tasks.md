@@ -548,6 +548,8 @@ T57 → T58
 **Depends on**: T9
 **Reuses**: `M:1792843860000_conta-teto-emails.sql:26`, `:43`; `M:1792844100000_conta-cota-trava.sql:7`; `M:1792843980000_conta-teto-emails-origem.sql:27`, `:50`; `M:1792843920000_conta-esqueci-nao-confirmada.sql:9`
 **Requirement**: ACE-72, ACE-73, ACE-75
+**Status**: rascunhada
+**Nota do rascunho**: casos limite listados no topo do teste; sem lacuna. O teto por categoria (80% ou 100%) é da API (T24); aqui ele entra como parâmetro.
 
 **Done when**:
 
