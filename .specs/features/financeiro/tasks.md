@@ -294,6 +294,8 @@ T47 → T48
 **Depends on**: T0
 **Reuses**: Regra do domínio sem relógio e sem I/O (`GE:527`, `F:385`); regra de `L:backend/dominio/src/caixa/saldos.ts:27-79` (só consulta)
 **Requirement**: FIN-13
+**Status**: rascunhada
+**Nota do rascunho**: rascunhada fora da ordem, sem a T0 (que depende do cenário da grupos-e-elenco), a pedido do usuário em 2026-11-05. O `index.ts` do domínio ainda não exporta o caixa: o /executar acrescenta as exportações (outra sessão edita o arquivo).
 
 **Done when**:
 
