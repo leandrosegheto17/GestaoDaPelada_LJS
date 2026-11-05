@@ -409,6 +409,7 @@ T73 → T74 → T75
 **Depends on**: T1
 **Reuses**: `M:1792844340000_grupo-criar.sql:10-75` (sufixo em `:37-44`, auditoria em `:68`); `ordem` identity em `M:1792843200000_linha-de-base.sql:210`; cenário de T0
 **Requirement**: GEL-01, GEL-02, GEL-09, GEL-10, GEL-14
+**Status**: rascunhada
 
 **Done when**:
 
