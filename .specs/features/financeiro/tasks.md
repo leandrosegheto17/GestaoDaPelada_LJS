@@ -264,6 +264,8 @@ T47 → T48
 **Depends on**: None
 **Reuses**: `comoApp` e o cenário de dois grupos (`F:909`); cenário de grupos e elenco (`GE:348`); `M:1792843200000_linha-de-base.sql:233-269`; `M:1792843260000_roles.sql:20-31`; `M:1792843320000_rls.sql:32-61`; `M:1792843680000_conta-admins-listar.sql:8-20`; molde da rede da `partidas-e-ranking` (`PR:430`)
 **Requirement**: FIN-37, FIN-38, FIN-39, FIN-41 (linha de base)
+**Status**: rascunhada
+**Nota do rascunho**: a evidência da rede (uma sabotagem por item) está listada no topo do teste; o /executar roda e registra aqui.
 
 **Done when**:
 
