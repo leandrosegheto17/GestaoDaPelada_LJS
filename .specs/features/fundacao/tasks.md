@@ -778,6 +778,8 @@ T81 → T82
 **Depends on**: T18
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-08
+**Status**: rascunhada
+**Nota do rascunho**: ignora também `migracoes_aplicadas` (do legado; o design manda a v2 ignorá-la). As strings esperadas do `pg_get_*` foram escritas sem rodar: o /executar confere a forma exata.
 
 **Done when**:
 
