@@ -1723,6 +1723,8 @@ T81 → T82
 **Depends on**: T54
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-35
+**Status**: rascunhada
+**Nota do rascunho**: SPEC_DEVIATION: a página nasce em `frontend/web/offline.html`, como segunda entrada do Vite (`build.rollupOptions.input` no `vite.config.ts`), e não em `public/offline.html`: o arquivo de `public` é copiado sem build e não acharia o CSS com os tokens (`tokens.css` fica em `src`). O build a grava em `dist/offline.html`, onde o SW da T54 a procura. O CSS é `src/pwa/offline.css`, que importa o `global.css` e repete as classes da casca (`Casca.module.css`, `EstadoErro.module.css`), porque HTML puro não usa CSS Modules. O `/executar` confere no `dist` que `offline.html` sai com o CSS do build e entra no precache; se o Vite 8 pedir `rolldownOptions` no lugar de `rollupOptions`, troca.
 
 **Done when**:
 

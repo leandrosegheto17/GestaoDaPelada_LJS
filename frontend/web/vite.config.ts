@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import { defineConfig } from 'vitest/config';
@@ -29,6 +30,13 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     emptyOutDir: true,
+    // Duas páginas: o app e a página offline (FUN-35), que sai em dist/offline.html com o CSS do build.
+    rollupOptions: {
+      input: {
+        app: fileURLToPath(new URL('./index.html', import.meta.url)),
+        offline: fileURLToPath(new URL('./offline.html', import.meta.url)),
+      },
+    },
   },
   server: {
     proxy: { '/api': 'http://127.0.0.1:8787' },
