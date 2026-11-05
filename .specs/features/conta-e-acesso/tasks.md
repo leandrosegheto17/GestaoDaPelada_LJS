@@ -845,6 +845,8 @@ T57 → T58
 **Depends on**: T20
 **Reuses**: `grupos_visiveis()` vigente (`M:1792844280000_grupos-visiveis-arquivado.sql:9`); `comBanco` estendido (T20)
 **Requirement**: ACE-41
+**Status**: rascunhada
+**Nota do rascunho**: `grupoId` que não é uuid dá 404 sem consulta. `protegerRotasDeGrupo(api)` registra em `criarApp` a cadeia `exigirSessao` → `comBanco()` → `exigirVinculo` em `/grupos/:grupoId/*`; as rotas da T30 só declaram o handler. Teste em `test/sessao/vinculo.test.ts` (projeto `banco`).
 
 **Done when**:
 

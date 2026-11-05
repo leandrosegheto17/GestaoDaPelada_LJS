@@ -4,6 +4,7 @@ import { exigirCabecalhoPelada } from './middlewares/cabecalho-pelada.ts';
 import { semCache, semSniff } from './middlewares/cabecalhos.ts';
 import { limitarRotasDeAcesso } from './middlewares/limite-taxa.ts';
 import { carregarSessao } from './middlewares/sessao.ts';
+import { protegerRotasDeGrupo } from './middlewares/vinculo.ts';
 import { devEmails } from './rotas/dev-emails.ts';
 import { health } from './rotas/health.ts';
 import {
@@ -34,6 +35,8 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
   limitarRotasDeAcesso(api);
   // Sessão resolvida em transação própria, antes do `comBanco` de cada rota (ACE-47, T20).
   api.use('*', carregarSessao(opcoes.fabricaBanco ? { fabrica: opcoes.fabricaBanco } : {}));
+  // Rotas de grupo: sessão, transação com a conta e vínculo sob a RLS (ACE-41, T21).
+  protegerRotasDeGrupo(api, opcoes.fabricaBanco ? { fabrica: opcoes.fabricaBanco } : {});
 
   api.route('/', health);
   // Só responde com EMAIL_DEV=1; sem ela, 404 como rota inexistente (T17).
