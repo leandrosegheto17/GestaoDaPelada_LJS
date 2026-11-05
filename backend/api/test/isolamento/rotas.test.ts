@@ -25,6 +25,11 @@ import { abrirCenarioGrupos, type CenarioGruposAberto } from './cenario-grupos.t
  * partidas-e-ranking T48 (PAR-92, PAR-137 a PAR-139): as 12 rotas novas de admin (`ROTAS_DE_PARTIDAS`) com o 404
  * cruzado, inclusive a data de partida que só existe em H, conferindo partidas, presenças, pesos, eventos e auditoria;
  * e as 3 públicas (`ROTAS_PUBLICAS`), tipo novo, com o slug de G, o de H e o de G arquivado.
+ *
+ * simulador T40 (SIM-79, SIM-80, SIM-83): as 5 rotas novas (`ROTAS_DO_SIMULADOR`) com o 404 cruzado sem ler nem
+ * gravar (escalações e eventos de G e de H iguais); sem sessão, 401; id de jogador de H nos aptos ou na composição de
+ * G dá 422 sem o apelido nem o id de H (e o contrário); com G arquivado, 409 nos POST. As 2 rotas ampliadas
+ * (`GET /api/grupos/:grupoId`, `GET …/partidas/nova`) já têm caso nas tabelas de grupo e de partidas.
  */
 
 let aberto: CenarioGruposAberto;
@@ -672,12 +677,134 @@ const ROTAS_PUBLICAS: Record<string, Linha> = Object.fromEntries(
   Object.entries(PEDIDOS_PUBLICOS).map(([rota, p]) => [rota, casoPublico(p)]),
 );
 
+// ---------------------------------------------------------------- simulador (simulador T40)
+
+/**
+ * Rotas do simulador (SIM-79, SIM-80, SIM-83). A data é a quinta 2026-02-26, em que Toninho (G) e o jogador de H
+ * (período até 2026-03-01) estão ativos. Cada pedido recebe os ids de jogador da vez: o de G e o de H, mais 2 UUIDs que
+ * não existem, para o corpo passar no contrato (2 times de 2) e a regra de "ativo no grupo" decidir.
+ */
+const DATA_DO_SIMULADOR = '2026-02-26';
+const SEM_JOGADOR_1 = '0a1b2c3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d';
+const SEM_JOGADOR_2 = '1b2c3d4e-5f6a-4b7c-8d9e-0f1a2b3c4d5e';
+
+type QuatroIds = readonly [string, string, string, string];
+
+interface PedidoDoSimulador {
+  metodo: 'GET' | 'POST';
+  caminho: string;
+  corpo?: (ids: QuatroIds) => unknown;
+  /** Leva ids de jogador (aptos ou composição): o 422 de SIM-80 vale para ela. */
+  comJogadores?: boolean;
+}
+
+const aptosDoPedido = (ids: QuatroIds) => ids.map((id) => ({ id, so1oTempo: false }));
+const composicaoDoPedido = ([a, b, c, d]: QuatroIds) => ({
+  times: [
+    { titulares: [{ id: a, so1oTempo: false }, { id: b, so1oTempo: false }], entramNo2oTempo: [] },
+    { titulares: [{ id: c, so1oTempo: false }, { id: d, so1oTempo: false }], entramNo2oTempo: [] },
+  ],
+  naoEntra: [],
+});
+
+const PEDIDOS_DO_SIMULADOR: Record<string, PedidoDoSimulador> = {
+  'GET /api/grupos/:grupoId/simulador/contexto': {
+    metodo: 'GET',
+    caminho: `/simulador/contexto?data=${DATA_DO_SIMULADOR}`,
+  },
+  'POST /api/grupos/:grupoId/simulador/previa': {
+    metodo: 'POST',
+    caminho: '/simulador/previa',
+    corpo: (ids) => ({ formato: 'dois_times', n: 2, k: 0, aptos: aptosDoPedido(ids) }),
+  },
+  'POST /api/grupos/:grupoId/simulador/sugerir': {
+    metodo: 'POST',
+    caminho: '/simulador/sugerir',
+    corpo: (ids) => ({ formato: 'dois_times', data: DATA_DO_SIMULADOR, n: 2, k: 0, aptos: aptosDoPedido(ids) }),
+    comJogadores: true,
+  },
+  'POST /api/grupos/:grupoId/simulador/avaliar': {
+    metodo: 'POST',
+    caminho: '/simulador/avaliar',
+    corpo: (ids) => ({
+      formato: 'dois_times',
+      data: DATA_DO_SIMULADOR,
+      n: 2,
+      k: 0,
+      aptos: aptosDoPedido(ids),
+      composicao: composicaoDoPedido(ids),
+    }),
+    comJogadores: true,
+  },
+  'POST /api/grupos/:grupoId/escalacoes': {
+    metodo: 'POST',
+    caminho: '/escalacoes',
+    corpo: (ids) => ({ formato: 'dois_times', data: DATA_DO_SIMULADOR, n: 2, k: 0, composicao: composicaoDoPedido(ids) }),
+    comJogadores: true,
+  },
+};
+
+/** Escalações e eventos de uso de um grupo, além de partidas e pesos: o que as rotas do simulador não podem mudar. */
+async function retratoDoSimulador(grupo: string): Promise<string> {
+  const { db } = aberto;
+  const escalacoes = await db.query(
+    'SELECT data::text, formato, n, k, composicao, confirmada_por, confirmada_em FROM escalacoes WHERE grupo_id = $1 ORDER BY data',
+    [grupo],
+  );
+  const eventos = await db.query('SELECT tipo, count(*)::int AS n FROM eventos_uso WHERE grupo_id = $1 GROUP BY tipo ORDER BY tipo', [
+    grupo,
+  ]);
+  return JSON.stringify([escalacoes.rows, eventos.rows, await retratoDePartidas(grupo)]);
+}
+
+/** Os 4 ids da vez: o jogador do grupo da rota, o do outro grupo e 2 que não existem. */
+function idsDoSimulador(doGrupo: string, doOutro: string): QuatroIds {
+  return [doGrupo, doOutro, SEM_JOGADOR_1, SEM_JOGADOR_2];
+}
+
+function enviarAoSimulador(p: PedidoDoSimulador, grupo: string, ids: QuatroIds, sessaoDaVez?: string): Promise<Response> {
+  return pedir(`/grupos/${grupo}${p.caminho}`, {
+    metodo: p.metodo,
+    ...(sessaoDaVez !== undefined ? { sessao: sessaoDaVez } : {}),
+    ...(p.corpo !== undefined ? { corpo: p.corpo(ids) } : {}),
+  });
+}
+
+function casoDoSimulador(p: PedidoDoSimulador): Linha {
+  return {
+    caso: async () => {
+      const { cenario } = aberto;
+      const retratos = async () => [
+        await retratoDeG(),
+        await retratoDeH(),
+        await retratoDoSimulador(cenario.grupoG),
+        await retratoDoSimulador(cenario.grupoH),
+      ];
+      const antes = await retratos();
+
+      // SIM-79: B com G na rota dá 404, sem dado de G na resposta e sem ler nem gravar nada de G.
+      const r = await enviarAoSimulador(p, cenario.grupoG, idsDoSimulador(cenario.idsG.jogadorAtivo, deH.jogador), sessaoB);
+      expect(r.status, 'SIM-79: B com o id de G').toBe(404);
+      const texto = await r.text();
+      expect(texto).not.toContain('Toninho');
+      expect(texto).not.toContain(cenario.idsG.jogadorAtivo);
+
+      expect(await retratos()).toEqual(antes);
+    },
+  };
+}
+
+const ROTAS_DO_SIMULADOR: Record<string, Linha> = Object.fromEntries(
+  Object.entries(PEDIDOS_DO_SIMULADOR).map(([rota, p]) => [rota, casoDoSimulador(p)]),
+);
+
 /** Uma linha por rota do Hono (`MÉTODO caminho`). */
 const TABELA: Record<string, Linha> = {
   ...ROTAS_DE_GRUPO,
   ...ROTAS_DO_FINANCEIRO,
   ...ROTAS_DE_PARTIDAS,
   ...ROTAS_PUBLICAS,
+  ...ROTAS_DO_SIMULADOR,
   'GET /api/health': { naoSeAplica: 'rota pública de saúde, sem dado de conta nem de grupo' },
   'GET /api/dev/emails': { naoSeAplica: 'só existe com EMAIL_DEV=1, em dev e no e2e (T17)' },
   'POST /api/conta': { naoSeAplica: SEM_SESSAO },
@@ -860,6 +987,80 @@ describe('isolamento de rotas', () => {
       await db.query('UPDATE grupos SET arquivado_em = NULL WHERE id = $1', [cenario.grupoG]);
     }
     expect(await retratoDoCaixa(cenario.grupoG)).toBe(antes);
+  });
+
+  it('SIM-83: as 5 rotas do simulador estão no app e têm caso; o meta-teste falha com uma rota nova sem caso', () => {
+    const rotas = new Set(rotasDoApp(criarApp()));
+    expect(Object.keys(PEDIDOS_DO_SIMULADOR)).toHaveLength(5);
+    for (const rota of Object.keys(PEDIDOS_DO_SIMULADOR)) {
+      expect(rotas.has(rota), rota).toBe(true);
+      expect('caso' in (TABELA[rota] ?? {}), rota).toBe(true);
+    }
+    const comNova = criarApp({
+      registrarExtras: (api) => {
+        api.post('/grupos/:grupoId/simulador/extra', (c) => c.json({ ok: true }));
+        api.get('/grupos/:grupoId/escalacoes/extra', (c) => c.json({ ok: true }));
+      },
+    });
+    expect(rotasSemLinha(comNova, TABELA).sort()).toEqual([
+      'GET /api/grupos/:grupoId/escalacoes/extra',
+      'POST /api/grupos/:grupoId/simulador/extra',
+    ]);
+    // Sem as extras, nenhuma rota do simulador ou de escalação fica sem linha.
+    const doSimulador = /\/(simulador|escalacoes)\b/;
+    expect(rotasSemLinha(criarApp(), TABELA).filter((r) => doSimulador.test(r))).toEqual([]);
+  });
+
+  it.each(Object.entries(PEDIDOS_DO_SIMULADOR))('SIM-79: %s sem sessão dá 401 e nada muda', async (_rota, p) => {
+    const { cenario } = aberto;
+    const antes = await retratoDoSimulador(cenario.grupoG);
+    const r = await enviarAoSimulador(p, cenario.grupoG, idsDoSimulador(cenario.idsG.jogadorAtivo, deH.jogador));
+    expect(r.status).toBe(401);
+    expect(await r.text()).not.toContain('Toninho');
+    expect(await retratoDoSimulador(cenario.grupoG)).toBe(antes);
+  });
+
+  it.each(Object.entries(PEDIDOS_DO_SIMULADOR).filter(([, p]) => p.comJogadores))(
+    'SIM-80: %s com o jogador de H em G (e o de G em H) dá 422 sem o apelido nem o id do outro grupo',
+    async (_rota, p) => {
+      const { cenario } = aberto;
+      const antes = [await retratoDoSimulador(cenario.grupoG), await retratoDoSimulador(cenario.grupoH)];
+
+      const emG = await enviarAoSimulador(p, cenario.grupoG, idsDoSimulador(cenario.idsG.jogadorAtivo, deH.jogador), sessaoA);
+      expect(emG.status, 'A em G com o jogador de H').toBe(422);
+      const textoG = await emG.text();
+      expect(textoG).not.toContain('Isolado de H');
+      expect(textoG).not.toContain(deH.jogador);
+      expect(JSON.parse(textoG)).toMatchObject({ codigo: 'dados_invalidos' });
+
+      const emH = await enviarAoSimulador(p, cenario.grupoH, idsDoSimulador(deH.jogador, cenario.idsG.jogadorAtivo), sessaoB);
+      expect(emH.status, 'B em H com o jogador de G').toBe(422);
+      const textoH = await emH.text();
+      expect(textoH).not.toContain('Toninho');
+      expect(textoH).not.toContain(cenario.idsG.jogadorAtivo);
+
+      expect([await retratoDoSimulador(cenario.grupoG), await retratoDoSimulador(cenario.grupoH)]).toEqual(antes);
+    },
+  );
+
+  it('SIM-83: com G arquivado, os POST do simulador dão 409 à criadora e a leitura do contexto, 200', async () => {
+    const { db, cenario } = aberto;
+    const antes = await retratoDoSimulador(cenario.grupoG);
+    await db.query('UPDATE grupos SET arquivado_em = now() WHERE id = $1', [cenario.grupoG]);
+    try {
+      for (const [rota, p] of Object.entries(PEDIDOS_DO_SIMULADOR)) {
+        const r = await enviarAoSimulador(p, cenario.grupoG, idsDoSimulador(cenario.idsG.jogadorAtivo, SEM_JOGADOR_1), sessaoA);
+        if (p.metodo === 'GET') {
+          expect(r.status, `${rota}: leitura da criadora`).toBe(200);
+        } else {
+          expect(r.status, `${rota}: escrita da criadora`).toBe(409);
+          expect(await r.json()).toMatchObject({ codigo: 'grupo_arquivado' });
+        }
+      }
+    } finally {
+      await db.query('UPDATE grupos SET arquivado_em = NULL WHERE id = $1', [cenario.grupoG]);
+    }
+    expect(await retratoDoSimulador(cenario.grupoG)).toBe(antes);
   });
 
   const casos = Object.entries(TABELA).filter((e): e is [string, { caso: () => Promise<void> }] => 'caso' in e[1]);

@@ -1408,6 +1408,8 @@ T53 → T54
 **Depends on**: T39
 **Reuses**: Suíte de isolamento (`CA:1070`, estendida em `GE:1607` e `PR:1658`)
 **Requirement**: SIM-79, SIM-80, SIM-83
+**Status**: rascunhada
+**Nota do rascunho**: tabela `PEDIDOS_DO_SIMULADOR` na suíte de `rotas.test.ts`: 404 cruzado de B contra G com retrato de escalações, eventos, partidas e pesos de G e H; 401 sem sessão; 422 de SIM-80 nos 3 POST com ids (A em G com o jogador de H e B em H com o de G); 409 nos POST com G arquivado; meta-teste com rota extra de `/simulador` e de `/escalacoes`.
 
 **Done when**:
 
