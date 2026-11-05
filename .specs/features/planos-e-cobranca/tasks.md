@@ -1673,6 +1673,8 @@ T56 → T57
 **Depends on**: T53
 **Reuses**: páginas de `CA:1458` (T48); T2
 **Requirement**: PLA-66, PLA-67
+**Status**: rascunhada
+**Lacunas**: o texto de cobrança entrou nas seções existentes (O serviço, Encerramento, O que guardamos) porque o teste ACE-58 confere a lista exata de seções; seção própria pede trocar aquele teste, com aprovação. TERMOS_VERSAO não foi trocada (o texto segue em rascunho)
 
 **Done when**:
 

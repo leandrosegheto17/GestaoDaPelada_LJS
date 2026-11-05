@@ -1,4 +1,5 @@
 import { TERMOS_VERSAO } from '@pelada/contrato/acesso';
+import { DIAS_DE_TRIAL, formatarPreco, LIMITE_GRUPOS_FREE, LIMITE_JOGADORES_FREE, PRECO_PRO_CENTAVOS } from '@pelada/dominio';
 import { Casca } from '../../componentes/Casca.tsx';
 import { LinkVoltar } from '../../componentes/LinkVoltar.tsx';
 import estilos from '../acesso.module.css';
@@ -11,7 +12,27 @@ import estilos from '../acesso.module.css';
  * Texto: RASCUNHO do agente, a partir do mockup (`t33-termos--pagina.html`,
  * `t07-privacidade--pagina.html`). Não é texto jurídico revisado: o usuário revisa e aprova a
  * versão; ao aprovar, troca `TEXTO_EM_RASCUNHO` para `false` e a data de `TERMOS_VERSAO`.
+ *
+ * Planos e cobrança (planos-e-cobranca T54; PLA-66, PLA-67), também RASCUNHO para revisão: os planos, o trial, a queda
+ * para o Free sem apagar dados e o cancelamento entram nas seções "O serviço" e "Encerramento" dos termos, e o Asaas
+ * como operador entra em "O que guardamos" da privacidade. Preço e limites vêm da tabela do domínio, nunca escritos
+ * aqui. Ficam dentro das seções que já existem porque o teste das páginas (ACE-58) confere a lista de seções; uma seção
+ * própria de cobrança pede a troca daquele teste, com aprovação.
  */
+
+const PRECO_PRO = `${formatarPreco(PRECO_PRO_CENTAVOS)} por mês por grupo`;
+
+export const TEXTO_PLANOS =
+  `Há dois planos. O Free é grátis, com partidas e ranking (inclusive o link público), até ${LIMITE_JOGADORES_FREE} jogadores ativos e ${LIMITE_GRUPOS_FREE} grupo por organizador. ` +
+  `O Pro custa ${PRECO_PRO}, sem limite de jogadores, com simulador de times, financeiro, PDF do ranking e avisos no celular. ` +
+  `Todo grupo novo começa com ${DIAS_DE_TRIAL} dias de Pro grátis, sem cartão. ` +
+  'Quando o trial acaba, ou quando um pagamento atrasa, é estornado ou a assinatura é cancelada e o período pago termina, o grupo volta ao Free na hora: nada é apagado, e o que passa do limite do Free fica só para leitura até o grupo voltar ao limite ou assinar o Pro.';
+
+export const TEXTO_CANCELAMENTO =
+  'A assinatura do Pro é cancelada em Meu plano, por quem criou o grupo. O grupo continua Pro até o fim do período já pago e depois volta ao Free, sem perder dados. Enquanto houver assinatura ativa ou aguardando pagamento, o grupo não pode ser arquivado nem a conta de quem o criou pode ser excluída: cancele a assinatura antes.';
+
+export const TEXTO_PAGAMENTO =
+  'Pagamentos: a cobrança do Pro é feita pelo Asaas, que atua como operador dos dados de pagamento. Para assinar, quem criou o grupo informa nome e CPF, que enviamos ao Asaas junto com o e-mail da conta; o app não guarda o CPF nem dado de cartão (a forma de pagamento é escolhida na fatura do Asaas) e guarda só o id do cliente no Asaas e a situação da assinatura.';
 
 export const TEXTO_EM_RASCUNHO = true;
 export const SELO_RASCUNHO = 'Rascunho para revisão';
@@ -24,22 +45,21 @@ interface Secao {
 export const SECOES_TERMOS: readonly Secao[] = [
   {
     titulo: 'O serviço',
-    texto:
-      'O Gestão da Pelada ajuda o organizador a controlar presença, times, ranking e caixa de um grupo de futebol entre amigos.',
+    texto: `O Gestão da Pelada ajuda o organizador a controlar presença, times, ranking e caixa de um grupo de futebol entre amigos. ${TEXTO_PLANOS}`,
   },
   {
     titulo: 'Sua conta',
     texto:
       'Você é responsável pelos dados que cadastra e por manter sua senha em segredo. Os jogadores do grupo não precisam de conta.',
   },
-  { titulo: 'Encerramento', texto: 'Você pode excluir sua conta a qualquer momento em Minha conta.' },
+  { titulo: 'Encerramento', texto: `Você pode excluir sua conta a qualquer momento em Minha conta. ${TEXTO_CANCELAMENTO}` },
 ];
 
 export const SECOES_PRIVACIDADE: readonly Secao[] = [
   {
     titulo: 'O que guardamos',
     texto:
-      'Do jogador: apelido, ano de nascimento, posição, telefone (opcional), data de entrada no grupo, presenças e as notas de habilidade dadas pelos admins. Dos admins: nome, e-mail, a senha guardada de um jeito que ninguém consegue ler, e a data em que aceitou estes termos. Do uso do app: contagens anônimas, sem nome, telefone nem localização.',
+      'Do jogador: apelido, ano de nascimento, posição, telefone (opcional), data de entrada no grupo, presenças e as notas de habilidade dadas pelos admins. Dos admins: nome, e-mail, a senha guardada de um jeito que ninguém consegue ler, e a data em que aceitou estes termos. Do uso do app: contagens anônimas, sem nome, telefone nem localização. ' + TEXTO_PAGAMENTO,
   },
   {
     titulo: 'E-mails',
