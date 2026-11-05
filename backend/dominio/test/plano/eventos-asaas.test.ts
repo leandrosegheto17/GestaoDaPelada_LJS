@@ -160,8 +160,7 @@ describe('efeitoDoEvento: estorno', () => {
 describe('efeitoDoEvento: ordem e tipos', () => {
   it('PLA-48: PAYMENT_CREATED com dateCreated anterior a um PAYMENT_RECEIVED aplicado → fora_de_ordem', () => {
     const e = evento('PAYMENT_CREATED', { dataCriacao: '2026-11-04 09:00:00' });
-    // PAYMENT_CREATED nem é tratado; o teste de ordem que pega a regressão é o seguinte.
-    expect(efeitoDoEvento(e, ATIVA).tipo).toBe('nenhum');
+    expect(efeitoDoEvento(e, ATIVA)).toEqual({ tipo: 'nenhum', motivo: 'fora_de_ordem' });
   });
 
   it('PLA-48: OVERDUE com dateCreated anterior ao último aplicado não regride o Pro', () => {

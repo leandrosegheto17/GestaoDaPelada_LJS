@@ -12,7 +12,8 @@ export default defineConfig({
         test: {
           name: 'banco',
           include: ['test/**/*.test.ts'],
-          exclude: ['test/rotas/**'],
+          // A cifra e o VAPID do push rodam no workerd: é lá que a P-256 precisa funcionar (AD-100).
+          exclude: ['test/rotas/**', 'test/infraestrutura/push/**'],
           env: { DATABASE_URL_TESTE: URL_TESTE },
           // As roles são do cluster: migrar bancos de teste em paralelo disputa o CREATE ROLE.
           fileParallelism: false,
@@ -35,7 +36,7 @@ export default defineConfig({
         ],
         test: {
           name: 'worker',
-          include: ['test/rotas/**/*.test.ts'],
+          include: ['test/rotas/**/*.test.ts', 'test/infraestrutura/push/**/*.test.ts'],
         },
       },
     ],

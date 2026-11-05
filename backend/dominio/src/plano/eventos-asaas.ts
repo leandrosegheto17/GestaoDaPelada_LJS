@@ -91,13 +91,13 @@ function centavosDe(valorReais: number | null): number | null {
 }
 
 export function efeitoDoEvento(evento: EventoAsaas, assinatura: AssinaturaGravada): EfeitoDoEvento {
-  if (!(EVENTOS_TRATADOS as readonly string[]).includes(evento.evento)) return nenhum('nao_tratado');
-
-  // PLA-48: o que é mais antigo que o último aplicado não muda nada. Sem data e com algo já aplicado, não há como
-  // provar a ordem: não aplica (conservador).
+  // PLA-48: o que é mais antigo que o último aplicado não muda nada, de qualquer tipo (o `PAYMENT_CREATED` atrasado
+  // sai como `fora_de_ordem`). Sem data e com algo já aplicado, não há como provar a ordem: não aplica (conservador).
   if (assinatura.ultimoEventoEm !== null) {
     if (evento.dataCriacao === null || evento.dataCriacao < assinatura.ultimoEventoEm) return nenhum('fora_de_ordem');
   }
+
+  if (!(EVENTOS_TRATADOS as readonly string[]).includes(evento.evento)) return nenhum('nao_tratado');
 
   switch (evento.evento) {
     case 'SUBSCRIPTION_DELETED':

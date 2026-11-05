@@ -1703,6 +1703,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T50
 **Reuses**: estender os modelos da CA (`CA:672`, T16); regra de `GSEG:102` e `GSEG:162` (`nomeDoGrupoNoEmail`)
 **Requirement**: SEC-006
+**Status**: rascunhada
 
 **Done when**:
 

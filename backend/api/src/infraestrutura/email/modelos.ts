@@ -71,15 +71,32 @@ export function emailRecuperacao(d: { urlPublica: string; nome: string; token: s
   };
 }
 
+/** Tamanho máximo do nome do grupo no e-mail (o do cadastro, GEL-03). */
+export const NOME_GRUPO_EMAIL_MAX = 60;
+
+/**
+ * O nome do grupo como texto puro no e-mail de convite (grupos-e-elenco T51; SEC-006, `GSEG:102`): qualquer quebra de
+ * linha, caractere de controle ou espaço repetido vira um espaço só (uma linha, inclusive no assunto); os separadores
+ * de link (`.`, `@`, `:` e `/`) colados em outro caractere ganham um espaço de cada lado, para "www.golpe.com" ou
+ * "pix@golpe.com" não virarem link no cliente de e-mail; e o resultado tem até 60 caracteres. Nome sem nada disso sai
+ * igual. No HTML, o resultado ainda passa pelo `escaparHtml`.
+ */
+export function nomeDoGrupoNoEmail(nome: string): string {
+  const umaLinha = nome.replace(/[\s\p{Cc}\p{Cf}]+/gu, ' ').trim();
+  const semLink = umaLinha.replace(/(?<=\S)([.@:/])(?=\S)/g, ' $1 ').replace(/ {2,}/g, ' ');
+  return Array.from(semLink).slice(0, NOME_GRUPO_EMAIL_MAX).join('').trim();
+}
+
 export function emailConvite(d: { urlPublica: string; grupoNome: string; token: string }): Conteudo {
   const link = montarLink(d.urlPublica, CAMINHOS.convite, d.token);
+  const grupo = nomeDoGrupoNoEmail(d.grupoNome);
   return {
-    assunto: `Convite para administrar ${d.grupoNome}`,
-    texto: `Você foi convidada para administrar o grupo ${d.grupoNome} no Gestão da Pelada.\n\nPara aceitar, abra o link abaixo (vale por 7 dias):\n${link}`,
+    assunto: `Convite para administrar ${grupo}`,
+    texto: `Você foi convidada para administrar o grupo ${grupo} no Gestão da Pelada.\n\nPara aceitar, abra o link abaixo (vale por 7 dias):\n${link}`,
     html: html(
       'Convite para administrar um grupo',
       [
-        `Você foi convidada para administrar o grupo <strong>${escaparHtml(d.grupoNome)}</strong> no Gestão da Pelada.`,
+        `Você foi convidada para administrar o grupo <strong>${escaparHtml(grupo)}</strong> no Gestão da Pelada.`,
         'Para aceitar, use o botão abaixo. O convite vale por 7 dias.',
       ],
       { texto: 'Ver convite', link },
