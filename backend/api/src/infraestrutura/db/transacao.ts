@@ -1,12 +1,10 @@
 import { Kysely, PostgresDialect, type PostgresPool, type PostgresPoolClient } from 'kysely';
 import type { ClienteRequisicao } from './cliente.ts';
 
-/**
- * Tabelas tipadas do Kysely. Vazio na fundação: as features acrescentam as suas tabelas aqui.
- * Enquanto isso, as consultas usam o `sql` do Kysely.
- */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface Banco {}
+import type { Banco } from './tipos.ts';
+
+/** Tabelas tipadas do Kysely (T21): as da grupos-e-elenco, em `tipos.ts`. As outras usam o `sql` do Kysely. */
+export type { Banco };
 
 /**
  * Kysely sobre o cliente da requisição (design C4): toda consulta passa pela mesma conexão,

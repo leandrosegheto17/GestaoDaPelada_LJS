@@ -913,6 +913,7 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T20
 **Reuses**: `Kysely<Banco>` da fundação (`FD:103`); `lerEsquema` (`F:736`); modelo de `GD:220-236`
 **Requirement**: GEL-112
+**Status**: rascunhada
 
 **Done when**:
 
