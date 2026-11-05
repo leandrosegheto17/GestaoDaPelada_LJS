@@ -26,6 +26,7 @@ import {
   type ErrosJogador,
   type FormularioJogador,
 } from './camposJogador.tsx';
+import { AlterarInicio, CorrigirPeriodo } from './CorrigirDatas.tsx';
 import { AcoesSituacao } from './PeriodosJogador.tsx';
 
 /**
@@ -38,9 +39,9 @@ import { AcoesSituacao } from './PeriodosJogador.tsx';
  *   habilidade; mudar a nota grava na hora (`useSalvarNota`, T55) e o nível vem da resposta
  *   (GEL-97); "–" apaga a nota (GEL-98);
  * - "Situação": "Ativo desde dd/mm/aaaa." e os períodos de atividade, do mais antigo ao atual,
- *   com Inativar ou Reativar (`AcoesSituacao`, T65); o aviso de sucesso fica no topo da ficha.
- *   As ações de período e a exclusão entram nas T66 e T67, pelos encaixes `acoesPeriodo`,
- *   `acaoInicio` e `acaoExcluir`.
+ *   com Inativar ou Reativar (`AcoesSituacao`, T65) e "Corrigir datas" em cada período
+ *   (`CorrigirPeriodo`, T66); "Alterar data de início" fica nos dados (`AlterarInicio`, T66).
+ *   O aviso de sucesso fica no topo da ficha. A exclusão entra na T67, pelo encaixe `acaoExcluir`.
  */
 
 export const TEXTO_DADOS_SALVOS = 'Dados salvos.';
@@ -71,15 +72,11 @@ export function corpoDaEdicao(dados: FormularioJogador): Record<string, unknown>
 }
 
 export interface EncaixesFicha {
-  /** Botão "Alterar data de início" (T66). */
-  acaoInicio?: (ficha: JogadorDetalhe) => ReactNode;
-  /** Ação de cada período ("Corrigir datas", T66). */
-  acoesPeriodo?: (ficha: JogadorDetalhe, periodo: JogadorDetalhe['periodos'][number], indice: number) => ReactNode;
   /** Botão "Excluir jogador" (T67), que recebe como abrir o diálogo de inativar. */
   acaoExcluir?: (ficha: JogadorDetalhe, abrirInativar: () => void) => ReactNode;
 }
 
-function Dados({ grupoId, ficha, acaoInicio }: { grupoId: string; ficha: JogadorDetalhe; acaoInicio?: EncaixesFicha['acaoInicio'] }) {
+function Dados({ grupoId, ficha, avisar }: { grupoId: string; ficha: JogadorDetalhe; avisar: (texto: string | null) => void }) {
   const editar = useEditarJogador(grupoId, ficha.id);
   const [hoje] = useState(() => hojeEmSaoPaulo());
   const [dados, setDados] = useState<FormularioJogador>({
@@ -132,7 +129,9 @@ function Dados({ grupoId, ficha, acaoInicio }: { grupoId: string; ficha: Jogador
           <p className={estilos.paragrafo} id="inicio-valor">
             {formatarData(ficha.inicioPontuacao)}
           </p>
-          {acaoInicio ? <div>{acaoInicio(ficha)}</div> : null}
+          <div>
+            <AlterarInicio grupoId={grupoId} ficha={ficha} avisar={avisar} />
+          </div>
         </div>
         <div>
           <Botao type="submit" carregando={editar.isPending}>
@@ -221,9 +220,11 @@ function Situacao({
                     {formatarData(p.inicio)} <span aria-hidden="true">→</span>
                     <span className="sr">até</span> {p.fim === null ? 'atual' : formatarData(p.fim)}
                   </span>
-                  {i === 0 ? <span className={listas['item__meta']}>Entrada</span> : null}
+                  <span className={listas['item__meta']}>{i === 0 ? 'Entrada' : 'Retorno'}</span>
                 </div>
-                {encaixes.acoesPeriodo ? encaixes.acoesPeriodo(ficha, p, i) : null}
+                <div className={modulo['item-lado']}>
+                  <CorrigirPeriodo grupoId={grupoId} ficha={ficha} periodo={p} indice={i} avisar={avisar} />
+                </div>
               </li>
             ))}
           </ul>
@@ -285,7 +286,7 @@ export function FichaJogador({ encaixes = {} }: { encaixes?: EncaixesFicha }) {
       <>
         <h1 className={estilos['titulo-pagina']}>{f.apelido}</h1>
         {aviso ? <Faixa tipo="sucesso">{aviso}</Faixa> : null}
-        <Dados key={`dados-${f.id}`} grupoId={grupoId} ficha={f} acaoInicio={encaixes.acaoInicio} />
+        <Dados key={`dados-${f.id}`} grupoId={grupoId} ficha={f} avisar={setAviso} />
         <Notas grupoId={grupoId} ficha={f} />
         <Situacao grupoId={grupoId} ficha={f} encaixes={encaixes} avisar={setAviso} />
       </>

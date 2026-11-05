@@ -159,3 +159,11 @@
   border-radius: var(--raio-sm);
   background: var(--cor-esqueleto);
 }
+
+/* Lado do item com a ação (base.css:151). */
+.item-lado {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-2);
+  flex-shrink: 0;
+}

@@ -2084,6 +2084,8 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T65
 **Reuses**: `R-12`, `R-13`, `R-14`, `R-21` e `R-22` (`t16-jogador--corrigido`, `--corrigir-erro`, `--corrigir`, `--inicio-erro`, `--inicio`); dados de T54
 **Requirement**: GEL-76, GEL-77, GEL-114
+**Status**: rascunhada
+**Lacunas**: o mockup não traz a mensagem de sucesso do início alterado; a tela usa "Data de início alterada para dd/mm/aaaa." (`textoInicioAlterado` em `CorrigirDatas.tsx`).
 
 **Done when**:
 
