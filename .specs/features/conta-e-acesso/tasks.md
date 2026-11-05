@@ -407,6 +407,8 @@ T57 → T58
 **Depends on**: T4
 **Reuses**: `M:1792844040000_conta-entrar-teto-conta.sql:21` (versão vigente de `conta_entrar`, com a trava por e-mail e IP de `M:1792843500000_conta-entrar-e-sessao.sql:15`)
 **Requirement**: ACE-09, ACE-10, ACE-11, ACE-12, ACE-13, ACE-14, ACE-66
+**Status**: rascunhada
+**Nota do rascunho**: casos limite listados no topo do teste; sem lacuna. O teste com 4 falhas e duas tentativas simultâneas é o que morre sem a trava por e-mail.
 
 **Done when**:
 
