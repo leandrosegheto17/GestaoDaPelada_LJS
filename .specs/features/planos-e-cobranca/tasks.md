@@ -1498,6 +1498,8 @@ T56 → T57
 **Depends on**: T43
 **Reuses**: `Casca`, `Barra`, `Lista` (`F:1424`, `CA:1286`); `RECURSOS_POR_PLANO` (T2); AD-064
 **Requirement**: PLA-52, PLA-57, PLA-58
+**Status**: rascunhada
+**Nota do rascunho**: Pro com `pagoAte` mostra "Pro até dd/mm/aaaa"; sem limite, "N jogadores ativos". Cada recurso leva "Liberado" ou "Só no Pro" em texto e ícone. As ações da criadora entram pela prop `acoesDaCriadora` (T45, T46). Teste em `frontend/web/test/telas/meu-plano.test.tsx`, com as rotas do próprio teste (a rota do app entra na T47).
 
 **Done when**:
 
