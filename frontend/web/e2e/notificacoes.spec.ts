@@ -32,7 +32,11 @@ interface MensagemDev {
   texto: string;
 }
 
-async function linkDoEmail(request: APIRequestContext, para: string, tipo: string): Promise<string> {
+async function linkDoEmail(
+  request: APIRequestContext,
+  para: string,
+  tipo: string,
+): Promise<string> {
   let link: string | undefined;
   await expect
     .poll(
@@ -136,7 +140,10 @@ async function comPushSimulado(pagina: Page): Promise<void> {
           return atual;
         },
       };
-      Object.defineProperty(window, 'Notification', { value: NotificacaoFalsa, configurable: true });
+      Object.defineProperty(window, 'Notification', {
+        value: NotificacaoFalsa,
+        configurable: true,
+      });
       Object.defineProperty(window, 'PushManager', { value: class {}, configurable: true });
       Object.defineProperty(navigator, 'serviceWorker', {
         configurable: true,
@@ -180,7 +187,12 @@ test('NOT-64, NOT-63: J-34 assinar o ranking, o admin lança a partida, o aviso 
   await contaNova(admin, 'Admin do Push');
   const g = await admin.request.post('/api/grupos', {
     headers: CABECALHO,
-    data: { nome: `Pelada Push ${sufixo()}`, diaSemana: 'quinta', frequencia: 'semanal', horario: '20:00' },
+    data: {
+      nome: `Pelada Push ${sufixo()}`,
+      diaSemana: 'quinta',
+      frequencia: 'semanal',
+      horario: '20:00',
+    },
   });
   expect(g.status()).toBe(201);
   const grupo = (await g.json()) as { id: string; slug: string };

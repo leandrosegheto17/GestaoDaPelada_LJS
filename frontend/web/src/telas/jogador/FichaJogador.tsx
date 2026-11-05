@@ -7,7 +7,10 @@ import { CampoNota } from '../../componentes/CampoNota.tsx';
 import { Casca, NOME_DO_APP } from '../../componentes/Casca.tsx';
 import { EstadoErro } from '../../componentes/EstadoErro.tsx';
 import { Faixa } from '../../componentes/Faixa.tsx';
-import { FaixaSomenteLeitura, TrechoSomenteLeitura } from '../../componentes/FaixaSomenteLeitura.tsx';
+import {
+  FaixaSomenteLeitura,
+  TrechoSomenteLeitura,
+} from '../../componentes/FaixaSomenteLeitura.tsx';
 import { LinkVoltar } from '../../componentes/LinkVoltar.tsx';
 import { ResumoErros } from '../../componentes/ResumoErros.tsx';
 import { ErroApi, MENSAGEM_REDE } from '../../dados/cliente.ts';

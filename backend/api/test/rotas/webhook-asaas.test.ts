@@ -76,7 +76,12 @@ function evento(id: string, extra: Record<string, unknown> = {}) {
     id,
     event: 'PAYMENT_CREATED',
     dateCreated: '2026-11-05 10:00:00',
-    payment: { id: 'pay_t35', subscription: 'sub_t35_desconhecida', value: 9.9, dueDate: '2026-11-05' },
+    payment: {
+      id: 'pay_t35',
+      subscription: 'sub_t35_desconhecida',
+      value: 9.9,
+      dueDate: '2026-11-05',
+    },
     ...extra,
   };
 }
@@ -93,7 +98,8 @@ function espiarLogs(): () => string {
   const espias = (['log', 'info', 'warn', 'error', 'debug'] as const).map((m) =>
     vi.spyOn(console, m).mockImplementation(() => undefined),
   );
-  return () => espias.flatMap((s) => s.mock.calls.map((args) => args.map(String).join(' '))).join('\n');
+  return () =>
+    espias.flatMap((s) => s.mock.calls.map((args) => args.map(String).join(' '))).join('\n');
 }
 
 /** Corpo JSON válido com exatamente `bytes` bytes. */
@@ -219,7 +225,9 @@ describe('POST /api/webhooks/asaas: corpo (PLA-50)', () => {
       }),
     });
     expect(r.status).toBe(200);
-    const linha = await aberto.db.query(`SELECT * FROM eventos_asaas WHERE id = 'evt_t35_customer'`);
+    const linha = await aberto.db.query(
+      `SELECT * FROM eventos_asaas WHERE id = 'evt_t35_customer'`,
+    );
     const texto = JSON.stringify(linha.rows);
     expect(texto).not.toContain('Bia Souza');
     expect(texto).not.toContain('bia@exemplo.test');

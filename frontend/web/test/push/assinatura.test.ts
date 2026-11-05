@@ -86,7 +86,10 @@ describe('assinar (NOT-02, NOT-04)', () => {
     const m = montar({});
     expect(await assinar(RANKING, CHAVE_PUBLICA, m.deps)).toBe('assinado');
     expect(m.pedirPermissao).toHaveBeenCalledOnce();
-    expect(m.subscribe).toHaveBeenCalledWith({ userVisibleOnly: true, applicationServerKey: CHAVE });
+    expect(m.subscribe).toHaveBeenCalledWith({
+      userVisibleOnly: true,
+      applicationServerKey: CHAVE,
+    });
     expect(m.chamadas).toEqual([
       {
         metodo: 'POST',

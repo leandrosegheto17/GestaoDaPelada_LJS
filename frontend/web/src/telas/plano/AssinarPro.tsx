@@ -25,10 +25,11 @@ import modulo from '../grupos-elenco.module.css';
 
 export type CampoAssinatura = 'nome' | 'cpf';
 
-export const CAMPOS_ASSINATURA: readonly { campo: CampoAssinatura; id: string; rotulo: string }[] = [
-  { campo: 'nome', id: 'assinatura-nome', rotulo: 'Nome completo' },
-  { campo: 'cpf', id: 'assinatura-cpf', rotulo: 'CPF' },
-];
+export const CAMPOS_ASSINATURA: readonly { campo: CampoAssinatura; id: string; rotulo: string }[] =
+  [
+    { campo: 'nome', id: 'assinatura-nome', rotulo: 'Nome completo' },
+    { campo: 'cpf', id: 'assinatura-cpf', rotulo: 'CPF' },
+  ];
 
 export function tituloAssinarPro(): string {
   return `Assinar Pro: ${formatarPreco(PRECO_PRO_CENTAVOS)}/mês`;

@@ -9,7 +9,10 @@ import { CampoData } from '../../componentes/CampoData.tsx';
 import { EsqueletoLista } from '../../componentes/EsqueletoLista.tsx';
 import { EstadoErro } from '../../componentes/EstadoErro.tsx';
 import { Faixa } from '../../componentes/Faixa.tsx';
-import { FaixaSomenteLeitura, TrechoSomenteLeitura } from '../../componentes/FaixaSomenteLeitura.tsx';
+import {
+  FaixaSomenteLeitura,
+  TrechoSomenteLeitura,
+} from '../../componentes/FaixaSomenteLeitura.tsx';
 import { LinkBotao } from '../../componentes/LinkBotao.tsx';
 import { LinkVoltar } from '../../componentes/LinkVoltar.tsx';
 import { ResumoErros, type ErroDoResumo } from '../../componentes/ResumoErros.tsx';

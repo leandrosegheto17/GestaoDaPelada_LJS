@@ -6,11 +6,7 @@ import { Faixa } from '../../componentes/Faixa.tsx';
 import { ErroApi } from '../../dados/cliente.ts';
 import { useCliente } from '../../dados/ContextoCliente.tsx';
 import { AvisoInstalarIphone } from '../../pwa/AvisoInstalarIphone.tsx';
-import {
-  ehSafariIos,
-  lerAmbiente,
-  type AmbienteNavegador,
-} from '../../pwa/useModoInstalacao.ts';
+import { ehSafariIos, lerAmbiente, type AmbienteNavegador } from '../../pwa/useModoInstalacao.ts';
 import {
   assinar,
   cancelar,

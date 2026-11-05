@@ -1037,7 +1037,10 @@ interface PedidoDePush {
 }
 
 /** Rotas públicas de push: com o slug de G e os dados de H, nada de H muda nem aparece; o contrário também. */
-function casoPushPublico(p: Omit<PedidoDePush, 'corpo'>, corpoDe?: (s: typeof SEMEADAS.h) => unknown): Linha {
+function casoPushPublico(
+  p: Omit<PedidoDePush, 'corpo'>,
+  corpoDe?: (s: typeof SEMEADAS.h) => unknown,
+): Linha {
   return {
     caso: async () => {
       const { cenario } = aberto;
@@ -1089,7 +1092,8 @@ function casoPushConta(p: PedidoDePush): Linha {
       expect(r.status, `${p.metodo} ${p.caminho} da conta B`).toBeLessThan(300);
       const texto = await r.text();
       semValorSemeado(texto, `${p.metodo} ${p.caminho}`);
-      if (p.caminho === '/conta/push/estado') expect(JSON.parse(texto)).toEqual({ assinado: false });
+      if (p.caminho === '/conta/push/estado')
+        expect(JSON.parse(texto)).toEqual({ assinado: false });
       expect(await retratoDoPush()).toBe(antes);
       await aberto.db.query('DELETE FROM push_conta WHERE conta_id = $1', [aberto.cenario.contaB]);
     },
@@ -1098,7 +1102,10 @@ function casoPushConta(p: PedidoDePush): Linha {
 
 const ROTAS_DE_PUSH: Record<string, Linha> = {
   'GET /api/publico/:slug/push': casoPushPublico({ metodo: 'GET', caminho: '/push' }),
-  'POST /api/publico/:slug/push': casoPushPublico({ metodo: 'POST', caminho: '/push' }, corpoComChaves),
+  'POST /api/publico/:slug/push': casoPushPublico(
+    { metodo: 'POST', caminho: '/push' },
+    corpoComChaves,
+  ),
   'DELETE /api/publico/:slug/push': casoPushPublico(
     { metodo: 'DELETE', caminho: '/push' },
     corpoComAuth,
@@ -1168,7 +1175,9 @@ async function comAssinaturasSemeadas(fn: () => Promise<void>): Promise<void> {
   try {
     await fn();
   } finally {
-    await db.query(`DELETE FROM assinaturas WHERE asaas_assinatura_id IN ('sub_t39_g', 'sub_t39_h')`);
+    await db.query(
+      `DELETE FROM assinaturas WHERE asaas_assinatura_id IN ('sub_t39_g', 'sub_t39_h')`,
+    );
   }
 }
 
@@ -1185,7 +1194,10 @@ async function pedirComAsaas(
   if (p.sessao) headers.set('cookie', `${NOME_COOKIE_SESSAO}=${p.sessao}`);
   if (p.token) headers.set('asaas-access-token', p.token);
   const ctx = contextoFalso();
-  const r = await criarApp({ fabricaBanco: fabricaComoApp().fabrica, asaas: asaasDoIsolamento }).request(
+  const r = await criarApp({
+    fabricaBanco: fabricaComoApp().fabrica,
+    asaas: asaasDoIsolamento,
+  }).request(
     `/api${caminho}`,
     {
       method: p.metodo,
@@ -1208,19 +1220,25 @@ function casoDoPlano(p: { metodo: string; corpo?: unknown }): Linha {
         const antes = await retratoDoPlano();
         asaasDoIsolamento.limpar();
 
-        const bEmG = await pedirComAsaas(`/grupos/${cenario.grupoG}/${p.metodo === 'GET' ? 'plano' : 'assinatura'}`, {
-          metodo: p.metodo,
-          sessao: sessaoB,
-          ...(p.corpo !== undefined ? { corpo: p.corpo } : {}),
-        });
+        const bEmG = await pedirComAsaas(
+          `/grupos/${cenario.grupoG}/${p.metodo === 'GET' ? 'plano' : 'assinatura'}`,
+          {
+            metodo: p.metodo,
+            sessao: sessaoB,
+            ...(p.corpo !== undefined ? { corpo: p.corpo } : {}),
+          },
+        );
         expect(bEmG.status, `PLA-09: B com o id de G (${p.metodo})`).toBe(404);
         expect(await bEmG.text()).not.toContain(FATURA_DE_G);
 
-        const cEmH = await pedirComAsaas(`/grupos/${cenario.grupoH}/${p.metodo === 'GET' ? 'plano' : 'assinatura'}`, {
-          metodo: p.metodo,
-          sessao: sessaoA,
-          ...(p.corpo !== undefined ? { corpo: p.corpo } : {}),
-        });
+        const cEmH = await pedirComAsaas(
+          `/grupos/${cenario.grupoH}/${p.metodo === 'GET' ? 'plano' : 'assinatura'}`,
+          {
+            metodo: p.metodo,
+            sessao: sessaoA,
+            ...(p.corpo !== undefined ? { corpo: p.corpo } : {}),
+          },
+        );
         expect(cEmH.status, `PLA-09: C com o id de H (${p.metodo})`).toBe(404);
         expect(await cEmH.text()).not.toContain(FATURA_DE_H);
 
@@ -1249,7 +1267,11 @@ const ROTAS_DO_PLANO: Record<string, Linha> = {
           dateCreated: '2026-11-05 10:00:00',
           subscription: { id: 'sub_t39_g' },
         };
-        const r = await pedirComAsaas('/webhooks/asaas', { metodo: 'POST', sessao: sessaoB, corpo });
+        const r = await pedirComAsaas('/webhooks/asaas', {
+          metodo: 'POST',
+          sessao: sessaoB,
+          corpo,
+        });
         expect(r.status, 'webhook sem token, com a sessão de B').toBe(401);
         expect(await r.text()).not.toContain(FATURA_DE_G);
         expect(await retratoDoPlano()).toBe(antes);
@@ -1604,10 +1626,11 @@ describe('isolamento de rotas', () => {
         api.get('/conta/push/extra', (c) => c.json({ ok: true }));
       },
     });
-    expect(rotasSemLinha(comNova, TABELA).filter((r) => r.includes('/push')).sort()).toEqual([
-      'GET /api/conta/push/extra',
-      'GET /api/publico/:slug/push/extra',
-    ]);
+    expect(
+      rotasSemLinha(comNova, TABELA)
+        .filter((r) => r.includes('/push'))
+        .sort(),
+    ).toEqual(['GET /api/conta/push/extra', 'GET /api/publico/:slug/push/extra']);
   });
 
   it('PLA-09: as 4 rotas do plano estão no app e têm caso; uma rota de plano nova sem caso reprova', () => {

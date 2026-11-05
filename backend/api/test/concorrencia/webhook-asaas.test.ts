@@ -162,10 +162,15 @@ async function planoEm(agora: string) {
 
 async function estado() {
   const { db, cenario } = aberto;
-  const g = await db.query<{ s: string }>('SELECT situacao_comercial AS s FROM grupos WHERE id = $1', [
-    cenario.grupoH,
-  ]);
-  const a = await db.query<{ situacao: string; pago_ate: string | null; cobranca_pro_id: string | null }>(
+  const g = await db.query<{ s: string }>(
+    'SELECT situacao_comercial AS s FROM grupos WHERE id = $1',
+    [cenario.grupoH],
+  );
+  const a = await db.query<{
+    situacao: string;
+    pago_ate: string | null;
+    cobranca_pro_id: string | null;
+  }>(
     `SELECT situacao, pago_ate::text AS pago_ate, cobranca_pro_id FROM assinaturas WHERE asaas_assinatura_id = $1`,
     [SUB],
   );
@@ -248,9 +253,14 @@ describe('webhook em paralelo', () => {
       { confirmar: true },
     );
     await primeiroGravou.promessa;
-    const segundo = comDb(url, null, async (db) => (await aplicarEventoAsaas(db, corpo)).resultado, {
-      confirmar: true,
-    });
+    const segundo = comDb(
+      url,
+      null,
+      async (db) => (await aplicarEventoAsaas(db, corpo)).resultado,
+      {
+        confirmar: true,
+      },
+    );
 
     await esperarNaTrava();
     await esperar(SEGURAR_MS);
@@ -288,8 +298,12 @@ describe('webhook em paralelo', () => {
       url,
       null,
       async (db) =>
-        (await aplicarEventoAsaas(db, evento('evt_t37_par_b', 'SUBSCRIPTION_DELETED', '2026-11-05 11:00:00', null)))
-          .resultado,
+        (
+          await aplicarEventoAsaas(
+            db,
+            evento('evt_t37_par_b', 'SUBSCRIPTION_DELETED', '2026-11-05 11:00:00', null),
+          )
+        ).resultado,
       { confirmar: true },
     );
 
@@ -345,7 +359,10 @@ describe('webhook em sequência', () => {
   it('PLA-74: no 16º dia o plano é free; depois do webhook de pagamento, pro, sem perda de linha', async () => {
     await preparar('trial', 'aguardando_pagamento', '2026-11-01');
     const antes = await linhasDoGrupo();
-    expect(await planoEm('2026-11-16T15:00:00Z')).toMatchObject({ plano: 'free', situacao: 'trial' });
+    expect(await planoEm('2026-11-16T15:00:00Z')).toMatchObject({
+      plano: 'free',
+      situacao: 'trial',
+    });
 
     expect(
       (

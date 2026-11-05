@@ -80,11 +80,7 @@ export function ExcluirJogador({
 
   return (
     <>
-      <Botao
-        variante="texto-destrutivo"
-        disabled={somenteLeitura}
-        onClick={() => setAberto(true)}
-      >
+      <Botao variante="texto-destrutivo" disabled={somenteLeitura} onClick={() => setAberto(true)}>
         Excluir jogador
       </Botao>
       {aberto ? (

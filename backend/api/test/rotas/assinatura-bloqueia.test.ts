@@ -64,7 +64,13 @@ async function assinatura(grupo: string, situacao: 'aguardando_pagamento' | 'ati
     `INSERT INTO assinaturas (grupo_id, asaas_cliente_id, asaas_assinatura_id, valor_centavos, situacao, pago_ate,
        criada_por, criada_em)
      VALUES ($1, 'cus_t38', $2, 990, $3, $4, $5, now())`,
-    [grupo, SUB, situacao, situacao === 'aguardando_pagamento' ? null : '2026-12-05', cenario.contaB],
+    [
+      grupo,
+      SUB,
+      situacao,
+      situacao === 'aguardando_pagamento' ? null : '2026-12-05',
+      cenario.contaB,
+    ],
   );
 }
 
