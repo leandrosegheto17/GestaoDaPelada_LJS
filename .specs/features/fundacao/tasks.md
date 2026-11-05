@@ -586,6 +586,8 @@ T81 → T82
 **Depends on**: T11
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-47, FUN-49
+**Status**: rascunhada
+**Nota do rascunho**: SHAs das actions tirados da versão anterior (`b65b7d8`); o /executar confere. O gitleaks local fica para o /executar.
 
 **Done when**:
 
