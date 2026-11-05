@@ -866,6 +866,7 @@ T39 → T40 → T41
 **Depends on**: T21
 **Reuses**: rota do webhook (`PC:176-187`), S-03, S-04; T15, T16; centavos da `planos-e-cobranca` (PLA-51); AD-105
 **Requirement**: NOT-38, NOT-39, NOT-47
+**Nota do rascunho**: adiada (2026-11-05). A rota `POST /api/webhooks/asaas` que esta tarefa estende (S-03) nasce na T35 a T37 da `planos-e-cobranca`, que ainda não foram rascunhadas; pela mesma decisão da T0 e da T1 (só o que não depende da feature 7), a T22 fica para depois delas. A T23 e a T24 seguem, porque só consomem a mensagem `cobranca` da fila (T16).
 
 **Done when**:
 
@@ -892,6 +893,9 @@ T39 → T40 → T41
 **Depends on**: T22
 **Reuses**: modelos dos e-mails de conta (`CA:672`); `URL_PUBLICA` (`F:1251`); S-05
 **Requirement**: NOT-40
+**Status**: rascunhada
+**Lacunas**: o título do tipo atrasado é "Pagamento em atraso" aqui (texto da T23) e "Pagamento atrasado" no push (`NOME_DO_TIPO`, T5); a spec só pede o tipo em texto claro. Confirmar com o usuário se unifica.
+**Nota do rascunho**: o nome do grupo passa pelo `nomeDoGrupoNoEmail` (uma linha, sem virar link, até 60 caracteres) antes do `escaparHtml`, como no convite. O valor usa o `formatarPreco` do domínio. Teste em `backend/api/test/infraestrutura/modelo-cobranca.test.ts`.
 
 **Done when**:
 
