@@ -2035,6 +2035,8 @@ T78 → T79
 **Depends on**: T57
 **Reuses**: Rotas do app (`CA:1309`) e guarda de rota (`CA:1192`); rotas da grupos-e-elenco (`GE:2068`)
 **Requirement**: PAR-143, PAR-83
+**Status**: rascunhada
+**Nota do rascunho**: as rotas de partidas, nova partida, partida por data, pontuação e uso apontam para a `PaginaProvisoria` (as telas nascem nas T59 a T63, que trocam o `element` de cada rota); o "Ver ranking" entrou nas `acoes` da `Casca` do `InicioGrupo`, como no `t09-inicio--sucesso.html:13`.
 
 **Done when**:
 

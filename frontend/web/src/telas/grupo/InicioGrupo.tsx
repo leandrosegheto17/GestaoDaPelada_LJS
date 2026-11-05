@@ -1,5 +1,6 @@
-import { useParams } from 'react-router';
+import { Link, useParams } from 'react-router';
 import { Casca, NOME_DO_APP } from '../../componentes/Casca.tsx';
+import estilosCasca from '../../componentes/Casca.module.css';
 import { EsqueletoLista } from '../../componentes/EsqueletoLista.tsx';
 import { EstadoErro } from '../../componentes/EstadoErro.tsx';
 import { Faixa } from '../../componentes/Faixa.tsx';
@@ -12,6 +13,11 @@ import estilos from '../acesso.module.css';
 import modulo from '../grupos-elenco.module.css';
 import { rotaDoGrupo } from '../grupos/Grupos.tsx';
 import { textoRecorrencia } from '../grupos/recorrencia.ts';
+
+/** `/g/<slug>`: o ranking público do grupo (PAR-83). */
+export function caminhoDoRanking(slug: string): string {
+  return `/g/${encodeURIComponent(slug)}`;
+}
 
 /**
  * Início do grupo (`/app/grupos/:grupoId`, t09; GEL-20, GEL-114), de `t09-inicio--sucesso.html` e
@@ -95,8 +101,21 @@ export function InicioGrupo() {
     );
   }
 
+  // "Ver ranking" (partidas-e-ranking T58; PAR-83): abre o ranking público `/g/:slug`, de `t09-inicio--sucesso.html:13`.
+  const verRanking = grupo.data ? (
+    <Link
+      className={`${estilosCasca['botao-icone']} ${estilosCasca['botao-icone--sem-borda']}`}
+      to={caminhoDoRanking(grupo.data.slug)}
+      aria-label="Ver ranking"
+    >
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true" focusable="false">
+        <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+      </svg>
+    </Link>
+  ) : undefined;
+
   return (
-    <Casca grupo={{ nome, trocarHref: '/app' }} ocupada={grupo.isPending}>
+    <Casca grupo={{ nome, trocarHref: '/app' }} ocupada={grupo.isPending} acoes={verRanking}>
       <h1 className="sr">{`Início do admin: ${nome}`}</h1>
       {conteudo()}
     </Casca>
