@@ -6,13 +6,16 @@ import {
   MENSAGEM_DATA_FUTURA,
   MENSAGEM_MES_FUTURO,
   mensagemPartidaJaExiste,
+  partidaCorpo,
   type CorpoErro,
+  type PartidaCorpo,
   type PartidaNova,
+  type PartidaResposta,
   type PartidasDoMes,
 } from '@pelada/contrato';
 import { compararApelido, compararDatas, compararMeses, dataSugeridaPartida, mesDe, navegacaoDeMes } from '@pelada/dominio';
 import type { Ambiente } from '../ambiente.ts';
-import { erroDeCampos, mensagensDoZod, respostaDeCampo } from '../corpo.ts';
+import { erroDeCampos, mensagensDoZod, respostaDeCampo, type Leitura } from '../corpo.ts';
 import { grupos } from '../../infraestrutura/db/repositorios/grupos.ts';
 import { jogadores } from '../../infraestrutura/db/repositorios/jogadores.ts';
 import { partidas } from '../../infraestrutura/db/repositorios/partidas.ts';
@@ -36,6 +39,39 @@ import { partidas } from '../../infraestrutura/db/repositorios/partidas.ts';
  *
  * `preMarcadaPelaEscalacao` (contrato da simulador, SIM-75): falso aqui; a pré-marcação pela escalação é da simulador.
  */
+
+/**
+ * Corpo de `POST …/partidas` e `PUT …/partidas/:data` (T40, T41). Como o `lerCorpoDoGrupo`, mas o campo é o caminho
+ * inteiro (`marcacoes.<índice>.jogadorId`, `marcacoes.<índice>.situacao`): o PAR-24 aponta a marcação, e o id que não é
+ * UUID (jogador inexistente) cai no mesmo campo e com a mesma mensagem do inativo e do de outro grupo.
+ */
+export async function lerPartidaCorpo(c: Context<Ambiente>): Promise<Leitura<PartidaCorpo>> {
+  let bruto: unknown;
+  try {
+    bruto = await c.req.json();
+  } catch {
+    return { ok: false, resposta: c.json(erroDeCampos({ corpo: 'Envie um JSON válido.' }), 422) };
+  }
+  const r = partidaCorpo.safeParse(bruto);
+  if (!r.success) {
+    const mensagens: Record<string, string> = {};
+    for (const problema of r.error.issues) {
+      const campo = problema.path.length > 0 ? problema.path.map(String).join('.') : 'corpo';
+      mensagens[campo] ??= problema.message;
+    }
+    return { ok: false, resposta: c.json(erroDeCampos(mensagens), 422) };
+  }
+  return { ok: true, dados: r.data };
+}
+
+/** Resposta da partida gravada (201 do lançamento, 200 da edição; PAR-22, PAR-46), relida na mesma transação. */
+export async function respostaDaPartida(c: Context<Ambiente>, grupoId: string, data: string, status: 200 | 201): Promise<Response> {
+  const lida = await partidas.ler(c.var.db, grupoId, data);
+  // Acabou de gravar na mesma transação: sem a partida, é erro (500, e o `comBanco` desfaz).
+  if (!lida) throw new Error('partida gravada não encontrada na releitura');
+  const resposta: PartidaResposta = { ...lida, hoje: c.var.relogio.hoje() };
+  return c.json(resposta, status);
+}
 
 /** 409 do PAR-21: a mensagem com a data e a data que já tem partida. */
 export function respostaPartidaJaExiste(c: Context<Ambiente>, data: string): Response {
@@ -77,6 +113,25 @@ export function rotasPartidas(): Hono<Ambiente> {
         .map((j) => ({ id: j.id, apelido: j.apelido, situacao: 'ausente' as const })),
     };
     return c.json(resposta, 200);
+  });
+
+  /**
+   * Lançamento (T40; PAR-19 a PAR-26, `BD:231`): corpo pelo contrato (422 no campo), data futura recusada antes do
+   * repositório (PAR-20), `partidas.lancar` (marcações contra os ativos na data, PAR-24, PAR-25; data já lançada,
+   * também na corrida, 409, PAR-21, PAR-30) e 201 com a partida relida. O `LIMITE_ESCRITA` por conta já vale para o
+   * POST (`limitarEscritasDeGrupo`).
+   */
+  rotas.post('/grupos/:grupoId/partidas', async (c) => {
+    const corpo = await lerPartidaCorpo(c);
+    if (!corpo.ok) return corpo.resposta;
+    const grupoId = c.req.param('grupoId');
+    const dados = corpo.dados;
+    if (ehFutura(dados.data, c.var.relogio.hoje())) return respostaDeCampo(c, 'data', MENSAGEM_DATA_FUTURA);
+
+    const r = await partidas.lancar(c.var.db, grupoId, dados);
+    if (r.resultado === 'invalido') return c.json(erroDeCampos(r.campos), 422);
+    if (r.resultado === 'partida_ja_existe') return respostaPartidaJaExiste(c, dados.data);
+    return respostaDaPartida(c, grupoId, dados.data, 201);
   });
 
   rotas.get('/grupos/:grupoId/partidas', async (c) => {

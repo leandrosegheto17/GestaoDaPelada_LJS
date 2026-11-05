@@ -1534,6 +1534,8 @@ T78 → T79
 **Depends on**: T39
 **Reuses**: T30; `BD:231`; `LIMITE_ESCRITA` por conta da grupos-e-elenco (`GE:928`)
 **Requirement**: PAR-19, PAR-20, PAR-21, PAR-22, PAR-24, PAR-25, PAR-26
+**Status**: rascunhada
+**Nota do rascunho**: o POST fica em `rotas/partidas.ts` com um leitor próprio, `lerPartidaCorpo`: o erro do zod leva o caminho inteiro (`marcacoes.<i>.jogadorId`), para o id que não é UUID cair no mesmo campo do inativo (PAR-24); o `lerCorpoDoGrupo` cortaria em `marcacoes`. `respostaDaPartida` relê a partida na mesma transação; os dois servem ao PUT da T41. Testes em `backend/api/test/rotas/partidas-lancar.test.ts`.
 
 **Done when**:
 
