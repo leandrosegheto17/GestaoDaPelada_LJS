@@ -1,6 +1,7 @@
 # Financeiro — Tarefas
 
 **Modo**: enxuto
+**Passada**: rascunho
 **Base**: .specs/features/financeiro/spec.md (aprovada em 2026-11-04), conferido em 2026-11-04. Contratos: fundação v2 (`.specs/features/fundacao/`), `conta-e-acesso`, `grupos-e-elenco` e `partidas-e-ranking` v2 (`tasks.md` de cada uma, nada executado ainda) e a spec da `simulador` (`.specs/features/simulador/spec.md`, SIM-68).
 **Branch pai**: feature/simulador (a ordem de execução segue o roteiro). Se a `simulador` já estiver integrada na `main` quando o `/executar` começar, a Branch pai passa a ser `main`.
 **Feature**: 6 de 8 do roteiro (AD-001, AD-015). Requisitos `FIN-*`.

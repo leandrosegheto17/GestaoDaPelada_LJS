@@ -1,6 +1,7 @@
 # Grupos e elenco — Tarefas
 
 **Modo**: enxuto
+**Passada**: rascunho
 **Base**: `ljs:.specs/features/grupos-e-elenco/spec.md` (aprovada em 2026-10-29, GEL-01 a GEL-118, e as regras da auditoria em `spec.md:541-548`), `ljs:.specs/features/grupos-e-elenco/context.md` (C1 a C10), `ljs:.specs/features/grupos-e-elenco/design.md` (aprovado em 2026-10-29), `ljs:.specs/features/grupos-e-elenco/seguranca.md` (SEC-001 a SEC-010, reteste de 2026-10-30), `ljs:.specs/features/grupos-e-elenco/validation.md` (PASS) e o mockup de módulo `ljs:.specs/features/grupos-e-elenco/mockup/`, com `ljs:` = `C:\Leandro\Projetos\GestaoDaPelada_LJS` @ `e557292` (branch `main`), conferido em 2026-11-04. A remota `feat/grupos-e-elenco` (`1380484`) é anterior (só a spec, sem aprovação) e não é a Base. Contratos da v2: `.specs/features/fundacao/` (spec, design, tasks) e `.specs/features/conta-e-acesso/tasks.md`.
 **Branch pai**: `feature/conta-e-acesso` (a conta-e-acesso ainda não estará integrada quando esta feature for executada). Se a conta-e-acesso já estiver integrada na `main` quando o `/executar` começar, a Branch pai passa a ser `main`.
 **Feature**: 3 de 8 do roteiro (AD-001, AD-015). Requisitos `GEL-*` e `SEC-*`.

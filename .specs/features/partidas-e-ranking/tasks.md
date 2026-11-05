@@ -1,6 +1,7 @@
 # Partidas e ranking — Tarefas
 
 **Modo**: enxuto
+**Passada**: rascunho
 **Base**: `ljs:.specs/features/partidas-e-ranking/spec.md` (aprovada em 2026-10-30, PAR-01 a PAR-161), `design.md`, `context.md` (P1 a P28) e `mockup/`, todos @ `c6dc82c` (branch `feat/partidas-e-ranking`), com `ljs:` = `C:\Leandro\Projetos\GestaoDaPelada_LJS`, conferido em 2026-11-04. Contratos: fundação v2 (`.specs/features/fundacao/`), `conta-e-acesso` v2 e `grupos-e-elenco` v2 (`tasks.md` de cada uma).
 **Branch pai**: `feature/grupos-e-elenco` (a `grupos-e-elenco` ainda não estará integrada). Se já estiver integrada na `main` quando o `/executar` começar, a Branch pai passa a ser `main`.
 **Feature**: 4 de 8 do roteiro (AD-001, AD-015). Requisitos `PAR-*`.

@@ -1,6 +1,7 @@
 # Simulador — Tarefas
 
 **Modo**: enxuto
+**Passada**: rascunho
 **Base**: .specs/features/simulador/spec.md (aprovada em 2026-11-04), conferido em 2026-11-04. Contratos: fundação v2 (`.specs/features/fundacao/`), `conta-e-acesso`, `grupos-e-elenco` e `partidas-e-ranking` v2 (`tasks.md` de cada uma, nenhuma executada).
 **Branch pai**: `feature/partidas-e-ranking` (a `partidas-e-ranking` ainda não estará integrada). Se já estiver integrada na `main` quando o `/executar` começar, a Branch pai passa a ser `main`.
 **Feature**: 5 de 8 do roteiro (AD-001, AD-015). Requisitos `SIM-*`.

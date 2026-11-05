@@ -1,6 +1,7 @@
 # Planos e cobrança — Tarefas
 
 **Modo**: enxuto
+**Passada**: rascunho
 **Base**: .specs/features/planos-e-cobranca/spec.md (aprovada em 2026-11-04), conferido em 2026-11-04
 **Branch pai**: `feature/financeiro` (a `financeiro` ainda não estará integrada). Se já estiver integrada na `main` quando o `/executar` começar, a Branch pai passa a ser `main`.
 **Feature**: 7 de 8 do roteiro (AD-001, AD-015). Requisitos `PLA-01` a `PLA-74`.

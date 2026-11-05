@@ -12,6 +12,8 @@ Implemente estas tarefas com a skill `tlc-spec-driven`: **acione-a pelo nome e s
 **Spec**: `.specs/features/fundacao/spec.md`
 **Reuso**: `.specs/features/fundacao/reuso.md`
 **Status**: Approved (usuário, 2026-11-03)
+**Passada**: rascunho
+**Branch pai**: main
 **Tamanho**: 82 tarefas em 25 Phases, 110,7h de trabalho humano estimado
 
 > Premissas desta lista:
@@ -301,10 +303,10 @@ T81 → T82
 
 **Done when**:
 
-- [x] `node -v` imprime v26.x e `pnpm -v` imprime 11.x num terminal novo (o pnpm funciona fora do corepack quebrado)
-- [x] `docker compose version` e `gh auth status` respondem sem erro
-- [x] `python .claude/scripts/preparar-ambiente.py` imprime "Ambiente pronto" depois da T2
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] `node -v` imprime v26.x e `pnpm -v` imprime 11.x num terminal novo (o pnpm funciona fora do corepack quebrado)
+- [ ] `docker compose version` e `gh auth status` respondem sem erro
+- [ ] `python .claude/scripts/preparar-ambiente.py` imprime "Ambiente pronto" depois da T2
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
@@ -325,10 +327,10 @@ T81 → T82
 
 **Done when**:
 
-- [x] `pnpm install` termina sem erro
-- [x] `git add --renormalize .` não deixa diferença e o git não avisa mais sobre CRLF
-- [x] Commit com o `pnpm-lock.yaml`
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] `pnpm install` termina sem erro
+- [ ] `git add --renormalize .` não deixa diferença e o git não avisa mais sobre CRLF
+- [ ] Commit com o `pnpm-lock.yaml`
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
@@ -349,10 +351,10 @@ T81 → T82
 
 **Done when**:
 
-- [x] `test/estrutura.test.ts` (nomes citam FUN-01 e FUN-02) confere nos cinco pacotes: `type: module`, `engines`, `strict: true` e os scripts `lint`, `typecheck` e `test`
-- [x] O teste falha quando se remove `strict` de um `tsconfig` (conferido uma vez e revertido)
-- [x] `pnpm typecheck` e `pnpm test` na raiz saem com código 0, com 5 testes de fumaça mais o de estrutura
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] `test/estrutura.test.ts` (nomes citam FUN-01 e FUN-02) confere nos cinco pacotes: `type: module`, `engines`, `strict: true` e os scripts `lint`, `typecheck` e `test`
+- [ ] O teste falha quando se remove `strict` de um `tsconfig` (conferido uma vez e revertido)
+- [ ] `pnpm typecheck` e `pnpm test` na raiz saem com código 0, com 5 testes de fumaça mais o de estrutura
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -373,9 +375,9 @@ T81 → T82
 
 **Done when**:
 
-- [x] `pnpm lint` e `pnpm format:check` saem com código 0 na base limpa
-- [x] Uma linha com `var` no pacote `dominio` faz o lint falhar (conferido uma vez e revertido)
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] `pnpm lint` e `pnpm format:check` saem com código 0 na base limpa
+- [ ] Uma linha com `var` no pacote `dominio` faz o lint falhar (conferido uma vez e revertido)
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
@@ -396,10 +398,10 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-06` com um arquivo de exemplo que importa `node:fs`: o ESLint reporta o erro
-- [x] Teste `FUN-06` com um arquivo sem I/O: o ESLint não reporta nada
-- [x] `pnpm --filter @pelada/dominio test` passa com 2 testes novos
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-06` com um arquivo de exemplo que importa `node:fs`: o ESLint reporta o erro
+- [ ] Teste `FUN-06` com um arquivo sem I/O: o ESLint não reporta nada
+- [ ] `pnpm --filter @pelada/dominio test` passa com 2 testes novos
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -420,14 +422,13 @@ T81 → T82
 
 **Done when**:
 
-- [x] `testes.json` traz o comando `pnpm lint && pnpm format:check && pnpm typecheck && pnpm test`, sem `dispensado`
-- [x] `python .claude/scripts/trava-testes.py --rodar` termina com SUÍTE VERDE e o commit fica registrado
-- [x] Este comando cresce nas tarefas que criam `test:checagens`, build, e2e e visual: cada uma o atualiza (tabela de evolução na seção Gate Check Commands)
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] `testes.json` traz o comando `pnpm lint && pnpm format:check && pnpm typecheck && pnpm test`, sem `dispensado`
+- [ ] `python .claude/scripts/trava-testes.py --rodar` termina com SUÍTE VERDE e o commit fica registrado
+- [ ] Este comando cresce nas tarefas que criam `test:checagens`, build, e2e e visual: cada uma o atualiza (tabela de evolução na seção Gate Check Commands)
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
-**Gate (Lote 1)**: pnpm lint && pnpm format:check && pnpm typecheck && pnpm test @ 66810371cb3069adf87d199a49daa28d1ee98318 = verde
 
 ---
 
@@ -447,10 +448,10 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-03` lê o YAML: um serviço só, imagem `postgres:18`, porta presa em `127.0.0.1`, sem outro serviço
-- [x] `docker compose up -d --wait` sobe e `psql` consegue `CREATE EXTENSION pgcrypto`
-- [x] `pnpm --filter @pelada/scripts test` passa
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-03` lê o YAML: um serviço só, imagem `postgres:18`, porta presa em `127.0.0.1`, sem outro serviço
+- [ ] `docker compose up -d --wait` sobe e `psql` consegue `CREATE EXTENSION pgcrypto`
+- [ ] `pnpm --filter @pelada/scripts test` passa
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -471,10 +472,10 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-19`: `localhost`, `127.0.0.1` e `postgres` passam; um host `*.neon.tech` lança erro sem abrir socket
-- [x] Teste `FUN-19`: URL malformada lança erro; usuário e senha da URL nunca aparecem na mensagem
-- [x] `.env.example` lista `DATABASE_URL`, `DATABASE_URL_TESTE`, `DATABASE_URL_MIGRACAO`, `PELADA_APP_SENHA` e `PELADA_BACKUP_RO_SENHA`, sem valores reais
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-19`: `localhost`, `127.0.0.1` e `postgres` passam; um host `*.neon.tech` lança erro sem abrir socket
+- [ ] Teste `FUN-19`: URL malformada lança erro; usuário e senha da URL nunca aparecem na mensagem
+- [ ] `.env.example` lista `DATABASE_URL`, `DATABASE_URL_TESTE`, `DATABASE_URL_MIGRACAO`, `PELADA_APP_SENHA` e `PELADA_BACKUP_RO_SENHA`, sem valores reais
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -495,10 +496,10 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-55` aponta para uma porta fechada: sai com código 1 e a mensagem cita `docker compose up -d`
-- [x] Teste `FUN-55` com o Postgres de pé: conecta e fecha sem deixar conexão aberta
-- [x] `pnpm --filter @pelada/scripts test` passa
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-55` aponta para uma porta fechada: sai com código 1 e a mensagem cita `docker compose up -d`
+- [ ] Teste `FUN-55` com o Postgres de pé: conecta e fecha sem deixar conexão aberta
+- [ ] `pnpm --filter @pelada/scripts test` passa
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -519,15 +520,14 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-19`: com `DATABASE_URL_TESTE` apontando para um host remoto, `bancoDeTeste()` lança erro e não abre conexão
-- [x] Teste: cria o banco, grava uma linha, remove, e `pg_database` não tem `teste_*` órfão, mesmo quando o corpo do teste lança erro
-- [x] `DATABASE_URL_TESTE` tem padrão local no `vitest.config.ts` e está documentada no `.env.example`
-- [x] `testes.json` atualizado e `trava-testes.py --rodar` verde
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-19`: com `DATABASE_URL_TESTE` apontando para um host remoto, `bancoDeTeste()` lança erro e não abre conexão
+- [ ] Teste: cria o banco, grava uma linha, remove, e `pg_database` não tem `teste_*` órfão, mesmo quando o corpo do teste lança erro
+- [ ] `DATABASE_URL_TESTE` tem padrão local no `vitest.config.ts` e está documentada no `.env.example`
+- [ ] `testes.json` atualizado e `trava-testes.py --rodar` verde
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
-**Gate (Lote 2)**: docker compose up -d --wait && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test @ ad7490985196ecd5a1e5a87a8a7b55fc12dcef78 = verde
 
 ---
 
@@ -547,11 +547,11 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-47`: dump de um banco de teste com 2 grupos, decifrado com a chave privada de teste, passa em `pg_restore --list`
-- [x] Teste `FUN-49`: URL inválida faz o script sair com código diferente de 0 e não deixa nenhum `.age`
-- [x] Teste `FUN-49`: chave pública inválida faz o script sair com código diferente de 0 e não deixa arquivo parcial
-- [x] O teste roda dentro de um container `postgres:18` com `age` instalado; o comando fica documentado no teste
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-47`: dump de um banco de teste com 2 grupos, decifrado com a chave privada de teste, passa em `pg_restore --list`
+- [ ] Teste `FUN-49`: URL inválida faz o script sair com código diferente de 0 e não deixa nenhum `.age`
+- [ ] Teste `FUN-49`: chave pública inválida faz o script sair com código diferente de 0 e não deixa arquivo parcial
+- [ ] O teste roda dentro de um container `postgres:18` com `age` instalado; o comando fica documentado no teste
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -572,11 +572,11 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-47` lê o YAML: cron `0 7 * * *`, `workflow_dispatch`, `environment: backup` (AD-013), `retention-days: 30`
-- [x] Teste `FUN-49`: o passo do dump não usa `continue-on-error` nem `|| true`, e o upload tem `if-no-files-found: error`
-- [x] Teste: todo `uses:` está fixado por SHA de 40 caracteres
-- [x] Nenhum segredo literal no arquivo (gitleaks local limpo)
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-47` lê o YAML: cron `0 7 * * *`, `workflow_dispatch`, `environment: backup` (AD-013), `retention-days: 30`
+- [ ] Teste `FUN-49`: o passo do dump não usa `continue-on-error` nem `|| true`, e o upload tem `if-no-files-found: error`
+- [ ] Teste: todo `uses:` está fixado por SHA de 40 caracteres
+- [ ] Nenhum segredo literal no arquivo (gitleaks local limpo)
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -597,14 +597,13 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-50`: dump cifrado de um banco de teste, restaurado num banco vazio, dá contagem de linhas igual por tabela
-- [x] Teste `FUN-50`: recusa restaurar num host fora da lista de permitidos (trava de host)
-- [x] Teste `FUN-50`: recusa restaurar num banco que já tem tabelas
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-50`: dump cifrado de um banco de teste, restaurado num banco vazio, dá contagem de linhas igual por tabela
+- [ ] Teste `FUN-50`: recusa restaurar num host fora da lista de permitidos (trava de host)
+- [ ] Teste `FUN-50`: recusa restaurar num banco que já tem tabelas
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
-**Gate (Lote 3)**: docker compose up -d --wait && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test @ da9c17ff9b0831e5f8ee56c194d1b54288700a28 = verde
 
 ---
 
@@ -624,10 +623,10 @@ T81 → T82
 
 **Done when**:
 
-- [x] Os dois secrets existem no environment `backup` (conferido na tela do GitHub, sem ler os valores)
-- [x] A chave privada está guardada fora do GitHub (o usuário confirma)
-- [x] O usuário confirma qual é o `age` público em uso, para o runbook
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Os dois secrets existem no environment `backup` (conferido na tela do GitHub, sem ler os valores)
+- [ ] A chave privada está guardada fora do GitHub (o usuário confirma)
+- [ ] O usuário confirma qual é o `age` público em uso, para o runbook
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
@@ -676,10 +675,10 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-08` calcula o SHA-256 dos 23 arquivos e compara com o `migracoes.sha256`; passa
-- [x] Teste `FUN-08`: alterar um byte de uma migração faz o teste falhar (conferido uma vez e revertido)
-- [x] São exatamente 23 arquivos `.sql` e nenhum a mais
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-08` calcula o SHA-256 dos 23 arquivos e compara com o `migracoes.sha256`; passa
+- [ ] Teste `FUN-08`: alterar um byte de uma migração faz o teste falhar (conferido uma vez e revertido)
+- [ ] São exatamente 23 arquivos `.sql` e nenhum a mais
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -700,11 +699,11 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-07`: banco vazio, depois `migrar`: `pgmigrations` tem os 23 nomes na ordem dos arquivos
-- [x] Teste `FUN-07`: uma migração de exemplo com um comando que falha no meio não deixa DDL parcial dessa migração
-- [x] Teste `FUN-07`: duas execuções simultâneas de `migrar` terminam com cada migração aplicada uma vez
-- [x] Num banco vazio local, as migrações rodam como superusuário `postgres` (AD-009)
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-07`: banco vazio, depois `migrar`: `pgmigrations` tem os 23 nomes na ordem dos arquivos
+- [ ] Teste `FUN-07`: uma migração de exemplo com um comando que falha no meio não deixa DDL parcial dessa migração
+- [ ] Teste `FUN-07`: duas execuções simultâneas de `migrar` terminam com cada migração aplicada uma vez
+- [ ] Num banco vazio local, as migrações rodam como superusuário `postgres` (AD-009)
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -725,14 +724,13 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-19`: com host remoto e sem a variável de permissão do deploy, `pnpm migrar` aborta antes de conectar
-- [x] Teste `FUN-55`: com o Postgres parado, sai com código 1 e a mensagem pede `docker compose up -d`
-- [x] `pnpm migrar` num banco local vazio aplica as 23 migrações
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-19`: com host remoto e sem a variável de permissão do deploy, `pnpm migrar` aborta antes de conectar
+- [ ] Teste `FUN-55`: com o Postgres parado, sai com código 1 e a mensagem pede `docker compose up -d`
+- [ ] `pnpm migrar` num banco local vazio aplica as 23 migrações
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
-**Gate (Lote 4)**: docker compose up -d --wait && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test @ f563a9322b4cb6c0a5deb74289e4dc6702215bc3 = verde. T15 segue aberta de propósito (AD-014).
 
 ---
 
@@ -752,10 +750,10 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-08` cria um mini schema à mão (2 tabelas, FK, índice, trigger) e compara com a lista esperada, escrita no teste
-- [x] Teste `FUN-08`: mudar o tipo de uma coluna ou apagar um índice muda a saída
-- [x] A saída é estável: duas leituras seguidas dão a mesma lista
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-08` cria um mini schema à mão (2 tabelas, FK, índice, trigger) e compara com a lista esperada, escrita no teste
+- [ ] Teste `FUN-08`: mudar o tipo de uma coluna ou apagar um índice muda a saída
+- [ ] A saída é estável: duas leituras seguidas dão a mesma lista
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -776,10 +774,10 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-08` num mini schema: mudar o corpo de uma função, o `search_path`, uma policy, um `GRANT` ou o `FORCE` muda a saída
-- [x] Teste `FUN-08`: mudar um atributo de role (`BYPASSRLS`, `LOGIN`) muda a saída; mudar só a senha da role não muda
-- [x] Cada categoria nova tem um teste que a prova de forma independente
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-08` num mini schema: mudar o corpo de uma função, o `search_path`, uma policy, um `GRANT` ou o `FORCE` muda a saída
+- [ ] Teste `FUN-08`: mudar um atributo de role (`BYPASSRLS`, `LOGIN`) muda a saída; mudar só a senha da role não muda
+- [ ] Cada categoria nova tem um teste que a prova de forma independente
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -800,14 +798,13 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-08`: banco vazio migrado tem `lerEsquema` igual ao arquivo `esquema-producao.txt` versionado
-- [x] O arquivo cobre as 25 tabelas com `FORCE` e as funções `SECURITY DEFINER` herdadas (conferência por contagem no teste)
-- [x] O arquivo é uma referência de uma fonte: a comparação com o banco real (`dev`) está na tarefa de paridade (FUN-08, FUN-09)
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-08`: banco vazio migrado tem `lerEsquema` igual ao arquivo `esquema-producao.txt` versionado
+- [ ] O arquivo cobre as 25 tabelas com `FORCE` e as funções `SECURITY DEFINER` herdadas (conferência por contagem no teste)
+- [ ] O arquivo é uma referência de uma fonte: a comparação com o banco real (`dev`) está na tarefa de paridade (FUN-08, FUN-09)
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
-**Gate (Lote 5)**: docker compose up -d --wait && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test @ 6e73c99d23e516102ca375934815f299c5e74575 = verde
 
 ---
 
@@ -827,10 +824,10 @@ T81 → T82
 
 **Done when**:
 
-- [x] Casos limite e estados listados antes do código: vazio; 23 aplicadas; 20 aplicadas (prefixo); nome desconhecido; ordem trocada; tabelas sem `pgmigrations`; `pgmigrations` vazia com tabelas
-- [x] Teste `FUN-10`: cada caso divergente aborta com a lista de diferenças e o esquema e as contagens ficam idênticos
-- [x] Teste `FUN-10`: vazio e prefixo seguem para a execução
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Casos limite e estados listados antes do código: vazio; 23 aplicadas; 20 aplicadas (prefixo); nome desconhecido; ordem trocada; tabelas sem `pgmigrations`; `pgmigrations` vazia com tabelas
+- [ ] Teste `FUN-10`: cada caso divergente aborta com a lista de diferenças e o esquema e as contagens ficam idênticos
+- [ ] Teste `FUN-10`: vazio e prefixo seguem para a execução
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -851,10 +848,10 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-09`: um event trigger `ddl_command_start` conta zero DDL na segunda execução de `migrar`
-- [x] Teste `FUN-09`: contagem de linhas por tabela e `pgmigrations` iguais antes e depois
-- [x] Teste `FUN-09`: com uma migração nova de exemplo, só ela executa
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-09`: um event trigger `ddl_command_start` conta zero DDL na segunda execução de `migrar`
+- [ ] Teste `FUN-09`: contagem de linhas por tabela e `pgmigrations` iguais antes e depois
+- [ ] Teste `FUN-09`: com uma migração nova de exemplo, só ela executa
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -875,11 +872,11 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-56`: cada comando destrutivo reprova numa migração de exemplo
-- [x] Teste `FUN-56`: com a linha de exceção e uma AD existente em `STATE.md`, passa
-- [x] Teste `FUN-56`: as 23 copiadas passam pela lista fechada; um 24º arquivo com `DROP` reprova
-- [x] Cria o script `test:checagens` na raiz e o acrescenta ao `testes.json`
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-56`: cada comando destrutivo reprova numa migração de exemplo
+- [ ] Teste `FUN-56`: com a linha de exceção e uma AD existente em `STATE.md`, passa
+- [ ] Teste `FUN-56`: as 23 copiadas passam pela lista fechada; um 24º arquivo com `DROP` reprova
+- [ ] Cria o script `test:checagens` na raiz e o acrescenta ao `testes.json`
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -900,14 +897,13 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-07`: o arquivo novo tem timestamp maior que `1792844520000` e maior que o último arquivo existente
-- [x] Teste `FUN-07`: o nome é normalizado (minúsculas, hifens) e o cabeçalho `-- Up Migration` é criado
-- [x] Teste `FUN-07`: dois geradores no mesmo milissegundo não colidem
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-07`: o arquivo novo tem timestamp maior que `1792844520000` e maior que o último arquivo existente
+- [ ] Teste `FUN-07`: o nome é normalizado (minúsculas, hifens) e o cabeçalho `-- Up Migration` é criado
+- [ ] Teste `FUN-07`: dois geradores no mesmo milissegundo não colidem
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
-**Gate (Lote 6)**: docker compose up -d --wait && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:checagens @ 892aa85653a409d635bc35cacc23e75193bc9e8a = verde
 
 ---
 
@@ -927,10 +923,10 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste: `comoApp` com conta A enxerga o grupo de A e não o de B em `grupos`
-- [x] Teste: o cenário cria ao menos uma linha por tabela com `grupo_id` do catálogo (incluindo as de conta, ex. `convites_admin`), conferido por contagem
-- [x] Teste: o banco de teste é removido no `finally`
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste: `comoApp` com conta A enxerga o grupo de A e não o de B em `grupos`
+- [ ] Teste: o cenário cria ao menos uma linha por tabela com `grupo_id` do catálogo (incluindo as de conta, ex. `convites_admin`), conferido por contagem
+- [ ] Teste: o banco de teste é removido no `finally`
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -951,10 +947,10 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-11`: `pelada_app` tentando `TRUNCATE`, `CREATE TABLE` e `DROP TABLE` recebe erro de permissão
-- [x] Teste `FUN-11`: `rolbypassrls` é falso para `pelada_app`; `pelada_backup_ro` não tem `INSERT`, `UPDATE` nem `DELETE` em nenhuma tabela
-- [x] Teste `FUN-11`: `pelada_backup_ro` enxerga todas as linhas de todas as tabelas de negócio (policy `USING (true)`)
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-11`: `pelada_app` tentando `TRUNCATE`, `CREATE TABLE` e `DROP TABLE` recebe erro de permissão
+- [ ] Teste `FUN-11`: `rolbypassrls` é falso para `pelada_app`; `pelada_backup_ro` não tem `INSERT`, `UPDATE` nem `DELETE` em nenhuma tabela
+- [ ] Teste `FUN-11`: `pelada_backup_ro` enxerga todas as linhas de todas as tabelas de negócio (policy `USING (true)`)
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -975,10 +971,10 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-12`: todas as tabelas com `grupo_id` do catálogo têm `relforcerowsecurity`
-- [x] Teste `FUN-12`: criar uma tabela de exemplo com `grupo_id` sem RLS ou sem caso na matriz faz o meta-teste falhar (conferido num banco descartável)
-- [x] O meta-teste lê a lista de casos da matriz, para o teste de leitura e o de escrita usarem a mesma fonte
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-12`: todas as tabelas com `grupo_id` do catálogo têm `relforcerowsecurity`
+- [ ] Teste `FUN-12`: criar uma tabela de exemplo com `grupo_id` sem RLS ou sem caso na matriz faz o meta-teste falhar (conferido num banco descartável)
+- [ ] O meta-teste lê a lista de casos da matriz, para o teste de leitura e o de escrita usarem a mesma fonte
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -999,14 +995,13 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-13`, por tabela: a conta A lê só as linhas do grupo A; a conta B lê só as do grupo B; a conta sem vínculo lê zero linhas
-- [x] Tabela sem `GRANT SELECT` para `pelada_app` (ex. `eventos_uso`): o caso espera erro de permissão e o teste confere o motivo
-- [x] Um `USING (true)` colocado de propósito numa policy faz o teste falhar (conferido uma vez e revertido)
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-13`, por tabela: a conta A lê só as linhas do grupo A; a conta B lê só as do grupo B; a conta sem vínculo lê zero linhas
+- [ ] Tabela sem `GRANT SELECT` para `pelada_app` (ex. `eventos_uso`): o caso espera erro de permissão e o teste confere o motivo
+- [ ] Um `USING (true)` colocado de propósito numa policy faz o teste falhar (conferido uma vez e revertido)
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
-**Gate (Lote 7)**: docker compose up -d --wait && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:checagens @ df2df803bfba88948ba8eb97e12c158e56598229 = verde
 
 ---
 
@@ -1026,10 +1021,10 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-17`, por tabela e comando: a conta B afeta zero linhas do grupo A ou recebe erro; o conteúdo do grupo A fica idêntico
-- [x] Teste `FUN-17`: `UPDATE` e `DELETE` sem `WHERE` da conta B não alteram nenhuma linha do grupo A
-- [x] Um `WITH CHECK` removido de propósito faz o teste falhar (conferido uma vez e revertido)
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-17`, por tabela e comando: a conta B afeta zero linhas do grupo A ou recebe erro; o conteúdo do grupo A fica idêntico
+- [ ] Teste `FUN-17`: `UPDATE` e `DELETE` sem `WHERE` da conta B não alteram nenhuma linha do grupo A
+- [ ] Um `WITH CHECK` removido de propósito faz o teste falhar (conferido uma vez e revertido)
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1050,10 +1045,10 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-14`: com `app.slug_publico` do grupo A e sem conta, `SELECT` devolve só linhas do grupo A
-- [x] Teste `FUN-14`: `INSERT`, `UPDATE` e `DELETE` com só o slug são recusados ou afetam zero linhas
-- [x] Teste `FUN-15`: sem nenhum contexto, toda tabela de negócio devolve zero linhas
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-14`: com `app.slug_publico` do grupo A e sem conta, `SELECT` devolve só linhas do grupo A
+- [ ] Teste `FUN-14`: `INSERT`, `UPDATE` e `DELETE` com só o slug são recusados ou afetam zero linhas
+- [ ] Teste `FUN-15`: sem nenhum contexto, toda tabela de negócio devolve zero linhas
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1074,14 +1069,13 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-05`: num banco migrado, cria 1 conta, 1 grupo com vínculo e jogadores, e `comoApp` com essa conta enxerga o grupo
-- [x] Teste `FUN-05`: com host remoto, sai antes de conectar
-- [x] Teste `FUN-05`: rodar duas vezes não duplica nem falha
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-05`: num banco migrado, cria 1 conta, 1 grupo com vínculo e jogadores, e `comoApp` com essa conta enxerga o grupo
+- [ ] Teste `FUN-05`: com host remoto, sai antes de conectar
+- [ ] Teste `FUN-05`: rodar duas vezes não duplica nem falha
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
-**Gate (Lote 8)**: docker compose up -d --wait && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:checagens @ a267c413ea98c6abd0c4da48641534f0173265fc = verde
 
 ---
 
@@ -1101,11 +1095,11 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-20`: assets, `not_found_handling` e `run_worker_first` conforme a spec
-- [x] Teste `FUN-26`: os 4 bindings com os limites de 10, 60, 60 e 60 por minuto
-- [x] Teste `FUN-27`: nome `gestaodapelada-v2`, `workers_dev` verdadeiro, nenhuma chave `routes` nem `custom_domain`
-- [x] O `id` do Hyperdrive fica com o marcador `PREENCHER` até a tarefa de ID real (o teste de ID real é dela)
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-20`: assets, `not_found_handling` e `run_worker_first` conforme a spec
+- [ ] Teste `FUN-26`: os 4 bindings com os limites de 10, 60, 60 e 60 por minuto
+- [ ] Teste `FUN-27`: nome `gestaodapelada-v2`, `workers_dev` verdadeiro, nenhuma chave `routes` nem `custom_domain`
+- [ ] O `id` do Hyperdrive fica com o marcador `PREENCHER` até a tarefa de ID real (o teste de ID real é dela)
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1126,10 +1120,10 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-21`: `GET /api/health` responde 200 com `status` `ok` e `versao` igual à variável do teste
-- [x] Teste `FUN-21`: a rota funciona com o banco parado (sem `HYPERDRIVE` alcançável)
-- [x] Teste `FUN-20`: `GET /` entrega o `index.html` do build e `GET /rota-qualquer` cai na SPA
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-21`: `GET /api/health` responde 200 com `status` `ok` e `versao` igual à variável do teste
+- [ ] Teste `FUN-21`: a rota funciona com o banco parado (sem `HYPERDRIVE` alcançável)
+- [ ] Teste `FUN-20`: `GET /` entrega o `index.html` do build e `GET /rota-qualquer` cai na SPA
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1150,9 +1144,9 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-22`: respostas 200, 404 e 500 de `/api/*` têm `Cache-Control: no-store` e `X-Content-Type-Options: nosniff`
-- [x] Teste `FUN-22`: a rota de saúde também
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-22`: respostas 200, 404 e 500 de `/api/*` têm `Cache-Control: no-store` e `X-Content-Type-Options: nosniff`
+- [ ] Teste `FUN-22`: a rota de saúde também
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1173,14 +1167,13 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-26`: binding que nega gera 429 com `Retry-After` e corpo sem detalhe interno
-- [x] Teste `FUN-26`: binding que permite deixa a requisição passar
-- [x] Teste `FUN-26`: a chave do limite é o IP do cabeçalho `cf-connecting-ip`; sem ele, usa um valor fixo
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-26`: binding que nega gera 429 com `Retry-After` e corpo sem detalhe interno
+- [ ] Teste `FUN-26`: binding que permite deixa a requisição passar
+- [ ] Teste `FUN-26`: a chave do limite é o IP do cabeçalho `cf-connecting-ip`; sem ele, usa um valor fixo
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
-**Gate (Lote 9)**: docker compose up -d --wait && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:checagens @ 5d5018295e87c881d28d460faa5a8568b90b487a = verde
 
 ---
 
@@ -1200,10 +1193,10 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-16`: requisição que não consulta o banco não abre conexão
-- [x] Teste `FUN-16`: depois da resposta, a conexão fecha (`pg_stat_activity` sem a sessão)
-- [x] Teste `FUN-16`: erro de conexão vira 503 sem vazar a URL
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-16`: requisição que não consulta o banco não abre conexão
+- [ ] Teste `FUN-16`: depois da resposta, a conexão fecha (`pg_stat_activity` sem a sessão)
+- [ ] Teste `FUN-16`: erro de conexão vira 503 sem vazar a URL
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1224,11 +1217,11 @@ T81 → T82
 
 **Done when**:
 
-- [x] Casos limite e estados listados antes do código: GET e HEAD somente leitura; POST commit; status 4xx e 5xx rollback; exceção rollback; duas requisições simultâneas de contas diferentes; requisição sem contexto
-- [x] Teste `FUN-16`: o `SET LOCAL` ocorre antes da primeira consulta da rota
-- [x] Teste `FUN-16`: duas requisições concorrentes (conta A e conta B) nunca enxergam o contexto uma da outra, em 100 repetições
-- [x] Teste `FUN-16`: escrita numa rota GET falha; erro 500 desfaz a escrita
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Casos limite e estados listados antes do código: GET e HEAD somente leitura; POST commit; status 4xx e 5xx rollback; exceção rollback; duas requisições simultâneas de contas diferentes; requisição sem contexto
+- [ ] Teste `FUN-16`: o `SET LOCAL` ocorre antes da primeira consulta da rota
+- [ ] Teste `FUN-16`: duas requisições concorrentes (conta A e conta B) nunca enxergam o contexto uma da outra, em 100 repetições
+- [ ] Teste `FUN-16`: escrita numa rota GET falha; erro 500 desfaz a escrita
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1249,9 +1242,9 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-18`: JSON com `caching.disabled: true` passa; ausente ou `false` reprova com mensagem clara
-- [x] Teste `FUN-18`: JSON inválido reprova, sem lançar erro sem tratamento
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-18`: JSON com `caching.disabled: true` passa; ausente ou `false` reprova com mensagem clara
+- [ ] Teste `FUN-18`: JSON inválido reprova, sem lançar erro sem tratamento
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1272,14 +1265,13 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-23`: arquivo de exemplo com `ljssoftware.com.br` reprova; em `docs/` passa
-- [x] Teste `FUN-23`: um `workers.dev` em um `.ts` reprova
-- [x] A checagem roda na base atual e passa
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-23`: arquivo de exemplo com `ljssoftware.com.br` reprova; em `docs/` passa
+- [ ] Teste `FUN-23`: um `workers.dev` em um `.ts` reprova
+- [ ] A checagem roda na base atual e passa
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
-**Gate (Lote 10)**: docker compose up -d --wait && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:checagens @ 04985b7693b5ab6f762314d1fb78d74a5de780f3 = verde
 
 ---
 
@@ -1299,10 +1291,10 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-24`: evento com corpo, cookie, `authorization` e um e-mail na mensagem sai sem nenhum deles
-- [x] Teste `FUN-24`: o evento sem esses campos não muda
-- [x] Teste `FUN-24`: e-mail dentro de breadcrumb e de `extra` também é removido
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-24`: evento com corpo, cookie, `authorization` e um e-mail na mensagem sai sem nenhum deles
+- [ ] Teste `FUN-24`: o evento sem esses campos não muda
+- [ ] Teste `FUN-24`: e-mail dentro de breadcrumb e de `extra` também é removido
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1323,13 +1315,12 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-25`: sem `SENTRY_DSN`, o Worker responde normalmente e nenhuma chamada de rede sai (fetch espiado)
-- [x] Teste `FUN-24`: com DSN falso, a configuração tem `release` igual a `VERSAO` e o `beforeSend` é o de `limparEvento`
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-25`: sem `SENTRY_DSN`, o Worker responde normalmente e nenhuma chamada de rede sai (fetch espiado)
+- [ ] Teste `FUN-24`: com DSN falso, a configuração tem `release` igual a `VERSAO` e o `beforeSend` é o de `limparEvento`
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
-**Gate (Lote 11)**: docker compose up -d --wait && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:checagens @ 10a26f4701c918f4834f8f556f4c0e0a024a2948 = verde
 
 ---
 
@@ -1349,10 +1340,10 @@ T81 → T82
 
 **Done when**:
 
-- [x] `pnpm --filter @pelada/web build` gera `dist/index.html`
-- [x] Teste: o `App` renderiza sem erro no jsdom
-- [x] `pnpm --filter @pelada/web typecheck` passa
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] `pnpm --filter @pelada/web build` gera `dist/index.html`
+- [ ] Teste: o `App` renderiza sem erro no jsdom
+- [ ] `pnpm --filter @pelada/web typecheck` passa
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1373,10 +1364,10 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-30`: `tokens.css`, cada fonte e cada ícone do front têm SHA-256 igual ao do arquivo em `.specs/mockup/`
-- [x] Teste `FUN-30`: alterar um byte do `tokens.css` do front faz o teste falhar (conferido uma vez e revertido)
-- [x] O manifest ainda não existe: só os arquivos entram
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-30`: `tokens.css`, cada fonte e cada ícone do front têm SHA-256 igual ao do arquivo em `.specs/mockup/`
+- [ ] Teste `FUN-30`: alterar um byte do `tokens.css` do front faz o teste falhar (conferido uma vez e revertido)
+- [ ] O manifest ainda não existe: só os arquivos entram
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1397,10 +1388,10 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-32`: um CSS de exemplo com `#fff`, `rgb(...)`, `font-family: Arial` e `box-shadow: 0 0 4px #000` reprova
-- [x] Teste `FUN-32`: um CSS com `var(--...)` passa; o próprio `tokens.css` passa
-- [x] `pnpm lint` na raiz inclui o Stylelint
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-32`: um CSS de exemplo com `#fff`, `rgb(...)`, `font-family: Arial` e `box-shadow: 0 0 4px #000` reprova
+- [ ] Teste `FUN-32`: um CSS com `var(--...)` passa; o próprio `tokens.css` passa
+- [ ] `pnpm lint` na raiz inclui o Stylelint
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1421,14 +1412,13 @@ T81 → T82
 
 **Done when**:
 
-- [x] Passa no Stylelint de FUN-32 sem exceção
-- [x] O build embute as fontes locais e nenhuma requisição externa de fonte é feita
-- [x] `pnpm --filter @pelada/web build` passa
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Passa no Stylelint de FUN-32 sem exceção
+- [ ] O build embute as fontes locais e nenhuma requisição externa de fonte é feita
+- [ ] `pnpm --filter @pelada/web build` passa
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
-**Gate (Lote 12)**: docker compose up -d --wait && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:checagens @ c59a3df05820ae0f672f86fe1bab53cc47eb9b2b = verde
 
 ---
 
@@ -1448,10 +1438,10 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-31`: renderiza com e sem título e entrega a landmark `main`
-- [x] Teste `FUN-31`: axe sem violações
-- [x] CSS Module sem cor, fonte nem sombra literal (Stylelint verde)
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-31`: renderiza com e sem título e entrega a landmark `main`
+- [ ] Teste `FUN-31`: axe sem violações
+- [ ] CSS Module sem cor, fonte nem sombra literal (Stylelint verde)
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1472,10 +1462,10 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-31`: cada variante renderiza com a classe esperada e o clique dispara `onClick`
-- [x] Teste `FUN-31`: `disabled` e `carregando` não disparam o clique
-- [x] Teste `FUN-31`: axe sem violações
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-31`: cada variante renderiza com a classe esperada e o clique dispara `onClick`
+- [ ] Teste `FUN-31`: `disabled` e `carregando` não disparam o clique
+- [ ] Teste `FUN-31`: axe sem violações
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1496,10 +1486,10 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-31`: mostra o texto da mensagem e chama `aoTentarDeNovo` ao clicar
-- [x] Teste `FUN-31`: foco inicial no título ou no botão, conforme o mockup, e axe sem violações
-- [x] A marcação segue as classes do mockup, conferida lendo `.specs/mockup/telas/padrao--erro-rede.html`
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-31`: mostra o texto da mensagem e chama `aoTentarDeNovo` ao clicar
+- [ ] Teste `FUN-31`: foco inicial no título ou no botão, conforme o mockup, e axe sem violações
+- [ ] A marcação segue as classes do mockup, conferida lendo `.specs/mockup/telas/padrao--erro-rede.html`
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1522,9 +1512,9 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-31`: renderiza o número de linhas pedido e `aria-busy="true"`
-- [x] Teste `FUN-31`: axe sem violações
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-31`: renderiza o número de linhas pedido e `aria-busy="true"`
+- [ ] Teste `FUN-31`: axe sem violações
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1545,10 +1535,10 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-36`: com user agent de iPhone e `standalone` falso, o aviso aparece
-- [x] Teste `FUN-36`: em `standalone`, em Android e no desktop, o aviso não aparece
-- [x] Teste `FUN-36`: dispensar o aviso grava a escolha e ele não volta; axe sem violações
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-36`: com user agent de iPhone e `standalone` falso, o aviso aparece
+- [ ] Teste `FUN-36`: em `standalone`, em Android e no desktop, o aviso não aparece
+- [ ] Teste `FUN-36`: dispensar o aviso grava a escolha e ele não volta; axe sem violações
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1569,14 +1559,13 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste: `/` mostra a página provisória e `/qualquer` mostra o 404
-- [x] Teste `FUN-38`: com `VITE_VITRINE=1`, `/_vitrine/erro-rede`, `/_vitrine/carregando-lista` e `/_vitrine/indisponivel` renderizam; sem a variável, caem no 404
-- [x] O build de produção não contém as rotas de vitrine (busca no `dist`)
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste: `/` mostra a página provisória e `/qualquer` mostra o 404
+- [ ] Teste `FUN-38`: com `VITE_VITRINE=1`, `/_vitrine/erro-rede`, `/_vitrine/carregando-lista` e `/_vitrine/indisponivel` renderizam; sem a variável, caem no 404
+- [ ] O build de produção não contém as rotas de vitrine (busca no `dist`)
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
-**Gate (Lote 13)**: docker compose up -d --wait && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:checagens @ e8f8b1ba27714d6e534859946115ae22386337aa = verde
 
 ---
 
@@ -1596,10 +1585,10 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-33` lê o objeto do manifest: nome, `display`, `lang`, `start_url` e `theme_color` do token
-- [x] Teste `FUN-33`: os ícones 192 e 512 existem em `public/icones` e um é `maskable`
-- [x] O build gera `manifest.webmanifest` com os mesmos valores
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-33` lê o objeto do manifest: nome, `display`, `lang`, `start_url` e `theme_color` do token
+- [ ] Teste `FUN-33`: os ícones 192 e 512 existem em `public/icones` e um é `maskable`
+- [ ] O build gera `manifest.webmanifest` com os mesmos valores
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1620,10 +1609,10 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-34`: o SW registra listeners de `push` e `notificationclick`, que não lançam erro com evento vazio
-- [x] Teste `FUN-35`: navegação sem rede numa rota fora do cache responde `offline.html`
-- [x] Teste `FUN-34`: a lista de precache inclui o shell e `offline.html`
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-34`: o SW registra listeners de `push` e `notificationclick`, que não lançam erro com evento vazio
+- [ ] Teste `FUN-35`: navegação sem rede numa rota fora do cache responde `offline.html`
+- [ ] Teste `FUN-34`: a lista de precache inclui o shell e `offline.html`
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1644,9 +1633,9 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-35`: o HTML não referencia nenhuma URL externa e só usa `var(--...)` de tokens ou o CSS do build
-- [x] Teste `FUN-35`: tem `lang="pt-BR"`, título e uma landmark `main`
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-35`: o HTML não referencia nenhuma URL externa e só usa `var(--...)` de tokens ou o CSS do build
+- [ ] Teste `FUN-35`: tem `lang="pt-BR"`, título e uma landmark `main`
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1667,16 +1656,14 @@ T81 → T82
 
 **Done when**:
 
-- [x] Teste `FUN-25`: sem DSN, nada é inicializado e nenhuma requisição sai
-- [x] Teste `FUN-24`: com DSN falso, a configuração usa `release` e `limparEvento`
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-25`: sem DSN, nada é inicializado e nenhuma requisição sai
+- [ ] Teste `FUN-24`: com DSN falso, a configuração usa `release` e `limparEvento`
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
 
 ---
-
-Gate: pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:checagens @ 443c70107b4cf970eed32e9d5dd58efa77a52bab = verde (frontend/web 87 testes, scripts 68, contrato 6, dominio 3, api 15; 0 falharam)
 
 #### Phase 17: Cabeçalhos e e2e
 
@@ -1694,10 +1681,10 @@ Gate: pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test
 
 **Done when**:
 
-- [x] Teste `FUN-29` lê o arquivo: cada cabeçalho presente com o valor esperado
-- [x] Teste `FUN-29`: a CSP não contém `unsafe-inline` nem `unsafe-eval` em `script-src`
-- [x] O build copia o arquivo para o `dist`
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-29` lê o arquivo: cada cabeçalho presente com o valor esperado
+- [ ] Teste `FUN-29`: a CSP não contém `unsafe-inline` nem `unsafe-eval` em `script-src`
+- [ ] O build copia o arquivo para o `dist`
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1718,10 +1705,10 @@ Gate: pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test
 
 **Done when**:
 
-- [x] Teste e2e: `/` mostra a página provisória e `/api/health` responde 200 pelo mesmo servidor
-- [x] `pnpm --filter @pelada/web e2e` passa em máquina limpa com `docker compose up -d` e `playwright install`
-- [x] `testes.json` atualizado e `trava-testes.py --rodar` verde
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste e2e: `/` mostra a página provisória e `/api/health` responde 200 pelo mesmo servidor
+- [ ] `pnpm --filter @pelada/web e2e` passa em máquina limpa com `docker compose up -d` e `playwright install`
+- [ ] `testes.json` atualizado e `trava-testes.py --rodar` verde
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1742,9 +1729,9 @@ Gate: pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test
 
 **Done when**:
 
-- [x] Teste `FUN-29`: `GET /` traz CSP, `nosniff`, `Referrer-Policy` e `Strict-Transport-Security`
-- [x] Teste `FUN-22`: `GET /api/health` traz `no-store` e `nosniff`
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-29`: `GET /` traz CSP, `nosniff`, `Referrer-Policy` e `Strict-Transport-Security`
+- [ ] Teste `FUN-22`: `GET /api/health` traz `no-store` e `nosniff`
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1765,17 +1752,15 @@ Gate: pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test
 
 **Done when**:
 
-- [x] Teste `FUN-37`: o manifest parseado tem os campos de FUN-33
-- [x] Teste `FUN-37`: depois do registro, `navigator.serviceWorker.controller` existe na página
-- [x] Teste `FUN-37`: com `context.setOffline(true)`, uma rota fora do cache mostra o conteúdo da página offline
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-37`: o manifest parseado tem os campos de FUN-33
+- [ ] Teste `FUN-37`: depois do registro, `navigator.serviceWorker.controller` existe na página
+- [ ] Teste `FUN-37`: com `context.setOffline(true)`, uma rota fora do cache mostra o conteúdo da página offline
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
 
 ---
-
-Gate: python .claude/scripts/trava-testes.py --rodar (typecheck, vitest, checagens, build e playwright) @ e461fe0d65d13429d096919f06940db4398cab00 = SUÍTE VERDE, e2e 7 testes
 
 #### Phase 18: Comparação visual e pnpm dev
 
@@ -1793,10 +1778,10 @@ Gate: python .claude/scripts/trava-testes.py --rodar (typecheck, vitest, checage
 
 **Done when**:
 
-- [x] Teste `FUN-38`: duas imagens idênticas dão 0% de diferença e passam
-- [x] Teste `FUN-38`: diferença de 2% reprova e de 0,5% passa
-- [x] Teste `FUN-38`: imagens de tamanhos diferentes reprovam com mensagem clara
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-38`: duas imagens idênticas dão 0% de diferença e passam
+- [ ] Teste `FUN-38`: diferença de 2% reprova e de 0,5% passa
+- [ ] Teste `FUN-38`: imagens de tamanhos diferentes reprovam com mensagem clara
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1817,10 +1802,10 @@ Gate: python .claude/scripts/trava-testes.py --rodar (typecheck, vitest, checage
 
 **Done when**:
 
-- [x] Teste `FUN-38`: as 3 telas × 2 viewports ficam em até 1% de pixels diferentes
-- [x] Um componente deformado de propósito faz a comparação falhar (conferido uma vez e revertido)
-- [x] `testes.json` atualizado e `trava-testes.py --rodar` verde
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-38`: as 3 telas × 2 viewports ficam em até 1% de pixels diferentes
+- [ ] Um componente deformado de propósito faz a comparação falhar (conferido uma vez e revertido)
+- [ ] `testes.json` atualizado e `trava-testes.py --rodar` verde
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1841,17 +1826,15 @@ Gate: python .claude/scripts/trava-testes.py --rodar (typecheck, vitest, checage
 
 **Done when**:
 
-- [x] Teste e2e `FUN-04`: com `pnpm dev` no ar, `GET http://localhost:5173/api/health` responde 200 pelo proxy
-- [x] Teste `FUN-04`: com o Postgres parado, `pnpm dev` sai com a mensagem de `docker compose up -d` (FUN-55)
-- [x] `localConnectionString` não contém senha no arquivo versionado: vem do `.env`
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste e2e `FUN-04`: com `pnpm dev` no ar, `GET http://localhost:5173/api/health` responde 200 pelo proxy
+- [ ] Teste `FUN-04`: com o Postgres parado, `pnpm dev` sai com a mensagem de `docker compose up -d` (FUN-55)
+- [ ] `localConnectionString` não contém senha no arquivo versionado: vem do `.env`
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
 
 ---
-
-Gate: python .claude/scripts/trava-testes.py --rodar (typecheck, vitest, checagens, build, playwright e visual) @ 5678fbd61f0dc168a8b89a35baeeffabb7cdf708 = SUÍTE VERDE, e2e 9 testes, visual 6 comparações até 0,26%
 
 #### Phase 19: Checagens e segredos
 
@@ -1869,10 +1852,10 @@ Gate: python .claude/scripts/trava-testes.py --rodar (typecheck, vitest, checage
 
 **Done when**:
 
-- [x] Teste `FUN-40`: `uses: actions/checkout@v4` reprova; com SHA de 40 caracteres passa
-- [x] Teste `FUN-40`: `uses: ./.github/actions/x` (local) passa
-- [x] A checagem roda nos workflows existentes (`backup.yml`) e passa
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-40`: `uses: actions/checkout@v4` reprova; com SHA de 40 caracteres passa
+- [ ] Teste `FUN-40`: `uses: ./.github/actions/x` (local) passa
+- [ ] A checagem roda nos workflows existentes (`backup.yml`) e passa
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1893,10 +1876,10 @@ Gate: python .claude/scripts/trava-testes.py --rodar (typecheck, vitest, checage
 
 **Done when**:
 
-- [x] Teste `FUN-45`: `wrangler deploy` em `package.json`, num script `.mjs` ou em outro workflow reprova
-- [x] Teste `FUN-45`: o único lugar permitido é o `deploy.yml`
-- [x] Menção em documentação (`docs/`, `README.md`) não reprova
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-45`: `wrangler deploy` em `package.json`, num script `.mjs` ou em outro workflow reprova
+- [ ] Teste `FUN-45`: o único lugar permitido é o `deploy.yml`
+- [ ] Menção em documentação (`docs/`, `README.md`) não reprova
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1917,18 +1900,16 @@ Gate: python .claude/scripts/trava-testes.py --rodar (typecheck, vitest, checage
 
 **Done when**:
 
-- [x] Teste `FUN-46`: variável usada e ausente do `.env.example` reprova
-- [x] Teste `FUN-46`: variável sem a marcação de obrigatoriedade, formato ou segredo reprova
-- [x] `gitleaks detect` local na base atual não encontra segredo
-- [x] Nenhum valor real no `.env.example`
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-46`: variável usada e ausente do `.env.example` reprova
+- [ ] Teste `FUN-46`: variável sem a marcação de obrigatoriedade, formato ou segredo reprova
+- [ ] `gitleaks detect` local na base atual não encontra segredo
+- [ ] Nenhum valor real no `.env.example`
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
 
 ---
-
-Gate: python .claude/scripts/trava-testes.py --rodar @ f96c8b78b1dc89083a1f6b8f16d4bdb3ff668be9 = SUÍTE VERDE; gitleaks detect local sem segredo (130 commits)
 
 #### Phase 20: Workflow de CI
 
@@ -1946,10 +1927,10 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ f96c8b78b1dc89083a1f6b8f1
 
 **Done when**:
 
-- [x] Teste `FUN-40` lê o YAML: gatilhos `push` e `pull_request`, serviço `postgres:18`, e os passos de lint, format, typecheck, checagens, gitleaks, testes e migrar do zero
-- [x] Teste `FUN-40`: nenhum passo usa `continue-on-error`
-- [x] Passa na checagem de SHA (T64)
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-40` lê o YAML: gatilhos `push` e `pull_request`, serviço `postgres:18`, e os passos de lint, format, typecheck, checagens, gitleaks, testes e migrar do zero
+- [ ] Teste `FUN-40`: nenhum passo usa `continue-on-error`
+- [ ] Passa na checagem de SHA (T64)
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1970,16 +1951,14 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ f96c8b78b1dc89083a1f6b8f1
 
 **Done when**:
 
-- [x] Teste `FUN-40`: o job `web` tem build, e2e e visual, e envia o relatório do Playwright em caso de falha
-- [x] Teste `FUN-40`: o workflow completo passa nas checagens de SHA e de `wrangler deploy` único
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-40`: o job `web` tem build, e2e e visual, e envia o relatório do Playwright em caso de falha
+- [ ] Teste `FUN-40`: o workflow completo passa nas checagens de SHA e de `wrangler deploy` único
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
 
 ---
-
-Gate: python .claude/scripts/trava-testes.py --rodar @ f3ca76d7eb120bfe55201204f960d38e58351e26 = SUÍTE VERDE; o ci.yml ainda não rodou no GitHub (sem push, T80 e T82)
 
 #### Phase 21: Deploy da prévia
 
@@ -1997,10 +1976,10 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ f3ca76d7eb120bfe55201204f
 
 **Done when**:
 
-- [x] Teste `FUN-42` com `fetch` simulado: cria a branch com o pai `main` e o nome do `run_id`
-- [x] Teste `FUN-42`: com 4 branches de restauração, apaga as 2 mais antigas e nunca apaga `main`, `dev` nem outra que não seja de restauração
-- [x] Teste `FUN-42`: erro da API interrompe com código diferente de 0
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-42` com `fetch` simulado: cria a branch com o pai `main` e o nome do `run_id`
+- [ ] Teste `FUN-42`: com 4 branches de restauração, apaga as 2 mais antigas e nunca apaga `main`, `dev` nem outra que não seja de restauração
+- [ ] Teste `FUN-42`: erro da API interrompe com código diferente de 0
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -2021,13 +2000,13 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ f3ca76d7eb120bfe55201204f
 
 **Done when**:
 
-- [x] Teste `FUN-41`: só `workflow_dispatch`, condição de `main`, `environment: producao` (AD-119)
-- [x] Teste `FUN-57`: `concurrency` com `cancel-in-progress: false`
-- [x] Teste `FUN-42`: a ordem dos passos é build, restauração, dump, migração, deploy, saúde
-- [x] Teste `FUN-43`: o build vem antes de qualquer passo que use secrets do Neon ou da Cloudflare
-- [x] Teste `FUN-44`: o `wrangler deploy` depende do passo de migração (sem `continue-on-error`)
-- [x] Teste `FUN-58`: `URL_PUBLICA` vazia faz um passo anterior ao deploy falhar
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-41`: só `workflow_dispatch`, condição de `main`, `environment: producao` (AD-119)
+- [ ] Teste `FUN-57`: `concurrency` com `cancel-in-progress: false`
+- [ ] Teste `FUN-42`: a ordem dos passos é build, restauração, dump, migração, deploy, saúde
+- [ ] Teste `FUN-43`: o build vem antes de qualquer passo que use secrets do Neon ou da Cloudflare
+- [ ] Teste `FUN-44`: o `wrangler deploy` depende do passo de migração (sem `continue-on-error`)
+- [ ] Teste `FUN-58`: `URL_PUBLICA` vazia faz um passo anterior ao deploy falhar
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -2048,10 +2027,10 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ f3ca76d7eb120bfe55201204f
 
 **Done when**:
 
-- [x] Teste `FUN-28`: `name: gestaodapelada` reprova; `gestaodapelada-v2` passa
-- [x] Teste `FUN-28`: `routes` e `custom_domain` no `wrangler.jsonc` e no `deploy.yml` reprovam, e `environment: producao` passa (AD-119)
-- [x] A checagem passa nos arquivos reais
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-28`: `name: gestaodapelada` reprova; `gestaodapelada-v2` passa
+- [ ] Teste `FUN-28`: `routes` e `custom_domain` no `wrangler.jsonc` e no `deploy.yml` reprovam, e `environment: producao` passa (AD-119)
+- [ ] A checagem passa nos arquivos reais
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -2072,17 +2051,15 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ f3ca76d7eb120bfe55201204f
 
 **Done when**:
 
-- [x] Teste `FUN-42` com um servidor local: `versao` igual ao SHA passa
-- [x] Teste `FUN-42`: `versao` diferente ou resposta 500 depois das tentativas reprova
-- [x] Teste `FUN-42`: servidor que responde na 3ª tentativa passa
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-42` com um servidor local: `versao` igual ao SHA passa
+- [ ] Teste `FUN-42`: `versao` diferente ou resposta 500 depois das tentativas reprova
+- [ ] Teste `FUN-42`: servidor que responde na 3ª tentativa passa
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
 
 ---
-
-Gate: python .claude/scripts/trava-testes.py --rodar @ 19b860394665c048cbc161d58dd7921b5406b630 = SUÍTE VERDE; o deploy.yml não rodou (sem push nem disparo, T80 e T82; AD-119)
 
 #### Phase 22: Runbook
 
@@ -2100,10 +2077,10 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ 19b860394665c048cbc161d58
 
 **Done when**:
 
-- [x] Cada procedimento tem comandos exatos e o resultado esperado
-- [x] Um agente sem contexto consegue seguir o procedimento de restauração (conferido na validação da fase 7)
-- [x] `pnpm format:check` passa
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Cada procedimento tem comandos exatos e o resultado esperado
+- [ ] Um agente sem contexto consegue seguir o procedimento de restauração (conferido na validação da fase 7)
+- [ ] `pnpm format:check` passa
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
@@ -2124,10 +2101,10 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ 19b860394665c048cbc161d58
 
 **Done when**:
 
-- [x] Lista cada secret do environment `previa` e do `producao`, sem valores
-- [x] O passo de produção traz: desligar o Worker do LJS, dump cifrado e branch de restauração da `main` antes, domínio, Hyperdrive de produção
-- [x] Descreve o monitor do UptimeRobot em `GET /api/health`
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Lista cada secret do environment `previa` e do `producao`, sem valores
+- [ ] O passo de produção traz: desligar o Worker do LJS, dump cifrado e branch de restauração da `main` antes, domínio, Hyperdrive de produção
+- [ ] Descreve o monitor do UptimeRobot em `GET /api/health`
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
@@ -2150,10 +2127,10 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ 19b860394665c048cbc161d58
 
 **Done when**:
 
-- [x] Os comandos do README levam do clone ao app em `http://localhost:5173` (conferido seguindo-o na validação)
-- [x] Cada variável do `.env.example` é citada
-- [x] `pnpm format:check` passa
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Os comandos do README levam do clone ao app em `http://localhost:5173` (conferido seguindo-o na validação)
+- [ ] Cada variável do `.env.example` é citada
+- [ ] `pnpm format:check` passa
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
@@ -2174,16 +2151,14 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ 19b860394665c048cbc161d58
 
 **Done when**:
 
-- [x] Descreve stack, comandos, estrutura de pastas, regras de banco (migrações aditivas) e onde ficam as ADs
-- [x] Não duplica o conteúdo de `.claude/CLAUDE.md`
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Descreve stack, comandos, estrutura de pastas, regras de banco (migrações aditivas) e onde ficam as ADs
+- [ ] Não duplica o conteúdo de `.claude/CLAUDE.md`
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
 
 ---
-
-Gate: python .claude/scripts/trava-testes.py --rodar @ 27be2bb46c018b91ec4296490ef13b7da7dab49c = SUÍTE VERDE; conferências "na validação" (T73 restauração seguida por agente sem contexto; T75 clone ao app) ficam para o /validar
 
 #### Phase 24: Passos do usuário e paridade com a dev
 
@@ -2201,10 +2176,10 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ 27be2bb46c018b91ec4296490
 
 **Done when**:
 
-- [x] A branch `dev` existe, criada da `main` depois da data de hoje
-- [x] As três URLs funcionam com `psql -c 'select 1'` (o usuário confirma, sem colar valores)
-- [x] A chave de API tem o menor escopo possível
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] A branch `dev` existe, criada da `main` depois da data de hoje
+- [ ] As três URLs funcionam com `psql -c 'select 1'` (o usuário confirma, sem colar valores)
+- [ ] A chave de API tem o menor escopo possível
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
@@ -2249,16 +2224,14 @@ Gate: python .claude/scripts/trava-testes.py --rodar @ 27be2bb46c018b91ec4296490
 
 **Done when**:
 
-- [x] Teste `FUN-27`: o `id` do Hyperdrive é um hex de 32 caracteres, não o marcador
-- [x] `wrangler.jsonc` sem outra mudança
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-27`: o `id` do Hyperdrive é um hex de 32 caracteres, não o marcador
+- [ ] `wrangler.jsonc` sem outra mudança
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
 
 ---
-
-Gate: pnpm --filter @pelada/api exec vitest run test/config/wrangler.test.ts + hyperdrive.test.ts + format:check + typecheck @ 7cd73ffd611a9a88a8c1421b3b22b728d4459831 = verde; ID e cache desligado conferidos na tela do painel da Cloudflare (AD-032, AD-119)
 
 ### T80: Paridade e zero DDL na dev
 
@@ -2274,18 +2247,16 @@ Gate: pnpm --filter @pelada/api exec vitest run test/config/wrangler.test.ts + h
 
 **Done when**:
 
-- [x] Teste `FUN-08` do comparador com dois bancos locais: igual dá 0 diferenças, e uma diferença é listada
-- [x] Execução na `dev`: as diferenças da `dev` contra a referência são zero, ou a lista é registrada em `STATE.md` e decidida
-- [x] Execução na `dev`: `migrar` com zero DDL e contagem de linhas por tabela idêntica antes e depois (FUN-09)
-- [ ] `pelada_owner` existe na `dev` e é conferida (AD-009), e `pelada_app` e `pelada_backup_ro` batem com FUN-11 (pelada_owner existe e pelada_app confere; pelada_backup_ro NÃO confere: sem SELECT e sem policies na dev, AD-120)
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `FUN-08` do comparador com dois bancos locais: igual dá 0 diferenças, e uma diferença é listada
+- [ ] Execução na `dev`: as diferenças da `dev` contra a referência são zero, ou a lista é registrada em `STATE.md` e decidida
+- [ ] Execução na `dev`: `migrar` com zero DDL e contagem de linhas por tabela idêntica antes e depois (FUN-09)
+- [ ] `pelada_owner` existe na `dev` e é conferida (AD-009), e `pelada_app` e `pelada_backup_ro` batem com FUN-11
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
 
 ---
-
-Gate: python .claude/scripts/trava-testes.py --rodar @ f4b22ce3ecf7456e090aaac9bb5adcf8cb13dcca = SUÍTE VERDE; `esquema:comparar --alvo dev --migrar`: 0 migrações, 0 DDL, contagem igual; 52 faltando e 3 sobrando registrados na AD-120
 
 #### Phase 25: CI verde e primeiro deploy
 

@@ -1,6 +1,7 @@
 # Conta e acesso — Tarefas
 
 **Modo**: enxuto
+**Passada**: rascunho
 **Base**: `ljs:.specs/features/conta-e-acesso/spec.md` (aprovada em 2026-10-26, ACE-01 a ACE-76), `ljs:.specs/features/conta-e-acesso/design.md`, `ljs:.specs/features/conta-e-acesso/context.md`, `ljs:.specs/features/conta-e-acesso/seguranca.md`, `ljs:.specs/features/conta-e-acesso/validation.md` (PASS) e o mockup de módulo `ljs:.specs/features/conta-e-acesso/mockup/`, com `ljs:` = `C:\Leandro\Projetos\GestaoDaPelada_LJS` @ `e557292`, conferido em 2026-11-03. Contrato da fundação v2: `.specs/features/fundacao/spec.md`, `design.md` e `tasks.md`.
 **Branch pai**: `feature/fundacao` (a fundação ainda não estará integrada quando esta feature for executada). Se a fundação já estiver integrada na `main` quando o `/executar` começar, a Branch pai passa a ser `main`.
 **Feature**: 2 de 8 do roteiro (AD-001, AD-015). Requisitos `ACE-*`.

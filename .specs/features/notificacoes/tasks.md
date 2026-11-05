@@ -1,6 +1,7 @@
 # Notificações — Tarefas
 
 **Modo**: enxuto
+**Passada**: rascunho
 **Base**: .specs/features/notificacoes/spec.md (aprovada em 2026-11-04), conferido em 2026-11-04. Contratos (nada executado ainda): fundação v2, `conta-e-acesso`, `grupos-e-elenco` e `partidas-e-ranking` (`tasks.md` de cada uma) e a spec aprovada da `planos-e-cobranca` (o `tasks.md` dela está sendo gravado em paralelo).
 **Branch pai**: `feature/planos-e-cobranca` (a `planos-e-cobranca` ainda não estará integrada). Se já estiver integrada na `main` quando o `/executar` começar, a Branch pai passa a ser `main`.
 **Feature**: 8 de 8 do roteiro (AD-001, AD-015). Requisitos `NOT-*`.
