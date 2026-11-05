@@ -1,4 +1,29 @@
 {
-  "_leia": "Telas reais do .specs/mockup/telas.json (entradas com real: true) que entram na comparação visual (T54, AD-021): uma linha { id, estado } por estado. O runner é o e2e/visual.mjs.",
-  "telas": []
+  "_leia": "Telas reais do .specs/mockup/telas.json (entradas com real: true) que entram na comparação visual (T54, AD-021): uma linha { id, estado } por estado. O runner é o e2e/visual.mjs. Telas públicas de acesso: T55.",
+  "telas": [
+    { "id": "T04", "estado": "vazio" },
+    { "id": "T04", "estado": "sessao-expirada" },
+    { "id": "T04", "estado": "nao-confirmado" },
+    { "id": "T05", "estado": "vazio" },
+    { "id": "T05", "estado": "erro" },
+    { "id": "T05", "estado": "sucesso" },
+    { "id": "T06", "estado": "vazio" },
+    { "id": "T06", "estado": "erro" },
+    { "id": "T06", "estado": "invalido" },
+    { "id": "T06", "estado": "sucesso" },
+    { "id": "T07", "estado": "pagina" },
+    { "id": "T29", "estado": "vazio" },
+    { "id": "T29", "estado": "carregando" },
+    { "id": "T29", "estado": "erro" },
+    { "id": "T29", "estado": "sucesso" },
+    { "id": "T30", "estado": "carregando" },
+    { "id": "T30", "estado": "invalido" },
+    { "id": "T30", "estado": "reenviado" },
+    { "id": "T31", "estado": "carregando" },
+    { "id": "T31", "estado": "invalido" },
+    { "id": "T31", "estado": "sem-conta" },
+    { "id": "T31", "estado": "logado" },
+    { "id": "T31", "estado": "outro-email" },
+    { "id": "T33", "estado": "pagina" }
+  ]
 }

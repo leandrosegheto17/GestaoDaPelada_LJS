@@ -187,6 +187,35 @@ async function principal() {
     } else {
       console.log(`ok    controle: o componente deslocado reprovou (${porcentagem(r.proporcao)}).`);
     }
+
+    // Controle das telas reais (T55): a primeira, deformada, também tem de reprovar.
+    const real = reais[0];
+    if (real) {
+      const paginaMockup = await contexto.newPage();
+      const paginaApp = await contexto.newPage();
+      try {
+        await aplicarRespostas(paginaApp, real.entrada, { mockup: MOCKUP, globais: mapa.respostas ?? [] });
+        const m = await printTela(paginaMockup, pathToFileURL(join(MOCKUP, real.entrada.mockup)).href, real.viewport, {
+          recorte: recorteDe(real.entrada, 'mockup'),
+        });
+        const d = await printTela(paginaApp, `${URL_BASE}${real.entrada.rota}`, real.viewport, {
+          passos: real.entrada.passos,
+          esperar: real.entrada.esperar,
+          recorte: recorteDe(real.entrada, 'app'),
+          css: DEFORMACAO,
+        });
+        const rr = compararPng(m, d, { limite: real.limite });
+        if (rr.passou) {
+          console.log(`FALHA controle ${real.nome}: a tela deformada passou (${porcentagem(rr.proporcao)}).`);
+          falhas += 1;
+        } else {
+          console.log(`ok    controle ${real.nome}: a tela deformada reprovou (${porcentagem(rr.proporcao)}).`);
+        }
+      } finally {
+        await paginaMockup.close();
+        await paginaApp.close();
+      }
+    }
     await contexto.close();
   } finally {
     await navegador.close();

@@ -83,6 +83,14 @@ describe('entradasAtivas', () => {
   it('ACE-55: todas as entradas do telas-ativas.json existem no telas.json', () => {
     expect(() => entradasAtivas(MAPA, ATIVAS)).not.toThrow();
   });
+
+  it('ACE-54, ACE-55: todos os estados reais das telas públicas de acesso estão ativos (T55)', () => {
+    const publicas = ['T04', 'T05', 'T06', 'T07', 'T29', 'T30', 'T31', 'T33'];
+    const esperados = (MAPA.telas ?? []).filter((t) => t.real === true && publicas.includes(t.id)).map((t) => `${t.id} ${t.estado}`);
+    const ativos = ATIVAS.telas.map((t) => `${t.id} ${t.estado}`);
+    expect(esperados.length).toBeGreaterThan(0);
+    for (const e of esperados) expect(ativos).toContain(e);
+  });
 });
 
 describe('recorteDe', () => {

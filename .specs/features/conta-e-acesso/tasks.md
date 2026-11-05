@@ -1758,6 +1758,8 @@ T57 → T58
 **Depends on**: T54
 **Reuses**: entradas de `telas.json:152-182`; runner de T54
 **Requirement**: ACE-54, ACE-55
+**Status**: rascunhada
+**Nota do rascunho**: o `telas-ativas.json` lista os 24 estados reais de T04, T05, T06, T07, T29, T30, T31 e T33; um teste confere que nenhum estado real dessas telas ficou de fora. O controle de deformação do runner passou a rodar também na primeira tela real (deslocada de 40 px, tem de reprovar). Os ajustes de CSS e componentes até 1% ficam para o `/executar`, com os prints em `test-results/visual/`.
 
 **Done when**:
 
