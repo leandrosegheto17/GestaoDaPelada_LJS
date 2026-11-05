@@ -701,6 +701,8 @@ T47 → T48
 **Depends on**: T15
 **Reuses**: `auditoria.registrar` (`CA:844`); molde de repositório com auditoria (`PR:1159`); regra da trava de `L:backend/api/src/infraestrutura/db/repositorios/financeiro/config.ts:19-39` (só consulta)
 **Requirement**: FIN-01, FIN-04, FIN-05, FIN-06
+**Status**: rascunhada
+**Nota do rascunho**: `SPEC_DEVIATION`: a assinatura ficou `salvarConfig(db, grupoId, dados)`, sem `contaId` e `agora`, porque `auditoria.registrar` (`convites.ts:24`) já usa `app_conta_id()` e `now()` e a tabela não tem autoria. O repositório sai como `configFinanceira` (`lerConfig`, `salvarConfig`) e devolve `{ antes, depois }`; as rotas (T25) usam essa forma.
 
 **Done when**:
 
