@@ -394,6 +394,8 @@ T53 → T54
 **Depends on**: T2
 **Reuses**: Regra de `L:backend/dominio/src/simulador/previa.ts`; critérios `S:110-114`; Independent Test `S:118`
 **Requirement**: SIM-09, SIM-10, SIM-11, SIM-12, SIM-13
+**Status**: rascunhada
+**Nota do rascunho**: `calcularPrevia({ formato, n, aptos })` recebe a quantidade de aptos (o K não muda a prévia); a prévia carrega `n` e `aptos` para a descrição (T4).
 
 **Done when**:
 
