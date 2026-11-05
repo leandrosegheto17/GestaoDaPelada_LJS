@@ -1697,6 +1697,8 @@ T81 → T82
 **Depends on**: T53
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-34, FUN-35
+**Status**: rascunhada
+**Nota do rascunho**: as regras ficam em `src/pwa/servico.ts` (testado em ambiente node) e o `sw.ts` só as liga ao Workbox: o precache responde primeiro (shell em `/`), a navegação que sobra vai à rede e, sem rede, recebe `offline.html`; `/api/` fica fora do fallback. O `sw.ts` declara tipos mínimos de `self` em vez de `lib: webworker`, que colide com a `lib: DOM`. O `offline.html` só nasce na T55: até lá o precache o acrescenta sem revisão. A prova no navegador é da T60.
 
 **Done when**:
 
