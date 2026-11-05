@@ -1461,6 +1461,8 @@ T53 → T54
 **Depends on**: T41, T25
 **Reuses**: Script de ensaio da `partidas-e-ranking` (`PR:1684`, T81); restauração (`F:584`); `lerEsquema` e a referência (`F:736`, `F:784`); `F:834`; AD-073
 **Requirement**: SIM-67 (AD-037, AD-048)
+**Status**: rascunhada
+**Nota do rascunho**: o `ensaiar` ganha `mudancaDoEsquema` (schema do dump antes × depois, só informativo) e o imprime; teste em `test/ensaio-migracao-simulador.test.ts` com dump simulado até antes da `grupo-criar-contrair`. A `Evidência` com o backup real (pausa para o usuário) é do /executar.
 
 **Done when**:
 

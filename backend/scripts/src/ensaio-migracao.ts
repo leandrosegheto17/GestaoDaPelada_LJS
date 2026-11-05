@@ -1,5 +1,5 @@
 import { randomBytes } from 'node:crypto';
-import { TABELAS_IGNORADAS, lerReferencia } from '@pelada/api/esquema';
+import { OPCOES_REFERENCIA, TABELAS_IGNORADAS, lerEsquema, lerReferencia } from '@pelada/api/esquema';
 import { migrar } from '@pelada/api/migrar';
 import type pg from 'pg';
 import { contarLinhas, restaurarBackup } from '../ops/restaurar-backup.ts';
@@ -25,6 +25,9 @@ import { exigirHostPermitido, HOSTS_LOCAIS } from './host.ts';
  *    propósito (`podeGanhar` por padrão) e ganha exatamente uma linha por grupo que deixou de estar sem configuração;
  *    quando a `pesos-padrao` é aplicada no ensaio, nenhum grupo pode ficar sem configuração.
  * O schema conferido no passo 3 já inclui as funções, grants e a policy das migrações de partidas (PAR-91).
+ * 7. mudança do schema do dump (simulador T42; SIM-67, AD-037, AD-048, AD-073): o schema lido antes de migrar contra o
+ *    de depois, para a evidência mostrar o que as migrações em ensaio tiraram e puseram (com a `grupo-criar-contrair`,
+ *    só a `grupo_criar` de 6 parâmetros sai). Só informa: quem reprova é a referência do passo 3.
  */
 
 export class ErroEnsaio extends Error {
@@ -67,6 +70,12 @@ export interface AmostraAcesso {
   lidasSemAcesso?: number;
 }
 
+/** O que o schema do dump perdeu e ganhou com as migrações em ensaio (linhas do `lerEsquema`). */
+export interface MudancaDoEsquema {
+  removidas: string[];
+  novas: string[];
+}
+
 export interface RelatorioEnsaio {
   aplicadas: string[];
   antes: Record<string, number>;
@@ -77,7 +86,22 @@ export interface RelatorioEnsaio {
   segundaExecucao: string[];
   amostra: AmostraAcesso | null;
   pesos: PesosNoEnsaio;
+  mudancaDoEsquema: MudancaDoEsquema;
   ok: boolean;
+}
+
+async function esquemaDe(url: string): Promise<string[]> {
+  return comConexao(url, (c) => lerEsquema(c, OPCOES_REFERENCIA));
+}
+
+/** Linhas que só existem antes (removidas) e só depois (novas), ordenadas. */
+export function mudancaDoEsquema(antes: readonly string[], depois: readonly string[]): MudancaDoEsquema {
+  const deDepois = new Set(depois);
+  const deAntes = new Set(antes);
+  return {
+    removidas: antes.filter((l) => !deDepois.has(l)).sort(),
+    novas: depois.filter((l) => !deAntes.has(l)).sort(),
+  };
 }
 
 async function gruposSemConfig(url: string): Promise<number> {
@@ -176,6 +200,7 @@ export async function ensaiar(url: string, opcoes: OpcoesEnsaio = {}): Promise<R
     );
   }
   const semConfigAntes = await gruposSemConfig(url);
+  const esquemaAntes = await esquemaDe(url);
 
   const aplicadas = await migrar(url, { pasta: opcoes.pasta });
   const depois = semIgnoradas(await contarLinhas(url));
@@ -185,6 +210,7 @@ export async function ensaiar(url: string, opcoes: OpcoesEnsaio = {}): Promise<R
     linhasNovas: (depois.config_pesos ?? 0) - (antes.config_pesos ?? 0),
   };
   const esquema = await compararEsquema(url, referencia);
+  const mudanca = mudancaDoEsquema(esquemaAntes, await esquemaDe(url));
 
   const segundaExecucao = await migrar(url, { pasta: opcoes.pasta });
   const depoisDaSegunda = semIgnoradas(await contarLinhas(url));
@@ -199,7 +225,7 @@ export async function ensaiar(url: string, opcoes: OpcoesEnsaio = {}): Promise<R
     segundaExecucao.length === 0 &&
     amostraOk(amostra) &&
     pesosOk(pesos, aplicadas);
-  return { aplicadas, antes, depois, tabelasAlteradas, esquema, segundaExecucao, amostra, pesos, ok };
+  return { aplicadas, antes, depois, tabelasAlteradas, esquema, segundaExecucao, amostra, pesos, mudancaDoEsquema: mudanca, ok };
 }
 
 export const URL_BASE_ENSAIO = process.env.DATABASE_URL_TESTE ?? 'postgres://postgres:postgres@127.0.0.1:5432/pelada';
@@ -237,6 +263,10 @@ function imprimir(r: RelatorioEnsaio): void {
   console.log(`Schema: faltando ${r.esquema.faltando.length}, sobrando ${r.esquema.sobrando.length}`);
   for (const l of r.esquema.faltando) console.log(`  - ${l}`);
   for (const l of r.esquema.sobrando) console.log(`  + ${l}`);
+  const m = r.mudancaDoEsquema;
+  console.log(`Mudança do schema do dump: ${m.removidas.length} linhas removidas, ${m.novas.length} novas`);
+  for (const l of m.removidas) console.log(`  - ${l}`);
+  for (const l of m.novas) console.log(`  + ${l}`);
   console.log(`Segunda execução: ${r.segundaExecucao.length === 0 ? 'nada a aplicar' : r.segundaExecucao.join(', ')}`);
   const a = r.amostra;
   console.log(
