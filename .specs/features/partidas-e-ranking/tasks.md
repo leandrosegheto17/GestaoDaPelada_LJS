@@ -1908,6 +1908,8 @@ T78 → T79
 **Depends on**: T52
 **Reuses**: `reuso.md` R-01 a R-19
 **Requirement**: PAR-146
+**Status**: rascunhada
+**Nota do rascunho**: os 19 arquivos copiados com o comando do `reuso.md` (`git archive c6dc82c` + `tar -x`, `c6dc82c451c0` conferido); o `cmp` arquivo a arquivo e a abertura da galeria ficam para o `/executar`.
 
 **Done when**:
 
