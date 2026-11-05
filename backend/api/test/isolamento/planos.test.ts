@@ -233,6 +233,9 @@ const FUNCOES_DO_PLANO: readonly string[] = [
   // T12
   'plano_do_grupo(uuid)',
   'plano_grupos_da_criadora(uuid)',
+  // T14
+  'assinatura_registrar(uuid, text, text, integer, text)',
+  'assinatura_cancelar(uuid)',
 ];
 
 describe('PLA-13: funções do plano sem EXECUTE para PUBLIC', () => {

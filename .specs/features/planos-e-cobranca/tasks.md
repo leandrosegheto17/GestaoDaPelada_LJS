@@ -680,6 +680,8 @@ T56 → T57
 **Depends on**: T13
 **Reuses**: conferência da criadora de `M:1792844520000_grupos-arquivar-so-criadora.sql:8-20`; molde `SECURITY DEFINER` de `M:1792844340000_grupo-criar.sql:18-21,74-75`; AD-088
 **Requirement**: PLA-13, PLA-14, PLA-30, PLA-55
+**Status**: rascunhada
+**Nota do rascunho**: casos limite no topo da migração; sem lacuna. Cancelar em grupo arquivado continua valendo (o cancelamento nunca fica preso); `assinatura_cancelar` devolve a situação anterior da assinatura, para a T34.
 
 **Done when**:
 
