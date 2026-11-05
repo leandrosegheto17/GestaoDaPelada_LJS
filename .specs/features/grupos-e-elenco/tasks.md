@@ -596,6 +596,7 @@ T73 → T74 → T75
 **Depends on**: T8
 **Reuses**: interfaces de `GD:117` e `GD:123`
 **Requirement**: GEL-47, GEL-48
+**Status**: rascunhada
 
 **Done when**:
 
