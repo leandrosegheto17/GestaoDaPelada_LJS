@@ -3,8 +3,11 @@ import type { Hono } from 'hono';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { Ambiente, Env } from '../../src/entrada/ambiente.ts';
 import { criarApp } from '../../src/entrada/app.ts';
+import { asaasMemoria } from '../../src/infraestrutura/asaas/memoria.ts';
+import { NOME_COOKIE_SESSAO } from '../../src/infraestrutura/sessao/cookie.ts';
 import { gerarToken } from '../../src/infraestrutura/sessao/token.ts';
-import { cliente, conviteDeTeste, limparCaixa } from '../acesso/apoio.ts';
+import { cliente, conviteDeTeste, envAcesso, limparCaixa } from '../acesso/apoio.ts';
+import { contextoFalso, fabricaComoApp } from '../db/requisicao.ts';
 import { chavesAssinante, chavesVapid, endpointDe } from '../rotas/apoio-push.ts';
 import { abrirCenarioGrupos, type CenarioGruposAberto } from './cenario-grupos.ts';
 
@@ -35,6 +38,10 @@ import { abrirCenarioGrupos, type CenarioGruposAberto } from './cenario-grupos.t
  * notificacoes T32 (NOT-53, NOT-54): as 8 rotas de push (`ROTAS_DE_PUSH`): as 4 públicas com o slug de G e a assinatura
  * de H (e o contrário), as 4 da conta com a sessão de B e a assinatura de A; e nenhuma resposta GET do app, nem da
  * criadora de G, traz os valores semeados de endpoint, `p256dh` ou `auth`.
+ *
+ * planos-e-cobranca T39 (PLA-09, PLA-32): as 3 rotas de grupo do plano (`ROTAS_DO_PLANO`) com o 404 cruzado (B contra
+ * G e C contra H), sem nenhuma chamada ao Asaas em memória e sem mudar plano, assinatura nem auditoria de G e de H; e o
+ * webhook, rota sem sessão, que com a sessão de B e sem o token responde 401 e não lê nem muda nada de grupo.
  */
 
 let aberto: CenarioGruposAberto;
@@ -1118,8 +1125,146 @@ const ROTAS_DE_PUSH: Record<string, Linha> = {
   }),
 };
 
+// ---------------------------------------------------------------- planos e cobrança (T39)
+
+/** Asaas em memória das rotas do plano: nenhuma tentativa cruzada pode chamá-lo (PLA-32). */
+const asaasDoIsolamento = asaasMemoria();
+const TOKEN_WEBHOOK_ISOLAMENTO = 'token-do-webhook-do-isolamento-t39';
+const FATURA_DE_G = 'https://sandbox.asaas.com/i/pay_t39_de_g';
+const FATURA_DE_H = 'https://sandbox.asaas.com/i/pay_t39_de_h';
+
+/** O que do plano de G e de H nenhuma rota cruzada pode mudar. */
+async function retratoDoPlano(): Promise<string> {
+  const { db, cenario } = aberto;
+  const grupos = [cenario.grupoG, cenario.grupoH];
+  const partes = await Promise.all([
+    db.query(
+      `SELECT id, situacao_comercial, trial_inicio::text FROM grupos WHERE id = ANY($1::uuid[]) ORDER BY id`,
+      [grupos],
+    ),
+    db.query(
+      `SELECT grupo_id, asaas_assinatura_id, situacao, pago_ate::text, fatura_url FROM assinaturas
+        WHERE grupo_id = ANY($1::uuid[]) ORDER BY asaas_assinatura_id`,
+      [grupos],
+    ),
+    db.query(
+      `SELECT count(*)::int AS n FROM auditoria WHERE grupo_id = ANY($1::uuid[]) AND acao LIKE 'plano\\_%' ESCAPE '\\'`,
+      [grupos],
+    ),
+  ]);
+  return JSON.stringify(partes.map((p) => p.rows));
+}
+
+/** Uma assinatura pendente em G (de C) e outra em H (de B), com a fatura, apagadas no fim do caso. */
+async function comAssinaturasSemeadas(fn: () => Promise<void>): Promise<void> {
+  const { db, cenario } = aberto;
+  await db.query(
+    `INSERT INTO assinaturas (grupo_id, asaas_cliente_id, asaas_assinatura_id, valor_centavos, situacao, fatura_url,
+       criada_por, criada_em)
+     VALUES ($1, 'cus_t39_g', 'sub_t39_g', 990, 'aguardando_pagamento', $2, $3, now()),
+            ($4, 'cus_t39_h', 'sub_t39_h', 990, 'aguardando_pagamento', $5, $6, now())`,
+    [cenario.grupoG, FATURA_DE_G, cenario.contaC, cenario.grupoH, FATURA_DE_H, cenario.contaB],
+  );
+  try {
+    await fn();
+  } finally {
+    await db.query(`DELETE FROM assinaturas WHERE asaas_assinatura_id IN ('sub_t39_g', 'sub_t39_h')`);
+  }
+}
+
+/** Pedido ao app com o Asaas em memória (o `cliente` do apoio não o recebe). */
+async function pedirComAsaas(
+  caminho: string,
+  p: { metodo: string; sessao?: string; corpo?: unknown; token?: string },
+): Promise<Response> {
+  const headers = new Headers({
+    'x-pelada': '1',
+    'content-type': 'application/json',
+    'cf-connecting-ip': '203.0.113.39',
+  });
+  if (p.sessao) headers.set('cookie', `${NOME_COOKIE_SESSAO}=${p.sessao}`);
+  if (p.token) headers.set('asaas-access-token', p.token);
+  const ctx = contextoFalso();
+  const r = await criarApp({ fabricaBanco: fabricaComoApp().fabrica, asaas: asaasDoIsolamento }).request(
+    `/api${caminho}`,
+    {
+      method: p.metodo,
+      headers,
+      ...(p.corpo !== undefined ? { body: JSON.stringify(p.corpo) } : {}),
+    },
+    envAcesso(aberto.url, { ASAAS_WEBHOOK_TOKEN: TOKEN_WEBHOOK_ISOLAMENTO }),
+    ctx,
+  );
+  await ctx.esperar();
+  return r;
+}
+
+/** Caso de rota de grupo do plano: B contra G e C contra H dão 404, sem Asaas, sem fatura do outro e sem mudança. */
+function casoDoPlano(p: { metodo: string; corpo?: unknown }): Linha {
+  return {
+    caso: async () => {
+      const { cenario } = aberto;
+      await comAssinaturasSemeadas(async () => {
+        const antes = await retratoDoPlano();
+        asaasDoIsolamento.limpar();
+
+        const bEmG = await pedirComAsaas(`/grupos/${cenario.grupoG}/${p.metodo === 'GET' ? 'plano' : 'assinatura'}`, {
+          metodo: p.metodo,
+          sessao: sessaoB,
+          ...(p.corpo !== undefined ? { corpo: p.corpo } : {}),
+        });
+        expect(bEmG.status, `PLA-09: B com o id de G (${p.metodo})`).toBe(404);
+        expect(await bEmG.text()).not.toContain(FATURA_DE_G);
+
+        const cEmH = await pedirComAsaas(`/grupos/${cenario.grupoH}/${p.metodo === 'GET' ? 'plano' : 'assinatura'}`, {
+          metodo: p.metodo,
+          sessao: sessaoA,
+          ...(p.corpo !== undefined ? { corpo: p.corpo } : {}),
+        });
+        expect(cEmH.status, `PLA-09: C com o id de H (${p.metodo})`).toBe(404);
+        expect(await cEmH.text()).not.toContain(FATURA_DE_H);
+
+        expect(asaasDoIsolamento.chamadas, 'PLA-32: nenhuma chamada ao Asaas').toEqual([]);
+        expect(await retratoDoPlano()).toBe(antes);
+      });
+    },
+  };
+}
+
+const ROTAS_DO_PLANO: Record<string, Linha> = {
+  'GET /api/grupos/:grupoId/plano': casoDoPlano({ metodo: 'GET' }),
+  'POST /api/grupos/:grupoId/assinatura': casoDoPlano({
+    metodo: 'POST',
+    corpo: { nome: 'Intrusa da Silva', cpf: '529.982.247-25' },
+  }),
+  'DELETE /api/grupos/:grupoId/assinatura': casoDoPlano({ metodo: 'DELETE' }),
+  'POST /api/webhooks/asaas': {
+    caso: async () => {
+      await comAssinaturasSemeadas(async () => {
+        const antes = await retratoDoPlano();
+        // Sem o token, a sessão de B não dá acesso a nada: 401, e o corpo com a assinatura de G não muda G.
+        const corpo = {
+          id: 'evt_t39_isolamento',
+          event: 'SUBSCRIPTION_DELETED',
+          dateCreated: '2026-11-05 10:00:00',
+          subscription: { id: 'sub_t39_g' },
+        };
+        const r = await pedirComAsaas('/webhooks/asaas', { metodo: 'POST', sessao: sessaoB, corpo });
+        expect(r.status, 'webhook sem token, com a sessão de B').toBe(401);
+        expect(await r.text()).not.toContain(FATURA_DE_G);
+        expect(await retratoDoPlano()).toBe(antes);
+        const gravados = await aberto.db.query<{ n: number }>(
+          `SELECT count(*)::int AS n FROM eventos_asaas WHERE id = 'evt_t39_isolamento'`,
+        );
+        expect(gravados.rows[0]!.n).toBe(0);
+      });
+    },
+  },
+};
+
 /** Uma linha por rota do Hono (`MÉTODO caminho`). */
 const TABELA: Record<string, Linha> = {
+  ...ROTAS_DO_PLANO,
   ...ROTAS_DE_GRUPO,
   ...ROTAS_DO_FINANCEIRO,
   ...ROTAS_DE_PARTIDAS,
@@ -1463,6 +1608,26 @@ describe('isolamento de rotas', () => {
       'GET /api/conta/push/extra',
       'GET /api/publico/:slug/push/extra',
     ]);
+  });
+
+  it('PLA-09: as 4 rotas do plano estão no app e têm caso; uma rota de plano nova sem caso reprova', () => {
+    const rotas = new Set(rotasDoApp(criarApp()));
+    expect(Object.keys(ROTAS_DO_PLANO)).toHaveLength(4);
+    for (const rota of Object.keys(ROTAS_DO_PLANO)) {
+      expect(rotas.has(rota), rota).toBe(true);
+      expect('caso' in (TABELA[rota] ?? {}), rota).toBe(true);
+    }
+    const comNova = criarApp({
+      registrarExtras: (api) => {
+        api.get('/grupos/:grupoId/assinatura/extra', (c) => c.json({ ok: true }));
+        api.post('/webhooks/asaas/extra', (c) => c.json({ ok: true }));
+      },
+    });
+    expect(
+      rotasSemLinha(comNova, TABELA)
+        .filter((r) => r.includes('/assinatura') || r.includes('/webhooks'))
+        .sort(),
+    ).toEqual(['GET /api/grupos/:grupoId/assinatura/extra', 'POST /api/webhooks/asaas/extra']);
   });
 
   it('NOT-54: nenhuma resposta GET do app, nem da criadora e admin de G, contém endpoint, p256dh ou auth semeados', async () => {

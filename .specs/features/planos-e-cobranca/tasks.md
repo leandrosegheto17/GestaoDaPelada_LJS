@@ -1369,6 +1369,8 @@ T56 → T57
 **Depends on**: T38
 **Reuses**: suíte de `CA:1070` (T32), estendida em `GE:1607` e `PR:1658`
 **Requirement**: PLA-09, PLA-32
+**Status**: rascunhada
+**Nota do rascunho**: `ROTAS_DO_PLANO` em `rotas.test.ts`, com um pedido próprio (`pedirComAsaas`) porque o `cliente` do apoio não recebe o Asaas em memória. Cada caso semeia uma assinatura pendente em G e outra em H, com a fatura, para provar que a resposta cruzada não a traz. O meta-teste do plano usa uma rota extra de assinatura e outra de webhook.
 
 **Done when**:
 
