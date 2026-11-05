@@ -39,7 +39,8 @@ export default defineConfig({
     },
   },
   server: {
-    proxy: { '/api': 'http://127.0.0.1:8787' },
+    // pnpm dev (FUN-04) passa a porta do wrangler dev; padrão 8787.
+    proxy: { '/api': `http://127.0.0.1:${process.env.PELADA_DEV_PORTA_API || '8787'}` },
   },
   test: {
     environment: 'jsdom',

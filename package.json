@@ -7,7 +7,8 @@
   },
   "packageManager": "pnpm@11.23.0",
   "scripts": {
-    "lint": "eslint test eslint.config.mjs && pnpm -r lint",
+    "dev": "node scripts/dev.mjs",
+    "lint": "eslint test scripts eslint.config.mjs && pnpm -r lint",
     "format:check": "prettier --check .",
     "typecheck": "pnpm -r typecheck && tsc --noEmit -p .",
     "test": "vitest run --dir test && pnpm -r test",

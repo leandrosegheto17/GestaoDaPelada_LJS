@@ -1933,6 +1933,8 @@ T81 → T82
 **Depends on**: T62, T32, T34
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-04
+**Status**: rascunhada
+**Nota do rascunho**: o `dev.mjs` importa a `MENSAGEM_BANCO_FORA` de `backend/scripts/src/conectar.ts` (Node 26 roda `.ts` direto) e confere só a porta TCP do Postgres antes de subir, para não exigir a role `pelada_app` no teste; o `vite.config.ts` passou a ler `PELADA_DEV_PORTA_API` no proxy. O teste da raiz (`test/dev.test.ts`) sobe o wrangler e o Vite de verdade em portas livres. O `lint` da raiz passou a incluir `scripts/`. Pontos a conferir: se `process.loadEnvFile` sobrescreve `PELADA_APP_SENHA=` vazio vindo do ambiente (o caso "sem senha" depende de não sobrescrever); o encerramento da árvore de processos no Windows (`taskkill /T`).
 
 **Done when**:
 
