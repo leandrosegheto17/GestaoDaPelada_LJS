@@ -892,6 +892,9 @@ T53 → T54
 **Depends on**: None
 **Reuses**: Primitivos zod (`CA:550`) e data real de `PR:889` (T18); `L:backend/contrato/src/simulador/contexto.ts`, `previa.ts` e `entrada.ts:24-30`
 **Requirement**: SIM-01, SIM-04, SIM-09, SIM-55
+**Status**: rascunhada
+**Nota do rascunho**: `SPEC_DEVIATION`: a data real de `PR:889` ainda não existe no contrato; usa `ehDataDoCalendario` de `contrato/src/elenco.ts`. Lista de aptos vazia é aceita (a prévia descreve como insuficiente, sem mensagem nova). Id que não é UUID recebe a mensagem de SIM-54, sem revelar nada (SIM-80). O `index.ts` e o `package.json` do contrato ainda não exportam o arquivo (entram junto com a T23).
+**Lacunas**: SIM-53 dá "Há jogador repetido nos aptos." também para mais de 60 aptos; vale o texto da spec (`simulador.ts`, `[LACUNA]`).
 
 **Done when**:
 
