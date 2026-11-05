@@ -2150,6 +2150,8 @@ T81 → T82
 **Depends on**: T70
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-28
+**Status**: rascunhada
+**Nota do rascunho**: segue a AD-119: `environment: producao` passa; reprova o nome sem `-v2` (inclusive `-v3` e maiúsculas), a chave `route`/`routes`, `custom_domain` e as opções `--route`, `--routes` e `--domain`. Lê só os dois arquivos reais. O `ci.yml` (T67) não roda esta checagem como linha de comando: ela entra pelo `pnpm test:checagens`; o `/executar` decide se acrescenta `node backend/scripts/checagens/so-previa.ts` ao passo de checagens do job `qualidade`.
 
 **Done when**:
 
