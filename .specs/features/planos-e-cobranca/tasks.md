@@ -1621,6 +1621,7 @@ T56 → T57
 **Depends on**: T51
 **Reuses**: casca da página provisória (`F:1545`, AD-007) e a faixa dela (`CA:1309`, T42); `Faixa` (`CA:1286`); T2; S-06; AD-064
 **Requirement**: PLA-61, PLA-62, PLA-63
+**Status**: rascunhada
 
 **Done when**:
 

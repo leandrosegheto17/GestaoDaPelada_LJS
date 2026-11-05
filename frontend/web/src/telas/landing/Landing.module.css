@@ -1,0 +1,85 @@
+/* Landing (planos-e-cobranca T52; AD-064): estilo do guia, só com tokens. Os planos ficam lado a lado a partir do
+   tablet (--bp-tablet, 600px) e um embaixo do outro no celular. */
+
+.topo {
+  text-align: center;
+  padding: var(--esp-8) 0 var(--esp-6);
+}
+
+.titulo {
+  font-family: var(--fonte-titulo);
+  font-size: var(--texto-4xl);
+  text-transform: uppercase;
+  margin: 0 0 var(--esp-3);
+}
+
+.proposta {
+  color: var(--cor-texto-sec);
+  font-size: var(--texto-lg);
+  max-width: 560px;
+  margin: 0 auto var(--esp-6);
+}
+
+.acoes {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--esp-3);
+}
+
+.planos {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--esp-4);
+  margin: 0 0 var(--esp-8);
+}
+
+@media (min-width: 600px) {
+  .planos {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.plano {
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-linha);
+  border-radius: var(--raio);
+  padding: var(--esp-6) var(--esp-4);
+}
+
+.plano__nome {
+  font-family: var(--fonte-titulo);
+  font-size: var(--texto-2xl);
+  text-transform: uppercase;
+  margin: 0 0 var(--esp-2);
+}
+
+.plano__preco {
+  font-size: var(--texto-xl);
+  font-weight: var(--peso-forte);
+  margin: 0 0 var(--esp-2);
+}
+
+.plano__destaque {
+  color: var(--cor-sucesso-texto);
+  font-weight: var(--peso-semi);
+  margin: 0 0 var(--esp-3);
+}
+
+.plano__itens {
+  margin: 0;
+  padding-left: var(--esp-5);
+}
+
+.plano__itens li {
+  margin: 0 0 var(--esp-1);
+}
+
+.rodape {
+  display: flex;
+  justify-content: center;
+  gap: var(--esp-6);
+  padding: var(--esp-6) 0;
+  border-top: 1px solid var(--cor-linha);
+  font-size: var(--texto-sm);
+}
