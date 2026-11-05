@@ -2539,6 +2539,8 @@ T78 → T79
 **Depends on**: T76
 **Reuses**: Comparador (`F:1764`); bloco `pdf` de `telas.json:286-288`
 **Requirement**: PAR-108, PAR-104
+**Status**: rascunhada
+**Nota do rascunho**: no molde do LJS (`e2e/pdf-visual.spec.ts` e `e2e/apoio/pdf-pixels.ts` @ `c6dc82c`): a t01 com as respostas do mockup, "Exportar PDF" baixa o arquivo do app, o `pdfjs-dist` (devDependency nova `^6.5.438`, a do LJS, sem instalar) o rasteriza no navegador e o `compararPng` da fundação compara com a `.pdf-folha` do P01. A coluna deslocada virou um teste de controle automático (`COLUNA_DESLOCADA` sobre o mockup tem de reprovar); a prova à mão com o app deformado fica para o `/executar`. Depende das TTF da T68 para ficar no limite (em Helvetica a divergência passa dele).
 
 **Done when**:
 
