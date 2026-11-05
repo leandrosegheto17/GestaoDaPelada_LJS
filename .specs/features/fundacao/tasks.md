@@ -1616,6 +1616,8 @@ T81 → T82
 **Depends on**: T50
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-36, FUN-31
+**Status**: rascunhada
+**Nota do rascunho**: "Safari do iOS" inclui o iPadOS que se apresenta como Mac (com toque) e exclui Chrome, Firefox, Edge, Opera e navegadores embutidos no iOS. A dispensa fica em `localStorage` (`pelada.aviso-instalar-iphone`); sem armazenamento, vale até recarregar.
 
 **Done when**:
 

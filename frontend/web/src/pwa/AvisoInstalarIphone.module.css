@@ -1,0 +1,42 @@
+/* Aviso de instalação no iPhone (FUN-36), de .specs/mockup/base.css:23,68-77. */
+
+.faixa {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--esp-3);
+  padding: var(--esp-3) var(--esp-4);
+  border-radius: var(--raio);
+  margin: 0 0 var(--esp-3);
+  font-size: var(--texto-md);
+}
+
+.faixa--info {
+  background: var(--cor-info-fundo);
+  color: var(--cor-info-texto);
+}
+
+.faixa--topo {
+  border-radius: 0;
+  margin: 0;
+}
+
+.icone {
+  flex-shrink: 0;
+}
+
+.faixa__texto {
+  flex: 1;
+}
+
+.faixa__fechar {
+  margin: -10px -10px -10px 0;
+  width: var(--alvo-toque);
+  height: var(--alvo-toque);
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
