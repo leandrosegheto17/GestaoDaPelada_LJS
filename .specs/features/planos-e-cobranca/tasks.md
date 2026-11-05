@@ -627,6 +627,7 @@ T56 → T57
 **Depends on**: T11
 **Reuses**: molde de `contas_nomes_do_grupo` (`PR:1063`, AD-036); `grupos_visiveis()` (`M:1792844280000_grupos-visiveis-arquivado.sql:9`, ramo do slug de `PR:1109`); índice `periodos_um_aberto` (`M:1792843200000_linha-de-base.sql:131`)
 **Requirement**: PLA-07, PLA-17, PLA-25
+**Status**: rascunhada
 
 **Done when**:
 

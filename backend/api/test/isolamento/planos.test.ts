@@ -229,7 +229,11 @@ describe('PLA-35: nenhuma das tabelas do plano guarda CPF', () => {
 
 // As funções novas (T12 a T16) entram neste bloco, cada uma na tarefa que a cria: `PUBLIC` sem `EXECUTE` e `EXECUTE`
 // só para `pelada_app`.
-const FUNCOES_DO_PLANO: readonly string[] = [];
+const FUNCOES_DO_PLANO: readonly string[] = [
+  // T12
+  'plano_do_grupo(uuid)',
+  'plano_grupos_da_criadora(uuid)',
+];
 
 describe('PLA-13: funções do plano sem EXECUTE para PUBLIC', () => {
   it.each(FUNCOES_DO_PLANO)('PLA-13: %s', async (assinatura) => {
