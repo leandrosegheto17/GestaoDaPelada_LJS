@@ -12,7 +12,8 @@
   "scripts": {
     "lint": "eslint .",
     "typecheck": "tsc --noEmit -p .",
-    "test": "vitest run"
+    "test": "vitest run",
+    "dono": "node --env-file-if-exists=../../.env src/dono.ts"
   },
   "dependencies": {
     "@pelada/api": "workspace:*",

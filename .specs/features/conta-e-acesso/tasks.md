@@ -1198,6 +1198,8 @@ T57 → T58
 **Depends on**: T33
 **Reuses**: trava de host `exigirHostPermitido` (`F:459`); `conta_definir_senha` (`M:1792843560000_conta-senha-e-exclusao.sql:97`)
 **Requirement**: ACE-61, ACE-62
+**Status**: rascunhada
+**Nota do rascunho**: senha validada com os limites do contrato (8 a 72 caracteres, até 72 bytes) copiados como constantes, porque `@pelada/scripts` não depende de `@pelada/contrato`. Alvo `local` lê `DATABASE_URL_MIGRACAO` e passa pela trava de host local mesmo com `PELADA_PERMITIR_HOST_REMOTO=1`; `previa` lê `NEON_URL_DEV_MIGRACAO`; `producao`, `NEON_URL_MIGRACAO`. Script `dono` em `backend/scripts/package.json`. Helper novo `test/apoio/banco.ts` (o do `seed.test.ts` fica intacto).
 
 **Done when**:
 
