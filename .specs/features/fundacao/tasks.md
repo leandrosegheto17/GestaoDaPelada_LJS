@@ -1483,6 +1483,8 @@ T81 → T82
 **Depends on**: T45
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-30, FUN-32
+**Status**: rascunhada
+**Nota do rascunho**: as 14 `@font-face` foram geradas do `.specs/mockup/fontes/fontes.css`, com `url('/fontes/…')` (arquivos de `public/fontes`, T44). Reset e elementos (`body`, `a`, `h1`–`h4`, `p`) seguem as primeiras linhas de `.specs/mockup/base.css`.
 
 **Done when**:
 
