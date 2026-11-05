@@ -1249,6 +1249,8 @@ T39 → T40 → T41
 **Depends on**: T35
 **Reuses**: cliente HTTP (`CA:1169`); `useModoInstalacao` (`F:1521`)
 **Requirement**: NOT-02, NOT-04, NOT-16, NOT-62, NOT-70
+**Status**: rascunhada
+**Nota do rascunho**: um registro de SW tem um único `PushSubscription` para todos os grupos e a conta (NOT-70), então assinar outro grupo reaproveita a assinatura local, e o `cancelar` só chama `unsubscribe()` quando não sobra destino guardado no aparelho (o teste NOT-16, com um destino só, confere a chamada). Os destinos vão para o IndexedDB pelo `adicionarDestino` e `removerDestino` da T35, que o SW lê no `pushsubscriptionchange`. Testes em `frontend/web/test/push/assinatura.test.ts` (a pasta `test/` é a do `include` do Vitest do web).
 
 **Done when**:
 
