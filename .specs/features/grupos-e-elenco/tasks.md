@@ -1522,6 +1522,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T43
 **Reuses**: trava de T38; `bancoDeTeste()` (`F:507`)
 **Requirement**: GEL-109, GEL-110
+**Status**: rascunhada
 
 **Done when**:
 
