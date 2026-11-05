@@ -1313,6 +1313,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T35
 **Reuses**: `jogadores.listar` e `jogadores.criar` (T33, T34); relógio (T19); tabela de `GD:172`
 **Requirement**: GEL-31, GEL-33, GEL-34, GEL-36, GEL-37, GEL-39, GEL-40, GEL-46, SEC-002
+**Status**: rascunhada
 
 **Done when**:
 
