@@ -824,15 +824,15 @@ Gate (T12 a T13): pnpm --filter @pelada/dominio test (tarefas do lote verdes) + 
 **Depends on**: T13
 **Reuses**: `B:352` (PAR-113), `BD:165`
 **Requirement**: PAR-109, PAR-110, PAR-113
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-113`: reativar quem estava fora passa de `posicaoAntes` nula a uma posição
-- [ ] Teste `PAR-113`: corrigir a saída para antes de hoje dá `posicaoDepois` nula
-- [ ] Teste `PAR-113`: posições dos outros jogadores são recalculadas no cenário depois
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-113`: reativar quem estava fora passa de `posicaoAntes` nula a uma posição
+- [x] Teste `PAR-113`: corrigir a saída para antes de hoje dá `posicaoDepois` nula
+- [x] Teste `PAR-113`: posições dos outros jogadores são recalculadas no cenário depois
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -850,15 +850,15 @@ Gate (T12 a T13): pnpm --filter @pelada/dominio test (tarefas do lote verdes) + 
 **Depends on**: T14
 **Reuses**: `B:350`, `B:353-355` (PAR-111, PAR-114 a PAR-116), caso `B:500`; avaliação da data de início com o recuo de `GE:726`
 **Requirement**: PAR-111, PAR-114, PAR-115, PAR-116
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-116`: uma falta que passa a constar dá o aviso no singular; duas, no plural; nenhuma, nulo
-- [ ] Teste `PAR-114`: Gil inativo desde 05/10, retorno em 08/10, dá 08/10 e 15/10 passando a constar (`B:364`)
-- [ ] Teste `PAR-115`: recuo que não alcança presença mantém o acumulado e só passa rodadas de "–" a falta
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-116`: uma falta que passa a constar dá o aviso no singular; duas, no plural; nenhuma, nulo
+- [x] Teste `PAR-114`: Gil inativo desde 05/10, retorno em 08/10, dá 08/10 e 15/10 passando a constar (`B:364`)
+- [x] Teste `PAR-115`: recuo que não alcança presença mantém o acumulado e só passa rodadas de "–" a falta
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -876,19 +876,21 @@ Gate (T12 a T13): pnpm --filter @pelada/dominio test (tarefas do lote verdes) + 
 **Depends on**: T15
 **Reuses**: `B:237` (PAR-63), `BD:169-170`
 **Requirement**: PAR-63, PAR-62
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste `PAR-63`: mediana < 5 ms nas três funções
-- [ ] Teste: `index.ts` não exporta as internas da pontuação
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PAR-63`: mediana < 5 ms nas três funções
+- [x] Teste: `index.ts` não exporta as internas da pontuação
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
 
 ---
 
+
+Gate (T14 a T16): pnpm --filter @pelada/dominio test (verde; sem-io/sem-relogio estouram os 5 s só em carga paralela e passam sozinhos; simulador/* é da feature 5) + tsc dominio @ 03f72effb830d0fce7399a34ebfea63359c822a7
 #### Phase 8: Contrato
 
 ### T17: Contrato de pesos
