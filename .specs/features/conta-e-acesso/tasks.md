@@ -107,6 +107,7 @@ Nenhum critério fica fora. Mudam de sentido, pelas ADs propostas: ACE-45 (role 
 
 - **Comando da suíte** (o de `.specs/projeto/testes.json` ao fim da fundação, `F:72-78`): `docker compose up -d --wait && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:checagens && pnpm --filter @pelada/web build && pnpm --filter @pelada/web e2e && pnpm --filter @pelada/web visual`.
 - **Resultado hoje**: não roda. O `testes.json` atual é a dispensa temporária (sem código na v2) e a feature anterior, `fundacao`, ainda não foi executada.
+- **Resultado medido pelo /executar (2026-11-05, main @ c9ba38bf, banco `pelada_ace` local, 44 migrações aplicadas e seed ok)**: `lint` verde; `format:check` falha em 39 arquivos rascunhados de outras features (planos, notificações, grupos, partidas); `typecheck` falha em 1 erro (`frontend/web/src/pwa/servico.ts(133,55)` TS2352, notificações); `pnpm test` com 4 falhas por timeout de 5 s em `test/lint/*` (ex.: `sem-escrita-periodo.test.ts`), 46 passam.
 - **Falhas preexistentes**: feature anterior ainda não executada; a linha de base é o gate final da fundação. O `/executar` desta feature roda a suíte uma vez antes do lote 1 e registra aqui o resultado e as falhas encontradas.
 
 ## Test Coverage Matrix
