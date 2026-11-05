@@ -29,6 +29,7 @@ import { rotasPartidas } from './rotas/partidas.ts';
 import { rotasPesos } from './rotas/pesos.ts';
 import { rotasPlano } from './rotas/plano.ts';
 import { rotasAssinatura } from './rotas/assinatura.ts';
+import { rotasWebhookAsaas } from './rotas/webhook-asaas.ts';
 import { asaasHttp, type Asaas } from '../infraestrutura/asaas/cliente.ts';
 import { rotasPublico } from './rotas/publico.ts';
 import { rotasPublicoPush } from './rotas/publico-push.ts';
@@ -145,6 +146,8 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
   // Planos e cobrança (T24 em diante da planos-e-cobranca).
   api.route('/', rotasPlano());
   api.route('/', rotasAssinatura());
+  // Webhook do Asaas: sem sessão, sem `X-Pelada`, autenticado pelo token (T35; AD-093).
+  api.route('/', rotasWebhookAsaas(rotasAcesso));
   opcoes.registrarExtras?.(api);
 
   api.notFound((c) => c.json({ erro: 'Rota não encontrada.' }, 404));

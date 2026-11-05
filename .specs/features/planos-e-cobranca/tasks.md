@@ -1255,6 +1255,8 @@ T56 → T57
 **Depends on**: T34
 **Reuses**: `exigirCabecalhoPelada` (`CA:723`, T18) com a exceção da rota; `limiteTaxa` (`F:1153`); binding `LIMITE_WEBHOOK` (`F:1081`, FUN-26); `bodyLimit` de `PR:1634` (T47); T7
 **Requirement**: PLA-39, PLA-40, PLA-50
+**Status**: rascunhada
+**Nota do rascunho**: a exceção do `X-Pelada` mora no `exigirCabecalhoPelada` (só `POST` no caminho exato, `CAMINHO_WEBHOOK_ASAAS`); token em tempo constante por SHA-256 (`infraestrutura/asaas/token-webhook.ts`); `ASAAS_WEBHOOK_TOKEN` ausente ou vazio = 401 sempre. Nesta tarefa a rota só registra o evento (`eventosAsaas.registrar` + `eventoDoCorpo`); a T36 troca o `processar` pela aplicação do efeito. Testes em `backend/api/test/rotas/webhook-asaas.test.ts`, inclusive o limite exato de 64 KiB.
 
 **Done when**:
 

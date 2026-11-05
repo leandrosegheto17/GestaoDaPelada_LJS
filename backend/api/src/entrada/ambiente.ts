@@ -50,6 +50,11 @@ export interface Env {
   ASAAS_URL?: string;
   /** Chave da API do Asaas (secret, `$aact_…`). Ausente: toda chamada vira `falhou` e a rota responde 502. */
   ASAAS_API_KEY?: string;
+  /**
+   * Token do webhook do Asaas (secret; T35, PLA-39): o Asaas o manda no header `asaas-access-token`. Ausente: todo
+   * webhook recebe 401.
+   */
+  ASAAS_WEBHOOK_TOKEN?: string;
   HYPERDRIVE: HyperdriveBinding;
   /**
    * Produtor da fila `avisos` (notificacoes T16; NOT-22, AD-098). Opcional no tipo: sem a fila criada (ou nos testes
