@@ -383,16 +383,16 @@ T57 → T58
 **Depends on**: T3
 **Reuses**: `M:1792843440000_conta-cadastro-e-links.sql:11` (`envio_permitido`), `:29` (`conta_cadastrar`); `M:1792843920000_conta-esqueci-nao-confirmada.sql:47` (`link_pedir`); `M:1792843740000_conta-confirmar-sem-sessao.sql:9` (`link_confirmar`)
 **Requirement**: ACE-01, ACE-04, ACE-05, ACE-06, ACE-07, ACE-08, ACE-23, ACE-51
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: o apoio dos testes de banco (transação desfeita, troca de role) nasce em `backend/api/test/banco/apoio-conta.ts`.
 
 **Done when**:
 
-- [ ] Testes `ACE-01`, `ACE-04`, `ACE-05`: conta nova com `termos_versao` e `termos_aceitos_em`; e-mail existente (também com maiúsculas e espaços) devolve `existente` e não altera a linha
-- [ ] Testes `ACE-06`, `ACE-07`: confirmação dentro de 24 h marca `email_confirmado_em` e não cria sessão; 24 h + 1 s, usado ou inexistente devolvem nulo
-- [ ] Testes `ACE-08`, `ACE-23`, `ACE-51`: pedido novo invalida o anterior do mesmo tipo; aos 59 s não envia, aos 60 s e 61 s envia (borda exata do LJS)
-- [ ] Evidência da rede: `link_confirmar` sabotado para ignorar `expira_em` deixa vermelho (registrar aqui)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Testes `ACE-01`, `ACE-04`, `ACE-05`: conta nova com `termos_versao` e `termos_aceitos_em`; e-mail existente (também com maiúsculas e espaços) devolve `existente` e não altera a linha
+- [x] Testes `ACE-06`, `ACE-07`: confirmação dentro de 24 h marca `email_confirmado_em` e não cria sessão; 24 h + 1 s, usado ou inexistente devolvem nulo
+- [x] Testes `ACE-08`, `ACE-23`, `ACE-51`: pedido novo invalida o anterior do mesmo tipo; aos 59 s não envia, aos 60 s e 61 s envia (borda exata do LJS)
+- [x] Evidência da rede: `link_confirmar` sem `expira_em` deixou 2 testes `ACE-07` vermelhos (24 h + 1 s e borda exata); restaurado, verde (2026-11-05)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -410,18 +410,18 @@ T57 → T58
 **Depends on**: T4
 **Reuses**: `M:1792844040000_conta-entrar-teto-conta.sql:21` (versão vigente de `conta_entrar`, com a trava por e-mail e IP de `M:1792843500000_conta-entrar-e-sessao.sql:15`)
 **Requirement**: ACE-09, ACE-10, ACE-11, ACE-12, ACE-13, ACE-14, ACE-66
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: casos limite listados no topo do teste; sem lacuna. O teste com 4 falhas e duas tentativas simultâneas é o que morre sem a trava por e-mail.
 
 **Done when**:
 
-- [ ] Casos limite listados antes do teste: 4.ª e 5.ª falha; 15 min menos 1 s e mais 1 s; senha certa durante o bloqueio; e-mail inexistente; falhas concorrentes
-- [ ] Testes `ACE-09`, `ACE-10`: sucesso devolve `ok`, nome e conta, e `sessoes.token_hash` é o SHA-256 recebido, nunca o token
-- [ ] Testes `ACE-11`, `ACE-12`: `invalida` igual para e-mail inexistente e senha errada; `nao_confirmado` sem sessão
-- [ ] Testes `ACE-13`, `ACE-14`: 5 falhas do par bloqueiam até 15 min depois da quinta, mesmo com a senha certa; outro `ip_hash` entra
-- [ ] Teste `ACE-66`: duas transações simultâneas com senha errada do mesmo par gravam duas falhas
-- [ ] Evidência da rede: trava por e-mail sabotada (sem `pg_advisory_xact_lock`) deixa o teste de concorrência vermelho (registrar aqui)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do teste: 4.ª e 5.ª falha; 15 min menos 1 s e mais 1 s; senha certa durante o bloqueio; e-mail inexistente; falhas concorrentes
+- [x] Testes `ACE-09`, `ACE-10`: sucesso devolve `ok`, nome e conta, e `sessoes.token_hash` é o SHA-256 recebido, nunca o token
+- [x] Testes `ACE-11`, `ACE-12`: `invalida` igual para e-mail inexistente e senha errada; `nao_confirmado` sem sessão
+- [x] Testes `ACE-13`, `ACE-14`: 5 falhas do par bloqueiam até 15 min depois da quinta, mesmo com a senha certa; outro `ip_hash` entra
+- [x] Teste `ACE-66`: duas transações simultâneas com senha errada do mesmo par gravam duas falhas
+- [x] Evidência da rede: `conta_entrar` sem `pg_advisory_xact_lock` deixou o teste `ACE-66` de concorrência vermelho; restaurado, verde (2026-11-05)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -439,21 +439,23 @@ T57 → T58
 **Depends on**: T5
 **Reuses**: `M:1792843500000_conta-entrar-e-sessao.sql:78` (`sessao_tocar`); `M:1792844040000_conta-entrar-teto-conta.sql:21`
 **Requirement**: ACE-15, ACE-16, ACE-74
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: casos limite listados no topo do teste; sem lacuna.
 
 **Done when**:
 
-- [ ] Casos limite listados antes do teste: inatividade de 14:59 e 15:00; 11:59 h de uso contínuo e 12 h; 49.ª e 50.ª falha de IPs diferentes; 10 min menos 1 s e mais 1 s
-- [ ] Testes `ACE-15`, `ACE-16`: sessão vencida por inatividade ou pelas 12 h devolve nulo e é apagada; a válida renova `ultimo_uso_em`
-- [ ] Testes `ACE-74`: 50 falhas em 1 h de 50 IPs bloqueiam por 10 min com o mesmo resultado do bloqueio por par; conta inexistente responde igual; senha certa dentro do bloqueio não zera
-- [ ] Evidência da rede: `sessao_tocar` sem o teste de `expira_em` deixa vermelho (registrar aqui)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do teste: inatividade de 14:59 e 15:00; 11:59 h de uso contínuo e 12 h; 49.ª e 50.ª falha de IPs diferentes; 10 min menos 1 s e mais 1 s
+- [x] Testes `ACE-15`, `ACE-16`: sessão vencida por inatividade ou pelas 12 h devolve nulo e é apagada; a válida renova `ultimo_uso_em`
+- [x] Testes `ACE-74`: 50 falhas em 1 h de 50 IPs bloqueiam por 10 min com o mesmo resultado do bloqueio por par; conta inexistente responde igual; senha certa dentro do bloqueio não zera
+- [x] Evidência da rede: `sessao_tocar` sem `expira_em` deixou o teste `ACE-16` (12 h) vermelho; restaurado, verde (2026-11-05)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
 
 ---
+
+**Gate**: `pnpm vitest run` nos 3 arquivos de `test/banco` da Phase 2 (Postgres privado) @ b837eabb5b8ad4f5ece67112c6d6ea1254eaf765 = 57 testes verdes; nenhum arquivo de código mudou no lote (o rascunho passou de primeira)
 
 #### Phase 3: Rede de proteção: senha, exclusão, convites e cotas no banco
 
