@@ -648,6 +648,8 @@ T53 → T54
 **Depends on**: T11
 **Reuses**: `L:backend/dominio/src/simulador/indicadores.ts`; T7 (pares); `S:205`
 **Requirement**: SIM-39, SIM-95
+**Status**: rascunhada
+**Nota do rascunho**: recebe também as posições na ordem de prioridade (`Posicoes`), para a composição ajustada (T16) derivar quem sai pela prioridade.
 
 **Done when**:
 
