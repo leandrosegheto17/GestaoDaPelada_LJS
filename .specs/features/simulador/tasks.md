@@ -341,6 +341,9 @@ T53 → T54
 **Depends on**: T0
 **Reuses**: `lerEsquema` com funções (`F:760`); função de 7 de `PR:987` (T22); AD-037
 **Requirement**: SIM-67 (linha de base da remoção, AD-037)
+**Status**: rascunhada
+**Nota do rascunho**: varredura de `backend/{api,contrato,dominio,scripts}/src` com um contador de argumentos de cada `grupo_criar(...)` (testado no próprio arquivo). Chamadas à de 6 encontradas por leitura (lista para a T25): testes `test/concorrencia/grupos-slug.test.ts:32`, `test/banco/grupos-criar.test.ts:32`, `test/banco/partidas-rede.test.ts:82` e `:107`, `test/banco/grupo-criar-pesos.test.ts:138` (bloco da delegação e `ASSINATURA_6` em `:16`, `:154`, `:179`), `test/banco/financeiro-trava-acesso.test.ts:108`, `test/isolamento/cenario-grupos.ts:100` e a assinatura em `test/isolamento/meta-grupos.test.ts:25`.
+**Lacunas**: o seed chama a de 6 (`backend/scripts/src/seed.ts:147` e `:228`), e o Delta 2 não o lista; o teste "nenhum arquivo de src nem o seed" nasce vermelho por isso. Interpretação conservadora: o teste fica como a tarefa pede e a T25 passa o seed para a de 7 antes de remover a de 6 (senão o seed quebra). O /executar confirma com o usuário.
 
 **Done when**:
 
