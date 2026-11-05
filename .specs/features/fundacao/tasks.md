@@ -1246,6 +1246,8 @@ T81 → T82
 **Depends on**: T36
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-16
+**Status**: rascunhada
+**Nota do rascunho**: os testes rodam no projeto `banco` (Node), com `app.request(..., env, ctx)` e um `executionCtx` falso (`backend/api/test/db/requisicao.ts`). O `app.onError` passa a responder 503 para `ErroBancoIndisponivel`.
 
 **Done when**:
 
