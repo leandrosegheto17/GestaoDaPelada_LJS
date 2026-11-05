@@ -147,3 +147,11 @@ export {
   type Rodada,
   type SituacaoRodada,
 } from './ranking/rodadas.ts';
+export {
+  grupoFreeEditavel,
+  somenteLeitura,
+  type EntradaExcedente,
+  type GrupoDaCriadora,
+  type MotivoSomenteLeitura,
+  type OperacaoDeEscrita,
+} from './plano/excedente.ts';

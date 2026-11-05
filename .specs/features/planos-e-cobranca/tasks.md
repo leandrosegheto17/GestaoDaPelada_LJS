@@ -444,6 +444,8 @@ T56 → T57
 **Depends on**: T4
 **Reuses**: `RECURSOS_POR_PLANO` (T2); decisões de S:41-42 e AD-062
 **Requirement**: PLA-15, PLA-16, PLA-17
+**Status**: rascunhada
+**Lacunas**: com limite_grupos e limite_jogadores ao mesmo tempo, vale limite_grupos (a spec não define a precedência do motivo)
 
 **Done when**:
 
