@@ -1,6 +1,6 @@
 import type { SugerirCorpo, SugerirResposta } from '@pelada/contrato/simulador';
 import { useState } from 'react';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { Botao } from '../../componentes/Botao.tsx';
 import { Casca, NOME_DO_APP } from '../../componentes/Casca.tsx';
 import { EsqueletoLista } from '../../componentes/EsqueletoLista.tsx';
@@ -10,12 +10,13 @@ import { LinkBotao } from '../../componentes/LinkBotao.tsx';
 import { LinkVoltar } from '../../componentes/LinkVoltar.tsx';
 import { ErroApi } from '../../dados/cliente.ts';
 import { useGrupo } from '../../dados/grupos.ts';
-import { useContextoSimulador, usePreviaSimulador, useSugerir } from '../../dados/simulador.ts';
+import { useConfirmarEscalacao, useContextoSimulador, usePreviaSimulador, useSugerir } from '../../dados/simulador.ts';
 import acesso from '../acesso.module.css';
 import { rotaDoGrupo } from '../grupos/Grupos.tsx';
 import { corpoDaPrevia, corpoDoSugerir, EntradasSimulador, entradasIniciais, type Entradas } from './EntradasSimulador.tsx';
 import { ID_PREVIA_ERRO, podeSugerir, PreviaSimulador, previaInvalida } from './PreviaSimulador.tsx';
 import { MontandoTimes, ResultadoDoisTimes, TEXTO_MONTANDO } from './ResultadoDoisTimes.tsx';
+import { AcoesResultado, avisoEscalacaoConfirmada, corpoDaEscalacao, FalhaConfirmar } from './AcoesResultado.tsx';
 import { FalhaRecalcular, FolhaMover, useAjusteManual } from './MoverJogador.tsx';
 import { ResultadoVariosTimes } from './ResultadoVariosTimes.tsx';
 import estilos from './simulador.module.css';
@@ -32,7 +33,8 @@ import estilos from './simulador.module.css';
  *   com a resposta, "Times sugeridos" com o resultado de 2 times (t13) ou de 3 ou mais (t14, T48);
  * - tocar num jogador abre "Mover jogador" (T49; SIM-64, SIM-65): o movimento aparece na hora e o `avaliar` recalcula
  *   300 ms depois; a falha mantém a composição;
- * - as ações do resultado (T50) entram na tarefa seguinte.
+ * - "Confirmar escalação", "Refazer sugestão" e "Editar entradas" (T50; SIM-46, SIM-66, SIM-73, SIM-93): o sucesso
+ *   volta ao início com "Escalação de dd/mm confirmada."; a falha mantém a composição.
  */
 
 export const TEXTO_SEM_JOGADORES = 'Sem jogadores';
@@ -47,6 +49,7 @@ function dataCompletaNoCampo(valor: string): boolean {
 export function PaginaSimulador() {
   const { grupoId = '' } = useParams();
   const base = rotaDoGrupo(grupoId);
+  const navegar = useNavigate();
   const grupo = useGrupo(grupoId);
 
   /** Data consultada: `undefined` é a sugerida pela API. */
@@ -79,13 +82,37 @@ export function PaginaSimulador() {
   /** O jogador com a folha "Mover jogador" aberta. */
   const [aberto, setAberto] = useState<string | null>(null);
 
-  function pedirSugestao() {
-    if (!ctx || !entradas) return;
-    const corpo = corpoDoSugerir(entradas, ctx);
+  const confirmar = useConfirmarEscalacao(grupoId);
+  const [falhouConfirmar, setFalhouConfirmar] = useState(false);
+
+  function sugerirCom(corpo: SugerirCorpo) {
     setNoResultado(true);
     setSugestao(null);
+    setFalhouConfirmar(false);
     setEntradaDaSugestao(corpo);
     sugerirTimes.mutate(corpo, { onSuccess: (s) => setSugestao(s) });
+  }
+
+  function pedirSugestao() {
+    if (!ctx || !entradas) return;
+    sugerirCom(corpoDoSugerir(entradas, ctx));
+  }
+
+  /** "Refazer sugestão": as mesmas entradas da sugestão na tela, sem os ajustes (SIM-66). */
+  function refazer() {
+    ajuste.descartar();
+    if (entradaDaSugestao) sugerirCom(entradaDaSugestao);
+  }
+
+  function confirmarEscalacao() {
+    const composicao = ajuste.composicaoAtual;
+    if (!entradaDaSugestao || !composicao) return;
+    setFalhouConfirmar(false);
+    confirmar.mutate(corpoDaEscalacao(entradaDaSugestao, composicao), {
+      onSuccess: (r) => void navegar(base, { state: { aviso: avisoEscalacaoConfirmada(r.data) } }),
+      // Inclusive o 409 de grupo arquivado depois da sugestão (SIM-93): a composição fica na tela.
+      onError: () => setFalhouConfirmar(true),
+    });
   }
 
   function voltarAsEntradas() {
@@ -101,14 +128,28 @@ export function PaginaSimulador() {
     if (sugerirTimes.isPending || (!sugestao && !sugerirTimes.isError)) return <MontandoTimes />;
     if (!sugestao) {
       // [LACUNA] a spec não define a falha do `sugerir`; o rascunho usa o estado de erro padrão, com "Tentar de novo".
-      return <EstadoErro aoTentarDeNovo={pedirSugestao} />;
+      return <EstadoErro aoTentarDeNovo={() => entradaDaSugestao && sugerirCom(entradaDaSugestao)} />;
     }
     const naTela = ajuste.naTela ?? sugestao;
     const comum = {
       recalculando: ajuste.recalculando,
       movidos: ajuste.movidos,
       aoTocarJogador: setAberto,
-      antes: ajuste.falhou ? <FalhaRecalcular aoTentarDeNovo={ajuste.tentarDeNovo} /> : null,
+      antes: (
+        <>
+          {falhouConfirmar ? <FalhaConfirmar /> : null}
+          {ajuste.falhou ? <FalhaRecalcular aoTentarDeNovo={ajuste.tentarDeNovo} /> : null}
+        </>
+      ),
+      acoes: (
+        <AcoesResultado
+          ajustado={ajuste.ajustado}
+          confirmando={confirmar.isPending}
+          aoConfirmar={confirmarEscalacao}
+          aoRefazer={refazer}
+          aoEditar={voltarAsEntradas}
+        />
+      ),
     };
     const folha = aberto ? (
       <FolhaMover

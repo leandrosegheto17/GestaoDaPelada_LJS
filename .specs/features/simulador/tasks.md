@@ -1681,6 +1681,8 @@ T53 → T54
 **Depends on**: T49
 **Reuses**: `.specs/mockup/telas/t13-resultado-dois--{refazer,erro-confirmar}.html`; `Dialogo` e `Faixa` (`CA:1286`)
 **Requirement**: SIM-46, SIM-66, SIM-73, SIM-93
+**Status**: rascunhada
+**Nota do rascunho**: `AcoesResultado` (com `corpoDaEscalacao` e `avisoEscalacaoConfirmada`) e a página: refazer usa a mesma entrada da sugestão na tela; confirmar grava a composição na tela (a ajustada ou a sugerida) e volta ao início com o aviso no `state` da navegação (o `InicioGrupo` já mostra). Teste em `test/telas/simulador-acoes.test.tsx`.
 
 **Done when**:
 
