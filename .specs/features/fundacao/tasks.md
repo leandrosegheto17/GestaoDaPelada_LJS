@@ -2068,6 +2068,8 @@ T81 → T82
 **Depends on**: T67
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-40
+**Status**: rascunhada
+**Nota do rascunho**: o job `web` instala o Chromium (`playwright install --with-deps`), faz o build, roda o `playwright test` direto (o script `e2e` refaria o build) e o `visual`; em falha, envia `playwright-report` e `test-results` (prints da comparação) por 7 dias. Sem Postgres de serviço: o `/api/health` dos e2e não toca o banco. O teste foi acrescentado ao `workflow-ci.test.ts` da T67, sem mudar os casos dela.
 
 **Done when**:
 
