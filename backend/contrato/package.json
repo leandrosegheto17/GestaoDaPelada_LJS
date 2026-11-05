@@ -8,7 +8,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./sentry": "./src/sentry.ts",
-    "./primitivos": "./src/primitivos.ts"
+    "./primitivos": "./src/primitivos.ts",
+    "./acesso": "./src/acesso.ts"
   },
   "scripts": {
     "lint": "eslint .",

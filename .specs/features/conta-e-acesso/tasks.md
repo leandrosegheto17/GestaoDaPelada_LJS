@@ -604,6 +604,8 @@ T57 → T58
 **Depends on**: T11
 **Reuses**: formas de `ljs:.specs/features/conta-e-acesso/design.md:192` e `:215-228` (só consulta, AD-002)
 **Requirement**: ACE-02, ACE-58
+**Status**: rascunhada
+**Nota do rascunho**: corpo de erro `{ erro, codigo, campos?, grupos? }`; `TERMOS_VERSAO` = 2026-11-05, a data do rascunho dos textos (T48).
 
 **Done when**:
 
