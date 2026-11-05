@@ -2058,6 +2058,8 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T64
 **Reuses**: `R-19`, `R-20`, `R-24`, `R-25` e `R-26` (`t16-jogador--inativar`, `--inativo`, `--reativado`, `--reativar-erro`, `--reativar`); `Dialogo` (`CA:1286`)
 **Requirement**: GEL-59, GEL-60, GEL-114
+**Status**: rascunhada
+**Lacunas**: a spec não diz em que campo o 422 de período chega; a tela usa `mensagens.data` e, sem ele, a mensagem geral do 422 no campo de data (`erroDePeriodo` em `PeriodosJogador.tsx`). O `/executar` confere contra a rota (T42).
 
 **Done when**:
 

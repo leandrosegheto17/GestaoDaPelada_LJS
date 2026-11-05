@@ -26,6 +26,7 @@ import {
   type ErrosJogador,
   type FormularioJogador,
 } from './camposJogador.tsx';
+import { AcoesSituacao } from './PeriodosJogador.tsx';
 
 /**
  * Ficha do jogador (`/app/grupos/:grupoId/jogadores/:jogadorId`, t16; GEL-41, GEL-97, GEL-98,
@@ -36,9 +37,10 @@ import {
  * - "Habilidades e nível": o nível ("Nível 6,8", ou "sem nota") e uma `CampoNota` por
  *   habilidade; mudar a nota grava na hora (`useSalvarNota`, T55) e o nível vem da resposta
  *   (GEL-97); "–" apaga a nota (GEL-98);
- * - "Situação": "Ativo desde dd/mm/aaaa." e os períodos de atividade, do mais antigo ao atual.
- *   As ações de período e a exclusão entram nas T65 a T67, pelos encaixes `acoesPeriodo`,
- *   `acaoInicio` e `acoesSituacao`.
+ * - "Situação": "Ativo desde dd/mm/aaaa." e os períodos de atividade, do mais antigo ao atual,
+ *   com Inativar ou Reativar (`AcoesSituacao`, T65); o aviso de sucesso fica no topo da ficha.
+ *   As ações de período e a exclusão entram nas T66 e T67, pelos encaixes `acoesPeriodo`,
+ *   `acaoInicio` e `acaoExcluir`.
  */
 
 export const TEXTO_DADOS_SALVOS = 'Dados salvos.';
@@ -73,8 +75,8 @@ export interface EncaixesFicha {
   acaoInicio?: (ficha: JogadorDetalhe) => ReactNode;
   /** Ação de cada período ("Corrigir datas", T66). */
   acoesPeriodo?: (ficha: JogadorDetalhe, periodo: JogadorDetalhe['periodos'][number], indice: number) => ReactNode;
-  /** Inativar, reativar e excluir (T65, T67). */
-  acoesSituacao?: (ficha: JogadorDetalhe) => ReactNode;
+  /** Botão "Excluir jogador" (T67), que recebe como abrir o diálogo de inativar. */
+  acaoExcluir?: (ficha: JogadorDetalhe, abrirInativar: () => void) => ReactNode;
 }
 
 function Dados({ grupoId, ficha, acaoInicio }: { grupoId: string; ficha: JogadorDetalhe; acaoInicio?: EncaixesFicha['acaoInicio'] }) {
@@ -189,7 +191,17 @@ function Notas({ grupoId, ficha }: { grupoId: string; ficha: JogadorDetalhe }) {
   );
 }
 
-function Situacao({ ficha, encaixes }: { ficha: JogadorDetalhe; encaixes: EncaixesFicha }) {
+function Situacao({
+  grupoId,
+  ficha,
+  encaixes,
+  avisar,
+}: {
+  grupoId: string;
+  ficha: JogadorDetalhe;
+  encaixes: EncaixesFicha;
+  avisar: (texto: string | null) => void;
+}) {
   return (
     <section className={estilos.secao} aria-labelledby="s-sit">
       <h2 id="s-sit" className={estilos.subtitulo}>
@@ -216,7 +228,12 @@ function Situacao({ ficha, encaixes }: { ficha: JogadorDetalhe; encaixes: Encaix
             ))}
           </ul>
         </div>
-        {encaixes.acoesSituacao ? encaixes.acoesSituacao(ficha) : null}
+        <AcoesSituacao
+          grupoId={grupoId}
+          ficha={ficha}
+          avisar={avisar}
+          acaoExtra={encaixes.acaoExcluir ? (abrirInativar) => encaixes.acaoExcluir?.(ficha, abrirInativar) : undefined}
+        />
       </div>
     </section>
   );
@@ -247,6 +264,7 @@ export function FichaJogador({ encaixes = {} }: { encaixes?: EncaixesFicha }) {
   const grupo = useGrupo(grupoId);
   const ficha = useJogador(grupoId, jogadorId);
   const base = rotaDoGrupo(grupoId);
+  const [aviso, setAviso] = useState<string | null>(null);
 
   function conteudo() {
     if (ficha.isPending) return <Carregando />;
@@ -266,9 +284,10 @@ export function FichaJogador({ encaixes = {} }: { encaixes?: EncaixesFicha }) {
     return (
       <>
         <h1 className={estilos['titulo-pagina']}>{f.apelido}</h1>
+        {aviso ? <Faixa tipo="sucesso">{aviso}</Faixa> : null}
         <Dados key={`dados-${f.id}`} grupoId={grupoId} ficha={f} acaoInicio={encaixes.acaoInicio} />
         <Notas grupoId={grupoId} ficha={f} />
-        <Situacao ficha={f} encaixes={encaixes} />
+        <Situacao grupoId={grupoId} ficha={f} encaixes={encaixes} avisar={setAviso} />
       </>
     );
   }
