@@ -728,6 +728,8 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T13
 **Reuses**: funções de T11 a T13; ordem de `GS:233`; mensagens de `GS:240`, `GS:256-257`; interface de `GD:121`
 **Requirement**: GEL-58, GEL-62, GEL-69, GEL-72, GEL-73
+**Status**: rascunhada
+**Nota do rascunho**: a regra do GEL-69 só é avaliada quando a mudança é a saída do primeiro período, para um histórico antigo fora da regra não travar escritas em outros períodos; corrigir com as datas atuais (GEL-74) volta antes da regra de data futura.
 
 **Done when**:
 
