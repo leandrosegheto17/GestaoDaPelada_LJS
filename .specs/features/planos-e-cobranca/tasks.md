@@ -737,6 +737,9 @@ T56 → T57
 **Depends on**: T15
 **Reuses**: CHECK `grupos_trial` (`M:1792843200000_linha-de-base.sql:78`); `auditoria_autor` (`M:…:60`); molde da T14
 **Requirement**: PLA-13, PLA-14, PLA-44, PLA-45, PLA-46, PLA-47
+**Status**: rascunhada
+**Lacunas**: grupo de cortesia (`uso_proprio`) que assina e paga: a spec não diz se vira `ativo`; conservador, a cortesia fica e só a assinatura muda (o mesmo no inadimplente e no cancelado)
+**Nota do rascunho**: SPEC_DEVIATION: as três funções recebem também `p_evento_id`, para marcar `efeito` no evento. Nasce também `asaas_evento_sem_efeito(p_evento_id, p_motivo)`, que grava `nenhum:<motivo>` (PLA-49, PLA-51), para a T36.
 
 **Done when**:
 

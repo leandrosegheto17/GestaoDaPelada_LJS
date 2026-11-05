@@ -238,12 +238,19 @@ const FUNCOES_DO_PLANO: readonly string[] = [
   'assinatura_cancelar(uuid)',
   // T15
   'asaas_evento_registrar(text, text, text, text, text, text, integer)',
+  // T16
+  'plano_ativar(text, date, text, text, text)',
+  'plano_inadimplente(text, text, text)',
+  'plano_cancelado(text, text, text)',
+  'asaas_evento_sem_efeito(text, text)',
 ];
 
 // Funções auxiliares sem EXECUTE para ninguém além do owner (só chamadas de dentro das SECURITY DEFINER).
 const FUNCOES_SO_DO_OWNER: readonly string[] = [
   // T15
   'asaas_data(text)',
+  // T16
+  'plano_exigir_webhook()',
 ];
 
 describe('PLA-13: funções auxiliares do plano só do owner', () => {
