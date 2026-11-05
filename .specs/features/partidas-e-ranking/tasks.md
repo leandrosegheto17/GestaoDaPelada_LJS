@@ -550,14 +550,14 @@ Gate (T1 a T3): pnpm --filter @pelada/dominio test (T1-T3 verdes; falhas preexis
 **Depends on**: T3
 **Reuses**: `B:231` (PAR-57), Assumption `B:60` (saiu e voltou, vale o legado); tipos e intervalo [início, fim) de `GE:626` (T11 da grupos-e-elenco)
 **Requirement**: PAR-57
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-57`: sem período, S; um período, S; saiu e voltou, a data do retorno para X depois dele e S para X antes
-- [ ] Teste `PAR-57`: sair e voltar no mesmo dia (GEL-61) dá o retorno como início
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-57`: sem período, S; um período, S; saiu e voltou, a data do retorno para X depois dele e S para X antes
+- [x] Teste `PAR-57`: sair e voltar no mesmo dia (GEL-61) dá o retorno como início
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -575,16 +575,16 @@ Gate (T1 a T3): pnpm --filter @pelada/dominio test (T1-T3 verdes; falhas preexis
 **Depends on**: T4
 **Reuses**: `B:232-235` (PAR-58 a PAR-61), casos limite `B:486-489`, `B:501`; interface de `BD:155-158`
 **Requirement**: PAR-58, PAR-59, PAR-60, PAR-61
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-59`: S igual à primeira presença soma a inicial; S um dia depois, não
-- [ ] Teste `PAR-59`: sem presença, soma a inicial com qualquer S
-- [ ] Teste `PAR-60`: presença fora de período, dentro de [início da contagem, D], conta
-- [ ] Teste `PAR-58`: data de início hoje dá acumulado 0 e recuar volta ao valor anterior (Kim)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-59`: S igual à primeira presença soma a inicial; S um dia depois, não
+- [x] Teste `PAR-59`: sem presença, soma a inicial com qualquer S
+- [x] Teste `PAR-60`: presença fora de período, dentro de [início da contagem, D], conta
+- [x] Teste `PAR-58`: data de início hoje dá acumulado 0 e recuar volta ao valor anterior (Kim)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -602,20 +602,22 @@ Gate (T1 a T3): pnpm --filter @pelada/dominio test (T1-T3 verdes; falhas preexis
 **Depends on**: T5
 **Reuses**: AD-041; Goal `B:25` e Independent Test `B:239`
 **Requirement**: PAR-58, PAR-59, PAR-57
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste `PAR-58`: Vandré, Kim e "saiu e voltou" dão os mesmos números da origem, caso a caso
-- [ ] Teste `PAR-57`: no mês do retorno, PTS INICIAL 0 sem a inicial se havia presença antes; meses do primeiro período inalterados (`B:489`)
-- [ ] A tabela de origem (arquivo e linha de cada caso) fica no cabeçalho do teste
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PAR-58`: Vandré, Kim e "saiu e voltou" dão os mesmos números da origem, caso a caso
+- [x] Teste `PAR-57`: no mês do retorno, PTS INICIAL 0 sem a inicial se havia presença antes; meses do primeiro período inalterados (`B:489`)
+- [x] A tabela de origem (arquivo e linha de cada caso) fica no cabeçalho do teste
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
 
 ---
 
+
+Gate (T4 a T6): pnpm --filter @pelada/dominio test (tarefas do lote verdes) + tsc dominio @ edf738c1983d0985bacd2557103250f0c8edebfb
 #### Phase 4: Domínio: partida
 
 ### T7: Data sugerida da partida
