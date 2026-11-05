@@ -817,6 +817,8 @@ T47 → T48
 **Depends on**: T19
 **Reuses**: `contas_nomes_do_grupo` estendida (T10, `PR:1063`); "Conta excluída" de ACE-28 (`CA:470`); regra de `L:backend/api/src/aplicacao/financeiro/lancamentos/criar.ts:7-31` e `editar.ts:7-41`
 **Requirement**: FIN-25, FIN-27, FIN-28, FIN-31, FIN-32
+**Status**: rascunhada
+**Nota do rascunho**: exportado como `lancamentos.criar|ler|editar(db, grupoId, …)`, sem `contaId` (autora de `app_conta_id()`, como em T16). `ler` devolve também `vinculo` (jogador, apelido e mês) para a mensagem do 409 da T21. A conta excluída já tem o nome "Conta excluída" na própria linha de `contas` (`conta_excluir` a anonimiza), então `contas_nomes_do_grupo` a devolve assim; o repositório ainda cai no mesmo texto se a função não devolver a conta.
 
 **Done when**:
 
