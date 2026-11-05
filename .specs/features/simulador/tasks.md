@@ -313,6 +313,9 @@ T53 → T54
 **Depends on**: None
 **Reuses**: `comoApp` e o cenário de dois grupos (`F:909`); tabela `M:1792843200000_linha-de-base.sql:212-228`; grants `M:1792843260000_roles.sql:22-31`; policies do laço `M:1792843320000_rls.sql:51-56`; molde da matriz de `PR:1038` (T23)
 **Requirement**: SIM-81, SIM-69, SIM-72
+**Status**: rascunhada
+**Nota do rascunho**: usa o cenário da fundação (`abrirCenario`, grupos A e B com uma escalação cada); a evidência da rede (policy `USING (true)`) é do /executar.
+**Lacunas**: a matriz pede "slug público zero" no SELECT, mas a policy do laço (`grupos_visiveis()`, ramo do slug, FUN-14) deixa o slug do A ler a escalação do A. O teste segue a matriz (zero); se ficar vermelho, perguntar se vale a matriz (migração nova) ou a policy atual.
 
 **Done when**:
 
