@@ -621,6 +621,7 @@ T73 → T74 → T75
 **Depends on**: T9
 **Reuses**: interfaces de `GD:118-120`; ordem de `GS:82`; regra do nível de `GS:337-338`
 **Requirement**: GEL-02, GEL-36, GEL-101, GEL-102, GEL-104
+**Status**: rascunhada
 
 **Done when**:
 
