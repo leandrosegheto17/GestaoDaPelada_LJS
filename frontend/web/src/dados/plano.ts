@@ -4,6 +4,7 @@ import {
   type AssinaturaCriada,
   type PlanoResposta,
 } from '@pelada/contrato/plano';
+import type { RecursoPro } from '@pelada/dominio';
 import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { ErroApi, PREFIXO_CHAVE_PLANO } from './cliente.ts';
 import { useCliente } from './ContextoCliente.tsx';
@@ -48,6 +49,15 @@ export function usePlano(grupoId: string) {
     refetchOnMount: 'always',
     enabled: grupoId !== '',
   });
+}
+
+/**
+ * O grupo não tem o recurso Pro (planos-e-cobranca T50; PLA-27): só com o plano lido e sem o recurso na lista.
+ * Carregando ou com erro, conta como liberado: quem decide é a API (403 `plano_pro`), e o 403 relê o plano (T41).
+ */
+export function useSemRecurso(grupoId: string, recurso: RecursoPro): boolean {
+  const plano = usePlano(grupoId);
+  return plano.data !== undefined && !plano.data.recursos.includes(recurso);
 }
 
 export function useAssinar(grupoId: string) {

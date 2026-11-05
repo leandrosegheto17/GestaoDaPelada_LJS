@@ -1,6 +1,8 @@
 import type { LancamentoDoMes, MesFinanceiroResposta } from '@pelada/contrato/financeiro';
 import { useParams, useSearchParams } from 'react-router';
+import { AvisoRecursoPro } from '../../componentes/AvisoRecursoPro.tsx';
 import { Casca, NOME_DO_APP } from '../../componentes/Casca.tsx';
+import { TrechoBloqueado } from '../../componentes/FaixaSomenteLeitura.tsx';
 import { EsqueletoLista } from '../../componentes/EsqueletoLista.tsx';
 import { EstadoErro } from '../../componentes/EstadoErro.tsx';
 import { Faixa } from '../../componentes/Faixa.tsx';
@@ -11,6 +13,7 @@ import { TelaMensagem } from '../../componentes/TelaMensagem.tsx';
 import { formatarReais } from '../../dados/dinheiro.ts';
 import { erroDoFinanceiro, useMesFinanceiro } from '../../dados/financeiro.ts';
 import { useGrupo } from '../../dados/grupos.ts';
+import { useSemRecurso } from '../../dados/plano.ts';
 import estilos from '../acesso.module.css';
 import modulo from '../grupos-elenco.module.css';
 import { rotaDoGrupo } from '../grupos/Grupos.tsx';
@@ -31,7 +34,11 @@ import { ListaPagamentos } from './ListaPagamentos.tsx';
  *   lançamento neste mês." sem lançamentos;
  * - ações "Configurar caixa" e "Novo lançamento";
  * - sem configuração: "Caixa não configurado" com "Configurar caixa" (FIN-08);
- * - 403 `sem_permissao_financeiro`: "Sem acesso" com "Voltar" para o início do grupo (FIN-33).
+ * - 403 `sem_permissao_financeiro`: "Sem acesso" com "Voltar" para o início do grupo (FIN-33);
+ * - sem o recurso `financeiro` no plano (planos-e-cobranca T50; PLA-27): o saldo, o resumo, os pagamentos e os
+ *   lançamentos continuam (a leitura não trava, `exigirRecursoNaEscrita`); "Configurar caixa" sai, os interruptores
+ *   dos pagamentos ficam desabilitados e o `AvisoRecursoPro` entra no lugar de "Novo lançamento". [LACUNA] a spec não
+ *   diz se o link de edição de cada lançamento fica: fica, e a tela de edição recebe o 403 da API ao salvar.
  */
 
 export const TEXTO_SEM_CONFIG = 'Caixa não configurado';
@@ -141,21 +148,30 @@ function Mes({
   dados,
   base,
   aoIr,
+  semRecurso,
 }: {
   grupoId: string;
   dados: MesFinanceiroResposta;
   base: string;
   aoIr: (mes: string) => void;
+  /** Free sem o financeiro (planos-e-cobranca T50; PLA-27): os dados ficam, a escrita vira o aviso Pro. */
+  semRecurso: boolean;
 }) {
   const { config, resumoMes, saldoAtualCentavos } = dados;
   if (config === null || resumoMes === null || saldoAtualCentavos === null) {
     return (
       <div className={estilos.vazio}>
         <h2 className={estilos['vazio__titulo']}>{TEXTO_SEM_CONFIG}</h2>
-        <p className={estilos['vazio__texto']}>{TEXTO_SEM_CONFIG_AJUDA}</p>
-        <LinkBotao para={`${base}/financeiro/config`} variante="principal">
-          Configurar caixa
-        </LinkBotao>
+        {semRecurso ? (
+          <AvisoRecursoPro recurso="financeiro" grupoId={grupoId} />
+        ) : (
+          <>
+            <p className={estilos['vazio__texto']}>{TEXTO_SEM_CONFIG_AJUDA}</p>
+            <LinkBotao para={`${base}/financeiro/config`} variante="principal">
+              Configurar caixa
+            </LinkBotao>
+          </>
+        )}
       </div>
     );
   }
@@ -167,9 +183,11 @@ function Mes({
     <>
       <div className={fin.ferramentas}>
         <NavegacaoMes dados={dados} aoIr={aoIr} />
-        <LinkBotao para={`${base}/financeiro/config`} variante="texto">
-          Configurar caixa
-        </LinkBotao>
+        {semRecurso ? null : (
+          <LinkBotao para={`${base}/financeiro/config`} variante="texto">
+            Configurar caixa
+          </LinkBotao>
+        )}
       </div>
       <section className={fin.saldos} aria-labelledby="saldo">
         <p className={fin['saldos__rotulo']} id="saldo">
@@ -192,7 +210,9 @@ function Mes({
           <h2 id="pag" className={estilos.subtitulo}>
             {titulo}
           </h2>
-          <ListaPagamentos grupoId={grupoId} dados={dados} />
+          <TrechoBloqueado bloqueado={semRecurso}>
+            <ListaPagamentos grupoId={grupoId} dados={dados} />
+          </TrechoBloqueado>
         </section>
         <section aria-labelledby="lan">
           <h2 id="lan" className={estilos.subtitulo}>
@@ -225,12 +245,18 @@ function Mes({
           )}
         </section>
       </div>
-      <div className={modulo['reserva-barra']} aria-hidden="true" />
-      <div className={modulo['barra-acao']}>
-        <LinkBotao para={`${base}/financeiro/lancamentos/novo`} variante="principal">
-          Novo lançamento
-        </LinkBotao>
-      </div>
+      {semRecurso ? (
+        <AvisoRecursoPro recurso="financeiro" grupoId={grupoId} />
+      ) : (
+        <>
+          <div className={modulo['reserva-barra']} aria-hidden="true" />
+          <div className={modulo['barra-acao']}>
+            <LinkBotao para={`${base}/financeiro/lancamentos/novo`} variante="principal">
+              Novo lançamento
+            </LinkBotao>
+          </div>
+        </>
+      )}
     </>
   );
 }
@@ -241,6 +267,7 @@ export function FinanceiroMes() {
   const mes = busca.get('mes') ?? undefined;
   const grupo = useGrupo(grupoId);
   const consulta = useMesFinanceiro(grupoId, mes);
+  const semRecurso = useSemRecurso(grupoId, 'financeiro');
   const base = rotaDoGrupo(grupoId);
   const barra = { nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' };
 
@@ -285,7 +312,13 @@ export function FinanceiroMes() {
       return <EstadoErro aoTentarDeNovo={() => void consulta.refetch()} />;
     }
     return (
-      <Mes grupoId={grupoId} dados={consulta.data} base={base} aoIr={(m) => setBusca({ mes: m })} />
+      <Mes
+        grupoId={grupoId}
+        dados={consulta.data}
+        base={base}
+        aoIr={(m) => setBusca({ mes: m })}
+        semRecurso={semRecurso}
+      />
     );
   }
 

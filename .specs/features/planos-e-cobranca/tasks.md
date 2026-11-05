@@ -1654,6 +1654,9 @@ T56 → T57
 **Depends on**: T49
 **Reuses**: telas da `simulador` e da `financeiro` (S-05); T42
 **Requirement**: PLA-27
+**Status**: rascunhada
+**Nota do rascunho**: `useSemRecurso(grupoId, recurso)` em `dados/plano.ts` (o `usarPlano` da tarefa; carregando ou com erro conta como liberado). No financeiro, saem "Configurar caixa" e "Novo lançamento", os pagamentos ficam no `TrechoBloqueado` (T48) e o aviso entra no lugar da barra; sem caixa configurado, o aviso no lugar de "Configurar caixa". Teste em `frontend/web/test/telas/aviso-pro-telas.test.tsx`.
+**Lacunas**: o link de edição de cada lançamento continua no Free (a spec não diz); a edição recebe o 403 `plano_pro` da API ao salvar.
 
 **Done when**:
 

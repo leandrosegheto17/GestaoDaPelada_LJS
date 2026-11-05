@@ -1,6 +1,7 @@
 import type { SugerirCorpo, SugerirResposta } from '@pelada/contrato/simulador';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
+import { AvisoRecursoPro } from '../../componentes/AvisoRecursoPro.tsx';
 import { Botao } from '../../componentes/Botao.tsx';
 import { Casca, NOME_DO_APP } from '../../componentes/Casca.tsx';
 import { EsqueletoLista } from '../../componentes/EsqueletoLista.tsx';
@@ -10,6 +11,7 @@ import { LinkBotao } from '../../componentes/LinkBotao.tsx';
 import { LinkVoltar } from '../../componentes/LinkVoltar.tsx';
 import { ErroApi } from '../../dados/cliente.ts';
 import { useGrupo } from '../../dados/grupos.ts';
+import { useSemRecurso } from '../../dados/plano.ts';
 import {
   useConfirmarEscalacao,
   useContextoSimulador,
@@ -55,7 +57,8 @@ import estilos from './simulador.module.css';
  * - tocar num jogador abre "Mover jogador" (T49; SIM-64, SIM-65): o movimento aparece na hora e o `avaliar` recalcula
  *   300 ms depois; a falha mantém a composição;
  * - "Confirmar escalação", "Refazer sugestão" e "Editar entradas" (T50; SIM-46, SIM-66, SIM-73, SIM-93): o sucesso
- *   volta ao início com "Escalação de dd/mm confirmada."; a falha mantém a composição.
+ *   volta ao início com "Escalação de dd/mm confirmada."; a falha mantém a composição;
+ * - sem o recurso `simulador` no plano (planos-e-cobranca T50; PLA-27): `AvisoRecursoPro` no lugar do formulário.
  */
 
 export const TEXTO_SEM_JOGADORES = 'Sem jogadores';
@@ -72,6 +75,7 @@ export function PaginaSimulador() {
   const base = rotaDoGrupo(grupoId);
   const navegar = useNavigate();
   const grupo = useGrupo(grupoId);
+  const semSimulador = useSemRecurso(grupoId, 'simulador');
 
   /** Data consultada: `undefined` é a sugerida pela API. */
   const [dataConsultada, setDataConsultada] = useState<string | undefined>(undefined);
@@ -213,6 +217,9 @@ export function PaginaSimulador() {
   }
 
   function conteudo() {
+    // Free sem o simulador (planos-e-cobranca T50; PLA-27): o aviso no lugar do formulário. A API trava o simulador
+    // inteiro (403 `plano_pro`), então o erro do contexto não aparece junto.
+    if (semSimulador) return <AvisoRecursoPro recurso="simulador" grupoId={grupoId} />;
     if (contexto.isError && ctx === undefined) {
       if (contexto.error instanceof ErroApi && contexto.error.status === 404)
         return <Faixa tipo="atencao">Grupo não encontrado.</Faixa>;

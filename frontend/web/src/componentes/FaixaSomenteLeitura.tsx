@@ -56,6 +56,17 @@ export function TrechoSomenteLeitura({
   children: ReactNode;
 }) {
   const bloqueado = useEmSomenteLeitura(grupoId);
+  return <TrechoBloqueado bloqueado={bloqueado}>{children}</TrechoBloqueado>;
+}
+
+/** O mesmo `fieldset` sem borda, com o bloqueio dado (planos-e-cobranca T50: o recurso Pro que o Free não tem). */
+export function TrechoBloqueado({
+  bloqueado,
+  children,
+}: {
+  bloqueado: boolean;
+  children: ReactNode;
+}) {
   return (
     <fieldset className={estilos.trecho} disabled={bloqueado}>
       {children}
