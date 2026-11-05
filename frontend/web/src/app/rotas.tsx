@@ -6,11 +6,11 @@ import {
   InicioApp,
   MinhaConta,
   MinhaSenha,
-  NovaSenha,
   Privacidade,
   Termos,
 } from '../paginas/acesso/provisorias.tsx';
 import { GuardaApp, GuardaPublica } from './guarda.tsx';
+import { NovaSenha } from '../telas/nova-senha/NovaSenha.tsx';
 import { Esqueci } from '../telas/esqueci/Esqueci.tsx';
 import { Confirmar } from '../telas/confirmar/Confirmar.tsx';
 import { Cadastro } from '../telas/cadastro/Cadastro.tsx';

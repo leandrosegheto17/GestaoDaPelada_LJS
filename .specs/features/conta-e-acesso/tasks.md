@@ -1539,6 +1539,8 @@ T57 → T58
 **Depends on**: T46
 **Reuses**: `.specs/mockup/telas/t06-nova-senha--*.html` (4 estados); `lerTokenDoFragmento` (T38)
 **Requirement**: ACE-24, ACE-25, ACE-56
+**Status**: rascunhada
+**Nota do rascunho**: o token é lido num efeito, guardado num ref (StrictMode); até ler, a tela mostra só a casca ocupada. Sem token, token malformado ou 410: estado inválido com "Pedir novo link" (`/entrar/esqueci`). Validação antes de enviar: senha pelos limites do contrato e confirmação igual ("As senhas não conferem.").
 
 **Done when**:
 
