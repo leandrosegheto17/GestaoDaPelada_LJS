@@ -274,6 +274,8 @@ T57 → T58
 **Depends on**: None
 **Reuses**: estender a fábrica de cenário e o `comoApp` da fundação (`F:909`, `FD:89`) e o `bancoDeTeste()` (`F:507`); senha por `conta_definir_senha` (`M:1792843560000_conta-senha-e-exclusao.sql:97`), chamada como `postgres` (AD-009)
 **Requirement**: ACE-43, ACE-45
+**Status**: rascunhada
+**Nota do rascunho**: o teste do cenário fica em `cenario-conta.test.ts`; a evidência da rede (sabotagem do `conta_definir_senha`) é do /executar.
 
 **Done when**:
 
