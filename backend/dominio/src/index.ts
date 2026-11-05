@@ -72,3 +72,13 @@ export {
   type Mes,
   type NomeDiaDaSemana,
 } from './datas.ts';
+export {
+  CAMPOS_DE_PESO,
+  ehPesosPadrao,
+  PESOS_PADRAO,
+  pontosDaPresenca,
+  type ConfigPesos,
+  type Pesos,
+  type PresencaDoJogador,
+  type SituacaoGravada,
+} from './pontuacao/pesos.ts';

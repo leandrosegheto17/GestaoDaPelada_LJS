@@ -493,6 +493,7 @@ T78 → T79
 **Depends on**: T1
 **Reuses**: Regras de `B:229` (PAR-55), `B:77` (rótulo Pesos padrão, P10) e `BD:159-160`
 **Requirement**: PAR-55, PAR-135, PAR-13
+**Status**: rascunhada
 
 **Done when**:
 
