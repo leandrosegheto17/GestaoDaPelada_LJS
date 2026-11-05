@@ -981,6 +981,9 @@ T57 → T58
 **Depends on**: T25
 **Reuses**: cookie de T14; `contas.entrar` e `contas.eu` de T22; tabela de `ljs:.specs/features/conta-e-acesso/design.md:157-159`
 **Requirement**: ACE-09, ACE-11, ACE-12, ACE-13, ACE-14, ACE-17, ACE-18, ACE-50, ACE-74
+**Status**: rascunhada
+**Nota do rascunho**: casos limite no topo de `rotas/sessao.ts`. O entrar roda em `transacaoCurta` (nova, `src/infraestrutura/db/transacao-curta.ts`), confirmada mesmo com 401 ou 429: o `comBanco` desfaz a transação em 4xx e apagaria a falha de login, e o bloqueio (ACE-13, ACE-74) nunca chegaria. O 429 leva o texto único da tarefa no lugar da mensagem do contrato (`SPEC_DEVIATION` no código).
+**Lacunas**: sair sem sessão: a spec não define; o rascunho responde 204 com o cookie vencido, como com sessão.
 
 **Done when**:
 
