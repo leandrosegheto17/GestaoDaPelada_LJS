@@ -1285,17 +1285,17 @@ Gate (T27 a T29): vitest test/repositorios: todos os testes PAR-* verdes; 38 ver
 **Depends on**: T29
 **Reuses**: `BD:198-201`; ordem de travas AD-038; T8 e T29
 **Requirement**: PAR-22, PAR-23, PAR-24, PAR-28, PAR-29, PAR-30, PAR-142
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: `partidas.lancar(db, grupoId, dados)` devolve `ok` (id e contagem), `invalido` (campos do domínio) ou `partida_ja_existe`; a data futura fica na rota (T40). O 23505 de `partidas_grupo_id_data_key` é traduzido dentro de um SAVEPOINT (molde `financeiro/pagamentos.ts:53`). SPEC_DEVIATION: o evento `partida_lancada` é um INSERT direto, porque `eventos.partidaLancada` nasce na T33. Testes em `backend/api/test/repositorios/partidas-lancar.test.ts`.
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-30`: dois lançamentos simultâneos da mesma data, em duas conexões: um grava e o outro recebe `partida_ja_existe`
-- [ ] Teste `PAR-28`: falha forçada depois das presenças desfaz partida, presenças, evento e auditoria
-- [ ] Teste `PAR-23`: `ausente` e ativo sem marcação não gravam linha
-- [ ] Teste `PAR-142`: auditoria `partida_lancada` só com data, chuva e contagens
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-30`: dois lançamentos simultâneos da mesma data, em duas conexões: um grava e o outro recebe `partida_ja_existe`
+- [x] Teste `PAR-28`: falha forçada depois das presenças desfaz partida, presenças, evento e auditoria
+- [x] Teste `PAR-23`: `ausente` e ativo sem marcação não gravam linha
+- [x] Teste `PAR-142`: auditoria `partida_lancada` só com data, chuva e contagens
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1313,17 +1313,17 @@ Gate (T27 a T29): vitest test/repositorios: todos os testes PAR-* verdes; 38 ver
 **Depends on**: T30
 **Reuses**: `BD:202-204`; AD-038
 **Requirement**: PAR-46, PAR-48, PAR-49, PAR-50, PAR-51, PAR-142
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: `editar(db, grupoId, data, dados)` devolve `ok`, `nao_encontrada`, `data_alterada` (PAR-47, conferido também aqui) ou `invalido`; `excluir` devolve `ok` ou `nao_encontrada`. Testes em `backend/api/test/repositorios/partidas-editar.test.ts`; a serialização usa `jogadores.alterarInicio` segurando a trava do jogador.
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-48`: marcação de jogador ativo hoje mas não na data da partida é recusada
-- [ ] Teste `PAR-51`: excluir mantém o `partida_lancada`
-- [ ] Teste `PAR-49`: editar não grava evento; falha no meio desfaz tudo
-- [ ] Teste: editar a partida enquanto outra conexão corrige o período do mesmo jogador serializa (AD-038)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-48`: marcação de jogador ativo hoje mas não na data da partida é recusada
+- [x] Teste `PAR-51`: excluir mantém o `partida_lancada`
+- [x] Teste `PAR-49`: editar não grava evento; falha no meio desfaz tudo
+- [x] Teste: editar a partida enquanto outra conexão corrige o período do mesmo jogador serializa (AD-038)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1341,20 +1341,22 @@ Gate (T27 a T29): vitest test/repositorios: todos os testes PAR-* verdes; 38 ver
 **Depends on**: T31
 **Reuses**: `BD:195-197`; `contas_nomes_do_grupo` (T24)
 **Requirement**: PAR-37, PAR-41, PAR-44
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: `ler` devolve a partida sem `hoje` (a rota acrescenta) e ordena os jogadores em JS, pelo apelido sem acento (`NFD`) nem caixa; `alteradaEm` em ISO. Testes em `backend/api/test/repositorios/partidas-ler.test.ts`.
 
 **Done when**:
 
-- [ ] Teste `PAR-44`: jogador inativo na data com presença gravada aparece na leitura
-- [ ] Teste `PAR-37`: outubro com 01, 08 (chuva) e 15 vem de 15 para 01 com as contagens
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PAR-44`: jogador inativo na data com presença gravada aparece na leitura
+- [x] Teste `PAR-37`: outubro com 01, 08 (chuva) e 15 vem de 15 para 01 com as contagens
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
 
 ---
 
+
+Gate (T30 a T32): vitest test/repositorios: todos os testes PAR-* verdes; 38 vermelhos GEL/FIN/ACE/NOT/PLA de outras features, iguais na main (preexistentes) @ 86dd01dc765fe83fc678153a92aef97610b4822e
 #### Phase 13: Repositórios: eventos, grupos e auditoria de períodos
 
 ### T33: Repositório de eventos de uso
