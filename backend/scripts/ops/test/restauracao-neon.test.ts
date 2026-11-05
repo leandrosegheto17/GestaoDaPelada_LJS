@@ -19,7 +19,7 @@ interface Chamada {
   metodo: string;
   url: string;
   corpo?: unknown;
-  autorizacao?: string;
+  autorizacao?: string | undefined;
 }
 
 const CHAVE = 'chave-falsa-do-neon';

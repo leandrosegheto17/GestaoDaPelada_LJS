@@ -261,7 +261,7 @@ export async function idsDoGrupo(db: pg.Client, grupo: string): Promise<IdsDoGru
 
 export interface Tentativa {
   linhas: number | null;
-  erro: { code?: string; message: string } | null;
+  erro: { code?: string | undefined; message: string } | null;
   /** Conteúdo do grupo observado, lido na mesma transação, depois da tentativa. */
   observado: Record<string, string>;
 }

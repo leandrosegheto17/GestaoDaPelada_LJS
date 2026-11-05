@@ -87,7 +87,7 @@ describe('dump com a role de backup', () => {
     await comCenario(async (db, cenario, banco) => {
       await semear(db, cenario.contaA, cenario.contaB);
       const texto = await comLogin(db, (usuario, senha) =>
-        dump(banco.url, banco.nome, usuario, senha),
+        Promise.resolve(dump(banco.url, banco.nome, usuario, senha)),
       );
       for (const tabela of TABELAS) {
         expect(linhasDe(texto, tabela), `linhas de ${tabela} no dump`).toBe(SEMEADO[tabela]);
@@ -107,7 +107,7 @@ describe('dump com a role de backup', () => {
       );
       expect(Number(total.rows[0]?.n)).toBe(6);
       const texto = await comLogin(db, (usuario, senha) =>
-        dump(banco.url, banco.nome, usuario, senha),
+        Promise.resolve(dump(banco.url, banco.nome, usuario, senha)),
       );
       for (const tabela of TABELAS) {
         expect(linhasDe(texto, tabela), `linhas de ${tabela} no dump sem policy`).toBe(0);

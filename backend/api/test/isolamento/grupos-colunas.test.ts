@@ -30,7 +30,7 @@ afterAll(async () => {
 
 interface Resultado {
   linhas: number | null;
-  erro: { code?: string; message: string } | null;
+  erro: { code?: string | undefined; message: string } | null;
 }
 
 /** Roda o comando como `pelada_app` com a conta, numa transação desfeita, devolvendo linhas ou erro. */

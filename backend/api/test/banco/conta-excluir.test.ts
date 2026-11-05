@@ -8,6 +8,7 @@ import {
   IP_HASH_1,
   sha256,
   type CenarioContaAberto,
+  type Token,
 } from '../isolamento/cenario-conta.ts';
 import { comoAppAqui, comoSuper, contar, numaTransacao, umaLinha } from './apoio-conta.ts';
 
@@ -57,7 +58,7 @@ async function segundaAdminNoGrupoA(db: pg.Client): Promise<void> {
 }
 
 /** Grava, como superusuário, um rastro da conta A em cada tabela de conta que a exclusão limpa. */
-async function rastrosDeA(db: pg.Client): Promise<{ sessao: Buffer }> {
+async function rastrosDeA(db: pg.Client): Promise<{ sessao: Token }> {
   const { cenario } = aberto;
   const sessao = await criarSessao(db, cenario.contaA);
   await criarLink(db, cenario.contaA, 'recuperacao');

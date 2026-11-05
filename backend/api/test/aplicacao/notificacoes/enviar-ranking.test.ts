@@ -217,7 +217,7 @@ describe('enviarRanking', () => {
       VAPID_PUBLICA: undefined,
       VAPID_PRIVADA: '',
       VAPID_ASSUNTO: undefined,
-    } as Env;
+    } as unknown as Env;
     await expect(enviar(mensagem(), semVapid, abrir)).resolves.toEqual({ acao: 'concluir' });
     expect(servico.pedidos).toHaveLength(0);
     expect(abrir).not.toHaveBeenCalled();

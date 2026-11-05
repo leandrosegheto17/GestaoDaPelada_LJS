@@ -74,7 +74,8 @@ function lerComo(
   grupo: string,
   fn: typeof escalacoes.porData | typeof escalacoes.idsNaData,
 ): Promise<unknown> {
-  return comDb(aberto.url, aberto.cenario.contaC, (db) => fn(db, grupo, DATA));
+  const ler = fn as (db: Parameters<typeof fn>[0], grupo: string, data: string) => Promise<unknown>;
+  return comDb(aberto.url, aberto.cenario.contaC, (db) => ler(db, grupo, DATA));
 }
 
 async function idsComo(grupo: string): Promise<string[]> {

@@ -37,7 +37,7 @@ async function erroDe(
   d: pg.Client,
   sql: string,
   valores: unknown[] = [],
-): Promise<{ code?: string; constraint?: string } | null> {
+): Promise<{ code?: string | undefined; constraint?: string | undefined } | null> {
   await d.query('SAVEPOINT passo');
   try {
     await d.query(sql, valores);
