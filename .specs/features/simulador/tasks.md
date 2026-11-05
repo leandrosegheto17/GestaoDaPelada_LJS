@@ -759,6 +759,9 @@ T53 → T54
 **Depends on**: T15
 **Reuses**: `L:backend/api/src/aplicacao/simulador/avaliar.ts` (regra); T7, T12 a T14; `S:254-255`, Independent Test `S:260`
 **Requirement**: SIM-62, SIM-63
+**Status**: rascunhada
+**Nota do rascunho**: `avaliar(entrada, composicao, historico)` devolve `{ ok: false, campo: 'composicao', mensagem }` ou a avaliação; `idsDaComposicaoEntrada` e `problemaNaComposicao` também servem ao contrato e à rota de escalação.
+**Lacunas**: composição que não cobre todos os aptos: o legado recusava ("A composição precisa incluir todos os aptos."), a spec não pede; vale a spec (`avaliar.ts`, `[LACUNA]`).
 
 **Done when**:
 

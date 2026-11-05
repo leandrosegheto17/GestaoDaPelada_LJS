@@ -219,3 +219,16 @@ export {
   type SugestaoInvalida,
   type SugestaoVarios,
 } from './simulador/sugerir.ts';
+export {
+  avaliar,
+  idsDaComposicaoEntrada,
+  MENSAGEM_FORA_DOS_APTOS,
+  MENSAGEM_REPETIDO_NA_COMPOSICAO,
+  problemaNaComposicao,
+  type Avaliacao,
+  type AvaliacaoDois,
+  type AvaliacaoVarios,
+  type ComposicaoEntrada,
+  type FalhaAvaliacao,
+  type JogadorNaComposicao,
+} from './simulador/avaliar.ts';
