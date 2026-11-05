@@ -1195,6 +1195,8 @@ T47 → T48
 **Depends on**: T33
 **Reuses**: Relógio injetado (`GE:831`); T5
 **Requirement**: FIN-49
+**Status**: rascunhada
+**Nota do rascunho**: os dois relógios são `2026-11-01T02:30:00Z` e `2026-11-01T03:05:00Z` (São Paulo em UTC−3, sem horário de verão). O fim do saldo é conferido no `GET mes` e no detalhe do grupo (T30).
 
 **Done when**:
 
