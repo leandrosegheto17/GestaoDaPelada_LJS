@@ -1074,6 +1074,8 @@ T78 → T79
 **Depends on**: T22
 **Reuses**: Molde de função `admins_listar` (`M:1792843680000_conta-admins-listar.sql:8-21`); tabela `M:1792843200000_linha-de-base.sql:194-207`; policies `M:1792843320000_rls.sql:48-56`; `BD:130-137`; AD-034
 **Requirement**: PAR-127, PAR-129, PAR-130, PAR-131
+**Status**: rascunhada
+**Nota do rascunho**: migração `1792844700000_eventos-uso.sql`; testes em `backend/api/test/banco/eventos-uso.test.ts`. Tipo fora de `ranking_aberto`/`pdf_exportado`, dispositivo e mês trocados ou momento nulo levantam `22023`; conta na sessão, `42501`. O teste (c) "nenhum grant em eventos_uso" da T0 passou a exigir exatamente SELECT e INSERT, como a T0 previa.
 
 **Done when**:
 

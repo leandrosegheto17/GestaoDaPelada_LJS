@@ -124,8 +124,9 @@ describe('rede da partidas-e-ranking: grants atuais (c)', () => {
     expect(await privilegios('presencas')).toEqual(expect.arrayContaining(['DELETE', 'INSERT', 'SELECT', 'UPDATE']));
   });
 
-  it('PAR-130: nenhum grant em eventos_uso para pelada_app', async () => {
-    expect(await privilegios('eventos_uso')).toEqual([]);
+  // Trocado pela T23 (1792844700000_eventos-uso.sql): antes, nenhum grant; agora, exatamente SELECT e INSERT.
+  it('PAR-130: em eventos_uso, pelada_app tem exatamente SELECT e INSERT (T23)', async () => {
+    expect(await privilegios('eventos_uso')).toEqual(['INSERT', 'SELECT']);
   });
 });
 
