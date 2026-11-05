@@ -22,15 +22,19 @@ export interface PropsCasca {
   grupo?: GrupoDaBarra;
   /** Conteúdo centralizado na tela (mensagens: indisponível, offline, em breve). */
   centralizada?: boolean;
+  /** Coluna estreita dos formulários de acesso (`conteudo--estreito`, `t04-entrar--vazio`). */
+  estreita?: boolean;
   /** Marca a área principal como ocupada (carregando). */
   ocupada?: boolean;
   children?: ReactNode;
 }
 
-export function Casca({ titulo, grupo, centralizada = false, ocupada = false, children }: PropsCasca) {
+export function Casca({ titulo, grupo, centralizada = false, estreita = false, ocupada = false, children }: PropsCasca) {
   const classeMain = centralizada
     ? estilos['tela-mensagem']
-    : [estilos.conteudo, grupo ? estilos['conteudo--admin'] : ''].filter(Boolean).join(' ');
+    : [estilos.conteudo, grupo ? estilos['conteudo--admin'] : '', estreita ? estilos['conteudo--estreito'] : '']
+        .filter(Boolean)
+        .join(' ');
   return (
     <>
       <header className={[estilos.barra, grupo ? estilos['barra--admin'] : ''].filter(Boolean).join(' ')}>

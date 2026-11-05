@@ -71,6 +71,13 @@
   padding-right: var(--esp-4);
 }
 
+/* .specs/mockup/base.css:43 (formulários de acesso, ACE-56). */
+.conteudo--estreito {
+  max-width: var(--largura-formulario);
+  padding-left: var(--esp-4);
+  padding-right: var(--esp-4);
+}
+
 .titulo-pagina {
   font-size: var(--texto-3xl);
   font-weight: var(--peso-extra);

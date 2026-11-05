@@ -5,7 +5,6 @@ import {
   Cadastro,
   Confirmar,
   Convite,
-  Entrar,
   Esqueci,
   InicioApp,
   MinhaConta,
@@ -15,6 +14,7 @@ import {
   Termos,
 } from '../paginas/acesso/provisorias.tsx';
 import { GuardaApp, GuardaPublica } from './guarda.tsx';
+import { Entrar } from '../telas/entrar/Entrar.tsx';
 
 /**
  * Rotas (FUN-31, FUN-38; conta e acesso, T42):

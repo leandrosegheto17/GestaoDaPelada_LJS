@@ -1,0 +1,59 @@
+/* Layout comum das telas de acesso (ACE-56), de .specs/mockup/base.css:17-19,45,48,80,218-223. */
+
+.formulario {
+  display: grid;
+  gap: var(--esp-4);
+}
+
+.paragrafo {
+  margin: 0 0 var(--esp-3);
+  overflow-wrap: anywhere;
+}
+
+.acima-3 {
+  margin-top: var(--esp-3);
+}
+
+.acima-4 {
+  margin-top: var(--esp-4);
+}
+
+.voltar {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--esp-1);
+  min-height: var(--alvo-toque);
+  font-weight: var(--peso-semi);
+  text-decoration: none;
+  color: var(--cor-texto);
+}
+
+.esqueleto {
+  display: block;
+  background: var(--cor-esqueleto);
+  border-radius: var(--raio-sm);
+  animation: pulsar 1.4s ease-in-out infinite;
+}
+
+@keyframes pulsar {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.esqueleto--linha {
+  height: 16px;
+  margin: var(--esp-2) 0;
+}
+
+.esqueleto--botao {
+  height: var(--altura-botao);
+  width: 100%;
+  border-radius: var(--raio);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .esqueleto {
+    animation: none;
+  }
+}

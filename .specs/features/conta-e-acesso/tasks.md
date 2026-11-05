@@ -1432,6 +1432,8 @@ T57 → T58
 **Depends on**: T42
 **Reuses**: `.specs/mockup/telas/t04-entrar--*.html` (7 estados); componentes de T39 a T41
 **Requirement**: ACE-06, ACE-09, ACE-11, ACE-12, ACE-13, ACE-20, ACE-24, ACE-56, ACE-65
+**Status**: rascunhada
+**Nota do rascunho**: tela em `src/telas/entrar/Entrar.tsx`, ligada em `rotas.tsx` no lugar da provisória. No 200, só invalida a consulta `sessao`, e a `GuardaPublica` leva ao destino. A `Casca` ganha `estreita` (`conteudo--estreito`), há o `LinkBotao` (link com as classes do `Botao`) e o CSS comum das telas de acesso em `src/telas/acesso.module.css`. Apoio novo de teste de tela: `test/apoio/tela.tsx` (servidor falso por "MÉTODO /caminho"). SPEC_DEVIATION: o link "Voltar ao ranking" do mockup fica de fora até existir o ranking público (`partidas-e-ranking`); a T55 vai mostrar essa diferença. O texto do reenvio é o do mockup (`t30-confirmar--reenviado`), não o `MENSAGENS.reenvio` do contrato.
 
 **Done when**:
 
