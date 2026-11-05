@@ -1,7 +1,10 @@
 import { Hono, type Context } from 'hono';
+import { bodyLimit } from 'hono/body-limit';
 import {
   consultaMesPublico,
   corpoDoErro,
+  eventoPublicoCorpo,
+  LIMITE_CORPO_EVENTO_BYTES,
   MENSAGEM_MES_FORA_DO_HISTORICO,
   type LinhaPublica,
   type PdfPublico,
@@ -9,10 +12,14 @@ import {
 } from '@pelada/contrato';
 import { calcularPdf, calcularRanking, limitesDeMes, mesDe, mesNoHistorico, type LinhaRanking } from '@pelada/dominio';
 import type { Ambiente } from '../ambiente.ts';
-import { erroDeCampos, mensagensDoZod, respostaDeCampo } from '../corpo.ts';
+import { erroDeCampos, lerCorpoDoGrupo, mensagensDoZod, respostaDeCampo } from '../corpo.ts';
+import { eventos } from '../../infraestrutura/db/repositorios/eventos.ts';
 import { grupoPublico, type GrupoPublico } from '../../infraestrutura/db/repositorios/grupo-publico.ts';
 import { historico } from '../../infraestrutura/db/repositorios/historico.ts';
 import { linkPublico } from './grupos.ts';
+
+/** 413 do corpo do evento acima de 1 KB (PAR-128). */
+export const MENSAGEM_CORPO_GRANDE = 'O corpo da requisição é grande demais.';
 
 /**
  * Rotas públicas `/api/publico/:slug/*` (partidas-e-ranking T45 em diante; `BD:240-242`). O `protegerRotasPublicas`
@@ -102,6 +109,30 @@ export function rotasPublico(): Hono<Ambiente> {
     };
     return c.json(resposta, 200);
   });
+
+  /**
+   * `POST …/eventos` (T47; PAR-127 a PAR-129, `BD:242`, `BD:247`):
+   * - corpo acima de 1 KB: 413 "O corpo da requisição é grande demais.", antes de ler o JSON (PAR-128);
+   * - corpo fora do `eventoPublicoCorpo` (tipo desconhecido, campo a mais, aparelho que não é UUID v4): 422;
+   * - `evento_publico_registrar` com o slug do contexto e o instante do relógio; `false` (grupo inexistente ou
+   *   arquivado): 404 com o corpo do PAR-90; gravado: 204;
+   * - a linha só tem grupo, tipo, momento e o aparelho ou o mês: nem IP, nem user-agent, nem conta (PAR-129; a conta da
+   *   sessão já foi apagada pelo `contextoPublico`).
+   */
+  rotas.post(
+    '/publico/:slug/eventos',
+    bodyLimit({
+      maxSize: LIMITE_CORPO_EVENTO_BYTES,
+      onError: (c) => c.json({ erro: MENSAGEM_CORPO_GRANDE }, 413),
+    }),
+    async (c) => {
+      const corpo = await lerCorpoDoGrupo(c, eventoPublicoCorpo);
+      if (!corpo.ok) return corpo.resposta;
+      const gravou = await eventos.registrarPublico(c.var.db, c.var.slugPublico ?? '', corpo.dados, c.var.relogio.agoraIso());
+      if (!gravou) return c.json(corpoDoErro('nao_encontrado'), 404);
+      return c.body(null, 204);
+    },
+  );
 
   return rotas;
 }

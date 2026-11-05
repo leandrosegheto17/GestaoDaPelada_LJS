@@ -1722,6 +1722,8 @@ T78 → T79
 **Depends on**: T46
 **Reuses**: T23, T33; `BD:242`, `BD:247`
 **Requirement**: PAR-127, PAR-128, PAR-129
+**Status**: rascunhada
+**Nota do rascunho**: em `rotas/publico.ts`, com o `bodyLimit` do Hono (`hono/body-limit`) na própria rota e o corpo lido pelo `lerCorpoDoGrupo` (422 com a mensagem do campo). O 413 responde só `{ erro }`, como o 429 do `limiteTaxa`, porque não há código de erro para ele no contrato. Testes em `backend/api/test/rotas/publico-eventos.test.ts`.
 
 **Done when**:
 
