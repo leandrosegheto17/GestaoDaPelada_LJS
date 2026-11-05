@@ -486,6 +486,8 @@ T39 → T40 → T41
 **Depends on**: T7
 **Reuses**: molde de `evento_publico_registrar` (`PR:1038`, sem conta e slug do contexto); molde de função (`M:1792843680000_conta-admins-listar.sql:8-21`); AD-065, AD-034
 **Requirement**: NOT-05, NOT-07, NOT-08, NOT-10, NOT-17, NOT-18, NOT-51, NOT-65, NOT-70
+**Status**: rascunhada
+**Nota do rascunho**: `push_ranking_estado` devolve texto (`ativa`, `ausente` ou `nao_encontrado`), e `push_ranking_cancelar` devolve `void` e ignora em silêncio um slug que não é o do contexto (a API responde 204 de qualquer jeito). Os testes de corrida usam duas conexões com COMMIT real e limpam as linhas `t8-*` no `finally`.
 
 **Done when**:
 
