@@ -12,6 +12,7 @@ import { useMesDaUrl, useRankingPublico } from '../../dados/publico.ts';
 import estilos from '../acesso.module.css';
 import { nomeDoMes } from '../financeiro/FinanceiroMes.tsx';
 import { textoRecorrencia } from '../grupos/recorrencia.ts';
+import { ehSlugValido, GrupoIndisponivel } from './GrupoIndisponivel.tsx';
 import pagina from './ranking.module.css';
 import { TabelaRanking } from './TabelaRanking.tsx';
 
@@ -29,7 +30,7 @@ import { TabelaRanking } from './TabelaRanking.tsx';
  * - 422 do mês (fora do histórico ou malformado; P17 de `BC:29`): volta ao mês de hoje tirando o `?mes=` por
  *   substituição e mostra a faixa de erro com a mensagem da API;
  * - falha de rede: "Sem conexão" com "Tentar de novo" (t01 erro).
- * O 404 e o slug malformado (t03) são da T57.
+ * - 404 da API e slug malformado (este sem chamar a API): `GrupoIndisponivel` (t03, PAR-94, T57).
  */
 
 export const TEXTO_SEM_JOGADORES = 'Nenhum jogador no ranking ainda.';
@@ -244,6 +245,12 @@ function Ranking({ dados, aoIr }: { dados: RankingPublico; aoIr: (mes: string) =
 
 export function PaginaRanking() {
   const { slug = '' } = useParams();
+  // Slug malformado: a t03 sem chamar a API (PAR-94, T57).
+  if (!ehSlugValido(slug)) return <GrupoIndisponivel />;
+  return <RankingDoSlug slug={slug} />;
+}
+
+function RankingDoSlug({ slug }: { slug: string }) {
   const [mes, trocarMes] = useMesDaUrl();
   const consulta = useRankingPublico(slug, mes);
   const [aviso, setAviso] = useState<string | null>(null);
@@ -263,6 +270,9 @@ export function PaginaRanking() {
     setAviso(null);
     trocarMes(novo);
   };
+
+  // 404 da API: slug que não existe ou grupo arquivado, a t03 (PAR-94, T57).
+  if (erro instanceof ErroApi && erro.status === 404) return <GrupoIndisponivel />;
 
   if (consulta.isError && !mesRecusado) {
     return (

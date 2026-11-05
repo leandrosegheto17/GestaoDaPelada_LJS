@@ -2011,6 +2011,7 @@ T78 → T79
 **Depends on**: T56
 **Reuses**: `.specs/mockup/telas/t03-indisponivel--erro.html`; `EstadoErro` (`F:1472`)
 **Requirement**: PAR-94
+**Status**: rascunhada
 
 **Done when**:
 
