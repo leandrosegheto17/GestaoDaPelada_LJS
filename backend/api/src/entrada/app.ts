@@ -5,6 +5,7 @@ import { semCache, semSniff } from './middlewares/cabecalhos.ts';
 import { limitarRotasDeAcesso } from './middlewares/limite-taxa.ts';
 import { carregarSessao } from './middlewares/sessao.ts';
 import { protegerRotasDeGrupo } from './middlewares/vinculo.ts';
+import { rotasConta } from './rotas/conta.ts';
 import { devEmails } from './rotas/dev-emails.ts';
 import { health } from './rotas/health.ts';
 import {
@@ -41,6 +42,9 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
   api.route('/', health);
   // Só responde com EMAIL_DEV=1; sem ela, 404 como rota inexistente (T17).
   api.route('/', devEmails);
+  // Rotas de acesso (T25 em diante); a fábrica de teste vale para o banco delas também.
+  const rotasAcesso = opcoes.fabricaBanco ? { fabrica: opcoes.fabricaBanco } : {};
+  api.route('/', rotasConta(rotasAcesso));
   opcoes.registrarExtras?.(api);
 
   api.notFound((c) => c.json({ erro: 'Rota não encontrada.' }, 404));

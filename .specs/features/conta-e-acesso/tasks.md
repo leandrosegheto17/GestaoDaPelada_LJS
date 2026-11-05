@@ -953,6 +953,9 @@ T57 → T58
 **Depends on**: T24
 **Reuses**: tabela de rotas de `ljs:.specs/features/conta-e-acesso/design.md:152-157`; schemas de T12
 **Requirement**: ACE-01, ACE-02, ACE-03, ACE-04, ACE-06, ACE-07, ACE-08, ACE-50, ACE-58, ACE-68
+**Status**: rascunhada
+**Nota do rascunho**: apoio comum das rotas em `src/entrada/rotas/apoio-acesso.ts` (`lerCorpo`, `contarPedidoDeEmail`, `emailIndisponivel`); as rotas nascem de `rotasConta(opcoes)`, montada em `criarApp` com a fábrica de teste. O pedido por origem é contado antes de validar o corpo. Confirmar com token malformado responde 410 `link_invalido` (não 422). Testes no projeto `banco` (Node), em `test/acesso/`, com `SPEC_DEVIATION` (a matriz pede `workerd`, que não tem o Postgres).
+**Lacunas**: o aviso de cadastro duplicado não tem o nome do dono do e-mail (a função não o devolve); o rascunho saúda pelo endereço.
 
 **Done when**:
 
