@@ -1103,6 +1103,8 @@ T53 → T54
 **Depends on**: T28
 **Reuses**: `lerComposicao` e `idsDaComposicao` (T23); `L:backend/api/src/aplicacao/partidas/nova.ts:51-58`
 **Requirement**: SIM-75, SIM-76, SIM-94
+**Status**: rascunhada
+**Nota do rascunho**: `porData` devolve `{ data, n, k, escalada }` ou nulo; `idsNaData` devolve os ids ou nulo. Teste em `backend/api/test/repositorios/escalacoes-ler.test.ts`, com escalações gravadas como dono (inclusive as de forma inválida).
 
 **Done when**:
 
