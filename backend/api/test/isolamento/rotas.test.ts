@@ -1,10 +1,11 @@
 import { Buffer } from 'node:buffer';
 import type { Hono } from 'hono';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import type { Ambiente } from '../../src/entrada/ambiente.ts';
+import type { Ambiente, Env } from '../../src/entrada/ambiente.ts';
 import { criarApp } from '../../src/entrada/app.ts';
 import { gerarToken } from '../../src/infraestrutura/sessao/token.ts';
 import { cliente, conviteDeTeste, limparCaixa } from '../acesso/apoio.ts';
+import { chavesAssinante, chavesVapid, endpointDe } from '../rotas/apoio-push.ts';
 import { abrirCenarioGrupos, type CenarioGruposAberto } from './cenario-grupos.ts';
 
 /**
@@ -30,6 +31,10 @@ import { abrirCenarioGrupos, type CenarioGruposAberto } from './cenario-grupos.t
  * gravar (escalações e eventos de G e de H iguais); sem sessão, 401; id de jogador de H nos aptos ou na composição de
  * G dá 422 sem o apelido nem o id de H (e o contrário); com G arquivado, 409 nos POST. As 2 rotas ampliadas
  * (`GET /api/grupos/:grupoId`, `GET …/partidas/nova`) já têm caso nas tabelas de grupo e de partidas.
+ *
+ * notificacoes T32 (NOT-53, NOT-54): as 8 rotas de push (`ROTAS_DE_PUSH`): as 4 públicas com o slug de G e a assinatura
+ * de H (e o contrário), as 4 da conta com a sessão de B e a assinatura de A; e nenhuma resposta GET do app, nem da
+ * criadora de G, traz os valores semeados de endpoint, `p256dh` ou `auth`.
  */
 
 let aberto: CenarioGruposAberto;
@@ -933,6 +938,186 @@ const ROTAS_DO_SIMULADOR: Record<string, Linha> = Object.fromEntries(
   Object.entries(PEDIDOS_DO_SIMULADOR).map(([rota, p]) => [rota, casoDoSimulador(p)]),
 );
 
+// ---------------------------------------------------------------- notificações (notificacoes T32)
+
+/**
+ * Rotas de push (NOT-53, NOT-54; AD-103). As públicas, com a sessão de B no cookie (o `contextoPublico` a descarta):
+ * o slug de G só toca as assinaturas de G e o de H só as de H, mesmo com o endpoint e o `auth` de uma assinatura do
+ * outro grupo. As da conta: B, com o mesmo endpoint e `auth` da assinatura de A, não consulta, não apaga nem troca a
+ * dela. Os valores semeados nunca aparecem numa resposta (NOT-54). Os pedidos levam as VAPID (`pedirComPush`), senão o
+ * `POST` responderia 503 antes de chegar à função.
+ */
+let pedirComPush: ReturnType<typeof cliente>;
+let vapidDoTeste: Partial<Env> = {};
+
+beforeAll(async () => {
+  vapidDoTeste = (await chavesVapid()) as Partial<Env>;
+  pedirComPush = cliente(aberto.url, vapidDoTeste);
+  // G e H no Pro: o push só passa do 403 com o recurso liberado (AD-104).
+  await aberto.db.query(
+    `UPDATE grupos SET situacao_comercial = 'ativo', trial_inicio = NULL WHERE id IN ($1, $2)`,
+    [aberto.cenario.grupoG, aberto.cenario.grupoH],
+  );
+});
+
+/** Assinaturas semeadas: uma em G, uma em H e uma da conta A, com valores que não podem vazar. */
+const SEMEADAS = {
+  g: { endpoint: endpointDe('isolamento-g'), ...chavesAssinante(11) },
+  h: { endpoint: endpointDe('isolamento-h'), ...chavesAssinante(12) },
+  contaA: { endpoint: endpointDe('isolamento-conta-a'), ...chavesAssinante(13) },
+};
+
+async function semearPush(): Promise<void> {
+  const { db, cenario } = aberto;
+  await db.query('DELETE FROM push_ranking WHERE grupo_id IN ($1, $2)', [
+    cenario.grupoG,
+    cenario.grupoH,
+  ]);
+  await db.query('DELETE FROM push_conta');
+  for (const [grupo, s] of [
+    [cenario.grupoG, SEMEADAS.g],
+    [cenario.grupoH, SEMEADAS.h],
+  ] as const) {
+    await db.query(
+      'INSERT INTO push_ranking (grupo_id, endpoint, p256dh, auth) VALUES ($1, $2, $3, $4)',
+      [grupo, s.endpoint, s.p256dh, s.auth],
+    );
+  }
+  await db.query(
+    'INSERT INTO push_conta (conta_id, endpoint, p256dh, auth) VALUES ($1, $2, $3, $4)',
+    [cenario.contaA, SEMEADAS.contaA.endpoint, SEMEADAS.contaA.p256dh, SEMEADAS.contaA.auth],
+  );
+}
+
+/** As assinaturas de G, de H e de A, para provar que nada mudou. */
+async function retratoDoPush(): Promise<string> {
+  const { db, cenario } = aberto;
+  const partes = await Promise.all([
+    db.query(
+      'SELECT grupo_id, endpoint, p256dh, auth FROM push_ranking WHERE grupo_id IN ($1, $2) ORDER BY id',
+      [cenario.grupoG, cenario.grupoH],
+    ),
+    db.query('SELECT endpoint, p256dh, auth FROM push_conta WHERE conta_id = $1 ORDER BY id', [
+      cenario.contaA,
+    ]),
+  ]);
+  return JSON.stringify(partes.map((p) => p.rows));
+}
+
+/** O texto da resposta não tem nenhum dos valores semeados (NOT-54). */
+function semValorSemeado(texto: string, rota: string): void {
+  for (const s of Object.values(SEMEADAS)) {
+    expect(texto, `${rota}: endpoint`).not.toContain(s.endpoint);
+    expect(texto, `${rota}: p256dh`).not.toContain(s.p256dh);
+    expect(texto, `${rota}: auth`).not.toContain(s.auth);
+  }
+}
+
+const corpoComChaves = (s: { endpoint: string; p256dh: string; auth: string }) => ({
+  endpoint: s.endpoint,
+  chaves: { p256dh: s.p256dh, auth: s.auth },
+});
+const corpoComAuth = (s: { endpoint: string; auth: string }) => ({
+  endpoint: s.endpoint,
+  chaves: { auth: s.auth },
+});
+
+interface PedidoDePush {
+  metodo: 'GET' | 'POST' | 'DELETE';
+  caminho: string;
+  /** O corpo com o endpoint e as chaves da assinatura do outro dono (H no slug de G; A na sessão de B). */
+  corpo?: unknown;
+}
+
+/** Rotas públicas de push: com o slug de G e os dados de H, nada de H muda nem aparece; o contrário também. */
+function casoPushPublico(p: Omit<PedidoDePush, 'corpo'>, corpoDe?: (s: typeof SEMEADAS.h) => unknown): Linha {
+  return {
+    caso: async () => {
+      const { cenario } = aberto;
+      await semearPush();
+      const slugH = await slugDe(cenario.grupoH);
+      const antes = await retratoDoPush();
+      const enviar = (slug: string, dono: typeof SEMEADAS.h) =>
+        pedirComPush(`/publico/${slug}${p.caminho}`, {
+          metodo: p.metodo,
+          sessao: sessaoB,
+          ...(corpoDe ? { corpo: corpoDe(dono) } : {}),
+        });
+
+      const emG = await enviar(cenario.slugG, SEMEADAS.h);
+      semValorSemeado(await emG.text(), `slug de G com a assinatura de H (${p.metodo})`);
+      const emH = await enviar(slugH, SEMEADAS.g);
+      semValorSemeado(await emH.text(), `slug de H com a assinatura de G (${p.metodo})`);
+
+      if (p.metodo === 'POST' && p.caminho === '/push') {
+        // NOT-53: o mesmo endpoint vira linha nova no grupo do slug; a do outro grupo fica igual.
+        expect(emG.status).toBe(201);
+        expect(emH.status).toBe(201);
+        const r = await aberto.db.query<{ n: number }>(
+          'SELECT count(*)::int AS n FROM push_ranking WHERE grupo_id IN ($1, $2)',
+          [cenario.grupoG, cenario.grupoH],
+        );
+        expect(r.rows[0]!.n).toBe(4);
+        await semearPush();
+      } else if (p.caminho === '/push/estado') {
+        expect(await emG.json()).toEqual({ assinado: false });
+        expect(await emH.json()).toEqual({ assinado: false });
+      }
+      expect(await retratoDoPush()).toBe(antes);
+    },
+  };
+}
+
+/** Rotas da conta: B, com o endpoint e o `auth` de A, não consulta, não apaga nem troca a assinatura de A. */
+function casoPushConta(p: PedidoDePush): Linha {
+  return {
+    caso: async () => {
+      await semearPush();
+      const antes = await retratoDoPush();
+      const r = await pedirComPush(p.caminho, {
+        metodo: p.metodo,
+        sessao: sessaoB,
+        ...(p.corpo !== undefined ? { corpo: p.corpo } : {}),
+      });
+      expect(r.status, `${p.metodo} ${p.caminho} da conta B`).toBeLessThan(300);
+      const texto = await r.text();
+      semValorSemeado(texto, `${p.metodo} ${p.caminho}`);
+      if (p.caminho === '/conta/push/estado') expect(JSON.parse(texto)).toEqual({ assinado: false });
+      expect(await retratoDoPush()).toBe(antes);
+      await aberto.db.query('DELETE FROM push_conta WHERE conta_id = $1', [aberto.cenario.contaB]);
+    },
+  };
+}
+
+const ROTAS_DE_PUSH: Record<string, Linha> = {
+  'GET /api/publico/:slug/push': casoPushPublico({ metodo: 'GET', caminho: '/push' }),
+  'POST /api/publico/:slug/push': casoPushPublico({ metodo: 'POST', caminho: '/push' }, corpoComChaves),
+  'DELETE /api/publico/:slug/push': casoPushPublico(
+    { metodo: 'DELETE', caminho: '/push' },
+    corpoComAuth,
+  ),
+  'POST /api/publico/:slug/push/estado': casoPushPublico(
+    { metodo: 'POST', caminho: '/push/estado' },
+    corpoComAuth,
+  ),
+  'GET /api/conta/push': casoPushConta({ metodo: 'GET', caminho: '/conta/push' }),
+  'POST /api/conta/push': casoPushConta({
+    metodo: 'POST',
+    caminho: '/conta/push',
+    corpo: corpoComChaves({ ...SEMEADAS.contaA, ...chavesAssinante(14) }),
+  }),
+  'DELETE /api/conta/push': casoPushConta({
+    metodo: 'DELETE',
+    caminho: '/conta/push',
+    corpo: corpoComAuth(SEMEADAS.contaA),
+  }),
+  'POST /api/conta/push/estado': casoPushConta({
+    metodo: 'POST',
+    caminho: '/conta/push/estado',
+    corpo: corpoComAuth(SEMEADAS.contaA),
+  }),
+};
+
 /** Uma linha por rota do Hono (`MÉTODO caminho`). */
 const TABELA: Record<string, Linha> = {
   ...ROTAS_DE_GRUPO,
@@ -940,6 +1125,7 @@ const TABELA: Record<string, Linha> = {
   ...ROTAS_DE_PARTIDAS,
   ...ROTAS_PUBLICAS,
   ...ROTAS_DO_SIMULADOR,
+  ...ROTAS_DE_PUSH,
   'GET /api/health': { naoSeAplica: 'rota pública de saúde, sem dado de conta nem de grupo' },
   'GET /api/dev/emails': { naoSeAplica: 'só existe com EMAIL_DEV=1, em dev e no e2e (T17)' },
   'POST /api/conta': { naoSeAplica: SEM_SESSAO },
@@ -1258,6 +1444,55 @@ describe('isolamento de rotas', () => {
       await db.query('UPDATE grupos SET arquivado_em = NULL WHERE id = $1', [cenario.grupoG]);
     }
     expect(await retratoDoSimulador(cenario.grupoG)).toBe(antes);
+  });
+
+  it('NOT-54: as 8 rotas de push estão no app e têm caso; uma rota de push nova sem caso reprova', () => {
+    const rotas = new Set(rotasDoApp(criarApp()));
+    expect(Object.keys(ROTAS_DE_PUSH)).toHaveLength(8);
+    for (const rota of Object.keys(ROTAS_DE_PUSH)) {
+      expect(rotas.has(rota), rota).toBe(true);
+      expect('caso' in (TABELA[rota] ?? {}), rota).toBe(true);
+    }
+    const comNova = criarApp({
+      registrarExtras: (api) => {
+        api.get('/publico/:slug/push/extra', (c) => c.json({ ok: true }));
+        api.get('/conta/push/extra', (c) => c.json({ ok: true }));
+      },
+    });
+    expect(rotasSemLinha(comNova, TABELA).filter((r) => r.includes('/push')).sort()).toEqual([
+      'GET /api/conta/push/extra',
+      'GET /api/publico/:slug/push/extra',
+    ]);
+  });
+
+  it('NOT-54: nenhuma resposta GET do app, nem da criadora e admin de G, contém endpoint, p256dh ou auth semeados', async () => {
+    const { cenario } = aberto;
+    await semearPush();
+    const valores: Record<string, string> = {
+      grupoId: cenario.grupoG,
+      slug: cenario.slugG,
+      id: cenario.idsG.jogadorAtivo,
+      jogadorId: cenario.idsG.jogadorAtivo,
+      data: DATA_DE_G,
+      periodoId: periodoDeG,
+      habilidadeId: cenario.idsG.habilidade,
+      contaId: cenario.contaA,
+      mes: '2026-01',
+    };
+    const gets = rotasDoApp(criarApp()).filter((r) => r.startsWith('GET '));
+    let lidas = 0;
+    for (const rota of gets) {
+      const caminho = rota.slice('GET /api'.length);
+      const params = [...caminho.matchAll(/:(\w+)/g)].map((m) => m[1]!);
+      if (params.some((p) => !(p in valores))) continue;
+      const concreto = caminho.replace(/:(\w+)/g, (_t, p: string) => valores[p]!);
+      for (const sessaoDaVez of [sessaoA, sessaoO]) {
+        const r = await pedirComPush(concreto, { sessao: sessaoDaVez });
+        semValorSemeado(await r.text(), rota);
+      }
+      lidas += 1;
+    }
+    expect(lidas).toBeGreaterThan(10);
   });
 
   const casos = Object.entries(TABELA).filter(

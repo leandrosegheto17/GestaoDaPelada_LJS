@@ -1137,6 +1137,9 @@ T39 → T40 → T41
 **Depends on**: T31
 **Reuses**: suíte de isolamento de rotas (`CA:1070`); teste de log sem segredo (`CA:1047`)
 **Requirement**: NOT-33, NOT-54
+**Status**: rascunhada
+**Lacunas**: o teste existente `PAR-139: as 3 rotas públicas estão no app e têm caso` (`backend/api/test/isolamento/rotas.test.ts`) compara a lista exata das rotas `/api/publico/` com as 3 da partidas-e-ranking e vai falhar com as 4 rotas públicas de push. Não foi alterado (não há autorização em `## Autorizações` para esta feature): o `/executar` pergunta se troca o filtro para excluir `/push` (mesma força) ou se inclui as 4 na lista.
+**Nota do rascunho**: são 8 rotas novas, não 7 (a tarefa não contou o `GET /api/conta/push`). As linhas vão em `ROTAS_DE_PUSH` (casos públicos com o slug de G e a assinatura de H, e o contrário; casos da conta com a sessão de B e a assinatura de A), mais um meta-teste das 8 e o NOT-54 que percorre todo `GET` do app com parâmetros conhecidos, como a criadora A e como a admin O. G e H passam a Pro no `beforeAll` do arquivo (o `POST` precisa do recurso). O NOT-33 ficou em `backend/api/test/isolamento/push-log.test.ts`: console inteiro e relato do cliente de envio capturados, nas rotas e no envio do ranking com 201, 400 e 503.
 
 **Done when**:
 
