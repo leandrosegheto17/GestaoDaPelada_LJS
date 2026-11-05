@@ -2327,6 +2327,8 @@ T78 → T79
 **Depends on**: T68
 **Reuses**: `.specs/mockup/telas/t01-ranking--{pdf-compartilhar,pdf-baixado}.html`; `Dialogo` (`CA:1286`)
 **Requirement**: PAR-105, PAR-106
+**Status**: rascunhada
+**Nota do rascunho**: `entregar(blob, nome, ambiente)` em `pdf/entregar.ts` devolve `dialogo` (com o `File`) ou baixa na hora e devolve `baixado`; `compartilhar` trata `AbortError` e `NotAllowedError` como recusa (volta ao diálogo) e deixa subir outra falha. O diálogo "PDF pronto." é `telas/ranking/DialogoPdfPronto.tsx` (design C7), sobre o `Dialogo`; a faixa "PDF baixado." é da tela (T70).
 
 **Done when**:
 
