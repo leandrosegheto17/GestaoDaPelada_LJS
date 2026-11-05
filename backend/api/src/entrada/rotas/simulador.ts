@@ -2,15 +2,34 @@ import { Hono } from 'hono';
 import {
   consultaContexto,
   corpoDoErro,
+  MENSAGEM_APTOS_INATIVOS,
   previaCorpo,
+  sugerirCorpo,
   type ContextoResposta,
   type PreviaResposta,
+  type SugerirResposta,
 } from '@pelada/contrato';
-import { calcularPrevia, descreverPrevia, proximoDiaDeJogo, type NomeDiaDaSemana, type Previa } from '@pelada/dominio';
+import {
+  calcularPrevia,
+  descreverPrevia,
+  proximoDiaDeJogo,
+  sugerir,
+  vespera,
+  type NomeDiaDaSemana,
+  type Previa,
+} from '@pelada/dominio';
 import type { Ambiente } from '../ambiente.ts';
-import { erroDeCampos, lerCorpoDoGrupo, mensagensDoZod } from '../corpo.ts';
+import { erroDeCampos, lerCorpoDoGrupo, mensagensDoZod, respostaDeCampo } from '../corpo.ts';
+import { historico } from '../../infraestrutura/db/repositorios/historico.ts';
 import { jogadoresLeitura } from '../../infraestrutura/db/repositorios/jogadores-leitura.ts';
 import { rotasEscalacoes } from './escalacoes.ts';
+import {
+  aptosDoCorpo,
+  entradaDoDominio,
+  registrarRequisicao,
+  resultadoDoisSemOrdem,
+  resultadoVarios,
+} from './simulador-resultado.ts';
 
 /**
  * Rotas do simulador (T33 em diante da simulador). A cadeia do grupo vem antes (sessão 401, transação, vínculo 404,
@@ -24,6 +43,11 @@ import { rotasEscalacoes } from './escalacoes.ts';
  * - `POST …/simulador/previa` (T34; SIM-09, SIM-83): valida `previaCorpo` e devolve `calcularPrevia` com a descrição,
  *   sem consulta além da cadeia do grupo e sem gravar; 409 em grupo arquivado (pela cadeia). A transação `READ ONLY`
  *   pelo sufixo `/previa` (AD-035) é a do `comBanco` da partidas-e-ranking (`PR:1362`, T36), ainda não rascunhada.
+ *
+ * - `POST …/simulador/sugerir` (T35; SIM-17, SIM-47, SIM-53 a SIM-56, SIM-60, SIM-80): valida `sugerirCorpo`, confere
+ *   que cada apto é ativo do grupo na data (senão 422 "Há jogadores que não estão ativos…" no campo `aptos`, sem dizer
+ *   qual), carrega o histórico até a véspera e devolve `sugerir` na forma do contrato, sem gravar; aptos insuficientes
+ *   dão 422 com a descrição da prévia no campo `aptos` (SIM-56). Uma linha de log por requisição (SIM-60).
  *
  * Molde: `GET …/jogadores` (`rotas/jogadores.ts:17`); o `GET partidas/nova` de `PR:1436` ainda não existe.
  */
@@ -62,6 +86,35 @@ export function rotasSimulador(): Hono<Ambiente> {
     if (!corpo.ok) return corpo.resposta;
     const previa = calcularPrevia({ formato: corpo.dados.formato, n: corpo.dados.n, aptos: corpo.dados.aptos.length });
     return c.json(respostaDaPrevia(previa), 200);
+  });
+
+  rotas.post('/grupos/:grupoId/simulador/sugerir', async (c) => {
+    const corpo = await lerCorpoDoGrupo(c, sugerirCorpo);
+    if (!corpo.ok) return corpo.resposta;
+    const dados = corpo.dados;
+    registrarRequisicao('sugerir', dados);
+    const grupoId = c.req.param('grupoId');
+
+    const aptos = aptosDoCorpo(dados, await jogadoresLeitura.paraSimulador(c.var.db, grupoId, dados.data));
+    if (!aptos) return respostaDeCampo(c, 'aptos', MENSAGEM_APTOS_INATIVOS);
+
+    // Só as partidas até a véspera contam para a prioridade (SIM-17).
+    const hist = await historico.carregar(c.var.db, grupoId, vespera(dados.data));
+    const s = sugerir(entradaDoDominio(dados, aptos), hist);
+    if (!s.valida) return respostaDeCampo(c, 'aptos', s.descricao);
+
+    let resposta: SugerirResposta;
+    if (s.formato === 'dois_times' && dados.formato === 'dois_times') {
+      resposta = {
+        ...resultadoDoisSemOrdem(dados, s.descricao, s.composicao, s.indicadores, s.avisos, aptos),
+        ordemPrioridade: s.ordemPrioridade,
+      };
+    } else if (s.formato === 'varios_times' && dados.formato === 'varios_times') {
+      resposta = resultadoVarios(dados, s.descricao, s.times, s.incompleto, s.indicadores, s.avisos, aptos);
+    } else {
+      throw new Error('formato da sugestão diferente do pedido');
+    }
+    return c.json(resposta, 200);
   });
 
   // A escalação confirmada (T37) mora no próprio arquivo e entra no app junto com as rotas do simulador.

@@ -1270,6 +1270,8 @@ T53 → T54
 **Depends on**: T34
 **Reuses**: `historico.carregar` (`PR:1135`); T15, T22, T27; log de `L:backend/api/src/entrada/rotas/grupos/simulador/sugerir.ts:20-29`; captura de log de `CA:1047` (T31)
 **Requirement**: SIM-17, SIM-47, SIM-53, SIM-54, SIM-55, SIM-56, SIM-60, SIM-80
+**Status**: rascunhada
+**Nota do rascunho**: entrada e saída entre contrato e domínio em `rotas/simulador-resultado.ts` (a T36 reaproveita): aptos do corpo + dados do `paraSimulador` na data; resposta com "Time A"/"Time B" e "Time 1"…, `saiNoIntervalo` pelos `saem` dos indicadores, trocas pelos pares. A API não tem módulo de log: a linha de SIM-60 é um `console.log` com JSON (`evento: simulador_sugerir`), que vai ao `wrangler tail`; o teste espia o `console`. Teste em `test/rotas/simulador-sugerir.test.ts`.
 
 **Done when**:
 
