@@ -351,6 +351,8 @@ T57 → T58
 **Depends on**: T2
 **Reuses**: estender o meta-teste da fundação (`F:957`) e ler o catálogo como o `lerEsquema` (`F:760`); fecha o risco de `FD:183`
 **Requirement**: ACE-43, ACE-45
+**Status**: rascunhada
+**Nota do rascunho**: a matriz de conta (tabela → arquivo de teste) fica no próprio meta-teste.
 
 **Done when**:
 
