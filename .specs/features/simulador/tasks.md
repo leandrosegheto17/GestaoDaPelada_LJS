@@ -1434,6 +1434,8 @@ T53 → T54
 **Depends on**: T40
 **Reuses**: Molde de `CAMPOS_PROIBIDOS_PUBLICO` (`PR:913`, T19); `S:313`
 **Requirement**: SIM-82, SIM-03
+**Status**: rascunhada
+**Nota do rascunho**: lista própria `CAMPOS_PROIBIDOS_SIMULADOR` no teste (a pública proíbe `id` e `nivel`, que o simulador devolve); varredura no JSON cru, não no `parse`; também confere que todo objeto com `apelido` só tem as chaves permitidas (inclui `saiNoIntervalo` do titular). Jogadores com telefone, ano, posição e nota.
 
 **Done when**:
 
