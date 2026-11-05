@@ -1,0 +1,22 @@
+name: dump-cifrado
+description: pg_dump -Fc do banco, cifrado com age; falha sem deixar arquivo parcial (FUN-47, FUN-49)
+inputs:
+  url:
+    description: URL do banco (secret)
+    required: true
+  chave-publica:
+    description: destinatário age (secret)
+    required: true
+  saida:
+    description: caminho do arquivo .age
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Dump cifrado
+      shell: bash
+      env:
+        PG_URL: ${{ inputs.url }}
+        CHAVE_PUBLICA: ${{ inputs.chave-publica }}
+        SAIDA: ${{ inputs.saida }}
+      run: bash "$GITHUB_ACTION_PATH/dump-cifrado.sh"
