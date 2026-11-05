@@ -8,6 +8,7 @@ import { Faixa } from '../../componentes/Faixa.tsx';
 import { Marca } from '../../componentes/Marca.tsx';
 import { TelaMensagem } from '../../componentes/TelaMensagem.tsx';
 import { ErroApi } from '../../dados/cliente.ts';
+import { useEventoRankingAberto } from '../../dados/eventos.ts';
 import { useMesDaUrl, useRankingPublico } from '../../dados/publico.ts';
 import estilos from '../acesso.module.css';
 import { nomeDoMes } from '../financeiro/FinanceiroMes.tsx';
@@ -253,6 +254,8 @@ export function PaginaRanking() {
 function RankingDoSlug({ slug }: { slug: string }) {
   const [mes, trocarMes] = useMesDaUrl();
   const consulta = useRankingPublico(slug, mes);
+  // PAR-124: uma vez por slug a cada carregamento da página, não a cada mês (T67).
+  useEventoRankingAberto(slug, consulta.isSuccess);
   const [aviso, setAviso] = useState<string | null>(null);
 
   const erro = consulta.error;

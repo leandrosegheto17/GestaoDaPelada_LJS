@@ -2276,6 +2276,8 @@ T78 → T79
 **Depends on**: T66
 **Reuses**: Cliente HTTP (`CA:1169`); `B:376-379`; `BC:32` (P20)
 **Requirement**: PAR-123, PAR-124, PAR-125, PAR-126
+**Status**: rascunhada
+**Nota do rascunho**: `idDoAparelho()` e o acesso seguro ao `localStorage` em `pwa/armazenamento/armazenamento-local.ts` (chave `pelada:dispositivo`); `useEventoRankingAberto(slug, carregou)` com o conjunto de slugs no módulo (reinicia só ao recarregar) e `useEnviarPdfExportado(slug)` em `dados/eventos.ts`; a `PaginaRanking` chama o primeiro. Os testes de tela existentes não mudam: o POST de `/eventos` cai no 404 do servidor falso e é ignorado (PAR-126), e as contagens deles filtram o GET de `/ranking`.
 
 **Done when**:
 
