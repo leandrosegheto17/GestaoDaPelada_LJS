@@ -644,6 +644,8 @@ T47 → T48
 **Depends on**: T13
 **Reuses**: Referência do schema e teste de igualdade (`F:784`); hash das 23 (`F:661`); mesmo passo nas features 4 e 5
 **Requirement**: FIN-42
+**Status**: rascunhada
+**Nota do rascunho**: só o teste foi escrito (`backend/api/test/migracoes/esquema-financeiro.test.ts`). O `esquema-producao.txt` ainda não existe (a fundação não foi executada) e regenerá-lo exige rodar `pnpm esquema:gerar`, que o rascunho não faz: o /executar o gera depois de aplicar T9 e T10, confere o diff (só a função, o grant, as 5 policies e a função de nomes) e o commita. As linhas `policy`/`funcao` esperadas no teste seguem o formato de `esquema.ts:111-149`.
 
 **Done when**:
 
