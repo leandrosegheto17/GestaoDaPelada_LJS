@@ -1551,6 +1551,8 @@ T56 → T57
 **Depends on**: T45
 **Reuses**: `Dialogo` (`CA:1286`, T41); T41
 **Requirement**: PLA-54, PLA-55
+**Status**: rascunhada
+**Nota do rascunho**: na pendente, o diálogo diz "A fatura em aberto deixa de valer." (não há `pagoAte`). `dataBr` passou para `telas/plano/datas.ts`, para `AssinaturaAtual` e `MeuPlano` não se importarem em ciclo.
 
 **Done when**:
 

@@ -16,6 +16,8 @@ import estilos from '../acesso.module.css';
 import modulo from '../grupos-elenco.module.css';
 import { rotaDoGrupo } from '../grupos/Grupos.tsx';
 import { AssinarPro } from './AssinarPro.tsx';
+import { AssinaturaAtual } from './AssinaturaAtual.tsx';
+import { dataBr } from './datas.ts';
 
 /**
  * Meu plano (`/app/grupos/:grupoId/plano`; planos-e-cobranca T44; PLA-52, PLA-57, PLA-58; AD-063, AD-064). Sem mockup
@@ -44,12 +46,6 @@ export const NOMES_DOS_RECURSOS: Readonly<Record<Recurso, string>> = {
   ranking: 'Ranking',
   ...NOMES_RECURSOS_PRO,
 };
-
-/** "2026-11-14" → "14/11/2026". */
-export function dataBr(data: string): string {
-  const [ano, mes, dia] = data.split('-');
-  return `${dia}/${mes}/${ano}`;
-}
 
 /** "Trial Pro até 14/11/2026", "Pro até 05/12/2026" ou nada. */
 export function textoValidade(p: Pick<PlanoResposta, 'plano' | 'trialFimEm' | 'pagoAte'>): string | null {
@@ -130,10 +126,14 @@ export interface PropsMeuPlano {
   acoesDaCriadora?: (plano: PlanoResposta, grupoId: string) => ReactNode;
 }
 
-/** Sem assinatura pendente nem ativa: o formulário de assinar (T45; PLA-53). */
+/**
+ * Sem assinatura pendente nem ativa: o formulário de assinar (T45; PLA-53); com ela, a assinatura atual, com o
+ * aguardando e o cancelar (T46; PLA-54, PLA-55).
+ */
 export function acoesPadrao(plano: PlanoResposta, grupoId: string): ReactNode {
-  if (plano.assinatura === null) return <AssinarPro grupoId={grupoId} />;
-  return null;
+  if (plano.assinatura === null || plano.assinatura.situacao === 'cancelada')
+    return <AssinarPro grupoId={grupoId} />;
+  return <AssinaturaAtual plano={plano} grupoId={grupoId} />;
 }
 
 export function MeuPlano({ acoesDaCriadora = acoesPadrao }: PropsMeuPlano = {}) {
