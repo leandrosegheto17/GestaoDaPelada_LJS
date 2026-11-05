@@ -1525,6 +1525,8 @@ T56 → T57
 **Depends on**: T44
 **Reuses**: `Campo` e `ResumoErros` (`CA:1238`, `CA:1263`); mensagem ao lado do campo (`GE:2138`, T72); `assinaturaCorpo` (T6)
 **Requirement**: PLA-53, PLA-34, PLA-35
+**Status**: rascunhada
+**Nota do rascunho**: Meu plano mostra o formulário quando `podeAssinar` e `assinatura === null` (`acoesPadrao`). A validação local é o `assinaturaCorpo` do contrato; o 409 `assinatura_pendente` abre a fatura em aberto. A fatura abre com `window.open(url, '_blank', 'noopener')`.
 
 **Done when**:
 

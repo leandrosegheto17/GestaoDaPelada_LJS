@@ -15,6 +15,7 @@ import { usePlano } from '../../dados/plano.ts';
 import estilos from '../acesso.module.css';
 import modulo from '../grupos-elenco.module.css';
 import { rotaDoGrupo } from '../grupos/Grupos.tsx';
+import { AssinarPro } from './AssinarPro.tsx';
 
 /**
  * Meu plano (`/app/grupos/:grupoId/plano`; planos-e-cobranca T44; PLA-52, PLA-57, PLA-58; AD-063, AD-064). Sem mockup
@@ -129,7 +130,13 @@ export interface PropsMeuPlano {
   acoesDaCriadora?: (plano: PlanoResposta, grupoId: string) => ReactNode;
 }
 
-export function MeuPlano({ acoesDaCriadora }: PropsMeuPlano = {}) {
+/** Sem assinatura pendente nem ativa: o formulário de assinar (T45; PLA-53). */
+export function acoesPadrao(plano: PlanoResposta, grupoId: string): ReactNode {
+  if (plano.assinatura === null) return <AssinarPro grupoId={grupoId} />;
+  return null;
+}
+
+export function MeuPlano({ acoesDaCriadora = acoesPadrao }: PropsMeuPlano = {}) {
   const { grupoId = '' } = useParams();
   const grupo = useGrupo(grupoId);
   const plano = usePlano(grupoId);
@@ -144,7 +151,7 @@ export function MeuPlano({ acoesDaCriadora }: PropsMeuPlano = {}) {
     const p = plano.data;
     let acoes: ReactNode = null;
     if (p.plano !== 'cortesia') {
-      acoes = p.podeAssinar ? (acoesDaCriadora?.(p, grupoId) ?? null) : <p>{TEXTO_SO_A_CRIADORA}</p>;
+      acoes = p.podeAssinar ? acoesDaCriadora(p, grupoId) : <p>{TEXTO_SO_A_CRIADORA}</p>;
     }
     return (
       <>
