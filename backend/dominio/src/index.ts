@@ -1,1 +1,55 @@
 export const PACOTE = '@pelada/dominio';
+
+// grupos-e-elenco (GEL-70, GEL-104): regras puras, sem relógio nem I/O.
+export { slugBase, SLUGS_RESERVADOS } from './grupos/slug.ts';
+export { chaveBusca, compararApelido, formatarData } from './elenco/apelido.ts';
+export {
+  ANO_NASCIMENTO_MINIMO,
+  anoNascimentoMaximo,
+  calcularNivel,
+  HABILIDADES_INICIAIS,
+  NIVEL_SEM_NOTA,
+  type Nivel,
+} from './elenco/nivel.ts';
+export {
+  ativoEm,
+  contem,
+  ehDataValida,
+  ehFutura,
+  MENSAGEM_DATA_INVALIDA,
+  MENSAGEM_FUTURO,
+  somarDias,
+  sobrepoem,
+  validarData,
+  type CampoPeriodo,
+  type Data,
+  type FalhaPeriodo,
+  type Periodo,
+  type RegraPeriodo,
+} from './atividade/datas.ts';
+export { MENSAGEM_SOBREPOSICAO, verificarOrdem, verificarSobreposicao } from './atividade/ordem.ts';
+export {
+  coberturaRetirada,
+  falhaPresenca,
+  type PresencaJogador,
+  type Retirada,
+  type SituacaoPresenca,
+} from './atividade/cobertura.ts';
+export {
+  avaliarPeriodos,
+  EstadoDePeriodoInvalido,
+  MENSAGEM_INICIO_DO_PRIMEIRO,
+  MENSAGEM_SEM_SAIDA,
+  type EntradaAvaliacao,
+  type OperacaoPeriodo,
+  type ResultadoAvaliacao,
+} from './atividade/avaliar-periodos.ts';
+export {
+  avaliarInicio,
+  MENSAGEM_ANTES_DO_PISO,
+  PISO_INICIO,
+  type EntradaInicio,
+  type FalhaInicio,
+  type RegraInicio,
+  type ResultadoInicio,
+} from './atividade/avaliar-inicio.ts';

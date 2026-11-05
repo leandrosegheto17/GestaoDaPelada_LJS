@@ -755,6 +755,7 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T14
 **Reuses**: regras de `GS:275-278`; funções de T11 e T14
 **Requirement**: GEL-70, GEL-78, GEL-79, GEL-80, GEL-81, GEL-104
+**Status**: rascunhada
 
 **Done when**:
 
