@@ -383,6 +383,7 @@ T73 → T74 → T75
 **Depends on**: T0
 **Reuses**: `grupos_visiveis()` de `M:1792844280000_grupos-visiveis-arquivado.sql:9-20`; policies geradas em `M:1792843320000_rls.sql:39-57`; molde da matriz da fundação (`F:981`, `F:1007`)
 **Requirement**: GEL-25, GEL-107, GEL-112
+**Status**: rascunhada
 
 **Done when**:
 
