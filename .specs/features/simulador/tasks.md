@@ -1789,6 +1789,8 @@ T53 → T54
 **Depends on**: T53
 **Reuses**: Jornadas de `PR:2441` (T79) e `CA:1683`; seed de `PR:2319` (T74)
 **Requirement**: SIM-47, SIM-64, SIM-67, SIM-75
+**Status**: rascunhada
+**Nota do rascunho**: J-22, J-23 e J-24 em `e2e/simulador.spec.ts`; cada uma cria conta, grupo e jogadores, com o grupo jogando no dia da semana de hoje (próximo dia de jogo = data sugerida = hoje), para a J-24 não lançar partida no futuro. `SPEC_DEVIATION` no topo do spec: o "ausente" da J-22 é um jogador desmarcado, porque o grupo novo não tem ausência registrada.
 
 **Done when**:
 
