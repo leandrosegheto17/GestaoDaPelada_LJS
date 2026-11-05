@@ -128,3 +128,4 @@ export {
   type ResultadoMarcacoes,
   type SituacaoMarcacao,
 } from './partidas/marcacoes.ts';
+export { ANO_SEM_INFORMACAO, ordenarPorRanking, type Colocado, type Rankeavel } from './ranking/ordenar.ts';

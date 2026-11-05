@@ -679,6 +679,7 @@ T78 → T79
 **Depends on**: T5
 **Reuses**: `B:255-256` (PAR-68, PAR-69), `B:66` (sem ano no fim), caso limite `B:492`; ordem do apelido sem acento nem caixa de `GE:575`
 **Requirement**: PAR-68, PAR-69
+**Status**: rascunhada
 
 **Done when**:
 
