@@ -1,7 +1,7 @@
 import { DIAS_DA_SEMANA } from '@pelada/contrato/grupo';
 import type { ContagemPartida, PartidasDoMes } from '@pelada/contrato/partidas';
 import { diaDaSemana } from '@pelada/dominio';
-import { useParams, useSearchParams } from 'react-router';
+import { useLocation, useParams, useSearchParams } from 'react-router';
 import { Casca, NOME_DO_APP } from '../../componentes/Casca.tsx';
 import { ROTULOS_DIA_SEMANA } from '../../componentes/CampoSeletor.tsx';
 import { EsqueletoLista } from '../../componentes/EsqueletoLista.tsx';
@@ -129,6 +129,9 @@ export function PaginaPartidas() {
   const grupo = useGrupo(grupoId);
   const consulta = usePartidasDoMes(grupoId, mes);
   const base = rotaDoGrupo(grupoId);
+  // "Partida de dd/mm excluída." e "… salva." (T61; PAR-54): o aviso que a edição manda na navegação.
+  const estado = useLocation().state as { aviso?: unknown } | null;
+  const aviso = typeof estado?.aviso === 'string' ? estado.aviso : null;
 
   function conteudo() {
     if (consulta.isPending) return <EsqueletoLista linhas={3} />;
@@ -151,6 +154,7 @@ export function PaginaPartidas() {
   return (
     <Casca grupo={{ nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' }} titulo="Partidas" ocupada={consulta.isPending}>
       <LinkVoltar para={base}>Início</LinkVoltar>
+      {aviso ? <Faixa tipo="sucesso">{aviso}</Faixa> : null}
       {conteudo()}
       <div className={modulo['reserva-barra']} aria-hidden="true" />
       <div className={modulo['barra-acao']}>

@@ -2113,6 +2113,8 @@ T78 → T79
 **Depends on**: T60
 **Reuses**: `.specs/mockup/telas/t11-partida--{edicao,excluir}.html`; `Dialogo` (`CA:1286`)
 **Requirement**: PAR-52, PAR-53, PAR-54
+**Status**: rascunhada
+**Lacunas**: a spec não diz para onde vai a edição salva; o rascunho segue o destino da exclusão (partidas do mês, com "Partida de dd/mm salva."). O aviso da exclusão aparece na `PaginaPartidas` pelo `state.aviso`.
 
 **Done when**:
 
