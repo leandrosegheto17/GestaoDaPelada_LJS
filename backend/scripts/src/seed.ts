@@ -45,10 +45,76 @@ export const NOTAS_LOCAIS: Readonly<Record<string, readonly number[]>> = {
   Maestro: [9, 9, 5, 7, 6, 6],
 };
 
+/**
+ * Caixa de exemplo (financeiro T47, FIN-07): um segundo grupo, o "g-quinta" do mockup, com a configuração, os 20
+ * jogadores, os pagamentos e os lançamentos de outubro de `.specs/mockup/respostas/financeiro-2026-10.json`, para o
+ * `GET financeiro/mes?mes=2026-10` com hoje em 2026-10-22 dar os totais do mockup. A conta admin é a criadora (com
+ * acesso); a conta convidada é admin do grupo sem `acessa_financeiro` (jornada de permissão, T48).
+ * SPEC_DEVIATION: grupo próprio em vez do `pelada-local`, para o elenco do grupo local (GEL-46) ficar como está.
+ */
+export const GRUPO_CAIXA = { nome: 'Pelada de Quinta', slug: 'pelada-de-quinta' } as const;
+/** Admin convidado do grupo do caixa, sem acesso ao financeiro; entra com a mesma `SEED_SENHA_ADMIN` (só local). */
+export const CONTA_CONVIDADA = { email: 'convidado@exemplo.test', nome: 'Convidado Local' } as const;
+export const CAIXA_CONFIG = { mensalidadeCentavos: 7500, saldoInicialCentavos: 35000, dataSaldoInicial: '2026-02-05' } as const;
+/** Os 20 jogadores do mockup, todos ativos desde a data inicial do caixa. */
+export const JOGADORES_CAIXA = [
+  'Alemão', 'Bigode', 'Cabeça', 'Careca', 'Dudu', 'Fumaça', 'Gordo', 'Japa', 'Juninho', 'Léo Baiano',
+  'Marcão', 'Neném', 'Paulinho', 'Pedrão', 'Rafinha', 'Serginho', 'Tiago', 'Toninho', 'Vini', 'Zé Carlos',
+] as const;
+export const MES_CAIXA = '2026-10';
+
+interface LancamentoSeed {
+  tipo: 'entrada' | 'saida';
+  data: string;
+  descricao: string;
+  valorCentavos: number;
+  /** Apelido de quem pagou a mensalidade de `MES_CAIXA` com este lançamento. */
+  pagante?: string;
+}
+
+const mensalidade = (data: string, apelido: string): LancamentoSeed => ({
+  tipo: 'entrada',
+  data,
+  descricao: `Mensalidade ${apelido} 10/2026`,
+  valorCentavos: CAIXA_CONFIG.mensalidadeCentavos,
+  pagante: apelido,
+});
+
+/**
+ * Na ordem da lista do mockup (do mais recente ao mais antigo); o momento de criação cai a cada posição, para a
+ * ordem `data DESC, criado_em DESC` da leitura sair igual. A primeira linha fecha o saldo do mockup antes de outubro:
+ * 35.000 + 59.550 + 120.000 − 90.000 = 124.550. Julho fica sem lançamento, como em `financeiro-2026-07.json`.
+ */
+export const LANCAMENTOS_CAIXA: readonly LancamentoSeed[] = [
+  { tipo: 'saida', data: '2026-10-20', descricao: 'Bolas novas (2)', valorCentavos: 10000 },
+  { tipo: 'saida', data: '2026-10-05', descricao: 'Aluguel da quadra outubro', valorCentavos: 80000 },
+  mensalidade('2026-10-01', 'Toninho'),
+  mensalidade('2026-10-01', 'Bigode'),
+  mensalidade('2026-10-01', 'Careca'),
+  mensalidade('2026-10-01', 'Juninho'),
+  mensalidade('2026-10-01', 'Marcão'),
+  mensalidade('2026-10-02', 'Paulinho'),
+  mensalidade('2026-10-02', 'Zé Carlos'),
+  mensalidade('2026-10-03', 'Dudu'),
+  mensalidade('2026-10-03', 'Gordo'),
+  mensalidade('2026-10-05', 'Tiago'),
+  mensalidade('2026-10-06', 'Rafinha'),
+  mensalidade('2026-10-08', 'Alemão'),
+  mensalidade('2026-10-08', 'Pedrão'),
+  mensalidade('2026-10-09', 'Cabeça'),
+  mensalidade('2026-10-12', 'Vini'),
+  mensalidade('2026-10-15', 'Léo Baiano'),
+  { tipo: 'entrada', data: '2026-09-30', descricao: 'Sobra do caixa de fevereiro a setembro', valorCentavos: 59550 },
+];
+
 export interface ResultadoSeed {
   contaId: string;
   grupoId: string;
   jogadores: number;
+  /** Grupo do caixa de exemplo (T47). */
+  grupoCaixaId: string;
+  /** Admin do grupo do caixa sem acesso ao financeiro (T47). */
+  contaConvidadaId: string;
 }
 
 function exigir(env: Record<string, string | undefined>, nome: string): string {
@@ -137,11 +203,103 @@ async function semear(c: pg.Client, senhaApp: string, senhaBackup: string, senha
     await c.query<{ n: number }>('SELECT count(*)::int AS n FROM jogadores WHERE grupo_id = $1', [grupoId])
   ).rows[0]?.n;
 
+  const { grupoCaixaId, contaConvidadaId } = await semearCaixa(c, contaId, senhaAdmin);
+
   // ALTER ROLE não aceita parâmetro: a senha entra como literal escapado.
   await c.query(`ALTER ROLE pelada_app LOGIN PASSWORD ${c.escapeLiteral(senhaApp)}`);
   await c.query(`ALTER ROLE pelada_backup_ro LOGIN PASSWORD ${c.escapeLiteral(senhaBackup)}`);
 
-  return { contaId, grupoId, jogadores: jogadores ?? 0 };
+  return { contaId, grupoId, jogadores: jogadores ?? 0, grupoCaixaId, contaConvidadaId };
+}
+
+/**
+ * O grupo do caixa de exemplo (T47, FIN-07). Roda dentro da transação do seed, com `app.conta_id` já na conta admin.
+ * Rodar de novo não duplica: grupo, jogadores, períodos, vínculo e configuração são "se ainda não existe", e os
+ * lançamentos e pagamentos só entram quando o grupo ainda não tem nenhum lançamento.
+ */
+async function semearCaixa(
+  c: pg.Client,
+  contaId: string,
+  senhaAdmin: string,
+): Promise<{ grupoCaixaId: string; contaConvidadaId: string }> {
+  const existente = (await c.query<{ id: string }>('SELECT id FROM grupos WHERE slug = $1', [GRUPO_CAIXA.slug])).rows[0];
+  if (!existente) {
+    await c.query(
+      `SELECT id FROM grupo_criar($1, 'quinta', 'semanal', '20:00'::time, $2, $3::text[])`,
+      [GRUPO_CAIXA.nome, GRUPO_CAIXA.slug, [...HABILIDADES_LOCAIS]],
+    );
+  }
+  const grupoCaixaId = await idDe(c, 'SELECT id FROM grupos WHERE slug = $1', [GRUPO_CAIXA.slug]);
+
+  // Admin convidado sem acesso ao financeiro, confirmado e com a senha do ambiente (ACE-64, mesmo caminho da admin).
+  await c.query(
+    `INSERT INTO contas (email, nome, senha_hash, criada_em)
+     VALUES ($1, $2, $3, now())
+     ON CONFLICT (email) DO NOTHING`,
+    [CONTA_CONVIDADA.email, CONTA_CONVIDADA.nome, HASH_PROVISORIO],
+  );
+  const contaConvidadaId = await idDe(c, 'SELECT conta_definir_senha($1, $2, false) AS id', [
+    CONTA_CONVIDADA.email,
+    senhaAdmin,
+  ]);
+  await c.query(
+    `INSERT INTO vinculos_admin (conta_id, grupo_id, acessa_financeiro, criado_por, criado_em)
+     VALUES ($1, $2, false, $3, now())
+     ON CONFLICT (conta_id, grupo_id) DO NOTHING`,
+    [contaConvidadaId, grupoCaixaId, contaId],
+  );
+
+  for (const apelido of JOGADORES_CAIXA) {
+    await c.query(
+      `INSERT INTO jogadores (grupo_id, apelido, criado_por, criado_em, alterado_por, alterado_em)
+       VALUES ($1, $2, $3, now(), $3, now())
+       ON CONFLICT (grupo_id, lower(apelido)) DO NOTHING`,
+      [grupoCaixaId, apelido, contaId],
+    );
+  }
+  await c.query(
+    `INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim)
+     SELECT j.id, j.grupo_id, $2::date, NULL
+       FROM jogadores j
+      WHERE j.grupo_id = $1
+        AND NOT EXISTS (SELECT 1 FROM periodos_ativos p WHERE p.jogador_id = j.id)`,
+    [grupoCaixaId, CAIXA_CONFIG.dataSaldoInicial],
+  );
+
+  await c.query(
+    `INSERT INTO config_financeira (grupo_id, mensalidade_centavos, saldo_inicial_centavos, data_saldo_inicial)
+     VALUES ($1, $2, $3, $4)
+     ON CONFLICT (grupo_id) DO NOTHING`,
+    [grupoCaixaId, CAIXA_CONFIG.mensalidadeCentavos, CAIXA_CONFIG.saldoInicialCentavos, CAIXA_CONFIG.dataSaldoInicial],
+  );
+
+  const temLancamento = (
+    await c.query<{ ok: boolean }>('SELECT EXISTS (SELECT 1 FROM lancamentos WHERE grupo_id = $1) AS ok', [grupoCaixaId])
+  ).rows[0]?.ok;
+  if (!temLancamento) {
+    for (const [i, l] of LANCAMENTOS_CAIXA.entries()) {
+      // Às 20:00 de São Paulo do dia do lançamento, um minuto mais cedo a cada posição da lista.
+      const lancamentoId = await idDe(
+        c,
+        `INSERT INTO lancamentos (grupo_id, tipo, data, descricao, valor_centavos, criado_por, criado_em, alterado_por, alterado_em)
+         SELECT $1, $2, $3::date, $4, $5, $6, m, $6, m
+           FROM (SELECT ($3::date + time '20:00' - make_interval(mins => $7)) AT TIME ZONE 'America/Sao_Paulo' AS m) t
+         RETURNING id`,
+        [grupoCaixaId, l.tipo, l.data, l.descricao, l.valorCentavos, contaId, i],
+      );
+      if (l.pagante) {
+        await c.query(
+          `INSERT INTO pagamentos_mes (grupo_id, jogador_id, mes, lancamento_id, marcado_por, marcado_em)
+           SELECT $1, j.id, $3, $4, $5, l.criado_em
+             FROM jogadores j, lancamentos l
+            WHERE j.grupo_id = $1 AND lower(j.apelido) = lower($2) AND l.id = $4`,
+          [grupoCaixaId, l.pagante, MES_CAIXA, lancamentoId, contaId],
+        );
+      }
+    }
+  }
+
+  return { grupoCaixaId, contaConvidadaId };
 }
 
 export async function comandoSeed(
@@ -177,7 +335,8 @@ if (import.meta.main) {
   await executarCli(async () => {
     const r = await comandoSeed();
     console.log(
-      `Seed pronto: conta ${CONTA_LOCAL.email} (senha de SEED_SENHA_ADMIN), grupo ${GRUPO_LOCAL.slug}, ${r.jogadores} jogadores.`,
+      `Seed pronto: conta ${CONTA_LOCAL.email} (senha de SEED_SENHA_ADMIN), grupo ${GRUPO_LOCAL.slug}, ${r.jogadores} jogadores; ` +
+        `caixa de exemplo em ${GRUPO_CAIXA.slug}, com ${CONTA_CONVIDADA.email} (mesma senha) sem acesso ao financeiro.`,
     );
   });
 }

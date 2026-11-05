@@ -1541,6 +1541,9 @@ T47 → T48
 **Depends on**: T46
 **Reuses**: Seed de `GE:2164` e `PR:2319`; `.specs/mockup/respostas/financeiro-2026-10.json`
 **Requirement**: FIN-07
+**Status**: rascunhada
+**Nota do rascunho**: o seed atual (`GE` T73) tem só o grupo `pelada-local` com 6 jogadores de períodos abertos em `current_date`, que não estão ativos em outubro; o caixa vai num grupo próprio, `Pelada de Quinta` (`pelada-de-quinta`, o "g-quinta" do mockup), com os 20 jogadores do mockup ativos desde 2026-02-05 (`SPEC_DEVIATION` no `seed.ts`). O saldo de 124.550 pede um lançamento antes de outubro: "Sobra do caixa de fevereiro a setembro" (entrada de 59.550 em 2026-09-30). O admin convidado é `convidado@exemplo.test`, com a mesma `SEED_SENHA_ADMIN`. O teste fica em `backend/api/test/repositorios/financeiro-seed.test.ts` (lê a resposta do mockup do arquivo e usa o `financeiroMes.lerMes` da rota); o `@pelada/scripts` passa a exportar `./seed`.
+**Lacunas**: (1) os testes existentes `FUN-05` de `backend/scripts/test/seed.test.ts` contam linhas no banco inteiro (`contas: 1`, `grupos: 1`, `vinculos: 1`, `jogadores`/`periodos` = 6) e esperam que a conta veja só `pelada-local`; com o grupo do caixa passam a falhar. A autorização de 2026-11-05 da `conta-e-acesso` não os cobre: o /executar pede a aprovação para eles contarem só o grupo local (ou somarem o do caixa), mesma força, sem mudá-los antes. (2) Em `financeiro-2026-07.json` julho tem `naoPagaram: 18`; o seed deixa os 20 ativos desde fevereiro (julho daria 20), porque a resposta não diz quais dois entraram depois; fora do critério desta tarefa. (3) A `partidas-e-ranking` T74 (ainda não rascunhada) recria o grupo do seed com `grupo_criar` de 7 parâmetros e os ids do `telas.json` (`PR:29`, S-03): conferir se o grupo do caixa passa a ser o mesmo dela.
 
 **Done when**:
 

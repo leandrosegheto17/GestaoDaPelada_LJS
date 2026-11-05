@@ -7,7 +7,8 @@
   },
   "exports": {
     "./host": "./src/host.ts",
-    "./conectar": "./src/conectar.ts"
+    "./conectar": "./src/conectar.ts",
+    "./seed": "./src/seed.ts"
   },
   "scripts": {
     "lint": "eslint .",
