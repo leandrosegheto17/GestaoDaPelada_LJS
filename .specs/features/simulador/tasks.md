@@ -618,6 +618,9 @@ T53 → T54
 **Depends on**: T10
 **Reuses**: `L:backend/dominio/src/simulador/distribuicao-varios.ts:7` (200), `:33-47` (chave), `:94-119` (laço); `S:189-190`, `S:343`
 **Requirement**: SIM-36, SIM-37, SIM-59, SIM-92
+**Status**: rascunhada
+**Nota do rascunho**: `distribuirVariosTimes(inicial, elenco, { maxTrocas })` parte da saída de `montarVariosTimes` (T10) e devolve `{ times, incompleto, trocasAceitas }`.
+**Lacunas**: time sem ninguém com ano (idade média nula) fica fora da amplitude de idade da chave (`distribuicao-varios.ts`, `[LACUNA]`).
 
 **Done when**:
 
