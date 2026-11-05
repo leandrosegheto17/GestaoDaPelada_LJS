@@ -7,8 +7,10 @@
 -- SPEC_DEVIATION: `push_ranking_resultado` recebe o grupo do lote (`p_grupo`) como primeiro parâmetro, porque a
 -- tarefa pede que só as linhas do grupo do lote mudem e que o id de outro grupo seja ignorado (caso limite da T10).
 -- S-01 (o `recursoLiberado` vale sem conta nem slug) é conferida pela T0 ainda não executada; enquanto isso
--- `push_envio_grupo` devolve só nome, slug e arquivado, e a API confere o plano (AD-104). Se a T0 disser que S-01 não vale, o
--- /executar acrescenta aqui as entradas do `planoEfetivo`.
+-- `push_envio_grupo` devolve nome, slug, arquivado e as entradas do `planoEfetivo` (situação comercial, início do trial e
+-- `pago_ate`), e a API decide o plano pelo domínio (AD-104). S-01 não vale: o `recursoLiberado` da planos-e-cobranca
+-- (`aplicacao/plano/recurso-liberado.ts`) devolve `false` para grupo que o contexto não enxerga, e o consumidor da fila
+-- roda sem conta nem slug (notificacoes T18, plano B da S-01). SPEC_DEVIATION: o plano vem daqui, não do `recursoLiberado`.
 
 -- Usada pelas funções que só o consumidor da fila e o Cron chamam: com conta ou com slug no contexto, recusa (42501).
 CREATE FUNCTION push_exigir_sem_contexto(p_funcao text) RETURNS void
@@ -23,17 +25,26 @@ CREATE FUNCTION push_exigir_sem_contexto(p_funcao text) RETURNS void
   $$;
 REVOKE ALL ON FUNCTION push_exigir_sem_contexto(text) FROM PUBLIC;
 
--- O grupo do aviso: nome, slug e se está arquivado (o consumidor não envia de grupo arquivado, NOT-24). Grupo
--- inexistente: nenhuma linha.
+-- O grupo do aviso: nome, slug, se está arquivado (o consumidor não envia de grupo arquivado, NOT-24) e as entradas do
+-- plano efetivo (NOT-24, NOT-68), com o `pago_ate` escolhido como na `plano_do_grupo` (1792845480000_planos-leitura.sql:26).
+-- Grupo inexistente: nenhuma linha.
 CREATE FUNCTION push_envio_grupo(p_grupo uuid)
-  RETURNS TABLE (nome text, slug text, arquivado boolean)
+  RETURNS TABLE (nome text, slug text, arquivado boolean, situacao_comercial text, trial_inicio date, pago_ate date)
   LANGUAGE plpgsql STABLE SECURITY DEFINER
   SET search_path = public, pg_temp
   AS $$
   #variable_conflict use_column
   BEGIN
     PERFORM push_exigir_sem_contexto('push_envio_grupo');
-    RETURN QUERY SELECT g.nome, g.slug, g.arquivado_em IS NOT NULL FROM grupos g WHERE g.id = p_grupo;
+    RETURN QUERY
+      SELECT g.nome, g.slug, g.arquivado_em IS NOT NULL, g.situacao_comercial, g.trial_inicio,
+             (SELECT a.pago_ate
+                FROM assinaturas a
+               WHERE a.grupo_id = g.id
+               ORDER BY (a.situacao <> 'cancelada') DESC, a.criada_em DESC, a.id
+               LIMIT 1)
+        FROM grupos g
+       WHERE g.id = p_grupo;
   END
   $$;
 REVOKE ALL ON FUNCTION push_envio_grupo(uuid) FROM PUBLIC;

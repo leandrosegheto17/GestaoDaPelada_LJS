@@ -1,4 +1,5 @@
 import { sql } from 'kysely';
+import type { Data, SituacaoComercial } from '@pelada/dominio';
 import type { Db } from './tipos.ts';
 
 /**
@@ -25,6 +26,10 @@ export interface GrupoDoEnvio {
   nome: string;
   slug: string;
   arquivado: boolean;
+  /** Entradas do `planoEfetivo` do domínio, lidas na hora do envio (notificacoes T18; NOT-24, NOT-68; plano B da S-01). */
+  situacaoComercial: SituacaoComercial;
+  trialInicio: Data | null;
+  pagoAte: Data | null;
 }
 
 /** Uma assinatura devolvida para o envio: as chaves ficam dentro da infraestrutura de push. */
@@ -98,10 +103,31 @@ async function estadoConta(db: Db, endpoint: string, auth: string): Promise<Esta
   return conferir('push_conta_estado', r.rows[0]?.r, ESTADO_CONTA);
 }
 
-/** Nome, slug e se o grupo está arquivado (NOT-24); `null` para grupo que não existe. Sessão sem conta e sem slug. */
+/**
+ * Nome, slug, se o grupo está arquivado e as entradas do plano (NOT-24, NOT-68); `null` para grupo que não existe.
+ * Sessão sem conta e sem slug. Datas como texto `AAAA-MM-DD`, como no repositório do plano.
+ */
 async function envioGrupo(db: Db, grupoId: string): Promise<GrupoDoEnvio | null> {
-  const r = await sql<GrupoDoEnvio>`SELECT nome, slug, arquivado FROM push_envio_grupo(${grupoId}::uuid)`.execute(db);
-  return r.rows[0] ?? null;
+  const r = await sql<{
+    nome: string;
+    slug: string;
+    arquivado: boolean;
+    situacao_comercial: SituacaoComercial;
+    trial_inicio: Data | null;
+    pago_ate: Data | null;
+  }>`
+    SELECT nome, slug, arquivado, situacao_comercial, trial_inicio::text AS trial_inicio, pago_ate::text AS pago_ate
+      FROM push_envio_grupo(${grupoId}::uuid)`.execute(db);
+  const l = r.rows[0];
+  if (l === undefined) return null;
+  return {
+    nome: l.nome,
+    slug: l.slug,
+    arquivado: l.arquivado,
+    situacaoComercial: l.situacao_comercial,
+    trialInicio: l.trial_inicio,
+    pagoAte: l.pago_ate,
+  };
 }
 
 /** Um lote de até `limite` assinaturas do grupo, por id crescente, só as sem envio aceito desde `desde` (NOT-69). */

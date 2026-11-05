@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { jwkP256 } from '../../../src/infraestrutura/push/cifra.ts';
 import {
   cabecalhoVapid,
+  chavesVapidDoAmbiente,
   ErroChavesVapid,
   novoCacheVapid,
   VALIDADE_JWT_S,
@@ -92,4 +93,26 @@ describe('cabecalhoVapid', () => {
     const chaves = montar(await parVapid());
     await expect(cabecalhoVapid('https://fcm.googleapis.com/x', chaves, AGORA)).rejects.toBeInstanceOf(ErroChavesVapid);
   });
+});
+
+describe('chavesVapidDoAmbiente', () => {
+  const CHEIO = { VAPID_PUBLICA: 'BPub', VAPID_PRIVADA: 'priv', VAPID_ASSUNTO: ASSUNTO };
+
+  it('NOT-61: as três presentes devolvem as chaves, sem os espaços das pontas', () => {
+    expect(chavesVapidDoAmbiente({ ...CHEIO, VAPID_PUBLICA: ' BPub ' })).toEqual({
+      publica: 'BPub',
+      privada: 'priv',
+      assunto: ASSUNTO,
+    });
+  });
+
+  it.each(['VAPID_PUBLICA', 'VAPID_PRIVADA', 'VAPID_ASSUNTO'] as const)(
+    'NOT-61: sem %s (ausente, vazia ou só espaços), o push fica desligado',
+    (nome) => {
+      for (const valor of [undefined, '', '   ']) {
+        const env: Record<string, string | undefined> = { ...CHEIO, [nome]: valor };
+        expect(chavesVapidDoAmbiente(env)).toBeNull();
+      }
+    },
+  );
 });

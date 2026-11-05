@@ -34,6 +34,12 @@ export interface Env {
   LIMITE_EMAILS_DIA?: string;
   /** `1` só no `.env` local e no e2e: e-mails na caixa em memória e `GET /api/dev/emails` (T17). */
   EMAIL_DEV?: string;
+  /** Chave pública VAPID (notificacoes T4; NOT-14, NOT-61). Sem as três VAPID, o push fica desligado. */
+  VAPID_PUBLICA?: string;
+  /** Chave privada VAPID (secret do Worker; NOT-14). Nunca vai para resposta nem log. */
+  VAPID_PRIVADA?: string;
+  /** Contato do remetente dos avisos, `mailto:` ou URL (`sub` do JWT, NOT-27). */
+  VAPID_ASSUNTO?: string;
   HYPERDRIVE: HyperdriveBinding;
   /**
    * Produtor da fila `avisos` (notificacoes T16; NOT-22, AD-098). Opcional no tipo: sem a fila criada (ou nos testes

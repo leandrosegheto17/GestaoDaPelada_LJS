@@ -1,5 +1,6 @@
 import * as Sentry from '@sentry/cloudflare';
 import { mensagemAviso, type MensagemAviso, type TipoMensagemAviso } from '@pelada/contrato/fila-avisos';
+import { enviarRanking } from '../aplicacao/notificacoes/enviar-ranking.ts';
 import type { ConexaoPg } from '../infraestrutura/db/cliente.ts';
 import type { Db } from '../infraestrutura/db/repositorios/tipos.ts';
 import { transacaoCurta } from '../infraestrutura/db/transacao-curta.ts';
@@ -54,8 +55,8 @@ export type CasoDeUso<M extends MensagemAviso = MensagemAviso> = (
 
 export type CasosDeUso = { [K in TipoMensagemAviso]?: CasoDeUso<Extract<MensagemAviso, { tipo: K }>> };
 
-/** Os casos de uso ligados: o ranking nasce na T18, a cobrança na T24 e na T25. */
-export const CASOS_PADRAO: CasosDeUso = {};
+/** Os casos de uso ligados: o ranking (T18); a cobrança entra na T24 e na T25. */
+export const CASOS_PADRAO: CasosDeUso = { ranking: enviarRanking };
 
 export type MotivoFila = 'mensagem_invalida' | 'sem_caso_de_uso' | 'caso_de_uso_falhou';
 

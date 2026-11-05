@@ -31,6 +31,23 @@ export class ErroChavesVapid extends Error {
   override name = 'ErroChavesVapid';
 }
 
+/**
+ * As três variáveis VAPID do ambiente (notificacoes T18; NOT-61). Falta uma delas, ou vem só com espaços: `null`, e o push
+ * fica desligado (sem envio, rotas 503, sem controle na tela); o e-mail de cobrança continua. Valor presente mas
+ * inválido não é conferido aqui: é o `ErroChavesVapid` do primeiro envio.
+ */
+export function chavesVapidDoAmbiente(env: {
+  VAPID_PUBLICA?: string;
+  VAPID_PRIVADA?: string;
+  VAPID_ASSUNTO?: string;
+}): ChavesVapid | null {
+  const publica = env.VAPID_PUBLICA?.trim() ?? '';
+  const privada = env.VAPID_PRIVADA?.trim() ?? '';
+  const assunto = env.VAPID_ASSUNTO?.trim() ?? '';
+  if (publica === '' || privada === '' || assunto === '') return null;
+  return { publica, privada, assunto };
+}
+
 const ECDSA = { name: 'ECDSA', namedCurve: 'P-256' } as const;
 const ASSINATURA = { name: 'ECDSA', hash: 'SHA-256' } as const;
 const codificador = new TextEncoder();

@@ -60,14 +60,39 @@ const lote = (d: pg.Client, grupo: string, apos: string | number, limite: number
   );
 
 describe('push_envio_grupo', () => {
-  it('NOT-24: devolve nome, slug e arquivado do grupo; grupo inexistente, nenhuma linha', async () => {
+  it('NOT-24: devolve nome, slug, arquivado e as entradas do plano do grupo; grupo inexistente, nenhuma linha', async () => {
     const { cenario } = aberto;
     const [achado, vazio] = await semContexto(async (d) => [
       await d.query('SELECT * FROM push_envio_grupo($1)', [cenario.grupoA]),
       await d.query('SELECT * FROM push_envio_grupo($1)', ['00000000-0000-4000-8000-000000000000']),
     ]);
-    expect(achado?.rows).toEqual([{ nome: 'Grupo A', slug: cenario.slugA, arquivado: false }]);
+    expect(achado?.rows).toEqual([
+      {
+        nome: 'Grupo A',
+        slug: cenario.slugA,
+        arquivado: false,
+        situacao_comercial: 'uso_proprio',
+        trial_inicio: null,
+        pago_ate: null,
+      },
+    ]);
     expect(vazio?.rows).toEqual([]);
+  });
+
+  it('NOT-68: a situação comercial e o trial lidos são os do momento da chamada', async () => {
+    const { cenario } = aberto;
+    const r = await semContexto(async (d) => {
+      await d.query('RESET ROLE');
+      await d.query(`UPDATE grupos SET situacao_comercial = 'trial', trial_inicio = '2026-11-01' WHERE id = $1`, [
+        cenario.grupoA,
+      ]);
+      await d.query('SET LOCAL ROLE pelada_app');
+      return d.query<{ situacao_comercial: string; trial_inicio: string }>(
+        'SELECT situacao_comercial, trial_inicio::text AS trial_inicio FROM push_envio_grupo($1)',
+        [cenario.grupoA],
+      );
+    });
+    expect(r.rows).toEqual([{ situacao_comercial: 'trial', trial_inicio: '2026-11-01' }]);
   });
 
   it('NOT-24: grupo arquivado volta com arquivado = true', async () => {

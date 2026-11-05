@@ -757,6 +757,8 @@ T39 → T40 → T41
 **Depends on**: T17
 **Reuses**: T6, T14; `recursoLiberado` (`PC:79`), S-01, S-02; AD-049, AD-070
 **Requirement**: NOT-24, NOT-29, NOT-30, NOT-61, NOT-68
+**Status**: rascunhada
+**Nota do rascunho**: **S-01 não vale** (`backend/api/src/aplicacao/plano/recurso-liberado.ts:26-27` da planos-e-cobranca: grupo que o contexto não enxerga, inclusive sem contexto, dá `false`), então entrou o plano B da própria S-01: a `push_envio_grupo` (migração da T10, ainda não aplicada) devolve também `situacao_comercial`, `trial_inicio` e `pago_ate` (o mesmo `pago_ate` da `plano_do_grupo`), o `push.envioGrupo` os mapeia, e o `enviarRanking` decide com `planoEfetivo` + `planoLibera(…, 'push')` do domínio, com o "hoje" de São Paulo do instante do envio (SPEC_DEVIATION no SQL e no caso de uso; o `/executar` confirma com o usuário se AD-104 precisa de nota). Os testes da T10 e da T14 ganharam as colunas novas. As variáveis VAPID entraram no `Env` e o `chavesVapidDoAmbiente` em `vapid.ts` (vazio ou só espaços = ausente). O caso de uso grava aceitos e revogados num `finally`, para uma queda no meio do lote não perder o que foi aceito; `tentarDeNovo` fica sem tratamento até a T19. `CASOS_PADRAO` do consumidor liga o `ranking`. Teste em `backend/api/test/aplicacao/notificacoes/enviar-ranking.test.ts` (Node).
 
 **Done when**:
 

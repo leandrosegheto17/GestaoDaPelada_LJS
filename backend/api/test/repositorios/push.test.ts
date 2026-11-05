@@ -148,6 +148,11 @@ describe('envio e limpeza (sessão sem conta e sem slug)', () => {
     expect(achado).toMatchObject({ slug: slugG, arquivado: false });
     expect(typeof achado?.nome).toBe('string');
     expect(nulo).toBeNull();
+    // Entradas do planoEfetivo (T18, plano B da S-01): situação do CHECK e datas em texto AAAA-MM-DD ou nulas.
+    expect(['uso_proprio', 'trial', 'ativo', 'inadimplente', 'cancelado']).toContain(achado?.situacaoComercial);
+    for (const data of [achado?.trialInicio, achado?.pagoAte]) {
+      if (data !== null) expect(data).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    }
   });
 
   it('NOT-69, NOT-29, NOT-30: loteRanking devolve ids em texto; resultadoRanking aceita e revoga só as do grupo', async () => {
