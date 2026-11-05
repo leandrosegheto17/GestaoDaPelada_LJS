@@ -1126,6 +1126,8 @@ Lacunas: (1) arquivar um grupo já arquivado com o nome errado: a spec não diz 
 **Depends on**: T28
 **Reuses**: `exigirVinculo` (`CA:795`); `grupos.ler` e `grupos.editar` (T26, T27); tabela de `GD:168-169`
 **Requirement**: GEL-16, GEL-17, GEL-18, GEL-19, GEL-20, GEL-21
+**Status**: rascunhada
+Lacunas: o `PATCH /api/grupos/:grupoId` real é registrado antes das rotas extras dos testes, então os casos de `backend/api/test/sessao/grupo-ativo.test.ts` (T22) que mandam `PATCH` com corpo `{}` à rota extra passam a cair na rota real (422 no grupo ativo; o 409 do arquivado continua). O rascunho não mexeu no teste da T22; o `/executar` decide com o usuário (corpo válido ou rota extra própria).
 
 **Done when**:
 
