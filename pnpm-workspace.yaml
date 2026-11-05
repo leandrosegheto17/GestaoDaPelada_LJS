@@ -6,5 +6,6 @@ allowBuilds:
   workerd: true
   unrs-resolver: false
   core-js: false
+  sharp: false
 blockExoticSubdeps: true
 minimumReleaseAge: 1440
