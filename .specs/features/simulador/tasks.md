@@ -561,6 +561,8 @@ T53 → T54
 **Depends on**: T8
 **Reuses**: `L:backend/dominio/src/simulador/distribuicao-dois.ts:7` (200), `:21` (serpentina), `:127-154` (laço); `S:167-172`, `S:342-343`, Independent Test `S:174`
 **Requirement**: SIM-27, SIM-28, SIM-30, SIM-31, SIM-32, SIM-59, SIM-91, SIM-92
+**Status**: rascunhada
+**Nota do rascunho**: `distribuirDoisTimes(classificacao, n, elenco, { maxTrocas })` devolve `{ composicao, trocasAceitas }`; o teto injetável é só para teste.
 
 **Done when**:
 
