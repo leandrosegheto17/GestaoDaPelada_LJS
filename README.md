@@ -19,7 +19,7 @@ pnpm install
 docker compose up -d --wait        # Postgres 18 em 127.0.0.1:5432
 cp .env.example .env               # depois preencha as senhas (abaixo)
 pnpm migrar                        # aplica as migrações como o superusuário postgres
-pnpm seed                          # cria roles, uma conta e um grupo de teste
+pnpm seed                          # cria roles, uma conta e um grupo de teste com elenco
 pnpm dev                           # wrangler dev (API) + Vite (web)
 ```
 
@@ -28,6 +28,12 @@ Antes de `pnpm seed` e `pnpm dev`, edite o `.env` e defina `PELADA_APP_SENHA`, `
 ### Entrar local
 
 O seed cria a conta admin `admin@exemplo.test`, já confirmada, com a senha que você pôs em `SEED_SENHA_ADMIN`, e o grupo **Pelada Local** (`pelada-local`) com essa conta como admin. Com o `pnpm dev` no ar, abra `http://localhost:5173/entrar` e entre com esse e-mail e essa senha: o app vai a `/app` e lista o grupo. Rodar o `pnpm seed` de novo redefine a senha para o valor atual de `SEED_SENHA_ADMIN`.
+
+O grupo do seed nasce pela mesma função do app (`grupo_criar`): já vem com as 6 habilidades (Visão de Jogo, Passe, Preparo Físico, Drible, Chute e Desarme) e com a conta como admin com acesso ao financeiro. Em **Jogadores** aparecem Bigode, Canhota, Paredão, Xerife e Foguete em Ativos e Maestro em Inativos; todos têm notas, menos Paredão, que mostra "sem nota". Abra um jogador para ver a ficha, o nível e os períodos. Rodar o seed de novo não duplica grupo, jogador nem nota, nem desfaz o que você mudou na tela.
+
+### Criar um grupo local
+
+Entre com qualquer conta (a do seed ou uma criada em `/cadastro`, com o link de confirmação da caixa de e-mails abaixo) e, em `/app`, toque em **Criar grupo**. O slug sai do nome (`Pelada de Quinta` vira `pelada-de-quinta`; repetido, ganha `-2`, `-3`...), e o link do ranking aparece em **Dados do grupo**. Só quem criou o grupo vê a opção de arquivar; o grupo arquivado fica em "Arquivados", com Reativar.
 
 ### E-mails em desenvolvimento
 

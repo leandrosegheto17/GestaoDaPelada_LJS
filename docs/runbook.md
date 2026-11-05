@@ -132,6 +132,25 @@ O backup da produção não é confiável até a revalidação do fim do projeto
    rm -r ./backup-baixado
    ```
 
+## Grupos e elenco
+
+### Limite de escritas por conta (`LIMITE_ESCRITA`, SEC-003)
+
+- **Valor:** 60 escritas por 60 segundos, **por conta** (não por IP), em toda requisição que muda estado em `/api/grupos*` (criar grupo, jogadores, períodos, habilidades, notas, admins). As leituras não contam.
+- **Onde muda:** no binding `LIMITE_ESCRITA` de `ratelimits` no `wrangler.jsonc` (`simple.limit` e `simple.period`; a Cloudflare só aceita `period` de 10 ou 60). A mudança vale no próximo deploy da prévia; não é segredo.
+- **Efeito:** passou do limite, a API responde 429 e nada é gravado. No lançamento de notas em lote, cada nota trocada na ficha é uma escrita (`PUT …/notas/:habilidadeId`): dar as 6 notas a 10 jogadores seguidos (60 escritas) esgota o minuto, e a nota seguinte aparece com o erro no campo, sem gravar. Basta esperar o minuto virar e escolher a nota de novo.
+- **Quando subir:** só se um organizador legítimo esbarrar no limite com frequência (reclamação no suporte ou 429 recorrente no log da mesma conta). Suba aos poucos (ex.: 120); o limite existe contra conta roubada ou script que encha o banco.
+
+### Grupo arquivado sem a criadora
+
+Só a conta em `grupos.criado_por` arquiva e reativa o grupo, e só enquanto for admin dele (GEL-24, SEC-009). Se a criadora excluiu a conta ou deixou de ser admin, **ninguém reativa aquele grupo pelo app**: as outras admins não o veem (404) e não há transferência de criadora (fora do escopo). Nada se perde: jogadores, notas e slug ficam no banco.
+
+Quando uma admin pedir ao suporte:
+
+1. Confirme pelo e-mail da conta que quem pede é admin do grupo (`vinculos_admin`), sem passar dado do elenco por fora do app.
+2. A correção é manual, no banco de produção, com a role de migração e a confirmação específica do dono (ação em produção): numa transação, defina `criado_por` para a conta da admin que pediu e, se o grupo estiver arquivado e ela quiser, limpe `arquivado_em`; registre a ação na `auditoria` com `autor_tipo = 'infraestrutura'` e o `grupo_id`, sem dado pessoal. A `pelada_app` não consegue fazer isso (sem grant em `criado_por`), de propósito.
+3. Avise a admin para abrir `/app`: o grupo volta à lista dela, com Arquivar e Reativar.
+
 ## Segredos
 
 Nenhum valor real vai para o repositório: o `.env.example` lista só os nomes, com obrigatoriedade, formato e se é segredo (checagem `env-example`, FUN-46), e o `gitleaks` roda no CI.

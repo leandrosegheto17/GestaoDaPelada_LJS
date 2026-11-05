@@ -2319,6 +2319,8 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T74
 **Reuses**: runbook e README da CA (`CA:1708`, T58); `GSEG:159`; caso de `GS:49`
 **Requirement**: SEC-003
+**Status**: rascunhada
+**Nota do rascunho**: runbook ganha a seção "Grupos e elenco" (`LIMITE_ESCRITA` e grupo sem criadora); README ganha o elenco do seed e "Criar um grupo local". O gate completo da feature é do /executar.
 
 **Done when**:
 
