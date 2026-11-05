@@ -37,7 +37,8 @@ function montar(binding: NomeLimite, falso: LimiteDeTaxa) {
     [binding]: falso,
   } as unknown as Env;
   const pedir = (cabecalhos: Record<string, string> = {}) =>
-    app.request('/api/teste/limitada', { method: 'POST', headers: cabecalhos }, env);
+    // X-Pelada: 1 desde a T18 (ACE-49): sem ele a escrita é recusada antes do limitador.
+    app.request('/api/teste/limitada', { method: 'POST', headers: { 'x-pelada': '1', ...cabecalhos } }, env);
   return { pedir, chamadas: () => chamadas };
 }
 

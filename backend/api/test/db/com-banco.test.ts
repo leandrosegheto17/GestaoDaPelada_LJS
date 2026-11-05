@@ -88,7 +88,10 @@ async function pedir(
   init: RequestInit = {},
 ): Promise<Response> {
   const ctx = contextoFalso();
-  const r = await app.request(caminho, init, envCom(urlApp), ctx);
+  // X-Pelada: 1 desde a T18 (ACE-49): sem ele toda escrita é recusada com 403 antes da rota.
+  const headers = new Headers(init.headers);
+  headers.set('x-pelada', '1');
+  const r = await app.request(caminho, { ...init, headers }, envCom(urlApp), ctx);
   await ctx.esperar();
   return r;
 }

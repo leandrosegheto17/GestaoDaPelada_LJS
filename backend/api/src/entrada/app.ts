@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import type { Ambiente } from './ambiente.ts';
+import { exigirCabecalhoPelada } from './middlewares/cabecalho-pelada.ts';
 import { semCache, semSniff } from './middlewares/cabecalhos.ts';
 import { devEmails } from './rotas/dev-emails.ts';
 import { health } from './rotas/health.ts';
@@ -19,6 +20,8 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
 
   // Antes de qualquer rota, para valer também no 404 e no 500 (FUN-22).
   api.use('*', semCache, semSniff);
+  // Escrita sem `X-Pelada: 1` é recusada antes de qualquer limitador (ACE-49, T18).
+  api.use('*', exigirCabecalhoPelada);
 
   api.route('/', health);
   // Só responde com EMAIL_DEV=1; sem ela, 404 como rota inexistente (T17).

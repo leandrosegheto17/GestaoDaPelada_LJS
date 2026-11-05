@@ -765,6 +765,9 @@ T57 → T58
 **Depends on**: T17
 **Reuses**: ordem de `ljs:.specs/features/conta-e-acesso/design.md:143`, escrita do zero no `app.ts` da fundação (`F:1106`); binding falso do teste de `limiteTaxa` (`F:1153`)
 **Requirement**: ACE-49
+**Status**: rascunhada
+**Nota do rascunho**: escrita = todo método fora de GET e HEAD; o valor tem de ser exatamente `1`; a recusa é `403` com `corpoDoErro('origem_recusada')`.
+**Lacunas**: mudança de teste existente sem aprovação registrada: `test/rotas/limite-taxa.test.ts` e `test/db/com-banco.test.ts` passam a mandar `X-Pelada: 1` nos POST (nenhuma asserção mudou); o `/executar` pede a aprovação antes do verde.
 
 **Done when**:
 
