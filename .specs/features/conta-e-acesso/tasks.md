@@ -817,6 +817,9 @@ T57 → T58
 **Depends on**: T19
 **Reuses**: estender o `comBanco` da fundação (`F:1203`, `FD:103`) e o cliente por requisição (`F:1179`); decisão de `ljs:.specs/features/conta-e-acesso/design.md:18-23` (transação curta antes do `comBanco`, leituras seguem `READ ONLY`)
 **Requirement**: ACE-15, ACE-16, ACE-47, ACE-69
+**Status**: rascunhada
+**Nota do rascunho**: casos limite listados no topo de `sessao.ts`. `sessoes.tocar` fica em `src/infraestrutura/db/repositorios/sessoes.ts` (a T22 acrescenta `encerrarAtual`); o `carregarSessao` é global em `criarApp`, depois dos limitadores; o `comBanco` passa a ter `contextoDaSessao` como padrão. Teste no projeto `banco` (Node), em `test/sessao/`, com o app como `pelada_app` pela `fabricaComoApp` nova de `test/db/requisicao.ts`.
+**Lacunas**: cookie de sessão de escopo `troca_de_senha` numa rota comum: a spec não define; o rascunho trata como sessão inválida e vence o cookie.
 
 **Done when**:
 

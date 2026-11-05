@@ -45,8 +45,15 @@ function somenteLeitura(metodo: string): boolean {
   return m === 'GET' || m === 'HEAD';
 }
 
+/**
+ * Contexto padrão (T20; ACE-47): a conta da sessão que o `carregarSessao` resolveu antes, sem
+ * slug. Sem sessão, `SEM_CONTEXTO`.
+ */
+export const contextoDaSessao: ObterContexto = (c) =>
+  c.var.contaId ? { conta: c.var.contaId, slug: null } : SEM_CONTEXTO;
+
 export function comBanco(
-  obterContexto: ObterContexto = () => SEM_CONTEXTO,
+  obterContexto: ObterContexto = contextoDaSessao,
   opcoes: OpcoesComBanco = {},
 ): MiddlewareHandler<Ambiente> {
   return async (c, next) => {

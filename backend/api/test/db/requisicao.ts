@@ -101,3 +101,27 @@ export function fabricaEspiada(): FabricaEspiada {
     },
   };
 }
+
+/**
+ * Fábrica de `pg.Client` que, logo depois de conectar como o superusuário local, passa a rodar
+ * como `pelada_app` (`SET ROLE`, da sessão inteira): o app dos testes enxerga o banco como em
+ * produção, com a RLS valendo (T20, T21). Conta as conexões criadas.
+ */
+export function fabricaComoApp(): { fabrica: (connectionString: string) => ConexaoPg; criadas(): number } {
+  let criadas = 0;
+  return {
+    criadas: () => criadas,
+    fabrica: (connectionString) => {
+      criadas += 1;
+      const c = new pg.Client({ connectionString });
+      return {
+        connect: async () => {
+          await c.connect();
+          await c.query('SET ROLE pelada_app');
+        },
+        end: () => c.end(),
+        query: (sql, valores) => c.query(sql, valores),
+      };
+    },
+  };
+}

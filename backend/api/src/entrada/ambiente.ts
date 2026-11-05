@@ -43,6 +43,10 @@ export type NomeLimite = 'LIMITE_ENTRAR' | 'LIMITE_PUBLICO' | 'LIMITE_WEBHOOK' |
 export interface Variaveis {
   /** Kysely da transação da requisição, posto pelo `comBanco` (FUN-16). Só existe nas rotas com ele. */
   db: Kysely<Banco>;
+  /** Conta da sessão, posta pelo `carregarSessao` (T20). Ausente = sem sessão válida. */
+  contaId?: string;
+  /** SHA-256 do token da sessão atual, para encerrá-la no sair (T20, T26). */
+  tokenHash?: Uint8Array;
 }
 
 export interface Ambiente {

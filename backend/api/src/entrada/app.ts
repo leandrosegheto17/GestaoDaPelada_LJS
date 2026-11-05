@@ -3,13 +3,20 @@ import type { Ambiente } from './ambiente.ts';
 import { exigirCabecalhoPelada } from './middlewares/cabecalho-pelada.ts';
 import { semCache, semSniff } from './middlewares/cabecalhos.ts';
 import { limitarRotasDeAcesso } from './middlewares/limite-taxa.ts';
+import { carregarSessao } from './middlewares/sessao.ts';
 import { devEmails } from './rotas/dev-emails.ts';
 import { health } from './rotas/health.ts';
-import { ErroBancoIndisponivel, MENSAGEM_BANCO_INDISPONIVEL } from '../infraestrutura/db/cliente.ts';
+import {
+  ErroBancoIndisponivel,
+  MENSAGEM_BANCO_INDISPONIVEL,
+  type OpcoesCliente,
+} from '../infraestrutura/db/cliente.ts';
 
 export interface OpcoesApp {
   /** Rotas extras sob /api, só para os testes (ex.: rota que lança erro). */
   registrarExtras?: (api: Hono<Ambiente>) => void;
+  /** Só para os testes: fábrica de conexões da leitura da sessão (ex.: como `pelada_app`). */
+  fabricaBanco?: NonNullable<OpcoesCliente['fabrica']>;
 }
 
 /**
@@ -25,6 +32,8 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
   api.use('*', exigirCabecalhoPelada);
   // LIMITE_ENTRAR nas rotas de acesso, antes da sessão e do banco (ACE-50, ACE-70, T19).
   limitarRotasDeAcesso(api);
+  // Sessão resolvida em transação própria, antes do `comBanco` de cada rota (ACE-47, T20).
+  api.use('*', carregarSessao(opcoes.fabricaBanco ? { fabrica: opcoes.fabricaBanco } : {}));
 
   api.route('/', health);
   // Só responde com EMAIL_DEV=1; sem ela, 404 como rota inexistente (T17).
