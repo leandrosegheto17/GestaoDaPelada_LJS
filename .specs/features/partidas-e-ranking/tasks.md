@@ -1697,6 +1697,8 @@ T78 → T79
 **Depends on**: T45
 **Reuses**: T13, T19, T45; `URL_PUBLICA` como única origem (`F:1251`); `BD:241`, `BD:246`
 **Requirement**: PAR-95, PAR-100, PAR-101
+**Status**: rascunhada
+**Nota do rascunho**: em `rotas/publico.ts`, com `grupoDoSlug` e `linhaPublicaDe` da T45 e `linkPublico` de `rotas/grupos.ts` para a `urlPublica`. O mês no histórico usa `limitesDeMes` sobre as partidas carregadas, porque o `calcularPdf` não devolve os limites. Testes em `backend/api/test/rotas/publico-pdf.test.ts`, com cada recusa comparada à do ranking.
 
 **Done when**:
 

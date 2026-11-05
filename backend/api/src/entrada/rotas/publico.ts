@@ -4,13 +4,15 @@ import {
   corpoDoErro,
   MENSAGEM_MES_FORA_DO_HISTORICO,
   type LinhaPublica,
+  type PdfPublico,
   type RankingPublico,
 } from '@pelada/contrato';
-import { calcularRanking, mesDe, mesNoHistorico, type LinhaRanking } from '@pelada/dominio';
+import { calcularPdf, calcularRanking, limitesDeMes, mesDe, mesNoHistorico, type LinhaRanking } from '@pelada/dominio';
 import type { Ambiente } from '../ambiente.ts';
 import { erroDeCampos, mensagensDoZod, respostaDeCampo } from '../corpo.ts';
 import { grupoPublico, type GrupoPublico } from '../../infraestrutura/db/repositorios/grupo-publico.ts';
 import { historico } from '../../infraestrutura/db/repositorios/historico.ts';
+import { linkPublico } from './grupos.ts';
 
 /**
  * Rotas públicas `/api/publico/:slug/*` (partidas-e-ranking T45 em diante; `BD:240-242`). O `protegerRotasPublicas`
@@ -67,6 +69,36 @@ export function rotasPublico(): Hono<Ambiente> {
       resumoMes: { partidas: r.resumoMes.partidas, comChuva: r.resumoMes.comChuva },
       partidas: r.partidas.map((p) => ({ data: p.data, choveu: p.choveu })),
       linhas: r.linhas.map(linhaPublicaDe),
+    };
+    return c.json(resposta, 200);
+  });
+
+  /**
+   * `GET …/pdf?mes=` (T46; PAR-95, PAR-100, PAR-101, `BD:241`, `BD:246`): a mesma leitura e as mesmas recusas do
+   * ranking (mês inválido, fora do histórico, slug indisponível; o 429 é do `protegerRotasPublicas`, antes de tudo), e
+   * `calcularPdf` no `pdfPublico`: até 12 colunas, linhas sem id. `urlPublica` = `<URL_PUBLICA>/g/<slug>`, a única
+   * origem de endereço absoluto.
+   */
+  rotas.get('/publico/:slug/pdf', async (c) => {
+    const consulta = consultaMesPublico.safeParse(c.req.query());
+    if (!consulta.success) return c.json(erroDeCampos(mensagensDoZod(consulta.error)), 422);
+    const grupo = await grupoDoSlug(c);
+    if (grupo instanceof Response) return grupo;
+
+    const hoje = c.var.relogio.hoje();
+    const mes = consulta.data.mes ?? mesDe(hoje);
+    const h = await historico.carregar(c.var.db, grupo.id, hoje);
+    if (!mesNoHistorico(limitesDeMes(h.partidas, hoje), mes)) return respostaDeCampo(c, 'mes', MENSAGEM_MES_FORA_DO_HISTORICO);
+    const p = calcularPdf({ ...h, hoje, mes });
+
+    const resposta: PdfPublico = {
+      grupo: { nome: grupo.nome, slug: grupo.slug },
+      mes,
+      geradoEm: c.var.relogio.agoraIso(),
+      urlPublica: linkPublico(c.env.URL_PUBLICA, grupo.slug),
+      semPartidasNoMes: p.semPartidasNoMes,
+      colunas: p.colunas.map((col) => ({ data: col.data, choveu: col.choveu, doMesExibido: col.doMesExibido })),
+      linhas: p.linhas.map(linhaPublicaDe),
     };
     return c.json(resposta, 200);
   });
