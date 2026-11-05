@@ -1698,6 +1698,7 @@ T56 → T57
 **Depends on**: T54
 **Reuses**: Playwright e axe da fundação (`F:1691`, `F:1738`); sessão de e2e de `CA:1683` (T57)
 **Requirement**: PLA-61, PLA-63, PLA-64, PLA-65
+**Status**: rascunhada
 
 **Done when**:
 
