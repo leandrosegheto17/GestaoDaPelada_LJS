@@ -20,6 +20,8 @@ export interface CasoMatriz extends TabelaComGrupo {
 export const MATRIZ: readonly CasoMatriz[] = [
   // auditoria: pelada_app só tem INSERT (1792843380000_conta-tabelas.sql).
   { tabela: 'auditoria', coluna: 'grupo_id', leitura: 'sem-grant' },
+  // avisos_cobranca e push_ranking (notificacoes T7, AD-101): sem grant para pelada_app; só as funções e o backup leem.
+  { tabela: 'avisos_cobranca', coluna: 'grupo_id', leitura: 'sem-grant' },
   { tabela: 'config_financeira', coluna: 'grupo_id', leitura: 'por-grupo' },
   { tabela: 'config_pesos', coluna: 'grupo_id', leitura: 'por-grupo' },
   { tabela: 'convites_admin', coluna: 'grupo_id', leitura: 'por-grupo' },
@@ -35,6 +37,7 @@ export const MATRIZ: readonly CasoMatriz[] = [
   { tabela: 'partidas', coluna: 'grupo_id', leitura: 'por-grupo' },
   { tabela: 'periodos_ativos', coluna: 'grupo_id', leitura: 'por-grupo' },
   { tabela: 'presencas', coluna: 'grupo_id', leitura: 'por-grupo' },
+  { tabela: 'push_ranking', coluna: 'grupo_id', leitura: 'sem-grant' },
   { tabela: 'vinculos_admin', coluna: 'grupo_id', leitura: 'por-grupo' },
 ];
 

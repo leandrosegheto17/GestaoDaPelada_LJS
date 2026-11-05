@@ -266,6 +266,25 @@ const PREENCHER: ReadonlyArray<readonly [string, (db: pg.Client, s: Semente) => 
       );
     },
   ],
+  [
+    // notificacoes T7: uma assinatura de push do ranking e um aviso de cobrança de cada grupo (NOT-52).
+    'push_ranking',
+    async (db, s) => {
+      await db.query(
+        `INSERT INTO push_ranking (grupo_id, endpoint, p256dh, auth) VALUES ($1, $2, $3, $4)`,
+        [s.grupo, `https://fcm.googleapis.com/fcm/send/semente-${s.marca}`, `p256dh-${s.marca}`, `auth-${s.marca}`],
+      );
+    },
+  ],
+  [
+    'avisos_cobranca',
+    async (db, s) => {
+      await db.query(
+        `INSERT INTO avisos_cobranca (id_externo, tipo, grupo_id) VALUES ($1, 'cobranca_gerada', $2)`,
+        [`pay_aviso_${s.marca}`, s.grupo],
+      );
+    },
+  ],
 ];
 
 async function criarConta(db: pg.Client, email: string, nome: string): Promise<string> {

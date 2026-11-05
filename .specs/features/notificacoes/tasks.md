@@ -459,6 +459,8 @@ T39 → T40 → T41
 **Depends on**: T6
 **Reuses**: gerador (`F:883`); checagem aditiva (`F:858`); RLS das tabelas (`M:1792843320000_rls.sql:33-59`); policy de backup (`M:1792843860000_conta-teto-emails.sql:17`); AD-067, AD-101
 **Requirement**: NOT-12, NOT-49, NOT-50, NOT-57
+**Status**: rascunhada
+**Nota do rascunho**: o timestamp é `1792846200000`, com folga para as migrações que a `planos-e-cobranca` ainda vai ganhar (SPEC_DEVIATION no cabeçalho do SQL); o `/executar` confere a ordem e renomeia se preciso. As duas tabelas com `grupo_id` entraram no cenário (`apoio.ts`, `cenario-grupos.ts`) e na matriz de leitura e escrita da fundação (`matriz.ts`, `casos-escrita.ts`) como `sem-grant`, senão o `criarCenario` falharia. A policy de backup é `TO pelada_backup` (o grupo de `pelada_backup_ro`), como a das tabelas do plano.
 
 **Done when**:
 

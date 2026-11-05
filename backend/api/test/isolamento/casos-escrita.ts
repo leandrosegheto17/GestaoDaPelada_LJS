@@ -27,6 +27,28 @@ export interface Escrita {
 }
 
 export const ESCRITA: Record<string, Escrita> = {
+  // notificacoes T7 (AD-101): sem grant nenhum para pelada_app; a escrita só passa pelas funções.
+  avisos_cobranca: {
+    insere: false,
+    altera: false,
+    apaga: false,
+    inserir: (g) => [
+      `INSERT INTO avisos_cobranca (id_externo, tipo, grupo_id) VALUES ('pay_intruso', 'cobranca_gerada', $1)`,
+      [g],
+    ],
+    alterar: 'enviado_em = now()',
+  },
+  push_ranking: {
+    insere: false,
+    altera: false,
+    apaga: false,
+    inserir: (g) => [
+      `INSERT INTO push_ranking (grupo_id, endpoint, p256dh, auth)
+       VALUES ($1, 'https://fcm.googleapis.com/fcm/send/intruso', 'p256dh-intruso', 'auth-intruso')`,
+      [g],
+    ],
+    alterar: `auth = 'auth-trocada'`,
+  },
   auditoria: {
     insere: true,
     altera: false,

@@ -83,6 +83,8 @@ const PREENCHIDAS_EM_G = new Set([
   'auditoria',
   'convites_admin',
   'assinaturas',
+  'push_ranking',
+  'avisos_cobranca',
 ]);
 
 /** Cria G pela `grupo_criar`, como `pelada_app` com a conta C, e devolve id e slug. */
@@ -212,6 +214,15 @@ export async function completarCenarioGrupos(
      VALUES ($1, 'cus_g', 'sub_g', 990, 'cancelada', '2026-01-05', 'pay_g', $2, now())`,
     [grupoG, contaC],
   );
+  // notificacoes T7: uma assinatura de push do ranking e um aviso de cobrança de G.
+  await db.query(
+    `INSERT INTO push_ranking (grupo_id, endpoint, p256dh, auth)
+     VALUES ($1, 'https://fcm.googleapis.com/fcm/send/semente-g', 'p256dh-g', 'auth-g')`,
+    [grupoG],
+  );
+  await db.query(`INSERT INTO avisos_cobranca (id_externo, tipo, grupo_id) VALUES ('pay_aviso_g', 'cobranca_gerada', $1)`, [
+    grupoG,
+  ]);
 
   return {
     ...base,
