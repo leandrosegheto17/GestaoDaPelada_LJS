@@ -941,6 +941,7 @@ T78 → T79
 **Depends on**: T18
 **Reuses**: `B:251`, `B:257`, `B:263` (PAR-76), `B:321`, `B:327`, `B:381`; `BD:179-182`
 **Requirement**: PAR-64, PAR-70, PAR-76, PAR-95, PAR-101, PAR-128
+**Status**: rascunhada
 
 **Done when**:
 

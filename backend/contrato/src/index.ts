@@ -6,6 +6,7 @@ export * from './elenco.ts';
 export * from './periodos.ts';
 export * from './pesos.ts';
 export * from './partidas.ts';
+export * from './publico.ts';
 export * from './push.ts';
 export * from './plano.ts';
 export * from './asaas.ts';
