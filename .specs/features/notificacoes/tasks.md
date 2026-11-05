@@ -786,6 +786,8 @@ T39 → T40 → T41
 **Depends on**: T18
 **Reuses**: T18; T10 (`desde`); AD-108
 **Requirement**: NOT-31, NOT-69
+**Status**: rascunhada
+**Nota do rascunho**: o lote lê 41 para saber se há continuação (80 assinaturas dão duas invocações e nenhuma continuação vazia). A mensagem de nova tentativa relê só os `ids` em páginas de 40 a partir do menor id, com o mesmo `desde`, sem função SQL nova. A continuação e a nova tentativa são enfileiradas depois de gravar o resultado; se o `agendarAviso` lançar, o consumidor faz `retry()` e a refeita não reenvia às aceitas. `Retry-After` 0 enfileira sem atraso. Testes no mesmo `enviar-ranking.test.ts` (bloco "retentativa e retomada (T19)").
 
 **Done when**:
 

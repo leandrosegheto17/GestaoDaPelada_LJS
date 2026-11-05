@@ -1,9 +1,14 @@
 import { paraBase64url } from '@pelada/contrato/push';
 import type { MensagemRanking } from '@pelada/contrato/fila-avisos';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { criarEnviarRanking } from '../../../src/aplicacao/notificacoes/enviar-ranking.ts';
+import {
+  ATRASO_PADRAO_S,
+  ATRASO_TETO_S,
+  criarEnviarRanking,
+} from '../../../src/aplicacao/notificacoes/enviar-ranking.ts';
 import type { Env } from '../../../src/entrada/ambiente.ts';
 import { bancoSemContexto, type AbrirBanco } from '../../../src/entrada/consumidor-avisos.ts';
+import { filaMemoria, type FilaMemoria } from '../../../src/infraestrutura/fila/avisos.ts';
 import { servicoPushFalso, TTL_RANKING, type ServicoPushFalso } from '../../../src/infraestrutura/push/enviar.ts';
 import { topicoDoGrupo } from '../../../src/infraestrutura/push/topico.ts';
 import { envCom, fabricaComoApp } from '../../db/requisicao.ts';
@@ -212,5 +217,128 @@ describe('enviarRanking', () => {
       { endpoint: um, enviado: true },
       { endpoint: dois, enviado: false },
     ]);
+  });
+});
+
+describe('enviarRanking: retentativa e retomada (T19)', () => {
+  let fila: FilaMemoria;
+  let env: Env;
+
+  beforeEach(() => {
+    fila = filaMemoria();
+    env = { ...envBase, FILA_AVISOS: fila };
+  });
+
+  /** Ids das assinaturas do grupo A, em ordem. */
+  async function idsDoGrupo(): Promise<string[]> {
+    const r = await aberto.db.query<{ id: string }>('SELECT id::text FROM push_ranking WHERE grupo_id = $1 ORDER BY id', [
+      aberto.cenario.grupoA,
+    ]);
+    return r.rows.map((l) => l.id);
+  }
+
+  /** A próxima mensagem da fila, já como ranking. */
+  function proxima(): { corpo: MensagemRanking; delaySeconds?: number } {
+    const item = fila.enviadas.shift();
+    if (item === undefined || item.corpo.tipo !== 'ranking') throw new Error('Nenhuma mensagem de ranking na fila.');
+    return { corpo: item.corpo, ...(item.delaySeconds === undefined ? {} : { delaySeconds: item.delaySeconds }) };
+  }
+
+  it('NOT-34: 41 assinaturas: 40 agora e a continuação a partir do id da 40.ª, que manda só a 41.ª', async () => {
+    await assinaturas(41);
+    const ids = await idsDoGrupo();
+    const aviso = mensagem();
+    await enviar(aviso, env);
+    expect(servico.pedidos).toHaveLength(40);
+    const continuacao = proxima();
+    expect(continuacao.corpo).toEqual({ ...aviso, aposId: ids[39] });
+    expect(continuacao.delaySeconds).toBeUndefined();
+
+    await enviar(continuacao.corpo, env);
+    expect(servico.pedidos).toHaveLength(41);
+    expect(servico.pedidos[40]?.url).toBe(ENDPOINT(41));
+    expect(fila.enviadas).toEqual([]);
+  });
+
+  it('NOT-34: 80 assinaturas: duas invocações e nenhuma continuação vazia', async () => {
+    await assinaturas(80);
+    await enviar(mensagem(), env);
+    await enviar(proxima().corpo, env);
+    expect(servico.pedidos).toHaveLength(80);
+    expect(new Set(servico.pedidos.map((p) => p.url)).size).toBe(80);
+    expect(fila.enviadas).toEqual([]);
+    expect((await linhas()).every((l) => l.enviado)).toBe(true);
+  });
+
+  it('NOT-31: 429 com Retry-After 120 vai numa mensagem só com o id, tentativa 2 e atraso de 120 s', async () => {
+    await assinaturas(3);
+    const ids = await idsDoGrupo();
+    servico.responder(201, { status: 429, cabecalhos: { 'retry-after': '120' } }, 201);
+    const aviso = mensagem();
+    await enviar(aviso, env);
+    const nova = proxima();
+    expect(nova.corpo).toEqual({ ...aviso, aposId: '0', ids: [ids[1]], tentativa: 2 });
+    expect(nova.delaySeconds).toBe(120);
+    expect(await linhas()).toEqual([
+      { endpoint: ENDPOINT(1), enviado: true },
+      { endpoint: ENDPOINT(2), enviado: false },
+      { endpoint: ENDPOINT(3), enviado: true },
+    ]);
+
+    // A nova tentativa manda só à que ficou pendente.
+    await enviar(nova.corpo, env);
+    expect(servico.pedidos.map((p) => p.url)).toEqual([ENDPOINT(1), ENDPOINT(2), ENDPOINT(3), ENDPOINT(2)]);
+    expect((await linhas()).every((l) => l.enviado)).toBe(true);
+    expect(fila.enviadas).toEqual([]);
+  });
+
+  it('NOT-31: 503 recebe 2 novas tentativas e depois desiste, sem apagar a assinatura; sem Retry-After, 60 s', async () => {
+    await assinaturas(1);
+    servico.responder(503, 503, 503);
+    await enviar(mensagem(), env);
+    const segunda = proxima();
+    expect([segunda.corpo.tentativa, segunda.delaySeconds]).toEqual([2, ATRASO_PADRAO_S]);
+    await enviar(segunda.corpo, env);
+    const terceira = proxima();
+    expect(terceira.corpo.tentativa).toBe(3);
+    await enviar(terceira.corpo, env);
+
+    expect(servico.pedidos).toHaveLength(3);
+    expect(fila.enviadas).toEqual([]);
+    expect(await linhas()).toEqual([{ endpoint: ENDPOINT(1), enviado: false }]);
+  });
+
+  it('NOT-31: o atraso é o maior Retry-After do lote, com teto de 1 h', async () => {
+    await assinaturas(3);
+    servico.responder(
+      { status: 429, cabecalhos: { 'retry-after': '30' } },
+      { status: 503, cabecalhos: { 'retry-after': '7200' } },
+      503,
+    );
+    await enviar(mensagem(), env);
+    const nova = proxima();
+    expect(nova.corpo.ids).toHaveLength(3);
+    expect(nova.delaySeconds).toBe(ATRASO_TETO_S);
+  });
+
+  it('NOT-69: queda depois de 10 aceitas; a mensagem refeita pela fila envia só as 30 restantes', async () => {
+    await assinaturas(40);
+    const aviso = mensagem();
+    servico.responder(...Array.from({ length: 10 }, () => 201), 400);
+    const cai = criarEnviarRanking({
+      fetch: servico.fetch,
+      reportar: () => {
+        throw new Error('queda no meio do lote');
+      },
+    });
+    await expect(cai(aviso, { env, banco })).rejects.toThrow('queda no meio do lote');
+    expect((await linhas()).filter((l) => l.enviado)).toHaveLength(10);
+
+    const antes = servico.pedidos.length;
+    await enviar(aviso, env); // a fila entrega a mesma mensagem de novo (retry do consumidor)
+    const refeitos = servico.pedidos.slice(antes).map((p) => p.url);
+    expect(refeitos).toHaveLength(30);
+    expect(refeitos).toEqual(Array.from({ length: 30 }, (_, i) => ENDPOINT(i + 11)));
+    expect((await linhas()).every((l) => l.enviado)).toBe(true);
   });
 });
