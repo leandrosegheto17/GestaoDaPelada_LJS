@@ -1588,6 +1588,9 @@ T78 → T79
 **Depends on**: T41
 **Reuses**: Rotas de período da grupos-e-elenco: reativar em `rotas/periodos.ts` (`GE:1409`, `dataCorpo` de `GE:804`), período e início em `rotas/periodos-correcao.ts` (`GE:1433`); a prévia de cada uma fica no mesmo arquivo da gravação; T15, T29, T36; `BD:237-239`, `BD:248-249`
 **Requirement**: PAR-109, PAR-110, PAR-111, PAR-112, PAR-113, PAR-114, PAR-115, PAR-116
+**Status**: rascunhada
+**Nota do rascunho**: a prévia de reativar fica em `rotas/periodos.ts` e as de período e início em `rotas/periodos-correcao.ts`, ao lado da gravação. Cada uma repete as recusas da gravação na mesma ordem sobre `jogadores.lerParaPrevia` (`avaliarNaPrevia` reproduz o `avaliar` privado de `jogadores.ts`), depois `historico.carregar` e `previaDosPeriodos` ou `previaDoInicio`. Testes em `backend/api/test/rotas/previas-periodos.test.ts`, com cada recusa comparada à resposta da gravação e o banco conferido antes e depois.
+**Lacunas**: prévia de corrigir período com as datas iguais às atuais: a Base não define a resposta (a gravação diz "Nada a alterar."); o rascunho devolve o cenário sem mudança, sem mensagem.
 
 **Done when**:
 
