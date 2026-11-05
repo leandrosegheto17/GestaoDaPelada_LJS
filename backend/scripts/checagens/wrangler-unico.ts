@@ -19,7 +19,7 @@ const PUBLICA = /\bwrangler(?:\s+versions)?\s+(?:deploy|publish)\b/i;
 const PASTAS_DE_DOCUMENTACAO: readonly string[] = ['docs/', '.specs/', '.claude/', '.rascunho/'];
 
 export function documentacao(caminho: string): boolean {
-  const c = caminho.replace(/\/g, '/');
+  const c = caminho.replace(/\\/g, '/');
   return c.toLowerCase().endsWith('.md') || PASTAS_DE_DOCUMENTACAO.some((p) => c.startsWith(p));
 }
 
@@ -27,7 +27,7 @@ export function documentacao(caminho: string): boolean {
 export function checarWrangler(arquivos: readonly Arquivo[]): string[] {
   const problemas: string[] = [];
   for (const { caminho, conteudo } of arquivos) {
-    const c = caminho.replace(/\/g, '/');
+    const c = caminho.replace(/\\/g, '/');
     if (c === UNICO_PERMITIDO || documentacao(c)) continue;
     if (conteudo.includes('\u0000')) continue;
     conteudo.split('\n').forEach((linha, i) => {

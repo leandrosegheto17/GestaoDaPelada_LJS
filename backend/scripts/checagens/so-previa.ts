@@ -38,7 +38,7 @@ export function checarSoPrevia(arquivos: readonly Arquivo[]): string[] {
   const problemas: string[] = [];
   for (const { caminho, conteudo } of arquivos) {
     conteudo.split('\n').forEach((linha, i) => {
-      if (rotaPermitida(caminho, linha) && !/--(?:routes?|domain)/i.test(linha)) {
+      if (rotaPermitida(caminho, linha) && !/--(?:routes?|domain)\b/i.test(linha)) {
         if (/gestaodapelada(?!-v2)/i.test(linha.replace(DOMINIO_PERMITIDO, ''))) {
           problemas.push(`${caminho}:${i + 1}: cita o Worker gestaodapelada sem -v2; o único alvo é a prévia gestaodapelada-v2`);
         }

@@ -1120,6 +1120,8 @@ T57 → T58
 **Depends on**: T30
 **Reuses**: `semCache` da fundação (`F:1130`, FUN-22) e o `beforeSend` do Sentry (`F:1277`)
 **Requirement**: ACE-21, ACE-53
+**Status**: rascunhada
+**Nota do rascunho**: só teste, no `workerd` e sem banco: cada rota de `/api/sessao` e `/api/conta` em 503 (banco fora, com e sem cookie), 422, 429 e 500 forçado (`HYPERDRIVE` que lança). O evento do Sentry é montado por um `withSentry` falso a partir da requisição (url, cabeçalhos, cookies e corpo) e passa pelo `beforeSend` das opções reais do Worker.
 
 **Done when**:
 

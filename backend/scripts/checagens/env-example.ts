@@ -100,7 +100,7 @@ export function checarMarcacao(variaveis: readonly Variavel[]): string[] {
 export function variaveisUsadas(arquivos: readonly Arquivo[]): Map<string, string> {
   const usadas = new Map<string, string>();
   for (const { caminho, conteudo } of arquivos) {
-    const c = caminho.replace(/\/g, '/');
+    const c = caminho.replace(/\\/g, '/');
     if (FORA.some((p) => c.startsWith(p))) continue;
     const padroes = CODIGO.test(c) ? LEITURAS : WORKFLOW.test(c) ? [...LEITURAS, ...DO_GITHUB] : [];
     if (padroes.length === 0) continue;

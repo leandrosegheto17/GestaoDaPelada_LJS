@@ -23,7 +23,7 @@ describe('checagem env-example', () => {
   it('FUN-46: variável usada no código e ausente do .env.example reprova', () => {
     const p = checarEnvExample(codigo(`const u = ${ler('process', FALTANDO)};\n`), ENV_OK);
     expect(p).toHaveLength(1);
-    expect(p[0]).toMatch(new RegExp(`^backend/scripts/src/x\.ts:1: ${FALTANDO} é usada e não está no \.env\.example`));
+    expect(p[0]).toMatch(new RegExp(`^backend/scripts/src/x\\.ts:1: ${FALTANDO} é usada e não está no \\.env\\.example`));
   });
 
   it('FUN-46: as formas de leitura (process, import.meta, env[...] e parâmetro env) são todas conferidas', () => {

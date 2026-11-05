@@ -63,7 +63,7 @@ function listarYaml(pasta: string): string[] {
 export function arquivosDoGithub(raiz = RAIZ): Arquivo[] {
   return [...listarYaml(join(raiz, '.github', 'workflows')), ...listarYaml(join(raiz, '.github', 'actions'))].map(
     (caminho) => ({
-      caminho: relative(raiz, caminho).replace(/\/g, '/'),
+      caminho: relative(raiz, caminho).replace(/\\/g, '/'),
       conteudo: readFileSync(caminho, 'utf8'),
     }),
   );
