@@ -1802,6 +1802,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T54
 **Reuses**: molde de T53; regra de `GS:339`
 **Requirement**: GEL-88, GEL-97, GEL-103
+**Status**: rascunhada
 
 **Done when**:
 
