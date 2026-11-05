@@ -519,6 +519,7 @@ T73 → T74 → T75
 **Depends on**: T5
 **Reuses**: estender o meta-teste da CA (`CA:338`, T3) e o da fundação (`F:957`); `M:1792844340000_grupo-criar.sql:74-75`; `M:1792844280000_grupos-visiveis-arquivado.sql:21-22`; `M:1792844520000_grupos-arquivar-so-criadora.sql:19`
 **Requirement**: GEL-112
+**Status**: rascunhada
 
 **Done when**:
 
