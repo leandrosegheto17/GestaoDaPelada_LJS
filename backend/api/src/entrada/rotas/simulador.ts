@@ -5,11 +5,14 @@ import {
   MENSAGEM_APTOS_INATIVOS,
   previaCorpo,
   sugerirCorpo,
+  avaliarCorpo,
+  type AvaliarResposta,
   type ContextoResposta,
   type PreviaResposta,
   type SugerirResposta,
 } from '@pelada/contrato';
 import {
+  avaliar,
   calcularPrevia,
   descreverPrevia,
   proximoDiaDeJogo,
@@ -25,6 +28,8 @@ import { jogadoresLeitura } from '../../infraestrutura/db/repositorios/jogadores
 import { rotasEscalacoes } from './escalacoes.ts';
 import {
   aptosDoCorpo,
+  comSo1oDaComposicao,
+  composicaoDoCorpo,
   entradaDoDominio,
   registrarRequisicao,
   resultadoDoisSemOrdem,
@@ -48,6 +53,10 @@ import {
  *   que cada apto é ativo do grupo na data (senão 422 "Há jogadores que não estão ativos…" no campo `aptos`, sem dizer
  *   qual), carrega o histórico até a véspera e devolve `sugerir` na forma do contrato, sem gravar; aptos insuficientes
  *   dão 422 com a descrição da prévia no campo `aptos` (SIM-56). Uma linha de log por requisição (SIM-60).
+ *
+ * - `POST …/simulador/avaliar` (T36; SIM-62, SIM-63): a mesma entrada do `sugerir` mais a composição ajustada;
+ *   repetido e fora dos aptos dão 422 no campo `composicao` (pelo contrato); recalcula indicadores, pares e avisos da
+ *   composição recebida pelo `avaliar` do domínio, sem ordem de prioridade e sem gravar.
  *
  * Molde: `GET …/jogadores` (`rotas/jogadores.ts:17`); o `GET partidas/nova` de `PR:1436` ainda não existe.
  */
@@ -113,6 +122,33 @@ export function rotasSimulador(): Hono<Ambiente> {
       resposta = resultadoVarios(dados, s.descricao, s.times, s.incompleto, s.indicadores, s.avisos, aptos);
     } else {
       throw new Error('formato da sugestão diferente do pedido');
+    }
+    return c.json(resposta, 200);
+  });
+
+  rotas.post('/grupos/:grupoId/simulador/avaliar', async (c) => {
+    // O contrato já recusa repetido e fora dos aptos no campo `composicao` (SIM-63).
+    const corpo = await lerCorpoDoGrupo(c, avaliarCorpo);
+    if (!corpo.ok) return corpo.resposta;
+    const dados = corpo.dados;
+    const grupoId = c.req.param('grupoId');
+
+    const doBanco = aptosDoCorpo(dados, await jogadoresLeitura.paraSimulador(c.var.db, grupoId, dados.data));
+    if (!doBanco) return respostaDeCampo(c, 'aptos', MENSAGEM_APTOS_INATIVOS);
+    // O "só 1º" vale como está na composição ajustada (T16).
+    const aptos = comSo1oDaComposicao(doBanco, dados);
+
+    const hist = await historico.carregar(c.var.db, grupoId, vespera(dados.data));
+    const a = avaliar(entradaDoDominio(dados, aptos), composicaoDoCorpo(dados), hist);
+    if (!a.ok) return respostaDeCampo(c, a.campo, a.mensagem);
+
+    let resposta: AvaliarResposta;
+    if (a.formato === 'dois_times' && dados.formato === 'dois_times') {
+      resposta = resultadoDoisSemOrdem(dados, a.descricao, a.composicao, a.indicadores, a.avisos, aptos);
+    } else if (a.formato === 'varios_times' && dados.formato === 'varios_times') {
+      resposta = resultadoVarios(dados, a.descricao, a.times, a.incompleto, a.indicadores, a.avisos, aptos);
+    } else {
+      throw new Error('formato da avaliação diferente do pedido');
     }
     return c.json(resposta, 200);
   });

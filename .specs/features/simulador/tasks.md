@@ -1300,6 +1300,8 @@ T53 → T54
 **Depends on**: T35
 **Reuses**: T16, T22, T35
 **Requirement**: SIM-62, SIM-63
+**Status**: rascunhada
+**Nota do rascunho**: reaproveita `simulador-resultado.ts` da T35, mais `composicaoDoCorpo` (contrato → `ComposicaoEntrada`) e `comSo1oDaComposicao` (o "só 1º" da composição vale sobre o dos aptos, `avaliar.ts:4`). Sem linha de log (SIM-60 fala do `sugerir`). Teste em `test/rotas/simulador-avaliar.test.ts`.
 
 **Done when**:
 

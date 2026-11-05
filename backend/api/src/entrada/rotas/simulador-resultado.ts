@@ -3,6 +3,7 @@ import type {
   Apto,
   Aviso,
   ComposicaoDois,
+  ComposicaoEntrada,
   EntradaSimulador,
   IndicadoresTimeDois,
   IndicadoresTimeVarios,
@@ -51,8 +52,37 @@ export function entradaDoDominio(corpo: CorpoSimulador, aptos: readonly Apto[]):
   };
 }
 
-/** Uma linha de log por requisição (SIM-60): formato, N, K e quantos aptos; sem id, apelido nem grupo. */
-export function registrarRequisicao(rota: 'sugerir' | 'avaliar', corpo: CorpoSimulador): void {
+/** A composição do corpo do `avaliar` na forma do domínio (T36; `ComposicaoEntrada` de T16). */
+export function composicaoDoCorpo(corpo: AvaliarCorpo): ComposicaoEntrada {
+  if (corpo.formato === 'varios_times') {
+    return { formato: 'varios_times', times: corpo.composicao.times.map((t) => t.jogadores) };
+  }
+  const [a, b] = corpo.composicao.times;
+  return {
+    formato: 'dois_times',
+    times: [
+      { titulares: a.titulares, entram: a.entramNo2oTempo },
+      { titulares: b.titulares, entram: b.entramNo2oTempo },
+    ],
+    naoEntra: corpo.composicao.naoEntra,
+  };
+}
+
+/**
+ * Os aptos com o "só 1º" que a composição ajustada traz (T36): é o que o admin acabou de marcar, e vale sobre o dos
+ * aptos (`avaliar.ts:4`). Em 3 ou mais não há "só 1º".
+ */
+export function comSo1oDaComposicao(aptos: readonly Apto[], corpo: AvaliarCorpo): Apto[] {
+  if (corpo.formato === 'varios_times') return [...aptos];
+  const marcados = new Map<string, boolean>();
+  for (const time of corpo.composicao.times) {
+    for (const j of [...time.titulares, ...time.entramNo2oTempo]) marcados.set(j.id, j.so1oTempo);
+  }
+  return aptos.map((a) => ({ ...a, so1oTempo: marcados.get(a.id) ?? a.so1oTempo }));
+}
+
+/** Uma linha de log por requisição do `sugerir` (SIM-60): formato, N, K e quantos aptos; sem id, apelido nem grupo. */
+export function registrarRequisicao(rota: 'sugerir', corpo: CorpoSimulador): void {
   console.log(
     JSON.stringify({
       evento: `simulador_${rota}`,
