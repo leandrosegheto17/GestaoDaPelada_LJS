@@ -1,5 +1,5 @@
 {
-  "_leia": "Telas reais do .specs/mockup/telas.json (entradas com real: true) que entram na comparação visual (T54, AD-021): uma linha { id, estado } por estado. O runner é o e2e/visual.mjs. Telas públicas de acesso: T55.",
+  "_leia": "Telas reais do .specs/mockup/telas.json (entradas com real: true) que entram na comparação visual (T54, AD-021): uma linha { id, estado } por estado. O runner é o e2e/visual.mjs. Telas públicas de acesso: T55; telas com sessão: T56 (sem as T08 sucesso e vazio, que usam o mockup da grupos-e-elenco e passam para a T71 de lá, AD-031).",
   "telas": [
     { "id": "T04", "estado": "vazio" },
     { "id": "T04", "estado": "sessao-expirada" },
@@ -24,6 +24,19 @@
     { "id": "T31", "estado": "sem-conta" },
     { "id": "T31", "estado": "logado" },
     { "id": "T31", "estado": "outro-email" },
-    { "id": "T33", "estado": "pagina" }
+    { "id": "T33", "estado": "pagina" },
+    { "id": "T09", "estado": "menu-conta" },
+    { "id": "T19", "estado": "sucesso" },
+    { "id": "T19", "estado": "carregando" },
+    { "id": "T19", "estado": "convite-enviado" },
+    { "id": "T19", "estado": "ja-admin" },
+    { "id": "T25", "estado": "vazio" },
+    { "id": "T25", "estado": "erro" },
+    { "id": "T25", "estado": "sucesso" },
+    { "id": "T32", "estado": "sucesso" },
+    { "id": "T32", "estado": "carregando" },
+    { "id": "T32", "estado": "excluir" },
+    { "id": "T32", "estado": "unico-admin" },
+    { "id": "T32", "estado": "excluida" }
   ]
 }

@@ -1784,6 +1784,9 @@ T57 → T58
 **Depends on**: T55
 **Reuses**: entradas de `telas.json:137-139`, `telas.json:166` (T09 `menu-conta`), `telas.json:183-187` e as de T19; runner de T54
 **Requirement**: ACE-54, ACE-55
+**Status**: rascunhada
+**Nota do rascunho**: o `telas-ativas.json` ganhou T09 `menu-conta`, T19 (`sucesso`, `carregando`, `convite-enviado`, `ja-admin`), T25 (3 estados) e T32 (5 estados, com o `recorte` da faixa em `/?aviso=conta-excluida` que já está no `telas.json`); sem as T08 (AD-031). Um teste confere a lista. Diferença já prevista para o `/executar`: o `t32-conta--carregando` é a tela vazia (comentário: "a guarda não mostra nada"), e a `GuardaApp` (T37) mostra o `EsqueletoLista`.
+**Lacunas**: os estados de `revisaoManual` das telas de acesso (`telas.json:267-270`: T19 `senha`, `vinculo`, `remover`, `erro`) não foram conferidos à mão no rascunho (nada roda). `senha` e `vinculo` são do fluxo antigo (adicionar admin com senha), que esta feature trocou pelo convite (`t19-admins--sucesso`, comentário); `erro` é o formulário antigo de nome e e-mail. Só `remover` vale para a tela nova: o `/executar` confere e registra aqui.
 
 **Done when**:
 
