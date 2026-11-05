@@ -88,7 +88,7 @@ describe('conta_cadastrar', () => {
         `SELECT tipo, (expira_em - criado_em)::text AS validade FROM links_conta WHERE conta_id = $1`,
         [r.conta_id],
       );
-      expect(link).toEqual({ tipo: 'confirmacao', validade: '24:00:00' });
+      expect(link).toEqual({ tipo: 'confirmacao', validade: '1 day' });
     });
   });
 
