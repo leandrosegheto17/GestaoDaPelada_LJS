@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dados do grupo (corrigir)</title>
+<link rel="stylesheet" href="../../../../mockup/fontes/fontes.css">
+<link rel="stylesheet" href="../../../../mockup/tokens.css">
+<link rel="stylesheet" href="../../../../mockup/base.css">
+</head>
+<body>
+<!-- GEL-19, GEL-118: 422 com dois campos; mesmas mensagens da criação. -->
+<header class="barra barra--admin"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span><a class="barra__link" href="t08-grupos--sucesso.html">Trocar grupo</a></div></header>
+<main id="conteudo" class="conteudo conteudo--admin conteudo--estreito">
+  <a class="voltar" href="t09-inicio--sucesso.html"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 18 9 12 15 6"/></svg>Início</a>
+  <h1 class="titulo-pagina">Dados do grupo</h1>
+  
+  <form class="formulario" novalidate>
+    <div class="faixa faixa--erro resumo-erros" role="alert"><div class="faixa__texto"><strong>Corrija 2 campos:</strong><ul><li><a href="#nome">Nome</a></li><li><a href="#hora">Horário</a></li></ul></div></div>
+    <div class="campo campo--erro"><label class="campo__rotulo" for="nome">Nome</label><input class="campo__entrada" id="nome" value="Pe" maxlength="60" aria-invalid="true" aria-describedby="nome-ajuda nome-erro"><p class="campo__ajuda" id="nome-ajuda">Mudar o nome não muda o link do ranking.</p><p class="campo__erro" id="nome-erro"><svg class="icone" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>O nome precisa ter de 3 a 60 caracteres.</p></div>
+    <div class="duas-colunas">
+      <div class="campo"><label class="campo__rotulo" for="dia">Dia da semana</label><select class="campo__entrada" id="dia"><option>Domingo</option><option>Segunda</option><option>Terça</option><option>Quarta</option><option selected>Quinta</option><option>Sexta</option><option>Sábado</option></select></div>
+      <div class="campo campo--erro"><label class="campo__rotulo" for="hora">Horário</label><input class="campo__entrada" id="hora" type="time" aria-invalid="true" aria-describedby="hora-erro"><p class="campo__erro" id="hora-erro"><svg class="icone" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>Informe o horário.</p></div>
+    </div>
+    <fieldset class="segmentado"><legend class="campo__rotulo">Frequência</legend><label><input type="radio" name="freq" checked><span>Semanal</span></label><label><input type="radio" name="freq"><span>Quinzenal</span></label><label><input type="radio" name="freq"><span>Mensal</span></label></fieldset>
+    <div><button class="botao botao--principal" type="submit">Salvar</button></div>
+  </form>
+  <section class="cartao secao" aria-labelledby="link">
+    <h2 id="link" class="subtitulo sem-topo">Link do ranking</h2>
+    <p class="paragrafo" id="url"><strong>https://gestaodapelada.ljssoftware.com.br/g/pelada-de-quinta</strong></p>
+    <div class="grupo-botoes"><a class="botao botao--secundario" href="../../../../mockup/telas/t20-grupo--link-copiado.html" aria-describedby="url">Copiar link</a><button class="botao botao--secundario" type="button" aria-describedby="url">Compartilhar</button></div>
+  </section>
+  <section class="secao" aria-labelledby="arq">
+    <h2 id="arq" class="subtitulo">Arquivar grupo</h2>
+    <p class="paragrafo">Os outros admins perdem o acesso e o grupo não pode ser alterado enquanto estiver arquivado. Nada é apagado: você reativa quando quiser, em Seus grupos.</p>
+    <p class="paragrafo texto-sec">Só você vê esta opção, porque criou o grupo.</p>
+    <a class="botao botao--destrutivo" href="t20-grupo--arquivar.html">Arquivar grupo</a>
+  </section>
+</main>
+</body>
+</html>

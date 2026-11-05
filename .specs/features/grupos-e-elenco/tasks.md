@@ -1730,6 +1730,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T51
 **Reuses**: `reuso.md` R-01 a R-36 (comando de adaptação no topo do mapa; a origem só é aberta pelo comando); entradas de `telas.json:164-165` e `:188-227`
 **Requirement**: GEL-116
+**Status**: rascunhada
 
 **Done when**:
 

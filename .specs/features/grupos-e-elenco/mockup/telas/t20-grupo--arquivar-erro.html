@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Arquivar grupo (nome não confere)</title>
+<link rel="stylesheet" href="../../../../mockup/fontes/fontes.css">
+<link rel="stylesheet" href="../../../../mockup/tokens.css">
+<link rel="stylesheet" href="../../../../mockup/base.css">
+</head>
+<body>
+<!-- GEL-23: 422 no campo nomeConfirmacao (a caixa difere). Recorte em .dialogo. -->
+<header class="barra barra--admin" aria-hidden="true"><div class="barra__grupo"><span class="barra__nome">Pelada de Quinta</span></div></header>
+<div class="veu">
+  <section class="dialogo" role="alertdialog" aria-modal="true" aria-labelledby="d2-t" aria-describedby="d2-x">
+    <h2 id="d2-t" class="dialogo__titulo">Arquivar “Pelada de Quinta”?</h2>
+    <p id="d2-x" class="dialogo__texto">Os outros admins perdem o acesso e o grupo não pode ser alterado enquanto estiver arquivado. Os dados ficam guardados e você pode reativar em Seus grupos.</p>
+    <div class="campo campo--erro"><label class="campo__rotulo" for="conf">Digite o nome do grupo para confirmar</label><input class="campo__entrada" id="conf" autocomplete="off" value="pelada de quinta" aria-invalid="true" aria-describedby="conf-erro"><p class="campo__erro" id="conf-erro"><svg class="icone" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>O nome digitado não confere com o nome do grupo.</p></div>
+    <div class="dialogo__acoes"><a class="botao botao--secundario" href="t20-grupo--sucesso.html">Cancelar</a><a class="botao botao--destrutivo" href="t08-grupos--arquivado.html">Arquivar grupo</a></div>
+  </section>
+</div>
+</body>
+</html>
