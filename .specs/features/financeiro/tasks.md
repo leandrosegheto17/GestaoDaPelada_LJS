@@ -1403,6 +1403,8 @@ T47 → T48
 **Depends on**: T41
 **Reuses**: `t24-config--{vazio,erro}.html`; T41 (mesmos componentes); `respostas/erro-validacao-config.json`
 **Requirement**: FIN-48, FIN-47, FIN-02
+**Status**: rascunhada
+**Nota do rascunho**: a configuração atual vem do `GET …/financeiro/mes` (não há `GET config`); sem ela, a data sugerida é o `hoje` da resposta. O erro de reais do próprio formulário fica só no campo, sem o resumo (como `t24-config--erro`); o resumo aparece no 422 da API. Mensalidade vazia vai `null`. Teste em `frontend/web/test/telas/financeiro-config.test.tsx`.
 
 **Done when**:
 
