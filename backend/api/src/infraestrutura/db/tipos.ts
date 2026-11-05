@@ -193,6 +193,76 @@ export interface TabelaEscalacoes {
   confirmada_em: Instante;
 }
 
+/** Leitura sem escrita: a `pelada_app` não tem INSERT nem UPDATE (só as funções `SECURITY DEFINER` escrevem). */
+type SoLeitura<T> = ColumnType<T, never, never>;
+
+/**
+ * Assinatura do Pro (planos-e-cobranca T19; PLA-30; AD-088), de `1792845420000_planos-tabelas.sql`. Só leitura: as
+ * escritas são de `assinatura_registrar`, `assinatura_cancelar` e das transições do webhook (T14, T16).
+ */
+export interface TabelaAssinaturas {
+  id: SoLeitura<string>;
+  grupo_id: SoLeitura<string>;
+  asaas_cliente_id: SoLeitura<string>;
+  asaas_assinatura_id: SoLeitura<string>;
+  valor_centavos: SoLeitura<number>;
+  situacao: SoLeitura<'aguardando_pagamento' | 'ativa' | 'cancelada'>;
+  fatura_url: SoLeitura<string | null>;
+  pago_ate: SoLeitura<string | null>;
+  cobranca_pro_id: SoLeitura<string | null>;
+  ultimo_evento_em: SoLeitura<Date | null>;
+  criada_por: SoLeitura<string>;
+  criada_em: SoLeitura<Date>;
+}
+
+/**
+ * Evento do webhook do Asaas (T19; PLA-41), de `1792845420000_planos-tabelas.sql`. A `pelada_app` não tem nem SELECT
+ * (só `asaas_evento_registrar` e as transições a tocam); tipada para os testes e para o contrato com a `notificacoes`
+ * (S-07).
+ */
+export interface TabelaEventosAsaas {
+  id: SoLeitura<string>;
+  evento: SoLeitura<string>;
+  data_criacao: SoLeitura<Date | null>;
+  cobranca_id: SoLeitura<string | null>;
+  assinatura_id: SoLeitura<string | null>;
+  status: SoLeitura<string | null>;
+  valor_centavos: SoLeitura<number | null>;
+  recebido_em: SoLeitura<Date>;
+  efeito: SoLeitura<string | null>;
+}
+
+/** Linha de `plano_do_grupo(grupo)` (T12): datas como texto `AAAA-MM-DD` (lidas com `::text`). */
+export interface LinhaPlanoDoGrupo {
+  situacao_comercial: 'uso_proprio' | 'trial' | 'ativo' | 'inadimplente' | 'cancelado';
+  trial_inicio: string | null;
+  pago_ate: string | null;
+  criado_por: string;
+  criado_em: Date;
+  jogadores_ativos: number;
+}
+
+/** Linha de `plano_grupos_da_criadora(grupo)` (T12). */
+export interface LinhaGrupoDaCriadora {
+  id: string;
+  criado_em: Date;
+  situacao_comercial: LinhaPlanoDoGrupo['situacao_comercial'];
+  trial_inicio: string | null;
+  pago_ate: string | null;
+}
+
+/** Linha de `asaas_evento_registrar(...)` (T15): estado nulo quando `repetido` ou de assinatura desconhecida. */
+export interface LinhaEventoRegistrado {
+  resultado: 'novo' | 'repetido';
+  grupo_id: string | null;
+  situacao: 'aguardando_pagamento' | 'ativa' | 'cancelada' | null;
+  valor_centavos: number | null;
+  pago_ate: string | null;
+  cobranca_pro_id: string | null;
+  /** `dateCreated` do último evento aplicado, no texto do Asaas (`AAAA-MM-DD HH:MM:SS`). */
+  ultimo_evento_em: string | null;
+}
+
 /** Tabelas tipadas do Kysely da requisição. As outras continuam pelo `sql` do Kysely. */
 export interface Banco {
   grupos: TabelaGrupos;
@@ -208,6 +278,8 @@ export interface Banco {
   escalacoes: TabelaEscalacoes;
   config_pesos: TabelaConfigPesos;
   eventos_uso: TabelaEventosUso;
+  assinaturas: TabelaAssinaturas;
+  eventos_asaas: TabelaEventosAsaas;
 }
 
 type Colunas<T> = { readonly [K in keyof T]-?: string };
@@ -314,6 +386,31 @@ export const COLUNAS_TIPADAS = {
     confirmada_por: 'uuid',
     confirmada_em: 'timestamptz',
   },
+  assinaturas: {
+    id: 'uuid',
+    grupo_id: 'uuid',
+    asaas_cliente_id: 'text',
+    asaas_assinatura_id: 'text',
+    valor_centavos: 'int4',
+    situacao: 'text',
+    fatura_url: 'text',
+    pago_ate: 'date',
+    cobranca_pro_id: 'text',
+    ultimo_evento_em: 'timestamptz',
+    criada_por: 'uuid',
+    criada_em: 'timestamptz',
+  },
+  eventos_asaas: {
+    id: 'text',
+    evento: 'text',
+    data_criacao: 'timestamptz',
+    cobranca_id: 'text',
+    assinatura_id: 'text',
+    status: 'text',
+    valor_centavos: 'int4',
+    recebido_em: 'timestamptz',
+    efeito: 'text',
+  },
 } as const satisfies { readonly [T in keyof Banco]: Colunas<Banco[T]> };
 
 /** Colunas que o tipo declara anuláveis (`| null` na leitura); o teste confere `is_nullable`. */
@@ -325,4 +422,6 @@ export const COLUNAS_ANULAVEIS: Readonly<Partial<Record<keyof Banco, readonly st
   config_financeira: ['mensalidade_centavos'],
   escalacoes: ['k'],
   eventos_uso: ['dispositivo_id', 'mes_exportado', 'data_partida'],
+  assinaturas: ['fatura_url', 'pago_ate', 'cobranca_pro_id', 'ultimo_evento_em'],
+  eventos_asaas: ['data_criacao', 'cobranca_id', 'assinatura_id', 'status', 'valor_centavos', 'efeito'],
 };

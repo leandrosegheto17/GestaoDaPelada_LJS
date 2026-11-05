@@ -822,6 +822,8 @@ T56 → T57
 **Depends on**: T18
 **Reuses**: estender `tipos.ts` (`GE:878`, ampliado em `PR:1013`)
 **Requirement**: PLA-30
+**Status**: rascunhada
+**Nota do rascunho**: as duas tabelas entram só leitura (`ColumnType<T, never, never>`); os retornos das funções viram `LinhaPlanoDoGrupo`, `LinhaGrupoDaCriadora` e `LinhaEventoRegistrado`. O `expectTypeOf<Insertable<…>>().toEqualTypeOf<{}>()` pode precisar de ajuste à forma exata do Kysely no /executar.
 
 **Done when**:
 
