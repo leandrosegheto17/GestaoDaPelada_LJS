@@ -60,7 +60,13 @@ describe('Meu plano', () => {
   });
 
   it('PLA-52: Pro mostra a data de pagoAte', async () => {
-    abrir({ ...PLANO_BASE, plano: 'pro', situacao: 'ativo', trialFimEm: null, pagoAte: '2026-12-05' });
+    abrir({
+      ...PLANO_BASE,
+      plano: 'pro',
+      situacao: 'ativo',
+      trialFimEm: null,
+      pagoAte: '2026-12-05',
+    });
     expect(await screen.findByText('Pro até 05/12/2026')).toBeDefined();
   });
 
@@ -71,8 +77,16 @@ describe('Meu plano', () => {
   });
 
   it('PLA-58: cortesia mostra "Cortesia: Pro sem cobrança" e nenhum botão nem o texto da criadora', async () => {
-    abrir({ ...PLANO_BASE, plano: 'cortesia', situacao: 'uso_proprio', trialFimEm: null, podeAssinar: false });
-    expect(await screen.findByRole('heading', { level: 2, name: 'Cortesia: Pro sem cobrança' })).toBeDefined();
+    abrir({
+      ...PLANO_BASE,
+      plano: 'cortesia',
+      situacao: 'uso_proprio',
+      trialFimEm: null,
+      podeAssinar: false,
+    });
+    expect(
+      await screen.findByRole('heading', { level: 2, name: 'Cortesia: Pro sem cobrança' }),
+    ).toBeDefined();
     expect(screen.queryByRole('button', { name: /Assinar|Cancelar/ })).toBeNull();
     expect(screen.queryByText(TEXTO_SO_A_CRIADORA)).toBeNull();
   });

@@ -5,11 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { criarCliente } from '../../src/dados/cliente.ts';
 import { ProvedorCliente } from '../../src/dados/ContextoCliente.tsx';
 import { guardaMemoria } from '../../src/pwa/sw-assinatura.ts';
-import type {
-  AssinaturaLocal,
-  DependenciasPush,
-  GerentePush,
-} from '../../src/push/assinatura.ts';
+import type { AssinaturaLocal, DependenciasPush, GerentePush } from '../../src/push/assinatura.ts';
 import {
   AvisosCobranca,
   TEXTO_RECEBER_COBRANCA,

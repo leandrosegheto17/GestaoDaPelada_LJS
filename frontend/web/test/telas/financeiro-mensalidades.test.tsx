@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -19,9 +19,7 @@ import { abrirTela, json, pendente, SESSAO_ANA } from '../apoio/tela.tsx';
 
 const OUTUBRO = JSON.parse(
   readFileSync(
-    fileURLToPath(
-      new URL('../../../../.specs/mockup/respostas/financeiro-2026-10.json', import.meta.url),
-    ),
+    resolve(process.cwd(), '../../.specs/mockup/respostas/financeiro-2026-10.json'),
     'utf8',
   ),
 ) as { lancamentos: LancamentoDoMes[] };
