@@ -145,4 +145,40 @@ async function inativar(db: Db, grupoId: string, id: string, dados: DataCorpo, h
   return { resultado: 'ok', alterado: true };
 }
 
-export const jogadores = { criar, inativar };
+/**
+ * Reativa o jogador (GEL-54): abre um período novo na data de retorno (hoje, sem ela, GEL-55), sem mexer em
+ * `inicio_pontuacao` nem em `pontuacao_inicial`, e audita `jogador_reativado` com o retorno e a saída anterior
+ * (GEL-57). Mesma trava e mesmas regras de período do inativar (GEL-58).
+ *
+ * Casos limite (Domínio: sim), listados antes do código:
+ * - retorno no dia da saída anterior: vale (sair e voltar no mesmo dia, GEL-61);
+ * - retorno na véspera da saída anterior: `invalido`, regra `retorno-antes-da-saida-anterior` (GEL-58, GEL-66);
+ * - já ativo (há período aberto): `ja_ativo`, sem gravar (GEL-56);
+ * - sem data: o retorno é hoje;
+ * - jogador de outro grupo: `nao_encontrado`;
+ * - erro depois do `INSERT`: sobe, e a transação da requisição desfaz o período (GEL-109).
+ */
+async function reativar(db: Db, grupoId: string, id: string, dados: DataCorpo, hoje: string): Promise<ResultadoPeriodo> {
+  const estado = await travarParaPeriodo(db, grupoId, id);
+  if (!estado) return { resultado: 'nao_encontrado' };
+  if (estado.periodos.some((p) => p.fim === null)) return { resultado: 'ja_ativo' };
+
+  const retorno = dados.data ?? hoje;
+  const r = avaliar(estado, { tipo: 'reativar', retorno }, hoje);
+  if (!r.ok) return { resultado: 'invalido', regra: r.regra, campo: r.campo, mensagem: r.mensagem };
+
+  const saidaAnterior = estado.periodos.at(-1)?.fim ?? null;
+  const novo = await sql<{ id: string }>`
+    INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim)
+    VALUES (${id}, ${grupoId}, ${retorno}::date, NULL)
+    RETURNING id`.execute(db);
+  await auditoria.registrar(db, grupoId, {
+    acao: 'jogador_reativado',
+    entidade: 'jogador',
+    entidadeId: id,
+    resumo: { retorno, saidaAnterior, periodoId: novo.rows[0]?.id ?? null },
+  });
+  return { resultado: 'ok', alterado: true };
+}
+
+export const jogadores = { criar, inativar, reativar };

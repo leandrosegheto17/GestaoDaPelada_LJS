@@ -1393,6 +1393,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T38
 **Reuses**: trava e leitura de T38 (mesma função interna de `jogadores.ts`); `avaliarPeriodos` (T14)
 **Requirement**: GEL-54, GEL-55, GEL-56, GEL-57, GEL-58
+**Status**: rascunhada
 
 **Done when**:
 
