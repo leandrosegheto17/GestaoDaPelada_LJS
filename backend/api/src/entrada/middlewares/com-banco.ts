@@ -21,6 +21,15 @@ import { kyselyDoCliente } from '../../infraestrutura/db/transacao.ts';
  *
  * [LACUNA] COMMIT que falha depois de a rota responder 2xx: a spec não define a resposta; o
  * rascunho responde 500 "Erro interno." (interpretação conservadora).
+ *
+ * Tarefas depois do commit (notificacoes T15; NOT-20, NOT-21, NOT-22; AD-068, AD-098): a rota registra com
+ * `c.var.aposCommit(fn)` o que deve acontecer só se a gravação ficar de pé (hoje, enfileirar o aviso do ranking).
+ * - `COMMIT` bem-sucedido (ou resposta abaixo de 400 numa rota que nunca abriu conexão, sem nada a confirmar):
+ *   as tarefas rodam em ordem, por `executionCtx.waitUntil`, depois de a resposta estar pronta e fora dela;
+ * - status 4xx ou 5xx, erro na rota ou `COMMIT` que falha: as tarefas são descartadas, nenhuma roda;
+ * - tarefa que lança (ou rejeita): o erro vai ao Sentry sem conteúdo (só um motivo fixo), as seguintes seguem e a
+ *   resposta já enviada não muda;
+ * - sem `executionCtx` (fora do Worker): as tarefas rodam sem esperar, também depois do `COMMIT`.
  */
 
 export interface ContextoBanco {
@@ -37,6 +46,46 @@ export type ObterContexto = (c: Context<Ambiente>) => ContextoBanco | Promise<Co
 export interface OpcoesComBanco {
   /** Só para os testes: troca a fábrica de conexões (ex.: para registrar as consultas). */
   fabrica?: NonNullable<OpcoesCliente['fabrica']>;
+  /** Só para os testes: troca o relato ao Sentry de uma tarefa que falhou depois do commit. */
+  reportarFalhaAposCommit?: () => void;
+}
+
+/**
+ * O que vai ao Sentry quando uma tarefa depois do commit falha: nenhuma mensagem de erro, nenhum dado (NOT-22, NOT-33).
+ * O Sentry é carregado só aqui, na falha, para o módulo continuar importável fora do Worker (testes em Node).
+ */
+function reportarFalhaPadrao(): void {
+  void import('@sentry/cloudflare')
+    .then((Sentry) => Sentry.captureMessage('apos_commit_erro', { level: 'error', tags: { motivo: 'tarefa_falhou' } }))
+    .catch(() => undefined);
+}
+
+/** Roda as tarefas em ordem; a que lança é reportada e as outras seguem. Nunca rejeita. */
+async function rodarTarefas(tarefas: ReadonlyArray<() => unknown>, reportar: () => void): Promise<void> {
+  for (const tarefa of tarefas) {
+    try {
+      await tarefa();
+    } catch {
+      try {
+        reportar();
+      } catch {
+        // o relato não pode derrubar as demais tarefas
+      }
+    }
+  }
+}
+
+/** Agenda as tarefas para depois da resposta (`waitUntil`); sem contexto de execução, só dispara. */
+function agendarTarefas(c: Context, tarefas: ReadonlyArray<() => unknown>, reportar: () => void): void {
+  if (tarefas.length === 0) return;
+  const andamento = rodarTarefas(tarefas, reportar);
+  let ctx: { waitUntil(p: Promise<unknown>): void } | undefined;
+  try {
+    ctx = c.executionCtx;
+  } catch {
+    ctx = undefined;
+  }
+  if (ctx) ctx.waitUntil(andamento);
 }
 
 export const SQL_CONTEXTO = `SELECT set_config('app.conta_id', $1, true), set_config('app.slug_publico', $2, true)`;
@@ -81,6 +130,11 @@ export function comBanco(
       },
     });
     c.set('db', kyselyDoCliente(cliente));
+    const tarefas: Array<() => unknown> = [];
+    c.set('aposCommit', (tarefa) => {
+      tarefas.push(tarefa);
+    });
+    const reportar = opcoes.reportarFalhaAposCommit ?? reportarFalhaPadrao;
 
     let erroDaRota = false;
     try {
@@ -90,18 +144,21 @@ export function comBanco(
       erroDaRota = true;
       throw erro;
     } finally {
+      const confirmar = !erroDaRota && !c.error && c.res.status < 400;
+      let confirmado = confirmar;
       if (cliente.aberto()) {
-        const confirmar = !erroDaRota && !c.error && c.res.status < 400;
         if (confirmar) {
           try {
             await cliente.consultar('COMMIT');
           } catch {
+            confirmado = false;
             c.res = c.json({ erro: 'Erro interno.' }, 500);
           }
         } else {
           await cliente.consultar('ROLLBACK').catch(() => undefined);
         }
       }
+      if (confirmado) agendarTarefas(c, tarefas, reportar);
       await fecharNoFim(c, cliente);
     }
   };

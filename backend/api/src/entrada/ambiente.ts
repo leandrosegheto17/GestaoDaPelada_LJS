@@ -45,6 +45,11 @@ export type NomeLimite = 'LIMITE_ENTRAR' | 'LIMITE_PUBLICO' | 'LIMITE_WEBHOOK' |
 export interface Variaveis {
   /** Kysely da transação da requisição, posto pelo `comBanco` (FUN-16). Só existe nas rotas com ele. */
   db: Kysely<Banco>;
+  /**
+   * Registra uma tarefa para depois do `COMMIT` da requisição (notificacoes T15; NOT-20 a NOT-22), posta pelo `comBanco`.
+   * Roda fora da resposta, só se o `COMMIT` der certo; é descartada no `ROLLBACK`. Só existe nas rotas com o `comBanco`.
+   */
+  aposCommit: (tarefa: () => unknown) => void;
   /** Conta da sessão, posta pelo `carregarSessao` (T20). Ausente = sem sessão válida. */
   contaId?: string;
   /** SHA-256 do token da sessão atual, para encerrá-la no sair (T20, T26). */

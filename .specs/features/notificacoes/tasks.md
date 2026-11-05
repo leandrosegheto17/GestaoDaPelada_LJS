@@ -676,6 +676,8 @@ T39 → T40 → T41
 **Depends on**: T14
 **Reuses**: estender o `comBanco` (`F:1203`, já estendido em `CA:770`); Sentry (`F:1301`); AD-068
 **Requirement**: NOT-20, NOT-21, NOT-22
+**Status**: rascunhada
+**Nota do rascunho**: `aposCommit` entrou em `Variaveis` (`ambiente.ts`) e as tarefas rodam também quando a rota nunca abriu conexão e respondeu abaixo de 400 (nada a confirmar). O Sentry é carregado por `import()` só na falha, para o `com-banco.ts` continuar importável nos testes em Node; `OpcoesComBanco.reportarFalhaAposCommit` troca o relato nos testes.
 
 **Done when**:
 
