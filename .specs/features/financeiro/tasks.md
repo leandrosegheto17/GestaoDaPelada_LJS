@@ -1456,6 +1456,8 @@ T47 → T48
 **Depends on**: T43
 **Reuses**: Estender a tela de `CA:1582` e `GE:2091`; selo de `.specs/mockup/telas/t19-admins--sucesso.html:19`; interruptor do legado `L:.md/mockup/telas/t19-admins--sucesso.html` (só consulta), com os tokens de `.specs/mockup/tokens.css` (AD-053)
 **Requirement**: FIN-51, FIN-35, FIN-36
+**Status**: rascunhada
+**Nota do rascunho**: quem tem acesso sai da própria linha da lista de admins (mais recente que a sessão). `SPEC_DEVIATION`: o texto "Financeiro" ao lado do trilho só aparece com o interruptor ligado (no legado, em todos), para o `ACE-37` seguir achando um único "Financeiro" sem mudar teste existente; a revisão manual da T46 confere. O `aria-checked` vem do `checked` nativo, sem o atributo explícito. 409 e 403 relêem a lista. Teste em `frontend/web/test/telas/admins-financeiro.test.tsx`; nenhum teste existente mudou.
 
 **Done when**:
 

@@ -14,7 +14,9 @@ import { LinkVoltar } from '../../componentes/LinkVoltar.tsx';
 import { ItemLista, Lista } from '../../componentes/Lista.tsx';
 import { ErroApi, MENSAGEM_REDE } from '../../dados/cliente.ts';
 import { useCliente } from '../../dados/ContextoCliente.tsx';
+import { erroDoFinanceiro, useAlterarAcessoFinanceiro } from '../../dados/financeiro.ts';
 import estilos from '../acesso.module.css';
+import fin from '../financeiro/financeiro.module.css';
 
 /**
  * Admins do grupo (`/app/grupos/:grupoId/admins`, t19; ACE-31, ACE-32, ACE-37 a ACE-40, ACE-56):
@@ -35,6 +37,11 @@ import estilos from '../acesso.module.css';
  *
  * grupos-e-elenco T70 (SEC-001): a linha da criadora do grupo (`criador`) não tem "Remover", e o
  * 409 `criadora_nao_removivel` mostra a mensagem do contrato na faixa, com a lista relida.
+ *
+ * financeiro T44 (FIN-35, FIN-36, FIN-51): para quem acessa o financeiro, um interruptor "Acessa financeiro" por admin
+ * (`InterruptorFinanceiro`), o da própria conta desabilitado com a ajuda; a troca chama o
+ * `PATCH .../admins/:contaId/financeiro` e a tela redesenha com a lista devolvida; 409 e 403 mostram a mensagem na
+ * faixa. Para quem não acessa, só o selo "Financeiro" nos que acessam.
  */
 
 export const TEXTO_CONVITE_ENVIADO = (email: string) => `Convite enviado para ${email}. Vale por 7 dias.`;
@@ -44,6 +51,8 @@ export const TEXTO_UNICO_ADMIN_GRUPO = 'Você é o único admin deste grupo. Tod
 export const TEXTO_ULTIMO_ADMIN = 'O grupo precisa de pelo menos uma pessoa admin. Convide outra pessoa antes de remover esta.';
 export const TEXTO_GRUPO_NAO_ENCONTRADO = 'Grupo não encontrado.';
 export const TEXTO_CRIADORA_NAO_REMOVIVEL = MENSAGENS_ERRO.criadora_nao_removivel;
+export const ROTULO_ACESSA_FINANCEIRO = 'Acessa financeiro';
+export const TEXTO_AJUDA_PROPRIO_ACESSO = 'Você não pode alterar o seu próprio acesso.';
 
 type Admin = AdminsResposta['admins'][number];
 
@@ -54,6 +63,44 @@ export function chaveAdmins(grupoId: string) {
 /** `2026-10-30T12:00:00.000Z` → `30/10/2026`, no fuso de Brasília. */
 export function dataDoConvite(iso: string): string {
   return new Date(iso).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+}
+
+/**
+ * Interruptor "Acessa financeiro" de um admin (financeiro T44; FIN-51), do mockup do legado
+ * (`L:.md/mockup/telas/t19-admins--sucesso.html:18-19`) com o `.interruptor` de `financeiro.module.css` (tokens do
+ * guia): `role="switch"`, rótulo "Acessa financeiro: <nome>", o `aria-checked` vem do `checked` nativo (o atributo
+ * explícito num checkbox nativo é redundante e o axe pode acusar). O da própria conta fica
+ * marcado conforme a permissão, desabilitado e com o texto de ajuda ligado por `aria-describedby`.
+ * SPEC_DEVIATION: o estado "Financeiro" ao lado do trilho só aparece com o interruptor ligado (no legado aparece em
+ * todos), para o texto visível dizer quem acessa, como o selo (e o `ACE-37` seguir achando um único "Financeiro").
+ */
+function InterruptorFinanceiro({ admin, eu, ocupado, aoAlternar }: { admin: Admin; eu: boolean; ocupado: boolean; aoAlternar: () => void }) {
+  const idAjuda = `ajuda-acesso-${admin.id}`;
+  return (
+    <>
+      <label className={fin.interruptor}>
+        <input
+          type="checkbox"
+          role="switch"
+          checked={admin.acessaFinanceiro}
+          aria-label={`${ROTULO_ACESSA_FINANCEIRO}: ${admin.nome}`}
+          aria-describedby={eu ? idAjuda : undefined}
+          aria-busy={ocupado || undefined}
+          disabled={eu || ocupado}
+          onChange={aoAlternar}
+        />
+        <span className={fin['interruptor__trilho']} aria-hidden="true" />
+        <span className={fin['interruptor__estado']} aria-hidden="true">
+          {admin.acessaFinanceiro ? 'Financeiro' : ''}
+        </span>
+      </label>
+      {eu ? (
+        <p className={estilos.ajuda} id={idAjuda}>
+          {TEXTO_AJUDA_PROPRIO_ACESSO}
+        </p>
+      ) : null}
+    </>
+  );
 }
 
 function Carregando() {
@@ -91,12 +138,29 @@ export function Admins() {
   const [remover, setRemover] = useState<Admin | null>(null);
   const [removendo, setRemovendo] = useState(false);
   const [falhaLista, setFalhaLista] = useState<string | null>(null);
+  const alterarAcesso = useAlterarAcessoFinanceiro(grupoId);
 
   const conta = sessao.data?.tipo === 'ativa' ? sessao.data.sessao : null;
   const nomeDoGrupo = conta?.grupos.find((g) => g.id === grupoId)?.nome ?? NOME_DO_APP;
 
   async function reler() {
     await consultas.invalidateQueries({ queryKey: chaveAdmins(grupoId) });
+  }
+
+  function alternarAcesso(a: Admin) {
+    if (alterarAcesso.isPending) return;
+    setFalhaLista(null);
+    // A lista devolvida pelo PATCH substitui a dos admins (`useAlterarAcessoFinanceiro`); a tela redesenha com ela.
+    alterarAcesso.mutate(
+      { contaId: a.id, acessaFinanceiro: !a.acessaFinanceiro },
+      {
+        onError: (erro) => {
+          // FIN-36: 409 `acao_na_propria_conta` e 403 `sem_permissao_financeiro` com a mensagem do contrato.
+          setFalhaLista(erroDoFinanceiro(erro).mensagem);
+          void reler();
+        },
+      },
+    );
   }
 
   async function convidar(e: FormEvent<HTMLFormElement>) {
@@ -162,6 +226,8 @@ export function Admins() {
       return <EstadoErro aoTentarDeNovo={() => void lista.refetch()} />;
     }
     const { admins, convites } = lista.data;
+    // FIN-51: quem acessa o financeiro (a própria linha da lista, a mais recente) vê o interruptor; os outros, o selo.
+    const euAcesso = admins.find((a) => a.id === conta?.id)?.acessaFinanceiro === true;
     return (
       <>
         {falhaLista ? <Faixa tipo="erro">{falhaLista}</Faixa> : null}
@@ -175,7 +241,16 @@ export function Admins() {
                 meta={a.email}
                 lateral={
                   <>
-                    {a.acessaFinanceiro ? <span className={`${estilos.selo} ${estilos['selo--neutro']}`}>Financeiro</span> : null}
+                    {euAcesso ? (
+                      <InterruptorFinanceiro
+                        admin={a}
+                        eu={eu}
+                        ocupado={alterarAcesso.isPending && alterarAcesso.variables?.contaId === a.id}
+                        aoAlternar={() => alternarAcesso(a)}
+                      />
+                    ) : a.acessaFinanceiro ? (
+                      <span className={`${estilos.selo} ${estilos['selo--neutro']}`}>Financeiro</span>
+                    ) : null}
                     {eu || a.criador === true ? null : (
                       <Botao variante="texto-destrutivo" aria-label={`Remover ${a.nome}`} onClick={() => setRemover(a)}>
                         Remover
