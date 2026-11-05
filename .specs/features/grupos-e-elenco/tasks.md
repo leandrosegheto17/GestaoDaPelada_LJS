@@ -1045,6 +1045,7 @@ Lacunas: o lado do arquivar no teste trava a linha com `FOR UPDATE` antes do `UP
 **Depends on**: T25
 **Reuses**: interfaces de `GD:150`; `grupo_criar` (`M:1792844340000_grupo-criar.sql:10`); molde dos repositórios da CA com `grupoId` primeiro (`CA:844`)
 **Requirement**: GEL-01, GEL-02, GEL-14, GEL-20, GEL-27
+**Status**: rascunhada
 
 **Done when**:
 
