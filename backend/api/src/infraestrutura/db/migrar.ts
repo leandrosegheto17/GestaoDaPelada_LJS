@@ -1,5 +1,7 @@
 import { join } from 'node:path';
 import { runner } from 'node-pg-migrate';
+import pg from 'pg';
+import { detectarEstado, ErroEsquemaDivergente, listarMigracoes } from './estado.ts';
 
 export const PASTA_MIGRACOES = join(import.meta.dirname, 'migracoes');
 export const TABELA_MIGRACOES = 'pgmigrations';
@@ -18,9 +20,19 @@ export interface OpcoesMigrar {
  * Devolve os nomes aplicados nesta execução.
  */
 export async function migrar(url: string, opcoes: OpcoesMigrar = {}): Promise<string[]> {
+  const pasta = opcoes.pasta ?? PASTA_MIGRACOES;
+  // FUN-10: banco divergente aborta antes de qualquer escrita, com a lista de diferenças.
+  const cliente = new pg.Client({ connectionString: url });
+  await cliente.connect();
+  try {
+    const deteccao = await detectarEstado(cliente, listarMigracoes(pasta));
+    if (deteccao.estado === 'divergente') throw new ErroEsquemaDivergente(deteccao.diferencas);
+  } finally {
+    await cliente.end();
+  }
   const aplicadas = await runner({
     databaseUrl: url,
-    dir: join(opcoes.pasta ?? PASTA_MIGRACOES, '*.sql'),
+    dir: join(pasta, '*.sql'),
     useGlob: true,
     migrationsTable: TABELA_MIGRACOES,
     direction: 'up',

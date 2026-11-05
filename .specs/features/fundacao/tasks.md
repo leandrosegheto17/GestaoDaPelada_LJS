@@ -859,6 +859,9 @@ T81 → T82
 **Depends on**: T21
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-10
+**Status**: rascunhada
+**Lacunas**: a FUN-10 fala em schema "igual ao da produção", e o design (C2) define `gerenciado` só pela `pgmigrations`. O rascunho segue o design (comentário `[LACUNA]` em `estado.ts`); o /executar confirma com o usuário.
+**Nota do rascunho**: removidas as parameter properties do `ContainerAge` (o `erasableSyntaxOnly` do tsconfig não as aceita).
 
 **Done when**:
 

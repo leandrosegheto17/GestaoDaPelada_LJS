@@ -50,11 +50,14 @@ function esperar(ms: number): void {
 }
 
 export class ContainerAge {
-  private constructor(
-    readonly id: string,
-    /** Porta do Postgres do container publicada em 127.0.0.1, quando pedida. */
-    readonly portaHost: number | undefined,
-  ) {}
+  readonly id: string;
+  /** Porta do Postgres do container publicada em 127.0.0.1, quando pedida. */
+  readonly portaHost: number | undefined;
+
+  private constructor(id: string, portaHost: number | undefined) {
+    this.id = id;
+    this.portaHost = portaHost;
+  }
 
   static iniciar(opcoes: { publicarPorta?: boolean } = {}): ContainerAge {
     docker(['build', '-q', '-t', IMAGEM, '-'], { input: DOCKERFILE, stdio: ['pipe', 'pipe', 'pipe'] });
