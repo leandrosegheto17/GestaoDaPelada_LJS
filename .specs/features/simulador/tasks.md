@@ -787,6 +787,8 @@ T53 → T54
 **Depends on**: T16
 **Reuses**: Regra do domínio sem relógio (AD-028, `GE:527`) e teste de regra por arquivo de exemplo (`F:385`); `S:227-229`
 **Requirement**: SIM-48, SIM-49, SIM-50
+**Status**: rascunhada
+**Nota do rascunho**: a varredura é por texto, inclusive em comentário (os fontes do simulador não citam os nomes proibidos); a prova com o arquivo de `Math.random()` é do /executar.
 
 **Done when**:
 
