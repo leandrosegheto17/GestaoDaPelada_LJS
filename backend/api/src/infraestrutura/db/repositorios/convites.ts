@@ -149,19 +149,30 @@ async function listar(db: Db, grupoId: string): Promise<ListaAdmins> {
   return { admins: admins.rows, convites: pendentes.rows };
 }
 
-export type ResultadoRemover = 'ok' | 'ultimo_admin' | 'nao_encontrado';
+export type ResultadoRemover = 'ok' | 'ultimo_admin' | 'nao_encontrado' | 'criadora_nao_removivel';
 
 /**
  * Remove o vínculo de admin (ACE-39), recusando o último (ACE-40). Decisão do design do LJS
  * (`design.md:128`): `SELECT … FOR UPDATE` dos vínculos do grupo na mesma transação. Duas
  * remoções simultâneas no grupo de dois admins se enfileiram na trava; a segunda relê os
  * vínculos já sem o removido, vê um só e responde `ultimo_admin`. Grava a auditoria (ACE-42).
+ *
+ * A criadora do grupo (`criado_por`) não é removida por outra admin: `criadora_nao_removivel`
+ * (grupos-e-elenco T32; SEC-001, `GSEG:57`). Ela remove as outras e pode sair de si mesma (se não
+ * for a última). `criado_por` é lido na mesma transação; ele não muda (sem grant de UPDATE).
+ * SPEC_DEVIATION: o `Where` da T32 é `repositorios/admins.ts`; o `admins` mora aqui desde a CA.
  */
 async function remover(db: Db, grupoId: string, contaId: string): Promise<ResultadoRemover> {
   const vinculos = await sql<{ conta_id: string }>`
     SELECT conta_id FROM vinculos_admin WHERE grupo_id = ${grupoId} FOR UPDATE`.execute(db);
   const contas = vinculos.rows.map((v) => v.conta_id);
   if (!contas.includes(contaId)) return 'nao_encontrado';
+  const grupo = await sql<{ criadora: boolean; propria: boolean }>`
+    SELECT criado_por = ${contaId} AS criadora, ${contaId} = app_conta_id() AS propria
+      FROM grupos WHERE id = ${grupoId}`.execute(db);
+  const g = grupo.rows[0];
+  if (!g) return 'nao_encontrado';
+  if (g.criadora === true && g.propria !== true) return 'criadora_nao_removivel';
   if (contas.length <= 1) return 'ultimo_admin';
   await sql`DELETE FROM vinculos_admin WHERE grupo_id = ${grupoId} AND conta_id = ${contaId}`.execute(db);
   await registrar(db, grupoId, { acao: 'remover_admin', entidade: 'vinculo_admin', entidadeId: contaId });

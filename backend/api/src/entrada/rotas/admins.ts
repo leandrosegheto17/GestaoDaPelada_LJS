@@ -72,6 +72,8 @@ export function rotasAdmins(opcoes: OpcoesRotas = {}): Hono<Ambiente> {
     if (!UUID.test(contaId)) return c.json(naoEncontrado, 404);
     const r = await admins.remover(c.var.db, c.req.param('grupoId'), contaId);
     if (r === 'ultimo_admin') return c.json(corpoDoErro('ultimo_admin'), 409);
+    // Outra admin não remove a criadora (SEC-001, grupos-e-elenco T32).
+    if (r === 'criadora_nao_removivel') return c.json(corpoDoErro('criadora_nao_removivel'), 409);
     if (r === 'nao_encontrado') return c.json(naoEncontrado, 404);
     return c.body(null, 204);
   });

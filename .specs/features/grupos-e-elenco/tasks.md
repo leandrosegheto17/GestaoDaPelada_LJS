@@ -1205,6 +1205,8 @@ SPEC_DEVIATION: o teste fica em `backend/api/test/grupos/grupo-arquivado.test.ts
 **Depends on**: T31
 **Reuses**: estender `admins.remover` (`CA:844`, T23) e a rota (`CA:1020`, T30); decisão de `GSEG:57` e `GSEG:157`
 **Requirement**: SEC-001
+**Status**: rascunhada
+SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/src/infraestrutura/db/repositorios/convites.ts`; não existe `repositorios/admins.ts`.
 
 **Done when**:
 
