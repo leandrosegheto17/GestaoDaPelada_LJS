@@ -1356,6 +1356,8 @@ T39 → T40 → T41
 **Depends on**: T39
 **Reuses**: README (`F:2113`); runbook de segredos (`F:2087`); documentação da conta (`CA:1708`)
 **Requirement**: NOT-62
+**Status**: rascunhada
+**Nota do rascunho**: SPEC_DEVIATION: a tarefa fala em "environment `previa`"; pela AD-119 o deploy usa o environment `producao`, e as VAPID são secrets do próprio Worker (como `RESEND_API_KEY`), então o runbook manda gravá-las com `wrangler secret put`. README ganhou "Avisos no celular (push)" em Rodar local; o runbook, "Avisos no celular (push e fila)" em Segredos (passos do usuário, Cron, fila acumulando, troca das chaves). A checagem que cita cada variável do `.env.example` já passava pelas linhas da tabela de variáveis do README (T4 e T27).
 
 **Done when**:
 

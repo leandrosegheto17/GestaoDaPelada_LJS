@@ -57,6 +57,15 @@ A assinatura do Pro fala com o Asaas, **só o sandbox** (`ASAAS_URL` do `wrangle
 - **e2e:** o `playwright.config.ts` sobe o Asaas falso (`frontend/web/e2e/apoio/asaas-falso.mjs`, porta 8789) antes do Worker e passa ao Worker `ASAAS_URL`, `ASAAS_API_KEY` e `ASAAS_WEBHOOK_TOKEN` falsos por `--var`. O falso responde às 4 rotas do Asaas que a API usa, serve uma fatura de mentira e dispara o webhook no Worker com o token (`POST /teste/webhook {"event":"PAYMENT_RECEIVED","subscription":"sub_…"}`).
 - **À mão, sem Asaas de verdade:** `node frontend/web/e2e/apoio/asaas-falso.mjs` e suba a API com `--var ASAAS_URL:http://127.0.0.1:8789/v3 --var ASAAS_API_KEY:qualquer --var ASAAS_WEBHOOK_TOKEN:<token>`; para o webhook do falso chegar ao Worker, defina `ASAAS_FALSO_WEBHOOK=http://127.0.0.1:8787/api/webhooks/asaas` e `ASAAS_FALSO_TOKEN` com o mesmo token.
 
+### Avisos no celular (push)
+
+Os avisos do ranking (link público) e de cobrança (Minha conta) saem por Web Push, cifrados pela própria API (RFC 8291 e 8292, sem biblioteca). Sem as três variáveis VAPID o push fica desligado: o controle não aparece, as rotas de assinar respondem 503 e os e-mails de cobrança continuam.
+
+- **Chaves:** `pnpm vapid:gerar` imprime um par novo (`VAPID_PUBLICA` e `VAPID_PRIVADA`, base64url); não grava arquivo. Copie as duas e um contato (`VAPID_ASSUNTO=mailto:...`) para o `.env` local. A privada é segredo: nunca no repositório.
+- **Push falso local e no e2e:** o navegador de teste não fala com um serviço de push de verdade. `node frontend/web/e2e/apoio/push-falso.mjs` sobe um serviço falso que guarda as requisições recebidas; suba a API com `--var PUSH_HOSTS_DEV:localhost:<porta do falso>` para a API aceitar endpoints `localhost` dele. `PUSH_HOSTS_DEV` aceita só `localhost` (ou subdomínio) e nunca vai para o `wrangler.jsonc` nem para o `deploy.yml` (checagem `push-hosts-dev`).
+- **Testes de API:** usam o `servicoPushFalso()` (`backend/api/src/infraestrutura/push/enviar.ts`) e o remetente em memória; nenhum teste chama serviço de push real nem o Resend.
+- **Fila e Cron:** o envio passa pela fila `avisos` (Cloudflare Queues) e a limpeza diária roda pelo Cron do `wrangler.jsonc`; no `wrangler dev` a fila é local.
+
 ### Conta do dono
 
 `pnpm --filter @pelada/scripts dono -- --email <e-mail do dono>` cria a conta do dono ou troca a senha dela. A senha é pedida no terminal duas vezes, sem eco, e nunca aparece na tela nem no log. O alvo padrão é o banco local (`DATABASE_URL_MIGRACAO`); `--alvo previa` e `--alvo producao` usam o Neon, e o de produção só segue depois de você digitar o e-mail do dono e a palavra `producao`. Banco remoto sem `--alvo` explícito é recusado antes de conectar. O e-mail do dono é o que o banco aceita (CHECK `contas_dono_email`); outro falha lá.

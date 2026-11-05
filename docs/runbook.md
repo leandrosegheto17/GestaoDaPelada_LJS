@@ -243,6 +243,45 @@ pnpm --filter @pelada/api exec wrangler secret list --config ../../wrangler.json
 
 **Asaas fora do ar, lento ou em 429:** sem resposta em 10 s, ou com erro, assinar e cancelar respondem 502 "Não foi possível falar com o sistema de pagamento. Tente de novo em instantes.", sem gravar nada e sem repetir sozinho; o log registra só a operação e o status, nunca CPF, nome, e-mail ou a chave.
 
+### Avisos no celular (push e fila)
+
+Os avisos do ranking e de cobrança saem por Web Push com as chaves VAPID e passam pela fila `avisos` (Cloudflare Queues; a rota só enfileira depois do `COMMIT`, e o próprio Worker consome uma mensagem por vez). Sem as três VAPID no Worker, o push fica desligado: o controle some das telas, as rotas de assinar respondem 503 `push_indisponivel` e os e-mails de cobrança continuam.
+
+**Passos do usuário, uma vez (`/preparar` Nível 2)** (nenhum valor vai para o repositório nem para esta página):
+
+1. Gere o par: `pnpm vapid:gerar` (imprime `VAPID_PUBLICA` e `VAPID_PRIVADA`; não grava arquivo). Feche o terminal depois de copiar.
+2. Grave as três como secrets do Worker da prévia (`gestaodapelada-v2`); o valor é pedido no terminal. `VAPID_ASSUNTO` é o contato do remetente (`mailto:<e-mail>` ou uma URL `https`):
+
+```bash
+pnpm --filter @pelada/api exec wrangler secret put VAPID_PUBLICA --config ../../wrangler.jsonc
+pnpm --filter @pelada/api exec wrangler secret put VAPID_PRIVADA --config ../../wrangler.jsonc
+pnpm --filter @pelada/api exec wrangler secret put VAPID_ASSUNTO --config ../../wrangler.jsonc
+pnpm --filter @pelada/api exec wrangler secret list --config ../../wrangler.jsonc   # só os nomes
+```
+
+3. Crie a fila, antes do primeiro deploy com o binding `FILA_AVISOS` (sem ela o deploy falha):
+
+```bash
+pnpm --filter @pelada/api exec wrangler queues create avisos
+pnpm --filter @pelada/api exec wrangler queues list   # "avisos" com o Worker como produtor e consumidor depois do deploy
+```
+
+4. Confira: num grupo Pro, abra `/g/<slug>` num navegador com suporte (no iPhone, só com o app instalado na Tela de Início), toque em **Receber avisos do ranking**, lance uma partida pela área do admin e veja a notificação chegar.
+
+SPEC_DEVIATION: a T40 fala em "environment `previa`"; pela AD-119 o deploy usa o environment `producao` do GitHub, e as VAPID não passam por ele: são secrets do próprio Worker, como `RESEND_API_KEY`.
+
+**Limpeza diária.** O Cron do `wrangler.jsonc` (`0 6 * * *`, 06:00 UTC) apaga as assinaturas sem aviso aceito há 180 dias e os registros de avisos de cobrança com mais de 90 dias. Para conferir que roda: `wrangler tail` perto das 06:00 UTC, ou o painel do Worker (_Triggers > Cron Triggers_, última execução).
+
+**Fila acumulando.** No painel da Cloudflare (_Queues > avisos_) o backlog deve voltar a zero em minutos. Se crescer:
+
+1. Veja o `wrangler tail` e o Sentry: nada ali traz endpoint, chave nem conteúdo do aviso (NOT-33); os erros do serviço de push chegam só com o host e o status.
+2. Banco fora (`/api/health` 503): a mensagem volta à fila sozinha (até 2 novas entregas); passou disso, ela é descartada e o aviso daquela partida não sai (o próximo lançamento avisa de novo).
+3. Serviço de push lento ou em 429/5xx: o app reenfileira só as assinaturas que falharam, com o atraso do `Retry-After` (padrão 60 s, teto 1 h), até 2 vezes, e depois desiste daquele aviso sem apagar a assinatura.
+4. Resend fora ou cota acabada: o e-mail de cobrança volta à fila a cada 8 h, até 3 tentativas; na última, o Sentry recebe "desistência" com o tipo, sem destinatário.
+5. As mensagens ficam no máximo 24 h na fila (plano Free); o que passar disso some.
+
+**Troca das chaves VAPID** (vazou a privada, ou a rotação anual): as assinaturas existentes foram feitas com a chave pública antiga e **deixam de valer** com a nova (o serviço de push recusa o envio e a assinatura é apagada no primeiro aviso). Não há como migrá-las: cada aparelho assina de novo. O front faz isso sozinho: ao abrir a tela, ele vê que a assinatura local é de outra chave, cancela a local e volta a mostrar **Receber avisos do ranking** (ou o de cobrança), e a pessoa toca de novo. Passos: gere o par novo (`pnpm vapid:gerar`), grave `VAPID_PUBLICA` e `VAPID_PRIVADA` juntas (`wrangler secret put`), faça o deploy e confira que um aviso de teste chega a um aparelho assinado depois da troca.
+
 ### Conferir e criar
 
 ```bash
