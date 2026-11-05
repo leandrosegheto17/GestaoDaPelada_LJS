@@ -1264,6 +1264,8 @@ T78 → T79
 **Depends on**: T29
 **Reuses**: `BD:198-201`; ordem de travas AD-038; T8 e T29
 **Requirement**: PAR-22, PAR-23, PAR-24, PAR-28, PAR-29, PAR-30, PAR-142
+**Status**: rascunhada
+**Nota do rascunho**: `partidas.lancar(db, grupoId, dados)` devolve `ok` (id e contagem), `invalido` (campos do domínio) ou `partida_ja_existe`; a data futura fica na rota (T40). O 23505 de `partidas_grupo_id_data_key` é traduzido dentro de um SAVEPOINT (molde `financeiro/pagamentos.ts:53`). SPEC_DEVIATION: o evento `partida_lancada` é um INSERT direto, porque `eventos.partidaLancada` nasce na T33. Testes em `backend/api/test/repositorios/partidas-lancar.test.ts`.
 
 **Done when**:
 
