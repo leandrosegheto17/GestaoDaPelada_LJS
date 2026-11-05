@@ -971,6 +971,8 @@ T53 → T54
 **Depends on**: T23
 **Reuses**: Estender `partidaNova` (`PR:889`, T18) e `grupoDetalhe` (`GE:753`, ampliado em `PR:937`); resposta do mockup `respostas/partida-nova-2026-10-22.json` (já tem o campo)
 **Requirement**: SIM-08, SIM-75
+**Status**: rascunhada
+**Nota do rascunho**: `SPEC_DEVIATION`: a forma do GET do grupo é o `grupoDetalheComPartidas` (`contrato/src/previas.ts`, T20 da partidas-e-ranking), e o `grupoDetalhe` ficou só para o PATCH; os 2 campos do simulador vão no `grupoDetalheComPartidas`. Os testes existentes de `partidas.test.ts` (PAR-17) e `previas.test.ts` (PAR-132) passam a enviar os campos novos (autorizado), sem asserção removida.
 
 **Done when**:
 

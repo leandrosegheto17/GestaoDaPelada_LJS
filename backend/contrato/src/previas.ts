@@ -52,8 +52,12 @@ export const usoResposta = z.strictObject({ semanas: z.array(semanaDeUso) });
 export type UsoResposta = z.infer<typeof usoResposta>;
 
 /**
- * `GET /api/grupos/:grupoId` com os 6 campos de PAR-132. O `grupoDetalhe` da grupos-e-elenco continua como está (o
- * PATCH do grupo, GEL-20, responde com ele); esta é a forma do GET, que acrescenta os campos do início do grupo.
+ * `GET /api/grupos/:grupoId` com os 6 campos de PAR-132 e os 2 do simulador (T24 da simulador; SIM-08). O
+ * `grupoDetalhe` da grupos-e-elenco continua como está (o PATCH do grupo, GEL-20, responde com ele); esta é a forma do
+ * GET, que acrescenta os campos do início do grupo.
+ *
+ * SPEC_DEVIATION: a T24 da simulador manda estender o `grupoDetalhe` no arquivo dele (`GE:753`), mas a partidas-e-ranking
+ * deixou o `grupoDetalhe` só para o PATCH e pôs a forma do GET aqui; os campos do simulador vão na forma do GET.
  */
 export const grupoDetalheComPartidas = grupoDetalhe.extend({
   dataSugeridaPartida: dataTexto,
@@ -62,5 +66,9 @@ export const grupoDetalheComPartidas = grupoDetalhe.extend({
   pesosVigentesDesde: dataTexto,
   pesosPadrao: z.boolean(),
   aparelhosNaSemana: contagem,
+  /** Próximo dia de jogo, hoje incluso (SIM-08, AD-086). */
+  proximoDiaDeJogo: dataTexto,
+  /** Existe escalação confirmada em `proximoDiaDeJogo` (SIM-08). */
+  escalacaoNoProximoDia: z.boolean(),
 });
 export type GrupoDetalheComPartidas = z.infer<typeof grupoDetalheComPartidas>;

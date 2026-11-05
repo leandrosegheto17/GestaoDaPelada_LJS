@@ -99,15 +99,19 @@ describe('grupoDetalheComPartidas', () => {
     pesosPadrao: true,
     aparelhosNaSemana: 3,
   };
+  // Mudança autorizada (`## Autorizações`, 2026-11-04): a T24 da simulador acrescenta os 2 campos do simulador, e os
+  // testes de PAR-132 passam a enviá-los, com as mesmas asserções.
+  const simulador = { proximoDiaDeJogo: '2026-10-22', escalacaoNoProximoDia: false };
+  const completo = { ...base, ...novos, ...simulador };
 
   it('PAR-132: aceita a resposta com os 6 campos novos', () => {
-    expect(grupoDetalheComPartidas.parse({ ...base, ...novos })).toEqual({ ...base, ...novos });
+    expect(grupoDetalheComPartidas.parse(completo)).toEqual(completo);
   });
 
   it.each(Object.keys(novos))('PAR-132: exige o campo %s', (campo) => {
-    const completo: Record<string, unknown> = { ...base, ...novos };
-    delete completo[campo];
-    expect(grupoDetalheComPartidas.safeParse(completo).success).toBe(false);
+    const sem: Record<string, unknown> = { ...completo };
+    delete sem[campo];
+    expect(grupoDetalheComPartidas.safeParse(sem).success).toBe(false);
   });
 
   it('PAR-132: os 6 campos novos não entram no grupoDetalhe da grupos-e-elenco (PATCH continua igual)', () => {
@@ -116,7 +120,23 @@ describe('grupoDetalheComPartidas', () => {
   });
 
   it('PAR-132: tipos errados são recusados', () => {
-    expect(grupoDetalheComPartidas.safeParse({ ...base, ...novos, pesosPadrao: 'sim' }).success).toBe(false);
-    expect(grupoDetalheComPartidas.safeParse({ ...base, ...novos, aparelhosNaSemana: -1 }).success).toBe(false);
+    expect(grupoDetalheComPartidas.safeParse({ ...completo, pesosPadrao: 'sim' }).success).toBe(false);
+    expect(grupoDetalheComPartidas.safeParse({ ...completo, aparelhosNaSemana: -1 }).success).toBe(false);
+  });
+
+  it.each(Object.keys(simulador))('SIM-08: exige o campo %s', (campo) => {
+    const sem: Record<string, unknown> = { ...completo };
+    delete sem[campo];
+    expect(grupoDetalheComPartidas.safeParse(sem).success).toBe(false);
+  });
+
+  it('SIM-08: tipos dos campos do simulador', () => {
+    expect(grupoDetalheComPartidas.parse({ ...completo, escalacaoNoProximoDia: true }).escalacaoNoProximoDia).toBe(true);
+    expect(grupoDetalheComPartidas.safeParse({ ...completo, proximoDiaDeJogo: '22/10/2026' }).success).toBe(false);
+    expect(grupoDetalheComPartidas.safeParse({ ...completo, escalacaoNoProximoDia: 'sim' }).success).toBe(false);
+  });
+
+  it('SIM-08: os campos do simulador não entram no grupoDetalhe do PATCH', () => {
+    expect(grupoDetalhe.safeParse({ ...base, ...simulador }).success).toBe(false);
   });
 });

@@ -72,12 +72,16 @@ export const jogadorDaPartida = z.strictObject({
 });
 export type JogadorDaPartida = z.infer<typeof jogadorDaPartida>;
 
-/** `GET …/partidas/nova` (PAR-17, PAR-18). */
+/**
+ * `GET …/partidas/nova` (PAR-17, PAR-18). `preMarcadaPelaEscalacao` (T24 da simulador; SIM-75, SIM-76): as situações
+ * vieram da escalação confirmada da data; sem escalação, ou com escalação inválida, é falso e a tela fica como antes.
+ */
 export const partidaNova = z.strictObject({
   data: dataTexto,
   dataSugerida: dataTexto,
   hoje: dataTexto,
   choveu: z.boolean(),
+  preMarcadaPelaEscalacao: z.boolean(),
   jogadores: z.array(jogadorDaPartida),
 });
 export type PartidaNova = z.infer<typeof partidaNova>;

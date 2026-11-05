@@ -110,9 +110,25 @@ describe('consultaData e consultaMes', () => {
 describe('respostas', () => {
   const jogadores = [{ id: BETO, apelido: 'Beto', situacao: 'ausente' }];
 
+  // Mudança autorizada (`## Autorizações`, 2026-11-04): a T24 da simulador acrescenta `preMarcadaPelaEscalacao`.
+  const nova = {
+    data: '2026-10-15',
+    dataSugerida: '2026-10-15',
+    hoje: '2026-10-16',
+    choveu: false,
+    preMarcadaPelaEscalacao: false,
+    jogadores,
+  };
+
   it('PAR-17: partidaNova', () => {
-    const r = { data: '2026-10-15', dataSugerida: '2026-10-15', hoje: '2026-10-16', choveu: false, jogadores };
-    expect(partidaNova.parse(r)).toEqual(r);
+    expect(partidaNova.parse(nova)).toEqual(nova);
+  });
+
+  it('SIM-75: partidaNova sem preMarcadaPelaEscalacao é recusada', () => {
+    const { preMarcadaPelaEscalacao: _fora, ...sem } = nova;
+    expect(partidaNova.safeParse(sem).success).toBe(false);
+    expect(partidaNova.safeParse({ ...nova, preMarcadaPelaEscalacao: 'sim' }).success).toBe(false);
+    expect(partidaNova.parse({ ...nova, preMarcadaPelaEscalacao: true }).preMarcadaPelaEscalacao).toBe(true);
   });
 
   it('PAR-44: partidaResposta com alteradaPor e alteradaEm', () => {
