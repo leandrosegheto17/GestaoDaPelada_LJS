@@ -1382,6 +1382,8 @@ T56 → T57
 **Depends on**: T41
 **Reuses**: `TelaMensagem` (`CA:1286`, T41); `Botao` (`F:1448`); Stylelint de tokens (`F:1374`); AD-064
 **Requirement**: PLA-27
+**Status**: rascunhada
+**Lacunas**: o @pelada/web passa a depender do @pelada/dominio (S-06) só no package.json; o pnpm-lock.yaml precisa do pnpm install, que o rascunho não roda
 
 **Done when**:
 

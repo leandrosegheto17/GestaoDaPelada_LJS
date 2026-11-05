@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@pelada/contrato": "workspace:*",
+    "@pelada/dominio": "workspace:*",
     "@sentry/react": "^10.0.0",
     "@tanstack/react-query": "^5.90.0",
     "react": "^19.2.0",

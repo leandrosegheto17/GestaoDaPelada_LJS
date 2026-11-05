@@ -1,0 +1,25 @@
+/* Aviso de recurso Pro (planos-e-cobranca T42; AD-064): o padrão tela-mensagem do guia, só com tokens. */
+
+.aviso {
+  text-align: center;
+  padding: var(--esp-8) var(--esp-4);
+  background: var(--cor-superficie);
+  border-radius: var(--raio);
+}
+
+.icone {
+  color: var(--cor-verde);
+  margin-bottom: var(--esp-3);
+}
+
+.titulo {
+  font-family: var(--fonte-titulo);
+  font-size: var(--texto-xl);
+  text-transform: uppercase;
+  margin: 0 0 var(--esp-2);
+}
+
+.texto {
+  color: var(--cor-texto-sec);
+  margin: 0 auto var(--esp-6);
+}
