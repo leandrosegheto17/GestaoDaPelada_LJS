@@ -656,6 +656,8 @@ T57 → T58
 **Depends on**: T13
 **Reuses**: app Hono da fundação (`F:1106`); atributos de `ljs:.specs/features/conta-e-acesso/spec.md:48` e `:99`
 **Requirement**: ACE-09, ACE-17
+**Status**: rascunhada
+**Nota do rascunho**: o cookie leva `Max-Age` das 12 h da sessão; o vencido leva também `Expires` em 1970.
 
 **Done when**:
 
