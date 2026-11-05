@@ -668,6 +668,8 @@ T81 → T82
 **Depends on**: T14
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-48, FUN-50, FUN-39
+**Status**: rascunhada
+**Nota do rascunho**: push, disparo do workflow e restauração real são ações externas; ficam para o /executar, com confirmação. O `docs/restauracao-registro.md` nasce com os números reais.
 
 **Done when**:
 
