@@ -1601,6 +1601,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T46
 **Reuses**: `habilidades.*` (T46); tabela de `GD:177`
 **Requirement**: GEL-88, GEL-89, GEL-90, GEL-91, GEL-92, GEL-93, GEL-96
+**Status**: rascunhada
 
 **Done when**:
 
