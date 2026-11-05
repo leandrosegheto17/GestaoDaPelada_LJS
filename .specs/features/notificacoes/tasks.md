@@ -731,6 +731,8 @@ T39 → T40 → T41
 **Depends on**: T16
 **Reuses**: `worker.ts` (`F:1106`); cliente pg por invocação (`F:1179`); AD-098, AD-108
 **Requirement**: NOT-22, NOT-33
+**Status**: rascunhada
+**Nota do rascunho**: a lógica fica em `backend/api/src/entrada/consumidor-avisos.ts` (`consumirAvisos`), e o `worker.ts` só a liga ao `queue`; o `criarWorker` (`observabilidade.ts`) passa a repassar o `queue`, pelo `withSentry` quando há DSN. O caso de uso recebe `banco(fn)`, uma `transacaoCurta` sem conta e sem slug por chamada, para gravar o resultado de cada lote antes do próximo (NOT-69). Caso de uso que lança: `retry()` sem atraso (a fila entrega de novo, `max_retries` 2); tipo sem caso ligado: `ack` e relato `sem_caso_de_uso` (a cobrança só liga na T24). Teste em `backend/api/test/entrada/consumidor-avisos.test.ts` (Node, com o `@sentry/cloudflare` simulado por `vi.mock`).
 
 **Done when**:
 

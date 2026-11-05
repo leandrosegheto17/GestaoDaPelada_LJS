@@ -17,6 +17,8 @@ export interface OpcoesSentry {
 /** Manipulador do Worker, com os tipos mínimos que o projeto usa. */
 export interface Manipulador {
   fetch(requisicao: Request, env: Env, ctx: unknown): Response | Promise<Response>;
+  /** Consumidor da fila `avisos` (notificacoes T17; AD-098). */
+  queue?(lote: unknown, env: Env, ctx: unknown): Promise<void>;
 }
 
 export type EmbrulharSentry = (opcoes: (env: Env) => OpcoesSentry, manipulador: Manipulador) => Manipulador;
@@ -43,9 +45,19 @@ export function sentryLigado(env: Env): boolean {
  * `embrulhar` existe para os testes trocarem o `withSentry`.
  */
 export function criarWorker(app: Manipulador, embrulhar: EmbrulharSentry = embrulharPadrao): Manipulador {
-  const comSentry = embrulhar(opcoesSentry, { fetch: (r, env, ctx) => app.fetch(r, env, ctx) });
-  return {
+  const consumir = app.queue?.bind(app);
+  const comSentry = embrulhar(opcoesSentry, {
+    fetch: (r, env, ctx) => app.fetch(r, env, ctx),
+    ...(consumir ? { queue: (lote: unknown, env: Env, ctx: unknown) => consumir(lote, env, ctx) } : {}),
+  });
+  const manipulador: Manipulador = {
     fetch: (requisicao, env, ctx) =>
       sentryLigado(env) ? comSentry.fetch(requisicao, env, ctx) : app.fetch(requisicao, env, ctx),
   };
+  // A fila passa pelo mesmo `withSentry` do fetch (notificacoes T17): sem DSN, vai direto ao consumidor.
+  if (consumir) {
+    manipulador.queue = (lote, env, ctx) =>
+      sentryLigado(env) && comSentry.queue ? comSentry.queue(lote, env, ctx) : consumir(lote, env, ctx);
+  }
+  return manipulador;
 }
