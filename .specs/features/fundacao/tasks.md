@@ -1987,6 +1987,8 @@ T81 → T82
 **Depends on**: T64
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-45
+**Status**: rascunhada
+**Nota do rascunho**: reaproveita `arquivosDoRepositorio` e o tipo `Arquivo` de `sem-url-absoluta.ts` (git ls-files). Pega também o antigo `publish` e o `versions deploy`, sem diferenciar maiúsculas. Documentação é `docs/`, `.specs/`, `.claude/`, `.rascunho/` e todo `*.md`. O texto da checagem e do teste não contém o comando por inteiro, para a rodada na base atual passar.
 
 **Done when**:
 
