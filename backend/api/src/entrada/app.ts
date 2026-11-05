@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import type { Ambiente } from './ambiente.ts';
 import { exigirCabecalhoPelada } from './middlewares/cabecalho-pelada.ts';
+import { protegerRotasPublicas } from './middlewares/contexto-publico.ts';
 import { semCache, semSniff } from './middlewares/cabecalhos.ts';
 import { travarFinanceiro } from './middlewares/financeiro.ts';
 import { limitarEscritasDeGrupo } from './middlewares/limite-escrita.ts';
@@ -74,6 +75,9 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
   api.use('*', limitarEscritasDeGrupo);
   // Rotas de grupo: sessão, transação com a conta e vínculo sob a RLS (ACE-41, T21).
   protegerRotasDeGrupo(api, opcoes.fabricaBanco ? { fabrica: opcoes.fabricaBanco } : {});
+  // Rotas públicas: LIMITE_PUBLICO por IP, slug validado, conta apagada e transação só com o slug (PAR-77, PAR-78,
+  // PAR-90, AD-045; partidas-e-ranking T37).
+  protegerRotasPublicas(api, opcoes.fabricaBanco ? { fabrica: opcoes.fabricaBanco } : {});
   // Trava de recurso do plano depois do vínculo e do grupo ativo (SIM-68, AD-077).
   travarRecursosDoPlano(api);
   // Permissão do financeiro depois do vínculo e do grupo ativo (FIN-33, AD-077).
