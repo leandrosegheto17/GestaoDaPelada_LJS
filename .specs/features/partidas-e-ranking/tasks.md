@@ -1199,15 +1199,15 @@ Gate (T23 a T26): vitest dos testes de banco da feature (pesos-padrao, grupo-cri
 **Depends on**: T26, T80
 **Reuses**: `c.var.db: Kysely` (`FD:103`); colunas `M:1792843200000_linha-de-base.sql:155-192`; `BD:190-192`
 **Requirement**: PAR-62, PAR-77
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: devolve o `HistoricoDoGrupo` do domínio (`backend/dominio/src/previas/comparar.ts:18`); as presenças vêm só das partidas até `ate`, e as configurações de pesos, todas. Testes em `backend/api/test/repositorios/historico.test.ts`, com um plugin do Kysely que conta as consultas e guarda o SQL.
 
 **Done when**:
 
-- [ ] Teste `PAR-62`: o histórico do seed de 2 grupos traz só o grupo do contexto, em 4 consultas (contador do Kysely)
-- [ ] Teste `PAR-77`: a consulta não seleciona telefone, posição nem notas
-- [ ] Teste: expulso com chuva lê `expulso_com_chuva`, sem chuva lê `expulso`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PAR-62`: o histórico do seed de 2 grupos traz só o grupo do contexto, em 4 consultas (contador do Kysely)
+- [x] Teste `PAR-77`: a consulta não seleciona telefone, posição nem notas
+- [x] Teste: expulso com chuva lê `expulso_com_chuva`, sem chuva lê `expulso`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1225,18 +1225,18 @@ Gate (T23 a T26): vitest dos testes de banco da feature (pesos-padrao, grupo-cri
 **Depends on**: T27
 **Reuses**: Repositório de auditoria (`CA:844`); `BD:193-194`; `B:110-114`
 **Requirement**: PAR-01, PAR-02, PAR-03, PAR-04, PAR-05, PAR-09, PAR-142
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: `pesos.salvar` devolve `{ substituiu }` pelo `xmax` da linha do `ON CONFLICT`; `entidade` da auditoria é `config_pesos` com `entidade_id` = hoje. Testes em `backend/api/test/repositorios/pesos.test.ts` (G fica só com a configuração de 2026-01-01 do cenário, sem depender do relógio).
 **Lacunas**: (1) configuração com `vigente_desde` depois de hoje: o painel a ignora e o salvar não a toca (interpretação conservadora); (2) autora sem nome em `contas_nomes_do_grupo`: `registradoPor` vazio, sem rótulo inventado. O `/executar` pergunta antes de levar ao verde.
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-04`: salvar duas vezes no mesmo dia deixa uma linha e audita `pesos_substituidos`
-- [ ] Teste `PAR-02`: `vigenteAte` de cada anterior é a véspera da seguinte
-- [ ] Teste `PAR-09`: configuração de ontem nunca muda; erro depois do INSERT desfaz pesos e auditoria
-- [ ] Teste `PAR-142`: o `resumo` da auditoria só tem números e nomes de evento
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-04`: salvar duas vezes no mesmo dia deixa uma linha e audita `pesos_substituidos`
+- [x] Teste `PAR-02`: `vigenteAte` de cada anterior é a véspera da seguinte
+- [x] Teste `PAR-09`: configuração de ontem nunca muda; erro depois do INSERT desfaz pesos e auditoria
+- [x] Teste `PAR-142`: o `resumo` da auditoria só tem números e nomes de evento
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1254,22 +1254,24 @@ Gate (T23 a T26): vitest dos testes de banco da feature (pesos-padrao, grupo-cri
 **Depends on**: T28
 **Reuses**: Estender `jogadores.ts` da grupos-e-elenco (trava `SELECT … FOR UPDATE` de `GE:1305`); ordem de travas AD-038
 **Requirement**: PAR-27, PAR-29
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: `travarParaPeriodo` passou a delegar a `lerEstado(…, travar)`, que `lerParaPrevia` usa sem `FOR UPDATE` (mesma leitura); `ativosNaData` devolve `{ id, apelido }` em ordem de apelido; `EstadoDoJogador` passou a ser exportado. Testes em `backend/api/test/repositorios/jogadores-partidas.test.ts`, com duas conexões de verdade.
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-29`: duas conexões travando [B, A] e [A, B] não fazem deadlock (ordem crescente de id)
-- [ ] Teste `PAR-27`: `ativosNaData` segue [início, fim)
-- [ ] Teste: id de outro grupo não é travado nem devolvido
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-29`: duas conexões travando [B, A] e [A, B] não fazem deadlock (ordem crescente de id)
+- [x] Teste `PAR-27`: `ativosNaData` segue [início, fim)
+- [x] Teste: id de outro grupo não é travado nem devolvido
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
 
 ---
 
+
+Gate (T27 a T29): vitest test/repositorios: todos os testes PAR-* verdes; 38 vermelhos GEL/FIN/ACE/NOT/PLA de outras features, iguais na main (preexistentes) @ ebff63dc90ac2ffa105cf4715b03a6f18b1ac340
 #### Phase 12: Repositórios: partidas
 
 ### T30: partidas.lancar
