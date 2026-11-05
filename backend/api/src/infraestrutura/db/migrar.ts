@@ -32,7 +32,8 @@ export async function migrar(url: string, opcoes: OpcoesMigrar = {}): Promise<st
   }
   const aplicadas = await runner({
     databaseUrl: url,
-    dir: join(pasta, '*.sql'),
+    // O glob só entende `/`: no Windows o `join` sai com `\` e não acharia nenhuma migração.
+    dir: join(pasta, '*.sql').replaceAll('\\', '/'),
     useGlob: true,
     migrationsTable: TABELA_MIGRACOES,
     direction: 'up',
