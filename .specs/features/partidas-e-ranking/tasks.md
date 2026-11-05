@@ -2141,6 +2141,8 @@ T78 → T79
 **Depends on**: T61
 **Reuses**: `.specs/mockup/telas/t18-pontuacao--{sucesso,salvo,erro}.html`; `Campo` e `ResumoErros` (`CA:1238`, `CA:1263`); asserção de posição no molde de `GE:2138`
 **Requirement**: PAR-10, PAR-11, PAR-12, PAR-147
+**Status**: rascunhada
+**Lacunas**: a mensagem local do peso usa o sinal de menos ("−10", como a spec e o mockup), mas o `MENSAGEM_PESO` do contrato (`backend/contrato/src/pesos.ts:12`), que a API devolve no 422, usa o hífen ("-10"); o `/executar` decide se o contrato passa ao sinal de menos. Os dados ficaram em `dados/pesos.ts` e a tabela em `telas/tabela-simples.module.css` (a T63 reaproveita).
 
 **Done when**:
 

@@ -1,0 +1,26 @@
+/* Tabela simples (t18 pesos vigentes, t21 uso por semana), de .specs/mockup/base.css:294-297 e 361. */
+
+.tabela-simples {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--cor-superficie);
+  font-variant-numeric: tabular-nums;
+}
+
+.tabela-simples th,
+.tabela-simples td {
+  padding: var(--esp-2) var(--esp-3);
+  border-bottom: 1px solid var(--cor-linha);
+  text-align: right;
+}
+
+.tabela-simples th:first-child,
+.tabela-simples td:first-child {
+  text-align: left;
+}
+
+.tabela-simples thead th {
+  font-size: var(--texto-sm);
+  color: var(--cor-texto-sec);
+  font-weight: var(--peso-forte);
+}
