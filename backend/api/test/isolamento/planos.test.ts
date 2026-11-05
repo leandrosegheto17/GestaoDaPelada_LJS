@@ -236,7 +236,29 @@ const FUNCOES_DO_PLANO: readonly string[] = [
   // T14
   'assinatura_registrar(uuid, text, text, integer, text)',
   'assinatura_cancelar(uuid)',
+  // T15
+  'asaas_evento_registrar(text, text, text, text, text, text, integer)',
 ];
+
+// Funções auxiliares sem EXECUTE para ninguém além do owner (só chamadas de dentro das SECURITY DEFINER).
+const FUNCOES_SO_DO_OWNER: readonly string[] = [
+  // T15
+  'asaas_data(text)',
+];
+
+describe('PLA-13: funções auxiliares do plano só do owner', () => {
+  it.each(FUNCOES_SO_DO_OWNER)('PLA-13: %s sem EXECUTE para PUBLIC nem para pelada_app', async (assinatura) => {
+    const r = await aberto.db.query<{ executores: string[] }>(
+      `SELECT coalesce(array(SELECT coalesce(r.rolname, 'PUBLIC')::text
+                               FROM aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) a
+                               LEFT JOIN pg_roles r ON r.oid = a.grantee
+                              WHERE a.privilege_type = 'EXECUTE' AND a.grantee <> p.proowner), '{}') AS executores
+         FROM pg_proc p WHERE p.oid = $1::regprocedure`,
+      [assinatura],
+    );
+    expect(r.rows[0]?.executores).toEqual([]);
+  });
+});
 
 describe('PLA-13: funções do plano sem EXECUTE para PUBLIC', () => {
   it.each(FUNCOES_DO_PLANO)('PLA-13: %s', async (assinatura) => {

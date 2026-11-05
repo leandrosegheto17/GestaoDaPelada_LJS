@@ -710,6 +710,8 @@ T56 → T57
 **Depends on**: T14
 **Reuses**: exigência de contexto de `evento_publico_registrar` (`PR:1038`, invertida: sem conta e sem slug); `eventos_asaas` (T10); AD-088
 **Requirement**: PLA-41, PLA-42, PLA-48, PLA-49, PLA-13
+**Status**: rascunhada
+**Nota do rascunho**: casos limite no topo da migração; sem lacuna. O `dateCreated` entra como texto do Asaas e é convertido por `asaas_data` (hora de São Paulo; fora do formato vira nulo); o estado volta com `ultimo_evento_em` no mesmo texto, para a comparação do domínio (T4).
 
 **Done when**:
 
