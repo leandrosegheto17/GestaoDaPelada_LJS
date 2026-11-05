@@ -326,6 +326,8 @@ T81 → T82
 **Depends on**: T1
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-01
+**Status**: rascunhada
+**Nota do rascunho**: o `pnpm-lock.yaml` nasce no `pnpm install` do /executar. O `.gitattributes` já existia.
 
 **Done when**:
 

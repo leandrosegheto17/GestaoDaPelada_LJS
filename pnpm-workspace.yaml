@@ -1,0 +1,10 @@
+packages:
+  - backend/*
+  - frontend/*
+allowBuilds:
+  esbuild: true
+  workerd: true
+  unrs-resolver: false
+  core-js: false
+blockExoticSubdeps: true
+minimumReleaseAge: 1440

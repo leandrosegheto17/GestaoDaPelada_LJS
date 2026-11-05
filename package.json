@@ -1,0 +1,21 @@
+{
+  "name": "gestao-da-pelada",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=26 <27"
+  },
+  "packageManager": "pnpm@11.23.0",
+  "scripts": {
+    "lint": "pnpm -r lint",
+    "format:check": "prettier --check .",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test"
+  },
+  "devDependencies": {
+    "@types/node": "^26.0.0",
+    "prettier": "^3.9.10",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.12"
+  }
+}
