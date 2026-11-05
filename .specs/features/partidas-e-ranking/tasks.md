@@ -1047,6 +1047,8 @@ T78 → T79
 **Depends on**: T22
 **Reuses**: Estender `tipos.ts` da grupos-e-elenco (`GE:878`, que já tem `partidas` e `presencas` só leitura); colunas `M:1792843200000_linha-de-base.sql:155-207`
 **Requirement**: PAR-62
+**Status**: rascunhada
+**Nota do rascunho**: teste em `backend/api/test/banco/partidas-tipos.test.ts`; o erro de compilação do UPDATE é conferido por `@ts-expect-error` numa função que só o typecheck lê. O alias `SoLeitura` saiu do `tipos.ts` (ficou sem uso).
 
 **Done when**:
 

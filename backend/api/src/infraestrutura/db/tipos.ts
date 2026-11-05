@@ -4,7 +4,8 @@ import type { ColumnType, Generated } from 'kysely';
  * Tipos Kysely das tabelas da grupos-e-elenco (T21; GEL-112), do modelo de `GD:220-236` e das migrações (linha de base
  * e `1792844*`). Só o que as rotas da feature leem ou escrevem: `grupos` completo, o elenco (`jogadores`,
  * `periodos_ativos`, `habilidades`, `notas`) e, só leitura, `partidas` e `presencas` (as presenças das regras de
- * período, GEL-68). `pagamentos_mes` nasceu só leitura (o histórico que impede excluir, GEL-85); o financeiro (T11) a
+ * período, GEL-68); a partidas-e-ranking (T80) as torna graváveis e acrescenta `config_pesos` e `eventos_uso` (só de
+ * inserção). `pagamentos_mes` nasceu só leitura (o histórico que impede excluir, GEL-85); o financeiro (T11) a
  * torna gravável junto de `config_financeira` e `lancamentos`.
  *
  * `COLUNAS_TIPADAS` repete as colunas com o tipo do catálogo (`udt_name`) para o teste conferir contra o banco
@@ -18,8 +19,6 @@ import type { ColumnType, Generated } from 'kysely';
 type Data = ColumnType<string, string, string>;
 /** `timestamptz` gravado pelo SQL (`now()` ou o instante do relógio). */
 type Instante = ColumnType<Date, Date | string, Date | string>;
-/** Coluna só de leitura nesta feature. */
-type SoLeitura<T> = ColumnType<T, never, never>;
 
 export interface TabelaGrupos {
   id: Generated<string>;
@@ -77,18 +76,66 @@ export interface TabelaNotas {
   valor: number;
 }
 
+/**
+ * Partidas e presenças (T80 da partidas-e-ranking; PAR-62), de `M:1792843200000_linha-de-base.sql:169-191`. Deixam de
+ * ser só leitura: o lançamento e a edição gravam. Como no grant por coluna (T25), só `choveu`, `alterada_por` e
+ * `alterada_em` mudam numa partida; `grupo_id`, `data` e a criação ficam fixos (`never` no UPDATE).
+ */
 export interface TabelaPartidas {
-  id: SoLeitura<string>;
-  grupo_id: SoLeitura<string>;
-  data: SoLeitura<string>;
-  choveu: SoLeitura<boolean>;
+  id: Generated<string>;
+  grupo_id: ColumnType<string, string, never>;
+  data: ColumnType<string, string, never>;
+  choveu: ColumnType<boolean, boolean | undefined, boolean>;
+  criada_por: ColumnType<string, string, never>;
+  criada_em: ColumnType<Date, Date | string, never>;
+  alterada_por: string;
+  alterada_em: Instante;
 }
 
+/** Só `presente`, `lesionado` e `expulso` gravam linha (PAR-23); a edição troca as presenças (apaga e insere). */
 export interface TabelaPresencas {
-  partida_id: SoLeitura<string>;
-  jogador_id: SoLeitura<string>;
-  grupo_id: SoLeitura<string>;
-  situacao: SoLeitura<'presente' | 'lesionado' | 'expulso'>;
+  partida_id: ColumnType<string, string, never>;
+  jogador_id: ColumnType<string, string, never>;
+  grupo_id: ColumnType<string, string, never>;
+  situacao: 'presente' | 'lesionado' | 'expulso';
+}
+
+/**
+ * Configuração de pesos (T80; PAR-62), de `M:1792843200000_linha-de-base.sql:155-167` e `:287`. A coluna `expulso` é o
+ * peso do expulso **sem chuva** (nome do legado); `expulso_com_chuva` é o com chuva. `grupo_id` e `vigente_desde` não
+ * mudam (grant por coluna da T25): salvar no mesmo dia é `ON CONFLICT (grupo_id, vigente_desde) DO UPDATE` dos pesos.
+ */
+export interface TabelaConfigPesos {
+  id: Generated<string>;
+  grupo_id: ColumnType<string, string, never>;
+  vigente_desde: ColumnType<string, string, never>;
+  presenca_sem_chuva: number;
+  presenca_com_chuva: number;
+  lesionado_sem_chuva: number;
+  lesionado_com_chuva: number;
+  /** Peso do expulso sem chuva. */
+  expulso: number;
+  expulso_com_chuva: number;
+  registrado_por: string;
+  registrado_em: Instante;
+}
+
+/** Coluna que só se grava na inserção: nunca muda (sem grant de UPDATE, T23). */
+type SoInsercao<T, I = T> = ColumnType<T, I, never>;
+
+/**
+ * Eventos de uso (T80; PAR-62), de `M:1792843200000_linha-de-base.sql:194-207`: só de inserção (grant SELECT e INSERT,
+ * T23). Nenhuma coluna aceita UPDATE, então `updateTable('eventos_uso')` não compila. `id` é `bigint` identity
+ * (`GENERATED ALWAYS`): o `pg` o devolve como texto e ninguém o grava.
+ */
+export interface TabelaEventosUso {
+  id: ColumnType<string, never, never>;
+  grupo_id: SoInsercao<string>;
+  tipo: SoInsercao<'ranking_aberto' | 'pdf_exportado' | 'partida_lancada' | 'escalacao_confirmada'>;
+  momento: SoInsercao<Date, Date | string>;
+  dispositivo_id: SoInsercao<string | null, string | null | undefined>;
+  mes_exportado: SoInsercao<string | null, string | null | undefined>;
+  data_partida: SoInsercao<string | null, string | null | undefined>;
 }
 
 /**
@@ -159,6 +206,8 @@ export interface Banco {
   config_financeira: TabelaConfigFinanceira;
   lancamentos: TabelaLancamentos;
   escalacoes: TabelaEscalacoes;
+  config_pesos: TabelaConfigPesos;
+  eventos_uso: TabelaEventosUso;
 }
 
 type Colunas<T> = { readonly [K in keyof T]-?: string };
@@ -195,8 +244,39 @@ export const COLUNAS_TIPADAS = {
   periodos_ativos: { id: 'uuid', jogador_id: 'uuid', grupo_id: 'uuid', inicio: 'date', fim: 'date' },
   habilidades: { id: 'uuid', grupo_id: 'uuid', nome: 'text', ordem: 'int8' },
   notas: { jogador_id: 'uuid', habilidade_id: 'uuid', grupo_id: 'uuid', valor: 'int2' },
-  partidas: { id: 'uuid', grupo_id: 'uuid', data: 'date', choveu: 'bool' },
+  partidas: {
+    id: 'uuid',
+    grupo_id: 'uuid',
+    data: 'date',
+    choveu: 'bool',
+    criada_por: 'uuid',
+    criada_em: 'timestamptz',
+    alterada_por: 'uuid',
+    alterada_em: 'timestamptz',
+  },
   presencas: { partida_id: 'uuid', jogador_id: 'uuid', grupo_id: 'uuid', situacao: 'text' },
+  config_pesos: {
+    id: 'uuid',
+    grupo_id: 'uuid',
+    vigente_desde: 'date',
+    presenca_sem_chuva: 'int2',
+    presenca_com_chuva: 'int2',
+    lesionado_sem_chuva: 'int2',
+    lesionado_com_chuva: 'int2',
+    expulso: 'int2',
+    expulso_com_chuva: 'int2',
+    registrado_por: 'uuid',
+    registrado_em: 'timestamptz',
+  },
+  eventos_uso: {
+    id: 'int8',
+    grupo_id: 'uuid',
+    tipo: 'text',
+    momento: 'timestamptz',
+    dispositivo_id: 'uuid',
+    mes_exportado: 'text',
+    data_partida: 'date',
+  },
   pagamentos_mes: {
     grupo_id: 'uuid',
     jogador_id: 'uuid',
@@ -244,4 +324,5 @@ export const COLUNAS_ANULAVEIS: Readonly<Partial<Record<keyof Banco, readonly st
   pagamentos_mes: ['lancamento_id'],
   config_financeira: ['mensalidade_centavos'],
   escalacoes: ['k'],
+  eventos_uso: ['dispositivo_id', 'mes_exportado', 'data_partida'],
 };
