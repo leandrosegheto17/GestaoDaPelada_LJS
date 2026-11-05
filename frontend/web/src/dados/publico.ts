@@ -3,6 +3,7 @@ import { pdfPublico, rankingPublico, type PdfPublico, type RankingPublico } from
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { useSearchParams } from 'react-router';
+import { guardarRanking } from '../pwa/armazenamento/ranking-guardado.ts';
 import { useCliente } from './ContextoCliente.tsx';
 
 /**
@@ -45,7 +46,12 @@ export function useRankingPublico(slug: string, mes?: string) {
   const api = useCliente();
   return useQuery<RankingPublico>({
     queryKey: chaveRankingPublico(slug, mes),
-    queryFn: async () => rankingPublico.parse(await api.get<unknown>(caminhoRankingPublico(slug, mes))),
+    queryFn: async () => {
+      const dados = rankingPublico.parse(await api.get<unknown>(caminhoRankingPublico(slug, mes)));
+      // PAR-148 (T72): guarda no aparelho para a tela sem conexão.
+      guardarRanking(slug, mes, dados);
+      return dados;
+    },
     retry: false,
     enabled: slug !== '',
   });

@@ -2405,6 +2405,8 @@ T78 → T79
 **Depends on**: T71
 **Reuses**: `BC:35` (P23); `BC:36` (P24: `localStorage.clear()` entre testes); aviso de instalação (`F:1521`)
 **Requirement**: PAR-148, PAR-154
+**Status**: rascunhada
+**Nota do rascunho**: `guardarRanking`, `lerRankingGuardado` (valida com `rankingPublico`, confere slug e mês, remove o inválido), `chavePermitida` e `limparChavesNaoPermitidas` em `pwa/armazenamento/ranking-guardado.ts`; o `useRankingPublico` grava a cada sucesso dentro da `queryFn`. A leitura do guardado na tela é da T73. As 4 formas permitidas: `pelada:dispositivo`, `pelada.aviso-instalar-iphone` (a chave da fundação, `useModoInstalacao.ts:16`) e `pelada:ranking:<slug>:<AAAA-MM|atual>`.
 
 **Done when**:
 
