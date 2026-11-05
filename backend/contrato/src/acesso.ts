@@ -141,7 +141,19 @@ export type ConviteCriado = z.infer<typeof conviteCriado>;
 export const adminsResposta = z
   .object({
     admins: z.array(
-      z.object({ id: z.string(), nome: z.string(), email: z.string(), acessaFinanceiro: z.boolean() }).strict(),
+      z
+        .object({
+          id: z.string(),
+          nome: z.string(),
+          email: z.string(),
+          acessaFinanceiro: z.boolean(),
+          /**
+           * A conta que criou o grupo (SEC-001, grupos-e-elenco T70): a tela não oferece "Remover" nela. Opcional para a
+           * resposta da CA seguir válida; [LACUNA] a lista de admins da API ainda não envia o campo.
+           */
+          criador: z.boolean().optional(),
+        })
+        .strict(),
     ),
     convites: z.array(conviteCriado),
   })

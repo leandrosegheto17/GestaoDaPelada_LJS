@@ -1,4 +1,4 @@
-import type { AdminsResposta } from '@pelada/contrato/acesso';
+import { MENSAGENS_ERRO, type AdminsResposta } from '@pelada/contrato/acesso';
 import { email as esquemaEmail } from '@pelada/contrato/primitivos';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState, type FormEvent } from 'react';
@@ -32,6 +32,9 @@ import estilos from '../acesso.module.css';
  *
  * A barra mostra o nome do grupo (da sessão) com "Trocar grupo" para `/app`
  * (`t19-admins--sucesso`).
+ *
+ * grupos-e-elenco T70 (SEC-001): a linha da criadora do grupo (`criador`) não tem "Remover", e o
+ * 409 `criadora_nao_removivel` mostra a mensagem do contrato na faixa, com a lista relida.
  */
 
 export const TEXTO_CONVITE_ENVIADO = (email: string) => `Convite enviado para ${email}. Vale por 7 dias.`;
@@ -40,6 +43,7 @@ export const ERRO_EMAIL = 'Informe um e-mail válido.';
 export const TEXTO_UNICO_ADMIN_GRUPO = 'Você é o único admin deste grupo. Todo grupo precisa de pelo menos um admin.';
 export const TEXTO_ULTIMO_ADMIN = 'O grupo precisa de pelo menos uma pessoa admin. Convide outra pessoa antes de remover esta.';
 export const TEXTO_GRUPO_NAO_ENCONTRADO = 'Grupo não encontrado.';
+export const TEXTO_CRIADORA_NAO_REMOVIVEL = MENSAGENS_ERRO.criadora_nao_removivel;
 
 type Admin = AdminsResposta['admins'][number];
 
@@ -140,6 +144,7 @@ export function Admins() {
       await api.delete(`${base}/${encodeURIComponent(remover.id)}`);
     } catch (erro) {
       if (erro instanceof ErroApi && erro.codigo === 'ultimo_admin') setFalhaLista(TEXTO_ULTIMO_ADMIN);
+      else if (erro instanceof ErroApi && erro.codigo === 'criadora_nao_removivel') setFalhaLista(TEXTO_CRIADORA_NAO_REMOVIVEL);
       else if (!(erro instanceof ErroApi && erro.status === 404)) setFalhaLista(erro instanceof ErroApi ? erro.message : MENSAGEM_REDE);
     } finally {
       setRemovendo(false);
@@ -171,7 +176,7 @@ export function Admins() {
                 lateral={
                   <>
                     {a.acessaFinanceiro ? <span className={`${estilos.selo} ${estilos['selo--neutro']}`}>Financeiro</span> : null}
-                    {eu ? null : (
+                    {eu || a.criador === true ? null : (
                       <Botao variante="texto-destrutivo" aria-label={`Remover ${a.nome}`} onClick={() => setRemover(a)}>
                         Remover
                       </Botao>

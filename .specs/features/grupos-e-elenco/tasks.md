@@ -2187,6 +2187,8 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T69
 **Reuses**: estender a tela da CA (`CA:1582`, T53); decisão de `GSEG:157`
 **Requirement**: SEC-001
+**Status**: rascunhada
+**Lacunas**: `GET …/admins` (CA) não diz quem é a criadora. O rascunho acrescentou `criador` opcional ao `adminsResposta` e a tela esconde "Remover" quando ele vem `true`; falta a API enviar o campo (repositório e rota de admins da CA, junto da T32). O `/executar` decide se entra nesta tarefa ou num retrabalho. SPEC_DEVIATION: contrato estendido fora do escopo nomeado da T70.
 
 **Done when**:
 
