@@ -131,3 +131,10 @@
   padding-top: var(--esp-4);
   border-top: 1px solid var(--cor-linha);
 }
+
+/* Texto de ajuda solto (T53), o `campo__ajuda` de .specs/mockup/base.css fora de um campo (t19-admins--ultimo-admin). */
+.ajuda {
+  margin: 0;
+  font-size: var(--texto-sm);
+  color: var(--cor-texto-sec);
+}

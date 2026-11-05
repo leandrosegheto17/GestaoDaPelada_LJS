@@ -1702,6 +1702,9 @@ T57 → T58
 **Depends on**: T52
 **Reuses**: `.specs/mockup/telas/t19-admins--*.html` (estados do `telas.json`); `Lista` e `Dialogo` (T41)
 **Requirement**: ACE-31, ACE-32, ACE-37, ACE-38, ACE-39, ACE-40, ACE-56
+**Status**: rascunhada
+**Nota do rascunho**: a lista é uma consulta `['admins', grupoId]`, relida depois de convidar, cancelar e remover. O admin da sessão aparece com "(você)" e sem "Remover"; quem acessa o financeiro leva o selo "Financeiro" (`t19-admins--sucesso`). Com um admin só, o aviso do `t19-admins--ultimo-admin`; o 409 `ultimo_admin` mostra uma faixa de erro e mantém a pessoa. Os botões "Remover" e "Cancelar convite" levam `aria-label` com o nome ou o e-mail. A barra mostra o nome do grupo da sessão com "Trocar grupo" para `/app`. Com esta tarefa, o `paginas/acesso/provisorias.tsx` (T42) ficou sem uso e saiu.
+**Lacunas**: o mockup não tem estado para o 404 da lista (grupo sem vínculo, ACE-41): o rascunho mostra a faixa "Grupo não encontrado.". O texto do diálogo de remover troca "Ele perde o acesso…" do mockup por "A pessoa perde o acesso a este grupo na hora." (neutro); o estado `remover` é de `revisaoManual`.
 
 **Done when**:
 

@@ -1,6 +1,6 @@
 import type { RouteObject } from 'react-router';
 import { NaoEncontrada, PaginaProvisoria } from '../paginas/Mensagens.tsx';
-import { AdminsGrupo } from '../paginas/acesso/provisorias.tsx';
+import { Admins } from '../telas/admins/Admins.tsx';
 import { MinhaSenha } from '../telas/minha-senha/MinhaSenha.tsx';
 import { MinhaConta } from '../telas/minha-conta/MinhaConta.tsx';
 import { GuardaApp, GuardaPublica } from './guarda.tsx';
@@ -58,7 +58,7 @@ export function criarRotas(): RouteObject[] {
         { index: true, element: <Grupos />, handle: { tela: 'app' } },
         { path: 'conta', element: <MinhaConta />, handle: { tela: 'conta' } },
         { path: 'conta/senha', element: <MinhaSenha />, handle: { tela: 'senha' } },
-        { path: 'grupos/:grupoId/admins', element: <AdminsGrupo />, handle: { tela: 'admins' } },
+        { path: 'grupos/:grupoId/admins', element: <Admins />, handle: { tela: 'admins' } },
         { path: '*', element: <NaoEncontrada />, handle: { tela: 'nao-encontrada' } },
       ],
     },
