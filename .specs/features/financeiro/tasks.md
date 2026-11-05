@@ -1298,6 +1298,8 @@ T47 → T48
 **Depends on**: T37
 **Reuses**: `.specs/mockup/telas/t22-financeiro--{sucesso,vazio-config,vazio-mes,sem-permissao}.html`; `TelaMensagem` e `Lista` (`CA:1286`); molde da navegação de mês da t10 (`PR:1951`)
 **Requirement**: FIN-08, FIN-15, FIN-33, FIN-46
+**Status**: rascunhada
+**Nota do rascunho**: resolve o `[LACUNA]` da T36: os ids das respostas do contrato (`pagamentoDoMes.jogadorId`, `lancamentoDoMes.id`, `lancamentoResposta.id`) passam a `idResposta` = `z.string().min(1)`, como `grupo.ts:86`, para as respostas do mockup (`j-alemao`, `l-m01`) passarem; os corpos seguem exigindo uuid. Estilos novos em `telas/financeiro/financeiro.module.css` (de `base.css`, só tokens). A lista de pagamentos mostra só "Pagou"/"Não pagou" e os lançamentos saem um por linha: o interruptor é da T39 e a linha agrupada, da T40. O 422 do `?mes=` fora do histórico mostra a mensagem com "Ir para o mês atual" (a spec não desenha esse estado na tela). A navegação de mês é própria (o molde da t10, `PR:1951`, ainda não existe).
 
 **Done when**:
 

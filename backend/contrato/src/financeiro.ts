@@ -69,13 +69,19 @@ export type MesFinanceiroConsulta = z.infer<typeof mesFinanceiroConsulta>;
 export const tipoLancamento = z.enum(['entrada', 'saida']);
 export type TipoLancamento = z.infer<typeof tipoLancamento>;
 
+/**
+ * Id nas respostas: texto não vazio, como `grupo.ts:86` (a API sempre devolve uuid; as respostas do mockup usam ids
+ * legíveis, `j-alemao`, `l-m01`). Os corpos de entrada continuam exigindo uuid (`pagamentoCorpo`).
+ */
+export const idResposta = z.string().min(1);
+
 /** Pagamento na lista do mês: só jogadores ativos no mês (FIN-12). */
-export const pagamentoDoMes = z.object({ jogadorId: z.uuid(), apelido: z.string(), pagou: z.boolean() }).strict();
+export const pagamentoDoMes = z.object({ jogadorId: idResposta, apelido: z.string(), pagou: z.boolean() }).strict();
 
 /** Lançamento na lista do mês; `mensalidade` marca o vinculado a um pagamento (FIN-14). */
 export const lancamentoDoMes = z
   .object({
-    id: z.uuid(),
+    id: idResposta,
     tipo: tipoLancamento,
     data: dataFinanceira,
     descricao: z.string(),

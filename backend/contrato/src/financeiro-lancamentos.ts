@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { centavos, dataFinanceira, LIMITES_FINANCEIRO, mesFinanceiro, tipoLancamento } from './financeiro.ts';
+import { centavos, dataFinanceira, idResposta, LIMITES_FINANCEIRO, mesFinanceiro, tipoLancamento } from './financeiro.ts';
 
 /**
  * Contrato de pagamentos, lançamentos e acesso do financeiro (T8; FIN-25, FIN-26, FIN-35, FIN-36). Corpos `.strict()`:
@@ -44,7 +44,7 @@ export type LancamentoCorpo = z.infer<typeof lancamentoCorpo>;
 /** Lançamento devolvido por `GET`, `POST` e `PUT`; `alteradoPor` é o nome, ou "Conta excluída" (FIN-32, ACE-28). */
 export const lancamentoResposta = z
   .object({
-    id: z.uuid(),
+    id: idResposta,
     tipo: tipoLancamento,
     data: dataFinanceira,
     descricao: z.string(),
