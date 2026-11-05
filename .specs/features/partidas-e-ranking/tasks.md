@@ -599,6 +599,7 @@ T78 → T79
 **Depends on**: T5
 **Reuses**: AD-041; Goal `B:25` e Independent Test `B:239`
 **Requirement**: PAR-58, PAR-59, PAR-57
+**Status**: rascunhada
 
 **Done when**:
 
