@@ -1981,6 +1981,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T61
 **Reuses**: `.specs/mockup/telas/t15-jogadores--*.html` (3 estados, `telas.json:195-197`); `compararApelido` e `chaveBusca` (T9); `Busca` e `Abas` (T57)
 **Requirement**: GEL-46, GEL-47, GEL-48, GEL-49, GEL-103, GEL-114
+**Status**: rascunhada
 
 **Done when**:
 
