@@ -21,6 +21,10 @@ import { abrirCenarioGrupos, type CenarioGruposAberto } from './cenario-grupos.t
  * financeiro T31 (FIN-31, FIN-33, FIN-37): as rotas do financeiro entram na tabela (`ROTAS_DO_FINANCEIRO`) com o
  * mesmo 404 cruzado, agora conferindo também o caixa de G e de H; e cada uma, lida da lista do roteador, dá 403 para
  * a admin de G sem acesso (O) e, com G arquivado, 409 nas escritas e 200 nas leituras da criadora e 404 para O.
+ *
+ * partidas-e-ranking T48 (PAR-92, PAR-137 a PAR-139): as 12 rotas novas de admin (`ROTAS_DE_PARTIDAS`) com o 404
+ * cruzado, inclusive a data de partida que só existe em H, conferindo partidas, presenças, pesos, eventos e auditoria;
+ * e as 3 públicas (`ROTAS_PUBLICAS`), tipo novo, com o slug de G, o de H e o de G arquivado.
  */
 
 let aberto: CenarioGruposAberto;
@@ -427,10 +431,253 @@ const ROTAS_DO_FINANCEIRO: Record<string, Linha> = Object.fromEntries(
   Object.entries(PEDIDOS_DO_FINANCEIRO).map(([rota, p]) => [rota, casoDoCaixa(p)]),
 );
 
+// ---------------------------------------------------------------- partidas e ranking (partidas-e-ranking T48)
+
+/**
+ * Rotas de admin da partidas-e-ranking (PAR-137, PAR-138; `BD:250-251`): o mesmo 404 cruzado das rotas de grupo, agora
+ * conferindo também partidas, presenças, pesos, eventos de uso e auditoria de G e de H. Nas rotas por data, o filho é
+ * a data: a de G (2026-01-08, do cenário) e uma que só existe em H (2026-02-19, criada aqui).
+ */
+const DATA_DE_G = '2026-01-08';
+const DATA_SO_DE_H = '2026-02-19';
+
+beforeAll(async () => {
+  const { db, cenario } = aberto;
+  const p = await db.query<{ id: string }>(
+    `INSERT INTO partidas (grupo_id, data, choveu, criada_por, criada_em, alterada_por, alterada_em)
+     VALUES ($1, $2, true, $3, now(), $3, now()) RETURNING id`,
+    [cenario.grupoH, DATA_SO_DE_H, cenario.contaB],
+  );
+  await db.query(`INSERT INTO presencas (partida_id, jogador_id, grupo_id, situacao) VALUES ($1, $2, $3, 'presente')`, [
+    p.rows[0]!.id,
+    deH.jogador,
+    cenario.grupoH,
+  ]);
+});
+
+/** Partidas, presenças, pesos, eventos e auditoria de um grupo, para provar que nada mudou (PAR-138). */
+async function retratoDePartidas(grupo: string): Promise<string> {
+  const { db } = aberto;
+  const partes = await Promise.all([
+    db.query('SELECT id, data::text, choveu, alterada_por, alterada_em FROM partidas WHERE grupo_id = $1 ORDER BY id', [grupo]),
+    db.query('SELECT partida_id, jogador_id, situacao FROM presencas WHERE grupo_id = $1 ORDER BY partida_id, jogador_id', [grupo]),
+    db.query(
+      `SELECT vigente_desde::text, presenca_sem_chuva, presenca_com_chuva, lesionado_sem_chuva, lesionado_com_chuva, expulso,
+              expulso_com_chuva, registrado_por FROM config_pesos WHERE grupo_id = $1 ORDER BY vigente_desde`,
+      [grupo],
+    ),
+    db.query('SELECT count(*)::int AS n FROM eventos_uso WHERE grupo_id = $1', [grupo]),
+    db.query('SELECT count(*)::int AS n FROM auditoria WHERE grupo_id = $1', [grupo]),
+  ]);
+  return JSON.stringify(partes.map((p) => p.rows));
+}
+
+interface IdsDePartida extends IdsFilhos {
+  data: string;
+}
+
+interface PedidoDePartida {
+  metodo: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  caminho: (ids: IdsDePartida) => string;
+  corpo?: (ids: IdsDePartida) => unknown;
+  /** Leva data de partida, id de jogador ou de período: também C com os de H e B com os de G (PAR-138). */
+  comFilho?: boolean;
+}
+
+function casoDePartidas(p: PedidoDePartida): Linha {
+  return {
+    caso: async () => {
+      const { cenario } = aberto;
+      const idsDeG: IdsDePartida = {
+        jogador: cenario.idsG.jogadorAtivo,
+        periodo: periodoDeG,
+        habilidade: cenario.idsG.habilidade,
+        data: DATA_DE_G,
+      };
+      const idsDeH: IdsDePartida = { ...deH, data: DATA_SO_DE_H };
+      const enviar = (grupo: string, ids: IdsDePartida, sessaoDaVez: string) =>
+        pedir(`/grupos/${grupo}${p.caminho(ids)}`, {
+          metodo: p.metodo,
+          sessao: sessaoDaVez,
+          ...(p.corpo !== undefined ? { corpo: p.corpo(ids) } : {}),
+        });
+
+      const antes = [await retratoDeG(), await retratoDeH(), await retratoDePartidas(cenario.grupoG), await retratoDePartidas(cenario.grupoH)];
+
+      const r = await enviar(cenario.grupoG, idsDeG, sessaoB);
+      expect(r.status, 'PAR-138: B com o id de G').toBe(404);
+      expect(await r.text()).not.toContain('Toninho');
+
+      if (p.comFilho) {
+        const cComH = await enviar(cenario.grupoG, idsDeH, sessaoA);
+        expect(cComH.status, 'PAR-138: C com G na rota e a data ou os ids de H').toBe(404);
+        expect(await cComH.text()).not.toContain('Isolado de H');
+        const bComG = await enviar(cenario.grupoH, idsDeG, sessaoB);
+        expect(bComG.status, 'PAR-138: B com H na rota e a data ou os ids de G').toBe(404);
+        expect(await bComG.text()).not.toContain('Toninho');
+      }
+
+      const depois = [await retratoDeG(), await retratoDeH(), await retratoDePartidas(cenario.grupoG), await retratoDePartidas(cenario.grupoH)];
+      expect(depois).toEqual(antes);
+    },
+  };
+}
+
+const PESOS_VALIDOS = {
+  presencaSemChuva: 9,
+  presencaComChuva: 9,
+  lesionadoSemChuva: 9,
+  lesionadoComChuva: 9,
+  expulsoSemChuva: 9,
+  expulsoComChuva: 9,
+};
+
+const PEDIDOS_DE_PARTIDAS: Record<string, PedidoDePartida> = {
+  'GET /api/grupos/:grupoId/pesos': { metodo: 'GET', caminho: () => '/pesos' },
+  'POST /api/grupos/:grupoId/pesos': { metodo: 'POST', caminho: () => '/pesos', corpo: () => PESOS_VALIDOS },
+  'GET /api/grupos/:grupoId/partidas/nova': { metodo: 'GET', caminho: () => '/partidas/nova?data=2026-02-26' },
+  'GET /api/grupos/:grupoId/partidas': { metodo: 'GET', caminho: () => '/partidas?mes=2026-01' },
+  'POST /api/grupos/:grupoId/partidas': {
+    metodo: 'POST',
+    caminho: () => '/partidas',
+    corpo: () => ({ data: '2026-02-26', choveu: false, marcacoes: [] }),
+  },
+  'GET /api/grupos/:grupoId/partidas/:data': { metodo: 'GET', caminho: (i) => `/partidas/${i.data}`, comFilho: true },
+  'PUT /api/grupos/:grupoId/partidas/:data': {
+    metodo: 'PUT',
+    caminho: (i) => `/partidas/${i.data}`,
+    corpo: (i) => ({ data: i.data, choveu: false, marcacoes: [] }),
+    comFilho: true,
+  },
+  'DELETE /api/grupos/:grupoId/partidas/:data': { metodo: 'DELETE', caminho: (i) => `/partidas/${i.data}`, comFilho: true },
+  'GET /api/grupos/:grupoId/uso': { metodo: 'GET', caminho: () => '/uso' },
+  'POST /api/grupos/:grupoId/jogadores/:id/reativar/previa': {
+    metodo: 'POST',
+    caminho: (i) => `/jogadores/${i.jogador}/reativar/previa`,
+    corpo: () => ({ data: '2026-03-02' }),
+    comFilho: true,
+  },
+  'POST /api/grupos/:grupoId/jogadores/:id/periodos/:periodoId/previa': {
+    metodo: 'POST',
+    caminho: (i) => `/jogadores/${i.jogador}/periodos/${i.periodo}/previa`,
+    corpo: () => ({ saida: '2026-02-01' }),
+    comFilho: true,
+  },
+  'POST /api/grupos/:grupoId/jogadores/:id/inicio/previa': {
+    metodo: 'POST',
+    caminho: (i) => `/jogadores/${i.jogador}/inicio/previa`,
+    corpo: () => ({ data: '2025-12-01' }),
+    comFilho: true,
+  },
+};
+
+const ROTAS_DE_PARTIDAS: Record<string, Linha> = Object.fromEntries(
+  Object.entries(PEDIDOS_DE_PARTIDAS).map(([rota, p]) => [rota, casoDePartidas(p)]),
+);
+
+/**
+ * Rotas públicas (PAR-139, PAR-92; tipo `publico` de `BD:250-251`): com o slug de G, como `pelada_app` e com a sessão
+ * de B no cookie, só saem dados de G (nem o nome de H nem o jogador de H); com o slug de H, nada de G; com G arquivado,
+ * 404. O evento cai só no grupo do slug.
+ */
+interface PedidoPublico {
+  metodo: 'GET' | 'POST';
+  caminho: string;
+  corpo?: unknown;
+}
+
+async function nomeDe(grupo: string): Promise<string> {
+  const r = await aberto.db.query<{ nome: string }>('SELECT nome FROM grupos WHERE id = $1', [grupo]);
+  return r.rows[0]!.nome;
+}
+
+async function slugDe(grupo: string): Promise<string> {
+  const r = await aberto.db.query<{ slug: string }>('SELECT slug FROM grupos WHERE id = $1', [grupo]);
+  return r.rows[0]!.slug;
+}
+
+function casoPublico(p: PedidoPublico): Linha {
+  return {
+    caso: async () => {
+      const { db, cenario } = aberto;
+      const nomeH = await nomeDe(cenario.grupoH);
+      const slugH = await slugDe(cenario.grupoH);
+      const enviar = (slug: string) =>
+        pedir(`/publico/${slug}${p.caminho}`, {
+          metodo: p.metodo,
+          sessao: sessaoB,
+          ...(p.corpo !== undefined ? { corpo: p.corpo } : {}),
+        });
+      const antesG = await retratoDePartidas(cenario.grupoG);
+      const antesH = await retratoDePartidas(cenario.grupoH);
+      const eventosDe = async (g: string) =>
+        (await db.query<{ n: number }>('SELECT count(*)::int AS n FROM eventos_uso WHERE grupo_id = $1', [g])).rows[0]!.n;
+      const eventosAntesG = await eventosDe(cenario.grupoG);
+
+      const deG = await enviar(cenario.slugG);
+      expect(deG.status, 'PAR-139: slug de G').toBeLessThan(300);
+      const textoG = await deG.text();
+      expect(textoG).not.toContain(nomeH);
+      expect(textoG).not.toContain('Isolado de H');
+
+      const deH2 = await enviar(slugH);
+      expect(deH2.status, 'PAR-139: slug de H').toBeLessThan(300);
+      const textoH = await deH2.text();
+      expect(textoH).not.toContain(NOME_DE_G);
+      expect(textoH).not.toContain('Toninho');
+
+      await db.query('UPDATE grupos SET arquivado_em = now() WHERE id = $1', [cenario.grupoG]);
+      try {
+        const arquivado = await enviar(cenario.slugG);
+        expect(arquivado.status, 'PAR-92: slug de G arquivado').toBe(404);
+      } finally {
+        await db.query('UPDATE grupos SET arquivado_em = NULL WHERE id = $1', [cenario.grupoG]);
+      }
+
+      if (p.metodo === 'POST') {
+        // O evento de G e o de H caem cada um no grupo do slug; os deste teste (pelo aparelho) saem, o resto fica.
+        expect(await eventosDe(cenario.grupoG)).toBe(eventosAntesG + 1);
+        await db.query('DELETE FROM eventos_uso WHERE dispositivo_id = $1 AND grupo_id IN ($2, $3)', [
+          APARELHO_DO_ISOLAMENTO,
+          cenario.grupoG,
+          cenario.grupoH,
+        ]);
+      }
+      expect(await retratoDePartidas(cenario.grupoG)).toBe(antesG);
+      expect(await retratoDePartidas(cenario.grupoH)).toBe(antesH);
+    },
+  };
+}
+
+/** O nome de G no cenário de grupos (`NOME_G`), lido do banco no caso público. */
+let NOME_DE_G = '';
+beforeAll(async () => {
+  NOME_DE_G = await nomeDe(aberto.cenario.grupoG);
+});
+
+/** UUID v4 do aparelho dos eventos deste teste, para apagar só eles. */
+const APARELHO_DO_ISOLAMENTO = '7d3f0a8e-2b1c-4e5f-9a6b-1c2d3e4f5a6b';
+
+const PEDIDOS_PUBLICOS: Record<string, PedidoPublico> = {
+  'GET /api/publico/:slug/ranking': { metodo: 'GET', caminho: '/ranking' },
+  'GET /api/publico/:slug/pdf': { metodo: 'GET', caminho: '/pdf' },
+  'POST /api/publico/:slug/eventos': {
+    metodo: 'POST',
+    caminho: '/eventos',
+    corpo: { tipo: 'ranking_aberto', dispositivoId: APARELHO_DO_ISOLAMENTO },
+  },
+};
+
+const ROTAS_PUBLICAS: Record<string, Linha> = Object.fromEntries(
+  Object.entries(PEDIDOS_PUBLICOS).map(([rota, p]) => [rota, casoPublico(p)]),
+);
+
 /** Uma linha por rota do Hono (`MÉTODO caminho`). */
 const TABELA: Record<string, Linha> = {
   ...ROTAS_DE_GRUPO,
   ...ROTAS_DO_FINANCEIRO,
+  ...ROTAS_DE_PARTIDAS,
+  ...ROTAS_PUBLICAS,
   'GET /api/health': { naoSeAplica: 'rota pública de saúde, sem dado de conta nem de grupo' },
   'GET /api/dev/emails': { naoSeAplica: 'só existe com EMAIL_DEV=1, em dev e no e2e (T17)' },
   'POST /api/conta': { naoSeAplica: SEM_SESSAO },
@@ -546,6 +793,37 @@ describe('isolamento de rotas', () => {
     expect(rotasDoApp(comNova).filter((r) => r.includes('/financeiro') && !(r in PEDIDOS_DO_FINANCEIRO))).toEqual([
       'GET /api/grupos/:grupoId/financeiro/nova',
     ]);
+  });
+
+  it('PAR-138: as 13 rotas de admin da partidas-e-ranking estão no app e têm caso de isolamento', () => {
+    const rotas = new Set(rotasDoApp(criarApp()));
+    const deAdmin = [...Object.keys(PEDIDOS_DE_PARTIDAS), 'GET /api/grupos/:grupoId'];
+    expect(deAdmin).toHaveLength(13);
+    for (const rota of deAdmin) {
+      expect(rotas.has(rota), rota).toBe(true);
+      expect('caso' in (TABELA[rota] ?? {}), rota).toBe(true);
+    }
+  });
+
+  it('PAR-137: o meta-teste falha com uma rota nova de partidas ou pública sem caso', () => {
+    const app = criarApp({
+      registrarExtras: (api) => {
+        api.get('/grupos/:grupoId/partidas/:data/extra', (c) => c.json({ ok: true }));
+        api.get('/publico/:slug/extra', (c) => c.json({ ok: true }));
+      },
+    });
+    const novas = ['GET /api/grupos/:grupoId/partidas/:data/extra', 'GET /api/publico/:slug/extra'];
+    const semLinha = rotasSemLinha(app, TABELA);
+    for (const rota of novas) expect(semLinha, rota).toContain(rota);
+    // Sem as rotas extras, nenhuma rota de partidas, pesos, uso, prévia ou pública fica sem linha.
+    const daFeature = /\/(pesos|partidas|uso)\b|\/jogadores\/:id\/(reativar|periodos\/:periodoId|inicio)\/previa$|\/api\/publico\//;
+    expect(rotasSemLinha(criarApp(), TABELA).filter((r) => daFeature.test(r))).toEqual([]);
+  });
+
+  it('PAR-139: as 3 rotas públicas estão no app e têm caso', () => {
+    const publicas = rotasDoApp(criarApp()).filter((r) => r.includes('/api/publico/'));
+    expect(publicas.sort()).toEqual(Object.keys(PEDIDOS_PUBLICOS).sort());
+    for (const rota of publicas) expect('caso' in (TABELA[rota] ?? {}), rota).toBe(true);
   });
 
   it.each(Object.entries(PEDIDOS_DO_FINANCEIRO))(

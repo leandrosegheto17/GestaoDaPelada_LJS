@@ -1748,6 +1748,8 @@ T78 → T79
 **Depends on**: T47
 **Reuses**: Suíte de isolamento de rotas (`CA:1070`, estendida pela grupos-e-elenco em `GE:1607`); `BD:250-251`
 **Requirement**: PAR-137, PAR-138, PAR-139, PAR-92
+**Status**: rascunhada
+**Nota do rascunho**: só acréscimos em `backend/api/test/isolamento/rotas.test.ts`: `ROTAS_DE_PARTIDAS` (12 rotas novas, mais o `GET /api/grupos/:grupoId` que já tinha caso: as 13 do PAR-138), com um retrato de partidas, presenças, pesos, eventos e auditoria de G e de H; e `ROTAS_PUBLICAS` (tipo público), com o slug de G, o de H e o de G arquivado. O meta-teste do PAR-137 confere as rotas desta feature e não a lista inteira, porque as rotas da simulador ainda não têm linha na tabela (são da feature dela).
 
 **Done when**:
 
