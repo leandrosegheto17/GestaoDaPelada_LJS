@@ -597,6 +597,8 @@ T39 → T40 → T41
 **Depends on**: T11
 **Reuses**: matrizes de leitura, escrita e contexto público (`F:981`, `F:1007`, `F:1031`); meta-teste (`F:957`); cenário (`F:909`)
 **Requirement**: NOT-51, NOT-52, NOT-53, NOT-54
+**Status**: rascunhada
+**Nota do rascunho**: a `push_conta` não tem `grupo_id`, então o caso dela entrou no meta-teste de conta (`meta-conta.test.ts`: linha na `MATRIZ_CONTA` e a contagem de 9 para 10 tabelas, mudança de teste existente pelo motivo de a tabela nova existir, sem enfraquecer a checagem); `notificacoes_limpar_em` entrou na lista `SO_OWNER`. As tabelas com `grupo_id` já estavam na `MATRIZ` desde a T7. O ator N (sem contexto) é o do consumidor da fila e pode chamar as funções do envio, então só A, C, B e S são recusados nelas. A `planos-e-cobranca` tem `eventos_asaas` na mesma situação (sem `grupo_id`, fora da `MATRIZ_CONTA`) e vai pedir a contagem 11 quando as duas forem executadas.
 
 **Done when**:
 

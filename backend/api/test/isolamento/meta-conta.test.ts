@@ -22,6 +22,8 @@ const MATRIZ_CONTA: Readonly<Record<string, string>> = {
   pedidos_email_origem: 'conta-apoio.test.ts',
   falhas_senha_atual: 'conta-apoio.test.ts',
   pedidos_reset: 'conta-apoio.test.ts',
+  // notificacoes T12: sem `grupo_id` (a assinatura é da conta); matriz política × comando em `push.test.ts`.
+  push_conta: 'push.test.ts',
 };
 
 /** Tabela de controle do node-pg-migrate: não é dado de conta nem de grupo. */
@@ -35,6 +37,7 @@ const SO_OWNER = [
   'conta_definir_senha(text, text, boolean)',
   'email_cota_reservar_em(timestamptz, integer)',
   'email_origem_registrar_em(timestamptz, bytea, integer)',
+  'notificacoes_limpar_em(timestamptz)',
 ];
 
 let aberto: CenarioAberto;
@@ -117,8 +120,8 @@ describe('meta-teste das tabelas de conta', () => {
     expect(await problemasDeTabelas(aberto.db)).toEqual([]);
   });
 
-  it('ACE-45: a matriz de conta cobre as 9 tabelas sem grupo_id', () => {
-    expect(Object.keys(MATRIZ_CONTA)).toHaveLength(9);
+  it('ACE-45: a matriz de conta cobre as 10 tabelas sem grupo_id', () => {
+    expect(Object.keys(MATRIZ_CONTA)).toHaveLength(10);
   });
 
   it('ACE-45: tabela nova sem RLS, sem policy do backup e sem linha na matriz reprova', async () => {
