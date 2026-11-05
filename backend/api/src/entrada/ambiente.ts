@@ -23,6 +23,14 @@ export interface Env {
   URL_PUBLICA: string;
   /** DSN do Sentry (secret). Ausente: o Sentry fica desligado e nada sai (FUN-25). */
   SENTRY_DSN?: string;
+  /** Chave da API do Resend (secret). Ausente: o envio falha com 503 `email_indisponivel` (ACE-52). */
+  RESEND_API_KEY?: string;
+  /** Remetente dos e-mails de conta, ex. `Pelada <nao-responda@dominio>`. */
+  RESEND_REMETENTE?: string;
+  /** Teto diário de e-mails de conta (o do plano do Resend); 80% para cadastro, reenvio e convite (ACE-72). */
+  LIMITE_EMAILS_DIA?: string;
+  /** `1` só no `.env` local e no e2e: e-mails na caixa em memória e `GET /api/dev/emails` (T17). */
+  EMAIL_DEV?: string;
   HYPERDRIVE: HyperdriveBinding;
   LIMITE_ENTRAR: LimiteDeTaxa;
   LIMITE_PUBLICO: LimiteDeTaxa;

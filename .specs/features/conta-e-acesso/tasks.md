@@ -737,6 +737,8 @@ T57 → T58
 **Depends on**: T16
 **Reuses**: molde das checagens da fundação (`F:1251`, `backend/scripts/checagens/`) e a checagem do `.env.example` (`F:1886`)
 **Requirement**: ACE-52
+**Status**: rascunhada
+**Nota do rascunho**: como o Hono monta o app sem o `env`, a rota existe sempre e responde o 404 padrão sem `EMAIL_DEV=1`. A checagem `email-dev` entra no ci.yml.
 
 **Done when**:
 

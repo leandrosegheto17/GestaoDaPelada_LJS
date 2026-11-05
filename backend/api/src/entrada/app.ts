@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import type { Ambiente } from './ambiente.ts';
 import { semCache, semSniff } from './middlewares/cabecalhos.ts';
+import { devEmails } from './rotas/dev-emails.ts';
 import { health } from './rotas/health.ts';
 import { ErroBancoIndisponivel, MENSAGEM_BANCO_INDISPONIVEL } from '../infraestrutura/db/cliente.ts';
 
@@ -20,6 +21,8 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
   api.use('*', semCache, semSniff);
 
   api.route('/', health);
+  // Só responde com EMAIL_DEV=1; sem ela, 404 como rota inexistente (T17).
+  api.route('/', devEmails);
   opcoes.registrarExtras?.(api);
 
   api.notFound((c) => c.json({ erro: 'Rota não encontrada.' }, 404));
