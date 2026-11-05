@@ -1101,6 +1101,8 @@ T78 → T79
 **Depends on**: T23
 **Reuses**: Molde `M:1792843680000_conta-admins-listar.sql:8-21`; `BD:138-140`; filtro por `grupos_visiveis()` (`BC:25`, P13); AD-036
 **Requirement**: PAR-01, PAR-44, PAR-52
+**Status**: rascunhada
+**Nota do rascunho**: migração `1792844760000_contas-nomes-do-grupo.sql`; testes em `backend/api/test/banco/contas-nomes-do-grupo.test.ts`, com cada autoria (pesos, criação e alteração de partida) e o grupo arquivado para a admin que não o criou.
 
 **Done when**:
 
