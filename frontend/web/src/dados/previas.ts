@@ -1,4 +1,4 @@
-import type { CorrigirPeriodoCorpo } from '@pelada/contrato/elenco';
+import type { CorrigirPeriodoCorpo } from '@pelada/contrato/periodos';
 import {
   previaInicioResposta,
   previaResposta,

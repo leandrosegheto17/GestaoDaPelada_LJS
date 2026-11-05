@@ -35,10 +35,12 @@ vi.mock('workbox-precaching', () => ({
 vi.mock('workbox-routing', () => ({
   NavigationRoute: class {
     readonly tipo = 'navegacao';
-    constructor(
-      readonly tratador: unknown,
-      readonly opcoes: unknown,
-    ) {}
+    readonly tratador: unknown;
+    readonly opcoes: unknown;
+    constructor(tratador: unknown, opcoes: unknown) {
+      this.tratador = tratador;
+      this.opcoes = opcoes;
+    }
   },
   registerRoute: vi.fn((casar: unknown, tratador?: unknown, metodo?: unknown) => {
     registro.rotas.push({ casar, tratador, metodo });
@@ -47,7 +49,9 @@ vi.mock('workbox-routing', () => ({
 
 vi.mock('workbox-strategies', () => ({
   NetworkFirst: class {
-    constructor(readonly opcoes: Record<string, unknown>) {
+    readonly opcoes: Record<string, unknown>;
+    constructor(opcoes: Record<string, unknown>) {
+      this.opcoes = opcoes;
       registro.estrategias.push({ tipo: 'NetworkFirst', opcoes });
     }
   },
@@ -55,7 +59,9 @@ vi.mock('workbox-strategies', () => ({
 
 vi.mock('workbox-cacheable-response', () => ({
   CacheableResponsePlugin: class {
-    constructor(readonly opcoes: unknown) {
+    readonly opcoes: unknown;
+    constructor(opcoes: unknown) {
+      this.opcoes = opcoes;
       registro.plugins.push({ tipo: 'CacheableResponsePlugin', opcoes });
     }
   },
@@ -63,7 +69,9 @@ vi.mock('workbox-cacheable-response', () => ({
 
 vi.mock('workbox-expiration', () => ({
   ExpirationPlugin: class {
-    constructor(readonly opcoes: unknown) {
+    readonly opcoes: unknown;
+    constructor(opcoes: unknown) {
+      this.opcoes = opcoes;
       registro.plugins.push({ tipo: 'ExpirationPlugin', opcoes });
     }
   },

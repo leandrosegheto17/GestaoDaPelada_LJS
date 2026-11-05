@@ -142,7 +142,7 @@ export function criarCliente({
         method: metodo,
         headers: cabecalhos,
         credentials: 'same-origin',
-        body: corpo === undefined ? undefined : JSON.stringify(corpo),
+        ...(corpo === undefined ? {} : { body: JSON.stringify(corpo) }),
       });
     } catch {
       throw new ErroApi(0, undefined, MENSAGEM_REDE);

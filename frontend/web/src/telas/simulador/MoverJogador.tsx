@@ -66,7 +66,7 @@ function jogadorDoDois(r: Dois, id: string): JogadorDois | null {
     if (achado)
       return {
         ...achado,
-        saiNoIntervalo: 'saiNoIntervalo' in achado ? achado.saiNoIntervalo : false,
+        saiNoIntervalo: 'saiNoIntervalo' in achado && achado.saiNoIntervalo === true,
       };
   }
   const n = r.naoEntra.find((j) => j.id === id);
@@ -310,6 +310,7 @@ export function FolhaMover({
   const jogador = dois
     ? jogadorDoDois(resultado, jogadorId)
     : (resultado.times.flatMap((t) => t.jogadores).find((j) => j.id === jogadorId) ?? null);
+  const jogadorNoDois = dois ? jogadorDoDois(resultado, jogadorId) : null;
   const apelido = jogador?.apelido ?? '';
 
   if (trocando) {
@@ -380,18 +381,18 @@ export function FolhaMover({
           </button>
         </li>
       </ul>
-      {dois && jogador ? (
+      {jogadorNoDois ? (
         <label className={estilos.interruptor}>
           <span>Só 1º tempo</span>
           <input
             type="checkbox"
             role="switch"
-            checked={jogador.so1oTempo}
+            checked={jogadorNoDois.so1oTempo}
             onChange={aoAlternarSo1o}
           />
           <span className={estilos['interruptor__trilho']} aria-hidden="true" />
           <span className={estilos['interruptor__estado']} aria-hidden="true">
-            {jogador.so1oTempo ? 'Sim' : 'Não'}
+            {jogadorNoDois.so1oTempo ? 'Sim' : 'Não'}
           </span>
         </label>
       ) : null}

@@ -102,7 +102,7 @@ export function ListaJogadores({
   classeExtra,
 }: {
   jogadores: ReadonlyArray<JogadorDaTela & { saiNoIntervalo?: boolean }>;
-  aoTocar?: (id: string) => void;
+  aoTocar?: ((id: string) => void) | undefined;
   movidos?: ReadonlySet<string> | undefined;
   classeExtra?: string | undefined;
 }) {

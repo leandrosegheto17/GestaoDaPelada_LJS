@@ -94,6 +94,7 @@ describe('mutações do elenco', () => {
         apelido: 'Novo',
         anoNascimento: 1990,
         posicao: 'meia',
+        telefone: null,
         pontuacaoInicial: 0,
       });
     });

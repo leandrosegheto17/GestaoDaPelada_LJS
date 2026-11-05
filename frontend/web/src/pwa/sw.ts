@@ -47,13 +47,19 @@ registerRoute(
   ),
 );
 
+// As classes de plugin do workbox declaram métodos opcionais sem `| undefined`, o que o
+// `exactOptionalPropertyTypes` recusa contra o `WorkboxPlugin`; em tempo de execução são o mesmo objeto.
+type PluginWorkbox = NonNullable<
+  NonNullable<ConstructorParameters<typeof NetworkFirst>[0]>['plugins']
+>[number];
+
 registerRoute(
   ({ url, request }) => request.method === 'GET' && ehRankingPublico(url, self.location.origin),
   new NetworkFirst({
     cacheName: CACHE_RANKING_PUBLICO,
     plugins: [
-      new CacheableResponsePlugin({ statuses: [200] }),
-      new ExpirationPlugin({ maxEntries: MAX_RANKINGS_GUARDADOS }),
+      new CacheableResponsePlugin({ statuses: [200] }) as PluginWorkbox,
+      new ExpirationPlugin({ maxEntries: MAX_RANKINGS_GUARDADOS }) as PluginWorkbox,
       marcarRespostaDoCache,
     ],
   }),

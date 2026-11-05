@@ -102,8 +102,8 @@ describe('regras do ajuste', () => {
     expect(movido.times[1].entramNo2oTempo.at(-1)?.id).toBe('j-japa');
     const v = resposta('simulador-sugestao-varios.json') as never;
     const trocado = trocarNoVarios(v, 'j-vini', 'j-bigode');
-    expect(trocado.times[0].jogadores.map((j) => j.id)).toContain('j-bigode');
-    expect(trocado.times[1].jogadores.map((j) => j.id)).toContain('j-vini');
+    expect(trocado.times[0]?.jogadores.map((j) => j.id)).toContain('j-bigode');
+    expect(trocado.times[1]?.jogadores.map((j) => j.id)).toContain('j-vini');
   });
 });
 

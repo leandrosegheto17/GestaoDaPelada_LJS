@@ -92,7 +92,9 @@ export function CorrigirPeriodo({
   const [hoje] = useState(() => hojeEmSaoPaulo());
   const [retorno, setRetorno] = useState(periodo.inicio);
   const [saida, setSaida] = useState(periodo.fim ?? '');
-  const [erros, setErros] = useState<{ retorno?: string; saida?: string }>({});
+  const [erros, setErros] = useState<{ retorno?: string | undefined; saida?: string | undefined }>(
+    {},
+  );
   const [falha, setFalha] = useState<string | undefined>(undefined);
 
   const comRetorno = indice > 0;
@@ -100,7 +102,7 @@ export function CorrigirPeriodo({
   const idTitulo = `p${indice + 1}-t`;
   const previas = usePedirPrevias(grupoId, ficha.id);
   const [rodadas, setRodadas] = useState<string | null>(null);
-  const dadosPrevia: { retorno?: string; saida?: string } = {};
+  const dadosPrevia: { retorno?: string | undefined; saida?: string | undefined } = {};
   if (comRetorno) dadosPrevia.retorno = retorno;
   if (comSaida) dadosPrevia.saida = saida;
   const datasValidas = (!comRetorno || ehDataReal(retorno)) && (!comSaida || ehDataReal(saida));
@@ -148,7 +150,7 @@ export function CorrigirPeriodo({
     avisar(null);
     setFalha(undefined);
     setRodadas(null);
-    const dados: { retorno?: string; saida?: string } = {};
+    const dados: { retorno?: string | undefined; saida?: string | undefined } = {};
     if (comRetorno) dados.retorno = retorno;
     if (comSaida) dados.saida = saida;
     corrigir.mutate(
