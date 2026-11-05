@@ -1,0 +1,44 @@
+// Worker da prévia (FUN-20, FUN-26, FUN-27; AD-004, AD-119): o único alvo publicado é o
+// gestaodapelada-v2 no endereço padrão da Cloudflare. Sem routes e sem domínio próprio.
+// O deploy só acontece pelo .github/workflows/deploy.yml (FUN-45).
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "gestaodapelada-v2",
+  "main": "backend/api/src/entrada/worker.ts",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+
+  // O build do front é servido como SPA; só /api/* passa pelo Worker (Hono) antes dos assets.
+  "assets": {
+    "directory": "frontend/web/dist",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+
+  // Limites por minuto (FUN-26). O namespace_id é só um número único por binding na conta.
+  "ratelimits": [
+    { "name": "LIMITE_ENTRAR", "namespace_id": "2001", "simple": { "limit": 10, "period": 60 } },
+    { "name": "LIMITE_PUBLICO", "namespace_id": "2002", "simple": { "limit": 60, "period": 60 } },
+    { "name": "LIMITE_WEBHOOK", "namespace_id": "2003", "simple": { "limit": 60, "period": 60 } },
+    { "name": "LIMITE_ESCRITA", "namespace_id": "2004", "simple": { "limit": 60, "period": 60 } }
+  ],
+
+  // Hyperdrive da prévia, sobre a branch dev do Neon, com cache desligado (FUN-18).
+  // O id real entra na T79; até lá fica o marcador. Local: o wrangler dev usa o localConnectionString,
+  // sem senha aqui; o pnpm dev passa a URL com a senha do .env por
+  // CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE.
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "PREENCHER",
+      "localConnectionString": "postgres://pelada_app@127.0.0.1:5432/pelada"
+    }
+  ],
+
+  // Valores locais. No deploy, VERSAO (SHA do commit) e URL_PUBLICA chegam por --var (FUN-23, FUN-58).
+  "vars": {
+    "VERSAO": "local",
+    "URL_PUBLICA": ""
+  }
+}
