@@ -891,6 +891,7 @@ T78 → T79
 **Depends on**: None
 **Reuses**: Primitivos zod do contrato (`CA:550`); `B:110-117`; `BD:177`
 **Requirement**: PAR-01, PAR-06, PAR-07, PAR-08
+**Status**: rascunhada
 
 **Done when**:
 

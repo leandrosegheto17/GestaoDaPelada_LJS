@@ -13,6 +13,7 @@
     "./grupo": "./src/grupo.ts",
     "./elenco": "./src/elenco.ts",
     "./periodos": "./src/periodos.ts",
+    "./pesos": "./src/pesos.ts",
     "./push": "./src/push.ts",
     "./plano": "./src/plano.ts",
     "./asaas": "./src/asaas.ts"
