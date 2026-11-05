@@ -73,10 +73,7 @@ function responderCancelar(c: Context<Ambiente>, r: ResultadoCancelar): Response
     case 'cancelada':
       return c.body(null, 204);
     case 'sem_assinatura':
-      return c.json(
-        { erro: 'sem_assinatura', mensagem: MENSAGENS_ERRO_PLANO.sem_assinatura },
-        409,
-      );
+      return c.json({ erro: 'sem_assinatura', mensagem: MENSAGENS_ERRO_PLANO.sem_assinatura }, 409);
     case 'so_quem_criou':
       return c.json(corpoDoErro('so_quem_criou'), 403);
     case 'nao_encontrado':

@@ -119,7 +119,12 @@ export async function aplicarEventoAsaas(
       );
       break;
     case 'cancelar':
-      aplicou = await eventosAsaas.cancelado(db, evento.assinaturaId, evento.dataCriacao, evento.id);
+      aplicou = await eventosAsaas.cancelado(
+        db,
+        evento.assinaturaId,
+        evento.dataCriacao,
+        evento.id,
+      );
       break;
     case 'nenhum':
       if (efeito.motivo === 'valor_divergente') {

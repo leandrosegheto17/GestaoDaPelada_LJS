@@ -69,7 +69,10 @@ registerRoute(
 
 registrarEventos(self);
 // A troca da assinatura pelo navegador (notificacoes T35; NOT-19), com os destinos guardados no IndexedDB.
-registrarTrocaDeAssinatura(self, { guarda: guardaIndexedDb(), buscar: (url, init) => fetch(url, init) });
+registrarTrocaDeAssinatura(self, {
+  guarda: guardaIndexedDb(),
+  buscar: (url, init) => fetch(url, init),
+});
 
 // registerType 'autoUpdate': a versão nova assume sem esperar as abas fecharem.
 self.addEventListener('install', () => {

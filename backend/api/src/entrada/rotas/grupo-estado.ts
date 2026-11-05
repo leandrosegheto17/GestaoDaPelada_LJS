@@ -51,8 +51,14 @@ export function rotasGrupoEstado(): Hono<Ambiente> {
     const grupoId = c.req.param('grupoId');
     // Assinatura pendente ou ativa: 409, sem arquivar (planos-e-cobranca T38; PLA-69, AD-115).
     const conta = c.var.contaId;
-    if (conta !== undefined && (await assinaturaBloqueia.bloqueiaArquivar(c.var.db, grupoId, conta))) {
-      return c.json({ erro: 'assinatura_ativa', mensagem: MENSAGEM_CANCELE_ANTES_DE_ARQUIVAR }, 409);
+    if (
+      conta !== undefined &&
+      (await assinaturaBloqueia.bloqueiaArquivar(c.var.db, grupoId, conta))
+    ) {
+      return c.json(
+        { erro: 'assinatura_ativa', mensagem: MENSAGEM_CANCELE_ANTES_DE_ARQUIVAR },
+        409,
+      );
     }
     return responder(
       c,

@@ -8,7 +8,10 @@ import { Dialogo } from '../../componentes/Dialogo.tsx';
 import { EsqueletoLista } from '../../componentes/EsqueletoLista.tsx';
 import { EstadoErro } from '../../componentes/EstadoErro.tsx';
 import { Faixa } from '../../componentes/Faixa.tsx';
-import { FaixaSomenteLeitura, TrechoSomenteLeitura } from '../../componentes/FaixaSomenteLeitura.tsx';
+import {
+  FaixaSomenteLeitura,
+  TrechoSomenteLeitura,
+} from '../../componentes/FaixaSomenteLeitura.tsx';
 import { LinkVoltar } from '../../componentes/LinkVoltar.tsx';
 import { ResumoErros, type ErroDoResumo } from '../../componentes/ResumoErros.tsx';
 import { ErroApi } from '../../dados/cliente.ts';
@@ -158,33 +161,33 @@ function Edicao({
       <ResumoErros erros={resumo} />
       {outras.length > 0 ? <Faixa tipo="erro">{outras.join(' ')}</Faixa> : null}
       <TrechoSomenteLeitura grupoId={grupoId}>
-      <FormularioPartida
-        campoData={
-          <CampoData
-            id="data"
-            rotulo="Data"
-            value={partida.data}
-            somenteLeitura
-            ajuda={textoUltimaAlteracaoPartida(partida)}
-            erro={errosCampos['data']}
-          />
-        }
-        choveuInicial={partida.choveu}
-        jogadores={partida.jogadores}
-        salvando={editar.isPending}
-        aoSalvar={({ choveu, marcacoes }) => enviar({ data: partida.data, choveu, marcacoes })}
-        acoesExtras={
-          <Botao
-            variante="texto-destrutivo"
-            onClick={() => {
-              setFalhaExcluir(false);
-              setConfirmando(true);
-            }}
-          >
-            Excluir partida
-          </Botao>
-        }
-      />
+        <FormularioPartida
+          campoData={
+            <CampoData
+              id="data"
+              rotulo="Data"
+              value={partida.data}
+              somenteLeitura
+              ajuda={textoUltimaAlteracaoPartida(partida)}
+              erro={errosCampos['data']}
+            />
+          }
+          choveuInicial={partida.choveu}
+          jogadores={partida.jogadores}
+          salvando={editar.isPending}
+          aoSalvar={({ choveu, marcacoes }) => enviar({ data: partida.data, choveu, marcacoes })}
+          acoesExtras={
+            <Botao
+              variante="texto-destrutivo"
+              onClick={() => {
+                setFalhaExcluir(false);
+                setConfirmando(true);
+              }}
+            >
+              Excluir partida
+            </Botao>
+          }
+        />
       </TrechoSomenteLeitura>
       {confirmando ? (
         <DialogoExcluir

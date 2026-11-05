@@ -4,7 +4,10 @@ import { useNavigate, useParams } from 'react-router';
 import { Botao } from '../../componentes/Botao.tsx';
 import { Casca, NOME_DO_APP } from '../../componentes/Casca.tsx';
 import { Faixa } from '../../componentes/Faixa.tsx';
-import { FaixaSomenteLeitura, TrechoSomenteLeitura } from '../../componentes/FaixaSomenteLeitura.tsx';
+import {
+  FaixaSomenteLeitura,
+  TrechoSomenteLeitura,
+} from '../../componentes/FaixaSomenteLeitura.tsx';
 import { LinkVoltar } from '../../componentes/LinkVoltar.tsx';
 import { ResumoErros } from '../../componentes/ResumoErros.tsx';
 import { ErroApi, MENSAGEM_REDE } from '../../dados/cliente.ts';
