@@ -9,7 +9,8 @@ import { kyselyDoCliente } from '../../infraestrutura/db/transacao.ts';
  *
  * Estados e casos limite (a conexão só abre na primeira consulta, T37):
  * - rota que não consulta: nenhuma conexão, nenhum BEGIN, nada a encerrar;
- * - GET e HEAD: `BEGIN TRANSACTION READ ONLY` (escrita falha no banco); os demais: `BEGIN`;
+ * - GET e HEAD, e as prévias (caminho que termina em `/previa`, PAR-109): `BEGIN TRANSACTION READ ONLY`
+ *   (escrita falha no banco); os demais: `BEGIN`;
  * - logo depois do BEGIN, `set_config('app.conta_id'|'app.slug_publico', $n, true)`, com
  *   parâmetros e local à transação; sem contexto, os dois valem '' (a RLS não vê nada);
  * - status menor que 400 e sem erro: COMMIT; status 4xx ou 5xx, ou erro na rota: ROLLBACK;
@@ -40,9 +41,22 @@ export interface OpcoesComBanco {
 
 export const SQL_CONTEXTO = `SELECT set_config('app.conta_id', $1, true), set_config('app.slug_publico', $2, true)`;
 
-function somenteLeitura(metodo: string): boolean {
+/**
+ * Prévia (partidas-e-ranking T36; PAR-109, AD-035, `BD:33-35`): caminho que termina em `/previa`, sem barra final.
+ * As prévias são POST com corpo validado como na gravação, mas nada gravam.
+ */
+export function ehPrevia(caminho: string): boolean {
+  return /\/previa$/.test(caminho);
+}
+
+/**
+ * A transação da requisição é `READ ONLY`: GET e HEAD, e qualquer método nas prévias (PAR-109). O
+ * `exigirGrupoAtivo` usa a mesma regra para não pedir `FOR KEY SHARE`, que o Postgres recusa em
+ * transação de leitura (PAR-112).
+ */
+export function transacaoSomenteLeitura(metodo: string, caminho: string): boolean {
   const m = metodo.toUpperCase();
-  return m === 'GET' || m === 'HEAD';
+  return m === 'GET' || m === 'HEAD' || ehPrevia(caminho);
 }
 
 /**
@@ -58,7 +72,7 @@ export function comBanco(
 ): MiddlewareHandler<Ambiente> {
   return async (c, next) => {
     const contexto = await obterContexto(c);
-    const leitura = somenteLeitura(c.req.method);
+    const leitura = transacaoSomenteLeitura(c.req.method, c.req.path);
     const cliente = criarCliente(c.env.HYPERDRIVE.connectionString, {
       ...(opcoes.fabrica ? { fabrica: opcoes.fabrica } : {}),
       aoAbrir: async (consultar) => {

@@ -1427,6 +1427,8 @@ T78 → T79
 **Depends on**: T35
 **Reuses**: Estender `comBanco` (`F:1203`, `FD:103`) e `exigirGrupoAtivo` (`GE:901`); `BD:33-35`; AD-035
 **Requirement**: PAR-109, PAR-110, PAR-111, PAR-112
+**Status**: rascunhada
+**Nota do rascunho**: a regra fica em `transacaoSomenteLeitura(metodo, caminho)` de `com-banco.ts` (GET, HEAD ou caminho que termina em `/previa`, sem barra final), e o `exigirGrupoAtivo` a usa para ler `arquivado_em` sem `FOR KEY SHARE`. Vale para qualquer método no sufixo, inclusive o `POST …/simulador/previa` que já existe (o teste dele já exige que nada seja gravado). Testes em `backend/api/test/sessao/previa-somente-leitura.test.ts`.
 
 **Done when**:
 
