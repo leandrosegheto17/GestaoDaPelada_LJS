@@ -572,6 +572,7 @@ T78 → T79
 **Depends on**: T4
 **Reuses**: `B:232-235` (PAR-58 a PAR-61), casos limite `B:486-489`, `B:501`; interface de `BD:155-158`
 **Requirement**: PAR-58, PAR-59, PAR-60, PAR-61
+**Status**: rascunhada
 
 **Done when**:
 

@@ -96,3 +96,4 @@ export {
   type Plano,
   type SituacaoComercial,
 } from './plano/plano-efetivo.ts';
+export { acumuladoPorInicio, type EntradaAcumulado } from './pontuacao/acumulado.ts';
