@@ -2248,6 +2248,8 @@ T78 → T79
 **Depends on**: T65
 **Reuses**: Telas da grupos-e-elenco `PeriodosJogador.tsx` (`GE:1970`) e `CorrigirDatas.tsx` (`GE:1994`); mockup do módulo R-05 a R-19; `BC:18` (P6), `BC:30` (P18)
 **Requirement**: PAR-120, PAR-121, PAR-159
+**Status**: rascunhada
+**Nota do rascunho**: hook `usePrevia` (300 ms, descarta resposta velha) e as três chamadas em `dados/previas.ts`; `BlocoPrevia` em `PeriodosJogador.tsx`, usado também nos diálogos de corrigir e de início (`CorrigirDatas.tsx`). A frase das rodadas confirmadas (PAR-121) aparece numa faixa de atenção junto das ações, com "Abrir partidas". Testes existentes mudados sob a autorização de 2026-11-04 (texto do reativar e "Confirmar" desabilitado até a prévia): `periodos-jogador.test.tsx` e `corrigir-datas.test.tsx` passam a responder as rotas `…/previa` com uma prévia neutra e a esperar o botão habilitar antes do clique, sem asserção removida.
 
 **Done when**:
 

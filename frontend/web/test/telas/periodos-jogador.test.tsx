@@ -52,8 +52,39 @@ const BETO_INATIVO = {
   periodos: [{ id: 'p1', inicio: '2026-02-05', fim: '2026-10-05' }],
 };
 
+// partidas-e-ranking T66 (autorização de 2026-11-04 no STATE.md): "Confirmar" só habilita com a prévia pronta.
+// As rotas `…/previa` respondem uma prévia neutra quando o teste não dá outra; os cliques de confirmar esperam o botão
+// habilitar. Nenhuma asserção sai.
+const PREVIA_NEUTRA = {
+  acumuladoAntes: 0,
+  acumuladoDepois: 0,
+  posicaoAntes: null,
+  posicaoDepois: null,
+  rodadasQuePassamAConstar: [],
+  rodadasQueDeixamDeConstar: [],
+  aviso: null,
+};
+const PREVIA_INICIO_NEUTRA = { acumuladoAntes: 0, acumuladoDepois: 0, posicaoAntes: null, posicaoDepois: null, rodadasQuePassamAConstar: 0 };
+
+function comPrevias(api: Record<string, Manipulador>): Record<string, Manipulador> {
+  return new Proxy(api, {
+    get: (alvo, chave: string) =>
+      alvo[chave] ??
+      (chave.startsWith('POST ') && chave.endsWith('/inicio/previa')
+        ? () => json(200, PREVIA_INICIO_NEUTRA)
+        : chave.startsWith('POST ') && chave.endsWith('/previa')
+          ? () => json(200, PREVIA_NEUTRA)
+          : undefined),
+  });
+}
+
+async function clicarQuandoPronto(botao: HTMLElement) {
+  await waitFor(() => expect((botao as HTMLButtonElement).disabled).toBe(false));
+  fireEvent.click(botao);
+}
+
 function abrir(id: string, api: Record<string, Manipulador>) {
-  return abrirTela(`/app/grupos/g-quinta/jogadores/${id}`, { 'GET /api/sessao': () => json(200, SESSAO_ANA), ...api }, rotas);
+  return abrirTela(`/app/grupos/g-quinta/jogadores/${id}`, comPrevias({ 'GET /api/sessao': () => json(200, SESSAO_ANA), ...api }), rotas);
 }
 
 afterEach(() => {
@@ -150,7 +181,7 @@ describe('ficha do jogador: inativar e reativar', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Reativar' }));
     const dialogo = screen.getByRole('dialog');
     fireEvent.change(within(dialogo).getByLabelText('Data de retorno'), { target: { value: '2026-10-22' } });
-    fireEvent.click(within(dialogo).getByRole('button', { name: 'Reativar' }));
+    await clicarQuandoPronto(within(dialogo).getByRole('button', { name: 'Reativar' }));
     expect(await screen.findByText('Beto reativado desde 22/10/2026.')).toBeTruthy();
     expect(chamadasA('POST', '/api/grupos/g-quinta/jogadores/j-beto/reativar').map((c) => c.corpo)).toEqual([{ data: '2026-10-22' }]);
     await waitFor(() => expect(screen.getByText('Ativo desde 22/10/2026.')).toBeTruthy());
@@ -171,7 +202,7 @@ describe('ficha do jogador: inativar e reativar', () => {
     const dialogo = screen.getByRole('dialog');
     const retorno = within(dialogo).getByLabelText('Data de retorno');
     fireEvent.change(retorno, { target: { value: '2026-10-03' } });
-    fireEvent.click(within(dialogo).getByRole('button', { name: 'Reativar' }));
+    await clicarQuandoPronto(within(dialogo).getByRole('button', { name: 'Reativar' }));
     await waitFor(() => expect(retorno.getAttribute('aria-invalid')).toBe('true'));
     expect(retorno.getAttribute('aria-describedby')).toBe('retorno-ajuda retorno-erro');
     expect(document.getElementById('retorno-erro')?.textContent).toBe('O retorno não pode ser antes da saída anterior (05/10/2026).');

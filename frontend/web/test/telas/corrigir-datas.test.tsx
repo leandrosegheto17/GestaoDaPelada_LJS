@@ -49,8 +49,39 @@ const TONINHO = { ...BASE, id: 'j-toninho', apelido: 'Toninho', desde: '2026-02-
 const API_GIL = '/api/grupos/g-quinta/jogadores/j-gil';
 const API_TONINHO = '/api/grupos/g-quinta/jogadores/j-toninho';
 
+// partidas-e-ranking T66 (autorização de 2026-11-04 no STATE.md): "Confirmar" só habilita com a prévia pronta.
+// As rotas `…/previa` respondem uma prévia neutra quando o teste não dá outra; os cliques de confirmar esperam o botão
+// habilitar. Nenhuma asserção sai.
+const PREVIA_NEUTRA = {
+  acumuladoAntes: 0,
+  acumuladoDepois: 0,
+  posicaoAntes: null,
+  posicaoDepois: null,
+  rodadasQuePassamAConstar: [],
+  rodadasQueDeixamDeConstar: [],
+  aviso: null,
+};
+const PREVIA_INICIO_NEUTRA = { acumuladoAntes: 0, acumuladoDepois: 0, posicaoAntes: null, posicaoDepois: null, rodadasQuePassamAConstar: 0 };
+
+function comPrevias(api: Record<string, Manipulador>): Record<string, Manipulador> {
+  return new Proxy(api, {
+    get: (alvo, chave: string) =>
+      alvo[chave] ??
+      (chave.startsWith('POST ') && chave.endsWith('/inicio/previa')
+        ? () => json(200, PREVIA_INICIO_NEUTRA)
+        : chave.startsWith('POST ') && chave.endsWith('/previa')
+          ? () => json(200, PREVIA_NEUTRA)
+          : undefined),
+  });
+}
+
+async function clicarQuandoPronto(botao: HTMLElement) {
+  await waitFor(() => expect((botao as HTMLButtonElement).disabled).toBe(false));
+  fireEvent.click(botao);
+}
+
 function abrir(id: string, api: Record<string, Manipulador>) {
-  return abrirTela(`/app/grupos/g-quinta/jogadores/${id}`, { 'GET /api/sessao': () => json(200, SESSAO_ANA), ...api }, rotas);
+  return abrirTela(`/app/grupos/g-quinta/jogadores/${id}`, comPrevias({ 'GET /api/sessao': () => json(200, SESSAO_ANA), ...api }), rotas);
 }
 
 function erro422(mensagens: Record<string, string>): Response {
@@ -105,7 +136,7 @@ describe('ficha do jogador: corrigir datas', () => {
     await esperarSemViolacoes(container);
 
     fireEvent.change(retorno, { target: { value: '2026-10-12' } });
-    fireEvent.click(within(dialogo).getByRole('button', { name: 'Confirmar novas datas' }));
+    await clicarQuandoPronto(within(dialogo).getByRole('button', { name: 'Confirmar novas datas' }));
     expect(await screen.findByText(TEXTO_DATAS_CORRIGIDAS)).toBeTruthy();
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(chamadasA('PATCH', `${API_GIL}/periodos/p2`).map((c) => c.corpo)).toEqual([{ retorno: '2026-10-12' }]);
@@ -125,7 +156,7 @@ describe('ficha do jogador: corrigir datas', () => {
     const saida = within(dialogo).getByLabelText('Data de saída');
     expect(within(dialogo).getByText(/Não pode ser depois do próximo retorno \(20\/10\/2026\)/)).toBeTruthy();
     fireEvent.change(saida, { target: { value: '2026-10-01' } });
-    fireEvent.click(within(dialogo).getByRole('button', { name: 'Confirmar novas datas' }));
+    await clicarQuandoPronto(within(dialogo).getByRole('button', { name: 'Confirmar novas datas' }));
     await waitFor(() => expect(saida.getAttribute('aria-invalid')).toBe('true'));
     expect(document.getElementById('saida-erro')?.textContent).toBe(MENSAGEM);
     expect(chamadasA('PATCH', `${API_GIL}/periodos/p1`).map((c) => c.corpo)).toEqual([{ saida: '2026-10-01' }]);
@@ -153,7 +184,7 @@ describe('ficha do jogador: alterar a data de início', () => {
     await esperarSemViolacoes(container);
 
     fireEvent.change(campo, { target: { value: '2026-01-15' } });
-    fireEvent.click(within(dialogo).getByRole('button', { name: 'Confirmar nova data' }));
+    await clicarQuandoPronto(within(dialogo).getByRole('button', { name: 'Confirmar nova data' }));
     expect(await screen.findByText('Data de início alterada para 15/01/2026.')).toBeTruthy();
     expect(chamadasA('PUT', `${API_TONINHO}/inicio`).map((c) => c.corpo)).toEqual([{ data: '2026-01-15' }]);
     await waitFor(() => expect(document.getElementById('inicio-valor')?.textContent).toBe('15/01/2026'));
@@ -170,7 +201,7 @@ describe('ficha do jogador: alterar a data de início', () => {
     const dialogo = screen.getByRole('dialog');
     const campo = within(dialogo).getByLabelText('Data de início');
     fireEvent.change(campo, { target: { value: '2026-10-15' } });
-    fireEvent.click(within(dialogo).getByRole('button', { name: 'Confirmar nova data' }));
+    await clicarQuandoPronto(within(dialogo).getByRole('button', { name: 'Confirmar nova data' }));
     await waitFor(() => expect(campo.getAttribute('aria-invalid')).toBe('true'));
     expect(document.getElementById('inicio-erro')?.textContent).toBe(MENSAGEM);
     await esperarSemViolacoes(container);

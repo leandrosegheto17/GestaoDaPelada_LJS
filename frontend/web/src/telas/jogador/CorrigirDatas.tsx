@@ -1,16 +1,20 @@
 import type { JogadorDetalhe, PeriodoItem } from '@pelada/contrato/elenco';
 import { PISO_DATA_ENTRADA } from '@pelada/contrato/elenco';
-import { formatarData } from '@pelada/dominio';
+import { ehDataReal, formatarData } from '@pelada/dominio';
 import { useState } from 'react';
 import { Botao } from '../../componentes/Botao.tsx';
 import { CampoData } from '../../componentes/CampoData.tsx';
 import { Dialogo } from '../../componentes/Dialogo.tsx';
 import { Faixa } from '../../componentes/Faixa.tsx';
+import { LinkBotao } from '../../componentes/LinkBotao.tsx';
+import { PreviaInicio, PreviaPeriodos } from '../../componentes/PreviaPeriodos.tsx';
 import { useAlterarInicio, useCorrigirPeriodo } from '../../dados/elenco.ts';
 import { mensagensDosCampos } from '../../dados/erros-campo.ts';
 import { hojeEmSaoPaulo } from '../../dados/hoje.ts';
+import { usePedirPrevias, usePrevia } from '../../dados/previas.ts';
 import listas from '../../componentes/Lista.module.css';
-import { erroDePeriodo } from './PeriodosJogador.tsx';
+import { rotaDoGrupo } from '../grupos/Grupos.tsx';
+import { BlocoPrevia, erroDePeriodo, recusaDaPrevia, textoRodadasConfirmadas } from './PeriodosJogador.tsx';
 
 /**
  * Corrigir as datas de um período e alterar a data de início, na ficha do jogador (GEL-71 a GEL-82,
@@ -24,6 +28,13 @@ import { erroDePeriodo } from './PeriodosJogador.tsx';
  * - "Alterar data de início": `PUT …/inicio` com a data nova (GEL-77) e a faixa com a data;
  * - os 422 de período ficam no campo (`mensagens.saida`, `.retorno` ou `.data`; sem campo, no
  *   primeiro campo do diálogo); o resto, na faixa do diálogo.
+ *
+ * Prévia (partidas-e-ranking T66; PAR-120, PAR-121), do mockup do módulo da partidas-e-ranking
+ * (`t16-jogador--corrigir-{previa,calculando,erro-rede}.html`, `--corrigido`, `--inicio-{recuar,avancar,calculando,
+ * erro-rede}.html`): nos dois diálogos a prévia é pedida 300 ms depois da última troca de data (`BlocoPrevia`), com
+ * "Calculando…" e o botão de confirmar desabilitado até ela voltar sem erro; a recusa da prévia fica no campo. A
+ * correção confirmada com rodadas que passam a constar mostra "N rodadas passaram a constar: …" com "Abrir partidas".
+ * (O "sem prévia (C7)" da grupos-e-elenco deixa de valer.)
  */
 
 export const TEXTO_DATAS_CORRIGIDAS = 'Datas corrigidas.';
@@ -74,6 +85,17 @@ export function CorrigirPeriodo({
   const comRetorno = indice > 0;
   const comSaida = periodo.fim !== null;
   const idTitulo = `p${indice + 1}-t`;
+  const previas = usePedirPrevias(grupoId, ficha.id);
+  const [rodadas, setRodadas] = useState<string | null>(null);
+  const dadosPrevia: { retorno?: string; saida?: string } = {};
+  if (comRetorno) dadosPrevia.retorno = retorno;
+  if (comSaida) dadosPrevia.saida = saida;
+  const datasValidas = (!comRetorno || ehDataReal(retorno)) && (!comSaida || ehDataReal(saida));
+  const { estado, tentarDeNovo } = usePrevia(
+    aberto && (comRetorno || comSaida) && datasValidas ? () => previas.periodo(periodo.id, dadosPrevia) : null,
+    `${aberto ? 'aberto' : 'fechado'}|${retorno}|${saida}`,
+  );
+  const recusa = recusaDaPrevia(estado);
 
   if (!comRetorno && !comSaida) {
     const idExpl = `p${indice + 1}-expl`;
@@ -101,9 +123,11 @@ export function CorrigirPeriodo({
   }
 
   function confirmar() {
-    if (corrigir.isPending) return;
+    if (corrigir.isPending || estado.tipo !== 'pronta') return;
+    const previa = estado.previa;
     avisar(null);
     setFalha(undefined);
+    setRodadas(null);
     const dados: { retorno?: string; saida?: string } = {};
     if (comRetorno) dados.retorno = retorno;
     if (comSaida) dados.saida = saida;
@@ -113,6 +137,8 @@ export function CorrigirPeriodo({
         onSuccess: () => {
           setAberto(false);
           avisar(TEXTO_DATAS_CORRIGIDAS);
+          // PAR-121: as rodadas que passaram a constar, pela prévia que o admin viu ao confirmar.
+          setRodadas(textoRodadasConfirmadas(previa));
         },
         onError: (erro) => {
           const m = mensagensDosCampos(erro);
@@ -131,6 +157,18 @@ export function CorrigirPeriodo({
 
   return (
     <>
+      {rodadas ? (
+        <Faixa
+          tipo="atencao"
+          acao={
+            <LinkBotao para={`${rotaDoGrupo(grupoId)}/partidas`} variante="texto">
+              Abrir partidas
+            </LinkBotao>
+          }
+        >
+          {rodadas}
+        </Faixa>
+      ) : null}
       <Botao variante="secundario" aria-describedby={idTitulo} onClick={abrir}>
         Corrigir datas
       </Botao>
@@ -144,7 +182,7 @@ export function CorrigirPeriodo({
               <Botao variante="secundario" autoFocus onClick={() => setAberto(false)}>
                 Cancelar
               </Botao>
-              <Botao carregando={corrigir.isPending} onClick={confirmar}>
+              <Botao carregando={corrigir.isPending} disabled={estado.tipo !== 'pronta'} onClick={confirmar}>
                 Confirmar novas datas
               </Botao>
             </>
@@ -157,7 +195,7 @@ export function CorrigirPeriodo({
               rotulo="Data de retorno"
               max={hoje}
               ajuda={ajudaRetornoCorrecao(anterior)}
-              erro={erros.retorno}
+              erro={erros.retorno ?? (comRetorno ? recusa : undefined)}
               value={retorno}
               onChange={(e) => setRetorno(e.target.value)}
             />
@@ -168,11 +206,12 @@ export function CorrigirPeriodo({
               rotulo="Data de saída"
               max={hoje}
               ajuda={ajudaSaida(proximo)}
-              erro={erros.saida}
+              erro={erros.saida ?? (!comRetorno ? recusa : undefined)}
               value={saida}
               onChange={(e) => setSaida(e.target.value)}
             />
           ) : null}
+          <BlocoPrevia estado={estado} tentarDeNovo={tentarDeNovo} mostrar={(p) => <PreviaPeriodos previa={p} />} />
         </Dialogo>
       ) : null}
     </>
@@ -194,6 +233,11 @@ export function AlterarInicio({
   const [data, setData] = useState(ficha.inicioPontuacao);
   const [erro, setErro] = useState<string | undefined>(undefined);
   const [falha, setFalha] = useState<string | undefined>(undefined);
+  const previas = usePedirPrevias(grupoId, ficha.id);
+  const { estado, tentarDeNovo } = usePrevia(
+    aberto && ehDataReal(data) ? () => previas.inicio(data) : null,
+    `${aberto ? 'aberto' : 'fechado'}|${data}`,
+  );
 
   function abrir() {
     setData(ficha.inicioPontuacao);
@@ -203,7 +247,7 @@ export function AlterarInicio({
   }
 
   function confirmar() {
-    if (alterar.isPending) return;
+    if (alterar.isPending || estado.tipo !== 'pronta') return;
     avisar(null);
     setFalha(undefined);
     alterar.mutate(
@@ -237,7 +281,7 @@ export function AlterarInicio({
               <Botao variante="secundario" autoFocus onClick={() => setAberto(false)}>
                 Cancelar
               </Botao>
-              <Botao carregando={alterar.isPending} onClick={confirmar}>
+              <Botao carregando={alterar.isPending} disabled={estado.tipo !== 'pronta'} onClick={confirmar}>
                 Confirmar nova data
               </Botao>
             </>
@@ -250,10 +294,11 @@ export function AlterarInicio({
             min={PISO_DATA_ENTRADA}
             max={hoje}
             ajuda={AJUDA_INICIO}
-            erro={erro}
+            erro={erro ?? recusaDaPrevia(estado)}
             value={data}
             onChange={(e) => setData(e.target.value)}
           />
+          <BlocoPrevia estado={estado} tentarDeNovo={tentarDeNovo} mostrar={(p) => <PreviaInicio previa={p} />} />
         </Dialogo>
       ) : null}
     </>
