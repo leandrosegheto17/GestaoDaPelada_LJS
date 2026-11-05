@@ -102,6 +102,10 @@ describe('jogadores.alterarInicio', () => {
     expect(a).toHaveLength(1);
     expect(a[0]?.autor).toBe(aberto.cenario.contaO);
     expect(a[0]?.resumo).toMatchObject({ anterior: '2026-02-05', nova: '2026-02-01' });
+    // T35 da partidas-e-ranking (PAR-122): a auditoria passa a levar acumulado e posição antes e depois.
+    expect(Object.keys(a[0]?.resumo ?? {})).toEqual(
+      expect.arrayContaining(['acumuladoAntes', 'acumuladoDepois', 'posicaoAntes', 'posicaoDepois']),
+    );
   });
 
   it('GEL-77, GEL-81: avançar dentro do primeiro período grava só a data de início', async () => {

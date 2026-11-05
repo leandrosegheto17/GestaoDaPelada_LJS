@@ -107,6 +107,10 @@ describe('jogadores.corrigirPeriodo', () => {
       antes: { inicio: '2026-01-10', fim: '2026-10-05' },
       depois: { inicio: '2026-01-10', fim: '2026-10-03' },
     });
+    // T35 da partidas-e-ranking (PAR-122): a auditoria passa a levar acumulado e posição antes e depois.
+    expect(Object.keys(a[0]?.resumo ?? {})).toEqual(
+      expect.arrayContaining(['acumuladoAntes', 'acumuladoDepois', 'posicaoAntes', 'posicaoDepois']),
+    );
   });
 
   it('GEL-71: corrige o retorno de um período que não é o primeiro', async () => {

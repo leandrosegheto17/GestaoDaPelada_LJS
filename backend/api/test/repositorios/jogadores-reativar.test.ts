@@ -128,6 +128,10 @@ describe('jogadores.reativar', () => {
     expect(a).toHaveLength(1);
     expect(a[0]?.autor).toBe(aberto.cenario.contaO);
     expect(a[0]?.resumo).toMatchObject({ retorno: '2026-10-20', saidaAnterior: '2026-03-01' });
+    // T35 da partidas-e-ranking (PAR-122): a auditoria passa a levar acumulado e posição antes e depois.
+    expect(Object.keys(a[0]?.resumo ?? {})).toEqual(
+      expect.arrayContaining(['acumuladoAntes', 'acumuladoDepois', 'posicaoAntes', 'posicaoDepois']),
+    );
   });
 
   it('GEL-58: retorno na véspera da saída anterior é recusado com a mensagem e nada é gravado', async () => {

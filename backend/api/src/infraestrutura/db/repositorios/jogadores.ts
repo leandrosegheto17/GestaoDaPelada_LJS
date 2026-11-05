@@ -3,6 +3,8 @@ import type { CorrigirPeriodoCorpo, DataCorpo, InicioCorpo, JogadorCorpo } from 
 import {
   avaliarInicio,
   avaliarPeriodos,
+  compararCenarios,
+  previaDoInicio,
   type RegraInicio,
   type CampoPeriodo,
   type OperacaoPeriodo,
@@ -11,6 +13,7 @@ import {
   type RegraPeriodo,
 } from '@pelada/dominio';
 import { auditoria } from './convites.ts';
+import { historico } from './historico.ts';
 import type { Db } from './tipos.ts';
 
 /**
@@ -113,6 +116,52 @@ async function lerEstado(db: Db, grupoId: string, id: string, travar: boolean): 
   return { inicioPontuacao: linha.inicio_pontuacao, periodos: periodos.rows, presencas: presencas.rows };
 }
 
+/** Acumulado e posição do jogador antes e depois da escrita, na auditoria (PAR-122). */
+interface CenariosDaAuditoria {
+  acumuladoAntes: number;
+  acumuladoDepois: number;
+  posicaoAntes: number | null;
+  posicaoDepois: number | null;
+}
+
+function soCenarios(c: CenariosDaAuditoria): CenariosDaAuditoria {
+  return {
+    acumuladoAntes: c.acumuladoAntes,
+    acumuladoDepois: c.acumuladoDepois,
+    posicaoAntes: c.posicaoAntes,
+    posicaoDepois: c.posicaoDepois,
+  };
+}
+
+/**
+ * T35 da partidas-e-ranking (PAR-122; `BC:27`, P15): depois do `avaliarPeriodos` e antes de gravar, lê o histórico
+ * do grupo na mesma transação (com a linha do jogador já travada) e compara o cenário de antes com o dos períodos
+ * depois da escrita, com a mesma função das prévias (`compararCenarios`, T14): a auditoria guarda os mesmos números
+ * que a prévia do mesmo cenário mostrou.
+ */
+async function cenariosDosPeriodos(
+  db: Db,
+  grupoId: string,
+  id: string,
+  periodosDepois: readonly Periodo[],
+  hoje: string,
+): Promise<CenariosDaAuditoria> {
+  const h = await historico.carregar(db, grupoId, hoje);
+  return soCenarios(compararCenarios(h, id, periodosDepois, hoje));
+}
+
+/** O mesmo para a data de início da pontuação, com a função da prévia de início (`previaDoInicio`, T15). */
+async function cenariosDoInicio(
+  db: Db,
+  grupoId: string,
+  id: string,
+  novaData: string,
+  hoje: string,
+): Promise<CenariosDaAuditoria> {
+  const h = await historico.carregar(db, grupoId, hoje);
+  return soCenarios(previaDoInicio(h, id, novaData, hoje));
+}
+
 /** As regras do domínio sobre o estado travado; a falha vira `invalido`. */
 function avaliar(estado: EstadoDoJogador, operacao: OperacaoPeriodo, hoje: string) {
   return avaliarPeriodos({
@@ -182,6 +231,7 @@ async function reativar(db: Db, grupoId: string, id: string, dados: DataCorpo, h
   if (!r.ok) return { resultado: 'invalido', regra: r.regra, campo: r.campo, mensagem: r.mensagem };
 
   const saidaAnterior = estado.periodos.at(-1)?.fim ?? null;
+  const cenarios = await cenariosDosPeriodos(db, grupoId, id, r.periodos, hoje);
   const novo = await sql<{ id: string }>`
     INSERT INTO periodos_ativos (jogador_id, grupo_id, inicio, fim)
     VALUES (${id}, ${grupoId}, ${retorno}::date, NULL)
@@ -190,7 +240,7 @@ async function reativar(db: Db, grupoId: string, id: string, dados: DataCorpo, h
     acao: 'jogador_reativado',
     entidade: 'jogador',
     entidadeId: id,
-    resumo: { retorno, saidaAnterior, periodoId: novo.rows[0]?.id ?? null },
+    resumo: { retorno, saidaAnterior, periodoId: novo.rows[0]?.id ?? null, ...cenarios },
   });
   return { resultado: 'ok', alterado: true };
 }
@@ -228,6 +278,7 @@ async function corrigirPeriodo(
 
   const depois = r.periodos[indice];
   if (!depois) throw new Error('Período corrigido sumiu da avaliação');
+  const cenarios = await cenariosDosPeriodos(db, grupoId, id, r.periodos, hoje);
   await sql`
     UPDATE periodos_ativos SET inicio = ${depois.inicio}::date, fim = ${depois.fim}::date
      WHERE grupo_id = ${grupoId} AND jogador_id = ${id} AND id = ${periodoId}`.execute(db);
@@ -239,6 +290,7 @@ async function corrigirPeriodo(
       periodoId,
       antes: { inicio: antes.inicio, fim: antes.fim },
       depois: { inicio: depois.inicio, fim: depois.fim },
+      ...cenarios,
     },
   });
   return { resultado: 'ok', alterado: true };
@@ -283,6 +335,7 @@ async function alterarInicio(
   if (!r.ok) return { resultado: 'invalido', regra: r.regra, campo: r.campo, mensagem: r.mensagem };
   if (!r.alterado) return { resultado: 'ok', alterado: false };
 
+  const cenarios = await cenariosDoInicio(db, grupoId, id, r.inicioPontuacao, hoje);
   await sql`
     UPDATE jogadores SET inicio_pontuacao = ${r.inicioPontuacao}::date, alterado_por = app_conta_id(), alterado_em = now()
      WHERE grupo_id = ${grupoId} AND id = ${id}`.execute(db);
@@ -297,7 +350,7 @@ async function alterarInicio(
     acao: 'jogador_inicio_alterado',
     entidade: 'jogador',
     entidadeId: id,
-    resumo: { anterior: r.anterior, nova: r.inicioPontuacao },
+    resumo: { anterior: r.anterior, nova: r.inicioPontuacao, ...cenarios },
   });
   return { resultado: 'ok', alterado: true };
 }

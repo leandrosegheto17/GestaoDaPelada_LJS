@@ -1400,6 +1400,8 @@ T78 → T79
 **Depends on**: T34
 **Reuses**: Escritas de período da grupos-e-elenco (`GE:1333`, `GE:1358`, `GE:1383`); `BC:27` (P15); T14
 **Requirement**: PAR-122
+**Status**: rascunhada
+**Nota do rascunho**: o histórico é lido depois do `avaliarPeriodos`/`avaliarInicio` e antes de gravar (o "antes" do cenário); reativar e corrigir usam `compararCenarios`, alterar o início usa `previaDoInicio`, as mesmas funções das prévias. Escrita sem mudança não lê nem audita. Testes novos em `backend/api/test/repositorios/jogadores-auditoria-cenarios.test.ts`; os de auditoria de `jogadores-reativar`, `jogadores-corrigir` e `jogadores-inicio` ganharam a exigência dos 4 campos (só acréscimo; Autorizações de 2026-11-04).
 
 **Done when**:
 
