@@ -97,6 +97,13 @@ describe('tela Dados do grupo (t20)', () => {
     await esperarSemViolacoes(container);
   });
 
+  it('GEL-114: a ajuda do nome na edição diz que mudar o nome não muda o link (t20), não o texto do cadastro', async () => {
+    abrir({ 'GET /api/grupos/g-quinta': () => json(200, QUINTA) });
+    await screen.findByLabelText('Nome');
+    expect(screen.getByText('Mudar o nome não muda o link do ranking.')).toBeTruthy();
+    expect(screen.queryByText(/será criado a partir do nome/)).toBeNull();
+  });
+
   it('GEL-18: salvar envia o PATCH com os quatro campos e mostra "Dados salvos."', async () => {
     const { chamadasA } = abrir({
       'GET /api/grupos/g-quinta': () => json(200, QUINTA),

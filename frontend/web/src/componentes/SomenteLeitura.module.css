@@ -1,5 +1,11 @@
-/* Trecho de escrita em somente leitura (planos-e-cobranca T48): o `fieldset` só agrupa, sem borda nem espaço. */
+/*
+ * Trecho de escrita em somente leitura (planos-e-cobranca T48): o `fieldset` só agrupa, sem borda nem espaço.
+ * `display: grid` com `gap: inherit` mantém o espaçamento do `.formulario` (`gap: var(--esp-4)`, mockup base.css:80)
+ * entre os campos de dentro; como `block`, o `fieldset` cortava esse espaço e colava os campos.
+ */
 .trecho {
+  display: grid;
+  gap: inherit;
   border: 0;
   margin: 0;
   padding: 0;

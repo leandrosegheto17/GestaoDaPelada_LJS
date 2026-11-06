@@ -44,6 +44,8 @@ export const CAMPOS_GRUPO: readonly { campo: CampoGrupo; id: string; rotulo: str
 ];
 
 export const AJUDA_NOME_GRUPO = 'O link do ranking será criado a partir do nome e não muda depois.';
+/** Texto da t20 (edição): `.specs/features/grupos-e-elenco/mockup/telas/t20-grupo--sucesso.html`. */
+export const AJUDA_NOME_GRUPO_EDICAO = 'Mudar o nome não muda o link do ranking.';
 
 export interface FormularioGrupo {
   nome: string;
@@ -71,9 +73,11 @@ export function CamposGrupo({
   dados,
   erros,
   mudar,
+  ajudaNome = AJUDA_NOME_GRUPO,
 }: {
   dados: FormularioGrupo;
   erros: ErrosGrupo;
+  ajudaNome?: string;
   mudar: <C extends keyof FormularioGrupo>(campo: C, valor: FormularioGrupo[C]) => void;
 }) {
   return (
@@ -83,7 +87,7 @@ export function CamposGrupo({
         rotulo="Nome"
         maxLength={60}
         autoComplete="off"
-        ajuda={AJUDA_NOME_GRUPO}
+        ajuda={ajudaNome}
         erro={erros.nome}
         value={dados.nome}
         onChange={(e) => mudar('nome', e.target.value)}

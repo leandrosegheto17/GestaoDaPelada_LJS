@@ -43,7 +43,7 @@ const MOCKUP = join(WEB, '..', '..', '.specs', 'mockup');
 const SAIDA = join(WEB, 'test-results', 'visual');
 const BUILD = join(WEB, 'test-results', 'vitrine-build');
 const ATIVAS = join(WEB, 'e2e', 'telas-ativas.json');
-const PORTA = 4174;
+const PORTA = Number(process.env.PELADA_VISUAL_PORTA ?? 4174);
 const URL_BASE = `http://127.0.0.1:${PORTA}`;
 
 /** As 3 telas da fundação: rota de vitrine → HTML do mockup (mesmo caminho do telas.json). */
@@ -135,7 +135,13 @@ async function print(pagina, url, viewport, css) {
 async function principal() {
   const mapa = JSON.parse(readFileSync(join(MOCKUP, 'telas.json'), 'utf8'));
   const lista = comparacoes(mapa);
-  const reais = comparacoesReais(mapa, JSON.parse(readFileSync(ATIVAS, 'utf8')));
+  // PELADA_VISUAL_FILTRO: expressão regular sobre o nome da comparação (ex.: `^t20-`), para iterar numa tela.
+  const filtro = process.env.PELADA_VISUAL_FILTRO
+    ? new RegExp(process.env.PELADA_VISUAL_FILTRO)
+    : null;
+  const reais = comparacoesReais(mapa, JSON.parse(readFileSync(ATIVAS, 'utf8'))).filter(
+    (c) => filtro === null || filtro.test(c.nome),
+  );
   mkdirSync(SAIDA, { recursive: true });
 
   await rodar(

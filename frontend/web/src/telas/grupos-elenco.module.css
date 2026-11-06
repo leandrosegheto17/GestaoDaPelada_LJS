@@ -26,13 +26,11 @@
   height: calc(var(--altura-botao) + var(--esp-8));
 }
 
+/* De .specs/mockup/base.css:65: os botões ficam na largura natural e quebram a linha quando não cabem. */
 .grupo-botoes {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--esp-2);
-}
-
-.grupo-botoes > * {
-  flex: 1;
 }
 
 /* Item que quebra a linha com o botão (base.css:21). */

@@ -21,6 +21,7 @@ import estilos from '../acesso.module.css';
 import modulo from '../grupos-elenco.module.css';
 import { AVISO_GRUPO_ARQUIVADO, rotaDoGrupo } from '../grupos/Grupos.tsx';
 import {
+  AJUDA_NOME_GRUPO_EDICAO,
   CamposGrupo,
   errosDoGrupo,
   resumoDoGrupo,
@@ -135,7 +136,8 @@ function CartaoLink({ link }: { link: string }) {
 
   return (
     <section className={`${modulo.cartao} ${estilos.secao}`} aria-labelledby="link">
-      <h2 id="link" className={`${estilos.subtitulo} ${modulo['sem-topo']}`}>
+      {/* O mockup mantém a margem de cima do subtítulo: `.subtitulo` vem depois de `.sem-topo` no base.css. */}
+      <h2 id="link" className={estilos.subtitulo}>
         Link do ranking
       </h2>
       <p className={estilos.paragrafo} id="url">
@@ -209,7 +211,12 @@ function Formulario({ grupo }: { grupo: GrupoDetalhe }) {
         <ResumoErros erros={resumoDoGrupo(erros)} />
         {falha ? <Faixa tipo="erro">{falha}</Faixa> : null}
         <TrechoSomenteLeitura grupoId={grupo.id}>
-          <CamposGrupo dados={dados} erros={erros} mudar={mudar} />
+          <CamposGrupo
+            dados={dados}
+            erros={erros}
+            mudar={mudar}
+            ajudaNome={AJUDA_NOME_GRUPO_EDICAO}
+          />
           <div>
             <Botao type="submit" carregando={editar.isPending}>
               {editar.isPending ? 'Salvando…' : 'Salvar'}
