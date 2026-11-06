@@ -32,7 +32,12 @@ export const nSimulador = z
 /** Substituições por time: inteiro de 0 a 20, ou sem limite (SIM-55). */
 export const kSimulador = z.union(
   [
-    z.number().int().min(LIMITES_SIMULADOR.kMin).max(LIMITES_SIMULADOR.kMax),
+    // A mensagem vai em cada regra: o zod devolve a do ramo que quase serviu, não a da união.
+    z
+      .number({ error: MENSAGEM_K })
+      .int(MENSAGEM_K)
+      .min(LIMITES_SIMULADOR.kMin, MENSAGEM_K)
+      .max(LIMITES_SIMULADOR.kMax, MENSAGEM_K),
     z.literal('ilimitado'),
   ],
   { error: MENSAGEM_K },
