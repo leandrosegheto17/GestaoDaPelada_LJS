@@ -96,7 +96,7 @@ export function Landing() {
       {parametros.get('aviso') === 'conta-excluida' ? (
         <Faixa tipo="sucesso">{TEXTO_CONTA_EXCLUIDA}</Faixa>
       ) : null}
-      <div className={estilos.topo}>
+      <div className={estilos.abertura}>
         <h1 className={estilos.titulo}>{TITULO_LANDING}</h1>
         <p className={estilos.proposta}>{TEXTO_PROPOSTA}</p>
         <div className={estilos.acoes}>

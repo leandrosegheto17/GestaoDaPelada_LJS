@@ -1,16 +1,15 @@
-import { cleanup, render, screen } from '@testing-library/react';
-import { createMemoryRouter, RouterProvider } from 'react-router';
+import { cleanup, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { criarRotas } from '../../src/app/rotas.tsx';
+import { abrirTela } from '../apoio/tela.tsx';
 
 afterEach(() => {
   cleanup();
   vi.unstubAllEnvs();
 });
 
+// A landing consulta a sessão: o apoio traz o cliente e o React Query (sessão ausente = 401, como sem login).
 function abrir(caminho: string) {
-  const roteador = createMemoryRouter(criarRotas(), { initialEntries: [caminho] });
-  return render(<RouterProvider router={roteador} />);
+  return abrirTela(caminho);
 }
 
 describe('rotas da fundação', () => {

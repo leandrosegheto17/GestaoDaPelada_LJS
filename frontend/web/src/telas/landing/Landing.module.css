@@ -1,7 +1,7 @@
 /* Landing (planos-e-cobranca T52; AD-064): estilo do guia, só com tokens. Os planos ficam lado a lado a partir do
    tablet (--bp-tablet, 600px) e um embaixo do outro no celular. */
 
-.topo {
+.abertura {
   text-align: center;
   padding: var(--esp-8) 0 var(--esp-6);
 }
