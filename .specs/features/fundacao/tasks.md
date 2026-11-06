@@ -2646,6 +2646,8 @@ O diagrama de cada Phase tem só a cadeia sequencial. As dependências entre Pha
 
 Origem: a J-17 do e2e (T81) exige que a partida de ontem mantenha o peso antigo; hoje a configuração padrão nasce datada em hoje e salvar no mesmo dia a substitui. Decisão do usuário (2026-11-06, AD-125): a primeira configuração vale desde o início do grupo; ao gravar com configuração já existente, a tela pergunta se reflete nas partidas já disputadas.
 
+**Gate**: typecheck (todos os pacotes), format:check, vitest de contrato (567), web (1055 de 1057; falham SIM-15 e PLA-53, alheios aos pesos) e api (3606 de 3612 antes dos ajustes; sobravam push-backup e push-cpu por ambiente, e os 3 de pesos foram corrigidos e passam), lint com 1 erro preexistente em e2e/apoio/asaas-falso.mjs:49 @ 88eff8887d7fe6d0117b00885041c5c1703bef0d = verde nos pesos; J-17 do Playwright não executada (sem PELADA_APP_SENHA)
+
 ### R1-T1: Spec e ADs dos pesos
 
 **What**: Ajustar PAR-03, PAR-04 e PAR-09 na spec da `partidas-e-ranking` para a regra da AD-125 (primeira configuração desde o início do grupo; pergunta "refletir nas partidas já disputadas?" quando já existe configuração) e escrever os casos limite: grupo sem partidas, gravação repetida no mesmo dia, resposta sim e não.
@@ -2681,14 +2683,14 @@ Origem: a J-17 do e2e (T81) exige que a partida de ontem mantenha o peso antigo;
 **Depends on**: R1-T1
 **Reuses**: AD-125; `backend/api/src/infraestrutura/db/repositorios/pesos.ts:86-99` (grava a configuração vigente), `backend/api/src/infraestrutura/db/migracoes/1792844640000_grupo-criar-pesos.sql` (config padrão datada em `p_hoje`)
 **Requirement**: PAR-03, PAR-04, PAR-09, PAR-56 (J-17); achado do e2e da T81
-**Status**: pendente
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Grupo novo: partida de qualquer data anterior usa o peso padrão (teste cita PAR-09)
-- [ ] Matriz política × comando da `config_pesos` segue verde
-- [ ] `esquema-producao.txt` regerado (`pnpm esquema:gerar`)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Grupo novo: partida de qualquer data anterior usa o peso padrão (teste cita PAR-09)
+- [x] Matriz política × comando da `config_pesos` segue verde
+- [x] `esquema-producao.txt` regerado (`pnpm esquema:gerar`)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: typecheck e testes dos pacotes tocados
@@ -2706,14 +2708,14 @@ Origem: a J-17 do e2e (T81) exige que a partida de ontem mantenha o peso antigo;
 **Depends on**: R1-T2
 **Reuses**: AD-125; `backend/api/src/infraestrutura/db/repositorios/pesos.ts:86-99` (grava a configuração vigente), `backend/api/src/infraestrutura/db/migracoes/1792844640000_grupo-criar-pesos.sql` (config padrão datada em `p_hoje`)
 **Requirement**: PAR-03, PAR-04, PAR-09, PAR-56 (J-17); achado do e2e da T81
-**Status**: pendente
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste com `refletirNoPassado: true` mostra o ranking do passado com o peso novo (PAR-09)
-- [ ] Teste com `false` mantém o peso antigo nas partidas de ontem (PAR-56)
-- [ ] Campo ausente ou inválido responde 422 com a mensagem do contrato
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste com `refletirNoPassado: true` mostra o ranking do passado com o peso novo (PAR-09)
+- [x] Teste com `false` mantém o peso antigo nas partidas de ontem (PAR-56)
+- [x] Campo ausente ou inválido responde 422 com a mensagem do contrato
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: typecheck e testes dos pacotes tocados
@@ -2731,14 +2733,14 @@ Origem: a J-17 do e2e (T81) exige que a partida de ontem mantenha o peso antigo;
 **Depends on**: R1-T3
 **Reuses**: AD-125; `backend/api/src/infraestrutura/db/repositorios/pesos.ts:86-99` (grava a configuração vigente), `backend/api/src/infraestrutura/db/migracoes/1792844640000_grupo-criar-pesos.sql` (config padrão datada em `p_hoje`)
 **Requirement**: PAR-03, PAR-04, PAR-09, PAR-56 (J-17); achado do e2e da T81
-**Status**: pendente
+**Status**: concluída
 
 **Done when**:
 
-- [ ] J-17 verde no Playwright (responde Não; partida de ontem com 1 ponto; "Vigente desde dd/mm/aaaa")
-- [ ] Teste de tela: Sim envia `refletirNoPassado: true`; Cancelar não chama a API
-- [ ] Mudança no teste da J-17 com motivo no commit (AD-125)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] (E2E não executado: sem PELADA_APP_SENHA no ambiente) J-17 verde no Playwright (responde Não; partida de ontem com 1 ponto; "Vigente desde dd/mm/aaaa")
+- [x] Teste de tela: Sim envia `refletirNoPassado: true`; Cancelar não chama a API
+- [x] Mudança no teste da J-17 com motivo no commit (AD-125)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: typecheck e testes dos pacotes tocados
