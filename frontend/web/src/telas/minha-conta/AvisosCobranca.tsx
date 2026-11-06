@@ -23,7 +23,7 @@ export const TEXTO_EXPLICA_COBRANCA =
   'Os mesmos avisos que chegam por e-mail: cobrança gerada, pagamento confirmado e pagamento em atraso dos grupos que você criou.';
 
 const TEXTOS_COBRANCA: TextosAvisos = {
-  rotulo: 'Controle dos avisos de cobran�a',
+  rotulo: 'Controle dos avisos de cobrança',
   receber: TEXTO_RECEBER_COBRANCA,
   assinado: 'Você recebe neste aparelho os avisos de cobrança dos seus grupos.',
 };

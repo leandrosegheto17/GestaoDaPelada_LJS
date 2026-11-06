@@ -5,102 +5,102 @@
   "choveu": false,
   "jogadores": [
     {
-      "id": "j-alemao",
+      "id": "00000000-0000-4000-8000-000000000001",
       "apelido": "Alemão",
       "situacao": "presente"
     },
     {
-      "id": "j-bigode",
+      "id": "00000000-0000-4000-8000-000000000002",
       "apelido": "Bigode",
       "situacao": "presente"
     },
     {
-      "id": "j-cabeca",
+      "id": "00000000-0000-4000-8000-000000000003",
       "apelido": "Cabeça",
       "situacao": "presente"
     },
     {
-      "id": "j-careca",
+      "id": "00000000-0000-4000-8000-000000000004",
       "apelido": "Careca",
       "situacao": "presente"
     },
     {
-      "id": "j-dudu",
+      "id": "00000000-0000-4000-8000-000000000005",
       "apelido": "Dudu",
       "situacao": "presente"
     },
     {
-      "id": "j-fumaca",
+      "id": "00000000-0000-4000-8000-000000000006",
       "apelido": "Fumaça",
       "situacao": "ausente"
     },
     {
-      "id": "j-gordo",
+      "id": "00000000-0000-4000-8000-000000000007",
       "apelido": "Gordo",
       "situacao": "presente"
     },
     {
-      "id": "j-japa",
+      "id": "00000000-0000-4000-8000-000000000008",
       "apelido": "Japa",
       "situacao": "presente"
     },
     {
-      "id": "j-juninho",
+      "id": "00000000-0000-4000-8000-000000000009",
       "apelido": "Juninho",
       "situacao": "presente"
     },
     {
-      "id": "j-leo",
+      "id": "00000000-0000-4000-8000-000000000010",
       "apelido": "Léo Baiano",
       "situacao": "presente"
     },
     {
-      "id": "j-marcao",
+      "id": "00000000-0000-4000-8000-000000000011",
       "apelido": "Marcão",
       "situacao": "presente"
     },
     {
-      "id": "j-nenem",
+      "id": "00000000-0000-4000-8000-000000000012",
       "apelido": "Neném",
       "situacao": "presente"
     },
     {
-      "id": "j-paulinho",
+      "id": "00000000-0000-4000-8000-000000000013",
       "apelido": "Paulinho",
       "situacao": "presente"
     },
     {
-      "id": "j-pedrao",
+      "id": "00000000-0000-4000-8000-000000000014",
       "apelido": "Pedrão",
       "situacao": "presente"
     },
     {
-      "id": "j-rafinha",
+      "id": "00000000-0000-4000-8000-000000000015",
       "apelido": "Rafinha",
       "situacao": "presente"
     },
     {
-      "id": "j-serginho",
+      "id": "00000000-0000-4000-8000-000000000016",
       "apelido": "Serginho",
       "situacao": "presente"
     },
     {
-      "id": "j-tiago",
+      "id": "00000000-0000-4000-8000-000000000017",
       "apelido": "Tiago",
       "situacao": "presente"
     },
     {
-      "id": "j-toninho",
+      "id": "00000000-0000-4000-8000-000000000018",
       "apelido": "Toninho",
       "situacao": "presente"
     },
     {
-      "id": "j-vini",
+      "id": "00000000-0000-4000-8000-000000000019",
       "apelido": "Vini",
       "situacao": "presente"
     },
     {
-      "id": "j-ze",
+      "id": "00000000-0000-4000-8000-000000000020",
       "apelido": "Zé Carlos",
       "situacao": "presente"
     }

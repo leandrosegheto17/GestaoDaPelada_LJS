@@ -126,14 +126,19 @@ describe('entradasAtivas', () => {
     for (const e of esperados) expect(ativos).toContain(e);
   });
 
-  it('ACE-54, ACE-55: os estados reais das telas com sessão estão ativos, sem as T08 da grupos-e-elenco (T56, AD-031)', () => {
+  it('ACE-54, ACE-55: os estados reais das telas com sessão estão ativos; as T08 passaram para a T71 da grupos-e-elenco (T56, AD-031)', () => {
     const comSessao = ['T19', 'T25', 'T32'];
     const esperados = (MAPA.telas ?? [])
       .filter((t) => t.real === true && comSessao.includes(t.id))
       .map((t) => `${t.id} ${t.estado}`);
     const ativos = ATIVAS.telas.map((t) => `${t.id} ${t.estado}`);
     for (const e of [...esperados, 'T09 menu-conta']) expect(ativos).toContain(e);
-    expect(ativos.filter((a) => a.startsWith('T08 '))).toEqual([]);
+    // AD-031: as T08 ficaram de fora da T56 e entraram na T71 da grupos-e-elenco, que as ativou todas.
+    const t08Reais = (MAPA.telas ?? [])
+      .filter((t) => t.real === true && t.id === 'T08')
+      .map((t) => `${t.id} ${t.estado}`);
+    expect(t08Reais.length).toBeGreaterThan(0);
+    for (const e of t08Reais) expect(ativos).toContain(e);
   });
 });
 

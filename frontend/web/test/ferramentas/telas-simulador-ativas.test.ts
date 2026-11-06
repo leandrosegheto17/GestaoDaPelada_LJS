@@ -2,7 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { grupoDetalheComPartidas } from '@pelada/contrato';
+import { campoSaldoDoGrupo, grupoDetalheComPartidas } from '@pelada/contrato';
 import stylelint from 'stylelint';
 import { describe, expect, it } from 'vitest';
 import { entradasAtivas, type MapaTelas } from '../../e2e/ferramentas/telas-reais.mjs';
@@ -95,9 +95,12 @@ describe('telas ativas do simulador', () => {
       respostas: { url: string; arquivo: string }[];
     };
     const grupo = t09.respostas.find((r) => r.url === '**/api/grupos/g-quinta');
-    const corpo = grupoDetalheComPartidas.parse(
-      JSON.parse(readFileSync(fileURLToPath(new URL(grupo?.arquivo ?? '', RAIZ_MOCKUP)), 'utf8')),
-    );
+    // O GET do grupo traz também o saldo do caixa (financeiro T43, FIN-34).
+    const corpo = grupoDetalheComPartidas
+      .extend(campoSaldoDoGrupo)
+      .parse(
+        JSON.parse(readFileSync(fileURLToPath(new URL(grupo?.arquivo ?? '', RAIZ_MOCKUP)), 'utf8')),
+      );
     expect([corpo.proximoDiaDeJogo, corpo.escalacaoNoProximoDia]).toEqual(['2026-10-22', true]);
   });
 
