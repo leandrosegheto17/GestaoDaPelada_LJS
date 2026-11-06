@@ -3,7 +3,7 @@
 **Modo**: enxuto
 **Passada**: rascunho
 **Base**: .specs/features/notificacoes/spec.md (aprovada em 2026-11-04), conferido em 2026-11-04. Contratos (nada executado ainda): fundação v2, `conta-e-acesso`, `grupos-e-elenco` e `partidas-e-ranking` (`tasks.md` de cada uma) e a spec aprovada da `planos-e-cobranca` (o `tasks.md` dela está sendo gravado em paralelo).
-**Branch pai**: `feature/planos-e-cobranca` (a `planos-e-cobranca` ainda não estará integrada). Se já estiver integrada na `main` quando o `/executar` começar, a Branch pai passa a ser `main`.
+**Branch pai**: `main` (decidido na execu��o: o rascunho das features 1 a 7 est� na `main`, nenhuma executada).
 **Feature**: 8 de 8 do roteiro (AD-001, AD-015). Requisitos `NOT-*`.
 
 > Convenções: `S:` = `.specs/features/notificacoes/spec.md`; `F:` = `.specs/features/fundacao/tasks.md`; `FD:` = `.specs/features/fundacao/design.md`; `CA:` = `.specs/features/conta-e-acesso/tasks.md`; `GE:` = `.specs/features/grupos-e-elenco/tasks.md`; `PR:` = `.specs/features/partidas-e-ranking/tasks.md`; `PC:` = `.specs/features/planos-e-cobranca/spec.md`; `M:` = as 23 migrações copiadas pela fundação (AD-003), em `backend/api/src/infraestrutura/db/migracoes/`, conferidas em `GestaoDaPelada_LJS@e557292`. Do zero (AD-002): nenhum código de biblioteca ou do LJS é copiado. ADs novas AD-098 a AD-112 e AD-116 (lista no fim). Nome de teste de tarefa de risco alto cita o `NOT-NN`.
