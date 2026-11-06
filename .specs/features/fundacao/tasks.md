@@ -2338,15 +2338,17 @@ T81 → T82
 **Depends on**: T77
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-27, FUN-18
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: ação do usuário na Cloudflare e no GitHub; nada a escrever. Além dos secrets listados, o `deploy.yml` da T70 usa `BACKUP_CHAVE` e o opcional `VITE_SENTRY_DSN` no environment `producao` (lista completa no `docs/runbook.md`, seção Segredos).
+
+**Evidência (2026-11-06)**: `gh secret list --env producao` mostra os 8 secrets; `wrangler hyperdrive get e06363bd…` mostra `pelada-prod`, origem `pelada_app` no Neon e `caching.disabled: true`; ID em `wrangler.jsonc:37`; `pnpm --filter @pelada/web build` verde.
 
 **Done when**:
 
-- [ ] O Hyperdrive existe e `wrangler hyperdrive get` mostra o cache desligado (AD-119)
-- [ ] O environment `producao` tem `NEON_URL_MIGRACAO`, `NEON_URL_BACKUP`, `BACKUP_CHAVE`, `NEON_API_KEY`, `NEON_PROJECT_ID`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` e `URL_PUBLICA` (AD-119)
-- [ ] O usuário informa o ID do Hyperdrive (não é segredo)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] O Hyperdrive existe e `wrangler hyperdrive get` mostra o cache desligado (AD-119)
+- [x] O environment `producao` tem `NEON_URL_MIGRACAO`, `NEON_URL_BACKUP`, `BACKUP_CHAVE`, `NEON_API_KEY`, `NEON_PROJECT_ID`, `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID` e `URL_PUBLICA` (AD-119)
+- [x] O usuário informa o ID do Hyperdrive (não é segredo)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
