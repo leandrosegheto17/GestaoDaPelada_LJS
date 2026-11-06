@@ -1,4 +1,4 @@
-import { PRECO_PRO_CENTAVOS, type Data } from '@pelada/dominio';
+import { planoEfetivo, PRECO_PRO_CENTAVOS, type Data } from '@pelada/dominio';
 import type { Asaas, RegistroAsaas } from '../../infraestrutura/asaas/cliente.ts';
 import { assinaturas } from '../../infraestrutura/db/repositorios/assinaturas.ts';
 import { contas } from '../../infraestrutura/db/repositorios/contas.ts';
@@ -82,7 +82,11 @@ export async function assinar(
   if (dados === null) return { resultado: 'nao_encontrado' };
   if (dados.criadoPor !== conta) return { resultado: 'so_quem_criou' };
   // A-04: a cortesia (`uso_proprio`) já tem o Pro; cobrar não faz sentido e `plano_ativar` a manteria (PLA-02, PLA-58).
-  if (dados.situacaoComercial === 'uso_proprio') return { resultado: 'grupo_cortesia' };
+  if (
+    planoEfetivo(dados.situacaoComercial, dados.trialInicio, dados.pagoAte, hoje) === 'cortesia'
+  ) {
+    return { resultado: 'grupo_cortesia' };
+  }
 
   const vigente = await assinaturas.pendenteOuAtiva(db, grupoId);
   if (vigente !== null) {
