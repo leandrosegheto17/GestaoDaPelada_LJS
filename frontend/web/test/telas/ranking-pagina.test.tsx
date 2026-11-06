@@ -62,6 +62,7 @@ function ranking(extra: Record<string, unknown> = {}) {
     mes: '2026-10',
     hoje: '2026-10-22',
     geradoEm: '2026-10-22T12:00:00.000Z',
+    pdfLiberado: true,
     navegacao: { mesAnterior: '2026-09', mesSeguinte: null },
     resumoMes: { partidas: 2, comChuva: 1 },
     partidas: [
