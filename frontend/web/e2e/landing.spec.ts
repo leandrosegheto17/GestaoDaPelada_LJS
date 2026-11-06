@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { expect, test, type Page } from '@playwright/test';
 
@@ -11,7 +12,8 @@ const CONTA_SEED = 'admin@exemplo.test';
 const requerer = createRequire(import.meta.url);
 
 async function semViolacoesAxe(pagina: Page): Promise<void> {
-  await pagina.addScriptTag({ path: requerer.resolve('axe-core/axe.min.js') });
+  // Avaliado pelo protocolo, não por <script> inline: a CSP do app (`script-src 'self'`) recusa o inline.
+  await pagina.evaluate(readFileSync(requerer.resolve('axe-core/axe.min.js'), 'utf-8'));
   const violacoes = await pagina.evaluate(async () => {
     const axe = (
       window as unknown as {
