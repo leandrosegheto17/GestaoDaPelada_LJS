@@ -107,7 +107,8 @@ Nenhum critério fica fora. Mudam de sentido, pelas ADs propostas: ACE-45 (role 
 
 - **Comando da suíte** (o de `.specs/projeto/testes.json` ao fim da fundação, `F:72-78`): `docker compose up -d --wait && pnpm lint && pnpm format:check && pnpm typecheck && pnpm test && pnpm test:checagens && pnpm --filter @pelada/web build && pnpm --filter @pelada/web e2e && pnpm --filter @pelada/web visual`.
 - **Resultado hoje**: não roda. O `testes.json` atual é a dispensa temporária (sem código na v2) e a feature anterior, `fundacao`, ainda não foi executada.
-- **Falhas preexistentes**: feature anterior ainda não executada; a linha de base é o gate final da fundação. O `/executar` desta feature roda a suíte uma vez antes do lote 1 e registra aqui o resultado e as falhas encontradas.
+- **Resultado medido pelo /executar (2026-11-05, main @ c9ba38bf, banco `pelada_ace` local, 44 migrações aplicadas e seed ok)**: `lint` verde; `format:check` falha em 39 arquivos rascunhados de outras features (planos, notificações, grupos, partidas); `typecheck` falha em 1 erro (`frontend/web/src/pwa/servico.ts(133,55)` TS2352, notificações); `pnpm test` com 4 falhas por timeout de 5 s em `test/lint/*` (ex.: `sem-escrita-periodo.test.ts`), 46 passam.
+- **Falhas preexistentes**: feature anterior ainda não executada; (no lote 5: `@pelada/contrato` com 3 falhas de outras features em `publico.test.ts` e `simulador.test.ts`; `pnpm test:checagens` com 5 checagens falhando na base; o projeto `worker` do vitest do api não carrega `pg`, ver T17) a linha de base é o gate final da fundação. O `/executar` desta feature roda a suíte uma vez antes do lote 1 e registra aqui o resultado e as falhas encontradas.
 
 ## Test Coverage Matrix
 
@@ -274,15 +275,15 @@ T57 → T58
 **Depends on**: None
 **Reuses**: estender a fábrica de cenário e o `comoApp` da fundação (`F:909`, `FD:89`) e o `bancoDeTeste()` (`F:507`); senha por `conta_definir_senha` (`M:1792843560000_conta-senha-e-exclusao.sql:97`), chamada como `postgres` (AD-009)
 **Requirement**: ACE-43, ACE-45
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: o teste do cenário fica em `cenario-conta.test.ts`; a evidência da rede (sabotagem do `conta_definir_senha`) é do /executar.
 
 **Done when**:
 
-- [ ] Teste `ACE-43`: as contas A e B entram com a senha do cenário por `conta_entrar` e cada uma enxerga só o próprio grupo por `comoApp`
-- [ ] O banco `teste_*` é removido no `finally`, também quando a criação do cenário falha
-- [ ] Evidência da rede: com `conta_definir_senha` sabotada (hash fixo), o teste fica vermelho (registrar aqui)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `ACE-43`: as contas A e B entram com a senha do cenário por `conta_entrar` e cada uma enxerga só o próprio grupo por `comoApp`
+- [x] O banco `teste_*` é removido no `finally`, também quando a criação do cenário falha
+- [x] Evidência da rede: com `conta_definir_senha` sabotada (hash fixo), 2 testes `ACE-43` (A e B entram) ficaram vermelhos; migração restaurada, verde (2026-11-05)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -300,14 +301,14 @@ T57 → T58
 **Depends on**: T0
 **Reuses**: molde da matriz de leitura e escrita da fundação (`F:981`, `F:1007`); policies e grants em `M:1792843380000_conta-tabelas.sql:69-81`
 **Requirement**: ACE-43, ACE-44, ACE-45
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Testes `ACE-43`: linhas da Test Coverage Matrix para `contas` (4 comandos, sem `WHERE`, `WITH CHECK` do `id`, grant de coluna de `senha_hash`)
-- [ ] Testes `ACE-44`: linhas para `sessoes` (4 comandos, `DELETE` sem `WHERE` só apaga as de A)
-- [ ] Evidência da rede: `DROP POLICY contas_alterar` + `CREATE POLICY ... USING (true)` e um `GRANT SELECT (senha_hash)` deixam testes vermelhos (registrar aqui)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Testes `ACE-43`: linhas da Test Coverage Matrix para `contas` (4 comandos, sem `WHERE`, `WITH CHECK` do `id`, grant de coluna de `senha_hash`)
+- [x] Testes `ACE-44`: linhas para `sessoes` (4 comandos, `DELETE` sem `WHERE` só apaga as de A)
+- [x] Evidência da rede: `DROP POLICY contas_alterar` + `CREATE POLICY ... USING (true)` e um `GRANT SELECT (senha_hash)` deixaram 4 testes `ACE-43` vermelhos (grant de `senha_hash`, `SELECT *`, UPDATE sem WHERE, UPDATE sem contexto); migração restaurada, verde (2026-11-05)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -325,15 +326,15 @@ T57 → T58
 **Depends on**: T1
 **Reuses**: policies de `M:1792843380000_conta-tabelas.sql:55-101`; tabelas novas em `M:1792843800000_conta-senha-bloqueio.sql:8`, `M:1792843860000_conta-teto-emails.sql:7`, `M:1792843980000_conta-teto-emails-origem.sql:7`; role renomeada em `M:1792844220000_roles-padronizadas.sql:26` (AD-016 proposta)
 **Requirement**: ACE-45, ACE-46
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Testes `ACE-45`: `convites_admin` por comando, com o slug público sem conta vendo zero linhas e `UPDATE` que move o convite para o grupo de B recusado
-- [ ] Teste `ACE-46`: `pelada_app` insere em `auditoria` do próprio grupo e recebe recusa em UPDATE e DELETE
-- [ ] Testes `ACE-45`: nas 7 tabelas de apoio, os 4 comandos recusados para `pelada_app`; `pelada_backup_ro` lê todas e não escreve
-- [ ] Evidência da rede: `GRANT UPDATE ON auditoria TO pelada_app` deixa o teste vermelho (registrar aqui)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Testes `ACE-45`: `convites_admin` por comando, com o slug público sem conta vendo zero linhas e `UPDATE` que move o convite para o grupo de B recusado
+- [x] Teste `ACE-46`: `pelada_app` insere em `auditoria` do próprio grupo e recebe recusa em UPDATE e DELETE
+- [x] Testes `ACE-45`: nas 7 tabelas de apoio, os 4 comandos recusados para `pelada_app`; `pelada_backup_ro` lê todas e não escreve
+- [x] Evidência da rede: `GRANT UPDATE, DELETE ON auditoria TO pelada_app` deixou 2 testes `ACE-46` vermelhos (UPDATE e DELETE sem WHERE); só `GRANT UPDATE` com WHERE passava, por isso o WHERE saiu do teste (2026-11-05)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -351,21 +352,23 @@ T57 → T58
 **Depends on**: T2
 **Reuses**: estender o meta-teste da fundação (`F:957`) e ler o catálogo como o `lerEsquema` (`F:760`); fecha o risco de `FD:183`
 **Requirement**: ACE-43, ACE-45
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: a matriz de conta (tabela → arquivo de teste) fica no próprio meta-teste.
 
 **Done when**:
 
-- [ ] Teste `ACE-45`: uma tabela nova sem `FORCE` ou sem linha na matriz reprova (conferido com tabela criada no teste)
-- [ ] Teste `ACE-43`: as 20 funções `SECURITY DEFINER` têm `search_path = public, pg_temp`; uma função criada sem ele reprova
-- [ ] Teste `ACE-43`: `PUBLIC` sem `EXECUTE` em nenhuma; `pelada_app` sem `EXECUTE` em `conta_definir_senha`, `email_cota_reservar_em` e `email_origem_registrar_em`
-- [ ] Evidência da rede: `GRANT EXECUTE ON FUNCTION conta_definir_senha(...) TO pelada_app` deixa vermelho (registrar aqui)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `ACE-45`: uma tabela nova sem `FORCE` ou sem linha na matriz reprova (conferido com tabela criada no teste)
+- [x] Teste `ACE-43`: as 20 funções `SECURITY DEFINER` têm `search_path = public, pg_temp`; uma função criada sem ele reprova
+- [x] Teste `ACE-43`: `PUBLIC` sem `EXECUTE` em nenhuma; `pelada_app` sem `EXECUTE` em `conta_definir_senha`, `email_cota_reservar_em` e `email_origem_registrar_em`
+- [x] Evidência da rede: `GRANT EXECUTE ON FUNCTION conta_definir_senha(...) TO pelada_app` deixou 2 testes `ACE-43` vermelhos; restaurado, verde (2026-11-05)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
 
 ---
+
+**Gate**: `pnpm vitest run` nos 4 arquivos de isolamento de conta (DATABASE_URL_TESTE no Postgres privado) @ 5947d69f67ea91ab744bce85507b520995ce6dd0 = 158 testes verdes; typecheck do api só com o erro preexistente `test/rotas/apoio-push.ts(99,40)` (notificações)
 
 #### Phase 2: Rede de proteção: cadastro, entrar e sessão no banco
 
@@ -380,16 +383,16 @@ T57 → T58
 **Depends on**: T3
 **Reuses**: `M:1792843440000_conta-cadastro-e-links.sql:11` (`envio_permitido`), `:29` (`conta_cadastrar`); `M:1792843920000_conta-esqueci-nao-confirmada.sql:47` (`link_pedir`); `M:1792843740000_conta-confirmar-sem-sessao.sql:9` (`link_confirmar`)
 **Requirement**: ACE-01, ACE-04, ACE-05, ACE-06, ACE-07, ACE-08, ACE-23, ACE-51
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: o apoio dos testes de banco (transação desfeita, troca de role) nasce em `backend/api/test/banco/apoio-conta.ts`.
 
 **Done when**:
 
-- [ ] Testes `ACE-01`, `ACE-04`, `ACE-05`: conta nova com `termos_versao` e `termos_aceitos_em`; e-mail existente (também com maiúsculas e espaços) devolve `existente` e não altera a linha
-- [ ] Testes `ACE-06`, `ACE-07`: confirmação dentro de 24 h marca `email_confirmado_em` e não cria sessão; 24 h + 1 s, usado ou inexistente devolvem nulo
-- [ ] Testes `ACE-08`, `ACE-23`, `ACE-51`: pedido novo invalida o anterior do mesmo tipo; aos 59 s não envia, aos 60 s e 61 s envia (borda exata do LJS)
-- [ ] Evidência da rede: `link_confirmar` sabotado para ignorar `expira_em` deixa vermelho (registrar aqui)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Testes `ACE-01`, `ACE-04`, `ACE-05`: conta nova com `termos_versao` e `termos_aceitos_em`; e-mail existente (também com maiúsculas e espaços) devolve `existente` e não altera a linha
+- [x] Testes `ACE-06`, `ACE-07`: confirmação dentro de 24 h marca `email_confirmado_em` e não cria sessão; 24 h + 1 s, usado ou inexistente devolvem nulo
+- [x] Testes `ACE-08`, `ACE-23`, `ACE-51`: pedido novo invalida o anterior do mesmo tipo; aos 59 s não envia, aos 60 s e 61 s envia (borda exata do LJS)
+- [x] Evidência da rede: `link_confirmar` sem `expira_em` deixou 2 testes `ACE-07` vermelhos (24 h + 1 s e borda exata); restaurado, verde (2026-11-05)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -407,18 +410,18 @@ T57 → T58
 **Depends on**: T4
 **Reuses**: `M:1792844040000_conta-entrar-teto-conta.sql:21` (versão vigente de `conta_entrar`, com a trava por e-mail e IP de `M:1792843500000_conta-entrar-e-sessao.sql:15`)
 **Requirement**: ACE-09, ACE-10, ACE-11, ACE-12, ACE-13, ACE-14, ACE-66
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: casos limite listados no topo do teste; sem lacuna. O teste com 4 falhas e duas tentativas simultâneas é o que morre sem a trava por e-mail.
 
 **Done when**:
 
-- [ ] Casos limite listados antes do teste: 4.ª e 5.ª falha; 15 min menos 1 s e mais 1 s; senha certa durante o bloqueio; e-mail inexistente; falhas concorrentes
-- [ ] Testes `ACE-09`, `ACE-10`: sucesso devolve `ok`, nome e conta, e `sessoes.token_hash` é o SHA-256 recebido, nunca o token
-- [ ] Testes `ACE-11`, `ACE-12`: `invalida` igual para e-mail inexistente e senha errada; `nao_confirmado` sem sessão
-- [ ] Testes `ACE-13`, `ACE-14`: 5 falhas do par bloqueiam até 15 min depois da quinta, mesmo com a senha certa; outro `ip_hash` entra
-- [ ] Teste `ACE-66`: duas transações simultâneas com senha errada do mesmo par gravam duas falhas
-- [ ] Evidência da rede: trava por e-mail sabotada (sem `pg_advisory_xact_lock`) deixa o teste de concorrência vermelho (registrar aqui)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do teste: 4.ª e 5.ª falha; 15 min menos 1 s e mais 1 s; senha certa durante o bloqueio; e-mail inexistente; falhas concorrentes
+- [x] Testes `ACE-09`, `ACE-10`: sucesso devolve `ok`, nome e conta, e `sessoes.token_hash` é o SHA-256 recebido, nunca o token
+- [x] Testes `ACE-11`, `ACE-12`: `invalida` igual para e-mail inexistente e senha errada; `nao_confirmado` sem sessão
+- [x] Testes `ACE-13`, `ACE-14`: 5 falhas do par bloqueiam até 15 min depois da quinta, mesmo com a senha certa; outro `ip_hash` entra
+- [x] Teste `ACE-66`: duas transações simultâneas com senha errada do mesmo par gravam duas falhas
+- [x] Evidência da rede: `conta_entrar` sem `pg_advisory_xact_lock` deixou o teste `ACE-66` de concorrência vermelho; restaurado, verde (2026-11-05)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -436,21 +439,23 @@ T57 → T58
 **Depends on**: T5
 **Reuses**: `M:1792843500000_conta-entrar-e-sessao.sql:78` (`sessao_tocar`); `M:1792844040000_conta-entrar-teto-conta.sql:21`
 **Requirement**: ACE-15, ACE-16, ACE-74
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: casos limite listados no topo do teste; sem lacuna.
 
 **Done when**:
 
-- [ ] Casos limite listados antes do teste: inatividade de 14:59 e 15:00; 11:59 h de uso contínuo e 12 h; 49.ª e 50.ª falha de IPs diferentes; 10 min menos 1 s e mais 1 s
-- [ ] Testes `ACE-15`, `ACE-16`: sessão vencida por inatividade ou pelas 12 h devolve nulo e é apagada; a válida renova `ultimo_uso_em`
-- [ ] Testes `ACE-74`: 50 falhas em 1 h de 50 IPs bloqueiam por 10 min com o mesmo resultado do bloqueio por par; conta inexistente responde igual; senha certa dentro do bloqueio não zera
-- [ ] Evidência da rede: `sessao_tocar` sem o teste de `expira_em` deixa vermelho (registrar aqui)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do teste: inatividade de 14:59 e 15:00; 11:59 h de uso contínuo e 12 h; 49.ª e 50.ª falha de IPs diferentes; 10 min menos 1 s e mais 1 s
+- [x] Testes `ACE-15`, `ACE-16`: sessão vencida por inatividade ou pelas 12 h devolve nulo e é apagada; a válida renova `ultimo_uso_em`
+- [x] Testes `ACE-74`: 50 falhas em 1 h de 50 IPs bloqueiam por 10 min com o mesmo resultado do bloqueio por par; conta inexistente responde igual; senha certa dentro do bloqueio não zera
+- [x] Evidência da rede: `sessao_tocar` sem `expira_em` deixou o teste `ACE-16` (12 h) vermelho; restaurado, verde (2026-11-05)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
 
 ---
+
+**Gate**: `pnpm vitest run` nos 3 arquivos de `test/banco` da Phase 2 (Postgres privado) @ b837eabb5b8ad4f5ece67112c6d6ea1254eaf765 = 57 testes verdes; nenhum arquivo de código mudou no lote (o rascunho passou de primeira)
 
 #### Phase 3: Rede de proteção: senha, exclusão, convites e cotas no banco
 
@@ -465,17 +470,17 @@ T57 → T58
 **Depends on**: T6
 **Reuses**: `M:1792844160000_conta-nova-senha-zera-falhas.sql:10` (`link_nova_senha` vigente); `M:1792843800000_conta-senha-bloqueio.sql:27-82` (`falhas_senha_atual`, `conta_trocar_senha`)
 **Requirement**: ACE-23, ACE-24, ACE-25, ACE-26, ACE-27, ACE-70, ACE-76
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: casos limite listados no topo do teste; sem lacuna.
 
 **Done when**:
 
-- [ ] Casos limite listados antes do teste: link de 1 h menos 1 s e mais 1 s; link usado; 5.ª falha; senha certa antes da 5.ª zera; conta bloqueada por 50 falhas de login
-- [ ] Testes `ACE-24`, `ACE-25`, `ACE-76`: link válido troca a senha, apaga todas as sessões, confirma o e-mail e apaga as `tentativas_login` do e-mail; vencido ou usado devolve falso e não troca
-- [ ] Testes `ACE-26`, `ACE-27`: troca mantém só a sessão do hash recebido; senha atual errada não troca
-- [ ] Testes `ACE-70`: 5 falhas em 15 min recusam a 6.ª sem comparar a senha; senha certa antes zera a contagem
-- [ ] Evidência da rede: `link_nova_senha` sem o `DELETE FROM sessoes` deixa vermelho (registrar aqui)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do teste: link de 1 h menos 1 s e mais 1 s; link usado; 5.ª falha; senha certa antes da 5.ª zera; conta bloqueada por 50 falhas de login
+- [x] Testes `ACE-24`, `ACE-25`, `ACE-76`: link válido troca a senha, apaga todas as sessões, confirma o e-mail e apaga as `tentativas_login` do e-mail; vencido ou usado devolve falso e não troca
+- [x] Testes `ACE-26`, `ACE-27`: troca mantém só a sessão do hash recebido; senha atual errada não troca
+- [x] Testes `ACE-70`: 5 falhas em 15 min recusam a 6.ª sem comparar a senha; senha certa antes zera a contagem
+- [x] Evidência da rede: `link_nova_senha` sem o `DELETE FROM sessoes` deixou o teste `ACE-24` vermelho; restaurado, verde (2026-11-05)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -493,15 +498,15 @@ T57 → T58
 **Depends on**: T7
 **Reuses**: `M:1792843800000_conta-senha-bloqueio.sql:92` (`conta_excluir` vigente)
 **Requirement**: ACE-28, ACE-29, ACE-30, ACE-69
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Testes `ACE-28`: depois da exclusão, a linha tem `excluida-<id>@invalido`, "Conta excluída", hash `!` e `excluida_em`; a auditoria aponta para ela; nenhum nome ou e-mail da pessoa resta nas tabelas de conta
-- [ ] Testes `ACE-29`: única admin de grupo não arquivado recebe a lista (id e nome); grupo arquivado não conta
-- [ ] Testes `ACE-30`, `ACE-69`: senha errada não apaga nada; a sessão aberta de outro aparelho some e `sessao_tocar` devolve nulo
-- [ ] Evidência da rede: `conta_excluir` sem a checagem de única admin deixa vermelho (registrar aqui)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Testes `ACE-28`: depois da exclusão, a linha tem `excluida-<id>@invalido`, "Conta excluída", hash `!` e `excluida_em`; a auditoria aponta para ela; nenhum nome ou e-mail da pessoa resta nas tabelas de conta
+- [x] Testes `ACE-29`: única admin de grupo não arquivado recebe a lista (id e nome); grupo arquivado não conta
+- [x] Testes `ACE-30`, `ACE-69`: senha errada não apaga nada; a sessão aberta de outro aparelho some e `sessao_tocar` devolve nulo
+- [x] Evidência da rede: `conta_excluir` sem a checagem de única admin deixou 2 testes `ACE-29` vermelhos; restaurado, verde (2026-11-05)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -519,18 +524,18 @@ T57 → T58
 **Depends on**: T8
 **Reuses**: `M:1792843620000_conta-convites.sql:13` (`convite_criar`); versões vigentes de `convite_ler`, `convite_aceitar` e `convite_cadastrar` em `M:1792844460000_convites-grupo-arquivado.sql:11`, `:25`, `:61`; `M:1792843680000_conta-admins-listar.sql:8`
 **Requirement**: ACE-31, ACE-32, ACE-33, ACE-34, ACE-35, ACE-36, ACE-37, ACE-67
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: casos limite listados no topo do teste; sem lacuna. O aceite concorrente grava de verdade (COMMIT) e limpa no finally.
 
 **Done when**:
 
-- [ ] Casos limite listados antes do teste: 7 dias menos 1 s e mais 1 s; usado; cancelado; grupo arquivado; e-mail diferente; aceites concorrentes; conta sem vínculo chamando `convite_criar`
-- [ ] Testes `ACE-31`, `ACE-32`: convite com `expira_em` de 7 dias; e-mail já admin recusado; conta sem vínculo recusada
-- [ ] Testes `ACE-33`, `ACE-35`: aceite cria o vínculo com `acessa_financeiro` falso e usa o convite; e-mail de outra conta recebe `convite_de_outro_email`
-- [ ] Testes `ACE-34`, `ACE-36`: cadastro pelo convite nasce confirmado, com vínculo e sessão; vencido, usado, cancelado ou inexistente dá `link_invalido`
-- [ ] Testes `ACE-37`, `ACE-67`: `admins_listar` só com vínculo; dois aceites simultâneos criam um vínculo e o segundo dá `link_invalido`
-- [ ] Evidência da rede: `convite_aceitar` sem `FOR UPDATE` deixa o teste de concorrência vermelho (registrar aqui)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do teste: 7 dias menos 1 s e mais 1 s; usado; cancelado; grupo arquivado; e-mail diferente; aceites concorrentes; conta sem vínculo chamando `convite_criar`
+- [x] Testes `ACE-31`, `ACE-32`: convite com `expira_em` de 7 dias; e-mail já admin recusado; conta sem vínculo recusada
+- [x] Testes `ACE-33`, `ACE-35`: aceite cria o vínculo com `acessa_financeiro` falso e usa o convite; e-mail de outra conta recebe `convite_de_outro_email`
+- [x] Testes `ACE-34`, `ACE-36`: cadastro pelo convite nasce confirmado, com vínculo e sessão; vencido, usado, cancelado ou inexistente dá `link_invalido`
+- [x] Testes `ACE-37`, `ACE-67`: `admins_listar` só com vínculo; dois aceites simultâneos criam um vínculo e o segundo dá `link_invalido`
+- [x] Evidência da rede: `convite_aceitar` sem `FOR UPDATE` deixou o teste `ACE-67` de concorrência vermelho; restaurado, verde (2026-11-05)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -548,22 +553,24 @@ T57 → T58
 **Depends on**: T9
 **Reuses**: `M:1792843860000_conta-teto-emails.sql:26`, `:43`; `M:1792844100000_conta-cota-trava.sql:7`; `M:1792843980000_conta-teto-emails-origem.sql:27`, `:50`; `M:1792843920000_conta-esqueci-nao-confirmada.sql:9`
 **Requirement**: ACE-72, ACE-73, ACE-75
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: casos limite listados no topo do teste; sem lacuna. O teto por categoria (80% ou 100%) é da API (T24); aqui ele entra como parâmetro.
 
 **Done when**:
 
-- [ ] Casos limite listados antes do teste: 80.º e 81.º e-mail com teto 100; 100.º e 101.º para recuperação; 23:59:59 e 00:00:00 em `America/Sao_Paulo`; 20.º e 21.º pedido da mesma chave em 1 h; trava segurada por 2,5 s
-- [ ] Testes `ACE-72`: o 80.º sai e o 81.º não, na cota de cadastro; a recuperação segue até 100; o contador zera na virada do dia de São Paulo
-- [ ] Testes `ACE-73`: recuperação de conta não confirmada gasta a cota de cadastro; o 21.º pedido da mesma chave em 1 h é recusado
-- [ ] Teste `ACE-75`: com a linha do dia travada por outra transação, a reserva falha com `55P03` em até cerca de 2 s
-- [ ] Evidência da rede: `ALTER FUNCTION email_cota_reservar(integer) RESET lock_timeout` deixa vermelho (registrar aqui)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do teste: 80.º e 81.º e-mail com teto 100; 100.º e 101.º para recuperação; 23:59:59 e 00:00:00 em `America/Sao_Paulo`; 20.º e 21.º pedido da mesma chave em 1 h; trava segurada por 2,5 s
+- [x] Testes `ACE-72`: o 80.º sai e o 81.º não, na cota de cadastro; a recuperação segue até 100; o contador zera na virada do dia de São Paulo
+- [x] Testes `ACE-73`: recuperação de conta não confirmada gasta a cota de cadastro; o 21.º pedido da mesma chave em 1 h é recusado
+- [x] Teste `ACE-75`: com a linha do dia travada por outra transação, a reserva falha com `55P03` em até cerca de 2 s
+- [x] Evidência da rede: `ALTER FUNCTION email_cota_reservar(integer) RESET lock_timeout` deixou 2 testes `ACE-75` vermelhos; restaurado, verde (2026-11-05)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
 
 ---
+
+**Gate**: `pnpm vitest run` nos 4 arquivos de `test/banco` da Phase 3 (Postgres privado) @ fc598822c3d6ea623767613dadab599bf2decb88 = 68 testes verdes; nenhum arquivo de código mudou no lote
 
 #### Phase 4: Contrato, token e cookie
 
@@ -578,15 +585,15 @@ T57 → T58
 **Depends on**: None
 **Reuses**: pacote `@pelada/contrato` da fundação (`F:338`, nomes em `F:18`); limites de `ljs:.specs/features/conta-e-acesso/spec.md:50` e `:76`
 **Requirement**: ACE-03, ACE-05, ACE-68
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: o `pnpm-lock.yaml` com o zod nasce no `pnpm install` do /executar.
 
 **Done when**:
 
-- [ ] Testes `ACE-03`: 1, 2, 60 e 61 caracteres de nome; 7, 8, 72 e 73 de senha; 254 e 255 de e-mail
-- [ ] Teste `ACE-05`: `"  Ana@Ex.COM "` vira `ana@ex.com`
-- [ ] Teste `ACE-68`: senha de 30 emojis (menos de 72 caracteres e mais de 72 bytes) é recusada
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Testes `ACE-03`: 1, 2, 60 e 61 caracteres de nome; 7, 8, 72 e 73 de senha; 254 e 255 de e-mail
+- [x] Teste `ACE-05`: `"  Ana@Ex.COM "` vira `ana@ex.com`
+- [x] Teste `ACE-68`: senha de 30 emojis (menos de 72 caracteres e mais de 72 bytes) é recusada
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -604,15 +611,15 @@ T57 → T58
 **Depends on**: T11
 **Reuses**: formas de `ljs:.specs/features/conta-e-acesso/design.md:192` e `:215-228` (só consulta, AD-002)
 **Requirement**: ACE-02, ACE-58
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: corpo de erro `{ erro, codigo, campos?, grupos? }`; `TERMOS_VERSAO` = 2026-11-05, a data do rascunho dos textos (T48).
 
 **Done when**:
 
-- [ ] Teste `ACE-02`: `cadastroCorpo` sem `termos: true` falha com o código `termos_obrigatorios`
-- [ ] Teste `ACE-58`: `TERMOS_VERSAO` casa `^\d{4}-\d{2}-\d{2}$`
-- [ ] Teste: campo a mais em qualquer corpo é recusado (`.strict()`)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `ACE-02`: `cadastroCorpo` sem `termos: true` falha com o código `termos_obrigatorios`
+- [x] Teste `ACE-58`: `TERMOS_VERSAO` casa `^\d{4}-\d{2}-\d{2}$`
+- [x] Teste: campo a mais em qualquer corpo é recusado (`.strict()`)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -630,15 +637,15 @@ T57 → T58
 **Depends on**: T12
 **Reuses**: decisão de `ljs:.specs/features/conta-e-acesso/design.md:141-142` (token e hash do IP); escrito do zero
 **Requirement**: ACE-10, ACE-71, ACE-73
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: o hash é o SHA-256 do texto do token (UTF-8); valor que não é IP também vira `sem-ip`.
 
 **Done when**:
 
-- [ ] Teste `ACE-10`: o hash tem 32 bytes e não contém o token; dois tokens seguidos diferem
-- [ ] Testes `ACE-71`: `2001:db8:1:2:aaaa::1` e `2001:db8:1:2:bbbb::9` dão a mesma chave /64; IPv4 inteiro; IPv6 abreviado e com `::ffff:` normalizados; sem IP, `sem-ip`
-- [ ] Teste `ACE-73`: `2001:db8:1:2::1` e `2001:db8:1:ff::1` dão a mesma chave /48
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `ACE-10`: o hash tem 32 bytes e não contém o token; dois tokens seguidos diferem
+- [x] Testes `ACE-71`: `2001:db8:1:2:aaaa::1` e `2001:db8:1:2:bbbb::9` dão a mesma chave /64; IPv4 inteiro; IPv6 abreviado e com `::ffff:` normalizados; sem IP, `sem-ip`
+- [x] Teste `ACE-73`: `2001:db8:1:2::1` e `2001:db8:1:ff::1` dão a mesma chave /48
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -656,19 +663,21 @@ T57 → T58
 **Depends on**: T13
 **Reuses**: app Hono da fundação (`F:1106`); atributos de `ljs:.specs/features/conta-e-acesso/spec.md:48` e `:99`
 **Requirement**: ACE-09, ACE-17
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: o cookie leva `Max-Age` das 12 h da sessão; o vencido leva também `Expires` em 1970.
 
 **Done when**:
 
-- [ ] Teste `ACE-09`: o `Set-Cookie` tem os 4 atributos e não tem `Domain`
-- [ ] Teste `ACE-17`: o cookie vencido tem `Max-Age=0` e o mesmo nome e caminho
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `ACE-09`: o `Set-Cookie` tem os 4 atributos e não tem `Domain`
+- [x] Teste `ACE-17`: o cookie vencido tem `Max-Age=0` e o mesmo nome e caminho
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
 
 ---
+
+**Gate**: `typecheck` de contrato e api (api só com o erro preexistente `test/rotas/apoio-push.ts(99,40)`) e `vitest run` de T11 a T14 @ fce9ca7f919042fa4653c5769a283728c101e525 = 77 testes verdes. Vermelho por sabotagem do código (2026-11-05), restaurado em seguida: limite de bytes da senha (ACE-68, 2 testes), código `termos_obrigatorios` (ACE-02, 4), prefixo /48 do IP (ACE-73, 1), `HttpOnly` do cookie (ACE-09 e ACE-17, 2)
 
 #### Phase 5: E-mail
 
@@ -683,16 +692,16 @@ T57 → T58
 **Depends on**: T14
 **Reuses**: decisão de `ljs:.specs/features/conta-e-acesso/design.md:176-187` (`fetch` direto, sem SDK); escrito do zero
 **Requirement**: ACE-21, ACE-52, ACE-75
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: casos limite listados no topo do código; sem lacuna. O remetente em memória tem `falharProximos(n)` para provar o ACE-52 nas rotas.
 
 **Done when**:
 
-- [ ] Casos limite listados antes do código: 2xx, 4xx, 429 de cota, 5xx, rede caída, resposta depois de 10 s
-- [ ] Testes `ACE-52`: com `fetch` falso devolvendo 500 ou 429, o resultado é `'falhou'` e o log tem o status sem destino, assunto nem corpo
-- [ ] Teste `ACE-75`: resposta que demora mais de 10 s é abortada e vira `'falhou'`
-- [ ] Teste `ACE-21`: nenhum log do remetente contém o link nem o token
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do código: 2xx, 4xx, 429 de cota, 5xx, rede caída, resposta depois de 10 s
+- [x] Testes `ACE-52`: com `fetch` falso devolvendo 500 ou 429, o resultado é `'falhou'` e o log tem o status sem destino, assunto nem corpo
+- [x] Teste `ACE-75`: resposta que demora mais de 10 s é abortada e vira `'falhou'`
+- [x] Teste `ACE-21`: nenhum log do remetente contém o link nem o token
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -710,16 +719,16 @@ T57 → T58
 **Depends on**: T15
 **Reuses**: `URL_PUBLICA` como única origem de URL (FUN-23, `F:1251`); fragmento de `ljs:.specs/features/conta-e-acesso/design.md:30-31`
 **Requirement**: ACE-04, ACE-23, ACE-31
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: o aviso de cadastro duplicado leva só o link de `/entrar/esqueci`, sem token.
 
 **Done when**:
 
-- [ ] Teste `ACE-23`: o link de recuperação começa por `URL_PUBLICA` e leva o token só depois de `#t=`
-- [ ] Teste `ACE-04`: o aviso de cadastro duplicado não tem link de confirmação
-- [ ] Teste `ACE-31`: o convite traz o nome do grupo e o link `/convite#t=`
-- [ ] A checagem de URL absoluta da fundação continua verde
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `ACE-23`: o link de recuperação começa por `URL_PUBLICA` e leva o token só depois de `#t=`
+- [x] Teste `ACE-04`: o aviso de cadastro duplicado não tem link de confirmação
+- [x] Teste `ACE-31`: o convite traz o nome do grupo e o link `/convite#t=`
+- [x] A checagem de URL absoluta da fundação continua verde
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -737,7 +746,7 @@ T57 → T58
 **Depends on**: T16
 **Reuses**: molde das checagens da fundação (`F:1251`, `backend/scripts/checagens/`) e a checagem do `.env.example` (`F:1886`)
 **Requirement**: ACE-52
-**Status**: rascunhada
+**Status**: bloqueada (2026-11-05): todo teste do projeto `worker` que importa `pg` falha ao carregar (`SyntaxError: Cannot use import statement outside a module` em `pg/lib/connection.js?mf_vitest_no_cjs_esm_shim`); é o ambiente de teste de rotas da fundação, que nunca rodou. A checagem `email-dev` passa (5 testes); falta o teste de `GET /api/dev/emails` (`test/rotas/dev-emails.test.ts`) e o gate full.
 **Nota do rascunho**: como o Hono monta o app sem o `env`, a rota existe sempre e responde o 404 padrão sem `EMAIL_DEV=1`. A checagem `email-dev` entra no ci.yml.
 
 **Done when**:
@@ -751,6 +760,8 @@ T57 → T58
 **Gate**: full
 
 ---
+
+**Gate** (T15 e T16): `vitest run` de `resend.test.ts` e `modelos.test.ts` @ 3236f2b1d277187f0f32324182a26becccdfb02d = 22 testes verdes. Vermelho por sabotagem do código, restaurado: sem `abort` aos 10 s (ACE-75, 1 teste) e `?t=` no lugar de `#t=` (ACE-23 e ACE-06, 4 testes). T17 não fechada (ver o bloqueio nela).
 
 #### Phase 6: Middlewares de entrada e sessão
 

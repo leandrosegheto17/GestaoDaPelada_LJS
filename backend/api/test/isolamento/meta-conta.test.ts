@@ -24,6 +24,8 @@ const MATRIZ_CONTA: Readonly<Record<string, string>> = {
   pedidos_reset: 'conta-apoio.test.ts',
   // notificacoes T12: sem `grupo_id` (a assinatura é da conta); matriz política × comando em `push.test.ts`.
   push_conta: 'push.test.ts',
+  // planos-e-cobranca: tabela do webhook do Asaas, sem `grupo_id`; matriz política × comando em `planos.test.ts`.
+  eventos_asaas: 'planos.test.ts',
 };
 
 /** Tabela de controle do node-pg-migrate: não é dado de conta nem de grupo. */
@@ -129,8 +131,8 @@ describe('meta-teste das tabelas de conta', () => {
     expect(await problemasDeTabelas(aberto.db)).toEqual([]);
   });
 
-  it('ACE-45: a matriz de conta cobre as 10 tabelas sem grupo_id', () => {
-    expect(Object.keys(MATRIZ_CONTA)).toHaveLength(10);
+  it('ACE-45: a matriz de conta cobre as 11 tabelas sem grupo_id', () => {
+    expect(Object.keys(MATRIZ_CONTA)).toHaveLength(11);
   });
 
   it('ACE-45: tabela nova sem RLS, sem policy do backup e sem linha na matriz reprova', async () => {
