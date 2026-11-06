@@ -1866,12 +1866,12 @@ T58 → T59 → T60 → T61 → T62 → T63 → T64 → T65 → T66 → T67 → 
 **Depends on**: —
 **Reuses**: molde do próprio arquivo; achado em `validation.md`
 **Requirement**: PLA-68, PLA-69 · Achado: A-01 (validation.md)
-**Status**: pendente
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste que reproduz o achado e falha antes da correção
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste que reproduz o achado e falha antes da correção
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1888,12 +1888,12 @@ T58 → T59 → T60 → T61 → T62 → T63 → T64 → T65 → T66 → T67 → 
 **Depends on**: T58
 **Reuses**: molde do próprio arquivo; achado em `validation.md`
 **Requirement**: gate do api · Achado: A-02 (validation.md)
-**Status**: pendente
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste que reproduz o achado e falha antes da correção
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste que reproduz o achado e falha antes da correção
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1910,12 +1910,12 @@ T58 → T59 → T60 → T61 → T62 → T63 → T64 → T65 → T66 → T67 → 
 **Depends on**: T59
 **Reuses**: molde do próprio arquivo; achado em `validation.md`
 **Requirement**: PLA-04, PLA-07, PLA-17 · Achado: A-03 (validation.md)
-**Status**: pendente
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste que reproduz o achado e falha antes da correção
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste que reproduz o achado e falha antes da correção
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1932,12 +1932,12 @@ T58 → T59 → T60 → T61 → T62 → T63 → T64 → T65 → T66 → T67 → 
 **Depends on**: T60
 **Reuses**: molde do próprio arquivo; achado em `validation.md`
 **Requirement**: PLA-02, PLA-32, PLA-58 · Achado: A-04 (validation.md)
-**Status**: pendente
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste que reproduz o achado e falha antes da correção
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste que reproduz o achado e falha antes da correção
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1954,12 +1954,12 @@ T58 → T59 → T60 → T61 → T62 → T63 → T64 → T65 → T66 → T67 → 
 **Depends on**: T61
 **Reuses**: molde do próprio arquivo; achado em `validation.md`
 **Requirement**: PLA-44, PLA-56 · Achado: A-05 (validation.md)
-**Status**: pendente
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste que reproduz o achado e falha antes da correção
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste que reproduz o achado e falha antes da correção
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1976,12 +1976,12 @@ T58 → T59 → T60 → T61 → T62 → T63 → T64 → T65 → T66 → T67 → 
 **Depends on**: T62
 **Reuses**: molde do próprio arquivo; achado em `validation.md`
 **Requirement**: PLA-36 · Achado: A-06 (validation.md)
-**Status**: pendente
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste que reproduz o achado e falha antes da correção
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste que reproduz o achado e falha antes da correção
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1998,12 +1998,12 @@ T58 → T59 → T60 → T61 → T62 → T63 → T64 → T65 → T66 → T67 → 
 **Depends on**: T63
 **Reuses**: molde do próprio arquivo; achado em `validation.md`
 **Requirement**: FUN-24, PLA-39 · Achado: A-07 (validation.md)
-**Status**: pendente
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste que reproduz o achado e falha antes da correção
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste que reproduz o achado e falha antes da correção
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -2020,12 +2020,12 @@ T58 → T59 → T60 → T61 → T62 → T63 → T64 → T65 → T66 → T67 → 
 **Depends on**: T64
 **Reuses**: molde do próprio arquivo; achado em `validation.md`
 **Requirement**: PLA-39, PLA-41 · Achado: A-08 (validation.md)
-**Status**: pendente
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste que reproduz o achado e falha antes da correção
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste que reproduz o achado e falha antes da correção
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -2042,12 +2042,12 @@ T58 → T59 → T60 → T61 → T62 → T63 → T64 → T65 → T66 → T67 → 
 **Depends on**: T65
 **Reuses**: molde do próprio arquivo; achado em `validation.md`
 **Requirement**: PLA-38 · Achado: A-09 (validation.md)
-**Status**: pendente
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste que reproduz o achado e falha antes da correção
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste que reproduz o achado e falha antes da correção
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -2064,12 +2064,12 @@ T58 → T59 → T60 → T61 → T62 → T63 → T64 → T65 → T66 → T67 → 
 **Depends on**: T66
 **Reuses**: molde do próprio arquivo; achado em `validation.md`
 **Requirement**: PLA-09, PLA-13 · Achado: A-10 (validation.md)
-**Status**: pendente
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste que reproduz o achado e falha antes da correção
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste que reproduz o achado e falha antes da correção
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -2086,12 +2086,12 @@ T58 → T59 → T60 → T61 → T62 → T63 → T64 → T65 → T66 → T67 → 
 **Depends on**: T67
 **Reuses**: molde do próprio arquivo; achado em `validation.md`
 **Requirement**: PLA-38 · Achado: A-11 (validation.md)
-**Status**: pendente
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste que reproduz o achado e falha antes da correção
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste que reproduz o achado e falha antes da correção
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -2108,12 +2108,12 @@ T58 → T59 → T60 → T61 → T62 → T63 → T64 → T65 → T66 → T67 → 
 **Depends on**: T68
 **Reuses**: molde do próprio arquivo; achado em `validation.md`
 **Requirement**: PLA-48 · Achado: A-12 (validation.md)
-**Status**: pendente
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste que reproduz o achado e falha antes da correção
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste que reproduz o achado e falha antes da correção
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -2130,12 +2130,12 @@ T58 → T59 → T60 → T61 → T62 → T63 → T64 → T65 → T66 → T67 → 
 **Depends on**: T69
 **Reuses**: molde do próprio arquivo; achado em `validation.md`
 **Requirement**: PLA-53, PLA-54 · Achado: A-13, A-14 (validation.md)
-**Status**: pendente
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste que reproduz o achado e falha antes da correção
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste que reproduz o achado e falha antes da correção
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick

@@ -194,6 +194,27 @@ describe('POST …/assinatura', () => {
     }
   });
 
+  it('PLA-60 (A-08): 5 assinaturas abertas na última hora, o POST seguinte recebe 429 sem chamar o Asaas', async () => {
+    const { cenario, db } = aberto;
+    for (let i = 0; i < 5; i += 1) {
+      await db.query(
+        `INSERT INTO assinaturas (grupo_id, asaas_cliente_id, asaas_assinatura_id, valor_centavos, situacao, criada_por,
+           criada_em)
+         VALUES ($1, 'cus_a08', $2, 990, 'cancelada', $3, now() - interval '5 minutes')`,
+        [cenario.grupoH, `sub_a08r_${i}`, cenario.contaB],
+      );
+    }
+    try {
+      const r = await pedir(cenario.grupoH, { conta: cenario.contaB });
+      expect(r.status).toBe(429);
+      expect(r.headers.get('Retry-After')).toBe('3600');
+      expect(await r.json()).toMatchObject({ erro: 'muitas_tentativas' });
+      expect(asaas.chamadas).toEqual([]);
+    } finally {
+      await db.query(`DELETE FROM assinaturas WHERE asaas_assinatura_id ~ '^sub_a08r_[0-9]$'`);
+    }
+  });
+
   it('PLA-33: segundo POST recebe 409 com a mesma faturaUrl', async () => {
     const { cenario } = aberto;
     const primeiro = assinaturaCriada.parse(

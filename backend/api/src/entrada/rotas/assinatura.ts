@@ -55,6 +55,12 @@ function responder(c: Context<Ambiente>, r: ResultadoAssinar): Response {
       return c.json(corpoDoErro('so_quem_criou'), 403);
     case 'grupo_cortesia':
       return c.json({ erro: 'grupo_cortesia', mensagem: MENSAGENS_ERRO_PLANO.grupo_cortesia }, 409);
+    case 'muitas_tentativas':
+      return c.json(
+        { erro: 'muitas_tentativas', mensagem: MENSAGENS_ERRO_PLANO.muitas_tentativas },
+        429,
+        { 'Retry-After': '3600' },
+      );
     case 'nao_encontrado':
       return c.json(corpoDoErro('nao_encontrado'), 404);
     case 'pagamento_indisponivel':

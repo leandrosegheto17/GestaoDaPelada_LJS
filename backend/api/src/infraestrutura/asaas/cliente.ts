@@ -85,6 +85,25 @@ function campo(corpo: unknown, nome: string): unknown {
     : undefined;
 }
 
+/**
+ * A chave da API só viaja para o sandbox do Asaas (PLA-38, A-09): `https://api-sandbox.asaas.com/…`. A exceção é o
+ * teste local, com o Asaas falso do e2e em `localhost`, `127.0.0.1` ou `*.localhost` (loopback nunca sai da máquina).
+ * Qualquer outro endereço (http, outro domínio, produção sem AD) é recusado antes de a chave sair.
+ */
+export function urlDoAsaasPermitida(base: string): boolean {
+  let u: URL;
+  try {
+    u = new URL(base);
+  } catch {
+    return false;
+  }
+  if (u.username !== '' || u.password !== '') return false;
+  if (u.protocol === 'https:' && u.hostname === 'api-sandbox.asaas.com') return true;
+  const loopback =
+    u.hostname === 'localhost' || u.hostname === '127.0.0.1' || u.hostname.endsWith('.localhost');
+  return u.protocol === 'http:' && loopback;
+}
+
 export function asaasHttp(config: ConfigAsaas, opcoes: OpcoesAsaas = {}): Asaas {
   const buscar = opcoes.fetch ?? fetch;
   const registrar = opcoes.registrar ?? registroPadrao;
@@ -104,6 +123,7 @@ export function asaasHttp(config: ConfigAsaas, opcoes: OpcoesAsaas = {}): Asaas 
     corpo?: unknown,
   ): Promise<unknown> {
     if (!base || !config.ASAAS_API_KEY) return falha(operacao, 0, 'sem_configuracao');
+    if (!urlDoAsaasPermitida(base)) return falha(operacao, 0, 'url_nao_permitida');
     const controle = new AbortController();
     const relogio = setTimeout(() => controle.abort(), tempoLimite);
     try {

@@ -142,6 +142,21 @@ describe('GET …/plano', () => {
     });
   });
 
+  it('PLA-08 (A-10): a admin convidada vê a situação da assinatura, mas não o link da fatura', async () => {
+    const { db, cenario } = aberto;
+    await db.query(
+      `INSERT INTO assinaturas (grupo_id, asaas_cliente_id, asaas_assinatura_id, valor_centavos, situacao, fatura_url,
+         criada_por, criada_em)
+       VALUES ($1, 'cus_t24', 'sub_t24_a10', 990, 'aguardando_pagamento', 'https://sandbox.asaas.com/i/a10', $2, now())`,
+      [cenario.grupoG, cenario.contaC],
+    );
+    const r = await lerPlano(cenario.grupoG, cenario.contaO);
+    const corpo = planoResposta.parse(await r.json());
+    expect(corpo.podeAssinar).toBe(false);
+    expect(corpo.assinatura).toEqual({ situacao: 'aguardando_pagamento', faturaUrl: null });
+    expect(JSON.stringify(corpo)).not.toContain('sandbox.asaas.com');
+  });
+
   it('PLA-08: assinatura ativa com o grupo em dia não mostra a fatura', async () => {
     const { db, cenario } = aberto;
     await situacao('ativo', null);

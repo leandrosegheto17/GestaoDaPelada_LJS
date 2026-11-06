@@ -9,7 +9,7 @@ import {
 import { ehDataValida, reaisParaCentavos } from '@pelada/dominio';
 import type { Ambiente } from '../ambiente.ts';
 import { comBanco, SEM_CONTEXTO } from '../middlewares/com-banco.ts';
-import { limiteTaxa } from '../middlewares/limite-taxa.ts';
+import { ESPERA_SEGUNDOS, MENSAGEM_LIMITE } from '../middlewares/limite-taxa.ts';
 import { MENSAGEM_CORPO_GRANDE } from './publico.ts';
 import {
   aplicarEventoAsaas,
@@ -19,15 +19,18 @@ import {
 import { agendarAviso } from '../../infraestrutura/fila/avisos.ts';
 import type { RegistroAsaas } from '../../infraestrutura/asaas/cliente.ts';
 import { tokenDoWebhookConfere } from '../../infraestrutura/asaas/token-webhook.ts';
+import { chaveIp } from '../../infraestrutura/sessao/token.ts';
 import type { OpcoesCliente } from '../../infraestrutura/db/cliente.ts';
 import type { Db } from '../../infraestrutura/db/repositorios/tipos.ts';
 
 /**
  * `POST /api/webhooks/asaas` (planos-e-cobranca T35; PLA-39, PLA-40, PLA-50; AD-093). Sem sessão e fora do
  * `exigirCabecalhoPelada` (a exceção mora lá). Na ordem, antes de abrir o banco:
- * 1. `LIMITE_WEBHOOK` com chave fixa (o Asaas sai de vários IPs; o limite é do webhook inteiro): 429 (PLA-40);
- * 2. `asaas-access-token` contra `ASAAS_WEBHOOK_TOKEN`, em tempo constante: 401 sem gravar e sem logar o valor
- *    (PLA-39); a chave da API no header também é recusada (são segredos diferentes);
+ * 1. `asaas-access-token` contra `ASAAS_WEBHOOK_TOKEN`, em tempo constante: 401 sem gravar e sem logar o valor
+ *    (PLA-39); a chave da API no header também é recusada (são segredos diferentes). Quem erra o token conta no
+ *    `LIMITE_WEBHOOK` por IP (429 acima dele), e nunca na cota fixa do Asaas (A-08, SEC-002);
+ * 2. `LIMITE_WEBHOOK` com chave fixa só para quem tem o token (o Asaas sai de vários IPs; o limite é do webhook
+ *    inteiro): 429 (PLA-40);
  * 3. corpo acima de 64 KiB: 413, antes de ler o JSON (PLA-40);
  * 4. JSON inválido ou sem `id`/`event`: 400; campo novo segue (contrato tolerante, PLA-50);
  * 5. transação sem conta e sem slug (a `asaas_evento_registrar` recusa outro contexto) e `processar` (registrar e
@@ -130,6 +133,8 @@ export function avisoDoWebhook(
 export const LIMITE_CORPO_WEBHOOK_BYTES = 64 * 1024;
 /** Chave fixa do `LIMITE_WEBHOOK`. */
 export const CHAVE_LIMITE_WEBHOOK = 'webhook:asaas';
+/** Prefixo da chave de quem chega sem o token certo (A-08): uma cota por IP, separada da do Asaas. */
+export const CHAVE_RECUSADO_WEBHOOK = 'webhook:recusado:';
 export const HEADER_TOKEN_ASAAS = 'asaas-access-token';
 
 /** O que a rota faz com o evento já validado, dentro da transação. */
@@ -157,16 +162,31 @@ export function rotasWebhookAsaas(opcoes: OpcoesWebhookAsaas = {}): Hono<Ambient
 
   rotas.post(
     '/webhooks/asaas',
-    limiteTaxa('LIMITE_WEBHOOK', () => CHAVE_LIMITE_WEBHOOK),
     async (c, next) => {
       const recebido = c.req.header(HEADER_TOKEN_ASAAS);
-      if (!(await tokenDoWebhookConfere(recebido, c.env.ASAAS_WEBHOOK_TOKEN))) {
+      const limitar = async (chave: string): Promise<Response | null> => {
+        const { success } = await c.env.LIMITE_WEBHOOK.limit({ key: chave });
+        return success
+          ? null
+          : c.json({ erro: MENSAGEM_LIMITE }, 429, { 'Retry-After': String(ESPERA_SEGUNDOS) });
+      };
+      if (
+        !(await tokenDoWebhookConfere(recebido, c.env.ASAAS_WEBHOOK_TOKEN, c.env.ASAAS_API_KEY))
+      ) {
+        // A-08: quem não tem o token gasta só a cota do próprio IP, nunca a do Asaas (senão 61 chamadas por minuto sem
+        // token fariam o Asaas receber 429 e pausar a fila).
+        const negada = await limitar(
+          `${CHAVE_RECUSADO_WEBHOOK}${chaveIp(c.req.header('cf-connecting-ip'), 64)}`,
+        );
+        if (negada !== null) return negada;
         registrar({
           evento: 'webhook_asaas_recusado',
           comHeader: recebido !== undefined ? 'sim' : 'nao',
         });
         return c.json({ erro: 'nao_autorizado' }, 401);
       }
+      const negada = await limitar(CHAVE_LIMITE_WEBHOOK);
+      if (negada !== null) return negada;
       await next();
     },
     bodyLimit({

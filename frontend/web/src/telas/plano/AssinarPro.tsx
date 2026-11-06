@@ -17,7 +17,9 @@ import modulo from '../grupos-elenco.module.css';
  * - o título "Assinar Pro: R$ 9,90/mês", com o preço da tabela do domínio;
  * - nome e CPF, validados pelo mesmo contrato da API (`assinaturaCorpo`) antes do envio: CPF inválido mostra o erro ao
  *   lado do campo e não chama a API (PLA-35); a API valida de novo (422 por campo);
- * - sucesso: abre a fatura do Asaas (`window.open` com a `faturaUrl`, PLA-53); o plano é relido pelo `useAssinar`;
+ * - sucesso: abre a fatura do Asaas (`window.open` com a `faturaUrl`, PLA-53) e deixa o link "Abrir a fatura" visível,
+ *   porque Safari/iOS e o PWA bloqueiam a janela aberta depois de uma chamada assíncrona (A-13); o plano é relido pelo
+ *   `useAssinar`;
  * - 502: a mensagem da API e "Tentar de novo", que reenvia o mesmo formulário (PLA-36);
  * - 409 `assinatura_pendente`: abre a fatura em aberto, se houver (outra aba já tinha assinado);
  * - nenhum campo de cartão: o pagamento é na fatura do Asaas (PLA-34).
@@ -49,8 +51,10 @@ export function validarAssinatura(dados: { nome: string; cpf: string }): Erros {
   return erros;
 }
 
-function abrirFatura(url: string): void {
+/** Abre a fatura em outra aba e devolve o endereço para o link visível (A-13: o navegador pode bloquear a janela). */
+function abrirFatura(url: string): string {
   window.open(url, '_blank', 'noopener');
+  return url;
 }
 
 export function AssinarPro({ grupoId }: { grupoId: string }) {
@@ -58,6 +62,7 @@ export function AssinarPro({ grupoId }: { grupoId: string }) {
   const [dados, setDados] = useState({ nome: '', cpf: '' });
   const [erros, setErros] = useState<Erros>({});
   const [falha, setFalha] = useState<string | null>(null);
+  const [fatura, setFatura] = useState<string | null>(null);
 
   function enviar() {
     if (assinar.isPending) return;
@@ -67,11 +72,11 @@ export function AssinarPro({ grupoId }: { grupoId: string }) {
     if (Object.keys(locais).length > 0) return;
     const corpo = assinaturaCorpo.parse(dados);
     assinar.mutate(corpo, {
-      onSuccess: (r) => abrirFatura(r.faturaUrl),
+      onSuccess: (r) => setFatura(abrirFatura(r.faturaUrl)),
       onError: (erro) => {
         const dePlano = erroDePlano(erro);
         if (dePlano?.tipo === 'assinatura_pendente') {
-          if (dePlano.faturaUrl) abrirFatura(dePlano.faturaUrl);
+          if (dePlano.faturaUrl) setFatura(abrirFatura(dePlano.faturaUrl));
           return;
         }
         if (dePlano?.tipo === 'pagamento_indisponivel') {
@@ -143,6 +148,13 @@ export function AssinarPro({ grupoId }: { grupoId: string }) {
           value={dados.cpf}
           onChange={(e) => setDados((d) => ({ ...d, cpf: e.target.value }))}
         />
+        {fatura ? (
+          <p>
+            <a href={fatura} target="_blank" rel="noopener noreferrer">
+              Abrir a fatura
+            </a>
+          </p>
+        ) : null}
         <p>O pagamento é feito na fatura do Asaas (Pix, boleto ou cartão).</p>
         <Botao type="submit" carregando={assinar.isPending}>
           {assinar.isPending ? 'Abrindo a fatura…' : 'Assinar Pro'}

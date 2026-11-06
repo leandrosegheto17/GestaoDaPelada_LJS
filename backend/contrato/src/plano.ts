@@ -189,6 +189,7 @@ export const CODIGOS_ERRO_PLANO = [
   'assinatura_ativa',
   'sem_assinatura',
   'grupo_cortesia',
+  'muitas_tentativas',
   'pagamento_indisponivel',
 ] as const;
 export type CodigoErroPlano = (typeof CODIGOS_ERRO_PLANO)[number];
@@ -200,5 +201,6 @@ export const MENSAGENS_ERRO_PLANO: Readonly<Record<CodigoErroPlano, string>> = {
   assinatura_ativa: 'O grupo já tem uma assinatura ativa.',
   sem_assinatura: 'O grupo não tem assinatura para cancelar.',
   grupo_cortesia: 'Este grupo tem o Pro de cortesia e não precisa de assinatura.',
+  muitas_tentativas: 'Muitas tentativas de assinatura. Tente de novo mais tarde.',
   pagamento_indisponivel: MENSAGEM_PAGAMENTO_INDISPONIVEL,
 };

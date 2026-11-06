@@ -11,6 +11,7 @@ import { ItemLista, Lista } from '../../componentes/Lista.tsx';
 import { LinkVoltar } from '../../componentes/LinkVoltar.tsx';
 import { ErroApi } from '../../dados/cliente.ts';
 import { useGrupo } from '../../dados/grupos.ts';
+import { hojeEmSaoPaulo } from '../../dados/hoje.ts';
 import { usePlano } from '../../dados/plano.ts';
 import estilos from '../acesso.module.css';
 import modulo from '../grupos-elenco.module.css';
@@ -47,12 +48,18 @@ export const NOMES_DOS_RECURSOS: Readonly<Record<Recurso, string>> = {
   ...NOMES_RECURSOS_PRO,
 };
 
-/** "Trial Pro até 14/11/2026", "Pro até 05/12/2026" ou nada. */
+/**
+ * "Trial Pro até 14/11/2026", "Pro até 05/12/2026" ou nada. Assinatura em dia com o `pagoAte` já passado (a renovação
+ * ainda não chegou pelo webhook) não promete uma data que já venceu: "Pro: renovação em andamento" (A-14).
+ */
 export function textoValidade(
   p: Pick<PlanoResposta, 'plano' | 'trialFimEm' | 'pagoAte'>,
+  hoje: string = hojeEmSaoPaulo(),
 ): string | null {
   if (p.plano === 'trial' && p.trialFimEm) return `Trial Pro até ${dataBr(p.trialFimEm)}`;
-  if (p.plano === 'pro' && p.pagoAte) return `Pro até ${dataBr(p.pagoAte)}`;
+  if (p.plano === 'pro' && p.pagoAte) {
+    return p.pagoAte < hoje ? 'Pro: renovação em andamento' : `Pro até ${dataBr(p.pagoAte)}`;
+  }
   return null;
 }
 

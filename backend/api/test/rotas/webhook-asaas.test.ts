@@ -3,6 +3,7 @@ import type { Env, LimiteDeTaxa } from '../../src/entrada/ambiente.ts';
 import { criarApp } from '../../src/entrada/app.ts';
 import {
   CHAVE_LIMITE_WEBHOOK,
+  CHAVE_RECUSADO_WEBHOOK,
   LIMITE_CORPO_WEBHOOK_BYTES,
 } from '../../src/entrada/rotas/webhook-asaas.ts';
 import { envAcesso } from '../acesso/apoio.ts';
@@ -171,6 +172,55 @@ describe('POST /api/webhooks/asaas: limite e tamanho (PLA-40)', () => {
     expect(r.status).toBe(429);
     expect(chaves).toEqual([CHAVE_LIMITE_WEBHOOK]);
     expect(await eventosGravados()).toEqual([]);
+  });
+
+  it('PLA-40 (A-08): sem o token, o limite conta por IP e nunca na chave fixa do Asaas', async () => {
+    const chaves: string[] = [];
+    const conta: LimiteDeTaxa = {
+      limit: async ({ key }) => {
+        chaves.push(key);
+        return { success: true };
+      },
+    };
+    const r = await enviar({
+      token: 'chute',
+      corpo: evento('evt_a08'),
+      env: { LIMITE_WEBHOOK: conta },
+    });
+    expect(r.status).toBe(401);
+    expect(chaves).toHaveLength(1);
+    expect(chaves[0]!.startsWith(CHAVE_RECUSADO_WEBHOOK)).toBe(true);
+    expect(chaves).not.toContain(CHAVE_LIMITE_WEBHOOK);
+  });
+
+  it('PLA-40 (A-08): sem o token e acima do limite do IP, 429 (e a chave do Asaas segue livre)', async () => {
+    const nega: LimiteDeTaxa = { limit: async () => ({ success: false }) };
+    const r = await enviar({
+      token: null,
+      corpo: evento('evt_a08b'),
+      env: { LIMITE_WEBHOOK: nega },
+    });
+    expect(r.status).toBe(429);
+    expect(await eventosGravados()).toEqual([]);
+  });
+
+  it('PLA-40 (A-08): o Asaas com o token certo não é afetado pela cota de quem errou o token', async () => {
+    const porChave: Record<string, number> = {};
+    const limite: LimiteDeTaxa = {
+      limit: async ({ key }) => {
+        porChave[key] = (porChave[key] ?? 0) + 1;
+        return { success: !key.startsWith(CHAVE_RECUSADO_WEBHOOK) };
+      },
+    };
+    for (let i = 0; i < 70; i += 1) {
+      await enviar({
+        token: 'chute',
+        corpo: evento(`evt_a08_${i}`),
+        env: { LIMITE_WEBHOOK: limite },
+      });
+    }
+    const certo = await enviar({ corpo: evento('evt_a08_certo'), env: { LIMITE_WEBHOOK: limite } });
+    expect(certo.status).toBe(200);
   });
 
   it('PLA-40: corpo de 65.537 bytes responde 413, sem gravar', async () => {

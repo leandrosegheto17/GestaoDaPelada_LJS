@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   asaasHttp,
   TEMPO_LIMITE_ASAAS_MS,
+  urlDoAsaasPermitida,
   type NovaAssinatura,
   type NovoCliente,
 } from '../../src/infraestrutura/asaas/cliente.ts';
@@ -291,5 +292,40 @@ describe('asaasHttp: dado pessoal e cartão', () => {
       const corpo = String(chamada(buscar, i).init.body ?? '');
       expect(corpo).not.toMatch(/creditCard|creditCardHolderInfo|creditCardToken|cvv/i);
     }
+  });
+});
+
+describe('asaasHttp: a chave só vai para o sandbox (PLA-38, A-09)', () => {
+  it.each([
+    'http://api-sandbox.asaas.com/v3',
+    'https://api.asaas.com/v3',
+    'https://api-sandbox.asaas.com.evil.example/v3',
+    'https://evil.example/v3',
+    'https://usuario:senha@api-sandbox.asaas.com/v3',
+    'http://api-sandbox.asaas.com@evil.example/v3',
+    'https://localhost/v3',
+    'sem-url',
+  ])('%s é recusado antes de a chave sair', async (url) => {
+    const buscar = vi.fn(async () => resposta(200, { id: 'x' }));
+    const log = { linhas: [] as unknown[] };
+    const r = await asaasHttp(
+      { ASAAS_URL: url, ASAAS_API_KEY: CHAVE },
+      { fetch: buscar, registrar: (l) => log.linhas.push(l) },
+    ).criarCliente(CLIENTE);
+    expect(r).toBe('falhou');
+    expect(buscar).not.toHaveBeenCalled();
+    expect(log.linhas).toEqual([
+      { evento: 'asaas_falhou', operacao: 'criar_cliente', status: 0, motivo: 'url_nao_permitida' },
+    ]);
+    expect(JSON.stringify(log.linhas)).not.toContain(CHAVE);
+  });
+
+  it.each([
+    'https://api-sandbox.asaas.com/v3',
+    'http://127.0.0.1:8749',
+    'http://localhost:8749',
+    'http://asaas.localhost:8749',
+  ])('%s é permitido (sandbox e o Asaas falso local)', (url) => {
+    expect(urlDoAsaasPermitida(url)).toBe(true);
   });
 });

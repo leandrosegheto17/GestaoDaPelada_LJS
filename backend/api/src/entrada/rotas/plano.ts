@@ -19,7 +19,7 @@ import { plano as repositorioPlano } from '../../infraestrutura/db/repositorios/
  * - `somenteLeitura`: o motivo de uma escrita comum (`escrita`), o mesmo que o `exigirPlanoEditavel` usaria;
  * - `recursos`: os que o plano libera (tabela do domínio); `limiteJogadores`: 20 no Free, `null` nos outros;
  * - `podeAssinar`: verdadeiro só para a criadora (PLA-08, PLA-32);
- * - `assinatura`: a vigente, com `faturaUrl` só quando há fatura em aberto (pendente, ou o grupo `inadimplente` com a
+ * - `assinatura`: a vigente, com `faturaUrl` só para a criadora (A-10) e só quando há fatura em aberto (pendente, ou o grupo `inadimplente` com a
  *   assinatura ativa, AD-096; `mostraFaturaEmAberto` do domínio).
  */
 export function rotasPlano(): Hono<Ambiente> {
@@ -34,6 +34,7 @@ export function rotasPlano(): Hono<Ambiente> {
     const motivo = await motivoSomenteLeitura(c.var.db, grupoId, hoje, estado, 'escrita');
     const assinatura = await repositorioPlano.assinaturaVigente(c.var.db, grupoId);
     const limite = estado.recursosDoPlano.limiteJogadores;
+    const podeAssinar = c.var.contaId !== undefined && c.var.contaId === estado.criadoPor;
 
     const resposta: PlanoResposta = {
       plano: estado.plano,
@@ -47,15 +48,17 @@ export function rotasPlano(): Hono<Ambiente> {
       limiteJogadores: limite === 20 ? 20 : null,
       somenteLeitura: motivo === null ? null : { motivo },
       recursos: [...estado.recursosDoPlano.recursos],
-      podeAssinar: c.var.contaId !== undefined && c.var.contaId === estado.criadoPor,
+      podeAssinar,
       assinatura:
         assinatura === null
           ? null
           : {
               situacao: assinatura.situacao,
-              faturaUrl: mostraFaturaEmAberto(estado.situacaoComercial, assinatura.situacao)
-                ? assinatura.faturaUrl
-                : null,
+              // A-10: o link da fatura (que pode trazer nome e documento de quem paga) é só da criadora.
+              faturaUrl:
+                podeAssinar && mostraFaturaEmAberto(estado.situacaoComercial, assinatura.situacao)
+                  ? assinatura.faturaUrl
+                  : null,
             },
     };
     return c.json(resposta, 200);

@@ -67,6 +67,16 @@ describe('Assinar Pro', () => {
     });
   });
 
+  it('PLA-53 (A-13): com a janela bloqueada, o link "Abrir a fatura" fica visível e aponta para a fatura', async () => {
+    abrir.mockImplementation(() => null);
+    montar(() => json(201, { faturaUrl: FATURA }));
+    await preencher('Maria Silva', '529.982.247-25');
+    const link = await screen.findByRole('link', { name: 'Abrir a fatura' });
+    expect(link.getAttribute('href')).toBe(FATURA);
+    expect(link.getAttribute('target')).toBe('_blank');
+    expect(link.getAttribute('rel')).toContain('noopener');
+  });
+
   it('PLA-35: CPF inválido mostra o erro no campo sem chamar a API', async () => {
     const { chamadasA } = montar(() => json(201, { faturaUrl: FATURA }));
     await preencher('Maria Silva', '111.111.111-11');

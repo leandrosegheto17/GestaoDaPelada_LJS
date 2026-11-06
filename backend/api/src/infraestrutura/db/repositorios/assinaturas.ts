@@ -147,4 +147,20 @@ async function travarGrupo(db: Db, grupoId: string): Promise<void> {
   );
 }
 
-export const assinaturas = { pendenteOuAtiva, clienteDaConta, registrar, cancelar, travarGrupo };
+/** Quantas assinaturas o grupo abriu na última hora (relógio do banco), em qualquer situação (A-08). */
+async function abertasNaUltimaHora(db: Db, grupoId: string): Promise<number> {
+  const r = await sql<{ n: number }>`
+    SELECT count(*)::int AS n
+      FROM assinaturas
+     WHERE grupo_id = ${grupoId}::uuid AND criada_em > now() - interval '1 hour'`.execute(db);
+  return r.rows[0]?.n ?? 0;
+}
+
+export const assinaturas = {
+  pendenteOuAtiva,
+  clienteDaConta,
+  registrar,
+  cancelar,
+  travarGrupo,
+  abertasNaUltimaHora,
+};

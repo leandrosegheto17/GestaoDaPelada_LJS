@@ -9,6 +9,18 @@ import type { EventoParaRegistrar } from '../../infraestrutura/db/repositorios/e
  * - o valor, em reais no Asaas, vira centavos na fronteira (PLA-06); valor que não converte (fração de centavo,
  *   negativo) vira nulo e o domínio o trata como divergente (PLA-51).
  */
+/**
+ * `dateCreated` no único formato que o domínio e o banco comparam (`AAAA-MM-DD HH:MM:SS`, hora de São Paulo; A-12).
+ * Aceita também a forma com `T` e frações de segundo (`2026-11-05T11:00:00.123`), sem fuso, e a devolve no formato do
+ * Asaas. Qualquer outra coisa (com fuso, só a data, texto livre) vira `null`: o domínio trata como sem data, e a
+ * ordem dos eventos nunca depende de uma comparação de textos de formatos diferentes.
+ */
+export function dataCriacaoNormalizada(texto: string | null | undefined): string | null {
+  if (texto === null || texto === undefined) return null;
+  const m = /^(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2}:\d{2})(?:\.\d+)?$/.exec(texto.trim());
+  return m === null ? null : `${m[1]} ${m[2]}`;
+}
+
 export function eventoDoCorpo(corpo: AsaasEventoCorpo): EventoParaRegistrar {
   const pagamento = corpo.payment ?? null;
   let valorCentavos: number | null = null;
@@ -22,7 +34,7 @@ export function eventoDoCorpo(corpo: AsaasEventoCorpo): EventoParaRegistrar {
   return {
     id: corpo.id,
     evento: corpo.event,
-    dataCriacao: corpo.dateCreated ?? null,
+    dataCriacao: dataCriacaoNormalizada(corpo.dateCreated),
     cobrancaId: pagamento?.id ?? null,
     assinaturaId: pagamento?.subscription ?? corpo.subscription?.id ?? null,
     status: pagamento?.status ?? null,
