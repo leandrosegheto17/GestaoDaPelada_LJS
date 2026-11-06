@@ -276,7 +276,7 @@ T57 → T58
 **Depends on**: None
 **Reuses**: estender a fábrica de cenário e o `comoApp` da fundação (`F:909`, `FD:89`) e o `bancoDeTeste()` (`F:507`); senha por `conta_definir_senha` (`M:1792843560000_conta-senha-e-exclusao.sql:97`), chamada como `postgres` (AD-009)
 **Requirement**: ACE-43, ACE-45
-concluída
+**Status**: concluída
 **Nota do rascunho**: o teste do cenário fica em `cenario-conta.test.ts`; a evidência da rede (sabotagem do `conta_definir_senha`) é do /executar.
 
 **Done when**:
@@ -302,7 +302,7 @@ T57 → T58
 **Depends on**: T0
 **Reuses**: molde da matriz de leitura e escrita da fundação (`F:981`, `F:1007`); policies e grants em `M:1792843380000_conta-tabelas.sql:69-81`
 **Requirement**: ACE-43, ACE-44, ACE-45
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -327,7 +327,7 @@ T57 → T58
 **Depends on**: T1
 **Reuses**: policies de `M:1792843380000_conta-tabelas.sql:55-101`; tabelas novas em `M:1792843800000_conta-senha-bloqueio.sql:8`, `M:1792843860000_conta-teto-emails.sql:7`, `M:1792843980000_conta-teto-emails-origem.sql:7`; role renomeada em `M:1792844220000_roles-padronizadas.sql:26` (AD-016 proposta)
 **Requirement**: ACE-45, ACE-46
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -353,7 +353,7 @@ T57 → T58
 **Depends on**: T2
 **Reuses**: estender o meta-teste da fundação (`F:957`) e ler o catálogo como o `lerEsquema` (`F:760`); fecha o risco de `FD:183`
 **Requirement**: ACE-43, ACE-45
-concluída
+**Status**: concluída
 **Nota do rascunho**: a matriz de conta (tabela → arquivo de teste) fica no próprio meta-teste.
 
 **Done when**:
@@ -384,7 +384,7 @@ T57 → T58
 **Depends on**: T3
 **Reuses**: `M:1792843440000_conta-cadastro-e-links.sql:11` (`envio_permitido`), `:29` (`conta_cadastrar`); `M:1792843920000_conta-esqueci-nao-confirmada.sql:47` (`link_pedir`); `M:1792843740000_conta-confirmar-sem-sessao.sql:9` (`link_confirmar`)
 **Requirement**: ACE-01, ACE-04, ACE-05, ACE-06, ACE-07, ACE-08, ACE-23, ACE-51
-concluída
+**Status**: concluída
 **Nota do rascunho**: o apoio dos testes de banco (transação desfeita, troca de role) nasce em `backend/api/test/banco/apoio-conta.ts`.
 
 **Done when**:
@@ -411,7 +411,7 @@ T57 → T58
 **Depends on**: T4
 **Reuses**: `M:1792844040000_conta-entrar-teto-conta.sql:21` (versão vigente de `conta_entrar`, com a trava por e-mail e IP de `M:1792843500000_conta-entrar-e-sessao.sql:15`)
 **Requirement**: ACE-09, ACE-10, ACE-11, ACE-12, ACE-13, ACE-14, ACE-66
-concluída
+**Status**: concluída
 **Nota do rascunho**: casos limite listados no topo do teste; sem lacuna. O teste com 4 falhas e duas tentativas simultâneas é o que morre sem a trava por e-mail.
 
 **Done when**:
@@ -440,7 +440,7 @@ T57 → T58
 **Depends on**: T5
 **Reuses**: `M:1792843500000_conta-entrar-e-sessao.sql:78` (`sessao_tocar`); `M:1792844040000_conta-entrar-teto-conta.sql:21`
 **Requirement**: ACE-15, ACE-16, ACE-74
-concluída
+**Status**: concluída
 **Nota do rascunho**: casos limite listados no topo do teste; sem lacuna.
 
 **Done when**:
@@ -471,7 +471,7 @@ T57 → T58
 **Depends on**: T6
 **Reuses**: `M:1792844160000_conta-nova-senha-zera-falhas.sql:10` (`link_nova_senha` vigente); `M:1792843800000_conta-senha-bloqueio.sql:27-82` (`falhas_senha_atual`, `conta_trocar_senha`)
 **Requirement**: ACE-23, ACE-24, ACE-25, ACE-26, ACE-27, ACE-70, ACE-76
-concluída
+**Status**: concluída
 **Nota do rascunho**: casos limite listados no topo do teste; sem lacuna.
 
 **Done when**:
@@ -499,7 +499,7 @@ T57 → T58
 **Depends on**: T7
 **Reuses**: `M:1792843800000_conta-senha-bloqueio.sql:92` (`conta_excluir` vigente)
 **Requirement**: ACE-28, ACE-29, ACE-30, ACE-69
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -525,7 +525,7 @@ T57 → T58
 **Depends on**: T8
 **Reuses**: `M:1792843620000_conta-convites.sql:13` (`convite_criar`); versões vigentes de `convite_ler`, `convite_aceitar` e `convite_cadastrar` em `M:1792844460000_convites-grupo-arquivado.sql:11`, `:25`, `:61`; `M:1792843680000_conta-admins-listar.sql:8`
 **Requirement**: ACE-31, ACE-32, ACE-33, ACE-34, ACE-35, ACE-36, ACE-37, ACE-67
-concluída
+**Status**: concluída
 **Nota do rascunho**: casos limite listados no topo do teste; sem lacuna. O aceite concorrente grava de verdade (COMMIT) e limpa no finally.
 
 **Done when**:
@@ -554,7 +554,7 @@ T57 → T58
 **Depends on**: T9
 **Reuses**: `M:1792843860000_conta-teto-emails.sql:26`, `:43`; `M:1792844100000_conta-cota-trava.sql:7`; `M:1792843980000_conta-teto-emails-origem.sql:27`, `:50`; `M:1792843920000_conta-esqueci-nao-confirmada.sql:9`
 **Requirement**: ACE-72, ACE-73, ACE-75
-concluída
+**Status**: concluída
 **Nota do rascunho**: casos limite listados no topo do teste; sem lacuna. O teto por categoria (80% ou 100%) é da API (T24); aqui ele entra como parâmetro.
 
 **Done when**:
@@ -586,7 +586,7 @@ T57 → T58
 **Depends on**: None
 **Reuses**: pacote `@pelada/contrato` da fundação (`F:338`, nomes em `F:18`); limites de `ljs:.specs/features/conta-e-acesso/spec.md:50` e `:76`
 **Requirement**: ACE-03, ACE-05, ACE-68
-concluída
+**Status**: concluída
 **Nota do rascunho**: o `pnpm-lock.yaml` com o zod nasce no `pnpm install` do /executar.
 
 **Done when**:
@@ -612,7 +612,7 @@ T57 → T58
 **Depends on**: T11
 **Reuses**: formas de `ljs:.specs/features/conta-e-acesso/design.md:192` e `:215-228` (só consulta, AD-002)
 **Requirement**: ACE-02, ACE-58
-concluída
+**Status**: concluída
 **Nota do rascunho**: corpo de erro `{ erro, codigo, campos?, grupos? }`; `TERMOS_VERSAO` = 2026-11-05, a data do rascunho dos textos (T48).
 
 **Done when**:
@@ -638,7 +638,7 @@ T57 → T58
 **Depends on**: T12
 **Reuses**: decisão de `ljs:.specs/features/conta-e-acesso/design.md:141-142` (token e hash do IP); escrito do zero
 **Requirement**: ACE-10, ACE-71, ACE-73
-concluída
+**Status**: concluída
 **Nota do rascunho**: o hash é o SHA-256 do texto do token (UTF-8); valor que não é IP também vira `sem-ip`.
 
 **Done when**:
@@ -664,7 +664,7 @@ T57 → T58
 **Depends on**: T13
 **Reuses**: app Hono da fundação (`F:1106`); atributos de `ljs:.specs/features/conta-e-acesso/spec.md:48` e `:99`
 **Requirement**: ACE-09, ACE-17
-concluída
+**Status**: concluída
 **Nota do rascunho**: o cookie leva `Max-Age` das 12 h da sessão; o vencido leva também `Expires` em 1970.
 
 **Done when**:
@@ -693,7 +693,7 @@ T57 → T58
 **Depends on**: T14
 **Reuses**: decisão de `ljs:.specs/features/conta-e-acesso/design.md:176-187` (`fetch` direto, sem SDK); escrito do zero
 **Requirement**: ACE-21, ACE-52, ACE-75
-concluída
+**Status**: concluída
 **Nota do rascunho**: casos limite listados no topo do código; sem lacuna. O remetente em memória tem `falharProximos(n)` para provar o ACE-52 nas rotas.
 
 **Done when**:
@@ -720,7 +720,7 @@ T57 → T58
 **Depends on**: T15
 **Reuses**: `URL_PUBLICA` como única origem de URL (FUN-23, `F:1251`); fragmento de `ljs:.specs/features/conta-e-acesso/design.md:30-31`
 **Requirement**: ACE-04, ACE-23, ACE-31
-concluída
+**Status**: concluída
 **Nota do rascunho**: o aviso de cadastro duplicado leva só o link de `/entrar/esqueci`, sem token.
 
 **Done when**:
@@ -747,7 +747,7 @@ T57 → T58
 **Depends on**: T16
 **Reuses**: molde das checagens da fundação (`F:1251`, `backend/scripts/checagens/`) e a checagem do `.env.example` (`F:1886`)
 **Requirement**: ACE-52
-concluída
+**Status**: concluída
 **Nota do rascunho**: como o Hono monta o app sem o `env`, a rota existe sempre e responde o 404 padrão sem `EMAIL_DEV=1`. A checagem `email-dev` entra no ci.yml.
 
 **Done when**:
@@ -777,7 +777,7 @@ T57 → T58
 **Depends on**: T17
 **Reuses**: ordem de `ljs:.specs/features/conta-e-acesso/design.md:143`, escrita do zero no `app.ts` da fundação (`F:1106`); binding falso do teste de `limiteTaxa` (`F:1153`)
 **Requirement**: ACE-49
-concluída
+**Status**: concluída
 **Nota do rascunho**: escrita = todo método fora de GET e HEAD; o valor tem de ser exatamente `1`; a recusa é `403` com `corpoDoErro('origem_recusada')`.
 **Lacunas**: mudança de teste existente sem aprovação registrada: `test/rotas/limite-taxa.test.ts` e `test/db/com-banco.test.ts` passam a mandar `X-Pelada: 1` nos POST (nenhuma asserção mudou); o `/executar` pede a aprovação antes do verde.
 
@@ -803,7 +803,7 @@ T57 → T58
 **Depends on**: T18
 **Reuses**: estender `limiteTaxa(binding)` (`F:1153`); binding `LIMITE_ENTRAR` de FUN-26 (`F:1081`); `chaveIp` (T13)
 **Requirement**: ACE-50, ACE-70, ACE-71
-concluída
+**Status**: concluída
 **Nota do rascunho**: `CHAVE_SEM_IP` passa a ser o `SEM_IP` da T13 (mesmo valor); as rotas ficam em `ROTAS_LIMITE_ENTRAR`, registradas por `limitarRotasDeAcesso(api)` antes das rotas, para valerem já antes de elas existirem.
 
 **Done when**:
@@ -829,7 +829,7 @@ T57 → T58
 **Depends on**: T19
 **Reuses**: estender o `comBanco` da fundação (`F:1203`, `FD:103`) e o cliente por requisição (`F:1179`); decisão de `ljs:.specs/features/conta-e-acesso/design.md:18-23` (transação curta antes do `comBanco`, leituras seguem `READ ONLY`)
 **Requirement**: ACE-15, ACE-16, ACE-47, ACE-69
-concluída
+**Status**: concluída
 **Nota do rascunho**: casos limite listados no topo de `sessao.ts`. `sessoes.tocar` fica em `src/infraestrutura/db/repositorios/sessoes.ts` (a T22 acrescenta `encerrarAtual`); o `carregarSessao` é global em `criarApp`, depois dos limitadores; o `comBanco` passa a ter `contextoDaSessao` como padrão. Teste no projeto `banco` (Node), em `test/sessao/`, com o app como `pelada_app` pela `fabricaComoApp` nova de `test/db/requisicao.ts`.
 **Lacunas**: cookie de sessão de escopo `troca_de_senha` numa rota comum: a spec não define; o rascunho trata como sessão inválida e vence o cookie.
 
@@ -857,7 +857,7 @@ T57 → T58
 **Depends on**: T20
 **Reuses**: `grupos_visiveis()` vigente (`M:1792844280000_grupos-visiveis-arquivado.sql:9`); `comBanco` estendido (T20)
 **Requirement**: ACE-41
-concluída
+**Status**: concluída
 **Nota do rascunho**: `grupoId` que não é uuid dá 404 sem consulta. `protegerRotasDeGrupo(api)` registra em `criarApp` a cadeia `exigirSessao` → `comBanco()` → `exigirVinculo` em `/grupos/:grupoId/*`; as rotas da T30 só declaram o handler. Teste em `test/sessao/vinculo.test.ts` (projeto `banco`).
 
 **Done when**:
@@ -884,7 +884,7 @@ T57 → T58
 **Depends on**: T21
 **Reuses**: `c.var.db: Kysely<Banco>` da fundação (`FD:103`); assinaturas das funções em T4 a T8 (`M:` citados lá)
 **Requirement**: ACE-18
-concluída
+**Status**: concluída
 **Nota do rascunho**: `contas` e `links` em `contas.ts`; `sessoes.encerrarAtual` em `sessoes.ts`, ao lado do `tocar` (T20); `Db` e `bytea()` em `repositorios/tipos.ts`. `links.pedir` chama `link_pedir_com_confirmacao` (devolve também `confirmada`, para o ACE-73 da T24). `links.confirmar` passa `NULL` no hash de sessão (a função não abre sessão desde `1792843740000`). Teste com o `comDb` novo de `test/repositorios/apoio.ts`.
 
 **Done when**:
@@ -910,7 +910,7 @@ T57 → T58
 **Depends on**: T22
 **Reuses**: funções de T9; decisão de `ljs:.specs/features/conta-e-acesso/design.md:128` (último admin por `FOR UPDATE` na mesma transação)
 **Requirement**: ACE-39, ACE-40, ACE-42
-concluída
+**Status**: concluída
 **Nota do rascunho**: `convites`, `admins` e `auditoria` em `convites.ts`. Criar, aceitar e cadastrar convite gravam a auditoria no próprio banco; cancelar (`cancelar_convite`) e remover (`remover_admin`, entidade `vinculo_admin`) gravam pelo `auditoria.registrar`. `admins.remover` devolve `ok`, `ultimo_admin` ou `nao_encontrado`.
 
 **Done when**:
@@ -936,7 +936,7 @@ T57 → T58
 **Depends on**: T23
 **Reuses**: funções de cota de T10; remetentes de T15; chave /48 de T13
 **Requirement**: ACE-51, ACE-52, ACE-72, ACE-73, ACE-75
-concluída
+**Status**: concluída
 **Nota do rascunho**: casos limite listados no topo de `enviar-email.ts`. O caso de uso tem duas partes: `registrarOrigem(urlBanco, ip)`, que a rota chama ao chegar, em transação curta própria (o ACE-73 conta o pedido "mesmo que a rota depois o recuse", e a resposta 4xx desfaria o registro na transação da rota), e `enviarEmailDeConta(db, remetente, pedido)`, que reserva a cota sob `SAVEPOINT` e o desfaz quando o remetente falha ou a trava passa de 2 s (55P03). `categoriaDaRecuperacao(confirmada)` escolhe 80% ou 100% (ACE-73).
 
 **Done when**:
@@ -965,7 +965,7 @@ T57 → T58
 **Depends on**: T24
 **Reuses**: tabela de rotas de `ljs:.specs/features/conta-e-acesso/design.md:152-157`; schemas de T12
 **Requirement**: ACE-01, ACE-02, ACE-03, ACE-04, ACE-06, ACE-07, ACE-08, ACE-50, ACE-58, ACE-68
-concluída
+**Status**: concluída
 **Nota do rascunho**: apoio comum das rotas em `src/entrada/rotas/apoio-acesso.ts` (`lerCorpo`, `contarPedidoDeEmail`, `emailIndisponivel`); as rotas nascem de `rotasConta(opcoes)`, montada em `criarApp` com a fábrica de teste. O pedido por origem é contado antes de validar o corpo. Confirmar com token malformado responde 410 `link_invalido` (não 422). Testes no projeto `banco` (Node), em `test/acesso/`, com `SPEC_DEVIATION` (a matriz pede `workerd`, que não tem o Postgres).
 **Lacunas**: o aviso de cadastro duplicado não tem o nome do dono do e-mail (a função não o devolve); o rascunho saúda pelo endereço.
 
@@ -993,7 +993,7 @@ T57 → T58
 **Depends on**: T25
 **Reuses**: cookie de T14; `contas.entrar` e `contas.eu` de T22; tabela de `ljs:.specs/features/conta-e-acesso/design.md:157-159`
 **Requirement**: ACE-09, ACE-11, ACE-12, ACE-13, ACE-14, ACE-17, ACE-18, ACE-50, ACE-74
-concluída
+**Status**: concluída
 **Nota do rascunho**: casos limite no topo de `rotas/sessao.ts`. O entrar roda em `transacaoCurta` (nova, `src/infraestrutura/db/transacao-curta.ts`), confirmada mesmo com 401 ou 429: o `comBanco` desfaz a transação em 4xx e apagaria a falha de login, e o bloqueio (ACE-13, ACE-74) nunca chegaria. O 429 leva o texto único da tarefa no lugar da mensagem do contrato (`SPEC_DEVIATION` no código).
 **Lacunas**: sair sem sessão: a spec não define; o rascunho responde 204 com o cookie vencido, como com sessão.
 
@@ -1021,7 +1021,7 @@ T57 → T58
 **Depends on**: T26
 **Reuses**: `links.pedir` e `links.novaSenha` (T22); envio de T24; tabela de `ljs:.specs/features/conta-e-acesso/design.md:160-161`
 **Requirement**: ACE-22, ACE-23, ACE-24, ACE-25, ACE-50, ACE-76
-concluída
+**Status**: concluída
 **Nota do rascunho**: nova senha com token ausente ou malformado responde 410 `link_invalido`; senha fora dos limites, 422 sem usar o link. O esqueci escolhe a cota pela `categoriaDaRecuperacao(confirmada)` (ACE-73).
 
 **Done when**:
@@ -1049,7 +1049,7 @@ T57 → T58
 **Depends on**: T27
 **Reuses**: `contas.trocarSenha` e `contas.excluir` (T22); tabela de `ljs:.specs/features/conta-e-acesso/design.md:162-163`
 **Requirement**: ACE-26, ACE-27, ACE-28, ACE-29, ACE-30, ACE-70
-concluída
+**Status**: concluída
 **Nota do rascunho**: as duas rotas rodam em `transacaoCurta` com a conta da sessão (a falha da senha atual fica gravada no 401, ACE-70). Bloqueado: 429 `bloqueado_temporariamente`; senha errada na troca e na exclusão: 401 `senha_atual_incorreta`; exclusão `ok` vence o cookie.
 
 **Done when**:
@@ -1075,7 +1075,7 @@ T57 → T58
 **Depends on**: T28
 **Reuses**: `convites.*` (T23); tabela de `ljs:.specs/features/conta-e-acesso/design.md:164-166`
 **Requirement**: ACE-33, ACE-34, ACE-35, ACE-36, ACE-50, ACE-67
-concluída
+**Status**: concluída
 **Nota do rascunho**: casos limite no topo de `rotas/convites.ts`. Token ausente ou malformado responde 410. Aceitar responde 200 `{grupoId}`; cadastrar, 201 `{grupoId}` com o cookie da sessão nova.
 **Lacunas**: cadastrar pelo convite quando o e-mail ganhou conta depois do convite (`conta_existente`): a spec não define; o rascunho responde 409 com o código `dados_invalidos` e o texto "Já existe uma conta com este e-mail. Entre para aceitar o convite." (o contrato não tem código próprio).
 
@@ -1103,7 +1103,7 @@ T57 → T58
 **Depends on**: T29
 **Reuses**: `admins.*` e `convites.*` (T23); envio de T24; tabela de `ljs:.specs/features/conta-e-acesso/design.md:167-170`
 **Requirement**: ACE-31, ACE-32, ACE-37, ACE-38, ACE-39, ACE-40, ACE-41, ACE-42
-concluída
+**Status**: concluída
 **Nota do rascunho**: as rotas só declaram os handlers; sessão, `comBanco` e vínculo vêm de `protegerRotasDeGrupo` (T21). Convidar conta o pedido por origem (ACE-73) e lê o nome do grupo para o e-mail. `id` e `contaId` que não são uuid dão 404 sem consulta.
 
 **Done when**:
@@ -1132,7 +1132,7 @@ T57 → T58
 **Depends on**: T30
 **Reuses**: `semCache` da fundação (`F:1130`, FUN-22) e o `beforeSend` do Sentry (`F:1277`)
 **Requirement**: ACE-21, ACE-53
-concluída
+**Status**: concluída
 **Nota do rascunho**: só teste, no `workerd` e sem banco: cada rota de `/api/sessao` e `/api/conta` em 503 (banco fora, com e sem cookie), 422, 429 e 500 forçado (`HYPERDRIVE` que lança). O evento do Sentry é montado por um `withSentry` falso a partir da requisição (url, cabeçalhos, cookies e corpo) e passa pelo `beforeSend` das opções reais do Worker.
 
 **Done when**:
@@ -1157,7 +1157,7 @@ T57 → T58
 **Depends on**: T31
 **Reuses**: cenário de T0; `app.routes` do Hono da fundação (`F:1106`)
 **Requirement**: ACE-41, ACE-48
-concluída
+**Status**: concluída
 **Nota do rascunho**: a tabela é por `MÉTODO caminho` do `app.routes` (sem os middlewares `ALL`). Rotas sem sessão (agem por token ou e-mail), `/health` e `/dev/emails` ficam como "não se aplica" com motivo; `GET /api/sessao`, sair, trocar senha, excluir, aceitar convite e as 4 de admins têm caso com a conta B e um retrato do grupo e da conta de A antes e depois. Também reprova linha da tabela sem rota.
 
 **Done when**:
@@ -1182,7 +1182,7 @@ T57 → T58
 **Depends on**: T32
 **Reuses**: molde da checagem de URL absoluta (`F:1251`)
 **Requirement**: ACE-63
-concluída
+**Status**: concluída
 **Nota do rascunho**: a coluna de dono é conferida em `entrada/`, `aplicacao/` e `repositorios/`; `crypt(`, `scrypt(` e bibliotecas de hash de senha (bcrypt, argon2) em `backend/api/src/` fora de `migracoes/` e em `frontend/web/src/`. Testes e scripts ficam fora (o cenário de teste usa `crypt` no SQL). Entra no passo de checagens do `ci.yml`.
 
 **Done when**:
@@ -1210,7 +1210,7 @@ T57 → T58
 **Depends on**: T33
 **Reuses**: trava de host `exigirHostPermitido` (`F:459`); `conta_definir_senha` (`M:1792843560000_conta-senha-e-exclusao.sql:97`)
 **Requirement**: ACE-61, ACE-62
-concluída
+**Status**: concluída
 **Nota do rascunho**: senha validada com os limites do contrato (8 a 72 caracteres, até 72 bytes) copiados como constantes, porque `@pelada/scripts` não depende de `@pelada/contrato`. Alvo `local` lê `DATABASE_URL_MIGRACAO` e passa pela trava de host local mesmo com `PELADA_PERMITIR_HOST_REMOTO=1`; `previa` lê `NEON_URL_DEV_MIGRACAO`; `producao`, `NEON_URL_MIGRACAO`. Script `dono` em `backend/scripts/package.json`. Helper novo `test/apoio/banco.ts` (o do `seed.test.ts` fica intacto).
 
 **Done when**:
@@ -1236,7 +1236,7 @@ T57 → T58
 **Depends on**: T34
 **Reuses**: estender o seed da fundação (`F:1055`, FUN-05)
 **Requirement**: ACE-64
-concluída
+**Status**: concluída
 **Nota do rascunho**: a conta nasce com um hash provisório que não é bcrypt e recebe a senha por `conta_definir_senha(email, senha, false)`, que também confirma o e-mail; `SEED_SENHA_ADMIN` validada pelos limites do script do dono (`validarSenha`). `CONTA_LOCAL` perde a senha fixa. Testes FUN-05 do `seed.test.ts` alterados com autorização do usuário (2026-11-05, `## Autorizações` do `STATE.md`): `envDe` ganha `SEED_SENHA_ADMIN` e o teste do bcrypt confere a senha do ambiente; nenhuma asserção removida. O `README.md` ainda cita conta e senha antigas do seed: fica para a T58.
 
 **Done when**:
@@ -1264,7 +1264,7 @@ T57 → T58
 **Depends on**: T35
 **Reuses**: TanStack Query do esqueleto da fundação (`F:1326`)
 **Requirement**: ACE-20, ACE-49
-concluída
+**Status**: concluída
 **Nota do rascunho**: `criarCliente({ consultas, navegar })` com `ErroApi` (status, código, campos, grupos; status 0 na falha de rede) e o contexto `ProvedorCliente`/`useCliente` em `src/dados/ContextoCliente.tsx`; o `App` liga o cliente ao `QueryClient` e ao roteador. Só o 401 `sessao_expirada` navega; `sem_sessao` fica com a guarda (T37). Teste em `test/dados/` (molde dos testes da fundação, que ficam em `frontend/web/test/`).
 
 **Done when**:
@@ -1289,7 +1289,7 @@ T57 → T58
 **Depends on**: T36
 **Reuses**: roteador da fundação (`F:1545`)
 **Requirement**: ACE-19, ACE-65
-concluída
+**Status**: concluída
 **Nota do rascunho**: `useSessao()` devolve `ativa`, `ausente` ou `expirada` (401 não é erro de tela) e chama o cliente com `semTratarExpiracao` (opção nova do T36), para não haver laço de navegação no `/entrar`. `GuardaApp` manda a `/entrar?volta=<rota>` (com `aviso=sessao-expirada` quando expirou); `GuardaPublica` manda a `destinoSeguro(volta)`, que só aceita `/app`, `/app/...`, `/app?...`. O login volta à rota pedida porque a tela Entrar só invalida a consulta `sessao` e a `GuardaPublica` redireciona. As rotas reais ligam as guardas na T42.
 
 **Done when**:
@@ -1314,7 +1314,7 @@ T57 → T58
 **Depends on**: T37
 **Reuses**: decisão de `ljs:.specs/features/conta-e-acesso/design.md:200` (fragmento apagado logo depois de lido)
 **Requirement**: ACE-06, ACE-24
-concluída
+**Status**: concluída
 **Nota do rascunho**: valida o token com o primitivo `token` do contrato (43 caracteres base64url); com `#t=` presente, o fragmento sai da barra mesmo quando o token é malformado. Sem `#t=`, nada muda.
 
 **Done when**:
@@ -1339,7 +1339,7 @@ T57 → T58
 **Depends on**: T38
 **Reuses**: molde dos componentes da fundação (`F:1448`, `Botao`); marcação de `.specs/mockup/telas/t04-entrar--vazio.html` e `.specs/mockup/base.css`; Stylelint de tokens (`F:1374`)
 **Requirement**: ACE-56
-concluída
+**Status**: concluída
 **Nota do rascunho**: `Campo` e `CampoSenha` no mesmo arquivo, com `Campo.module.css` (só tokens). A ajuda e o erro entram no `aria-describedby` nessa ordem, como no mockup. O botão do `CampoSenha` mantém o rótulo "Mostrar" e alterna `aria-pressed` (o mockup só mostra o estado não pressionado).
 
 **Done when**:
@@ -1366,7 +1366,7 @@ T57 → T58
 **Depends on**: T39
 **Reuses**: molde de `Campo` (T39); marcação de `.specs/mockup/telas/t29-cadastro--erro.html`
 **Requirement**: ACE-56, ACE-59
-concluída
+**Status**: concluída
 **Nota do rascunho**: `ResumoErros` em arquivo próprio (`src/componentes/ResumoErros.tsx`), com a faixa de erro no próprio CSS Module; o foco vai ao resumo quando a lista muda e cada link foca o campo sem mudar a URL. `CaixaSelecao` reaproveita as classes de `Campo.module.css` para o erro.
 
 **Done when**:
@@ -1391,7 +1391,7 @@ T57 → T58
 **Depends on**: T40
 **Reuses**: molde de `EstadoErro` da fundação (`F:1472`); marcação de `.specs/mockup/telas/t30-confirmar--invalido.html`, `t32-conta--excluir.html` e `t32-conta--excluida.html` (`.faixa--sucesso`)
 **Requirement**: ACE-56
-concluída
+**Status**: concluída
 **Nota do rascunho**: um arquivo por componente (`Faixa.tsx`, `TelaMensagem.tsx`, `Dialogo.tsx`, `Lista.tsx` com `ItemLista`), cada um com CSS Module. `Faixa`: `role="alert"` só no erro; sucesso, atenção e info são `role="status"`. `Dialogo` é montado e desmontado por quem usa, foca o `autoFocus` (ou o primeiro focável), prende Tab, fecha com Esc e devolve o foco; `alerta` dá `role="alertdialog"`. `TelaMensagem` vai dentro da `Casca centralizada` e foca o título.
 
 **Done when**:
@@ -1416,7 +1416,7 @@ T57 → T58
 **Depends on**: T41
 **Reuses**: estender `rotas.tsx` da fundação (`F:1545`, página provisória da AD-007); rotas de `telas.json:137-187` (AD-017 proposta)
 **Requirement**: ACE-28, ACE-58
-concluída
+**Status**: concluída
 **Nota do rascunho**: as telas ainda não existem: as rotas usam as telas provisórias de `src/paginas/acesso/provisorias.tsx`, e cada tarefa de tela (T43 a T53) troca a sua entrada em `rotas.tsx` pelo componente real. O marcador por tela é o `handle.tela` da rota, que não muda com a tela real. Só `/entrar` e `/cadastro` passam pela `GuardaPublica`; `/confirmar`, `/entrar/esqueci`, `/entrar/nova-senha` e `/convite` ficam sem guarda (o convite tem estado para quem já entrou, e o `#t=` não pode se perder num redirecionamento). `/app/*` desconhecida cai no 404 dentro da guarda.
 
 **Done when**:
@@ -1444,7 +1444,7 @@ T57 → T58
 **Depends on**: T42
 **Reuses**: `.specs/mockup/telas/t04-entrar--*.html` (7 estados); componentes de T39 a T41
 **Requirement**: ACE-06, ACE-09, ACE-11, ACE-12, ACE-13, ACE-20, ACE-24, ACE-56, ACE-65
-concluída
+**Status**: concluída
 **Nota do rascunho**: tela em `src/telas/entrar/Entrar.tsx`, ligada em `rotas.tsx` no lugar da provisória. No 200, só invalida a consulta `sessao`, e a `GuardaPublica` leva ao destino. A `Casca` ganha `estreita` (`conteudo--estreito`), há o `LinkBotao` (link com as classes do `Botao`) e o CSS comum das telas de acesso em `src/telas/acesso.module.css`. Apoio novo de teste de tela: `test/apoio/tela.tsx` (servidor falso por "MÉTODO /caminho"). SPEC_DEVIATION: o link "Voltar ao ranking" do mockup fica de fora até existir o ranking público (`partidas-e-ranking`); a T55 vai mostrar essa diferença. O texto do reenvio é o do mockup (`t30-confirmar--reenviado`), não o `MENSAGENS.reenvio` do contrato.
 
 **Done when**:
@@ -1471,7 +1471,7 @@ T57 → T58
 **Depends on**: T43
 **Reuses**: `.specs/mockup/telas/t29-cadastro--*.html` (4 estados); `CaixaSelecao` e `ResumoErros` (T40)
 **Requirement**: ACE-01, ACE-03, ACE-56, ACE-59
-concluída
+**Status**: concluída
 **Nota do rascunho**: valida antes de enviar com os primitivos do contrato (o estado de erro do `telas.json` não tem resposta da API) e também marca os campos do 422. Textos de erro de e-mail, senha curta e aceite são os do mockup; o do nome é PREMISSA (o mockup não o mostra). "Enviar outro link" da tela de sucesso leva a `/confirmar`, que sem token mostra o pedido de novo link (T45).
 
 **Done when**:
@@ -1498,7 +1498,7 @@ T57 → T58
 **Depends on**: T44
 **Reuses**: `.specs/mockup/telas/t30-confirmar--*.html` (3 estados); `lerTokenDoFragmento` (T38); `TelaMensagem` (T41)
 **Requirement**: ACE-06, ACE-07, ACE-08, ACE-56
-concluída
+**Status**: concluída
 **Nota do rascunho**: o token é lido uma vez num ref e o POST fica guardado em outro ref, para o StrictMode (efeito duplo) não gastar o link num segundo pedido. Sem token ou com token malformado, vai direto ao link inválido sem chamar a API. Falha que não é 410/422 mostra a faixa de erro com "Tentar de novo". SPEC_DEVIATION: a tarefa cita `TelaMensagem`, mas o mockup de t30 usa título, faixa e formulário na coluna estreita; vale o mockup. O destino do sucesso é `/entrar?aviso=email-confirmado` (ACE-06), não o `/app` do comentário do mockup.
 
 **Done when**:
@@ -1526,7 +1526,7 @@ T57 → T58
 **Depends on**: T45
 **Reuses**: `.specs/mockup/telas/t05-esqueci--*.html` (3 estados)
 **Requirement**: ACE-22, ACE-56
-concluída
+**Status**: concluída
 **Nota do rascunho**: componente novo `LinkVoltar` (link "Voltar" com a seta do mockup), usado aqui; o `Cadastro` (T44) ainda tem a seta própria. E-mail inválido é marcado no campo antes de chamar a API.
 
 **Done when**:
@@ -1551,7 +1551,7 @@ T57 → T58
 **Depends on**: T46
 **Reuses**: `.specs/mockup/telas/t06-nova-senha--*.html` (4 estados); `lerTokenDoFragmento` (T38)
 **Requirement**: ACE-24, ACE-25, ACE-56
-concluída
+**Status**: concluída
 **Nota do rascunho**: o token é lido num efeito, guardado num ref (StrictMode); até ler, a tela mostra só a casca ocupada. Sem token, token malformado ou 410: estado inválido com "Pedir novo link" (`/entrar/esqueci`). Validação antes de enviar: senha pelos limites do contrato e confirmação igual ("As senhas não conferem.").
 
 **Done when**:
@@ -1577,7 +1577,7 @@ T57 → T58
 **Depends on**: T47
 **Reuses**: `.specs/mockup/telas/t33-termos--pagina.html` e `t07-privacidade--pagina.html`; `TERMOS_VERSAO` (T12)
 **Requirement**: ACE-58, ACE-60
-concluída
+**Status**: concluída
 **Nota do rascunho**: as duas páginas em `src/telas/termos/Termos.tsx` (`Termos` e `Privacidade`), com o texto do mockup marcado como RASCUNHO do agente para revisão do usuário (não é texto jurídico revisado). `TEXTO_EM_RASCUNHO = true` liga o selo; ao aprovar, o usuário troca para `false` e atualiza `TERMOS_VERSAO`. O "Voltar" de termos vai a `/cadastro` (mockup) e o de privacidade a `/` (o mockup vai ao ranking, que ainda não existe).
 
 **Done when**:
@@ -1603,7 +1603,7 @@ T57 → T58
 **Depends on**: T48
 **Reuses**: `.specs/mockup/telas/t31-convite--*.html` (5 estados); `Campo` somente leitura (T39); destino da AD-022 proposta
 **Requirement**: ACE-33, ACE-34, ACE-35, ACE-36, ACE-56
-concluída
+**Status**: concluída
 **Nota do rascunho**: o token é lido num ref e o `ler` fica guardado em outro (StrictMode). O estado vem da leitura e de `useSessao()`: com sessão no e-mail do convite, aceitar; com sessão em outro e-mail (ou 403 no aceitar), o aviso com "Sair e entrar com outra conta" (`POST /api/sessao/sair` e ida a `/entrar`); sem sessão, o cadastro com o e-mail travado. Validação e textos de erro reaproveitam os do `Cadastro` (T44). Depois de aceitar ou cadastrar, invalida a sessão e vai a `/app/grupos/:grupoId/admins` (AD-022).
 **Lacunas**: sem sessão e com conta já existente no e-mail do convite, o mockup não tem estado; o rascunho pede para entrar com essa conta e abrir o link de novo (o token não sobrevive ao login). O 409 do `cadastrar` (conta criada entre o ler e o cadastrar) só mostra a mensagem da API na faixa de erro.
 
@@ -1633,7 +1633,7 @@ T57 → T58
 **Depends on**: T49
 **Reuses**: `.specs/mockup/telas/t08-grupos--sucesso.html`, `t08-grupos--vazio.html`, `t09-inicio--menu-conta.html`; `Casca` e `Barra` da fundação (`F:1424`)
 **Requirement**: ACE-17, ACE-18, ACE-56, ACE-57
-concluída
+**Status**: concluída
 **Nota do rascunho**: os grupos vêm do `useSessao()` (a guarda já leu a sessão), com link para `/app/grupos/:grupoId/admins` (AD-022) e o selo "Sem acesso ao financeiro". O menu é `MenuConta` (`componentes/MenuConta.tsx`), com `CascaConta` (barra do admin com o nome do app e o botão "Menu da conta"); para isso a `Casca` ganhou `acoes`, o `Dialogo` ganhou `formato="folha"` (sem o "Fechar" do canto; Esc e o véu fecham) e o `ItemLista` ganhou `seta`.
 
 **Done when**:
@@ -1660,7 +1660,7 @@ T57 → T58
 **Depends on**: T50
 **Reuses**: `.specs/mockup/telas/t32-conta--*.html` (5 estados); `Dialogo` (T41)
 **Requirement**: ACE-28, ACE-29, ACE-56
-concluída
+**Status**: concluída
 **Nota do rascunho**: no 204 a tela navega a `/?aviso=conta-excluida` e só depois limpa o cache (limpar antes faria a `GuardaApp` reler a sessão e ir a `/entrar`). 401 marca o campo com "Senha incorreta." (comentário do `t32-conta--excluir`); 429 e rede vão numa faixa dentro do diálogo. O `Botao` ganhou as variantes `destrutivo` e `texto-destrutivo` (o `LinkBotao` usa as mesmas classes).
 **Lacunas**: senha vazia no diálogo: o mockup não tem o texto; o rascunho mostra "Digite sua senha." no campo sem chamar a API.
 
@@ -1687,7 +1687,7 @@ T57 → T58
 **Depends on**: T51
 **Reuses**: `.specs/mockup/telas/t25-senha--*.html` (3 estados); `CampoSenha` (T39)
 **Requirement**: ACE-26, ACE-27, ACE-56
-concluída
+**Status**: concluída
 **Nota do rascunho**: SPEC_DEVIATION: **Reuses** cita o `CampoSenha`, mas o mockup t25 não tem o botão "Mostrar" e a T56 compara a tela com ele; os campos usam o `Campo` com `type="password"`, como a Nova senha (T47). Validação antes de enviar como na T47 (com o `ResumoErros`); o 401 da API marca só o campo, sem o resumo, como no `t25-senha--erro`. O 204 limpa os campos e mostra a faixa de sucesso.
 **Lacunas**: senha atual vazia: o mockup não tem o texto; o rascunho mostra "Digite sua senha atual." sem chamar a API.
 
@@ -1714,7 +1714,7 @@ T57 → T58
 **Depends on**: T52
 **Reuses**: `.specs/mockup/telas/t19-admins--*.html` (estados do `telas.json`); `Lista` e `Dialogo` (T41)
 **Requirement**: ACE-31, ACE-32, ACE-37, ACE-38, ACE-39, ACE-40, ACE-56
-concluída
+**Status**: concluída
 **Nota do rascunho**: a lista é uma consulta `['admins', grupoId]`, relida depois de convidar, cancelar e remover. O admin da sessão aparece com "(você)" e sem "Remover"; quem acessa o financeiro leva o selo "Financeiro" (`t19-admins--sucesso`). Com um admin só, o aviso do `t19-admins--ultimo-admin`; o 409 `ultimo_admin` mostra uma faixa de erro e mantém a pessoa. Os botões "Remover" e "Cancelar convite" levam `aria-label` com o nome ou o e-mail. A barra mostra o nome do grupo da sessão com "Trocar grupo" para `/app`. Com esta tarefa, o `paginas/acesso/provisorias.tsx` (T42) ficou sem uso e saiu.
 **Lacunas**: o mockup não tem estado para o 404 da lista (grupo sem vínculo, ACE-41): o rascunho mostra a faixa "Grupo não encontrado.". O texto do diálogo de remover troca "Ele perde o acesso…" do mockup por "A pessoa perde o acesso a este grupo na hora." (neutro); o estado `remover` é de `revisaoManual`.
 
@@ -1744,7 +1744,7 @@ T57 → T58
 **Depends on**: T53
 **Reuses**: estender `visual.mjs` (`F:1788`) e o comparador (`F:1764`); formato do `telas.json:1-12` e `telas.json:187` (exemplo com `recorte`); AD-021 proposta
 **Requirement**: ACE-54, ACE-55
-concluída
+**Status**: concluída
 **Nota do rascunho**: as funções ficam em `e2e/ferramentas/telas-reais.mjs` (com `.d.mts`): `entradasAtivas`, `aplicarRespostas` (globais do `telas.json` e depois as da entrada; o resto de `/api/**` responde 404 `nao_encontrado`, porque o `vite preview` devolveria o `index.html` com 200), `executarPassos`, `printTela` (`load` e `networkidle` com teto de 3 s, por causa das respostas `pendente`) e `recorteDe`. Os JSONs do mockup trazem o erro no formato antigo (`{ erro: { codigo, mensagem } }`): `adaptarCorpo` converte no `corpoErro` do contrato e troca `nao_autenticado` por `sem_sessao`. O build da comparação (`VITE_VITRINE=1`) nomeia as classes de CSS Module como `<classe>--m-<hash>` (`vite.config.ts`) e `seletorDoApp` reescreve `.classe` do lado do app, para o `recorte` (`.faixa--erro`, `.dialogo`) achar o elemento. A lista do que entra é `e2e/telas-ativas.json` (nasce vazia; T55 e T56 a preenchem).
 
 **Done when**:
@@ -1770,7 +1770,7 @@ T57 → T58
 **Depends on**: T54
 **Reuses**: entradas de `telas.json:152-182`; runner de T54
 **Requirement**: ACE-54, ACE-55
-concluída
+**Status**: concluída
 **Nota do rascunho**: o `telas-ativas.json` lista os 24 estados reais de T04, T05, T06, T07, T29, T30, T31 e T33; um teste confere que nenhum estado real dessas telas ficou de fora. O controle de deformação do runner passou a rodar também na primeira tela real (deslocada de 40 px, tem de reprovar). Os ajustes de CSS e componentes até 1% ficam para o `/executar`, com os prints em `test-results/visual/`.
 
 **Done when**:
@@ -1796,7 +1796,7 @@ T57 → T58
 **Depends on**: T55
 **Reuses**: entradas de `telas.json:137-139`, `telas.json:166` (T09 `menu-conta`), `telas.json:183-187` e as de T19; runner de T54
 **Requirement**: ACE-54, ACE-55
-concluída
+**Status**: concluída
 **Nota do rascunho**: o `telas-ativas.json` ganhou T09 `menu-conta`, T19 (`sucesso`, `carregando`, `convite-enviado`, `ja-admin`), T25 (3 estados) e T32 (5 estados, com o `recorte` da faixa em `/?aviso=conta-excluida` que já está no `telas.json`); sem as T08 (AD-031). Um teste confere a lista. Diferença já prevista para o `/executar`: o `t32-conta--carregando` é a tela vazia (comentário: "a guarda não mostra nada"), e a `GuardaApp` (T37) mostra o `EsqueletoLista`.
 **Lacunas**: os estados de `revisaoManual` das telas de acesso (`telas.json:267-270`: T19 `senha`, `vinculo`, `remover`, `erro`) não foram conferidos à mão no rascunho (nada roda). `senha` e `vinculo` são do fluxo antigo (adicionar admin com senha), que esta feature trocou pelo convite (`t19-admins--sucesso`, comentário); `erro` é o formulário antigo de nome e e-mail. Só `remover` vale para a tela nova: o `/executar` confere e registra aqui.
 
@@ -1825,7 +1825,7 @@ T57 → T58
 **Depends on**: T56
 **Reuses**: Playwright e servidor de e2e da fundação (`F:1691`); caixa de dev (T17); `pnpm dev` (`F:1812`)
 **Requirement**: ACE-01, ACE-06, ACE-09, ACE-24, ACE-28, ACE-33
-concluída
+**Status**: concluída
 **Nota do rascunho**: o `wrangler dev` do e2e (`playwright.config.ts`) passou a subir com `--var EMAIL_DEV:1 --var URL_PUBLICA:<URL_BASE>`: sem a `URL_PUBLICA` local (vazia no `wrangler.jsonc`), o modelo de e-mail recusa montar o link. As jornadas leem o último e-mail do tipo e do destinatário em `GET /api/dev/emails` e abrem o caminho com o `#t=`. Cada jornada usa e-mails novos e um contexto de navegador por aparelho. A J-08 usa a conta e o grupo do seed (`admin@exemplo.test`, "Pelada Local", senha de `SEED_SENHA_ADMIN` do `.env`) e é pulada, com o motivo, sem a variável. A J-08 não cobre "A tenta se remover sozinho": a tela não oferece "Remover" para a própria conta (T53).
 **Lacunas**: o `LIMITE_ENTRAR` local é de 10 requisições por minuto por IP, e as quatro jornadas fazem mais que isso; cada aparelho manda um `cf-connecting-ip` próprio para separar as cotas, mas não está conferido que o `wrangler dev` respeita o cabeçalho vindo do cliente. Se não respeitar, o `/executar` decide (ex.: `LIMITE_ENTRAR` maior só no e2e).
 
@@ -1853,7 +1853,7 @@ T57 → T58
 **Depends on**: T57
 **Reuses**: runbook e README da fundação (`F:2063`, `F:2113`)
 **Requirement**: ACE-52, ACE-61, ACE-64
-concluída
+**Status**: concluída
 **Nota do rascunho**: SPEC_DEVIATION: a tarefa fala em secrets "no environment `previa`", mas pela AD-119 esse environment não é usado; `RESEND_API_KEY` e `RESEND_REMETENTE` ficam como secrets do Worker `gestaodapelada-v2` (`wrangler secret put`), na seção "Secret do Worker" do runbook, com a nova seção "E-mails de conta (Resend)" (domínio verificado, chave só de envio, cota de 100 por dia com 80% e 100%, o que fazer quando acaba, `LIMITE_EMAILS_DIA`). O README corrigiu a conta do seed (era `seed@pelada.local` com senha fixa; o seed da T35 cria `admin@exemplo.test` com `SEED_SENHA_ADMIN`) e ganhou "Entrar local", "E-mails em desenvolvimento", "Conta do dono" e as 5 variáveis novas na tabela.
 **Lacunas**: o `pnpm dev` (`scripts/dev.mjs`) não passa `EMAIL_DEV` nem `URL_PUBLICA` ao `wrangler dev`, então cadastro, recuperação e convite locais falham ao montar o link (a `URL_PUBLICA` do `wrangler.jsonc` é vazia). O README documenta o comando manual; mudar o `dev.mjs` fica para o `/executar` decidir (fora do escopo de documentação).
 

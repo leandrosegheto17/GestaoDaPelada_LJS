@@ -316,7 +316,7 @@ T53 → T54
 **Depends on**: None
 **Reuses**: `comoApp` e o cenário de dois grupos (`F:909`); tabela `M:1792843200000_linha-de-base.sql:212-228`; grants `M:1792843260000_roles.sql:22-31`; policies do laço `M:1792843320000_rls.sql:51-56`; molde da matriz de `PR:1038` (T23)
 **Requirement**: SIM-81, SIM-69, SIM-72
-concluída
+**Status**: concluída
 **Nota do rascunho**: usa o cenário da fundação (`abrirCenario`, grupos A e B com uma escalação cada); a evidência da rede (policy `USING (true)`) é do /executar.
 **Resolução**: o usuário decidiu em 2026-11-05 que vale a matriz (AD-122): migração `1793919878922_escalacoes-leitura-so-conta.sql`; evidência da rede: o teste de SELECT pelo slug estava vermelho (1 linha em vez de 0) e passa. (Lacuna original: a matriz pede "slug público zero" no SELECT, mas a policy do laço (`grupos_visiveis()`, ramo do slug, FUN-14) deixa o slug do A ler a escalação do A. O teste segue a matriz (zero); se ficar vermelho, perguntar se vale a matriz (migração nova) ou a policy atual.
 
@@ -344,7 +344,7 @@ T53 → T54
 **Depends on**: T0
 **Reuses**: `lerEsquema` com funções (`F:760`); função de 7 de `PR:987` (T22); AD-037
 **Requirement**: SIM-67 (linha de base da remoção, AD-037)
-concluída
+**Status**: concluída
 **Nota do rascunho**: varredura de `backend/{api,contrato,dominio,scripts}/src` com um contador de argumentos de cada `grupo_criar(...)` (testado no próprio arquivo). Chamadas à de 6 encontradas por leitura (lista para a T25): testes `test/concorrencia/grupos-slug.test.ts:32`, `test/banco/grupos-criar.test.ts:32`, `test/banco/partidas-rede.test.ts:82` e `:107`, `test/banco/grupo-criar-pesos.test.ts:138` (bloco da delegação e `ASSINATURA_6` em `:16`, `:154`, `:179`), `test/banco/financeiro-trava-acesso.test.ts:108`, `test/isolamento/cenario-grupos.ts:100` e a assinatura em `test/isolamento/meta-grupos.test.ts:25`.
 **Resolução**: a T25 passa o seed para a de 7 antes de remover a de 6; o teste de T1 passou como está. (Lacuna original: o seed chama a de 6 (`backend/scripts/src/seed.ts:147` e `:228`), e o Delta 2 não o lista; o teste "nenhum arquivo de src nem o seed" nasce vermelho por isso. Interpretação conservadora: o teste fica como a tarefa pede e a T25 passa o seed para a de 7 antes de remover a de 6 (senão o seed quebra). O /executar confirma com o usuário.
 
@@ -373,7 +373,7 @@ T53 → T54
 **Depends on**: None
 **Reuses**: `diaDaSemana` e `ehDataReal` de `backend/dominio/src/datas.ts` (`PR:457`), sem duplicar; regra de domínio sem relógio (AD-028, `GE:527`); idade de `L:backend/api/src/aplicacao/simulador/entrada.ts:63` e `L:backend/dominio/src/elenco/idade.ts:4`; convenções `S:73-79`; AD-086
 **Requirement**: SIM-01, SIM-51, SIM-95
-concluída
+**Status**: concluída
 **Nota do rascunho**: `diaDaSemana`, `NUMERO_DO_DIA` e `NomeDiaDaSemana` vêm de `backend/dominio/src/datas.ts` (já rascunhado pela T1 da partidas-e-ranking); `somarDias` de `atividade/datas.ts`. Além do pedido: `JogadorSim` (apto com idade), `montarElenco`, `jogadorDe` e `compararIds`, usados pelas tarefas seguintes.
 
 **Done when**:
@@ -400,7 +400,7 @@ T53 → T54
 **Depends on**: T2
 **Reuses**: Regra de `L:backend/dominio/src/simulador/previa.ts`; critérios `S:110-114`; Independent Test `S:118`
 **Requirement**: SIM-09, SIM-10, SIM-11, SIM-12, SIM-13
-concluída
+**Status**: concluída
 **Nota do rascunho**: `calcularPrevia({ formato, n, aptos })` recebe a quantidade de aptos (o K não muda a prévia); a prévia carrega `n` e `aptos` para a descrição (T4).
 
 **Done when**:
@@ -428,7 +428,7 @@ T53 → T54
 **Depends on**: T3
 **Reuses**: Textos de `S:111-114`; `L:backend/api/src/aplicacao/simulador/descricao.ts` (regra, escrita do zero no domínio)
 **Requirement**: SIM-10, SIM-11, SIM-12, SIM-13
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -456,7 +456,7 @@ T53 → T54
 **Depends on**: T4
 **Reuses**: `inicioDaContagem` (`PR:534`) e `acumuladoPorInicio` (`PR:558`) pelo `index.ts` da pontuação (a regra de lint de `PR:1758` proíbe as internas); `vespera` (`PR:457`); `compararApelido` (`GE:575`); regra de `L:backend/dominio/src/simulador/prioridade.ts`; `S:130-133`, Independent Test `S:136`
 **Requirement**: SIM-16, SIM-17, SIM-18
-concluída
+**Status**: concluída
 **Nota do rascunho**: rascunhada depois da T14, quando a função única de acumulado (`pontuacao/acumulado.ts`, T5 da partidas-e-ranking) já estava commitada. Não há `index.ts` da pontuação: usa `acumuladoPorInicio` direto e os tipos do histórico de `ranking/calcular.ts` (`JogadorDoRanking`, `PartidaDoRanking`, `PresencaDoRanking`). O apelido compara só pela `chaveBusca` (o `compararApelido` desempata pelo texto original, e SIM-16 pede o id).
 
 **Done when**:
@@ -483,7 +483,7 @@ T53 → T54
 **Depends on**: T5
 **Reuses**: `vagasDeReserva` de `L:backend/dominio/src/simulador/classificacao.ts:32-46`; `S:148-150`, `S:340`
 **Requirement**: SIM-21, SIM-22, SIM-23, SIM-89
-concluída
+**Status**: concluída
 **Nota do rascunho**: a T5 (ordem de prioridade) ainda não foi rascunhada (depende da pontuação da partidas-e-ranking); `classificarDoisTimes` recebe a lista já ordenada e é genérica no tipo do apto.
 
 **Done when**:
@@ -511,7 +511,7 @@ T53 → T54
 **Depends on**: T6
 **Reuses**: `L:backend/dominio/src/simulador/classificacao.ts:52-60`; `S:151-152`, `S:340-341`, Independent Test `S:155`
 **Requirement**: SIM-24, SIM-25, SIM-89, SIM-90
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -540,7 +540,7 @@ T53 → T54
 **Depends on**: T7
 **Reuses**: `chaveDe` de `L:backend/dominio/src/simulador/distribuicao-dois.ts:61-106`; `mediaInteira` e `idadeNaData` (T2); `S:169-170`, `S:346`
 **Requirement**: SIM-29, SIM-30, SIM-51, SIM-95
-concluída
+**Status**: concluída
 **Nota do rascunho**: a chave recebe o elenco em vetores indexados pela ordem de prioridade (`elencoDois`); `TimeDois` e `ComposicaoDois` nascem aqui.
 **Lacunas**: idade média nula num dos times (ninguém com ano) contra outro com idade: o critério (4) vale 0 (`chave-dois.ts`, `[LACUNA]`).
 
@@ -569,7 +569,7 @@ T53 → T54
 **Depends on**: T8
 **Reuses**: `L:backend/dominio/src/simulador/distribuicao-dois.ts:7` (200), `:21` (serpentina), `:127-154` (laço); `S:167-172`, `S:342-343`, Independent Test `S:174`
 **Requirement**: SIM-27, SIM-28, SIM-30, SIM-31, SIM-32, SIM-59, SIM-91, SIM-92
-concluída
+**Status**: concluída
 **Nota do rascunho**: `distribuirDoisTimes(classificacao, n, elenco, { maxTrocas })` devolve `{ composicao, trocasAceitas }`; o teto injetável é só para teste.
 
 **Done when**:
@@ -599,7 +599,7 @@ T53 → T54
 **Depends on**: T9
 **Reuses**: `L:backend/dominio/src/simulador/distribuicao-varios.ts:10` (60 aptos), `:70-82` (vaivém); `S:186-190`, Independent Test `S:193`
 **Requirement**: SIM-33, SIM-34, SIM-35, SIM-37
-concluída
+**Status**: concluída
 **Nota do rascunho**: `montarVariosTimes(elenco, n)` recebe o elenco (T2) e devolve `{ times, incompleto }`; `MAX_APTOS_SIMULADOR` (60) nasce aqui.
 
 **Done when**:
@@ -626,7 +626,7 @@ T53 → T54
 **Depends on**: T10
 **Reuses**: `L:backend/dominio/src/simulador/distribuicao-varios.ts:7` (200), `:33-47` (chave), `:94-119` (laço); `S:189-190`, `S:343`
 **Requirement**: SIM-36, SIM-37, SIM-59, SIM-92
-concluída
+**Status**: concluída
 **Nota do rascunho**: `distribuirVariosTimes(inicial, elenco, { maxTrocas })` parte da saída de `montarVariosTimes` (T10) e devolve `{ times, incompleto, trocasAceitas }`.
 **Lacunas**: time sem ninguém com ano (idade média nula) fica fora da amplitude de idade da chave (`distribuicao-varios.ts`, `[LACUNA]`).
 
@@ -656,7 +656,7 @@ T53 → T54
 **Depends on**: T11
 **Reuses**: `L:backend/dominio/src/simulador/indicadores.ts`; T7 (pares); `S:205`
 **Requirement**: SIM-39, SIM-95
-concluída
+**Status**: concluída
 **Nota do rascunho**: recebe também as posições na ordem de prioridade (`Posicoes`), para a composição ajustada (T16) derivar quem sai pela prioridade.
 
 **Done when**:
@@ -683,7 +683,7 @@ T53 → T54
 **Depends on**: T12
 **Reuses**: `L:backend/dominio/src/simulador/indicadores.ts`; `mediaInteira` (T2); `S:206`
 **Requirement**: SIM-40, SIM-95
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -707,7 +707,7 @@ T53 → T54
 **Depends on**: T13
 **Reuses**: `L:backend/dominio/src/simulador/avisos.ts:61-73` (N alternativos) e textos de `L:backend/api/src/aplicacao/simulador/textos-avisos.ts`; `S:208-212`, Independent Test `S:214`
 **Requirement**: SIM-42, SIM-43, SIM-44, SIM-45, SIM-46, SIM-90
-concluída
+**Status**: concluída
 **Nota do rascunho**: duas funções, `avisosDoisTimes` e `avisosVariosTimes`, devolvendo `{ tipo, texto }`. O exemplo "2 'só 1º' e 1 reserva … com o plural" dá 1 jogador pela regra de SIM-42 (titulares "só 1º" − reservas); o teste do plural usa 3 e 1.
 
 **Done when**:
@@ -738,7 +738,7 @@ T53 → T54
 **Depends on**: T14
 **Reuses**: `L:backend/dominio/src/simulador/sugerir.ts`; exportação pública do domínio (`PR:840`); `S:133`, `S:226-228`
 **Requirement**: SIM-19, SIM-47, SIM-48, SIM-49
-concluída
+**Status**: concluída
 **Nota do rascunho**: `sugerir(entrada, historico)` devolve `valida: false` com a prévia e a descrição quando faltam aptos (a rota faz o 422). O `index.ts` exporta também `idadeNaData` e os tipos de resultado (a rota e o contrato usam); o `avaliar` entra na T16. Apoio de teste em `backend/dominio/test/simulador/apoio.ts` (elenco e histórico fixos, embaralhamento sem aleatoriedade).
 
 **Done when**:
@@ -765,7 +765,7 @@ T53 → T54
 **Depends on**: T15
 **Reuses**: `L:backend/api/src/aplicacao/simulador/avaliar.ts` (regra); T7, T12 a T14; `S:254-255`, Independent Test `S:260`
 **Requirement**: SIM-62, SIM-63
-concluída
+**Status**: concluída
 **Nota do rascunho**: `avaliar(entrada, composicao, historico)` devolve `{ ok: false, campo: 'composicao', mensagem }` ou a avaliação; `idsDaComposicaoEntrada` e `problemaNaComposicao` também servem ao contrato e à rota de escalação.
 **Lacunas**: composição que não cobre todos os aptos: o legado recusava ("A composição precisa incluir todos os aptos."), a spec não pede; vale a spec (`avaliar.ts`, `[LACUNA]`).
 
@@ -793,7 +793,7 @@ T53 → T54
 **Depends on**: T16
 **Reuses**: Regra do domínio sem relógio (AD-028, `GE:527`) e teste de regra por arquivo de exemplo (`F:385`); `S:227-229`
 **Requirement**: SIM-48, SIM-49, SIM-50
-concluída
+**Status**: concluída
 **Nota do rascunho**: a varredura é por texto, inclusive em comentário (os fontes do simulador não citam os nomes proibidos); a prova com o arquivo de `Math.random()` é do /executar.
 
 **Done when**:
@@ -820,7 +820,7 @@ T53 → T54
 **Depends on**: T17
 **Reuses**: Fixtures de `L:backend/dominio/test/simulador/apoio.ts` e `L:backend/dominio/test/simulador/sugerir.test.ts` como dado; Goal `S:25`; AD-046; molde de regressão `PR:584` (T6)
 **Requirement**: SIM-52
-concluída
+**Status**: concluída
 **Nota do rascunho**: 7 casos (4 em 2 times, 3 em 3+) sobre o elenco e o histórico de `apoio.ts`; o esperado fica em `referencia-legado.json`, hoje com `null` em cada caso, e o teste do caso falha até a saída do legado ser registrada. Rodar o legado é do /executar (o rascunho não executa nada).
 **Lacunas**: os esperados dependem de rodar o legado `ece227e0`; a conversão da entrada (nível × 100, mesmo histórico) está no cabeçalho do teste. Divergência entre v2 e legado: parar e perguntar, como a tarefa manda.
 
@@ -846,7 +846,7 @@ T53 → T54
 **Depends on**: T18
 **Reuses**: `L:backend/dominio/test/simulador/sugerir.orcamento.test.ts:10` (limiar 4 ms); bench de `PR:840` (T16); `S:236`
 **Requirement**: SIM-57
-concluída
+**Status**: concluída
 **Nota do rascunho**: rascunhada antes da T18 (que pede rodar o legado, fora do rascunho). A medição (`test/simulador/medir.ts`) usa `performance.now()` em `test/`, fora da regra sem relógio de `src/`; o elenco e o histórico grandes estão no `apoio.ts`. Os números são impressos para a Evidência.
 
 **Done when**:
@@ -872,7 +872,7 @@ T53 → T54
 **Depends on**: T19
 **Reuses**: `MAX_APTOS_SIMULADOR` de `L:backend/dominio/src/simulador/distribuicao-varios.ts:10`; Assumption `S:56`; T19
 **Requirement**: SIM-58, SIM-59
-concluída
+**Status**: concluída
 **Nota do rascunho**: 20 medições por combinação e função, com 5 de aquecimento (são 40 medições no teste). O teto de avaliações continua `[A ESCLARECER]`: só entra se a medição passar de 4 ms.
 
 **Done when**:
@@ -901,7 +901,7 @@ T53 → T54
 **Depends on**: None
 **Reuses**: Primitivos zod (`CA:550`) e data real de `PR:889` (T18); `L:backend/contrato/src/simulador/contexto.ts`, `previa.ts` e `entrada.ts:24-30`
 **Requirement**: SIM-01, SIM-04, SIM-09, SIM-55
-concluída
+**Status**: concluída
 **Nota do rascunho**: `SPEC_DEVIATION`: a data real de `PR:889` ainda não existe no contrato; usa `ehDataDoCalendario` de `contrato/src/elenco.ts`. Lista de aptos vazia é aceita (a prévia descreve como insuficiente, sem mensagem nova). Id que não é UUID recebe a mensagem de SIM-54, sem revelar nada (SIM-80). O `index.ts` e o `package.json` do contrato ainda não exportam o arquivo (entram junto com a T23).
 **Lacunas**: SIM-53 dá "Há jogador repetido nos aptos." também para mais de 60 aptos; vale o texto da spec (`simulador.ts`, `[LACUNA]`).
 
@@ -928,7 +928,7 @@ T53 → T54
 **Depends on**: T21
 **Reuses**: `L:backend/contrato/src/simulador/entrada.ts` e `resultado.ts`; `S:186`, `S:226`, `S:232`, `S:313`
 **Requirement**: SIM-33, SIM-47, SIM-53, SIM-55, SIM-62, SIM-82
-concluída
+**Status**: concluída
 **Nota do rascunho**: as composições (`composicaoDois`, `composicaoVarios`), `Escalada` e `idsDaComposicao` nascem aqui, no `simulador.ts`, porque o `avaliarCorpo` precisa delas antes da T23; a T23 as reusa. `ordemPrioridade` da resposta vai em ids; `saiNoIntervalo`, `saiSemPar` e `entraSemPar` são marcações da troca, não dado do jogador.
 
 **Done when**:
@@ -954,7 +954,7 @@ T53 → T54
 **Depends on**: T22
 **Reuses**: `L:backend/contrato/src/simulador/escalacao.ts`; `L:backend/api/src/aplicacao/simulador/composicao.ts:4-11`; `S:272`, `S:345`
 **Requirement**: SIM-67, SIM-82, SIM-94
-concluída
+**Status**: concluída
 **Nota do rascunho**: `composicaoDois`, `composicaoVarios`, `Escalada` e `idsDaComposicao` ficaram no `simulador.ts` (T22); aqui `composicaoGravada` os reúne por formato. O `index.ts` e o `package.json` do contrato passam a exportar `simulador` e `escalacao`.
 
 **Done when**:
@@ -980,7 +980,7 @@ T53 → T54
 **Depends on**: T23
 **Reuses**: Estender `partidaNova` (`PR:889`, T18) e `grupoDetalhe` (`GE:753`, ampliado em `PR:937`); resposta do mockup `respostas/partida-nova-2026-10-22.json` (já tem o campo)
 **Requirement**: SIM-08, SIM-75
-concluída
+**Status**: concluída
 **Nota do rascunho**: `SPEC_DEVIATION`: a forma do GET do grupo é o `grupoDetalheComPartidas` (`contrato/src/previas.ts`, T20 da partidas-e-ranking), e o `grupoDetalhe` ficou só para o PATCH; os 2 campos do simulador vão no `grupoDetalheComPartidas`. Os testes existentes de `partidas.test.ts` (PAR-17) e `previas.test.ts` (PAR-132) passam a enviar os campos novos (autorizado), sem asserção removida.
 
 **Done when**:
@@ -1008,7 +1008,7 @@ T53 → T54
 **Depends on**: T1
 **Reuses**: Gerador e checagem aditiva (`F:883`, `F:858`: `DROP FUNCTION` não está na lista, sem exceção); função de 7 de `PR:987` (T22); meta-teste `GE:502` (T6); AD-037, AD-048
 **Requirement**: SIM-67 (AD-037)
-concluída
+**Status**: concluída
 **Nota do rascunho**: `1792844940000_grupo-criar-contrair.sql` (folga da feature 5 entre a última da `partidas-e-ranking` e a primeira do `financeiro`). O seed passa a chamar a de 7 com `(now() AT TIME ZONE 'America/Sao_Paulo')::date` no SQL do próprio seed (a data que a de 6 calculava; lacuna da T1). Os testes da lista da T1 recebem o 7º argumento com essa mesma data, mesmas asserções; em `grupo-criar-pesos.test.ts` o caso da delegação vira "a de 6 não existe (42883)", o `it.each` fica só com a de 7 e a regra do relógio exige zero funções; a rede da T1 se inverte (só a de 7). A referência do schema (`migracoes/esquema-producao.txt`, `F:784`) não existe no repositório: o /executar a regenera (`esquema-gerar`) com a função a menos.
 
 **Done when**:
@@ -1035,7 +1035,7 @@ T53 → T54
 **Depends on**: T25
 **Reuses**: Estender `tipos.ts` (`GE:878`, `PR:1013`); colunas `M:1792843200000_linha-de-base.sql:194-228`
 **Requirement**: SIM-67
-concluída
+**Status**: concluída
 **Nota do rascunho**: rascunhada antes da T25 (que depende da T1 e da migração da `partidas-e-ranking`). Só `escalacoes`: `eventos_uso` é tipada pela T80 da `partidas-e-ranking`, ainda não rascunhada; o INSERT do evento (T28) usa o `sql` do Kysely até lá. Teste próprio em `backend/api/test/banco/escalacoes-tipos.test.ts` (molde `financeiro-tipos.test.ts`).
 
 **Done when**:
@@ -1062,7 +1062,7 @@ T53 → T54
 **Depends on**: T26
 **Reuses**: Estender `jogadores-leitura.ts` (`GE:1179`, duas consultas e nível no domínio); `ativosNaData` (`PR:1185`); `compararApelido` (`GE:575`)
 **Requirement**: SIM-01, SIM-02, SIM-03
-concluída
+**Status**: concluída
 **Nota do rascunho**: `ativosNaData` é o do domínio (`partidas/marcacoes.ts`, já rascunhado), não um repositório de `PR:1185`: a 1ª consulta agrega os períodos de cada jogador (`json_agg`) e o domínio filtra; a 2ª lê as notas. Saída `{ id, apelido, anoNascimento, nivel, semNota }` (o ano vai para a idade média; a rota responde só `semAno`). Teste em `backend/api/test/repositorios/jogadores-simulador.test.ts`, com o SQL compilado registrado por um plugin.
 
 **Done when**:
@@ -1088,7 +1088,7 @@ T53 → T54
 **Depends on**: T27
 **Reuses**: `L:backend/api/src/aplicacao/simulador/confirmar-escalacao.ts`; INSERT de evento com conta de `PR:1212` (T30, `partida_lancada`); `ON CONFLICT` de `PR:1159` (T28); `c.var.db` (`FD:103`)
 **Requirement**: SIM-67, SIM-69, SIM-70, SIM-72, SIM-87
-concluída
+**Status**: concluída
 **Nota do rascunho**: `escalacoes.confirmar(db, grupoId, { data, n, k?, escalada }, conta, momento)`; o momento vem do relógio (`agoraIso`). O INSERT do evento vai pelo `sql` do Kysely (sem `eventos_uso` nos tipos até a T80 da `partidas-e-ranking`), sem o molde de `PR:1212`, que ainda não existe. SIM-87 com duas conexões: a primeira segura a transação até a segunda aparecer em `pg_stat_activity` esperando lock.
 
 **Done when**:
@@ -1116,7 +1116,7 @@ T53 → T54
 **Depends on**: T28
 **Reuses**: `lerComposicao` e `idsDaComposicao` (T23); `L:backend/api/src/aplicacao/partidas/nova.ts:51-58`
 **Requirement**: SIM-75, SIM-76, SIM-94
-concluída
+**Status**: concluída
 **Nota do rascunho**: `porData` devolve `{ data, n, k, escalada }` ou nulo; `idsNaData` devolve os ids ou nulo. Teste em `backend/api/test/repositorios/escalacoes-ler.test.ts`, com escalações gravadas como dono (inclusive as de forma inválida).
 
 **Done when**:
@@ -1144,7 +1144,7 @@ T53 → T54
 **Depends on**: T29
 **Reuses**: Estender `eventos.porSemana` (`PR:1289`, T33); Independent Test `S:281`
 **Requirement**: SIM-70
-concluída
+**Status**: concluída
 **Nota do rascunho**: contagem por `FILTER (WHERE tipo = 'escalacao_confirmada')` e o tipo entra no `IN` que forma as semanas. `eventos.test.ts` ganha os casos SIM-70 (os demais continuam esperando 0, agora contado); em `rotas/uso.test.ts` a semana de 2026-03-02, que o `beforeAll` já semeia com uma escalação, passa a esperar 1.
 **Lacunas**: semana que só tem `escalacao_confirmada` (o `[LACUNA]` da `partidas-e-ranking` em `eventos.ts`): o rascunho a mostra, com o resto zerado, por ser uso do app; o /executar confirma.
 
@@ -1170,7 +1170,7 @@ T53 → T54
 **Depends on**: T30
 **Reuses**: Estender `grupos.ler` (`GE:1003`, ampliado em `PR:1314`); T2
 **Requirement**: SIM-08
-concluída
+**Status**: concluída
 **Nota do rascunho**: os 2 campos entram em `DadosDoInicio` (só com `hoje`, como os da `partidas-e-ranking`), com `proximoDiaDeJogo` de `@pelada/dominio` (T2) e um `EXISTS` em `escalacoes` (grupo e data). Testes em `test/repositorios/grupos-inicio.test.ts`.
 **Lacunas**: escalação gravada com JSON inválido conta como existente no item do início (só a linha é consultada); a SIM-94 fala da pré-marcação. O /executar confirma.
 
@@ -1195,7 +1195,7 @@ T53 → T54
 **Depends on**: T31
 **Reuses**: Cadeia `exigirVinculo` → `exigirGrupoAtivo` (`CA:795`, `GE:901`); assinatura de PLA-07 (`.specs/features/planos-e-cobranca/spec.md:79`); AD-049, AD-062
 **Requirement**: SIM-68
-concluída
+**Status**: concluída
 **Nota do rascunho**: rascunhada antes das T30 e T31 (que dependem dos repositórios da `partidas-e-ranking`). `recursoLiberado(db, grupoId, recurso)` (o `Db` da requisição vai junto, porque a versão da feature 7 lê a situação no banco), injetável por `criarApp({ recursoLiberado })` e lido em `c.var.recursoLiberado`; `travarRecursosDoPlano(api)` liga `exigirRecurso('simulador')` em `/grupos/:grupoId/simulador/*` e `/grupos/:grupoId/escalacoes`, depois de `protegerRotasDeGrupo`. Corpo do 403 na forma da AD-091 (`{ erro: 'plano_pro', recurso, mensagem }`), sem importar o `plano.ts` da feature 7. Teste em `backend/api/test/sessao/recurso.test.ts`; o meta-teste pede as 5 rotas das T33 a T37 e fica vermelho até elas existirem.
 
 **Done when**:
@@ -1222,7 +1222,7 @@ T53 → T54
 **Depends on**: T32
 **Reuses**: Molde de `GET partidas/nova` (`PR:1436`, T39); `Relogio` (`GE:831`); T21, T27
 **Requirement**: SIM-01, SIM-02, SIM-03, SIM-04
-concluída
+**Status**: concluída
 **Nota do rascunho**: `rotasSimulador()` em `rotas/simulador.ts`, registrada no `criarApp` depois das rotas do elenco. Molde `GET …/jogadores` (`rotas/jogadores.ts:17`): o `GET partidas/nova` de `PR:1436` ainda não existe. Query lida por `consultaContexto` (strict); 422 pelo `erroDeCampos` no campo `data`. Teste em `backend/api/test/rotas/simulador-contexto.test.ts`.
 
 **Done when**:
@@ -1248,7 +1248,7 @@ T53 → T54
 **Depends on**: T33
 **Reuses**: `lerCorpo` (`GE:854`); `READ ONLY` de `PR:1362` (T36); T3, T4, T21
 **Requirement**: SIM-09, SIM-83
-concluída
+**Status**: concluída
 **Nota do rascunho**: `respostaDaPrevia(previa)` monta a resposta do contrato com a `descricao`. A transação `READ ONLY` pelo sufixo `/previa` (AD-035) é do `comBanco` da `partidas-e-ranking` (`PR:1362`, T36), ainda não rascunhada: esta rota não a reimplementa. Atenção para o /executar: em `READ ONLY` o `SELECT … FOR KEY SHARE` do `exigirGrupoAtivo` falha no Postgres; a T36 da `partidas-e-ranking` precisa tratar o sufixo. Teste em `backend/api/test/rotas/simulador-previa.test.ts`.
 
 **Done when**:
@@ -1273,7 +1273,7 @@ T53 → T54
 **Depends on**: T34
 **Reuses**: `historico.carregar` (`PR:1135`); T15, T22, T27; log de `L:backend/api/src/entrada/rotas/grupos/simulador/sugerir.ts:20-29`; captura de log de `CA:1047` (T31)
 **Requirement**: SIM-17, SIM-47, SIM-53, SIM-54, SIM-55, SIM-56, SIM-60, SIM-80
-concluída
+**Status**: concluída
 **Nota do rascunho**: entrada e saída entre contrato e domínio em `rotas/simulador-resultado.ts` (a T36 reaproveita): aptos do corpo + dados do `paraSimulador` na data; resposta com "Time A"/"Time B" e "Time 1"…, `saiNoIntervalo` pelos `saem` dos indicadores, trocas pelos pares. A API não tem módulo de log: a linha de SIM-60 é um `console.log` com JSON (`evento: simulador_sugerir`), que vai ao `wrangler tail`; o teste espia o `console`. Teste em `test/rotas/simulador-sugerir.test.ts`.
 
 **Done when**:
@@ -1303,7 +1303,7 @@ T53 → T54
 **Depends on**: T35
 **Reuses**: T16, T22, T35
 **Requirement**: SIM-62, SIM-63
-concluída
+**Status**: concluída
 **Nota do rascunho**: reaproveita `simulador-resultado.ts` da T35, mais `composicaoDoCorpo` (contrato → `ComposicaoEntrada`) e `comSo1oDaComposicao` (o "só 1º" da composição vale sobre o dos aptos, `avaliar.ts:4`). Sem linha de log (SIM-60 fala do `sugerir`). Teste em `test/rotas/simulador-avaliar.test.ts`.
 
 **Done when**:
@@ -1328,7 +1328,7 @@ T53 → T54
 **Depends on**: T36
 **Reuses**: Molde de `POST partidas` (`PR:1461`, T40); T23, T27, T28
 **Requirement**: SIM-67, SIM-71, SIM-72, SIM-93
-concluída
+**Status**: concluída
 **Nota do rascunho**: rascunhada antes das T35 e T36 (que dependem do `historico.carregar` da `partidas-e-ranking`). `rotasEscalacoes()` em `rotas/escalacoes.ts`, montada pelo `rotasSimulador()` (sem mexer no `app.ts`). Ativo na data pelo `jogadoresLeitura.paraSimulador` (T27); molde `POST …/jogadores` (`rotas/jogadores.ts:22`), pois o `POST partidas` de `PR:1461` ainda não existe. Teste em `backend/api/test/rotas/escalacoes.test.ts`.
 
 **Done when**:
@@ -1355,7 +1355,7 @@ T53 → T54
 **Depends on**: T37
 **Reuses**: Estender `GET partidas/nova` (`PR:1436`, T39); T24, T29; `L:backend/api/src/aplicacao/partidas/nova.ts:51-58`
 **Requirement**: SIM-75, SIM-76, SIM-78, SIM-88
-concluída
+**Status**: concluída
 **Nota do rascunho**: a rota usa `escalacoes.idsNaData` (T29) sobre os `ativosNaData` de antes: só ativos aparecem (SIM-88), `presente` quem está na escalação. O teste existente de `PR:1436` (`partidas-leitura.test.ts:84`) já espera `preMarcadaPelaEscalacao: false` sem escalação e continua valendo sem mudança. Testes novos em `test/rotas/partidas-pre-marcada.test.ts`.
 **Lacunas**: escalação válida sem nenhum id ativo na data: a marca fica verdadeira com todos `ausente` (a escalação existe); a Base não diz. O /executar confirma.
 
@@ -1386,7 +1386,7 @@ T53 → T54
 **Depends on**: T38
 **Reuses**: Rota de `GE:1080` ampliada em `PR:1538` (T43); T31
 **Requirement**: SIM-08
-concluída
+**Status**: concluída
 **Nota do rascunho**: a rota passa os 2 campos de `grupos.ler` (T31). O teste existente `grupo-inicio.test.ts` troca o schema sem os 2 campos pelo contrato inteiro (autorizado); casos novos com relógio na terça (10/03 → 12/03) e na sexta (13/03 → 19/03).
 
 **Done when**:
@@ -1411,7 +1411,7 @@ T53 → T54
 **Depends on**: T39
 **Reuses**: Suíte de isolamento (`CA:1070`, estendida em `GE:1607` e `PR:1658`)
 **Requirement**: SIM-79, SIM-80, SIM-83
-concluída
+**Status**: concluída
 **Nota do rascunho**: tabela `PEDIDOS_DO_SIMULADOR` na suíte de `rotas.test.ts`: 404 cruzado de B contra G com retrato de escalações, eventos, partidas e pesos de G e H; 401 sem sessão; 422 de SIM-80 nos 3 POST com ids (A em G com o jogador de H e B em H com o de G); 409 nos POST com G arquivado; meta-teste com rota extra de `/simulador` e de `/escalacoes`.
 
 **Done when**:
@@ -1437,7 +1437,7 @@ T53 → T54
 **Depends on**: T40
 **Reuses**: Molde de `CAMPOS_PROIBIDOS_PUBLICO` (`PR:913`, T19); `S:313`
 **Requirement**: SIM-82, SIM-03
-concluída
+**Status**: concluída
 **Nota do rascunho**: lista própria `CAMPOS_PROIBIDOS_SIMULADOR` no teste (a pública proíbe `id` e `nivel`, que o simulador devolve); varredura no JSON cru, não no `parse`; também confere que todo objeto com `apelido` só tem as chaves permitidas (inclui `saiNoIntervalo` do titular). Jogadores com telefone, ano, posição e nota.
 
 **Done when**:
@@ -1464,7 +1464,7 @@ T53 → T54
 **Depends on**: T41, T25
 **Reuses**: Script de ensaio da `partidas-e-ranking` (`PR:1684`, T81); restauração (`F:584`); `lerEsquema` e a referência (`F:736`, `F:784`); `F:834`; AD-073
 **Requirement**: SIM-67 (AD-037, AD-048)
-concluída
+**Status**: concluída
 **Nota do rascunho**: o `ensaiar` ganha `mudancaDoEsquema` (schema do dump antes × depois, só informativo) e o imprime; teste em `test/ensaio-migracao-simulador.test.ts` com dump simulado até antes da `grupo-criar-contrair`. A `Evidência` com o backup real (pausa para o usuário) é do /executar.
 
 **Done when**:
@@ -1491,7 +1491,7 @@ T53 → T54
 **Depends on**: T42
 **Reuses**: Assumption `S:55` e critério `S:240`; AD-117; entradas de T19; `URL_PUBLICA` como origem (`F:1251`)
 **Requirement**: SIM-61
-concluída
+**Status**: concluída
 **Nota do rascunho**: duas etapas em `medir-simulador.ts`: `disparar <grupoId> --confirmo-previa` (só previa, sugerir e avaliar; contagens de escalações e eventos pela própria `GET uso`, sem acesso ao banco da produção) e `analisar <tail.jsonl>` (p99 nearest-rank e 1102 por `outcome`). `SESSAO_MEDICAO` no `.env.example`. A `Evidência` (deploy e medição com o usuário) é do /executar.
 **Lacunas**: método do p99 (rascunho: nearest-rank); 50 `sugerir` no total ou por configuração (rascunho: 50 de cada); nomes `cpuTime` e `outcome` do JSON do `wrangler tail` (PREMISSA, conferir com saída real). O /executar confirma.
 
@@ -1520,7 +1520,7 @@ T53 → T54
 **Depends on**: None
 **Reuses**: Molde da P27 da `partidas-e-ranking` (respostas sem `enderecoNovo`, `PR:2344`); `.specs/mockup/respostas/simulador-*.json`; AD-047
 **Requirement**: SIM-85, SIM-15
-concluída
+**Status**: concluída
 **Nota do rascunho**: respostas reescritas por conversão (nível × 100, `semAno` falso, ids na ordem e nas trocas, `descricao` da prévia, indicadores inteiros); a t12 vazio na rota do app com a sessão e o `elenco-grupo-domingo.json`; estado `T11 pre-marcada` em `telas` com `respostas/partida-nova-2026-10-22-pre-marcada.json` (19 presentes, Fumaça ausente). Não há entradas com rota da t13/t14 (só em `revisaoManual`). Teste em `test/ferramentas/telas-simulador.test.ts`.
 
 **Done when**:
@@ -1545,7 +1545,7 @@ T53 → T54
 **Depends on**: T44
 **Reuses**: `.specs/mockup/telas/t12-simulador--{vazio,dois-times,tres-times}.html`; `exibirNivel` (`GE:1726`); `CampoData` (`GE:1751`); molde de `PaginaNovaPartida` (`PR:1974`)
 **Requirement**: SIM-05, SIM-06, SIM-07, SIM-95
-concluída
+**Status**: concluída
 **Nota do rascunho**: `dados/simulador.ts` (contexto, prévia e avaliar pelo `usePrevia` de `dados/previas.ts`, sugerir, confirmar); as entradas em `EntradasSimulador.tsx` (com `corpoDaPrevia` e `corpoDoSugerir`), a página em `PaginaSimulador.tsx`, o CSS em `simulador.module.css`. A rota no app é da T51. Teste em `test/telas/simulador-entradas.test.tsx`.
 **Lacunas**: N e K iniciais não definidos na spec (rascunho: 7 e 2, do mockup `t12-simulador--dois-times.html`). O /executar confirma.
 
@@ -1575,7 +1575,7 @@ T53 → T54
 **Depends on**: T45
 **Reuses**: `.specs/mockup/telas/t12-simulador--{insuficiente,calculando}.html`; T45
 **Requirement**: SIM-14, SIM-15
-concluída
+**Status**: concluída
 **Nota do rascunho**: `PreviaSimulador` com `podeSugerir` e `previaInvalida`; a página pede a prévia por `usePreviaSimulador` (debounce do `usePrevia`, 300 ms) com o `corpoDaPrevia` das entradas. Teste com temporizador falso só de `setTimeout` em `test/telas/simulador-previa.test.tsx`.
 
 **Done when**:
@@ -1601,7 +1601,7 @@ T53 → T54
 **Depends on**: T46
 **Reuses**: `.specs/mockup/telas/t13-resultado-dois--{sucesso,carregando}.html`; `respostas/simulador-sugestao-dois.json` (T44); `exibirNivel` (`GE:1726`)
 **Requirement**: SIM-20, SIM-26, SIM-41, SIM-74, SIM-86
-concluída
+**Status**: concluída
 **Nota do rascunho**: `ResultadoDoisTimes` (com `ListaJogadores`, `MontandoTimes`, `cabecalhoDois`, `umaCasa`) e a página ligada ao `sugerir`: pendente mostra "Montando os times…" no título e no `status`; pronto, "Times sugeridos". No resultado, o voltar é o botão "Simulador" (às entradas). Teste em `test/telas/simulador-resultado-dois.test.tsx`, com as respostas do mockup (T44).
 **Lacunas**: singular de "até 1 substituições" (rascunho: o texto da spec); texto de quem sai ou entra sem par (SIM-25; rascunho: "X → sem par" e "sem par → Y"); falha do `sugerir` (rascunho: `EstadoErro` com "Tentar de novo"). O /executar confirma.
 
@@ -1631,7 +1631,7 @@ T53 → T54
 **Depends on**: T47
 **Reuses**: `.specs/mockup/telas/t14-resultado-varios--sucesso.html`; `respostas/simulador-sugestao-varios.json` (T44); T47
 **Requirement**: SIM-38, SIM-74
-concluída
+**Status**: concluída
 **Nota do rascunho**: `ResultadoVariosTimes` (reusa `ListaJogadores`, `diaAbreviado` e `umaCasa` da T47) e a página mostra ele no formato 3+. Teste em `test/telas/simulador-resultado-varios.test.tsx`.
 
 **Done when**:
@@ -1656,7 +1656,7 @@ T53 → T54
 **Depends on**: T48
 **Reuses**: `.specs/mockup/telas/t13-resultado-dois--{mover,trocar,recalculando,erro-recalcular}.html` e `t14-resultado-varios--mover.html`; `Dialogo` (`CA:1286`)
 **Requirement**: SIM-64, SIM-65
-concluída
+**Status**: concluída
 **Nota do rascunho**: `MoverJogador.tsx`: regras puras (`moverNoDois`, `trocarNoDois`, `alternarSo1oNoDois`, `moverNoVarios`, `trocarNoVarios`, `corpoDoAvaliar`), o hook `useAjusteManual` (avaliar pelo `useAvaliar`, 300 ms) e a `FolhaMover` sobre o `Dialogo` em formato folha. A tela mostra a composição local com "recalculando…" até o `avaliar` responder; pronto, mostra a resposta dele (sem a ordem de prioridade, SIM-62). Teste em `test/telas/simulador-mover.test.tsx`.
 
 **Done when**:
@@ -1684,7 +1684,7 @@ T53 → T54
 **Depends on**: T49
 **Reuses**: `.specs/mockup/telas/t13-resultado-dois--{refazer,erro-confirmar}.html`; `Dialogo` e `Faixa` (`CA:1286`)
 **Requirement**: SIM-46, SIM-66, SIM-73, SIM-93
-concluída
+**Status**: concluída
 **Nota do rascunho**: `AcoesResultado` (com `corpoDaEscalacao` e `avisoEscalacaoConfirmada`) e a página: refazer usa a mesma entrada da sugestão na tela; confirmar grava a composição na tela (a ajustada ou a sugerida) e volta ao início com o aviso no `state` da navegação (o `InicioGrupo` já mostra). Teste em `test/telas/simulador-acoes.test.tsx`.
 
 **Done when**:
@@ -1712,7 +1712,7 @@ T53 → T54
 **Depends on**: T50
 **Reuses**: Rotas do app (`CA:1309`, `PR:1926`); tela de `PR:2073` (T64); asserção de posição no molde de `GE:2138`; `.specs/mockup/telas/t09-inicio--sucesso.html:19-20`
 **Requirement**: SIM-08, SIM-84
-concluída
+**Status**: concluída
 **Nota do rascunho**: o item fica no bloco "Dia de jogo" (botão secundário abaixo do lançar, com a linha da escalação embaixo), como `t09-inicio--sucesso.html:19-20`, e só com jogador ativo (a t09 `sem-jogadores` não o mostra). Rota em `rotas.tsx` (`handle.tela` = `simulador`), teste em `test/app/rotas-simulador.test.tsx`; textos e estados em `test/telas/inicio-grupo.test.tsx`; posição em `e2e/simulador-inicio.spec.ts`.
 
 **Done when**:
@@ -1739,7 +1739,7 @@ T53 → T54
 **Depends on**: T51
 **Reuses**: Estender `PaginaNovaPartida` (`PR:1974`, T60); `telas/t11-partida--pre-marcada.html` (T44); `Faixa` (`CA:1286`)
 **Requirement**: SIM-77
-concluída
+**Status**: concluída
 **Nota do rascunho**: a faixa fica dentro do formulário, abaixo da data e do "Choveu?" (como a t11 `pre-marcada`), por uma prop opcional `avisoAposData` do `FormularioPartida`; só aparece com a lista da data na tela. Teste em `test/telas/partida-nova-pre-marcada.test.tsx` (o `partida-nova.test.tsx` não muda).
 
 **Done when**:
@@ -1765,7 +1765,7 @@ T53 → T54
 **Depends on**: T52
 **Reuses**: Lista de telas ativas (`CA:1633`, `PR:2369`); runner com `sequencia`, `pendente` e `abortar` (`PR:2344`); Stylelint de tokens (`F:1374`)
 **Requirement**: SIM-85, SIM-26, SIM-38, SIM-86
-concluída
+**Status**: concluída
 **Nota do rascunho**: o `telas.json` só tinha a t12 `vazio` do simulador; as 14 entradas novas (com `respostas`, `passos` e o `recorte` que o comentário de cada mockup indica) nascem aqui, e a t12 `vazio` e a t11 `pre-marcada` ganham `real: true`. A t09 `sucesso` já é comparada inteira pela T46 da `financeiro` (AD-118): em vez do recorte do "Dia de jogo", a `financeiro-grupo-quinta.json` ganha os campos do início e do simulador (`escalacaoNoProximoDia: true`), para a tela inteira mostrar o Simulador e a escalação do mockup. Teste em `test/ferramentas/telas-simulador-ativas.test.ts`.
 **Lacunas**: os valores de N dos `passos` (4, 8, 11) e os seletores `.cartao`, `.comparativo` e `.folha` do lado do app vêm dos mockups; o `/executar` confere na primeira rodada do `visual`.
 
@@ -1792,7 +1792,7 @@ T53 → T54
 **Depends on**: T53
 **Reuses**: Jornadas de `PR:2441` (T79) e `CA:1683`; seed de `PR:2319` (T74)
 **Requirement**: SIM-47, SIM-64, SIM-67, SIM-75
-concluída
+**Status**: concluída
 **Nota do rascunho**: J-22, J-23 e J-24 em `e2e/simulador.spec.ts`; cada uma cria conta, grupo e jogadores, com o grupo jogando no dia da semana de hoje (próximo dia de jogo = data sugerida = hoje), para a J-24 não lançar partida no futuro. `SPEC_DEVIATION` no topo do spec: o "ausente" da J-22 é um jogador desmarcado, porque o grupo novo não tem ausência registrada.
 
 **Done when**:

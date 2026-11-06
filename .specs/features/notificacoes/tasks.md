@@ -271,7 +271,7 @@ T39 → T40 → T41
 **Depends on**: none
 **Reuses**: método da skill `rede-de-protecao`; rotas de partida (`PR:1461`, `PR:1487`); webhook (`PC:176-187`); `conta_excluir` (`CA:470`, `M:1792843800000_conta-senha-bloqueio.sql:92`); `recursoLiberado` (`PC:79`)
 **Requirement**: NOT-20, NOT-38, NOT-55
-concluída
+**Status**: concluída
 **Lacunas**: S-01 sem contexto (consumidor da fila) provavelmente não vale: `backend/api/src/aplicacao/plano/recurso-liberado.ts:29` devolve `false` para o grupo que o contexto não enxerga; o teste afirma `false`. Confirmado no verde, o `/executar` pergunta antes do lote 2 se a T10 e a T18 seguem o plano B da S-01.
 **Nota do rascunho**: escrita depois da T21 e da T22 (por isso a fila em memória nos casos de partida e de webhook). Teste em `backend/api/test/caracterizacao/notificacoes.test.ts` (projeto `banco`, Node). Evidência preliminar, por leitura, a confirmar no verde: S-01 vale para o slug (`recurso-liberado.ts:33`), sem contexto ver Lacunas; S-02 vale (`backend/dominio/src/plano/plano-efetivo.ts:56`); S-03 vale em parte (`backend/api/src/entrada/rotas/webhook-asaas.ts`, `comBanco` sem contexto; `aplicarEventoAsaas` devolve repetido, assinatura desconhecida, aplicado ou sem efeito com o efeito e o grupo em `backend/api/src/aplicacao/plano/webhook.ts:62`; valor e vencimento a T22 lê do corpo); S-04 vale (`backend/dominio/src/plano/eventos-asaas.ts:20`, `PAYMENT_CREATED` é `nao_tratado` e não obsoleto); S-05 vale (`frontend/web/src/telas/plano/MeuPlano.tsx:23`); S-06 vale (nenhuma migração redefine `conta_excluir` depois de `1792843800000_conta-senha-bloqueio.sql:149`); S-07 vale (`backend/api/src/entrada/rotas/partidas.ts:180`, `:215`).
 
@@ -299,7 +299,7 @@ T39 → T40 → T41
 **Depends on**: T0
 **Reuses**: primitivos zod (`CA:550`); AD-066 e AD-109
 **Requirement**: NOT-06, NOT-67
-concluída
+**Status**: concluída
 **Nota do rascunho**: rascunhada antes da T0 (decisão do usuário: só o que não depende da feature 7). O teto de 1024 fica no `endpointPushAceito`, sem `.max` no zod, para o campo ter uma só mensagem.
 
 **Done when**:
@@ -325,7 +325,7 @@ T39 → T40 → T41
 **Depends on**: T1
 **Reuses**: RFC 8291 §3 e Apêndice A, RFC 8188 §2 (texto dos RFCs, `S:240`); `base64url` (T1)
 **Requirement**: NOT-26
-concluída
+**Status**: concluída
 **Nota do rascunho**: o vetor do Apêndice A foi transcrito de memória do RFC; se o teste do vetor falhar, confira cada valor contra o texto do RFC antes de mexer na cifra. Os testes de `test/infraestrutura/push/` passam a rodar no projeto `worker` do `vitest.config.ts` (AD-100); a T20 tem parte em Node (bench) e precisa de arquivo fora dessa pasta ou de um terceiro projeto.
 
 **Done when**:
@@ -352,7 +352,7 @@ T39 → T40 → T41
 **Depends on**: T2
 **Reuses**: RFC 8292 §2 e §3 (`S:240`); assinatura ECDSA em formato IEEE P1363 = JWS; relógio (`GE:831`)
 **Requirement**: NOT-27
-concluída
+**Status**: concluída
 **Nota do rascunho**: a assinatura `cabecalhoVapid(endpoint, chaves, agora, cache?)` ganhou o `cache` opcional da invocação (chave conferida uma vez e um cabeçalho por origem). O par é conferido com assinar e verificar, porque a Web Crypto não promete recusar o JWK com `d` de outro par.
 
 **Done when**:
@@ -378,7 +378,7 @@ T39 → T40 → T41
 **Depends on**: T3
 **Reuses**: checagem do `.env.example` (`F:1886`); variáveis só pelo nome (`CA:697`); `cabecalhoVapid` (T3) no teste
 **Requirement**: NOT-14, NOT-60
-concluída
+**Status**: concluída
 **Nota do rascunho**: o `@pelada/api` passa a exportar `./push/vapid` para o teste do script usar o `cabecalhoVapid` (T3). O gitleaks fica para o gate do `/executar`.
 
 **Done when**:
@@ -406,7 +406,7 @@ T39 → T40 → T41
 **Depends on**: T4
 **Reuses**: datas do domínio (`PR:457`); campos proibidos de PAR-76 (`PR:913`); S-05
 **Requirement**: NOT-25, NOT-28, NOT-43, NOT-66
-concluída
+**Status**: concluída
 **Nota do rascunho**: `topicoDoGrupo` fica em `backend/api/src/infraestrutura/push/topico.ts`; o tamanho cifrado e o tópico são testados em `backend/api/test/infraestrutura/push/payload.test.ts` (workerd). O payload de cobrança não tem `texto` (NOT-43: "só o título ... e o caminho"); o service worker (T34) trata a ausência. A lista de PAR-76 não é importada (o `CAMPOS_PROIBIDOS_PUBLICO` nasce na T19 da feature 4): o teste confere a lista exata de chaves.
 
 **Done when**:
@@ -433,7 +433,7 @@ T39 → T40 → T41
 **Depends on**: T5
 **Reuses**: T2, T3, T5; `limparEvento` e Sentry (`F:1277`, `F:1301`); log sem conteúdo do remetente (`CA:647`)
 **Requirement**: NOT-27, NOT-28, NOT-29, NOT-30, NOT-31, NOT-32, NOT-33, NOT-63
-concluída
+**Status**: concluída
 **Lacunas**: (1) status fora dos citados pela spec (200, 202, 3xx, 401, outros 4xx) viram `erro` reportado e mantêm a assinatura; (2) `fetch` que lança ou passa de 10 s vira `tentarDeNovo` sem atraso (mesmo teto do 5xx). Confirmar com o usuário antes do verde.
 **Nota do rascunho**: o serviço de push falso (`servicoPushFalso`) mora no próprio `enviar.ts`, ao lado do remetente em memória do molde (`resend.ts`). Os relatos vão por `reportar` (padrão: `Sentry.captureMessage` só com host, status e motivo).
 
@@ -463,7 +463,7 @@ T39 → T40 → T41
 **Depends on**: T6
 **Reuses**: gerador (`F:883`); checagem aditiva (`F:858`); RLS das tabelas (`M:1792843320000_rls.sql:33-59`); policy de backup (`M:1792843860000_conta-teto-emails.sql:17`); AD-067, AD-101
 **Requirement**: NOT-12, NOT-49, NOT-50, NOT-57
-concluída
+**Status**: concluída
 **Nota do rascunho**: o timestamp é `1792846200000`, com folga para as migrações que a `planos-e-cobranca` ainda vai ganhar (SPEC_DEVIATION no cabeçalho do SQL); o `/executar` confere a ordem e renomeia se preciso. As duas tabelas com `grupo_id` entraram no cenário (`apoio.ts`, `cenario-grupos.ts`) e na matriz de leitura e escrita da fundação (`matriz.ts`, `casos-escrita.ts`) como `sem-grant`, senão o `criarCenario` falharia. A policy e o grant de backup são `TO pelada_backup_ro`: depois de `1792844220000_roles-padronizadas.sql` a role `pelada_backup` não existe mais, e o `TO pelada_backup` da `planos-e-cobranca` (`1792845420000_planos-tabelas.sql:70-72`) vai falhar numa base nova; ela precisa do mesmo ajuste.
 
 **Done when**:
@@ -490,7 +490,7 @@ T39 → T40 → T41
 **Depends on**: T7
 **Reuses**: molde de `evento_publico_registrar` (`PR:1038`, sem conta e slug do contexto); molde de função (`M:1792843680000_conta-admins-listar.sql:8-21`); AD-065, AD-034
 **Requirement**: NOT-05, NOT-07, NOT-08, NOT-10, NOT-17, NOT-18, NOT-51, NOT-65, NOT-70
-concluída
+**Status**: concluída
 **Nota do rascunho**: `push_ranking_estado` devolve texto (`ativa`, `ausente` ou `nao_encontrado`), e `push_ranking_cancelar` devolve `void` e ignora em silêncio um slug que não é o do contexto (a API responde 204 de qualquer jeito). Os testes de corrida usam duas conexões com COMMIT real e limpam as linhas `t8-*` no `finally`.
 
 **Done when**:
@@ -519,7 +519,7 @@ T39 → T40 → T41
 **Depends on**: T8
 **Reuses**: T8; molde de trigger (`M:1792844520000_grupos-arquivar-so-criadora.sql:8-25`); `conta_excluir` (`M:1792843800000_conta-senha-bloqueio.sql:143-149`); S-06
 **Requirement**: NOT-45, NOT-53, NOT-55
-concluída
+**Status**: concluída
 **Nota do rascunho**: a trigger roda como `SECURITY DEFINER` e dispara só na passagem de `excluida_em` de nulo a preenchido (`WHEN`), então nenhuma exclusão posterior reapaga. O teste de `conta_excluir` usa o cenário de conta e a senha de A, com a conta sem vínculo como segunda admin do grupo A.
 
 **Done when**:
@@ -547,7 +547,7 @@ T39 → T40 → T41
 **Depends on**: T9
 **Reuses**: T8; S-01
 **Requirement**: NOT-29, NOT-30, NOT-69
-concluída
+**Status**: concluída
 **Nota do rascunho**: `push_ranking_resultado` recebe o grupo do lote como primeiro parâmetro (`p_grupo`, SPEC_DEVIATION no SQL) para que o id de outro grupo seja ignorado. `push_envio_grupo` devolve só nome, slug e arquivado: S-01 ainda não foi conferida (a T0 não rodou); se não valer, o `/executar` acrescenta as entradas do `planoEfetivo`. A função de apoio `push_exigir_sem_contexto` concentra a recusa com conta ou slug (42501).
 
 **Done when**:
@@ -574,7 +574,7 @@ T39 → T40 → T41
 **Depends on**: T10
 **Reuses**: par `_em` e wrapper (`M:1792843860000_conta-teto-emails.sql:26`, `:43`); T10; AD-070, AD-105
 **Requirement**: NOT-38, NOT-39, NOT-56, NOT-57
-concluída
+**Status**: concluída
 **Nota do rascunho**: `push_conta_resultado` também recebe a conta (`p_conta`) como primeiro parâmetro. `aviso_cobranca_destino` devolve uma linha com `assinaturas` em jsonb. `notificacoes_limpar_em` devolve `(ranking, avisos)` com as linhas apagadas e só limpa `push_ranking` e `avisos_cobranca`, como a spec manda (NOT-56 não cita `push_conta`).
 
 **Done when**:
@@ -601,7 +601,7 @@ T39 → T40 → T41
 **Depends on**: T11
 **Reuses**: matrizes de leitura, escrita e contexto público (`F:981`, `F:1007`, `F:1031`); meta-teste (`F:957`); cenário (`F:909`)
 **Requirement**: NOT-51, NOT-52, NOT-53, NOT-54
-concluída
+**Status**: concluída
 **Nota do rascunho**: a `push_conta` não tem `grupo_id`, então o caso dela entrou no meta-teste de conta (`meta-conta.test.ts`: linha na `MATRIZ_CONTA` e a contagem de 9 para 10 tabelas, mudança de teste existente pelo motivo de a tabela nova existir, sem enfraquecer a checagem); `notificacoes_limpar_em` entrou na lista `SO_OWNER`. As tabelas com `grupo_id` já estavam na `MATRIZ` desde a T7. O ator N (sem contexto) é o do consumidor da fila e pode chamar as funções do envio, então só A, C, B e S são recusados nelas. A `planos-e-cobranca` tem `eventos_asaas` na mesma situação (sem `grupo_id`, fora da `MATRIZ_CONTA`) e vai pedir a contagem 11 quando as duas forem executadas.
 
 **Done when**:
@@ -630,7 +630,7 @@ T39 → T40 → T41
 **Depends on**: T12
 **Reuses**: matriz de backup da conta (`CA:313`); script de dump (`F:534`); AD-010, AD-016
 **Requirement**: NOT-58
-concluída
+**Status**: concluída
 **Nota do rascunho**: o dump real roda `pg_dump` do PATH com um login temporário que herda de `pelada_backup_ro` (removido no `finally`); sem o cliente no PATH o teste falha dizendo isso, sem pular, e o `/executar` ajusta o pré-voo se preciso. A T7 ganhou `GRANT SELECT` nas duas sequences identity para a role de backup (o `pg_dump` lê o valor delas).
 
 **Done when**:
@@ -655,7 +655,7 @@ T39 → T40 → T41
 **Depends on**: T13
 **Reuses**: repositórios que chamam função (`CA:820`, `PR:1289`); T8 a T11
 **Requirement**: NOT-05, NOT-17, NOT-45
-concluída
+**Status**: concluída
 **Nota do rascunho**: os ids de assinatura (`bigint`) circulam como texto e os arrays vão como literal `{1,2}` com `::bigint[]`. Só `loteRanking` e `destinoCobranca` devolvem as chaves, para a infraestrutura de envio; as rotas usam os seis primeiros métodos, que só devolvem texto de estado.
 
 **Done when**:
@@ -680,7 +680,7 @@ T39 → T40 → T41
 **Depends on**: T14
 **Reuses**: estender o `comBanco` (`F:1203`, já estendido em `CA:770`); Sentry (`F:1301`); AD-068
 **Requirement**: NOT-20, NOT-21, NOT-22
-concluída
+**Status**: concluída
 **Nota do rascunho**: `aposCommit` entrou em `Variaveis` (`ambiente.ts`) e as tarefas rodam também quando a rota nunca abriu conexão e respondeu abaixo de 400 (nada a confirmar). O Sentry é carregado por `import()` só na falha, para o `com-banco.ts` continuar importável nos testes em Node; `OpcoesComBanco.reportarFalhaAposCommit` troca o relato nos testes.
 
 **Done when**:
@@ -709,7 +709,7 @@ T39 → T40 → T41
 **Depends on**: T15
 **Reuses**: `wrangler.jsonc` e o teste dele (`F:1081`); contrato zod (`CA:550`); AD-098
 **Requirement**: NOT-22, NOT-43
-concluída
+**Status**: concluída
 **Nota do rascunho**: os schemas zod ficam no contrato (`backend/contrato/src/fila-avisos.ts`, exportado em `./fila-avisos`), porque o `@pelada/api` não depende do zod; testes em `backend/contrato/test/fila-avisos.test.ts`. O `avisos.ts` tem só o produtor (`agendarAviso`, que confere a mensagem antes do `send`) e a `filaMemoria` dos testes; `FILA_AVISOS` é opcional no `Env`, e sem ele o `agendarAviso` lança (o `aposCommit` reporta). O teste do produtor fica em `backend/api/test/infraestrutura/fila/` (projeto `banco`, Node). O teste de config entrou em `test/wrangler.test.ts`, da raiz. `tentativa` vai de 1 a 3.
 
 **Done when**:
@@ -735,7 +735,7 @@ T39 → T40 → T41
 **Depends on**: T16
 **Reuses**: `worker.ts` (`F:1106`); cliente pg por invocação (`F:1179`); AD-098, AD-108
 **Requirement**: NOT-22, NOT-33
-concluída
+**Status**: concluída
 **Nota do rascunho**: a lógica fica em `backend/api/src/entrada/consumidor-avisos.ts` (`consumirAvisos`), e o `worker.ts` só a liga ao `queue`; o `criarWorker` (`observabilidade.ts`) passa a repassar o `queue`, pelo `withSentry` quando há DSN. O caso de uso recebe `banco(fn)`, uma `transacaoCurta` sem conta e sem slug por chamada, para gravar o resultado de cada lote antes do próximo (NOT-69). Caso de uso que lança: `retry()` sem atraso (a fila entrega de novo, `max_retries` 2); tipo sem caso ligado: `ack` e relato `sem_caso_de_uso` (a cobrança só liga na T24). Teste em `backend/api/test/entrada/consumidor-avisos.test.ts` (Node, com o `@sentry/cloudflare` simulado por `vi.mock`).
 
 **Done when**:
@@ -761,7 +761,7 @@ T39 → T40 → T41
 **Depends on**: T17
 **Reuses**: T6, T14; `recursoLiberado` (`PC:79`), S-01, S-02; AD-049, AD-070
 **Requirement**: NOT-24, NOT-29, NOT-30, NOT-61, NOT-68
-concluída
+**Status**: concluída
 **Nota do rascunho**: **S-01 não vale** (`backend/api/src/aplicacao/plano/recurso-liberado.ts:26-27` da planos-e-cobranca: grupo que o contexto não enxerga, inclusive sem contexto, dá `false`), então entrou o plano B da própria S-01: a `push_envio_grupo` (migração da T10, ainda não aplicada) devolve também `situacao_comercial`, `trial_inicio` e `pago_ate` (o mesmo `pago_ate` da `plano_do_grupo`), o `push.envioGrupo` os mapeia, e o `enviarRanking` decide com `planoEfetivo` + `planoLibera(…, 'push')` do domínio, com o "hoje" de São Paulo do instante do envio (SPEC_DEVIATION no SQL e no caso de uso; o `/executar` confirma com o usuário se AD-104 precisa de nota). Os testes da T10 e da T14 ganharam as colunas novas. As variáveis VAPID entraram no `Env` e o `chavesVapidDoAmbiente` em `vapid.ts` (vazio ou só espaços = ausente). O caso de uso grava aceitos e revogados num `finally`, para uma queda no meio do lote não perder o que foi aceito; `tentarDeNovo` fica sem tratamento até a T19. `CASOS_PADRAO` do consumidor liga o `ranking`. Teste em `backend/api/test/aplicacao/notificacoes/enviar-ranking.test.ts` (Node).
 
 **Done when**:
@@ -790,7 +790,7 @@ T39 → T40 → T41
 **Depends on**: T18
 **Reuses**: T18; T10 (`desde`); AD-108
 **Requirement**: NOT-31, NOT-69
-concluída
+**Status**: concluída
 **Nota do rascunho**: o lote lê 41 para saber se há continuação (80 assinaturas dão duas invocações e nenhuma continuação vazia). A mensagem de nova tentativa relê só os `ids` em páginas de 40 a partir do menor id, com o mesmo `desde`, sem função SQL nova. A continuação e a nova tentativa são enfileiradas depois de gravar o resultado; se o `agendarAviso` lançar, o consumidor faz `retry()` e a refeita não reenvia às aceitas. `Retry-After` 0 enfileira sem atraso. Testes no mesmo `enviar-ranking.test.ts` (bloco "retentativa e retomada (T19)").
 
 **Done when**:
@@ -816,7 +816,7 @@ T39 → T40 → T41
 **Depends on**: T19
 **Reuses**: bench do domínio (`PR:840`); T18, T19
 **Requirement**: NOT-34
-concluída
+**Status**: concluída
 **Nota do rascunho**: o teste do `workerd` (`limites.test.ts`) simula o repositório (`vi.spyOn(push, …)`) e conta cada abertura de banco, cada envio à fila, cada `fetch` e cada relato ao Sentry como subrequisição; com 40 aceitas são 42. O bench de CPU ficou em `backend/api/test/infraestrutura/push-cpu.test.ts` (projeto `banco`, Node), fora da pasta `push/`, que roda no `workerd`. Risco para o `/executar` avaliar: 40 respostas 400, 403 ou 413 dariam 40 relatos ao Sentry (82 subrequisições com o resto); o teste não cobre esse pior caso, que a spec não define.
 
 **Done when**:
@@ -841,7 +841,7 @@ T39 → T40 → T41
 **Depends on**: T20
 **Reuses**: rotas de partida (`PR:1461`, `PR:1487`), S-07; T15, T16; caracterização da T0
 **Requirement**: NOT-20, NOT-21, NOT-22, NOT-23
-concluída
+**Status**: concluída
 **Nota do rascunho**: o `avisarRankingAtualizado` registra o `aposCommit` logo depois de o repositório gravar, antes da releitura; `criadoEm` é o `relogio.agoraIso()` da requisição. Sem a T0, o NOT-22 compara a resposta e a partida gravada de um lançamento com fila boa e de outro com fila que lança (fora o `alteradaEm`); o `/executar` confere contra a caracterização da T0 quando ela existir. Teste em `backend/api/test/rotas/partidas-aviso.test.ts` (`workerd`).
 
 **Done when**:
@@ -870,7 +870,7 @@ T39 → T40 → T41
 **Depends on**: T21
 **Reuses**: rota do webhook (`PC:176-187`), S-03, S-04; T15, T16; centavos da `planos-e-cobranca` (PLA-51); AD-105
 **Requirement**: NOT-38, NOT-39, NOT-47
-concluída
+**Status**: concluída
 **Lacunas**: pagamento confirmado com valor divergente (PLA-51) ou de assinatura já cancelada não avisa (interpretação conservadora: não dizer que o Pro foi pago quando não foi); confirmar com o usuário.
 **Nota do rascunho**: rascunhada depois da T35 a T37 da `planos-e-cobranca`. `avisoDoWebhook` na própria rota: mapa S-04, só resultado `aplicado` ou `sem_efeito` com grupo (repetido e assinatura desconhecida ficam de fora) e sem os motivos `fora_de_ordem` (o "obsoleto" da S-03), `valor_divergente` e `assinatura_cancelada`; valor e vencimento que não cabem no contrato da fila: nada. `PAYMENT_RECEIVED` depois de `PAYMENT_CONFIRMED` enfileira duas vezes a mesma chave e o consumidor descarta a segunda (AD-105). Teste em `backend/api/test/rotas/webhook-asaas-aviso.test.ts` (`workerd`).
 
@@ -899,7 +899,7 @@ T39 → T40 → T41
 **Depends on**: T22
 **Reuses**: modelos dos e-mails de conta (`CA:672`); `URL_PUBLICA` (`F:1251`); S-05
 **Requirement**: NOT-40
-concluída
+**Status**: concluída
 **Lacunas**: o título do tipo atrasado é "Pagamento em atraso" aqui (texto da T23) e "Pagamento atrasado" no push (`NOME_DO_TIPO`, T5); a spec só pede o tipo em texto claro. Confirmar com o usuário se unifica.
 **Nota do rascunho**: o nome do grupo passa pelo `nomeDoGrupoNoEmail` (uma linha, sem virar link, até 60 caracteres) antes do `escaparHtml`, como no convite. O valor usa o `formatarPreco` do domínio. Teste em `backend/api/test/infraestrutura/modelo-cobranca.test.ts`.
 
@@ -926,7 +926,7 @@ T39 → T40 → T41
 **Depends on**: T23
 **Reuses**: `email_cota_reservar` (`CA:522`, `M:1792843860000_conta-teto-emails.sql:43`); `Remetente` e `remetenteMemoria` (`CA:647`); fluxo de `enviarEmailDeConta` (`CA:868`); T11, T14, T17; AD-108
 **Requirement**: NOT-38, NOT-39, NOT-41, NOT-42, NOT-47
-concluída
+**Status**: concluída
 **Nota do rascunho**: o envio reaproveita o `enviarEmailDeConta` (savepoint da cota) na categoria `recuperacao`, que é a de 100%; o e-mail ganhou o `TipoEmail` `aviso_cobranca` (`resend.ts`). A nova tentativa é uma mensagem nova com `tentativa` + 1 e 8 h de atraso (como a T19), não o `retry()` da fila, para a 3.ª saber que é a última. Criadora excluída ou grupo inexistente encerra com o registro do aviso confirmado. `CASOS_PADRAO` liga `cobranca`. Teste em `backend/api/test/aplicacao/notificacoes/avisar-cobranca.test.ts`; o da criadora excluída grava e desfaz `excluida_em` direto (a trigger da T9 só age na passagem de nulo a preenchido).
 
 **Done when**:
@@ -956,7 +956,7 @@ T39 → T40 → T41
 **Depends on**: T24
 **Reuses**: T6, T19, T24; `payloadCobranca` (T5)
 **Requirement**: NOT-43, NOT-46, NOT-48
-concluída
+**Status**: concluída
 **Nota do rascunho**: o push sai depois do `COMMIT` do e-mail, fora da transação. A nova tentativa do push é uma mensagem `cobranca` com o campo novo `pushIds` (contrato da T16 estendido), que pula o registro e o e-mail e manda só às assinaturas listadas que ainda existem; ela conta as tentativas do push a partir de 1. O atraso é o da T19 (`atrasoDaNovaTentativa`, agora exportado de `enviar-ranking.ts`). A decifra do lado do navegador para ler o payload no teste ficou em `backend/api/test/apoio/push.ts` (cópia do método do `cifra.test.ts`, que não foi alterado).
 
 **Done when**:
@@ -982,7 +982,7 @@ T39 → T40 → T41
 **Depends on**: T25
 **Reuses**: `worker.ts` (`F:1106`); T11, T14; teste do `wrangler.jsonc` (`F:1081`)
 **Requirement**: NOT-56, NOT-57
-concluída
+**Status**: concluída
 **Nota do rascunho**: `limparNotificacoes(env)` usa o mesmo `bancoSemContexto` do consumidor; o `worker.ts` ganhou o `scheduled` e o `criarWorker` passa a repassá-lo (pelo `withSentry` com DSN), como o `queue`. As linhas vencidas são semeadas como superusuário com `now() - interval`, sem a `notificacoes_limpar_em` (que só o owner executa), e a limpeza roda como `pelada_app`. Teste em `backend/api/test/aplicacao/notificacoes/limpar.test.ts`; o do Cron em `test/wrangler.test.ts`.
 
 **Done when**:
@@ -1006,7 +1006,7 @@ T39 → T40 → T41
 **Depends on**: T26
 **Reuses**: checagem do `EMAIL_DEV` (`CA:697`); T1; AD-109
 **Requirement**: NOT-63
-concluída
+**Status**: concluída
 **Nota do rascunho**: `hostsPushDev` e a aceitação de `http(s)://localhost:<porta>` ficaram no contrato (`backend/contrato/src/push.ts`); a variável só aceita `localhost` ou `*.localhost`, e outro host nela é ignorado. Os casos de uso do ranking e da cobrança passam `hostsExtras` ao cliente de envio. A checagem vigia `wrangler.jsonc` e `deploy.yml` e entrou no `ci.yml`. O servidor falso mora em `frontend/web/e2e/apoio/push-falso.mjs` (teste em `frontend/web/test/ferramentas/`). Falta ligá-lo ao `playwright.config.ts` e passar `--var PUSH_HOSTS_DEV`, o que é da T41.
 
 **Done when**:
@@ -1033,7 +1033,7 @@ T39 → T40 → T41
 **Depends on**: T27
 **Reuses**: `contextoPublico` e `LIMITE_PUBLICO` (`PR:1386`, AD-045); `bodyLimit` de `POST eventos` (`PR:1634`); `recursoLiberado` (`PC:79`); AD-103
 **Requirement**: NOT-01, NOT-14, NOT-61, NOT-71
-concluída
+**Status**: concluída
 **Nota do rascunho**: SPEC_DEVIATION: grupo arquivado responde o 404 do PAR-90 no `GET …/push` (a RLS do slug não o mostra e o PAR-90 pede o mesmo corpo de inexistente); o front esconde o controle quando o `GET` falha (T37). Contrato: `LIMITE_CORPO_PUSH_BYTES`, mensagens e os tipos `DisponibilidadePush`, `EstadoPush` e `ErroPush` em `backend/contrato/src/push.ts`. Testes em `backend/api/test/rotas/push-publico-estado.test.ts` com o apoio `apoio-push.ts`, no molde do `publico-pdf.test.ts` (Postgres local). As rotas novas só entram na suíte de isolamento de rotas na T32.
 
 **Done when**:
@@ -1059,7 +1059,7 @@ T39 → T40 → T41
 **Depends on**: T28
 **Reuses**: T28; `exigirCabecalhoPelada` (`CA:723`); chave de IP (`CA:746`); T1, T14; AD-065, AD-104
 **Requirement**: NOT-05, NOT-06, NOT-07, NOT-08, NOT-09, NOT-10, NOT-11, NOT-61, NOT-65, NOT-67
-concluída
+**Status**: concluída
 **Nota do rascunho**: a ordem é a da tarefa (413, 422, 503, 404, 403, função); o 404 do grupo vem antes do 403 do plano porque o `recursoLiberado` precisa do id do grupo. A resposta de 201 e 200 é `{ assinado: true }`, sem ecoar endpoint nem chaves. O NOT-11 conta o IP como chave do limitador e procura o IP na linha (`row_to_json`) e no console capturado. Testes em `backend/api/test/rotas/push-publico-assinar.test.ts`.
 
 **Done when**:
@@ -1089,7 +1089,7 @@ T39 → T40 → T41
 **Depends on**: T29
 **Reuses**: T29; T8
 **Requirement**: NOT-16, NOT-17, NOT-18, NOT-67
-concluída
+**Status**: concluída
 **Nota do rascunho**: o `DELETE` não confere VAPID nem plano (cancelar nunca depende do push estar ligado) e responde 204 também para slug inexistente, sem enumerar. Testes em `backend/api/test/rotas/push-publico-cancelar.test.ts`.
 
 **Done when**:
@@ -1117,7 +1117,7 @@ T39 → T40 → T41
 **Depends on**: T30
 **Reuses**: rotas de minha conta (`CA:971`); `exigirSessao` (`CA:770`); `LIMITE_ESCRITA` (`GE:928`); T9, T14; AD-103, AD-107
 **Requirement**: NOT-44, NOT-45, NOT-53, NOT-61
-concluída
+**Status**: concluída
 **Nota do rascunho**: como minha conta, `/api/conta/*` não passa pelo `comBanco`: cada rota abre a `transacaoCurta` com a conta da sessão. O `LIMITE_ESCRITA` entra por rota, depois do `exigirSessao`, com a chave `conta:<id>` do `limitarEscritasDeGrupo` (que só vigia `/api/grupos*`); conta também o `POST …/estado`. `oferecer` lê `grupos` sob a RLS da conta (`criado_por = app_conta_id()` e não arquivado). SPEC_DEVIATION: o `POST` não recusa a não criadora (a tarefa não define); ela só receberia aviso se fosse criadora na hora do aviso. Testes em `backend/api/test/rotas/push-conta.test.ts`, com a sessão gravada pelo `sessaoDe` (`apoio-financeiro.ts`).
 
 **Done when**:
@@ -1143,7 +1143,7 @@ T39 → T40 → T41
 **Depends on**: T31
 **Reuses**: suíte de isolamento de rotas (`CA:1070`); teste de log sem segredo (`CA:1047`)
 **Requirement**: NOT-33, NOT-54
-concluída
+**Status**: concluída
 **Lacunas**: o teste existente `PAR-139: as 3 rotas públicas estão no app e têm caso` (`backend/api/test/isolamento/rotas.test.ts`) compara a lista exata das rotas `/api/publico/` com as 3 da partidas-e-ranking e vai falhar com as 4 rotas públicas de push. Não foi alterado (não há autorização em `## Autorizações` para esta feature): o `/executar` pergunta se troca o filtro para excluir `/push` (mesma força) ou se inclui as 4 na lista.
 **Nota do rascunho**: são 8 rotas novas, não 7 (a tarefa não contou o `GET /api/conta/push`). As linhas vão em `ROTAS_DE_PUSH` (casos públicos com o slug de G e a assinatura de H, e o contrário; casos da conta com a sessão de B e a assinatura de A), mais um meta-teste das 8 e o NOT-54 que percorre todo `GET` do app com parâmetros conhecidos, como a criadora A e como a admin O. G e H passam a Pro no `beforeAll` do arquivo (o `POST` precisa do recurso). O NOT-33 ficou em `backend/api/test/isolamento/push-log.test.ts`: console inteiro e relato do cliente de envio capturados, nas rotas e no envio do ranking com 201, 400 e 503.
 
@@ -1172,7 +1172,7 @@ T39 → T40 → T41
 **Depends on**: T32
 **Reuses**: ensaio da `partidas-e-ranking` (`PR:1684`); restauração (`F:584`); `lerEsquema` e referência (`F:736`, `F:784`); zero DDL (`F:834`); AD-033, AD-073
 **Requirement**: NOT-49
-concluída
+**Status**: concluída
 **Nota do rascunho**: o `ensaio-migracao.ts` já existia (financeiro T15 em diante); ganhou o passo 9 (`conferirPush`: com a `notificacoes-tabelas` aplicada, as 3 tabelas existem e estão vazias depois da segunda execução, pela contagem crua) e a linha no relatório impresso. Teste do ensaio sobre um dump simulado em `backend/scripts/test/ensaio-migracao-notificacoes.test.ts`, no molde do da planos-e-cobranca. Falta o ensaio real com o backup cifrado da produção (pausa para o usuário) e a `Evidência` abaixo, que são do `/executar`.
 
 **Done when**:
@@ -1201,7 +1201,7 @@ T39 → T40 → T41
 **Depends on**: T33
 **Reuses**: estender o SW da fundação (`F:1595`) e da `partidas-e-ranking` (`PR:2246`); ícones do manifest (`F:1571`)
 **Requirement**: NOT-35, NOT-36, NOT-37, NOT-48, NOT-66
-concluída
+**Status**: concluída
 **Nota do rascunho**: as regras ficam em `frontend/web/src/pwa/notificacao.ts` (puras, como o `servico.ts`), e os handlers vazios de `servico.ts` passam a chamá-las com o `self` como escopo; o `sw.ts` não mudou. O tipo do push vai no `data` da notificação: ranking (título `TITULO_RANKING` e caminho `/g/<slug>?mes=`) só abre `/g/`; cobrança (caminho `/app/grupos/<uuid>/plano`) só abre `/app/`; o resto é a genérica e abre `/`. O teste FUN-34 da fundação não muda: sem escopo e com evento vazio, os handlers não fazem nada. Testes em `frontend/web/test/pwa/notificacao.test.ts`.
 
 **Done when**:
@@ -1228,7 +1228,7 @@ T39 → T40 → T41
 **Depends on**: T34
 **Reuses**: T34; cabeçalho `X-Pelada` do cliente HTTP (`CA:1169`)
 **Requirement**: NOT-19
-concluída
+**Status**: concluída
 **Nota do rascunho**: um registro de SW tem um único `PushSubscription`, então o IndexedDB (`pelada-push`, loja `destinos`) guarda por endpoint a lista de destinos (cada slug e a conta, NOT-70); o front grava e tira destinos pelo `adicionarDestino` e `removerDestino` na T36. O handler vai em `registrarTrocaDeAssinatura`, ligado pelo `sw.ts` fora do `registrarEventos` (o teste FUN-34 compara a lista exata de eventos). Um destino só passa para o endpoint novo com o `POST` 2xx. Testes em `frontend/web/test/pwa/sw-assinatura.test.ts`.
 
 **Done when**:
@@ -1255,7 +1255,7 @@ T39 → T40 → T41
 **Depends on**: T35
 **Reuses**: cliente HTTP (`CA:1169`); `useModoInstalacao` (`F:1521`)
 **Requirement**: NOT-02, NOT-04, NOT-16, NOT-62, NOT-70
-concluída
+**Status**: concluída
 **Nota do rascunho**: um registro de SW tem um único `PushSubscription` para todos os grupos e a conta (NOT-70), então assinar outro grupo reaproveita a assinatura local, e o `cancelar` só chama `unsubscribe()` quando não sobra destino guardado no aparelho (o teste NOT-16, com um destino só, confere a chamada). Os destinos vão para o IndexedDB pelo `adicionarDestino` e `removerDestino` da T35, que o SW lê no `pushsubscriptionchange`. Testes em `frontend/web/test/push/assinatura.test.ts` (a pasta `test/` é a do `include` do Vitest do web).
 
 **Done when**:
@@ -1282,7 +1282,7 @@ T39 → T40 → T41
 **Depends on**: T36
 **Reuses**: `PaginaRanking` (`PR:1878`); `Botao` (`F:1448`); `Faixa` (`CA:1286`); `AvisoInstalarIphone` (`F:1521`); tokens e componentes do guia (`.specs/mockup/index.html`, `tokens.css`, `base.css`, AD-111); AD-072
 **Requirement**: NOT-01, NOT-03, NOT-04, NOT-13, NOT-15, NOT-61, NOT-71, NOT-72
-concluída
+**Status**: concluída
 **Nota do rascunho**: o controle vai na `PaginaRanking` depois do ranking e antes do rodapé, só com dados e fora do guardado sem rede. A parte comum com a T38 é o `ControleAvisos` (estados e ações de um destino), exportado do `ControlePush.tsx`; o `ControlePush` acrescenta o `GET …/push` e o caso do iOS. A `section` com `aria-label` "Avisos do ranking" é o contêiner que o NOT-03 confere (o `AvisoInstalarIphone` dentro dela, sem botão). Os textos que a spec não fixa (assinado, desligado, sem suporte) estão nas constantes do arquivo. Não conferido por teste aqui: o Stylelint de tokens e as entradas da t01 no `telas.json` (gate de lint e o `visual` do `/executar`). Testes existentes da t01 que contam as chamadas exatas da API podem ver o `GET …/push` a mais (responde 404 no servidor falso e o controle some). Testes em `frontend/web/test/telas/controle-push.test.tsx`.
 
 **Done when**:
@@ -1310,7 +1310,7 @@ T39 → T40 → T41
 **Depends on**: T37
 **Reuses**: `MinhaConta` (`CA:1534`); T36, T37; AD-072
 **Requirement**: NOT-44, NOT-72
-concluída
+**Status**: concluída
 **Nota do rascunho**: a seção vai em Minha conta entre Segurança e Excluir conta, com o `ControleAvisos` da T37 e o destino `conta`. Em jsdom não há `PushManager`, então os testes existentes da t32 não veem a seção (e o `GET /api/conta/push` responde 404 no servidor falso deles). Não conferido por teste aqui: as entradas da t32 no `telas.json` (o `visual` do `/executar`). O mesmo commit troca o nome `contêiner` por `regiao` no teste da T37. Testes em `frontend/web/test/telas/avisos-cobranca.test.tsx`.
 
 **Done when**:
@@ -1337,7 +1337,7 @@ T39 → T40 → T41
 **Depends on**: T38
 **Reuses**: páginas de termos e privacidade (`CA:1458`); `.specs/mockup/telas/t07-privacidade--pagina.html:21`; `TERMOS_VERSAO` (`CA:574`); nova versão com a data da mudança, sem novo aceite (AD-116)
 **Requirement**: NOT-59
-concluída
+**Status**: concluída
 **Nota do rascunho**: o texto do push entra em "O que guardamos" (como o da cobrança na planos-e-cobranca T54), porque o ACE-58 confere a lista exata das 4 seções. A `TERMOS_VERSAO` (`backend/contrato/src/acesso.ts:11`) já é `2026-11-05`, a data desta mudança (a planos-e-cobranca T54 a trocou hoje), então não mudou; se o `/executar` levar a mudança ao ar em outra data, troca para a data dele (AD-116). Testes em `frontend/web/test/telas/privacidade-push.test.tsx`.
 
 **Done when**:
@@ -1362,7 +1362,7 @@ T39 → T40 → T41
 **Depends on**: T39
 **Reuses**: README (`F:2113`); runbook de segredos (`F:2087`); documentação da conta (`CA:1708`)
 **Requirement**: NOT-62
-concluída
+**Status**: concluída
 **Nota do rascunho**: SPEC_DEVIATION: a tarefa fala em "environment `previa`"; pela AD-119 o deploy usa o environment `producao`, e as VAPID são secrets do próprio Worker (como `RESEND_API_KEY`), então o runbook manda gravá-las com `wrangler secret put`. README ganhou "Avisos no celular (push)" em Rodar local; o runbook, "Avisos no celular (push e fila)" em Segredos (passos do usuário, Cron, fila acumulando, troca das chaves). A checagem que cita cada variável do `.env.example` já passava pelas linhas da tabela de variáveis do README (T4 e T27).
 
 **Done when**:
@@ -1388,7 +1388,7 @@ T39 → T40 → T41
 **Depends on**: T40
 **Reuses**: jornadas da `partidas-e-ranking` (`PR:2441`); Playwright e servidor de e2e (`F:1691`); T27
 **Requirement**: NOT-63, NOT-64
-concluída
+**Status**: concluída
 **Nota do rascunho**: a J-34 já estava em `.specs/projeto/jornadas.md` (numerada no planejamento), então o arquivo não mudou. O `playwright.config.ts` ganhou o push falso como `webServer` (porta 8790) e, no `wrangler dev`, as VAPID do e2e (par gerado a cada execução pelo `generateKeyPairSync`, nunca em arquivo) e `PUSH_HOSTS_DEV`, só por `--var`. A página troca `Notification`, `PushManager` e `navigator.serviceWorker` por um gerente falso com chaves P-256 de verdade (a API cifra para elas). SPEC_DEVIATION: tocar na notificação e o texto dela ficam com os testes do SW (T34), porque o SW de verdade fica bloqueado nas jornadas. O NOT-63 confere os hosts que a página chamou; o que o Worker chama sai só para o push falso, provado pelo `PUSH_HOSTS_DEV`. Teste em `frontend/web/e2e/notificacoes.spec.ts`.
 
 **Done when**:

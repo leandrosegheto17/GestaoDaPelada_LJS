@@ -358,7 +358,7 @@ T73 → T74 → T75
 **Depends on**: None
 **Reuses**: estender o cenário da CA (`CA:265`, T0) e o `comoApp` e a fábrica da fundação (`F:909`); `bancoDeTeste()` (`F:507`); tabelas em `M:1792843200000_linha-de-base.sql:65`, `:106`, `:122`, `:135`, `:143`, `:182`, `:257`
 **Requirement**: GEL-112
-concluída
+**Status**: concluída
 **Nota do rascunho**: o teste do cenário fica em `cenario-grupos.test.ts`; a evidência da rede (sabotagem da `grupo_criar`) é do /executar.
 
 **Done when**:
@@ -384,7 +384,7 @@ T73 → T74 → T75
 **Depends on**: T0
 **Reuses**: `grupos_visiveis()` de `M:1792844280000_grupos-visiveis-arquivado.sql:9-20`; policies geradas em `M:1792843320000_rls.sql:39-57`; molde da matriz da fundação (`F:981`, `F:1007`)
 **Requirement**: GEL-25, GEL-107, GEL-112
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -410,7 +410,7 @@ T73 → T74 → T75
 **Depends on**: T1
 **Reuses**: `M:1792844340000_grupo-criar.sql:10-75` (sufixo em `:37-44`, auditoria em `:68`); `ordem` identity em `M:1792843200000_linha-de-base.sql:210`; cenário de T0
 **Requirement**: GEL-01, GEL-02, GEL-09, GEL-10, GEL-14
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -440,7 +440,7 @@ T73 → T74 → T75
 **Depends on**: T2
 **Reuses**: laço de `M:1792844340000_grupo-criar.sql:37-58` (`grupos_slug_key`, até 3 tentativas); `bancoDeTeste()` (`F:507`)
 **Requirement**: GEL-15
-concluída
+**Status**: concluída
 **Nota do rascunho**: o caso de três colisões seguidas fica só listado (exige três transações em ordem exata); a evidência da rede é do /executar.
 
 **Done when**:
@@ -467,7 +467,7 @@ T73 → T74 → T75
 **Depends on**: T3
 **Reuses**: `M:1792844400000_grupos-grants-coluna.sql:6-7`; `M:1792844520000_grupos-arquivar-so-criadora.sql:8-24`; trigger do slug em `M:1792843200000_linha-de-base.sql:82-93`
 **Requirement**: GEL-16, GEL-24, SEC-009
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -493,7 +493,7 @@ T73 → T74 → T75
 **Depends on**: T4
 **Reuses**: grants em `M:1792843260000_roles.sql:22-33`; `M:1792843200000_linha-de-base.sql:120` (`jogadores_apelido_grupo`), `:128-131` (cascade e `periodos_um_aberto`), `:141` (`habilidades_nome_grupo`), `:149-150` (FKs de `notas`), `:189`, `:266`, `:324-326` (posições)
 **Requirement**: GEL-35, GEL-37, GEL-50, GEL-84, GEL-85, GEL-91, GEL-93, GEL-112
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -520,7 +520,7 @@ T73 → T74 → T75
 **Depends on**: T5
 **Reuses**: estender o meta-teste da CA (`CA:338`, T3) e o da fundação (`F:957`); `M:1792844340000_grupo-criar.sql:74-75`; `M:1792844280000_grupos-visiveis-arquivado.sql:21-22`; `M:1792844520000_grupos-arquivar-so-criadora.sql:19`
 **Requirement**: GEL-112
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -546,7 +546,7 @@ T73 → T74 → T75
 **Depends on**: T6
 **Reuses**: estender a regra `no-restricted-imports` da fundação (`F:385`, T5) com `no-restricted-syntax`; decisão de `GD:61` (lint do domínio impede I/O, relógio e zod) e AD-028 proposta
 **Requirement**: GEL-70, GEL-104
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -571,7 +571,7 @@ T73 → T74 → T75
 **Depends on**: T7
 **Reuses**: regras de `GS:104-106` e lista de reservadas de `GS:106`; interface de `GD:116` (`gerarSlug` com sufixo fica de fora: o sufixo é do banco, `GD:213`)
 **Requirement**: GEL-11, GEL-12, GEL-13
-concluída
+**Status**: concluída
 **Nota do rascunho**: a reservada `g` tem 1 caractere e, pela ordem da spec (GEL-12 antes de GEL-13, `GS:105-106`), vira `grupo`; o teste das reservadas cobre as 8 com 3 ou mais caracteres e o caso `g` à parte.
 
 **Done when**:
@@ -597,7 +597,7 @@ T73 → T74 → T75
 **Depends on**: T8
 **Reuses**: interfaces de `GD:117` e `GD:123`
 **Requirement**: GEL-47, GEL-48
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -622,7 +622,7 @@ T73 → T74 → T75
 **Depends on**: T9
 **Reuses**: interfaces de `GD:118-120`; ordem de `GS:82`; regra do nível de `GS:337-338`
 **Requirement**: GEL-02, GEL-36, GEL-101, GEL-102, GEL-104
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -650,7 +650,7 @@ T73 → T74 → T75
 **Depends on**: T10
 **Reuses**: regras de `GS:232-235`; interface de `GD:121`
 **Requirement**: GEL-61, GEL-63, GEL-64
-concluída
+**Status**: concluída
 Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a spec não diz se vale; o rascunho o aceita e o trata como sem dia nenhum, sem sobreposição (`[LACUNA]` em `backend/dominio/src/atividade/datas.ts`, `sobrepoem`).
 
 **Done when**:
@@ -676,7 +676,7 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T11
 **Reuses**: mensagens de `GS:236-238`; `formatarData` (T9)
 **Requirement**: GEL-65, GEL-66, GEL-67
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -701,7 +701,7 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T12
 **Reuses**: regra e mensagem de `GS:239`; interface de `GD:121` (`coberturaRetirada`)
 **Requirement**: GEL-68
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -729,7 +729,7 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T13
 **Reuses**: funções de T11 a T13; ordem de `GS:233`; mensagens de `GS:240`, `GS:256-257`; interface de `GD:121`
 **Requirement**: GEL-58, GEL-62, GEL-69, GEL-72, GEL-73
-concluída
+**Status**: concluída
 **Nota do rascunho**: a regra do GEL-69 só é avaliada quando a mudança é a saída do primeiro período, para um histórico antigo fora da regra não travar escritas em outros períodos; corrigir com as datas atuais (GEL-74) volta antes da regra de data futura.
 
 **Done when**:
@@ -756,7 +756,7 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T14
 **Reuses**: regras de `GS:275-278`; funções de T11 e T14
 **Requirement**: GEL-70, GEL-78, GEL-79, GEL-80, GEL-81, GEL-104
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -784,7 +784,7 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T15
 **Reuses**: primitivos zod da CA (`CA:550`, T11) e `.strict()` dos schemas de acesso (`CA:574`, T12); formas de `GD:138`; mensagens de `GS:83-87`; regra de `GSEG:94`
 **Requirement**: GEL-03, GEL-04, GEL-05, GEL-06, GEL-07, GEL-19, SEC-005
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -810,7 +810,7 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T16
 **Reuses**: fábrica por `hoje` de `GD:139`; mensagens de `GS:165-175`; piso de `GSEG:66` com a mensagem de `GS:275`; `textoVisivel` (T16)
 **Requirement**: GEL-33, GEL-34, GEL-36, GEL-37, GEL-38, GEL-39, GEL-40, GEL-43, SEC-002, SEC-005
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -837,7 +837,7 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T17
 **Reuses**: formas de `GD:140-142`; mensagens de `GS:313`, `GS:335`
 **Requirement**: GEL-52, GEL-55, GEL-90, GEL-99, SEC-005
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -865,7 +865,7 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T18
 **Reuses**: `criarApp` da fundação (`F:1106`); decisão de `GD:66-67` e `GD:296` (só o relógio injetado lê a data; o SQL não usa `now()` para regra de data)
 **Requirement**: GEL-32, GEL-52, GEL-55
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -889,7 +889,7 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T19
 **Reuses**: 422 `dados_invalidos` das rotas de acesso (`CA:895`, T25); forma de `GS:70-71`; tradução por constraint de `GD:155`
 **Requirement**: GEL-118
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -914,7 +914,7 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T20
 **Reuses**: `Kysely<Banco>` da fundação (`FD:103`); `lerEsquema` (`F:736`); modelo de `GD:220-236`
 **Requirement**: GEL-112
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -938,7 +938,7 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T21
 **Reuses**: estender a cadeia do `exigirVinculo` (`CA:795`, T21); decisão de `GD:181` e a nota de `GS:145` (arquivar também passa); exceção de `GSEG:160` (SEC-004); `FOR KEY SHARE` de `GSEG:163` (`FOR SHARE` dava deadlock)
 **Requirement**: GEL-26, SEC-004, SEC-007
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -966,7 +966,7 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T22
 **Reuses**: estender `limiteTaxa(binding)` (`F:1153`, estendido em `CA:746`) com a chave `conta:<id>`; binding de `F:1081` (FUN-26, 60 por minuto); decisão de `GSEG:75` e `GSEG:159`
 **Requirement**: SEC-003
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -991,7 +991,7 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T23
 **Reuses**: estender `contas.eu` (`CA:820`, T22); decisão de `GD:91` e `GD:286`
 **Requirement**: GEL-25, GEL-27
-concluída
+**Status**: concluída
 Lacunas: o teste da CA `ACE-18: a criadora ainda vê o próprio grupo arquivado` (`backend/api/test/repositorios/contas.test.ts:57`) contradiz o GEL-27 (a sessão da criadora não traz o arquivado); o rascunho não o alterou, porque mudar teste existente pede aprovação. O `/executar` pergunta antes de levar ao verde.
 
 **Done when**:
@@ -1017,7 +1017,7 @@ Lacunas: o teste da CA `ACE-18: a criadora ainda vê o próprio grupo arquivado`
 **Depends on**: T24
 **Reuses**: `exigirGrupoAtivo` (T22); evidência do LJS em `GSEG:163` (só consulta); `bancoDeTeste()` (`F:507`)
 **Requirement**: SEC-007
-concluída
+**Status**: concluída
 Lacunas: o lado do arquivar no teste trava a linha com `FOR UPDATE` antes do `UPDATE`, como `GD:150` manda para o `grupos.arquivar`; um `UPDATE` sozinho pega `FOR NO KEY UPDATE`, que não espera o `FOR KEY SHARE`. A T27 precisa seguir a mesma trava, ou o SEC-007 não vale na rota real.
 
 **Done when**:
@@ -1046,7 +1046,7 @@ Lacunas: o lado do arquivar no teste trava a linha com `FOR UPDATE` antes do `UP
 **Depends on**: T25
 **Reuses**: interfaces de `GD:150`; `grupo_criar` (`M:1792844340000_grupo-criar.sql:10`); molde dos repositórios da CA com `grupoId` primeiro (`CA:844`)
 **Requirement**: GEL-01, GEL-02, GEL-14, GEL-20, GEL-27
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1071,7 +1071,7 @@ Lacunas: o lado do arquivar no teste trava a linha com `FOR UPDATE` antes do `UP
 **Depends on**: T26
 **Reuses**: decisão de `GD:150` e o risco de `GD:271` (vínculo com `FOR KEY SHARE`); `auditoria.registrar` (`CA:844`, T23); eventos de `GSEG:164`
 **Requirement**: GEL-18, GEL-22, GEL-23, GEL-24, GEL-28, GEL-29, GEL-30, SEC-008
-concluída
+**Status**: concluída
 Lacunas: (1) arquivar um grupo já arquivado com o nome errado: a spec não diz se vale o 200 do GEL-29 ou o 422 do GEL-23; o rascunho confere o nome antes. (2) Dois arquivar simultâneos: cada um tem o `FOR KEY SHARE` do `exigirGrupoAtivo` e pede `FOR UPDATE`, então um cai em deadlock (500); a spec não define o resultado. SPEC_DEVIATION: o editar trava com `FOR NO KEY UPDATE`, não `FOR UPDATE` (`GD:150`), para dois PATCH não darem deadlock (`GSEG:163`).
 
 **Done when**:
@@ -1098,7 +1098,7 @@ Lacunas: (1) arquivar um grupo já arquivado com o nome errado: a spec não diz 
 **Depends on**: T27
 **Reuses**: `exigirSessao` (`CA:770`, T20); leitor de corpo (T20); `URL_PUBLICA` de `F:1081`; tabela de `GD:165-167`
 **Requirement**: GEL-01, GEL-03, GEL-04, GEL-05, GEL-06, GEL-07, GEL-08, GEL-09, GEL-10, GEL-17, GEL-27
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1127,7 +1127,7 @@ Lacunas: (1) arquivar um grupo já arquivado com o nome errado: a spec não diz 
 **Depends on**: T28
 **Reuses**: `exigirVinculo` (`CA:795`); `grupos.ler` e `grupos.editar` (T26, T27); tabela de `GD:168-169`
 **Requirement**: GEL-16, GEL-17, GEL-18, GEL-19, GEL-20, GEL-21
-concluída
+**Status**: concluída
 Lacunas: o `PATCH /api/grupos/:grupoId` real é registrado antes das rotas extras dos testes, então os casos de `backend/api/test/sessao/grupo-ativo.test.ts` (T22) que mandam `PATCH` com corpo `{}` à rota extra passam a cair na rota real (422 no grupo ativo; o 409 do arquivado continua). O rascunho não mexeu no teste da T22; o `/executar` decide com o usuário (corpo válido ou rota extra própria).
 
 **Done when**:
@@ -1154,7 +1154,7 @@ Lacunas: o `PATCH /api/grupos/:grupoId` real é registrado antes das rotas extra
 **Depends on**: T29
 **Reuses**: `grupos.arquivar` e `grupos.reativar` (T27); tabela de `GD:170-171`
 **Requirement**: GEL-22, GEL-23, GEL-24, GEL-28, GEL-29
-concluída
+**Status**: concluída
 Lacunas: como na T29, as rotas reais de arquivar e reativar vêm antes das extras de `backend/api/test/sessao/grupo-ativo.test.ts` (T22); o caso "reativar e arquivar passam no grupo arquivado" manda o arquivar sem corpo e passa a receber 422 da rota real. Teste da T22 não alterado no rascunho.
 
 **Done when**:
@@ -1180,7 +1180,7 @@ Lacunas: como na T29, as rotas reais de arquivar e reativar vêm antes das extra
 **Depends on**: T30
 **Reuses**: lista de rotas do `app.routes` usada na suíte da CA (`CA:1070`); cenário de T0
 **Requirement**: GEL-25, GEL-26
-concluída
+**Status**: concluída
 SPEC_DEVIATION: o teste fica em `backend/api/test/grupos/grupo-arquivado.test.ts`, não em `test/rotas/` (que roda no `workerd`, sem o Postgres), como os testes das rotas de acesso.
 
 **Done when**:
@@ -1206,7 +1206,7 @@ SPEC_DEVIATION: o teste fica em `backend/api/test/grupos/grupo-arquivado.test.ts
 **Depends on**: T31
 **Reuses**: estender `admins.remover` (`CA:844`, T23) e a rota (`CA:1020`, T30); decisão de `GSEG:57` e `GSEG:157`
 **Requirement**: SEC-001
-concluída
+**Status**: concluída
 SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/src/infraestrutura/db/repositorios/convites.ts`; não existe `repositorios/admins.ts`.
 
 **Done when**:
@@ -1234,7 +1234,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T32
 **Reuses**: interface de `GD:151` e a decisão de `GD:287` (duas consultas e cálculo no domínio); `calcularNivel` (T10)
 **Requirement**: GEL-46, GEL-50, GEL-102
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1260,7 +1260,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T33
 **Reuses**: interface de `GD:151`; tradutor do 23505 (T20); `auditoria.registrar` (`CA:844`)
 **Requirement**: GEL-31, GEL-32, GEL-35, GEL-38, GEL-45
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1286,7 +1286,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T34
 **Reuses**: interface de `GD:151`; regra de histórico de `GS:52` e C8 (`ljs:.specs/features/grupos-e-elenco/context.md:14`); eventos de `GSEG:164`
 **Requirement**: GEL-41, GEL-42, GEL-43, GEL-44, GEL-45, GEL-84, GEL-85, SEC-008
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1314,7 +1314,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T35
 **Reuses**: `jogadores.listar` e `jogadores.criar` (T33, T34); relógio (T19); tabela de `GD:172`
 **Requirement**: GEL-31, GEL-33, GEL-34, GEL-36, GEL-37, GEL-39, GEL-40, GEL-46, SEC-002
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1340,7 +1340,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T36
 **Reuses**: `jogadores.ler`, `editar` e `excluir` (T33, T35); tabela de `GD:173`; mensagem de `GS:295`
 **Requirement**: GEL-41, GEL-44, GEL-84, GEL-85
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1365,7 +1365,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T37
 **Reuses**: escrita de período de `GD:152` (trava antes da validação); `avaliarPeriodos` (T14); auditoria de inativar de C9 (`ljs:.specs/features/grupos-e-elenco/context.md:15`)
 **Requirement**: GEL-51, GEL-52, GEL-53, GEL-58, GEL-68, GEL-109
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1394,7 +1394,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T38
 **Reuses**: trava e leitura de T38 (mesma função interna de `jogadores.ts`); `avaliarPeriodos` (T14)
 **Requirement**: GEL-54, GEL-55, GEL-56, GEL-57, GEL-58
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1420,7 +1420,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T39
 **Reuses**: trava de T38; `avaliarPeriodos` com a operação corrigir (T14); regras de `GS:255-259`
 **Requirement**: GEL-71, GEL-72, GEL-73, GEL-74, GEL-75
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1446,7 +1446,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T40
 **Reuses**: trava de T38; avaliação do início (T15); regras de `GS:274-280`
 **Requirement**: GEL-77, GEL-81, GEL-82, GEL-83
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1473,7 +1473,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T41
 **Reuses**: `jogadores.inativar` e `reativar` (T38, T39); tabela de `GD:174`
 **Requirement**: GEL-51, GEL-52, GEL-53, GEL-54, GEL-55, GEL-56
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1498,7 +1498,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T42
 **Reuses**: `corrigirPeriodo` e `alterarInicio` (T40, T41); tabela de `GD:175-176`
 **Requirement**: GEL-71, GEL-72, GEL-73, GEL-74, GEL-75, GEL-77, GEL-78, GEL-79, GEL-80, GEL-82
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1523,7 +1523,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T43
 **Reuses**: trava de T38; `bancoDeTeste()` (`F:507`)
 **Requirement**: GEL-109, GEL-110
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1549,7 +1549,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T44
 **Reuses**: molde da checagem da CA (`CA:1093`, T33) e da fundação (`F:1251`); regra de `GD:191`
 **Requirement**: GEL-83, GEL-111
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1576,7 +1576,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T45
 **Reuses**: interface de `GD:153`; tradutor do 23505 (T20); eventos de `GSEG:164`
 **Requirement**: GEL-88, GEL-89, GEL-91, GEL-92, GEL-93, GEL-96, SEC-008
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1602,7 +1602,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T46
 **Reuses**: `habilidades.*` (T46); tabela de `GD:177`
 **Requirement**: GEL-88, GEL-89, GEL-90, GEL-91, GEL-92, GEL-93, GEL-96
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1627,7 +1627,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T47
 **Reuses**: interface de `GD:154`; `calcularNivel` (T10); tabela de `GD:178`
 **Requirement**: GEL-97, GEL-98, GEL-99, GEL-100, GEL-105
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1655,7 +1655,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T48
 **Reuses**: colunas de `auditoria` em `M:1792843200000_linha-de-base.sql:50`; rotas de T28 a T48
 **Requirement**: GEL-113
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1679,7 +1679,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T49
 **Reuses**: estender a suíte da CA (`CA:1070`, T32; vale ela no lugar do `casos.ts` do LJS, AD-027 proposta); decisão de `GD:192`
 **Requirement**: GEL-106, GEL-107, GEL-108
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1704,7 +1704,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T50
 **Reuses**: estender os modelos da CA (`CA:672`, T16); regra de `GSEG:102` e `GSEG:162` (`nomeDoGrupoNoEmail`)
 **Requirement**: SEC-006
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1731,7 +1731,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T51
 **Reuses**: `reuso.md` R-01 a R-36 (comando de adaptação no topo do mapa; a origem só é aberta pelo comando); entradas de `telas.json:164-165` e `:188-227`
 **Requirement**: GEL-116
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1755,7 +1755,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T52
 **Reuses**: cliente HTTP da CA (`CA:1169`, T36) e `useSessao` (`CA:1192`, T37); contratos de T16
 **Requirement**: GEL-01, GEL-18, GEL-22, GEL-27
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1779,7 +1779,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T53
 **Reuses**: molde de `dados/grupos.ts` (T53); contratos de T17 e T18
 **Requirement**: GEL-31, GEL-46, GEL-51, GEL-54
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1803,7 +1803,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T54
 **Reuses**: molde de T53; regra de `GS:339`
 **Requirement**: GEL-88, GEL-97, GEL-103
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1829,7 +1829,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T55
 **Reuses**: molde de `Campo` da CA (`CA:1238`, T39); marcação de `.specs/mockup/telas/t27-novo-grupo--vazio.html` e de `t16-jogador--novo.html`; Stylelint de tokens (`F:1374`)
 **Requirement**: GEL-115
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1853,7 +1853,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T56
 **Reuses**: molde de T56; marcação de `.specs/mockup/telas/t15-jogadores--sucesso.html` e `t16-jogador--edicao.html`
 **Requirement**: GEL-115
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1879,7 +1879,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T57
 **Reuses**: estender a tela da CA (`CA:1509`, T50); estados de `R-02` a `R-08` (`t08-grupos--*.html` do módulo)
 **Requirement**: GEL-27, GEL-114, GEL-117
-concluída
+**Status**: concluída
 **Lacunas**: os testes ACE-18 e ACE-57 da CA (`frontend/web/test/telas/grupos.test.tsx`) passam a falhar com a tela estendida: o link vai a `/app/grupos/:grupoId` (não mais `/admins`), a lista vem de `GET /api/grupos` (o teste só simula a sessão) e o texto do vazio muda (`t08-grupos--vazio`). Mudar teste existente pede aprovação: o rascunho não os tocou; o `/executar` pergunta antes de ajustá-los (mesma força, só a fonte e o destino). Os casos novos estão em `test/telas/grupos-modulo.test.tsx`.
 
 **Done when**:
@@ -1905,7 +1905,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T58
 **Reuses**: `R-34` a `R-36` (`t27-novo-grupo--*.html`); `ResumoErros` (`CA:1263`, T40); campos de T56
 **Requirement**: GEL-01, GEL-03, GEL-06, GEL-114, GEL-118
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1930,7 +1930,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T59
 **Reuses**: `R-09` e `R-10` (`t09-inicio--*.html` do módulo); decisão de `GD:5-6` (t09 sem "Pontuação")
 **Requirement**: GEL-20, GEL-114
-concluída
+**Status**: concluída
 **Lacunas**: o mockup só mostra "Nenhum cadastrado" para o grupo novo; com jogadores só inativos (`jogadoresAtivos` = 0), a tela usa o mesmo texto e o Dia de jogo pede o cadastro (`InicioGrupo.tsx`, `[LACUNA]`).
 
 **Done when**:
@@ -1955,7 +1955,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T60
 **Reuses**: `R-27` a `R-33` (`t20-grupo--*.html` do módulo); `Dialogo` (`CA:1286`, T41)
 **Requirement**: GEL-18, GEL-19, GEL-22, GEL-23, GEL-114, GEL-118
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1982,7 +1982,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T61
 **Reuses**: `.specs/mockup/telas/t15-jogadores--*.html` (3 estados, `telas.json:195-197`); `compararApelido` e `chaveBusca` (T9); `Busca` e `Abas` (T57)
 **Requirement**: GEL-46, GEL-47, GEL-48, GEL-49, GEL-103, GEL-114
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -2007,7 +2007,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T62
 **Reuses**: `R-23` (`t16-jogador--novo.html`) e `R-16` (`t16-jogador--erro.html`); campos de T56
 **Requirement**: GEL-31, GEL-33, GEL-34, GEL-39, GEL-114, GEL-118
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -2032,7 +2032,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T63
 **Reuses**: `R-11` (`t16-jogador--carregando.html`) e `R-15` (`t16-jogador--edicao.html`); `exibirNivel` (T55); `CampoNota` (T57)
 **Requirement**: GEL-41, GEL-97, GEL-103, GEL-114
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -2059,7 +2059,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T64
 **Reuses**: `R-19`, `R-20`, `R-24`, `R-25` e `R-26` (`t16-jogador--inativar`, `--inativo`, `--reativado`, `--reativar-erro`, `--reativar`); `Dialogo` (`CA:1286`)
 **Requirement**: GEL-59, GEL-60, GEL-114
-concluída
+**Status**: concluída
 **Lacunas**: a spec não diz em que campo o 422 de período chega; a tela usa `mensagens.data` e, sem ele, a mensagem geral do 422 no campo de data (`erroDePeriodo` em `PeriodosJogador.tsx`). O `/executar` confere contra a rota (T42).
 
 **Done when**:
@@ -2085,7 +2085,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T65
 **Reuses**: `R-12`, `R-13`, `R-14`, `R-21` e `R-22` (`t16-jogador--corrigido`, `--corrigir-erro`, `--corrigir`, `--inicio-erro`, `--inicio`); dados de T54
 **Requirement**: GEL-76, GEL-77, GEL-114
-concluída
+**Status**: concluída
 **Lacunas**: o mockup não traz a mensagem de sucesso do início alterado; a tela usa "Data de início alterada para dd/mm/aaaa." (`textoInicioAlterado` em `CorrigirDatas.tsx`).
 
 **Done when**:
@@ -2111,7 +2111,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T66
 **Reuses**: `R-17` e `R-18` (`t16-jogador--excluir`, `--exclusao-recusada`); `Dialogo` (`CA:1286`)
 **Requirement**: GEL-86, GEL-87, GEL-114
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -2136,7 +2136,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T67
 **Reuses**: `.specs/mockup/telas/t17-habilidades--*.html` (4 estados, `telas.json:198-201`); dados de T55
 **Requirement**: GEL-94, GEL-95, GEL-114
-concluída
+**Status**: concluída
 **Lacunas**: o mockup não diz quando o renomear grava; a tela grava ao sair do campo ou com Enter, só quando o nome mudou (`Habilidades.tsx`).
 
 **Done when**:
@@ -2164,7 +2164,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T68
 **Reuses**: estender `rotas.tsx` da CA (`CA:1309`, T42); rotas de `GD:202` e do `telas.json:188-227`
 **Requirement**: GEL-114
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -2188,7 +2188,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T69
 **Reuses**: estender a tela da CA (`CA:1582`, T53); decisão de `GSEG:157`
 **Requirement**: SEC-001
-concluída
+**Status**: concluída
 **Lacunas**: `GET …/admins` (CA) não diz quem é a criadora. O rascunho acrescentou `criador` opcional ao `adminsResposta` e a tela esconde "Remover" quando ele vem `true`; falta a API enviar o campo (repositório e rota de admins da CA, junto da T32). O `/executar` decide se entra nesta tarefa ou num retrabalho. SPEC_DEVIATION: contrato estendido fora do escopo nomeado da T70.
 
 **Done when**:
@@ -2213,7 +2213,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T70
 **Reuses**: runner da CA (`CA:1609`, T54) e a lista de telas ativas (`CA:1657`, T56); entradas de `telas.json:164-165` e `:188-227`; mockup copiado em T52
 **Requirement**: GEL-115, GEL-116
-concluída
+**Status**: concluída
 **Lacunas**: (1) o teste ACE-54/ACE-55 da CA em `frontend/web/test/ferramentas/telas-reais.test.ts:95` exige zero entradas T08 e passa a falhar com a AD-031; mudar teste existente pede aprovação, o rascunho não o tocou (a regra nova está em `test/ferramentas/telas-grupos-elenco.test.ts`). (2) Rodar a comparação, ajustar CSS até 1% e a deformação de propósito ficam para o `/executar`. (3) Estados de `revisaoManual` do módulo a conferir à mão: T16 `salvo` (nota salva), T20 `link-copiado`; T27 `senha` não se aplica (sem "Primeiro admin", GEL-114).
 
 **Done when**:
@@ -2239,7 +2239,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T71
 **Reuses**: Playwright da fundação (`F:1691`); interceptação de respostas do runner da CA (`CA:1609`); `.specs/mockup/respostas/erro-validacao-novo-grupo.json` e `elenco-erro-novo-jogador.json`
 **Requirement**: GEL-118
-concluída
+**Status**: concluída
 **Lacunas**: as respostas do mockup estão no formato antigo (`erro.campos` como objeto, e o `adaptarCorpo` da CA descarta esse objeto); o spec converte para o `corpoErro` com `mensagens` e ignora `adminEmail` (campo que a t27 não tem mais). O vermelho (mensagem movida para o fim do formulário) fica para o `/executar`.
 
 **Done when**:
@@ -2267,7 +2267,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T72
 **Reuses**: estender o seed da CA (`CA:1143`, T35) e o da fundação (`F:1055`); decisão de `GD:211`
 **Requirement**: GEL-01, GEL-46
-concluída
+**Status**: concluída
 **Nota do rascunho**: o seed não depende de `@pelada/dominio`; a lista de habilidades é copiada em `HABILIDADES_LOCAIS` e o teste confere contra o texto literal do GEL-02. Maestro é o inativo; Paredão, o ativo sem nota.
 
 **Done when**:
@@ -2293,7 +2293,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T73
 **Reuses**: jornadas da CA (`CA:1683`, T57) e a caixa de dev (`CA:697`, T17) para o convite da J-14; `pnpm dev` (`F:1812`)
 **Requirement**: GEL-01, GEL-22, GEL-28, GEL-31, GEL-51, GEL-54, GEL-97
-concluída
+**Status**: concluída
 **Nota do rascunho**: cada jornada cria as próprias contas e o próprio grupo; o nome da J-11 leva sufixo único (SPEC_DEVIATION no spec: o banco do e2e guarda as rodadas anteriores e o sufixo livre mudaria o slug). O passo 4 da J-12 (saída antes de presença) depende de partidas (feature 4); no lugar, a recusa da saída depois do retorno seguinte. A auditoria sem telefone nem ano fica nos testes da API.
 
 **Done when**:
@@ -2320,7 +2320,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T74
 **Reuses**: runbook e README da CA (`CA:1708`, T58); `GSEG:159`; caso de `GS:49`
 **Requirement**: SEC-003
-concluída
+**Status**: concluída
 **Nota do rascunho**: runbook ganha a seção "Grupos e elenco" (`LIMITE_ESCRITA` e grupo sem criadora); README ganha o elenco do seed e "Criar um grupo local". O gate completo da feature é do /executar.
 
 **Done when**:

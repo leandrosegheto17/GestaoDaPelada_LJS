@@ -265,7 +265,7 @@ T47 → T48
 **Depends on**: None
 **Reuses**: `comoApp` e o cenário de dois grupos (`F:909`); cenário de grupos e elenco (`GE:348`); `M:1792843200000_linha-de-base.sql:233-269`; `M:1792843260000_roles.sql:20-31`; `M:1792843320000_rls.sql:32-61`; `M:1792843680000_conta-admins-listar.sql:8-20`; molde da rede da `partidas-e-ranking` (`PR:430`)
 **Requirement**: FIN-37, FIN-38, FIN-39, FIN-41 (linha de base)
-concluída
+**Status**: concluída
 **Nota do rascunho**: a evidência da rede (uma sabotagem por item) está listada no topo do teste; o /executar roda e registra aqui.
 
 **Done when**:
@@ -297,7 +297,7 @@ T47 → T48
 **Depends on**: T0
 **Reuses**: Regra do domínio sem relógio e sem I/O (`GE:527`, `F:385`); regra de `L:backend/dominio/src/caixa/saldos.ts:27-79` (só consulta)
 **Requirement**: FIN-13
-concluída
+**Status**: concluída
 **Nota do rascunho**: rascunhada fora da ordem, sem a T0 (que depende do cenário da grupos-e-elenco), a pedido do usuário em 2026-11-05. O `index.ts` do domínio ainda não exporta o caixa: o /executar acrescenta as exportações (outra sessão edita o arquivo).
 
 **Done when**:
@@ -324,7 +324,7 @@ T47 → T48
 **Depends on**: T1
 **Reuses**: Intervalo `[início, fim)` de `backend/dominio/src/atividade/datas.ts` (`GE:626`); `primeiroDia` e `ultimoDia` de `backend/dominio/src/datas.ts` (`PR:457`); `compararApelido` (`GE:575`); regra de `L:backend/dominio/src/atividade/atividade.ts:3-36`
 **Requirement**: FIN-12, FIN-11, FIN-19
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -350,7 +350,7 @@ T47 → T48
 **Depends on**: T2
 **Reuses**: `somarCentavos` (T1); regra de `L:backend/dominio/src/caixa/saldos.ts:34-40`; AD-055 (data futura só conta quando chega)
 **Requirement**: FIN-10, FIN-13, FIN-49
-concluída
+**Status**: concluída
 **Nota do rascunho**: fora da ordem, a pedido do usuário. O código entrou por engano no commit `7137e7d` de outra sessão. Datas comparadas como texto `AAAA-MM-DD`, sem os tipos da feature 3.
 
 **Done when**:
@@ -379,7 +379,7 @@ T47 → T48
 **Depends on**: T3
 **Reuses**: T1 e T2; regra de `L:backend/dominio/src/caixa/saldos.ts:42-79`
 **Requirement**: FIN-11, FIN-12, FIN-13
-concluída
+**Status**: concluída
 **Nota do rascunho**: fora da ordem, sem a T2: `resumoDoMes` recebe os ativos já filtrados e ordenados por `ativosNoMes` e só remove repetidos. O código entrou no commit `7137e7d` de outra sessão.
 
 **Done when**:
@@ -406,7 +406,7 @@ T47 → T48
 **Depends on**: T4
 **Reuses**: `mesDe`, `mesAnterior`, `mesSeguinte`, `compararMeses` (`PR:457`); molde da navegação do ranking (`PR:738`); regra de `L:backend/api/src/aplicacao/financeiro/mes.ts:20-89`
 **Requirement**: FIN-07, FIN-09, FIN-18, FIN-49
-concluída
+**Status**: concluída
 **Lacunas**: (1) outro mês sem configuração: tratado como fora do histórico (422); (2) data do saldo inicial em mês posterior ao de hoje: histórico só com o mês de hoje (`backend/dominio/src/caixa/mes.ts`).
 
 **Done when**:
@@ -433,7 +433,7 @@ T47 → T48
 **Depends on**: T5
 **Reuses**: regra de `L:backend/dominio/src/caixa/mensalidade.ts:10-28`
 **Requirement**: FIN-16, FIN-17
-concluída
+**Status**: concluída
 **Nota do rascunho**: fora da ordem, sem a T5. O código entrou no commit `7137e7d` de outra sessão.
 
 **Done when**:
@@ -461,7 +461,7 @@ T47 → T48
 **Depends on**: T6
 **Reuses**: Primitivos `.strict()` e inteiros da CA (`CA:550`); molde do contrato de pesos (`PR:865`); limites de `L:backend/contrato/src/limites.ts:17-19` e `L:backend/contrato/src/financeiro.ts:8-103`
 **Requirement**: FIN-01, FIN-03, FIN-07, FIN-13
-concluída
+**Status**: concluída
 **Nota do rascunho**: fora da ordem, sem os primitivos da GE: `centavos`, a data real (`z.iso.date()`) e a mensagem "Informe uma data válida." ficam locais em `financeiro.ts`; falta `./financeiro` no `exports` do `package.json` e no `index.ts` do contrato (outra sessão edita esses arquivos). O código entrou no commit `7137e7d` de outra sessão.
 
 **Done when**:
@@ -487,7 +487,7 @@ T47 → T48
 **Depends on**: T7
 **Reuses**: Códigos de erro da GE (`GE:854`); primitivos (`CA:550`)
 **Requirement**: FIN-25, FIN-26, FIN-35, FIN-36
-concluída
+**Status**: concluída
 **Nota do rascunho**: `centavos` passou a ser exportado de `financeiro.ts` (T7); `plano_pro` repete o código e o texto de `plano.ts` (feature 7) para não depender dela; falta `./financeiro-lancamentos` no `exports` do `package.json` e no `index.ts` do contrato (outra sessão edita esses arquivos).
 
 **Done when**:
@@ -515,7 +515,7 @@ T47 → T48
 **Depends on**: T8
 **Reuses**: Gerador e checagem aditiva (`F:883`, `F:858`); molde de função de visibilidade `grupos_visiveis()` (`M:1792844280000_grupos-visiveis-arquivado.sql:9-22`); laço das policies herdadas (`M:1792843320000_rls.sql:32-61`); AD-052
 **Requirement**: FIN-38, FIN-39, FIN-42
-concluída
+**Status**: concluída
 **Nota do rascunho**: migração `1792845300000_financeiro-rls.sql`, com folga para as migrações das features 4 e 5 (ainda não escritas): o /executar confere que o timestamp é maior que a última delas. Testes em `backend/api/test/banco/financeiro-rls-migracao.test.ts` e `backend/scripts/checagens/test/migracao-aditiva-financeiro.test.ts` (este já cita a migração da T10). O código entrou no commit `b65363b` de outra sessão (índice do git compartilhado).
 
 **Done when**:
@@ -542,7 +542,7 @@ T47 → T48
 **Depends on**: T9
 **Reuses**: `app_acessa_financeiro` (T9); `contas_nomes_do_grupo` vigente (`PR:1063`, AD-036); funções `SECURITY DEFINER` de convite e de criar grupo que inserem vínculo (`M:1792844460000_convites-grupo-arquivado.sql:49`, `:90`; `M:1792844340000_grupo-criar.sql:60`), que não podem quebrar
 **Requirement**: FIN-41, FIN-42, FIN-32
-concluída
+**Status**: concluída
 **Nota do rascunho**: migração `1792845360000_financeiro-trava-acesso.sql`. O corpo de `contas_nomes_do_grupo` foi escrito sem a migração da feature 4 (ainda não existe no repositório): o /executar confere que ele repete o dela e só acrescenta as autoras de lançamentos. Testes em `backend/api/test/banco/financeiro-trava-acesso.test.ts`; o item (d) da T0 foi invertido em `financeiro-rede.test.ts`. Teste de `convite_aceitar` fica para o /executar (os testes da CA já o cobrem; só `grupo_criar` foi provado aqui).
 
 **Done when**:
@@ -569,7 +569,7 @@ T47 → T48
 **Depends on**: T10
 **Reuses**: Estender `tipos.ts` (`GE:878`, `PR:1013`); colunas de `M:1792843200000_linha-de-base.sql:233-269`
 **Requirement**: FIN-13
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -594,7 +594,7 @@ T47 → T48
 **Depends on**: T11
 **Reuses**: Matrizes de leitura e escrita da fundação (`F:981`, `F:1007`); `comoApp` (`F:909`); molde da matriz da GE (`GE:372`)
 **Requirement**: FIN-38, FIN-39, FIN-40
-concluída
+**Status**: concluída
 **Nota do rascunho**: a evidência (sabotagens) está listada no topo do teste; o /executar roda e registra aqui.
 
 **Done when**:
@@ -619,7 +619,7 @@ T47 → T48
 **Depends on**: T12
 **Reuses**: T12; matriz de escrita da fundação (`F:1007`)
 **Requirement**: FIN-39, FIN-40, FIN-41
-concluída
+**Status**: concluída
 **Nota do rascunho**: a evidência (sabotagens) está listada no topo do teste; o /executar roda e registra aqui. A célula de DELETE do controle C apaga pagamentos, lançamentos e configuração nessa ordem, porque a FK do lançamento vinculado é `ON DELETE RESTRICT`.
 
 **Done when**:
@@ -645,7 +645,7 @@ T47 → T48
 **Depends on**: T13
 **Reuses**: Referência do schema e teste de igualdade (`F:784`); hash das 23 (`F:661`); mesmo passo nas features 4 e 5
 **Requirement**: FIN-42
-concluída
+**Status**: concluída
 **Nota do rascunho**: só o teste foi escrito (`backend/api/test/migracoes/esquema-financeiro.test.ts`). O `esquema-producao.txt` ainda não existe (a fundação não foi executada) e regenerá-lo exige rodar `pnpm esquema:gerar`, que o rascunho não faz: o /executar o gera depois de aplicar T9 e T10, confere o diff (só a função, o grant, as 5 policies e a função de nomes) e o commita. As linhas `policy`/`funcao` esperadas no teste seguem o formato de `esquema.ts:111-149`.
 
 **Done when**:
@@ -672,7 +672,7 @@ T47 → T48
 **Depends on**: T14
 **Reuses**: Script do ensaio da `partidas-e-ranking` (`PR:1684`, estender); restauração da fundação (`F:584`); `lerEsquema` e referência (`F:736`, `F:784`); migrar sobre banco migrado (`F:834`); AD-033 e AD-073
 **Requirement**: FIN-42, FIN-39
-concluída
+**Status**: concluída
 **Nota do rascunho**: o script e o teste dele foram escritos (`backend/scripts/src/ensaio-migracao.ts`, `backend/scripts/test/ensaio-migracao.test.ts`, script `ensaio` no `package.json`). O ensaio com o dump real da produção (pausa para o usuário decifrar o backup, `pnpm --filter @pelada/scripts ensaio <backup.age> <chave.txt>`) e a `Evidência` ficam para o /executar. O script da `partidas-e-ranking` (T81 dela) ainda não existe: este nasceu sozinho e `podeGanhar` aceita `config_pesos` quando as duas se juntarem.
 
 **Done when**:
@@ -702,7 +702,7 @@ T47 → T48
 **Depends on**: T15
 **Reuses**: `auditoria.registrar` (`CA:844`); molde de repositório com auditoria (`PR:1159`); regra da trava de `L:backend/api/src/infraestrutura/db/repositorios/financeiro/config.ts:19-39` (só consulta)
 **Requirement**: FIN-01, FIN-04, FIN-05, FIN-06
-concluída
+**Status**: concluída
 **Nota do rascunho**: `SPEC_DEVIATION`: a assinatura ficou `salvarConfig(db, grupoId, dados)`, sem `contaId` e `agora`, porque `auditoria.registrar` (`convites.ts:24`) já usa `app_conta_id()` e `now()` e a tabela não tem autoria. O repositório sai como `configFinanceira` (`lerConfig`, `salvarConfig`) e devolve `{ antes, depois }`; as rotas (T25) usam essa forma.
 
 **Done when**:
@@ -730,7 +730,7 @@ T47 → T48
 **Depends on**: T16
 **Reuses**: Domínio T2 a T5; leitura de períodos de `jogadores-leitura.ts` (`GE:1179`); regra de `L:backend/api/src/aplicacao/financeiro/mes.ts:20-89`
 **Requirement**: FIN-07, FIN-08, FIN-10, FIN-11, FIN-12, FIN-13, FIN-14
-concluída
+**Status**: concluída
 **Nota do rascunho**: o repositório sai como `financeiroMes.lerMes(db, grupoId, mes, hoje)`; o mês chega validado pela rota (FIN-09, T26). Importa `@pelada/dominio` (`ativosNoMes`, `resumoDoMes`, `saldoAtual`, `navegacao`) e o tipo de `@pelada/contrato` (`MesFinanceiroResposta`): o /executar precisa acrescentar as exportações do caixa no `index.ts` do domínio e `./financeiro` no `exports` e no `index.ts` do contrato (ver notas de T1 a T8). O estouro do inteiro seguro é provado no domínio (T1); aqui não há teste de estouro, que exigiria ~90 milhões de linhas.
 
 **Done when**:
@@ -760,7 +760,7 @@ T47 → T48
 **Depends on**: T17
 **Reuses**: `travarVarios` (`PR:1185`); tradutor de 23505 (`GE:854`); T6; regra de `L:backend/api/src/aplicacao/financeiro/marcar-pagamento.ts:7-63`
 **Requirement**: FIN-16, FIN-17, FIN-19, FIN-20, FIN-21
-concluída
+**Status**: concluída
 **Nota do rascunho**: `SPEC_DEVIATION`: assinatura `financeiroPagamentos.marcar(db, grupoId, jogadorId, mes, hoje)`, sem `contaId` e `agora` (autora de `app_conta_id()`, momento de `now()`, como em T16). `travarVarios` (`PR:1185`) ainda não existe no repositório: o jogador é travado com `SELECT … FOR UPDATE` direto, o mesmo bloqueio dos escritores de período; o /executar troca por `travarVarios` se ele existir. O 23505 da PK é traduzido por `SAVEPOINT` (`ja_marcado`), depois da conferência por consulta, que a trava do jogador já garante.
 
 **Done when**:
@@ -789,7 +789,7 @@ T47 → T48
 **Depends on**: T18
 **Reuses**: T18; regra de `L:backend/api/src/aplicacao/financeiro/desmarcar-pagamento.ts:5-28`
 **Requirement**: FIN-22, FIN-23
-concluída
+**Status**: concluída
 **Nota do rascunho**: exportado como `financeiroPagamentosDesmarcar.desmarcar(db, grupoId, jogadorId, mes)`, sem `contaId` (a autora da auditoria vem de `app_conta_id()`, como em T16 e T18).
 
 **Done when**:
@@ -818,7 +818,7 @@ T47 → T48
 **Depends on**: T19
 **Reuses**: `contas_nomes_do_grupo` estendida (T10, `PR:1063`); "Conta excluída" de ACE-28 (`CA:470`); regra de `L:backend/api/src/aplicacao/financeiro/lancamentos/criar.ts:7-31` e `editar.ts:7-41`
 **Requirement**: FIN-25, FIN-27, FIN-28, FIN-31, FIN-32
-concluída
+**Status**: concluída
 **Nota do rascunho**: exportado como `lancamentos.criar|ler|editar(db, grupoId, …)`, sem `contaId` (autora de `app_conta_id()`, como em T16). `ler` devolve também `vinculo` (jogador, apelido e mês) para a mensagem do 409 da T21. A conta excluída já tem o nome "Conta excluída" na própria linha de `contas` (`conta_excluir` a anonimiza), então `contas_nomes_do_grupo` a devolve assim; o repositório ainda cai no mesmo texto se a função não devolver a conta.
 
 **Done when**:
@@ -846,7 +846,7 @@ T47 → T48
 **Depends on**: T20
 **Reuses**: FK de `M:1792843200000_linha-de-base.sql:267`; regra de `L:backend/api/src/aplicacao/financeiro/lancamentos/excluir.ts:5-36`
 **Requirement**: FIN-29, FIN-30
-concluída
+**Status**: concluída
 **Nota do rascunho**: exportado como `lancamentosExcluir.excluir(db, grupoId, id, opcoes)`, sem `contaId` (autora de `app_conta_id()`). Devolve `vinculado` com apelido e mês; a rota (T28) monta o 409 com `mensagemLancamentoVinculado`. A opção `pularChecagemDoVinculo` existe só para o teste da corrida (23503 da FK).
 
 **Done when**:
@@ -873,7 +873,7 @@ T47 → T48
 **Depends on**: T21
 **Reuses**: `admins.listar` e `auditoria.registrar` (`CA:844`); trava do banco (T10); regra de `L:backend/api/src/aplicacao/grupos/admins/financeiro.ts:6-30`
 **Requirement**: FIN-35, FIN-36
-concluída
+**Status**: concluída
 **Nota do rascunho**: `SPEC_DEVIATION`: `acessoFinanceiro.alterarFinanceiro(db, grupoId, alvoId, valor, opcoes)`, sem `contaId` (a própria conta é `app_conta_id()`), e mora em `financeiro/acesso.ts`, não em `admins` (`convites.ts`), para não editar o arquivo da CA. Resultado extra `sem_permissao` quando o banco (T10) afeta zero linhas; `pularChecagemDaPropriaConta` existe só para o teste FIN-41. `numAffectedRows` do Kysely `sql` é a contagem usada: o /executar confere que vem preenchido no driver do projeto.
 
 **Done when**:
@@ -901,7 +901,7 @@ T47 → T48
 **Depends on**: T22
 **Reuses**: `exigirVinculo` (`CA:795`); `exigirGrupoAtivo` (`GE:901`); regra de `L:backend/api/src/entrada/middlewares/grupo.ts:34-43`
 **Requirement**: FIN-33
-concluída
+**Status**: concluída
 **Nota do rascunho**: lê o acesso por `app_acessa_financeiro` (T9), a mesma função da RLS. Ligado pelo `travarFinanceiro(api)` em `app.ts`, nos caminhos `…/financeiro/*` e `…/admins/:contaId/financeiro`; `acessaFinanceiro` entrou em `Variaveis` (`ambiente.ts`). O 403 é montado local (`corpoSemPermissaoFinanceiro`), porque `corpoDoErro` só aceita os códigos de `acesso.ts`.
 
 **Done when**:
@@ -926,7 +926,7 @@ T47 → T48
 **Depends on**: T23
 **Reuses**: `recursoLiberado` da `simulador` (SIM-68, `SIM:273`; caminho e injeção no `tasks.md` dela, conferir ao abrir o lote: se não existir, criá-lo aqui e registrar no commit); contrato da feature 7 (`.specs/features/planos-e-cobranca/spec.md:79`, `:135`); AD-051
 **Requirement**: FIN-45, FIN-50
-concluída
+**Status**: concluída
 **Nota do rascunho**: `SPEC_DEVIATION`: sem arquivo `middlewares/plano.ts`; o ponto único da simulador mora em `middlewares/recurso.ts`, e lá entraram o recurso `financeiro` no `RecursoPro` e o `exigirRecursoNaEscrita`. O `travarFinanceiro` (T23) liga os dois em sequência nos caminhos do financeiro. O "rg situacao_comercial" virou um teste que lê `rotas/financeiro*` e `middlewares/financeiro.ts`.
 
 **Done when**:
@@ -954,7 +954,7 @@ T47 → T48
 **Depends on**: T24
 **Reuses**: Molde da rota de pesos (`PR:1412`); leitor de corpo (`GE:854`); relógio (`GE:831`); rota de `L:backend/api/src/aplicacao/financeiro/config.ts:7-42`
 **Requirement**: FIN-01, FIN-02, FIN-03, FIN-04
-concluída
+**Status**: concluída
 **Nota do rascunho**: `rotasFinanceiroConfig()` ligada no `app.ts`. O "GET do mês reflete" fica no teste da T26 (a rota nasce lá); aqui o teste confere a linha gravada. `test/rotas/apoio-financeiro.ts` (app com relógio fixo em 2026-10-15, pedido com sessão, `restaurarCaixa`) é reaproveitado por T26 e T27.
 
 **Done when**:
@@ -980,7 +980,7 @@ T47 → T48
 **Depends on**: T25
 **Reuses**: Molde de `GET partidas?mes` (`PR:1436`); `comBanco` (`F:1203`); T5
 **Requirement**: FIN-07, FIN-08, FIN-09, FIN-14
-concluída
+**Status**: concluída
 **Nota do rascunho**: `rotasFinanceiroMes()` ligada no `app.ts`. O 422 de fora do histórico só vale **com configuração** (texto da tarefa); sem ela, qualquer mês bem formado dá 200 com os nulos (o `[LACUNA]` de `caixa/mes.ts:48` fica para o /executar decidir). O `index.ts` do domínio ganhou só `mesNoHistorico as mesNoHistoricoDoCaixa` (o nome já é do ranking), `mesFuturo` e as duas mensagens; o resto das exportações do caixa segue para o /executar (nota da T17). O teste também prova o reflexo do PUT da T25 (FIN-01).
 
 **Done when**:
@@ -1006,7 +1006,7 @@ T47 → T48
 **Depends on**: T26
 **Reuses**: T18, T19; rotas de `L:backend/api/src/entrada/rotas/grupos/financeiro/pagamentos-desmarcar.ts:8-27`; molde de `POST partidas` (`PR:1461`)
 **Requirement**: FIN-16, FIN-17, FIN-18, FIN-19, FIN-20, FIN-22, FIN-23
-concluída
+**Status**: concluída
 **Nota do rascunho**: `rotasFinanceiroPagamentos()` ligada no `app.ts`. No DELETE, o mês é conferido antes do id (422 tem precedência); id que não é uuid dá 404. O `restaurarCaixa` do apoio passou a repor o lançamento e o pagamento do cenário (Bira, 2026-01), que o teste de desmarcar apaga.
 
 **Done when**:
@@ -1036,7 +1036,7 @@ T47 → T48
 **Depends on**: T27
 **Reuses**: T20, T21; molde de `GET, PUT e DELETE partidas/:data` (`PR:1487`)
 **Requirement**: FIN-25, FIN-26, FIN-27, FIN-28, FIN-29, FIN-30, FIN-31
-concluída
+**Status**: concluída
 **Nota do rascunho**: `rotasFinanceiroLancamentos()` ligada no `app.ts`. A resposta omite o `vinculo` do repositório (contrato `.strict()`). No PUT, o id malformado dá 404 antes de ler o corpo.
 
 **Done when**:
@@ -1064,7 +1064,7 @@ T47 → T48
 **Depends on**: T28
 **Reuses**: Estender `rotas/admins.ts` da CA (`CA:1020`); `adminsResposta` (`CA:574`); rota de `L:backend/api/src/entrada/rotas/grupos/admins/financeiro.ts:12-44`
 **Requirement**: FIN-35, FIN-36
-concluída
+**Status**: concluída
 **Nota do rascunho**: o PATCH usa o `lerCorpoDoGrupo` (422 com `mensagens`, como as demais rotas do financeiro), não o `lerCorpo` das rotas de acesso. O mapeamento da lista virou `adminsResposta(lista)` local, usado pelo GET (mesmo formato) e pelo PATCH. `sem_permissao` do repositório (banco recusou) vira 403 `sem_permissao_financeiro`.
 
 **Done when**:
@@ -1090,7 +1090,7 @@ T47 → T48
 **Depends on**: T29
 **Reuses**: Rota de `GE:1080`, ampliada em `PR:1538`; contrato `grupoDetalhe` (`GE:753`); T17 (leitura do saldo)
 **Requirement**: FIN-34
-concluída
+**Status**: concluída
 **Nota do rascunho**: `SPEC_DEVIATION`: o `grupoDetalhe` não muda (a partidas-e-ranking o deixou só para o PATCH, `previas.ts:56-60`); o campo vai no fragmento `campoSaldoDoGrupo` e no `grupoDetalheComSaldo` (`contrato/src/financeiro.ts`), e quando o GET passar a responder `grupoDetalheComPartidas` (`PR:1538`) ele estende o mesmo fragmento. O saldo vem de `financeiroMes.saldoDoGrupo` (acrescentado ao `mes.ts` da T17), que lê `app_acessa_financeiro` antes de tudo. Teste existente mudado com a autorização de 2026-11-04: `test/grupos/rotas-grupo.test.ts` (lista exata de chaves da criadora ganha `saldoFinanceiroCentavos`). O teste do `PAR-160` (`PR:2075`) ainda não existe no repositório.
 
 **Done when**:
@@ -1118,7 +1118,7 @@ T47 → T48
 **Depends on**: T30
 **Reuses**: Suíte de isolamento da CA, estendida pela GE e pela PR (`CA:1070`, `GE:1607`, `PR:1658`); prova do arquivado (`GE:1131`)
 **Requirement**: FIN-31, FIN-33, FIN-37
-concluída
+**Status**: concluída
 **Nota do rascunho**: `PEDIDOS_DO_FINANCEIRO` (9 rotas) alimenta a tabela do ACE-48 e os testes FIN-33 e FIN-37; o teste "toda rota com `/financeiro` tem pedido" falha com rota nova. B ganha acesso ao financeiro de H no `beforeAll`, para o "B com H na rota" chegar ao 404 da rota. As rotas do simulador e das escalações ainda não estão na tabela (são da `simulador`): o ACE-48 já falharia por elas, fora do escopo daqui.
 
 **Done when**:
@@ -1144,7 +1144,7 @@ T47 → T48
 **Depends on**: T31
 **Reuses**: T24; lista de rotas do roteador (T31)
 **Requirement**: FIN-45, FIN-50
-concluída
+**Status**: concluída
 **Nota do rascunho**: o retrato antes e depois traz as contagens de `config_financeira`, `lancamentos`, `pagamentos_mes` e `auditoria` de G, os valores da configuração, a soma dos lançamentos e o acesso de O. A lista das 8 escritas é fixa no teste; a cobertura "toda rota do financeiro" pelo roteador fica no T31.
 
 **Done when**:
@@ -1170,7 +1170,7 @@ T47 → T48
 **Depends on**: T32
 **Reuses**: Molde da auditoria sem dado pessoal (`GE:1584`); prova do `comBanco` (`F:1203`)
 **Requirement**: FIN-21, FIN-43, FIN-44
-concluída
+**Status**: concluída
 **Nota do rascunho**: a falha forçada é uma trigger de teste `BEFORE INSERT ON auditoria` só para a ação da vez, criada como superusuário e removida no `finally` (e no `afterAll`). O `SET LOCAL` antes da primeira consulta é provado pelo autor de cada evento (`autor_conta_id` = C, de `app_conta_id()`) e pelas escritas passarem pela RLS do financeiro; a prova direta do `comBanco` segue em `F:1203`. O texto da linha sai sem `momento` e sem o `id` sequencial antes da busca dos marcadores.
 
 **Done when**:
@@ -1196,7 +1196,7 @@ T47 → T48
 **Depends on**: T33
 **Reuses**: Relógio injetado (`GE:831`); T5
 **Requirement**: FIN-49
-concluída
+**Status**: concluída
 **Nota do rascunho**: os dois relógios são `2026-11-01T02:30:00Z` e `2026-11-01T03:05:00Z` (São Paulo em UTC−3, sem horário de verão). O fim do saldo é conferido no `GET mes` e no detalhe do grupo (T30).
 
 **Done when**:
@@ -1223,7 +1223,7 @@ T47 → T48
 **Depends on**: T34
 **Reuses**: Molde de utilitário de exibição (`GE:1726`); regra de `L:backend/contrato/src/primitivos.ts:35-42`
 **Requirement**: FIN-15, FIN-48
-concluída
+**Status**: concluída
 **Nota do rascunho**: `SPEC_DEVIATION`: o negativo sai "− R$ 900,00" (U+2212 e um espaço), como o mockup (`t22-financeiro--sucesso.html:52`), não "−R$ 900,00" do texto da tarefa ("conforme o mockup"). `lerReais` devolve `{ ok, centavos }` ou `{ ok: false, mensagem }` e aceita o sinal de menos (saldo inicial negativo, FIN-03). Teste em `frontend/web/test/dados/dinheiro.test.ts`, onde o projeto põe os testes do front (a matriz diz `src/**`).
 
 **Done when**:
@@ -1249,7 +1249,7 @@ T47 → T48
 **Depends on**: T35
 **Reuses**: Cliente HTTP (`CA:1169`); molde de dados do elenco (`GE:1703`)
 **Requirement**: FIN-07
-concluída
+**Status**: concluída
 **Nota do rascunho**: os códigos do financeiro não são do `CODIGOS_ERRO` da conta e acesso, então o `ErroApi.codigo` vem vazio; `erroDoFinanceiro(erro)` lê o corpo bruto (`ErroApi.corpo`), inclusive o `plano_pro` na forma da AD-091. O `package.json` do contrato ganhou `./financeiro` e `./financeiro-lancamentos` em `exports` (o `index.ts` raiz ainda não exporta o caixa, nota da T17). `[LACUNA]` para o /executar: o contrato exige `z.uuid()` nos ids de `pagamentoDoMes` e `lancamentoDoMes`, mas `.specs/mockup/respostas/financeiro-2026-10.json` usa `j-alemao` e afins; ou o contrato passa a `z.string().min(1)` como `grupo.ts:86`, ou a resposta do mockup troca os ids, antes das telas (T38) e da comparação visual (T46). O `useGrupo` (`dados/grupos.ts`) não mudou aqui: o GET do grupo ganhou o início da partidas-e-ranking e o saldo, e o parser dele é da T43.
 
 **Done when**:
@@ -1273,7 +1273,7 @@ T47 → T48
 **Depends on**: T36
 **Reuses**: Estender `rotas.tsx` (`GE:2068`, `PR:1926`); AD-054
 **Requirement**: FIN-47
-concluída
+**Status**: concluída
 **Nota do rascunho**: as telas `FinanceiroMes`, `Lancamento` e `ConfigCaixa` nascem aqui como esqueleto (só a `Casca` com o título), para o roteador não importar arquivo de tarefa posterior; T38, T41 e T42 as completam. `handle.tela`: `financeiro`, `novo-lancamento`, `lancamento`, `config-caixa`. Teste em `frontend/web/test/app/rotas-financeiro.test.tsx`.
 
 **Done when**:
@@ -1299,7 +1299,7 @@ T47 → T48
 **Depends on**: T37
 **Reuses**: `.specs/mockup/telas/t22-financeiro--{sucesso,vazio-config,vazio-mes,sem-permissao}.html`; `TelaMensagem` e `Lista` (`CA:1286`); molde da navegação de mês da t10 (`PR:1951`)
 **Requirement**: FIN-08, FIN-15, FIN-33, FIN-46
-concluída
+**Status**: concluída
 **Nota do rascunho**: resolve o `[LACUNA]` da T36: os ids das respostas do contrato (`pagamentoDoMes.jogadorId`, `lancamentoDoMes.id`, `lancamentoResposta.id`) passam a `idResposta` = `z.string().min(1)`, como `grupo.ts:86`, para as respostas do mockup (`j-alemao`, `l-m01`) passarem; os corpos seguem exigindo uuid. Estilos novos em `telas/financeiro/financeiro.module.css` (de `base.css`, só tokens). A lista de pagamentos mostra só "Pagou"/"Não pagou" e os lançamentos saem um por linha: o interruptor é da T39 e a linha agrupada, da T40. O 422 do `?mes=` fora do histórico mostra a mensagem com "Ir para o mês atual" (a spec não desenha esse estado na tela). A navegação de mês é própria (o molde da t10, `PR:1951`, ainda não existe).
 
 **Done when**:
@@ -1326,7 +1326,7 @@ T47 → T48
 **Depends on**: T38
 **Reuses**: `t22-financeiro--{desmarcar,erro-pagamento}.html`; `Dialogo` e `Faixa` (`CA:1286`)
 **Requirement**: FIN-24
-concluída
+**Status**: concluída
 **Nota do rascunho**: `ListaPagamentos` entra na t22 no lugar da lista simples da T38. A entrada do diálogo sai do lançamento do mês com `mensalidade` e a descrição "Mensalidade <apelido> MM/AAAA"; sem ele, a mensalidade configurada. Lacunas: a resposta do mês não liga pagamento a lançamento, e a spec não define o texto do diálogo para pagamento sem entrada (sai só o título) nem a mensagem da falha ao desmarcar (sai a mensagem da API na faixa); ver `[LACUNA]` em `ListaPagamentos.tsx`.
 
 **Done when**:
@@ -1351,7 +1351,7 @@ T47 → T48
 **Depends on**: T39
 **Reuses**: `t22-financeiro--sucesso.html` (linha agrupada); `formatarReais` (T35)
 **Requirement**: FIN-15
-concluída
+**Status**: concluída
 **Nota do rascunho**: a linha é um botão com `aria-expanded` (o mockup a desenha como link para o t23; a tarefa manda abrir). Fica na posição da mensalidade mais antiga, antes do primeiro avulso de data anterior (`ordemDaLista`, `t22-financeiro--sucesso.html:52-54`). O item de lançamento e os auxiliares de data e valor saíram da `FinanceiroMes` para `ItemLancamento.tsx`, para não haver import circular.
 
 **Done when**:
@@ -1378,7 +1378,7 @@ T47 → T48
 **Depends on**: T40
 **Reuses**: `t23-lancamento--{novo,edicao,erro,excluir}.html`; `Campo`, `ResumoErros`, `Dialogo` (`CA:1239`, `CA:1263`, `CA:1286`); mensagem ao lado do campo (`GE:2138`); `CampoData` (`GE:1751`)
 **Requirement**: FIN-32, FIN-47
-concluída
+**Status**: concluída
 **Nota do rascunho**: o tipo usa o `CampoSeletor` segmentado com a `legend` "Tipo" visível (no mockup ela é `sr`); se a comparação visual (T46) acusar, o /executar esconde a legenda. O valor passa por `lerReais` antes da API (texto inválido marca o campo sem chamar a API). Salvo ou excluído, volta a `/financeiro` (mês atual; a spec não diz o mês). A data do novo vem do `hoje` do `GET …/financeiro/mes` atual. Os auxiliares `reaisParaCampo`, `resumoDosErros` e `errosConhecidos` ficam exportados para a T42. Teste em `frontend/web/test/telas/financeiro-lancamento.test.tsx`.
 
 **Done when**:
@@ -1404,7 +1404,7 @@ T47 → T48
 **Depends on**: T41
 **Reuses**: `t24-config--{vazio,erro}.html`; T41 (mesmos componentes); `respostas/erro-validacao-config.json`
 **Requirement**: FIN-48, FIN-47, FIN-02
-concluída
+**Status**: concluída
 **Nota do rascunho**: a configuração atual vem do `GET …/financeiro/mes` (não há `GET config`); sem ela, a data sugerida é o `hoje` da resposta. O erro de reais do próprio formulário fica só no campo, sem o resumo (como `t24-config--erro`); o resumo aparece no 422 da API. Mensalidade vazia vai `null`. Teste em `frontend/web/test/telas/financeiro-config.test.tsx`.
 
 **Done when**:
@@ -1431,7 +1431,7 @@ T47 → T48
 **Depends on**: T42
 **Reuses**: Estender a tela de `GE:1847` e `PR:2073`; item de `.specs/mockup/telas/t09-inicio--sucesso.html:31`
 **Requirement**: FIN-34, FIN-46
-concluída
+**Status**: concluída
 **Nota do rascunho**: o teste `PAR-160` e a extensão da t09 pela `partidas-e-ranking` ainda não existem no front (o `inicio-grupo.test.tsx` só tem os testes da GE, e o `GEL-20` lista os 4 itens sem a chave, o que segue valendo): nenhum teste existente foi mudado; os casos novos ficam em `frontend/web/test/telas/inicio-grupo-financeiro.test.tsx`. Quando o /executar levar a `PAR-160` ao verde, ela passa a exigir "sem Financeiro" só sem a chave (autorização de 2026-11-04). O `useGrupo` (`dados/grupos.ts`) passa a conferir pelo `grupoDetalheComSaldo` (o `grupoDetalhe` é `.strict()` e recusaria a chave); quando o GET adotar o `grupoDetalheComPartidas`, o parser segue a forma estendida (nota da T30).
 
 **Done when**:
@@ -1457,7 +1457,7 @@ T47 → T48
 **Depends on**: T43
 **Reuses**: Estender a tela de `CA:1582` e `GE:2091`; selo de `.specs/mockup/telas/t19-admins--sucesso.html:19`; interruptor do legado `L:.md/mockup/telas/t19-admins--sucesso.html` (só consulta), com os tokens de `.specs/mockup/tokens.css` (AD-053)
 **Requirement**: FIN-51, FIN-35, FIN-36
-concluída
+**Status**: concluída
 **Nota do rascunho**: quem tem acesso sai da própria linha da lista de admins (mais recente que a sessão). `SPEC_DEVIATION`: o texto "Financeiro" ao lado do trilho só aparece com o interruptor ligado (no legado, em todos), para o `ACE-37` seguir achando um único "Financeiro" sem mudar teste existente; a revisão manual da T46 confere. O `aria-checked` vem do `checked` nativo, sem o atributo explícito. 409 e 403 relêem a lista. Teste em `frontend/web/test/telas/admins-financeiro.test.tsx`; nenhum teste existente mudou.
 
 **Done when**:
@@ -1486,7 +1486,7 @@ T47 → T48
 **Depends on**: T44
 **Reuses**: Formato das entradas `real` (`telas.json:193`, AD-021); runner com `passos` e campos novos (`CA:1609`, `PR:2344`); AD-054
 **Requirement**: FIN-47
-concluída
+**Status**: concluída
 **Nota do rascunho**: as 12 entradas (`telas.json:124-135`) passam a `real` com `acesso-sessao-leandro.json`, `elenco-grupo-quinta.json` e a resposta do mês; as 5 de `revisaoManual` (desmarcar, erro-pagamento, t23 erro e excluir, t24 erro) saem de lá e viram `passos`. O 422 do t23 ganhou `respostas/financeiro-erro-lancamento.json` no formato da API (o `adaptarCorpo` não converte `campos` em objeto do formato antigo, então o `erro-validacao-lancamento.json` não marcaria os campos), com os textos do mockup. O t24 `erro` é o erro de reais do próprio formulário ("mil"), sem API, como o mockup; o `erro-validacao-config.json` não é usado. Teste em `frontend/web/test/ferramentas/telas-financeiro.test.ts`.
 
 **Done when**:
@@ -1511,7 +1511,7 @@ T47 → T48
 **Depends on**: T45
 **Reuses**: Lista de telas ativas (`CA:1657`, `PR:2369`); AD-118 e AD-029 (t09 `sucesso` entra, `sem-financeiro` fora); asserção espacial de `GE:2138`; Stylelint de tokens (`F:1374`)
 **Requirement**: FIN-46, FIN-47, FIN-51, FIN-34
-concluída
+**Status**: concluída
 **Nota do rascunho**: as 12 telas e a T09 `sucesso` entram em `e2e/telas-ativas.json`; a entrada da T09 `sucesso` passa ao mockup do projeto (`telas/t09-inicio--sucesso.html`) com `respostas/financeiro-grupo-quinta.json` (o `elenco-grupo-quinta.json` com `saldoFinanceiroCentavos: 124550`). O mockup do projeto da t09 traz também Partidas, Dia de jogo e Uso do app: a comparação até 1% depende das telas da `partidas-e-ranking` e do `simulador` (e de as respostas deles entrarem na entrada da T09, se faltarem). Asserção espacial em `e2e/financeiro-erros-campo.spec.ts` (molde `e2e/erros-campo.spec.ts`); Stylelint e a lista ativa em `test/ferramentas/telas-financeiro-ativas.test.ts`.
 **Lacunas**: (1) ativar a T09 `sucesso` faz o teste existente `GEL-116, AD-029` (`frontend/web/test/ferramentas/telas-grupos-elenco.test.ts:35-36`, "só `T09 menu-conta`") falhar; a AD-118 fecha a AD-029, mas a autorização de 2026-11-04 da `financeiro` em `## Autorizações` não cita esse teste: o /executar pede a aprovação para ele passar a aceitar `['T09 menu-conta', 'T09 sucesso']` (mesma força), sem mudá-lo antes. (2) A revisão manual do t19 (PC e celular, contra `L:.md/mockup/telas/t19-admins--sucesso.html` e o guia; FIN-51) precisa da tela rodando: fica para o /executar registrar aqui com data e resultado, conferindo também o `SPEC_DEVIATION` da T44 (texto "Financeiro" só com o interruptor ligado).
 
@@ -1542,7 +1542,7 @@ T47 → T48
 **Depends on**: T46
 **Reuses**: Seed de `GE:2164` e `PR:2319`; `.specs/mockup/respostas/financeiro-2026-10.json`
 **Requirement**: FIN-07
-concluída
+**Status**: concluída
 **Nota do rascunho**: o seed atual (`GE` T73) tem só o grupo `pelada-local` com 6 jogadores de períodos abertos em `current_date`, que não estão ativos em outubro; o caixa vai num grupo próprio, `Pelada de Quinta` (`pelada-de-quinta`, o "g-quinta" do mockup), com os 20 jogadores do mockup ativos desde 2026-02-05 (`SPEC_DEVIATION` no `seed.ts`). O saldo de 124.550 pede um lançamento antes de outubro: "Sobra do caixa de fevereiro a setembro" (entrada de 59.550 em 2026-09-30). O admin convidado é `convidado@exemplo.test`, com a mesma `SEED_SENHA_ADMIN`. O teste fica em `backend/api/test/repositorios/financeiro-seed.test.ts` (lê a resposta do mockup do arquivo e usa o `financeiroMes.lerMes` da rota); o `@pelada/scripts` passa a exportar `./seed`.
 **Lacunas**: (1) os testes existentes `FUN-05` de `backend/scripts/test/seed.test.ts` contam linhas no banco inteiro (`contas: 1`, `grupos: 1`, `vinculos: 1`, `jogadores`/`periodos` = 6) e esperam que a conta veja só `pelada-local`; com o grupo do caixa passam a falhar. A autorização de 2026-11-05 da `conta-e-acesso` não os cobre: o /executar pede a aprovação para eles contarem só o grupo local (ou somarem o do caixa), mesma força, sem mudá-los antes. (2) Em `financeiro-2026-07.json` julho tem `naoPagaram: 18`; o seed deixa os 20 ativos desde fevereiro (julho daria 20), porque a resposta não diz quais dois entraram depois; fora do critério desta tarefa. (3) A `partidas-e-ranking` T74 (ainda não rascunhada) recria o grupo do seed com `grupo_criar` de 7 parâmetros e os ids do `telas.json` (`PR:29`, S-03): conferir se o grupo do caixa passa a ser o mesmo dela.
 
@@ -1567,7 +1567,7 @@ T47 → T48
 **Depends on**: T47
 **Reuses**: Jornadas de `CA:1683`, `GE:2188` e `PR:2441`; `pnpm dev` (`F:1812`)
 **Requirement**: FIN-01, FIN-16, FIN-22, FIN-25, FIN-33, FIN-34, FIN-35, FIN-36
-concluída
+**Status**: concluída
 **Nota do rascunho**: J-25 e J-26 (`jornadas.md:162-172`) em `e2e/financeiro.spec.ts`, no molde de `e2e/elenco.spec.ts` (ajudantes repetidos, contas e grupo próprios por jornada, convite pela caixa `/api/dev/emails`). `SPEC_DEVIATION`: as jornadas não usam o grupo do seed (T47), porque configurar o caixa e conceder o acesso mudam o estado e a segunda rodada acharia tudo feito. Os ativos da J-25 entram hoje (Toninho e Bigode), então "Não pagaram" sai de 2 para 1 e volta a 2; o inativo fora da conta é provado pelo `FIN-11` das camadas de baixo (T4, T17).
 
 **Done when**:

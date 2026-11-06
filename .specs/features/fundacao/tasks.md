@@ -301,7 +301,7 @@ T81 → T82
 **Depends on**: None
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-01
-concluída
+**Status**: concluída
 **Nota do rascunho**: ação do usuário; nada a escrever. O /executar confere a máquina.
 
 **Done when**:
@@ -327,7 +327,7 @@ T81 → T82
 **Depends on**: T1
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-01
-concluída
+**Status**: concluída
 **Nota do rascunho**: o `pnpm-lock.yaml` nasce no `pnpm install` do /executar. O `.gitattributes` já existia.
 
 **Done when**:
@@ -353,7 +353,7 @@ T81 → T82
 **Depends on**: T2
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-01, FUN-02
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -378,7 +378,7 @@ T81 → T82
 **Depends on**: T3
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-02
-concluída
+**Status**: concluída
 **Nota do rascunho**: a formatação da base com `prettier --write .` fica para o /executar.
 
 **Done when**:
@@ -403,7 +403,7 @@ T81 → T82
 **Depends on**: T4
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-06
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -428,7 +428,7 @@ T81 → T82
 **Depends on**: T5
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-54
-concluída
+**Status**: concluída
 **Nota do rascunho**: o `testes.json` tinha o comando final da versão removida; volta ao da T6 e cresce nas T10, T24, T58 e T62. A `trava-testes.py --rodar` fica para o /executar.
 
 **Done when**:
@@ -456,7 +456,7 @@ T81 → T82
 **Depends on**: T6
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-03
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -481,7 +481,7 @@ T81 → T82
 **Depends on**: T7
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-19, FUN-05
-concluída
+**Status**: concluída
 **Nota do rascunho**: o `.env.example` já listava as cinco variáveis de banco; não mudou.
 
 **Done when**:
@@ -507,7 +507,7 @@ T81 → T82
 **Depends on**: T8
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-55
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -532,7 +532,7 @@ T81 → T82
 **Depends on**: T9
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-19
-concluída
+**Status**: concluída
 **Nota do rascunho**: `@pelada/api` usa `@pelada/scripts` como devDependency (trava de host); a T18 faz o inverso. Se o pnpm reclamar do ciclo, o /executar decide.
 
 **Done when**:
@@ -561,7 +561,7 @@ T81 → T82
 **Depends on**: T10
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-47, FUN-49
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -587,7 +587,7 @@ T81 → T82
 **Depends on**: T11
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-47, FUN-49
-concluída
+**Status**: concluída
 **Nota do rascunho**: SHAs das actions tirados da versão anterior (`b65b7d8`); o /executar confere. O gitleaks local fica para o /executar.
 
 **Done when**:
@@ -614,7 +614,7 @@ T81 → T82
 **Depends on**: T12
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-50
-concluída
+**Status**: concluída
 **Nota do rascunho**: `pg_restore` sem `--no-acl`; os grants exigem as roles `pelada_*` no cluster local (criadas pelo `pnpm migrar`). O runbook (T73) diz isso.
 
 **Done when**:
@@ -642,7 +642,7 @@ T81 → T82
 **Depends on**: T13
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-48
-concluída
+**Status**: concluída
 **Nota do rascunho**: ação do usuário, já registrada acima; nada a escrever.
 
 **Done when**:
@@ -669,7 +669,7 @@ T81 → T82
 **Depends on**: T14
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-48, FUN-50, FUN-39
-concluída
+**Status**: concluída
 **Nota do rascunho**: push, disparo do workflow e restauração real são ações externas; ficam para o /executar, com confirmação. O `docs/restauracao-registro.md` nasce com os números reais.
 
 **Done when**:
@@ -698,7 +698,7 @@ T81 → T82
 **Depends on**: T15
 **Reuses**: R1 de `reuso.md`: `git -C ../GestaoDaPelada_LJS archive e557292 backend/api/src/infraestrutura/db/migracoes` e extrair só os `.sql`; o hash vem da origem, nunca da cópia
 **Requirement**: FUN-08, FUN-09
-concluída
+**Status**: concluída
 **Nota do rascunho**: copiadas com `git show e557292:<arquivo>` (o `tar` do Git Bash é BusyBox, sem `--wildcards`); hash calculado sobre o blob da origem.
 
 **Done when**:
@@ -724,7 +724,7 @@ T81 → T82
 **Depends on**: T16
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-07, FUN-08
-concluída
+**Status**: concluída
 **Nota do rascunho**: `fileParallelism: false` no vitest da api, porque as roles são do cluster e o `CREATE ROLE` das migrações disputa entre bancos de teste. `bancoDeTeste` ganhou a opção `migrado`.
 
 **Done when**:
@@ -751,7 +751,7 @@ T81 → T82
 **Depends on**: T17, T9, T8
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-07, FUN-55, FUN-19
-concluída
+**Status**: concluída
 **Nota do rascunho**: a trava aceita a lista de teste (`postgres` do CI incluído), porque o CI migra no serviço `postgres`.
 
 **Done when**:
@@ -779,7 +779,7 @@ T81 → T82
 **Depends on**: T18
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-08
-concluída
+**Status**: concluída
 **Nota do rascunho**: ignora também `migracoes_aplicadas` (do legado; o design manda a v2 ignorá-la). As strings esperadas do `pg_get_*` foram escritas sem rodar: o /executar confere a forma exata.
 
 **Done when**:
@@ -805,7 +805,7 @@ T81 → T82
 **Depends on**: T19
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-08
-concluída
+**Status**: concluída
 **Nota do rascunho**: grants do dono ficam fora (o dono muda entre local e Neon). Opção `ignorarLogin` para a comparação com a referência (ver T21).
 
 **Done when**:
@@ -831,7 +831,7 @@ T81 → T82
 **Depends on**: T20
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-08
-concluída
+**Status**: concluída
 **Nota do rascunho**: o `esquema-producao.txt` não foi gerado (nada roda no rascunho); o /executar roda `pnpm esquema:gerar` e confere o arquivo.
 **Lacunas**: o LOGIN das roles fica fora da comparação com a referência (`OPCOES_REFERENCIA`), porque as roles são do cluster e o seed local dá LOGIN (AD-009). Interpretação conservadora: só o LOGIN sai; o resto dos atributos continua comparado. O /executar confirma com o usuário.
 
@@ -860,7 +860,7 @@ T81 → T82
 **Depends on**: T21
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-10
-concluída
+**Status**: concluída
 **Lacunas**: a FUN-10 fala em schema "igual ao da produção", e o design (C2) define `gerenciado` só pela `pgmigrations`. O rascunho segue o design (comentário `[LACUNA]` em `estado.ts`); o /executar confirma com o usuário.
 **Nota do rascunho**: removidas as parameter properties do `ContainerAge` (o `erasableSyntaxOnly` do tsconfig não as aceita).
 
@@ -887,7 +887,7 @@ T81 → T82
 **Depends on**: T22
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-09
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -912,7 +912,7 @@ T81 → T82
 **Depends on**: T23
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-56
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -938,7 +938,7 @@ T81 → T82
 **Depends on**: T24
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-07
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -965,7 +965,7 @@ T81 → T82
 **Depends on**: T25, T17
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-13, FUN-15, FUN-17
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -990,7 +990,7 @@ T81 → T82
 **Depends on**: T26
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-11
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1015,7 +1015,7 @@ T81 → T82
 **Depends on**: T27
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-12
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1040,7 +1040,7 @@ T81 → T82
 **Depends on**: T28
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-13
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1067,7 +1067,7 @@ T81 → T82
 **Depends on**: T29
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-17
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1092,7 +1092,7 @@ T81 → T82
 **Depends on**: T30
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-14, FUN-15
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1117,7 +1117,7 @@ T81 → T82
 **Depends on**: T31
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-05
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1144,7 +1144,7 @@ T81 → T82
 **Depends on**: T32
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-20, FUN-26, FUN-27
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1170,7 +1170,7 @@ T81 → T82
 **Depends on**: T33
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-21, FUN-20
-concluída
+**Status**: concluída
 **Nota do rascunho**: o design cita `@cloudflare/vitest-plugin`; o rascunho usa `@cloudflare/vitest-pool-workers` (plugin `cloudflareTest`, Vitest 4) e sobrepõe os assets com a SPA de `backend/api/test/rotas/spa` pela opção `miniflare.assets`. O /executar confere o nome do pacote e a sobreposição na versão instalada.
 
 **Done when**:
@@ -1196,7 +1196,7 @@ T81 → T82
 **Depends on**: T34
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-22
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1220,7 +1220,7 @@ T81 → T82
 **Depends on**: T35
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-26
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1247,7 +1247,7 @@ T81 → T82
 **Depends on**: T36
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-16
-concluída
+**Status**: concluída
 **Nota do rascunho**: os testes rodam no projeto `banco` (Node), com `app.request(..., env, ctx)` e um `executionCtx` falso (`backend/api/test/db/requisicao.ts`). O `app.onError` passa a responder 503 para `ErroBancoIndisponivel`.
 
 **Done when**:
@@ -1273,7 +1273,7 @@ T81 → T82
 **Depends on**: T37, T26
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-16
-concluída
+**Status**: concluída
 **Lacunas**: COMMIT que falha depois de a rota responder 2xx: a spec não define a resposta; o rascunho responde 500 "Erro interno." (`com-banco.ts`, `[LACUNA]`).
 **Nota do rascunho**: `kysely` entrou no `package.json` da API (`^0.29.0`, versão do design) sem instalação; o `/executar` instala e confere a interface `PostgresPool` em `transacao.ts`. Os casos limite estão no topo de `com-banco.ts`. A BEGIN e o contexto rodam no `aoAbrir` do cliente (T37), isto é, só na primeira consulta.
 
@@ -1301,7 +1301,7 @@ T81 → T82
 **Depends on**: T38
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-18
-concluída
+**Status**: concluída
 **Nota do rascunho**: o comando aceita o `<id>` (roda `pnpm --filter @pelada/api exec wrangler hyperdrive get <id> --json`) ou o JSON na entrada padrão. O `/executar` confere se a versão instalada do wrangler tem `--json` no `hyperdrive get` e o formato `caching.disabled`.
 
 **Done when**:
@@ -1326,7 +1326,7 @@ T81 → T82
 **Depends on**: T39
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-23
-concluída
+**Status**: concluída
 **Nota do rascunho**: `SPEC_DEVIATION`: `test/wrangler.test.ts` entrou na lista permitida, porque o nome de um caso da T33 cita o endereço padrão da Cloudflare. O `/executar` decide (`AskUserQuestion`) entre manter a linha ou renomear o caso, que é mudança de teste existente e pede aprovação. A checagem lê os arquivos do `git ls-files` e roda no `pnpm test:checagens`.
 
 **Done when**:
@@ -1354,7 +1354,7 @@ T81 → T82
 **Depends on**: T40
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-24
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1379,7 +1379,7 @@ T81 → T82
 **Depends on**: T41
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-24, FUN-25
-concluída
+**Status**: concluída
 **Nota do rascunho**: `@sentry/cloudflare` (`^10.0.0`) e `@pelada/contrato` entraram no `package.json` da API sem instalação; o `/executar` confere a versão atual e a assinatura do `withSentry` (tipada à mão em `EmbrulharSentry`). Sem DSN, a requisição nem passa pelo SDK; DSN vazio ou só com espaços conta como ausente.
 
 **Done when**:
@@ -1406,7 +1406,7 @@ T81 → T82
 **Depends on**: T42
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-31
-concluída
+**Status**: concluída
 **Nota do rascunho**: versões no `package.json` sem instalação (Vite 8 do design, `@vitejs/plugin-react` 5, React 19, React Router 7, TanStack Query 5, jsdom); o `/executar` instala e confere as atuais. O Vitest fica no `vite.config.ts`.
 
 **Done when**:
@@ -1432,7 +1432,7 @@ T81 → T82
 **Depends on**: T43
 **Reuses**: R2, R3 e R4 de `reuso.md`: `cp .specs/mockup/tokens.css frontend/web/src/estilos/tokens.css`; `cp .specs/mockup/fontes/*.woff2 .specs/mockup/fontes/OFL.txt frontend/web/public/fontes/`; `cp .specs/mockup/icones/*.png .specs/mockup/icones/icone.svg frontend/web/public/icones/`
 **Requirement**: FUN-30
-concluída
+**Status**: concluída
 **Nota do rascunho**: os três `cp` do mapa rodaram (cópia, não execução de teste). A conferência manual "alterar um byte e reverter" fica para o `/executar`.
 
 **Done when**:
@@ -1458,7 +1458,7 @@ T81 → T82
 **Depends on**: T44
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-32
-concluída
+**Status**: concluída
 **Nota do rascunho**: cor literal pelas regras nativas (`color-no-hex`, `color-named`, `function-disallowed-list`); fonte e sombra pelo plugin `frontend/web/stylelint/so-tokens.mjs`, que deixa passar só o nome da fonte dentro de `@font-face` (necessário para o `global.css` da T46). `stylelint` `^16.25.0` sem instalação; o `/executar` confere a versão e a API de plugin.
 
 **Done when**:
@@ -1484,7 +1484,7 @@ T81 → T82
 **Depends on**: T45
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-30, FUN-32
-concluída
+**Status**: concluída
 **Nota do rascunho**: as 14 `@font-face` foram geradas do `.specs/mockup/fontes/fontes.css`, com `url('/fontes/…')` (arquivos de `public/fontes`, T44). Reset e elementos (`body`, `a`, `h1`–`h4`, `p`) seguem as primeiras linhas de `.specs/mockup/base.css`.
 
 **Done when**:
@@ -1512,7 +1512,7 @@ T81 → T82
 **Depends on**: T46
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-31
-concluída
+**Status**: concluída
 **Nota do rascunho**: `Marca` é a marca de presença do mockup (`.marca` P/L/E/F/X de `base.css:191-201`; a galeria a chama "Marca presente/lesionado/expulso/falta"), não o nome do app; o nome do app fica na barra pública da `Casca`. O axe roda com `axe-core` no jsdom (`test/apoio/axe.ts`), sem `color-contrast` e `region`, que o jsdom não avalia. O Vitest processa os CSS Modules com nomes não escopados, para os testes conferirem as classes do mockup. `.sr` entrou no `global.css`.
 
 **Done when**:
@@ -1538,7 +1538,7 @@ T81 → T82
 **Depends on**: T47
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-31
-concluída
+**Status**: concluída
 **Nota do rascunho**: além de primário e secundário, entrou a variante `texto` (`botao--texto`), que o `EstadoErro` (T49) usa no "Tentar de novo" do mockup. Carregando segue o mockup: `disabled` com `aria-busy`.
 
 **Done when**:
@@ -1564,7 +1564,7 @@ T81 → T82
 **Depends on**: T48
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-31
-concluída
+**Status**: concluída
 **Lacunas**: o mockup é estático e não diz onde fica o foco inicial. O rascunho põe o foco no botão "Tentar de novo" no formato `faixa` (`padrao--erro-rede`) e no título no formato `tela` (`t03-indisponivel--erro`); o `/executar` confirma com o usuário.
 **Nota do rascunho**: o `Botao` passou a repassar a `ref` (prop comum no React 19) para o `<button>`, para o foco.
 
@@ -1593,7 +1593,7 @@ T81 → T82
 **Depends on**: T49
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-31
-concluída
+**Status**: concluída
 
 **Done when**:
 
@@ -1617,7 +1617,7 @@ T81 → T82
 **Depends on**: T50
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-36, FUN-31
-concluída
+**Status**: concluída
 **Nota do rascunho**: "Safari do iOS" inclui o iPadOS que se apresenta como Mac (com toque) e exclui Chrome, Firefox, Edge, Opera e navegadores embutidos no iOS. A dispensa fica em `localStorage` (`pelada.aviso-instalar-iphone`); sem armazenamento, vale até recarregar.
 
 **Done when**:
@@ -1643,7 +1643,7 @@ T81 → T82
 **Depends on**: T51
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-38, FUN-31
-concluída
+**Status**: concluída
 **Lacunas**: o teste da T43 (`frontend/web/test/app.test.tsx`) espera um `h1` "Gestão da Pelada"; com as rotas, `/` mostra a página provisória, cujo `h1` é "Em breve" (o nome do app fica na barra). O rascunho não mexeu no teste existente: o `/executar` pede aprovação para trocar a asserção pelo `h1` "Em breve", com a mesma força.
 **Nota do rascunho**: a vitrine entra por `import()` dentro do `if (import.meta.env.VITE_VITRINE === '1')`; o `/executar` confere no `dist` que o chunk não nasce sem a variável. A vitrine de erro de rede foca o botão ao abrir (T49): conferir na T62 se o anel de foco aparece no print.
 
@@ -1672,7 +1672,7 @@ T81 → T82
 **Depends on**: T52
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-33
-concluída
+**Status**: concluída
 **Nota do rascunho**: as cores do manifest são literais (o manifest não lê CSS) e o teste as compara com `--cor-verde` e `--cor-fundo` de `tokens.css`. Dependências novas no `package.json` sem instalar (`vite-plugin-pwa`, `workbox-precaching`, `workbox-routing`): o `/executar` roda `pnpm install`, confere a compatibilidade do `vite-plugin-pwa` com o Vite 8 e confere no `dist` o `manifest.webmanifest` (terceiro critério, sem teste automatizado). O build só fecha depois da T54, que cria o `src/pwa/sw.ts` citado no `vite.config.ts`.
 
 **Done when**:
@@ -1698,7 +1698,7 @@ T81 → T82
 **Depends on**: T53
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-34, FUN-35
-concluída
+**Status**: concluída
 **Nota do rascunho**: as regras ficam em `src/pwa/servico.ts` (testado em ambiente node) e o `sw.ts` só as liga ao Workbox: o precache responde primeiro (shell em `/`), a navegação que sobra vai à rede e, sem rede, recebe `offline.html`; `/api/` fica fora do fallback. O `sw.ts` declara tipos mínimos de `self` em vez de `lib: webworker`, que colide com a `lib: DOM`. O `offline.html` só nasce na T55: até lá o precache o acrescenta sem revisão. A prova no navegador é da T60.
 
 **Done when**:
@@ -1724,7 +1724,7 @@ T81 → T82
 **Depends on**: T54
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-35
-concluída
+**Status**: concluída
 **Nota do rascunho**: SPEC_DEVIATION: a página nasce em `frontend/web/offline.html`, como segunda entrada do Vite (`build.rollupOptions.input` no `vite.config.ts`), e não em `public/offline.html`: o arquivo de `public` é copiado sem build e não acharia o CSS com os tokens (`tokens.css` fica em `src`). O build a grava em `dist/offline.html`, onde o SW da T54 a procura. O CSS é `src/pwa/offline.css`, que importa o `global.css` e repete as classes da casca (`Casca.module.css`, `EstadoErro.module.css`), porque HTML puro não usa CSS Modules. O `/executar` confere no `dist` que `offline.html` sai com o CSS do build e entra no precache; se o Vite 8 pedir `rolldownOptions` no lugar de `rollupOptions`, troca.
 
 **Done when**:
@@ -1749,7 +1749,7 @@ T81 → T82
 **Depends on**: T55, T41
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-24, FUN-25
-concluída
+**Status**: concluída
 **Nota do rascunho**: mesmo molde do Worker (`opcoesSentry`, `sentryLigado`, `iniciar` trocável no teste); `release` vem de `VITE_VERSAO` (já no `.env.example`). Chamado no `main.tsx` antes do render. Dependências novas no `package.json` sem instalar: `@sentry/react` e `@pelada/contrato` (`workspace:*`). O tipo de `beforeSend` (`limparEvento`) pode precisar de ajuste para casar com o `BrowserOptions` do Sentry: o `/executar` confere no `typecheck`.
 
 **Done when**:
@@ -1776,7 +1776,7 @@ T81 → T82
 **Depends on**: T56
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-29
-concluída
+**Status**: concluída
 **Nota do rascunho**: os valores esperados ficam em `frontend/web/test/apoio/cabecalhos.ts`, usados também pelo e2e da T59. A CSP abre `connect-src` só para `https://*.ingest.sentry.io` (Sentry do front, T56). O `_headers` vale só para os assets estáticos; `/api/*` tem os cabeçalhos do Worker (FUN-22). O `/executar` confere no `dist` que o build copiou o arquivo (terceiro critério) e, na T59, que a CSP não quebra o `registerSW.js` e as fontes.
 
 **Done when**:
@@ -1802,7 +1802,7 @@ T81 → T82
 **Depends on**: T57
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-37
-concluída
+**Status**: concluída
 **Nota do rascunho**: o `webServer` sobe o `wrangler dev` do `wrangler.jsonc` da raiz (pelo pacote `@pelada/api`) na porta fixa 8788, em `127.0.0.1`; o script `e2e` faz o build antes (`pnpm build && playwright test`), e o `testes.json` ganhou `pnpm --filter @pelada/web e2e` no fim. A senha de `pelada_app` vem do `.env` da raiz, por `process.loadEnvFile`, só para o Hyperdrive local. Dependência nova sem instalar: `@playwright/test`; o `/executar` roda `pnpm install` e `playwright install chromium`, e confere se o CI (T67/T68) precisa do mesmo passo.
 
 **Done when**:
@@ -1828,7 +1828,7 @@ T81 → T82
 **Depends on**: T58
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-29, FUN-22
-concluída
+**Status**: concluída
 **Nota do rascunho**: compara com os valores de `test/apoio/cabecalhos.ts` (T57) em `/`, `offline.html`, manifest, um ícone e no fallback da SPA, e acrescenta um caso que lê o console da página: violação de CSP reprova. `/api/health` e `/api/rota-inexistente` conferem `no-store` e `nosniff`. Se o `wrangler dev` não aplicar o `_headers` no fallback da SPA, o `/executar` registra a diferença em vez de enfraquecer o teste.
 
 **Done when**:
@@ -1853,7 +1853,7 @@ T81 → T82
 **Depends on**: T59
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-37, FUN-33, FUN-35
-concluída
+**Status**: concluída
 **Nota do rascunho**: o SW (T54) chama `skipWaiting` mas não `clients.claim`: o teste espera o `ready` e recarrega antes de conferir o `controller`. Além dos três critérios, confere que `/` abre o shell sem rede. Os ícones vêm do próprio manifest servido. Se o `wrangler dev` em `127.0.0.1` não deixar o SW registrar, o `/executar` investiga (contexto seguro) em vez de pular o teste.
 
 **Done when**:
@@ -1881,7 +1881,7 @@ T81 → T82
 **Depends on**: T60
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-38
-concluída
+**Status**: concluída
 **Nota do rascunho**: os tipos ficam em `comparar.d.mts`, ao lado, para o teste em TypeScript importar o `.mjs`. O limite de 1% é inclusivo (exatamente 1% passa), caso acrescentado ao teste. Tamanhos diferentes não são comparados: o runner da T62 tira o print do viewport, não da página inteira, para os dois lados terem o mesmo tamanho. Dependências novas sem instalar: `pixelmatch`, `pngjs` e `@types/pngjs`.
 
 **Done when**:
@@ -1907,7 +1907,7 @@ T81 → T82
 **Depends on**: T61, T49, T50, T52
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-38
-concluída
+**Status**: concluída
 **Lacunas**: ajuste visual até 1% depende de rodar o runner; o rascunho não sabe a diferença atual das 3 telas.
 **Nota do rascunho**: o runner faz o build com `VITE_VITRINE=1` em `test-results/vitrine-build` (ignorado pelo git, ESLint e Prettier), serve com `vite preview` na porta 4174 e tira o print do viewport, sem service worker. O segundo critério (componente deformado reprova) virou um **controle automático** a cada rodada: o runner desloca o `main` 40px numa tela e reprova se a comparação passar. O ajuste de CSS e componentes até 1% fica para o `/executar`, com a suíte à frente. Pontos a conferir: o `servidor.kill()` com `shell: true` pode não derrubar o `vite preview` no Windows; o anel de foco do botão "Tentar de novo" (T49) no print da vitrine de erro de rede, que o mockup estático não tem.
 
@@ -1934,7 +1934,7 @@ T81 → T82
 **Depends on**: T62, T32, T34
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-04
-concluída
+**Status**: concluída
 **Nota do rascunho**: o `dev.mjs` importa a `MENSAGEM_BANCO_FORA` de `backend/scripts/src/conectar.ts` (Node 26 roda `.ts` direto) e confere só a porta TCP do Postgres antes de subir, para não exigir a role `pelada_app` no teste; o `vite.config.ts` passou a ler `PELADA_DEV_PORTA_API` no proxy. O teste da raiz (`test/dev.test.ts`) sobe o wrangler e o Vite de verdade em portas livres. O `lint` da raiz passou a incluir `scripts/`. Pontos a conferir: se `process.loadEnvFile` sobrescreve `PELADA_APP_SENHA=` vazio vindo do ambiente (o caso "sem senha" depende de não sobrescrever); o encerramento da árvore de processos no Windows (`taskkill /T`).
 
 **Done when**:
@@ -1962,7 +1962,7 @@ T81 → T82
 **Depends on**: T63
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-40
-concluída
+**Status**: concluída
 **Nota do rascunho**: lê `.github/workflows` e `.github/actions` (actions compostas também). Além da action local, passa a imagem `docker://` com digest `@sha256`; SHA em maiúsculas, curto ou de 41 caracteres reprova. Roda como linha de comando com `node backend/scripts/checagens/actions-por-sha.ts` (molde do `sem-url-absoluta.ts`).
 
 **Done when**:
@@ -1988,7 +1988,7 @@ T81 → T82
 **Depends on**: T64
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-45
-concluída
+**Status**: concluída
 **Nota do rascunho**: reaproveita `arquivosDoRepositorio` e o tipo `Arquivo` de `sem-url-absoluta.ts` (git ls-files). Pega também o antigo `publish` e o `versions deploy`, sem diferenciar maiúsculas. Documentação é `docs/`, `.specs/`, `.claude/`, `.rascunho/` e todo `*.md`. O texto da checagem e do teste não contém o comando por inteiro, para a rodada na base atual passar.
 
 **Done when**:
@@ -2014,7 +2014,7 @@ T81 → T82
 **Depends on**: T65
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-46
-concluída
+**Status**: concluída
 **Nota do rascunho**: a checagem fica em `backend/scripts/checagens/env-example.ts`; lê toda forma `env.NOME` e `env["NOME"]` no código (cobre `process.env`, `import.meta.env` e o parâmetro `env`) e `secrets.`/`vars.` nos workflows, e ignora as variáveis do ambiente de execução (CI, `GITHUB_*`, `RUNNER_*`, Node, Vite) e os bindings do `wrangler.jsonc`. Faltava `DATABASE_URL_RESTAURACAO` (lida pelo `restaurar-backup.ts`): entrou no `.env.example`. O `.gitleaks.toml` já existia (T11/T12): não foi recriado. O `gitleaks detect` local (terceiro critério) é do `/executar`.
 
 **Done when**:
@@ -2043,7 +2043,7 @@ T81 → T82
 **Depends on**: T66
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-40
-concluída
+**Status**: concluída
 **Nota do rascunho**: SHAs das actions conferidos com `git ls-remote` em 2026-11-05 (commit da tag, não o objeto da tag): `actions/setup-node` v7.1.0, `pnpm/action-setup` v6.1.1, `gitleaks/gitleaks-action` v3.0.0; checkout e upload-artifact são os do `backup.yml`. O job `banco` migra do zero, migra de novo (zero DDL) e roda `test/migracoes` (impressão digital e estado) e `test/isolamento` do `@pelada/api`. As checagens rodam como linha de comando no job `qualidade` e como teste no job `testes`. Teste em `backend/scripts/test/workflow-ci.test.ts`, no molde do `workflow-backup.test.ts`. Conferir: se o `gitleaks-action` v3 pede licença ou outra variável; se o `pnpm/action-setup` lê o `packageManager` sem `version`.
 
 **Done when**:
@@ -2069,7 +2069,7 @@ T81 → T82
 **Depends on**: T67
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-40
-concluída
+**Status**: concluída
 **Nota do rascunho**: o job `web` instala o Chromium (`playwright install --with-deps`), faz o build, roda o `playwright test` direto (o script `e2e` refaria o build) e o `visual`; em falha, envia `playwright-report` e `test-results` (prints da comparação) por 7 dias. Sem Postgres de serviço: o `/api/health` dos e2e não toca o banco. O teste foi acrescentado ao `workflow-ci.test.ts` da T67, sem mudar os casos dela.
 
 **Done when**:
@@ -2096,7 +2096,7 @@ T81 → T82
 **Depends on**: T68
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-42
-concluída
+**Status**: concluída
 **Nota do rascunho**: segue a AD-119: o pai é a `main` do Neon (produção), não a `dev`. API v2 do Neon (`GET` e `POST /projects/{id}/branches`, `DELETE /projects/{id}/branches/{branch_id}`); o nome é `restauracao-<GITHUB_RUN_ID>`. Mantém as 2 de restauração mais recentes contando a nova; nunca apaga `main`, `dev`, a branch padrão, uma protegida nem nome sem o prefixo. O erro da API leva só método, caminho e status (sem a chave). Conferir na documentação atual do Neon se o `POST` sem `endpoints` basta para a restauração (branch sem compute) e o formato de `created_at`.
 
 **Done when**:
@@ -2122,7 +2122,7 @@ T81 → T82
 **Depends on**: T69
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-41, FUN-42, FUN-43, FUN-44, FUN-57, FUN-58
-concluída
+**Status**: concluída
 **Nota do rascunho**: segue a AD-119 (environment `producao`, restauração, dump e migração na `main` do Neon). Um job só, para a ordem e a parada no primeiro erro valerem; o passo "Conferir URL_PUBLICA" fica logo depois do build e também recusa URL sem `https://` (o teste roda o script do passo no bash). O dump de antes do deploy sobe como artefato por 30 dias. A saúde lê o SHA do `GITHUB_SHA` do job (nenhuma variável nova). Secrets que o environment `producao` precisa ter além dos da AD-119: `BACKUP_CHAVE` (chave pública age do dump) e, opcional, `VITE_SENTRY_DSN`; T77/T78 conferem. O `verificar-saude.mjs` citado no último passo nasce na T72.
 
 **Done when**:
@@ -2151,7 +2151,7 @@ T81 → T82
 **Depends on**: T70
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-28
-concluída
+**Status**: concluída
 **Nota do rascunho**: segue a AD-119: `environment: producao` passa; reprova o nome sem `-v2` (inclusive `-v3` e maiúsculas), a chave `route`/`routes`, `custom_domain` e as opções `--route`, `--routes` e `--domain`. Lê só os dois arquivos reais. O `ci.yml` (T67) não roda esta checagem como linha de comando: ela entra pelo `pnpm test:checagens`; o `/executar` decide se acrescenta `node backend/scripts/checagens/so-previa.ts` ao passo de checagens do job `qualidade`.
 
 **Done when**:
@@ -2177,7 +2177,7 @@ T81 → T82
 **Depends on**: T71
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-42
-concluída
+**Status**: concluída
 **Nota do rascunho**: o SHA esperado vem do `GITHUB_SHA` do job; tentativas e espera de `PELADA_SAUDE_TENTATIVAS` e `PELADA_SAUDE_ESPERA_MS` (já no `.env.example`). Erro de rede, status diferente de 200 e versão diferente contam como tentativa falha e esperam a próxima. Tipos em `verificar-saude.d.mts`, ao lado, para o teste em TypeScript. O teste sobe um servidor HTTP local em porta livre e fecha no `afterEach`.
 
 **Done when**:
@@ -2205,7 +2205,7 @@ T81 → T82
 **Depends on**: T72
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-52, FUN-44, FUN-50
-concluída
+**Status**: concluída
 **Nota do rascunho**: o `docs/` não existia na `main`: o runbook nasce aqui. Segue a AD-119 (environment `producao`, restauração na `main` do Neon). A restauração pela branch usa a API do Neon (`POST /projects/{id}/branches/{main}/restore` com `source_branch_id` e `preserve_under_name`) ou a tela; conferir na documentação atual do Neon antes do primeiro uso. A âncora `#restaurar-um-backup` é a que o `README.md` já cita. O `docs/restauracao-registro.md` é da T15 (números reais) e ainda não existe: o link fica quebrado até lá. O `/executar` roda o `pnpm format:check` (o Prettier pode reformatar as listas).
 
 **Done when**:
@@ -2231,7 +2231,7 @@ T81 → T82
 **Depends on**: T73
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-52
-concluída
+**Status**: concluída
 **Nota do rascunho**: segue a AD-119: lista os secrets do environment `producao` (os da AD-119 mais `BACKUP_CHAVE` e o opcional `VITE_SENTRY_DSN`, que o `deploy.yml` da T70 usa) e do `backup`, sem valores, e registra que o `previa` do plano original não é usado. O Hyperdrive descrito é o da prévia sobre a `main` (não o de `dev`, que a T74 pedia antes da AD-119). O passo de produção traz dump cifrado e branch de restauração `antes-da-paridade` da `main` antes de desligar o Worker do LJS; o domínio fica para uma AD nova, com a guarda `so-previa` valendo até lá. Âncoras com acento no formato do GitHub (`#deploy-da-prévia`): o `/executar` confere os links na tela.
 
 **Done when**:
@@ -2259,7 +2259,7 @@ T81 → T82
 **Depends on**: T74
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-51
-concluída
+**Status**: concluída
 **Nota do rascunho**: o `README.md` já existia na `main` (commits `d257824` e `ef2d0e3`): o rascunho só acrescentou à tabela as 11 variáveis do `.env.example` que faltavam (inclusive a `DATABASE_URL_RESTAURACAO` da T66) e o environment `producao` (AD-119) no deploy. Acrescentado `test/readme.test.ts`: as cinco seções, cada variável do `.env.example` citada e os comandos até `http://localhost:5173`. O Prettier vai realinhar a tabela (`pnpm format` no `/executar`).
 
 **Done when**:
@@ -2285,7 +2285,7 @@ T81 → T82
 **Depends on**: T75
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-53
-concluída
+**Status**: concluída
 **Nota do rascunho**: o `CLAUDE.md` da raiz já existia na `main` (commits `fd7e23a` e `ef2d0e3`) e cobre stack, comandos, estrutura, regras de banco (migrações aditivas, RLS forçada) e onde ficam as ADs, sem repetir o `.claude/CLAUDE.md`. Nada a escrever no rascunho; o `/executar` só confere se os comandos novos (`pnpm dev`, `e2e`, `visual`) continuam batendo com a tabela.
 
 **Done when**:
@@ -2312,7 +2312,7 @@ T81 → T82
 **Depends on**: T76
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-27
-concluída
+**Status**: concluída
 **Nota do rascunho**: ação do usuário no console do Neon; nada a escrever. Pela AD-119 o deploy opera na `main`; a `dev` serve à comparação da T80 (AD-120 registra que ela já foi criada em 2026-11-04).
 
 **Done when**:
@@ -2338,7 +2338,7 @@ T81 → T82
 **Depends on**: T77
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-27, FUN-18
-concluída
+**Status**: concluída
 **Nota do rascunho**: ação do usuário na Cloudflare e no GitHub; nada a escrever. Além dos secrets listados, o `deploy.yml` da T70 usa `BACKUP_CHAVE` e o opcional `VITE_SENTRY_DSN` no environment `producao` (lista completa no `docs/runbook.md`, seção Segredos).
 
 **Done when**:
@@ -2364,7 +2364,7 @@ T81 → T82
 **Depends on**: T78
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-27
-concluída
+**Status**: concluída
 **Nota do rascunho**: id `e06363bd85874f1eaffc6382da6d394b`, o Hyperdrive existente da AD-032 (registrado em `.specs/preparacao.md`). O teste `FUN-27` existente de `test/wrangler.test.ts` esperava o marcador `PREENCHER`: passou a exigir hex de 32 caracteres e recusar o marcador, como a tarefa pede (mesma força, mais estrito); o `/executar` confirma a aprovação dessa mudança de teste existente. Além do `id`, o `wrangler.jsonc` só teve os dois comentários do bloco corrigidos (marcador e "branch dev", desatualizados pela AD-119).
 
 **Done when**:
@@ -2389,7 +2389,7 @@ T81 → T82
 **Depends on**: T79, T21, T23, T18
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-08, FUN-09, FUN-11
-concluída
+**Status**: concluída
 **Nota do rascunho**: o comando `pnpm esquema:comparar --alvo dev|local [--migrar]` lê `NEON_URL_DEV_MIGRACAO` (dev) ou `DATABASE_URL_TESTE` (local), com a trava de host (remoto só com `PELADA_PERMITIR_HOST_REMOTO=1`). Zero DDL na `dev` é medido por zero migrações aplicadas (event trigger, como no teste da T23, exige superusuário, que o Neon não dá); a contagem por tabela usa o `contarLinhas` do `restaurar-backup.ts`. Também lista se `pelada_owner`, `pelada_app` e `pelada_backup_ro` existem (AD-009, FUN-11). Sai com 1 quando há diferença. A execução na `dev` (critérios 2 a 4) é ação externa com confirmação específica, do `/executar`; a AD-120 já registra a lista de uma rodada anterior (52 faltando, 3 sobrando).
 
 **Done when**:
@@ -2418,7 +2418,7 @@ T81 → T82
 **Depends on**: T80
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-40, FUN-54
-concluída
+**Status**: concluída
 **Nota do rascunho**: push e conferência do `ci.yml` são ações externas, com confirmação, do `/executar`. O `testes.json` já roda lint, format, typecheck, testes, checagens, e2e (o script `e2e` faz o build antes, T58) e visual (T62); o `/executar` decide se o build do web entra como passo próprio para espelhar o job `web` do CI.
 
 **Done when**:
@@ -2444,7 +2444,7 @@ T81 → T82
 **Depends on**: T81
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-41, FUN-42, FUN-27, FUN-37
-concluída
+**Status**: concluída
 **Nota do rascunho**: disparar o `deploy.yml`, conferir a saúde e instalar o PWA no celular são ações externas, com confirmação específica, do `/executar`. O registro (data, SHA e URL da prévia) entra no `docs/runbook.md` com os números reais.
 
 **Done when**:
