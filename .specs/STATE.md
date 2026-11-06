@@ -126,6 +126,7 @@
 - **AD-122** (2026-11-05, `simulador` T0): a matriz de SIM-81 vale sobre a AD-084 e o Delta 1: o slug público lê zero linhas de `escalacoes`. Migração aditiva `1793919878922_escalacoes-leitura-so-conta.sql` com policy RESTRICTIVE de SELECT (`app_conta_id() IS NOT NULL`). Decisão do usuário.
 
 - **AD-123** (2026-11-05, `simulador` T16): `avaliar` e o contrato recusam composição que não inclui todos os aptos ("A composição precisa incluir todos os aptos."), como o legado; a spec não pedia e o rascunho aceitava. Idade média nula (T8, T11): vale o rascunho (critério 0 em 2 times; fora da amplitude em 3+). Decisões do usuário.
+- **AD-124** (2026-11-06, `grupos-e-elenco` T24, conferência spec × design): a spec do ACE-18 mandava a criadora ver o próprio grupo arquivado na sessão; o GEL-25/27 manda a sessão só com grupos ativos e o arquivado na seção "Arquivados" de `GET /api/grupos`. Vale o GEL-25/27; o teste `contas.test.ts` troca a asserção (agora `not.toContain` do arquivado, `toContain` do ativo). Decisão do usuário.
 
 ## Autorizações
 

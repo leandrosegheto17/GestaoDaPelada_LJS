@@ -65,10 +65,13 @@ describe('contas.eu', () => {
     expect(ids).not.toContain(grupoArquivado);
   });
 
-  it('ACE-18: a criadora ainda vê o próprio grupo arquivado', async () => {
+  // AD-124: o GEL-25/27 vence o ACE-18 original. A sessão só traz grupos ativos, até para a criadora; o arquivado dela
+  // aparece só na seção "Arquivados" de GET /api/grupos (T26/T28). Decisão do usuário em 2026-11-06.
+  it('ACE-18 e GEL-27: nem a criadora recebe o grupo arquivado na sessão, só os ativos', async () => {
     const { url, cenario } = aberto;
     const eu = await comDb(url, cenario.contaA, (db) => contas.eu(db));
-    expect(eu?.grupos.map((g) => g.id)).toContain(grupoArquivado);
+    expect(eu?.grupos.map((g) => g.id)).not.toContain(grupoArquivado);
+    expect(eu?.grupos.map((g) => g.id)).toContain(cenario.grupoA);
   });
 
   it('ACE-18: sem conta no contexto, nulo', async () => {
