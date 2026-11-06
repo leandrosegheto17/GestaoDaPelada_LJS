@@ -49,10 +49,28 @@ describe('ci.yml', () => {
     ).toBe(true);
   });
 
-  it('FUN-40: o job testes roda a suíte e os testes das checagens', () => {
-    const t = runs(wf.jobs.testes);
-    expect(t).toMatch(/pnpm test\b/);
-    expect(t).toMatch(/pnpm test:checagens\b/);
+  it('FUN-40: o job testes roda a suíte inteira em 3 jobs paralelos, com as checagens na entrada demais', () => {
+    const testes = wf.jobs.testes;
+    const matriz = (testes?.strategy?.matrix?.include ?? []) as Array<{
+      nome: string;
+      comando: string;
+    }>;
+    expect(matriz.map((m) => m.nome)).toEqual(['api-banco', 'api-worker', 'demais']);
+    const comando = (nome: string) => matriz.find((m) => m.nome === nome)?.comando ?? '';
+    // O api inteiro: os dois projetos do vitest, sem sobra nem repetição.
+    expect(comando('api-banco')).toMatch(/@pelada\/api exec vitest run --project banco\b/);
+    expect(comando('api-worker')).toMatch(/@pelada\/api exec vitest run --project worker\b/);
+    // O resto da suíte: raiz e os demais pacotes (o api fica de fora), mais as checagens.
+    expect(comando('demais')).toMatch(/vitest run --dir test\b/);
+    expect(comando('demais')).toMatch(/pnpm -r --filter '!@pelada\/api' test\b/);
+    expect(comando('demais')).toMatch(/pnpm test:checagens\b/);
+    expect(runs(testes)).toMatch(/\$\{\{ matrix\.comando \}\}/);
+  });
+
+  it('FUN-40: o dump do teste de backup usa o pg_dump 18, igual ao servidor de serviço (NOT-58)', () => {
+    const passo = (wf.jobs.testes?.steps ?? []).find((p) => /pg_dump 18/.test(p.name ?? ''));
+    expect(passo?.if).toBe("matrix.nome == 'api-banco'");
+    expect(passo?.run).toMatch(/postgresql-client-18/);
   });
 
   it('FUN-40: o job banco migra do zero, migra de novo e roda impressão digital, estado e isolamento', () => {

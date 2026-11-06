@@ -12,7 +12,6 @@ export interface Passo {
   env?: Record<string, unknown>;
   if?: string;
   'continue-on-error'?: unknown;
-  strategy?: { matrix?: Record<string, unknown> };
 }
 
 export interface Job {

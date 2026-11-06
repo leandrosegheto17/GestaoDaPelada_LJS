@@ -60,8 +60,21 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   testes:
+    name: testes (${{ matrix.nome }})
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    # A suíte em 3 jobs paralelos, cada um com o próprio banco de serviço: o api (o mais longo) fica dividido nos dois
+    # projetos do vitest, e o resto roda junto com os testes das checagens (FUN-40).
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - nome: api-banco
+            comando: pnpm --filter @pelada/api exec vitest run --project banco
+          - nome: api-worker
+            comando: pnpm --filter @pelada/api exec vitest run --project worker
+          - nome: demais
+            comando: pnpm exec vitest run --dir test && pnpm -r --filter '!@pelada/api' test && pnpm test:checagens
     env:
       # Senha fictícia só do CI: o /api/health não toca o banco, mas o wrangler dev exige a URL do Hyperdrive local com senha.
       PELADA_APP_SENHA: senha-ficticia-do-ci
@@ -91,10 +104,18 @@ jobs:
           cache: pnpm
       - name: Instalar dependências
         run: pnpm install --frozen-lockfile
+      - name: Instalar o pg_dump 18
+        # O banco de serviço é o Postgres 18; o pg_dump do runner é mais antigo e o teste do dump com a role de backup
+        # (NOT-58) exige a mesma versão do servidor, como no backup.yml.
+        if: matrix.nome == 'api-banco'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-common
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install -y postgresql-client-18
+          pg_dump --version | grep -E ' 18\.'
       - name: Testes
-        run: pnpm test
-      - name: Testes das checagens
-        run: pnpm test:checagens
+        run: ${{ matrix.comando }}
 
   banco:
     runs-on: ubuntu-latest
