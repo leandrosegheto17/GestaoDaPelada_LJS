@@ -178,7 +178,7 @@ test('J-11: conta nova cria o grupo e cadastra o primeiro jogador no celular', a
   await pagina.getByRole('button', { name: 'Criar grupo' }).click();
 
   // GEL-01: o grupo nasce com 6 habilidades (GEL-02) e a criadora como única admin.
-  await expect(pagina).toHaveURL(/\/app\/grupos\/[^/]+$/);
+  await expect(pagina).toHaveURL(/\/app\/grupos\/(?!novo$)[^/]+$/);
   const grupoId = new URL(pagina.url()).pathname.split('/')[3] ?? '';
   const gerenciar = pagina.getByRole('list', { name: 'Gerenciar' });
   await expect(gerenciar).toContainText('6 habilidades');
@@ -287,9 +287,10 @@ test('J-12: inativar, reativar e corrigir a saída de um jogador', async ({ brow
     .click();
   const depois = pagina.getByRole('dialog', { name: 'Corrigir datas' });
   await depois.getByLabel('Data de saída').fill(diasAntes(dataHoje, -1));
-  await depois.getByRole('button', { name: 'Confirmar novas datas' }).click();
-  await expect(depois).toBeVisible();
+  // A prévia (300 ms depois da troca) recusa a data e mantém o botão de confirmar desabilitado.
   await expect(depois.getByLabel('Data de saída')).toHaveAttribute('aria-invalid', 'true');
+  await expect(depois.getByRole('button', { name: 'Confirmar novas datas' })).toBeDisabled();
+  await expect(depois).toBeVisible();
   await depois.getByRole('button', { name: 'Cancelar' }).click();
 
   // GEL-76, GEL-77: recuar a data de início; o primeiro período passa a começar nela.
