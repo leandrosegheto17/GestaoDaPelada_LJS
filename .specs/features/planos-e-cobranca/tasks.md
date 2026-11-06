@@ -294,6 +294,12 @@ T53 → T54 → T55
 T56 → T57
 ```
 
+### Phase 22: Retrabalho R1 (crítica, 18,5h)
+
+```
+T58 → T59 → T60 → T61 → T62 → T63 → T64 → T65 → T66 → T67 → T68 → T69 → T70
+```
+
 ## Task Breakdown
 
 #### Phase 1: Rede de proteção
@@ -1847,3 +1853,289 @@ T56 → T57
 
 **Tests**: none
 **Gate**: build
+
+---
+
+### T58: Teste dos textos literais de PLA-68 e PLA-69 (A-01)
+
+**What**: Teste em `backend/contrato/test/plano.test.ts` com os literais da spec; a sonda que troca o texto deve falhar.
+**Estimativa**: 1h
+**Risco**: baixo
+**Domínio**: não
+**Criticidade**: comum
+**Depends on**: —
+**Reuses**: molde do próprio arquivo; achado em `validation.md`
+**Requirement**: PLA-68, PLA-69 · Achado: A-01 (validation.md)
+**Status**: pendente
+
+**Done when**:
+
+- [ ] Teste que reproduz o achado e falha antes da correção
+- [ ] Gate passa, sem teste removido ou enfraquecido
+
+**Tests**: unit
+**Gate**: quick
+
+---
+
+### T59: `hookTimeout` do projeto `worker` (A-02)
+
+**What**: `hookTimeout: 120_000` no projeto `worker` de `backend/api/vitest.config.ts`, como no `banco`.
+**Estimativa**: 30 min
+**Risco**: baixo
+**Domínio**: não
+**Criticidade**: comum
+**Depends on**: T58
+**Reuses**: molde do próprio arquivo; achado em `validation.md`
+**Requirement**: gate do api · Achado: A-02 (validation.md)
+**Status**: pendente
+
+**Done when**:
+
+- [ ] Teste que reproduz o achado e falha antes da correção
+- [ ] Gate passa, sem teste removido ou enfraquecido
+
+**Tests**: unit
+**Gate**: quick
+
+---
+
+### T60: Plano não cai para free ao reassinar depois de cancelar (A-03)
+
+**What**: Migração nova: `plano_do_grupo` e `plano_grupos_da_criadora` usam o maior `pago_ate` entre as assinaturas do grupo; teste do caso cancelar e reassinar (pendente com `pago_ate` NULL).
+**Estimativa**: 1,5h
+**Risco**: alto
+**Domínio**: não
+**Criticidade**: crítica
+**Depends on**: T59
+**Reuses**: molde do próprio arquivo; achado em `validation.md`
+**Requirement**: PLA-04, PLA-07, PLA-17 · Achado: A-03 (validation.md)
+**Status**: pendente
+
+**Done when**:
+
+- [ ] Teste que reproduz o achado e falha antes da correção
+- [ ] Gate passa, sem teste removido ou enfraquecido
+
+**Tests**: unit
+**Gate**: quick
+
+---
+
+### T61: Recusar assinatura de grupo de cortesia (A-04)
+
+**What**: `assinar.ts` devolve resultado próprio quando o grupo é `uso_proprio`, sem chamar o Asaas; a rota responde com código estável; teste na API.
+**Estimativa**: 1,5h
+**Risco**: alto
+**Domínio**: não
+**Criticidade**: crítica
+**Depends on**: T60
+**Reuses**: molde do próprio arquivo; achado em `validation.md`
+**Requirement**: PLA-02, PLA-32, PLA-58 · Achado: A-04 (validation.md)
+**Status**: pendente
+
+**Done when**:
+
+- [ ] Teste que reproduz o achado e falha antes da correção
+- [ ] Gate passa, sem teste removido ou enfraquecido
+
+**Tests**: unit
+**Gate**: quick
+
+---
+
+### T62: Mesma ordem de lock em cancelar e webhook (A-05)
+
+**What**: Migração nova: `assinatura_cancelar` e as funções do webhook travam `grupos` e `assinaturas` na mesma ordem; teste de concorrência cancelar × webhook sem 40P01.
+**Estimativa**: 2h
+**Risco**: alto
+**Domínio**: não
+**Criticidade**: crítica
+**Depends on**: T61
+**Reuses**: molde do próprio arquivo; achado em `validation.md`
+**Requirement**: PLA-44, PLA-56 · Achado: A-05 (validation.md)
+**Status**: pendente
+
+**Done when**:
+
+- [ ] Teste que reproduz o achado e falha antes da correção
+- [ ] Gate passa, sem teste removido ou enfraquecido
+
+**Tests**: unit
+**Gate**: quick
+
+---
+
+### T63: Compensar qualquer erro depois de criar a assinatura (A-06)
+
+**What**: `assinar.ts`: try/catch em volta do registro e do COMMIT chama `compensar`; teste com dublê que lança.
+**Estimativa**: 1,5h
+**Risco**: alto
+**Domínio**: não
+**Criticidade**: crítica
+**Depends on**: T62
+**Reuses**: molde do próprio arquivo; achado em `validation.md`
+**Requirement**: PLA-36 · Achado: A-06 (validation.md)
+**Status**: pendente
+
+**Done when**:
+
+- [ ] Teste que reproduz o achado e falha antes da correção
+- [ ] Gate passa, sem teste removido ou enfraquecido
+
+**Tests**: unit
+**Gate**: quick
+
+---
+
+### T64: Sentry sem o token do webhook (A-07)
+
+**What**: `limparEvento` mantém só cabeçalhos de uma lista de permissão; teste com `asaas-access-token`, `x-pelada` e cabeçalhos desconhecidos.
+**Estimativa**: 1h
+**Risco**: alto
+**Domínio**: não
+**Criticidade**: crítica
+**Depends on**: T63
+**Reuses**: molde do próprio arquivo; achado em `validation.md`
+**Requirement**: FUN-24, PLA-39 · Achado: A-07 (validation.md)
+**Status**: pendente
+
+**Done when**:
+
+- [ ] Teste que reproduz o achado e falha antes da correção
+- [ ] Gate passa, sem teste removido ou enfraquecido
+
+**Tests**: unit
+**Gate**: quick
+
+---
+
+### T65: Limitador do webhook depois do token (A-08)
+
+**What**: Conferir o token antes do `LIMITE_WEBHOOK` (sem token: limitador por IP) e limite por grupo em assinar e cancelar; teste: chamadas sem token não esgotam o limite do Asaas.
+**Estimativa**: 2h
+**Risco**: alto
+**Domínio**: não
+**Criticidade**: crítica
+**Depends on**: T64
+**Reuses**: molde do próprio arquivo; achado em `validation.md`
+**Requirement**: PLA-39, PLA-41 · Achado: A-08 (validation.md)
+**Status**: pendente
+
+**Done when**:
+
+- [ ] Teste que reproduz o achado e falha antes da correção
+- [ ] Gate passa, sem teste removido ou enfraquecido
+
+**Tests**: unit
+**Gate**: quick
+
+---
+
+### T66: `ASAAS_URL` só https do sandbox em execução (A-09)
+
+**What**: `cliente.ts` recusa em execução qualquer `ASAAS_URL` que não seja o sandbox, com exceção explícita do teste local; teste.
+**Estimativa**: 1h
+**Risco**: alto
+**Domínio**: não
+**Criticidade**: crítica
+**Depends on**: T65
+**Reuses**: molde do próprio arquivo; achado em `validation.md`
+**Requirement**: PLA-38 · Achado: A-09 (validation.md)
+**Status**: pendente
+
+**Done when**:
+
+- [ ] Teste que reproduz o achado e falha antes da correção
+- [ ] Gate passa, sem teste removido ou enfraquecido
+
+**Tests**: unit
+**Gate**: quick
+
+---
+
+### T67: Fatura e cliente só para a criadora (A-10)
+
+**What**: `faturaUrl` só quando `podeAssinar`; policy de leitura de `assinaturas` só da criadora (migração nova); teste por comando.
+**Estimativa**: 2h
+**Risco**: alto
+**Domínio**: não
+**Criticidade**: crítica
+**Depends on**: T66
+**Reuses**: molde do próprio arquivo; achado em `validation.md`
+**Requirement**: PLA-09, PLA-13 · Achado: A-10 (validation.md)
+**Status**: pendente
+
+**Done when**:
+
+- [ ] Teste que reproduz o achado e falha antes da correção
+- [ ] Gate passa, sem teste removido ou enfraquecido
+
+**Tests**: unit
+**Gate**: quick
+
+---
+
+### T68: Recusar token do webhook fraco (A-11)
+
+**What**: `token-webhook.ts` e a rota recusam token igual à chave da API e com menos de 32 caracteres, com teste.
+**Estimativa**: 1h
+**Risco**: alto
+**Domínio**: não
+**Criticidade**: comum
+**Depends on**: T67
+**Reuses**: molde do próprio arquivo; achado em `validation.md`
+**Requirement**: PLA-38 · Achado: A-11 (validation.md)
+**Status**: pendente
+
+**Done when**:
+
+- [ ] Teste que reproduz o achado e falha antes da correção
+- [ ] Gate passa, sem teste removido ou enfraquecido
+
+**Tests**: unit
+**Gate**: quick
+
+---
+
+### T69: Normalizar `dateCreated` do evento (A-12)
+
+**What**: Normalizar ou recusar o formato em `eventos-asaas.ts` e na função SQL; teste de formato diferente.
+**Estimativa**: 1,5h
+**Risco**: alto
+**Domínio**: não
+**Criticidade**: comum
+**Depends on**: T68
+**Reuses**: molde do próprio arquivo; achado em `validation.md`
+**Requirement**: PLA-48 · Achado: A-12 (validation.md)
+**Status**: pendente
+
+**Done when**:
+
+- [ ] Teste que reproduz o achado e falha antes da correção
+- [ ] Gate passa, sem teste removido ou enfraquecido
+
+**Tests**: unit
+**Gate**: quick
+
+---
+
+### T70: Link visível da fatura e texto de validade (A-13, A-14)
+
+**What**: Tela Assinar Pro com link da fatura além do `window.open`; `textoValidade` sem data passada; testes.
+**Estimativa**: 1,5h
+**Risco**: baixo
+**Domínio**: não
+**Criticidade**: comum
+**Depends on**: T69
+**Reuses**: molde do próprio arquivo; achado em `validation.md`
+**Requirement**: PLA-53, PLA-54 · Achado: A-13, A-14 (validation.md)
+**Status**: pendente
+
+**Done when**:
+
+- [ ] Teste que reproduz o achado e falha antes da correção
+- [ ] Gate passa, sem teste removido ou enfraquecido
+
+**Tests**: unit
+**Gate**: quick
