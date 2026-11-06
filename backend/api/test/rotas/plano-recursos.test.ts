@@ -106,8 +106,19 @@ describe('simulador no Free (PLA-23)', () => {
     await situacao('trial', '2026-11-10');
     await db.query(
       `INSERT INTO escalacoes (grupo_id, data, formato, n, composicao, confirmada_por, confirmada_em)
-       VALUES ($1, $2, 'dois_times', 5, '{}'::jsonb, $3, now())`,
-      [cenario.grupoG, DATA_ESCALACAO, cenario.contaC],
+       VALUES ($1, $2, 'dois_times', 5, $4::jsonb, $3, now())`,
+      [
+        cenario.grupoG,
+        DATA_ESCALACAO,
+        cenario.contaC,
+        JSON.stringify({
+          times: [
+            { titulares: [], entramNo2oTempo: [] },
+            { titulares: [], entramNo2oTempo: [] },
+          ],
+          naoEntra: [],
+        }),
+      ],
     );
     await free();
     const r = await pedir(aberto, {

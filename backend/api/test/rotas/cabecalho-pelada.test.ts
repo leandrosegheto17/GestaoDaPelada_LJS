@@ -92,7 +92,7 @@ describe('exigirCabecalhoPelada', () => {
     expect(r.status).toBe(200);
   });
 
-  it.each(['', '0', 'true', ' 1', '11'])(
+  it.each(['', '0', 'true', '+1', '11'])(
     'ACE-49: POST com X-Pelada "%s" (valor diferente de 1) recebe 403',
     async (valor) => {
       const { pedir, handler } = montar();

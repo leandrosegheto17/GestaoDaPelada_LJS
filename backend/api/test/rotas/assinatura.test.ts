@@ -89,6 +89,8 @@ async function assinaturasNovas(grupo: string): Promise<number> {
 beforeAll(async () => {
   aberto = await abrirCenarioGrupos();
   const { db, cenario } = aberto;
+  // O cenário semeia uma assinatura cancelada por grupo (T10). B "nunca assinou" aqui: sem cliente do Asaas guardado.
+  await db.query('DELETE FROM assinaturas WHERE criada_por = $1', [cenario.contaB]);
   for (const id of [cenario.grupoG, cenario.grupoH]) {
     const r = await db.query<{ s: string; t: string | null }>(
       'SELECT situacao_comercial AS s, trial_inicio::text AS t FROM grupos WHERE id = $1',
