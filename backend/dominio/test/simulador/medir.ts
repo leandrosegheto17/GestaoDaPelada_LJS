@@ -38,5 +38,9 @@ export const LIMIAR_MS = 4;
  */
 export const LIMIAR_CI_MS = 15;
 
-/** O limiar que os testes de CPU usam neste ambiente. */
-export const LIMIAR_EFETIVO_MS = process.env.CI ? LIMIAR_CI_MS : LIMIAR_MS;
+/**
+ * O limiar que os testes de CPU usam em qualquer ambiente: 15 ms. Na máquina local de desenvolvimento (Windows) o p99
+ * de 4 ms reprovou 2 de cada 3 rodadas mesmo sem carga (pior caso de 5 a 14 ms, SIM-58); decisão do usuário,
+ * 2026-11-06, de valer o teto do CI também fora dele. `LIMIAR_MS` fica como referência do legado.
+ */
+export const LIMIAR_EFETIVO_MS = LIMIAR_CI_MS;
