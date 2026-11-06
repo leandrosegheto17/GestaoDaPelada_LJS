@@ -105,17 +105,9 @@ describe('ci.yml: job web', () => {
     expect(runsWeb).toMatch(/playwright install --with-deps chromium/);
   });
 
-  it('FUN-40: a comparação visual roda no job web-visual, depois do build, e não repete o e2e', () => {
-    const visual = wf.jobs['web-visual'];
-    const passos = visual?.steps ?? [];
-    const iBuild = passos.findIndex((p) => /pnpm --filter @pelada\/web build\b/.test(p.run ?? ''));
-    const iVisual = passos.findIndex((p) =>
-      /pnpm --filter @pelada\/web visual\b/.test(p.run ?? ''),
-    );
-    expect(iBuild).toBeGreaterThanOrEqual(0);
-    expect(iVisual).toBeGreaterThan(iBuild);
-    expect(runs(visual)).not.toMatch(/playwright test\b/);
-    expect(runs(visual)).toMatch(/playwright install --with-deps chromium/);
+  it('FUN-40: a comparação visual com o mockup não roda no CI (é do verificador no /validar)', () => {
+    expect(Object.keys(wf.jobs)).not.toContain('web-visual');
+    expect(todosOsRuns).not.toMatch(/@pelada\/web visual/);
   });
 
   it('FUN-40: em caso de falha, envia o relatório do Playwright e os prints', () => {
