@@ -13,7 +13,7 @@ import { join } from 'node:path';
  * - Os JSONs do mockup trazem o erro no formato antigo (`{ "erro": { "codigo", "mensagem",
  *   "grupos" } }`); `adaptarCorpo` o converte no `corpoErro` do contrato
  *   (`{ erro, codigo, grupos }`). O código `nao_autenticado` do mockup vira `sem_sessao`.
- * - `passos` (`preencher` + `valor`, `clicar` com `indice` opcional, `esperar`, `aguardarMs`) e o
+ * - `passos` (`preencher` e `selecionar` + `valor`, `clicar` com `indice` opcional, `esperar`, `aguardarMs`) e o
  *   `esperar` da entrada rodam só no app; o mockup é estático.
  * - `recorte`: compara só o seletor (ou a caixa que envolve a lista de seletores) nas duas
  *   imagens. No app, cada `.classe` do seletor vale também para o nome do CSS Module do build
@@ -139,6 +139,11 @@ export async function executarPassos(pagina, passos = []) {
         .locator(seletorDoApp(passo.preencher))
         .first()
         .fill(String(passo.valor ?? ''));
+    else if ('selecionar' in passo)
+      await pagina
+        .locator(seletorDoApp(passo.selecionar))
+        .first()
+        .selectOption(String(passo.valor ?? ''));
     else if ('clicar' in passo)
       await pagina
         .locator(seletorDoApp(passo.clicar))

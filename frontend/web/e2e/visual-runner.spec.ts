@@ -65,6 +65,14 @@ test('ACE-54: os passos rodam e o erro antigo do mockup chega como o código do 
   await expect(page.locator('#atual-erro')).toHaveText('Senha atual incorreta.');
 });
 
+test('ACE-54: o passo selecionar escolhe a opção de um select pelo valor', async ({ page }) => {
+  await page.setContent(
+    '<select id="dia"><option value="">—</option><option value="quinta">Quinta</option></select>',
+  );
+  await executarPassos(page, [{ selecionar: '#dia', valor: 'quinta' }]);
+  await expect(page.locator('#dia')).toHaveValue('quinta');
+});
+
 test('ACE-54: recorte compara só o seletor indicado nas duas imagens', async ({ page }) => {
   const viewport = { width: 400, height: 300 };
   const alvo = '<div class="alvo" style="width:200px;height:80px;background:#1b5e20"></div>';

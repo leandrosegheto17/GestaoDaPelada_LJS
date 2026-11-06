@@ -14,6 +14,7 @@ export interface RespostaFalsa {
 
 export type Passo =
   | { preencher: string; valor?: string }
+  | { selecionar: string; valor: string }
   | { clicar: string; indice?: number }
   | { esperar: string }
   | { aguardarMs: number };
