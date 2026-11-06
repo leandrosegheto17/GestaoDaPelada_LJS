@@ -35,13 +35,13 @@
 |---|---|---|
 | PAR-01 | `GET pesos`: vigente e histórico com `registradoPor` | T17, T24, T28, T38 |
 | PAR-02 | `vigenteAte` = véspera da configuração seguinte | T28 |
-| PAR-03 | `POST pesos` grava com vigência hoje e a conta | T28, T38 |
-| PAR-04 | Já há configuração hoje: substitui, sem linha nova | T28 |
+| PAR-03 | `POST pesos` grava com vigência hoje e a conta; recebe `refletirNoPassado` (AD-125, PAR-162) | T28, T38, R1-T3 |
+| PAR-04 | Já há configuração hoje: substitui, sem linha nova; com `refletirNoPassado` falso (AD-125, PAR-163) | T28, R1-T3 |
 | PAR-05 | Auditoria `pesos_configurados` ou `pesos_substituidos` na transação | T28 |
 | PAR-06 | Peso não inteiro ou fora de −10 a 10: 422 no campo | T17, T38 |
 | PAR-07 | Falta peso: 422 no campo | T17, T38 |
 | PAR-08 | `vigenteDesde` ou campo extra: 422 sem gravar | T17, T38 |
-| PAR-09 | Configuração anterior a hoje nunca muda | T25, T28 |
+| PAR-09 | Configuração anterior a hoje nunca muda, exceto pela resposta "sim" a `refletirNoPassado`, que troca só os pesos (AD-125, PAR-164) | T25, T28, R1-T2, R1-T3 |
 | PAR-10 | Tela t18 com vigente, formulário, nota e histórico | T62 |
 | PAR-11 | Salvo: "Nova configuração vale a partir de hoje." | T62 |
 | PAR-12 | Campo inválido: mensagem ao lado, sem enviar (posição) | T62 |
@@ -194,8 +194,29 @@
 | PAR-159 | Texto novo do diálogo de reativar | T66 |
 | PAR-160 | t09 sem Simulador e Financeiro | T64 |
 | PAR-161 | t01 sem o atalho Financeiro | T56 |
+| PAR-162 | `POST pesos` exige `refletirNoPassado` (boolean); ausente ou de outro tipo: 422 no campo (AD-125, R1) | R1-T3 |
+| PAR-163 | `refletirNoPassado: false`: a nova configuração vale desde hoje e as anteriores (inclusive a padrão) ficam como estão; repetir no mesmo dia substitui a de hoje (AD-125, R1) | R1-T3 |
+| PAR-164 | `refletirNoPassado: true`: os 6 pesos de **todas** as configurações do grupo passam a ser os novos (datas e histórico ficam), então o ranking do passado usa o peso novo; auditoria `pesos_substituidos` (AD-125, R1) | R1-T3 |
+| PAR-165 | `grupo_criar` e a migração datam a configuração padrão em `1900-01-01` (início do grupo, decisão do usuário em 2026-11-06); a partida de qualquer data usa o peso padrão até a primeira gravação por "não" (AD-125, R1) | R1-T2 |
+| PAR-166 | Em Pontuação, todo salvar abre "Refletir nas partidas já disputadas?" (Sim, Não, Cancelar), pois todo grupo já nasce com configuração; Cancelar não chama a API; a data `1900-01-01` aparece como "Desde o início do grupo" (AD-125, R1) | R1-T4 |
 
 Nenhum critério fica fora. Mudam de leitura, pelas ADs propostas: PAR-15 (delegação da `grupo_criar` antiga, AD-037), PAR-78 (limite ligado aqui, AD-045), PAR-140 e PAR-141 (sem G-26 nem THREAT-MODEL, AD-039), PAR-145 (Stylelint, AD-042), PAR-148 e PAR-154 (`localStorage`, AD-040).
+
+### Pesos com efeito no passado (AD-125, R1): casos limite
+
+Decisão do usuário (2026-11-06): a primeira configuração vale desde o início do grupo; a tela pergunta se o salvar reflete nas partidas já disputadas. `pelada_app` não tem DELETE em `config_pesos` nem UPDATE de `vigente_desde` (PAR-09), então "sim" troca só os pesos das linhas existentes.
+
+| Caso | Resultado |
+|---|---|
+| Grupo novo, sem partidas | Uma linha em `1900-01-01` (PAR-165); a tela pergunta mesmo assim (PAR-166) |
+| Salvar, resposta "não", primeira vez | Insere linha de hoje; a padrão fica; partida de ontem mantém o peso padrão (PAR-163, PAR-56) |
+| Salvar "não" de novo no mesmo dia | Substitui a de hoje, sem linha nova; auditoria `pesos_substituidos` (PAR-04) |
+| Salvar "sim" | Atualiza os pesos de todas as linhas do grupo; ranking do passado muda (PAR-164) |
+| Salvar "sim" com só a padrão | Atualiza a padrão; sem linha nova de hoje |
+| Grupo existente com padrão datada na criação e única | A migração a leva para `1900-01-01` (PAR-165); padrão alterada ou grupo com mais de uma linha fica intacto |
+| `refletirNoPassado` ausente, `"sim"` ou nulo | 422 no campo, sem gravar (PAR-162) |
+| Falha na auditoria depois do UPDATE/INSERT | A transação desfaz os pesos (PAR-05) |
+| Cancelar no diálogo | Nenhuma chamada à API (PAR-166) |
 
 ## Linha de base
 

@@ -2657,13 +2657,13 @@ Origem: a J-17 do e2e (T81) exige que a partida de ontem mantenha o peso antigo;
 **Depends on**: AD-125 (STATE.md)
 **Reuses**: AD-125; `backend/api/src/infraestrutura/db/repositorios/pesos.ts:86-99` (grava a configuração vigente), `backend/api/src/infraestrutura/db/migracoes/1792844640000_grupo-criar-pesos.sql` (config padrão datada em `p_hoje`)
 **Requirement**: PAR-03, PAR-04, PAR-09, PAR-56 (J-17); achado do e2e da T81
-**Status**: pendente
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Spec lista os casos limite e o resultado de cada resposta (sim/não) com ID `PAR-NN`
-- [ ] Conferência spec × design registrada (AD-125 citada)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Spec lista os casos limite e o resultado de cada resposta (sim/não) com ID `PAR-NN`
+- [x] Conferência spec × design registrada (AD-125 citada)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: typecheck e testes dos pacotes tocados
