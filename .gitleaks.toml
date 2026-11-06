@@ -6,11 +6,12 @@ useDefault = true
 
 [allowlist]
 description = "Valores de desenvolvimento local e documentação, sem segredo real."
+# Só arquivos nomeados: pasta inteira ignorada vira ponto cego (A-14 do /validar). `.claude/.instalacao.json` guarda
+# hashes de arquivos (não são chaves); `cifra.test.ts` usa um segredo de autenticação fictício do Web Push.
 paths = [
   '''pnpm-lock\.yaml''',
-  '''\.specs/''',
-  '''\.claude/''',
-  '''\.rascunho/''',
+  '''\.claude/\.instalacao\.json''',
+  '''backend/api/test/infraestrutura/push/cifra\.test\.ts''',
 ]
 # O usuário e a senha do Postgres do docker compose local (postgres:postgres) não são segredo.
 regexes = [

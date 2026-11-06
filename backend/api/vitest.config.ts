@@ -73,7 +73,9 @@ export default defineConfig({
           cloudflareTest({
             wrangler: { configPath: '../../wrangler.jsonc' },
             miniflare: {
-              bindings: { VERSAO: VERSAO_TESTE },
+              // O cluster de teste também vale dentro do workerd (process.env vem dos bindings): sem isto os testes do
+              // Worker caem no 5432 padrão e disputam o banco de outra sessão.
+              bindings: { VERSAO: VERSAO_TESTE, DATABASE_URL_TESTE: URL_TESTE },
               hyperdrives: { HYPERDRIVE: HYPERDRIVE_TESTE },
               assets: { directory: './test/rotas/spa' },
             },
@@ -85,6 +87,7 @@ export default defineConfig({
           include: ['test/rotas/**/*.test.ts', 'test/infraestrutura/push/**/*.test.ts'],
           // Matriz de plano e banco fora (conexão recusada) passam de 5 s no workerd do Windows.
           testTimeout: 30_000,
+          hookTimeout: 60_000,
         },
       },
     ],
