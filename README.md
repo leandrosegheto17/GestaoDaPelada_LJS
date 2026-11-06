@@ -76,48 +76,52 @@ O `pnpm dev` abre o app em `http://localhost:5173`, a API em `http://localhost:8
 
 O `.env.example` lista todas, com obrigatoriedade, formato e se é segredo. Segredo nunca é versionado.
 
-| Variável                                                        | Uso                                                                                                    |
-| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `DATABASE_URL`                                                  | Banco da aplicação nos testes e scripts locais (padrão: o banco do compose)                            |
-| `DATABASE_URL_TESTE`                                            | Cluster dos testes de banco (padrão: o banco local)                                                    |
-| `DATABASE_URL_MIGRACAO`                                         | Role de migração, host local; obrigatória em `pnpm migrar` e `pnpm seed`                               |
-| `PELADA_APP_SENHA`                                              | Senha da role `pelada_app`; obrigatória em `pnpm seed` e `pnpm dev` (segredo)                          |
-| `PELADA_BACKUP_RO_SENHA`                                        | Senha da role `pelada_backup_ro`; obrigatória em `pnpm seed` (segredo)                                 |
-| `PELADA_DEV_BANCO_PORTA`                                        | Porta do Postgres local usada pelo `pnpm dev` (padrão 5432)                                            |
-| `PELADA_DEV_PORTA_API`                                          | Porta do `wrangler dev` (padrão 8787)                                                                  |
-| `PELADA_DEV_PORTA_WEB`                                          | Porta do Vite (padrão 5173)                                                                            |
-| `VITE_VITRINE`                                                  | `1` inclui as rotas de vitrine no build (só a comparação visual usa)                                   |
-| `VITE_SENTRY_DSN`                                               | Sentry do front; vazio desliga (segredo)                                                               |
-| `VITE_VERSAO`                                                   | SHA do commit publicado, release do Sentry do front                                                    |
-| `SENTRY_DSN`                                                    | Sentry do Worker; vazio desliga (secret do Worker)                                                     |
-| `VERSAO`                                                        | SHA publicado, injetado por `--var` no deploy                                                          |
-| `URL_PUBLICA`                                                   | URL https do app, injetada por `--var` no deploy                                                       |
-| `RESEND_API_KEY`                                                | Chave da API do Resend, secret do Worker (segredo)                                                     |
-| `RESEND_REMETENTE`                                              | Remetente dos e-mails de conta, de domínio verificado no Resend                                        |
-| `LIMITE_EMAILS_DIA`                                             | Teto diário de e-mails de conta (padrão 100, o do Resend Free)                                         |
-| `EMAIL_DEV`                                                     | `1` liga a caixa de e-mails em memória e `GET /api/dev/emails` (só local e e2e)                        |
-| `ASAAS_API_KEY`                                                 | Chave da API do Asaas sandbox, secret do Worker (segredo)                                              |
-| `ASAAS_WEBHOOK_TOKEN`                                           | `authToken` do webhook do Asaas, 32 a 255 caracteres, secret do Worker (segredo)                       |
-| `ASAAS_URL`                                                     | URL base do Asaas; só `https://api-sandbox.asaas.com/v3` até haver AD de produção                      |
-| `ASAAS_FALSO_PORTA`, `ASAAS_FALSO_WEBHOOK`, `ASAAS_FALSO_TOKEN` | Porta, webhook do Worker e token do Asaas falso do e2e (sem segredo)                                   |
-| `SEED_SENHA_ADMIN`                                              | Senha da conta admin criada pelo `pnpm seed`; obrigatória nele (segredo)                               |
-| `VAPID_PUBLICA`, `VAPID_ASSUNTO`                                | Chave pública e contato (`mailto:` ou `https`) do push; sem as três VAPID o push fica desligado        |
-| `VAPID_PRIVADA`                                                 | Chave privada do push, par da `VAPID_PUBLICA` (`pnpm vapid:gerar`), secret do Worker (segredo)         |
-| `PUSH_HOSTS_DEV`                                                | Hosts do push falso (`localhost:porta`), só `.env` local e e2e                                         |
-| `SESSAO_MEDICAO`                                                | Sessão de uma admin da prévia para o `medir-simulador disparar`, só na hora (segredo)                  |
-| `NEON_URL_BACKUP`                                               | Role somente leitura do Neon, usada pelo `backup.yml` (secret do GitHub)                               |
-| `BACKUP_CHAVE`                                                  | Chave pública `age` do backup (secret do GitHub)                                                       |
-| `DATABASE_URL_RESTAURACAO`                                      | Banco local vazio do `pnpm restaurar`, quando o terceiro argumento falta                               |
-| `NEON_URL_DEV_MIGRACAO`                                         | Role dona da branch `dev` do Neon, só no seu `.env`, para `pnpm esquema:comparar --alvo dev` (segredo) |
-| `PELADA_PERMITIR_HOST_REMOTO`                                   | `1` confirma migração ou comparação contra host remoto (o `deploy.yml` define)                         |
-| `WORKER_TESTE_SENHA`                                            | Senha da role dos testes do Worker; vazia, a suíte gera uma aleatória (segredo)                        |
-| `NEON_URL_MIGRACAO`                                             | Role `pelada_owner` da `main` do Neon, no environment `producao` (segredo)                             |
-| `NEON_API_KEY`                                                  | Chave da API do Neon para a branch de restauração, no environment `producao` (segredo)                 |
-| `NEON_PROJECT_ID`                                               | Projeto do Neon, no environment `producao` (segredo)                                                   |
-| `CLOUDFLARE_API_TOKEN`                                          | Token da Cloudflare só com permissão de Workers, no environment `producao` (segredo)                   |
-| `CLOUDFLARE_ACCOUNT_ID`                                         | Conta da Cloudflare, no environment `producao` (segredo)                                               |
-| `PELADA_SAUDE_TENTATIVAS`                                       | Tentativas da verificação de saúde pós-deploy (padrão 10)                                              |
-| `PELADA_SAUDE_ESPERA_MS`                                        | Espera entre as tentativas da verificação de saúde, em ms (padrão 3000)                                |
+| Variável                                                        | Uso                                                                                                                          |
+| --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`                                                  | Banco da aplicação nos testes e scripts locais (padrão: o banco do compose)                                                  |
+| `DATABASE_URL_TESTE`                                            | Cluster dos testes de banco (padrão: o banco local)                                                                          |
+| `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE`      | URL do pool do Worker nos testes da `api` (vitest), no lugar do Hyperdrive; padrão: montada com `PELADA_APP_SENHA` (segredo) |
+| `PUSH_FALSO_PORTA`                                              | Porta TCP (padrão 8790) do servidor de push falso do e2e                                                                     |
+| `PELADA_E2E_VAPID_PUBLICA`                                      | Chave VAPID pública do e2e; sem ela o par é gerado na hora, só para o teste                                                  |
+| `PELADA_E2E_VAPID_PRIVADA`                                      | Chave VAPID privada do e2e; sem ela o par é gerado na hora, só para o teste (segredo)                                        |
+| `DATABASE_URL_MIGRACAO`                                         | Role de migração, host local; obrigatória em `pnpm migrar` e `pnpm seed`                                                     |
+| `PELADA_APP_SENHA`                                              | Senha da role `pelada_app`; obrigatória em `pnpm seed` e `pnpm dev` (segredo)                                                |
+| `PELADA_BACKUP_RO_SENHA`                                        | Senha da role `pelada_backup_ro`; obrigatória em `pnpm seed` (segredo)                                                       |
+| `PELADA_DEV_BANCO_PORTA`                                        | Porta do Postgres local usada pelo `pnpm dev` (padrão 5432)                                                                  |
+| `PELADA_DEV_PORTA_API`                                          | Porta do `wrangler dev` (padrão 8787)                                                                                        |
+| `PELADA_DEV_PORTA_WEB`                                          | Porta do Vite (padrão 5173)                                                                                                  |
+| `VITE_VITRINE`                                                  | `1` inclui as rotas de vitrine no build (só a comparação visual usa)                                                         |
+| `VITE_SENTRY_DSN`                                               | Sentry do front; vazio desliga (segredo)                                                                                     |
+| `VITE_VERSAO`                                                   | SHA do commit publicado, release do Sentry do front                                                                          |
+| `SENTRY_DSN`                                                    | Sentry do Worker; vazio desliga (secret do Worker)                                                                           |
+| `VERSAO`                                                        | SHA publicado, injetado por `--var` no deploy                                                                                |
+| `URL_PUBLICA`                                                   | URL https do app, injetada por `--var` no deploy                                                                             |
+| `RESEND_API_KEY`                                                | Chave da API do Resend, secret do Worker (segredo)                                                                           |
+| `RESEND_REMETENTE`                                              | Remetente dos e-mails de conta, de domínio verificado no Resend                                                              |
+| `LIMITE_EMAILS_DIA`                                             | Teto diário de e-mails de conta (padrão 100, o do Resend Free)                                                               |
+| `EMAIL_DEV`                                                     | `1` liga a caixa de e-mails em memória e `GET /api/dev/emails` (só local e e2e)                                              |
+| `ASAAS_API_KEY`                                                 | Chave da API do Asaas sandbox, secret do Worker (segredo)                                                                    |
+| `ASAAS_WEBHOOK_TOKEN`                                           | `authToken` do webhook do Asaas, 32 a 255 caracteres, secret do Worker (segredo)                                             |
+| `ASAAS_URL`                                                     | URL base do Asaas; só `https://api-sandbox.asaas.com/v3` até haver AD de produção                                            |
+| `ASAAS_FALSO_PORTA`, `ASAAS_FALSO_WEBHOOK`, `ASAAS_FALSO_TOKEN` | Porta, webhook do Worker e token do Asaas falso do e2e (sem segredo)                                                         |
+| `SEED_SENHA_ADMIN`                                              | Senha da conta admin criada pelo `pnpm seed`; obrigatória nele (segredo)                                                     |
+| `VAPID_PUBLICA`, `VAPID_ASSUNTO`                                | Chave pública e contato (`mailto:` ou `https`) do push; sem as três VAPID o push fica desligado                              |
+| `VAPID_PRIVADA`                                                 | Chave privada do push, par da `VAPID_PUBLICA` (`pnpm vapid:gerar`), secret do Worker (segredo)                               |
+| `PUSH_HOSTS_DEV`                                                | Hosts do push falso (`localhost:porta`), só `.env` local e e2e                                                               |
+| `SESSAO_MEDICAO`                                                | Sessão de uma admin da prévia para o `medir-simulador disparar`, só na hora (segredo)                                        |
+| `NEON_URL_BACKUP`                                               | Role somente leitura do Neon, usada pelo `backup.yml` (secret do GitHub)                                                     |
+| `BACKUP_CHAVE`                                                  | Chave pública `age` do backup (secret do GitHub)                                                                             |
+| `DATABASE_URL_RESTAURACAO`                                      | Banco local vazio do `pnpm restaurar`, quando o terceiro argumento falta                                                     |
+| `NEON_URL_DEV_MIGRACAO`                                         | Role dona da branch `dev` do Neon, só no seu `.env`, para `pnpm esquema:comparar --alvo dev` (segredo)                       |
+| `PELADA_PERMITIR_HOST_REMOTO`                                   | `1` confirma migração ou comparação contra host remoto (o `deploy.yml` define)                                               |
+| `WORKER_TESTE_SENHA`                                            | Senha da role dos testes do Worker; vazia, a suíte gera uma aleatória (segredo)                                              |
+| `NEON_URL_MIGRACAO`                                             | Role `pelada_owner` da `main` do Neon, no environment `producao` (segredo)                                                   |
+| `NEON_API_KEY`                                                  | Chave da API do Neon para a branch de restauração, no environment `producao` (segredo)                                       |
+| `NEON_PROJECT_ID`                                               | Projeto do Neon, no environment `producao` (segredo)                                                                         |
+| `CLOUDFLARE_API_TOKEN`                                          | Token da Cloudflare só com permissão de Workers, no environment `producao` (segredo)                                         |
+| `CLOUDFLARE_ACCOUNT_ID`                                         | Conta da Cloudflare, no environment `producao` (segredo)                                                                     |
+| `PELADA_SAUDE_TENTATIVAS`                                       | Tentativas da verificação de saúde pós-deploy (padrão 10)                                                                    |
+| `PELADA_SAUDE_ESPERA_MS`                                        | Espera entre as tentativas da verificação de saúde, em ms (padrão 3000)                                                      |
 
 ## Testes e checagens
 

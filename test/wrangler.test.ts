@@ -49,6 +49,8 @@ describe('wrangler.jsonc da prévia', () => {
   it('FUN-20: assets do build do web como SPA, com /api/* passando antes pelo Worker', () => {
     expect(config.assets).toEqual({
       directory: 'frontend/web/dist',
+      // binding ASSETS: o teste da SPA no Worker (FUN-20) lê `env.ASSETS`; o resto da forma não mudou.
+      binding: 'ASSETS',
       not_found_handling: 'single-page-application',
       run_worker_first: ['/api/*'],
     });
