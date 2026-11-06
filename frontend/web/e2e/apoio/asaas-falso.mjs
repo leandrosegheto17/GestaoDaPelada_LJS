@@ -48,7 +48,7 @@ export async function iniciarAsaasFalso(opcoes = {}) {
   // Marca da execução: o banco do e2e persiste entre execuções, e ids repetidos colidiriam com os de antes.
   const marca = Math.random().toString(36).slice(2, 8);
   const proximoId = (prefixo) => `${prefixo}_${marca}_${String(++sequencia).padStart(6, '0')}`;
-  let base = '';
+  let base;
   const URL_FATURA_FALSA = 'https://fatura-falsa.asaas.test';
 
   const deveFalhar = (rota) => {
