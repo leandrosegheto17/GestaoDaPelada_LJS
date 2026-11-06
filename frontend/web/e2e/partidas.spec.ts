@@ -290,11 +290,13 @@ test('J-16: corrigir e excluir uma partida', async ({ browser }) => {
 
   // 1 e 2. abrir a partida e trocar um presente por lesionado (PAR-46).
   await pagina.goto(`/app/grupos/${grupo.id}/partidas/${dataPartida}`);
-  await situacao(pagina, 'Toninho', 'Lesionado').check();
-  await pagina.getByRole('button', { name: /^Salvar partida/ }).click();
   await expect(
     pagina.getByText(/^Última alteração: Jornada Dezesseis, \d{2}\/\d{2} \d{2}:\d{2}$/),
   ).toBeVisible();
+  await situacao(pagina, 'Toninho', 'Lesionado').check();
+  await pagina.getByRole('button', { name: /^Salvar partida/ }).click();
+  // A edição salva volta às partidas do mês com o aviso; só então o ranking já mudou.
+  await expect(pagina.getByText(`Partida de ${diaMes(dataPartida)} salva.`)).toBeVisible();
   let ranking = (await rankingPublico(pagina.request, grupo.slug, mes)).corpo;
   expect(ranking.linhas.find((l) => l.apelido === 'Toninho')?.rodadas.at(-1)?.situacao).toBe(
     'lesionado',

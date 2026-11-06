@@ -196,9 +196,17 @@ export function TabelaRanking({ partidas, linhas, legenda, nomeMes }: PropsTabel
               Pts inicial <span className="sr">(antes das partidas do mês)</span>
             </th>
             {partidas.map((p) => (
-              <th key={p.data} scope="col" className={estilos['c-partida']}>
+              <th
+                key={p.data}
+                scope="col"
+                className={estilos['c-partida']}
+                // O nome vem do aria-label: um span `.sr` solto ganha um espaço antes dele no nome do navegador.
+                aria-label={`${diaMes(p.data)}${p.choveu ? ', com chuva' : ', sem chuva'}`}
+              >
                 {diaMes(p.data)}
-                <span className="sr">{p.choveu ? ', com chuva' : ', sem chuva'}</span>
+                <span className="sr" aria-hidden="true">
+                  {p.choveu ? ', com chuva' : ', sem chuva'}
+                </span>
                 <IconeTempo choveu={p.choveu} />
               </th>
             ))}
