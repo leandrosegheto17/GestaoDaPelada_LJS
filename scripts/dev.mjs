@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { spawn, spawnSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, mkdirSync } from 'node:fs';
 import { createConnection } from 'node:net';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { MENSAGEM_BANCO_FORA } from '../backend/scripts/src/conectar.ts';
@@ -70,6 +70,9 @@ export async function principal(env = process.env) {
     console.error(MENSAGEM_BANCO_FORA);
     return 1;
   }
+
+  // O wrangler dev recusa subir se `assets.directory` não existe; sem build do web (CI, clone novo) a pasta nasce vazia.
+  mkdirSync(fileURLToPath(new URL('../frontend/web/dist', import.meta.url)), { recursive: true });
 
   const comum = { cwd: RAIZ, stdio: 'inherit', shell: process.platform === 'win32' };
   const worker = spawn(

@@ -137,8 +137,25 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     env:
-      # Senha fictícia só do CI: o /api/health não toca o banco, mas o wrangler dev exige a URL do Hyperdrive local com senha.
+      # Senhas fictícias só do CI. O e2e das jornadas usa o banco de serviço: o `pnpm seed` cria as roles com elas e o
+      # wrangler dev conecta como `pelada_app` pela URL do Hyperdrive local.
       PELADA_APP_SENHA: senha-ficticia-do-ci
+      PELADA_BACKUP_RO_SENHA: senha-ficticia-backup-do-ci
+      SEED_SENHA_ADMIN: senha-ficticia-admin-ci
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: pelada
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d pelada"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -150,6 +167,8 @@ jobs:
           cache: pnpm
       - name: Instalar dependências
         run: pnpm install --frozen-lockfile
+      - name: Migrar e semear o banco do e2e
+        run: pnpm migrar && pnpm seed
       - name: Instalar o Chromium do Playwright
         run: pnpm --filter @pelada/web exec playwright install --with-deps chromium
       - name: Build do web
