@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { sugerir, type EntradaSimulador } from '../../src/simulador/sugerir.ts';
 import { aptosGrandes, DATA, historicoGrande } from './apoio.ts';
-import { LIMIAR_MS, medir } from './medir.ts';
+import { LIMIAR_EFETIVO_MS, medir } from './medir.ts';
 
 /**
  * Orçamento de CPU no Node (T19; SIM-57). 50 medições de `sugerir`, com 10 de aquecimento descartadas: 30 aptos em
@@ -33,7 +33,7 @@ describe('orçamento de CPU do sugerir', () => {
     expect(sugerir(entrada, HISTORICO).valida).toBe(true);
     const { mediana, p99 } = medir(() => sugerir(entrada, HISTORICO));
     console.info(`SIM-57 ${nome}: mediana ${mediana.toFixed(3)} ms, p99 ${p99.toFixed(3)} ms`);
-    expect(mediana).toBeLessThan(LIMIAR_MS);
-    expect(p99).toBeLessThan(LIMIAR_MS);
+    expect(mediana).toBeLessThan(LIMIAR_EFETIVO_MS);
+    expect(p99).toBeLessThan(LIMIAR_EFETIVO_MS);
   });
 });

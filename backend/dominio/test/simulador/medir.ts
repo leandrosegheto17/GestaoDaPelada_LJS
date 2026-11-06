@@ -30,3 +30,13 @@ export function medir(fn: () => unknown, vezes = 50, aquecimento = 10): Medicao 
 
 /** Limiar de CPU do domínio em Node (SIM-57, legado `sugerir.orcamento.test.ts:10`). */
 export const LIMIAR_MS = 4;
+
+/**
+ * Limiar no CI: o runner Linux compartilhado do GitHub mediu p99 de 4,3 a 11,2 ms nas mesmas entradas (2026-11-06), o
+ * dobro ou mais do que numa máquina local. Teto de 15 ms no CI (decisão do usuário, 2026-11-06, como no PDF); o limiar
+ * de 4 ms vale fora do CI.
+ */
+export const LIMIAR_CI_MS = 15;
+
+/** O limiar que os testes de CPU usam neste ambiente. */
+export const LIMIAR_EFETIVO_MS = process.env.CI ? LIMIAR_CI_MS : LIMIAR_MS;

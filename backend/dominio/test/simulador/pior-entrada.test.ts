@@ -4,7 +4,7 @@ import type { Formato } from '../../src/simulador/base.ts';
 import { MAX_APTOS_SIMULADOR } from '../../src/simulador/varios-inicial.ts';
 import { sugerir, type EntradaSimulador, type Sugestao } from '../../src/simulador/sugerir.ts';
 import { aptosGrandes, DATA, historicoGrande } from './apoio.ts';
-import { LIMIAR_MS, medir } from './medir.ts';
+import { LIMIAR_EFETIVO_MS, medir } from './medir.ts';
 
 /**
  * Pior entrada válida e teto da busca (T20; SIM-58, SIM-59). Com 60 aptos (`MAX_APTOS_SIMULADOR`), para todo N de 2 a
@@ -102,7 +102,7 @@ describe('pior entrada válida', () => {
     const pior = resultados.reduce((a, b) => (b.p99 > a.p99 ? b : a));
     console.info(`SIM-58 pior combinação: ${pior.nome}, p99 ${pior.p99.toFixed(3)} ms`);
     const acima = resultados
-      .filter((r) => r.p99 >= LIMIAR_MS)
+      .filter((r) => r.p99 >= LIMIAR_EFETIVO_MS)
       .map((r) => `${r.nome}: ${r.p99.toFixed(3)} ms`);
     expect(acima).toEqual([]);
   });
