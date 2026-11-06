@@ -1,6 +1,7 @@
 import type { ResultadoVarios } from '@pelada/contrato/simulador';
 import type { ReactNode } from 'react';
 import { diaAbreviado, ListaJogadores, umaCasa } from './ResultadoDoisTimes.tsx';
+import { IconeAviso } from './IconeAviso.tsx';
 import estilos from './simulador.module.css';
 
 /**
@@ -51,7 +52,10 @@ export function ResultadoVariosTimes({
         <div role="status">
           <ul className={estilos.avisos}>
             {resultado.avisos.map((av) => (
-              <li key={`${av.tipo}-${av.texto}`}>{av.texto}</li>
+              <li key={`${av.tipo}-${av.texto}`}>
+                <IconeAviso />
+                {av.texto}
+              </li>
             ))}
           </ul>
         </div>

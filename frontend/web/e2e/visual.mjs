@@ -201,6 +201,8 @@ async function principal() {
       const paginaMockup = await contexto.newPage();
       const paginaApp = await contextoApp.newPage();
       const ocultar = ocultarDe(mapa, c.entrada);
+      // PELADA_VISUAL_TIMEOUT (ms): teto de cada espera do app, para iterar sem esperar 30 s por passo.
+      paginaApp.setDefaultTimeout(Number(process.env.PELADA_VISUAL_TIMEOUT ?? 30000));
       try {
         await aplicarRespostas(paginaApp, c.entrada, {
           mockup: MOCKUP,
@@ -216,6 +218,7 @@ async function principal() {
           },
         );
         const app = await printTela(paginaApp, `${URL_BASE}${c.entrada.rota}`, c.viewport, {
+          css: c.entrada.cssApp,
           passos: c.entrada.passos,
           esperar: c.entrada.esperar,
           recorte: recorteDe(c.entrada, 'app'),
@@ -230,6 +233,10 @@ async function principal() {
         if (!r.passou) falhas += 1;
       } catch (erro) {
         console.log(`FALHA ${c.nome}: ${erro instanceof Error ? erro.message : String(erro)}`);
+        // Print do app no ponto da falha, para ver o que a tela mostrava no lugar do esperado.
+        await paginaApp
+          .screenshot({ path: join(SAIDA, `${c.nome}--app-falha.png`) })
+          .catch(() => {});
         falhas += 1;
       } finally {
         await paginaMockup.close();

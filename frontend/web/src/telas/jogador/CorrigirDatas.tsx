@@ -80,12 +80,15 @@ export function CorrigirPeriodo({
   periodo,
   indice,
   avisar,
+  avisarRodadas,
 }: {
   grupoId: string;
   ficha: JogadorDetalhe;
   periodo: PeriodoItem;
   indice: number;
   avisar: (texto: string | null) => void;
+  /** As rodadas que passaram a constar viram a faixa de atenção da seção Situação (fora da linha do período). */
+  avisarRodadas: (texto: string | null) => void;
 }) {
   const corrigir = useCorrigirPeriodo(grupoId, ficha.id);
   const [aberto, setAberto] = useState(false);
@@ -101,7 +104,6 @@ export function CorrigirPeriodo({
   const comSaida = periodo.fim !== null;
   const idTitulo = `p${indice + 1}-t`;
   const previas = usePedirPrevias(grupoId, ficha.id);
-  const [rodadas, setRodadas] = useState<string | null>(null);
   const dadosPrevia: { retorno?: string | undefined; saida?: string | undefined } = {};
   if (comRetorno) dadosPrevia.retorno = retorno;
   if (comSaida) dadosPrevia.saida = saida;
@@ -149,7 +151,7 @@ export function CorrigirPeriodo({
     const previa = estado.previa;
     avisar(null);
     setFalha(undefined);
-    setRodadas(null);
+    avisarRodadas(null);
     const dados: { retorno?: string | undefined; saida?: string | undefined } = {};
     if (comRetorno) dados.retorno = retorno;
     if (comSaida) dados.saida = saida;
@@ -160,7 +162,7 @@ export function CorrigirPeriodo({
           setAberto(false);
           avisar(TEXTO_DATAS_CORRIGIDAS);
           // PAR-121: as rodadas que passaram a constar, pela prévia que o admin viu ao confirmar.
-          setRodadas(textoRodadasConfirmadas(previa));
+          avisarRodadas(textoRodadasConfirmadas(previa));
         },
         onError: (erro) => {
           const m = mensagensDosCampos(erro);
@@ -179,18 +181,6 @@ export function CorrigirPeriodo({
 
   return (
     <>
-      {rodadas ? (
-        <Faixa
-          tipo="atencao"
-          acao={
-            <LinkBotao para={`${rotaDoGrupo(grupoId)}/partidas`} variante="texto">
-              Abrir partidas
-            </LinkBotao>
-          }
-        >
-          {rodadas}
-        </Faixa>
-      ) : null}
       <Botao variante="secundario" aria-describedby={idTitulo} onClick={abrir}>
         Corrigir datas
       </Botao>

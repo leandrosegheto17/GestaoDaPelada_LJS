@@ -2,6 +2,7 @@ import type { ResultadoDois } from '@pelada/contrato/simulador';
 import type { ReactNode } from 'react';
 import { exibirNivel } from '../../dados/habilidades.ts';
 import { TEXTO_SEM_ANO } from './EntradasSimulador.tsx';
+import { IconeAviso } from './IconeAviso.tsx';
 import estilos from './simulador.module.css';
 
 /**
@@ -183,7 +184,10 @@ export function ResultadoDoisTimes({
         <div role="status">
           <ul className={estilos.avisos}>
             {resultado.avisos.map((av) => (
-              <li key={`${av.tipo}-${av.texto}`}>{av.texto}</li>
+              <li key={`${av.tipo}-${av.texto}`}>
+                <IconeAviso />
+                {av.texto}
+              </li>
             ))}
           </ul>
         </div>

@@ -6,20 +6,21 @@ import { join } from 'node:path';
  * Telas reais na comparação visual (T54; ACE-54, ACE-55; AD-021): as entradas do
  * `.specs/mockup/telas.json` com `rota` de verdade (`real: true`), além das rotas de vitrine.
  *
- * - `respostas`: cada `{ url, arquivo, status, pendente, sequencia, abortar }` vira uma rota do
+ * - `respostas`: cada `{ url, metodo, arquivo, status, pendente, sequencia, abortar }` vira uma rota do
  *   Playwright. As globais do `telas.json` entram primeiro e as da entrada depois (no Playwright
  *   vale a última registrada). Toda outra chamada a `/api/` responde 404 `nao_encontrado`: o
  *   build é servido pelo `vite preview`, que devolveria o `index.html` com 200.
  * - Os JSONs do mockup trazem o erro no formato antigo (`{ "erro": { "codigo", "mensagem",
  *   "grupos" } }`); `adaptarCorpo` o converte no `corpoErro` do contrato
  *   (`{ erro, codigo, grupos }`). O código `nao_autenticado` do mockup vira `sem_sessao`.
- * - `passos` (`preencher` e `selecionar` + `valor`, `clicar` com `indice` opcional, `esperar`, `aguardarMs`) e o
+ * - `passos` (`preencher` e `selecionar` + `valor`, `clicar` com `indice` opcional, `esperar`, `aguardarMs`, `rolar`) e o
  *   `esperar` da entrada rodam só no app; o mockup é estático.
  * - `recorte`: compara só o seletor (ou a caixa que envolve a lista de seletores) nas duas
  *   imagens. No app, cada `.classe` do seletor vale também para o nome do CSS Module do build
  *   visual (`<classe>--m-<hash>`, `vite.config.ts`); ver `seletorDoApp`.
  * - `ocultar` (partidas-e-ranking T75; o do `telas.json` e o da entrada): seletores escondidos
  *   com `visibility: hidden` nos dois lados (o espaço fica), como no runner do LJS.
+ * - `cssApp`: CSS acrescentado só ao app antes do print (ex.: esconder seções que a ficha reduzida do mockup não tem).
  * - `userAgent` (T75): user agent só do lado do app (o visual abre um contexto próprio).
  * - Relógio congelado (T75, AD-044): o app abre com `Date` fixo em `RELOGIO_VISUAL` (o "hoje" do
  *   mockup), ou no `relogio` da entrada; o mockup é estático e não precisa.
@@ -43,7 +44,7 @@ export function cssOcultar(seletores, lado = 'mockup') {
 /** Separador do nome das classes de CSS Module no build visual (`vite.config.ts`). */
 export const SUFIXO_MODULO = '--m-';
 
-const CODIGOS_ANTIGOS = { nao_autenticado: 'sem_sessao' };
+const CODIGOS_ANTIGOS = { nao_autenticado: 'sem_sessao', validacao: 'dados_invalidos' };
 
 /** Lê o `e2e/telas-ativas.json` e devolve as entradas do `telas.json` que ele lista, na ordem. */
 export function entradasAtivas(mapa, ativas) {
@@ -73,6 +74,14 @@ export function adaptarCorpo(texto) {
   const codigo = CODIGOS_ANTIGOS[erro.codigo] ?? erro.codigo;
   const corpo = { erro: typeof erro.mensagem === 'string' ? erro.mensagem : '', codigo };
   if (Array.isArray(erro.campos)) corpo.campos = erro.campos;
+  // Formato antigo das rotas de grupo: `campos` era o mapa { campo: mensagem }; no contrato, `campos` lista os
+  // nomes e `mensagens` traz o texto de cada um.
+  else if (erro.campos && typeof erro.campos === 'object') {
+    corpo.campos = Object.keys(erro.campos);
+    corpo.mensagens = erro.campos;
+  }
+  if (typeof erro.sugestao === 'string') corpo.sugestao = erro.sugestao;
+  if (typeof erro.dataExistente === 'string') corpo.dataExistente = erro.dataExistente;
   if (Array.isArray(erro.grupos)) corpo.grupos = erro.grupos;
   return JSON.stringify(corpo);
 }
@@ -114,19 +123,37 @@ export async function aplicarRespostas(pagina, entrada, { mockup, globais = [] }
     }),
   );
   for (const item of [...globais, ...(entrada.respostas ?? [])]) {
+    // `metodo` (ex.: "PUT"): a rota só responde a esse método; os outros caem na rota anterior da mesma URL
+    // (o GET e o PUT de `/api/grupos/:id` têm respostas diferentes).
+    const doMetodo = (tratar) => (rota, requisicao) =>
+      item.metodo && requisicao.method() !== String(item.metodo).toUpperCase()
+        ? rota.fallback()
+        : tratar(rota);
     if (item.pendente) {
-      await pagina.route(item.url, () => new Promise(() => undefined));
+      await pagina.route(
+        item.url,
+        doMetodo(() => new Promise(() => undefined)),
+      );
     } else if (item.abortar) {
-      await pagina.route(item.url, (rota) => rota.abort());
+      await pagina.route(
+        item.url,
+        doMetodo((rota) => rota.abort()),
+      );
     } else if (Array.isArray(item.sequencia)) {
       let vez = 0;
-      await pagina.route(item.url, (rota) => {
-        const passo = item.sequencia[Math.min(vez, item.sequencia.length - 1)];
-        vez += 1;
-        return rota.fulfill(respostaDoArquivo(mockup, { status: item.status, ...passo }));
-      });
+      await pagina.route(
+        item.url,
+        doMetodo((rota) => {
+          const passo = item.sequencia[Math.min(vez, item.sequencia.length - 1)];
+          vez += 1;
+          return rota.fulfill(respostaDoArquivo(mockup, { status: item.status, ...passo }));
+        }),
+      );
     } else {
-      await pagina.route(item.url, (rota) => rota.fulfill(respostaDoArquivo(mockup, item)));
+      await pagina.route(
+        item.url,
+        doMetodo((rota) => rota.fulfill(respostaDoArquivo(mockup, item))),
+      );
     }
   }
 }
@@ -152,6 +179,9 @@ export async function executarPassos(pagina, passos = []) {
     else if ('esperar' in passo)
       await pagina.locator(seletorDoApp(passo.esperar)).first().waitFor({ state: 'visible' });
     else if ('aguardarMs' in passo) await pagina.waitForTimeout(passo.aguardarMs);
+    else if ('rolar' in passo)
+      // `rolar: "topo"`: volta ao início da página (um clique no fim da tela a deixou rolada; o mockup é estático).
+      await pagina.evaluate(() => globalThis.scrollTo(0, 0));
     else throw new Error(`Passo desconhecido: ${JSON.stringify(passo)}`);
   }
 }
@@ -193,12 +223,17 @@ export async function printTela(
   // Resposta `pendente` nunca chega: a rede não fica ociosa, então a espera tem teto.
   await pagina.waitForLoadState('networkidle', { timeout: 3000 }).catch(() => undefined);
   await executarPassos(pagina, passos);
-  if (esperar) await pagina.locator(esperar).first().waitFor({ state: 'visible' });
+  if (esperar) await pagina.locator(seletorDoApp(esperar)).first().waitFor({ state: 'visible' });
   if (css) await pagina.addStyleTag({ content: css });
   if (ocultar) await pagina.addStyleTag({ content: ocultar });
   await pagina.evaluate(() => document.fonts.ready);
   const opcoes = { animations: 'disabled', caret: 'hide' };
   if (!recorte) return pagina.screenshot(opcoes);
+  // O foco (anel do botão autofocado do diálogo) não faz parte do que se compara: o mockup estático não tem foco.
+  await pagina.evaluate(() => {
+    const ativo = globalThis.document.activeElement;
+    if (ativo && ativo !== globalThis.document.body) ativo.blur();
+  });
   if (Array.isArray(recorte))
     return pagina.screenshot({ ...opcoes, clip: await caixaDe(pagina, recorte) });
   return pagina.locator(recorte).first().screenshot(opcoes);

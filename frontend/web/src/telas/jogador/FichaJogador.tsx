@@ -232,6 +232,7 @@ function Situacao({
   avisar: (texto: string | null) => void;
   alertar: (conteudo: ReactNode | null) => void;
 }) {
+  const [rodadas, setRodadas] = useState<string | null>(null);
   return (
     <section className={estilos.secao} aria-labelledby="s-sit">
       <h2 id="s-sit" className={estilos.subtitulo}>
@@ -261,6 +262,7 @@ function Situacao({
                       periodo={p}
                       indice={i}
                       avisar={avisar}
+                      avisarRodadas={setRodadas}
                     />
                   </TrechoSomenteLeitura>
                 </div>
@@ -272,6 +274,8 @@ function Situacao({
           grupoId={grupoId}
           ficha={ficha}
           avisar={avisar}
+          rodadas={rodadas}
+          setRodadas={setRodadas}
           acaoExtra={(abrirInativar) => (
             <ExcluirJogador
               grupoId={grupoId}

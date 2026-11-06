@@ -62,6 +62,8 @@ export interface PropsCampoSeletor<V extends string> {
   ajuda?: string | undefined;
   erro?: string | undefined;
   desabilitado?: boolean | undefined;
+  /** `segmentado` com o rótulo só para leitor de tela (classe `sr`), como no mockup do lançamento. */
+  rotuloOculto?: boolean | undefined;
 }
 
 function IconeErro() {
@@ -96,6 +98,7 @@ export function CampoSeletor<V extends string>({
   ajuda,
   erro,
   desabilitado = false,
+  rotuloOculto = false,
 }: PropsCampoSeletor<V>) {
   const idAjuda = ajuda ? `${id}-ajuda` : undefined;
   const idErro = erro ? `${id}-erro` : undefined;
@@ -132,7 +135,7 @@ export function CampoSeletor<V extends string>({
           aria-describedby={descricao}
           disabled={desabilitado || undefined}
         >
-          <legend className={estilosCampo['campo__rotulo']} id={idLegenda}>
+          <legend className={rotuloOculto ? 'sr' : estilosCampo['campo__rotulo']} id={idLegenda}>
             {rotulo}
           </legend>
           {opcoes.map((opcao) => (

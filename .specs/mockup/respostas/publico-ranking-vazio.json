@@ -6,5 +6,6 @@
   "navegacao": { "mesAnterior": null, "mesSeguinte": null },
   "resumoMes": { "partidas": 0, "comChuva": 0 },
   "partidas": [],
-  "linhas": []
+  "linhas": [],
+  "pdfLiberado": true
 }

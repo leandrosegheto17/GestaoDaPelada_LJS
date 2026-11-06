@@ -256,6 +256,7 @@ export function Admins() {
                 key={a.id}
                 titulo={eu ? `${a.nome} (você)` : a.nome}
                 meta={a.email}
+                quebra
                 lateral={
                   <>
                     {euAcesso ? (
@@ -299,6 +300,7 @@ export function Admins() {
                   key={c.id}
                   titulo={c.email}
                   meta={`Vale até ${dataDoConvite(c.expiraEm)}`}
+                  quebra
                   lateral={
                     <Botao
                       variante="texto-destrutivo"

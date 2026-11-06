@@ -1,1 +1,8 @@
-{ "data": "2026-01-29", "dataSugerida": "2026-10-22", "hoje": "2026-10-22", "choveu": false, "jogadores": [] }
+{
+  "data": "2026-01-29",
+  "dataSugerida": "2026-10-22",
+  "hoje": "2026-10-22",
+  "choveu": false,
+  "preMarcadaPelaEscalacao": false,
+  "jogadores": []
+}

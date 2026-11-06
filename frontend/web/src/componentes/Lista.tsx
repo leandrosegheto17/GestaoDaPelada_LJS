@@ -23,6 +23,8 @@ export interface PropsItemLista {
   lateral?: ReactNode | undefined;
   /** Seta à direita (`item__seta`), no item que abre outra tela (T50). */
   seta?: boolean | undefined;
+  /** O item quebra a linha quando o conteúdo lateral não cabe (`item--quebra`, base.css:21). */
+  quebra?: boolean | undefined;
 }
 
 function Seta() {
@@ -45,7 +47,15 @@ function Seta() {
   );
 }
 
-export function ItemLista({ titulo, meta, para, lateral, seta = false }: PropsItemLista) {
+export function ItemLista({
+  titulo,
+  meta,
+  para,
+  lateral,
+  seta = false,
+  quebra = false,
+}: PropsItemLista) {
+  const classe = quebra ? `${estilos.item} ${estilos['item--quebra']}` : estilos.item;
   const conteudo = (
     <>
       <span className={estilos['item__principal']}>
@@ -59,11 +69,11 @@ export function ItemLista({ titulo, meta, para, lateral, seta = false }: PropsIt
   return (
     <li>
       {para ? (
-        <Link className={estilos.item} to={para}>
+        <Link className={classe} to={para}>
           {conteudo}
         </Link>
       ) : (
-        <div className={estilos.item}>{conteudo}</div>
+        <div className={classe}>{conteudo}</div>
       )}
     </li>
   );

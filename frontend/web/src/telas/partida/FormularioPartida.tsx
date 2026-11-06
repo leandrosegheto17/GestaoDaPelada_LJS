@@ -138,6 +138,12 @@ export function FormularioPartida({
     aoSalvar({ choveu, marcacoes: marcacoesDoCorpo(jogadores ?? [], situacoes) });
   }
 
+  const botaoSalvar = (
+    <Botao type="submit" variante="principal" disabled={!comLista} carregando={salvando}>
+      {comLista ? textoSalvar(contagem.presentes) : 'Salvar partida'}
+    </Botao>
+  );
+
   return (
     <form noValidate onSubmit={enviar}>
       <div className={modulo['duas-colunas']}>
@@ -204,10 +210,14 @@ export function FormularioPartida({
       )}
       <div className={modulo['reserva-barra']} aria-hidden="true" />
       <div className={modulo['barra-acao']}>
-        <Botao type="submit" variante="principal" disabled={!comLista} carregando={salvando}>
-          {comLista ? textoSalvar(contagem.presentes) : 'Salvar partida'}
-        </Botao>
-        {acoesExtras}
+        {acoesExtras ? (
+          <div className={modulo['grupo-botoes']}>
+            {botaoSalvar}
+            {acoesExtras}
+          </div>
+        ) : (
+          botaoSalvar
+        )}
       </div>
     </form>
   );

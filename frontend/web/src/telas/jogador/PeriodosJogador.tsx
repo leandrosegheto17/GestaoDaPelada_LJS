@@ -212,11 +212,16 @@ export function AcoesSituacao({
   grupoId,
   ficha,
   avisar,
+  rodadas,
+  setRodadas,
   acaoExtra,
 }: {
   grupoId: string;
   ficha: JogadorDetalhe;
   avisar: (texto: string | null) => void;
+  /** Faixa das rodadas que passaram a constar (reativar ou corrigir): o estado fica na seção Situação da ficha. */
+  rodadas: string | null;
+  setRodadas: (texto: string | null) => void;
   /** Botão ao lado (T67), que recebe como abrir o diálogo de inativar. */
   acaoExtra?: (abrirInativar: () => void) => ReactNode;
 }) {
@@ -225,7 +230,6 @@ export function AcoesSituacao({
   const previas = usePedirPrevias(grupoId, ficha.id);
   // Somente leitura (planos-e-cobranca T48; PLA-22): reativar trava (PLA-16); inativar nunca (PLA-15).
   const somenteLeitura = useEmSomenteLeitura(grupoId);
-  const [rodadas, setRodadas] = useState<string | null>(null);
   const [aberto, setAberto] = useState<'inativar' | 'reativar' | null>(null);
   const [erroCampo, setErroCampo] = useState<string | undefined>(undefined);
   const [falha, setFalha] = useState<string | undefined>(undefined);

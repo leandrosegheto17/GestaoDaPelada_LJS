@@ -20,7 +20,16 @@
   color: var(--cor-texto);
 }
 
+.item--quebra {
+  flex-wrap: wrap;
+}
+
 .lista > li:last-child > .item {
+  border-bottom: 0;
+}
+
+/* Lista cujo item é o próprio `li` (períodos da ficha), como o `.lista .item:last-child` do mockup. */
+.lista > .item:last-child {
   border-bottom: 0;
 }
 
