@@ -90,6 +90,8 @@ O `.env.example` lista todas, com obrigatoriedade, formato e se é segredo. Segr
 | `PELADA_DEV_BANCO_PORTA`                                        | Porta do Postgres local usada pelo `pnpm dev` (padrão 5432)                                                                  |
 | `PELADA_DEV_PORTA_API`                                          | Porta do `wrangler dev` (padrão 8787)                                                                                        |
 | `PELADA_DEV_PORTA_WEB`                                          | Porta do Vite (padrão 5173)                                                                                                  |
+| `PELADA_VISUAL_PORTA`                                           | Porta do `vite preview` da comparação visual, `pnpm visual` (padrão 4174)                                                    |
+| `PELADA_VISUAL_FILTRO`                                          | Expressão regular sobre o nome da comparação visual, para iterar numa tela (ex. `^t20-`)                                     |
 | `VITE_VITRINE`                                                  | `1` inclui as rotas de vitrine no build (só a comparação visual usa)                                                         |
 | `VITE_SENTRY_DSN`                                               | Sentry do front; vazio desliga (segredo)                                                                                     |
 | `VITE_VERSAO`                                                   | SHA do commit publicado, release do Sentry do front                                                                          |
