@@ -131,7 +131,12 @@ describe('prévia em transação somente leitura', () => {
     expect(await r.json()).toEqual({ gravou: false, codigo: '25006' });
     expect(await habilidadesDeProva()).toBe(0);
     expect(consultas).toContain('BEGIN TRANSACTION READ ONLY');
-    expect(consultas).not.toContain('BEGIN');
+    // O `BEGIN` curto do `sessao_tocar` vem antes e é de escrita por desenho; o que importa é que a transação do
+    // INSERT de prova abriu como somente leitura (o último BEGIN antes dele).
+    const iInsert = consultas.findIndex((s) => /^INSERT INTO habilidades/.test(s));
+    expect(consultas.slice(0, iInsert).findLast((s) => /^BEGIN/.test(s))).toBe(
+      'BEGIN TRANSACTION READ ONLY',
+    );
   });
 
   it('PAR-112: prévia em grupo ativo lê arquivado_em sem FOR KEY SHARE (o Postgres o recusaria)', async () => {

@@ -58,7 +58,12 @@ async function sessao(conta: string): Promise<string> {
   return token;
 }
 
-async function pedir(caminho: string, conta: string, metodo: string): Promise<Response> {
+async function pedir(
+  caminho: string,
+  conta: string,
+  metodo: string,
+  corpo: unknown = {},
+): Promise<Response> {
   const headers = new Headers({
     'x-pelada': '1',
     cookie: `${NOME_COOKIE_SESSAO}=${await sessao(conta)}`,
@@ -68,7 +73,7 @@ async function pedir(caminho: string, conta: string, metodo: string): Promise<Re
   const ctx = contextoFalso();
   const r = await montar().request(
     `/api${caminho}`,
-    { method: metodo, headers, ...(comCorpo ? { body: '{}' } : {}) },
+    { method: metodo, headers, ...(comCorpo ? { body: JSON.stringify(corpo) } : {}) },
     envAcesso(aberto.url),
     ctx,
   );
@@ -124,6 +129,7 @@ describe('exigirFinanceiro', () => {
       `/grupos/${cenario.grupoG}/admins/${cenario.contaO}/financeiro`,
       cenario.contaC,
       'PATCH',
+      { acessaFinanceiro: true },
     );
     expect(ok.status).toBe(200);
   });

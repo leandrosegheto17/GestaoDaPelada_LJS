@@ -11,6 +11,7 @@ import { contextoFalso } from '../db/requisicao.ts';
 import {
   abrirCenarioGrupos,
   arquivar,
+  NOME_G,
   reativar,
   type CenarioGruposAberto,
 } from '../isolamento/cenario-grupos.ts';
@@ -70,6 +71,14 @@ async function sessao(conta: string): Promise<string> {
   return token;
 }
 
+/** Corpo válido da edição de G (o contrato valida de verdade). */
+const DADOS_G = {
+  nome: NOME_G,
+  diaSemana: 'quinta',
+  frequencia: 'semanal',
+  horario: '20:00',
+};
+
 async function pedir(
   caminho: string,
   token: string,
@@ -107,7 +116,12 @@ describe('exigirGrupoAtivo com o grupo arquivado', () => {
     const { cenario } = aberto;
     await arquivar(aberto.db, cenario.grupoG);
     const antes = chamadas;
-    const r = await pedir(`/grupos/${cenario.grupoG}`, await sessao(cenario.contaC), 'PATCH', {});
+    const r = await pedir(
+      `/grupos/${cenario.grupoG}`,
+      await sessao(cenario.contaC),
+      'PATCH',
+      DADOS_G,
+    );
     expect(r.status).toBe(409);
     expect(await r.json()).toMatchObject({ codigo: 'grupo_arquivado' });
     expect(chamadas).toBe(antes);
@@ -175,7 +189,13 @@ describe('exigirGrupoAtivo com o grupo arquivado', () => {
     await arquivar(aberto.db, cenario.grupoG);
     const token = await sessao(cenario.contaC);
     expect((await pedir(`/grupos/${cenario.grupoG}/reativar`, token, 'POST')).status).toBe(200);
-    expect((await pedir(`/grupos/${cenario.grupoG}/arquivar`, token, 'POST')).status).toBe(200);
+    expect(
+      (
+        await pedir(`/grupos/${cenario.grupoG}/arquivar`, token, 'POST', {
+          nomeConfirmacao: NOME_G,
+        })
+      ).status,
+    ).toBe(200);
   });
 
   it('SEC-004: a criadora cancela convite pendente do grupo arquivado (204)', async () => {
@@ -203,7 +223,12 @@ describe('exigirGrupoAtivo com o grupo arquivado', () => {
 describe('exigirGrupoAtivo com o grupo ativo', () => {
   it('GEL-26: PATCH do grupo ativo passa', async () => {
     const { cenario } = aberto;
-    const r = await pedir(`/grupos/${cenario.grupoG}`, await sessao(cenario.contaC), 'PATCH', {});
+    const r = await pedir(
+      `/grupos/${cenario.grupoG}`,
+      await sessao(cenario.contaC),
+      'PATCH',
+      DADOS_G,
+    );
     expect(r.status).toBe(200);
   });
 
@@ -232,7 +257,12 @@ describe('exigirGrupoAtivo com o grupo ativo', () => {
 
   it('a cadeia roda uma vez por requisição no caminho do próprio grupo', async () => {
     const { cenario } = aberto;
-    const r = await pedir(`/grupos/${cenario.grupoG}`, await sessao(cenario.contaC), 'PATCH', {});
+    const r = await pedir(
+      `/grupos/${cenario.grupoG}`,
+      await sessao(cenario.contaC),
+      'PATCH',
+      DADOS_G,
+    );
     expect(r.status).toBe(200);
     // O `tocar` da sessão tem a própria transação curta; a cadeia do grupo lê o grupo ativo uma vez só.
     expect(consultas.filter((s) => /FOR KEY SHARE/.test(s))).toHaveLength(1);

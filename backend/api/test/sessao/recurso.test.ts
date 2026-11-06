@@ -78,11 +78,12 @@ async function pedir(
   corpo?: unknown,
 ): Promise<Response> {
   const headers = new Headers({ 'x-pelada': '1', cookie: `${NOME_COOKIE_SESSAO}=${token}` });
-  if (corpo !== undefined) headers.set('content-type', 'application/json');
+  const comCorpo = corpo !== undefined && metodo !== 'GET' && metodo !== 'HEAD';
+  if (comCorpo) headers.set('content-type', 'application/json');
   const ctx = contextoFalso();
   const r = await app.request(
     `/api${caminho}`,
-    { method: metodo, headers, ...(corpo !== undefined ? { body: JSON.stringify(corpo) } : {}) },
+    { method: metodo, headers, ...(comCorpo ? { body: JSON.stringify(corpo) } : {}) },
     envAcesso(aberto.url),
     ctx,
   );
@@ -157,6 +158,11 @@ describe('recursoLiberado padrão', () => {
       metodo,
       {},
     );
+    if (caminho === '/escalacoes') {
+      // A rota real de escalação existe: passou da trava e parou na validação do corpo (422), sem chamar o stub.
+      expect(r.status).toBe(422);
+      return;
+    }
     expect(r.status).toBe(200);
     expect(chamadas).toBe(antes + 1);
   });
