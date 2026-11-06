@@ -2391,16 +2391,16 @@ T81 → T82
 **Depends on**: T79, T21, T23, T18
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-08, FUN-09, FUN-11
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: o comando `pnpm esquema:comparar --alvo dev|local [--migrar]` lê `NEON_URL_DEV_MIGRACAO` (dev) ou `DATABASE_URL_TESTE` (local), com a trava de host (remoto só com `PELADA_PERMITIR_HOST_REMOTO=1`). Zero DDL na `dev` é medido por zero migrações aplicadas (event trigger, como no teste da T23, exige superusuário, que o Neon não dá); a contagem por tabela usa o `contarLinhas` do `restaurar-backup.ts`. Também lista se `pelada_owner`, `pelada_app` e `pelada_backup_ro` existem (AD-009, FUN-11). Sai com 1 quando há diferença. A execução na `dev` (critérios 2 a 4) é ação externa com confirmação específica, do `/executar`; a AD-120 já registra a lista de uma rodada anterior (52 faltando, 3 sobrando).
 
 **Done when**:
 
-- [ ] Teste `FUN-08` do comparador com dois bancos locais: igual dá 0 diferenças, e uma diferença é listada
-- [ ] Execução na `dev`: as diferenças da `dev` contra a referência são zero, ou a lista é registrada em `STATE.md` e decidida
-- [ ] Execução na `dev`: `migrar` com zero DDL e contagem de linhas por tabela idêntica antes e depois (FUN-09)
-- [ ] `pelada_owner` existe na `dev` e é conferida (AD-009), e `pelada_app` e `pelada_backup_ro` batem com FUN-11
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-08` do comparador com dois bancos locais: igual dá 0 diferenças, e uma diferença é listada
+- [x] Execução na `dev`: as diferenças da `dev` contra a referência são zero, ou a lista é registrada em `STATE.md` e decidida
+- [x] Execução na `dev`: `migrar` com zero DDL e contagem de linhas por tabela idêntica antes e depois (FUN-09)
+- [x] `pelada_owner` existe na `dev` e é conferida (AD-009), e `pelada_app` e `pelada_backup_ro` batem com FUN-11
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
