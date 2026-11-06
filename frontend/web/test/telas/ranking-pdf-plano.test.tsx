@@ -62,13 +62,14 @@ describe('Exportar PDF pelo plano (T51)', () => {
   it('PLA-25: pdfLiberado falso → a tabela aparece e nenhum "Exportar PDF"', async () => {
     abrir(false);
     expect(await screen.findByText('Toninho')).toBeDefined();
-    expect(screen.queryAllByRole('button', { name: /Exportar PDF/ })).toHaveLength(0);
+    expect(screen.queryAllByRole('button', { name: /Exportar PDF/, hidden: true })).toHaveLength(0);
   });
 
   it('PLA-25: pdfLiberado verdadeiro → "Exportar PDF" no topo e na barra do celular', async () => {
     abrir(true);
     expect(await screen.findByText('Toninho')).toBeDefined();
-    expect(screen.getAllByRole('button', { name: /Exportar PDF/ })).toHaveLength(2);
+    // O CSS do módulo vale no jsdom e sem media query o topo fica oculto: conta também os ocultos.
+    expect(screen.getAllByRole('button', { name: /Exportar PDF/, hidden: true })).toHaveLength(2);
   });
 
   it('PLA-25: mostrarExportar exige o PDF liberado e fora do guardado sem rede', () => {

@@ -139,11 +139,11 @@ function TabelaMesSemPartidas({
               Jogador
             </th>
             <th scope="col" className={estilos['c-pts']}>
-              Pts inicial<span className="sr"> (início de {nomeMes})</span>
+              Pts inicial <span className="sr">(início de {nomeMes})</span>
             </th>
             <th scope="col">Partidas do mês</th>
             <th scope="col" className={estilos['c-pts']}>
-              Pts final<span className="sr"> (fim de {nomeMes})</span>
+              Pts final <span className="sr">(fim de {nomeMes})</span>
             </th>
           </tr>
         </thead>
@@ -193,17 +193,17 @@ export function TabelaRanking({ partidas, linhas, legenda, nomeMes }: PropsTabel
               Jogador
             </th>
             <th scope="col" className={estilos['c-pts']}>
-              Pts inicial<span className="sr"> (antes das partidas do mês)</span>
+              Pts inicial <span className="sr">(antes das partidas do mês)</span>
             </th>
             {partidas.map((p) => (
               <th key={p.data} scope="col" className={estilos['c-partida']}>
                 {diaMes(p.data)}
-                <IconeTempo choveu={p.choveu} />
                 <span className="sr">{p.choveu ? ', com chuva' : ', sem chuva'}</span>
+                <IconeTempo choveu={p.choveu} />
               </th>
             ))}
             <th scope="col" className={estilos['c-pts']}>
-              Pts final<span className="sr"> (acumulado até hoje)</span>
+              Pts final <span className="sr">(acumulado até hoje)</span>
             </th>
           </tr>
         </thead>

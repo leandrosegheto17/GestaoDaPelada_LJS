@@ -19,6 +19,14 @@ const SESSAO_LEANDRO = {
   ],
 };
 const SESSAO_SEM_GRUPOS = { ...SESSAO_LEANDRO, grupos: [] };
+const ITEM = { diaSemana: 'quinta', frequencia: 'semanal', horario: '20:00' };
+const LISTA_GRUPOS = {
+  ativos: [
+    { id: 'g-quinta', nome: 'Pelada de Quinta', slug: 'pelada-de-quinta', ...ITEM },
+    { id: 'g-domingo', nome: 'Racha de Domingo', slug: 'racha-de-domingo', ...ITEM },
+  ],
+  arquivados: [],
+};
 
 afterEach(() => {
   cleanup();
@@ -26,12 +34,15 @@ afterEach(() => {
 
 describe('tela Seus grupos e menu da conta', () => {
   it('ACE-18: os grupos da resposta aparecem com nome e link; axe sem violação', async () => {
-    const { container } = abrirTela('/app', { 'GET /api/sessao': () => json(200, SESSAO_LEANDRO) });
+    const { container } = abrirTela('/app', {
+      'GET /api/sessao': () => json(200, SESSAO_LEANDRO),
+      'GET /api/grupos': () => json(200, LISTA_GRUPOS),
+    });
     expect(await screen.findByRole('heading', { level: 1, name: 'Seus grupos' })).toBeTruthy();
-    const quinta = screen.getByRole('link', { name: /Pelada de Quinta/ });
-    expect(quinta.getAttribute('href')).toBe('/app/grupos/g-quinta/admins');
+    const quinta = await screen.findByRole('link', { name: /Pelada de Quinta/ });
+    expect(quinta.getAttribute('href')).toBe('/app/grupos/g-quinta');
     const domingo = screen.getByRole('link', { name: /Racha de Domingo/ });
-    expect(domingo.getAttribute('href')).toBe('/app/grupos/g-domingo/admins');
+    expect(domingo.getAttribute('href')).toBe('/app/grupos/g-domingo');
     expect(within(domingo).getByText('Sem acesso ao financeiro')).toBeTruthy();
     expect(within(quinta).queryByText('Sem acesso ao financeiro')).toBeNull();
     expect(screen.queryByText(TITULO_VAZIO)).toBeNull();
@@ -41,6 +52,7 @@ describe('tela Seus grupos e menu da conta', () => {
   it('ACE-57: sem grupos, o estado vazio do t08; axe sem violação', async () => {
     const { container } = abrirTela('/app', {
       'GET /api/sessao': () => json(200, SESSAO_SEM_GRUPOS),
+      'GET /api/grupos': () => json(200, { ativos: [], arquivados: [] }),
     });
     expect(await screen.findByRole('heading', { level: 2, name: TITULO_VAZIO })).toBeTruthy();
     expect(screen.getByText(TEXTO_VAZIO)).toBeTruthy();

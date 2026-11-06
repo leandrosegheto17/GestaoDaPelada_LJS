@@ -77,7 +77,13 @@ function avaliacaoDois(): Json {
 }
 
 beforeEach(() => {
-  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'], shouldAdvanceTime: true });
+  // O rel�gio falso anda 1 ms por ms real (advanceTimeDelta); a checagem de "ainda n�o chamou" fica em 290 ms para
+  // n�o pegar esse avan�o, e o limite de 300 ms continua provado pela chamada que vem logo depois.
+  vi.useFakeTimers({
+    toFake: ['setTimeout', 'clearTimeout'],
+    shouldAdvanceTime: true,
+    advanceTimeDelta: 1,
+  });
 });
 
 afterEach(() => {
@@ -138,7 +144,7 @@ describe('Simulador: mover e trocar jogador', () => {
     ).toBeNull();
     expect(screen.getAllByText('recalculando…').length).toBeGreaterThan(0);
 
-    await act(() => vi.advanceTimersByTimeAsync(299));
+    await act(() => vi.advanceTimersByTimeAsync(290));
     expect(t.chamadasA('POST', AVALIAR)).toHaveLength(0);
     await act(() => vi.advanceTimersByTimeAsync(1));
     await waitFor(() => expect(t.chamadasA('POST', AVALIAR)).toHaveLength(1));

@@ -105,8 +105,12 @@ function ItemHabilidade({
           }
         }}
       />
-      <Botao variante="texto-destrutivo" onClick={aoExcluir}>
-        Excluir<span className="sr">{` ${habilidade.nome}`}</span>
+      <Botao
+        variante="texto-destrutivo"
+        aria-label={`Excluir ${habilidade.nome}`}
+        onClick={aoExcluir}
+      >
+        Excluir
       </Botao>
       {erro ? (
         <p className={estilosCampo['campo__erro']} id={`${id}-erro`}>

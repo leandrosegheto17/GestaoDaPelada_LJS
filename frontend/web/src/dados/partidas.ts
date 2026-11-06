@@ -60,13 +60,18 @@ export function caminhoPartida(grupoId: string, data: string): string {
   return `${caminhoPartidas(grupoId)}/${encodeURIComponent(data)}`;
 }
 
-/** Invalida as partidas do grupo, o detalhe do grupo (o início) e os rankings públicos em cache. */
-export async function invalidarPartidas(consultas: QueryClient, grupoId: string): Promise<void> {
-  await Promise.all([
+/**
+ * Invalida as partidas do grupo, o detalhe do grupo (o início) e os rankings públicos em cache. Não espera as
+ * consultas voltarem: a invalidação marca tudo como velho na hora, e a tela de destino busca de novo ao abrir; esperar
+ * seguraria a navegação (e o `onSuccess` da tela) enquanto qualquer consulta ativa estivesse lenta ou fora do ar.
+ */
+export function invalidarPartidas(consultas: QueryClient, grupoId: string): Promise<void> {
+  void Promise.all([
     consultas.invalidateQueries({ queryKey: chavePartidas(grupoId) }),
     consultas.invalidateQueries({ queryKey: chaveGrupo(grupoId), exact: true }),
     consultas.invalidateQueries({ queryKey: [chavePublico('')[0]] }),
   ]);
+  return Promise.resolve();
 }
 
 export function usePartidasDoMes(grupoId: string, mes?: string) {

@@ -46,12 +46,12 @@ export async function invalidarElenco(
   grupoId: string,
   id?: string,
 ): Promise<void> {
+  void consultas.invalidateQueries({ queryKey: chaveGrupo(grupoId), exact: true });
   await Promise.all([
     consultas.invalidateQueries({ queryKey: chaveJogadores(grupoId), exact: true }),
     id === undefined
       ? Promise.resolve()
       : consultas.invalidateQueries({ queryKey: chaveJogador(grupoId, id), exact: true }),
-    consultas.invalidateQueries({ queryKey: chaveGrupo(grupoId), exact: true }),
   ]);
 }
 

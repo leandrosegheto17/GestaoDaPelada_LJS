@@ -176,7 +176,8 @@ describe('ficha do jogador: corrigir datas', () => {
     expect(chamadasA('PATCH', `${API_GIL}/periodos/p2`).map((c) => c.corpo)).toEqual([
       { retorno: '2026-10-12' },
     ]);
-    await waitFor(() => expect(screen.getByText(/12\/10\/2026/)).toBeTruthy());
+    await waitFor(() => expect(screen.getByText('Ativo desde 12/10/2026.')).toBeTruthy());
+    expect(screen.getAllByText(/12\/10\/2026/)).toHaveLength(2);
   });
 
   it('GEL-114: 422 da saída do primeiro período mostra a mensagem no campo; axe sem violação', async () => {

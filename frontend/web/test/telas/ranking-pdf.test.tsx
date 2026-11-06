@@ -19,6 +19,8 @@ vi.mock('jspdf', () => {
       jspdf.documentos += 1;
       return new Proxy(this, {
         get: (_alvo, prop) => {
+          // Sem isto o `await` do documento (async) o trata como thenable e nunca resolve.
+          if (prop === 'then') return undefined;
           if (prop === 'output')
             return () => new Blob(['%PDF-1.3 falso'], { type: 'application/pdf' });
           if (prop === 'splitTextToSize') return (texto: string) => [texto];
@@ -239,7 +241,15 @@ describe('Exportar PDF', () => {
     const share = vi.fn(async () => undefined);
     vi.stubGlobal(
       'navigator',
-      Object.assign(Object.create(navigator) as Navigator, { canShare: () => true, share }),
+      new Proxy(navigator, {
+        // Getters do Navigator só funcionam com o `this` verdadeiro: o resto vai ao navegador do jsdom.
+        get: (alvo, prop) => {
+          if (prop === 'canShare') return () => true;
+          if (prop === 'share') return share;
+          const valor: unknown = Reflect.get(alvo, prop, alvo);
+          return typeof valor === 'function' ? valor.bind(alvo) : valor;
+        },
+      }),
     );
     const t = abrirTela(
       `/g/${SLUG}`,

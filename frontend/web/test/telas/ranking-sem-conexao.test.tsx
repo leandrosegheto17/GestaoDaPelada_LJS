@@ -15,6 +15,9 @@ import { abrirTela, json, pendente, type Manipulador } from '../apoio/tela.tsx';
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
+  // `onLine` é um getter do protótipo; depois do spy fica uma propriedade própria quebrada ('get onLine' chamado em
+  // objeto que não é Navigator) que derruba os testes seguintes.
+  Reflect.deleteProperty(navigator, 'onLine');
 });
 
 const SLUG = 'pelada-de-quinta';
@@ -100,7 +103,7 @@ describe('com o ranking guardado', () => {
     expect(
       await screen.findByRole('heading', { level: 2, name: 'setembro de 2026' }),
     ).toBeDefined();
-    expect(screen.getByText('Sem conexão, atualizado em 15/10 22:30')).toBeDefined();
+    expect(await screen.findByText('Sem conexão, atualizado em 15/10 22:30')).toBeDefined();
     cleanup();
 
     abrirTela(`/g/${SLUG}?mes=2026-08`, { [API]: semRede }, rotas);

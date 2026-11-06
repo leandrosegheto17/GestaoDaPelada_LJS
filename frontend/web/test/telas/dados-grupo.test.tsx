@@ -83,7 +83,9 @@ describe('tela Dados do grupo (t20)', () => {
     expect(screen.getByRole('link', { name: 'Início' }).getAttribute('href')).toBe(
       '/app/grupos/g-quinta',
     );
-    expect((screen.getByLabelText('Nome') as HTMLInputElement).value).toBe('Pelada de Quinta');
+    expect(((await screen.findByLabelText('Nome')) as HTMLInputElement).value).toBe(
+      'Pelada de Quinta',
+    );
     expect((screen.getByLabelText('Dia da semana') as HTMLSelectElement).value).toBe('quinta');
     expect((screen.getByLabelText('Horário') as HTMLInputElement).value).toBe('20:00');
     expect((screen.getByLabelText('Semanal') as HTMLInputElement).checked).toBe(true);
@@ -101,7 +103,9 @@ describe('tela Dados do grupo (t20)', () => {
       'PATCH /api/grupos/g-quinta': (corpo) => json(200, { ...QUINTA, ...(corpo as object) }),
     });
     await screen.findByRole('heading', { level: 1, name: 'Dados do grupo' });
-    fireEvent.change(screen.getByLabelText('Nome'), { target: { value: 'Pelada da Quinta' } });
+    fireEvent.change(await screen.findByLabelText('Nome'), {
+      target: { value: 'Pelada da Quinta' },
+    });
     fireEvent.change(screen.getByLabelText('Horário'), { target: { value: '21:00' } });
     fireEvent.click(screen.getByRole('button', { name: 'Salvar' }));
     expect(await screen.findByText(TEXTO_DADOS_SALVOS)).toBeTruthy();
@@ -120,7 +124,7 @@ describe('tela Dados do grupo (t20)', () => {
         }),
     });
     await screen.findByRole('heading', { level: 1, name: 'Dados do grupo' });
-    fireEvent.change(screen.getByLabelText('Nome'), { target: { value: 'Ra' } });
+    fireEvent.change(await screen.findByLabelText('Nome'), { target: { value: 'Ra' } });
     fireEvent.click(screen.getByRole('button', { name: 'Salvar' }));
     const resumo = await screen.findByRole('alert');
     expect(within(resumo).getByText('Corrija 2 campos:')).toBeTruthy();

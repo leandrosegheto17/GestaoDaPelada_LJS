@@ -186,7 +186,13 @@ export async function desenharFolha(folha: Folha, opcoes: OpcoesGerarPdf = {}): 
     (opcoes.jspdf ?? carregarJspdf)(),
     (opcoes.fontes ?? carregarFontesPadrao)(),
   ]);
-  const doc = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4', compress: false });
+  const doc = new jsPDF({
+    orientation: 'portrait',
+    unit: 'pt',
+    format: 'a4',
+    compress: false,
+    floatPrecision: 2,
+  });
   const tipo = instalarFontes(doc, fontes);
   folha.paginas.forEach((elementos, i) => {
     if (i > 0) doc.addPage('a4', 'portrait');

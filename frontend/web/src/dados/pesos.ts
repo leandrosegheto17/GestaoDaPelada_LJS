@@ -36,7 +36,8 @@ export function useSalvarPesos(grupoId: string) {
       pesosPainel.parse(await api.post<unknown>(caminhoPesos(grupoId), corpo)),
     onSuccess: async (painel) => {
       consultas.setQueryData(chavePesos(grupoId), painel);
-      await consultas.invalidateQueries({ queryKey: chaveGrupo(grupoId), exact: true });
+      // O início busca de novo ao abrir; esperar a consulta do grupo seguraria a tela de pesos.
+      void consultas.invalidateQueries({ queryKey: chaveGrupo(grupoId), exact: true });
     },
   });
 }

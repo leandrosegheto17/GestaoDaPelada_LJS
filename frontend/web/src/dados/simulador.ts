@@ -121,10 +121,9 @@ export function useConfirmarEscalacao(grupoId: string) {
         await api.post<unknown>(`${caminhoGrupo(grupoId)}/escalacoes`, corpo),
       ),
     onSuccess: async () => {
-      await Promise.all([
-        consultas.invalidateQueries({ queryKey: chaveGrupo(grupoId), exact: true }),
-        consultas.invalidateQueries({ queryKey: chavePartidas(grupoId) }),
-      ]);
+      // Marca como velho e segue: o início busca de novo ao abrir, sem segurar a navegação.
+      void consultas.invalidateQueries({ queryKey: chaveGrupo(grupoId), exact: true });
+      void consultas.invalidateQueries({ queryKey: chavePartidas(grupoId) });
     },
   });
 }
