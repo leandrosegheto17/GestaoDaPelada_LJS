@@ -13,6 +13,9 @@ import { ordenarTimes, type VariosTimes } from './varios-inicial.ts';
 /** Teto de trocas aceitas (SIM-36, SIM-59): garante que o laço termina. */
 export const MAX_TROCAS_ACEITAS_VARIOS = 200;
 
+/** Idade média de time sem ninguém com ano (SIM-95): fica fora da amplitude. */
+const SEM_IDADE = Number.NaN;
+
 export type ChaveVarios = readonly [number, number];
 
 /** Totais de um time, para avaliar uma troca sem percorrer o time. */
@@ -99,6 +102,14 @@ export function distribuirVariosTimes(
   const agregados = inicial.times.map((ids) => agregar(ids, elenco));
   const total = times.length;
 
+  // Médias de cada time, mantidas ao lado dos agregados: uma troca mexe em dois times, então a chave candidata sai de
+  // um laço sobre as médias com os dois valores novos no lugar, sem alocar (o p99 de 60 aptos tem de caber em 4 ms,
+  // SIM-58). A idade média é nula (`SEM_IDADE`, NaN) em time sem ninguém com ano (SIM-95).
+  const nivelMedio = agregados.map((ag) => mediaInteira(ag.somaNivel, ag.n) ?? 0);
+  const idadeMedia = agregados.map(
+    (ag) => mediaInteira(100 * ag.somaIdade, ag.comAno) ?? SEM_IDADE,
+  );
+
   let chave = chaveDe(agregados);
   let aceitas = 0;
   let melhorou = true;
@@ -108,24 +119,68 @@ export function distribuirVariosTimes(
       for (let b = a + 1; b < total && !melhorou; b += 1) {
         const ta = times[a]!;
         const tb = times[b]!;
+        // Máximos e mínimos dos outros times: valem para todas as trocas deste par (só uma troca aceita muda as médias,
+        // e ela reinicia a busca).
+        let outrosNivelMax = -Infinity;
+        let outrosNivelMin = Infinity;
+        let outrosIdadeMax = -Infinity;
+        let outrosIdadeMin = Infinity;
+        for (let t = 0; t < total; t += 1) {
+          if (t === a || t === b) continue;
+          const nivel = nivelMedio[t]!;
+          const idade = idadeMedia[t]!;
+          if (nivel > outrosNivelMax) outrosNivelMax = nivel;
+          if (nivel < outrosNivelMin) outrosNivelMin = nivel;
+          if (!Number.isNaN(idade)) {
+            if (idade > outrosIdadeMax) outrosIdadeMax = idade;
+            if (idade < outrosIdadeMin) outrosIdadeMin = idade;
+          }
+        }
         for (let i = 0; i < ta.length && !melhorou; i += 1) {
           for (let j = 0; j < tb.length && !melhorou; j += 1) {
             const deA = ta[i]!;
             const deB = tb[j]!;
+            // Trocar quem tem o mesmo nível e a mesma idade não muda nenhum agregado: a chave não diminui.
+            if (deA.nivel === deB.nivel && deA.idade === deB.idade) continue;
             const antesA = agregados[a]!;
             const antesB = agregados[b]!;
-            agregados[a] = trocarNoAgregado(antesA, deA, deB);
-            agregados[b] = trocarNoAgregado(antesB, deB, deA);
-            const candidata = chaveDe(agregados);
+            // Primeiro só o nível: se a amplitude já passa da atual, a troca perde sem olhar a idade.
+            const nivelA = mediaInteira(antesA.somaNivel - deA.nivel + deB.nivel, antesA.n) ?? 0;
+            const nivelB = mediaInteira(antesB.somaNivel - deB.nivel + deA.nivel, antesB.n) ?? 0;
+            const nivelMax = Math.max(outrosNivelMax, nivelA, nivelB);
+            const nivelMin = Math.min(outrosNivelMin, nivelA, nivelB);
+            const difNivel = nivelMax - nivelMin;
+            if (difNivel > chave[0]) continue;
+            const novoA = trocarNoAgregado(antesA, deA, deB);
+            const novoB = trocarNoAgregado(antesB, deB, deA);
+            const idadeA = mediaInteira(100 * novoA.somaIdade, novoA.comAno) ?? SEM_IDADE;
+            const idadeB = mediaInteira(100 * novoB.somaIdade, novoB.comAno) ?? SEM_IDADE;
+            let idadeMax = outrosIdadeMax;
+            let idadeMin = outrosIdadeMin;
+            if (!Number.isNaN(idadeA)) {
+              if (idadeA > idadeMax) idadeMax = idadeA;
+              if (idadeA < idadeMin) idadeMin = idadeA;
+            }
+            if (!Number.isNaN(idadeB)) {
+              if (idadeB > idadeMax) idadeMax = idadeB;
+              if (idadeB < idadeMin) idadeMin = idadeB;
+            }
+            const candidata: ChaveVarios = [
+              difNivel,
+              idadeMax === -Infinity ? 0 : idadeMax - idadeMin,
+            ];
             if (menorChave(candidata, chave)) {
               chave = candidata;
+              agregados[a] = novoA;
+              agregados[b] = novoB;
+              nivelMedio[a] = nivelA;
+              nivelMedio[b] = nivelB;
+              idadeMedia[a] = idadeA;
+              idadeMedia[b] = idadeB;
               ta[i] = deB;
               tb[j] = deA;
               melhorou = true;
               aceitas += 1;
-            } else {
-              agregados[a] = antesA;
-              agregados[b] = antesB;
             }
           }
         }
