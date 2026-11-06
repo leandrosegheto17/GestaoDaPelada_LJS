@@ -121,9 +121,18 @@ describe('ensaio das migrações da notificacoes', () => {
       const r = await ensaiar(url, { referencia });
       expect(r.esquema.faltando).toEqual([]);
       expect(r.esquema.sobrando).toEqual([]);
-      expect(r.mudancaDoEsquema.removidas).toEqual([]);
-      const novas = r.mudancaDoEsquema.novas.join('\n');
-      for (const tabela of TABELAS_DO_PUSH) expect(novas).toContain(tabela);
+      // Troca de corpo de função com a mesma assinatura (ex.: `grupo_criar` na R1-T2, AD-125) aparece como removida e
+      // nova: não é remoção. Qualquer outra remoção (tabela, coluna, policy, função) continua reprovando.
+      const novas = r.mudancaDoEsquema.novas;
+      const semTrocaDeCorpo = r.mudancaDoEsquema.removidas.filter((linha) => {
+        const i = linha.lastIndexOf(' corpo=');
+        if (!linha.startsWith('funcao ') || i < 0) return true;
+        const prefixo = linha.slice(0, i + ' corpo='.length);
+        return !novas.some((n) => n.startsWith(prefixo));
+      });
+      expect(semTrocaDeCorpo).toEqual([]);
+      const textoNovas = novas.join('\n');
+      for (const tabela of TABELAS_DO_PUSH) expect(textoNovas).toContain(tabela);
       for (const funcao of [
         'push_ranking_assinar',
         'push_conta_assinar',
@@ -131,7 +140,7 @@ describe('ensaio das migrações da notificacoes', () => {
         'aviso_cobranca_registrar',
         'notificacoes_limpar',
       ])
-        expect(novas).toContain(funcao);
+        expect(textoNovas).toContain(funcao);
     });
   });
 
