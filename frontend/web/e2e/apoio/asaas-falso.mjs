@@ -45,7 +45,9 @@ export async function iniciarAsaasFalso(opcoes = {}) {
   const falhas = new Map();
   let sequencia = 0;
   let eventos = 0;
-  const proximoId = (prefixo) => `${prefixo}_${String(++sequencia).padStart(6, '0')}`;
+  // Marca da execução: o banco do e2e persiste entre execuções, e ids repetidos colidiriam com os de antes.
+  const marca = Math.random().toString(36).slice(2, 8);
+  const proximoId = (prefixo) => `${prefixo}_${marca}_${String(++sequencia).padStart(6, '0')}`;
   let base = '';
   const URL_FATURA_FALSA = 'https://fatura-falsa.asaas.test';
 
@@ -102,7 +104,7 @@ export async function iniciarAsaasFalso(opcoes = {}) {
         const evento = String(corpo.event);
         eventos += 1;
         const payload = {
-          id: `evt_falso_${String(eventos).padStart(6, '0')}`,
+          id: `evt_falso_${marca}_${String(eventos).padStart(6, '0')}`,
           event: evento,
           dateCreated: agoraAsaas(),
           ...(evento.startsWith('SUBSCRIPTION_')
