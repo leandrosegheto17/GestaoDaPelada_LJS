@@ -83,6 +83,8 @@ export default defineConfig({
           name: 'worker',
           globalSetup: ['./test/apoio/molde-worker.ts'],
           include: ['test/rotas/**/*.test.ts', 'test/infraestrutura/push/**/*.test.ts'],
+          // Matriz de plano e banco fora (conexão recusada) passam de 5 s no workerd do Windows.
+          testTimeout: 30_000,
         },
       },
     ],

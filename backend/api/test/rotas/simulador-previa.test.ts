@@ -1,7 +1,8 @@
 import { Buffer } from 'node:buffer';
 import pg from 'pg';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { MENSAGEM_APTOS_REPETIDO, MENSAGEM_N, previaResposta } from '@pelada/contrato';
+import { MENSAGEM_APTOS_REPETIDO, MENSAGEM_N } from '@pelada/contrato';
+import { previaResposta } from '@pelada/contrato/simulador';
 import { criarApp } from '../../src/entrada/app.ts';
 import type { ConexaoPg } from '../../src/infraestrutura/db/cliente.ts';
 import { relogioFixo } from '../../src/infraestrutura/relogio.ts';
