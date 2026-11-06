@@ -2420,15 +2420,15 @@ T81 → T82
 **Depends on**: T80
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-40, FUN-54
-**Status**: rascunhada
+**Status**: em andamento (faltam 2 itens que dependem do `testes.json`, hoje dispensado por decisão do usuário)
 **Nota do rascunho**: push e conferência do `ci.yml` são ações externas, com confirmação, do `/executar`. O `testes.json` já roda lint, format, typecheck, testes, checagens, e2e (o script `e2e` faz o build antes, T58) e visual (T62); o `/executar` decide se o build do web entra como passo próprio para espelhar o job `web` do CI.
 
 **Done when**:
 
-- [ ] `ci.yml` verde no último commit da `main`
+- [x] `ci.yml` verde no último commit da `main` (run 42264671967 @ 45ec02f0: qualidade, banco, testes em 3 jobs e web em 3 fatias; a comparação visual saiu do CI, AD-126)
 - [ ] `testes.json` roda lint, format, typecheck, testes, checagens, build, e2e e visual
 - [ ] `trava-testes.py --rodar` verde
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Gate passa, sem teste removido ou enfraquecido (testes mudados com motivo no commit e aprovação do usuário)
 
 **Tests**: none
 **Gate**: build
