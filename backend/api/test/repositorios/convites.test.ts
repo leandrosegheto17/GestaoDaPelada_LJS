@@ -74,7 +74,12 @@ describe('admins.remover', () => {
         },
         { confirmar: true },
       );
-    const resultados = await Promise.all([remover(cenario.contaB), remover(cenario.contaA)]);
+    // A segunda começa 100 ms depois e a primeira segura a trava por 200 ms: quem entra primeiro é sempre a remoção de B.
+    // (Se A saísse primeiro, a remoção de B daria `nao_encontrado`: A já não enxerga o grupo. Outro cenário, não este.)
+    const resultados = await Promise.all([
+      remover(cenario.contaB),
+      new Promise((r) => setTimeout(r, 100)).then(() => remover(cenario.contaA)),
+    ]);
     expect([...resultados].sort()).toEqual(['ok', 'ultimo_admin']);
     expect(await vinculos(grupo)).toHaveLength(1);
   });
