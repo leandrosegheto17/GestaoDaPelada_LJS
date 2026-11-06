@@ -133,6 +133,14 @@ async function criarJogadorPelaApi(
   return ((await r.json()) as { id: string }).id;
 }
 
+/** O interruptor é um label com o input escondido sob o trilho: o clique do usuário cai no trilho. */
+async function alternarPagou(pagina: Page, apelido: string) {
+  await pagina
+    .locator('label')
+    .filter({ has: pagina.getByRole('switch', { name: `Pagou: ${apelido}` }) })
+    .click();
+}
+
 function respostaDe(pagina: Page, metodo: string, trecho: string) {
   return pagina.waitForResponse((r) => r.request().method() === metodo && r.url().includes(trecho));
 }
@@ -178,7 +186,7 @@ test('J-25: caixa do mês da pelada: configurar, marcar, lançar a saída e desm
 
   // Passo 3 (FIN-16, FIN-10, FIN-15): marcar Toninho cria a entrada de R$ 75,00 com a data de hoje; o saldo sobe.
   const marcou = respostaDe(pagina, 'POST', '/financeiro/pagamentos');
-  await pagina.getByRole('switch', { name: 'Pagou: Toninho' }).click();
+  await alternarPagou(pagina, 'Toninho');
   expect((await marcou).status()).toBe(204);
   await expect(pagina.getByRole('switch', { name: 'Pagou: Toninho' })).toBeChecked();
   await expect(saldo).toContainText('R$ 425,00');
@@ -213,7 +221,7 @@ test('J-25: caixa do mês da pelada: configurar, marcar, lançar a saída e desm
   await expect(aluguel).toContainText(`${MENOS} R$ 800,00`);
 
   // Passo 5 (FIN-22, FIN-24): desmarcar pede confirmação, remove a entrada e o saldo volta.
-  await pagina.getByRole('switch', { name: 'Pagou: Toninho' }).click();
+  await alternarPagou(pagina, 'Toninho');
   const confirmar = pagina.getByRole('alertdialog', { name: 'Desmarcar o pagamento de Toninho?' });
   await expect(confirmar).toContainText(
     `A entrada “${descricaoMensalidade}” (R$ 75,00) será removida do caixa.`,
@@ -287,7 +295,7 @@ test('J-26: permissão do financeiro: convidado sem acesso, concessão pela cria
   const interruptorO = c.getByRole('switch', { name: 'Acessa financeiro: Convidado Vinte e Seis' });
   await expect(interruptorO).not.toBeChecked();
   const concedeu = respostaDe(c, 'PATCH', '/financeiro');
-  await interruptorO.click();
+  await c.locator('label').filter({ has: interruptorO }).click();
   expect((await concedeu).status()).toBe(200);
   await expect(interruptorO).toBeChecked();
 
