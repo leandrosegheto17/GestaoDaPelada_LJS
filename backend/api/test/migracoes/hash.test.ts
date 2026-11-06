@@ -44,11 +44,12 @@ describe('migrações herdadas', () => {
     expect(HERDADAS).toEqual([...HERDADAS].sort());
   });
 
-  // Na fundação são exatamente as 23. A primeira feature que criar migração troca este caso
-  // por "toda extra tem timestamp maior que a última herdada" (mudança de teste com aprovação).
-  it('FUN-08: são exatamente 23 arquivos .sql, nenhum a mais', () => {
+  // As features criaram migrações novas (mudança de teste autorizada, mesma força): as 23 herdadas continuam
+  // todas lá, e toda extra tem timestamp maior que o da última herdada.
+  it('FUN-08: as 23 herdadas continuam todas na pasta e toda migração extra vem depois da última delas', () => {
     const sql = readdirSync(DIR).filter((f) => f.endsWith('.sql'));
-    expect(sql).toHaveLength(23);
-    expect(sql.filter((f) => !HERDADAS.includes(f))).toEqual([]);
+    expect(HERDADAS.filter((h) => !sql.includes(h))).toEqual([]);
+    const ultima = [...HERDADAS].sort().at(-1) as string;
+    expect(sql.filter((f) => !HERDADAS.includes(f) && f <= ultima)).toEqual([]);
   });
 });

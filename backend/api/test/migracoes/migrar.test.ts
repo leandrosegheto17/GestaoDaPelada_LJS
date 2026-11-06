@@ -28,12 +28,12 @@ async function existeTabela(url: string, nome: string): Promise<boolean> {
 }
 
 describe('migrar', () => {
-  it('FUN-07: banco vazio, depois migrar, registra as 23 na ordem dos arquivos', async () => {
+  it('FUN-07: banco vazio, depois migrar, registra todas na ordem dos arquivos', async () => {
     await bancoDeTeste(async (url) => {
       const aplicadas = await migrar(url);
       expect(aplicadas).toEqual(ARQUIVOS);
       expect(await registradas(url)).toEqual(ARQUIVOS);
-      expect(ARQUIVOS).toHaveLength(23);
+      expect(ARQUIVOS.length).toBeGreaterThanOrEqual(23);
     });
   });
 

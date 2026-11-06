@@ -102,11 +102,11 @@ describe('detectarEstado', () => {
   it('FUN-10: banco vazio é vazio e segue para a execução', async () => {
     await bancoDeTeste(async (url) => {
       expect((await estado(url)).estado).toBe('vazio');
-      expect(await migrar(url)).toHaveLength(23);
+      expect(await migrar(url)).toEqual(ARQUIVOS);
     });
   });
 
-  it('FUN-09: com as 23 aplicadas é gerenciado', async () => {
+  it('FUN-09: com todas aplicadas é gerenciado', async () => {
     await bancoDeTeste(
       async (url) => {
         const d = await estado(url);
@@ -116,7 +116,7 @@ describe('detectarEstado', () => {
     );
   });
 
-  it('FUN-10: com as 20 primeiras (prefixo) é gerenciado e aplica as 3 restantes', async () => {
+  it('FUN-10: com as 20 primeiras (prefixo) é gerenciado e aplica as restantes', async () => {
     const pasta = pastaComAs(20);
     try {
       await bancoDeTeste(async (url) => {

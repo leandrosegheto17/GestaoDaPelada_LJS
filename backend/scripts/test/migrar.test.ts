@@ -1,8 +1,14 @@
 import { randomBytes } from 'node:crypto';
+import { readdirSync } from 'node:fs';
 import pg from 'pg';
 import { describe, expect, it, vi } from 'vitest';
 import { comConexao, executarCli } from '../src/conectar.ts';
 import { comandoMigrar } from '../src/migrar.ts';
+
+/** Quantas migrações existem na pasta (as features acrescentam às 23 herdadas). */
+const TOTAL_MIGRACOES = readdirSync(
+  new URL('../../api/src/infraestrutura/db/migracoes/', import.meta.url),
+).filter((f) => f.endsWith('.sql')).length;
 
 const URL_BASE =
   process.env.DATABASE_URL_TESTE ?? 'postgres://postgres:postgres@127.0.0.1:5432/pelada';
@@ -61,19 +67,19 @@ describe('pnpm migrar', () => {
     }
   });
 
-  it('FUN-07: num banco local vazio aplica as 23 migrações', async () => {
+  it('FUN-07: num banco local vazio aplica todas as migrações', async () => {
     const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
     try {
       await comBancoVazio(async (url) => {
         const aplicadas = await comandoMigrar({ DATABASE_URL_MIGRACAO: url });
-        expect(aplicadas).toHaveLength(23);
+        expect(aplicadas).toHaveLength(TOTAL_MIGRACOES);
         const n = await comConexao(
           url,
           async (c) =>
             (await c.query<{ n: number }>('SELECT count(*)::int AS n FROM pgmigrations')).rows[0]
               ?.n,
         );
-        expect(n).toBe(23);
+        expect(n).toBe(TOTAL_MIGRACOES);
       });
     } finally {
       log.mockRestore();
