@@ -55,7 +55,7 @@ const PDF = {
   grupo: { nome: 'Pelada de Quinta', slug: SLUG },
   mes: '2026-10',
   geradoEm: '2026-10-22T12:00:00.000Z',
-  urlPublica: 'https://gestaodapelada-v2.exemplo.workers.dev/g/pelada-de-quinta',
+  urlPublica: 'https://gestaodapelada-v2.exemplo.test/g/pelada-de-quinta',
   semPartidasNoMes: false,
   colunas: [{ data: '2026-10-15', choveu: false, doMesExibido: true }],
   linhas: [

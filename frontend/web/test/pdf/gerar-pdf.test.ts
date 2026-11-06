@@ -28,7 +28,7 @@ function projecao(linhas: number): PdfPublico {
     grupo: { nome: 'Pelada de Quinta', slug: 'pelada-de-quinta' },
     mes: '2026-10',
     geradoEm: '2026-10-22T21:40:00.000Z',
-    urlPublica: 'https://pelada.gestaodapelada.workers.dev/g/pelada-de-quinta',
+    urlPublica: 'https://pelada.gestaodapelada.exemplo.test/g/pelada-de-quinta',
     semPartidasNoMes: false,
     colunas: DATAS.map((data) => ({
       data,
@@ -75,7 +75,7 @@ describe('gerarPdf', () => {
     expect(pdf).toContain('(PELADA DE QUINTA)');
     expect(pdf).toContain('(Ranking: outubro de 2026)');
     expect(pdf).toContain('(Gerado em 22/10/2026 18:40)');
-    expect(pdf).toContain('(pelada.gestaodapelada.workers.dev/g/pelada-de-quinta)');
+    expect(pdf).toContain('(pelada.gestaodapelada.exemplo.test/g/pelada-de-quinta)');
     expect(pdf).not.toContain('https://');
     // O menos do expulso vira hífen na Helvetica (fora do WinAnsi).
     expect(pdf).toContain('(-1)');

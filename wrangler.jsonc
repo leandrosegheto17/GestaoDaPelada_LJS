@@ -50,7 +50,7 @@
   "triggers": { "crons": ["0 6 * * *"] },
 
   // Valores locais. No deploy, VERSAO (SHA do commit) e URL_PUBLICA chegam por --var (FUN-23, FUN-58).
-  // ASAAS_URL: só o sandbox até haver AD de produção (PLA-38, checagem so-previa); a chave e o token do webhook
+  // ASAAS_URL (https://api-sandbox.asaas.com/v3): só o sandbox até haver AD de produção (PLA-38, checagem so-previa); a chave e o token do webhook
   // são secrets do Worker (ASAAS_API_KEY, ASAAS_WEBHOOK_TOKEN), nunca aqui.
   "vars": {
     "VERSAO": "local",

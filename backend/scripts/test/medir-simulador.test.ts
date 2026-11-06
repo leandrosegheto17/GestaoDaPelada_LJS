@@ -16,7 +16,7 @@ import {
  */
 
 const BASE =
-  'https://gestaodapelada-v2.exemplo.workers.dev/api/grupos/7f0c1a2b-3c4d-4e5f-8a6b-1c2d3e4f5a6b';
+  'https://gestaodapelada-v2.exemplo.test/api/grupos/7f0c1a2b-3c4d-4e5f-8a6b-1c2d3e4f5a6b';
 
 function evento(sufixo: string, cpuTime: number | undefined, extra: Record<string, unknown> = {}) {
   return JSON.stringify({

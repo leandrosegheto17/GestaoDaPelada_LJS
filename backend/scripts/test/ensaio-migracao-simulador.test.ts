@@ -7,7 +7,7 @@ import { migrar, PASTA_MIGRACOES } from '@pelada/api/migrar';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { comConexao } from '../src/conectar.ts';
 import { ensaiar, mudancaDoEsquema } from '../src/ensaio-migracao.ts';
-import { comBancoMigrado, URL_BASE, urlDoBanco } from './apoio/banco.ts';
+import { URL_BASE, urlDoBanco } from './apoio/banco.ts';
 
 /**
  * Ensaio da migração da simulador sobre um "dump da produção" (T42; SIM-67; AD-033, AD-037, AD-048, AD-073). O dump é
@@ -26,6 +26,7 @@ const FUNCAO_GRUPO_CRIAR = 'funcao grupo_criar(';
 
 let pastaAntes: string;
 let pastaAteContrair: string;
+let pastaAteFinanceiro: string;
 let referenciaAteContrair: string[];
 let referenciaV2: string[];
 let nomeContrair = '';
@@ -58,13 +59,18 @@ beforeAll(async () => {
   copiarAte(pastaAntes, (n) => n < nomeContrair);
   copiarAte(pastaAteContrair, (n) => n <= nomeContrair);
   referenciaAteContrair = await esquemaDaPasta(pastaAteContrair);
-  await comBancoMigrado(async (url) => {
-    referenciaV2 = await comConexao(url, (c) => lerEsquema(c, OPCOES_REFERENCIA));
-  });
+  // "Completo" = até a última do financeiro (as posteriores, de planos e notificações, têm ensaio próprio).
+  pastaAteFinanceiro = mkdtempSync(join(tmpdir(), 'migracoes-ate-financeiro-'));
+  const ultimaFinanceiro =
+    readdirSync(PASTA_MIGRACOES)
+      .filter((n) => n.endsWith('_financeiro-trava-acesso.sql'))
+      .pop() ?? '';
+  copiarAte(pastaAteFinanceiro, (n) => n <= ultimaFinanceiro);
+  referenciaV2 = await esquemaDaPasta(pastaAteFinanceiro);
 });
 
 afterAll(() => {
-  for (const p of [pastaAntes, pastaAteContrair])
+  for (const p of [pastaAntes, pastaAteContrair, pastaAteFinanceiro])
     if (p) rmSync(p, { recursive: true, force: true });
 });
 
@@ -178,8 +184,9 @@ describe('ensaiar com a migração da simulador', () => {
 
   it('SIM-67: o ensaio completo, com as do financeiro, termina na referência da v2 e passa', async () => {
     await comBancoDeProducao(async (url) => {
-      const r = await ensaiar(url, { referencia: referenciaV2 });
-      expect(r.aplicadas.some((n) => n.endsWith(CONTRAIR))).toBe(true);
+      const r = await ensaiar(url, { referencia: referenciaV2, pasta: pastaAteFinanceiro });
+      console.log(JSON.stringify(r, null, 1).slice(1500, 4000));
+      expect(r.aplicadas.some((n) => `${n}.sql`.endsWith(CONTRAIR))).toBe(true);
       expect(r.tabelasAlteradas).toEqual([]);
       expect(r.esquema).toEqual({ faltando: [], sobrando: [] });
       expect(r.segundaExecucao).toEqual([]);

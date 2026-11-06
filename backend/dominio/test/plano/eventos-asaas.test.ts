@@ -140,7 +140,7 @@ describe('efeitoDoEvento: atraso', () => {
   });
 
   it('PLA-45: PAYMENT_OVERDUE da cobrança mais recente de assinatura ativa → inadimplente', () => {
-    expect(efeitoDoEvento(atraso, ATIVA)).toEqual({ tipo: 'inadimplente' });
+    expect(efeitoDoEvento(atraso, ATIVA)).toEqual({ tipo: 'marcar_inadimplente' });
   });
 
   it('PLA-45: PAYMENT_OVERDUE em aguardando_pagamento → nenhum', () => {
@@ -180,7 +180,7 @@ describe('efeitoDoEvento: estorno', () => {
   it.each(['PAYMENT_REFUNDED', 'PAYMENT_CHARGEBACK_REQUESTED'])(
     'PLA-47: %s da cobrança do Pro atual → inadimplente',
     (tipo) => {
-      expect(efeitoDoEvento(evento(tipo), ATIVA)).toEqual({ tipo: 'inadimplente' });
+      expect(efeitoDoEvento(evento(tipo), ATIVA)).toEqual({ tipo: 'marcar_inadimplente' });
     },
   );
 

@@ -7,7 +7,7 @@ import { migrar, PASTA_MIGRACOES } from '@pelada/api/migrar';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { comConexao } from '../src/conectar.ts';
 import { ensaiar, ErroEnsaio } from '../src/ensaio-migracao.ts';
-import { comBancoMigrado, URL_BASE, urlDoBanco } from './apoio/banco.ts';
+import { URL_BASE, urlDoBanco } from './apoio/banco.ts';
 
 /**
  * Ensaio das migrações do financeiro sobre um "dump da produção" (T15; FIN-42, FIN-39; AD-033). O dump é simulado por
@@ -19,21 +19,40 @@ import { comBancoMigrado, URL_BASE, urlDoBanco } from './apoio/banco.ts';
 const DO_FINANCEIRO = ['_financeiro-rls.sql', '_financeiro-trava-acesso.sql'] as const;
 
 let pastaAntiga: string;
+let pastaAte: string;
 let referencia: string[];
 
 beforeAll(async () => {
   pastaAntiga = mkdtempSync(join(tmpdir(), 'migracoes-antes-financeiro-'));
-  for (const nome of readdirSync(PASTA_MIGRACOES)) {
-    if (DO_FINANCEIRO.some((s) => nome.endsWith(s))) continue;
+  pastaAte = mkdtempSync(join(tmpdir(), 'migracoes-ate-financeiro-'));
+  // O dump só tem o que vem antes do financeiro: as posteriores (planos, notificações...) também ficam de fora, senão a
+  // ordem registrada divergiria da pasta. Os nomes começam pelo timestamp: a ordem de texto é a de aplicação.
+  const nomes = readdirSync(PASTA_MIGRACOES).sort();
+  const primeira = nomes.find((n) => DO_FINANCEIRO.some((s) => n.endsWith(s))) ?? '';
+  for (const nome of nomes) {
+    if (nome >= primeira) continue;
     copyFileSync(join(PASTA_MIGRACOES, nome), join(pastaAntiga, nome));
   }
-  await comBancoMigrado(async (url) => {
+  // O ensaio aplica só as do financeiro; a referência é a de um banco migrado com a mesma pasta (as posteriores têm
+  // ensaio próprio).
+  const ultima = nomes.filter((n) => DO_FINANCEIRO.some((s) => n.endsWith(s))).pop() ?? '';
+  for (const nome of nomes) {
+    if (nome <= ultima) copyFileSync(join(PASTA_MIGRACOES, nome), join(pastaAte, nome));
+  }
+  const nomeBanco = `teste_${randomBytes(6).toString('hex')}`;
+  await comConexao(URL_BASE, (c) => c.query(`CREATE DATABASE ${nomeBanco}`));
+  try {
+    const url = urlDoBanco(URL_BASE, nomeBanco);
+    await migrar(url, { pasta: pastaAte });
     referencia = await comConexao(url, (c) => lerEsquema(c, OPCOES_REFERENCIA));
-  });
+  } finally {
+    await comConexao(URL_BASE, (c) => c.query(`DROP DATABASE IF EXISTS ${nomeBanco} WITH (FORCE)`));
+  }
 });
 
 afterAll(() => {
   if (pastaAntiga) rmSync(pastaAntiga, { recursive: true, force: true });
+  if (pastaAte) rmSync(pastaAte, { recursive: true, force: true });
 });
 
 interface Ids {
@@ -104,7 +123,7 @@ async function comBancoDeProducao(
 describe('ensaiar', () => {
   it('FIN-42: aplica as migrações do financeiro sem mudar a contagem de nenhuma tabela, com schema igual e segunda execução vazia', async () => {
     await comBancoDeProducao(async (url) => {
-      const r = await ensaiar(url, { referencia });
+      const r = await ensaiar(url, { referencia, pasta: pastaAte });
       expect(r.aplicadas.map((n) => n.replace(/^\d+_/, '').replace(/\.sql$/, ''))).toEqual(
         expect.arrayContaining(['financeiro-rls', 'financeiro-trava-acesso']),
       );
@@ -118,7 +137,7 @@ describe('ensaiar', () => {
 
   it('FIN-39: a conta com acesso lê o caixa do grupo dela inteiro e a sem acesso lê zero linhas', async () => {
     await comBancoDeProducao(async (url) => {
-      const r = await ensaiar(url, { referencia });
+      const r = await ensaiar(url, { referencia, pasta: pastaAte });
       expect(r.amostra).toMatchObject({ esperadas: 3, lidasComAcesso: 3, lidasSemAcesso: 0 });
     });
   });
@@ -126,7 +145,7 @@ describe('ensaiar', () => {
   it('FIN-39: grupo sem conta sem acesso também passa, sem a comparação com a conta sem acesso', async () => {
     await comBancoDeProducao(
       async (url) => {
-        const r = await ensaiar(url, { referencia });
+        const r = await ensaiar(url, { referencia, pasta: pastaAte });
         expect(r.amostra?.lidasSemAcesso).toBeUndefined();
         expect(r.amostra?.lidasComAcesso).toBe(r.amostra?.esperadas);
         expect(r.ok).toBe(true);
@@ -138,8 +157,10 @@ describe('ensaiar', () => {
   it('FIN-42: dump sem linhas de negócio bloqueia o ensaio e não aplica migração nenhuma', async () => {
     await comBancoDeProducao(
       async (url) => {
-        await expect(ensaiar(url, { referencia })).rejects.toThrow(ErroEnsaio);
-        await expect(ensaiar(url, { referencia })).rejects.toThrow(/não prova nada/);
+        await expect(ensaiar(url, { referencia, pasta: pastaAte })).rejects.toThrow(ErroEnsaio);
+        await expect(ensaiar(url, { referencia, pasta: pastaAte })).rejects.toThrow(
+          /não prova nada/,
+        );
         const aplicadas = await comConexao(
           url,
           async (c) =>
@@ -154,8 +175,8 @@ describe('ensaiar', () => {
   it('FIN-42: migração que apaga linhas reprova o ensaio e a tabela aparece com antes e depois', async () => {
     const pasta = mkdtempSync(join(tmpdir(), 'migracoes-apaga-'));
     try {
-      for (const nome of readdirSync(PASTA_MIGRACOES))
-        copyFileSync(join(PASTA_MIGRACOES, nome), join(pasta, nome));
+      for (const nome of readdirSync(pastaAte))
+        copyFileSync(join(pastaAte, nome), join(pasta, nome));
       writeFileSync(
         join(pasta, '1792999999999_apaga-lancamentos.sql'),
         '-- Up Migration\nDELETE FROM lancamentos;\n',
@@ -173,8 +194,8 @@ describe('ensaiar', () => {
   it('FIN-42: tabela listada em podeGanhar pode crescer, mas não encolher', async () => {
     const pasta = mkdtempSync(join(tmpdir(), 'migracoes-cresce-'));
     try {
-      for (const nome of readdirSync(PASTA_MIGRACOES))
-        copyFileSync(join(PASTA_MIGRACOES, nome), join(pasta, nome));
+      for (const nome of readdirSync(pastaAte))
+        copyFileSync(join(pastaAte, nome), join(pasta, nome));
       writeFileSync(
         join(pasta, '1792999999999_enche-config.sql'),
         `-- Up Migration\nINSERT INTO habilidades (grupo_id, nome) SELECT id, 'Extra' FROM grupos;\n`,
@@ -196,6 +217,7 @@ describe('ensaiar', () => {
     await comBancoDeProducao(async (url) => {
       const r = await ensaiar(url, {
         referencia: referencia.filter((l) => !l.startsWith('funcao app_acessa_financeiro(')),
+        pasta: pastaAte,
       });
       expect(r.esquema.sobrando.some((l) => l.startsWith('funcao app_acessa_financeiro('))).toBe(
         true,
@@ -206,7 +228,10 @@ describe('ensaiar', () => {
 
   it('FIN-42: host fora da lista local é recusado antes de qualquer conexão', async () => {
     await expect(
-      ensaiar('postgres://u:p@ep-abc.sa-east-1.aws.neon.tech/neondb', { referencia }),
+      ensaiar('postgres://u:p@ep-abc.sa-east-1.aws.neon.tech/neondb', {
+        referencia,
+        pasta: pastaAte,
+      }),
     ).rejects.toThrow(/não permitido/);
   });
 });

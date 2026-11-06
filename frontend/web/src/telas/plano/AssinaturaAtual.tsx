@@ -1,4 +1,5 @@
 import type { PlanoResposta } from '@pelada/contrato/plano';
+import { mostraFaturaEmAberto } from '@pelada/dominio';
 import { useState } from 'react';
 import { Botao } from '../../componentes/Botao.tsx';
 import { Dialogo } from '../../componentes/Dialogo.tsx';
@@ -35,7 +36,7 @@ export function AssinaturaAtual({ plano, grupoId }: { plano: PlanoResposta; grup
 
   const aguardando =
     assinatura.situacao === 'aguardando_pagamento' ||
-    (plano.situacao === 'inadimplente' && assinatura.faturaUrl !== null);
+    (mostraFaturaEmAberto(plano.situacao, assinatura.situacao) && assinatura.faturaUrl !== null);
   const descricao =
     assinatura.situacao === 'ativa' && plano.pagoAte
       ? textoContinuaPro(plano.pagoAte)

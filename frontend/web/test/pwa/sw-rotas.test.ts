@@ -17,7 +17,7 @@ import {
  * registra de fato. O Workbox é trocado por dublês que guardam o que foi registrado; o `self` do SW é um alvo falso.
  */
 
-const ORIGEM = 'https://gestaodapelada-v2.exemplo.workers.dev';
+const ORIGEM = 'https://gestaodapelada-v2.exemplo.test';
 const url = (caminho: string, origem = ORIGEM) => new URL(caminho, origem);
 
 const registro = vi.hoisted(() => ({
@@ -112,10 +112,7 @@ describe('ehRankingPublico', () => {
     ).toBe(false);
     expect(
       ehRankingPublico(
-        url(
-          '/api/publico/pelada-de-quinta/ranking',
-          'http://gestaodapelada-v2.exemplo.workers.dev',
-        ),
+        url('/api/publico/pelada-de-quinta/ranking', 'http://gestaodapelada-v2.exemplo.test'),
         ORIGEM,
       ),
     ).toBe(false);

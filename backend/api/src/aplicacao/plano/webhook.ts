@@ -110,7 +110,7 @@ export async function aplicarEventoAsaas(
         evento.id,
       );
       break;
-    case 'inadimplente':
+    case 'marcar_inadimplente':
       aplicou = await eventosAsaas.inadimplente(
         db,
         evento.assinaturaId,

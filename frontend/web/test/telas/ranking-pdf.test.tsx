@@ -68,7 +68,7 @@ function projecaoPdf(mes = '2026-10') {
     grupo: { nome: 'Pelada de Quinta', slug: SLUG },
     mes,
     geradoEm: '2026-10-22T21:40:00.000Z',
-    urlPublica: `https://gestaodapelada-v2.exemplo.workers.dev/g/${SLUG}`,
+    urlPublica: `https://gestaodapelada-v2.exemplo.test/g/${SLUG}`,
     semPartidasNoMes: false,
     colunas: [{ data: `${mes}-15`, choveu: false, doMesExibido: true }],
     linhas: [LINHA],

@@ -75,7 +75,7 @@ export type MotivoSemEfeito =
 
 export type EfeitoDoEvento =
   | { tipo: 'ativar'; pagoAte: Data; cobrancaId: string }
-  | { tipo: 'inadimplente' }
+  | { tipo: 'marcar_inadimplente' }
   | { tipo: 'cancelar' }
   | { tipo: 'nenhum'; motivo: MotivoSemEfeito };
 
@@ -129,14 +129,14 @@ export function efeitoDoEvento(evento: EventoAsaas, assinatura: AssinaturaGravad
       // vence no `pagoAte` ou depois dele, isto é, a que ainda não foi coberta por um pagamento; a que vence antes já
       // foi superada por uma cobrança paga mais nova e não derruba o Pro.
       if (cobranca.vencimento < assinatura.pagoAte) return nenhum('outra_cobranca');
-      return { tipo: 'inadimplente' };
+      return { tipo: 'marcar_inadimplente' };
     }
 
     case 'PAYMENT_REFUNDED':
     case 'PAYMENT_CHARGEBACK_REQUESTED': {
       if (evento.cobranca === null || evento.cobranca.id !== assinatura.cobrancaDoPro)
         return nenhum('outra_cobranca');
-      return { tipo: 'inadimplente' };
+      return { tipo: 'marcar_inadimplente' };
     }
 
     default:

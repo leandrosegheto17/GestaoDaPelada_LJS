@@ -7,7 +7,7 @@ import { migrar, PASTA_MIGRACOES } from '@pelada/api/migrar';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { comConexao } from '../src/conectar.ts';
 import { ensaiar } from '../src/ensaio-migracao.ts';
-import { comBancoMigrado, URL_BASE, urlDoBanco } from './apoio/banco.ts';
+import { URL_BASE, urlDoBanco } from './apoio/banco.ts';
 
 /**
  * Ensaio das migrações da partidas-e-ranking sobre um "dump da produção" (T81; PAR-13, PAR-14, PAR-91; AD-032, AD-033).
@@ -29,21 +29,38 @@ const DO_FINANCEIRO = ['_financeiro-rls.sql', '_financeiro-trava-acesso.sql'] as
 const PENDENTES = [...DA_PARTIDAS, ...DO_FINANCEIRO];
 
 let pastaAntiga: string;
+let pastaAte: string;
 let referencia: string[];
 
 beforeAll(async () => {
   pastaAntiga = mkdtempSync(join(tmpdir(), 'migracoes-antes-partidas-'));
-  for (const nome of readdirSync(PASTA_MIGRACOES)) {
-    if (PENDENTES.some((s) => nome.endsWith(s))) continue;
+  pastaAte = mkdtempSync(join(tmpdir(), 'migracoes-ate-partidas-'));
+  // Fora do dump: as pendentes e tudo o que vem depois delas (a ordem registrada tem de ser prefixo da pasta).
+  const nomes = readdirSync(PASTA_MIGRACOES).sort();
+  const primeira = nomes.find((n) => PENDENTES.some((s) => n.endsWith(s))) ?? '';
+  for (const nome of nomes) {
+    if (nome >= primeira) continue;
     copyFileSync(join(PASTA_MIGRACOES, nome), join(pastaAntiga, nome));
   }
-  await comBancoMigrado(async (url) => {
+  // A referência é a de um banco migrado até a última pendente desta feature (as posteriores têm ensaio próprio).
+  const ultima = nomes.filter((n) => PENDENTES.some((s) => n.endsWith(s))).pop() ?? '';
+  for (const nome of nomes) {
+    if (nome <= ultima) copyFileSync(join(PASTA_MIGRACOES, nome), join(pastaAte, nome));
+  }
+  const nomeBanco = `teste_${randomBytes(6).toString('hex')}`;
+  await comConexao(URL_BASE, (c) => c.query(`CREATE DATABASE ${nomeBanco}`));
+  try {
+    const url = urlDoBanco(URL_BASE, nomeBanco);
+    await migrar(url, { pasta: pastaAte });
     referencia = await comConexao(url, (c) => lerEsquema(c, OPCOES_REFERENCIA));
-  });
+  } finally {
+    await comConexao(URL_BASE, (c) => c.query(`DROP DATABASE IF EXISTS ${nomeBanco} WITH (FORCE)`));
+  }
 });
 
 afterAll(() => {
   if (pastaAntiga) rmSync(pastaAntiga, { recursive: true, force: true });
+  if (pastaAte) rmSync(pastaAte, { recursive: true, force: true });
 });
 
 interface Ids {
@@ -125,7 +142,7 @@ async function pesosDe(url: string, grupoId: string) {
 describe('ensaiar com as migrações da partidas-e-ranking', () => {
   it('PAR-14: aplica as 6 migrações da feature, nenhuma tabela perde linha e config_pesos ganha uma linha por grupo sem configuração', async () => {
     await comBancoDeProducao(async (url) => {
-      const r = await ensaiar(url, { referencia });
+      const r = await ensaiar(url, { referencia, pasta: pastaAte });
       const nomes = r.aplicadas.map((n) => n.replace(/^\d+_/, '').replace(/\.sql$/, ''));
       expect(nomes).toEqual(expect.arrayContaining(DA_PARTIDAS.map((s) => s.slice(1, -4))));
       expect(r.tabelasAlteradas).toEqual([]);
@@ -142,7 +159,7 @@ describe('ensaiar com as migrações da partidas-e-ranking', () => {
 
   it('PAR-14: a configuração que já existia fica intacta e o grupo sem configuração recebe os pesos padrão do dia da criação em São Paulo', async () => {
     await comBancoDeProducao(async (url, ids) => {
-      await ensaiar(url, { referencia });
+      await ensaiar(url, { referencia, pasta: pastaAte });
       expect(await pesosDe(url, ids.comPesos)).toEqual([
         { vigente_desde: '2026-02-01', presenca_sem_chuva: 3, expulso: -5 },
       ]);
@@ -156,8 +173,8 @@ describe('ensaiar com as migrações da partidas-e-ranking', () => {
   it('PAR-14: migração que dá duas linhas de pesos ao mesmo grupo reprova o ensaio', async () => {
     const pasta = mkdtempSync(join(tmpdir(), 'migracoes-pesos-a-mais-'));
     try {
-      for (const nome of readdirSync(PASTA_MIGRACOES))
-        copyFileSync(join(PASTA_MIGRACOES, nome), join(pasta, nome));
+      for (const nome of readdirSync(pastaAte))
+        copyFileSync(join(pastaAte, nome), join(pasta, nome));
       writeFileSync(
         join(pasta, '1792999999999_pesos-duplicados.sql'),
         `-- Up Migration
@@ -180,9 +197,9 @@ SELECT id, '2026-04-01', 1, 1, 1, 1, -1, -1, criado_por, criado_em FROM grupos;
   it('PAR-13: sem a migração dos pesos padrão o relatório mostra o grupo que segue sem configuração', async () => {
     const pasta = mkdtempSync(join(tmpdir(), 'migracoes-sem-pesos-'));
     try {
-      for (const nome of readdirSync(PASTA_MIGRACOES)) {
+      for (const nome of readdirSync(pastaAte)) {
         if (nome.endsWith('_pesos-padrao.sql')) continue;
-        copyFileSync(join(PASTA_MIGRACOES, nome), join(pasta, nome));
+        copyFileSync(join(pastaAte, nome), join(pasta, nome));
       }
       await comBancoDeProducao(async (url) => {
         const r = await ensaiar(url, { referencia, pasta });
@@ -199,8 +216,8 @@ SELECT id, '2026-04-01', 1, 1, 1, 1, -1, -1, criado_por, criado_em FROM grupos;
   it('PAR-13: com a pesos-padrao aplicada, grupo que termina sem configuração reprova o ensaio', async () => {
     const pasta = mkdtempSync(join(tmpdir(), 'migracoes-apaga-pesos-'));
     try {
-      for (const nome of readdirSync(PASTA_MIGRACOES))
-        copyFileSync(join(PASTA_MIGRACOES, nome), join(pasta, nome));
+      for (const nome of readdirSync(pastaAte))
+        copyFileSync(join(pastaAte, nome), join(pasta, nome));
       // Apaga a linha que a pesos-padrao acabou de criar: config_pesos fica com a mesma contagem (não aparece em
       // tabelasAlteradas), mas o grupo volta a ficar sem configuração.
       writeFileSync(
@@ -220,7 +237,7 @@ SELECT id, '2026-04-01', 1, 1, 1, 1, -1, -1, criado_por, criado_em FROM grupos;
 
   it('PAR-91: o schema depois do ensaio é a referência, que inclui as funções e a policy destas migrações', async () => {
     await comBancoDeProducao(async (url) => {
-      const r = await ensaiar(url, { referencia });
+      const r = await ensaiar(url, { referencia, pasta: pastaAte });
       expect(r.esquema).toEqual({ faltando: [], sobrando: [] });
       expect(referencia.some((l) => l.startsWith('funcao evento_publico_registrar('))).toBe(true);
       expect(referencia.some((l) => l.startsWith('funcao contas_nomes_do_grupo('))).toBe(true);
@@ -231,6 +248,7 @@ SELECT id, '2026-04-01', 1, 1, 1, 1, -1, -1, criado_por, criado_em FROM grupos;
     await comBancoDeProducao(async (url) => {
       const r = await ensaiar(url, {
         referencia: referencia.filter((l) => !l.startsWith('funcao evento_publico_registrar(')),
+        pasta: pastaAte,
       });
       expect(r.esquema.sobrando.some((l) => l.startsWith('funcao evento_publico_registrar('))).toBe(
         true,

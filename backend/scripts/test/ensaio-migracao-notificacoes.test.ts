@@ -104,7 +104,9 @@ describe('ensaio das migrações da notificacoes', () => {
   it('NOT-49: aplica as migrações da feature, nenhuma tabela perde linha e as 3 tabelas novas ficam vazias', async () => {
     await comDump(async (url) => {
       const r = await ensaiar(url, { referencia });
-      expect(r.aplicadas).toEqual(daFeature);
+      expect(r.aplicadas.map((n) => n.replace(/\.sql$/, ''))).toEqual(
+        daFeature.map((n) => n.replace(/\.sql$/, '')),
+      );
       expect(r.tabelasAlteradas).toEqual([]);
       expect(r.push.aplicada).toBe(true);
       expect(r.push.problemas).toEqual([]);

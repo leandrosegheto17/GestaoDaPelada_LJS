@@ -6,9 +6,11 @@ import { comConexao } from '../src/conectar.ts';
 import {
   comandoSeed,
   CONTA_LOCAL,
+  GRUPO_CAIXA,
   GRUPO_LOCAL,
   HABILIDADES_LOCAIS,
   JOGADOR_INATIVO_LOCAL,
+  JOGADORES_CAIXA,
   JOGADORES_LOCAIS,
 } from '../src/seed.ts';
 import { entrarComo } from './apoio/banco.ts';
@@ -85,16 +87,18 @@ async function contagens(url: string) {
 }
 
 describe('pnpm seed', () => {
-  it('FUN-05: num banco migrado, cria 1 conta, 1 grupo com vínculo e jogadores, e a conta enxerga o grupo como pelada_app', async () => {
+  it('FUN-05: num banco migrado, cria 2 contas, 2 grupos com vínculo e jogadores, e a conta enxerga os grupos dela como pelada_app', async () => {
     await comBancoMigrado(async (url) => {
       const r = await comandoSeed(envDe(url));
       expect(r.jogadores).toBe(JOGADORES_LOCAIS.length);
+      // Admin local + admin convidada; grupo local + grupo do caixa (T47); 1 + 2 vínculos.
+      const todos = JOGADORES_LOCAIS.length + JOGADORES_CAIXA.length;
       expect(await contagens(url)).toEqual({
-        contas: 1,
-        grupos: 1,
-        vinculos: 1,
-        jogadores: JOGADORES_LOCAIS.length,
-        periodos: JOGADORES_LOCAIS.length,
+        contas: 2,
+        grupos: 2,
+        vinculos: 3,
+        jogadores: todos,
+        periodos: todos,
       });
 
       const vistos = await comConexao(url, async (c) => {
@@ -109,7 +113,7 @@ describe('pnpm seed', () => {
           await c.query('ROLLBACK');
         }
       });
-      expect(vistos).toEqual([GRUPO_LOCAL.slug]);
+      expect([...vistos].sort()).toEqual([GRUPO_CAIXA.slug, GRUPO_LOCAL.slug].sort());
     });
   });
 

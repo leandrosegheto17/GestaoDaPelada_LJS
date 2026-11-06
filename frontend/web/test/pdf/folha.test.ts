@@ -44,7 +44,7 @@ function projecao(linhas: number, colunas = 12, extra: Partial<PdfPublico> = {})
     grupo: { nome: 'Pelada de Quinta', slug: 'pelada-de-quinta' },
     mes: '2026-10',
     geradoEm: '2026-10-22T21:40:00.000Z',
-    urlPublica: 'https://pelada.gestaodapelada.workers.dev/g/pelada-de-quinta',
+    urlPublica: 'https://pelada.gestaodapelada.exemplo.test/g/pelada-de-quinta',
     semPartidasNoMes: false,
     colunas: datas.map((data) => ({
       data,
@@ -142,7 +142,7 @@ describe('PAR-104: conteúdo', () => {
     expect(lidos).toContain('Ranking: outubro de 2026');
     expect(lidos).toContain('Gerado em 22/10/2026 18:40');
     expect(lidos).toContain('Gestão da Pelada');
-    expect(lidos).toContain('pelada.gestaodapelada.workers.dev/g/pelada-de-quinta');
+    expect(lidos).toContain('pelada.gestaodapelada.exemplo.test/g/pelada-de-quinta');
     expect(lidos.join('\n')).not.toContain('https://');
     expect(lidos.join('\n')).not.toContain('http://');
   });
@@ -153,7 +153,7 @@ describe('PAR-104: conteúdo', () => {
   });
 
   it('PAR-104: endereço sem esquema', () => {
-    expect(enderecoSemEsquema('https://a.workers.dev/g/x')).toBe('a.workers.dev/g/x');
+    expect(enderecoSemEsquema('https://a.exemplo.test/g/x')).toBe('a.exemplo.test/g/x');
     expect(enderecoSemEsquema('http://127.0.0.1:8787/g/x')).toBe('127.0.0.1:8787/g/x');
   });
 

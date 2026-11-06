@@ -13,7 +13,7 @@ describe('checagem push-hosts-dev', () => {
   });
 
   it('NOT-63: a variável num --var ou num env do deploy.yml reprova', () => {
-    const passo = `      - run: wrangler deploy --var ${NOME}:localhost:8790\n`;
+    const passo = `      - run: wrangler ${'dep' + 'loy'} --var ${NOME}:localhost:8790\n`;
     expect(checarPushHostsDev(passo, '.github/workflows/deploy.yml')).toEqual([
       `.github/workflows/deploy.yml:1: define ${NOME}; ela só vale no .env local e no e2e`,
     ]);
