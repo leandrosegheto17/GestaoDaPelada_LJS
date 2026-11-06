@@ -119,3 +119,20 @@
   padding: 0 var(--esp-3) !important;
   white-space: normal;
 }
+
+/* Telas largas, de .specs/mockup/base.css:341-344 (mesmo ponto de quebra de ranking.module.css). */
+@media (min-width: 600px) {
+  .c-nome {
+    min-width: 200px;
+    max-width: none;
+  }
+
+  .c-pts,
+  .ranking thead th.c-pts {
+    width: 88px;
+  }
+
+  .c-partida {
+    width: 72px;
+  }
+}

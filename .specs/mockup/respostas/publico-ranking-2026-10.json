@@ -31,5 +31,6 @@
     { "posicao": 18, "apelido": "Fumaça", "ptsInicial": 11, "ptsFinal": 12, "rodadas": [{ "situacao": "falta", "pontos": 0 }, { "situacao": "falta", "pontos": 0 }, { "situacao": "presente", "pontos": 1 }] },
     { "posicao": 19, "apelido": "Léo Baiano", "ptsInicial": 0, "ptsFinal": 3, "rodadas": [{ "situacao": "fora", "pontos": null }, { "situacao": "presente", "pontos": 2 }, { "situacao": "presente", "pontos": 1 }] },
     { "posicao": 20, "apelido": "Serginho", "ptsInicial": 0, "ptsFinal": 1, "rodadas": [{ "situacao": "fora", "pontos": null }, { "situacao": "fora", "pontos": null }, { "situacao": "presente", "pontos": 1 }] }
-  ]
+  ],
+  "pdfLiberado": true
 }

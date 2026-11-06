@@ -22,6 +22,7 @@ import { diaEHora } from '../financeiro/Lancamento.tsx';
 import { rotaDoGrupo } from '../grupos/Grupos.tsx';
 import { FormularioPartida } from './FormularioPartida.tsx';
 import { avisoPartidaSalva, diaMes, TEXTO_FALHA_SALVAR } from './PaginaNovaPartida.tsx';
+import estilos from '../acesso.module.css';
 
 /**
  * Editar e excluir partida (`/app/grupos/:grupoId/partidas/:data`, t11; partidas-e-ranking T61; PAR-52 a PAR-54), de
@@ -226,11 +227,9 @@ export function PaginaEditarPartida() {
   }
 
   return (
-    <Casca
-      grupo={{ nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' }}
-      titulo="Editar partida"
-    >
+    <Casca grupo={{ nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' }}>
       <LinkVoltar para={partidasDoMes(base, data)}>Partidas</LinkVoltar>
+      <h1 className={estilos['titulo-pagina']}>Editar partida</h1>
       <FaixaSomenteLeitura grupoId={grupoId} />
       {conteudo()}
     </Casca>

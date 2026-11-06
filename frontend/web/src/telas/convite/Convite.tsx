@@ -235,9 +235,11 @@ export function Convite() {
         <Convidado grupoNome={convite.grupoNome} />
         <p className={estilos.paragrafo}>Você está conectado como {ativa.email}.</p>
         {falha ? <Faixa tipo="erro">{falha}</Faixa> : null}
-        <Botao bloco carregando={enviando} onClick={() => void aceitar()}>
-          {enviando ? 'Aceitando…' : 'Aceitar e abrir o grupo'}
-        </Botao>
+        <div className={estilos['acima-3-soma']}>
+          <Botao bloco carregando={enviando} onClick={() => void aceitar()}>
+            {enviando ? 'Aceitando…' : 'Aceitar e abrir o grupo'}
+          </Botao>
+        </div>
         <LinkBotao para="/app">Agora não</LinkBotao>
       </Casca>
     );

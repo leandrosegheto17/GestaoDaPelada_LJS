@@ -23,6 +23,12 @@
   margin-top: var(--esp-3);
 }
 
+/* Botão num invólucro: padding no lugar da margem, que colapsaria com a do parágrafo acima
+   (no mockup a margem é do próprio botão e soma). */
+.acima-3-soma {
+  padding-top: var(--esp-3);
+}
+
 .acima-4 {
   margin-top: var(--esp-4);
 }

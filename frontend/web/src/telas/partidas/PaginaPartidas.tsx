@@ -20,6 +20,7 @@ import { nomeDoMes } from '../financeiro/FinanceiroMes.tsx';
 import modulo from '../grupos-elenco.module.css';
 import { rotaDoGrupo } from '../grupos/Grupos.tsx';
 import navegacao from '../ranking/ranking.module.css';
+import tempo from '../ranking/TabelaRanking.module.css';
 
 /**
  * Partidas do mês (`/app/grupos/:grupoId/partidas[?mes=AAAA-MM]`, t10; partidas-e-ranking T59; PAR-42, PAR-43), de
@@ -51,6 +52,7 @@ function IconeChuva() {
   return (
     <svg
       viewBox="0 0 24 24"
+      className={tempo['icone-tempo--chuva']}
       width="14"
       height="14"
       fill="none"

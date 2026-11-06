@@ -156,7 +156,7 @@ export function PaginaNovaPartida() {
       .map(([, m]) => m);
 
     const campoData = (
-      <div>
+      <div className={pagina['campo-data']}>
         <CampoData
           id="data"
           rotulo="Data"
@@ -247,11 +247,9 @@ export function PaginaNovaPartida() {
   }
 
   return (
-    <Casca
-      grupo={{ nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' }}
-      titulo="Lançar partida"
-    >
+    <Casca grupo={{ nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' }}>
       <LinkVoltar para={base}>Início</LinkVoltar>
+      <h1 className={estilos['titulo-pagina']}>Lançar partida</h1>
       <FaixaSomenteLeitura grupoId={grupoId} />
       {conteudo()}
     </Casca>

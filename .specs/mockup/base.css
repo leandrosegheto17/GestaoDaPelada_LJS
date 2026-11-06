@@ -52,7 +52,7 @@ p{margin:0}
 .rodape a{font-weight:var(--peso-semi)}
 
 /* ---------- Botões ---------- */
-.botao{display:inline-flex;align-items:center;justify-content:center;gap:var(--esp-2);min-height:var(--altura-botao);padding:0 var(--esp-5);border-radius:var(--raio);border:2px solid transparent;font-family:var(--fonte-titulo);font-size:var(--texto-xl);font-weight:var(--peso-forte);letter-spacing:var(--espacamento-caixa-alta);text-transform:uppercase;text-decoration:none;cursor:pointer;background:transparent;color:var(--cor-texto)}
+.botao{display:inline-flex;align-items:center;justify-content:center;gap:var(--esp-2);min-height:var(--altura-botao);padding:0 var(--esp-5);border-radius:var(--raio);border:2px solid transparent;font-family:var(--fonte-titulo);font-size:var(--texto-xl);font-weight:var(--peso-forte);letter-spacing:var(--espacamento-caixa-alta);text-transform:uppercase;text-decoration:none;cursor:pointer;background:transparent;color:var(--cor-texto);line-height:var(--altura-linha)}
 .botao--principal{background:var(--cor-amarelo);color:var(--cor-sobre-amarelo);box-shadow:var(--sombra-botao)}
 .botao--secundario{border-color:var(--cor-texto);background:var(--cor-superficie)}
 .botao--destrutivo{background:var(--cor-destrutivo);color:var(--cor-sobre-destrutivo)}
@@ -81,6 +81,7 @@ p{margin:0}
 .campo{display:grid;gap:var(--esp-1)}
 .campo__rotulo{font-weight:var(--peso-semi)}
 .campo__ajuda{font-size:var(--texto-sm);color:var(--cor-texto-sec)}
+.ajuda{margin:0;font-size:var(--texto-sm);color:var(--cor-texto-sec)}
 .campo__erro{display:flex;gap:var(--esp-1);align-items:flex-start;font-size:var(--texto-sm);font-weight:var(--peso-semi);color:var(--cor-erro-texto)}
 .campo__entrada{width:100%;min-height:var(--alvo-toque);padding:0 var(--esp-3);border:2px solid var(--cor-contorno);border-radius:var(--raio-sm);background:var(--cor-superficie);color:var(--cor-texto);font:inherit}
 textarea.campo__entrada{padding:var(--esp-2) var(--esp-3);min-height:96px}

@@ -18,6 +18,7 @@
   cursor: pointer;
   background: transparent;
   color: var(--cor-texto);
+  line-height: var(--altura-linha);
 }
 
 .botao--principal {

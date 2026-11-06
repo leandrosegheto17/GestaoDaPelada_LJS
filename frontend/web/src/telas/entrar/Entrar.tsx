@@ -9,6 +9,7 @@ import estilosCampo from '../../componentes/Campo.module.css';
 import { Casca } from '../../componentes/Casca.tsx';
 import { Faixa, type TipoFaixa } from '../../componentes/Faixa.tsx';
 import { LinkBotao } from '../../componentes/LinkBotao.tsx';
+import { LinkVoltar } from '../../componentes/LinkVoltar.tsx';
 import { ErroApi, MENSAGEM_REDE } from '../../dados/cliente.ts';
 import { useCliente } from '../../dados/ContextoCliente.tsx';
 import estilos from '../acesso.module.css';
@@ -22,8 +23,8 @@ import estilos from '../acesso.module.css';
  *   `POST /api/conta/reenviar-confirmacao` (`t04-entrar--nao-confirmado`, ACE-12);
  * - `?aviso=` mostra a faixa do aviso (sessão expirada, e-mail confirmado, senha alterada).
  *
- * SPEC_DEVIATION: o mockup tem o link "Voltar ao ranking", que depende do ranking público
- * (feature `partidas-e-ranking`); ele fica de fora até lá.
+ * O link "Voltar ao ranking" do mockup aponta para o início público (`/`), pois o ranking
+ * público é por grupo (`/g/:slug`) e a tela não sabe o grupo.
  */
 
 export const AVISOS_ENTRAR: Readonly<Record<string, { tipo: TipoFaixa; texto: string }>> = {
@@ -86,7 +87,9 @@ export function Entrar() {
   }
 
   return (
-    <Casca titulo="Entrar" estreita>
+    <Casca estreita>
+      <LinkVoltar para="/">Voltar ao ranking</LinkVoltar>
+      <h1 className={estilos['titulo-pagina']}>Entrar</h1>
       {aviso ? <Faixa tipo={aviso.tipo}>{aviso.texto}</Faixa> : null}
       <form
         className={estilos.formulario}

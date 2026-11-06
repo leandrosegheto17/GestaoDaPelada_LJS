@@ -33,6 +33,11 @@
   gap: var(--esp-2);
 }
 
+/* Celular: os botões do grupo dividem a barra (base.css:215); no PC voltam à largura natural (:340). */
+.barra-acao .grupo-botoes > * {
+  flex: 1;
+}
+
 /* Item que quebra a linha com o botão (base.css:21). */
 .item-quebra {
   flex-wrap: wrap;
@@ -81,7 +86,7 @@
     width: auto;
   }
 
-  .grupo-botoes > * {
+  .barra-acao .grupo-botoes > * {
     flex: none;
   }
 

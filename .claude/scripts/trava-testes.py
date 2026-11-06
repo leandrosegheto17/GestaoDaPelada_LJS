@@ -8,10 +8,10 @@ Dois modos:
       registra o commit como verde. É a "checagem final" dos fluxos.
 
   (hook PreToolUse do Bash, lendo o JSON da ferramenta pela entrada padrão)
-      git push / gh pr create : libera se HEAD já está verde; senão roda a suíte agora
-                                e bloqueia se falhar.
-      git merge <branch>      : libera só se o último commit de <branch> já está verde;
-                                senão bloqueia e diz como testar a branch.
+      Só o DEPLOY é travado: `gh workflow run deploy.yml` e `wrangler deploy`. Libera se HEAD já
+      está verde; senão roda a suíte agora e bloqueia se falhar.
+      git push, gh pr create e git merge passam direto (decisão do usuário, 2026-11-06: a suíte
+      completa a cada push era demorada demais; o CI roda no push e a trava vale na hora de implantar).
       Outros comandos passam direto.
 
 O comando da suíte fica em .specs/projeto/testes.json:
@@ -32,8 +32,9 @@ from pathlib import Path
 # Só conta quando é o comando de fato: no início ou depois de ;, &&, ||, | ou (.
 # Texto "git push" dentro de uma string (ex.: um echo) não dispara a trava.
 INICIO = r"(?:^|[;&|(])\s*"
-PUSH_OU_PR = re.compile(INICIO + r"(?:git\s+push\b|gh\s+pr\s+create\b)")
-MERGE = re.compile(INICIO + r"git\s+merge\s+(?:-[^\s]+\s+)*(?P<alvo>[^\s;&|\"'-][^\s;&|\"']*)")
+DEPLOY = re.compile(
+    INICIO + r"(?:gh\s+workflow\s+run\s+(?:\S*/)?deploy(?:\.ya?ml)?\b|(?:\S+\s+)*wrangler\s+deploy\b)"
+)
 
 
 CD_INICIAL = re.compile(r"^\s*cd\s+(?:\"([^\"]+)\"|'([^']+)'|([^\s;&|]+))\s*(?:&&|;)")
@@ -94,18 +95,6 @@ def git(raiz, *args):
     return r.stdout.strip() if r.returncode == 0 else None
 
 
-def worktree_da_branch(raiz, branch):
-    """Pasta do worktree em que `branch` está em uso, se tiver testes.json; senão None."""
-    saida = git(raiz, "worktree", "list", "--porcelain") or ""
-    pasta = None
-    for linha in saida.splitlines():
-        if linha.startswith("worktree "):
-            pasta = Path(linha[len("worktree "):])
-        elif linha == f"branch refs/heads/{branch}" and pasta and (pasta / ".specs" / "projeto" / "testes.json").exists():
-            return pasta
-    return None
-
-
 def arvore_limpa(raiz):
     return git(raiz, "status", "--porcelain", "--untracked-files=no") == ""
 
@@ -159,8 +148,7 @@ def modo_rodar():
 def modo_hook():
     dados = json.load(sys.stdin)
     comando = (dados.get("tool_input") or {}).get("command", "")
-    merge = MERGE.search(comando)
-    if not (PUSH_OU_PR.search(comando) or merge):
+    if not DEPLOY.search(comando):
         return 0
 
     raiz = raiz_projeto(dados)
@@ -169,33 +157,17 @@ def modo_hook():
         sem_config(raiz)
     if config.get("dispensado"):
         return 0
-    verdes = ler_verdes(raiz)
-
-    if merge:
-        alvo = merge.group("alvo")
-        commit = git(raiz, "rev-parse", alvo)
-        if commit is None or commit in verdes:
-            return 0
-        # A suíte da branch pode ter rodado no worktree dela, que tem registro próprio.
-        pasta = worktree_da_branch(raiz, alvo)
-        if pasta and pasta.resolve() != raiz.resolve() and commit in ler_verdes(pasta):
-            return 0
-        bloquear(
-            f"Trava de testes: o último commit de `{alvo}` ({commit[:7]}) não tem a suíte verde registrada.\n"
-            f"Teste a branch antes do merge: `git checkout {alvo}` e "
-            "`python .claude/scripts/trava-testes.py --rodar`; depois volte e faça o merge."
-        )
 
     commit = git(raiz, "rev-parse", "HEAD")
-    if commit in verdes:
+    if commit in ler_verdes(raiz):
         return 0
     if not arvore_limpa(raiz):
-        bloquear("Trava de testes: há mudanças não commitadas. Faça o commit e rode a suíte antes de enviar.")
+        bloquear("Trava de testes: há mudanças não commitadas. Faça o commit e rode a suíte antes de implantar.")
     passou, final = rodar_suite(raiz, config)
     if passou:
         gravar_verde(raiz, commit, final.splitlines()[-1] if final else "ok")
         return 0
-    bloquear(f"Trava de testes: a suíte falhou no commit {commit[:7]}. Envio bloqueado.\n{final}")
+    bloquear(f"Trava de testes: a suíte falhou no commit {commit[:7]}. Deploy bloqueado.\n{final}")
 
 
 if __name__ == "__main__":

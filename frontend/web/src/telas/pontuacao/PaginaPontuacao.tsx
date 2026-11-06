@@ -195,7 +195,8 @@ function Painel({ grupoId, painel }: { grupoId: string; painel: PesosPainel }) {
         />
       ) : null}
       <section className={modulo.cartao} aria-labelledby="vig">
-        <h2 id="vig" className={`${estilos.subtitulo} ${modulo['sem-topo']}`}>
+        {/* Como na T20, o mockup mantém a margem de cima do subtítulo (`.subtitulo` vem depois de `.sem-topo`). */}
+        <h2 id="vig" className={estilos.subtitulo}>
           {textoVigencia(vigente.vigenteDesde)}
         </h2>
         <table className={tabela['tabela-simples']}>
@@ -287,12 +288,9 @@ export function PaginaPontuacao() {
   }
 
   return (
-    <Casca
-      grupo={{ nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' }}
-      titulo="Pontuação"
-      estreita
-    >
+    <Casca grupo={{ nome: grupo.data?.nome ?? NOME_DO_APP, trocarHref: '/app' }} estreita>
       <LinkVoltar para={base}>Início</LinkVoltar>
+      <h1 className={estilos['titulo-pagina']}>Pontuação</h1>
       <FaixaSomenteLeitura grupoId={grupoId} />
       {conteudo()}
     </Casca>

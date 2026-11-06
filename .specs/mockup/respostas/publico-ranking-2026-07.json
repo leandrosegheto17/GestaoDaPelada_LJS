@@ -27,5 +27,6 @@
     { "posicao": 18, "apelido": "Fumaça", "ptsInicial": 7, "ptsFinal": 7, "rodadas": [] },
     { "posicao": 19, "apelido": "Léo Baiano", "ptsInicial": 0, "ptsFinal": 0, "rodadas": [] },
     { "posicao": 20, "apelido": "Serginho", "ptsInicial": 0, "ptsFinal": 0, "rodadas": [] }
-  ]
+  ],
+  "pdfLiberado": true
 }

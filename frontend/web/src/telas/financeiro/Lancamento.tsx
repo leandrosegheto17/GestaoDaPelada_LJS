@@ -235,6 +235,7 @@ function Formulario({
           id="tipo"
           rotulo="Tipo"
           variante="segmentado"
+          rotuloOculto
           opcoes={OPCOES_TIPO}
           valor={dados.tipo}
           aoMudar={(v) => mudar('tipo', v)}

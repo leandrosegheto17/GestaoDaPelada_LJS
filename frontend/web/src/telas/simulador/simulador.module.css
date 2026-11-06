@@ -278,6 +278,11 @@
   max-width: 440px;
 }
 
+/* Celular: os botões do grupo dividem a barra (base.css:215); no PC voltam à largura natural (:340). */
+.barra-acao .grupo-botoes > * {
+  flex: 1;
+}
+
 @media (min-width: 600px) {
   .barra-acao {
     position: static;
@@ -290,6 +295,10 @@
 
   .barra-acao > * {
     width: auto;
+  }
+
+  .barra-acao .grupo-botoes > * {
+    flex: none;
   }
 }
 
@@ -348,6 +357,10 @@
 .selo--info {
   background: var(--cor-info-fundo);
   color: var(--cor-info-texto);
+}
+
+.icone {
+  flex-shrink: 0;
 }
 
 .avisos {

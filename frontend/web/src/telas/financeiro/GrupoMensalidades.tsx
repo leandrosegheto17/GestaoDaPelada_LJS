@@ -4,6 +4,7 @@ import lista from '../../componentes/Lista.module.css';
 import { formatarReais } from '../../dados/dinheiro.ts';
 import estilos from '../acesso.module.css';
 import modulo from '../grupos-elenco.module.css';
+import proprio from './financeiro.module.css';
 import { diaEMes, IconeTipo, ItemLancamento } from './ItemLancamento.tsx';
 
 /**
@@ -54,7 +55,7 @@ export function GrupoMensalidades({ mes, mensalidades, base }: PropsGrupoMensali
     <li>
       <button
         type="button"
-        className={lista.item}
+        className={`${lista.item} ${proprio['item-botao']}`}
         aria-expanded={aberta}
         aria-controls={idLista}
         onClick={() => setAberta((a) => !a)}

@@ -23,6 +23,8 @@
 .ferramentas-lista > :first-child {
   flex: 1;
   min-width: 180px;
+  /* A `Busca` traz a margem própria da T15; aqui a margem é só a da barra (base.css:141). */
+  margin: 0;
 }
 
 .lista-situacao {
@@ -85,8 +87,11 @@
   border-radius: var(--raio-sm);
   font-family: var(--fonte-titulo);
   font-size: var(--texto-lg);
-  font-weight: var(--peso-forte);
+  font-weight: var(--peso-extra);
+  line-height: 1;
   cursor: pointer;
+  background: var(--cor-superficie);
+  color: var(--cor-texto-sec);
 }
 
 .seletor-situacao i {
@@ -147,4 +152,10 @@
   .lista-situacao--duas .linha-jogador:nth-last-child(2) {
     border-bottom: 0;
   }
+}
+
+/* Campo da data com o aviso e o link de edição embaixo, como o `.campo` do mockup (grade: o botão ocupa a largura). */
+.campo-data {
+  display: grid;
+  gap: var(--esp-1);
 }
