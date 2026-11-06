@@ -194,8 +194,13 @@ async function jornadaDoisTimes(pagina: Page, grupoId: string): Promise<void> {
 
   // 2. desmarcar um (o "ausente"), marcar um "Só 1º"; N = 7 e K = 2 (os iniciais, SIM-05).
   await pagina.getByRole('checkbox', { name: 'Dudu', exact: true }).uncheck();
-  await pagina.getByRole('switch', { name: 'Só 1º tempo: Gil' }).check();
-  await expect(pagina.getByLabel('Jogadores por time')).toHaveValue('7');
+  // O input do interruptor fica sob o trilho do label: o clique do usuário cai no label.
+  await pagina
+    .locator('label')
+    .filter({ has: pagina.getByRole('switch', { name: 'Só 1º tempo: Gil' }) })
+    .click();
+  await expect(pagina.getByRole('switch', { name: 'Só 1º tempo: Gil' })).toBeChecked();
+  await expect(pagina.getByRole('spinbutton', { name: 'Jogadores por time' })).toHaveValue('7');
   await expect(pagina.getByText(/^2 times de 7 · \d+ reservas?$/)).toBeVisible();
 
   // 3. sugerir (SIM-47) e mover um titular do Time A para o Time B (SIM-64): os números recalculam (SIM-65).
@@ -279,7 +284,7 @@ test('J-23: dividir em 3 ou mais times', async ({ browser }) => {
   // 1. 22 aptos, "3 ou mais times" e N = 4.
   await pagina.goto(`/app/grupos/${grupo.id}/simulador`);
   await pagina.getByRole('radio', { name: '3 ou mais times' }).check();
-  await pagina.getByLabel('Jogadores por time').fill('4');
+  await pagina.getByRole('spinbutton', { name: 'Jogadores por time' }).fill('4');
   await expect(
     pagina.getByText('5 times de 4 + 1 time incompleto de 2', { exact: true }),
   ).toBeVisible();
