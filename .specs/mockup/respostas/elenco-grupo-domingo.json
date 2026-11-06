@@ -12,5 +12,10 @@
   "souCriador": false,
   "partidasNoMes": 0,
   "pesosPadrao": true,
-  "aparelhosNaSemana": 0
+  "aparelhosNaSemana": 0,
+  "dataSugeridaPartida": "2026-10-22",
+  "partidaNaDataSugerida": false,
+  "pesosVigentesDesde": "2026-09-01",
+  "proximoDiaDeJogo": "2026-10-22",
+  "escalacaoNoProximoDia": false
 }

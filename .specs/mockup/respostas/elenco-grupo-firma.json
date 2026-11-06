@@ -9,5 +9,13 @@
   "jogadoresAtivos": 12,
   "habilidades": 6,
   "admins": 1,
-  "souCriador": true
+  "souCriador": true,
+  "dataSugeridaPartida": "2026-10-22",
+  "partidaNaDataSugerida": false,
+  "partidasNoMes": 0,
+  "pesosVigentesDesde": "2026-09-01",
+  "pesosPadrao": true,
+  "aparelhosNaSemana": 0,
+  "proximoDiaDeJogo": "2026-10-22",
+  "escalacaoNoProximoDia": false
 }
