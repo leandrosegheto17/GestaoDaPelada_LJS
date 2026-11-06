@@ -4,6 +4,7 @@
 **Passada**: rascunho
 **Base**: .specs/features/simulador/spec.md (aprovada em 2026-11-04), conferido em 2026-11-04. Contratos: fundação v2 (`.specs/features/fundacao/`), `conta-e-acesso`, `grupos-e-elenco` e `partidas-e-ranking` v2 (`tasks.md` de cada uma, nenhuma executada).
 **Branch pai**: `feature/partidas-e-ranking` (a `partidas-e-ranking` ainda não estará integrada). Se já estiver integrada na `main` quando o `/executar` começar, a Branch pai passa a ser `main`.
+**Gate**: format, lint, typecheck, checagens e vitest por pacote @ abc17b49f3f1527747c2c9614614f25ab3b235a3 = verde, com pendências aceitas pelo usuário em 2026-11-06 (api: push-backup e push-cpu, por ambiente; dominio: SIM-57 e SIM-58, no CI; Playwright não rodado)
 **Feature**: 5 de 8 do roteiro (AD-001, AD-015). Requisitos `SIM-*`.
 
 > Convenções: `S:` = `.specs/features/simulador/spec.md` (linha); `F:` = `.specs/features/fundacao/tasks.md`; `FD:` = `.specs/features/fundacao/design.md`; `CA:` = `.specs/features/conta-e-acesso/tasks.md`; `GE:` = `.specs/features/grupos-e-elenco/tasks.md`; `PR:` = `.specs/features/partidas-e-ranking/tasks.md`; `M:` = `ljs:backend/api/src/infraestrutura/db/migracoes/` (as 23 migrações copiadas, AD-003); `L:` = legado `C:\Leandro\Projetos\GestaodaPelada` @ `ece227e0`, só leitura, referência de regra. Do zero (AD-002): código e testes do legado e do LJS são só consulta. ADs da feature: AD-080 a AD-086, AD-117 e AD-118. Nome de teste de tarefa de risco alto cita o `SIM-NN`.
@@ -315,17 +316,17 @@ T53 → T54
 **Depends on**: None
 **Reuses**: `comoApp` e o cenário de dois grupos (`F:909`); tabela `M:1792843200000_linha-de-base.sql:212-228`; grants `M:1792843260000_roles.sql:22-31`; policies do laço `M:1792843320000_rls.sql:51-56`; molde da matriz de `PR:1038` (T23)
 **Requirement**: SIM-81, SIM-69, SIM-72
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: usa o cenário da fundação (`abrirCenario`, grupos A e B com uma escalação cada); a evidência da rede (policy `USING (true)`) é do /executar.
 **Resolução**: o usuário decidiu em 2026-11-05 que vale a matriz (AD-122): migração `1793919878922_escalacoes-leitura-so-conta.sql`; evidência da rede: o teste de SELECT pelo slug estava vermelho (1 linha em vez de 0) e passa. (Lacuna original: a matriz pede "slug público zero" no SELECT, mas a policy do laço (`grupos_visiveis()`, ramo do slug, FUN-14) deixa o slug do A ler a escalação do A. O teste segue a matriz (zero); se ficar vermelho, perguntar se vale a matriz (migração nova) ou a policy atual.
 
 **Done when**:
 
-- [ ] Teste `SIM-81`: uma célula por comando da matriz (SELECT, INSERT, UPDATE, DELETE, UPDATE e DELETE sem `WHERE`), com o banco do B igual antes e depois
-- [ ] Teste `SIM-69`: segunda linha na mesma data dá 23505 em `escalacoes_grupo_data`; `SIM-72`: `varios_times` com K dá 23514
-- [ ] Evidência da rede: `CREATE POLICY ... USING (true)` temporária para `escalacoes` deixa o teste de SELECT vermelho; registrada nesta tarefa
-- [ ] Banco e dados de teste limpos no `finally`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SIM-81`: uma célula por comando da matriz (SELECT, INSERT, UPDATE, DELETE, UPDATE e DELETE sem `WHERE`), com o banco do B igual antes e depois
+- [x] Teste `SIM-69`: segunda linha na mesma data dá 23505 em `escalacoes_grupo_data`; `SIM-72`: `varios_times` com K dá 23514
+- [x] Evidência da rede: `CREATE POLICY ... USING (true)` temporária para `escalacoes` deixa o teste de SELECT vermelho; registrada nesta tarefa
+- [x] Banco e dados de teste limpos no `finally`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -343,16 +344,16 @@ T53 → T54
 **Depends on**: T0
 **Reuses**: `lerEsquema` com funções (`F:760`); função de 7 de `PR:987` (T22); AD-037
 **Requirement**: SIM-67 (linha de base da remoção, AD-037)
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: varredura de `backend/{api,contrato,dominio,scripts}/src` com um contador de argumentos de cada `grupo_criar(...)` (testado no próprio arquivo). Chamadas à de 6 encontradas por leitura (lista para a T25): testes `test/concorrencia/grupos-slug.test.ts:32`, `test/banco/grupos-criar.test.ts:32`, `test/banco/partidas-rede.test.ts:82` e `:107`, `test/banco/grupo-criar-pesos.test.ts:138` (bloco da delegação e `ASSINATURA_6` em `:16`, `:154`, `:179`), `test/banco/financeiro-trava-acesso.test.ts:108`, `test/isolamento/cenario-grupos.ts:100` e a assinatura em `test/isolamento/meta-grupos.test.ts:25`.
 **Resolução**: a T25 passa o seed para a de 7 antes de remover a de 6; o teste de T1 passou como está. (Lacuna original: o seed chama a de 6 (`backend/scripts/src/seed.ts:147` e `:228`), e o Delta 2 não o lista; o teste "nenhum arquivo de src nem o seed" nasce vermelho por isso. Interpretação conservadora: o teste fica como a tarefa pede e a T25 passa o seed para a de 7 antes de remover a de 6 (senão o seed quebra). O /executar confirma com o usuário.
 
 **Done when**:
 
-- [ ] Teste: o catálogo tem as duas sobrecargas e a de 6 delega à de 7 (estado depois da `partidas-e-ranking`)
-- [ ] Teste: nenhum arquivo de `src` nem o seed chama a `grupo_criar` com 6 argumentos
-- [ ] `Evidência`: a lista dos testes que chamam a de 6, com arquivo e linha
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste: o catálogo tem as duas sobrecargas e a de 6 delega à de 7 (estado depois da `partidas-e-ranking`)
+- [x] Teste: nenhum arquivo de `src` nem o seed chama a `grupo_criar` com 6 argumentos
+- [x] `Evidência`: a lista dos testes que chamam a de 6, com arquivo e linha
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -372,16 +373,16 @@ T53 → T54
 **Depends on**: None
 **Reuses**: `diaDaSemana` e `ehDataReal` de `backend/dominio/src/datas.ts` (`PR:457`), sem duplicar; regra de domínio sem relógio (AD-028, `GE:527`); idade de `L:backend/api/src/aplicacao/simulador/entrada.ts:63` e `L:backend/dominio/src/elenco/idade.ts:4`; convenções `S:73-79`; AD-086
 **Requirement**: SIM-01, SIM-51, SIM-95
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `diaDaSemana`, `NUMERO_DO_DIA` e `NomeDiaDaSemana` vêm de `backend/dominio/src/datas.ts` (já rascunhado pela T1 da partidas-e-ranking); `somarDias` de `atividade/datas.ts`. Além do pedido: `JogadorSim` (apto com idade), `montarElenco`, `jogadorDe` e `compararIds`, usados pelas tarefas seguintes.
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `SIM-01`: grupo de quinta, numa terça, dá a quinta seguinte; numa quinta, hoje; virada de ano
-- [ ] Teste `SIM-51`: `mediaInteira(683 + 684, 2)` = 684 (meio para cima); 0 jogadores dá nulo
-- [ ] Teste `SIM-95`: `idadeNaData(null, d)` é nulo; `idadeNaData(1990, '2026-01-01')` = 36 em qualquer dia
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `SIM-01`: grupo de quinta, numa terça, dá a quinta seguinte; numa quinta, hoje; virada de ano
+- [x] Teste `SIM-51`: `mediaInteira(683 + 684, 2)` = 684 (meio para cima); 0 jogadores dá nulo
+- [x] Teste `SIM-95`: `idadeNaData(null, d)` é nulo; `idadeNaData(1990, '2026-01-01')` = 36 em qualquer dia
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -399,17 +400,17 @@ T53 → T54
 **Depends on**: T2
 **Reuses**: Regra de `L:backend/dominio/src/simulador/previa.ts`; critérios `S:110-114`; Independent Test `S:118`
 **Requirement**: SIM-09, SIM-10, SIM-11, SIM-12, SIM-13
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `calcularPrevia({ formato, n, aptos })` recebe a quantidade de aptos (o K não muda a prévia); a prévia carrega `n` e `aptos` para a descrição (T4).
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `SIM-10`: 19 aptos, N = 7: válida com 5 reservas; 14 aptos: 0 reservas
-- [ ] Teste `SIM-11`: 19 aptos, N = 11: `maiorNPossivel` 9; 3 aptos: nulo
-- [ ] Teste `SIM-12`: 18 aptos, N = 4: 4 completos e incompleto de 2; 20 aptos: 5 completos, sem incompleto
-- [ ] Teste `SIM-13`: 8 aptos, N = 4: inválida, `nSugerido` 3, `doisTimesPossivel` verdadeiro; 3 aptos: `nSugerido` nulo e falso
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `SIM-10`: 19 aptos, N = 7: válida com 5 reservas; 14 aptos: 0 reservas
+- [x] Teste `SIM-11`: 19 aptos, N = 11: `maiorNPossivel` 9; 3 aptos: nulo
+- [x] Teste `SIM-12`: 18 aptos, N = 4: 4 completos e incompleto de 2; 20 aptos: 5 completos, sem incompleto
+- [x] Teste `SIM-13`: 8 aptos, N = 4: inválida, `nSugerido` 3, `doisTimesPossivel` verdadeiro; 3 aptos: `nSugerido` nulo e falso
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -427,15 +428,15 @@ T53 → T54
 **Depends on**: T3
 **Reuses**: Textos de `S:111-114`; `L:backend/api/src/aplicacao/simulador/descricao.ts` (regra, escrita do zero no domínio)
 **Requirement**: SIM-10, SIM-11, SIM-12, SIM-13
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `SIM-10`: "2 times de 7 · 5 reservas", "2 times de 7 · 1 reserva", "2 times de 7"
-- [ ] Teste `SIM-11`: "Faltam aptos para 2 times de 11. Maior N possível: 9."
-- [ ] Teste `SIM-13`: as três continuações ("Use N menor ou o formato 2 times.", "Use N menor.", "Use o formato 2 times.") e o caso sem nenhuma
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `SIM-10`: "2 times de 7 · 5 reservas", "2 times de 7 · 1 reserva", "2 times de 7"
+- [x] Teste `SIM-11`: "Faltam aptos para 2 times de 11. Maior N possível: 9."
+- [x] Teste `SIM-13`: as três continuações ("Use N menor ou o formato 2 times.", "Use N menor.", "Use o formato 2 times.") e o caso sem nenhuma
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -455,16 +456,16 @@ T53 → T54
 **Depends on**: T4
 **Reuses**: `inicioDaContagem` (`PR:534`) e `acumuladoPorInicio` (`PR:558`) pelo `index.ts` da pontuação (a regra de lint de `PR:1758` proíbe as internas); `vespera` (`PR:457`); `compararApelido` (`GE:575`); regra de `L:backend/dominio/src/simulador/prioridade.ts`; `S:130-133`, Independent Test `S:136`
 **Requirement**: SIM-16, SIM-17, SIM-18
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: rascunhada depois da T14, quando a função única de acumulado (`pontuacao/acumulado.ts`, T5 da partidas-e-ranking) já estava commitada. Não há `index.ts` da pontuação: usa `acumuladoPorInicio` direto e os tipos do histórico de `ranking/calcular.ts` (`JogadorDoRanking`, `PartidaDoRanking`, `PresencaDoRanking`). O apelido compara só pela `chaveBusca` (o `compararApelido` desempata pelo texto original, e SIM-16 pede o id).
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `SIM-17`: A com 10 até a véspera e B com 8 (12 contando a partida da própria data): A antes de B
-- [ ] Teste `SIM-18`: grupo sem partida anterior: ordem por ano, apelido e id; sem ano vai ao fim
-- [ ] Teste `SIM-16`: "José" e "Jose" empatados em tudo: o id menor primeiro
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `SIM-17`: A com 10 até a véspera e B com 8 (12 contando a partida da própria data): A antes de B
+- [x] Teste `SIM-18`: grupo sem partida anterior: ordem por ano, apelido e id; sem ano vai ao fim
+- [x] Teste `SIM-16`: "José" e "Jose" empatados em tudo: o id menor primeiro
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -482,17 +483,17 @@ T53 → T54
 **Depends on**: T5
 **Reuses**: `vagasDeReserva` de `L:backend/dominio/src/simulador/classificacao.ts:32-46`; `S:148-150`, `S:340`
 **Requirement**: SIM-21, SIM-22, SIM-23, SIM-89
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: a T5 (ordem de prioridade) ainda não foi rascunhada (depende da pontuação da partidas-e-ranking); `classificarDoisTimes` recebe a lista já ordenada e é genérica no tipo do apto.
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `SIM-22`: 19 aptos, N = 7, K = 2: 14 titulares, 4 que entram, 1 "não entra"
-- [ ] Teste `SIM-22`: K ilimitado com 40 aptos e N = 7: 14 entram, 12 "não entram"; K = 9 com N = 7 usa min(K, N)
-- [ ] Teste `SIM-89`: K = 0: ninguém entra, todos os reservas em "não entra"
-- [ ] Teste `SIM-23`: reserva "só 1º" além do limite fica em "não entra"
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `SIM-22`: 19 aptos, N = 7, K = 2: 14 titulares, 4 que entram, 1 "não entra"
+- [x] Teste `SIM-22`: K ilimitado com 40 aptos e N = 7: 14 entram, 12 "não entram"; K = 9 com N = 7 usa min(K, N)
+- [x] Teste `SIM-89`: K = 0: ninguém entra, todos os reservas em "não entra"
+- [x] Teste `SIM-23`: reserva "só 1º" além do limite fica em "não entra"
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -510,16 +511,16 @@ T53 → T54
 **Depends on**: T6
 **Reuses**: `L:backend/dominio/src/simulador/classificacao.ts:52-60`; `S:151-152`, `S:340-341`, Independent Test `S:155`
 **Requirement**: SIM-24, SIM-25, SIM-89, SIM-90
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `SIM-24`: time com 2 reservas e um titular "só 1º": sai ele e o titular de pior prioridade
-- [ ] Teste `SIM-90`: titular "só 1º" sem reserva sai e fica em "sai sem par"
-- [ ] Teste `SIM-89`: K = 0 só os "só 1º" saem
-- [ ] Teste `SIM-25`: 3 saem e 2 entram: 2 pares na ordem e 1 sai sem par
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `SIM-24`: time com 2 reservas e um titular "só 1º": sai ele e o titular de pior prioridade
+- [x] Teste `SIM-90`: titular "só 1º" sem reserva sai e fica em "sai sem par"
+- [x] Teste `SIM-89`: K = 0 só os "só 1º" saem
+- [x] Teste `SIM-25`: 3 saem e 2 entram: 2 pares na ordem e 1 sai sem par
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -539,18 +540,18 @@ T53 → T54
 **Depends on**: T7
 **Reuses**: `chaveDe` de `L:backend/dominio/src/simulador/distribuicao-dois.ts:61-106`; `mediaInteira` e `idadeNaData` (T2); `S:169-170`, `S:346`
 **Requirement**: SIM-29, SIM-30, SIM-51, SIM-95
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: a chave recebe o elenco em vetores indexados pela ordem de prioridade (`elencoDois`); `TimeDois` e `ComposicaoDois` nascem aqui.
 **Lacunas**: idade média nula num dos times (ninguém com ano) contra outro com idade: o critério (4) vale 0 (`chave-dois.ts`, `[LACUNA]`).
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `SIM-29`: composição com time sem N titulares perde de qualquer outra com N, mesmo com nível pior
-- [ ] Teste `SIM-30`: substituições 3 × 1 perdem de 2 × 2 antes de olhar o nível
-- [ ] Teste `SIM-95`: jogador sem ano não entra na idade média; time sem ninguém com ano tem idade nula e o critério (4) não lança
-- [ ] Teste `SIM-51`: a chave só tem inteiros (`Number.isInteger` em cada termo)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `SIM-29`: composição com time sem N titulares perde de qualquer outra com N, mesmo com nível pior
+- [x] Teste `SIM-30`: substituições 3 × 1 perdem de 2 × 2 antes de olhar o nível
+- [x] Teste `SIM-95`: jogador sem ano não entra na idade média; time sem ninguém com ano tem idade nula e o critério (4) não lança
+- [x] Teste `SIM-51`: a chave só tem inteiros (`Number.isInteger` em cada termo)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -568,17 +569,17 @@ T53 → T54
 **Depends on**: T8
 **Reuses**: `L:backend/dominio/src/simulador/distribuicao-dois.ts:7` (200), `:21` (serpentina), `:127-154` (laço); `S:167-172`, `S:342-343`, Independent Test `S:174`
 **Requirement**: SIM-27, SIM-28, SIM-30, SIM-31, SIM-32, SIM-59, SIM-91, SIM-92
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `distribuirDoisTimes(classificacao, n, elenco, { maxTrocas })` devolve `{ composicao, trocasAceitas }`; o teto injetável é só para teste.
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `SIM-91`: 4 aptos iguais, N = 2, K = 0: A recebe o 1º e o 4º, zero trocas aceitas
-- [ ] Teste `SIM-31`: na saída, nenhuma troca titular↔titular nem reserva↔reserva diminui a chave (força bruta no teste)
-- [ ] Teste `SIM-92`: com teto 1 injetado, devolve a melhor até ali com N titulares por time
-- [ ] Teste `SIM-27`: um craque muito acima fica no time que, sem ele, tem menos nível
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `SIM-91`: 4 aptos iguais, N = 2, K = 0: A recebe o 1º e o 4º, zero trocas aceitas
+- [x] Teste `SIM-31`: na saída, nenhuma troca titular↔titular nem reserva↔reserva diminui a chave (força bruta no teste)
+- [x] Teste `SIM-92`: com teto 1 injetado, devolve a melhor até ali com N titulares por time
+- [x] Teste `SIM-27`: um craque muito acima fica no time que, sem ele, tem menos nível
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -598,16 +599,16 @@ T53 → T54
 **Depends on**: T9
 **Reuses**: `L:backend/dominio/src/simulador/distribuicao-varios.ts:10` (60 aptos), `:70-82` (vaivém); `S:186-190`, Independent Test `S:193`
 **Requirement**: SIM-33, SIM-34, SIM-35, SIM-37
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `montarVariosTimes(elenco, n)` recebe o elenco (T2) e devolve `{ times, incompleto }`; `MAX_APTOS_SIMULADOR` (60) nasce aqui.
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `SIM-34`: 22 aptos, N = 4: 5 times de 4 e um incompleto de 2, por último; 20 aptos: 5 de 4
-- [ ] Teste `SIM-35`: vaivém com capacidade: o incompleto não recebe além de R
-- [ ] Teste `SIM-37`: o pior nível não vai obrigatoriamente para o incompleto
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `SIM-34`: 22 aptos, N = 4: 5 times de 4 e um incompleto de 2, por último; 20 aptos: 5 de 4
+- [x] Teste `SIM-35`: vaivém com capacidade: o incompleto não recebe além de R
+- [x] Teste `SIM-37`: o pior nível não vai obrigatoriamente para o incompleto
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -625,17 +626,17 @@ T53 → T54
 **Depends on**: T10
 **Reuses**: `L:backend/dominio/src/simulador/distribuicao-varios.ts:7` (200), `:33-47` (chave), `:94-119` (laço); `S:189-190`, `S:343`
 **Requirement**: SIM-36, SIM-37, SIM-59, SIM-92
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `distribuirVariosTimes(inicial, elenco, { maxTrocas })` parte da saída de `montarVariosTimes` (T10) e devolve `{ times, incompleto, trocasAceitas }`.
 **Lacunas**: time sem ninguém com ano (idade média nula) fica fora da amplitude de idade da chave (`distribuicao-varios.ts`, `[LACUNA]`).
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `SIM-36`: na saída, nenhuma troca entre dois times diminui a chave (força bruta no teste)
-- [ ] Teste `SIM-92`: com teto 1 injetado, os tamanhos continuam os da prévia
-- [ ] Teste `SIM-37`: saída de cada time por nível (maior primeiro) e id
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `SIM-36`: na saída, nenhuma troca entre dois times diminui a chave (força bruta no teste)
+- [x] Teste `SIM-92`: com teto 1 injetado, os tamanhos continuam os da prévia
+- [x] Teste `SIM-37`: saída de cada time por nível (maior primeiro) e id
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -655,16 +656,16 @@ T53 → T54
 **Depends on**: T11
 **Reuses**: `L:backend/dominio/src/simulador/indicadores.ts`; T7 (pares); `S:205`
 **Requirement**: SIM-39, SIM-95
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: recebe também as posições na ordem de prioridade (`Posicoes`), para a composição ajustada (T16) derivar quem sai pela prioridade.
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `SIM-39`: no 2º tempo, quem sai no intervalo deixa a soma e quem entra é somado
-- [ ] Teste `SIM-39`: time sem ninguém no 2º tempo tem nível médio nulo
-- [ ] Teste `SIM-95`: idade média ignora quem não tem ano
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `SIM-39`: no 2º tempo, quem sai no intervalo deixa a soma e quem entra é somado
+- [x] Teste `SIM-39`: time sem ninguém no 2º tempo tem nível médio nulo
+- [x] Teste `SIM-95`: idade média ignora quem não tem ano
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -682,13 +683,13 @@ T53 → T54
 **Depends on**: T12
 **Reuses**: `L:backend/dominio/src/simulador/indicadores.ts`; `mediaInteira` (T2); `S:206`
 **Requirement**: SIM-40, SIM-95
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `SIM-40`: time de 4 com níveis 600, 650, 700, 683: soma 2633, média 658
-- [ ] Teste `SIM-95`: time só com jogadores sem ano tem idade média nula
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SIM-40`: time de 4 com níveis 600, 650, 700, 683: soma 2633, média 658
+- [x] Teste `SIM-95`: time só com jogadores sem ano tem idade média nula
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -706,18 +707,18 @@ T53 → T54
 **Depends on**: T13
 **Reuses**: `L:backend/dominio/src/simulador/avisos.ts:61-73` (N alternativos) e textos de `L:backend/api/src/aplicacao/simulador/textos-avisos.ts`; `S:208-212`, Independent Test `S:214`
 **Requirement**: SIM-42, SIM-43, SIM-44, SIM-45, SIM-46, SIM-90
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: duas funções, `avisosDoisTimes` e `avisosVariosTimes`, devolvendo `{ tipo, texto }`. O exemplo "2 'só 1º' e 1 reserva … com o plural" dá 1 jogador pela regra de SIM-42 (titulares "só 1º" − reservas); o teste do plural usa 3 e 1.
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `SIM-44`: "Léo Baiano e Serginho não têm nota: usamos nível 5,5."; um só: "não tem nota"
-- [ ] Teste `SIM-42`, `SIM-90`: time com 2 "só 1º" e 1 reserva entrando avisa com o plural
-- [ ] Teste `SIM-45`: 13 aptos, N = 4 (incompleto de 1): "Experimente N = …" só com N que forma 3 times sem incompleto menor que a metade
-- [ ] Teste `SIM-43`: 3+ com dois times abaixo de N avisa e lista os times
-- [ ] Teste `SIM-46`: nenhum texto contém um nível individual (regex `\d,\d` só no aviso de sem nota)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `SIM-44`: "Léo Baiano e Serginho não têm nota: usamos nível 5,5."; um só: "não tem nota"
+- [x] Teste `SIM-42`, `SIM-90`: time com 2 "só 1º" e 1 reserva entrando avisa com o plural
+- [x] Teste `SIM-45`: 13 aptos, N = 4 (incompleto de 1): "Experimente N = …" só com N que forma 3 times sem incompleto menor que a metade
+- [x] Teste `SIM-43`: 3+ com dois times abaixo de N avisa e lista os times
+- [x] Teste `SIM-46`: nenhum texto contém um nível individual (regex `\d,\d` só no aviso de sem nota)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -737,16 +738,16 @@ T53 → T54
 **Depends on**: T14
 **Reuses**: `L:backend/dominio/src/simulador/sugerir.ts`; exportação pública do domínio (`PR:840`); `S:133`, `S:226-228`
 **Requirement**: SIM-19, SIM-47, SIM-48, SIM-49
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `sugerir(entrada, historico)` devolve `valida: false` com a prévia e a descrição quando faltam aptos (a rota faz o 422). O `index.ts` exporta também `idadeNaData` e os tipos de resultado (a rota e o contrato usam); o `avaliar` entra na T16. Apoio de teste em `backend/dominio/test/simulador/apoio.ts` (elenco e histórico fixos, embaralhamento sem aleatoriedade).
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `SIM-49`: aptos, jogadores, partidas e presenças embaralhados dão o mesmo resultado (`toStrictEqual`)
-- [ ] Teste `SIM-19`: em 3+, o resultado não tem `ordemPrioridade`
-- [ ] Teste `SIM-47`: aptos insuficientes devolvem erro com a descrição da prévia
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `SIM-49`: aptos, jogadores, partidas e presenças embaralhados dão o mesmo resultado (`toStrictEqual`)
+- [x] Teste `SIM-19`: em 3+, o resultado não tem `ordemPrioridade`
+- [x] Teste `SIM-47`: aptos insuficientes devolvem erro com a descrição da prévia
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -764,17 +765,17 @@ T53 → T54
 **Depends on**: T15
 **Reuses**: `L:backend/api/src/aplicacao/simulador/avaliar.ts` (regra); T7, T12 a T14; `S:254-255`, Independent Test `S:260`
 **Requirement**: SIM-62, SIM-63
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `avaliar(entrada, composicao, historico)` devolve `{ ok: false, campo: 'composicao', mensagem }` ou a avaliação; `idsDaComposicaoEntrada` e `problemaNaComposicao` também servem ao contrato e à rota de escalação.
 **Lacunas**: composição que não cobre todos os aptos: o legado recusava ("A composição precisa incluir todos os aptos."), a spec não pede; vale a spec (`avaliar.ts`, `[LACUNA]`).
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `SIM-62`: mover Japa de A para B muda somas e pares e mantém o resto da composição
-- [ ] Teste `SIM-63`: "Há jogador repetido na composição." e "Há jogador fora dos aptos na composição."
-- [ ] Teste `SIM-62`: avaliar a própria sugestão devolve os mesmos indicadores e avisos de `sugerir`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `SIM-62`: mover Japa de A para B muda somas e pares e mantém o resto da composição
+- [x] Teste `SIM-63`: "Há jogador repetido na composição." e "Há jogador fora dos aptos na composição."
+- [x] Teste `SIM-62`: avaliar a própria sugestão devolve os mesmos indicadores e avisos de `sugerir`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -792,14 +793,14 @@ T53 → T54
 **Depends on**: T16
 **Reuses**: Regra do domínio sem relógio (AD-028, `GE:527`) e teste de regra por arquivo de exemplo (`F:385`); `S:227-229`
 **Requirement**: SIM-48, SIM-49, SIM-50
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: a varredura é por texto, inclusive em comentário (os fontes do simulador não citam os nomes proibidos); a prova com o arquivo de `Math.random()` é do /executar.
 
 **Done when**:
 
-- [ ] Teste `SIM-50`: um arquivo de prova com `Math.random()` no diretório faz o teste falhar (conferido e removido)
-- [ ] Teste `SIM-48`: 20 chamadas iguais dão respostas iguais
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SIM-50`: um arquivo de prova com `Math.random()` no diretório faz o teste falhar (conferido e removido)
+- [x] Teste `SIM-48`: 20 chamadas iguais dão respostas iguais
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -819,15 +820,15 @@ T53 → T54
 **Depends on**: T17
 **Reuses**: Fixtures de `L:backend/dominio/test/simulador/apoio.ts` e `L:backend/dominio/test/simulador/sugerir.test.ts` como dado; Goal `S:25`; AD-046; molde de regressão `PR:584` (T6)
 **Requirement**: SIM-52
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: 7 casos (4 em 2 times, 3 em 3+) sobre o elenco e o histórico de `apoio.ts`; o esperado fica em `referencia-legado.json`, hoje com `null` em cada caso, e o teste do caso falha até a saída do legado ser registrada. Rodar o legado é do /executar (o rascunho não executa nada).
 **Lacunas**: os esperados dependem de rodar o legado `ece227e0`; a conversão da entrada (nível × 100, mesmo histórico) está no cabeçalho do teste. Divergência entre v2 e legado: parar e perguntar, como a tarefa manda.
 
 **Done when**:
 
-- [ ] Teste `SIM-52`: cada caso dá a composição, a ordem e os avisos registrados
-- [ ] `Evidência`: comando, commit `ece227e0` e saída do legado para cada entrada, no cabeçalho do teste
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SIM-52`: cada caso dá a composição, a ordem e os avisos registrados
+- [x] `Evidência`: comando, commit `ece227e0` e saída do legado para cada entrada, no cabeçalho do teste
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -845,15 +846,15 @@ T53 → T54
 **Depends on**: T18
 **Reuses**: `L:backend/dominio/test/simulador/sugerir.orcamento.test.ts:10` (limiar 4 ms); bench de `PR:840` (T16); `S:236`
 **Requirement**: SIM-57
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: rascunhada antes da T18 (que pede rodar o legado, fora do rascunho). A medição (`test/simulador/medir.ts`) usa `performance.now()` em `test/`, fora da regra sem relógio de `src/`; o elenco e o histórico grandes estão no `apoio.ts`. Os números são impressos para a Evidência.
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `SIM-57`: mediana e p99 < 4 ms nos dois cenários, com aquecimento descartado
-- [ ] `Evidência`: números medidos na máquina local e no CI
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `SIM-57`: mediana e p99 < 4 ms nos dois cenários, com aquecimento descartado
+- [x] `Evidência`: números medidos na máquina local e no CI
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -871,16 +872,16 @@ T53 → T54
 **Depends on**: T19
 **Reuses**: `MAX_APTOS_SIMULADOR` de `L:backend/dominio/src/simulador/distribuicao-varios.ts:10`; Assumption `S:56`; T19
 **Requirement**: SIM-58, SIM-59
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: 20 medições por combinação e função, com 5 de aquecimento (são 40 medições no teste). O teto de avaliações continua `[A ESCLARECER]`: só entra se a medição passar de 4 ms.
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `SIM-58`: as 20 combinações × 2 funções abaixo de 4 ms (p99)
-- [ ] Teste `SIM-59`: toda combinação devolve composição válida
-- [ ] `Evidência`: a pior combinação e o tempo dela; teto de avaliações [A ESCLARECER: só se a medição passar de 4 ms]
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `SIM-58`: as 20 combinações × 2 funções abaixo de 4 ms (p99)
+- [x] Teste `SIM-59`: toda combinação devolve composição válida
+- [x] `Evidência`: a pior combinação e o tempo dela; teto de avaliações [A ESCLARECER: só se a medição passar de 4 ms]
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -900,16 +901,16 @@ T53 → T54
 **Depends on**: None
 **Reuses**: Primitivos zod (`CA:550`) e data real de `PR:889` (T18); `L:backend/contrato/src/simulador/contexto.ts`, `previa.ts` e `entrada.ts:24-30`
 **Requirement**: SIM-01, SIM-04, SIM-09, SIM-55
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `SPEC_DEVIATION`: a data real de `PR:889` ainda não existe no contrato; usa `ehDataDoCalendario` de `contrato/src/elenco.ts`. Lista de aptos vazia é aceita (a prévia descreve como insuficiente, sem mensagem nova). Id que não é UUID recebe a mensagem de SIM-54, sem revelar nada (SIM-80). O `index.ts` e o `package.json` do contrato ainda não exportam o arquivo (entram junto com a T23).
 **Lacunas**: SIM-53 dá "Há jogador repetido nos aptos." também para mais de 60 aptos; vale o texto da spec (`simulador.ts`, `[LACUNA]`).
 
 **Done when**:
 
-- [ ] Teste `SIM-04`: `2026-02-30` e `2026-1-1` recusados no campo `data`
-- [ ] Teste `SIM-55`: N 1 e 12, K 21 e "infinito" recusados no campo; campo ausente recusado
-- [ ] Teste: campo desconhecido recusado (`.strict()`)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SIM-04`: `2026-02-30` e `2026-1-1` recusados no campo `data`
+- [x] Teste `SIM-55`: N 1 e 12, K 21 e "infinito" recusados no campo; campo ausente recusado
+- [x] Teste: campo desconhecido recusado (`.strict()`)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -927,15 +928,15 @@ T53 → T54
 **Depends on**: T21
 **Reuses**: `L:backend/contrato/src/simulador/entrada.ts` e `resultado.ts`; `S:186`, `S:226`, `S:232`, `S:313`
 **Requirement**: SIM-33, SIM-47, SIM-53, SIM-55, SIM-62, SIM-82
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: as composições (`composicaoDois`, `composicaoVarios`), `Escalada` e `idsDaComposicao` nascem aqui, no `simulador.ts`, porque o `avaliarCorpo` precisa delas antes da T23; a T23 as reusa. `ordemPrioridade` da resposta vai em ids; `saiNoIntervalo`, `saiSemPar` e `entraSemPar` são marcações da troca, não dado do jogador.
 
 **Done when**:
 
-- [ ] Teste `SIM-33`: 3+ com `k` ou com `so1oTempo` recusado
-- [ ] Teste `SIM-53`: 61 aptos e id repetido recusados com "Há jogador repetido nos aptos." no campo `aptos`
-- [ ] Teste `SIM-82`: resposta com `telefone`, `anoNascimento`, `idade`, `posicao`, `notas` ou `pontos` em qualquer jogador é recusada
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SIM-33`: 3+ com `k` ou com `so1oTempo` recusado
+- [x] Teste `SIM-53`: 61 aptos e id repetido recusados com "Há jogador repetido nos aptos." no campo `aptos`
+- [x] Teste `SIM-82`: resposta com `telefone`, `anoNascimento`, `idade`, `posicao`, `notas` ou `pontos` em qualquer jogador é recusada
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -953,15 +954,15 @@ T53 → T54
 **Depends on**: T22
 **Reuses**: `L:backend/contrato/src/simulador/escalacao.ts`; `L:backend/api/src/aplicacao/simulador/composicao.ts:4-11`; `S:272`, `S:345`
 **Requirement**: SIM-67, SIM-82, SIM-94
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `composicaoDois`, `composicaoVarios`, `Escalada` e `idsDaComposicao` ficaram no `simulador.ts` (T22); aqui `composicaoGravada` os reúne por formato. O `index.ts` e o `package.json` do contrato passam a exportar `simulador` e `escalacao`.
 
 **Done when**:
 
-- [ ] Teste `SIM-94`: JSON sem `times`, com tipo errado ou com campo extra dá nulo, sem lançar
-- [ ] Teste `SIM-82`: `composicaoGravada` com apelido ou nível recusada
-- [ ] Teste `SIM-67`: `idsDaComposicao` de 2 times inclui titulares, reservas e "não entra"
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SIM-94`: JSON sem `times`, com tipo errado ou com campo extra dá nulo, sem lançar
+- [x] Teste `SIM-82`: `composicaoGravada` com apelido ou nível recusada
+- [x] Teste `SIM-67`: `idsDaComposicao` de 2 times inclui titulares, reservas e "não entra"
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -979,15 +980,15 @@ T53 → T54
 **Depends on**: T23
 **Reuses**: Estender `partidaNova` (`PR:889`, T18) e `grupoDetalhe` (`GE:753`, ampliado em `PR:937`); resposta do mockup `respostas/partida-nova-2026-10-22.json` (já tem o campo)
 **Requirement**: SIM-08, SIM-75
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `SPEC_DEVIATION`: a forma do GET do grupo é o `grupoDetalheComPartidas` (`contrato/src/previas.ts`, T20 da partidas-e-ranking), e o `grupoDetalhe` ficou só para o PATCH; os 2 campos do simulador vão no `grupoDetalheComPartidas`. Os testes existentes de `partidas.test.ts` (PAR-17) e `previas.test.ts` (PAR-132) passam a enviar os campos novos (autorizado), sem asserção removida.
 
 **Done when**:
 
-- [ ] Teste `SIM-75`: `partidaNova` sem `preMarcadaPelaEscalacao` é recusada
-- [ ] Teste `SIM-08`: `grupoDetalhe` exige os 2 campos novos
-- [ ] Os testes existentes dos dois schemas passam a esperar os campos novos (autorizado, `## Autorizações`), sem asserção removida
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SIM-75`: `partidaNova` sem `preMarcadaPelaEscalacao` é recusada
+- [x] Teste `SIM-08`: `grupoDetalhe` exige os 2 campos novos
+- [x] Os testes existentes dos dois schemas passam a esperar os campos novos (autorizado, `## Autorizações`), sem asserção removida
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1007,16 +1008,16 @@ T53 → T54
 **Depends on**: T1
 **Reuses**: Gerador e checagem aditiva (`F:883`, `F:858`: `DROP FUNCTION` não está na lista, sem exceção); função de 7 de `PR:987` (T22); meta-teste `GE:502` (T6); AD-037, AD-048
 **Requirement**: SIM-67 (AD-037)
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `1792844940000_grupo-criar-contrair.sql` (folga da feature 5 entre a última da `partidas-e-ranking` e a primeira do `financeiro`). O seed passa a chamar a de 7 com `(now() AT TIME ZONE 'America/Sao_Paulo')::date` no SQL do próprio seed (a data que a de 6 calculava; lacuna da T1). Os testes da lista da T1 recebem o 7º argumento com essa mesma data, mesmas asserções; em `grupo-criar-pesos.test.ts` o caso da delegação vira "a de 6 não existe (42883)", o `it.each` fica só com a de 7 e a regra do relógio exige zero funções; a rede da T1 se inverte (só a de 7). A referência do schema (`migracoes/esquema-producao.txt`, `F:784`) não existe no repositório: o /executar a regenera (`esquema-gerar`) com a função a menos.
 
 **Done when**:
 
-- [ ] Teste: o catálogo tem só a `grupo_criar` de 7 parâmetros, com `SECURITY DEFINER`, `search_path` e `EXECUTE` só para `pelada_app`
-- [ ] Teste: os testes de T1 passam com a de 7, mesmas asserções (sufixo, rollback, concorrência, pesos)
-- [ ] Teste: com a exceção da AD-037 removida, o teste de `PR:987` ("nenhuma outra função usa `now()` para data") passa a exigir zero funções (autorizado, `## Autorizações`)
-- [ ] Teste: migrar de novo não faz DDL (`F:834`)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste: o catálogo tem só a `grupo_criar` de 7 parâmetros, com `SECURITY DEFINER`, `search_path` e `EXECUTE` só para `pelada_app`
+- [x] Teste: os testes de T1 passam com a de 7, mesmas asserções (sufixo, rollback, concorrência, pesos)
+- [x] Teste: com a exceção da AD-037 removida, o teste de `PR:987` ("nenhuma outra função usa `now()` para data") passa a exigir zero funções (autorizado, `## Autorizações`)
+- [x] Teste: migrar de novo não faz DDL (`F:834`)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1034,14 +1035,14 @@ T53 → T54
 **Depends on**: T25
 **Reuses**: Estender `tipos.ts` (`GE:878`, `PR:1013`); colunas `M:1792843200000_linha-de-base.sql:194-228`
 **Requirement**: SIM-67
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: rascunhada antes da T25 (que depende da T1 e da migração da `partidas-e-ranking`). Só `escalacoes`: `eventos_uso` é tipada pela T80 da `partidas-e-ranking`, ainda não rascunhada; o INSERT do evento (T28) usa o `sql` do Kysely até lá. Teste próprio em `backend/api/test/banco/escalacoes-tipos.test.ts` (molde `financeiro-tipos.test.ts`).
 
 **Done when**:
 
-- [ ] Teste: os tipos batem com o catálogo em `escalacoes`
-- [ ] `pnpm typecheck` passa
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste: os tipos batem com o catálogo em `escalacoes`
+- [x] `pnpm typecheck` passa
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1061,15 +1062,15 @@ T53 → T54
 **Depends on**: T26
 **Reuses**: Estender `jogadores-leitura.ts` (`GE:1179`, duas consultas e nível no domínio); `ativosNaData` (`PR:1185`); `compararApelido` (`GE:575`)
 **Requirement**: SIM-01, SIM-02, SIM-03
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `ativosNaData` é o do domínio (`partidas/marcacoes.ts`, já rascunhado), não um repositório de `PR:1185`: a 1ª consulta agrega os períodos de cada jogador (`json_agg`) e o domínio filtra; a 2ª lê as notas. Saída `{ id, apelido, anoNascimento, nivel, semNota }` (o ano vai para a idade média; a rota responde só `semAno`). Teste em `backend/api/test/repositorios/jogadores-simulador.test.ts`, com o SQL compilado registrado por um plugin.
 
 **Done when**:
 
-- [ ] Teste `SIM-02`: jogador com período que termina na data não aparece; que começa na data aparece
-- [ ] Teste `SIM-03`: a consulta não seleciona telefone, posição nem notas individuais (consulta registrada)
-- [ ] Teste: 30 jogadores em exatamente 2 consultas; jogador de outro grupo não aparece
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SIM-02`: jogador com período que termina na data não aparece; que começa na data aparece
+- [x] Teste `SIM-03`: a consulta não seleciona telefone, posição nem notas individuais (consulta registrada)
+- [x] Teste: 30 jogadores em exatamente 2 consultas; jogador de outro grupo não aparece
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1087,17 +1088,17 @@ T53 → T54
 **Depends on**: T27
 **Reuses**: `L:backend/api/src/aplicacao/simulador/confirmar-escalacao.ts`; INSERT de evento com conta de `PR:1212` (T30, `partida_lancada`); `ON CONFLICT` de `PR:1159` (T28); `c.var.db` (`FD:103`)
 **Requirement**: SIM-67, SIM-69, SIM-70, SIM-72, SIM-87
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `escalacoes.confirmar(db, grupoId, { data, n, k?, escalada }, conta, momento)`; o momento vem do relógio (`agoraIso`). O INSERT do evento vai pelo `sql` do Kysely (sem `eventos_uso` nos tipos até a T80 da `partidas-e-ranking`), sem o molde de `PR:1212`, que ainda não existe. SIM-87 com duas conexões: a primeira segura a transação até a segunda aparecer em `pg_stat_activity` esperando lock.
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `SIM-87`: duas conexões confirmando a mesma data terminam com uma linha (a última) e nenhum 23505
-- [ ] Teste `SIM-70`: falha forçada no INSERT do evento desfaz a escalação; falha na escalação não grava evento
-- [ ] Teste `SIM-69`: confirmar duas vezes deixa uma linha com a segunda composição e dois eventos
-- [ ] Teste `SIM-72`: 3+ e 2 times ilimitado gravam `k` nulo; o evento não tem dado de jogador
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `SIM-87`: duas conexões confirmando a mesma data terminam com uma linha (a última) e nenhum 23505
+- [x] Teste `SIM-70`: falha forçada no INSERT do evento desfaz a escalação; falha na escalação não grava evento
+- [x] Teste `SIM-69`: confirmar duas vezes deixa uma linha com a segunda composição e dois eventos
+- [x] Teste `SIM-72`: 3+ e 2 times ilimitado gravam `k` nulo; o evento não tem dado de jogador
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1115,15 +1116,15 @@ T53 → T54
 **Depends on**: T28
 **Reuses**: `lerComposicao` e `idsDaComposicao` (T23); `L:backend/api/src/aplicacao/partidas/nova.ts:51-58`
 **Requirement**: SIM-75, SIM-76, SIM-94
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `porData` devolve `{ data, n, k, escalada }` ou nulo; `idsNaData` devolve os ids ou nulo. Teste em `backend/api/test/repositorios/escalacoes-ler.test.ts`, com escalações gravadas como dono (inclusive as de forma inválida).
 
 **Done when**:
 
-- [ ] Teste `SIM-94`: linha com `composicao = '{"x":1}'` (gravada como owner) volta nula, sem erro
-- [ ] Teste `SIM-75`: os ids incluem "não entra" em 2 times e todos os times em 3+
-- [ ] Teste: escalação do grupo B não é lida pelo A
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SIM-94`: linha com `composicao = '{"x":1}'` (gravada como owner) volta nula, sem erro
+- [x] Teste `SIM-75`: os ids incluem "não entra" em 2 times e todos os times em 3+
+- [x] Teste: escalação do grupo B não é lida pelo A
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1143,15 +1144,15 @@ T53 → T54
 **Depends on**: T29
 **Reuses**: Estender `eventos.porSemana` (`PR:1289`, T33); Independent Test `S:281`
 **Requirement**: SIM-70
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: contagem por `FILTER (WHERE tipo = 'escalacao_confirmada')` e o tipo entra no `IN` que forma as semanas. `eventos.test.ts` ganha os casos SIM-70 (os demais continuam esperando 0, agora contado); em `rotas/uso.test.ts` a semana de 2026-03-02, que o `beforeAll` já semeia com uma escalação, passa a esperar 1.
 **Lacunas**: semana que só tem `escalacao_confirmada` (o `[LACUNA]` da `partidas-e-ranking` em `eventos.ts`): o rascunho a mostra, com o resto zerado, por ser uso do app; o /executar confirma.
 
 **Done when**:
 
-- [ ] Teste `SIM-70`: duas confirmações da mesma data na semana contam 2
-- [ ] O teste existente de `PR:1289` e o de `PR:1561` passam a esperar a contagem real (autorizado, `## Autorizações`), sem asserção removida
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SIM-70`: duas confirmações da mesma data na semana contam 2
+- [x] O teste existente de `PR:1289` e o de `PR:1561` passam a esperar a contagem real (autorizado, `## Autorizações`), sem asserção removida
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1169,14 +1170,14 @@ T53 → T54
 **Depends on**: T30
 **Reuses**: Estender `grupos.ler` (`GE:1003`, ampliado em `PR:1314`); T2
 **Requirement**: SIM-08
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: os 2 campos entram em `DadosDoInicio` (só com `hoje`, como os da `partidas-e-ranking`), com `proximoDiaDeJogo` de `@pelada/dominio` (T2) e um `EXISTS` em `escalacoes` (grupo e data). Testes em `test/repositorios/grupos-inicio.test.ts`.
 **Lacunas**: escalação gravada com JSON inválido conta como existente no item do início (só a linha é consultada); a SIM-94 fala da pré-marcação. O /executar confirma.
 
 **Done when**:
 
-- [ ] Teste `SIM-08`: grupo de quinta numa terça com escalação da quinta: `escalacaoNoProximoDia` verdadeiro; sem, falso
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SIM-08`: grupo de quinta numa terça com escalação da quinta: `escalacaoNoProximoDia` verdadeiro; sem, falso
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1194,14 +1195,14 @@ T53 → T54
 **Depends on**: T31
 **Reuses**: Cadeia `exigirVinculo` → `exigirGrupoAtivo` (`CA:795`, `GE:901`); assinatura de PLA-07 (`.specs/features/planos-e-cobranca/spec.md:79`); AD-049, AD-062
 **Requirement**: SIM-68
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: rascunhada antes das T30 e T31 (que dependem dos repositórios da `partidas-e-ranking`). `recursoLiberado(db, grupoId, recurso)` (o `Db` da requisição vai junto, porque a versão da feature 7 lê a situação no banco), injetável por `criarApp({ recursoLiberado })` e lido em `c.var.recursoLiberado`; `travarRecursosDoPlano(api)` liga `exigirRecurso('simulador')` em `/grupos/:grupoId/simulador/*` e `/grupos/:grupoId/escalacoes`, depois de `protegerRotasDeGrupo`. Corpo do 403 na forma da AD-091 (`{ erro: 'plano_pro', recurso, mensagem }`), sem importar o `plano.ts` da feature 7. Teste em `backend/api/test/sessao/recurso.test.ts`; o meta-teste pede as 5 rotas das T33 a T37 e fica vermelho até elas existirem.
 
 **Done when**:
 
-- [ ] Teste `SIM-68`: com o padrão, as rotas passam; com `recursoLiberado` falso injetado, 403 `plano_pro` em todas as rotas do simulador e de escalação
-- [ ] Teste `SIM-68`: o meta-teste falha se uma rota de `/simulador` ou `/escalacoes` não tem o middleware
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SIM-68`: com o padrão, as rotas passam; com `recursoLiberado` falso injetado, 403 `plano_pro` em todas as rotas do simulador e de escalação
+- [x] Teste `SIM-68`: o meta-teste falha se uma rota de `/simulador` ou `/escalacoes` não tem o middleware
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1221,15 +1222,15 @@ T53 → T54
 **Depends on**: T32
 **Reuses**: Molde de `GET partidas/nova` (`PR:1436`, T39); `Relogio` (`GE:831`); T21, T27
 **Requirement**: SIM-01, SIM-02, SIM-03, SIM-04
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `rotasSimulador()` em `rotas/simulador.ts`, registrada no `criarApp` depois das rotas do elenco. Molde `GET …/jogadores` (`rotas/jogadores.ts:17`): o `GET partidas/nova` de `PR:1436` ainda não existe. Query lida por `consultaContexto` (strict); 422 pelo `erroDeCampos` no campo `data`. Teste em `backend/api/test/rotas/simulador-contexto.test.ts`.
 
 **Done when**:
 
-- [ ] Teste `SIM-01`: relógio numa terça, grupo de quinta, 20 ativos: a quinta seguinte e os 20 em ordem alfabética
-- [ ] Teste `SIM-02`: `data` de outra semana lista os ativos dela e mantém `dataSugerida`
-- [ ] Teste `SIM-04`: `data=2026-13-01` responde 422 no campo `data`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SIM-01`: relógio numa terça, grupo de quinta, 20 ativos: a quinta seguinte e os 20 em ordem alfabética
+- [x] Teste `SIM-02`: `data` de outra semana lista os ativos dela e mantém `dataSugerida`
+- [x] Teste `SIM-04`: `data=2026-13-01` responde 422 no campo `data`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1247,14 +1248,14 @@ T53 → T54
 **Depends on**: T33
 **Reuses**: `lerCorpo` (`GE:854`); `READ ONLY` de `PR:1362` (T36); T3, T4, T21
 **Requirement**: SIM-09, SIM-83
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `respostaDaPrevia(previa)` monta a resposta do contrato com a `descricao`. A transação `READ ONLY` pelo sufixo `/previa` (AD-035) é do `comBanco` da `partidas-e-ranking` (`PR:1362`, T36), ainda não rascunhada: esta rota não a reimplementa. Atenção para o /executar: em `READ ONLY` o `SELECT … FOR KEY SHARE` do `exigirGrupoAtivo` falha no Postgres; a T36 da `partidas-e-ranking` precisa tratar o sufixo. Teste em `backend/api/test/rotas/simulador-previa.test.ts`.
 
 **Done when**:
 
-- [ ] Teste `SIM-09`: 19 aptos, N = 7 responde "2 times de 7 · 5 reservas" e nenhuma consulta a tabela de negócio (consulta registrada)
-- [ ] Teste `SIM-83`: grupo arquivado responde 409 `grupo_arquivado`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SIM-09`: 19 aptos, N = 7 responde "2 times de 7 · 5 reservas" e nenhuma consulta a tabela de negócio (consulta registrada)
+- [x] Teste `SIM-83`: grupo arquivado responde 409 `grupo_arquivado`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1272,17 +1273,17 @@ T53 → T54
 **Depends on**: T34
 **Reuses**: `historico.carregar` (`PR:1135`); T15, T22, T27; log de `L:backend/api/src/entrada/rotas/grupos/simulador/sugerir.ts:20-29`; captura de log de `CA:1047` (T31)
 **Requirement**: SIM-17, SIM-47, SIM-53, SIM-54, SIM-55, SIM-56, SIM-60, SIM-80
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: entrada e saída entre contrato e domínio em `rotas/simulador-resultado.ts` (a T36 reaproveita): aptos do corpo + dados do `paraSimulador` na data; resposta com "Time A"/"Time B" e "Time 1"…, `saiNoIntervalo` pelos `saem` dos indicadores, trocas pelos pares. A API não tem módulo de log: a linha de SIM-60 é um `console.log` com JSON (`evento: simulador_sugerir`), que vai ao `wrangler tail`; o teste espia o `console`. Teste em `test/rotas/simulador-sugerir.test.ts`.
 
 **Done when**:
 
-- [ ] Teste `SIM-47`: sugestão de 19 aptos com a ordem de prioridade e nada gravado (contagem antes e depois)
-- [ ] Teste `SIM-54`, `SIM-80`: id de jogador inativo ou do grupo B dá 422 "Há jogadores que não estão ativos no grupo nesta data." sem apelido na resposta
-- [ ] Teste `SIM-56`: 8 aptos, 3+, N = 4: 422 com "Com 8 aptos e N = 4 não há 3 times. …" em `aptos`
-- [ ] Teste `SIM-60`: uma linha de log com `formato`, `n`, `k`, `aptos` e sem id, apelido nem grupo
-- [ ] Teste `SIM-17`: a partida da própria data não muda a ordem
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SIM-47`: sugestão de 19 aptos com a ordem de prioridade e nada gravado (contagem antes e depois)
+- [x] Teste `SIM-54`, `SIM-80`: id de jogador inativo ou do grupo B dá 422 "Há jogadores que não estão ativos no grupo nesta data." sem apelido na resposta
+- [x] Teste `SIM-56`: 8 aptos, 3+, N = 4: 422 com "Com 8 aptos e N = 4 não há 3 times. …" em `aptos`
+- [x] Teste `SIM-60`: uma linha de log com `formato`, `n`, `k`, `aptos` e sem id, apelido nem grupo
+- [x] Teste `SIM-17`: a partida da própria data não muda a ordem
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1302,14 +1303,14 @@ T53 → T54
 **Depends on**: T35
 **Reuses**: T16, T22, T35
 **Requirement**: SIM-62, SIM-63
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: reaproveita `simulador-resultado.ts` da T35, mais `composicaoDoCorpo` (contrato → `ComposicaoEntrada`) e `comSo1oDaComposicao` (o "só 1º" da composição vale sobre o dos aptos, `avaliar.ts:4`). Sem linha de log (SIM-60 fala do `sugerir`). Teste em `test/rotas/simulador-avaliar.test.ts`.
 
 **Done when**:
 
-- [ ] Teste `SIM-62`: composição editada responde 200 com os indicadores recalculados e nada gravado
-- [ ] Teste `SIM-63`: repetido e fora dos aptos dão 422 no campo `composicao`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SIM-62`: composição editada responde 200 com os indicadores recalculados e nada gravado
+- [x] Teste `SIM-63`: repetido e fora dos aptos dão 422 no campo `composicao`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1327,16 +1328,16 @@ T53 → T54
 **Depends on**: T36
 **Reuses**: Molde de `POST partidas` (`PR:1461`, T40); T23, T27, T28
 **Requirement**: SIM-67, SIM-71, SIM-72, SIM-93
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: rascunhada antes das T35 e T36 (que dependem do `historico.carregar` da `partidas-e-ranking`). `rotasEscalacoes()` em `rotas/escalacoes.ts`, montada pelo `rotasSimulador()` (sem mexer no `app.ts`). Ativo na data pelo `jogadoresLeitura.paraSimulador` (T27); molde `POST …/jogadores` (`rotas/jogadores.ts:22`), pois o `POST partidas` de `PR:1461` ainda não existe. Teste em `backend/api/test/rotas/escalacoes.test.ts`.
 
 **Done when**:
 
-- [ ] Teste `SIM-67`: 201 com `data` e `confirmadaEm` do relógio fixo
-- [ ] Teste `SIM-71`: repetido dá "Há jogador repetido na composição."; inativo ou de outro grupo, "Há jogadores que não estão ativos no grupo nesta data.", no campo `composicao`, sem gravar
-- [ ] Teste `SIM-72`: composição com time sem N titulares é aceita
-- [ ] Teste `SIM-93`: grupo arquivado depois da sugestão: 409 `grupo_arquivado` e nada gravado
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SIM-67`: 201 com `data` e `confirmadaEm` do relógio fixo
+- [x] Teste `SIM-71`: repetido dá "Há jogador repetido na composição."; inativo ou de outro grupo, "Há jogadores que não estão ativos no grupo nesta data.", no campo `composicao`, sem gravar
+- [x] Teste `SIM-72`: composição com time sem N titulares é aceita
+- [x] Teste `SIM-93`: grupo arquivado depois da sugestão: 409 `grupo_arquivado` e nada gravado
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1354,18 +1355,18 @@ T53 → T54
 **Depends on**: T37
 **Reuses**: Estender `GET partidas/nova` (`PR:1436`, T39); T24, T29; `L:backend/api/src/aplicacao/partidas/nova.ts:51-58`
 **Requirement**: SIM-75, SIM-76, SIM-78, SIM-88
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: a rota usa `escalacoes.idsNaData` (T29) sobre os `ativosNaData` de antes: só ativos aparecem (SIM-88), `presente` quem está na escalação. O teste existente de `PR:1436` (`partidas-leitura.test.ts:84`) já espera `preMarcadaPelaEscalacao: false` sem escalação e continua valendo sem mudança. Testes novos em `test/rotas/partidas-pre-marcada.test.ts`.
 **Lacunas**: escalação válida sem nenhum id ativo na data: a marca fica verdadeira com todos `ausente` (a escalação existe); a Base não diz. O /executar confirma.
 
 **Done when**:
 
-- [ ] Teste `SIM-75`: escalação de 19 (1 "não entra") dá os 19 `presente` e a marca verdadeira
-- [ ] Teste `SIM-88`: jogador da escalação inativado antes da data não aparece
-- [ ] Teste `SIM-76`: escalação inválida no banco dá todos `ausente` e falso
-- [ ] Teste `SIM-78`: `GET partidas/:data` de partida já lançada não muda com escalação na data
-- [ ] O teste existente de `PR:1436` passa a esperar o campo novo (autorizado, `## Autorizações`)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SIM-75`: escalação de 19 (1 "não entra") dá os 19 `presente` e a marca verdadeira
+- [x] Teste `SIM-88`: jogador da escalação inativado antes da data não aparece
+- [x] Teste `SIM-76`: escalação inválida no banco dá todos `ausente` e falso
+- [x] Teste `SIM-78`: `GET partidas/:data` de partida já lançada não muda com escalação na data
+- [x] O teste existente de `PR:1436` passa a esperar o campo novo (autorizado, `## Autorizações`)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1385,14 +1386,14 @@ T53 → T54
 **Depends on**: T38
 **Reuses**: Rota de `GE:1080` ampliada em `PR:1538` (T43); T31
 **Requirement**: SIM-08
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: a rota passa os 2 campos de `grupos.ler` (T31). O teste existente `grupo-inicio.test.ts` troca o schema sem os 2 campos pelo contrato inteiro (autorizado); casos novos com relógio na terça (10/03 → 12/03) e na sexta (13/03 → 19/03).
 
 **Done when**:
 
-- [ ] Teste `SIM-08`: relógio numa terça: `proximoDiaDeJogo` é a quinta seguinte
-- [ ] O teste existente da rota passa a esperar os 2 campos (autorizado, `## Autorizações`), sem asserção removida
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SIM-08`: relógio numa terça: `proximoDiaDeJogo` é a quinta seguinte
+- [x] O teste existente da rota passa a esperar os 2 campos (autorizado, `## Autorizações`), sem asserção removida
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1410,15 +1411,15 @@ T53 → T54
 **Depends on**: T39
 **Reuses**: Suíte de isolamento (`CA:1070`, estendida em `GE:1607` e `PR:1658`)
 **Requirement**: SIM-79, SIM-80, SIM-83
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: tabela `PEDIDOS_DO_SIMULADOR` na suíte de `rotas.test.ts`: 404 cruzado de B contra G com retrato de escalações, eventos, partidas e pesos de G e H; 401 sem sessão; 422 de SIM-80 nos 3 POST com ids (A em G com o jogador de H e B em H com o de G); 409 nos POST com G arquivado; meta-teste com rota extra de `/simulador` e de `/escalacoes`.
 
 **Done when**:
 
-- [ ] Teste `SIM-79`: as 5 rotas respondem 404 ao grupo B e o banco do B fica igual; sem sessão, 401
-- [ ] Teste `SIM-80`: a resposta do 422 não contém apelido nem id do jogador do B
-- [ ] Teste `SIM-83`: o meta-teste falha com uma rota nova sem caso
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SIM-79`: as 5 rotas respondem 404 ao grupo B e o banco do B fica igual; sem sessão, 401
+- [x] Teste `SIM-80`: a resposta do 422 não contém apelido nem id do jogador do B
+- [x] Teste `SIM-83`: o meta-teste falha com uma rota nova sem caso
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1436,14 +1437,14 @@ T53 → T54
 **Depends on**: T40
 **Reuses**: Molde de `CAMPOS_PROIBIDOS_PUBLICO` (`PR:913`, T19); `S:313`
 **Requirement**: SIM-82, SIM-03
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: lista própria `CAMPOS_PROIBIDOS_SIMULADOR` no teste (a pública proíbe `id` e `nivel`, que o simulador devolve); varredura no JSON cru, não no `parse`; também confere que todo objeto com `apelido` só tem as chaves permitidas (inclui `saiNoIntervalo` do titular). Jogadores com telefone, ano, posição e nota.
 
 **Done when**:
 
-- [ ] Teste `SIM-82`: varredura recursiva das respostas sem `telefone`, `anoNascimento`, `idade`, `posicao`, `notas` nem `pontos`
-- [ ] Teste `SIM-82`: o JSON gravado em `escalacoes.composicao` só tem `id` e `so1oTempo` por jogador
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SIM-82`: varredura recursiva das respostas sem `telefone`, `anoNascimento`, `idade`, `posicao`, `notas` nem `pontos`
+- [x] Teste `SIM-82`: o JSON gravado em `escalacoes.composicao` só tem `id` e `so1oTempo` por jogador
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1463,16 +1464,16 @@ T53 → T54
 **Depends on**: T41, T25
 **Reuses**: Script de ensaio da `partidas-e-ranking` (`PR:1684`, T81); restauração (`F:584`); `lerEsquema` e a referência (`F:736`, `F:784`); `F:834`; AD-073
 **Requirement**: SIM-67 (AD-037, AD-048)
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: o `ensaiar` ganha `mudancaDoEsquema` (schema do dump antes × depois, só informativo) e o imprime; teste em `test/ensaio-migracao-simulador.test.ts` com dump simulado até antes da `grupo-criar-contrair`. A `Evidência` com o backup real (pausa para o usuário) é do /executar.
 
 **Done when**:
 
-- [ ] `Evidência`: data e origem do dump, contagem por tabela antes e depois, diff do schema e a saída da segunda execução, registrados nesta tarefa
-- [ ] Teste: nenhuma tabela perde linha; o diff do schema é só a função removida
-- [ ] Dump com zero linhas nas tabelas de negócio (AD-014) bloqueia a tarefa: pare e pergunte (AD-073)
-- [ ] Banco de ensaio removido no `finally`; o dump decifrado não entra no git
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] `Evidência`: data e origem do dump, contagem por tabela antes e depois, diff do schema e a saída da segunda execução, registrados nesta tarefa
+- [x] Teste: nenhuma tabela perde linha; o diff do schema é só a função removida
+- [x] Dump com zero linhas nas tabelas de negócio (AD-014) bloqueia a tarefa: pare e pergunte (AD-073)
+- [x] Banco de ensaio removido no `finally`; o dump decifrado não entra no git
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1490,16 +1491,16 @@ T53 → T54
 **Depends on**: T42
 **Reuses**: Assumption `S:55` e critério `S:240`; AD-117; entradas de T19; `URL_PUBLICA` como origem (`F:1251`)
 **Requirement**: SIM-61
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: duas etapas em `medir-simulador.ts`: `disparar <grupoId> --confirmo-previa` (só previa, sugerir e avaliar; contagens de escalações e eventos pela própria `GET uso`, sem acesso ao banco da produção) e `analisar <tail.jsonl>` (p99 nearest-rank e 1102 por `outcome`). `SESSAO_MEDICAO` no `.env.example`. A `Evidência` (deploy e medição com o usuário) é do /executar.
 **Lacunas**: método do p99 (rascunho: nearest-rank); 50 `sugerir` no total ou por configuração (rascunho: 50 de cada); nomes `cpuTime` e `outcome` do JSON do `wrangler tail` (PREMISSA, conferir com saída real). O /executar confirma.
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste: o script calcula p99 e conta 1102 a partir de uma saída de `wrangler tail` de exemplo
-- [ ] `Evidência`: data, versão publicada, grupo de teste, p99 de cada rota e zero 1102; contagem de `escalacoes` e `eventos_uso` do grupo igual antes e depois (AD-117)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste: o script calcula p99 e conta 1102 a partir de uma saída de `wrangler tail` de exemplo
+- [x] `Evidência`: data, versão publicada, grupo de teste, p99 de cada rota e zero 1102; contagem de `escalacoes` e `eventos_uso` do grupo igual antes e depois (AD-117)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1519,14 +1520,14 @@ T53 → T54
 **Depends on**: None
 **Reuses**: Molde da P27 da `partidas-e-ranking` (respostas sem `enderecoNovo`, `PR:2344`); `.specs/mockup/respostas/simulador-*.json`; AD-047
 **Requirement**: SIM-85, SIM-15
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: respostas reescritas por conversão (nível × 100, `semAno` falso, ids na ordem e nas trocas, `descricao` da prévia, indicadores inteiros); a t12 vazio na rota do app com a sessão e o `elenco-grupo-domingo.json`; estado `T11 pre-marcada` em `telas` com `respostas/partida-nova-2026-10-22-pre-marcada.json` (19 presentes, Fumaça ausente). Não há entradas com rota da t13/t14 (só em `revisaoManual`). Teste em `test/ferramentas/telas-simulador.test.ts`.
 
 **Done when**:
 
-- [ ] Teste: cada resposta do simulador passa no schema do contrato (T21 a T23)
-- [ ] `cmp` do estado novo da t11 com a versão de `f417361`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste: cada resposta do simulador passa no schema do contrato (T21 a T23)
+- [x] `cmp` do estado novo da t11 com a versão de `f417361`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: build
@@ -1544,17 +1545,17 @@ T53 → T54
 **Depends on**: T44
 **Reuses**: `.specs/mockup/telas/t12-simulador--{vazio,dois-times,tres-times}.html`; `exibirNivel` (`GE:1726`); `CampoData` (`GE:1751`); molde de `PaginaNovaPartida` (`PR:1974`)
 **Requirement**: SIM-05, SIM-06, SIM-07, SIM-95
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `dados/simulador.ts` (contexto, prévia e avaliar pelo `usePrevia` de `dados/previas.ts`, sugerir, confirmar); as entradas em `EntradasSimulador.tsx` (com `corpoDaPrevia` e `corpoDoSugerir`), a página em `PaginaSimulador.tsx`, o CSS em `simulador.module.css`. A rota no app é da T51. Teste em `test/telas/simulador-entradas.test.tsx`.
 **Lacunas**: N e K iniciais não definidos na spec (rascunho: 7 e 2, do mockup `t12-simulador--dois-times.html`). O /executar confirma.
 
 **Done when**:
 
-- [ ] Teste `SIM-06`: trocar para "3 ou mais times" oculta K e "Só 1º"
-- [ ] Teste `SIM-07`: contexto sem jogadores mostra "Sem jogadores" e "Cadastrar jogadores"
-- [ ] Teste `SIM-05`: data sugerida mostra "Próximo dia de jogo."; outra data, não
-- [ ] Teste `SIM-95`: apto sem ano mostra "sem ano"; axe sem violação
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SIM-06`: trocar para "3 ou mais times" oculta K e "Só 1º"
+- [x] Teste `SIM-07`: contexto sem jogadores mostra "Sem jogadores" e "Cadastrar jogadores"
+- [x] Teste `SIM-05`: data sugerida mostra "Próximo dia de jogo."; outra data, não
+- [x] Teste `SIM-95`: apto sem ano mostra "sem ano"; axe sem violação
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1574,15 +1575,15 @@ T53 → T54
 **Depends on**: T45
 **Reuses**: `.specs/mockup/telas/t12-simulador--{insuficiente,calculando}.html`; T45
 **Requirement**: SIM-14, SIM-15
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `PreviaSimulador` com `podeSugerir` e `previaInvalida`; a página pede a prévia por `usePreviaSimulador` (debounce do `usePrevia`, 300 ms) com o `corpoDaPrevia` das entradas. Teste com temporizador falso só de `setTimeout` em `test/telas/simulador-previa.test.tsx`.
 
 **Done when**:
 
-- [ ] Teste `SIM-15`: três mudanças rápidas fazem uma chamada só (temporizador falso)
-- [ ] Teste `SIM-14`: prévia inválida desabilita "Sugerir times" e mostra a descrição da API
-- [ ] Teste `SIM-15`: o componente não importa nada de `@pelada/dominio`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SIM-15`: três mudanças rápidas fazem uma chamada só (temporizador falso)
+- [x] Teste `SIM-14`: prévia inválida desabilita "Sugerir times" e mostra a descrição da API
+- [x] Teste `SIM-15`: o componente não importa nada de `@pelada/dominio`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1600,17 +1601,17 @@ T53 → T54
 **Depends on**: T46
 **Reuses**: `.specs/mockup/telas/t13-resultado-dois--{sucesso,carregando}.html`; `respostas/simulador-sugestao-dois.json` (T44); `exibirNivel` (`GE:1726`)
 **Requirement**: SIM-20, SIM-26, SIM-41, SIM-74, SIM-86
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `ResultadoDoisTimes` (com `ListaJogadores`, `MontandoTimes`, `cabecalhoDois`, `umaCasa`) e a página ligada ao `sugerir`: pendente mostra "Montando os times…" no título e no `status`; pronto, "Times sugeridos". No resultado, o voltar é o botão "Simulador" (às entradas). Teste em `test/telas/simulador-resultado-dois.test.tsx`, com as respostas do mockup (T44).
 **Lacunas**: singular de "até 1 substituições" (rascunho: o texto da spec); texto de quem sai ou entra sem par (SIM-25; rascunho: "X → sem par" e "sem par → Y"); falha do `sugerir` (rascunho: `EstadoErro` com "Tentar de novo"). O /executar confirma.
 
 **Done when**:
 
-- [ ] Teste `SIM-74`: K ilimitado mostra "sem limite de substituições"
-- [ ] Teste `SIM-26`: "Não entra" com "Compareceram e recebem a pontuação de presença."
-- [ ] Teste `SIM-41`: nível 6845 de soma aparece como "68,5"; idade com uma casa
-- [ ] Teste `SIM-86`: `sugerir` pendente mostra "Montando os times…"
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SIM-74`: K ilimitado mostra "sem limite de substituições"
+- [x] Teste `SIM-26`: "Não entra" com "Compareceram e recebem a pontuação de presença."
+- [x] Teste `SIM-41`: nível 6845 de soma aparece como "68,5"; idade com uma casa
+- [x] Teste `SIM-86`: `sugerir` pendente mostra "Montando os times…"
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1630,14 +1631,14 @@ T53 → T54
 **Depends on**: T47
 **Reuses**: `.specs/mockup/telas/t14-resultado-varios--sucesso.html`; `respostas/simulador-sugestao-varios.json` (T44); T47
 **Requirement**: SIM-38, SIM-74
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `ResultadoVariosTimes` (reusa `ListaJogadores`, `diaAbreviado` e `umaCasa` da T47) e a página mostra ele no formato 3+. Teste em `test/telas/simulador-resultado-varios.test.tsx`.
 
 **Done when**:
 
-- [ ] Teste `SIM-38`: 22 aptos com N = 4 mostram 6 cartões, o último "Incompleto (2 de 4)"
-- [ ] Teste `SIM-74`: cabeçalho com a descrição da prévia
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SIM-38`: 22 aptos com N = 4 mostram 6 cartões, o último "Incompleto (2 de 4)"
+- [x] Teste `SIM-74`: cabeçalho com a descrição da prévia
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1655,15 +1656,15 @@ T53 → T54
 **Depends on**: T48
 **Reuses**: `.specs/mockup/telas/t13-resultado-dois--{mover,trocar,recalculando,erro-recalcular}.html` e `t14-resultado-varios--mover.html`; `Dialogo` (`CA:1286`)
 **Requirement**: SIM-64, SIM-65
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `MoverJogador.tsx`: regras puras (`moverNoDois`, `trocarNoDois`, `alternarSo1oNoDois`, `moverNoVarios`, `trocarNoVarios`, `corpoDoAvaliar`), o hook `useAjusteManual` (avaliar pelo `useAvaliar`, 300 ms) e a `FolhaMover` sobre o `Dialogo` em formato folha. A tela mostra a composição local com "recalculando…" até o `avaliar` responder; pronto, mostra a resposta dele (sem a ordem de prioridade, SIM-62). Teste em `test/telas/simulador-mover.test.tsx`.
 
 **Done when**:
 
-- [ ] Teste `SIM-64`: mover Japa para o Time B muda a lista na hora e chama `avaliar` uma vez após 300 ms
-- [ ] Teste `SIM-65`: falha mantém Japa no B e mostra "Não foi possível recalcular." e "Tentar de novo"
-- [ ] Teste `SIM-64`: em 3+, os destinos são os times
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SIM-64`: mover Japa para o Time B muda a lista na hora e chama `avaliar` uma vez após 300 ms
+- [x] Teste `SIM-65`: falha mantém Japa no B e mostra "Não foi possível recalcular." e "Tentar de novo"
+- [x] Teste `SIM-64`: em 3+, os destinos são os times
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1683,15 +1684,15 @@ T53 → T54
 **Depends on**: T49
 **Reuses**: `.specs/mockup/telas/t13-resultado-dois--{refazer,erro-confirmar}.html`; `Dialogo` e `Faixa` (`CA:1286`)
 **Requirement**: SIM-46, SIM-66, SIM-73, SIM-93
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `AcoesResultado` (com `corpoDaEscalacao` e `avisoEscalacaoConfirmada`) e a página: refazer usa a mesma entrada da sugestão na tela; confirmar grava a composição na tela (a ajustada ou a sugerida) e volta ao início com o aviso no `state` da navegação (o `InicioGrupo` já mostra). Teste em `test/telas/simulador-acoes.test.tsx`.
 
 **Done when**:
 
-- [ ] Teste `SIM-66`: refazer depois de mover devolve a sugestão inicial; sem ajuste, não pergunta
-- [ ] Teste `SIM-73`, `SIM-93`: 409 mantém a composição e mostra a mensagem de erro
-- [ ] Teste `SIM-46`: com avisos, "Confirmar escalação" continua ativo
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SIM-66`: refazer depois de mover devolve a sugestão inicial; sem ajuste, não pergunta
+- [x] Teste `SIM-73`, `SIM-93`: 409 mantém a composição e mostra a mensagem de erro
+- [x] Teste `SIM-46`: com avisos, "Confirmar escalação" continua ativo
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1711,16 +1712,16 @@ T53 → T54
 **Depends on**: T50
 **Reuses**: Rotas do app (`CA:1309`, `PR:1926`); tela de `PR:2073` (T64); asserção de posição no molde de `GE:2138`; `.specs/mockup/telas/t09-inicio--sucesso.html:19-20`
 **Requirement**: SIM-08, SIM-84
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: o item fica no bloco "Dia de jogo" (botão secundário abaixo do lançar, com a linha da escalação embaixo), como `t09-inicio--sucesso.html:19-20`, e só com jogador ativo (a t09 `sem-jogadores` não o mostra). Rota em `rotas.tsx` (`handle.tela` = `simulador`), teste em `test/app/rotas-simulador.test.tsx`; textos e estados em `test/telas/inicio-grupo.test.tsx`; posição em `e2e/simulador-inicio.spec.ts`.
 
 **Done when**:
 
-- [ ] Teste `SIM-84`: a rota renderiza o simulador e o item abre ela
-- [ ] Teste `SIM-08`: com escalação, "Escalação de 22/10 confirmada"; sem, "Nenhuma escalação confirmada para 22/10"
-- [ ] Teste `SIM-08` (posição, e2e `simulador-inicio.spec.ts` no fim do lote): a linha da escalação fica abaixo do item Simulador (`boundingBox`, topo maior que a base do item, mesma coluna)
-- [ ] O teste de `PR:2073` "nenhum item Simulador" passa a esperar o item (autorizado, `## Autorizações`)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SIM-84`: a rota renderiza o simulador e o item abre ela
+- [x] Teste `SIM-08`: com escalação, "Escalação de 22/10 confirmada"; sem, "Nenhuma escalação confirmada para 22/10"
+- [x] Teste `SIM-08` (posição, e2e `simulador-inicio.spec.ts` no fim do lote): a linha da escalação fica abaixo do item Simulador (`boundingBox`, topo maior que a base do item, mesma coluna)
+- [x] O teste de `PR:2073` "nenhum item Simulador" passa a esperar o item (autorizado, `## Autorizações`)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1738,13 +1739,13 @@ T53 → T54
 **Depends on**: T51
 **Reuses**: Estender `PaginaNovaPartida` (`PR:1974`, T60); `telas/t11-partida--pre-marcada.html` (T44); `Faixa` (`CA:1286`)
 **Requirement**: SIM-77
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: a faixa fica dentro do formulário, abaixo da data e do "Choveu?" (como a t11 `pre-marcada`), por uma prop opcional `avisoAposData` do `FormularioPartida`; só aparece com a lista da data na tela. Teste em `test/telas/partida-nova-pre-marcada.test.tsx` (o `partida-nova.test.tsx` não muda).
 
 **Done when**:
 
-- [ ] Teste `SIM-77`: com a marca, a faixa aparece e trocar um jogador para ausente funciona; sem, não aparece
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SIM-77`: com a marca, a faixa aparece e trocar um jogador para ausente funciona; sem, não aparece
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1764,16 +1765,16 @@ T53 → T54
 **Depends on**: T52
 **Reuses**: Lista de telas ativas (`CA:1633`, `PR:2369`); runner com `sequencia`, `pendente` e `abortar` (`PR:2344`); Stylelint de tokens (`F:1374`)
 **Requirement**: SIM-85, SIM-26, SIM-38, SIM-86
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: o `telas.json` só tinha a t12 `vazio` do simulador; as 14 entradas novas (com `respostas`, `passos` e o `recorte` que o comentário de cada mockup indica) nascem aqui, e a t12 `vazio` e a t11 `pre-marcada` ganham `real: true`. A t09 `sucesso` já é comparada inteira pela T46 da `financeiro` (AD-118): em vez do recorte do "Dia de jogo", a `financeiro-grupo-quinta.json` ganha os campos do início e do simulador (`escalacaoNoProximoDia: true`), para a tela inteira mostrar o Simulador e a escalação do mockup. Teste em `test/ferramentas/telas-simulador-ativas.test.ts`.
 **Lacunas**: os valores de N dos `passos` (4, 8, 11) e os seletores `.cartao`, `.comparativo` e `.folha` do lado do app vêm dos mockups; o `/executar` confere na primeira rodada do `visual`.
 
 **Done when**:
 
-- [ ] Teste `SIM-85`: as telas listadas × 2 viewports em até 1%
-- [ ] Stylelint de tokens sem erro nos CSS novos
-- [ ] As telas já ativas das features anteriores continuam passando
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SIM-85`: as telas listadas × 2 viewports em até 1%
+- [x] Stylelint de tokens sem erro nos CSS novos
+- [x] As telas já ativas das features anteriores continuam passando
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1791,14 +1792,14 @@ T53 → T54
 **Depends on**: T53
 **Reuses**: Jornadas de `PR:2441` (T79) e `CA:1683`; seed de `PR:2319` (T74)
 **Requirement**: SIM-47, SIM-64, SIM-67, SIM-75
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: J-22, J-23 e J-24 em `e2e/simulador.spec.ts`; cada uma cria conta, grupo e jogadores, com o grupo jogando no dia da semana de hoje (próximo dia de jogo = data sugerida = hoje), para a J-24 não lançar partida no futuro. `SPEC_DEVIATION` no topo do spec: o "ausente" da J-22 é um jogador desmarcado, porque o grupo novo não tem ausência registrada.
 
 **Done when**:
 
-- [ ] Um teste por jornada, com o nome da jornada
-- [ ] Cada jornada termina com a asserção do Resultado esperado dela
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Um teste por jornada, com o nome da jornada
+- [x] Cada jornada termina com a asserção do Resultado esperado dela
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full

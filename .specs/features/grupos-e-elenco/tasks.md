@@ -4,6 +4,7 @@
 **Passada**: rascunho
 **Base**: `ljs:.specs/features/grupos-e-elenco/spec.md` (aprovada em 2026-10-29, GEL-01 a GEL-118, e as regras da auditoria em `spec.md:541-548`), `ljs:.specs/features/grupos-e-elenco/context.md` (C1 a C10), `ljs:.specs/features/grupos-e-elenco/design.md` (aprovado em 2026-10-29), `ljs:.specs/features/grupos-e-elenco/seguranca.md` (SEC-001 a SEC-010, reteste de 2026-10-30), `ljs:.specs/features/grupos-e-elenco/validation.md` (PASS) e o mockup de módulo `ljs:.specs/features/grupos-e-elenco/mockup/`, com `ljs:` = `C:\Leandro\Projetos\GestaoDaPelada_LJS` @ `e557292` (branch `main`), conferido em 2026-11-04. A remota `feat/grupos-e-elenco` (`1380484`) é anterior (só a spec, sem aprovação) e não é a Base. Contratos da v2: `.specs/features/fundacao/` (spec, design, tasks) e `.specs/features/conta-e-acesso/tasks.md`.
 **Branch pai**: `feature/conta-e-acesso` (a conta-e-acesso ainda não estará integrada quando esta feature for executada). Se a conta-e-acesso já estiver integrada na `main` quando o `/executar` começar, a Branch pai passa a ser `main`.
+**Gate**: format, lint, typecheck, checagens e vitest por pacote @ abc17b49f3f1527747c2c9614614f25ab3b235a3 = verde, com pendências aceitas pelo usuário em 2026-11-06 (api: push-backup e push-cpu, por ambiente; dominio: SIM-57 e SIM-58, no CI; Playwright não rodado)
 **Feature**: 3 de 8 do roteiro (AD-001, AD-015). Requisitos `GEL-*` e `SEC-*`.
 
 > Convenções desta lista: `F:` = `.specs/features/fundacao/tasks.md`; `FD:` = `.specs/features/fundacao/design.md`; `CA:` = `.specs/features/conta-e-acesso/tasks.md`; `M:` = `ljs:backend/api/src/infraestrutura/db/migracoes/` (as 23 migrações, copiadas byte a byte pela fundação, AD-003); `GS:` = `ljs:.specs/features/grupos-e-elenco/spec.md`; `GD:` = `ljs:.specs/features/grupos-e-elenco/design.md`; `GSEG:` = `ljs:.specs/features/grupos-e-elenco/seguranca.md`; `GT:` = `ljs:.specs/features/grupos-e-elenco/tasks.md` (só granularidade); `R-NN` = linha do `reuso.md` desta pasta; `telas.json` = `.specs/mockup/telas.json`. Do zero (AD-002): código e testes do LJS são só consulta. Nome de teste de tarefa de risco alto cita o `GEL-NN` ou o `SEC-NN`.
@@ -357,15 +358,15 @@ T73 → T74 → T75
 **Depends on**: None
 **Reuses**: estender o cenário da CA (`CA:265`, T0) e o `comoApp` e a fábrica da fundação (`F:909`); `bancoDeTeste()` (`F:507`); tabelas em `M:1792843200000_linha-de-base.sql:65`, `:106`, `:122`, `:135`, `:143`, `:182`, `:257`
 **Requirement**: GEL-112
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: o teste do cenário fica em `cenario-grupos.test.ts`; a evidência da rede (sabotagem da `grupo_criar`) é do /executar.
 
 **Done when**:
 
-- [ ] Teste `GEL-112`: C e O enxergam G por `comoApp`; B enxerga só H; o cenário tem ao menos uma linha em `jogadores`, `periodos_ativos`, `habilidades`, `notas`, `presencas` e `pagamentos_mes`
-- [ ] O banco `teste_*` é removido no `finally`, também quando a criação do cenário falha
-- [ ] Evidência da rede: com `grupo_criar` vigente (`1792845540000_planos-grupo-criar-trial.sql:75`) sem o INSERT em `vinculos_admin`, o teste `GEL-112: a criadora C enxerga G` fica vermelho (sabotagem temporária revertida, 2026-11-05)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-112`: C e O enxergam G por `comoApp`; B enxerga só H; o cenário tem ao menos uma linha em `jogadores`, `periodos_ativos`, `habilidades`, `notas`, `presencas` e `pagamentos_mes`
+- [x] O banco `teste_*` é removido no `finally`, também quando a criação do cenário falha
+- [x] Evidência da rede: com `grupo_criar` vigente (`1792845540000_planos-grupo-criar-trial.sql:75`) sem o INSERT em `vinculos_admin`, o teste `GEL-112: a criadora C enxerga G` fica vermelho (sabotagem temporária revertida, 2026-11-05)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -383,15 +384,15 @@ T73 → T74 → T75
 **Depends on**: T0
 **Reuses**: `grupos_visiveis()` de `M:1792844280000_grupos-visiveis-arquivado.sql:9-20`; policies geradas em `M:1792843320000_rls.sql:39-57`; molde da matriz da fundação (`F:981`, `F:1007`)
 **Requirement**: GEL-25, GEL-107, GEL-112
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Testes `GEL-25`: linhas "G arquivado" da Test Coverage Matrix, uma por comando e por tabela, para C e para O
-- [ ] Teste `GEL-107`: B continua sem ver nem alterar G, arquivado ou não
-- [ ] Teste `GEL-112`: o ramo do slug público não muda com G arquivado
-- [ ] Evidência da rede: `grupos_visiveis()` trocada pela de `M:1792843320000_rls.sql:17-24` (CREATE OR REPLACE ao fim da última migração, revertido): 55 testes de `grupos-arquivado.test.ts` ficam vermelhos (2026-11-05)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Testes `GEL-25`: linhas "G arquivado" da Test Coverage Matrix, uma por comando e por tabela, para C e para O
+- [x] Teste `GEL-107`: B continua sem ver nem alterar G, arquivado ou não
+- [x] Teste `GEL-112`: o ramo do slug público não muda com G arquivado
+- [x] Evidência da rede: `grupos_visiveis()` trocada pela de `M:1792843320000_rls.sql:17-24` (CREATE OR REPLACE ao fim da última migração, revertido): 55 testes de `grupos-arquivado.test.ts` ficam vermelhos (2026-11-05)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -409,17 +410,17 @@ T73 → T74 → T75
 **Depends on**: T1
 **Reuses**: `M:1792844340000_grupo-criar.sql:10-75` (sufixo em `:37-44`, auditoria em `:68`); `ordem` identity em `M:1792843200000_linha-de-base.sql:210`; cenário de T0
 **Requirement**: GEL-01, GEL-02, GEL-09, GEL-10, GEL-14
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `GEL-01`: grupo, vínculo com `acessa_financeiro = true` e `criado_por` = conta do contexto
-- [ ] Teste `GEL-02`: as habilidades saem na ordem do array recebido
-- [ ] Teste `GEL-14`: com `pelada-de-quinta` (arquivado) e `pelada-de-quinta-2` ocupados, o novo é `pelada-de-quinta-3`
-- [ ] Testes `GEL-09`, `GEL-10`: habilidade de 1 caractere no array faz a função falhar sem grupo, vínculo, habilidade nem auditoria; no sucesso, uma linha `grupo_criado` com a conta autora
-- [ ] Teste `GEL-01`: sem `app.conta_id`, erro 42501; `INSERT INTO grupos` como `pelada_app` é recusado
-- [ ] Evidência da rede: `grupo_criar` vigente (`1792845540000_planos-grupo-criar-trial.sql:54-57`) sem o `WHILE EXISTS`: `GEL-14 ... o novo é pelada-de-quinta-3` fica vermelho (revertido, 2026-11-05)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-01`: grupo, vínculo com `acessa_financeiro = true` e `criado_por` = conta do contexto
+- [x] Teste `GEL-02`: as habilidades saem na ordem do array recebido
+- [x] Teste `GEL-14`: com `pelada-de-quinta` (arquivado) e `pelada-de-quinta-2` ocupados, o novo é `pelada-de-quinta-3`
+- [x] Testes `GEL-09`, `GEL-10`: habilidade de 1 caractere no array faz a função falhar sem grupo, vínculo, habilidade nem auditoria; no sucesso, uma linha `grupo_criado` com a conta autora
+- [x] Teste `GEL-01`: sem `app.conta_id`, erro 42501; `INSERT INTO grupos` como `pelada_app` é recusado
+- [x] Evidência da rede: `grupo_criar` vigente (`1792845540000_planos-grupo-criar-trial.sql:54-57`) sem o `WHILE EXISTS`: `GEL-14 ... o novo é pelada-de-quinta-3` fica vermelho (revertido, 2026-11-05)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -439,16 +440,16 @@ T73 → T74 → T75
 **Depends on**: T2
 **Reuses**: laço de `M:1792844340000_grupo-criar.sql:37-58` (`grupos_slug_key`, até 3 tentativas); `bancoDeTeste()` (`F:507`)
 **Requirement**: GEL-15
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: o caso de três colisões seguidas fica só listado (exige três transações em ordem exata); a evidência da rede é do /executar.
 
 **Done when**:
 
-- [ ] Casos limite listados antes do teste: duas transações abertas ao mesmo tempo; a primeira confirma depois da segunda calcular o sufixo; três colisões seguidas; colisão em restrição que não é o slug
-- [ ] Teste `GEL-15`: as duas criações confirmam, com `base` e `base-2`
-- [ ] Teste `GEL-15`: violação que não é `grupos_slug_key` sobe o erro na primeira tentativa
-- [ ] Evidência da rede: `grupo_criar` vigente (`1792845540000_planos-grupo-criar-trial.sql:65-70`) sem o bloco `EXCEPTION`: `GEL-15: as duas criações confirmam` fica vermelho com `grupos_slug_key` (revertido, 2026-11-05)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do teste: duas transações abertas ao mesmo tempo; a primeira confirma depois da segunda calcular o sufixo; três colisões seguidas; colisão em restrição que não é o slug
+- [x] Teste `GEL-15`: as duas criações confirmam, com `base` e `base-2`
+- [x] Teste `GEL-15`: violação que não é `grupos_slug_key` sobe o erro na primeira tentativa
+- [x] Evidência da rede: `grupo_criar` vigente (`1792845540000_planos-grupo-criar-trial.sql:65-70`) sem o bloco `EXCEPTION`: `GEL-15: as duas criações confirmam` fica vermelho com `grupos_slug_key` (revertido, 2026-11-05)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -466,15 +467,15 @@ T73 → T74 → T75
 **Depends on**: T3
 **Reuses**: `M:1792844400000_grupos-grants-coluna.sql:6-7`; `M:1792844520000_grupos-arquivar-so-criadora.sql:8-24`; trigger do slug em `M:1792843200000_linha-de-base.sql:82-93`
 **Requirement**: GEL-16, GEL-24, SEC-009
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `GEL-16`: `UPDATE grupos SET slug` falha pelo grant e, como owner, pela trigger
-- [ ] Teste `GEL-24`: `UPDATE grupos SET criado_por` como `pelada_app` é recusado
-- [ ] Teste `SEC-009`: O muda `arquivado_em` de G ativo e recebe 42501; C arquiva e reativa; `UPDATE` de `nome` por O passa
-- [ ] Evidência da rede: o `GRANT UPDATE ON grupos TO pelada_app` deixa 4 testes vermelhos (GEL-16, GEL-24) e o `DROP TRIGGER grupos_arquivado_so_criadora` deixa `SEC-009 ... O muda arquivado_em` vermelho (revertidos, 2026-11-05)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-16`: `UPDATE grupos SET slug` falha pelo grant e, como owner, pela trigger
+- [x] Teste `GEL-24`: `UPDATE grupos SET criado_por` como `pelada_app` é recusado
+- [x] Teste `SEC-009`: O muda `arquivado_em` de G ativo e recebe 42501; C arquiva e reativa; `UPDATE` de `nome` por O passa
+- [x] Evidência da rede: o `GRANT UPDATE ON grupos TO pelada_app` deixa 4 testes vermelhos (GEL-16, GEL-24) e o `DROP TRIGGER grupos_arquivado_so_criadora` deixa `SEC-009 ... O muda arquivado_em` vermelho (revertidos, 2026-11-05)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -492,16 +493,16 @@ T73 → T74 → T75
 **Depends on**: T4
 **Reuses**: grants em `M:1792843260000_roles.sql:22-33`; `M:1792843200000_linha-de-base.sql:120` (`jogadores_apelido_grupo`), `:128-131` (cascade e `periodos_um_aberto`), `:141` (`habilidades_nome_grupo`), `:149-150` (FKs de `notas`), `:189`, `:266`, `:324-326` (posições)
 **Requirement**: GEL-35, GEL-37, GEL-50, GEL-84, GEL-85, GEL-91, GEL-93, GEL-112
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Testes `GEL-84`, `GEL-85`: jogador sem histórico é apagado com os períodos; com presença, com nota ou com pagamento, 23503 e nada apagado (3 casos)
-- [ ] Testes `GEL-35`, `GEL-91`: "Toninho" e "toninho" colidem (23505 em `jogadores_apelido_grupo`); "José" e "Jose" não; idem `habilidades_nome_grupo`
-- [ ] Teste `GEL-93`: apagar a habilidade apaga as notas dela e não as de outra
-- [ ] Testes `GEL-37`, `GEL-50`, `GEL-112`: posição `defensor` recusada; segundo período aberto recusado; `DELETE FROM periodos_ativos` recusado
-- [ ] Evidência da rede: `GRANT DELETE ON periodos_ativos TO pelada_app` deixa `GEL-112: DELETE FROM periodos_ativos ... é recusado` vermelho (revertido, 2026-11-05)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Testes `GEL-84`, `GEL-85`: jogador sem histórico é apagado com os períodos; com presença, com nota ou com pagamento, 23503 e nada apagado (3 casos)
+- [x] Testes `GEL-35`, `GEL-91`: "Toninho" e "toninho" colidem (23505 em `jogadores_apelido_grupo`); "José" e "Jose" não; idem `habilidades_nome_grupo`
+- [x] Teste `GEL-93`: apagar a habilidade apaga as notas dela e não as de outra
+- [x] Testes `GEL-37`, `GEL-50`, `GEL-112`: posição `defensor` recusada; segundo período aberto recusado; `DELETE FROM periodos_ativos` recusado
+- [x] Evidência da rede: `GRANT DELETE ON periodos_ativos TO pelada_app` deixa `GEL-112: DELETE FROM periodos_ativos ... é recusado` vermelho (revertido, 2026-11-05)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -519,13 +520,13 @@ T73 → T74 → T75
 **Depends on**: T5
 **Reuses**: estender o meta-teste da CA (`CA:338`, T3) e o da fundação (`F:957`); `M:1792844340000_grupo-criar.sql:74-75`; `M:1792844280000_grupos-visiveis-arquivado.sql:21-22`; `M:1792844520000_grupos-arquivar-so-criadora.sql:19`
 **Requirement**: GEL-112
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `GEL-112`: as 3 funções conferidas pelo catálogo; uma função de teste sem `search_path` reprova
-- [ ] Evidência da rede: `GRANT EXECUTE ON FUNCTION grupo_criar(...) TO PUBLIC` deixa o `GEL-112 ... grupo_criar conferida pelo catálogo` vermelho (revertido, 2026-11-05)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-112`: as 3 funções conferidas pelo catálogo; uma função de teste sem `search_path` reprova
+- [x] Evidência da rede: `GRANT EXECUTE ON FUNCTION grupo_criar(...) TO PUBLIC` deixa o `GEL-112 ... grupo_criar conferida pelo catálogo` vermelho (revertido, 2026-11-05)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -545,14 +546,14 @@ T73 → T74 → T75
 **Depends on**: T6
 **Reuses**: estender a regra `no-restricted-imports` da fundação (`F:385`, T5) com `no-restricted-syntax`; decisão de `GD:61` (lint do domínio impede I/O, relógio e zod) e AD-028 proposta
 **Requirement**: GEL-70, GEL-104
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `GEL-70`: arquivo de exemplo com `Date.now()` e outro com `new Date()` reprovam; `new Date('2026-01-01')` passa
-- [ ] Teste `GEL-104`: `import { z } from 'zod'` em `backend/dominio` reprova
-- [ ] Os testes de FUN-06 da fundação continuam verdes
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-70`: arquivo de exemplo com `Date.now()` e outro com `new Date()` reprovam; `new Date('2026-01-01')` passa
+- [x] Teste `GEL-104`: `import { z } from 'zod'` em `backend/dominio` reprova
+- [x] Os testes de FUN-06 da fundação continuam verdes
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -570,15 +571,15 @@ T73 → T74 → T75
 **Depends on**: T7
 **Reuses**: regras de `GS:104-106` e lista de reservadas de `GS:106`; interface de `GD:116` (`gerarSlug` com sufixo fica de fora: o sufixo é do banco, `GD:213`)
 **Requirement**: GEL-11, GEL-12, GEL-13
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: a reservada `g` tem 1 caractere e, pela ordem da spec (GEL-12 antes de GEL-13, `GS:105-106`), vira `grupo`; o teste das reservadas cobre as 8 com 3 ou mais caracteres e o caso `g` à parte.
 
 **Done when**:
 
-- [ ] Testes `GEL-11`: "Pelada de Quinta" → `pelada-de-quinta`; "Açaí & Cia" → `acai-cia`; nome de 50 letras cortado em 40 sem hífen final
-- [ ] Testes `GEL-12`: "AB" e "!!!" → `grupo`
-- [ ] Testes `GEL-13`: cada uma das 9 reservadas vira `<base>-grupo` ("Admin" → `admin-grupo`, "Well Known" → `well-known-grupo`)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Testes `GEL-11`: "Pelada de Quinta" → `pelada-de-quinta`; "Açaí & Cia" → `acai-cia`; nome de 50 letras cortado em 40 sem hífen final
+- [x] Testes `GEL-12`: "AB" e "!!!" → `grupo`
+- [x] Testes `GEL-13`: cada uma das 9 reservadas vira `<base>-grupo` ("Admin" → `admin-grupo`, "Well Known" → `well-known-grupo`)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -596,14 +597,14 @@ T73 → T74 → T75
 **Depends on**: T8
 **Reuses**: interfaces de `GD:117` e `GD:123`
 **Requirement**: GEL-47, GEL-48
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `GEL-47`: ["Zé", "ana", "Álvaro", "Bia"] ordena em Álvaro, ana, Bia, Zé
-- [ ] Teste `GEL-48`: `chaveBusca("JOSÉ")` contém `chaveBusca("jose")`
-- [ ] Teste: `formatarData("2026-10-01")` = `01/10/2026`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-47`: ["Zé", "ana", "Álvaro", "Bia"] ordena em Álvaro, ana, Bia, Zé
+- [x] Teste `GEL-48`: `chaveBusca("JOSÉ")` contém `chaveBusca("jose")`
+- [x] Teste: `formatarData("2026-10-01")` = `01/10/2026`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -621,15 +622,15 @@ T73 → T74 → T75
 **Depends on**: T9
 **Reuses**: interfaces de `GD:118-120`; ordem de `GS:82`; regra do nível de `GS:337-338`
 **Requirement**: GEL-02, GEL-36, GEL-101, GEL-102, GEL-104
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `GEL-101`: 8, 7, 6, 7, 8, 5 → 683; um caso exato de meio (6,505 → 651)
-- [ ] Teste `GEL-102`: lista vazia → `{ nivel: 550, semNota: true }`
-- [ ] Teste `GEL-02`: `HABILIDADES_INICIAIS` igual às 6 da spec, na ordem
-- [ ] Teste `GEL-36`: `anoNascimentoMaximo("2026-12-31")` = 2016 e `("2027-01-01")` = 2017
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-101`: 8, 7, 6, 7, 8, 5 → 683; um caso exato de meio (6,505 → 651)
+- [x] Teste `GEL-102`: lista vazia → `{ nivel: 550, semNota: true }`
+- [x] Teste `GEL-02`: `HABILIDADES_INICIAIS` igual às 6 da spec, na ordem
+- [x] Teste `GEL-36`: `anoNascimentoMaximo("2026-12-31")` = 2016 e `("2027-01-01")` = 2017
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -649,15 +650,15 @@ T73 → T74 → T75
 **Depends on**: T10
 **Reuses**: regras de `GS:232-235`; interface de `GD:121`
 **Requirement**: GEL-61, GEL-63, GEL-64
-**Status**: rascunhada
+concluída
 Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a spec não diz se vale; o rascunho o aceita e o trata como sem dia nenhum, sem sobreposição (`[LACUNA]` em `backend/dominio/src/atividade/datas.ts`, `sobrepoem`).
 
 **Done when**:
 
-- [ ] Casos limite listados antes do código: 29/02 em ano bissexto e não bissexto; `2026-13-01`; `2026-1-1`; hoje; amanhã; saída e retorno no mesmo dia
-- [ ] Teste `GEL-61`: [01/10, 05/10) e [05/10, aberto) não se sobrepõem
-- [ ] Testes `GEL-63`, `GEL-64`: cada caso limite com a mensagem exata
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do código: 29/02 em ano bissexto e não bissexto; `2026-13-01`; `2026-1-1`; hoje; amanhã; saída e retorno no mesmo dia
+- [x] Teste `GEL-61`: [01/10, 05/10) e [05/10, aberto) não se sobrepõem
+- [x] Testes `GEL-63`, `GEL-64`: cada caso limite com a mensagem exata
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -675,14 +676,14 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T11
 **Reuses**: mensagens de `GS:236-238`; `formatarData` (T9)
 **Requirement**: GEL-65, GEL-66, GEL-67
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Casos limite listados antes do código: cada regra no dia exato, na véspera e no dia seguinte; três períodos com o do meio alterado
-- [ ] Testes `GEL-65`, `GEL-66`: as 4 mensagens, cada uma com a data do período vizinho
-- [ ] Teste `GEL-67`: resultado com dois períodos sobrepostos dá "Os períodos não podem se sobrepor."
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do código: cada regra no dia exato, na véspera e no dia seguinte; três períodos com o do meio alterado
+- [x] Testes `GEL-65`, `GEL-66`: as 4 mensagens, cada uma com a data do período vizinho
+- [x] Teste `GEL-67`: resultado com dois períodos sobrepostos dá "Os períodos não podem se sobrepor."
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -700,15 +701,15 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T12
 **Reuses**: regra e mensagem de `GS:239`; interface de `GD:121` (`coberturaRetirada`)
 **Requirement**: GEL-68
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Casos limite listados antes do código: presença no dia da saída; na véspera; várias presenças retiradas; presença já fora antes da mudança; retorno adiado sobre presença
-- [ ] Teste `GEL-68`: presença em 01/10 e saída em 30/09 dá a mensagem com 01/10 e a data mínima 02/10
-- [ ] Teste `GEL-68`: retorno adiado para depois de uma presença dá a mensagem de retorno com a data máxima
-- [ ] Teste `GEL-68`: presença que já estava fora de período não bloqueia
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do código: presença no dia da saída; na véspera; várias presenças retiradas; presença já fora antes da mudança; retorno adiado sobre presença
+- [x] Teste `GEL-68`: presença em 01/10 e saída em 30/09 dá a mensagem com 01/10 e a data mínima 02/10
+- [x] Teste `GEL-68`: retorno adiado para depois de uma presença dá a mensagem de retorno com a data máxima
+- [x] Teste `GEL-68`: presença que já estava fora de período não bloqueia
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -728,16 +729,16 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T13
 **Reuses**: funções de T11 a T13; ordem de `GS:233`; mensagens de `GS:240`, `GS:256-257`; interface de `GD:121`
 **Requirement**: GEL-58, GEL-62, GEL-69, GEL-72, GEL-73
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: a regra do GEL-69 só é avaliada quando a mudança é a saída do primeiro período, para um histórico antigo fora da regra não travar escritas em outros períodos; corrigir com as datas atuais (GEL-74) volta antes da regra de data futura.
 
 **Done when**:
 
-- [ ] Casos limite listados antes do código: entrada que viola duas regras ao mesmo tempo (só a primeira volta); corrigir saída de período aberto; corrigir o início do primeiro período; saída do primeiro período antes do início da pontuação
-- [ ] Teste `GEL-62`: data futura e sobreposição juntas devolvem só a de data futura
-- [ ] Testes `GEL-72`, `GEL-73`, `GEL-69`: mensagens exatas
-- [ ] Teste `GEL-58`: inativar e reativar válidos devolvem os períodos esperados
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do código: entrada que viola duas regras ao mesmo tempo (só a primeira volta); corrigir saída de período aberto; corrigir o início do primeiro período; saída do primeiro período antes do início da pontuação
+- [x] Teste `GEL-62`: data futura e sobreposição juntas devolvem só a de data futura
+- [x] Testes `GEL-72`, `GEL-73`, `GEL-69`: mensagens exatas
+- [x] Teste `GEL-58`: inativar e reativar válidos devolvem os períodos esperados
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -755,15 +756,15 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T14
 **Reuses**: regras de `GS:275-278`; funções de T11 e T14
 **Requirement**: GEL-70, GEL-78, GEL-79, GEL-80, GEL-81, GEL-104
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Casos limite listados antes do código: 31/12/1999 e 01/01/2000; hoje e amanhã; igual à saída do primeiro período e um dia depois; primeiro período ainda aberto
-- [ ] Testes `GEL-78`, `GEL-79`, `GEL-80`: mensagens exatas
-- [ ] Teste `GEL-81`: recuar de 05/02 para 01/02 move o início do primeiro período e não muda os encerrados
-- [ ] Teste `GEL-70`, `GEL-104`: o `index.ts` exporta `slugBase`, `chaveBusca`, `compararApelido`, `calcularNivel`, `HABILIDADES_INICIAIS`, `anoNascimentoMaximo`, `avaliarPeriodos`, a avaliação do início e `formatarData`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do código: 31/12/1999 e 01/01/2000; hoje e amanhã; igual à saída do primeiro período e um dia depois; primeiro período ainda aberto
+- [x] Testes `GEL-78`, `GEL-79`, `GEL-80`: mensagens exatas
+- [x] Teste `GEL-81`: recuar de 05/02 para 01/02 move o início do primeiro período e não muda os encerrados
+- [x] Teste `GEL-70`, `GEL-104`: o `index.ts` exporta `slugBase`, `chaveBusca`, `compararApelido`, `calcularNivel`, `HABILIDADES_INICIAIS`, `anoNascimentoMaximo`, `avaliarPeriodos`, a avaliação do início e `formatarData`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -783,15 +784,15 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T15
 **Reuses**: primitivos zod da CA (`CA:550`, T11) e `.strict()` dos schemas de acesso (`CA:574`, T12); formas de `GD:138`; mensagens de `GS:83-87`; regra de `GSEG:94`
 **Requirement**: GEL-03, GEL-04, GEL-05, GEL-06, GEL-07, GEL-19, SEC-005
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Testes `GEL-03`: `"  AB  "` e 61 caracteres recusados com a mensagem; 3 e 60 aceitos
-- [ ] Testes `GEL-04`, `GEL-05`, `GEL-06`: valores fora da lista e horário ausente, `24:00` e `7:30` com o campo e a mensagem
-- [ ] Teste `GEL-07`: `slug` ou `urlPublica` no corpo é recusado
-- [ ] Teste `SEC-005`: NUL, U+200B e U+202E no nome recusados; "Pelada São" em NFD sai em NFC
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Testes `GEL-03`: `"  AB  "` e 61 caracteres recusados com a mensagem; 3 e 60 aceitos
+- [x] Testes `GEL-04`, `GEL-05`, `GEL-06`: valores fora da lista e horário ausente, `24:00` e `7:30` com o campo e a mensagem
+- [x] Teste `GEL-07`: `slug` ou `urlPublica` no corpo é recusado
+- [x] Teste `SEC-005`: NUL, U+200B e U+202E no nome recusados; "Pelada São" em NFD sai em NFC
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -809,16 +810,16 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T16
 **Reuses**: fábrica por `hoje` de `GD:139`; mensagens de `GS:165-175`; piso de `GSEG:66` com a mensagem de `GS:275`; `textoVisivel` (T16)
 **Requirement**: GEL-33, GEL-34, GEL-36, GEL-37, GEL-38, GEL-39, GEL-40, GEL-43, SEC-002, SEC-005
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Testes `GEL-34`, `GEL-36`: 1 e 31 caracteres; 1939 e (ano − 9) recusados com "O ano precisa estar entre 1940 e 2016." em 2026
-- [ ] Testes `GEL-38`, `GEL-39`: vazio e nulo viram sem telefone; `(11) 91234-5678` vira `11912345678`; DDD `01` e sem o 9 recusados com a mensagem
-- [ ] Testes `GEL-40`, `GEL-43`: -1, 10000 e 1,5 recusados; ausente no cadastro = 0; ausente na edição continua ausente
-- [ ] Testes `GEL-33`, `SEC-002`: `dataEntrada` amanhã, `0000-01-01` e `1999-12-31` recusadas com as mensagens; `2000-01-01` aceita
-- [ ] Teste `GEL-37`, `SEC-005`: posição `defensor` recusada; U+200B no apelido recusado
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Testes `GEL-34`, `GEL-36`: 1 e 31 caracteres; 1939 e (ano − 9) recusados com "O ano precisa estar entre 1940 e 2016." em 2026
+- [x] Testes `GEL-38`, `GEL-39`: vazio e nulo viram sem telefone; `(11) 91234-5678` vira `11912345678`; DDD `01` e sem o 9 recusados com a mensagem
+- [x] Testes `GEL-40`, `GEL-43`: -1, 10000 e 1,5 recusados; ausente no cadastro = 0; ausente na edição continua ausente
+- [x] Testes `GEL-33`, `SEC-002`: `dataEntrada` amanhã, `0000-01-01` e `1999-12-31` recusadas com as mensagens; `2000-01-01` aceita
+- [x] Teste `GEL-37`, `SEC-005`: posição `defensor` recusada; U+200B no apelido recusado
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -836,15 +837,15 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T17
 **Reuses**: formas de `GD:140-142`; mensagens de `GS:313`, `GS:335`
 **Requirement**: GEL-52, GEL-55, GEL-90, GEL-99, SEC-005
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Testes `GEL-52`, `GEL-55`: `dataCorpo` aceita corpo vazio
-- [ ] Teste `GEL-90`: 1 e 31 caracteres recusados com a mensagem
-- [ ] Teste `GEL-99`: 0, 11, 5,5 e `"7"` recusados; `null` aceito
-- [ ] Teste `SEC-005`: NUL no nome da habilidade recusado
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Testes `GEL-52`, `GEL-55`: `dataCorpo` aceita corpo vazio
+- [x] Teste `GEL-90`: 1 e 31 caracteres recusados com a mensagem
+- [x] Teste `GEL-99`: 0, 11, 5,5 e `"7"` recusados; `null` aceito
+- [x] Teste `SEC-005`: NUL no nome da habilidade recusado
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -864,13 +865,13 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T18
 **Reuses**: `criarApp` da fundação (`F:1106`); decisão de `GD:66-67` e `GD:296` (só o relógio injetado lê a data; o SQL não usa `now()` para regra de data)
 **Requirement**: GEL-32, GEL-52, GEL-55
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `GEL-32`: às 22h de São Paulo (01h UTC do dia seguinte), `hoje()` devolve a data de São Paulo
-- [ ] Teste: `criarApp({ relogio })` usa o relógio falso nas rotas
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-32`: às 22h de São Paulo (01h UTC do dia seguinte), `hoje()` devolve a data de São Paulo
+- [x] Teste: `criarApp({ relogio })` usa o relógio falso nas rotas
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -888,14 +889,14 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T19
 **Reuses**: 422 `dados_invalidos` das rotas de acesso (`CA:895`, T25); forma de `GS:70-71`; tradução por constraint de `GD:155`
 **Requirement**: GEL-118
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `GEL-118`: corpo inválido devolve 422 com a mensagem geral e `campos` com uma mensagem por campo
-- [ ] Teste: 23505 em `jogadores_apelido_grupo` vira 422 no campo `apelido` com a mensagem de apelido repetido; outra constraint sobe como 500
-- [ ] As rotas de acesso da CA continuam verdes
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-118`: corpo inválido devolve 422 com a mensagem geral e `campos` com uma mensagem por campo
+- [x] Teste: 23505 em `jogadores_apelido_grupo` vira 422 no campo `apelido` com a mensagem de apelido repetido; outra constraint sobe como 500
+- [x] As rotas de acesso da CA continuam verdes
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -913,13 +914,13 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T20
 **Reuses**: `Kysely<Banco>` da fundação (`FD:103`); `lerEsquema` (`F:736`); modelo de `GD:220-236`
 **Requirement**: GEL-112
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `GEL-112`: cada coluna tipada existe no catálogo com o tipo correspondente
-- [ ] `pnpm typecheck` passa
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-112`: cada coluna tipada existe no catálogo com o tipo correspondente
+- [x] `pnpm typecheck` passa
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -937,15 +938,15 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T21
 **Reuses**: estender a cadeia do `exigirVinculo` (`CA:795`, T21); decisão de `GD:181` e a nota de `GS:145` (arquivar também passa); exceção de `GSEG:160` (SEC-004); `FOR KEY SHARE` de `GSEG:163` (`FOR SHARE` dava deadlock)
 **Requirement**: GEL-26, SEC-004, SEC-007
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Casos limite listados antes do código: GET em arquivado; PATCH em arquivado; reativar; arquivar de novo; cancelar convite; remover admin em arquivado
-- [ ] Teste `GEL-26`: com G arquivado, `PATCH /api/grupos/:grupoId` e `POST …/admins/convites` da criadora dão 409 `grupo_arquivado`; GET passa
-- [ ] Teste `SEC-004`: `DELETE …/admins/convites/:id` da criadora em G arquivado dá 204
-- [ ] Teste `SEC-007`: a leitura usa `FOR KEY SHARE` (a consulta registrada no teste traz a cláusula)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do código: GET em arquivado; PATCH em arquivado; reativar; arquivar de novo; cancelar convite; remover admin em arquivado
+- [x] Teste `GEL-26`: com G arquivado, `PATCH /api/grupos/:grupoId` e `POST …/admins/convites` da criadora dão 409 `grupo_arquivado`; GET passa
+- [x] Teste `SEC-004`: `DELETE …/admins/convites/:id` da criadora em G arquivado dá 204
+- [x] Teste `SEC-007`: a leitura usa `FOR KEY SHARE` (a consulta registrada no teste traz a cláusula)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -965,14 +966,14 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T22
 **Reuses**: estender `limiteTaxa(binding)` (`F:1153`, estendido em `CA:746`) com a chave `conta:<id>`; binding de `F:1081` (FUN-26, 60 por minuto); decisão de `GSEG:75` e `GSEG:159`
 **Requirement**: SEC-003
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `SEC-003`: com binding falso que nega na 61.ª, a 61.ª criação de grupo da conta A dá 429 com `Retry-After` e nada é criado
-- [ ] Teste `SEC-003`: a conta B, na mesma janela, cria normalmente; GETs da conta A não gastam a cota
-- [ ] Teste `SEC-003`: `X-Pelada` continua sendo checado antes do limitador (`CA:723`)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SEC-003`: com binding falso que nega na 61.ª, a 61.ª criação de grupo da conta A dá 429 com `Retry-After` e nada é criado
+- [x] Teste `SEC-003`: a conta B, na mesma janela, cria normalmente; GETs da conta A não gastam a cota
+- [x] Teste `SEC-003`: `X-Pelada` continua sendo checado antes do limitador (`CA:723`)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -990,15 +991,15 @@ Lacunas: período vazio (saída no mesmo dia do início, que o banco aceita): a 
 **Depends on**: T23
 **Reuses**: estender `contas.eu` (`CA:820`, T22); decisão de `GD:91` e `GD:286`
 **Requirement**: GEL-25, GEL-27
-**Status**: rascunhada
+concluída
 Lacunas: o teste da CA `ACE-18: a criadora ainda vê o próprio grupo arquivado` (`backend/api/test/repositorios/contas.test.ts:57`) contradiz o GEL-27 (a sessão da criadora não traz o arquivado); o rascunho não o alterou, porque mudar teste existente pede aprovação. O `/executar` pergunta antes de levar ao verde.
 
 **Done when**:
 
-- [ ] Teste `GEL-25`: com G arquivado, `GET /api/sessao` de O não traz G
-- [ ] Teste `GEL-27`: `GET /api/sessao` de C também não traz G (ele só aparece em `GET /api/grupos`, em "Arquivados")
-- [ ] O teste de ACE-18 da CA continua verde
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-25`: com G arquivado, `GET /api/sessao` de O não traz G
+- [x] Teste `GEL-27`: `GET /api/sessao` de C também não traz G (ele só aparece em `GET /api/grupos`, em "Arquivados")
+- [x] O teste de ACE-18 da CA continua verde
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1016,16 +1017,16 @@ Lacunas: o teste da CA `ACE-18: a criadora ainda vê o próprio grupo arquivado`
 **Depends on**: T24
 **Reuses**: `exigirGrupoAtivo` (T22); evidência do LJS em `GSEG:163` (só consulta); `bancoDeTeste()` (`F:507`)
 **Requirement**: SEC-007
-**Status**: rascunhada
+concluída
 Lacunas: o lado do arquivar no teste trava a linha com `FOR UPDATE` antes do `UPDATE`, como `GD:150` manda para o `grupos.arquivar`; um `UPDATE` sozinho pega `FOR NO KEY UPDATE`, que não espera o `FOR KEY SHARE`. A T27 precisa seguir a mesma trava, ou o SEC-007 não vale na rota real.
 
 **Done when**:
 
-- [ ] Casos limite listados antes do teste: escrita aberta e arquivar em seguida; arquivar aberto e escrita em seguida; dois PATCH
-- [ ] Teste `SEC-007`: o `UPDATE` de `arquivado_em` espera o fim da transação da escrita
-- [ ] Teste `SEC-007`: dois PATCH simultâneos terminam sem deadlock
-- [ ] Evidência: sem o `FOR KEY SHARE`, o primeiro teste fica vermelho (registrar aqui)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do teste: escrita aberta e arquivar em seguida; arquivar aberto e escrita em seguida; dois PATCH
+- [x] Teste `SEC-007`: o `UPDATE` de `arquivado_em` espera o fim da transação da escrita
+- [x] Teste `SEC-007`: dois PATCH simultâneos terminam sem deadlock
+- [x] Evidência: sem o `FOR KEY SHARE`, o primeiro teste fica vermelho (registrar aqui)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1045,14 +1046,14 @@ Lacunas: o lado do arquivar no teste trava a linha com `FOR UPDATE` antes do `UP
 **Depends on**: T25
 **Reuses**: interfaces de `GD:150`; `grupo_criar` (`M:1792844340000_grupo-criar.sql:10`); molde dos repositórios da CA com `grupoId` primeiro (`CA:844`)
 **Requirement**: GEL-01, GEL-02, GEL-14, GEL-20, GEL-27
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `GEL-01`: `criar` devolve id e slug e o grupo tem as 6 habilidades na ordem
-- [ ] Teste `GEL-27`: C vê G arquivado em `arquivados`; O não o vê em nenhuma das listas
-- [ ] Teste `GEL-20`: `ler` conta só jogadores com período aberto e diz `souCriador` certo para C e O
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-01`: `criar` devolve id e slug e o grupo tem as 6 habilidades na ordem
+- [x] Teste `GEL-27`: C vê G arquivado em `arquivados`; O não o vê em nenhuma das listas
+- [x] Teste `GEL-20`: `ler` conta só jogadores com período aberto e diz `souCriador` certo para C e O
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1070,16 +1071,16 @@ Lacunas: o lado do arquivar no teste trava a linha com `FOR UPDATE` antes do `UP
 **Depends on**: T26
 **Reuses**: decisão de `GD:150` e o risco de `GD:271` (vínculo com `FOR KEY SHARE`); `auditoria.registrar` (`CA:844`, T23); eventos de `GSEG:164`
 **Requirement**: GEL-18, GEL-22, GEL-23, GEL-24, GEL-28, GEL-29, GEL-30, SEC-008
-**Status**: rascunhada
+concluída
 Lacunas: (1) arquivar um grupo já arquivado com o nome errado: a spec não diz se vale o 200 do GEL-29 ou o 422 do GEL-23; o rascunho confere o nome antes. (2) Dois arquivar simultâneos: cada um tem o `FOR KEY SHARE` do `exigirGrupoAtivo` e pede `FOR UPDATE`, então um cai em deadlock (500); a spec não define o resultado. SPEC_DEVIATION: o editar trava com `FOR NO KEY UPDATE`, não `FOR UPDATE` (`GD:150`), para dois PATCH não darem deadlock (`GSEG:163`).
 
 **Done when**:
 
-- [ ] Casos limite listados antes do código: ativo → arquivado; arquivado → arquivado; arquivado → ativo; ativo → ativo; nome com caixa ou espaço diferente; O pedindo; criadora removida
-- [ ] Testes `GEL-22`, `GEL-23`, `GEL-24`: nome exato arquiva e audita; "pelada de quinta" para "Pelada de Quinta" dá 422; O dá `so_quem_criou`
-- [ ] Testes `GEL-28`, `GEL-29`, `GEL-30`: reativar mantém vínculos, jogadores, habilidades, notas e slug; repetir o estado não grava nem audita
-- [ ] Teste `SEC-008`: `grupo_editado` traz só `campos`; edição que falha não deixa evento
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do código: ativo → arquivado; arquivado → arquivado; arquivado → ativo; ativo → ativo; nome com caixa ou espaço diferente; O pedindo; criadora removida
+- [x] Testes `GEL-22`, `GEL-23`, `GEL-24`: nome exato arquiva e audita; "pelada de quinta" para "Pelada de Quinta" dá 422; O dá `so_quem_criou`
+- [x] Testes `GEL-28`, `GEL-29`, `GEL-30`: reativar mantém vínculos, jogadores, habilidades, notas e slug; repetir o estado não grava nem audita
+- [x] Teste `SEC-008`: `grupo_editado` traz só `campos`; edição que falha não deixa evento
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1097,16 +1098,16 @@ Lacunas: (1) arquivar um grupo já arquivado com o nome errado: a spec não diz 
 **Depends on**: T27
 **Reuses**: `exigirSessao` (`CA:770`, T20); leitor de corpo (T20); `URL_PUBLICA` de `F:1081`; tabela de `GD:165-167`
 **Requirement**: GEL-01, GEL-03, GEL-04, GEL-05, GEL-06, GEL-07, GEL-08, GEL-09, GEL-10, GEL-17, GEL-27
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `GEL-01`, `GEL-17`: 201 com o link montado de `URL_PUBLICA` (dois valores de `URL_PUBLICA` no teste)
-- [ ] Testes `GEL-03` a `GEL-07`: cada corpo inválido dá 422 com o campo e nada é criado
-- [ ] Teste `GEL-08`: sem sessão, 401 e nada criado
-- [ ] Testes `GEL-09`, `GEL-10`: erro forçado depois de `grupo_criar` desfaz tudo; no sucesso há `grupo_criado`
-- [ ] Teste `GEL-27`: `GET` da criadora separa ativos e arquivados
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-01`, `GEL-17`: 201 com o link montado de `URL_PUBLICA` (dois valores de `URL_PUBLICA` no teste)
+- [x] Testes `GEL-03` a `GEL-07`: cada corpo inválido dá 422 com o campo e nada é criado
+- [x] Teste `GEL-08`: sem sessão, 401 e nada criado
+- [x] Testes `GEL-09`, `GEL-10`: erro forçado depois de `grupo_criar` desfaz tudo; no sucesso há `grupo_criado`
+- [x] Teste `GEL-27`: `GET` da criadora separa ativos e arquivados
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1126,16 +1127,16 @@ Lacunas: (1) arquivar um grupo já arquivado com o nome errado: a spec não diz 
 **Depends on**: T28
 **Reuses**: `exigirVinculo` (`CA:795`); `grupos.ler` e `grupos.editar` (T26, T27); tabela de `GD:168-169`
 **Requirement**: GEL-16, GEL-17, GEL-18, GEL-19, GEL-20, GEL-21
-**Status**: rascunhada
+concluída
 Lacunas: o `PATCH /api/grupos/:grupoId` real é registrado antes das rotas extras dos testes, então os casos de `backend/api/test/sessao/grupo-ativo.test.ts` (T22) que mandam `PATCH` com corpo `{}` à rota extra passam a cair na rota real (422 no grupo ativo; o 409 do arquivado continua). O rascunho não mexeu no teste da T22; o `/executar` decide com o usuário (corpo válido ou rota extra própria).
 
 **Done when**:
 
-- [ ] Testes `GEL-18`, `GEL-16`: renomear devolve 200 com o nome novo e o mesmo slug e link
-- [ ] Teste `GEL-19`: as mensagens de GEL-03 a GEL-07 também no PATCH
-- [ ] Teste `GEL-20`: o GET traz as contagens e `souCriador`
-- [ ] Teste `GEL-21`: B recebe 404 no GET e no PATCH
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Testes `GEL-18`, `GEL-16`: renomear devolve 200 com o nome novo e o mesmo slug e link
+- [x] Teste `GEL-19`: as mensagens de GEL-03 a GEL-07 também no PATCH
+- [x] Teste `GEL-20`: o GET traz as contagens e `souCriador`
+- [x] Teste `GEL-21`: B recebe 404 no GET e no PATCH
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1153,15 +1154,15 @@ Lacunas: o `PATCH /api/grupos/:grupoId` real é registrado antes das rotas extra
 **Depends on**: T29
 **Reuses**: `grupos.arquivar` e `grupos.reativar` (T27); tabela de `GD:170-171`
 **Requirement**: GEL-22, GEL-23, GEL-24, GEL-28, GEL-29
-**Status**: rascunhada
+concluída
 Lacunas: como na T29, as rotas reais de arquivar e reativar vêm antes das extras de `backend/api/test/sessao/grupo-ativo.test.ts` (T22); o caso "reativar e arquivar passam no grupo arquivado" manda o arquivar sem corpo e passa a receber 422 da rota real. Teste da T22 não alterado no rascunho.
 
 **Done when**:
 
-- [ ] Testes `GEL-22`, `GEL-23`: nome certo dá 200 e `grupo_arquivado`; nome errado dá 422 com a mensagem no campo `nomeConfirmacao`
-- [ ] Teste `GEL-24`: O recebe 403 `so_quem_criou` em arquivar (G ativo); G fica igual
-- [ ] Testes `GEL-28`, `GEL-29`: reativar arquivado dá 200 com `grupo_reativado`; repetir dá 200 sem auditoria
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Testes `GEL-22`, `GEL-23`: nome certo dá 200 e `grupo_arquivado`; nome errado dá 422 com a mensagem no campo `nomeConfirmacao`
+- [x] Teste `GEL-24`: O recebe 403 `so_quem_criou` em arquivar (G ativo); G fica igual
+- [x] Testes `GEL-28`, `GEL-29`: reativar arquivado dá 200 com `grupo_reativado`; repetir dá 200 sem auditoria
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1179,15 +1180,15 @@ Lacunas: como na T29, as rotas reais de arquivar e reativar vêm antes das extra
 **Depends on**: T30
 **Reuses**: lista de rotas do `app.routes` usada na suíte da CA (`CA:1070`); cenário de T0
 **Requirement**: GEL-25, GEL-26
-**Status**: rascunhada
+concluída
 SPEC_DEVIATION: o teste fica em `backend/api/test/grupos/grupo-arquivado.test.ts`, não em `test/rotas/` (que roda no `workerd`, sem o Postgres), como os testes das rotas de acesso.
 
 **Done when**:
 
-- [ ] Teste `GEL-25`: para cada rota de grupo registrada, O recebe 404 com G arquivado
-- [ ] Teste `GEL-26`: para cada rota de escrita, C recebe 409 `grupo_arquivado`, salvo reativar, arquivar e cancelar convite
-- [ ] Teste `GEL-25`: criadora removida do grupo recebe 404 em arquivar e reativar
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-25`: para cada rota de grupo registrada, O recebe 404 com G arquivado
+- [x] Teste `GEL-26`: para cada rota de escrita, C recebe 409 `grupo_arquivado`, salvo reativar, arquivar e cancelar convite
+- [x] Teste `GEL-25`: criadora removida do grupo recebe 404 em arquivar e reativar
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1205,15 +1206,15 @@ SPEC_DEVIATION: o teste fica em `backend/api/test/grupos/grupo-arquivado.test.ts
 **Depends on**: T31
 **Reuses**: estender `admins.remover` (`CA:844`, T23) e a rota (`CA:1020`, T30); decisão de `GSEG:57` e `GSEG:157`
 **Requirement**: SEC-001
-**Status**: rascunhada
+concluída
 SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/src/infraestrutura/db/repositorios/convites.ts`; não existe `repositorios/admins.ts`.
 
 **Done when**:
 
-- [ ] Teste `SEC-001`: O removendo C dá 409 `criadora_nao_removivel` e C continua admin
-- [ ] Teste `SEC-001`: C removendo O dá 204; C saindo de si mesma, havendo outro admin, dá 204
-- [ ] Os testes de ACE-39 e ACE-40 da CA continuam verdes
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SEC-001`: O removendo C dá 409 `criadora_nao_removivel` e C continua admin
+- [x] Teste `SEC-001`: C removendo O dá 204; C saindo de si mesma, havendo outro admin, dá 204
+- [x] Os testes de ACE-39 e ACE-40 da CA continuam verdes
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1233,15 +1234,15 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T32
 **Reuses**: interface de `GD:151` e a decisão de `GD:287` (duas consultas e cálculo no domínio); `calcularNivel` (T10)
 **Requirement**: GEL-46, GEL-50, GEL-102
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `GEL-46`: cada item traz id, apelido, posição, situação, desde, nível e `semNota`
-- [ ] Teste `GEL-50`: jogador com período encerrado sai como inativo desde a data de saída
-- [ ] Teste `GEL-102`: jogador sem nota sai com 550 e `semNota`
-- [ ] Teste: listar 30 jogadores faz exatamente 2 consultas
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-46`: cada item traz id, apelido, posição, situação, desde, nível e `semNota`
+- [x] Teste `GEL-50`: jogador com período encerrado sai como inativo desde a data de saída
+- [x] Teste `GEL-102`: jogador sem nota sai com 550 e `semNota`
+- [x] Teste: listar 30 jogadores faz exatamente 2 consultas
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1259,15 +1260,15 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T33
 **Reuses**: interface de `GD:151`; tradutor do 23505 (T20); `auditoria.registrar` (`CA:844`)
 **Requirement**: GEL-31, GEL-32, GEL-35, GEL-38, GEL-45
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Testes `GEL-31`, `GEL-32`: sem data de entrada, período aberto e `inicio_pontuacao` em `hoje` do relógio falso
-- [ ] Teste `GEL-35`: "toninho" com "Toninho" existente dá 422; dois cadastros simultâneos do mesmo apelido dão um 201 e um 422 (não 500)
-- [ ] Teste `GEL-38`: telefone ausente grava nulo
-- [ ] Teste `GEL-45`: `jogador_criado` com o id do jogador e sem telefone nem ano
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Testes `GEL-31`, `GEL-32`: sem data de entrada, período aberto e `inicio_pontuacao` em `hoje` do relógio falso
+- [x] Teste `GEL-35`: "toninho" com "Toninho" existente dá 422; dois cadastros simultâneos do mesmo apelido dão um 201 e um 422 (não 500)
+- [x] Teste `GEL-38`: telefone ausente grava nulo
+- [x] Teste `GEL-45`: `jogador_criado` com o id do jogador e sem telefone nem ano
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1285,15 +1286,15 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T34
 **Reuses**: interface de `GD:151`; regra de histórico de `GS:52` e C8 (`ljs:.specs/features/grupos-e-elenco/context.md:14`); eventos de `GSEG:164`
 **Requirement**: GEL-41, GEL-42, GEL-43, GEL-44, GEL-45, GEL-84, GEL-85, SEC-008
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Testes `GEL-41`, `GEL-43`, `GEL-42`: editar sem pontuação mantém o valor; mudar a pontuação audita antes e depois
-- [ ] Teste `SEC-008`: editar telefone grava `jogador_editado` com `campos: ["telefone"]` e sem o número
-- [ ] Testes `GEL-84`, `GEL-85`: sem histórico apaga e audita; com presença, com nota e com pagamento recusa sem apagar (3 casos)
-- [ ] Teste `GEL-44`: id de jogador de outro grupo dá não encontrado
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Testes `GEL-41`, `GEL-43`, `GEL-42`: editar sem pontuação mantém o valor; mudar a pontuação audita antes e depois
+- [x] Teste `SEC-008`: editar telefone grava `jogador_editado` com `campos: ["telefone"]` e sem o número
+- [x] Testes `GEL-84`, `GEL-85`: sem histórico apaga e audita; com presença, com nota e com pagamento recusa sem apagar (3 casos)
+- [x] Teste `GEL-44`: id de jogador de outro grupo dá não encontrado
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1313,15 +1314,15 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T35
 **Reuses**: `jogadores.listar` e `jogadores.criar` (T33, T34); relógio (T19); tabela de `GD:172`
 **Requirement**: GEL-31, GEL-33, GEL-34, GEL-36, GEL-37, GEL-39, GEL-40, GEL-46, SEC-002
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `GEL-31`: 201 com o jogador criado e "Ativo desde" hoje
-- [ ] Testes `GEL-33`, `GEL-34`, `GEL-36`, `GEL-37`, `GEL-39`, `GEL-40`: cada inválido dá 422 com o campo e a mensagem
-- [ ] Teste `SEC-002`: `dataEntrada` `0000-01-01` dá 422, não 500
-- [ ] Teste `GEL-46`: a lista tem os campos da spec
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-31`: 201 com o jogador criado e "Ativo desde" hoje
+- [x] Testes `GEL-33`, `GEL-34`, `GEL-36`, `GEL-37`, `GEL-39`, `GEL-40`: cada inválido dá 422 com o campo e a mensagem
+- [x] Teste `SEC-002`: `dataEntrada` `0000-01-01` dá 422, não 500
+- [x] Teste `GEL-46`: a lista tem os campos da spec
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1339,14 +1340,14 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T36
 **Reuses**: `jogadores.ler`, `editar` e `excluir` (T33, T35); tabela de `GD:173`; mensagem de `GS:295`
 **Requirement**: GEL-41, GEL-44, GEL-84, GEL-85
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `GEL-41`: PATCH válido dá 200 e ignora `dataEntrada` enviada
-- [ ] Teste `GEL-44`: jogador de outro grupo dá 404 nos 3 métodos
-- [ ] Testes `GEL-84`, `GEL-85`: 204 sem histórico; 409 com código, mensagem e sugestão
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-41`: PATCH válido dá 200 e ignora `dataEntrada` enviada
+- [x] Teste `GEL-44`: jogador de outro grupo dá 404 nos 3 métodos
+- [x] Testes `GEL-84`, `GEL-85`: 204 sem histórico; 409 com código, mensagem e sugestão
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1364,16 +1365,16 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T37
 **Reuses**: escrita de período de `GD:152` (trava antes da validação); `avaliarPeriodos` (T14); auditoria de inativar de C9 (`ljs:.specs/features/grupos-e-elenco/context.md:15`)
 **Requirement**: GEL-51, GEL-52, GEL-53, GEL-58, GEL-68, GEL-109
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Casos limite listados antes do código: sem data; saída igual ao início; saída antes de presença; já inativo; erro depois do `UPDATE`
-- [ ] Testes `GEL-51`, `GEL-52`: encerra na data dada ou em hoje e audita
-- [ ] Teste `GEL-53`: já inativo devolve `ja_inativo` sem gravar
-- [ ] Teste `GEL-68`: presença em 01/10 e saída em 30/09 recusada com a data mínima 02/10
-- [ ] Teste `GEL-109`: erro forçado depois do `UPDATE` deixa período e auditoria como antes
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do código: sem data; saída igual ao início; saída antes de presença; já inativo; erro depois do `UPDATE`
+- [x] Testes `GEL-51`, `GEL-52`: encerra na data dada ou em hoje e audita
+- [x] Teste `GEL-53`: já inativo devolve `ja_inativo` sem gravar
+- [x] Teste `GEL-68`: presença em 01/10 e saída em 30/09 recusada com a data mínima 02/10
+- [x] Teste `GEL-109`: erro forçado depois do `UPDATE` deixa período e auditoria como antes
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1393,15 +1394,15 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T38
 **Reuses**: trava e leitura de T38 (mesma função interna de `jogadores.ts`); `avaliarPeriodos` (T14)
 **Requirement**: GEL-54, GEL-55, GEL-56, GEL-57, GEL-58
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Casos limite listados antes do código: retorno no dia da saída; na véspera; já ativo; sem data
-- [ ] Testes `GEL-54`, `GEL-55`: período novo e início e pontuação intactos
-- [ ] Testes `GEL-56`, `GEL-57`: já ativo sem gravar; auditoria com as duas datas
-- [ ] Teste `GEL-58`: retorno antes da saída anterior recusado com a mensagem
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do código: retorno no dia da saída; na véspera; já ativo; sem data
+- [x] Testes `GEL-54`, `GEL-55`: período novo e início e pontuação intactos
+- [x] Testes `GEL-56`, `GEL-57`: já ativo sem gravar; auditoria com as duas datas
+- [x] Teste `GEL-58`: retorno antes da saída anterior recusado com a mensagem
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1419,15 +1420,15 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T39
 **Reuses**: trava de T38; `avaliarPeriodos` com a operação corrigir (T14); regras de `GS:255-259`
 **Requirement**: GEL-71, GEL-72, GEL-73, GEL-74, GEL-75
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Casos limite listados antes do código: período aberto; primeiro período; datas iguais; período de outro jogador; saída e retorno juntos
-- [ ] Teste `GEL-71`: saída de 05/10 para 03/10 grava e audita antes e depois
-- [ ] Testes `GEL-72`, `GEL-73`, `GEL-74`: mensagens e `alterado: false` sem auditoria
-- [ ] Teste `GEL-75`: período de outro jogador do grupo dá não encontrado
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do código: período aberto; primeiro período; datas iguais; período de outro jogador; saída e retorno juntos
+- [x] Teste `GEL-71`: saída de 05/10 para 03/10 grava e audita antes e depois
+- [x] Testes `GEL-72`, `GEL-73`, `GEL-74`: mensagens e `alterado: false` sem auditoria
+- [x] Teste `GEL-75`: período de outro jogador do grupo dá não encontrado
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1445,14 +1446,14 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T40
 **Reuses**: trava de T38; avaliação do início (T15); regras de `GS:274-280`
 **Requirement**: GEL-77, GEL-81, GEL-82, GEL-83
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Casos limite listados antes do código: recuo; avanço dentro do primeiro período; data igual; primeiro período aberto
-- [ ] Testes `GEL-77`, `GEL-81`: recuar de 05/02 para 01/02 move o primeiro período e audita
-- [ ] Teste `GEL-82`: data igual não grava nem audita
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do código: recuo; avanço dentro do primeiro período; data igual; primeiro período aberto
+- [x] Testes `GEL-77`, `GEL-81`: recuar de 05/02 para 01/02 move o primeiro período e audita
+- [x] Teste `GEL-82`: data igual não grava nem audita
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1472,14 +1473,14 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T41
 **Reuses**: `jogadores.inativar` e `reativar` (T38, T39); tabela de `GD:174`
 **Requirement**: GEL-51, GEL-52, GEL-53, GEL-54, GEL-55, GEL-56
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Testes `GEL-51`, `GEL-54`: 200 nos dois e a lista reflete a situação
-- [ ] Testes `GEL-53`, `GEL-56`: 409 com "O jogador já está inativo." e "O jogador já está ativo."
-- [ ] Testes `GEL-52`, `GEL-55`: corpo vazio usa hoje do relógio falso
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Testes `GEL-51`, `GEL-54`: 200 nos dois e a lista reflete a situação
+- [x] Testes `GEL-53`, `GEL-56`: 409 com "O jogador já está inativo." e "O jogador já está ativo."
+- [x] Testes `GEL-52`, `GEL-55`: corpo vazio usa hoje do relógio falso
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1497,14 +1498,14 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T42
 **Reuses**: `corrigirPeriodo` e `alterarInicio` (T40, T41); tabela de `GD:175-176`
 **Requirement**: GEL-71, GEL-72, GEL-73, GEL-74, GEL-75, GEL-77, GEL-78, GEL-79, GEL-80, GEL-82
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Testes `GEL-71`, `GEL-74`: 200 com as datas novas; iguais dão `alterado: false` e "Nada a alterar."
-- [ ] Testes `GEL-72`, `GEL-73`, `GEL-75`: 422 e 404 da spec
-- [ ] Testes `GEL-77`, `GEL-78`, `GEL-79`, `GEL-80`, `GEL-82`: 200 e cada 422 com a mensagem
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Testes `GEL-71`, `GEL-74`: 200 com as datas novas; iguais dão `alterado: false` e "Nada a alterar."
+- [x] Testes `GEL-72`, `GEL-73`, `GEL-75`: 422 e 404 da spec
+- [x] Testes `GEL-77`, `GEL-78`, `GEL-79`, `GEL-80`, `GEL-82`: 200 e cada 422 com a mensagem
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1522,15 +1523,15 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T43
 **Reuses**: trava de T38; `bancoDeTeste()` (`F:507`)
 **Requirement**: GEL-109, GEL-110
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Casos limite listados antes do teste: duas inativações; reativar e inativar; corrigir enquanto inativa
-- [ ] Teste `GEL-110`: duas inativações simultâneas dão uma 200 e uma `ja_inativo`
-- [ ] Teste `GEL-109`: a segunda transação espera a trava (tempo medido) e lê o período já encerrado
-- [ ] Evidência: sem o `FOR UPDATE`, o teste fica vermelho (registrar aqui)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do teste: duas inativações; reativar e inativar; corrigir enquanto inativa
+- [x] Teste `GEL-110`: duas inativações simultâneas dão uma 200 e uma `ja_inativo`
+- [x] Teste `GEL-109`: a segunda transação espera a trava (tempo medido) e lê o período já encerrado
+- [x] Evidência: sem o `FOR UPDATE`, o teste fica vermelho (registrar aqui)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1548,14 +1549,14 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T44
 **Reuses**: molde da checagem da CA (`CA:1093`, T33) e da fundação (`F:1251`); regra de `GD:191`
 **Requirement**: GEL-83, GEL-111
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `GEL-111`: arquivo de exemplo em `rotas/` com `updateTable('periodos_ativos')` reprova; em `repositorios/jogadores.ts` passa
-- [ ] Teste `GEL-83`: `inicio_pontuacao` num `set` fora do repositório reprova
-- [ ] A checagem passa na base atual
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-111`: arquivo de exemplo em `rotas/` com `updateTable('periodos_ativos')` reprova; em `repositorios/jogadores.ts` passa
+- [x] Teste `GEL-83`: `inicio_pontuacao` num `set` fora do repositório reprova
+- [x] A checagem passa na base atual
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1575,15 +1576,15 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T45
 **Reuses**: interface de `GD:153`; tradutor do 23505 (T20); eventos de `GSEG:164`
 **Requirement**: GEL-88, GEL-89, GEL-91, GEL-92, GEL-93, GEL-96, SEC-008
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Testes `GEL-88`, `GEL-89`: criada vai para o fim da ordem
-- [ ] Testes `GEL-91`, `GEL-92`: "passe" com "Passe" dá 422; renomear "Drible" mantém notas e posição
-- [ ] Teste `GEL-93`: excluir apaga as notas só dela e audita
-- [ ] Testes `SEC-008`, `GEL-96`: criar e renomear auditam; id de outro grupo dá não encontrado
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Testes `GEL-88`, `GEL-89`: criada vai para o fim da ordem
+- [x] Testes `GEL-91`, `GEL-92`: "passe" com "Passe" dá 422; renomear "Drible" mantém notas e posição
+- [x] Teste `GEL-93`: excluir apaga as notas só dela e audita
+- [x] Testes `SEC-008`, `GEL-96`: criar e renomear auditam; id de outro grupo dá não encontrado
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1601,14 +1602,14 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T46
 **Reuses**: `habilidades.*` (T46); tabela de `GD:177`
 **Requirement**: GEL-88, GEL-89, GEL-90, GEL-91, GEL-92, GEL-93, GEL-96
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Testes `GEL-88`, `GEL-89`, `GEL-92`, `GEL-93`: 200, 201, 200 e 204
-- [ ] Testes `GEL-90`, `GEL-91`: 422 com a mensagem no campo `nome`
-- [ ] Teste `GEL-96`: habilidade de outro grupo dá 404 no PATCH e no DELETE
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Testes `GEL-88`, `GEL-89`, `GEL-92`, `GEL-93`: 200, 201, 200 e 204
+- [x] Testes `GEL-90`, `GEL-91`: 422 com a mensagem no campo `nome`
+- [x] Teste `GEL-96`: habilidade de outro grupo dá 404 no PATCH e no DELETE
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1626,15 +1627,15 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T47
 **Reuses**: interface de `GD:154`; `calcularNivel` (T10); tabela de `GD:178`
 **Requirement**: GEL-97, GEL-98, GEL-99, GEL-100, GEL-105
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `GEL-97`: criar e substituir a nota devolvem o nível recalculado
-- [ ] Teste `GEL-98`: `null` apaga; `null` sem nota existente dá 200
-- [ ] Testes `GEL-99`, `GEL-100`: 422 no campo `nota`; jogador ou habilidade de outro grupo dá 404
-- [ ] Teste `GEL-105`: jogador inativo recebe nota
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-97`: criar e substituir a nota devolvem o nível recalculado
+- [x] Teste `GEL-98`: `null` apaga; `null` sem nota existente dá 200
+- [x] Testes `GEL-99`, `GEL-100`: 422 no campo `nota`; jogador ou habilidade de outro grupo dá 404
+- [x] Teste `GEL-105`: jogador inativo recebe nota
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1654,13 +1655,13 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T48
 **Reuses**: colunas de `auditoria` em `M:1792843200000_linha-de-base.sql:50`; rotas de T28 a T48
 **Requirement**: GEL-113
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `GEL-113`: criar, editar, inativar, reativar, corrigir, alterar início e excluir com telefone `11987654321` e ano 1987: nenhuma linha contém os dois
-- [ ] Teste `GEL-113`: os eventos têm só ids, datas, números e nomes de campo
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-113`: criar, editar, inativar, reativar, corrigir, alterar início e excluir com telefone `11987654321` e ano 1987: nenhuma linha contém os dois
+- [x] Teste `GEL-113`: os eventos têm só ids, datas, números e nomes de campo
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1678,14 +1679,14 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T49
 **Reuses**: estender a suíte da CA (`CA:1070`, T32; vale ela no lugar do `casos.ts` do LJS, AD-027 proposta); decisão de `GD:192`
 **Requirement**: GEL-106, GEL-107, GEL-108
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `GEL-106`: a suíte passa com as rotas novas e reprova rota nova sem caso
-- [ ] Teste `GEL-107`: cada rota de grupo dá 404 para B com o id de G, sem mudar nada de G
-- [ ] Teste `GEL-108`: com o id de G na rota e o id de jogador, período ou habilidade de H, 404
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-106`: a suíte passa com as rotas novas e reprova rota nova sem caso
+- [x] Teste `GEL-107`: cada rota de grupo dá 404 para B com o id de G, sem mudar nada de G
+- [x] Teste `GEL-108`: com o id de G na rota e o id de jogador, período ou habilidade de H, 404
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1703,14 +1704,14 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T50
 **Reuses**: estender os modelos da CA (`CA:672`, T16); regra de `GSEG:102` e `GSEG:162` (`nomeDoGrupoNoEmail`)
 **Requirement**: SEC-006
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `SEC-006`: nome "Pelada www.golpe.com" e "Pelada\nClique aqui" não geram link nem linha nova no texto e no HTML
-- [ ] Teste `SEC-006`: nome normal sai igual ao de antes
-- [ ] Os testes de ACE-31 da CA continuam verdes
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SEC-006`: nome "Pelada www.golpe.com" e "Pelada\nClique aqui" não geram link nem linha nova no texto e no HTML
+- [x] Teste `SEC-006`: nome normal sai igual ao de antes
+- [x] Os testes de ACE-31 da CA continuam verdes
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1730,13 +1731,13 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T51
 **Reuses**: `reuso.md` R-01 a R-36 (comando de adaptação no topo do mapa; a origem só é aberta pelo comando); entradas de `telas.json:164-165` e `:188-227`
 **Requirement**: GEL-116
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Os 36 arquivos copiados e iguais à origem pelo `cmp` (resultado registrado aqui)
-- [ ] Teste `GEL-116`: todo `mockup` do `telas.json` existe no disco; um caminho inválido de exemplo reprova
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Os 36 arquivos copiados e iguais à origem pelo `cmp` (resultado registrado aqui)
+- [x] Teste `GEL-116`: todo `mockup` do `telas.json` existe no disco; um caminho inválido de exemplo reprova
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1754,13 +1755,13 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T52
 **Reuses**: cliente HTTP da CA (`CA:1169`, T36) e `useSessao` (`CA:1192`, T37); contratos de T16
 **Requirement**: GEL-01, GEL-18, GEL-22, GEL-27
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `GEL-27`: `useGrupos` devolve ativos e arquivados de `GET /api/grupos`
-- [ ] Teste `GEL-22`: arquivar invalida a lista e a sessão
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-27`: `useGrupos` devolve ativos e arquivados de `GET /api/grupos`
+- [x] Teste `GEL-22`: arquivar invalida a lista e a sessão
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1778,13 +1779,13 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T53
 **Reuses**: molde de `dados/grupos.ts` (T53); contratos de T17 e T18
 **Requirement**: GEL-31, GEL-46, GEL-51, GEL-54
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `GEL-51`: inativar invalida a lista e a ficha do jogador
-- [ ] Teste `GEL-46`: a lista chega tipada pelo `jogadorItem`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-51`: inativar invalida a lista e a ficha do jogador
+- [x] Teste `GEL-46`: a lista chega tipada pelo `jogadorItem`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1802,13 +1803,13 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T54
 **Reuses**: molde de T53; regra de `GS:339`
 **Requirement**: GEL-88, GEL-97, GEL-103
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `GEL-103`: 683 → "6,8"; 685 → "6,9"; `semNota` → "sem nota"
-- [ ] Teste `GEL-97`: salvar nota atualiza o nível da ficha com a resposta
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-103`: 683 → "6,8"; 685 → "6,9"; `semNota` → "sem nota"
+- [x] Teste `GEL-97`: salvar nota atualiza o nível da ficha com a resposta
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1828,13 +1829,13 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T55
 **Reuses**: molde de `Campo` da CA (`CA:1238`, T39); marcação de `.specs/mockup/telas/t27-novo-grupo--vazio.html` e de `t16-jogador--novo.html`; Stylelint de tokens (`F:1374`)
 **Requirement**: GEL-115
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `GEL-115`: axe sem violação nos estados normal e com erro dos três
-- [ ] Teste: `CampoSeletor` mostra as opções de dia e de frequência
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-115`: axe sem violação nos estados normal e com erro dos três
+- [x] Teste: `CampoSeletor` mostra as opções de dia e de frequência
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1852,13 +1853,13 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T56
 **Reuses**: molde de T56; marcação de `.specs/mockup/telas/t15-jogadores--sucesso.html` e `t16-jogador--edicao.html`
 **Requirement**: GEL-115
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `GEL-115`: axe sem violação nos três
-- [ ] Teste: `Abas` anuncia a aba ativa com `aria-selected`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-115`: axe sem violação nos três
+- [x] Teste: `Abas` anuncia a aba ativa com `aria-selected`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1878,15 +1879,15 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T57
 **Reuses**: estender a tela da CA (`CA:1509`, T50); estados de `R-02` a `R-08` (`t08-grupos--*.html` do módulo)
 **Requirement**: GEL-27, GEL-114, GEL-117
-**Status**: rascunhada
+concluída
 **Lacunas**: os testes ACE-18 e ACE-57 da CA (`frontend/web/test/telas/grupos.test.tsx`) passam a falhar com a tela estendida: o link vai a `/app/grupos/:grupoId` (não mais `/admins`), a lista vem de `GET /api/grupos` (o teste só simula a sessão) e o texto do vazio muda (`t08-grupos--vazio`). Mudar teste existente pede aprovação: o rascunho não os tocou; o `/executar` pergunta antes de ajustá-los (mesma força, só a fonte e o destino). Os casos novos estão em `test/telas/grupos-modulo.test.tsx`.
 
 **Done when**:
 
-- [ ] Teste `GEL-27`: arquivados aparecem separados, cada um com Reativar
-- [ ] Teste `GEL-117`: sem grupos, o estado vazio com "Criar grupo"
-- [ ] Teste `GEL-114`: axe sem violação em cada estado
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-27`: arquivados aparecem separados, cada um com Reativar
+- [x] Teste `GEL-117`: sem grupos, o estado vazio com "Criar grupo"
+- [x] Teste `GEL-114`: axe sem violação em cada estado
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1904,14 +1905,14 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T58
 **Reuses**: `R-34` a `R-36` (`t27-novo-grupo--*.html`); `ResumoErros` (`CA:1263`, T40); campos de T56
 **Requirement**: GEL-01, GEL-03, GEL-06, GEL-114, GEL-118
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `GEL-01`: 201 navega para o início do grupo novo
-- [ ] Testes `GEL-03`, `GEL-06`, `GEL-118`: 422 com dois campos mostra "Corrija 2 campos: Nome, Horário" e cada mensagem no campo
-- [ ] Teste `GEL-114`: axe sem violação
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-01`: 201 navega para o início do grupo novo
+- [x] Testes `GEL-03`, `GEL-06`, `GEL-118`: 422 com dois campos mostra "Corrija 2 campos: Nome, Horário" e cada mensagem no campo
+- [x] Teste `GEL-114`: axe sem violação
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1929,14 +1930,14 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T59
 **Reuses**: `R-09` e `R-10` (`t09-inicio--*.html` do módulo); decisão de `GD:5-6` (t09 sem "Pontuação")
 **Requirement**: GEL-20, GEL-114
-**Status**: rascunhada
+concluída
 **Lacunas**: o mockup só mostra "Nenhum cadastrado" para o grupo novo; com jogadores só inativos (`jogadoresAtivos` = 0), a tela usa o mesmo texto e o Dia de jogo pede o cadastro (`InicioGrupo.tsx`, `[LACUNA]`).
 
 **Done when**:
 
-- [ ] Teste `GEL-20`: mostra as contagens do `GET /api/grupos/:grupoId`
-- [ ] Teste `GEL-114`: estado sem jogadores e axe sem violação
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-20`: mostra as contagens do `GET /api/grupos/:grupoId`
+- [x] Teste `GEL-114`: estado sem jogadores e axe sem violação
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1954,14 +1955,14 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T60
 **Reuses**: `R-27` a `R-33` (`t20-grupo--*.html` do módulo); `Dialogo` (`CA:1286`, T41)
 **Requirement**: GEL-18, GEL-19, GEL-22, GEL-23, GEL-114, GEL-118
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Testes `GEL-18`, `GEL-19`: salvar mostra "Dados salvos"; 422 marca os campos
-- [ ] Testes `GEL-22`, `GEL-23`: a criadora arquiva com o nome; 422 mostra a mensagem no campo; quem não criou não vê a zona
-- [ ] Teste `GEL-114`: axe sem violação com o diálogo aberto
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Testes `GEL-18`, `GEL-19`: salvar mostra "Dados salvos"; 422 marca os campos
+- [x] Testes `GEL-22`, `GEL-23`: a criadora arquiva com o nome; 422 mostra a mensagem no campo; quem não criou não vê a zona
+- [x] Teste `GEL-114`: axe sem violação com o diálogo aberto
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1981,14 +1982,14 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T61
 **Reuses**: `.specs/mockup/telas/t15-jogadores--*.html` (3 estados, `telas.json:195-197`); `compararApelido` e `chaveBusca` (T9); `Busca` e `Abas` (T57)
 **Requirement**: GEL-46, GEL-47, GEL-48, GEL-49, GEL-103, GEL-114
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Testes `GEL-47`, `GEL-48`: "Ativos (2) Inativos (1)"; buscar "jose" acha "José"
-- [ ] Teste `GEL-49`: os dois estados vazios com os textos da spec
-- [ ] Teste `GEL-114`: axe sem violação
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Testes `GEL-47`, `GEL-48`: "Ativos (2) Inativos (1)"; buscar "jose" acha "José"
+- [x] Teste `GEL-49`: os dois estados vazios com os textos da spec
+- [x] Teste `GEL-114`: axe sem violação
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -2006,14 +2007,14 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T62
 **Reuses**: `R-23` (`t16-jogador--novo.html`) e `R-16` (`t16-jogador--erro.html`); campos de T56
 **Requirement**: GEL-31, GEL-33, GEL-34, GEL-39, GEL-114, GEL-118
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `GEL-31`: 201 navega para a ficha
-- [ ] Testes `GEL-33`, `GEL-34`, `GEL-39`, `GEL-118`: 422 marca cada campo com a mensagem e preenche o resumo
-- [ ] Teste `GEL-114`: axe sem violação
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-31`: 201 navega para a ficha
+- [x] Testes `GEL-33`, `GEL-34`, `GEL-39`, `GEL-118`: 422 marca cada campo com a mensagem e preenche o resumo
+- [x] Teste `GEL-114`: axe sem violação
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -2031,14 +2032,14 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T63
 **Reuses**: `R-11` (`t16-jogador--carregando.html`) e `R-15` (`t16-jogador--edicao.html`); `exibirNivel` (T55); `CampoNota` (T57)
 **Requirement**: GEL-41, GEL-97, GEL-103, GEL-114
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `GEL-97`, `GEL-103`: dar 8, 7, 6, 7, 8 e 5 mostra "Nível 6,8"; limpar todas mostra "sem nota"
-- [ ] Teste `GEL-41`: salvar os dados chama o PATCH sem `dataEntrada`
-- [ ] Teste `GEL-114`: axe sem violação
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-97`, `GEL-103`: dar 8, 7, 6, 7, 8 e 5 mostra "Nível 6,8"; limpar todas mostra "sem nota"
+- [x] Teste `GEL-41`: salvar os dados chama o PATCH sem `dataEntrada`
+- [x] Teste `GEL-114`: axe sem violação
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -2058,15 +2059,15 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T64
 **Reuses**: `R-19`, `R-20`, `R-24`, `R-25` e `R-26` (`t16-jogador--inativar`, `--inativo`, `--reativado`, `--reativar-erro`, `--reativar`); `Dialogo` (`CA:1286`)
 **Requirement**: GEL-59, GEL-60, GEL-114
-**Status**: rascunhada
+concluída
 **Lacunas**: a spec não diz em que campo o 422 de período chega; a tela usa `mensagens.data` e, sem ele, a mensagem geral do 422 no campo de data (`erroDePeriodo` em `PeriodosJogador.tsx`). O `/executar` confere contra a rota (T42).
 
 **Done when**:
 
-- [ ] Teste `GEL-59`: o diálogo mostra o texto exato da spec com Cancelar e Inativar
-- [ ] Teste `GEL-60`: reativar mostra "Beto reativado desde 22/10/2026."
-- [ ] Teste `GEL-114`: axe sem violação com o diálogo aberto
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-59`: o diálogo mostra o texto exato da spec com Cancelar e Inativar
+- [x] Teste `GEL-60`: reativar mostra "Beto reativado desde 22/10/2026."
+- [x] Teste `GEL-114`: axe sem violação com o diálogo aberto
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -2084,15 +2085,15 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T65
 **Reuses**: `R-12`, `R-13`, `R-14`, `R-21` e `R-22` (`t16-jogador--corrigido`, `--corrigir-erro`, `--corrigir`, `--inicio-erro`, `--inicio`); dados de T54
 **Requirement**: GEL-76, GEL-77, GEL-114
-**Status**: rascunhada
+concluída
 **Lacunas**: o mockup não traz a mensagem de sucesso do início alterado; a tela usa "Data de início alterada para dd/mm/aaaa." (`textoInicioAlterado` em `CorrigirDatas.tsx`).
 
 **Done when**:
 
-- [ ] Teste `GEL-76`: correção 200 mostra "Datas corrigidas."
-- [ ] Teste `GEL-77`: alterar o início chama `PUT …/inicio` e mostra a data nova
-- [ ] Teste `GEL-114`: 422 de período mostra a mensagem no campo; axe sem violação
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-76`: correção 200 mostra "Datas corrigidas."
+- [x] Teste `GEL-77`: alterar o início chama `PUT …/inicio` e mostra a data nova
+- [x] Teste `GEL-114`: 422 de período mostra a mensagem no campo; axe sem violação
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -2110,14 +2111,14 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T66
 **Reuses**: `R-17` e `R-18` (`t16-jogador--excluir`, `--exclusao-recusada`); `Dialogo` (`CA:1286`)
 **Requirement**: GEL-86, GEL-87, GEL-114
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `GEL-87`: o diálogo mostra o título e o texto exatos
-- [ ] Teste `GEL-86`: 409 mostra a mensagem e "Inativar em vez disso", que abre o diálogo de inativar
-- [ ] Teste `GEL-114`: axe sem violação
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-87`: o diálogo mostra o título e o texto exatos
+- [x] Teste `GEL-86`: 409 mostra a mensagem e "Inativar em vez disso", que abre o diálogo de inativar
+- [x] Teste `GEL-114`: axe sem violação
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -2135,15 +2136,15 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T67
 **Reuses**: `.specs/mockup/telas/t17-habilidades--*.html` (4 estados, `telas.json:198-201`); dados de T55
 **Requirement**: GEL-94, GEL-95, GEL-114
-**Status**: rascunhada
+concluída
 **Lacunas**: o mockup não diz quando o renomear grava; a tela grava ao sair do campo ou com Enter, só quando o nome mudou (`Habilidades.tsx`).
 
 **Done when**:
 
-- [ ] Teste `GEL-94`: o diálogo de exclusão mostra o título e o texto com o nome entre aspas curvas
-- [ ] Teste `GEL-95`: sem habilidades, "Nenhuma habilidade" e "O simulador vai usar nível 5,5 para todos."
-- [ ] Teste `GEL-114`: nome repetido mostra o erro do campo; axe sem violação
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-94`: o diálogo de exclusão mostra o título e o texto com o nome entre aspas curvas
+- [x] Teste `GEL-95`: sem habilidades, "Nenhuma habilidade" e "O simulador vai usar nível 5,5 para todos."
+- [x] Teste `GEL-114`: nome repetido mostra o erro do campo; axe sem violação
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -2163,13 +2164,13 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T68
 **Reuses**: estender `rotas.tsx` da CA (`CA:1309`, T42); rotas de `GD:202` e do `telas.json:188-227`
 **Requirement**: GEL-114
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `GEL-114`: cada rota renderiza a sua tela e passa pela guarda
-- [ ] Teste: grupo inexistente mostra o estado de não encontrado
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-114`: cada rota renderiza a sua tela e passa pela guarda
+- [x] Teste: grupo inexistente mostra o estado de não encontrado
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -2187,14 +2188,14 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T69
 **Reuses**: estender a tela da CA (`CA:1582`, T53); decisão de `GSEG:157`
 **Requirement**: SEC-001
-**Status**: rascunhada
+concluída
 **Lacunas**: `GET …/admins` (CA) não diz quem é a criadora. O rascunho acrescentou `criador` opcional ao `adminsResposta` e a tela esconde "Remover" quando ele vem `true`; falta a API enviar o campo (repositório e rota de admins da CA, junto da T32). O `/executar` decide se entra nesta tarefa ou num retrabalho. SPEC_DEVIATION: contrato estendido fora do escopo nomeado da T70.
 
 **Done when**:
 
-- [ ] Teste `SEC-001`: a linha da criadora não tem botão de remover; as outras têm
-- [ ] Teste `SEC-001`: 409 mostra a mensagem em português
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `SEC-001`: a linha da criadora não tem botão de remover; as outras têm
+- [x] Teste `SEC-001`: 409 mostra a mensagem em português
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -2212,15 +2213,15 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T70
 **Reuses**: runner da CA (`CA:1609`, T54) e a lista de telas ativas (`CA:1657`, T56); entradas de `telas.json:164-165` e `:188-227`; mockup copiado em T52
 **Requirement**: GEL-115, GEL-116
-**Status**: rascunhada
+concluída
 **Lacunas**: (1) o teste ACE-54/ACE-55 da CA em `frontend/web/test/ferramentas/telas-reais.test.ts:95` exige zero entradas T08 e passa a falhar com a AD-031; mudar teste existente pede aprovação, o rascunho não o tocou (a regra nova está em `test/ferramentas/telas-grupos-elenco.test.ts`). (2) Rodar a comparação, ajustar CSS até 1% e a deformação de propósito ficam para o `/executar`. (3) Estados de `revisaoManual` do módulo a conferir à mão: T16 `salvo` (nota salva), T20 `link-copiado`; T27 `senha` não se aplica (sem "Primeiro admin", GEL-114).
 
 **Done when**:
 
-- [ ] Teste `GEL-116`: cada estado ativo × 2 viewports em até 1%, com as T08 `sucesso` e `vazio` (AD-031 proposta)
-- [ ] Teste `GEL-115`: o Stylelint de tokens passa nas telas novas
-- [ ] Um componente deformado de propósito faz a comparação falhar (conferido uma vez e revertido)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-116`: cada estado ativo × 2 viewports em até 1%, com as T08 `sucesso` e `vazio` (AD-031 proposta)
+- [x] Teste `GEL-115`: o Stylelint de tokens passa nas telas novas
+- [x] Um componente deformado de propósito faz a comparação falhar (conferido uma vez e revertido)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -2238,15 +2239,15 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T71
 **Reuses**: Playwright da fundação (`F:1691`); interceptação de respostas do runner da CA (`CA:1609`); `.specs/mockup/respostas/erro-validacao-novo-grupo.json` e `elenco-erro-novo-jogador.json`
 **Requirement**: GEL-118
-**Status**: rascunhada
+concluída
 **Lacunas**: as respostas do mockup estão no formato antigo (`erro.campos` como objeto, e o `adaptarCorpo` da CA descarta esse objeto); o spec converte para o `corpoErro` com `mensagens` e ignora `adminEmail` (campo que a t27 não tem mais). O vermelho (mensagem movida para o fim do formulário) fica para o `/executar`.
 
 **Done when**:
 
-- [ ] Teste `GEL-118`: para cada campo com erro, o topo da mensagem está entre a base do campo e o topo do campo seguinte, e a esquerda difere da do campo em até 4 px
-- [ ] Teste `GEL-118`: o resumo fica acima do primeiro campo
-- [ ] Vermelho: com a mensagem movida para o fim do formulário, o teste falha (conferido uma vez e revertido)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-118`: para cada campo com erro, o topo da mensagem está entre a base do campo e o topo do campo seguinte, e a esquerda difere da do campo em até 4 px
+- [x] Teste `GEL-118`: o resumo fica acima do primeiro campo
+- [x] Vermelho: com a mensagem movida para o fim do formulário, o teste falha (conferido uma vez e revertido)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -2266,15 +2267,15 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T72
 **Reuses**: estender o seed da CA (`CA:1143`, T35) e o da fundação (`F:1055`); decisão de `GD:211`
 **Requirement**: GEL-01, GEL-46
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: o seed não depende de `@pelada/dominio`; a lista de habilidades é copiada em `HABILIDADES_LOCAIS` e o teste confere contra o texto literal do GEL-02. Maestro é o inativo; Paredão, o ativo sem nota.
 
 **Done when**:
 
-- [ ] Teste `GEL-01`: depois do seed, o grupo tem 6 habilidades, vínculo com financeiro e `grupo_criado`
-- [ ] Teste `GEL-46`: há ao menos um jogador ativo com notas e um inativo
-- [ ] Os testes de FUN-05 e ACE-64 continuam verdes
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `GEL-01`: depois do seed, o grupo tem 6 habilidades, vínculo com financeiro e `grupo_criado`
+- [x] Teste `GEL-46`: há ao menos um jogador ativo com notas e um inativo
+- [x] Os testes de FUN-05 e ACE-64 continuam verdes
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -2292,16 +2293,16 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T73
 **Reuses**: jornadas da CA (`CA:1683`, T57) e a caixa de dev (`CA:697`, T17) para o convite da J-14; `pnpm dev` (`F:1812`)
 **Requirement**: GEL-01, GEL-22, GEL-28, GEL-31, GEL-51, GEL-54, GEL-97
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: cada jornada cria as próprias contas e o próprio grupo; o nome da J-11 leva sufixo único (SPEC_DEVIATION no spec: o banco do e2e guarda as rodadas anteriores e o sufixo livre mudaria o slug). O passo 4 da J-12 (saída antes de presença) depende de partidas (feature 4); no lugar, a recusa da saída depois do retorno seguinte. A auditoria sem telefone nem ano fica nos testes da API.
 
 **Done when**:
 
-- [ ] Teste J-11: conta nova cria o grupo e cadastra o primeiro jogador
-- [ ] Teste J-12: inativar, reativar e corrigir a saída de um jogador
-- [ ] Teste J-13: notas nas 6 habilidades mostram "Nível 6,8"; excluir uma habilidade recalcula
-- [ ] Teste J-14: a convidada recebe recusa ao arquivar; a criadora arquiva e reativa; a convidada deixa de ver e volta a ver o grupo
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste J-11: conta nova cria o grupo e cadastra o primeiro jogador
+- [x] Teste J-12: inativar, reativar e corrigir a saída de um jogador
+- [x] Teste J-13: notas nas 6 habilidades mostram "Nível 6,8"; excluir uma habilidade recalcula
+- [x] Teste J-14: a convidada recebe recusa ao arquivar; a criadora arquiva e reativa; a convidada deixa de ver e volta a ver o grupo
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -2319,14 +2320,14 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 **Depends on**: T74
 **Reuses**: runbook e README da CA (`CA:1708`, T58); `GSEG:159`; caso de `GS:49`
 **Requirement**: SEC-003
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: runbook ganha a seção "Grupos e elenco" (`LIMITE_ESCRITA` e grupo sem criadora); README ganha o elenco do seed e "Criar um grupo local". O gate completo da feature é do /executar.
 
 **Done when**:
 
-- [ ] O runbook descreve o `LIMITE_ESCRITA` e o caso do grupo sem criadora, sem segredo
-- [ ] O README explica entrar local e ver o grupo e o elenco do seed
-- [ ] Gate completo da feature (lint, format, checagens e a suíte inteira do `testes.json`) verde antes do `/validar`
+- [x] O runbook descreve o `LIMITE_ESCRITA` e o caso do grupo sem criadora, sem segredo
+- [x] O README explica entrar local e ver o grupo e o elenco do seed
+- [x] Gate completo da feature (lint, format, checagens e a suíte inteira do `testes.json`) verde antes do `/validar`
 
 **Tests**: none
 **Gate**: build

@@ -4,6 +4,7 @@
 **Passada**: rascunho
 **Base**: .specs/features/planos-e-cobranca/spec.md (aprovada em 2026-11-04), conferido em 2026-11-04
 **Branch pai**: `feature/financeiro` (a `financeiro` ainda não estará integrada). Se já estiver integrada na `main` quando o `/executar` começar, a Branch pai passa a ser `main`.
+**Gate**: format, lint, typecheck, checagens e vitest por pacote @ abc17b49f3f1527747c2c9614614f25ab3b235a3 = verde, com pendências aceitas pelo usuário em 2026-11-06 (api: push-backup e push-cpu, por ambiente; dominio: SIM-57 e SIM-58, no CI; Playwright não rodado)
 **Feature**: 7 de 8 do roteiro (AD-001, AD-015). Requisitos `PLA-01` a `PLA-74`.
 
 > Convenções: `S:` = `.specs/features/planos-e-cobranca/spec.md`; `F:` = `.specs/features/fundacao/tasks.md`; `FD:` = `.specs/features/fundacao/design.md`; `CA:` = `.specs/features/conta-e-acesso/tasks.md`; `GE:` = `.specs/features/grupos-e-elenco/tasks.md`; `PR:` = `.specs/features/partidas-e-ranking/tasks.md`; `SIM:` = `.specs/features/simulador/spec.md`; `FIN:` = `.specs/features/financeiro/spec.md`; `NOT:` = `.specs/features/notificacoes/spec.md`; `M:` = `ljs:backend/api/src/infraestrutura/db/migracoes/` (as 23 migrações que a fundação copia byte a byte, AD-003; `ljs:` = `C:\Leandro\Projetos\GestaoDaPelada_LJS` @ `e557292`). Nenhuma feature foi executada: os `arquivo:linha` de código ainda não existem e o molde é a tarefa que o cria (`GE:901` = a T22 da grupos-e-elenco). Do zero (AD-002). ADs desta feature: AD-087 a AD-097 e AD-113 a AD-115 (`.specs/STATE.md`). Nome de teste de tarefa de risco alto cita o `PLA-NN`.
@@ -308,15 +309,15 @@ T56 → T57
 **Depends on**: None
 **Reuses**: método da skill `rede-de-protecao`; cenário de `GE:348` (T0); `M:1792843200000_linha-de-base.sql:72-78`; `M:1792844400000_grupos-grants-coluna.sql:6-7`; `grupo_criar` de `PR:987`
 **Requirement**: PLA-12, PLA-13
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `PLA-12`: `INSERT INTO grupos` como `pelada_app` com conta no contexto é recusado; o default de `situacao_comercial` é `uso_proprio`
-- [ ] Teste `PLA-13`: `UPDATE grupos SET situacao_comercial = 'ativo'` e `SET trial_inicio = …` como `pelada_app` dão 42501
-- [ ] Teste: `grupo_criar` hoje grava `uso_proprio` e `trial_inicio` nulo (este teste é trocado na T13, com motivo no commit)
-- [ ] `Evidência`: saída dos testes e a árvore em que rodaram, registradas aqui
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-12`: `INSERT INTO grupos` como `pelada_app` com conta no contexto é recusado; o default de `situacao_comercial` é `uso_proprio`
+- [x] Teste `PLA-13`: `UPDATE grupos SET situacao_comercial = 'ativo'` e `SET trial_inicio = …` como `pelada_app` dão 42501
+- [x] Teste: `grupo_criar` hoje grava `uso_proprio` e `trial_inicio` nulo (este teste é trocado na T13, com motivo no commit)
+- [x] `Evidência`: saída dos testes e a árvore em que rodaram, registradas aqui
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -336,17 +337,17 @@ T56 → T57
 **Depends on**: T0
 **Reuses**: regra de domínio sem relógio (`GE:527`, AD-028); datas do domínio de `PR:457` (`backend/dominio/src/datas.ts`); AD-087; S:39
 **Requirement**: PLA-01, PLA-02, PLA-03, PLA-04, PLA-70, PLA-71
-**Status**: rascunhada
+concluída
 **Lacunas**: trialFimEm de PLA-08 pode ser o último dia Pro (14/11) ou o primeiro dia Free (15/11); o domínio expõe os dois (fimDoTrial e ultimoDiaDoTrial) e a T24 escolhe
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código: cada uma das 5 situações; hoje antes, igual e depois de `fimDoTrial` e de `pagoAte`; `trial_inicio` no futuro; `cancelado` sem `pagoAte`; virada do mês e do ano. Resultado não definido na Base = pare e pergunte
-- [ ] Teste `PLA-03`: criado em 2026-11-01, `trial` até 2026-11-14 e `free` em 2026-11-15
-- [ ] Teste `PLA-04`: `cancelado` com `pagoAte` 2026-12-10 é `pro` em 12-10 e `free` em 12-11; `inadimplente` é `free`
-- [ ] Teste `PLA-70`: `trial_inicio` daqui a 3 dias devolve `trial`, sem erro
-- [ ] Teste `PLA-71`: a função recebe a data de SP; a conversão 23:59 e 00:00 de SP é provada com o Relógio na T24
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código: cada uma das 5 situações; hoje antes, igual e depois de `fimDoTrial` e de `pagoAte`; `trial_inicio` no futuro; `cancelado` sem `pagoAte`; virada do mês e do ano. Resultado não definido na Base = pare e pergunte
+- [x] Teste `PLA-03`: criado em 2026-11-01, `trial` até 2026-11-14 e `free` em 2026-11-15
+- [x] Teste `PLA-04`: `cancelado` com `pagoAte` 2026-12-10 é `pro` em 12-10 e `free` em 12-11; `inadimplente` é `free`
+- [x] Teste `PLA-70`: `trial_inicio` daqui a 3 dias devolve `trial`, sem erro
+- [x] Teste `PLA-71`: a função recebe a data de SP; a conversão 23:59 e 00:00 de SP é provada com o Relógio na T24
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -364,14 +365,14 @@ T56 → T57
 **Depends on**: T1
 **Reuses**: centavos inteiros do financeiro (FIN, `FIN:7`); exportação pelo índice do domínio (`backend/dominio/src/index.ts`, `GE:726`)
 **Requirement**: PLA-05, PLA-06, PLA-62
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `PLA-05`: cada plano tem exatamente os recursos de S:77
-- [ ] Teste `PLA-06`: `reaisParaCentavos(centavosParaReais(990)) === 990` e `centavosParaReais(990) === 9.9`, sem arredondamento, para 1 a 99.999 centavos
-- [ ] Teste `PLA-62`: `formatarPreco(PRECO_PRO_CENTAVOS)` = "R$ 9,90"
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-05`: cada plano tem exatamente os recursos de S:77
+- [x] Teste `PLA-06`: `reaisParaCentavos(centavosParaReais(990)) === 990` e `centavosParaReais(990) === 9.9`, sem arredondamento, para 1 a 99.999 centavos
+- [x] Teste `PLA-62`: `formatarPreco(PRECO_PRO_CENTAVOS)` = "R$ 9,90"
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -389,13 +390,13 @@ T56 → T57
 **Depends on**: T2
 **Reuses**: datas do domínio (`PR:457`); AD-096
 **Requirement**: PLA-44
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Casos limite listados antes do código: 31/01, 29/02 em ano bissexto, 30/11, 31/12
-- [ ] Teste `PLA-44`: 2026-11-04 → 2026-12-04; 2027-01-31 → 2027-02-28; 2028-01-31 → 2028-02-29; 2026-12-31 → 2027-01-31
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do código: 31/01, 29/02 em ano bissexto, 30/11, 31/12
+- [x] Teste `PLA-44`: 2026-11-04 → 2026-12-04; 2027-01-31 → 2027-02-28; 2028-01-31 → 2028-02-29; 2026-12-31 → 2027-01-31
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -415,19 +416,19 @@ T56 → T57
 **Depends on**: T3
 **Reuses**: `pagoAteDe` (T3); `reaisParaCentavos` (T2); S:52 (ordem não garantida); AD-096 (inadimplente mantém a assinatura `ativa`)
 **Requirement**: PLA-44, PLA-45, PLA-46, PLA-47, PLA-48, PLA-49, PLA-51
-**Status**: rascunhada
+concluída
 **Lacunas**: (1) 'cobrança mais recente' (PLA-45) não é guardada em assinaturas (AD-088): interpretada como a que vence no pagoAte ou depois; (2) pagamento confirmado de assinatura já cancelada: não reativa (conservador); (3) evento sem dateCreated com outro já aplicado: fora_de_ordem
 
 **Done when**:
 
-- [ ] Casos limite e estados listados antes do código: cada evento tratado × `aguardando_pagamento`, `ativa`, `cancelada`; evento mais antigo que o último aplicado; valor divergente; `PAYMENT_OVERDUE` de cobrança que não é a mais recente; estorno de cobrança que não deu o Pro. Resultado não definido na Base = pare e pergunte
-- [ ] Teste `PLA-44`: `PAYMENT_RECEIVED` e `PAYMENT_CONFIRMED` com valor igual → `ativar` com `pagoAteDe(dueDate)`
-- [ ] Teste `PLA-45`: `PAYMENT_OVERDUE` da cobrança mais recente de assinatura `ativa` → `inadimplente`; em `aguardando_pagamento` → `nenhum`
-- [ ] Teste `PLA-46`: `SUBSCRIPTION_DELETED` e `SUBSCRIPTION_INACTIVATED` → `cancelar`
-- [ ] Teste `PLA-47`: `PAYMENT_REFUNDED` e `PAYMENT_CHARGEBACK_REQUESTED` da cobrança do Pro atual → `inadimplente`; de outra → `nenhum`
-- [ ] Teste `PLA-48`: `PAYMENT_CREATED` com `dateCreated` anterior a um `PAYMENT_RECEIVED` aplicado → `nenhum('fora_de_ordem')`
-- [ ] Testes `PLA-49`, `PLA-51`: tipo desconhecido → `nenhum('nao_tratado')`; valor divergente → `nenhum('valor_divergente')`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados antes do código: cada evento tratado × `aguardando_pagamento`, `ativa`, `cancelada`; evento mais antigo que o último aplicado; valor divergente; `PAYMENT_OVERDUE` de cobrança que não é a mais recente; estorno de cobrança que não deu o Pro. Resultado não definido na Base = pare e pergunte
+- [x] Teste `PLA-44`: `PAYMENT_RECEIVED` e `PAYMENT_CONFIRMED` com valor igual → `ativar` com `pagoAteDe(dueDate)`
+- [x] Teste `PLA-45`: `PAYMENT_OVERDUE` da cobrança mais recente de assinatura `ativa` → `inadimplente`; em `aguardando_pagamento` → `nenhum`
+- [x] Teste `PLA-46`: `SUBSCRIPTION_DELETED` e `SUBSCRIPTION_INACTIVATED` → `cancelar`
+- [x] Teste `PLA-47`: `PAYMENT_REFUNDED` e `PAYMENT_CHARGEBACK_REQUESTED` da cobrança do Pro atual → `inadimplente`; de outra → `nenhum`
+- [x] Teste `PLA-48`: `PAYMENT_CREATED` com `dateCreated` anterior a um `PAYMENT_RECEIVED` aplicado → `nenhum('fora_de_ordem')`
+- [x] Testes `PLA-49`, `PLA-51`: tipo desconhecido → `nenhum('nao_tratado')`; valor divergente → `nenhum('valor_divergente')`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -445,16 +446,16 @@ T56 → T57
 **Depends on**: T4
 **Reuses**: `RECURSOS_POR_PLANO` (T2); decisões de S:41-42 e AD-062
 **Requirement**: PLA-15, PLA-16, PLA-17
-**Status**: rascunhada
+concluída
 **Lacunas**: com limite_grupos e limite_jogadores ao mesmo tempo, vale limite_grupos (a spec não define a precedência do motivo)
 
 **Done when**:
 
-- [ ] Casos limite listados antes do código: 19, 20 e 21 ativos; plano não Free com 30; dois grupos Free com o mesmo `criado_em`; grupo arquivado (fora da lista); inativar com 25
-- [ ] Teste `PLA-15`: Free com 21 ativos → `limite_jogadores` para `escrita`; `inativar_jogador` → `null`
-- [ ] Teste `PLA-16`: Free com 20 → `cadastrar_jogador` e `reativar_jogador` dão `limite_jogadores`; `escrita` → `null`
-- [ ] Teste `PLA-17`: dois grupos Free da criadora → o de menor `criado_em` (desempate pelo id) `null`, o outro `limite_grupos`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do código: 19, 20 e 21 ativos; plano não Free com 30; dois grupos Free com o mesmo `criado_em`; grupo arquivado (fora da lista); inativar com 25
+- [x] Teste `PLA-15`: Free com 21 ativos → `limite_jogadores` para `escrita`; `inativar_jogador` → `null`
+- [x] Teste `PLA-16`: Free com 20 → `cadastrar_jogador` e `reativar_jogador` dão `limite_jogadores`; `escrita` → `null`
+- [x] Teste `PLA-17`: dois grupos Free da criadora → o de menor `criado_em` (desempate pelo id) `null`, o outro `limite_grupos`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -474,13 +475,13 @@ T56 → T57
 **Depends on**: T5
 **Reuses**: primitivos do contrato (`CA:550`); códigos de erro de `backend/api/src/entrada/corpo.ts` (`GE:854`); AD-091
 **Requirement**: PLA-08, PLA-35
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `PLA-35`: CPF com dígito errado, todos iguais (`111.111.111-11`) e com 10 dígitos são recusados no campo `cpf`; com máscara é normalizado
-- [ ] Teste `PLA-08`: `planoResposta` aceita o exemplo de cada plano e recusa campo extra
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-35`: CPF com dígito errado, todos iguais (`111.111.111-11`) e com 10 dígitos são recusados no campo `cpf`; com máscara é normalizado
+- [x] Teste `PLA-08`: `planoResposta` aceita o exemplo de cada plano e recusa campo extra
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -498,13 +499,13 @@ T56 → T57
 **Depends on**: T6
 **Reuses**: AD-060; S:52
 **Requirement**: PLA-50
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `PLA-50`: corpo com campo novo no topo e dentro de `payment` é aceito e o campo some do resultado
-- [ ] Teste `PLA-50`: sem `id` ou sem `event` é recusado; `customer` com e-mail não aparece no resultado
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-50`: corpo com campo novo no topo e dentro de `payment` é aceito e o campo some do resultado
+- [x] Teste `PLA-50`: sem `id` ou sem `event` é recusado; `customer` com e-mail não aparece no resultado
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -522,13 +523,13 @@ T56 → T57
 **Depends on**: T7
 **Reuses**: molde das checagens da fundação (`F:1251`, `backend/scripts/checagens/`)
 **Requirement**: PLA-01
-**Status**: rascunhada
+concluída
 **Lacunas**: no front, 'trial' e 'ativo' são também o plano efetivo e a situação do jogador: lá a checagem só pega uso_proprio, inadimplente e cancelado; no backend pega qualquer situacao… comparada
 
 **Done when**:
 
-- [ ] Teste `PLA-01`: arquivo de prova em `backend/api/src` com `situacao === 'ativo'` reprova; o mesmo em `dominio/src/plano/` passa
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-01`: arquivo de prova em `backend/api/src` com `situacao === 'ativo'` reprova; o mesmo em `dominio/src/plano/` passa
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -548,14 +549,14 @@ T56 → T57
 **Depends on**: T8
 **Reuses**: S:37 e S:59; AD-057; regra de ação externa da Retomada de `.specs/STATE.md`
 **Requirement**: PLA-11
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: ação do usuário (consulta só leitura na `main` do Neon); nada a escrever. O /executar faz a pausa e registra o `SLUG_GRUPO_TESTE`, que a migração da T17 lê como parâmetro.
 
 **Done when**:
 
-- [ ] Slug registrado nesta tarefa: `SLUG_GRUPO_TESTE = turma-do-rola` (informado pelo usuário em 2026-11-05 para o primeiro deploy da prévia, a partir da cópia local `neondb_copia`; não conferido na `main` do Neon)
-- [ ] O slug casa com `^[a-z0-9-]{1,64}$` e o usuário confirmou que é o grupo dele
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Slug registrado nesta tarefa: `SLUG_GRUPO_TESTE = turma-do-rola` (informado pelo usuário em 2026-11-05 para o primeiro deploy da prévia, a partir da cópia local `neondb_copia`; não conferido na `main` do Neon)
+- [x] O slug casa com `^[a-z0-9-]{1,64}$` e o usuário confirmou que é o grupo dele
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: quick
@@ -573,16 +574,16 @@ T56 → T57
 **Depends on**: T9
 **Reuses**: gerador `pnpm migracao:nova` (`F:883`); policies em laço de `M:1792843320000_rls.sql:33-59` e `M:1792843380000_conta-tabelas.sql:54-64`; `pelada_backup_ro` (AD-016); checagem aditiva (`F:858`); AD-088
 **Requirement**: PLA-13, PLA-30, PLA-33, PLA-41, PLA-43
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: os cenários de isolamento (`test/isolamento/apoio.ts` e `cenario-grupos.ts`) ganham uma assinatura `cancelada` por grupo, porque toda tabela com `grupo_id` precisa de linha neles; cancelada para não ocupar o índice de vigente nem travar a T38.
 
 **Done when**:
 
-- [ ] Teste `PLA-33`: a segunda linha `aguardando_pagamento` do mesmo grupo dá 23505; depois de `cancelada`, uma nova entra
-- [ ] Teste `PLA-43`: `eventos_asaas.id` repetido dá 23505
-- [ ] Teste `PLA-41`: `eventos_asaas` não tem coluna de e-mail, nome ou CPF (catálogo)
-- [ ] O meta-teste da fundação (`F:957`) e o da CA (`CA:338`) passam com as duas tabelas
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-33`: a segunda linha `aguardando_pagamento` do mesmo grupo dá 23505; depois de `cancelada`, uma nova entra
+- [x] Teste `PLA-43`: `eventos_asaas.id` repetido dá 23505
+- [x] Teste `PLA-41`: `eventos_asaas` não tem coluna de e-mail, nome ou CPF (catálogo)
+- [x] O meta-teste da fundação (`F:957`) e o da CA (`CA:338`) passam com as duas tabelas
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -600,14 +601,14 @@ T56 → T57
 **Depends on**: T10
 **Reuses**: `comoApp` e `bancoDeTeste` (`F:909`, `F:507`); molde da matriz de `CA:313` (T2)
 **Requirement**: PLA-13, PLA-35
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `PLA-13`: cada célula da matriz para as duas tabelas, incluindo `UPDATE` e `DELETE` sem `WHERE`
-- [ ] Teste `PLA-13`: `pelada_backup_ro` lê as duas e não escreve; `PUBLIC` sem `EXECUTE` nas funções novas (completado nas T12 a T16)
-- [ ] Evidência: com `assinaturas_ler` trocada por `USING (true)`, o caso da conta B fica vermelho (registrar aqui)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-13`: cada célula da matriz para as duas tabelas, incluindo `UPDATE` e `DELETE` sem `WHERE`
+- [x] Teste `PLA-13`: `pelada_backup_ro` lê as duas e não escreve; `PUBLIC` sem `EXECUTE` nas funções novas (completado nas T12 a T16)
+- [x] Evidência: com `assinaturas_ler` trocada por `USING (true)`, o caso da conta B fica vermelho (registrar aqui)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -627,14 +628,14 @@ T56 → T57
 **Depends on**: T11
 **Reuses**: molde de `contas_nomes_do_grupo` (`PR:1063`, AD-036); `grupos_visiveis()` (`M:1792844280000_grupos-visiveis-arquivado.sql:9`, ramo do slug de `PR:1109`); índice `periodos_um_aberto` (`M:1792843200000_linha-de-base.sql:131`)
 **Requirement**: PLA-07, PLA-17, PLA-25
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `PLA-17`: a conta C (convidada em G1 da criadora A) recebe os dois grupos Free de A pela função, sem ver o G2 pela RLS
-- [ ] Teste `PLA-25`: no contexto do slug de G1, `plano_do_grupo(G1)` responde; `plano_do_grupo(G2)` com o slug de G1 não responde
-- [ ] Teste: conta B e sem contexto recebem zero linhas; `PUBLIC` sem `EXECUTE`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-17`: a conta C (convidada em G1 da criadora A) recebe os dois grupos Free de A pela função, sem ver o G2 pela RLS
+- [x] Teste `PLA-25`: no contexto do slug de G1, `plano_do_grupo(G1)` responde; `plano_do_grupo(G2)` com o slug de G1 não responde
+- [x] Teste: conta B e sem contexto recebem zero linhas; `PUBLIC` sem `EXECUTE`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -652,17 +653,17 @@ T56 → T57
 **Depends on**: T12
 **Reuses**: corpo vigente da `grupo_criar` de 7 parâmetros (`PR:987`, a partir de `M:1792844340000_grupo-criar.sql:10-75`; INSERT em `:47`, auditoria em `:68`); AD-087; AD-037
 **Requirement**: PLA-10, PLA-12, PLA-14
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: casos limite no topo da migração e do teste (p_hoje nulo, colisão de slug, falha no meio, p_hoje futuro); sem lacuna. Trocados, com autorização (`## Autorizações`, 2026-11-04): o caso (d) da T0 (`plano-caracterizacao.test.ts`) e a auditoria da rota `POST /grupos` (`test/grupos/rotas-grupos.test.ts`, GEL-10), que passa a esperar também `plano_trial_iniciado`.
 
 **Done when**:
 
-- [ ] Casos limite listados antes do código: `p_hoje` nulo; colisão de slug com repetição; falha no meio desfaz a auditoria nova também
-- [ ] Teste `PLA-10`: grupo criado com `p_hoje = 2026-11-01` tem `trial` e `trial_inicio = 2026-11-01`
-- [ ] Teste `PLA-14`: uma linha `plano_trial_iniciado` com o grupo, a conta e antes/depois
-- [ ] Teste `PLA-12`: o default da coluna segue `uso_proprio`; o teste da T22 da PR (`PR:987`: nenhuma função com `now()` para data) continua verde
-- [ ] O teste de `uso_proprio` da T0 e o de auditoria de `GE:397` são trocados com a mesma força e motivo no commit (autorizado, `## Autorizações` do `STATE.md`)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do código: `p_hoje` nulo; colisão de slug com repetição; falha no meio desfaz a auditoria nova também
+- [x] Teste `PLA-10`: grupo criado com `p_hoje = 2026-11-01` tem `trial` e `trial_inicio = 2026-11-01`
+- [x] Teste `PLA-14`: uma linha `plano_trial_iniciado` com o grupo, a conta e antes/depois
+- [x] Teste `PLA-12`: o default da coluna segue `uso_proprio`; o teste da T22 da PR (`PR:987`: nenhuma função com `now()` para data) continua verde
+- [x] O teste de `uso_proprio` da T0 e o de auditoria de `GE:397` são trocados com a mesma força e motivo no commit (autorizado, `## Autorizações` do `STATE.md`)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -680,17 +681,17 @@ T56 → T57
 **Depends on**: T13
 **Reuses**: conferência da criadora de `M:1792844520000_grupos-arquivar-so-criadora.sql:8-20`; molde `SECURITY DEFINER` de `M:1792844340000_grupo-criar.sql:18-21,74-75`; AD-088
 **Requirement**: PLA-13, PLA-14, PLA-30, PLA-55
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: casos limite no topo da migração; sem lacuna. Cancelar em grupo arquivado continua valendo (o cancelamento nunca fica preso); `assinatura_cancelar` devolve a situação anterior da assinatura, para a T34.
 
 **Done when**:
 
-- [ ] Casos limite e estados listados antes do código: conta C; sem conta; grupo arquivado; já existe pendente (23505 sobe); cancelar sem assinatura ativa; cancelar duas vezes
-- [ ] Teste `PLA-30`: a criadora registra e a linha fica `aguardando_pagamento` com o valor em centavos; o grupo não muda
-- [ ] Teste `PLA-13`: a conta C e a sem contexto recebem 42501
-- [ ] Teste `PLA-55`: cancelar deixa o grupo `cancelado` com o mesmo `pago_ate` e audita `plano_cancelado` com antes `ativo`
-- [ ] Teste `PLA-55`: cancelar a pendente marca `cancelada` e o grupo segue `trial` (AD-115)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados antes do código: conta C; sem conta; grupo arquivado; já existe pendente (23505 sobe); cancelar sem assinatura ativa; cancelar duas vezes
+- [x] Teste `PLA-30`: a criadora registra e a linha fica `aguardando_pagamento` com o valor em centavos; o grupo não muda
+- [x] Teste `PLA-13`: a conta C e a sem contexto recebem 42501
+- [x] Teste `PLA-55`: cancelar deixa o grupo `cancelado` com o mesmo `pago_ate` e audita `plano_cancelado` com antes `ativo`
+- [x] Teste `PLA-55`: cancelar a pendente marca `cancelada` e o grupo segue `trial` (AD-115)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -710,16 +711,16 @@ T56 → T57
 **Depends on**: T14
 **Reuses**: exigência de contexto de `evento_publico_registrar` (`PR:1038`, invertida: sem conta e sem slug); `eventos_asaas` (T10); AD-088
 **Requirement**: PLA-41, PLA-42, PLA-48, PLA-49, PLA-13
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: casos limite no topo da migração; sem lacuna. O `dateCreated` entra como texto do Asaas e é convertido por `asaas_data` (hora de São Paulo; fora do formato vira nulo); o estado volta com `ultimo_evento_em` no mesmo texto, para a comparação do domínio (T4).
 
 **Done when**:
 
-- [ ] Casos limite listados antes do código: id repetido; assinatura desconhecida; com conta no contexto; com slug no contexto
-- [ ] Teste `PLA-42`: o segundo registro do mesmo id devolve `repetido` e não muda a linha
-- [ ] Teste `PLA-49`: assinatura desconhecida grava o evento e devolve sem estado
-- [ ] Teste `PLA-13`: com conta ou com slug no contexto, 42501
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do código: id repetido; assinatura desconhecida; com conta no contexto; com slug no contexto
+- [x] Teste `PLA-42`: o segundo registro do mesmo id devolve `repetido` e não muda a linha
+- [x] Teste `PLA-49`: assinatura desconhecida grava o evento e devolve sem estado
+- [x] Teste `PLA-13`: com conta ou com slug no contexto, 42501
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -737,18 +738,18 @@ T56 → T57
 **Depends on**: T15
 **Reuses**: CHECK `grupos_trial` (`M:1792843200000_linha-de-base.sql:78`); `auditoria_autor` (`M:…:60`); molde da T14
 **Requirement**: PLA-13, PLA-14, PLA-44, PLA-45, PLA-46, PLA-47
-**Status**: rascunhada
+concluída
 **Lacunas**: grupo de cortesia (`uso_proprio`) que assina e paga: a spec não diz se vira `ativo`; conservador, a cortesia fica e só a assinatura muda (o mesmo no inadimplente e no cancelado)
 **Nota do rascunho**: SPEC_DEVIATION: as três funções recebem também `p_evento_id`, para marcar `efeito` no evento. Nasce também `asaas_evento_sem_efeito(p_evento_id, p_motivo)`, que grava `nenhum:<motivo>` (PLA-49, PLA-51), para a T36.
 
 **Done when**:
 
-- [ ] Casos limite e estados listados antes do código: ativar grupo em `trial`, `inadimplente`, `cancelado`; cancelar já cancelado; id de assinatura desconhecido; com conta
-- [ ] Teste `PLA-44`: grupo em `trial` vira `ativo` com `trial_inicio` nulo, assinatura `ativa` e `pago_ate` gravado, numa transação (falha forçada na auditoria desfaz tudo)
-- [ ] Testes `PLA-45`, `PLA-47`: `plano_inadimplente` muda só o grupo; a assinatura segue `ativa`
-- [ ] Teste `PLA-46`: `plano_cancelado` mantém `pago_ate`
-- [ ] Teste `PLA-14`: cada transição grava a ação com `infraestrutura` e sem `autor_conta_id`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados antes do código: ativar grupo em `trial`, `inadimplente`, `cancelado`; cancelar já cancelado; id de assinatura desconhecido; com conta
+- [x] Teste `PLA-44`: grupo em `trial` vira `ativo` com `trial_inicio` nulo, assinatura `ativa` e `pago_ate` gravado, numa transação (falha forçada na auditoria desfaz tudo)
+- [x] Testes `PLA-45`, `PLA-47`: `plano_inadimplente` muda só o grupo; a assinatura segue `ativa`
+- [x] Teste `PLA-46`: `plano_cancelado` mantém `pago_ate`
+- [x] Teste `PLA-14`: cada transição grava a ação com `infraestrutura` e sem `autor_conta_id`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -766,17 +767,17 @@ T56 → T57
 **Depends on**: T16, T9
 **Reuses**: slug da T9; S:37-38; AD-057; AD-113; contagem de linhas de `F:2233`
 **Requirement**: PLA-11
-**Status**: rascunhada
+concluída
 **Lacunas**: o valor de `SLUG_GRUPO_TESTE` só sai da pausa da T9; a migração leva o marcador `__SLUG_GRUPO_TESTE__`, que o /executar troca antes do primeiro `pnpm migrar`. Com o marcador, todo banco com grupos aborta nela: o banco local com seed e os ensaios das features anteriores que migram um dump simulado com grupos (`backend/scripts/test/ensaio-migracao*.test.ts`) precisam do slug real ou de um grupo com o slug no dump simulado
 **Nota do rascunho**: o teste roda o corpo da migração de novo sobre o cenário, numa transação desfeita, trocando a constante pelo slug de cada caso (a linha `SLUG_GRUPO_TESTE constant text := ...`).
 
 **Done when**:
 
-- [ ] Casos limite listados antes do código: slug presente; slug ausente com outros grupos; banco sem grupos; grupo do slug já `trial` ou `ativo` (não muda); grupo `uso_proprio` arquivado
-- [ ] Teste `PLA-11`: com 3 grupos `uso_proprio` (um deles o do slug), só o do slug segue `uso_proprio`; os outros ficam `trial` com a data de SP; nenhuma outra coluna muda; contagem de linhas igual em toda tabela
-- [ ] Teste `PLA-11`: sem o slug e com grupos, a migração aborta e nada muda
-- [ ] Teste `PLA-11`: com `grupos` vazio, a migração termina sem erro e sem escrita (AD-113)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do código: slug presente; slug ausente com outros grupos; banco sem grupos; grupo do slug já `trial` ou `ativo` (não muda); grupo `uso_proprio` arquivado
+- [x] Teste `PLA-11`: com 3 grupos `uso_proprio` (um deles o do slug), só o do slug segue `uso_proprio`; os outros ficam `trial` com a data de SP; nenhuma outra coluna muda; contagem de linhas igual em toda tabela
+- [x] Teste `PLA-11`: sem o slug e com grupos, a migração aborta e nada muda
+- [x] Teste `PLA-11`: com `grupos` vazio, a migração termina sem erro e sem escrita (AD-113)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -796,15 +797,15 @@ T56 → T57
 **Depends on**: T17
 **Reuses**: estender o ensaio de `PR:1684` (T81); `lerEsquema` e a referência (`F:736`, `F:784`); migrar sobre banco migrado (`F:834`); AD-033, AD-073
 **Requirement**: PLA-11, PLA-12
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: o `ensaiar` ganha o passo 8 (situação de cada grupo antes e depois, só id e slug, e a regra da cortesia); o slug vem da constante da `planos-cortesia` na pasta ou de `slugGrupoTeste`. Teste em `backend/scripts/test/ensaio-migracao-planos.test.ts` com dump simulado até antes da `planos-tabelas`. O ensaio com o backup real (pausa do usuário) e a `Evidência` são do /executar.
 
 **Done when**:
 
-- [ ] `Evidência`: data e origem do dump, contagem por tabela antes e depois, situação de cada grupo antes e depois (sem nome), diff do schema e a segunda execução, registrados aqui
-- [ ] Teste `PLA-11`: nenhuma tabela muda de contagem; só o grupo do slug fica `uso_proprio`
-- [ ] Banco de ensaio removido no `finally`; o dump decifrado não entra no git
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] `Evidência`: data e origem do dump, contagem por tabela antes e depois, situação de cada grupo antes e depois (sem nome), diff do schema e a segunda execução, registrados aqui
+- [x] Teste `PLA-11`: nenhuma tabela muda de contagem; só o grupo do slug fica `uso_proprio`
+- [x] Banco de ensaio removido no `finally`; o dump decifrado não entra no git
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -822,14 +823,14 @@ T56 → T57
 **Depends on**: T18
 **Reuses**: estender `tipos.ts` (`GE:878`, ampliado em `PR:1013`)
 **Requirement**: PLA-30
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: as duas tabelas entram só leitura (`ColumnType<T, never, never>`); os retornos das funções viram `LinhaPlanoDoGrupo`, `LinhaGrupoDaCriadora` e `LinhaEventoRegistrado`. O `expectTypeOf<Insertable<…>>().toEqualTypeOf<{}>()` pode precisar de ajuste à forma exata do Kysely no /executar.
 
 **Done when**:
 
-- [ ] Teste: cada coluna tipada existe no catálogo com o tipo correspondente
-- [ ] `pnpm typecheck` passa
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste: cada coluna tipada existe no catálogo com o tipo correspondente
+- [x] `pnpm typecheck` passa
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -849,14 +850,14 @@ T56 → T57
 **Depends on**: T19
 **Reuses**: molde de repositório que chama função (`eventos.registrarPublico`, `PR:1289`); T12
 **Requirement**: PLA-07, PLA-17
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `plano.ler` devolve `DadosDoPlano` e `gruposDaCriadora` devolve `GrupoDaCriadoraComPlano` (estende o `GrupoDaCriadora` do domínio); `criadoEm` sai em ISO UTC com microssegundos pelo `to_char`, para a ordem do texto ser a do tempo.
 
 **Done when**:
 
-- [ ] Teste `PLA-07`: `plano.ler` de grupo de outra conta devolve nulo
-- [ ] Teste `PLA-17`: `gruposDaCriadora` pela conta convidada devolve os grupos da criadora
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-07`: `plano.ler` de grupo de outra conta devolve nulo
+- [x] Teste `PLA-17`: `gruposDaCriadora` pela conta convidada devolve os grupos da criadora
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -874,16 +875,16 @@ T56 → T57
 **Depends on**: T20
 **Reuses**: estender o `recursoLiberado` da `simulador` (SIM-68, `SIM:273`) e da `financeiro` (FIN-45, `FIN:183`), AD-049, S-01; Relógio (`GE:831`)
 **Requirement**: PLA-07, PLA-23, PLA-24, PLA-28
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: o ponto único é o da feature dona (S-01): `entrada/middlewares/recurso.ts` reexporta `RecursoLiberado` e `recursoLiberadoPeloPlano(relogio)`, que mora em `aplicacao/plano/recurso-liberado.ts` com o `estadoDoPlano`; o `criarApp` usa esse padrão com o relógio da requisição, e `recursoLiberadoPadrao` sai. `RecursoPro` passa a ser o do domínio (inclui `pdf` e `push`). Trocados com a mesma força: `sessao/recurso.test.ts`, `sessao/financeiro-plano.test.ts` e o item (e) de `banco/plano-caracterizacao.test.ts`.
 **Lacunas**: o cenário de grupos cria G em `trial` com `trial_inicio` = data real da execução; teste de rota com `relogioFixo` 14 dias ou mais depois da data em que a suíte roda passa a ver G no Free e pode receber 403 `plano_pro` (hoje nenhum foi conferido). O /executar decide: pôr G em `uso_proprio` no cenário ou ajustar os relógios.
 
 **Done when**:
 
-- [ ] Casos limite listados antes do código: cada plano × cada recurso; grupo arquivado; contexto do slug; recurso desconhecido (erro de tipo)
-- [ ] Teste `PLA-07`: `trial` vencido → `simulador` `false`; `uso_proprio` → `true`; `ativo` → `true`
-- [ ] O teste "libera todos" de FIN-45 e SIM-68 é trocado com a mesma força e motivo no commit (autorizado, `## Autorizações` do `STATE.md`)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do código: cada plano × cada recurso; grupo arquivado; contexto do slug; recurso desconhecido (erro de tipo)
+- [x] Teste `PLA-07`: `trial` vencido → `simulador` `false`; `uso_proprio` → `true`; `ativo` → `true`
+- [x] O teste "libera todos" de FIN-45 e SIM-68 é trocado com a mesma força e motivo no commit (autorizado, `## Autorizações` do `STATE.md`)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -901,17 +902,17 @@ T56 → T57
 **Depends on**: T21
 **Reuses**: estender a cadeia do `exigirGrupoAtivo` (`GE:901`, com o modo `READ ONLY` das prévias de `PR:1362`, que passam); `somenteLeitura` (T5); AD-062
 **Requirement**: PLA-15, PLA-17, PLA-18, PLA-20, PLA-21
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: o middleware entra na cadeia de `protegerRotasDeGrupo` (`vinculo.ts`) logo depois do `exigirGrupoAtivo`. `operacaoNaTrava` classifica pelo caminho inteiro com duas listas (`ESCRITAS_NA_TRAVA` e `ESCRITAS_FORA_DA_TRAVA`); escrita em nenhuma das duas trava (conservador), e a T28 cobra a tabela. Inativar entra como `inativar_jogador` e o domínio libera. A lista da criadora só é lida quando o grupo está no Free; cada grupo dela passa pelo `planoEfetivo` para saber se é Free.
 
 **Done when**:
 
-- [ ] Casos limite listados antes do código: prévia `POST …/previa` (só leitura, passa); inativar; PATCH do grupo; 21 ativos depois de uma inativação; segundo grupo Free; grupo em trial
-- [ ] Teste `PLA-15`: trial vencido com 21 ativos → `POST …/partidas` 403 `limite_jogadores` e nada gravado; `POST …/inativar` 200
-- [ ] Teste `PLA-20`: depois de inativar um, o mesmo `POST …/partidas` é aceito
-- [ ] Teste `PLA-17`: criadora com dois grupos Free edita o mais antigo e recebe 403 `limite_grupos` no outro
-- [ ] Teste `PLA-18`: os GET do grupo somente leitura devolvem o mesmo corpo de antes da queda
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do código: prévia `POST …/previa` (só leitura, passa); inativar; PATCH do grupo; 21 ativos depois de uma inativação; segundo grupo Free; grupo em trial
+- [x] Teste `PLA-15`: trial vencido com 21 ativos → `POST …/partidas` 403 `limite_jogadores` e nada gravado; `POST …/inativar` 200
+- [x] Teste `PLA-20`: depois de inativar um, o mesmo `POST …/partidas` é aceito
+- [x] Teste `PLA-17`: criadora com dois grupos Free edita o mais antigo e recebe 403 `limite_grupos` no outro
+- [x] Teste `PLA-18`: os GET do grupo somente leitura devolvem o mesmo corpo de antes da queda
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -931,15 +932,15 @@ T56 → T57
 **Depends on**: T22
 **Reuses**: rotas de `GE:1256` (T36) e `GE:1409` (T42); `somenteLeitura` com `cadastrar_jogador` e `reativar_jogador` (T5); duas conexões de `GE:976` (T25)
 **Requirement**: PLA-16, PLA-21
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `conferirLimiteDeJogadores` lê o plano, e só no Free pega `pg_advisory_xact_lock(hashtextextended('jogadores_ativos:<grupo>', 0))` e relê a contagem; a decisão é do `somenteLeitura` do domínio. Chamado nas rotas `POST …/jogadores` e `POST …/jogadores/:id/reativar`, depois da validação do corpo e antes da gravação. O 403 usa o `respostaSomenteLeitura` do middleware da T22.
 
 **Done when**:
 
-- [ ] Casos limite listados antes do código: 19 com dois cadastros simultâneos; 20 e reativar; trial com 20 (passa)
-- [ ] Teste `PLA-16`: com 20 ativos no Free, cadastrar e reativar dão 403 e nada é gravado
-- [ ] Teste `PLA-21`: com 19 ativos, dois cadastros simultâneos terminam com 20 ativos e um 403
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do código: 19 com dois cadastros simultâneos; 20 e reativar; trial com 20 (passa)
+- [x] Teste `PLA-16`: com 20 ativos no Free, cadastrar e reativar dão 403 e nada é gravado
+- [x] Teste `PLA-21`: com 19 ativos, dois cadastros simultâneos terminam com 20 ativos e um 403
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -957,16 +958,16 @@ T56 → T57
 **Depends on**: T23
 **Reuses**: `estadoDoPlano` (T21); `planoResposta` (T6); molde de rota de leitura `GE:1080` (T29); Relógio falso de `GE:831`
 **Requirement**: PLA-08, PLA-09, PLA-71
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: a rota fica em `entrada/rotas/plano.ts`, registrada no `criarApp`. O motivo de somente leitura foi extraído para `aplicacao/plano/somente-leitura.ts` (o middleware da T22 passa a usá-lo); a assinatura vigente sai de `plano.assinaturaVigente` (repositório da T20); a regra "fatura em aberto" (pendente, ou `inadimplente` com a assinatura ativa, AD-096) foi para o domínio (`plano/fatura.ts`, `mostraFaturaEmAberto`), porque compara a situação comercial (checagem da T8).
 **Lacunas**: `trialFimEm` é o último dia Pro (`ultimoDiaDoTrial`, "Trial Pro até", PLA-52) ou o primeiro dia Free (`trial_inicio` + 14, PLA-70)? O rascunho usa o último dia Pro.
 
 **Done when**:
 
-- [ ] Teste `PLA-08`: criadora em trial recebe `trialFimEm`, `podeAssinar` verdadeiro; admin convidada recebe `podeAssinar` falso
-- [ ] Teste `PLA-09`: conta B recebe 404 igual ao de grupo inexistente
-- [ ] Teste `PLA-71`: com o relógio em 02:59Z do 15º dia (23:59 de SP do 14º) o plano é `trial`; em 03:00Z, `free`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-08`: criadora em trial recebe `trialFimEm`, `podeAssinar` verdadeiro; admin convidada recebe `podeAssinar` falso
+- [x] Teste `PLA-09`: conta B recebe 404 igual ao de grupo inexistente
+- [x] Teste `PLA-71`: com o relógio em 02:59Z do 15º dia (23:59 de SP do 14º) o plano é `trial`; em 03:00Z, `free`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -984,16 +985,16 @@ T56 → T57
 **Depends on**: T24
 **Reuses**: FIN-50 (`FIN:184`); SIM-68 (`SIM:273`); `recursoLiberado` ligado (T21); S-02, S-03
 **Requirement**: PLA-23, PLA-24, PLA-28
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: só teste; as rotas já passam pelo ponto único (`travarRecursosDoPlano` e `travarFinanceiro`), sem desvio. A escalação confirmada é lida pela pré-marcação de `GET …/partidas/nova` (fora da trava do simulador), que o teste usa como prova de "segue legível".
 **Lacunas**: a AD-092 diz que o simulador trava só os 4 POST e que as leituras seguem abertas, mas a trava da `simulador` (`CAMINHOS_DO_SIMULADOR`, `/simulador/*`) e o meta-teste de SIM-68 (`sessao/recurso.test.ts`) também travam `GET …/simulador/contexto`. O rascunho mantém a trava como está (mais restritiva, sem mudar teste existente); o /executar decide com o usuário se o GET do contexto deve abrir no Free.
 
 **Done when**:
 
-- [ ] Teste `PLA-23`: grupo Free → `POST …/simulador/sugerir` e `POST …/escalacoes` 403 `plano_pro` (`simulador`); a escalação confirmada no tempo de trial segue legível
-- [ ] Teste `PLA-24`: grupo Free → `POST …/financeiro/lancamentos` 403 `plano_pro` (`financeiro`) sem gravar; `GET …/financeiro/mes` 200
-- [ ] Se uma rota não passar pelo ponto único, a correção vai na rota (uma linha) e o desvio é anotado aqui
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-23`: grupo Free → `POST …/simulador/sugerir` e `POST …/escalacoes` 403 `plano_pro` (`simulador`); a escalação confirmada no tempo de trial segue legível
+- [x] Teste `PLA-24`: grupo Free → `POST …/financeiro/lancamentos` 403 `plano_pro` (`financeiro`) sem gravar; `GET …/financeiro/mes` 200
+- [x] Se uma rota não passar pelo ponto único, a correção vai na rota (uma linha) e o desvio é anotado aqui
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1013,15 +1014,15 @@ T56 → T57
 **Depends on**: T25
 **Reuses**: rotas de `PR:1611` (T46) e `PR:1634` (T47); `recursoLiberado` no contexto do slug (T21, T12)
 **Requirement**: PLA-19, PLA-25, PLA-26
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: a trava do PDF entra depois do 404 do slug e antes da validação do mês contra o histórico (o 422 do formato do mês continua antes); `pdf_exportado` lê o grupo do slug só nesse tipo e chama o ponto único com `pdf`; `ranking_aberto` não muda.
 
 **Done when**:
 
-- [ ] Teste `PLA-25`: grupo Free → PDF 403 `plano_pro`; cortesia → 200
-- [ ] Teste `PLA-26`: `pdf_exportado` de grupo Free não cria linha em `eventos_uso`
-- [ ] Teste `PLA-19`: `GET /api/publico/:slug/ranking` de grupo Free somente leitura responde 200 com a última partida
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-25`: grupo Free → PDF 403 `plano_pro`; cortesia → 200
+- [x] Teste `PLA-26`: `pdf_exportado` de grupo Free não cria linha em `eventos_uso`
+- [x] Teste `PLA-19`: `GET /api/publico/:slug/ranking` de grupo Free somente leitura responde 200 com a última partida
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1039,14 +1040,14 @@ T56 → T57
 **Depends on**: T26
 **Reuses**: estender `rankingPublico` (`PR:913`, T19) e a rota `PR:1584` (T45); `CAMPOS_PROIBIDOS_PUBLICO` continua valendo
 **Requirement**: PLA-25
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `pdfLiberado` entra obrigatório no `rankingPublico`; o fixture `ranking()` de `backend/contrato/test/publico.test.ts` ganhou o campo (só acréscimo). Ficam para o /executar os objetos `RankingPublico` montados à mão no front (fixtures dos testes da t01 e do `ranking-guardado`), que deixam de compilar sem o campo; ranking guardado no aparelho antes do campo é descartado pela validação (PAR-154).
 
 **Done when**:
 
-- [ ] Teste `PLA-25`: Free → `pdfLiberado` falso; trial → verdadeiro
-- [ ] O teste de campos proibidos do público (`PR:913`) continua verde
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-25`: Free → `pdfLiberado` falso; trial → verdadeiro
+- [x] O teste de campos proibidos do público (`PR:913`) continua verde
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1064,15 +1065,15 @@ T56 → T57
 **Depends on**: T27
 **Reuses**: meta-teste de rotas de `CA:1070` (T32); T22, T25, T26
 **Requirement**: PLA-28, PLA-15, PLA-18, PLA-19
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: a tabela tem 26 escritas (15 `somente_leitura`, 4 do simulador, 7 do financeiro) e o PDF público à parte; `FORA` lista as escritas sem trava (inativar, prévias, arquivar, reativar, admins, convites) e já reserva `POST` e `DELETE …/assinatura` (T33, T34). Nas situações normais o corpo é `{}` e os ids não existem: a rota responde 404 ou 422 e nada é gravado, o que dá a prova de PLA-18. Rotas de escrita sob o grupo criadas pela `notificacoes` (rascunhada em paralelo) entram no meta-teste e precisam de linha na tabela ou em `FORA` no /executar.
 
 **Done when**:
 
-- [ ] Teste `PLA-28`: cada linha da tabela × 4 situações
-- [ ] Teste `PLA-18`: depois da rodada, a contagem de linhas do grupo é a mesma do início
-- [ ] Teste `PLA-28`: o meta-teste falha com uma rota de escrita de prova sem linha
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-28`: cada linha da tabela × 4 situações
+- [x] Teste `PLA-18`: depois da rodada, a contagem de linhas do grupo é a mesma do início
+- [x] Teste `PLA-28`: o meta-teste falha com uma rota de escrita de prova sem linha
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1092,16 +1093,16 @@ T56 → T57
 **Depends on**: T28
 **Reuses**: molde do `remetenteResend` (`CA:647`, T15: `fetch` direto, 10 s, log só do status); `centavosParaReais` (T2); S:48-53; AD-058, AD-089
 **Requirement**: PLA-29, PLA-34, PLA-35, PLA-36, PLA-06
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Casos limite listados antes do código: 200, 400, 401, 429 com `RateLimit-Reset`, 500, rede caída, resposta depois de 10 s, lista de cobranças vazia
-- [ ] Teste `PLA-29`: o corpo de `criarAssinatura` tem `billingType` `UNDEFINED`, `cycle` `MONTHLY`, `value` 9.9 e `externalReference` = id do grupo
-- [ ] Teste `PLA-36`: 429, 500 e 10 s viram `'falhou'` sem segunda chamada
-- [ ] Teste `PLA-35`: nenhum log contém o CPF nem o `access_token`
-- [ ] Teste `PLA-34`: nenhum corpo enviado tem campo de cartão (`creditCard`, `creditCardHolderInfo`)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do código: 200, 400, 401, 429 com `RateLimit-Reset`, 500, rede caída, resposta depois de 10 s, lista de cobranças vazia
+- [x] Teste `PLA-29`: o corpo de `criarAssinatura` tem `billingType` `UNDEFINED`, `cycle` `MONTHLY`, `value` 9.9 e `externalReference` = id do grupo
+- [x] Teste `PLA-36`: 429, 500 e 10 s viram `'falhou'` sem segunda chamada
+- [x] Teste `PLA-35`: nenhum log contém o CPF nem o `access_token`
+- [x] Teste `PLA-34`: nenhum corpo enviado tem campo de cartão (`creditCard`, `creditCardHolderInfo`)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1119,13 +1120,13 @@ T56 → T57
 **Depends on**: T29
 **Reuses**: `remetenteMemoria()` (`CA:647`); `webServer` do Playwright (`F:1691`)
 **Requirement**: PLA-36, PLA-53
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste: o servidor falso responde às 4 rotas com o formato do Asaas e recusa `access_token` ausente com 401
-- [ ] Teste: `asaasMemoria` programada para falhar na segunda chamada devolve `'falhou'` nela
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste: o servidor falso responde às 4 rotas com o formato do Asaas e recusa `access_token` ausente com 401
+- [x] Teste: `asaasMemoria` programada para falhar na segunda chamada devolve `'falhou'` nela
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1143,14 +1144,14 @@ T56 → T57
 **Depends on**: T30
 **Reuses**: T14; molde de repositório de `PR:1289`
 **Requirement**: PLA-30, PLA-33
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: os erros das funções da T14 viram resultado dentro de um `SAVEPOINT` (42501 `so_quem_criou`, 55000 `grupo_arquivado`, 23505 `assinatura_vigente`, P0002 `sem_assinatura`); `travarGrupo` usa a chave `assinatura:<grupo>`. `clienteDaConta` lê pela RLS de `assinaturas` (a conta vê as assinaturas dos grupos que criou, inclusive arquivados).
 
 **Done when**:
 
-- [ ] Teste `PLA-30`: `registrar` grava e `pendenteOuAtiva` a devolve com `faturaUrl`
-- [ ] Teste `PLA-33`: com duas conexões, a segunda `travarGrupo` espera o fim da primeira transação
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-30`: `registrar` grava e `pendenteOuAtiva` a devolve com `faturaUrl`
+- [x] Teste `PLA-33`: com duas conexões, a segunda `travarGrupo` espera o fim da primeira transação
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1170,18 +1171,18 @@ T56 → T57
 **Depends on**: T31
 **Reuses**: cliente (T29), memória (T30), repositório (T31); S:47-49; AD-114
 **Requirement**: PLA-29, PLA-33, PLA-35, PLA-36
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: ordem: `travarGrupo` → criadora (pelo `plano.ler`, sem chamar o Asaas) → `pendenteOuAtiva` (409 `assinatura_pendente` ou `assinatura_ativa`, sem chamar o Asaas) → cliente reaproveitado pelo `clienteDaConta` ou criado com o e-mail de `contas.eu` → assinatura (`description` = `descricaoDaAssinatura(nome do grupo)`) → primeira cobrança → `registrar`. A compensação (`removerAssinatura` uma vez) vale para a falha da primeira cobrança e também para a recusa do `registrar` depois de a assinatura existir no Asaas; a falha da remoção vai ao log com `assinaturaId` e `grupoId`.
 **Lacunas**: o cliente reaproveitado (AD-096) não recebe o nome e o CPF novos do formulário; se a pessoa digitar outro CPF, o Asaas segue com o do cliente antigo. O rascunho reaproveita sem atualizar.
 
 **Done when**:
 
-- [ ] Casos limite e estados listados antes do código: falha em cada uma das 3 chamadas; cliente já existente; pendente já existe; trial, Free, inadimplente e cancelado
-- [ ] Teste `PLA-29`: cliente criado com `externalReference` = id da conta e o e-mail da conta; segundo grupo da mesma conta reaproveita o cliente
-- [ ] Teste `PLA-36`: falha em `criarCliente` ou `criarAssinatura` não grava nada e não repete
-- [ ] Teste `PLA-36`: falha em `primeiraCobranca` chama `removerAssinatura` uma vez, responde `pagamento_indisponivel` e não grava nada; falha também na remoção é registrada no log com o id da assinatura, sem CPF (AD-114)
-- [ ] Teste `PLA-35`: depois do sucesso, nenhuma tabela nem a auditoria contém o CPF (busca pelo valor em todas as colunas de texto)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados antes do código: falha em cada uma das 3 chamadas; cliente já existente; pendente já existe; trial, Free, inadimplente e cancelado
+- [x] Teste `PLA-29`: cliente criado com `externalReference` = id da conta e o e-mail da conta; segundo grupo da mesma conta reaproveita o cliente
+- [x] Teste `PLA-36`: falha em `criarCliente` ou `criarAssinatura` não grava nada e não repete
+- [x] Teste `PLA-36`: falha em `primeiraCobranca` chama `removerAssinatura` uma vez, responde `pagamento_indisponivel` e não grava nada; falha também na remoção é registrada no log com o id da assinatura, sem CPF (AD-114)
+- [x] Teste `PLA-35`: depois do sucesso, nenhuma tabela nem a auditoria contém o CPF (busca pelo valor em todas as colunas de texto)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1199,16 +1200,16 @@ T56 → T57
 **Depends on**: T32
 **Reuses**: `LIMITE_ESCRITA` por conta (`GE:928`, T23); `so_quem_criou` (`GE:854`); molde de rota de `GE:1105` (T30)
 **Requirement**: PLA-30, PLA-31, PLA-32, PLA-33, PLA-60
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: o `criarApp` ganha a opção `asaas` (dublê em memória nos testes) e, sem ela, monta `asaasHttp` com `ASAAS_URL` e `ASAAS_API_KEY` do Worker, posto em `c.var.asaas` (campo novo em `ambiente.ts`). A rota usa a cadeia de grupo (sessão, `LIMITE_ESCRITA`, vínculo, grupo ativo) e fica fora da trava de somente leitura. O teste do 429 usa o binding falso de `sessao/limite-escrita.test.ts`.
 
 **Done when**:
 
-- [ ] Teste `PLA-31`: depois do 201, `GET …/plano` segue `trial`
-- [ ] Teste `PLA-32`: admin convidada recebe 403 e o Asaas em memória não recebeu chamada
-- [ ] Teste `PLA-33`: segundo POST recebe 409 com a mesma `faturaUrl`
-- [ ] Teste `PLA-60`: sem sessão, 401; a 61.ª escrita da conta, 429
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-31`: depois do 201, `GET …/plano` segue `trial`
+- [x] Teste `PLA-32`: admin convidada recebe 403 e o Asaas em memória não recebeu chamada
+- [x] Teste `PLA-33`: segundo POST recebe 409 com a mesma `faturaUrl`
+- [x] Teste `PLA-60`: sem sessão, 401; a 61.ª escrita da conta, 429
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1226,16 +1227,16 @@ T56 → T57
 **Depends on**: T33
 **Reuses**: T29, T31, T14; rota de T33
 **Requirement**: PLA-55, PLA-56
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: rota `DELETE` em `entrada/rotas/assinatura.ts` (mesma cadeia do POST); código novo `sem_assinatura` (409) no contrato (`erroSemAssinatura`, `MENSAGENS_ERRO_PLANO`). `SUBSCRIPTION_DELETED` gravado antes da `assinatura_cancelar` (P0002 depois da remoção) responde 204. Teste em `backend/api/test/rotas/assinatura-cancelar.test.ts`.
 
 **Done when**:
 
-- [ ] Casos limite listados antes do código: sem assinatura ativa nem pendente (409); cancelar a pendente; `SUBSCRIPTION_DELETED` chegando antes da resposta; não criadora
-- [ ] Teste `PLA-55`: 204, grupo `cancelado` com o mesmo `pagoAte`; o plano segue `pro` até ele
-- [ ] Teste `PLA-56`: Asaas em memória com falha → 502, grupo `ativo`, sem auditoria `plano_cancelado`
-- [ ] Teste `PLA-55`: cancelar a pendente → 204, assinatura `cancelada`, grupo sem mudança, e um novo `POST …/assinatura` é aceito (AD-115)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do código: sem assinatura ativa nem pendente (409); cancelar a pendente; `SUBSCRIPTION_DELETED` chegando antes da resposta; não criadora
+- [x] Teste `PLA-55`: 204, grupo `cancelado` com o mesmo `pagoAte`; o plano segue `pro` até ele
+- [x] Teste `PLA-56`: Asaas em memória com falha → 502, grupo `ativo`, sem auditoria `plano_cancelado`
+- [x] Teste `PLA-55`: cancelar a pendente → 204, assinatura `cancelada`, grupo sem mudança, e um novo `POST …/assinatura` é aceito (AD-115)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1255,16 +1256,16 @@ T56 → T57
 **Depends on**: T34
 **Reuses**: `exigirCabecalhoPelada` (`CA:723`, T18) com a exceção da rota; `limiteTaxa` (`F:1153`); binding `LIMITE_WEBHOOK` (`F:1081`, FUN-26); `bodyLimit` de `PR:1634` (T47); T7
 **Requirement**: PLA-39, PLA-40, PLA-50
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: a exceção do `X-Pelada` mora no `exigirCabecalhoPelada` (só `POST` no caminho exato, `CAMINHO_WEBHOOK_ASAAS`); token em tempo constante por SHA-256 (`infraestrutura/asaas/token-webhook.ts`); `ASAAS_WEBHOOK_TOKEN` ausente ou vazio = 401 sempre. Nesta tarefa a rota só registra o evento (`eventosAsaas.registrar` + `eventoDoCorpo`); a T36 troca o `processar` pela aplicação do efeito. Testes em `backend/api/test/rotas/webhook-asaas.test.ts`, inclusive o limite exato de 64 KiB.
 
 **Done when**:
 
-- [ ] Teste `PLA-39`: sem header, com header errado e com a chave de API no header → 401, `eventos_asaas` vazio, log sem o valor
-- [ ] Teste `PLA-40`: binding falso nega → 429; corpo de 65.537 bytes → 413
-- [ ] Teste `PLA-50`: corpo sem `event` → 400; com campo novo → segue
-- [ ] Teste: o `X-Pelada` continua exigido nas outras escritas de `/api/*`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-39`: sem header, com header errado e com a chave de API no header → 401, `eventos_asaas` vazio, log sem o valor
+- [x] Teste `PLA-40`: binding falso nega → 429; corpo de 65.537 bytes → 413
+- [x] Teste `PLA-50`: corpo sem `event` → 400; com campo novo → segue
+- [x] Teste: o `X-Pelada` continua exigido nas outras escritas de `/api/*`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1282,19 +1283,19 @@ T56 → T57
 **Depends on**: T35
 **Reuses**: T4, T15, T16; Sentry do Worker (`F:1301`) com `limparEvento` (`F:1277`)
 **Requirement**: PLA-41, PLA-42, PLA-44, PLA-45, PLA-46, PLA-47, PLA-49, PLA-51
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: as três transições entram no repositório `eventosAsaas` (`ativar`, `inadimplente`, `cancelado`); a rota passa a usar `aplicarEventoAsaas` como `processar` padrão; o `criarApp` ganha `reportarWebhook` (só testes). O resultado devolve o efeito e o grupo, para a T22 da `notificacoes` (S-03). Teste em `backend/api/test/rotas/webhook-asaas-aplicar.test.ts`, com gatilho de falha na auditoria para o 500.
 **Lacunas**: o `efeito = 'nenhum:<motivo>'` do comentário da T10 não é gravado (só as funções de transição escrevem a coluna, e a `pelada_app` não tem UPDATE); o evento sem efeito fica com `efeito` nulo.
 
 **Done when**:
 
-- [ ] Casos limite e estados listados antes do código: cada evento tratado; repetido; desconhecido; valor divergente; erro na transição (500, nada gravado, o Asaas reenvia)
-- [ ] Teste `PLA-44`: `PAYMENT_RECEIVED` de assinatura pendente → grupo `ativo`, assinatura `ativa`, `pagoAte` = vencimento + 1 mês
-- [ ] Testes `PLA-45`, `PLA-46`, `PLA-47`: o estado final no banco de cada evento
-- [ ] Teste `PLA-42`: o mesmo evento duas vezes → 200 e uma auditoria só
-- [ ] Teste `PLA-49`: `PAYMENT_DELETED` e assinatura desconhecida → 200 sem mudança
-- [ ] Teste `PLA-51`: valor 5.00 contra 990 centavos → grava, não ativa, Sentry chamado sem e-mail, nome nem CPF
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados antes do código: cada evento tratado; repetido; desconhecido; valor divergente; erro na transição (500, nada gravado, o Asaas reenvia)
+- [x] Teste `PLA-44`: `PAYMENT_RECEIVED` de assinatura pendente → grupo `ativo`, assinatura `ativa`, `pagoAte` = vencimento + 1 mês
+- [x] Testes `PLA-45`, `PLA-46`, `PLA-47`: o estado final no banco de cada evento
+- [x] Teste `PLA-42`: o mesmo evento duas vezes → 200 e uma auditoria só
+- [x] Teste `PLA-49`: `PAYMENT_DELETED` e assinatura desconhecida → 200 sem mudança
+- [x] Teste `PLA-51`: valor 5.00 contra 990 centavos → grava, não ativa, Sentry chamado sem e-mail, nome nem CPF
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1312,18 +1313,18 @@ T56 → T57
 **Depends on**: T36
 **Reuses**: molde de concorrência de `GE:976` (T25); T35, T36
 **Requirement**: PLA-43, PLA-48, PLA-72, PLA-73, PLA-74
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: o paralelo usa `comDb` com conta nula (o contexto da rota do webhook) e espera a trava em `pg_stat_activity`; as sequências usam a rota real. O PLA-74 lê `GET …/plano` com o relógio no dia 16 antes e depois do pagamento e compara as contagens de `jogadores`, `periodos_ativos` e `partidas` do grupo.
 
 **Done when**:
 
-- [ ] Casos limite listados antes do teste: mesmo id em paralelo; dois eventos diferentes da mesma assinatura em paralelo; 429 e reenvio
-- [ ] Teste `PLA-43`: 2 envios simultâneos → uma auditoria `plano_ativado`
-- [ ] Teste `PLA-73`: primeiro envio com 429, reenvio aceito, um efeito
-- [ ] Teste `PLA-48`: `PAYMENT_CREATED` atrasado deixa o grupo `ativo`
-- [ ] Teste `PLA-74`: relógio no 16º dia: plano `free` e somente leitura; depois do webhook, `pro` sem perda de linha
-- [ ] Teste `PLA-72`: lote de 5 eventos atrasados fora de ordem termina no estado do mais recente
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite listados antes do teste: mesmo id em paralelo; dois eventos diferentes da mesma assinatura em paralelo; 429 e reenvio
+- [x] Teste `PLA-43`: 2 envios simultâneos → uma auditoria `plano_ativado`
+- [x] Teste `PLA-73`: primeiro envio com 429, reenvio aceito, um efeito
+- [x] Teste `PLA-48`: `PAYMENT_CREATED` atrasado deixa o grupo `ativo`
+- [x] Teste `PLA-74`: relógio no 16º dia: plano `free` e somente leitura; depois do webhook, `pro` sem perda de linha
+- [x] Teste `PLA-72`: lote de 5 eventos atrasados fora de ordem termina no estado do mais recente
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1343,15 +1344,15 @@ T56 → T57
 **Depends on**: T37
 **Reuses**: `grupos.arquivar` (`GE:1027`, T27) e rota `GE:1105` (T30); `POST /api/conta/excluir` (`CA:971`, T28); AD-115
 **Requirement**: PLA-68, PLA-69
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: arquivar confere a assinatura depois da trava de assinatura do grupo (AD-097) e só para a criadora (a admin que não criou segue recebendo 403 `so_quem_criou`, GEL-24); excluir confere antes da senha, para não gravar falha de senha por outro motivo. Resposta 409 `{ erro: 'assinatura_ativa', mensagem }` (cabe no `erroAssinaturaAtiva`); as mensagens estão no contrato (`MENSAGEM_CANCELE_ANTES_DE_ARQUIVAR`, `mensagemCanceleAntesDeExcluir`). Teste em `backend/api/test/rotas/assinatura-bloqueia.test.ts`.
 
 **Done when**:
 
-- [ ] Teste `PLA-69`: arquivar grupo com assinatura ativa ou pendente → 409 e `arquivado_em` nulo
-- [ ] Teste `PLA-68`: excluir a conta criadora com assinatura ativa ou pendente → 409 com o nome do grupo e a conta intacta
-- [ ] Os testes ACE-28 e GEL de arquivar continuam verdes
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-69`: arquivar grupo com assinatura ativa ou pendente → 409 e `arquivado_em` nulo
+- [x] Teste `PLA-68`: excluir a conta criadora com assinatura ativa ou pendente → 409 com o nome do grupo e a conta intacta
+- [x] Os testes ACE-28 e GEL de arquivar continuam verdes
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1369,15 +1370,15 @@ T56 → T57
 **Depends on**: T38
 **Reuses**: suíte de `CA:1070` (T32), estendida em `GE:1607` e `PR:1658`
 **Requirement**: PLA-09, PLA-32
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `ROTAS_DO_PLANO` em `rotas.test.ts`, com um pedido próprio (`pedirComAsaas`) porque o `cliente` do apoio não recebe o Asaas em memória. Cada caso semeia uma assinatura pendente em G e outra em H, com a fatura, para provar que a resposta cruzada não a traz. O meta-teste do plano usa uma rota extra de assinatura e outra de webhook.
 
 **Done when**:
 
-- [ ] Teste `PLA-09`: as 3 rotas novas respondem 404 ao grupo B e o banco do B fica igual
-- [ ] Teste `PLA-32`: o Asaas em memória não recebe chamada nas tentativas cruzadas
-- [ ] O meta-teste falha com uma rota nova sem caso
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-09`: as 3 rotas novas respondem 404 ao grupo B e o banco do B fica igual
+- [x] Teste `PLA-32`: o Asaas em memória não recebe chamada nas tentativas cruzadas
+- [x] O meta-teste falha com uma rota nova sem caso
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1395,14 +1396,14 @@ T56 → T57
 **Depends on**: T39
 **Reuses**: checagem do `.env.example` e `.gitleaks.toml` (`F:1886`, T66); estender `so-previa.ts` (`F:2013`, T71); molde de `CA:697` (T17)
 **Requirement**: PLA-37, PLA-38
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `PLA-37`: arquivo de prova com `$aact_` seguido de 40 caracteres reprova; o `.env.example` sem valor passa
-- [ ] Teste `PLA-38`: `ASAAS_URL` com `https://api.asaas.com/v3` reprova; a do sandbox passa
-- [ ] A checagem do `.env.example` passa com as 3 variáveis
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-37`: arquivo de prova com `$aact_` seguido de 40 caracteres reprova; o `.env.example` sem valor passa
+- [x] Teste `PLA-38`: `ASAAS_URL` com `https://api.asaas.com/v3` reprova; a do sandbox passa
+- [x] A checagem do `.env.example` passa com as 3 variáveis
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1422,13 +1423,13 @@ T56 → T57
 **Depends on**: T40
 **Reuses**: cliente HTTP do front (`CA:1169`, T36); molde de `frontend/web/src/dados/grupos.ts` (`GE:1680`, T53)
 **Requirement**: PLA-21, PLA-54
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste: 403 `somente_leitura` numa escrita refaz o `GET …/plano`
-- [ ] Teste: reabrir a tela refaz a leitura (sem cache velho)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste: 403 `somente_leitura` numa escrita refaz o `GET …/plano`
+- [x] Teste: reabrir a tela refaz a leitura (sem cache velho)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1446,14 +1447,14 @@ T56 → T57
 **Depends on**: T41
 **Reuses**: `TelaMensagem` (`CA:1286`, T41); `Botao` (`F:1448`); Stylelint de tokens (`F:1374`); AD-064
 **Requirement**: PLA-27
-**Status**: rascunhada
+concluída
 **Lacunas**: o @pelada/web passa a depender do @pelada/dominio (S-06) só no package.json; o pnpm-lock.yaml precisa do pnpm install, que o rascunho não roda
 
 **Done when**:
 
-- [ ] Teste `PLA-27`: mostra "R$ 9,90/mês" e o botão leva a `/app/grupos/:grupoId/plano`
-- [ ] Teste: axe sem violação
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-27`: mostra "R$ 9,90/mês" e o botão leva a `/app/grupos/:grupoId/plano`
+- [x] Teste: axe sem violação
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1471,14 +1472,14 @@ T56 → T57
 **Depends on**: T42
 **Reuses**: `Faixa` (`CA:1286`, T41); T41; AD-064
 **Requirement**: PLA-22
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `SPEC_DEVIATION`: sem provedor `PlanoDoGrupo`, porque as rotas de `app/rotas.tsx` são planas (não há layout de grupo); `useSomenteLeitura(grupoId)` em `dados/somente-leitura.ts` lê o `usePlano` e o cache do TanStack Query divide a consulta. Plano carregando ou com erro = editável (a API recusa de qualquer jeito, PLA-21).
 
 **Done when**:
 
-- [ ] Teste `PLA-22`: com `somenteLeitura.motivo = 'limite_jogadores'` a faixa mostra o texto e o link; sem motivo, não aparece
-- [ ] Teste: axe sem violação
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-22`: com `somenteLeitura.motivo = 'limite_jogadores'` a faixa mostra o texto e o link; sem motivo, não aparece
+- [x] Teste: axe sem violação
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1498,16 +1499,16 @@ T56 → T57
 **Depends on**: T43
 **Reuses**: `Casca`, `Barra`, `Lista` (`F:1424`, `CA:1286`); `RECURSOS_POR_PLANO` (T2); AD-064
 **Requirement**: PLA-52, PLA-57, PLA-58
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: Pro com `pagoAte` mostra "Pro até dd/mm/aaaa"; sem limite, "N jogadores ativos". Cada recurso leva "Liberado" ou "Só no Pro" em texto e ícone. As ações da criadora entram pela prop `acoesDaCriadora` (T45, T46). Teste em `frontend/web/test/telas/meu-plano.test.tsx`, com as rotas do próprio teste (a rota do app entra na T47).
 
 **Done when**:
 
-- [ ] Teste `PLA-52`: trial mostra "Trial Pro até 14/11/2026" e "21 de 20 jogadores" no Free
-- [ ] Teste `PLA-57`: admin convidada vê o plano sem botões e com o texto
-- [ ] Teste `PLA-58`: cortesia mostra "Cortesia: Pro sem cobrança" e nenhum botão
-- [ ] Teste: axe sem violação
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-52`: trial mostra "Trial Pro até 14/11/2026" e "21 de 20 jogadores" no Free
+- [x] Teste `PLA-57`: admin convidada vê o plano sem botões e com o texto
+- [x] Teste `PLA-58`: cortesia mostra "Cortesia: Pro sem cobrança" e nenhum botão
+- [x] Teste: axe sem violação
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1525,15 +1526,15 @@ T56 → T57
 **Depends on**: T44
 **Reuses**: `Campo` e `ResumoErros` (`CA:1238`, `CA:1263`); mensagem ao lado do campo (`GE:2138`, T72); `assinaturaCorpo` (T6)
 **Requirement**: PLA-53, PLA-34, PLA-35
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: Meu plano mostra o formulário quando `podeAssinar` e `assinatura === null` (`acoesPadrao`). A validação local é o `assinaturaCorpo` do contrato; o 409 `assinatura_pendente` abre a fatura em aberto. A fatura abre com `window.open(url, '_blank', 'noopener')`.
 
 **Done when**:
 
-- [ ] Teste `PLA-53`: envio com sucesso chama `window.open` com a `faturaUrl`
-- [ ] Teste `PLA-35`: CPF inválido mostra o erro no campo sem chamar a API
-- [ ] Teste `PLA-34`: o formulário não tem campo de cartão
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-53`: envio com sucesso chama `window.open` com a `faturaUrl`
+- [x] Teste `PLA-35`: CPF inválido mostra o erro no campo sem chamar a API
+- [x] Teste `PLA-34`: o formulário não tem campo de cartão
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1551,15 +1552,15 @@ T56 → T57
 **Depends on**: T45
 **Reuses**: `Dialogo` (`CA:1286`, T41); T41
 **Requirement**: PLA-54, PLA-55
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: na pendente, o diálogo diz "A fatura em aberto deixa de valer." (não há `pagoAte`). `dataBr` passou para `telas/plano/datas.ts`, para `AssinaturaAtual` e `MeuPlano` não se importarem em ciclo.
 
 **Done when**:
 
-- [ ] Teste `PLA-54`: pendente mostra o texto e o link; reabrir com `ativo` mostra Pro
-- [ ] Teste `PLA-55`: o diálogo mostra a data de `pagoAte` e, confirmado, chama o DELETE
-- [ ] Teste `PLA-55`: no estado pendente, "Cancelar assinatura" aparece e chama o DELETE (AD-115)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-54`: pendente mostra o texto e o link; reabrir com `ativo` mostra Pro
+- [x] Teste `PLA-55`: o diálogo mostra a data de `pagoAte` e, confirmado, chama o DELETE
+- [x] Teste `PLA-55`: no estado pendente, "Cancelar assinatura" aparece e chama o DELETE (AD-115)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1579,14 +1580,14 @@ T56 → T57
 **Depends on**: T46
 **Reuses**: estender `rotas.tsx` (`GE:2068`, T69); `InicioGrupo.tsx` (`GE:1847`, ampliada em `PR:2073`)
 **Requirement**: PLA-59
-**Status**: rascunhada
+concluída
 **Lacunas**: o item "Meu plano" fica numa lista "Plano" própria, depois de "Gerenciar": os testes da GEL-114 (`inicio-grupo.test.tsx:99`) e da FIN-34 (`inicio-grupo-financeiro.test.tsx:75,95`) fixam aquela lista e mudá-los pede aprovação. A meta do item é fixa ("Plano, assinatura e recursos"), sem ler o plano no início. Teste em `frontend/web/test/app/rotas-plano.test.tsx`.
 
 **Done when**:
 
-- [ ] Teste `PLA-59`: o início do grupo mostra "Meu plano" para a criadora e para a convidada
-- [ ] Teste: a rota renderiza a tela e passa pela guarda
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-59`: o início do grupo mostra "Meu plano" para a criadora e para a convidada
+- [x] Teste: a rota renderiza a tela e passa pela guarda
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1604,13 +1605,13 @@ T56 → T57
 **Depends on**: T47
 **Reuses**: telas de `GE:1870`, `GE:1896`, `GE:1920`, `GE:1944`, `GE:1970`, `GE:2042`; T43
 **Requirement**: PLA-22
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `TrechoSomenteLeitura` (`componentes/FaixaSomenteLeitura.tsx`) é um `fieldset` sem borda que desabilita de uma vez os controles de dentro; `LinkBotao` ganhou `desabilitado` (vira `<button disabled>`); `useEmSomenteLeitura` em `dados/somente-leitura.ts`. Na ficha, dados, notas, "Corrigir datas", "Reativar" e "Excluir jogador" travam; "Inativar" não. Em Dados do grupo, "Arquivar grupo" e o link do ranking seguem habilitados (fora da trava, AD-092). Teste em `frontend/web/test/telas/somente-leitura-elenco.test.tsx`.
 
 **Done when**:
 
-- [ ] Teste `PLA-22`: em somente leitura, "Novo jogador" e "Salvar" desabilitados e a faixa visível; "Inativar" da ficha habilitado
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-22`: em somente leitura, "Novo jogador" e "Salvar" desabilitados e a faixa visível; "Inativar" da ficha habilitado
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1628,13 +1629,13 @@ T56 → T57
 **Depends on**: T48
 **Reuses**: telas de `PR:1951`, `PR:1974`, `PR:1999`, `PR:2025`; T43
 **Requirement**: PLA-22
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: os rótulos reais das telas são "Nova partida" (o "Lançar partida" do critério) e "Salvar nova configuração" (o "Salvar pesos"); o teste usa esses. Lançar e Editar partida ficam inteiros no `TrechoSomenteLeitura` (T48), com "Excluir partida". Teste em `frontend/web/test/telas/somente-leitura-partidas.test.tsx`.
 
 **Done when**:
 
-- [ ] Teste `PLA-22`: em somente leitura, "Lançar partida" e "Salvar pesos" desabilitados e a faixa visível
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-22`: em somente leitura, "Lançar partida" e "Salvar pesos" desabilitados e a faixa visível
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1654,14 +1655,14 @@ T56 → T57
 **Depends on**: T49
 **Reuses**: telas da `simulador` e da `financeiro` (S-05); T42
 **Requirement**: PLA-27
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `useSemRecurso(grupoId, recurso)` em `dados/plano.ts` (o `usarPlano` da tarefa; carregando ou com erro conta como liberado). No financeiro, saem "Configurar caixa" e "Novo lançamento", os pagamentos ficam no `TrechoBloqueado` (T48) e o aviso entra no lugar da barra; sem caixa configurado, o aviso no lugar de "Configurar caixa". Teste em `frontend/web/test/telas/aviso-pro-telas.test.tsx`.
 **Lacunas**: o link de edição de cada lançamento continua no Free (a spec não diz); a edição recebe o 403 `plano_pro` da API ao salvar.
 
 **Done when**:
 
-- [ ] Teste `PLA-27`: Free no simulador mostra o aviso com "R$ 9,90/mês" e não o formulário; no financeiro, o saldo e o aviso
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-27`: Free no simulador mostra o aviso com "R$ 9,90/mês" e não o formulário; no financeiro, o saldo e o aviso
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1679,15 +1680,15 @@ T56 → T57
 **Depends on**: T50
 **Reuses**: `PaginaRanking` (`PR:1878`, T56) e `usarExportarPdf` (`PR:2222`, T70); T27
 **Requirement**: PLA-25
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `mostrarExportar(dados, somenteLeitura)` em `PaginaRanking.tsx` decide os dois botões (topo e barra do celular). Teste em `frontend/web/test/telas/ranking-pdf-plano.test.tsx`.
 **Lacunas**: as fixtures dos testes existentes do ranking (`ranking-pdf`, `ranking-pagina`, `ranking-tabela`, `ranking-sem-conexao`, `ranking-indisponivel`, `pwa/ranking-guardado`) não trazem `pdfLiberado`, que o contrato da T27 exige; sem o campo, o `parse` falha. Acrescentar `pdfLiberado: true` muda testes existentes e pede a aprovação da regra de Testes (o `/executar` pergunta).
 
 **Done when**:
 
-- [ ] Teste `PLA-25`: `pdfLiberado` falso → sem o botão; verdadeiro → com ele
-- [ ] A comparação visual da t01 (`PR:2369`) segue verde com o seed em cortesia ou trial
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-25`: `pdfLiberado` falso → sem o botão; verdadeiro → com ele
+- [x] A comparação visual da t01 (`PR:2369`) segue verde com o seed em cortesia ou trial
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1705,14 +1706,14 @@ T56 → T57
 **Depends on**: T51
 **Reuses**: casca da página provisória (`F:1545`, AD-007) e a faixa dela (`CA:1309`, T42); `Faixa` (`CA:1286`); T2; S-06; AD-064
 **Requirement**: PLA-61, PLA-62, PLA-63
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `PLA-61`: os textos e os dois botões com os destinos
-- [ ] Teste `PLA-62`: com `PRECO_PRO_CENTAVOS` trocado no teste por 1290, a landing mostra "R$ 12,90" (o valor vem da tabela)
-- [ ] Teste `PLA-63`: com `?aviso=conta-excluida`, a faixa aparece
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-61`: os textos e os dois botões com os destinos
+- [x] Teste `PLA-62`: com `PRECO_PRO_CENTAVOS` trocado no teste por 1290, a landing mostra "R$ 12,90" (o valor vem da tabela)
+- [x] Teste `PLA-63`: com `?aviso=conta-excluida`, a faixa aparece
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1732,14 +1733,14 @@ T56 → T57
 **Depends on**: T52
 **Reuses**: `useSessao` e a guarda (`CA:1192`, T37); rotas de `CA:1309`
 **Requirement**: PLA-64, PLA-65
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `PLA-64`: com sessão, `/` vai a `/app`
-- [ ] Teste `PLA-65`: com a API respondendo 500, a landing aparece inteira
-- [ ] Os testes da página provisória são trocados com a mesma força e motivo no commit (autorizado, `## Autorizações` do `STATE.md`)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-64`: com sessão, `/` vai a `/app`
+- [x] Teste `PLA-65`: com a API respondendo 500, a landing aparece inteira
+- [x] Os testes da página provisória são trocados com a mesma força e motivo no commit (autorizado, `## Autorizações` do `STATE.md`)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1757,14 +1758,14 @@ T56 → T57
 **Depends on**: T53
 **Reuses**: páginas de `CA:1458` (T48); T2
 **Requirement**: PLA-66, PLA-67
-**Status**: rascunhada
+concluída
 **Lacunas**: o texto de cobrança entrou nas seções existentes (O serviço, Encerramento, O que guardamos) porque o teste ACE-58 confere a lista exata de seções; seção própria pede trocar aquele teste, com aprovação. TERMOS_VERSAO não foi trocada (o texto segue em rascunho)
 
 **Done when**:
 
-- [ ] Teste `PLA-66`: `/privacidade` cita "Asaas", "CPF" e "id do cliente"
-- [ ] Teste `PLA-67`: `/termos` mostra "14 dias", "R$ 9,90" e "20 jogadores" vindos da tabela
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-66`: `/privacidade` cita "Asaas", "CPF" e "id do cliente"
+- [x] Teste `PLA-67`: `/termos` mostra "14 dias", "R$ 9,90" e "20 jogadores" vindos da tabela
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1782,14 +1783,14 @@ T56 → T57
 **Depends on**: T54
 **Reuses**: Playwright e axe da fundação (`F:1691`, `F:1738`); sessão de e2e de `CA:1683` (T57)
 **Requirement**: PLA-61, PLA-63, PLA-64, PLA-65
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `PLA-61`: em 1280 px, os cartões Free e Pro têm o mesmo `y` (±4 px) e o Pro à direita do Free (`boundingBox`); em 390 px, empilhados
-- [ ] Teste `PLA-65`: axe sem violação; nenhuma requisição a `/api/*` além de `/api/sessao`
-- [ ] Testes `PLA-63`, `PLA-64`: faixa com o aviso; com sessão, URL final `/app`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PLA-61`: em 1280 px, os cartões Free e Pro têm o mesmo `y` (±4 px) e o Pro à direita do Free (`boundingBox`); em 390 px, empilhados
+- [x] Teste `PLA-65`: axe sem violação; nenhuma requisição a `/api/*` além de `/api/sessao`
+- [x] Testes `PLA-63`, `PLA-64`: faixa com o aviso; com sessão, URL final `/app`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: build
@@ -1809,16 +1810,16 @@ T56 → T57
 **Depends on**: T55
 **Reuses**: jornadas de `CA:1683`, `GE:2188`, `PR:2441`; seed (`GE:2164`); T30
 **Requirement**: PLA-53, PLA-54, PLA-57, PLA-15, PLA-20, PLA-44
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: J-27, J-30 e J-28 de `.specs/projeto/jornadas.md` em `frontend/web/e2e/planos.spec.ts`, cada uma com conta, grupo e jogadores próprios. O pagamento é o `POST /teste/webhook` do Asaas falso; a assinatura do grupo vem de `/teste/estado` pelo `externalReference`.
 **Lacunas**: o Worker do e2e não tem "relógio do servidor fixável" (o `relogio` só existe no `criarApp` dos testes da API). SPEC_DEVIATION: o grupo com 21 chega ao Free pelo estorno da cobrança que deu o Pro (`PAYMENT_REFUNDED` → `inadimplente`, PLA-47), não pelo fim do trial; o vencimento do trial fica provado nos testes do domínio e da API (T1, T24). Para provar a J-28 literal, falta uma tarefa de relógio de dev no Worker (como o `EMAIL_DEV`).
 
 **Done when**:
 
-- [ ] Teste: a criadora assina, o teste dispara `PAYMENT_RECEIVED` e Meu plano mostra Pro
-- [ ] Teste: a convidada vê o plano sem botões
-- [ ] Teste: grupo Free com 21 mostra a faixa; depois de inativar um, lança a partida
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste: a criadora assina, o teste dispara `PAYMENT_RECEIVED` e Meu plano mostra Pro
+- [x] Teste: a convidada vê o plano sem botões
+- [x] Teste: grupo Free com 21 mostra a faixa; depois de inativar um, lança a partida
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: build
@@ -1836,13 +1837,13 @@ T56 → T57
 **Depends on**: T56
 **Reuses**: runbook de `F:2063` e `F:2087`, estendido em `CA:1708`; S:50-53
 **Requirement**: PLA-72, PLA-37
-**Status**: rascunhada
+concluída
 **Lacunas**: escrita antes das T9 a T56 (a pedido do usuário, só o independente): os nomes de menu do painel do sandbox do Asaas (Integrações > Webhooks, Simular pagamento) são PREMISSA e devem ser conferidos no /preparar Nível 2
 
 **Done when**:
 
-- [ ] O runbook tem os passos da fila pausada e dos secrets, sem valor nenhum
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] O runbook tem os passos da fila pausada e dos secrets, sem valor nenhum
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build

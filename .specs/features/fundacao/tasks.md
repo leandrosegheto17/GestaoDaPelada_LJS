@@ -14,6 +14,7 @@ Implemente estas tarefas com a skill `tlc-spec-driven`: **acione-a pelo nome e s
 **Status**: Approved (usuário, 2026-11-03)
 **Passada**: rascunho
 **Branch pai**: main
+**Gate**: format, lint, typecheck, checagens e vitest por pacote @ abc17b49f3f1527747c2c9614614f25ab3b235a3 = verde, com pendências aceitas pelo usuário em 2026-11-06 (api: push-backup e push-cpu, por ambiente; dominio: SIM-57 e SIM-58, no CI; Playwright não rodado)
 **Tamanho**: 82 tarefas em 25 Phases, 110,7h de trabalho humano estimado
 
 > Premissas desta lista:
@@ -300,7 +301,7 @@ T81 → T82
 **Depends on**: None
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-01
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: ação do usuário; nada a escrever. O /executar confere a máquina.
 
 **Done when**:
@@ -326,7 +327,7 @@ T81 → T82
 **Depends on**: T1
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-01
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: o `pnpm-lock.yaml` nasce no `pnpm install` do /executar. O `.gitattributes` já existia.
 
 **Done when**:
@@ -352,7 +353,7 @@ T81 → T82
 **Depends on**: T2
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-01, FUN-02
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
@@ -377,7 +378,7 @@ T81 → T82
 **Depends on**: T3
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-02
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: a formatação da base com `prettier --write .` fica para o /executar.
 
 **Done when**:
@@ -402,7 +403,7 @@ T81 → T82
 **Depends on**: T4
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-06
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
@@ -427,15 +428,15 @@ T81 → T82
 **Depends on**: T5
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-54
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: o `testes.json` tinha o comando final da versão removida; volta ao da T6 e cresce nas T10, T24, T58 e T62. A `trava-testes.py --rodar` fica para o /executar.
 
 **Done when**:
 
-- [ ] `testes.json` traz o comando `pnpm lint && pnpm format:check && pnpm typecheck && pnpm test`, sem `dispensado`
-- [ ] `python .claude/scripts/trava-testes.py --rodar` termina com SUÍTE VERDE e o commit fica registrado
-- [ ] Este comando cresce nas tarefas que criam `test:checagens`, build, e2e e visual: cada uma o atualiza (tabela de evolução na seção Gate Check Commands)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] `testes.json` traz o comando `pnpm lint && pnpm format:check && pnpm typecheck && pnpm test`, sem `dispensado`
+- [x] `python .claude/scripts/trava-testes.py --rodar` termina com SUÍTE VERDE e o commit fica registrado
+- [x] Este comando cresce nas tarefas que criam `test:checagens`, build, e2e e visual: cada uma o atualiza (tabela de evolução na seção Gate Check Commands)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
@@ -455,7 +456,7 @@ T81 → T82
 **Depends on**: T6
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-03
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
@@ -480,7 +481,7 @@ T81 → T82
 **Depends on**: T7
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-19, FUN-05
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: o `.env.example` já listava as cinco variáveis de banco; não mudou.
 
 **Done when**:
@@ -506,7 +507,7 @@ T81 → T82
 **Depends on**: T8
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-55
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
@@ -531,7 +532,7 @@ T81 → T82
 **Depends on**: T9
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-19
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `@pelada/api` usa `@pelada/scripts` como devDependency (trava de host); a T18 faz o inverso. Se o pnpm reclamar do ciclo, o /executar decide.
 
 **Done when**:
@@ -539,7 +540,7 @@ T81 → T82
 - [x] Teste `FUN-19`: com `DATABASE_URL_TESTE` apontando para um host remoto, `bancoDeTeste()` lança erro e não abre conexão
 - [x] Teste: cria o banco, grava uma linha, remove, e `pg_database` não tem `teste_*` órfão, mesmo quando o corpo do teste lança erro
 - [x] `DATABASE_URL_TESTE` tem padrão local no `vitest.config.ts` e está documentada no `.env.example`
-- [ ] `testes.json` atualizado e `trava-testes.py --rodar` verde
+- [x] `testes.json` atualizado e `trava-testes.py --rodar` verde
 - [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
@@ -560,7 +561,7 @@ T81 → T82
 **Depends on**: T10
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-47, FUN-49
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
@@ -586,7 +587,7 @@ T81 → T82
 **Depends on**: T11
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-47, FUN-49
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: SHAs das actions tirados da versão anterior (`b65b7d8`); o /executar confere. O gitleaks local fica para o /executar.
 
 **Done when**:
@@ -613,7 +614,7 @@ T81 → T82
 **Depends on**: T12
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-50
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `pg_restore` sem `--no-acl`; os grants exigem as roles `pelada_*` no cluster local (criadas pelo `pnpm migrar`). O runbook (T73) diz isso.
 
 **Done when**:
@@ -641,15 +642,15 @@ T81 → T82
 **Depends on**: T13
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-48
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: ação do usuário, já registrada acima; nada a escrever.
 
 **Done when**:
 
-- [ ] Os dois secrets existem no environment `backup` (conferido na tela do GitHub, sem ler os valores)
-- [ ] A chave privada está guardada fora do GitHub (o usuário confirma)
-- [ ] O usuário confirma qual é o `age` público em uso, para o runbook
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Os dois secrets existem no environment `backup` (conferido na tela do GitHub, sem ler os valores)
+- [x] A chave privada está guardada fora do GitHub (o usuário confirma)
+- [x] O usuário confirma qual é o `age` público em uso, para o runbook
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
@@ -668,7 +669,7 @@ T81 → T82
 **Depends on**: T14
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-48, FUN-50, FUN-39
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: push, disparo do workflow e restauração real são ações externas; ficam para o /executar, com confirmação. O `docs/restauracao-registro.md` nasce com os números reais.
 
 **Done when**:
@@ -697,15 +698,15 @@ T81 → T82
 **Depends on**: T15
 **Reuses**: R1 de `reuso.md`: `git -C ../GestaoDaPelada_LJS archive e557292 backend/api/src/infraestrutura/db/migracoes` e extrair só os `.sql`; o hash vem da origem, nunca da cópia
 **Requirement**: FUN-08, FUN-09
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: copiadas com `git show e557292:<arquivo>` (o `tar` do Git Bash é BusyBox, sem `--wildcards`); hash calculado sobre o blob da origem.
 
 **Done when**:
 
-- [ ] Teste `FUN-08` calcula o SHA-256 dos 23 arquivos e compara com o `migracoes.sha256`; passa
-- [ ] Teste `FUN-08`: alterar um byte de uma migração faz o teste falhar (conferido uma vez e revertido)
-- [ ] São exatamente 23 arquivos `.sql` e nenhum a mais
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-08` calcula o SHA-256 dos 23 arquivos e compara com o `migracoes.sha256`; passa
+- [x] Teste `FUN-08`: alterar um byte de uma migração faz o teste falhar (conferido uma vez e revertido)
+- [x] São exatamente 23 arquivos `.sql` e nenhum a mais
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -723,16 +724,16 @@ T81 → T82
 **Depends on**: T16
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-07, FUN-08
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `fileParallelism: false` no vitest da api, porque as roles são do cluster e o `CREATE ROLE` das migrações disputa entre bancos de teste. `bancoDeTeste` ganhou a opção `migrado`.
 
 **Done when**:
 
-- [ ] Teste `FUN-07`: banco vazio, depois `migrar`: `pgmigrations` tem os 23 nomes na ordem dos arquivos
-- [ ] Teste `FUN-07`: uma migração de exemplo com um comando que falha no meio não deixa DDL parcial dessa migração
-- [ ] Teste `FUN-07`: duas execuções simultâneas de `migrar` terminam com cada migração aplicada uma vez
-- [ ] Num banco vazio local, as migrações rodam como superusuário `postgres` (AD-009)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-07`: banco vazio, depois `migrar`: `pgmigrations` tem os 23 nomes na ordem dos arquivos
+- [x] Teste `FUN-07`: uma migração de exemplo com um comando que falha no meio não deixa DDL parcial dessa migração
+- [x] Teste `FUN-07`: duas execuções simultâneas de `migrar` terminam com cada migração aplicada uma vez
+- [x] Num banco vazio local, as migrações rodam como superusuário `postgres` (AD-009)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -750,15 +751,15 @@ T81 → T82
 **Depends on**: T17, T9, T8
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-07, FUN-55, FUN-19
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: a trava aceita a lista de teste (`postgres` do CI incluído), porque o CI migra no serviço `postgres`.
 
 **Done when**:
 
-- [ ] Teste `FUN-19`: com host remoto e sem a variável de permissão do deploy, `pnpm migrar` aborta antes de conectar
-- [ ] Teste `FUN-55`: com o Postgres parado, sai com código 1 e a mensagem pede `docker compose up -d`
-- [ ] `pnpm migrar` num banco local vazio aplica as 23 migrações
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-19`: com host remoto e sem a variável de permissão do deploy, `pnpm migrar` aborta antes de conectar
+- [x] Teste `FUN-55`: com o Postgres parado, sai com código 1 e a mensagem pede `docker compose up -d`
+- [x] `pnpm migrar` num banco local vazio aplica as 23 migrações
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -778,15 +779,15 @@ T81 → T82
 **Depends on**: T18
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-08
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: ignora também `migracoes_aplicadas` (do legado; o design manda a v2 ignorá-la). As strings esperadas do `pg_get_*` foram escritas sem rodar: o /executar confere a forma exata.
 
 **Done when**:
 
-- [ ] Teste `FUN-08` cria um mini schema à mão (2 tabelas, FK, índice, trigger) e compara com a lista esperada, escrita no teste
-- [ ] Teste `FUN-08`: mudar o tipo de uma coluna ou apagar um índice muda a saída
-- [ ] A saída é estável: duas leituras seguidas dão a mesma lista
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-08` cria um mini schema à mão (2 tabelas, FK, índice, trigger) e compara com a lista esperada, escrita no teste
+- [x] Teste `FUN-08`: mudar o tipo de uma coluna ou apagar um índice muda a saída
+- [x] A saída é estável: duas leituras seguidas dão a mesma lista
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -804,15 +805,15 @@ T81 → T82
 **Depends on**: T19
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-08
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: grants do dono ficam fora (o dono muda entre local e Neon). Opção `ignorarLogin` para a comparação com a referência (ver T21).
 
 **Done when**:
 
-- [ ] Teste `FUN-08` num mini schema: mudar o corpo de uma função, o `search_path`, uma policy, um `GRANT` ou o `FORCE` muda a saída
-- [ ] Teste `FUN-08`: mudar um atributo de role (`BYPASSRLS`, `LOGIN`) muda a saída; mudar só a senha da role não muda
-- [ ] Cada categoria nova tem um teste que a prova de forma independente
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-08` num mini schema: mudar o corpo de uma função, o `search_path`, uma policy, um `GRANT` ou o `FORCE` muda a saída
+- [x] Teste `FUN-08`: mudar um atributo de role (`BYPASSRLS`, `LOGIN`) muda a saída; mudar só a senha da role não muda
+- [x] Cada categoria nova tem um teste que a prova de forma independente
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -830,16 +831,16 @@ T81 → T82
 **Depends on**: T20
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-08
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: o `esquema-producao.txt` não foi gerado (nada roda no rascunho); o /executar roda `pnpm esquema:gerar` e confere o arquivo.
 **Lacunas**: o LOGIN das roles fica fora da comparação com a referência (`OPCOES_REFERENCIA`), porque as roles são do cluster e o seed local dá LOGIN (AD-009). Interpretação conservadora: só o LOGIN sai; o resto dos atributos continua comparado. O /executar confirma com o usuário.
 
 **Done when**:
 
-- [ ] Teste `FUN-08`: banco vazio migrado tem `lerEsquema` igual ao arquivo `esquema-producao.txt` versionado
-- [ ] O arquivo cobre as 25 tabelas com `FORCE` e as funções `SECURITY DEFINER` herdadas (conferência por contagem no teste)
-- [ ] O arquivo é uma referência de uma fonte: a comparação com o banco real (`dev`) está na tarefa de paridade (FUN-08, FUN-09)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-08`: banco vazio migrado tem `lerEsquema` igual ao arquivo `esquema-producao.txt` versionado
+- [x] O arquivo cobre as 25 tabelas com `FORCE` e as funções `SECURITY DEFINER` herdadas (conferência por contagem no teste)
+- [x] O arquivo é uma referência de uma fonte: a comparação com o banco real (`dev`) está na tarefa de paridade (FUN-08, FUN-09)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -859,16 +860,16 @@ T81 → T82
 **Depends on**: T21
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-10
-**Status**: rascunhada
+concluída
 **Lacunas**: a FUN-10 fala em schema "igual ao da produção", e o design (C2) define `gerenciado` só pela `pgmigrations`. O rascunho segue o design (comentário `[LACUNA]` em `estado.ts`); o /executar confirma com o usuário.
 **Nota do rascunho**: removidas as parameter properties do `ContainerAge` (o `erasableSyntaxOnly` do tsconfig não as aceita).
 
 **Done when**:
 
-- [ ] Casos limite e estados listados antes do código: vazio; 23 aplicadas; 20 aplicadas (prefixo); nome desconhecido; ordem trocada; tabelas sem `pgmigrations`; `pgmigrations` vazia com tabelas
-- [ ] Teste `FUN-10`: cada caso divergente aborta com a lista de diferenças e o esquema e as contagens ficam idênticos
-- [ ] Teste `FUN-10`: vazio e prefixo seguem para a execução
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados antes do código: vazio; 23 aplicadas; 20 aplicadas (prefixo); nome desconhecido; ordem trocada; tabelas sem `pgmigrations`; `pgmigrations` vazia com tabelas
+- [x] Teste `FUN-10`: cada caso divergente aborta com a lista de diferenças e o esquema e as contagens ficam idênticos
+- [x] Teste `FUN-10`: vazio e prefixo seguem para a execução
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -886,14 +887,14 @@ T81 → T82
 **Depends on**: T22
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-09
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `FUN-09`: um event trigger `ddl_command_start` conta zero DDL na segunda execução de `migrar`
-- [ ] Teste `FUN-09`: contagem de linhas por tabela e `pgmigrations` iguais antes e depois
-- [ ] Teste `FUN-09`: com uma migração nova de exemplo, só ela executa
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-09`: um event trigger `ddl_command_start` conta zero DDL na segunda execução de `migrar`
+- [x] Teste `FUN-09`: contagem de linhas por tabela e `pgmigrations` iguais antes e depois
+- [x] Teste `FUN-09`: com uma migração nova de exemplo, só ela executa
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -911,15 +912,15 @@ T81 → T82
 **Depends on**: T23
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-56
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `FUN-56`: cada comando destrutivo reprova numa migração de exemplo
-- [ ] Teste `FUN-56`: com a linha de exceção e uma AD existente em `STATE.md`, passa
-- [ ] Teste `FUN-56`: as 23 copiadas passam pela lista fechada; um 24º arquivo com `DROP` reprova
-- [ ] Cria o script `test:checagens` na raiz e o acrescenta ao `testes.json`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-56`: cada comando destrutivo reprova numa migração de exemplo
+- [x] Teste `FUN-56`: com a linha de exceção e uma AD existente em `STATE.md`, passa
+- [x] Teste `FUN-56`: as 23 copiadas passam pela lista fechada; um 24º arquivo com `DROP` reprova
+- [x] Cria o script `test:checagens` na raiz e o acrescenta ao `testes.json`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -937,14 +938,14 @@ T81 → T82
 **Depends on**: T24
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-07
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `FUN-07`: o arquivo novo tem timestamp maior que `1792844520000` e maior que o último arquivo existente
-- [ ] Teste `FUN-07`: o nome é normalizado (minúsculas, hifens) e o cabeçalho `-- Up Migration` é criado
-- [ ] Teste `FUN-07`: dois geradores no mesmo milissegundo não colidem
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-07`: o arquivo novo tem timestamp maior que `1792844520000` e maior que o último arquivo existente
+- [x] Teste `FUN-07`: o nome é normalizado (minúsculas, hifens) e o cabeçalho `-- Up Migration` é criado
+- [x] Teste `FUN-07`: dois geradores no mesmo milissegundo não colidem
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -964,14 +965,14 @@ T81 → T82
 **Depends on**: T25, T17
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-13, FUN-15, FUN-17
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste: `comoApp` com conta A enxerga o grupo de A e não o de B em `grupos`
-- [ ] Teste: o cenário cria ao menos uma linha por tabela com `grupo_id` do catálogo (incluindo as de conta, ex. `convites_admin`), conferido por contagem
-- [ ] Teste: o banco de teste é removido no `finally`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste: `comoApp` com conta A enxerga o grupo de A e não o de B em `grupos`
+- [x] Teste: o cenário cria ao menos uma linha por tabela com `grupo_id` do catálogo (incluindo as de conta, ex. `convites_admin`), conferido por contagem
+- [x] Teste: o banco de teste é removido no `finally`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -989,14 +990,14 @@ T81 → T82
 **Depends on**: T26
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-11
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `FUN-11`: `pelada_app` tentando `TRUNCATE`, `CREATE TABLE` e `DROP TABLE` recebe erro de permissão
-- [ ] Teste `FUN-11`: `rolbypassrls` é falso para `pelada_app`; `pelada_backup_ro` não tem `INSERT`, `UPDATE` nem `DELETE` em nenhuma tabela
-- [ ] Teste `FUN-11`: `pelada_backup_ro` enxerga todas as linhas de todas as tabelas de negócio (policy `USING (true)`)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-11`: `pelada_app` tentando `TRUNCATE`, `CREATE TABLE` e `DROP TABLE` recebe erro de permissão
+- [x] Teste `FUN-11`: `rolbypassrls` é falso para `pelada_app`; `pelada_backup_ro` não tem `INSERT`, `UPDATE` nem `DELETE` em nenhuma tabela
+- [x] Teste `FUN-11`: `pelada_backup_ro` enxerga todas as linhas de todas as tabelas de negócio (policy `USING (true)`)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1014,14 +1015,14 @@ T81 → T82
 **Depends on**: T27
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-12
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `FUN-12`: todas as tabelas com `grupo_id` do catálogo têm `relforcerowsecurity`
-- [ ] Teste `FUN-12`: criar uma tabela de exemplo com `grupo_id` sem RLS ou sem caso na matriz faz o meta-teste falhar (conferido num banco descartável)
-- [ ] O meta-teste lê a lista de casos da matriz, para o teste de leitura e o de escrita usarem a mesma fonte
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-12`: todas as tabelas com `grupo_id` do catálogo têm `relforcerowsecurity`
+- [x] Teste `FUN-12`: criar uma tabela de exemplo com `grupo_id` sem RLS ou sem caso na matriz faz o meta-teste falhar (conferido num banco descartável)
+- [x] O meta-teste lê a lista de casos da matriz, para o teste de leitura e o de escrita usarem a mesma fonte
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1039,14 +1040,14 @@ T81 → T82
 **Depends on**: T28
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-13
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `FUN-13`, por tabela: a conta A lê só as linhas do grupo A; a conta B lê só as do grupo B; a conta sem vínculo lê zero linhas
-- [ ] Tabela sem `GRANT SELECT` para `pelada_app` (ex. `eventos_uso`): o caso espera erro de permissão e o teste confere o motivo
-- [ ] Um `USING (true)` colocado de propósito numa policy faz o teste falhar (conferido uma vez e revertido)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-13`, por tabela: a conta A lê só as linhas do grupo A; a conta B lê só as do grupo B; a conta sem vínculo lê zero linhas
+- [x] Tabela sem `GRANT SELECT` para `pelada_app` (ex. `eventos_uso`): o caso espera erro de permissão e o teste confere o motivo
+- [x] Um `USING (true)` colocado de propósito numa policy faz o teste falhar (conferido uma vez e revertido)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1066,14 +1067,14 @@ T81 → T82
 **Depends on**: T29
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-17
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `FUN-17`, por tabela e comando: a conta B afeta zero linhas do grupo A ou recebe erro; o conteúdo do grupo A fica idêntico
-- [ ] Teste `FUN-17`: `UPDATE` e `DELETE` sem `WHERE` da conta B não alteram nenhuma linha do grupo A
-- [ ] Um `WITH CHECK` removido de propósito faz o teste falhar (conferido uma vez e revertido)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-17`, por tabela e comando: a conta B afeta zero linhas do grupo A ou recebe erro; o conteúdo do grupo A fica idêntico
+- [x] Teste `FUN-17`: `UPDATE` e `DELETE` sem `WHERE` da conta B não alteram nenhuma linha do grupo A
+- [x] Um `WITH CHECK` removido de propósito faz o teste falhar (conferido uma vez e revertido)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1091,14 +1092,14 @@ T81 → T82
 **Depends on**: T30
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-14, FUN-15
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `FUN-14`: com `app.slug_publico` do grupo A e sem conta, `SELECT` devolve só linhas do grupo A
-- [ ] Teste `FUN-14`: `INSERT`, `UPDATE` e `DELETE` com só o slug são recusados ou afetam zero linhas
-- [ ] Teste `FUN-15`: sem nenhum contexto, toda tabela de negócio devolve zero linhas
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-14`: com `app.slug_publico` do grupo A e sem conta, `SELECT` devolve só linhas do grupo A
+- [x] Teste `FUN-14`: `INSERT`, `UPDATE` e `DELETE` com só o slug são recusados ou afetam zero linhas
+- [x] Teste `FUN-15`: sem nenhum contexto, toda tabela de negócio devolve zero linhas
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1116,14 +1117,14 @@ T81 → T82
 **Depends on**: T31
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-05
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `FUN-05`: num banco migrado, cria 1 conta, 1 grupo com vínculo e jogadores, e `comoApp` com essa conta enxerga o grupo
-- [ ] Teste `FUN-05`: com host remoto, sai antes de conectar
-- [ ] Teste `FUN-05`: rodar duas vezes não duplica nem falha
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-05`: num banco migrado, cria 1 conta, 1 grupo com vínculo e jogadores, e `comoApp` com essa conta enxerga o grupo
+- [x] Teste `FUN-05`: com host remoto, sai antes de conectar
+- [x] Teste `FUN-05`: rodar duas vezes não duplica nem falha
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1143,15 +1144,15 @@ T81 → T82
 **Depends on**: T32
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-20, FUN-26, FUN-27
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `FUN-20`: assets, `not_found_handling` e `run_worker_first` conforme a spec
-- [ ] Teste `FUN-26`: os 4 bindings com os limites de 10, 60, 60 e 60 por minuto
-- [ ] Teste `FUN-27`: nome `gestaodapelada-v2`, `workers_dev` verdadeiro, nenhuma chave `routes` nem `custom_domain`
-- [ ] O `id` do Hyperdrive fica com o marcador `PREENCHER` até a tarefa de ID real (o teste de ID real é dela)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-20`: assets, `not_found_handling` e `run_worker_first` conforme a spec
+- [x] Teste `FUN-26`: os 4 bindings com os limites de 10, 60, 60 e 60 por minuto
+- [x] Teste `FUN-27`: nome `gestaodapelada-v2`, `workers_dev` verdadeiro, nenhuma chave `routes` nem `custom_domain`
+- [x] O `id` do Hyperdrive fica com o marcador `PREENCHER` até a tarefa de ID real (o teste de ID real é dela)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1169,15 +1170,15 @@ T81 → T82
 **Depends on**: T33
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-21, FUN-20
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: o design cita `@cloudflare/vitest-plugin`; o rascunho usa `@cloudflare/vitest-pool-workers` (plugin `cloudflareTest`, Vitest 4) e sobrepõe os assets com a SPA de `backend/api/test/rotas/spa` pela opção `miniflare.assets`. O /executar confere o nome do pacote e a sobreposição na versão instalada.
 
 **Done when**:
 
-- [ ] Teste `FUN-21`: `GET /api/health` responde 200 com `status` `ok` e `versao` igual à variável do teste
-- [ ] Teste `FUN-21`: a rota funciona com o banco parado (sem `HYPERDRIVE` alcançável)
-- [ ] Teste `FUN-20`: `GET /` entrega o `index.html` do build e `GET /rota-qualquer` cai na SPA
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-21`: `GET /api/health` responde 200 com `status` `ok` e `versao` igual à variável do teste
+- [x] Teste `FUN-21`: a rota funciona com o banco parado (sem `HYPERDRIVE` alcançável)
+- [x] Teste `FUN-20`: `GET /` entrega o `index.html` do build e `GET /rota-qualquer` cai na SPA
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1195,13 +1196,13 @@ T81 → T82
 **Depends on**: T34
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-22
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `FUN-22`: respostas 200, 404 e 500 de `/api/*` têm `Cache-Control: no-store` e `X-Content-Type-Options: nosniff`
-- [ ] Teste `FUN-22`: a rota de saúde também
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-22`: respostas 200, 404 e 500 de `/api/*` têm `Cache-Control: no-store` e `X-Content-Type-Options: nosniff`
+- [x] Teste `FUN-22`: a rota de saúde também
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1219,14 +1220,14 @@ T81 → T82
 **Depends on**: T35
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-26
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `FUN-26`: binding que nega gera 429 com `Retry-After` e corpo sem detalhe interno
-- [ ] Teste `FUN-26`: binding que permite deixa a requisição passar
-- [ ] Teste `FUN-26`: a chave do limite é o IP do cabeçalho `cf-connecting-ip`; sem ele, usa um valor fixo
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-26`: binding que nega gera 429 com `Retry-After` e corpo sem detalhe interno
+- [x] Teste `FUN-26`: binding que permite deixa a requisição passar
+- [x] Teste `FUN-26`: a chave do limite é o IP do cabeçalho `cf-connecting-ip`; sem ele, usa um valor fixo
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1246,15 +1247,15 @@ T81 → T82
 **Depends on**: T36
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-16
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: os testes rodam no projeto `banco` (Node), com `app.request(..., env, ctx)` e um `executionCtx` falso (`backend/api/test/db/requisicao.ts`). O `app.onError` passa a responder 503 para `ErroBancoIndisponivel`.
 
 **Done when**:
 
-- [ ] Teste `FUN-16`: requisição que não consulta o banco não abre conexão
-- [ ] Teste `FUN-16`: depois da resposta, a conexão fecha (`pg_stat_activity` sem a sessão)
-- [ ] Teste `FUN-16`: erro de conexão vira 503 sem vazar a URL
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-16`: requisição que não consulta o banco não abre conexão
+- [x] Teste `FUN-16`: depois da resposta, a conexão fecha (`pg_stat_activity` sem a sessão)
+- [x] Teste `FUN-16`: erro de conexão vira 503 sem vazar a URL
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1272,17 +1273,17 @@ T81 → T82
 **Depends on**: T37, T26
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-16
-**Status**: rascunhada
+concluída
 **Lacunas**: COMMIT que falha depois de a rota responder 2xx: a spec não define a resposta; o rascunho responde 500 "Erro interno." (`com-banco.ts`, `[LACUNA]`).
 **Nota do rascunho**: `kysely` entrou no `package.json` da API (`^0.29.0`, versão do design) sem instalação; o `/executar` instala e confere a interface `PostgresPool` em `transacao.ts`. Os casos limite estão no topo de `com-banco.ts`. A BEGIN e o contexto rodam no `aoAbrir` do cliente (T37), isto é, só na primeira consulta.
 
 **Done when**:
 
-- [ ] Casos limite e estados listados antes do código: GET e HEAD somente leitura; POST commit; status 4xx e 5xx rollback; exceção rollback; duas requisições simultâneas de contas diferentes; requisição sem contexto
-- [ ] Teste `FUN-16`: o `SET LOCAL` ocorre antes da primeira consulta da rota
-- [ ] Teste `FUN-16`: duas requisições concorrentes (conta A e conta B) nunca enxergam o contexto uma da outra, em 100 repetições
-- [ ] Teste `FUN-16`: escrita numa rota GET falha; erro 500 desfaz a escrita
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados antes do código: GET e HEAD somente leitura; POST commit; status 4xx e 5xx rollback; exceção rollback; duas requisições simultâneas de contas diferentes; requisição sem contexto
+- [x] Teste `FUN-16`: o `SET LOCAL` ocorre antes da primeira consulta da rota
+- [x] Teste `FUN-16`: duas requisições concorrentes (conta A e conta B) nunca enxergam o contexto uma da outra, em 100 repetições
+- [x] Teste `FUN-16`: escrita numa rota GET falha; erro 500 desfaz a escrita
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1300,14 +1301,14 @@ T81 → T82
 **Depends on**: T38
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-18
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: o comando aceita o `<id>` (roda `pnpm --filter @pelada/api exec wrangler hyperdrive get <id> --json`) ou o JSON na entrada padrão. O `/executar` confere se a versão instalada do wrangler tem `--json` no `hyperdrive get` e o formato `caching.disabled`.
 
 **Done when**:
 
-- [ ] Teste `FUN-18`: JSON com `caching.disabled: true` passa; ausente ou `false` reprova com mensagem clara
-- [ ] Teste `FUN-18`: JSON inválido reprova, sem lançar erro sem tratamento
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-18`: JSON com `caching.disabled: true` passa; ausente ou `false` reprova com mensagem clara
+- [x] Teste `FUN-18`: JSON inválido reprova, sem lançar erro sem tratamento
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1325,15 +1326,15 @@ T81 → T82
 **Depends on**: T39
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-23
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `SPEC_DEVIATION`: `test/wrangler.test.ts` entrou na lista permitida, porque o nome de um caso da T33 cita o endereço padrão da Cloudflare. O `/executar` decide (`AskUserQuestion`) entre manter a linha ou renomear o caso, que é mudança de teste existente e pede aprovação. A checagem lê os arquivos do `git ls-files` e roda no `pnpm test:checagens`.
 
 **Done when**:
 
-- [ ] Teste `FUN-23`: arquivo de exemplo com `ljssoftware.com.br` reprova; em `docs/` passa
-- [ ] Teste `FUN-23`: um `workers.dev` em um `.ts` reprova
-- [ ] A checagem roda na base atual e passa
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-23`: arquivo de exemplo com `ljssoftware.com.br` reprova; em `docs/` passa
+- [x] Teste `FUN-23`: um `workers.dev` em um `.ts` reprova
+- [x] A checagem roda na base atual e passa
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1353,14 +1354,14 @@ T81 → T82
 **Depends on**: T40
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-24
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `FUN-24`: evento com corpo, cookie, `authorization` e um e-mail na mensagem sai sem nenhum deles
-- [ ] Teste `FUN-24`: o evento sem esses campos não muda
-- [ ] Teste `FUN-24`: e-mail dentro de breadcrumb e de `extra` também é removido
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-24`: evento com corpo, cookie, `authorization` e um e-mail na mensagem sai sem nenhum deles
+- [x] Teste `FUN-24`: o evento sem esses campos não muda
+- [x] Teste `FUN-24`: e-mail dentro de breadcrumb e de `extra` também é removido
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1378,14 +1379,14 @@ T81 → T82
 **Depends on**: T41
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-24, FUN-25
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `@sentry/cloudflare` (`^10.0.0`) e `@pelada/contrato` entraram no `package.json` da API sem instalação; o `/executar` confere a versão atual e a assinatura do `withSentry` (tipada à mão em `EmbrulharSentry`). Sem DSN, a requisição nem passa pelo SDK; DSN vazio ou só com espaços conta como ausente.
 
 **Done when**:
 
-- [ ] Teste `FUN-25`: sem `SENTRY_DSN`, o Worker responde normalmente e nenhuma chamada de rede sai (fetch espiado)
-- [ ] Teste `FUN-24`: com DSN falso, a configuração tem `release` igual a `VERSAO` e o `beforeSend` é o de `limparEvento`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-25`: sem `SENTRY_DSN`, o Worker responde normalmente e nenhuma chamada de rede sai (fetch espiado)
+- [x] Teste `FUN-24`: com DSN falso, a configuração tem `release` igual a `VERSAO` e o `beforeSend` é o de `limparEvento`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1405,15 +1406,15 @@ T81 → T82
 **Depends on**: T42
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-31
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: versões no `package.json` sem instalação (Vite 8 do design, `@vitejs/plugin-react` 5, React 19, React Router 7, TanStack Query 5, jsdom); o `/executar` instala e confere as atuais. O Vitest fica no `vite.config.ts`.
 
 **Done when**:
 
-- [ ] `pnpm --filter @pelada/web build` gera `dist/index.html`
-- [ ] Teste: o `App` renderiza sem erro no jsdom
-- [ ] `pnpm --filter @pelada/web typecheck` passa
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] `pnpm --filter @pelada/web build` gera `dist/index.html`
+- [x] Teste: o `App` renderiza sem erro no jsdom
+- [x] `pnpm --filter @pelada/web typecheck` passa
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1431,15 +1432,15 @@ T81 → T82
 **Depends on**: T43
 **Reuses**: R2, R3 e R4 de `reuso.md`: `cp .specs/mockup/tokens.css frontend/web/src/estilos/tokens.css`; `cp .specs/mockup/fontes/*.woff2 .specs/mockup/fontes/OFL.txt frontend/web/public/fontes/`; `cp .specs/mockup/icones/*.png .specs/mockup/icones/icone.svg frontend/web/public/icones/`
 **Requirement**: FUN-30
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: os três `cp` do mapa rodaram (cópia, não execução de teste). A conferência manual "alterar um byte e reverter" fica para o `/executar`.
 
 **Done when**:
 
-- [ ] Teste `FUN-30`: `tokens.css`, cada fonte e cada ícone do front têm SHA-256 igual ao do arquivo em `.specs/mockup/`
-- [ ] Teste `FUN-30`: alterar um byte do `tokens.css` do front faz o teste falhar (conferido uma vez e revertido)
-- [ ] O manifest ainda não existe: só os arquivos entram
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-30`: `tokens.css`, cada fonte e cada ícone do front têm SHA-256 igual ao do arquivo em `.specs/mockup/`
+- [x] Teste `FUN-30`: alterar um byte do `tokens.css` do front faz o teste falhar (conferido uma vez e revertido)
+- [x] O manifest ainda não existe: só os arquivos entram
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1457,15 +1458,15 @@ T81 → T82
 **Depends on**: T44
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-32
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: cor literal pelas regras nativas (`color-no-hex`, `color-named`, `function-disallowed-list`); fonte e sombra pelo plugin `frontend/web/stylelint/so-tokens.mjs`, que deixa passar só o nome da fonte dentro de `@font-face` (necessário para o `global.css` da T46). `stylelint` `^16.25.0` sem instalação; o `/executar` confere a versão e a API de plugin.
 
 **Done when**:
 
-- [ ] Teste `FUN-32`: um CSS de exemplo com `#fff`, `rgb(...)`, `font-family: Arial` e `box-shadow: 0 0 4px #000` reprova
-- [ ] Teste `FUN-32`: um CSS com `var(--...)` passa; o próprio `tokens.css` passa
-- [ ] `pnpm lint` na raiz inclui o Stylelint
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-32`: um CSS de exemplo com `#fff`, `rgb(...)`, `font-family: Arial` e `box-shadow: 0 0 4px #000` reprova
+- [x] Teste `FUN-32`: um CSS com `var(--...)` passa; o próprio `tokens.css` passa
+- [x] `pnpm lint` na raiz inclui o Stylelint
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1483,15 +1484,15 @@ T81 → T82
 **Depends on**: T45
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-30, FUN-32
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: as 14 `@font-face` foram geradas do `.specs/mockup/fontes/fontes.css`, com `url('/fontes/…')` (arquivos de `public/fontes`, T44). Reset e elementos (`body`, `a`, `h1`–`h4`, `p`) seguem as primeiras linhas de `.specs/mockup/base.css`.
 
 **Done when**:
 
-- [ ] Passa no Stylelint de FUN-32 sem exceção
-- [ ] O build embute as fontes locais e nenhuma requisição externa de fonte é feita
-- [ ] `pnpm --filter @pelada/web build` passa
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Passa no Stylelint de FUN-32 sem exceção
+- [x] O build embute as fontes locais e nenhuma requisição externa de fonte é feita
+- [x] `pnpm --filter @pelada/web build` passa
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
@@ -1511,15 +1512,15 @@ T81 → T82
 **Depends on**: T46
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-31
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: `Marca` é a marca de presença do mockup (`.marca` P/L/E/F/X de `base.css:191-201`; a galeria a chama "Marca presente/lesionado/expulso/falta"), não o nome do app; o nome do app fica na barra pública da `Casca`. O axe roda com `axe-core` no jsdom (`test/apoio/axe.ts`), sem `color-contrast` e `region`, que o jsdom não avalia. O Vitest processa os CSS Modules com nomes não escopados, para os testes conferirem as classes do mockup. `.sr` entrou no `global.css`.
 
 **Done when**:
 
-- [ ] Teste `FUN-31`: renderiza com e sem título e entrega a landmark `main`
-- [ ] Teste `FUN-31`: axe sem violações
-- [ ] CSS Module sem cor, fonte nem sombra literal (Stylelint verde)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-31`: renderiza com e sem título e entrega a landmark `main`
+- [x] Teste `FUN-31`: axe sem violações
+- [x] CSS Module sem cor, fonte nem sombra literal (Stylelint verde)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1537,15 +1538,15 @@ T81 → T82
 **Depends on**: T47
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-31
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: além de primário e secundário, entrou a variante `texto` (`botao--texto`), que o `EstadoErro` (T49) usa no "Tentar de novo" do mockup. Carregando segue o mockup: `disabled` com `aria-busy`.
 
 **Done when**:
 
-- [ ] Teste `FUN-31`: cada variante renderiza com a classe esperada e o clique dispara `onClick`
-- [ ] Teste `FUN-31`: `disabled` e `carregando` não disparam o clique
-- [ ] Teste `FUN-31`: axe sem violações
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-31`: cada variante renderiza com a classe esperada e o clique dispara `onClick`
+- [x] Teste `FUN-31`: `disabled` e `carregando` não disparam o clique
+- [x] Teste `FUN-31`: axe sem violações
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1563,16 +1564,16 @@ T81 → T82
 **Depends on**: T48
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-31
-**Status**: rascunhada
+concluída
 **Lacunas**: o mockup é estático e não diz onde fica o foco inicial. O rascunho põe o foco no botão "Tentar de novo" no formato `faixa` (`padrao--erro-rede`) e no título no formato `tela` (`t03-indisponivel--erro`); o `/executar` confirma com o usuário.
 **Nota do rascunho**: o `Botao` passou a repassar a `ref` (prop comum no React 19) para o `<button>`, para o foco.
 
 **Done when**:
 
-- [ ] Teste `FUN-31`: mostra o texto da mensagem e chama `aoTentarDeNovo` ao clicar
-- [ ] Teste `FUN-31`: foco inicial no título ou no botão, conforme o mockup, e axe sem violações
-- [ ] A marcação segue as classes do mockup, conferida lendo `.specs/mockup/telas/padrao--erro-rede.html`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-31`: mostra o texto da mensagem e chama `aoTentarDeNovo` ao clicar
+- [x] Teste `FUN-31`: foco inicial no título ou no botão, conforme o mockup, e axe sem violações
+- [x] A marcação segue as classes do mockup, conferida lendo `.specs/mockup/telas/padrao--erro-rede.html`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1592,13 +1593,13 @@ T81 → T82
 **Depends on**: T49
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-31
-**Status**: rascunhada
+concluída
 
 **Done when**:
 
-- [ ] Teste `FUN-31`: renderiza o número de linhas pedido e `aria-busy="true"`
-- [ ] Teste `FUN-31`: axe sem violações
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-31`: renderiza o número de linhas pedido e `aria-busy="true"`
+- [x] Teste `FUN-31`: axe sem violações
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1616,15 +1617,15 @@ T81 → T82
 **Depends on**: T50
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-36, FUN-31
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: "Safari do iOS" inclui o iPadOS que se apresenta como Mac (com toque) e exclui Chrome, Firefox, Edge, Opera e navegadores embutidos no iOS. A dispensa fica em `localStorage` (`pelada.aviso-instalar-iphone`); sem armazenamento, vale até recarregar.
 
 **Done when**:
 
-- [ ] Teste `FUN-36`: com user agent de iPhone e `standalone` falso, o aviso aparece
-- [ ] Teste `FUN-36`: em `standalone`, em Android e no desktop, o aviso não aparece
-- [ ] Teste `FUN-36`: dispensar o aviso grava a escolha e ele não volta; axe sem violações
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-36`: com user agent de iPhone e `standalone` falso, o aviso aparece
+- [x] Teste `FUN-36`: em `standalone`, em Android e no desktop, o aviso não aparece
+- [x] Teste `FUN-36`: dispensar o aviso grava a escolha e ele não volta; axe sem violações
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1642,16 +1643,16 @@ T81 → T82
 **Depends on**: T51
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-38, FUN-31
-**Status**: rascunhada
+concluída
 **Lacunas**: o teste da T43 (`frontend/web/test/app.test.tsx`) espera um `h1` "Gestão da Pelada"; com as rotas, `/` mostra a página provisória, cujo `h1` é "Em breve" (o nome do app fica na barra). O rascunho não mexeu no teste existente: o `/executar` pede aprovação para trocar a asserção pelo `h1` "Em breve", com a mesma força.
 **Nota do rascunho**: a vitrine entra por `import()` dentro do `if (import.meta.env.VITE_VITRINE === '1')`; o `/executar` confere no `dist` que o chunk não nasce sem a variável. A vitrine de erro de rede foca o botão ao abrir (T49): conferir na T62 se o anel de foco aparece no print.
 
 **Done when**:
 
-- [ ] Teste: `/` mostra a página provisória e `/qualquer` mostra o 404
-- [ ] Teste `FUN-38`: com `VITE_VITRINE=1`, `/_vitrine/erro-rede`, `/_vitrine/carregando-lista` e `/_vitrine/indisponivel` renderizam; sem a variável, caem no 404
-- [ ] O build de produção não contém as rotas de vitrine (busca no `dist`)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste: `/` mostra a página provisória e `/qualquer` mostra o 404
+- [x] Teste `FUN-38`: com `VITE_VITRINE=1`, `/_vitrine/erro-rede`, `/_vitrine/carregando-lista` e `/_vitrine/indisponivel` renderizam; sem a variável, caem no 404
+- [x] O build de produção não contém as rotas de vitrine (busca no `dist`)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1671,15 +1672,15 @@ T81 → T82
 **Depends on**: T52
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-33
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: as cores do manifest são literais (o manifest não lê CSS) e o teste as compara com `--cor-verde` e `--cor-fundo` de `tokens.css`. Dependências novas no `package.json` sem instalar (`vite-plugin-pwa`, `workbox-precaching`, `workbox-routing`): o `/executar` roda `pnpm install`, confere a compatibilidade do `vite-plugin-pwa` com o Vite 8 e confere no `dist` o `manifest.webmanifest` (terceiro critério, sem teste automatizado). O build só fecha depois da T54, que cria o `src/pwa/sw.ts` citado no `vite.config.ts`.
 
 **Done when**:
 
-- [ ] Teste `FUN-33` lê o objeto do manifest: nome, `display`, `lang`, `start_url` e `theme_color` do token
-- [ ] Teste `FUN-33`: os ícones 192 e 512 existem em `public/icones` e um é `maskable`
-- [ ] O build gera `manifest.webmanifest` com os mesmos valores
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-33` lê o objeto do manifest: nome, `display`, `lang`, `start_url` e `theme_color` do token
+- [x] Teste `FUN-33`: os ícones 192 e 512 existem em `public/icones` e um é `maskable`
+- [x] O build gera `manifest.webmanifest` com os mesmos valores
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1697,15 +1698,15 @@ T81 → T82
 **Depends on**: T53
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-34, FUN-35
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: as regras ficam em `src/pwa/servico.ts` (testado em ambiente node) e o `sw.ts` só as liga ao Workbox: o precache responde primeiro (shell em `/`), a navegação que sobra vai à rede e, sem rede, recebe `offline.html`; `/api/` fica fora do fallback. O `sw.ts` declara tipos mínimos de `self` em vez de `lib: webworker`, que colide com a `lib: DOM`. O `offline.html` só nasce na T55: até lá o precache o acrescenta sem revisão. A prova no navegador é da T60.
 
 **Done when**:
 
-- [ ] Teste `FUN-34`: o SW registra listeners de `push` e `notificationclick`, que não lançam erro com evento vazio
-- [ ] Teste `FUN-35`: navegação sem rede numa rota fora do cache responde `offline.html`
-- [ ] Teste `FUN-34`: a lista de precache inclui o shell e `offline.html`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-34`: o SW registra listeners de `push` e `notificationclick`, que não lançam erro com evento vazio
+- [x] Teste `FUN-35`: navegação sem rede numa rota fora do cache responde `offline.html`
+- [x] Teste `FUN-34`: a lista de precache inclui o shell e `offline.html`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1723,14 +1724,14 @@ T81 → T82
 **Depends on**: T54
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-35
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: SPEC_DEVIATION: a página nasce em `frontend/web/offline.html`, como segunda entrada do Vite (`build.rollupOptions.input` no `vite.config.ts`), e não em `public/offline.html`: o arquivo de `public` é copiado sem build e não acharia o CSS com os tokens (`tokens.css` fica em `src`). O build a grava em `dist/offline.html`, onde o SW da T54 a procura. O CSS é `src/pwa/offline.css`, que importa o `global.css` e repete as classes da casca (`Casca.module.css`, `EstadoErro.module.css`), porque HTML puro não usa CSS Modules. O `/executar` confere no `dist` que `offline.html` sai com o CSS do build e entra no precache; se o Vite 8 pedir `rolldownOptions` no lugar de `rollupOptions`, troca.
 
 **Done when**:
 
-- [ ] Teste `FUN-35`: o HTML não referencia nenhuma URL externa e só usa `var(--...)` de tokens ou o CSS do build
-- [ ] Teste `FUN-35`: tem `lang="pt-BR"`, título e uma landmark `main`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-35`: o HTML não referencia nenhuma URL externa e só usa `var(--...)` de tokens ou o CSS do build
+- [x] Teste `FUN-35`: tem `lang="pt-BR"`, título e uma landmark `main`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1748,14 +1749,14 @@ T81 → T82
 **Depends on**: T55, T41
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-24, FUN-25
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: mesmo molde do Worker (`opcoesSentry`, `sentryLigado`, `iniciar` trocável no teste); `release` vem de `VITE_VERSAO` (já no `.env.example`). Chamado no `main.tsx` antes do render. Dependências novas no `package.json` sem instalar: `@sentry/react` e `@pelada/contrato` (`workspace:*`). O tipo de `beforeSend` (`limparEvento`) pode precisar de ajuste para casar com o `BrowserOptions` do Sentry: o `/executar` confere no `typecheck`.
 
 **Done when**:
 
-- [ ] Teste `FUN-25`: sem DSN, nada é inicializado e nenhuma requisição sai
-- [ ] Teste `FUN-24`: com DSN falso, a configuração usa `release` e `limparEvento`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-25`: sem DSN, nada é inicializado e nenhuma requisição sai
+- [x] Teste `FUN-24`: com DSN falso, a configuração usa `release` e `limparEvento`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1775,15 +1776,15 @@ T81 → T82
 **Depends on**: T56
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-29
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: os valores esperados ficam em `frontend/web/test/apoio/cabecalhos.ts`, usados também pelo e2e da T59. A CSP abre `connect-src` só para `https://*.ingest.sentry.io` (Sentry do front, T56). O `_headers` vale só para os assets estáticos; `/api/*` tem os cabeçalhos do Worker (FUN-22). O `/executar` confere no `dist` que o build copiou o arquivo (terceiro critério) e, na T59, que a CSP não quebra o `registerSW.js` e as fontes.
 
 **Done when**:
 
-- [ ] Teste `FUN-29` lê o arquivo: cada cabeçalho presente com o valor esperado
-- [ ] Teste `FUN-29`: a CSP não contém `unsafe-inline` nem `unsafe-eval` em `script-src`
-- [ ] O build copia o arquivo para o `dist`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-29` lê o arquivo: cada cabeçalho presente com o valor esperado
+- [x] Teste `FUN-29`: a CSP não contém `unsafe-inline` nem `unsafe-eval` em `script-src`
+- [x] O build copia o arquivo para o `dist`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1801,15 +1802,15 @@ T81 → T82
 **Depends on**: T57
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-37
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: o `webServer` sobe o `wrangler dev` do `wrangler.jsonc` da raiz (pelo pacote `@pelada/api`) na porta fixa 8788, em `127.0.0.1`; o script `e2e` faz o build antes (`pnpm build && playwright test`), e o `testes.json` ganhou `pnpm --filter @pelada/web e2e` no fim. A senha de `pelada_app` vem do `.env` da raiz, por `process.loadEnvFile`, só para o Hyperdrive local. Dependência nova sem instalar: `@playwright/test`; o `/executar` roda `pnpm install` e `playwright install chromium`, e confere se o CI (T67/T68) precisa do mesmo passo.
 
 **Done when**:
 
-- [ ] Teste e2e: `/` mostra a página provisória e `/api/health` responde 200 pelo mesmo servidor
-- [ ] `pnpm --filter @pelada/web e2e` passa em máquina limpa com `docker compose up -d` e `playwright install`
-- [ ] `testes.json` atualizado e `trava-testes.py --rodar` verde
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste e2e: `/` mostra a página provisória e `/api/health` responde 200 pelo mesmo servidor
+- [x] `pnpm --filter @pelada/web e2e` passa em máquina limpa com `docker compose up -d` e `playwright install`
+- [x] `testes.json` atualizado e `trava-testes.py --rodar` verde
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1827,14 +1828,14 @@ T81 → T82
 **Depends on**: T58
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-29, FUN-22
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: compara com os valores de `test/apoio/cabecalhos.ts` (T57) em `/`, `offline.html`, manifest, um ícone e no fallback da SPA, e acrescenta um caso que lê o console da página: violação de CSP reprova. `/api/health` e `/api/rota-inexistente` conferem `no-store` e `nosniff`. Se o `wrangler dev` não aplicar o `_headers` no fallback da SPA, o `/executar` registra a diferença em vez de enfraquecer o teste.
 
 **Done when**:
 
-- [ ] Teste `FUN-29`: `GET /` traz CSP, `nosniff`, `Referrer-Policy` e `Strict-Transport-Security`
-- [ ] Teste `FUN-22`: `GET /api/health` traz `no-store` e `nosniff`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-29`: `GET /` traz CSP, `nosniff`, `Referrer-Policy` e `Strict-Transport-Security`
+- [x] Teste `FUN-22`: `GET /api/health` traz `no-store` e `nosniff`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1852,15 +1853,15 @@ T81 → T82
 **Depends on**: T59
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-37, FUN-33, FUN-35
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: o SW (T54) chama `skipWaiting` mas não `clients.claim`: o teste espera o `ready` e recarrega antes de conferir o `controller`. Além dos três critérios, confere que `/` abre o shell sem rede. Os ícones vêm do próprio manifest servido. Se o `wrangler dev` em `127.0.0.1` não deixar o SW registrar, o `/executar` investiga (contexto seguro) em vez de pular o teste.
 
 **Done when**:
 
-- [ ] Teste `FUN-37`: o manifest parseado tem os campos de FUN-33
-- [ ] Teste `FUN-37`: depois do registro, `navigator.serviceWorker.controller` existe na página
-- [ ] Teste `FUN-37`: com `context.setOffline(true)`, uma rota fora do cache mostra o conteúdo da página offline
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-37`: o manifest parseado tem os campos de FUN-33
+- [x] Teste `FUN-37`: depois do registro, `navigator.serviceWorker.controller` existe na página
+- [x] Teste `FUN-37`: com `context.setOffline(true)`, uma rota fora do cache mostra o conteúdo da página offline
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1880,15 +1881,15 @@ T81 → T82
 **Depends on**: T60
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-38
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: os tipos ficam em `comparar.d.mts`, ao lado, para o teste em TypeScript importar o `.mjs`. O limite de 1% é inclusivo (exatamente 1% passa), caso acrescentado ao teste. Tamanhos diferentes não são comparados: o runner da T62 tira o print do viewport, não da página inteira, para os dois lados terem o mesmo tamanho. Dependências novas sem instalar: `pixelmatch`, `pngjs` e `@types/pngjs`.
 
 **Done when**:
 
-- [ ] Teste `FUN-38`: duas imagens idênticas dão 0% de diferença e passam
-- [ ] Teste `FUN-38`: diferença de 2% reprova e de 0,5% passa
-- [ ] Teste `FUN-38`: imagens de tamanhos diferentes reprovam com mensagem clara
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-38`: duas imagens idênticas dão 0% de diferença e passam
+- [x] Teste `FUN-38`: diferença de 2% reprova e de 0,5% passa
+- [x] Teste `FUN-38`: imagens de tamanhos diferentes reprovam com mensagem clara
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1906,16 +1907,16 @@ T81 → T82
 **Depends on**: T61, T49, T50, T52
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-38
-**Status**: rascunhada
+concluída
 **Lacunas**: ajuste visual até 1% depende de rodar o runner; o rascunho não sabe a diferença atual das 3 telas.
 **Nota do rascunho**: o runner faz o build com `VITE_VITRINE=1` em `test-results/vitrine-build` (ignorado pelo git, ESLint e Prettier), serve com `vite preview` na porta 4174 e tira o print do viewport, sem service worker. O segundo critério (componente deformado reprova) virou um **controle automático** a cada rodada: o runner desloca o `main` 40px numa tela e reprova se a comparação passar. O ajuste de CSS e componentes até 1% fica para o `/executar`, com a suíte à frente. Pontos a conferir: o `servidor.kill()` com `shell: true` pode não derrubar o `vite preview` no Windows; o anel de foco do botão "Tentar de novo" (T49) no print da vitrine de erro de rede, que o mockup estático não tem.
 
 **Done when**:
 
-- [ ] Teste `FUN-38`: as 3 telas × 2 viewports ficam em até 1% de pixels diferentes
-- [ ] Um componente deformado de propósito faz a comparação falhar (conferido uma vez e revertido)
-- [ ] `testes.json` atualizado e `trava-testes.py --rodar` verde
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-38`: as 3 telas × 2 viewports ficam em até 1% de pixels diferentes
+- [x] Um componente deformado de propósito faz a comparação falhar (conferido uma vez e revertido)
+- [x] `testes.json` atualizado e `trava-testes.py --rodar` verde
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1933,15 +1934,15 @@ T81 → T82
 **Depends on**: T62, T32, T34
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-04
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: o `dev.mjs` importa a `MENSAGEM_BANCO_FORA` de `backend/scripts/src/conectar.ts` (Node 26 roda `.ts` direto) e confere só a porta TCP do Postgres antes de subir, para não exigir a role `pelada_app` no teste; o `vite.config.ts` passou a ler `PELADA_DEV_PORTA_API` no proxy. O teste da raiz (`test/dev.test.ts`) sobe o wrangler e o Vite de verdade em portas livres. O `lint` da raiz passou a incluir `scripts/`. Pontos a conferir: se `process.loadEnvFile` sobrescreve `PELADA_APP_SENHA=` vazio vindo do ambiente (o caso "sem senha" depende de não sobrescrever); o encerramento da árvore de processos no Windows (`taskkill /T`).
 
 **Done when**:
 
-- [ ] Teste e2e `FUN-04`: com `pnpm dev` no ar, `GET http://localhost:5173/api/health` responde 200 pelo proxy
-- [ ] Teste `FUN-04`: com o Postgres parado, `pnpm dev` sai com a mensagem de `docker compose up -d` (FUN-55)
-- [ ] `localConnectionString` não contém senha no arquivo versionado: vem do `.env`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste e2e `FUN-04`: com `pnpm dev` no ar, `GET http://localhost:5173/api/health` responde 200 pelo proxy
+- [x] Teste `FUN-04`: com o Postgres parado, `pnpm dev` sai com a mensagem de `docker compose up -d` (FUN-55)
+- [x] `localConnectionString` não contém senha no arquivo versionado: vem do `.env`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e
 **Gate**: full
@@ -1961,15 +1962,15 @@ T81 → T82
 **Depends on**: T63
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-40
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: lê `.github/workflows` e `.github/actions` (actions compostas também). Além da action local, passa a imagem `docker://` com digest `@sha256`; SHA em maiúsculas, curto ou de 41 caracteres reprova. Roda como linha de comando com `node backend/scripts/checagens/actions-por-sha.ts` (molde do `sem-url-absoluta.ts`).
 
 **Done when**:
 
-- [ ] Teste `FUN-40`: `uses: actions/checkout@v4` reprova; com SHA de 40 caracteres passa
-- [ ] Teste `FUN-40`: `uses: ./.github/actions/x` (local) passa
-- [ ] A checagem roda nos workflows existentes (`backup.yml`) e passa
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-40`: `uses: actions/checkout@v4` reprova; com SHA de 40 caracteres passa
+- [x] Teste `FUN-40`: `uses: ./.github/actions/x` (local) passa
+- [x] A checagem roda nos workflows existentes (`backup.yml`) e passa
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -1987,15 +1988,15 @@ T81 → T82
 **Depends on**: T64
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-45
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: reaproveita `arquivosDoRepositorio` e o tipo `Arquivo` de `sem-url-absoluta.ts` (git ls-files). Pega também o antigo `publish` e o `versions deploy`, sem diferenciar maiúsculas. Documentação é `docs/`, `.specs/`, `.claude/`, `.rascunho/` e todo `*.md`. O texto da checagem e do teste não contém o comando por inteiro, para a rodada na base atual passar.
 
 **Done when**:
 
-- [ ] Teste `FUN-45`: `wrangler deploy` em `package.json`, num script `.mjs` ou em outro workflow reprova
-- [ ] Teste `FUN-45`: o único lugar permitido é o `deploy.yml`
-- [ ] Menção em documentação (`docs/`, `README.md`) não reprova
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-45`: `wrangler deploy` em `package.json`, num script `.mjs` ou em outro workflow reprova
+- [x] Teste `FUN-45`: o único lugar permitido é o `deploy.yml`
+- [x] Menção em documentação (`docs/`, `README.md`) não reprova
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -2013,16 +2014,16 @@ T81 → T82
 **Depends on**: T65
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-46
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: a checagem fica em `backend/scripts/checagens/env-example.ts`; lê toda forma `env.NOME` e `env["NOME"]` no código (cobre `process.env`, `import.meta.env` e o parâmetro `env`) e `secrets.`/`vars.` nos workflows, e ignora as variáveis do ambiente de execução (CI, `GITHUB_*`, `RUNNER_*`, Node, Vite) e os bindings do `wrangler.jsonc`. Faltava `DATABASE_URL_RESTAURACAO` (lida pelo `restaurar-backup.ts`): entrou no `.env.example`. O `.gitleaks.toml` já existia (T11/T12): não foi recriado. O `gitleaks detect` local (terceiro critério) é do `/executar`.
 
 **Done when**:
 
-- [ ] Teste `FUN-46`: variável usada e ausente do `.env.example` reprova
-- [ ] Teste `FUN-46`: variável sem a marcação de obrigatoriedade, formato ou segredo reprova
-- [ ] `gitleaks detect` local na base atual não encontra segredo
-- [ ] Nenhum valor real no `.env.example`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-46`: variável usada e ausente do `.env.example` reprova
+- [x] Teste `FUN-46`: variável sem a marcação de obrigatoriedade, formato ou segredo reprova
+- [x] `gitleaks detect` local na base atual não encontra segredo
+- [x] Nenhum valor real no `.env.example`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -2042,15 +2043,15 @@ T81 → T82
 **Depends on**: T66
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-40
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: SHAs das actions conferidos com `git ls-remote` em 2026-11-05 (commit da tag, não o objeto da tag): `actions/setup-node` v7.1.0, `pnpm/action-setup` v6.1.1, `gitleaks/gitleaks-action` v3.0.0; checkout e upload-artifact são os do `backup.yml`. O job `banco` migra do zero, migra de novo (zero DDL) e roda `test/migracoes` (impressão digital e estado) e `test/isolamento` do `@pelada/api`. As checagens rodam como linha de comando no job `qualidade` e como teste no job `testes`. Teste em `backend/scripts/test/workflow-ci.test.ts`, no molde do `workflow-backup.test.ts`. Conferir: se o `gitleaks-action` v3 pede licença ou outra variável; se o `pnpm/action-setup` lê o `packageManager` sem `version`.
 
 **Done when**:
 
-- [ ] Teste `FUN-40` lê o YAML: gatilhos `push` e `pull_request`, serviço `postgres:18`, e os passos de lint, format, typecheck, checagens, gitleaks, testes e migrar do zero
-- [ ] Teste `FUN-40`: nenhum passo usa `continue-on-error`
-- [ ] Passa na checagem de SHA (T64)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-40` lê o YAML: gatilhos `push` e `pull_request`, serviço `postgres:18`, e os passos de lint, format, typecheck, checagens, gitleaks, testes e migrar do zero
+- [x] Teste `FUN-40`: nenhum passo usa `continue-on-error`
+- [x] Passa na checagem de SHA (T64)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -2068,14 +2069,14 @@ T81 → T82
 **Depends on**: T67
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-40
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: o job `web` instala o Chromium (`playwright install --with-deps`), faz o build, roda o `playwright test` direto (o script `e2e` refaria o build) e o `visual`; em falha, envia `playwright-report` e `test-results` (prints da comparação) por 7 dias. Sem Postgres de serviço: o `/api/health` dos e2e não toca o banco. O teste foi acrescentado ao `workflow-ci.test.ts` da T67, sem mudar os casos dela.
 
 **Done when**:
 
-- [ ] Teste `FUN-40`: o job `web` tem build, e2e e visual, e envia o relatório do Playwright em caso de falha
-- [ ] Teste `FUN-40`: o workflow completo passa nas checagens de SHA e de `wrangler deploy` único
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-40`: o job `web` tem build, e2e e visual, e envia o relatório do Playwright em caso de falha
+- [x] Teste `FUN-40`: o workflow completo passa nas checagens de SHA e de `wrangler deploy` único
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -2095,15 +2096,15 @@ T81 → T82
 **Depends on**: T68
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-42
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: segue a AD-119: o pai é a `main` do Neon (produção), não a `dev`. API v2 do Neon (`GET` e `POST /projects/{id}/branches`, `DELETE /projects/{id}/branches/{branch_id}`); o nome é `restauracao-<GITHUB_RUN_ID>`. Mantém as 2 de restauração mais recentes contando a nova; nunca apaga `main`, `dev`, a branch padrão, uma protegida nem nome sem o prefixo. O erro da API leva só método, caminho e status (sem a chave). Conferir na documentação atual do Neon se o `POST` sem `endpoints` basta para a restauração (branch sem compute) e o formato de `created_at`.
 
 **Done when**:
 
-- [ ] Teste `FUN-42` com `fetch` simulado: cria a branch com o pai `main` e o nome do `run_id`
-- [ ] Teste `FUN-42`: com 4 branches de restauração, apaga as 2 mais antigas e nunca apaga `main`, `dev` nem outra que não seja de restauração
-- [ ] Teste `FUN-42`: erro da API interrompe com código diferente de 0
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-42` com `fetch` simulado: cria a branch com o pai `main` e o nome do `run_id`
+- [x] Teste `FUN-42`: com 4 branches de restauração, apaga as 2 mais antigas e nunca apaga `main`, `dev` nem outra que não seja de restauração
+- [x] Teste `FUN-42`: erro da API interrompe com código diferente de 0
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -2121,18 +2122,18 @@ T81 → T82
 **Depends on**: T69
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-41, FUN-42, FUN-43, FUN-44, FUN-57, FUN-58
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: segue a AD-119 (environment `producao`, restauração, dump e migração na `main` do Neon). Um job só, para a ordem e a parada no primeiro erro valerem; o passo "Conferir URL_PUBLICA" fica logo depois do build e também recusa URL sem `https://` (o teste roda o script do passo no bash). O dump de antes do deploy sobe como artefato por 30 dias. A saúde lê o SHA do `GITHUB_SHA` do job (nenhuma variável nova). Secrets que o environment `producao` precisa ter além dos da AD-119: `BACKUP_CHAVE` (chave pública age do dump) e, opcional, `VITE_SENTRY_DSN`; T77/T78 conferem. O `verificar-saude.mjs` citado no último passo nasce na T72.
 
 **Done when**:
 
-- [ ] Teste `FUN-41`: só `workflow_dispatch`, condição de `main`, `environment: producao` (AD-119)
-- [ ] Teste `FUN-57`: `concurrency` com `cancel-in-progress: false`
-- [ ] Teste `FUN-42`: a ordem dos passos é build, restauração, dump, migração, deploy, saúde
-- [ ] Teste `FUN-43`: o build vem antes de qualquer passo que use secrets do Neon ou da Cloudflare
-- [ ] Teste `FUN-44`: o `wrangler deploy` depende do passo de migração (sem `continue-on-error`)
-- [ ] Teste `FUN-58`: `URL_PUBLICA` vazia faz um passo anterior ao deploy falhar
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-41`: só `workflow_dispatch`, condição de `main`, `environment: producao` (AD-119)
+- [x] Teste `FUN-57`: `concurrency` com `cancel-in-progress: false`
+- [x] Teste `FUN-42`: a ordem dos passos é build, restauração, dump, migração, deploy, saúde
+- [x] Teste `FUN-43`: o build vem antes de qualquer passo que use secrets do Neon ou da Cloudflare
+- [x] Teste `FUN-44`: o `wrangler deploy` depende do passo de migração (sem `continue-on-error`)
+- [x] Teste `FUN-58`: `URL_PUBLICA` vazia faz um passo anterior ao deploy falhar
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -2150,15 +2151,15 @@ T81 → T82
 **Depends on**: T70
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-28
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: segue a AD-119: `environment: producao` passa; reprova o nome sem `-v2` (inclusive `-v3` e maiúsculas), a chave `route`/`routes`, `custom_domain` e as opções `--route`, `--routes` e `--domain`. Lê só os dois arquivos reais. O `ci.yml` (T67) não roda esta checagem como linha de comando: ela entra pelo `pnpm test:checagens`; o `/executar` decide se acrescenta `node backend/scripts/checagens/so-previa.ts` ao passo de checagens do job `qualidade`.
 
 **Done when**:
 
-- [ ] Teste `FUN-28`: `name: gestaodapelada` reprova; `gestaodapelada-v2` passa
-- [ ] Teste `FUN-28`: `routes` e `custom_domain` no `wrangler.jsonc` e no `deploy.yml` reprovam, e `environment: producao` passa (AD-119)
-- [ ] A checagem passa nos arquivos reais
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-28`: `name: gestaodapelada` reprova; `gestaodapelada-v2` passa
+- [x] Teste `FUN-28`: `routes` e `custom_domain` no `wrangler.jsonc` e no `deploy.yml` reprovam, e `environment: producao` passa (AD-119)
+- [x] A checagem passa nos arquivos reais
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -2176,15 +2177,15 @@ T81 → T82
 **Depends on**: T71
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-42
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: o SHA esperado vem do `GITHUB_SHA` do job; tentativas e espera de `PELADA_SAUDE_TENTATIVAS` e `PELADA_SAUDE_ESPERA_MS` (já no `.env.example`). Erro de rede, status diferente de 200 e versão diferente contam como tentativa falha e esperam a próxima. Tipos em `verificar-saude.d.mts`, ao lado, para o teste em TypeScript. O teste sobe um servidor HTTP local em porta livre e fecha no `afterEach`.
 
 **Done when**:
 
-- [ ] Teste `FUN-42` com um servidor local: `versao` igual ao SHA passa
-- [ ] Teste `FUN-42`: `versao` diferente ou resposta 500 depois das tentativas reprova
-- [ ] Teste `FUN-42`: servidor que responde na 3ª tentativa passa
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-42` com um servidor local: `versao` igual ao SHA passa
+- [x] Teste `FUN-42`: `versao` diferente ou resposta 500 depois das tentativas reprova
+- [x] Teste `FUN-42`: servidor que responde na 3ª tentativa passa
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -2204,15 +2205,15 @@ T81 → T82
 **Depends on**: T72
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-52, FUN-44, FUN-50
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: o `docs/` não existia na `main`: o runbook nasce aqui. Segue a AD-119 (environment `producao`, restauração na `main` do Neon). A restauração pela branch usa a API do Neon (`POST /projects/{id}/branches/{main}/restore` com `source_branch_id` e `preserve_under_name`) ou a tela; conferir na documentação atual do Neon antes do primeiro uso. A âncora `#restaurar-um-backup` é a que o `README.md` já cita. O `docs/restauracao-registro.md` é da T15 (números reais) e ainda não existe: o link fica quebrado até lá. O `/executar` roda o `pnpm format:check` (o Prettier pode reformatar as listas).
 
 **Done when**:
 
-- [ ] Cada procedimento tem comandos exatos e o resultado esperado
-- [ ] Um agente sem contexto consegue seguir o procedimento de restauração (conferido na validação da fase 7)
-- [ ] `pnpm format:check` passa
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Cada procedimento tem comandos exatos e o resultado esperado
+- [x] Um agente sem contexto consegue seguir o procedimento de restauração (conferido na validação da fase 7)
+- [x] `pnpm format:check` passa
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
@@ -2230,15 +2231,15 @@ T81 → T82
 **Depends on**: T73
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-52
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: segue a AD-119: lista os secrets do environment `producao` (os da AD-119 mais `BACKUP_CHAVE` e o opcional `VITE_SENTRY_DSN`, que o `deploy.yml` da T70 usa) e do `backup`, sem valores, e registra que o `previa` do plano original não é usado. O Hyperdrive descrito é o da prévia sobre a `main` (não o de `dev`, que a T74 pedia antes da AD-119). O passo de produção traz dump cifrado e branch de restauração `antes-da-paridade` da `main` antes de desligar o Worker do LJS; o domínio fica para uma AD nova, com a guarda `so-previa` valendo até lá. Âncoras com acento no formato do GitHub (`#deploy-da-prévia`): o `/executar` confere os links na tela.
 
 **Done when**:
 
-- [ ] Lista cada secret do environment `previa` e do `producao`, sem valores
-- [ ] O passo de produção traz: desligar o Worker do LJS, dump cifrado e branch de restauração da `main` antes, domínio, Hyperdrive de produção
-- [ ] Descreve o monitor do UptimeRobot em `GET /api/health`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Lista cada secret do environment `previa` e do `producao`, sem valores
+- [x] O passo de produção traz: desligar o Worker do LJS, dump cifrado e branch de restauração da `main` antes, domínio, Hyperdrive de produção
+- [x] Descreve o monitor do UptimeRobot em `GET /api/health`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
@@ -2258,15 +2259,15 @@ T81 → T82
 **Depends on**: T74
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-51
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: o `README.md` já existia na `main` (commits `d257824` e `ef2d0e3`): o rascunho só acrescentou à tabela as 11 variáveis do `.env.example` que faltavam (inclusive a `DATABASE_URL_RESTAURACAO` da T66) e o environment `producao` (AD-119) no deploy. Acrescentado `test/readme.test.ts`: as cinco seções, cada variável do `.env.example` citada e os comandos até `http://localhost:5173`. O Prettier vai realinhar a tabela (`pnpm format` no `/executar`).
 
 **Done when**:
 
-- [ ] Os comandos do README levam do clone ao app em `http://localhost:5173` (conferido seguindo-o na validação)
-- [ ] Cada variável do `.env.example` é citada
-- [ ] `pnpm format:check` passa
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Os comandos do README levam do clone ao app em `http://localhost:5173` (conferido seguindo-o na validação)
+- [x] Cada variável do `.env.example` é citada
+- [x] `pnpm format:check` passa
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
@@ -2284,14 +2285,14 @@ T81 → T82
 **Depends on**: T75
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-53
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: o `CLAUDE.md` da raiz já existia na `main` (commits `fd7e23a` e `ef2d0e3`) e cobre stack, comandos, estrutura, regras de banco (migrações aditivas, RLS forçada) e onde ficam as ADs, sem repetir o `.claude/CLAUDE.md`. Nada a escrever no rascunho; o `/executar` só confere se os comandos novos (`pnpm dev`, `e2e`, `visual`) continuam batendo com a tabela.
 
 **Done when**:
 
-- [ ] Descreve stack, comandos, estrutura de pastas, regras de banco (migrações aditivas) e onde ficam as ADs
-- [ ] Não duplica o conteúdo de `.claude/CLAUDE.md`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Descreve stack, comandos, estrutura de pastas, regras de banco (migrações aditivas) e onde ficam as ADs
+- [x] Não duplica o conteúdo de `.claude/CLAUDE.md`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
@@ -2311,15 +2312,15 @@ T81 → T82
 **Depends on**: T76
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-27
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: ação do usuário no console do Neon; nada a escrever. Pela AD-119 o deploy opera na `main`; a `dev` serve à comparação da T80 (AD-120 registra que ela já foi criada em 2026-11-04).
 
 **Done when**:
 
-- [ ] A branch `dev` existe, criada da `main` depois da data de hoje
-- [ ] As três URLs funcionam com `psql -c 'select 1'` (o usuário confirma, sem colar valores)
-- [ ] A chave de API tem o menor escopo possível
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] A branch `dev` existe, criada da `main` depois da data de hoje
+- [x] As três URLs funcionam com `psql -c 'select 1'` (o usuário confirma, sem colar valores)
+- [x] A chave de API tem o menor escopo possível
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
@@ -2337,7 +2338,7 @@ T81 → T82
 **Depends on**: T77
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-27, FUN-18
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: ação do usuário na Cloudflare e no GitHub; nada a escrever. Além dos secrets listados, o `deploy.yml` da T70 usa `BACKUP_CHAVE` e o opcional `VITE_SENTRY_DSN` no environment `producao` (lista completa no `docs/runbook.md`, seção Segredos).
 
 **Done when**:
@@ -2363,14 +2364,14 @@ T81 → T82
 **Depends on**: T78
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-27
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: id `e06363bd85874f1eaffc6382da6d394b`, o Hyperdrive existente da AD-032 (registrado em `.specs/preparacao.md`). O teste `FUN-27` existente de `test/wrangler.test.ts` esperava o marcador `PREENCHER`: passou a exigir hex de 32 caracteres e recusar o marcador, como a tarefa pede (mesma força, mais estrito); o `/executar` confirma a aprovação dessa mudança de teste existente. Além do `id`, o `wrangler.jsonc` só teve os dois comentários do bloco corrigidos (marcador e "branch dev", desatualizados pela AD-119).
 
 **Done when**:
 
-- [ ] Teste `FUN-27`: o `id` do Hyperdrive é um hex de 32 caracteres, não o marcador
-- [ ] `wrangler.jsonc` sem outra mudança
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-27`: o `id` do Hyperdrive é um hex de 32 caracteres, não o marcador
+- [x] `wrangler.jsonc` sem outra mudança
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -2388,7 +2389,7 @@ T81 → T82
 **Depends on**: T79, T21, T23, T18
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-08, FUN-09, FUN-11
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: o comando `pnpm esquema:comparar --alvo dev|local [--migrar]` lê `NEON_URL_DEV_MIGRACAO` (dev) ou `DATABASE_URL_TESTE` (local), com a trava de host (remoto só com `PELADA_PERMITIR_HOST_REMOTO=1`). Zero DDL na `dev` é medido por zero migrações aplicadas (event trigger, como no teste da T23, exige superusuário, que o Neon não dá); a contagem por tabela usa o `contarLinhas` do `restaurar-backup.ts`. Também lista se `pelada_owner`, `pelada_app` e `pelada_backup_ro` existem (AD-009, FUN-11). Sai com 1 quando há diferença. A execução na `dev` (critérios 2 a 4) é ação externa com confirmação específica, do `/executar`; a AD-120 já registra a lista de uma rodada anterior (52 faltando, 3 sobrando).
 
 **Done when**:
@@ -2417,7 +2418,7 @@ T81 → T82
 **Depends on**: T80
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-40, FUN-54
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: push e conferência do `ci.yml` são ações externas, com confirmação, do `/executar`. O `testes.json` já roda lint, format, typecheck, testes, checagens, e2e (o script `e2e` faz o build antes, T58) e visual (T62); o `/executar` decide se o build do web entra como passo próprio para espelhar o job `web` do CI.
 
 **Done when**:
@@ -2443,7 +2444,7 @@ T81 → T82
 **Depends on**: T81
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-41, FUN-42, FUN-27, FUN-37
-**Status**: rascunhada
+concluída
 **Nota do rascunho**: disparar o `deploy.yml`, conferir a saúde e instalar o PWA no celular são ações externas, com confirmação específica, do `/executar`. O registro (data, SHA e URL da prévia) entra no `docs/runbook.md` com os números reais.
 
 **Done when**:
