@@ -1,6 +1,6 @@
 import { Buffer } from 'node:buffer';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { MENSAGEM_PESO, pesosPainel } from '@pelada/contrato';
+import { MENSAGEM_PESO, MENSAGEM_REFLETIR, pesosPainel } from '@pelada/contrato';
 import { criarApp } from '../../src/entrada/app.ts';
 import { relogioFixo } from '../../src/infraestrutura/relogio.ts';
 import { NOME_COOKIE_SESSAO } from '../../src/infraestrutura/sessao/cookie.ts';
@@ -35,6 +35,7 @@ const VALIDO = {
   lesionadoComChuva: 3,
   expulsoSemChuva: -2,
   expulsoComChuva: -3,
+  refletirNoPassado: false,
 } as const;
 
 async function sessao(conta: string): Promise<string> {
@@ -89,6 +90,13 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
+  // A resposta "sim" (PAR-164) troca os pesos da configuração do cenário: volta ao valor original.
+  await aberto.db.query(
+    `UPDATE config_pesos SET presenca_sem_chuva = 3, presenca_com_chuva = 4, lesionado_sem_chuva = 1,
+            lesionado_com_chuva = 2, expulso = -1, registrado_por = $2
+      WHERE grupo_id = $1 AND vigente_desde = '2026-01-01'`,
+    [aberto.cenario.grupoG, aberto.cenario.contaC],
+  );
   await aberto.db.query('DELETE FROM config_pesos WHERE grupo_id = $1 AND vigente_desde = $2', [
     aberto.cenario.grupoG,
     HOJE,
@@ -118,7 +126,8 @@ describe('POST /api/grupos/:grupoId/pesos', () => {
     expect(r.status).toBe(200);
     const painel = pesosPainel.parse(await r.json());
     expect(painel.hoje).toBe(HOJE);
-    expect(painel.vigente).toMatchObject({ ...VALIDO, vigenteDesde: HOJE });
+    const { refletirNoPassado: _r, ...pesosEnviados } = VALIDO;
+    expect(painel.vigente).toMatchObject({ ...pesosEnviados, vigenteDesde: HOJE });
     expect(painel.historico[0]).toMatchObject({
       vigenteDesde: '2026-01-01',
       vigenteAte: '2026-03-13',
@@ -130,6 +139,39 @@ describe('POST /api/grupos/:grupoId/pesos', () => {
     const r = await pedir('POST', aberto.cenario.contaO, VALIDO);
     expect(r.status).toBe(200);
     expect(pesosPainel.parse(await r.json()).vigente.registradoPor).toBe('Outra Admin');
+  });
+
+  it('PAR-164: refletirNoPassado true responde 200 e a configuração de 2026-01-01 passa a ter os pesos novos', async () => {
+    const r = await pedir('POST', aberto.cenario.contaC, { ...VALIDO, refletirNoPassado: true });
+    expect(r.status).toBe(200);
+    const painel = pesosPainel.parse(await r.json());
+    expect(painel.vigente).toMatchObject({ presencaSemChuva: 5, vigenteDesde: '2026-01-01' });
+    // Todas as configurações do grupo (a de 1900-01-01 da grupo_criar inclusive) ganham os pesos novos.
+    expect(painel.historico.every((c) => c.presencaSemChuva === 5)).toBe(true);
+    expect(await configsDeHoje()).toBe(0);
+  });
+
+  it('PAR-163: refletirNoPassado false mantém a de 2026-01-01 e acrescenta a de hoje', async () => {
+    const r = await pedir('POST', aberto.cenario.contaC, VALIDO);
+    expect(r.status).toBe(200);
+    const painel = pesosPainel.parse(await r.json());
+    expect(painel.historico[0]).toMatchObject({ vigenteDesde: '2026-01-01', presencaSemChuva: 3 });
+  });
+
+  it.each([
+    ['ausente', undefined],
+    ['texto', 'sim'],
+    ['número', 1],
+    ['nulo', null],
+  ])('PAR-162: refletirNoPassado %s responde 422 no campo, sem gravar', async (_nome, valor) => {
+    const { refletirNoPassado: _fora, ...semCampo } = VALIDO;
+    const corpo = valor === undefined ? semCampo : { ...semCampo, refletirNoPassado: valor };
+    const r = await pedir('POST', aberto.cenario.contaC, corpo);
+    expect(r.status).toBe(422);
+    expect(await r.json()).toMatchObject({ mensagens: { refletirNoPassado: MENSAGEM_REFLETIR } });
+    expect(await configsDeHoje()).toBe(0);
+    const base = pesosPainel.parse(await (await pedir('GET')).json());
+    expect(base.vigente.presencaSemChuva).toBe(3);
   });
 
   it('PAR-08: corpo com vigenteDesde responde 422 sem gravar', async () => {

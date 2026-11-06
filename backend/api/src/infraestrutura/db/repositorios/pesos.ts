@@ -83,13 +83,63 @@ export interface ResultadoSalvarPesos {
   substituiu: boolean;
 }
 
-/** Grava a configuração vigente desde hoje, pela conta da sessão, e a auditoria na mesma transação (PAR-03 a PAR-05). */
+/**
+ * Grava os pesos pela conta da sessão e a auditoria na mesma transação (PAR-03 a PAR-05, PAR-162 a PAR-164; AD-125).
+ * - `refletirNoPassado` falso: configuração vigente desde hoje; as anteriores, inclusive a padrão de 1900-01-01,
+ *   ficam como estão (PAR-163);
+ * - verdadeiro: os 6 pesos de todas as configurações até hoje passam a ser os novos, com as datas intactas, porque a
+ *   `pelada_app` não apaga linha nem muda `vigente_desde` (PAR-09, PAR-164). Configuração futura (lacuna acima) não
+ *   é tocada, como no painel.
+ */
 async function salvar(
   db: Db,
   grupoId: string,
   p: PesosCorpo,
   hoje: string,
 ): Promise<ResultadoSalvarPesos> {
+  const substituiu = p.refletirNoPassado
+    ? await trocarTodas(db, grupoId, p, hoje)
+    : await gravarDeHoje(db, grupoId, p, hoje);
+
+  await auditoria.registrar(db, grupoId, {
+    acao: substituiu ? 'pesos_substituidos' : 'pesos_configurados',
+    entidade: 'config_pesos',
+    entidadeId: hoje,
+    resumo: {
+      presencaSemChuva: p.presencaSemChuva,
+      presencaComChuva: p.presencaComChuva,
+      lesionadoSemChuva: p.lesionadoSemChuva,
+      lesionadoComChuva: p.lesionadoComChuva,
+      expulsoSemChuva: p.expulsoSemChuva,
+      expulsoComChuva: p.expulsoComChuva,
+    },
+  });
+  return { substituiu };
+}
+
+async function trocarTodas(db: Db, grupoId: string, p: PesosCorpo, hoje: string): Promise<boolean> {
+  const r = await sql`
+    UPDATE config_pesos
+       SET presenca_sem_chuva = ${p.presencaSemChuva},
+           presenca_com_chuva = ${p.presencaComChuva},
+           lesionado_sem_chuva = ${p.lesionadoSemChuva},
+           lesionado_com_chuva = ${p.lesionadoComChuva},
+           expulso = ${p.expulsoSemChuva},
+           expulso_com_chuva = ${p.expulsoComChuva},
+           registrado_por = app_conta_id(),
+           registrado_em = now()
+     WHERE grupo_id = ${grupoId} AND vigente_desde <= ${hoje}::date`.execute(db);
+  // Sem linha atualizada o grupo não é da conta (a RLS filtrou): erro, e a transação da requisição desfaz.
+  if (Number(r.numAffectedRows ?? 0) === 0) throw new Error('UPDATE de pesos sem linha');
+  return true;
+}
+
+async function gravarDeHoje(
+  db: Db,
+  grupoId: string,
+  p: PesosCorpo,
+  hoje: string,
+): Promise<boolean> {
   // xmax diferente de zero na linha devolvida = o ON CONFLICT atualizou uma linha que já existia.
   const r = await sql<{ substituiu: boolean }>`
     INSERT INTO config_pesos (grupo_id, vigente_desde, presenca_sem_chuva, presenca_com_chuva, lesionado_sem_chuva,
@@ -108,21 +158,7 @@ async function salvar(
     RETURNING (xmax::text <> '0') AS substituiu`.execute(db);
   const substituiu = r.rows[0]?.substituiu;
   if (substituiu === undefined) throw new Error('INSERT de pesos sem linha');
-
-  await auditoria.registrar(db, grupoId, {
-    acao: substituiu ? 'pesos_substituidos' : 'pesos_configurados',
-    entidade: 'config_pesos',
-    entidadeId: hoje,
-    resumo: {
-      presencaSemChuva: p.presencaSemChuva,
-      presencaComChuva: p.presencaComChuva,
-      lesionadoSemChuva: p.lesionadoSemChuva,
-      lesionadoComChuva: p.lesionadoComChuva,
-      expulsoSemChuva: p.expulsoSemChuva,
-      expulsoComChuva: p.expulsoComChuva,
-    },
-  });
-  return { substituiu };
+  return substituiu;
 }
 
 export const pesos = { painel, salvar };

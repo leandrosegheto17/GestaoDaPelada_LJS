@@ -22,6 +22,7 @@ const NOVOS: PesosCorpo = {
   lesionadoComChuva: 1,
   expulsoSemChuva: -2,
   expulsoComChuva: -4,
+  refletirNoPassado: false,
 };
 
 let aberto: CenarioGruposAberto;
@@ -48,6 +49,13 @@ afterEach(async () => {
   await db.query(`DELETE FROM config_pesos WHERE grupo_id = $1 AND vigente_desde <> '2026-01-01'`, [
     cenario.grupoG,
   ]);
+  // A resposta "sim" (PAR-164) troca os pesos da configuração do cenário: volta ao valor original.
+  await db.query(
+    `UPDATE config_pesos SET presenca_sem_chuva = 3, presenca_com_chuva = 4, lesionado_sem_chuva = 1,
+            lesionado_com_chuva = 2, expulso = -1, expulso_com_chuva = -1, registrado_por = $2
+      WHERE grupo_id = $1 AND vigente_desde = '2026-01-01'`,
+    [cenario.grupoG, cenario.contaC],
+  );
   await db.query(
     `DELETE FROM auditoria WHERE acao IN ('pesos_configurados', 'pesos_substituidos')`,
   );
@@ -224,5 +232,68 @@ describe('pesos.salvar', () => {
     const { cenario } = aberto;
     await expect(salvarComo(cenario.contaB)).rejects.toMatchObject({ code: '42501' });
     expect((await linhasDeG()).map((l) => l.vigente)).toEqual(['2026-01-01']);
+  });
+});
+
+describe('pesos.salvar com refletirNoPassado (AD-125)', () => {
+  it('PAR-164: true troca os 6 pesos de todas as configurações, mantém as datas e audita pesos_substituidos', async () => {
+    const { cenario } = aberto;
+    await configurar('2026-11-04', cenario.contaO, [2, 2, 2, 2, -2, -2]);
+    const r = await salvarComo(cenario.contaC, { ...NOVOS, refletirNoPassado: true });
+    expect(r).toEqual({ substituiu: true });
+    const novos = [2, 3, 1, 1, -2, -4];
+    expect(await linhasDeG()).toEqual([
+      { vigente: '2026-01-01', pesos: novos, autora: cenario.contaC },
+      { vigente: '2026-11-04', pesos: novos, autora: cenario.contaC },
+    ]);
+    expect((await auditoriasDePesos()).map((a) => a.acao)).toEqual(['pesos_substituidos']);
+  });
+
+  it('PAR-164: true não cria linha de hoje nem mexe em configuração futura', async () => {
+    const { cenario } = aberto;
+    await configurar('2026-12-01', cenario.contaO, [5, 5, 5, 5, -5, -5]);
+    await salvarComo(cenario.contaC, { ...NOVOS, refletirNoPassado: true });
+    const linhas = await linhasDeG();
+    expect(linhas.map((l) => l.vigente)).toEqual(['2026-01-01', '2026-12-01']);
+    expect(linhas[1]?.pesos).toEqual([5, 5, 5, 5, -5, -5]);
+  });
+
+  it('PAR-163: false deixa as anteriores como estão e insere a de hoje', async () => {
+    const { cenario } = aberto;
+    await salvarComo(cenario.contaC, { ...NOVOS, refletirNoPassado: false });
+    expect(await linhasDeG()).toEqual([
+      { vigente: '2026-01-01', pesos: [3, 4, 1, 2, -1, -1], autora: cenario.contaC },
+      { vigente: HOJE, pesos: [2, 3, 1, 1, -2, -4], autora: cenario.contaC },
+    ]);
+  });
+
+  it('PAR-164: erro forçado na auditoria desfaz o UPDATE de todas as configurações', async () => {
+    const { cenario } = aberto;
+    await aberto.db.query(
+      `CREATE FUNCTION falha_teste_par05() RETURNS trigger LANGUAGE plpgsql AS $$
+       BEGIN
+         IF NEW.acao IN ('pesos_configurados', 'pesos_substituidos') THEN
+           RAISE EXCEPTION 'falha forçada (PAR-05)';
+         END IF;
+         RETURN NEW;
+       END $$`,
+    );
+    await aberto.db.query(
+      'CREATE TRIGGER falha_teste_par05 BEFORE INSERT ON auditoria FOR EACH ROW EXECUTE FUNCTION falha_teste_par05()',
+    );
+    await expect(salvarComo(cenario.contaC, { ...NOVOS, refletirNoPassado: true })).rejects.toThrow(
+      'falha forçada',
+    );
+    expect(await linhasDeG()).toEqual([
+      { vigente: '2026-01-01', pesos: [3, 4, 1, 2, -1, -1], autora: cenario.contaC },
+    ]);
+  });
+
+  it('PAR-164: a conta de outro grupo não troca os pesos de G (a RLS filtra o UPDATE)', async () => {
+    const { cenario } = aberto;
+    await salvarComo(cenario.contaB, { ...NOVOS, refletirNoPassado: true }).catch(() => undefined);
+    expect(await linhasDeG()).toEqual([
+      { vigente: '2026-01-01', pesos: [3, 4, 1, 2, -1, -1], autora: cenario.contaC },
+    ]);
   });
 });

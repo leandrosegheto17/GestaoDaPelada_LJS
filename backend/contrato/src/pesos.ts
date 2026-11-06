@@ -38,8 +38,19 @@ const formaPesos = {
   expulsoComChuva: peso,
 };
 
-/** Corpo de `POST /api/grupos/:grupoId/pesos`: os 6 pesos, todos obrigatórios (PAR-03, PAR-06 a PAR-08). */
-export const pesosCorpo = z.strictObject(formaPesos);
+/** PAR-162: mensagem de `refletirNoPassado` ausente ou que não é verdadeiro/falso. */
+export const MENSAGEM_REFLETIR =
+  'Escolha se os novos pesos valem também para as partidas já disputadas.';
+
+/**
+ * Corpo de `POST /api/grupos/:grupoId/pesos`: os 6 pesos, todos obrigatórios (PAR-03, PAR-06 a PAR-08), e
+ * `refletirNoPassado` (PAR-162, AD-125): verdadeiro troca os pesos de todas as configurações do grupo; falso vale
+ * só a partir de hoje (PAR-163, PAR-164).
+ */
+export const pesosCorpo = z.strictObject({
+  ...formaPesos,
+  refletirNoPassado: z.boolean({ error: MENSAGEM_REFLETIR }),
+});
 export type PesosCorpo = z.infer<typeof pesosCorpo>;
 
 const dataTexto = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);

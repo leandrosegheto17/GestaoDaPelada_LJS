@@ -624,6 +624,7 @@ const PESOS_VALIDOS = {
   lesionadoComChuva: 9,
   expulsoSemChuva: 9,
   expulsoComChuva: 9,
+  refletirNoPassado: false,
 };
 
 const PEDIDOS_DE_PARTIDAS: Record<string, PedidoDePartida> = {

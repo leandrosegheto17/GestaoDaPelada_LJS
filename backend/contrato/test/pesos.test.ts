@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { CAMPOS_PESO, MENSAGEM_PESO, pesosCorpo, pesosPainel } from '../src/pesos.ts';
+import {
+  CAMPOS_PESO,
+  MENSAGEM_PESO,
+  MENSAGEM_REFLETIR,
+  pesosCorpo,
+  pesosPainel,
+} from '../src/pesos.ts';
 
 /** Contrato dos pesos (T17; PAR-01, PAR-06, PAR-07, PAR-08). */
 
@@ -24,6 +30,8 @@ const PADRAO = {
   expulsoComChuva: -1,
 };
 
+const CORPO = { ...PADRAO, refletirNoPassado: false };
+
 describe('pesosCorpo', () => {
   it('PAR-06: a mensagem é a da spec', () => {
     expect(MENSAGEM_PESO).toBe('Use um número inteiro de -10 a 10.');
@@ -33,7 +41,7 @@ describe('pesosCorpo', () => {
     'PAR-06: peso %j é recusado no campo do peso, com a mensagem',
     (valor) => {
       for (const campo of CAMPOS_PESO) {
-        const r = pesosCorpo.safeParse({ ...PADRAO, [campo]: valor });
+        const r = pesosCorpo.safeParse({ ...CORPO, [campo]: valor });
         expect(r.success).toBe(false);
         expect(mensagens(r)).toEqual({ [campo]: [MENSAGEM_PESO] });
       }
@@ -41,30 +49,53 @@ describe('pesosCorpo', () => {
   );
 
   it.each([-10, 0, 10])('PAR-06: peso %s é aceito em todos os campos', (valor) => {
-    const corpo = Object.fromEntries(CAMPOS_PESO.map((c) => [c, valor]));
+    const corpo = {
+      ...Object.fromEntries(CAMPOS_PESO.map((c) => [c, valor])),
+      refletirNoPassado: false,
+    };
     expect(pesosCorpo.parse(corpo)).toEqual(corpo);
   });
 
   it('PAR-07: peso ausente é recusado no campo', () => {
     for (const campo of CAMPOS_PESO) {
-      const corpo: Record<string, number> = { ...PADRAO };
+      const corpo: Record<string, number | boolean> = { ...CORPO };
       delete corpo[campo];
       expect(mensagens(pesosCorpo.safeParse(corpo))).toEqual({ [campo]: [MENSAGEM_PESO] });
     }
   });
 
   it('PAR-08: vigenteDesde no corpo é recusado', () => {
-    expect(pesosCorpo.safeParse({ ...PADRAO, vigenteDesde: '2026-10-01' }).success).toBe(false);
+    expect(pesosCorpo.safeParse({ ...CORPO, vigenteDesde: '2026-10-01' }).success).toBe(false);
   });
 
   it('PAR-08: qualquer outro campo é recusado', () => {
-    expect(pesosCorpo.safeParse({ ...PADRAO, registradoPor: 'x' }).success).toBe(false);
-    expect(pesosCorpo.safeParse({ ...PADRAO, expulso: -1 }).success).toBe(false);
+    expect(pesosCorpo.safeParse({ ...CORPO, registradoPor: 'x' }).success).toBe(false);
+    expect(pesosCorpo.safeParse({ ...CORPO, expulso: -1 }).success).toBe(false);
   });
 
   it('PAR-03: os 6 campos são os da spec', () => {
     expect([...CAMPOS_PESO]).toEqual(Object.keys(PADRAO));
   });
+
+  it('PAR-162: refletirNoPassado true e false são aceitos', () => {
+    expect(pesosCorpo.parse({ ...PADRAO, refletirNoPassado: true }).refletirNoPassado).toBe(true);
+    expect(pesosCorpo.parse({ ...PADRAO, refletirNoPassado: false }).refletirNoPassado).toBe(false);
+  });
+
+  it('PAR-162: refletirNoPassado ausente é recusado no campo, com a mensagem do contrato', () => {
+    const r = pesosCorpo.safeParse(PADRAO);
+    expect(r.success).toBe(false);
+    expect(mensagens(r)).toEqual({ refletirNoPassado: [MENSAGEM_REFLETIR] });
+  });
+
+  it.each(['sim', 'true', 1, 0, null, undefined])(
+    'PAR-162: refletirNoPassado %j é recusado no campo',
+    (valor) => {
+      const r = pesosCorpo.safeParse({ ...PADRAO, refletirNoPassado: valor });
+      expect(r.success).toBe(false);
+      expect(mensagens(r)).toEqual({ refletirNoPassado: [MENSAGEM_REFLETIR] });
+    },
+  );
 });
 
 describe('pesosPainel', () => {
