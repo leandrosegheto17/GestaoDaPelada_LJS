@@ -19,6 +19,8 @@ export interface CasoMatriz extends TabelaComGrupo {
 
 export const MATRIZ: readonly CasoMatriz[] = [
   // auditoria: pelada_app só tem INSERT (1792843380000_conta-tabelas.sql).
+  // assinaturas (planos-e-cobranca, PLA-33): `pelada_app` lê pela policy `assinaturas_ler`; a escrita é só das funções.
+  { tabela: 'assinaturas', coluna: 'grupo_id', leitura: 'por-grupo' },
   { tabela: 'auditoria', coluna: 'grupo_id', leitura: 'sem-grant' },
   // avisos_cobranca e push_ranking (notificacoes T7, AD-101): sem grant para pelada_app; só as funções e o backup leem.
   { tabela: 'avisos_cobranca', coluna: 'grupo_id', leitura: 'sem-grant' },
@@ -26,8 +28,8 @@ export const MATRIZ: readonly CasoMatriz[] = [
   { tabela: 'config_pesos', coluna: 'grupo_id', leitura: 'por-grupo' },
   { tabela: 'convites_admin', coluna: 'grupo_id', leitura: 'por-grupo' },
   { tabela: 'escalacoes', coluna: 'grupo_id', leitura: 'por-grupo' },
-  // eventos_uso: sem grant para pelada_app (1792843260000_roles.sql).
-  { tabela: 'eventos_uso', coluna: 'grupo_id', leitura: 'sem-grant' },
+  // eventos_uso: SELECT e INSERT só com conta (1792844700000_eventos-uso.sql:61; o slug público não lê, PAR-129).
+  { tabela: 'eventos_uso', coluna: 'grupo_id', leitura: 'por-grupo' },
   { tabela: 'grupos', coluna: 'id', leitura: 'por-grupo' },
   { tabela: 'habilidades', coluna: 'grupo_id', leitura: 'por-grupo' },
   { tabela: 'jogadores', coluna: 'grupo_id', leitura: 'por-grupo' },

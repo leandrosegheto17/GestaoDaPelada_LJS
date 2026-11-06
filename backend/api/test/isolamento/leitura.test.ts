@@ -12,6 +12,9 @@ let aberto: CenarioAberto;
 
 beforeAll(async () => {
   aberto = await abrirCenario();
+  // As tabelas do financeiro só são lidas por quem tem o acesso (FIN-41, `app_acessa_financeiro`); esta matriz compara
+  // grupos, e a trava do financeiro tem testes próprios (`financeiro-rls*.test.ts`).
+  await aberto.db.query('UPDATE vinculos_admin SET acessa_financeiro = true');
 });
 
 afterAll(async () => {

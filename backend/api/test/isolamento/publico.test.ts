@@ -21,7 +21,17 @@ import { MATRIZ, type CasoMatriz } from './matriz.ts';
  * SPEC_DEVIATION herdado (1792843380000_conta-tabelas.sql): a leitura de `convites_admin` exige
  * conta, porque o convite traz o e-mail de quem foi convidado. Com só o slug, ela devolve zero.
  */
-const LEITURA_EXIGE_CONTA = new Set(['convites_admin']);
+// Também exigem conta: o caixa (FIN-39, `app_acessa_financeiro`), a escalação (SIM-81), os eventos (PAR-129) e a
+// assinatura do plano (`assinaturas_ler`, PLA-32).
+const LEITURA_EXIGE_CONTA = new Set([
+  'convites_admin',
+  'config_financeira',
+  'lancamentos',
+  'pagamentos_mes',
+  'escalacoes',
+  'eventos_uso',
+  'assinaturas',
+]);
 
 let aberto: CenarioAberto;
 let idsA: IdsDoGrupo;

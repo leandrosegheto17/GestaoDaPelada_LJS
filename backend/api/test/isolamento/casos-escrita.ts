@@ -24,6 +24,11 @@ export interface Escrita {
   alterar: string;
   /** A conta dona do grupo insere direto. Falso em `grupos`: o grupo nasce só pela `grupo_criar`. */
   donoInsere?: boolean;
+  /**
+   * Linhas do próprio grupo que o UPDATE sem WHERE da conta B altera, quando são menos que as do grupo: em
+   * `vinculos_admin` a trava do acesso (FIN-41) nunca deixa a conta mudar a própria linha.
+   */
+  alteraveisPorB?: number;
 }
 
 export const ESCRITA: Record<string, Escrita> = {
@@ -104,8 +109,21 @@ export const ESCRITA: Record<string, Escrita> = {
     ],
     alterar: 'n = 6',
   },
-  eventos_uso: {
+  // planos-e-cobranca (1792845420000_planos-tabelas.sql:66): só SELECT para pelada_app; a escrita é das funções.
+  assinaturas: {
     insere: false,
+    altera: false,
+    apaga: false,
+    inserir: (g, c) => [
+      `INSERT INTO assinaturas (grupo_id, asaas_cliente_id, asaas_assinatura_id, valor_centavos, situacao, criada_por, criada_em)
+       VALUES ($1, 'cus_intruso', 'sub_intruso', 990, 'aguardando_pagamento', $2, now())`,
+      [g, c],
+    ],
+    alterar: 'valor_centavos = 1',
+  },
+  // 1792844700000_eventos-uso.sql:61: SELECT e INSERT com conta; nunca altera nem apaga.
+  eventos_uso: {
+    insere: true,
     altera: false,
     apaga: false,
     inserir: (g) => [
@@ -216,6 +234,7 @@ export const ESCRITA: Record<string, Escrita> = {
       [g, c],
     ],
     alterar: 'acessa_financeiro = NOT acessa_financeiro',
+    alteraveisPorB: 1,
   },
 };
 

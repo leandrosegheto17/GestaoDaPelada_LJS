@@ -53,7 +53,28 @@ describe('meta-teste da RLS', () => {
   it('FUN-12: a matriz cobre as 16 tabelas da fundação, sem repetir', () => {
     const nomes = MATRIZ.map((c) => c.tabela);
     expect(new Set(nomes).size).toBe(nomes.length);
-    expect(nomes).toHaveLength(16);
+    // As 16 da fundação mais as das features seguintes (a cobertura exata do catálogo é conferida acima).
+    expect(nomes).toEqual(
+      expect.arrayContaining([
+        'auditoria',
+        'config_financeira',
+        'config_pesos',
+        'convites_admin',
+        'escalacoes',
+        'eventos_uso',
+        'grupos',
+        'habilidades',
+        'jogadores',
+        'lancamentos',
+        'notas',
+        'pagamentos_mes',
+        'partidas',
+        'periodos_ativos',
+        'presencas',
+        'vinculos_admin',
+      ]),
+    );
+    expect(nomes.length).toBeGreaterThanOrEqual(16);
   });
 
   it('FUN-12: tabela nova com grupo_id sem RLS e sem caso na matriz faz o meta-teste falhar', async () => {

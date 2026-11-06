@@ -29,6 +29,23 @@ let linhasB: Record<string, number>;
 beforeAll(async () => {
   aberto = await abrirCenario();
   const { db, cenario } = aberto;
+  // O financeiro só escreve com `acessa_financeiro` (FIN-40/41, tem matriz própria em `financeiro-rls-escrita`), e a
+  // trava do acesso nunca deixa a conta mudar a própria linha de vínculo: dá acesso às duas e ao grupo A uma segunda
+  // admin, para o UPDATE de controle de `vinculos_admin` ter linha própria de outra conta.
+  await db.query('UPDATE vinculos_admin SET acessa_financeiro = true');
+  for (const [grupo, dono, email] of [
+    [cenario.grupoA, cenario.contaA, 'segunda-admin-a@exemplo.test'],
+    [cenario.grupoB, cenario.contaB, 'segunda-admin-b@exemplo.test'],
+  ] as const) {
+    const segunda = await db.query<{ id: string }>(
+      `INSERT INTO contas (email, nome, senha_hash, criada_em) VALUES ($1, 'Segunda', 'x', now()) RETURNING id`,
+      [email],
+    );
+    await db.query(
+      `INSERT INTO vinculos_admin (conta_id, grupo_id, acessa_financeiro, criado_por, criado_em) VALUES ($1, $2, false, $3, now())`,
+      [segunda.rows[0]!.id, grupo, dono],
+    );
+  }
   idsA = await idsDoGrupo(db, cenario.grupoA);
   antesA = await conteudo(db, cenario.grupoA);
   linhasB = {};
@@ -126,7 +143,7 @@ describe.each(MATRIZ)('FUN-17: escrita em $tabela', (caso) => {
       return;
     }
     expect(t.erro, t.erro?.message).toBeNull();
-    expect(t.linhas).toBe(linhasB[tab]);
+    expect(t.linhas).toBe(e.alteraveisPorB ?? linhasB[tab]);
     expect(t.observado).toEqual(antesA);
   });
 

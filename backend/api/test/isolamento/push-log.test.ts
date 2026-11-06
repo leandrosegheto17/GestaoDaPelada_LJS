@@ -3,6 +3,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vites
 import { criarEnviarRanking } from '../../src/aplicacao/notificacoes/enviar-ranking.ts';
 import type { Env } from '../../src/entrada/ambiente.ts';
 import { bancoSemContexto } from '../../src/entrada/consumidor-avisos.ts';
+import { filaMemoria } from '../../src/infraestrutura/fila/avisos.ts';
 import type { RelatoPush } from '../../src/infraestrutura/push/enviar.ts';
 import { servicoPushFalso } from '../../src/infraestrutura/push/enviar.ts';
 import { envCom, fabricaComoApp } from '../db/requisicao.ts';
@@ -135,7 +136,8 @@ describe('NOT-33: nada sensível no log', () => {
     }
     const servico = servicoPushFalso();
     servico.responder(201, 400, 503);
-    const env: Env = { ...envCom(aberto.url), ...vapid };
+    // O 503 reagenda o envio (T19): precisa de uma fila, aqui em memória.
+    const env: Env = { ...envCom(aberto.url), ...vapid, FILA_AVISOS: filaMemoria() };
     const enviar = criarEnviarRanking({
       fetch: servico.fetch,
       reportar: (r) => {

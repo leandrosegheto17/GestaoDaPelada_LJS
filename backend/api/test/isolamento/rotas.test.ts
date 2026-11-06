@@ -1055,9 +1055,11 @@ function casoPushPublico(
         });
 
       const emG = await enviar(cenario.slugG, SEMEADAS.h);
-      semValorSemeado(await emG.text(), `slug de G com a assinatura de H (${p.metodo})`);
+      const textoG = await emG.text();
+      semValorSemeado(textoG, `slug de G com a assinatura de H (${p.metodo})`);
       const emH = await enviar(slugH, SEMEADAS.g);
-      semValorSemeado(await emH.text(), `slug de H com a assinatura de G (${p.metodo})`);
+      const textoH = await emH.text();
+      semValorSemeado(textoH, `slug de H com a assinatura de G (${p.metodo})`);
 
       if (p.metodo === 'POST' && p.caminho === '/push') {
         // NOT-53: o mesmo endpoint vira linha nova no grupo do slug; a do outro grupo fica igual.
@@ -1070,8 +1072,8 @@ function casoPushPublico(
         expect(r.rows[0]!.n).toBe(4);
         await semearPush();
       } else if (p.caminho === '/push/estado') {
-        expect(await emG.json()).toEqual({ assinado: false });
-        expect(await emH.json()).toEqual({ assinado: false });
+        expect(JSON.parse(textoG)).toEqual({ assinado: false });
+        expect(JSON.parse(textoH)).toEqual({ assinado: false });
       }
       expect(await retratoDoPush()).toBe(antes);
     },
@@ -1467,7 +1469,10 @@ describe('isolamento de rotas', () => {
   });
 
   it('PAR-139: as 3 rotas públicas estão no app e têm caso', () => {
-    const publicas = rotasDoApp(criarApp()).filter((r) => r.includes('/api/publico/'));
+    // As 4 públicas de push (notificacoes T32, NOT-53) têm caso próprio em `ROTAS_DE_PUSH`.
+    const publicas = rotasDoApp(criarApp()).filter(
+      (r) => r.includes('/api/publico/') && !(r in ROTAS_DE_PUSH),
+    );
     expect(publicas.sort()).toEqual(Object.keys(PEDIDOS_PUBLICOS).sort());
     for (const rota of publicas) expect('caso' in (TABELA[rota] ?? {}), rota).toBe(true);
   });
