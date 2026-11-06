@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { act, cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -28,7 +29,10 @@ type Json = Record<string, unknown>;
 function resposta(nome: string): Json {
   return JSON.parse(
     readFileSync(
-      fileURLToPath(new URL(`../../../../.specs/mockup/respostas/${nome}`, import.meta.url)),
+      resolve(
+        dirname(fileURLToPath(import.meta.url)),
+        `../../../../.specs/mockup/respostas/${nome}`,
+      ),
       'utf8',
     ),
   ) as Json;

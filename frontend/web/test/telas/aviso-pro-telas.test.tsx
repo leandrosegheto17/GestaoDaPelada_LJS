@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { cleanup, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -14,7 +15,10 @@ import { abrirTela, json, pendente, SESSAO_ANA } from '../apoio/tela.tsx';
 function resposta(nome: string): unknown {
   return JSON.parse(
     readFileSync(
-      fileURLToPath(new URL(`../../../../.specs/mockup/respostas/${nome}`, import.meta.url)),
+      resolve(
+        dirname(fileURLToPath(import.meta.url)),
+        `../../../../.specs/mockup/respostas/${nome}`,
+      ),
       'utf8',
     ),
   );

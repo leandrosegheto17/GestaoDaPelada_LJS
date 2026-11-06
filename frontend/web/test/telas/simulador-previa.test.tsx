@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { act, cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -154,7 +155,7 @@ describe('Simulador: prévia (t12)', () => {
   it('SIM-15: a prévia, as entradas e a página não importam nada de @pelada/dominio', () => {
     for (const arquivo of ['PreviaSimulador.tsx', 'EntradasSimulador.tsx', 'PaginaSimulador.tsx']) {
       const fonte = readFileSync(
-        fileURLToPath(new URL(`../../src/telas/simulador/${arquivo}`, import.meta.url)),
+        resolve(dirname(fileURLToPath(import.meta.url)), `../../src/telas/simulador/${arquivo}`),
         'utf8',
       );
       expect(fonte, arquivo).not.toMatch(/@pelada\/dominio/);

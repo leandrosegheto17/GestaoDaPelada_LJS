@@ -12,6 +12,20 @@ import { ProvedorCliente } from '../../src/dados/ContextoCliente.tsx';
  * Rota não dada responde 404. A resposta pode ser uma promessa que nunca resolve (carregando).
  */
 
+/** Resposta padrão de `GET /api/grupos/:id/plano` nos testes de tela: Pro, com todos os recursos e sem trava. */
+export const PLANO_PRO_EDITAVEL = {
+  plano: 'pro',
+  situacao: 'ativo',
+  trialFimEm: null,
+  pagoAte: '2026-12-31',
+  jogadoresAtivos: 20,
+  limiteJogadores: null,
+  somenteLeitura: null,
+  recursos: ['pdf', 'simulador', 'financeiro'],
+  podeAssinar: false,
+  assinatura: null,
+};
+
 export type Manipulador = (corpo: unknown) => Response | Promise<Response>;
 
 export interface Chamada {
@@ -70,6 +84,10 @@ export function abrirTela(
     const manipulador = api[`${metodo} ${caminhoUrl}`];
     if (manipulador) return manipulador(corpo);
     if (metodo === 'GET' && caminhoUrl === '/api/sessao') return erroApi(401, 'sem_sessao');
+    // O plano do grupo (planos-e-cobranca) entra em quase toda tela do app: sem manipulador próprio, o grupo é Pro e editável.
+    if (metodo === 'GET' && /^\/api\/grupos\/[^/]+\/plano$/.test(caminhoUrl)) {
+      return json(200, PLANO_PRO_EDITAVEL);
+    }
     return erroApi(404, 'nao_encontrado');
   }) as unknown as typeof globalThis.fetch;
 
