@@ -56,7 +56,10 @@ describe('asaas falso', () => {
     };
     expect(lista.data).toHaveLength(1);
     expect(lista.data[0]).toMatchObject({ value: 9.9, dueDate: '2026-11-05' });
-    const fatura = await fetch(lista.data[0]?.invoiceUrl ?? '');
+    // A fatura vem em https (o banco exige) num host que o e2e atende por interceptação; a página mora no falso.
+    const faturaUrl = lista.data[0]?.invoiceUrl ?? '';
+    expect(faturaUrl).toMatch(/^https:\/\/fatura-falsa\.asaas\.test\/fatura\//);
+    const fatura = await fetch(`${falso.base}${new URL(faturaUrl).pathname}`);
     expect(fatura.status).toBe(200);
     expect(await fatura.text()).toContain('Fatura de teste');
 
