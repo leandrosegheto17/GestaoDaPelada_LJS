@@ -29,8 +29,11 @@ describe('tela Confirmar e-mail', () => {
       { token: TOKEN },
     ]);
     expect(window.location.hash).toBe('');
-    expect((await screen.findByRole('status')).textContent).toBe(
-      'E-mail confirmado. Entre com a sua senha.',
+    // waitFor e não findByRole: logo depois da navegação o `status` ainda pode ser o "Confirmando…" da tela anterior.
+    await waitFor(() =>
+      expect(screen.getByRole('status').textContent).toBe(
+        'E-mail confirmado. Entre com a sua senha.',
+      ),
     );
   });
 

@@ -105,15 +105,17 @@ jobs:
       - name: Instalar dependências
         run: pnpm install --frozen-lockfile
       - name: Instalar o pg_dump 18
-        # O banco de serviço é o Postgres 18; o pg_dump do runner é mais antigo e o teste do dump com a role de backup
-        # (NOT-58) exige a mesma versão do servidor, como no backup.yml.
+        # O banco de serviço é o Postgres 18; o runner traz o pg_dump 16 no PATH e o teste do dump com a role de backup
+        # (NOT-58) exige a mesma versão do servidor. Instala o cliente 18 e o põe na frente do PATH.
         if: matrix.nome == 'api-banco'
         run: |
+          while sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do sleep 3; done
           sudo apt-get update
           sudo apt-get install -y postgresql-common
           sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
           sudo apt-get install -y postgresql-client-18
-          pg_dump --version | grep -E ' 18\.'
+          echo "/usr/lib/postgresql/18/bin" >> "$GITHUB_PATH"
+          /usr/lib/postgresql/18/bin/pg_dump --version | grep -E ' 18\.'
       - name: Testes
         run: ${{ matrix.comando }}
 
@@ -200,8 +202,11 @@ jobs:
         # 180 s e há até 3.
         run: |
           for tentativa in 1 2 3; do
+            # O runner às vezes mantém o apt ocupado em segundo plano (lock do dpkg): espera soltar.
+            while sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do sleep 3; done
             timeout 180 pnpm --filter @pelada/web exec playwright install --with-deps chromium && exit 0
             echo "Tentativa $tentativa falhou ou passou de 180 s"
+            sleep 5
           done
           exit 1
       - name: Build do web
