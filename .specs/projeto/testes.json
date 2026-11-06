@@ -1,3 +1,5 @@
 {
-  "comando": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test"
+  "comando": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test",
+  "dispensado": true,
+  "motivo": "2026-11-06, decisão do usuário: subir a main com as features 2 a 8 só rascunhadas (testes vermelhos ficam para o /executar de cada feature) e fazer o deploy da prévia com o fix do PDF (f93e49e5)."
 }
