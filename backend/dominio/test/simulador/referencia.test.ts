@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Formato, Limite } from '../../src/simulador/base.ts';
+import type { HistoricoSim } from '../../src/simulador/prioridade.ts';
 import { sugerir, type EntradaSimulador } from '../../src/simulador/sugerir.ts';
 import { aptosFixos, DATA, historicoFixo } from './apoio.ts';
 import referencia from './referencia-legado.json' with { type: 'json' };
@@ -18,6 +19,8 @@ import referencia from './referencia-legado.json' with { type: 'json' };
  * Casos limite cobertos: K = 2 com reservas "não entra"; "só 1º" entre titulares e reservas; K ilimitado com N = 11;
  * K = 0; 3+ com incompleto de 2; 3+ com incompleto de 1 (aviso de N alternativos, SIM-45); 3+ sem incompleto.
  */
+
+const ANO_SEM_ANO = 1990;
 
 interface SaidaDois {
   ordemPrioridade: string[];
@@ -50,13 +53,25 @@ const CASOS: Record<keyof typeof referencia.casos, Caso> = {
   'varios-20-n5': { formato: 'varios_times', quantos: 20, n: 5, k: 'ilimitado' },
 };
 
+function historicoSemNulos(): HistoricoSim {
+  const h = historicoFixo(22);
+  return {
+    ...h,
+    jogadores: h.jogadores.map((j) => ({ ...j, anoNascimento: j.anoNascimento ?? ANO_SEM_ANO })),
+  };
+}
+
 function entradaDe(caso: Caso): EntradaSimulador {
   return {
     formato: caso.formato,
     data: DATA,
     n: caso.n,
     k: caso.k,
-    aptos: aptosFixos(caso.quantos, caso.so1o ?? []),
+    // O legado não tem "sem ano" (SIM-95 é da v2): na comparação, quem não tem ano nasceu em 1990 nos dois lados.
+    aptos: aptosFixos(caso.quantos, caso.so1o ?? []).map((a) => ({
+      ...a,
+      anoNascimento: a.anoNascimento ?? ANO_SEM_ANO,
+    })),
   };
 }
 
@@ -73,7 +88,7 @@ describe('casos de referência conferidos contra o legado (SIM-52)', () => {
     it(`SIM-52: ${nome} dá a composição, a ordem e os avisos do legado`, () => {
       const esperado = referencia.casos[nome] as SaidaDois | SaidaVarios | null;
       expect(esperado, `saída do legado para ${nome} não registrada`).not.toBeNull();
-      const sugestao = sugerir(entradaDe(caso), historicoFixo(22));
+      const sugestao = sugerir(entradaDe(caso), historicoSemNulos());
       expect(sugestao.valida).toBe(true);
       if (!sugestao.valida) return;
 

@@ -1,14 +1,205 @@
 {
   "commit": "ece227e0",
-  "comando": null,
-  "conferidoEm": null,
+  "comando": "tsx gera.ts (fora do projeto): importa backend/dominio/src/simulador/sugerir.ts e backend/api/src/aplicacao/simulador/textos-avisos.ts de C:LeandroProjetosGestaodaPelada @ ece227e0 (somente leitura) e roda sugerir com as entradas de aptosFixos/historicoFixo; idade = ano de 2026-10-22 menos o ano de nascimento (1990 onde a v2 tem nulo)",
+  "conferidoEm": "2026-11-05",
   "casos": {
-    "dois-19-n7-k2": null,
-    "dois-19-n7-k2-so1o": null,
-    "dois-22-n11-ilimitado": null,
-    "dois-16-n7-k0": null,
-    "varios-22-n4": null,
-    "varios-13-n4": null,
-    "varios-20-n5": null
+    "dois-19-n7-k2": {
+      "ordemPrioridade": [
+        "j04",
+        "j08",
+        "j19",
+        "j03",
+        "j14",
+        "j18",
+        "j09",
+        "j12",
+        "j13",
+        "j16",
+        "j07",
+        "j15",
+        "j11",
+        "j02",
+        "j10",
+        "j06",
+        "j17",
+        "j05",
+        "j01"
+      ],
+      "times": [
+        {
+          "titulares": ["j19", "j03", "j12", "j16", "j07", "j15", "j11"],
+          "entram": ["j10", "j06"]
+        },
+        {
+          "titulares": ["j04", "j08", "j14", "j18", "j09", "j13", "j02"],
+          "entram": ["j17", "j05"]
+        }
+      ],
+      "naoEntra": ["j01"],
+      "avisos": ["Serginho e Léo Baiano não têm nota: usamos nível 5,5."]
+    },
+    "dois-19-n7-k2-so1o": {
+      "ordemPrioridade": [
+        "j04",
+        "j08",
+        "j19",
+        "j03",
+        "j14",
+        "j18",
+        "j09",
+        "j12",
+        "j13",
+        "j16",
+        "j07",
+        "j15",
+        "j11",
+        "j02",
+        "j10",
+        "j06",
+        "j17",
+        "j05",
+        "j01"
+      ],
+      "times": [
+        {
+          "titulares": ["j04", "j03", "j14", "j09", "j16", "j11", "j02"],
+          "entram": ["j10", "j06"]
+        },
+        {
+          "titulares": ["j08", "j19", "j18", "j12", "j13", "j07", "j15"],
+          "entram": ["j17", "j05"]
+        }
+      ],
+      "naoEntra": ["j01"],
+      "avisos": ["Serginho e Léo Baiano não têm nota: usamos nível 5,5."]
+    },
+    "dois-22-n11-ilimitado": {
+      "ordemPrioridade": [
+        "j04",
+        "j08",
+        "j19",
+        "j03",
+        "j14",
+        "j18",
+        "j09",
+        "j12",
+        "j20",
+        "j13",
+        "j16",
+        "j07",
+        "j15",
+        "j11",
+        "j02",
+        "j22",
+        "j10",
+        "j06",
+        "j17",
+        "j05",
+        "j01",
+        "j21"
+      ],
+      "times": [
+        {
+          "titulares": [
+            "j08",
+            "j03",
+            "j14",
+            "j12",
+            "j07",
+            "j15",
+            "j22",
+            "j10",
+            "j06",
+            "j05",
+            "j01"
+          ],
+          "entram": []
+        },
+        {
+          "titulares": [
+            "j04",
+            "j19",
+            "j18",
+            "j09",
+            "j20",
+            "j13",
+            "j16",
+            "j11",
+            "j02",
+            "j17",
+            "j21"
+          ],
+          "entram": []
+        }
+      ],
+      "naoEntra": [],
+      "avisos": ["Serginho e Léo Baiano não têm nota: usamos nível 5,5."]
+    },
+    "dois-16-n7-k0": {
+      "ordemPrioridade": [
+        "j04",
+        "j08",
+        "j03",
+        "j14",
+        "j09",
+        "j12",
+        "j13",
+        "j16",
+        "j07",
+        "j15",
+        "j11",
+        "j02",
+        "j10",
+        "j06",
+        "j05",
+        "j01"
+      ],
+      "times": [
+        {
+          "titulares": ["j09", "j16", "j07", "j15", "j02", "j10", "j06"],
+          "entram": []
+        },
+        {
+          "titulares": ["j04", "j08", "j03", "j14", "j12", "j13", "j11"],
+          "entram": []
+        }
+      ],
+      "naoEntra": ["j05", "j01"],
+      "avisos": []
+    },
+    "varios-22-n4": {
+      "times": [
+        ["j16", "j02", "j12", "j03"],
+        ["j11", "j04", "j15", "j14"],
+        ["j08", "j07", "j01", "j17"],
+        ["j22", "j21", "j20", "j06"],
+        ["j05", "j10", "j18", "j19"],
+        ["j13", "j09"]
+      ],
+      "incompleto": 5,
+      "avisos": ["Léo Baiano e Serginho não têm nota: usamos nível 5,5."]
+    },
+    "varios-13-n4": {
+      "times": [
+        ["j08", "j13", "j04", "j03"],
+        ["j11", "j10", "j01", "j06"],
+        ["j05", "j02", "j12", "j09"],
+        ["j07"]
+      ],
+      "incompleto": 3,
+      "avisos": [
+        "O time incompleto ficou com 1 jogador, menos da metade de N. Experimente N = 5 ou 2."
+      ]
+    },
+    "varios-20-n5": {
+      "times": [
+        ["j11", "j10", "j01", "j19", "j14"],
+        ["j08", "j07", "j15", "j09", "j17"],
+        ["j05", "j13", "j12", "j18", "j06"],
+        ["j16", "j02", "j04", "j20", "j03"]
+      ],
+      "incompleto": null,
+      "avisos": ["Léo Baiano e Serginho não têm nota: usamos nível 5,5."]
+    }
   }
 }
