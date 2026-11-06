@@ -93,8 +93,10 @@ describe('wrangler.jsonc da prévia', () => {
   });
 
   it('FUN-23: VERSAO e URL_PUBLICA existem nas vars e URL_PUBLICA não traz endereço fixo', () => {
+    // PLA-38 (T40): a variável ASAAS_URL entra nas vars, sempre no sandbox do Asaas.
     expect(Object.keys(config.vars).sort()).toEqual(['ASAAS_URL', 'URL_PUBLICA', 'VERSAO']);
     expect(config.vars.URL_PUBLICA).toBe('');
+    expect(config.vars.ASAAS_URL).toBe('https://api-sandbox.asaas.com/v3');
   });
 
   it('NOT-22: fila avisos com produtor FILA_AVISOS e consumidor de 1 mensagem por invocação e 2 novas entregas', () => {
