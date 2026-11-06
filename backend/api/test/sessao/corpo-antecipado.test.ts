@@ -91,7 +91,9 @@ describe('corpo lento (SV-01)', () => {
     const espia = fabricaEspiada();
     const app = criarApp({ fabricaBanco: espia.fabrica });
     const token = await sessao(aberto.cenario.contaC);
-    const bytes = new TextEncoder().encode(JSON.stringify({ apelido: '', posicao: 'meia' }));
+    const bytes = new TextEncoder().encode(
+      JSON.stringify({ apelido: 'Lento', anoNascimento: 1990, posicao: 'meia' }),
+    );
     let terminar!: () => void;
     const fim = new Promise<void>((res) => {
       terminar = res;
@@ -121,8 +123,57 @@ describe('corpo lento (SV-01)', () => {
     terminar();
     const r = await pedido;
     await ctx.esperar();
-    expect(r.status).toBe(422);
+    expect(r.status).toBe(201);
     expect(espia.criadas()).toBeGreaterThan(0);
+    const gravado = await aberto.db.query('SELECT 1 FROM jogadores WHERE apelido = $1', ['Lento']);
+    expect(gravado.rowCount).toBe(1);
+    await aberto.db.query('DELETE FROM jogadores WHERE grupo_id = $1 AND apelido = $2', [
+      aberto.cenario.grupoG,
+      'Lento',
+    ]);
+  });
+});
+
+describe('POST /api/grupos (raiz da coleção)', () => {
+  it('o corpo chega à rota uma vez só: 201 e o grupo gravado', async () => {
+    const app = criarApp({ fabricaBanco: fabricaEspiada().fabrica });
+    const token = await sessao(aberto.cenario.contaB);
+    const ctx = contextoFalso();
+    const r = await app.request(
+      '/api/grupos',
+      {
+        method: 'POST',
+        headers: cabecalhos(token),
+        body: JSON.stringify({
+          nome: 'Pelada Corpo Antes',
+          diaSemana: 'sabado',
+          frequencia: 'semanal',
+          horario: '09:00',
+        }),
+      },
+      envAcesso(aberto.url, { LIMITE_ESCRITA: permite }),
+      ctx,
+    );
+    await ctx.esperar();
+    expect(r.status).toBe(201);
+  });
+
+  it('corpo acima do limite dá 413 também na raiz', async () => {
+    const app = criarApp({ fabricaBanco: fabricaEspiada().fabrica });
+    const token = await sessao(aberto.cenario.contaB);
+    const ctx = contextoFalso();
+    const r = await app.request(
+      '/api/grupos',
+      {
+        method: 'POST',
+        headers: cabecalhos(token),
+        body: JSON.stringify({ nome: 'x'.repeat(LIMITE_CORPO_GRUPO_BYTES + 1) }),
+      },
+      envAcesso(aberto.url, { LIMITE_ESCRITA: permite }),
+      ctx,
+    );
+    await ctx.esperar();
+    expect(r.status).toBe(413);
   });
 });
 

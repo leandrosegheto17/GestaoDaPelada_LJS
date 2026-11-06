@@ -98,7 +98,7 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
   // Escrita sem `X-Pelada: 1` é recusada antes de qualquer limitador (ACE-49, T18).
   api.use('*', exigirCabecalhoPelada);
   // Corpo das escritas de grupo lido e limitado a 16 KB antes de qualquer conexão (SV-01, SV-04).
-  api.use('/grupos', lerCorpoAntes());
+  // `/grupos/*` casa também `/grupos`: um registro só, pois o corpo só pode ser lido uma vez.
   api.use('/grupos/*', lerCorpoAntes());
   // LIMITE_ENTRAR nas rotas de acesso, antes da sessão e do banco (ACE-50, ACE-70, T19).
   limitarRotasDeAcesso(api);
