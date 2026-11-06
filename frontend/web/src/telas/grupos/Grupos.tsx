@@ -136,7 +136,7 @@ export function Grupos() {
                     {textoRecorrencia(g)}
                     {semFinanceiro.has(g.id) ? (
                       <>
-                        {' '}
+                        <br />
                         <span className={`${estilos.selo} ${estilos['selo--neutro']}`}>
                           {TEXTO_SEM_FINANCEIRO}
                         </span>
@@ -145,6 +145,7 @@ export function Grupos() {
                   </>
                 }
                 para={rotaDoGrupo(g.id)}
+                seta
               />
             ))}
           </Lista>
@@ -162,6 +163,7 @@ export function Grupos() {
                   key={g.id}
                   titulo={g.nome}
                   meta={textoRecorrencia(g)}
+                  quebra
                   lateral={
                     <Botao
                       variante="secundario"

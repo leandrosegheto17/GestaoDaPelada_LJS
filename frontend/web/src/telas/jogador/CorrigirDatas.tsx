@@ -6,14 +6,12 @@ import { Botao } from '../../componentes/Botao.tsx';
 import { CampoData } from '../../componentes/CampoData.tsx';
 import { Dialogo } from '../../componentes/Dialogo.tsx';
 import { Faixa } from '../../componentes/Faixa.tsx';
-import { LinkBotao } from '../../componentes/LinkBotao.tsx';
 import { PreviaInicio, PreviaPeriodos } from '../../componentes/PreviaPeriodos.tsx';
 import { useAlterarInicio, useCorrigirPeriodo } from '../../dados/elenco.ts';
 import { mensagensDosCampos } from '../../dados/erros-campo.ts';
 import { hojeEmSaoPaulo } from '../../dados/hoje.ts';
 import { usePedirPrevias, usePrevia } from '../../dados/previas.ts';
 import listas from '../../componentes/Lista.module.css';
-import { rotaDoGrupo } from '../grupos/Grupos.tsx';
 import {
   BlocoPrevia,
   erroDePeriodo,

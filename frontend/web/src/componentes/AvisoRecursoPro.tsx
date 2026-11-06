@@ -35,8 +35,8 @@ export function AvisoRecursoPro({ recurso, grupoId }: PropsAvisoRecursoPro) {
       <svg
         className={estilos.icone}
         viewBox="0 0 24 24"
-        width={48}
-        height={48}
+        width={56}
+        height={56}
         fill="none"
         stroke="currentColor"
         strokeWidth="1.8"

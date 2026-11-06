@@ -20,6 +20,7 @@ import {
   usePrevia,
   type EstadoPrevia,
 } from '../../dados/previas.ts';
+import estilosPrevia from '../../componentes/PreviaPeriodos.module.css';
 import modulo from '../grupos-elenco.module.css';
 import { rotaDoGrupo } from '../grupos/Grupos.tsx';
 
@@ -93,7 +94,7 @@ export function BlocoPrevia<T>({
   if (estado.tipo === 'calculando') {
     return (
       <div aria-live="polite">
-        <p>{TEXTO_CALCULANDO}</p>
+        <p className={estilosPrevia.paragrafo}>{TEXTO_CALCULANDO}</p>
       </div>
     );
   }

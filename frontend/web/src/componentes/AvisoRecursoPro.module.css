@@ -4,6 +4,7 @@
   text-align: center;
   padding: var(--esp-8) var(--esp-4);
   background: var(--cor-superficie);
+  border: 1px dashed var(--cor-contorno);
   border-radius: var(--raio);
 }
 
@@ -14,12 +15,13 @@
 
 .titulo {
   font-family: var(--fonte-titulo);
-  font-size: var(--texto-xl);
+  font-size: var(--texto-2xl);
   text-transform: uppercase;
   margin: 0 0 var(--esp-2);
 }
 
 .texto {
   color: var(--cor-texto-sec);
-  margin: 0 auto var(--esp-6);
+  max-width: 420px;
+  margin: 0 auto var(--esp-4);
 }
