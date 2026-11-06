@@ -172,6 +172,40 @@ describe('textoVisivel (SEC-005)', () => {
   });
 });
 
+describe('textoVisivel: invisíveis fora de Cc e Cf e tamanho em caracteres (SV-03, RC-A04)', () => {
+  it.each([
+    ['U+034F junção de grafemas', 'Beto\u034F'],
+    ['U+2800 braille em branco', 'Beto\u2800'],
+    ['U+2028 separador de linha', 'Be\u2028to'],
+    ['U+2029 separador de parágrafo', 'Be\u2029to'],
+    ['U+3164 preenchimento hangul', 'Beto\u3164'],
+    ['U+115F preenchimento hangul', 'Beto\u115F'],
+    ['U+FFA0 hangul de meia largura', 'Beto\uFFA0'],
+    ['U+FE00 seletor de variação', 'Beto\uFE00'],
+  ])('SV-03: %s no apelido é recusado', (_nome, valor) => {
+    expect(textoVisivel(2, 20, 'tamanho').safeParse(valor).success).toBe(false);
+  });
+
+  it.each([
+    ['só U+3164', '\u3164\u3164\u3164'],
+    ['só U+2800', '\u2800\u2800\u2800'],
+    ['só pontuação', '...'],
+  ])('SV-03: %s não passa como texto de 3 caracteres', (_nome, valor) => {
+    expect(textoVisivel(3, 20, 'tamanho').safeParse(valor).success).toBe(false);
+  });
+
+  it('SV-03: emoji com seletor FE0F junto de letras continua aceito', () => {
+    expect(textoVisivel(2, 20, 'tamanho').parse('Beto ❤️')).toBe('Beto ❤️');
+  });
+
+  it('RC-A04: o tamanho conta caracteres, não unidades UTF-16 (emoji vale 1)', () => {
+    const schema = textoVisivel(1, 3, 'tamanho');
+    expect(schema.safeParse('a😀b').success).toBe(true);
+    expect(schema.safeParse('a😀bc').success).toBe(false);
+    expect(textoVisivel(3, 5, 'tamanho').safeParse('😀😀').success).toBe(false);
+  });
+});
+
 describe('arquivarCorpo e respostas', () => {
   it('GEL-22: arquivar recebe o nome de confirmação como veio, sem trim', () => {
     expect(arquivarCorpo.parse({ nomeConfirmacao: ' Pelada ' })).toEqual({

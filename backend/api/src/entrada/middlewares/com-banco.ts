@@ -100,7 +100,14 @@ function agendarTarefas(
   if (ctx) ctx.waitUntil(andamento);
 }
 
-export const SQL_CONTEXTO = `SELECT set_config('app.conta_id', $1, true), set_config('app.slug_publico', $2, true)`;
+/**
+ * Tetos de tempo da transação (SV-01): conexão `idle in transaction` por mais de 10 s e comando acima de 30 s são
+ * encerrados pelo banco, para uma rota parada não segurar conexão do pool nem a trava do grupo. Locais à transação.
+ */
+export const IDLE_IN_TRANSACTION_MS = 10_000;
+export const STATEMENT_TIMEOUT_MS = 30_000;
+
+export const SQL_CONTEXTO = `SELECT set_config('app.conta_id', $1, true), set_config('app.slug_publico', $2, true), set_config('idle_in_transaction_session_timeout', '${IDLE_IN_TRANSACTION_MS}ms', true), set_config('statement_timeout', '${STATEMENT_TIMEOUT_MS}ms', true)`;
 
 /**
  * Prévia (partidas-e-ranking T36; PAR-109, AD-035, `BD:33-35`): caminho que termina em `/previa`, sem barra final.

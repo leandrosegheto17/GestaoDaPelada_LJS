@@ -37,10 +37,6 @@ export function passaComGrupoArquivado(metodo: string, caminho: string): boolean
   return EXCECOES.some((e) => e.metodo === m && e.caminho.test(caminho));
 }
 
-/** A leitura de `arquivado_em` da escrita, com a trava que o arquivamento respeita (SEC-007). */
-export const SQL_GRUPO_ATIVO =
-  'SELECT arquivado_em IS NOT NULL AS arquivado FROM grupos WHERE id = $1 FOR KEY SHARE';
-
 /**
  * Prévia (partidas-e-ranking T36; PAR-112, `BD:35`): a transação é `READ ONLY` (`transacaoSomenteLeitura`), onde o
  * Postgres recusa `FOR KEY SHARE`; a leitura é simples e o arquivado continua dando 409. Sem trava: a prévia não

@@ -136,6 +136,29 @@ describe('DELETE /api/grupos/:grupoId/jogadores/:id', () => {
       ).rowCount,
     ).toBe(1);
   });
+
+  it('GEL-85 (SV-02): admin sem acesso ao financeiro também recebe 409 quando o único histórico é um pagamento', async () => {
+    const id = await novoJogador('So Pagamento');
+    await aberto.db.query(
+      `INSERT INTO pagamentos_mes (grupo_id, jogador_id, mes, marcado_por, marcado_em)
+       VALUES ($1, $2, '2026-02', $3, now())`,
+      [aberto.cenario.grupoG, id, aberto.cenario.contaC],
+    );
+    try {
+      const r = await jogador(id, aberto.cenario.contaO, 'DELETE');
+      expect(r.status).toBe(409);
+      expect(await r.json()).toEqual({
+        codigo: 'jogador_com_historico',
+        erro: 'So Pagamento tem histórico de partidas e não pode ser excluído.',
+        sugestao: 'inativar',
+      });
+      expect((await aberto.db.query('SELECT 1 FROM jogadores WHERE id = $1', [id])).rowCount).toBe(
+        1,
+      );
+    } finally {
+      await aberto.db.query('DELETE FROM pagamentos_mes WHERE jogador_id = $1', [id]);
+    }
+  });
 });
 
 describe('GEL-44: jogador de outro grupo', () => {

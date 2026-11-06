@@ -112,7 +112,16 @@ async function excluir(db: Db, grupoId: string, id: string): Promise<ResultadoEx
   if (!jogador) return { resultado: 'nao_encontrado' };
   if (jogador.historico) return { resultado: 'com_historico', apelido: jogador.apelido };
 
-  await sql`DELETE FROM jogadores WHERE grupo_id = ${grupoId} AND id = ${id}`.execute(db);
+  try {
+    await sql`DELETE FROM jogadores WHERE grupo_id = ${grupoId} AND id = ${id}`.execute(db);
+  } catch (erro) {
+    // A policy restritiva do financeiro esconde `pagamentos_mes` de quem não acessa o financeiro: o EXISTS acima não
+    // o vê e a FK recusa o DELETE (23503). Mesma resposta de quem vê o histórico, sem revelar o pagamento (SV-02).
+    if ((erro as { code?: unknown }).code === '23503') {
+      return { resultado: 'com_historico', apelido: jogador.apelido };
+    }
+    throw erro;
+  }
   await auditoria.registrar(db, grupoId, {
     acao: 'jogador_excluido',
     entidade: 'jogador',

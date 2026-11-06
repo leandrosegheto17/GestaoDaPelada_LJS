@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import type { Ambiente } from './ambiente.ts';
 import { exigirCabecalhoPelada } from './middlewares/cabecalho-pelada.ts';
+import { lerCorpoAntes } from './middlewares/corpo-antecipado.ts';
 import { protegerRotasPublicas } from './middlewares/contexto-publico.ts';
 import { semCache, semSniff } from './middlewares/cabecalhos.ts';
 import { travarFinanceiro } from './middlewares/financeiro.ts';
@@ -96,6 +97,9 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
   api.use('*', semCache, semSniff);
   // Escrita sem `X-Pelada: 1` é recusada antes de qualquer limitador (ACE-49, T18).
   api.use('*', exigirCabecalhoPelada);
+  // Corpo das escritas de grupo lido e limitado a 16 KB antes de qualquer conexão (SV-01, SV-04).
+  api.use('/grupos', lerCorpoAntes());
+  api.use('/grupos/*', lerCorpoAntes());
   // LIMITE_ENTRAR nas rotas de acesso, antes da sessão e do banco (ACE-50, ACE-70, T19).
   limitarRotasDeAcesso(api);
   // Sessão resolvida em transação própria, antes do `comBanco` de cada rota (ACE-47, T20).
