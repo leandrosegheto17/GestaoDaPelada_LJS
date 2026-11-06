@@ -20,7 +20,9 @@ import { novoCacheVapid, type ChavesVapid } from '../../src/infraestrutura/push/
 
 const ENVIOS = 40;
 const RODADAS = 5;
-const ORCAMENTO_MS = 6;
+// No runner Linux do GitHub as 5 rodadas mediram 31 a 41 ms (2026-11-06), de forma estável e não por ruído: lá o teto é
+// 60 ms (decisão do usuário, 2026-11-06). Os 6 ms valem fora do CI; o orçamento real do Worker se confere no deploy.
+const ORCAMENTO_MS = process.env.CI ? 60 : 6;
 
 const PAYLOAD = JSON.stringify({
   titulo: 'Ranking atualizado',
