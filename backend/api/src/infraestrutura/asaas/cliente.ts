@@ -135,6 +135,8 @@ export function asaasHttp(config: ConfigAsaas, opcoes: OpcoesAsaas = {}): Asaas 
           'User-Agent': USER_AGENT_ASAAS,
         },
         ...(corpo === undefined ? {} : { body: JSON.stringify(corpo) }),
+        // A chave vai no cabeçalho: um redirecionamento a levaria junto para outro endereço (SEC-004).
+        redirect: 'error',
         signal: controle.signal,
       });
       if (!resposta.ok)

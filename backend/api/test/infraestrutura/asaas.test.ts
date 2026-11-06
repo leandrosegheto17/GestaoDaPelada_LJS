@@ -329,3 +329,14 @@ describe('asaasHttp: a chave só vai para o sandbox (PLA-38, A-09)', () => {
     expect(urlDoAsaasPermitida(url)).toBe(true);
   });
 });
+
+describe('asaasHttp: redirecionamento (SEC-004)', () => {
+  it('a chamada recusa redirecionar, para a chave não seguir a outro endereço', async () => {
+    const buscar = vi.fn(async () => resposta(200, { id: 'cus_1' }));
+    await asaasHttp(CONFIG, { fetch: buscar, registrar: () => {} }).criarCliente(CLIENTE);
+    expect(buscar).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({ redirect: 'error' }),
+    );
+  });
+});

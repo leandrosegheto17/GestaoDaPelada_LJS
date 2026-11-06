@@ -5,6 +5,7 @@ import {
   assinar,
   descricaoDaAssinatura,
   TETO_ASSINATURAS_POR_HORA,
+  TETO_ASSINATURAS_POR_HORA_CONTA,
   type PedidoAssinar,
 } from '../../src/aplicacao/plano/assinar.ts';
 import { asaasMemoria, URL_FATURA_FALSA } from '../../src/infraestrutura/asaas/memoria.ts';
@@ -358,6 +359,45 @@ describe('assinar: teto por grupo (A-08)', () => {
         VALUES (${cenario.grupoH}, 'cus_a08', 'sub_a08_velha', 990, 'cancelada', ${cenario.contaB}, now() - interval '2 hours')`.execute(
         db,
       );
+      await sql`SET ROLE pelada_app`.execute(db);
+      expect((await assinar(db, asaas, pedido(cenario.grupoH, cenario.contaB))).resultado).toBe(
+        'criada',
+      );
+    });
+  });
+});
+
+describe('assinar: teto por conta (A-17)', () => {
+  it('PLA-60: 10 assinaturas da conta na última hora em outro grupo bloqueiam o grupo sem nenhuma', async () => {
+    const { url, cenario } = aberto;
+    await comDb(url, cenario.contaB, async (db) => {
+      await sql`RESET ROLE`.execute(db);
+      for (let i = 0; i < TETO_ASSINATURAS_POR_HORA_CONTA; i += 1) {
+        await sql`INSERT INTO assinaturas (grupo_id, asaas_cliente_id, asaas_assinatura_id, valor_centavos, situacao,
+            criada_por, criada_em)
+          VALUES (${h2}, 'cus_a17', ${`sub_a17_${i}`}, 990, 'cancelada', ${cenario.contaB}, now() - interval '10 minutes')`.execute(
+          db,
+        );
+      }
+      await sql`SET ROLE pelada_app`.execute(db);
+      expect(await assinar(db, asaas, pedido(cenario.grupoH, cenario.contaB))).toEqual({
+        resultado: 'muitas_tentativas',
+      });
+      expect(asaas.chamadas).toEqual([]);
+    });
+  });
+
+  it('PLA-60: 9 da conta em outro grupo ainda deixam assinar', async () => {
+    const { url, cenario } = aberto;
+    await comDb(url, cenario.contaB, async (db) => {
+      await sql`RESET ROLE`.execute(db);
+      for (let i = 0; i < TETO_ASSINATURAS_POR_HORA_CONTA - 1; i += 1) {
+        await sql`INSERT INTO assinaturas (grupo_id, asaas_cliente_id, asaas_assinatura_id, valor_centavos, situacao,
+            criada_por, criada_em)
+          VALUES (${h2}, 'cus_a17', ${`sub_a17_n_${i}`}, 990, 'cancelada', ${cenario.contaB}, now() - interval '10 minutes')`.execute(
+          db,
+        );
+      }
       await sql`SET ROLE pelada_app`.execute(db);
       expect((await assinar(db, asaas, pedido(cenario.grupoH, cenario.contaB))).resultado).toBe(
         'criada',

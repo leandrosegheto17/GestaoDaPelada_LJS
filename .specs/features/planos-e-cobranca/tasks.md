@@ -297,7 +297,13 @@ T56 → T57
 ### Phase 22: Retrabalho R1 (crítica, 18,5h)
 
 ```
-T58 → T59 → T60 → T61 → T62 → T63 → T64 → T65 → T66 → T67 → T68 → T69 → T70
+T58 → T59 → T60 → T61 → T62 → T63 → T64 → T65 → T66 → T67 → T68 → T69 → T70 → T71
+```
+
+### Phase 23: Retrabalho R2 (crítica, 1h)
+
+```
+T71
 ```
 
 ## Task Breakdown
@@ -2064,6 +2070,7 @@ T58 → T59 → T60 → T61 → T62 → T63 → T64 → T65 → T66 → T67 → 
 **Depends on**: T66
 **Reuses**: molde do próprio arquivo; achado em `validation.md`
 **Requirement**: PLA-09, PLA-13 · Achado: A-10 (validation.md)
+**SPEC_DEVIATION**: só o lado da API foi feito (`faturaUrl` só para a criadora); a restrição da policy `assinaturas_ler` ficou na AD-128 (a convidada lê a situação da assinatura pela RLS em Meu plano).
 **Status**: concluída
 
 **Done when**:
@@ -2135,6 +2142,29 @@ T58 → T59 → T60 → T61 → T62 → T63 → T64 → T65 → T66 → T67 → 
 **Done when**:
 
 - [x] Teste que reproduz o achado e falha antes da correção
+- [x] Gate passa, sem teste removido ou enfraquecido
+
+**Tests**: unit
+**Gate**: quick
+
+---
+
+### T71: Teto de assinaturas por conta e sem redirecionamento no Asaas (A-17, SEC-007)
+
+**What**: `assinar` também recusa (`muitas_tentativas`) quando a conta abriu 10 assinaturas na última hora somando todos os grupos; o cliente do Asaas passa `redirect: 'error'`; a AD-128 registra o SEC-005 de banco, o ajuste do SEC-003 e a T67 leva `SPEC_DEVIATION`.
+**Estimativa**: 1h
+**Risco**: alto
+**Domínio**: não
+**Criticidade**: crítica
+**Depends on**: T70
+**Reuses**: `assinar.ts` (teto por grupo da T65), `repositorios/assinaturas.ts`
+**Requirement**: PLA-60, PLA-38 · Achado: A-17 (validation.md)
+**Status**: concluída
+
+**Done when**:
+
+- [x] Teste: 10 assinaturas da conta em outro grupo bloqueiam o grupo sem nenhuma; 9 deixam assinar
+- [x] Teste: a chamada ao Asaas leva `redirect: 'error'`
 - [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit

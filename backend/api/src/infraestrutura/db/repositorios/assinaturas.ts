@@ -156,6 +156,15 @@ async function abertasNaUltimaHora(db: Db, grupoId: string): Promise<number> {
   return r.rows[0]?.n ?? 0;
 }
 
+/** Quantas assinaturas a conta abriu, em todos os grupos dela, na última hora (A-17: o teto por grupo não basta). */
+async function abertasPelaContaNaUltimaHora(db: Db, contaId: string): Promise<number> {
+  const r = await sql<{ n: number }>`
+    SELECT count(*)::int AS n
+      FROM assinaturas
+     WHERE criada_por = ${contaId}::uuid AND criada_em > now() - interval '1 hour'`.execute(db);
+  return r.rows[0]?.n ?? 0;
+}
+
 export const assinaturas = {
   pendenteOuAtiva,
   clienteDaConta,
@@ -163,4 +172,5 @@ export const assinaturas = {
   cancelar,
   travarGrupo,
   abertasNaUltimaHora,
+  abertasPelaContaNaUltimaHora,
 };

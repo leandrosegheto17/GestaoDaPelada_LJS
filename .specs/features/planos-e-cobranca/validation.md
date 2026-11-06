@@ -1,87 +1,45 @@
-# Planos e cobrança: Validação (rodada 1)
+# Planos e cobrança: Validação (rodada 2, retrabalho R1)
 
-**Data**: 2026-11-06 | **Spec**: `.specs/features/planos-e-cobranca/spec.md` | **Faixa**: código da feature já na `main` (`71b5abe6` a `923b39e2`), árvore `6bfdb8be` (HEAD `f9801ec0`) | **Verificador**: independente (autor ≠ verificador) | **Veredito**: FAIL ❌ (15 achados, 9 críticos, após consolidar verificador, revisão de código e segurança)
+**Data**: 2026-11-06 | **Spec**: `.specs/features/planos-e-cobranca/spec.md` | **Escopo**: `git diff d06e52f4^ HEAD` (T58 a T70, commits `16d0788b`, `3583c97f`, `9286663e`, `1fbee8fb`) mais regressão | **Árvore**: `66e8e95d` | **Verificador**: independente | **Veredito**: FAIL ❌ (A-01 a A-14 fechados; 1 achado comum de processo aberto: A-16)
 
-Tarefas: T0 a T57 = 58 de 58 `concluída` (`tasks.md`), nenhuma bloqueada. Caminhos abreviados: D=`backend/dominio/test/plano`, C=`backend/contrato/test`, A=`backend/api/test`, W=`frontend/web/test`, E=`frontend/web/e2e`.
+A rodada 1 (72 de 74 critérios conformes, A-01 a A-15) está no git (`d06e52f4`). A-15 é risco aceito (AD-128), fora do retrabalho. Aqui só o diff do retrabalho. Caminhos: A=`backend/api`, C=`backend/contrato`, W=`frontend/web`.
 
-## Critérios (spec → `arquivo:linha` e asserção → resultado)
+## Achados da rodada 1 (mutação: reverte só o código da correção numa cópia isolada e roda só o teste dele)
 
-| PLA | `arquivo:linha` e asserção | |
-|---|---|---|
-| 01 | `backend/scripts/checagens/test/plano-unico.test.ts:15` arquivo de prova com `situacao === 'ativo'` em `api/src` reprova; `D/plano-efetivo.test.ts:80` toda situação do CHECK tem resultado | ✅ |
-| 02-04 | `D/plano-efetivo.test.ts:18` `uso_proprio`→cortesia; `:24-26` trial 01-11 até 13-11 e free no 15; `:55-57` cancelado `pagoAte` 12-10 é pro, 12-11 free; `:50` inadimplente free | ✅ |
-| 05, 06 | `D/recursos.test.ts:14,37` free só partidas/ranking, 20 jogadores; `:58` `990`; `:68` ida e volta 1..99.999; `:75` 9.905 → RangeError | ✅ |
-| 07 | `A/aplicacao/recurso-liberado.test.ts:63,74,82,93,101,124` trial vencido nega, último dia libera, cortesia e ativo liberam, conta B false | ✅ |
-| 08, 09 | `A/rotas/plano.test.ts:88-93` `expect(corpo).toEqual({...})` com `trialFimEm`, `podeAssinar`; `:164` não admin 404 igual a inexistente | ✅ |
-| 10, 14 | `A/banco/planos-grupo-criar-trial.test.ts:48` `trial_inicio` = `p_hoje`; `:61,129` auditoria `plano_trial_iniciado` e rollback; `planos-assinatura.test.ts:111,205`, `planos-webhook-transicoes.test.ts:176,248,293` antes/depois, `infraestrutura` | ✅ |
-| 11 | `A/banco/planos-cortesia.test.ts:90,105,115,134` só o slug fica `uso_proprio`, contagem igual, aborta sem slug; `backend/scripts/test/ensaio-migracao-planos.test.ts:125` | ✅ |
-| 12, 13 | `A/banco/plano-caracterizacao.test.ts:53,98,111,120,129` default, INSERT recusado, UPDATE 42501; `A/isolamento/planos.test.ts:149-209,299` matriz política × comando e `EXECUTE` só `pelada_app`; `planos-webhook-transicoes.test.ts:319,327` com conta/slug 42501 | ✅ |
-| 15-17 | `A/rotas/plano-editavel.test.ts:208` 21 ativos 403 `limite_jogadores`, `:254` inativar 200, `:306` antigo 200 e novo 403; `A/concorrencia/limite-jogadores.test.ts:184,194` 20 ativos cadastrar/reativar 403 | ✅ |
-| 18-21 | `plano-editavel.test.ts:189` GET igual; `A/rotas/publico-plano.test.ts:154` ranking 200; `plano-editavel.test.ts:263` volta a aceitar; `limite-jogadores.test.ts:122` 2 cadastros simultâneos → 20 ativos e um 403 | ✅ |
-| 22 | `W/componentes/faixa-somente-leitura.test.tsx:44,54`; `W/telas/somente-leitura-elenco.test.tsx:115-174`, `somente-leitura-partidas.test.tsx:110-147` botões desabilitados. Texto da spec truncado ("…"): lacuna de precisão menor | ✅ ⚠ |
-| 23-26, 28 | `A/rotas/plano-recursos.test.ts:104,136,154`; `plano-matriz.test.ts:254` toda rota × 4 situações, `:279` PDF, `:292` meta-teste de rota sem linha; `publico-plano.test.ts:93,113` PDF 403 e `pdf_exportado` sem linha em `eventos_uso` | ✅ |
-| 27 | `W/componentes/aviso-recurso-pro.test.tsx:22` "R$ 9,90/mês" e botão; `W/telas/aviso-pro-telas.test.tsx:67,90` | ✅ |
-| 29-33 | `A/aplicacao/assinar.test.ts:77` campos do cliente e da assinatura; `A/rotas/assinatura.test.ts:138` 201 + linha `aguardando_pagamento`, `:150` plano segue trial, `:165` convidada 403 sem chamar Asaas, `:174` 409 com a mesma fatura | ✅ |
-| 34-38 | `A/infraestrutura/asaas.test.ts:281,264,162` sem cartão, log sem CPF, 10 s; `A/rotas/assinatura.test.ts:190` 502 com a mensagem literal; `C/plano.test.ts:59`; `A/isolamento/planos.test.ts:243`; `chave-asaas.test.ts:13`; `so-previa.test.ts:99` | ✅ |
-| 39-43 | `A/rotas/webhook-asaas.test.ts:112-144` 401 sem gravar nem logar; `:162,176,184` 429, 413 em 65.537 B, 64 KiB aceito; `:221` sem dado de pessoa; `webhook-asaas-aplicar.test.ts:246` `repetido`; `A/concorrencia/webhook-asaas.test.ts:237` `expect(await auditorias('plano_ativado')).toBe(1)` | ✅ |
-| 44-51 | `webhook-asaas-aplicar.test.ts:160,184,201,229,255,264,277` ativo/inadimplente/cancelado/estorno/desconhecido/valor divergente (Sentry só id e tipo); `transicoes.test.ts:146` rollback; `D/eventos-asaas.test.ts:203-232` fora de ordem; `webhook-asaas.test.ts:193,200,210` 400 só sem `id`/`event` | ✅ |
-| 52-60 | `W/telas/meu-plano.test.tsx:35,43,73,79`; `assinar-pro.test.tsx:53`; `assinatura-atual.test.tsx:45,77`; `A/rotas/assinatura-cancelar.test.ts:173,209` 502 e grupo segue `ativo`; `W/app/rotas-plano.test.tsx:45,55` menu; `assinatura.test.ts:221,228` 401 e 429; `E/planos.spec.ts:226,261,296` (rodado) | ✅ |
-| 61-65 | `W/telas/landing.test.tsx:36,47`; `E/landing.spec.ts:34` boundingBox lado a lado (rodado); `landing-preco.test.tsx:21` preço vem do domínio; `rotas-acesso.test.tsx:112`; `rotas-landing.test.tsx:54,69`; `landing.spec.ts:82` axe | ✅ |
-| 66, 67 | `W/telas/termos-cobranca.test.tsx:18,32,39`; `termos-tabela.test.tsx:22` | ✅ |
-| 68, 69 | `A/rotas/assinatura-bloqueia.test.ts:160,117` 409, conta intacta, `arquivado_em` nulo; a `mensagem` é comparada com a constante do próprio código (`:124,:166`), nenhum teste fixa o texto literal da spec | ⚠ GAP (A-01) |
-| 70-74 | `D/plano-efetivo.test.ts:65`; `A/rotas/plano.test.ts:173,179` 02:59Z trial / 03:00Z free; `docs/runbook.md:245-249` + `concorrencia/webhook-asaas.test.ts:387` lote de 5 atrasados; `:321` reenvio após 429 uma vez; `:359` 16º dia free e depois pro, `linhasDoGrupo` igual | ✅ |
+| ID | Teste novo (`arquivo:linha`, asserção) | Sem a correção | Com a correção | Situação |
+|---|---|---|---|---|
+| A-01 | `C/test/plano.test.ts:182,188` `toBe('Cancele a assinatura antes de arquivar o grupo')` e `mensagemCanceleAntesDeExcluir('Pelada de Quinta')` com o literal de `spec.md:244,252` | texto trocado em `plano.ts:162,166`: 2 falhas | 23/23 | fechado |
+| A-02 | `A/vitest.config.ts:89` `hookTimeout: 120_000` no projeto `worker` (config, sem teste possível); gate do api sem `Hook timed out` | n/a | ok | fechado (inspeção) |
+| A-03 | `A/test/banco/planos-leitura.test.ts:102` `plano_do_grupo` e `plano_grupos_da_criadora` devolvem `pago_ate` `2026-04-05` com a nova pendente | migração `1794004084481` removida: 1 falha | 14/14 | fechado |
+| A-04 | `A/test/aplicacao/assinar.test.ts:369` `{resultado:'grupo_cortesia'}` e `asaas.chamadas` `[]`; `A/test/rotas/assinatura.test.ts:174` 409 e mensagem | `=== 'cortesia'` anulado: 1 falha em cada arquivo; rota revertida: falha | verde | fechado |
+| A-05 | `A/test/concorrencia/cancelar-ordem-locks.test.ts:38` `FOR UPDATE NOWAIT` do grupo passa enquanto o cancelar espera a assinatura | migração `1794004086107` removida: 1 falha | 1/1 | fechado (ordem do webhook: `1792845720000_planos-webhook-transicoes.sql:57,61`) |
+| A-06 | `assinar.test.ts:283` dois testes (fatura lança; INSERT lança por trigger): `removida` `true`, `removerAssinatura` por último, erro sobe | `compensar('erro_inesperado')` removido: 2 falhas | 20/20 | fechado |
+| A-07 | `C/test/sentry.test.ts:104` `asaas-access-token` fora e `JSON.stringify` sem o segredo | `sentry.ts` revertido: 1 falha | 7/7 | fechado |
+| A-08 | `A/test/rotas/webhook-asaas.test.ts:177` chave `webhook:recusado:` e nunca `webhook:asaas`; `:196` 429 por IP; `assinar.test.ts:325` e `assinatura.test.ts:197` teto de 5 por hora, 429 com `Retry-After: 3600`, sem chamar o Asaas | rota revertida: falha; chave fixa para todos: falha; teto +1000: falha nos 2 arquivos | verde | fechado |
+| A-09 | `A/test/infraestrutura/asaas.test.ts:298` 8 URLs recusadas (http, produção, host parecido, usuário, `@`) com `fetch` não chamado e log `url_nao_permitida`; 4 permitidas | `cliente.ts` revertido: 12 falhas | 30/30 | fechado (`wrangler.jsonc:59` já é o sandbox) |
+| A-10 | `A/test/rotas/plano.test.ts:145` convidada: `assinatura` igual a `{situacao, faturaUrl:null}` e sem `sandbox.asaas.com` | `plano.ts` revertido: 1 falha | 9/9 | fechado (lado da API; RLS de leitura em AD-128) |
+| A-11 | `A/test/infraestrutura/token-webhook.test.ts:12-47` 31, 32, 255 e 256 caracteres, vazio, igual à chave da API; `tokenDoWebhookConfere` recusa o valor idêntico | `token-webhook.ts` revertido: 5 falhas | 7/7 | fechado |
+| A-12 | `A/test/aplicacao/evento-asaas.test.ts:7-40` 4 formatos viram `AAAA-MM-DD HH:MM:SS`; `Z`, fuso, só data, vazio e texto viram `null`; `eventoDoCorpo` grava a normalizada | `evento-asaas.ts` revertido: 12 falhas | 12/12 | fechado |
+| A-13 | `W/test/telas/assinar-pro.test.tsx:70` com `window.open` bloqueado, o link "Abrir a fatura" tem `href` da fatura, `target=_blank` e `rel` com `noopener` | `AssinarPro.tsx` revertido: 1 falha | verde | fechado |
+| A-14 | `W/test/telas/texto-validade.test.ts:19` `pagoAte` vencido dá "Pro: renovação em andamento", sem `05/12/2026`; o último dia ainda mostra a data | `MeuPlano.tsx` revertido: 1 falha | 16/16 (3 arquivos) | fechado |
 
-**Status**: 72 de 74 com resultado conforme a spec; PLA-68 e PLA-69 sem prova do texto literal; PLA-22 com lacuna de precisão da spec (texto truncado).
+**Sensor**: 17 mutações (todo o código de A-01 a A-14, com A-04, A-06 e A-08 também em ramos separados), 17 mortas, 0 sobreviventes; A-02 sem mutante possível (config). Cópia `…-val-planos-mut2` (junções de `node_modules`) removida; `git status --porcelain` só mostra `seguranca.md` (de outro agente); nenhum banco ou role `teste_*` em 5447.
 
-## Sensor (cópia isolada `…-val-planos-mut`, só o teste do arquivo mutado; 10 mutações + 2 sondas)
+## Regressão e processo
 
-| # | Arquivo | Mutação | Resultado |
-|---|---|---|---|
-| 1 | `dominio/src/plano/plano-efetivo.ts` | fim do trial `<` → `<=` | ✅ morto (3 falhas) |
-| 2 | `dominio/src/plano/eventos-asaas.ts` | remove conferência do valor (PLA-51) | ✅ morto (2) |
-| 3 | `dominio/src/plano/eventos-asaas.ts` | remove guarda de fora de ordem (PLA-48) | ✅ morto (4) |
-| 4 | `dominio/src/plano/excedente.ts` | inativar jogador deixa de ser exceção (PLA-15) | ✅ morto (2) |
-| 5 | `api/src/infraestrutura/asaas/token-webhook.ts` | aceita qualquer token (`diferenca === 0` removido) | ✅ morto (3) |
-| 6 | `api/src/entrada/rotas/publico.ts` | `pdf_exportado` sem trava de recurso (PLA-26) | ✅ morto (1) |
-| 7 | `api/src/aplicacao/plano/cancelar.ts` | ignora falha do Asaas ao cancelar (PLA-56) | ✅ morto (1) |
-| 8 | `api/src/aplicacao/plano/assinar.ts` | remove a checagem da criadora (PLA-32) | ✅ morto (1) |
-| 9 | `migracoes/…planos-tabelas.sql` | `GRANT INSERT, UPDATE, DELETE` a `pelada_app` em `assinaturas` | ✅ morto (20) |
-| 10 | `migracoes/…planos-tabelas.sql` | policy `assinaturas_ler` sem `grupos_visiveis()` (isolamento) | ✅ morto (3) |
-| S1, S2 | `contrato/src/plano.ts:162,166` | troca o texto de PLA-69 e PLA-68 | ❌ sobreviveram (não equivalentes: o texto é o definido pela spec) → A-01 |
+- Testes existentes: o diff dos testes só tem linhas adicionadas (0 removidas). `assinar.test.ts:55-60` prepara G, H e H2 em `trial` no `beforeAll`: necessário porque o cenário nasce `uso_proprio` (cortesia) e A-04 agora recusa; os testes antigos mantêm as asserções e `rotas/assinatura.test.ts:101` já fazia o mesmo. Não é enfraquecimento.
+- `esquema-producao.txt`: 3 linhas trocadas, só o hash de `assinatura_cancelar`, `plano_do_grupo` e `plano_grupos_da_criadora` (as funções que as 2 migrações redefinem); nenhuma outra. Migrações aditivas (arquivos novos com `CREATE OR REPLACE`), nenhuma aplicada foi editada.
+- Spec × design: `grupo_cortesia` e `muitas_tentativas` são códigos novos do contrato (`C/src/plano.ts:191,203`), nomeados em T61 e T65; sem divergência da spec.
+- (a) `testes.json` roda todos os pacotes. (b) typecheck de HEAD verde (gate do chamador); commits intermediários não amostrados (links do workspace apontam ao HEAD, inconclusivo como na rodada 1). Commits agrupam T58-T64 e T65-T70 em dois commits, em vez de um por pacote ou assunto: sem efeito.
+- Observação, sem achado: `dataCriacaoNormalizada` devolve `null` para formato fora de `AAAA-MM-DD HH:MM:SS`; com evento já aplicado, o domínio trata `null` como `fora_de_ordem` (`dominio/src/plano/eventos-asaas.ts:96-97`). É o desenho de T69 ("recusar"); se o Asaas mudasse o formato, os eventos seguintes seriam descartados sem aviso.
+- Observação: `webhook-asaas.test.ts:207` (a cota de quem errou o token não afeta o Asaas) passa também com o código antigo; quem discrimina é o `:177`, morto na reversão.
 
-**Sensor**: profundidade alta (dinheiro, webhook, isolamento); 10/10 mortos, 2 sondas vivas. Isolamento: `git status --porcelain` da árvore real igual ao de antes (só `revisao-codigo.md` e `seguranca.md` de outros agentes); junções removidas antes do `git worktree remove`; nenhum `teste_*` órfão em 5447.
+## Gate (árvore `66e8e95d`, rodado pelo chamador; não repetido)
 
-## Gate (árvore atual `6bfdb8be` ≠ `abc17b49` do `tasks.md`: 190 arquivos mudaram, gate repetido; sempre com `.env` do 5447)
+lint, format, typecheck, checagens 134/134, build do web; contrato 570, dominio 668, scripts, web 1062/1063 (SIM-15 só por tempo sob carga, passa isolado), api 3663/3667 (push-backup x2 e push-cpu: pendências aceitas em `tasks.md:7`; FUN-08 corrigido depois), e2e 72/74 (2 de `pdf-visual` PAR-108, idênticas na `main` `f9801ec0`: pré-existente). Reconfirmado por mim na cópia limpa: contrato 30/30 (plano e sentry), api banco 84/84 nos 6 arquivos tocados, api worker 42/42 nos 3 arquivos de rota, web 16/16.
 
-lint 0, format 0, typecheck 0, checagens 134/134, build do web ok. Vitest: contrato 567/567; scripts 326/326; dominio 665/668; web 1046/1058; api 3619/3623; raiz `test/` 48/50.
-- Pendências aceitas (`tasks.md:7`): `push-backup` (pg_dump de versão diferente), `push-cpu` e SIM-58 (CPU).
-- Falhas de carga (CPU a 100% por outras sessões), todas verdes ao repetir: 8 arquivos `worker` com `Hook timed out in 10000ms` (verdes com `--no-file-parallelism`, 129 testes) e PLA-28 matriz (verde isolada); 12 do web (SIM-15 passa com `--testTimeout=60000`); GEL-70 e PAR-61/PAR-140 (timeout de 5 s do eslint embutido; os de `test/lint` passam isolados, 18/18; GEL-70 segue vermelho sob carga); PAR-63.
-- Playwright (teto 2 tentativas, na cópia com portas 8747/8749/8797 e banco `pelada_planos`): `landing.spec.ts` 7/7, `planos.spec.ts` 3/3 (J-27, J-28, J-30). `visual` não rodado: AD-064 isenta as telas desta feature.
-
-## Checagens de processo
-
-(a) `testes.json` roda todos os pacotes (`pnpm -r`). (b) typecheck verde em HEAD; amostra de commits intermediários não conclusiva: os commits são de rascunho e os links do workspace apontam ao HEAD; `a37a43bb` ("corrige casts de tipo da base") e `STATE.md:155-157` registram que rascunhos não fechavam verde (regime autorizado em `STATE.md:168`). (c) testes existentes alterados: renomeação/dados com a mesma força e motivo no commit (ex.: `3b476bcb`), cobertos por `STATE.md:141,168`. (d) sem `reuso.md`. (e) sem `teste_*` órfão. (f) matriz política × comando completa para `assinaturas`, `eventos_asaas`, backup e as 9 funções (`isolamento/planos.test.ts`). (g) divergências spec × design têm AD (087-097, 113-115). Decisões da Base seguidas: `grupo_criar` de 7 parâmetros com `p_hoje`, webhook fora do `X-Pelada`, compensação do Asaas (`assinar.test.ts:206`), `pdfLiberado`.
-
-## Achados
+## Achados abertos
 
 | ID | `arquivo:linha` | Achado e evidência | Correção sugerida | Criticidade |
 |---|---|---|---|---|
-| A-01 | `backend/contrato/src/plano.ts:162-167`; `backend/api/test/rotas/assinatura-bloqueia.test.ts:124,166` | PLA-68 e PLA-69 definem o texto exato; os testes comparam com a constante importada do código e nenhum teste do repositório contém o literal (`git grep` vazio). Sondas S1 e S2 sobreviveram (`contrato` 21/21 verde com o texto trocado) | Teste em `backend/contrato/test/plano.test.ts` com os literais da spec ("Cancele a assinatura antes de arquivar o grupo"; `mensagemCanceleAntesDeExcluir('X')` = "Cancele a assinatura do grupo X antes de excluir a conta") | comum |
-| A-02 | `backend/api/vitest.config.ts:83-87` | O projeto `worker` não define `hookTimeout` (o `banco` define 120 s em `:65`); na suíte completa 8 arquivos `worker` (inclusive `plano-editavel`, `webhook-asaas-aplicar`, `assinatura-cancelar`) falharam com `Hook timed out in 10000ms` ao clonar o molde em paralelo, e passaram com `--no-file-parallelism`. Gate do api instável em máquina carregada | `hookTimeout: 120_000` no projeto `worker` (ou `fileParallelism: false`, como no `banco`) | comum |
-| A-03 | `migracoes/1792845480000_planos-leitura.sql:36-40,70-74` (R-01 da revisão) | `ORDER BY (a.situacao <> 'cancelada') DESC` prefere a assinatura não cancelada: quem cancela e reassina tem assinatura pendente com `pago_ate` NULL e cai para free na hora, perdendo os dias já pagos; `planos-leitura.test.ts:79` não cobre | Migração nova: usar o maior `pago_ate` entre as assinaturas do grupo, com teste do caso cancelar e reassinar | crítica |
-| A-04 | `backend/api/src/aplicacao/plano/assinar.ts:71-96` (R-02) | Grupo de cortesia (`uso_proprio`) pode ser assinado pela API; só a tela esconde o botão (PLA-58); a criadora seria cobrada R$ 9,90/mês | Recusar na aplicação (e teste) quando o grupo é `uso_proprio` | crítica |
-| A-05 | migrações `planos-assinatura`/`planos-webhook-*` (R-03) | Ordem de locks invertida: `assinatura_cancelar` trava `grupos` e depois `assinaturas`; webhook trava `assinaturas` e depois `grupos`: deadlock 40P01 possível e o cancelar vira 500 depois de o Asaas já ter cancelado | Migração com a mesma ordem de lock nas duas funções e teste de concorrência cancelar × webhook | crítica |
-| A-06 | `assinar.ts:108-122` (R-04) | Erro após `criarAssinatura` (registro local, COMMIT) não é compensado: assinatura viva no Asaas sem linha local, webhook a ignora e a cliente paga sem Pro | try/catch chamando `compensar`, com teste | crítica |
-| A-07 | `backend/contrato/src/sentry.ts:15` (SEC-001) | `limparEvento` só tira `cookie`, `set-cookie`, `authorization`: o `asaas-access-token` sai em claro nos eventos do webhook (prova: `scratchpad/sentry/prova.mjs`) | Lista de permissão de cabeçalhos, com teste; trocar o token se algum evento já foi ao Sentry de produção | crítica |
-| A-08 | `entrada/rotas/webhook-asaas.ts:160-163` (SEC-002) | `LIMITE_WEBHOOK` com chave fixa roda antes do token: quem não tem o token esgota o limite e o Asaas pausa a fila; assinar e cancelar em ciclo gastam a cota do Asaas | Conferir o token antes do limitador (sem token: limitador por IP) e limite por grupo em assinar e cancelar | crítica |
-| A-09 | `infraestrutura/asaas/cliente.ts:110` (SEC-004) | A chave do Asaas vai para qualquer `ASAAS_URL`, inclusive `http://` | Recusar em execução o que não for o sandbox, com exceção explícita do teste local | crítica |
-| A-10 | `entrada/rotas/plano.ts`, `migracoes/1792845420000_planos-tabelas.sql:68-69` (SEC-005) | Admin convidado vê `faturaUrl` e id do cliente Asaas da criadora (LGPD) | `faturaUrl` só com `podeAssinar`; leitura de `assinaturas` só da criadora | crítica |
-| A-11 | `webhook-asaas.ts:29-30`, `infraestrutura/asaas/token-webhook.ts` (SEC-006) | Comentário promete recusar token igual à chave da API e com menos de 32 caracteres; o código não faz | Recusar os dois casos, com teste | comum |
-| A-12 | `backend/dominio/src/plano/eventos-asaas.ts` e a função SQL (R-08) | `dateCreated` comparado como texto cru; formato diferente do exato é aplicado mas deixa `ultimo_evento_em` sem avançar | Normalizar ou recusar o formato, com teste | comum |
-| A-13 | `frontend/web` (tela Assinar Pro) (R-09) | `window.open` da fatura depois de POST assíncrono é bloqueado em Safari/iOS e no PWA | Link visível da fatura, com teste | comum |
-| A-14 | `frontend/web` (`textoValidade`) (R-10) | Pode mostrar "Pro até <data passada>" | Corrigir o texto e testar | comum |
-| A-15 | `aplicacao/plano/webhook.ts`, `assinar.ts` (R-05, R-06, R-07) e funções `plano_*` (SEC-003) | R-05: webhook antes do COMMIT do `assinar` vira `assinatura_desconhecida` sem reprocesso; R-06: transação e advisory lock seguram até 3 chamadas de 10 s ao Asaas; R-07: `asaas_evento_sem_efeito` sem chamador (a LACUNA de `webhook.ts` é contornável); SEC-003: sem conta no contexto a função `plano_ativar` aceita qualquer valor | Decisão do usuário: corrigir ou aceitar como risco registrado em AD | comum |
-
-## Perguntas para o usuário
-
-P-01 (`trialFimEm` é o último dia Pro?) e P-02 (aviso à criadora de pagamento divergente) são lacunas da spec, não achados; a P-02 já é `[LACUNA]` aberta no código.
+| A-16 | `.specs/features/planos-e-cobranca/tasks.md:7` | O `Gate:` do topo segue na árvore `abc17b49` (rodada 1) e nenhuma linha `Gate: <comando> @ <árvore> = <resultado>` registra o lote Retrabalho R1 (`git diff d06e52f4^ HEAD -- tasks.md` só marca `[x]` e `Status`). O verificador não tem o que reaproveitar | Registrar `Gate: … @ <árvore> = <resultado>` (com as pendências aceitas) num commit de fechamento do lote | comum |
