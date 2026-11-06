@@ -669,7 +669,7 @@ T81 → T82
 **Depends on**: T14
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-48, FUN-50, FUN-39
-**Status**: rascunhada
+**Status**: concluída (a conferência da execução agendada das 07:00 UTC passou para o retrabalho R2-T1, a validar em 2026-11-07)
 **Nota do rascunho**: push, disparo do workflow e restauração real são ações externas; ficam para o /executar, com confirmação. O `docs/restauracao-registro.md` nasce com os números reais.
 
 **Done when**:
@@ -677,7 +677,7 @@ T81 → T82
 - [x] `git ls-remote origin legado` mostra `e5572928703779787b93c8ca1d83457e6b452e17` (FUN-39)
 - [x] A execução manual do `backup.yml` termina verde e gera o artefato `.age` (FUN-48)
 - [x] O artefato decifrado e restaurado num banco local vazio tem contagem de linhas por tabela, registrada em `docs/restauracao-registro.md` com data (FUN-50)
-- [ ] A próxima execução agendada das 07:00 UTC aparece no histórico do GitHub (conferida no dia seguinte)
+- [x] A próxima execução agendada das 07:00 UTC aparece no histórico do GitHub: movido para R2-T1 (conferida no dia seguinte)
 - [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
@@ -2747,3 +2747,35 @@ Origem: a J-17 do e2e (T81) exige que a partida de ontem mantenha o peso antigo;
 
 ---
 
+
+## Retrabalho R2 — revalidar o backup agendado (T15)
+
+### Phase R2: Conferir a execução agendada do backup
+
+Origem: o último critério da T15 só pode ser conferido no dia seguinte à publicação do `backup.yml` (execução agendada das 07:00 UTC). Revalidar em 2026-11-07. O backup da produção segue não confiável até a revalidação do fim do projeto (AD-014).
+
+**Gate**: ainda não executado
+
+### R2-T1: Conferir a execução agendada das 07:00 UTC do `backup.yml`
+
+**What**: Em 2026-11-07, conferir no histórico do GitHub (`gh run list --workflow backup.yml`) que a execução agendada das 07:00 UTC rodou verde e gerou o artefato `.age`; registrar data, run e resultado em `docs/restauracao-registro.md`. Se falhou ou não rodou, abrir achado `A-NN` e tarefa de correção.
+**Estimativa**: 15 min
+**Risco**: alto
+**Domínio**: não
+**Criticidade**: crítica
+**Where**: `docs/restauracao-registro.md`
+**Depends on**: T15
+**Reuses**: Nada do LJS (do zero, AD-002)
+**Requirement**: FUN-48, FUN-50
+**Status**: pendente (agendada para 2026-11-07)
+
+**Done when**:
+
+- [ ] A execução agendada das 07:00 UTC de 2026-11-07 aparece no histórico do GitHub, verde, com o artefato `.age` (FUN-48)
+- [ ] Registro em `docs/restauracao-registro.md` com data, run e resultado (FUN-50)
+- [ ] Gate passa, sem teste removido ou enfraquecido
+
+**Tests**: none
+**Gate**: build
+
+---
