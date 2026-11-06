@@ -321,11 +321,11 @@ T53 → T54
 
 **Done when**:
 
-- [x] Teste `SIM-81`: uma célula por comando da matriz (SELECT, INSERT, UPDATE, DELETE, UPDATE e DELETE sem `WHERE`), com o banco do B igual antes e depois
-- [x] Teste `SIM-69`: segunda linha na mesma data dá 23505 em `escalacoes_grupo_data`; `SIM-72`: `varios_times` com K dá 23514
-- [x] Evidência da rede: `CREATE POLICY ... USING (true)` temporária para `escalacoes` deixa o teste de SELECT vermelho; registrada nesta tarefa
-- [x] Banco e dados de teste limpos no `finally`
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste `SIM-81`: uma célula por comando da matriz (SELECT, INSERT, UPDATE, DELETE, UPDATE e DELETE sem `WHERE`), com o banco do B igual antes e depois
+- [ ] Teste `SIM-69`: segunda linha na mesma data dá 23505 em `escalacoes_grupo_data`; `SIM-72`: `varios_times` com K dá 23514
+- [ ] Evidência da rede: `CREATE POLICY ... USING (true)` temporária para `escalacoes` deixa o teste de SELECT vermelho; registrada nesta tarefa
+- [ ] Banco e dados de teste limpos no `finally`
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -349,10 +349,10 @@ T53 → T54
 
 **Done when**:
 
-- [x] Teste: o catálogo tem as duas sobrecargas e a de 6 delega à de 7 (estado depois da `partidas-e-ranking`)
-- [x] Teste: nenhum arquivo de `src` nem o seed chama a `grupo_criar` com 6 argumentos
-- [x] `Evidência`: a lista dos testes que chamam a de 6, com arquivo e linha
-- [x] Gate passa, sem teste removido ou enfraquecido
+- [ ] Teste: o catálogo tem as duas sobrecargas e a de 6 delega à de 7 (estado depois da `partidas-e-ranking`)
+- [ ] Teste: nenhum arquivo de `src` nem o seed chama a `grupo_criar` com 6 argumentos
+- [ ] `Evidência`: a lista dos testes que chamam a de 6, com arquivo e linha
+- [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
