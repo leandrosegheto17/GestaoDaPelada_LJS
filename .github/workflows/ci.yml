@@ -175,7 +175,14 @@ jobs:
       - name: Migrar e semear o banco do e2e
         run: pnpm migrar && pnpm seed
       - name: Instalar o Chromium do Playwright
-        run: pnpm --filter @pelada/web exec playwright install --with-deps chromium
+        # O apt e o download às vezes travam no runner (uma fatia ficou parada por mais de 6 min): cada tentativa tem
+        # 180 s e há até 3.
+        run: |
+          for tentativa in 1 2 3; do
+            timeout 180 pnpm --filter @pelada/web exec playwright install --with-deps chromium && exit 0
+            echo "Tentativa $tentativa falhou ou passou de 180 s"
+          done
+          exit 1
       - name: Build do web
         run: pnpm --filter @pelada/web build
       - name: e2e (instalabilidade e cabeçalhos)
