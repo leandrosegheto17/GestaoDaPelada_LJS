@@ -11,7 +11,7 @@
     "lint": "eslint test scripts eslint eslint.config.mjs && pnpm -r lint",
     "format:check": "prettier --check .",
     "typecheck": "pnpm -r typecheck && tsc --noEmit -p .",
-    "test": "vitest run --dir test && pnpm -r test",
+    "test": "vitest run --dir test && pnpm -r --workspace-concurrency=1 test",
     "restaurar": "node --env-file-if-exists=.env backend/scripts/ops/restaurar-backup.ts",
     "migrar": "node --env-file-if-exists=.env backend/scripts/src/migrar.ts",
     "seed": "node --env-file-if-exists=.env backend/scripts/src/seed.ts",
