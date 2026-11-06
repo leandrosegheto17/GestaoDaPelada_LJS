@@ -476,8 +476,9 @@ test('J-20: reativar um jogador vendo o efeito nos pontos', async ({ browser }) 
   await partidaPelaApi(pagina, grupo.id, d2, false, [[beto, 'presente']]);
 
   // 1 e 2. Reativar com retorno antes das duas partidas (PAR-109, PAR-117, PAR-159).
+  // Os períodos vêm na ficha do jogador (não há rota própria de leitura).
   const periodos = async () =>
-    (await pagina.request.get(`/api/grupos/${grupo.id}/jogadores/${gil}/periodos`)).text();
+    (await pagina.request.get(`/api/grupos/${grupo.id}/jogadores/${gil}`)).text();
   const periodosAntes = await periodos();
   await pagina.goto(ficha);
   await pagina.getByRole('button', { name: 'Reativar', exact: true }).click();
@@ -535,7 +536,15 @@ test('J-21: painel de uso do app', async ({ browser }) => {
   await admin.getByRole('link', { name: /Uso do app/ }).click();
   await expect(admin).toHaveURL(new RegExp(`/app/grupos/${grupo.id}/uso$`));
   await expect(admin.getByRole('heading', { level: 1, name: 'Uso do app' })).toBeVisible();
-  await expect(admin.getByRole('main')).toContainText('1 aparelho');
+  // Um aparelho abriu o ranking: a primeira célula de dados da linha da semana mostra 1.
+  await expect(
+    admin
+      .getByRole('table', { name: /Uso por semana/ })
+      .getByRole('row')
+      .nth(1)
+      .getByRole('cell')
+      .first(),
+  ).toHaveText('1');
   const uso = (await (await admin.request.get(`/api/grupos/${grupo.id}/uso`)).json()) as unknown;
   expect(JSON.stringify(uso)).not.toMatch(/\b(ip|email|contaId)\b/i);
   await admin.context().close();
