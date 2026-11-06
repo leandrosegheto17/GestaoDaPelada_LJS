@@ -315,7 +315,7 @@ T53 → T54
 **Depends on**: None
 **Reuses**: `comoApp` e o cenário de dois grupos (`F:909`); tabela `M:1792843200000_linha-de-base.sql:212-228`; grants `M:1792843260000_roles.sql:22-31`; policies do laço `M:1792843320000_rls.sql:51-56`; molde da matriz de `PR:1038` (T23)
 **Requirement**: SIM-81, SIM-69, SIM-72
-**Status**: concluída
+**Status**: rascunhada
 **Nota do rascunho**: usa o cenário da fundação (`abrirCenario`, grupos A e B com uma escalação cada); a evidência da rede (policy `USING (true)`) é do /executar.
 **Resolução**: o usuário decidiu em 2026-11-05 que vale a matriz (AD-122): migração `1793919878922_escalacoes-leitura-so-conta.sql`; evidência da rede: o teste de SELECT pelo slug estava vermelho (1 linha em vez de 0) e passa. (Lacuna original: a matriz pede "slug público zero" no SELECT, mas a policy do laço (`grupos_visiveis()`, ramo do slug, FUN-14) deixa o slug do A ler a escalação do A. O teste segue a matriz (zero); se ficar vermelho, perguntar se vale a matriz (migração nova) ou a policy atual.
 
@@ -343,7 +343,7 @@ T53 → T54
 **Depends on**: T0
 **Reuses**: `lerEsquema` com funções (`F:760`); função de 7 de `PR:987` (T22); AD-037
 **Requirement**: SIM-67 (linha de base da remoção, AD-037)
-**Status**: concluída
+**Status**: rascunhada
 **Nota do rascunho**: varredura de `backend/{api,contrato,dominio,scripts}/src` com um contador de argumentos de cada `grupo_criar(...)` (testado no próprio arquivo). Chamadas à de 6 encontradas por leitura (lista para a T25): testes `test/concorrencia/grupos-slug.test.ts:32`, `test/banco/grupos-criar.test.ts:32`, `test/banco/partidas-rede.test.ts:82` e `:107`, `test/banco/grupo-criar-pesos.test.ts:138` (bloco da delegação e `ASSINATURA_6` em `:16`, `:154`, `:179`), `test/banco/financeiro-trava-acesso.test.ts:108`, `test/isolamento/cenario-grupos.ts:100` e a assinatura em `test/isolamento/meta-grupos.test.ts:25`.
 **Resolução**: a T25 passa o seed para a de 7 antes de remover a de 6; o teste de T1 passou como está. (Lacuna original: o seed chama a de 6 (`backend/scripts/src/seed.ts:147` e `:228`), e o Delta 2 não o lista; o teste "nenhum arquivo de src nem o seed" nasce vermelho por isso. Interpretação conservadora: o teste fica como a tarefa pede e a T25 passa o seed para a de 7 antes de remover a de 6 (senão o seed quebra). O /executar confirma com o usuário.
 

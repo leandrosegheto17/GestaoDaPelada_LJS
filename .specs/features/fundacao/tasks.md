@@ -300,7 +300,7 @@ T81 → T82
 **Depends on**: None
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-01
-**Status**: concluída
+**Status**: rascunhada
 **Nota do rascunho**: ação do usuário; nada a escrever. O /executar confere a máquina.
 
 **Done when**:
@@ -326,7 +326,7 @@ T81 → T82
 **Depends on**: T1
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-01
-**Status**: concluída
+**Status**: rascunhada
 **Nota do rascunho**: o `pnpm-lock.yaml` nasce no `pnpm install` do /executar. O `.gitattributes` já existia.
 
 **Done when**:
@@ -352,7 +352,7 @@ T81 → T82
 **Depends on**: T2
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-01, FUN-02
-**Status**: concluída
+**Status**: rascunhada
 
 **Done when**:
 
@@ -377,7 +377,7 @@ T81 → T82
 **Depends on**: T3
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-02
-**Status**: concluída
+**Status**: rascunhada
 **Nota do rascunho**: a formatação da base com `prettier --write .` fica para o /executar.
 
 **Done when**:
@@ -402,7 +402,7 @@ T81 → T82
 **Depends on**: T4
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-06
-**Status**: concluída
+**Status**: rascunhada
 
 **Done when**:
 
@@ -455,7 +455,7 @@ T81 → T82
 **Depends on**: T6
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-03
-**Status**: concluída
+**Status**: rascunhada
 
 **Done when**:
 
@@ -480,7 +480,7 @@ T81 → T82
 **Depends on**: T7
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-19, FUN-05
-**Status**: concluída
+**Status**: rascunhada
 **Nota do rascunho**: o `.env.example` já listava as cinco variáveis de banco; não mudou.
 
 **Done when**:
@@ -506,7 +506,7 @@ T81 → T82
 **Depends on**: T8
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-55
-**Status**: concluída
+**Status**: rascunhada
 
 **Done when**:
 
@@ -560,7 +560,7 @@ T81 → T82
 **Depends on**: T10
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-47, FUN-49
-**Status**: concluída
+**Status**: rascunhada
 
 **Done when**:
 
@@ -586,7 +586,7 @@ T81 → T82
 **Depends on**: T11
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-47, FUN-49
-**Status**: concluída
+**Status**: rascunhada
 **Nota do rascunho**: SHAs das actions tirados da versão anterior (`b65b7d8`); o /executar confere. O gitleaks local fica para o /executar.
 
 **Done when**:
@@ -613,7 +613,7 @@ T81 → T82
 **Depends on**: T12
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-50
-**Status**: concluída
+**Status**: rascunhada
 **Nota do rascunho**: `pg_restore` sem `--no-acl`; os grants exigem as roles `pelada_*` no cluster local (criadas pelo `pnpm migrar`). O runbook (T73) diz isso.
 
 **Done when**:

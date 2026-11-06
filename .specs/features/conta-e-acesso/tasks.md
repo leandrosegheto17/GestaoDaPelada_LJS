@@ -275,7 +275,7 @@ T57 → T58
 **Depends on**: None
 **Reuses**: estender a fábrica de cenário e o `comoApp` da fundação (`F:909`, `FD:89`) e o `bancoDeTeste()` (`F:507`); senha por `conta_definir_senha` (`M:1792843560000_conta-senha-e-exclusao.sql:97`), chamada como `postgres` (AD-009)
 **Requirement**: ACE-43, ACE-45
-**Status**: concluída
+**Status**: rascunhada
 **Nota do rascunho**: o teste do cenário fica em `cenario-conta.test.ts`; a evidência da rede (sabotagem do `conta_definir_senha`) é do /executar.
 
 **Done when**:
@@ -301,7 +301,7 @@ T57 → T58
 **Depends on**: T0
 **Reuses**: molde da matriz de leitura e escrita da fundação (`F:981`, `F:1007`); policies e grants em `M:1792843380000_conta-tabelas.sql:69-81`
 **Requirement**: ACE-43, ACE-44, ACE-45
-**Status**: concluída
+**Status**: rascunhada
 
 **Done when**:
 
@@ -326,7 +326,7 @@ T57 → T58
 **Depends on**: T1
 **Reuses**: policies de `M:1792843380000_conta-tabelas.sql:55-101`; tabelas novas em `M:1792843800000_conta-senha-bloqueio.sql:8`, `M:1792843860000_conta-teto-emails.sql:7`, `M:1792843980000_conta-teto-emails-origem.sql:7`; role renomeada em `M:1792844220000_roles-padronizadas.sql:26` (AD-016 proposta)
 **Requirement**: ACE-45, ACE-46
-**Status**: concluída
+**Status**: rascunhada
 
 **Done when**:
 
@@ -352,7 +352,7 @@ T57 → T58
 **Depends on**: T2
 **Reuses**: estender o meta-teste da fundação (`F:957`) e ler o catálogo como o `lerEsquema` (`F:760`); fecha o risco de `FD:183`
 **Requirement**: ACE-43, ACE-45
-**Status**: concluída
+**Status**: rascunhada
 **Nota do rascunho**: a matriz de conta (tabela → arquivo de teste) fica no próprio meta-teste.
 
 **Done when**:
@@ -383,7 +383,7 @@ T57 → T58
 **Depends on**: T3
 **Reuses**: `M:1792843440000_conta-cadastro-e-links.sql:11` (`envio_permitido`), `:29` (`conta_cadastrar`); `M:1792843920000_conta-esqueci-nao-confirmada.sql:47` (`link_pedir`); `M:1792843740000_conta-confirmar-sem-sessao.sql:9` (`link_confirmar`)
 **Requirement**: ACE-01, ACE-04, ACE-05, ACE-06, ACE-07, ACE-08, ACE-23, ACE-51
-**Status**: concluída
+**Status**: rascunhada
 **Nota do rascunho**: o apoio dos testes de banco (transação desfeita, troca de role) nasce em `backend/api/test/banco/apoio-conta.ts`.
 
 **Done when**:
@@ -410,7 +410,7 @@ T57 → T58
 **Depends on**: T4
 **Reuses**: `M:1792844040000_conta-entrar-teto-conta.sql:21` (versão vigente de `conta_entrar`, com a trava por e-mail e IP de `M:1792843500000_conta-entrar-e-sessao.sql:15`)
 **Requirement**: ACE-09, ACE-10, ACE-11, ACE-12, ACE-13, ACE-14, ACE-66
-**Status**: concluída
+**Status**: rascunhada
 **Nota do rascunho**: casos limite listados no topo do teste; sem lacuna. O teste com 4 falhas e duas tentativas simultâneas é o que morre sem a trava por e-mail.
 
 **Done when**:
@@ -439,7 +439,7 @@ T57 → T58
 **Depends on**: T5
 **Reuses**: `M:1792843500000_conta-entrar-e-sessao.sql:78` (`sessao_tocar`); `M:1792844040000_conta-entrar-teto-conta.sql:21`
 **Requirement**: ACE-15, ACE-16, ACE-74
-**Status**: concluída
+**Status**: rascunhada
 **Nota do rascunho**: casos limite listados no topo do teste; sem lacuna.
 
 **Done when**:
@@ -470,7 +470,7 @@ T57 → T58
 **Depends on**: T6
 **Reuses**: `M:1792844160000_conta-nova-senha-zera-falhas.sql:10` (`link_nova_senha` vigente); `M:1792843800000_conta-senha-bloqueio.sql:27-82` (`falhas_senha_atual`, `conta_trocar_senha`)
 **Requirement**: ACE-23, ACE-24, ACE-25, ACE-26, ACE-27, ACE-70, ACE-76
-**Status**: concluída
+**Status**: rascunhada
 **Nota do rascunho**: casos limite listados no topo do teste; sem lacuna.
 
 **Done when**:
@@ -498,7 +498,7 @@ T57 → T58
 **Depends on**: T7
 **Reuses**: `M:1792843800000_conta-senha-bloqueio.sql:92` (`conta_excluir` vigente)
 **Requirement**: ACE-28, ACE-29, ACE-30, ACE-69
-**Status**: concluída
+**Status**: rascunhada
 
 **Done when**:
 
@@ -524,7 +524,7 @@ T57 → T58
 **Depends on**: T8
 **Reuses**: `M:1792843620000_conta-convites.sql:13` (`convite_criar`); versões vigentes de `convite_ler`, `convite_aceitar` e `convite_cadastrar` em `M:1792844460000_convites-grupo-arquivado.sql:11`, `:25`, `:61`; `M:1792843680000_conta-admins-listar.sql:8`
 **Requirement**: ACE-31, ACE-32, ACE-33, ACE-34, ACE-35, ACE-36, ACE-37, ACE-67
-**Status**: concluída
+**Status**: rascunhada
 **Nota do rascunho**: casos limite listados no topo do teste; sem lacuna. O aceite concorrente grava de verdade (COMMIT) e limpa no finally.
 
 **Done when**:
@@ -553,7 +553,7 @@ T57 → T58
 **Depends on**: T9
 **Reuses**: `M:1792843860000_conta-teto-emails.sql:26`, `:43`; `M:1792844100000_conta-cota-trava.sql:7`; `M:1792843980000_conta-teto-emails-origem.sql:27`, `:50`; `M:1792843920000_conta-esqueci-nao-confirmada.sql:9`
 **Requirement**: ACE-72, ACE-73, ACE-75
-**Status**: concluída
+**Status**: rascunhada
 **Nota do rascunho**: casos limite listados no topo do teste; sem lacuna. O teto por categoria (80% ou 100%) é da API (T24); aqui ele entra como parâmetro.
 
 **Done when**:
@@ -585,7 +585,7 @@ T57 → T58
 **Depends on**: None
 **Reuses**: pacote `@pelada/contrato` da fundação (`F:338`, nomes em `F:18`); limites de `ljs:.specs/features/conta-e-acesso/spec.md:50` e `:76`
 **Requirement**: ACE-03, ACE-05, ACE-68
-**Status**: concluída
+**Status**: rascunhada
 **Nota do rascunho**: o `pnpm-lock.yaml` com o zod nasce no `pnpm install` do /executar.
 
 **Done when**:
@@ -611,7 +611,7 @@ T57 → T58
 **Depends on**: T11
 **Reuses**: formas de `ljs:.specs/features/conta-e-acesso/design.md:192` e `:215-228` (só consulta, AD-002)
 **Requirement**: ACE-02, ACE-58
-**Status**: concluída
+**Status**: rascunhada
 **Nota do rascunho**: corpo de erro `{ erro, codigo, campos?, grupos? }`; `TERMOS_VERSAO` = 2026-11-05, a data do rascunho dos textos (T48).
 
 **Done when**:
@@ -637,7 +637,7 @@ T57 → T58
 **Depends on**: T12
 **Reuses**: decisão de `ljs:.specs/features/conta-e-acesso/design.md:141-142` (token e hash do IP); escrito do zero
 **Requirement**: ACE-10, ACE-71, ACE-73
-**Status**: concluída
+**Status**: rascunhada
 **Nota do rascunho**: o hash é o SHA-256 do texto do token (UTF-8); valor que não é IP também vira `sem-ip`.
 
 **Done when**:
@@ -663,7 +663,7 @@ T57 → T58
 **Depends on**: T13
 **Reuses**: app Hono da fundação (`F:1106`); atributos de `ljs:.specs/features/conta-e-acesso/spec.md:48` e `:99`
 **Requirement**: ACE-09, ACE-17
-**Status**: concluída
+**Status**: rascunhada
 **Nota do rascunho**: o cookie leva `Max-Age` das 12 h da sessão; o vencido leva também `Expires` em 1970.
 
 **Done when**:
@@ -692,7 +692,7 @@ T57 → T58
 **Depends on**: T14
 **Reuses**: decisão de `ljs:.specs/features/conta-e-acesso/design.md:176-187` (`fetch` direto, sem SDK); escrito do zero
 **Requirement**: ACE-21, ACE-52, ACE-75
-**Status**: concluída
+**Status**: rascunhada
 **Nota do rascunho**: casos limite listados no topo do código; sem lacuna. O remetente em memória tem `falharProximos(n)` para provar o ACE-52 nas rotas.
 
 **Done when**:
@@ -719,7 +719,7 @@ T57 → T58
 **Depends on**: T15
 **Reuses**: `URL_PUBLICA` como única origem de URL (FUN-23, `F:1251`); fragmento de `ljs:.specs/features/conta-e-acesso/design.md:30-31`
 **Requirement**: ACE-04, ACE-23, ACE-31
-**Status**: concluída
+**Status**: rascunhada
 **Nota do rascunho**: o aviso de cadastro duplicado leva só o link de `/entrar/esqueci`, sem token.
 
 **Done when**:
@@ -746,7 +746,7 @@ T57 → T58
 **Depends on**: T16
 **Reuses**: molde das checagens da fundação (`F:1251`, `backend/scripts/checagens/`) e a checagem do `.env.example` (`F:1886`)
 **Requirement**: ACE-52
-**Status**: bloqueada (2026-11-05): todo teste do projeto `worker` que importa `pg` falha ao carregar (`SyntaxError: Cannot use import statement outside a module` em `pg/lib/connection.js?mf_vitest_no_cjs_esm_shim`); é o ambiente de teste de rotas da fundação, que nunca rodou. A checagem `email-dev` passa (5 testes); falta o teste de `GET /api/dev/emails` (`test/rotas/dev-emails.test.ts`) e o gate full.
+**Status**: rascunhada
 **Nota do rascunho**: como o Hono monta o app sem o `env`, a rota existe sempre e responde o 404 padrão sem `EMAIL_DEV=1`. A checagem `email-dev` entra no ci.yml.
 
 **Done when**:
