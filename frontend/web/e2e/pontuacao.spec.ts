@@ -17,6 +17,20 @@ function lerResposta(arquivo: string): unknown {
 
 const SESSAO = lerResposta('acesso-sessao-leandro.json');
 const PESOS = lerResposta('pesos.json');
+const GRUPO = lerResposta('grupo-quinta.json');
+const GRUPOS = lerResposta('grupos-leandro.json');
+const PLANO_PRO = {
+  plano: 'pro',
+  situacao: 'ativo',
+  trialFimEm: null,
+  pagoAte: '2026-12-31',
+  jogadoresAtivos: 20,
+  limiteJogadores: null,
+  somenteLeitura: null,
+  recursos: ['pdf', 'simulador', 'financeiro'],
+  podeAssinar: false,
+  assinatura: null,
+};
 
 const VIEWPORTS = [
   { nome: 'pc', largura: 1280, altura: 900 },
@@ -26,6 +40,16 @@ const VIEWPORTS = [
 async function prepararApi(pagina: Page, posts: string[]) {
   await pagina.route('**/api/sessao', (rota) =>
     rota.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(SESSAO) }),
+  );
+  await pagina.route('**/api/grupos', (rota) =>
+    rota.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(GRUPOS) }),
+  );
+  await pagina.route('**/api/grupos/g-quinta', (rota) =>
+    rota.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(GRUPO) }),
+  );
+  // O plano do grupo entra em toda tela do grupo; sem resposta aqui, a API real devolveria 401.
+  await pagina.route('**/api/grupos/*/plano', (rota) =>
+    rota.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(PLANO_PRO) }),
   );
   await pagina.route('**/api/grupos/*/pesos', (rota) => {
     if (rota.request().method() === 'POST') {
