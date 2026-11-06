@@ -43,7 +43,7 @@ async function semContexto<T>(fn: (d: pg.Client) => Promise<T>): Promise<T> {
 
 async function ids(d: pg.Client, grupo: string): Promise<string[]> {
   const r = await d.query<{ id: string }>(
-    'SELECT id::text FROM push_ranking WHERE grupo_id = $1 ORDER BY id',
+    'SELECT id::text FROM push_ranking WHERE grupo_id = $1 ORDER BY push_ranking.id',
     [grupo],
   );
   return r.rows.map((l) => l.id);
@@ -71,10 +71,18 @@ const lote = (d: pg.Client, grupo: string, apos: string | number, limite: number
 describe('push_envio_grupo', () => {
   it('NOT-24: devolve nome, slug, arquivado e as entradas do plano do grupo; grupo inexistente, nenhuma linha', async () => {
     const { cenario } = aberto;
-    const [achado, vazio] = await semContexto(async (d) => [
-      await d.query('SELECT * FROM push_envio_grupo($1)', [cenario.grupoA]),
-      await d.query('SELECT * FROM push_envio_grupo($1)', ['00000000-0000-4000-8000-000000000000']),
-    ]);
+    const [achado, vazio] = await semContexto(async (d) => {
+      // O cenário semeia uma assinatura cancelada por grupo (T10); aqui o grupo parte sem nenhuma.
+      await d.query('RESET ROLE');
+      await d.query('DELETE FROM assinaturas WHERE grupo_id = $1', [cenario.grupoA]);
+      await d.query('SET LOCAL ROLE pelada_app');
+      return [
+        await d.query('SELECT * FROM push_envio_grupo($1)', [cenario.grupoA]),
+        await d.query('SELECT * FROM push_envio_grupo($1)', [
+          '00000000-0000-4000-8000-000000000000',
+        ]),
+      ];
+    });
     expect(achado?.rows).toEqual([
       {
         nome: 'Grupo A',
@@ -145,7 +153,8 @@ describe('push_ranking_lote', () => {
         [],
       ]);
       const depois = await lote(d, cenario.grupoA, 0, 40, desde);
-      expect(depois.rows.map((l) => l.id)).toEqual([todas[2]]);
+      // `todas` traz também a semente do cenário (T7): as duas últimas continuam pendentes.
+      expect(depois.rows.map((l) => l.id)).toEqual(todas.slice(2));
     });
   });
 

@@ -245,9 +245,17 @@ describe('envio e limpeza (sessão sem conta e sem slug)', () => {
       [contaC, contaB, EP('rc-1'), EP('rc-2'), EP('rc-3')],
     );
     const [c1, c2, b1] = r.rows.map((l) => l.id);
-    await semContexto((db) => push.resultadoConta(db, contaC, [c1 ?? ''], [c2 ?? '', b1 ?? '']));
+    // Confirma a transação: o resultado é lido depois, pela conexão do dono (sem confirmar, o ROLLBACK apaga o efeito).
+    await comDb(
+      aberto.url,
+      null,
+      (db) => push.resultadoConta(db, contaC, [c1 ?? ''], [c2 ?? '', b1 ?? '']),
+      {
+        confirmar: true,
+      },
+    );
     const depois = await aberto.db.query<{ id: string; aceita: boolean }>(
-      `SELECT id::text, ultimo_envio_em IS NOT NULL AS aceita FROM push_conta WHERE id = ANY ($1::bigint[]) ORDER BY id`,
+      `SELECT id::text, ultimo_envio_em IS NOT NULL AS aceita FROM push_conta WHERE id = ANY ($1::bigint[]) ORDER BY push_conta.id`,
       [[c1, c2, b1]],
     );
     expect(depois.rows).toEqual([
