@@ -63,6 +63,9 @@ export async function carregarFontesPadrao(
       FONTES_TTF.map(async ({ arquivo }) => {
         const resposta = await buscar(`${PASTA_FONTES_PDF}${arquivo}`);
         if (!resposta.ok) throw new Error(`fonte ${arquivo}: ${resposta.status}`);
+        // Arquivo ausente: o servidor do app devolve o `index.html` com 200, e o `jspdf` quebraria ao ler HTML como TTF.
+        const tipo = resposta.headers.get('content-type') ?? '';
+        if (tipo.includes('text/html')) throw new Error(`fonte ${arquivo}: resposta é HTML`);
         return [arquivo, paraBase64(await resposta.arrayBuffer())] as const;
       }),
     );

@@ -71,7 +71,8 @@ export function usarExportarPdf(slug: string, mes: string | undefined): Exportar
             grupo: projecao.grupo.nome,
           });
         }
-      } catch {
+      } catch (erro) {
+        console.error('Exportar PDF falhou:', erro);
         setEstado({ tipo: 'erro' });
       } finally {
         emAndamento.current = false;

@@ -100,4 +100,14 @@ describe('gerarPdf', () => {
     expect(pedidos).toEqual(FONTES_TTF.map((f) => `/fontes/pdf/${f.arquivo}`));
     expect(Object.values(fontes?.arquivos ?? {})).toEqual(FONTES_TTF.map(() => 'AAEC/w=='));
   });
+
+  it('fonte ausente com o servidor devolvendo HTML (200) cai na Helvetica em vez de quebrar o PDF', async () => {
+    const html = (async () =>
+      new Response('<!doctype html><html></html>', {
+        headers: { 'content-type': 'text/html; charset=utf-8' },
+      })) as unknown as typeof fetch;
+    expect(await carregarFontesPadrao(html)).toBeNull();
+    const blob = await gerarPdf(projecao(5), { fontes: async () => carregarFontesPadrao(html) });
+    expect((await conteudo(blob)).startsWith('%PDF-')).toBe(true);
+  });
 });
