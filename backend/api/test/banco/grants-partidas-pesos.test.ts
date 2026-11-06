@@ -140,19 +140,25 @@ describe('UPDATE e DELETE como pelada_app', () => {
     expect(r.rowCount).toBe(0);
   });
 
-  it('PAR-09: UPDATE de choveu e dos pesos sem WHERE afeta só as linhas de G', async () => {
+  it('PAR-09: UPDATE de choveu e dos pesos sem WHERE afeta só as linhas dos grupos de C', async () => {
     const { db, cenario } = aberto;
-    const [partidasDeG, pesosDeG] = [
-      await contar(db, 'SELECT 1 FROM partidas WHERE grupo_id = $1', [cenario.grupoG]),
-      await contar(db, 'SELECT 1 FROM config_pesos WHERE grupo_id = $1', [cenario.grupoG]),
+    // C administra G e também o grupo A da base do cenário: "só os dele" são as linhas dos grupos com o vínculo dele.
+    const dele = '(SELECT grupo_id FROM vinculos_admin WHERE conta_id = $1)';
+    const [partidasDeC, pesosDeC] = [
+      await contar(db, `SELECT 1 FROM partidas WHERE grupo_id IN ${dele}`, [cenario.contaC]),
+      await contar(db, `SELECT 1 FROM config_pesos WHERE grupo_id IN ${dele}`, [cenario.contaC]),
     ];
     const totalPartidas = await contar(db, 'SELECT 1 FROM partidas');
-    expect(totalPartidas, 'o cenário precisa de partidas fora de G').toBeGreaterThan(partidasDeG);
+    const totalPesos = await contar(db, 'SELECT 1 FROM config_pesos');
+    expect(totalPartidas, 'o cenário precisa de partidas fora dos grupos de C').toBeGreaterThan(
+      partidasDeC,
+    );
+    expect(totalPesos, 'o cenário precisa de pesos fora dos grupos de C').toBeGreaterThan(pesosDeC);
     const afetadas = await comoConta(db, cenario.contaC, async (d) => [
       (await d.query('UPDATE partidas SET choveu = NOT choveu')).rowCount,
       (await d.query('UPDATE config_pesos SET expulso = -2, expulso_com_chuva = -3')).rowCount,
     ]);
-    expect(afetadas).toEqual([partidasDeG, pesosDeG]);
+    expect(afetadas).toEqual([partidasDeC, pesosDeC]);
   });
 
   it('PAR-09: ON CONFLICT (grupo_id, vigente_desde) DO UPDATE dos pesos continua permitido', async () => {

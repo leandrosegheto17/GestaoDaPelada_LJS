@@ -439,21 +439,22 @@ T78 → T79
 **Depends on**: None
 **Reuses**: `comoApp` e o cenário de dois grupos (`F:909`); `M:1792844280000_grupos-visiveis-arquivado.sql:9-22`; `M:1792844340000_grupo-criar.sql:10-75`; `M:1792843260000_roles.sql:22-31`; matriz de `F:981` e `F:1007`
 **Requirement**: PAR-91, PAR-15, PAR-130 (linha de base)
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste: com conta não criadora, grupo arquivado some de `grupos`; com a criadora, aparece (item a, fica verde até o fim da feature)
-- [ ] Teste: `grupo_criar` de 6 parâmetros cria grupo, vínculo e habilidades e desfaz tudo numa falha forçada (item b, fica verde até o fim: a delegação de T22 o mantém)
-- [ ] Teste: `pelada_app` tem `UPDATE` em `partidas` e `config_pesos`, nenhum grant em `eventos_uso` (item c, documenta o antes de T23 e T25)
-- [ ] Evidência da rede: uma sabotagem por item (ex.: `CREATE OR REPLACE` de `grupos_visiveis()` sem o filtro de arquivado) deixa o teste vermelho; registrada nesta tarefa
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste: com conta não criadora, grupo arquivado some de `grupos`; com a criadora, aparece (item a, fica verde até o fim da feature)
+- [x] Teste: `grupo_criar` de 6 parâmetros cria grupo, vínculo e habilidades e desfaz tudo numa falha forçada (item b, fica verde até o fim: a delegação de T22 o mantém)
+- [x] Teste: `pelada_app` tem `UPDATE` em `partidas` e `config_pesos`, nenhum grant em `eventos_uso` (item c, documenta o antes de T23 e T25)
+- [x] Evidência da rede: migração final temporária que refaz `grupos_visiveis()` sem o filtro de arquivado deixa vermelhos "PAR-91 grupo arquivado some..." e "PAR-92 slug de arquivado"; a sabotagem do grant de `eventos_uso` não derruba o teste porque T23 já trocou esse grant (o teste já é o do depois); a do `grupo_criar` de 6 parâmetros não se aplica, pois a contração (`1792844940000`) a remove e o teste usa a de 7. Sabotagem revertida.
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
 
 ---
 
+Gate: `pnpm exec vitest run test/banco/partidas-rede.test.ts` (backend/api) @ c4f8b1d40599efd1674792f7dbd3167ea09643b6 = 8 testes verdes; `tsc` do api e do web com erros PREEXISTENTES de outra feature (notificacoes: `test/rotas/apoio-push.ts:99`, `src/pwa/servico.ts:133`), fora do escopo deste lote
 #### Phase 2: Domínio: datas e pesos
 
 ### T1: Datas e meses no domínio
@@ -467,15 +468,15 @@ T78 → T79
 **Depends on**: None
 **Reuses**: Regra de domínio sem I/O (`F:385`); convenção de datas de `B:98-100`; reusar `ehDataReal` e o intervalo [início, fim) de `backend/dominio/src/atividade/datas.ts` (`GE:626`), sem duplicar
 **Requirement**: PAR-19, PAR-39, PAR-65, PAR-84, PAR-85
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-19`: 2026-02-29 e 2026-13-01 não são datas reais; 2028-02-29 é
-- [ ] Teste `PAR-84`/`PAR-85`: `mesAnterior('2026-01')` = `2025-12`, `mesSeguinte('2026-12')` = `2027-01`
-- [ ] Teste: `diaDaSemana` de 2026-10-15 é quinta; `ultimoDia('2028-02')` = `2028-02-29`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-19`: 2026-02-29 e 2026-13-01 não são datas reais; 2028-02-29 é
+- [x] Teste `PAR-84`/`PAR-85`: `mesAnterior('2026-01')` = `2025-12`, `mesSeguinte('2026-12')` = `2027-01`
+- [x] Teste: `diaDaSemana` de 2026-10-15 é quinta; `ultimoDia('2028-02')` = `2028-02-29`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -493,15 +494,15 @@ T78 → T79
 **Depends on**: T1
 **Reuses**: Regras de `B:229` (PAR-55), `B:77` (rótulo Pesos padrão, P10) e `BD:159-160`
 **Requirement**: PAR-55, PAR-135, PAR-13
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-55`: expulso em partida com chuva usa `expulsoComChuva` (caso limite `B:496`)
-- [ ] Teste `PAR-55`: cada uma das 3 situações × chuva sim/não dá o peso certo
-- [ ] Teste `PAR-135`: `ehPesosPadrao` é falso com duas configurações, mesmo ambas padrão, e falso com uma não padrão
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-55`: expulso em partida com chuva usa `expulsoComChuva` (caso limite `B:496`)
+- [x] Teste `PAR-55`: cada uma das 3 situações × chuva sim/não dá o peso certo
+- [x] Teste `PAR-135`: `ehPesosPadrao` é falso com duas configurações, mesmo ambas padrão, e falso com uma não padrão
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -519,21 +520,23 @@ T78 → T79
 **Depends on**: T2
 **Reuses**: `B:230` (PAR-56) e casos limite `B:490-491`; `BD:159`
 **Requirement**: PAR-56
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-56`: partida no dia exato do `vigente_desde` usa a configuração nova
-- [ ] Teste `PAR-56`: pesos trocados no meio do mês pontuam cada partida pela sua vigência
-- [ ] Teste `PAR-56`: data anterior à primeira configuração usa a mais antiga; lista vazia lança
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-56`: partida no dia exato do `vigente_desde` usa a configuração nova
+- [x] Teste `PAR-56`: pesos trocados no meio do mês pontuam cada partida pela sua vigência
+- [x] Teste `PAR-56`: data anterior à primeira configuração usa a mais antiga; lista vazia lança
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
 
 ---
 
+
+Gate (T1 a T3): pnpm --filter @pelada/dominio test (T1-T3 verdes; falhas preexistentes de outras tasks: PAR-63 desempenho (T16), simulador/*) + tsc dominio @ 9ed802ade6f626bfa5a27006b51bd70272a2e0b5
 #### Phase 3: Domínio: função única de acumulado
 
 ### T4: Início da contagem
@@ -547,14 +550,14 @@ T78 → T79
 **Depends on**: T3
 **Reuses**: `B:231` (PAR-57), Assumption `B:60` (saiu e voltou, vale o legado); tipos e intervalo [início, fim) de `GE:626` (T11 da grupos-e-elenco)
 **Requirement**: PAR-57
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-57`: sem período, S; um período, S; saiu e voltou, a data do retorno para X depois dele e S para X antes
-- [ ] Teste `PAR-57`: sair e voltar no mesmo dia (GEL-61) dá o retorno como início
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-57`: sem período, S; um período, S; saiu e voltou, a data do retorno para X depois dele e S para X antes
+- [x] Teste `PAR-57`: sair e voltar no mesmo dia (GEL-61) dá o retorno como início
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -572,16 +575,16 @@ T78 → T79
 **Depends on**: T4
 **Reuses**: `B:232-235` (PAR-58 a PAR-61), casos limite `B:486-489`, `B:501`; interface de `BD:155-158`
 **Requirement**: PAR-58, PAR-59, PAR-60, PAR-61
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-59`: S igual à primeira presença soma a inicial; S um dia depois, não
-- [ ] Teste `PAR-59`: sem presença, soma a inicial com qualquer S
-- [ ] Teste `PAR-60`: presença fora de período, dentro de [início da contagem, D], conta
-- [ ] Teste `PAR-58`: data de início hoje dá acumulado 0 e recuar volta ao valor anterior (Kim)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-59`: S igual à primeira presença soma a inicial; S um dia depois, não
+- [x] Teste `PAR-59`: sem presença, soma a inicial com qualquer S
+- [x] Teste `PAR-60`: presença fora de período, dentro de [início da contagem, D], conta
+- [x] Teste `PAR-58`: data de início hoje dá acumulado 0 e recuar volta ao valor anterior (Kim)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -599,20 +602,22 @@ T78 → T79
 **Depends on**: T5
 **Reuses**: AD-041; Goal `B:25` e Independent Test `B:239`
 **Requirement**: PAR-58, PAR-59, PAR-57
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste `PAR-58`: Vandré, Kim e "saiu e voltou" dão os mesmos números da origem, caso a caso
-- [ ] Teste `PAR-57`: no mês do retorno, PTS INICIAL 0 sem a inicial se havia presença antes; meses do primeiro período inalterados (`B:489`)
-- [ ] A tabela de origem (arquivo e linha de cada caso) fica no cabeçalho do teste
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PAR-58`: Vandré, Kim e "saiu e voltou" dão os mesmos números da origem, caso a caso
+- [x] Teste `PAR-57`: no mês do retorno, PTS INICIAL 0 sem a inicial se havia presença antes; meses do primeiro período inalterados (`B:489`)
+- [x] A tabela de origem (arquivo e linha de cada caso) fica no cabeçalho do teste
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
 
 ---
 
+
+Gate (T4 a T6): pnpm --filter @pelada/dominio test (tarefas do lote verdes) + tsc dominio @ edf738c1983d0985bacd2557103250f0c8edebfb
 #### Phase 4: Domínio: partida
 
 ### T7: Data sugerida da partida
@@ -626,14 +631,14 @@ T78 → T79
 **Depends on**: T1
 **Reuses**: `B:152` (PAR-17), caso limite `B:502`; Independent Test `B:173`
 **Requirement**: PAR-17
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-17`: grupo de quinta, numa sexta, sugere a quinta anterior; numa quinta, sugere hoje
-- [ ] Teste `PAR-17`: virada de mês e de ano (quinta 2026-12-31 → sexta 2027-01-01)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-17`: grupo de quinta, numa sexta, sugere a quinta anterior; numa quinta, sugere hoje
+- [x] Teste `PAR-17`: virada de mês e de ano (quinta 2026-12-31 → sexta 2027-01-01)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -651,21 +656,23 @@ T78 → T79
 **Depends on**: T7
 **Reuses**: `B:158-162` (PAR-23 a PAR-27); intervalo [início, fim) de `GE:626`
 **Requirement**: PAR-23, PAR-24, PAR-25, PAR-27
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste `PAR-24`: os três casos dão "Jogador não está ativo nesta data." em `marcacoes.<i>.jogadorId`
-- [ ] Teste `PAR-25`: jogador repetido dá "Há jogador repetido nas marcações." em `marcacoes`
-- [ ] Teste `PAR-27`: jogador com período [início, fim) que termina na data não está ativo nela
-- [ ] Teste `PAR-23`: `ausente` não entra na lista de presenças a gravar
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PAR-24`: os três casos dão "Jogador não está ativo nesta data." em `marcacoes.<i>.jogadorId`
+- [x] Teste `PAR-25`: jogador repetido dá "Há jogador repetido nas marcações." em `marcacoes`
+- [x] Teste `PAR-27`: jogador com período [início, fim) que termina na data não está ativo nela
+- [x] Teste `PAR-23`: `ausente` não entra na lista de presenças a gravar
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
 
 ---
 
+
+Gate (T7 a T8): pnpm --filter @pelada/dominio test (tarefas do lote verdes) + tsc dominio @ de94793ce48bd15887ce1d2c5ec39c2b6d5907ef
 #### Phase 5: Domínio: ranking
 
 ### T9: Ordem e posição do ranking
@@ -679,14 +686,14 @@ T78 → T79
 **Depends on**: T5
 **Reuses**: `B:255-256` (PAR-68, PAR-69), `B:66` (sem ano no fim), caso limite `B:492`; ordem do apelido sem acento nem caixa de `GE:575`
 **Requirement**: PAR-68, PAR-69
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-69`: "José", "Jose" e "Jôse" empatados em tudo ficam na mesma posição e o seguinte é o 4
-- [ ] Teste `PAR-68`: sem ano de nascimento vai depois de todos com ano, no mesmo acumulado
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-69`: "José", "Jose" e "Jôse" empatados em tudo ficam na mesma posição e o seguinte é o 4
+- [x] Teste `PAR-68`: sem ano de nascimento vai depois de todos com ano, no mesmo acumulado
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -704,15 +711,15 @@ T78 → T79
 **Depends on**: T9
 **Reuses**: `B:258-260` (PAR-71 a PAR-73), `B:62` (presença fora de período conta), casos `B:486`, `B:497`
 **Requirement**: PAR-71, PAR-72, PAR-73, PAR-60
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-73`: rodada anterior ao início da contagem é `fora` mesmo com presença gravada
-- [ ] Teste `PAR-72`: ativo sem presença é `falta` com 0
-- [ ] Teste `PAR-60`: presença fora de período e depois do início da contagem aparece com a situação
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-73`: rodada anterior ao início da contagem é `fora` mesmo com presença gravada
+- [x] Teste `PAR-72`: ativo sem presença é `falta` com 0
+- [x] Teste `PAR-60`: presença fora de período e depois do início da contagem aparece com a situação
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -730,22 +737,24 @@ T78 → T79
 **Depends on**: T10
 **Reuses**: `B:254`, `B:257`, `B:261-262` (PAR-67, PAR-70, PAR-74, PAR-75), `B:286-287`; casos `B:493-495`
 **Requirement**: PAR-67, PAR-70, PAR-74, PAR-75, PAR-86, PAR-87
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-74`: mês corrente toma o período em hoje e PTS FINAL = acumulado de hoje
-- [ ] Teste `PAR-67`: inativo hoje com partidas no mês sai das linhas, sem perder histórico
-- [ ] Teste `PAR-87`: mês sem partidas dá PTS INICIAL = PTS FINAL e a mesma ordem de outubro
-- [ ] Teste `PAR-86`: grupo sem partidas dá PTS INICIAL = PTS FINAL = acumulado
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-74`: mês corrente toma o período em hoje e PTS FINAL = acumulado de hoje
+- [x] Teste `PAR-67`: inativo hoje com partidas no mês sai das linhas, sem perder histórico
+- [x] Teste `PAR-87`: mês sem partidas dá PTS INICIAL = PTS FINAL e a mesma ordem de outubro
+- [x] Teste `PAR-86`: grupo sem partidas dá PTS INICIAL = PTS FINAL = acumulado
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
 
 ---
 
+
+Gate (T9 a T11): pnpm --filter @pelada/dominio test (tarefas do lote verdes) + tsc dominio @ 8da33f4947afd2d55fdb860de4e523f58690126a
 #### Phase 6: Domínio: meses e PDF
 
 ### T12: Mês no histórico e navegação
@@ -759,14 +768,14 @@ T78 → T79
 **Depends on**: T11
 **Reuses**: `B:253` (PAR-66), `B:284-286` (PAR-84 a PAR-86), `B:189` (PAR-41), `B:65`
 **Requirement**: PAR-41, PAR-66, PAR-84, PAR-85, PAR-86
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-66`: mês anterior à primeira partida, futuro, ou outro que não o de hoje sem partidas: fora do histórico
-- [ ] Teste `PAR-84`: no mês da primeira partida, `mesAnterior` nulo; `PAR-85`: no mês de hoje, `mesSeguinte` nulo
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-66`: mês anterior à primeira partida, futuro, ou outro que não o de hoje sem partidas: fora do histórico
+- [x] Teste `PAR-84`: no mês da primeira partida, `mesAnterior` nulo; `PAR-85`: no mês de hoje, `mesSeguinte` nulo
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -784,22 +793,24 @@ T78 → T79
 **Depends on**: T12
 **Reuses**: `B:322-325` (PAR-96 a PAR-99), `B:63-64`, casos `B:498-499`
 **Requirement**: PAR-96, PAR-97, PAR-98, PAR-99
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-96`: mês com 14 partidas fica com as 12 mais recentes e o PTS INICIAL absorve as 2 primeiras
-- [ ] Teste `PAR-96`: janeiro completa as colunas com dezembro do ano anterior
-- [ ] Teste `PAR-99`: soma das rodadas + `ptsInicial` fecha o `ptsFinal` do ranking em toda linha
-- [ ] Teste `PAR-97`: mês sem partida marca `semPartidasNoMes` com colunas só de meses anteriores
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-96`: mês com 14 partidas fica com as 12 mais recentes e o PTS INICIAL absorve as 2 primeiras
+- [x] Teste `PAR-96`: janeiro completa as colunas com dezembro do ano anterior
+- [x] Teste `PAR-99`: soma das rodadas + `ptsInicial` fecha o `ptsFinal` do ranking em toda linha
+- [x] Teste `PAR-97`: mês sem partida marca `semPartidasNoMes` com colunas só de meses anteriores
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
 
 ---
 
+
+Gate (T12 a T13): pnpm --filter @pelada/dominio test (tarefas do lote verdes) + tsc dominio @ fc1fdba6a35b2bf499ee1e7b60ca13f91e72e059
 #### Phase 7: Domínio: prévias e desempenho
 
 ### T14: compararCenarios: acumulado e posição antes e depois
@@ -813,15 +824,15 @@ T78 → T79
 **Depends on**: T13
 **Reuses**: `B:352` (PAR-113), `BD:165`
 **Requirement**: PAR-109, PAR-110, PAR-113
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-113`: reativar quem estava fora passa de `posicaoAntes` nula a uma posição
-- [ ] Teste `PAR-113`: corrigir a saída para antes de hoje dá `posicaoDepois` nula
-- [ ] Teste `PAR-113`: posições dos outros jogadores são recalculadas no cenário depois
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-113`: reativar quem estava fora passa de `posicaoAntes` nula a uma posição
+- [x] Teste `PAR-113`: corrigir a saída para antes de hoje dá `posicaoDepois` nula
+- [x] Teste `PAR-113`: posições dos outros jogadores são recalculadas no cenário depois
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -839,15 +850,15 @@ T78 → T79
 **Depends on**: T14
 **Reuses**: `B:350`, `B:353-355` (PAR-111, PAR-114 a PAR-116), caso `B:500`; avaliação da data de início com o recuo de `GE:726`
 **Requirement**: PAR-111, PAR-114, PAR-115, PAR-116
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-116`: uma falta que passa a constar dá o aviso no singular; duas, no plural; nenhuma, nulo
-- [ ] Teste `PAR-114`: Gil inativo desde 05/10, retorno em 08/10, dá 08/10 e 15/10 passando a constar (`B:364`)
-- [ ] Teste `PAR-115`: recuo que não alcança presença mantém o acumulado e só passa rodadas de "–" a falta
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-116`: uma falta que passa a constar dá o aviso no singular; duas, no plural; nenhuma, nulo
+- [x] Teste `PAR-114`: Gil inativo desde 05/10, retorno em 08/10, dá 08/10 e 15/10 passando a constar (`B:364`)
+- [x] Teste `PAR-115`: recuo que não alcança presença mantém o acumulado e só passa rodadas de "–" a falta
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -865,19 +876,21 @@ T78 → T79
 **Depends on**: T15
 **Reuses**: `B:237` (PAR-63), `BD:169-170`
 **Requirement**: PAR-63, PAR-62
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste `PAR-63`: mediana < 5 ms nas três funções
-- [ ] Teste: `index.ts` não exporta as internas da pontuação
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PAR-63`: mediana < 5 ms nas três funções
+- [x] Teste: `index.ts` não exporta as internas da pontuação
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
 
 ---
 
+
+Gate (T14 a T16): pnpm --filter @pelada/dominio test (verde; sem-io/sem-relogio estouram os 5 s só em carga paralela e passam sozinhos; simulador/* é da feature 5) + tsc dominio @ 03f72effb830d0fce7399a34ebfea63359c822a7
 #### Phase 8: Contrato
 
 ### T17: Contrato de pesos
@@ -891,14 +904,14 @@ T78 → T79
 **Depends on**: None
 **Reuses**: Primitivos zod do contrato (`CA:550`); `B:110-117`; `BD:177`
 **Requirement**: PAR-01, PAR-06, PAR-07, PAR-08
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste `PAR-06`: 10,5, 11 e −11 recusados no campo do peso, com a mensagem
-- [ ] Teste `PAR-07`: peso ausente recusado no campo
-- [ ] Teste `PAR-08`: `vigenteDesde` no corpo é recusado
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PAR-06`: 10,5, 11 e −11 recusados no campo do peso, com a mensagem
+- [x] Teste `PAR-07`: peso ausente recusado no campo
+- [x] Teste `PAR-08`: `vigenteDesde` no corpo é recusado
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -916,14 +929,14 @@ T78 → T79
 **Depends on**: T17
 **Reuses**: `CA:550`; `B:152-161`, `B:185-187`; `BD:178-179`
 **Requirement**: PAR-19, PAR-26, PAR-39
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste `PAR-19`: `data` que não é data real dá "Informe uma data válida."
-- [ ] Teste `PAR-26`: situação fora das 4 recusada no campo da marcação
-- [ ] Teste `PAR-39`: `mes` fora de `AAAA-MM` dá "Informe o mês como AAAA-MM."
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PAR-19`: `data` que não é data real dá "Informe uma data válida."
+- [x] Teste `PAR-26`: situação fora das 4 recusada no campo da marcação
+- [x] Teste `PAR-39`: `mes` fora de `AAAA-MM` dá "Informe o mês como AAAA-MM."
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -941,14 +954,14 @@ T78 → T79
 **Depends on**: T18
 **Reuses**: `B:251`, `B:257`, `B:263` (PAR-76), `B:321`, `B:327`, `B:381`; `BD:179-182`
 **Requirement**: PAR-64, PAR-70, PAR-76, PAR-95, PAR-101, PAR-128
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste `PAR-76`: um campo de `CAMPOS_PROIBIDOS_PUBLICO` (id de jogador, telefone, ano, idade, posição, notas, nível, períodos, pontuação inicial, financeiro) em qualquer nível é recusado
-- [ ] Teste `PAR-101`: 13 colunas ou linha com rodadas ≠ colunas recusadas
-- [ ] Teste `PAR-128`: `ranking_aberto` com `mes`, tipo desconhecido e campo extra recusados
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PAR-76`: um campo de `CAMPOS_PROIBIDOS_PUBLICO` (id de jogador, telefone, ano, idade, posição, notas, nível, períodos, pontuação inicial, financeiro) em qualquer nível é recusado
+- [x] Teste `PAR-101`: 13 colunas ou linha com rodadas ≠ colunas recusadas
+- [x] Teste `PAR-128`: `ranking_aberto` com `mes`, tipo desconhecido e campo extra recusados
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -966,19 +979,21 @@ T78 → T79
 **Depends on**: T19
 **Reuses**: `B:348-350`, `B:398`, `B:475`; `BD:181-182`; `grupoDetalhe` da grupos-e-elenco (`GE:753`)
 **Requirement**: PAR-109, PAR-110, PAR-111, PAR-132, PAR-155
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste `PAR-109`: `previaResposta` aceita `posicaoDepois` nula e recusa campo extra
-- [ ] Teste `PAR-132`: `grupoDetalhe` exige os 6 campos novos
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PAR-109`: `previaResposta` aceita `posicaoDepois` nula e recusa campo extra
+- [x] Teste `PAR-132`: `grupoDetalhe` exige os 6 campos novos
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
 
 ---
 
+
+Gate (T17 a T20): pnpm --filter @pelada/contrato test (verde; SIM-55 é da feature 5) + tsc contrato @ 5632662555446347da6b4dfa0990d348f83a9487
 #### Phase 9: Migrações: pesos padrão e grupo_criar
 
 ### T21: Migração: pesos padrão para os grupos sem configuração
@@ -992,16 +1007,16 @@ T78 → T79
 **Depends on**: T0
 **Reuses**: Gerador e checagem aditiva (`F:883`, `F:858`); tabela `M:1792843200000_linha-de-base.sql:155`; SQL de `BD:120-124`
 **Requirement**: PAR-13, PAR-14
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: migração `1792844580000_pesos-padrao.sql`; testes em `backend/api/test/banco/pesos-padrao.test.ts` (roda de novo o SQL da migração sobre grupos criados depois) e `backend/scripts/checagens/test/migracao-aditiva-partidas.test.ts` (as tarefas T22 a T26 acrescentam o sufixo delas). O código entrou no commit `f00bc55` de outra sessão (índice do git compartilhado).
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-13`: grupo criado em 2026-10-01 02:30 UTC ganha `vigente_desde` 2026-09-30 (fuso de São Paulo)
-- [ ] Teste `PAR-14`: grupo que já tinha configuração fica intacto; rodar de novo não duplica
-- [ ] Teste `PAR-14`: a checagem de migração aditiva passa
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-13`: grupo criado em 2026-10-01 02:30 UTC ganha `vigente_desde` 2026-09-30 (fuso de São Paulo)
+- [x] Teste `PAR-14`: grupo que já tinha configuração fica intacto; rodar de novo não duplica
+- [x] Teste `PAR-14`: a checagem de migração aditiva passa
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1019,17 +1034,17 @@ T78 → T79
 **Depends on**: T21
 **Reuses**: Função atual `M:1792844340000_grupo-criar.sql:10-75`; desenho `BD:125-129`; AD-037
 **Requirement**: PAR-15, PAR-16
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: migração `1792844640000_grupo-criar-pesos.sql` (a de 6 parâmetros vira `LANGUAGE sql` delegando; `p_hoje` nulo levanta `22023`); testes em `backend/api/test/banco/grupo-criar-pesos.test.ts`, com a falha forçada por um trigger criado e desfeito na própria transação.
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-15`: a de 7 parâmetros cria o grupo com a configuração padrão vigente desde `p_hoje` e a conta como `registrado_por`
-- [ ] Teste `PAR-16`: falha forçada no INSERT dos pesos desfaz grupo, vínculo e habilidades
-- [ ] Teste `PAR-15`: a de 6 parâmetros continua passando nos testes de T0 e agora cria os pesos; `p_hoje` nulo levanta erro
-- [ ] Teste: nenhuma outra função do schema usa `now()` para data (exceção única, AD-037)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-15`: a de 7 parâmetros cria o grupo com a configuração padrão vigente desde `p_hoje` e a conta como `registrado_por`
+- [x] Teste `PAR-16`: falha forçada no INSERT dos pesos desfaz grupo, vínculo e habilidades
+- [x] Teste `PAR-15`: a de 6 parâmetros continua passando nos testes de T0 e agora cria os pesos; `p_hoje` nulo levanta erro
+- [x] Teste: nenhuma outra função do schema usa `now()` para data (exceção única, AD-037)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1047,20 +1062,22 @@ T78 → T79
 **Depends on**: T22
 **Reuses**: Estender `tipos.ts` da grupos-e-elenco (`GE:878`, que já tem `partidas` e `presencas` só leitura); colunas `M:1792843200000_linha-de-base.sql:155-207`
 **Requirement**: PAR-62
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: teste em `backend/api/test/banco/partidas-tipos.test.ts`; o erro de compilação do UPDATE é conferido por `@ts-expect-error` numa função que só o typecheck lê. O alias `SoLeitura` saiu do `tipos.ts` (ficou sem uso).
 
 **Done when**:
 
-- [ ] Teste: os tipos batem com o catálogo nas 4 tabelas
-- [ ] Teste: `eventos_uso` não aceita `updateTable` no tipo (erro de compilação conferido)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste: os tipos batem com o catálogo nas 4 tabelas
+- [x] Teste: `eventos_uso` não aceita `updateTable` no tipo (erro de compilação conferido)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
 
 ---
 
+
+Gate (T21 a T80): vitest dos testes de banco da feature (pesos-padrao, grupo-criar-*, partidas-*, eventos-uso, contas-nomes, grants, grupos-visiveis) verdes; test/migracoes da fundação (hash, migrar, estado, esquema*) vermelhos por fixarem 23 migrações e esquema-producao.txt, falha preexistente da fundação aceita pelo usuário @ e61d76766c19b918c93ea7354db7035bb2d7ff85
 #### Phase 10: Migrações: evento público, nomes, grants e grupos_visiveis
 
 ### T23: Migração: evento público e grants de eventos_uso
@@ -1074,17 +1091,17 @@ T78 → T79
 **Depends on**: T22
 **Reuses**: Molde de função `admins_listar` (`M:1792843680000_conta-admins-listar.sql:8-21`); tabela `M:1792843200000_linha-de-base.sql:194-207`; policies `M:1792843320000_rls.sql:48-56`; `BD:130-137`; AD-034
 **Requirement**: PAR-127, PAR-129, PAR-130, PAR-131
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: migração `1792844700000_eventos-uso.sql`; testes em `backend/api/test/banco/eventos-uso.test.ts`. Tipo fora de `ranking_aberto`/`pdf_exportado`, dispositivo e mês trocados ou momento nulo levantam `22023`; conta na sessão, `42501`. O teste (c) "nenhum grant em eventos_uso" da T0 passou a exigir exatamente SELECT e INSERT, como a T0 previa.
 **Lacunas**: a matriz de isolamento da fundação descreve `eventos_uso` como sem grant (`backend/api/test/isolamento/matriz.ts:28`, `leitura: 'sem-grant'`; `backend/api/test/isolamento/casos-escrita.ts:86`, `insere: false`). Depois desta migração, a conta lê e insere no próprio grupo e o slug não lê: os testes de leitura e escrita da matriz vão falhar. Trocar isso (um modo de leitura "só com conta" e `insere: true`) muda teste existente fora das Autorizações: o `/executar` pergunta antes. Não alterado no rascunho.
 
 **Done when**:
 
-- [ ] Teste `PAR-130`: `pelada_app` tem só SELECT e INSERT em `eventos_uso`; UPDATE, DELETE e TRUNCATE recusados
-- [ ] Teste `PAR-131`: no contexto do slug, a função grava e um INSERT direto em `eventos_uso` ou em outra tabela é recusado
-- [ ] Teste `PAR-127`: slug de grupo arquivado ou outro slug que não o do contexto devolve `false` sem gravar; com conta, a função recusa
-- [ ] Teste `PAR-129`: a linha gravada só tem grupo, tipo, momento e `dispositivo_id` ou `mes_exportado`; o contexto do slug não lê `eventos_uso`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PAR-130`: `pelada_app` tem só SELECT e INSERT em `eventos_uso`; UPDATE, DELETE e TRUNCATE recusados
+- [x] Teste `PAR-131`: no contexto do slug, a função grava e um INSERT direto em `eventos_uso` ou em outra tabela é recusado
+- [x] Teste `PAR-127`: slug de grupo arquivado ou outro slug que não o do contexto devolve `false` sem gravar; com conta, a função recusa
+- [x] Teste `PAR-129`: a linha gravada só tem grupo, tipo, momento e `dispositivo_id` ou `mes_exportado`; o contexto do slug não lê `eventos_uso`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1102,14 +1119,14 @@ T78 → T79
 **Depends on**: T23
 **Reuses**: Molde `M:1792843680000_conta-admins-listar.sql:8-21`; `BD:138-140`; filtro por `grupos_visiveis()` (`BC:25`, P13); AD-036
 **Requirement**: PAR-01, PAR-44, PAR-52
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: migração `1792844760000_contas-nomes-do-grupo.sql`; testes em `backend/api/test/banco/contas-nomes-do-grupo.test.ts`, com cada autoria (pesos, criação e alteração de partida) e o grupo arquivado para a admin que não o criou.
 
 **Done when**:
 
-- [ ] Teste `PAR-01`: admin do grupo A recebe o nome da outra admin autora; não recebe conta que não é autora
-- [ ] Teste `PAR-01`: com o id do grupo B, zero linhas; sem conta, zero linhas; a função não devolve coluna de e-mail
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PAR-01`: admin do grupo A recebe o nome da outra admin autora; não recebe conta que não é autora
+- [x] Teste `PAR-01`: com o id do grupo B, zero linhas; sem conta, zero linhas; a função não devolve coluna de e-mail
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1127,14 +1144,14 @@ T78 → T79
 **Depends on**: T24
 **Reuses**: Grants atuais `M:1792843260000_roles.sql:22-31`; `BD:141-143`; matriz desta lista
 **Requirement**: PAR-09
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: migração `1792844820000_grants-partidas-pesos.sql`; testes em `backend/api/test/banco/grants-partidas-pesos.test.ts`. O teste (c) "pelada_app tem UPDATE em partidas e config_pesos" da T0 passou a exigir a lista exata dos privilégios de tabela, sem UPDATE, como a T0 previa.
 
 **Done when**:
 
-- [ ] Teste `PAR-09`: UPDATE de `partidas.data` e de `config_pesos.vigente_desde` recusado como `pelada_app`
-- [ ] Teste `PAR-09`: DELETE em `config_pesos` recusado (sem grant); UPDATE de `choveu` do grupo B afeta 0 linhas
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PAR-09`: UPDATE de `partidas.data` e de `config_pesos.vigente_desde` recusado como `pelada_app`
+- [x] Teste `PAR-09`: DELETE em `config_pesos` recusado (sem grant); UPDATE de `choveu` do grupo B afeta 0 linhas
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1152,21 +1169,23 @@ T78 → T79
 **Depends on**: T25
 **Reuses**: Função atual `M:1792844280000_grupos-visiveis-arquivado.sql:9-22`; `BD:144-145`; mudança de teste pela Pergunta 1
 **Requirement**: PAR-91, PAR-92, PAR-93
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: migração `1792844880000_grupos-visiveis-publico-ativo.sql`; testes em `backend/api/test/banco/grupos-visiveis-publico.test.ts`. Invertidos, com a mesma força (lista exata), o item (d) de `partidas-rede.test.ts` e o "ramo do slug não muda" de `backend/api/test/isolamento/grupos-arquivado.test.ts:184` (Autorizações de 2026-11-04).
 
 **Done when**:
 
-- [ ] Teste `PAR-92`: no contexto do slug de grupo arquivado, zero linhas em `grupos`, `jogadores`, `periodos_ativos`, `partidas`, `presencas`, `config_pesos` e `eventos_uso`
-- [ ] Teste `PAR-93`: reativado, o slug volta a ler o grupo
-- [ ] Teste `PAR-91`: os testes do ramo com conta de T0 continuam verdes
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PAR-92`: no contexto do slug de grupo arquivado, zero linhas em `grupos`, `jogadores`, `periodos_ativos`, `partidas`, `presencas`, `config_pesos` e `eventos_uso`
+- [x] Teste `PAR-93`: reativado, o slug volta a ler o grupo
+- [x] Teste `PAR-91`: os testes do ramo com conta de T0 continuam verdes
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
 
 ---
 
+
+Gate (T23 a T26): vitest dos testes de banco da feature (pesos-padrao, grupo-criar-*, partidas-*, eventos-uso, contas-nomes, grants, grupos-visiveis) verdes; test/migracoes da fundação (hash, migrar, estado, esquema*) vermelhos por fixarem 23 migrações e esquema-producao.txt, falha preexistente da fundação aceita pelo usuário @ 5b1d6ac545505be854c26dad517201ee886d976b
 #### Phase 11: Repositórios: histórico, pesos e jogadores
 
 ### T27: historico.carregar
@@ -1180,15 +1199,15 @@ T78 → T79
 **Depends on**: T26, T80
 **Reuses**: `c.var.db: Kysely` (`FD:103`); colunas `M:1792843200000_linha-de-base.sql:155-192`; `BD:190-192`
 **Requirement**: PAR-62, PAR-77
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: devolve o `HistoricoDoGrupo` do domínio (`backend/dominio/src/previas/comparar.ts:18`); as presenças vêm só das partidas até `ate`, e as configurações de pesos, todas. Testes em `backend/api/test/repositorios/historico.test.ts`, com um plugin do Kysely que conta as consultas e guarda o SQL.
 
 **Done when**:
 
-- [ ] Teste `PAR-62`: o histórico do seed de 2 grupos traz só o grupo do contexto, em 4 consultas (contador do Kysely)
-- [ ] Teste `PAR-77`: a consulta não seleciona telefone, posição nem notas
-- [ ] Teste: expulso com chuva lê `expulso_com_chuva`, sem chuva lê `expulso`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PAR-62`: o histórico do seed de 2 grupos traz só o grupo do contexto, em 4 consultas (contador do Kysely)
+- [x] Teste `PAR-77`: a consulta não seleciona telefone, posição nem notas
+- [x] Teste: expulso com chuva lê `expulso_com_chuva`, sem chuva lê `expulso`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1206,18 +1225,18 @@ T78 → T79
 **Depends on**: T27
 **Reuses**: Repositório de auditoria (`CA:844`); `BD:193-194`; `B:110-114`
 **Requirement**: PAR-01, PAR-02, PAR-03, PAR-04, PAR-05, PAR-09, PAR-142
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: `pesos.salvar` devolve `{ substituiu }` pelo `xmax` da linha do `ON CONFLICT`; `entidade` da auditoria é `config_pesos` com `entidade_id` = hoje. Testes em `backend/api/test/repositorios/pesos.test.ts` (G fica só com a configuração de 2026-01-01 do cenário, sem depender do relógio).
 **Lacunas**: (1) configuração com `vigente_desde` depois de hoje: o painel a ignora e o salvar não a toca (interpretação conservadora); (2) autora sem nome em `contas_nomes_do_grupo`: `registradoPor` vazio, sem rótulo inventado. O `/executar` pergunta antes de levar ao verde.
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-04`: salvar duas vezes no mesmo dia deixa uma linha e audita `pesos_substituidos`
-- [ ] Teste `PAR-02`: `vigenteAte` de cada anterior é a véspera da seguinte
-- [ ] Teste `PAR-09`: configuração de ontem nunca muda; erro depois do INSERT desfaz pesos e auditoria
-- [ ] Teste `PAR-142`: o `resumo` da auditoria só tem números e nomes de evento
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-04`: salvar duas vezes no mesmo dia deixa uma linha e audita `pesos_substituidos`
+- [x] Teste `PAR-02`: `vigenteAte` de cada anterior é a véspera da seguinte
+- [x] Teste `PAR-09`: configuração de ontem nunca muda; erro depois do INSERT desfaz pesos e auditoria
+- [x] Teste `PAR-142`: o `resumo` da auditoria só tem números e nomes de evento
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1235,22 +1254,24 @@ T78 → T79
 **Depends on**: T28
 **Reuses**: Estender `jogadores.ts` da grupos-e-elenco (trava `SELECT … FOR UPDATE` de `GE:1305`); ordem de travas AD-038
 **Requirement**: PAR-27, PAR-29
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: `travarParaPeriodo` passou a delegar a `lerEstado(…, travar)`, que `lerParaPrevia` usa sem `FOR UPDATE` (mesma leitura); `ativosNaData` devolve `{ id, apelido }` em ordem de apelido; `EstadoDoJogador` passou a ser exportado. Testes em `backend/api/test/repositorios/jogadores-partidas.test.ts`, com duas conexões de verdade.
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-29`: duas conexões travando [B, A] e [A, B] não fazem deadlock (ordem crescente de id)
-- [ ] Teste `PAR-27`: `ativosNaData` segue [início, fim)
-- [ ] Teste: id de outro grupo não é travado nem devolvido
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-29`: duas conexões travando [B, A] e [A, B] não fazem deadlock (ordem crescente de id)
+- [x] Teste `PAR-27`: `ativosNaData` segue [início, fim)
+- [x] Teste: id de outro grupo não é travado nem devolvido
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
 
 ---
 
+
+Gate (T27 a T29): vitest test/repositorios: todos os testes PAR-* verdes; 38 vermelhos GEL/FIN/ACE/NOT/PLA de outras features, iguais na main (preexistentes) @ ebff63dc90ac2ffa105cf4715b03a6f18b1ac340
 #### Phase 12: Repositórios: partidas
 
 ### T30: partidas.lancar
@@ -1264,17 +1285,17 @@ T78 → T79
 **Depends on**: T29
 **Reuses**: `BD:198-201`; ordem de travas AD-038; T8 e T29
 **Requirement**: PAR-22, PAR-23, PAR-24, PAR-28, PAR-29, PAR-30, PAR-142
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: `partidas.lancar(db, grupoId, dados)` devolve `ok` (id e contagem), `invalido` (campos do domínio) ou `partida_ja_existe`; a data futura fica na rota (T40). O 23505 de `partidas_grupo_id_data_key` é traduzido dentro de um SAVEPOINT (molde `financeiro/pagamentos.ts:53`). SPEC_DEVIATION: o evento `partida_lancada` é um INSERT direto, porque `eventos.partidaLancada` nasce na T33. Testes em `backend/api/test/repositorios/partidas-lancar.test.ts`.
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-30`: dois lançamentos simultâneos da mesma data, em duas conexões: um grava e o outro recebe `partida_ja_existe`
-- [ ] Teste `PAR-28`: falha forçada depois das presenças desfaz partida, presenças, evento e auditoria
-- [ ] Teste `PAR-23`: `ausente` e ativo sem marcação não gravam linha
-- [ ] Teste `PAR-142`: auditoria `partida_lancada` só com data, chuva e contagens
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-30`: dois lançamentos simultâneos da mesma data, em duas conexões: um grava e o outro recebe `partida_ja_existe`
+- [x] Teste `PAR-28`: falha forçada depois das presenças desfaz partida, presenças, evento e auditoria
+- [x] Teste `PAR-23`: `ausente` e ativo sem marcação não gravam linha
+- [x] Teste `PAR-142`: auditoria `partida_lancada` só com data, chuva e contagens
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1292,17 +1313,17 @@ T78 → T79
 **Depends on**: T30
 **Reuses**: `BD:202-204`; AD-038
 **Requirement**: PAR-46, PAR-48, PAR-49, PAR-50, PAR-51, PAR-142
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: `editar(db, grupoId, data, dados)` devolve `ok`, `nao_encontrada`, `data_alterada` (PAR-47, conferido também aqui) ou `invalido`; `excluir` devolve `ok` ou `nao_encontrada`. Testes em `backend/api/test/repositorios/partidas-editar.test.ts`; a serialização usa `jogadores.alterarInicio` segurando a trava do jogador.
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-48`: marcação de jogador ativo hoje mas não na data da partida é recusada
-- [ ] Teste `PAR-51`: excluir mantém o `partida_lancada`
-- [ ] Teste `PAR-49`: editar não grava evento; falha no meio desfaz tudo
-- [ ] Teste: editar a partida enquanto outra conexão corrige o período do mesmo jogador serializa (AD-038)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-48`: marcação de jogador ativo hoje mas não na data da partida é recusada
+- [x] Teste `PAR-51`: excluir mantém o `partida_lancada`
+- [x] Teste `PAR-49`: editar não grava evento; falha no meio desfaz tudo
+- [x] Teste: editar a partida enquanto outra conexão corrige o período do mesmo jogador serializa (AD-038)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1320,20 +1341,22 @@ T78 → T79
 **Depends on**: T31
 **Reuses**: `BD:195-197`; `contas_nomes_do_grupo` (T24)
 **Requirement**: PAR-37, PAR-41, PAR-44
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: `ler` devolve a partida sem `hoje` (a rota acrescenta) e ordena os jogadores em JS, pelo apelido sem acento (`NFD`) nem caixa; `alteradaEm` em ISO. Testes em `backend/api/test/repositorios/partidas-ler.test.ts`.
 
 **Done when**:
 
-- [ ] Teste `PAR-44`: jogador inativo na data com presença gravada aparece na leitura
-- [ ] Teste `PAR-37`: outubro com 01, 08 (chuva) e 15 vem de 15 para 01 com as contagens
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PAR-44`: jogador inativo na data com presença gravada aparece na leitura
+- [x] Teste `PAR-37`: outubro com 01, 08 (chuva) e 15 vem de 15 para 01 com as contagens
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
 
 ---
 
+
+Gate (T30 a T32): vitest test/repositorios: todos os testes PAR-* verdes; 38 vermelhos GEL/FIN/ACE/NOT/PLA de outras features, iguais na main (preexistentes) @ 86dd01dc765fe83fc678153a92aef97610b4822e
 #### Phase 13: Repositórios: eventos, grupos e auditoria de períodos
 
 ### T33: Repositório de eventos de uso
@@ -1347,17 +1370,17 @@ T78 → T79
 **Depends on**: T32
 **Reuses**: `BD:205-207`; `B:74` e `B:475-478`
 **Requirement**: PAR-127, PAR-155, PAR-156, PAR-157, PAR-158, PAR-132
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: `partidaLancada(db, grupoId, data)` usa o momento da transação; `partidas.lancar` (T30) passou a chamá-la no lugar do INSERT direto. `escalacoesConfirmadas` é 0. Testes em `backend/api/test/repositorios/eventos.test.ts`.
 **Lacunas**: semana que só tem `escalacao_confirmada` (a simulador grava): não aparece, porque só os três tipos desta feature formam semana (interpretação conservadora). O `/executar` pergunta antes de levar ao verde.
 
 **Done when**:
 
-- [ ] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
-- [ ] Teste `PAR-156`: evento de domingo 23:30 em São Paulo (segunda UTC) cai na semana do domingo
-- [ ] Teste `PAR-158`: partida de quinta 20:00 lançada no sábado 19:00 conta em 48 h; lançada na segunda, não ("2 (1)")
-- [ ] Teste `PAR-157`: dois `ranking_aberto` do mesmo aparelho contam 1
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
+- [x] Teste `PAR-156`: evento de domingo 23:30 em São Paulo (segunda UTC) cai na semana do domingo
+- [x] Teste `PAR-158`: partida de quinta 20:00 lançada no sábado 19:00 conta em 48 h; lançada na segunda, não ("2 (1)")
+- [x] Teste `PAR-157`: dois `ranking_aberto` do mesmo aparelho contam 1
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1375,14 +1398,14 @@ T78 → T79
 **Depends on**: T33
 **Reuses**: Estender `grupos.criar(db, dados)` e `grupos.ler(db, grupoId)` da grupos-e-elenco (`GE:1003`), acrescentando o parâmetro `hoje`; `BC:26` (P14); `BD:212-213`
 **Requirement**: PAR-15, PAR-132
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: `POST /api/grupos` (`rotas/grupos.ts`) passou a mandar `c.var.relogio.hoje()`; as 5 chamadas de `grupos.criar` em `backend/api/test/repositorios/grupos.test.ts` ganharam `HOJE` (Autorizações de 2026-11-04). SPEC_DEVIATION: `hoje` de `grupos.ler` é opcional (sobrecarga), porque o PATCH e o arquivar do grupo respondem o `grupoDetalhe` estrito; só o GET (T43) pede os campos do início. Testes novos em `backend/api/test/repositorios/grupos-inicio.test.ts`.
 
 **Done when**:
 
-- [ ] Teste `PAR-15`: grupo criado pelo repositório tem pesos vigentes desde o `hoje` recebido
-- [ ] Teste `PAR-132`: grupo novo devolve `partidasNoMes` 0, `pesosPadrao` verdadeiro e `aparelhosNaSemana` 0
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PAR-15`: grupo criado pelo repositório tem pesos vigentes desde o `hoje` recebido
+- [x] Teste `PAR-132`: grupo novo devolve `partidasNoMes` 0, `pesosPadrao` verdadeiro e `aparelhosNaSemana` 0
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -1400,20 +1423,22 @@ T78 → T79
 **Depends on**: T34
 **Reuses**: Escritas de período da grupos-e-elenco (`GE:1333`, `GE:1358`, `GE:1383`); `BC:27` (P15); T14
 **Requirement**: PAR-122
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: o histórico é lido depois do `avaliarPeriodos`/`avaliarInicio` e antes de gravar (o "antes" do cenário); reativar e corrigir usam `compararCenarios`, alterar o início usa `previaDoInicio`, as mesmas funções das prévias. Escrita sem mudança não lê nem audita. Testes novos em `backend/api/test/repositorios/jogadores-auditoria-cenarios.test.ts`; os de auditoria de `jogadores-reativar`, `jogadores-corrigir` e `jogadores-inicio` ganharam a exigência dos 4 campos (só acréscimo; Autorizações de 2026-11-04).
 
 **Done when**:
 
-- [ ] Teste `PAR-122`: reativar grava na auditoria os quatro valores, iguais aos da prévia do mesmo cenário
-- [ ] Os testes de auditoria existentes da grupos-e-elenco passam a esperar os 4 campos a mais (Pergunta 1), sem asserção removida
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `PAR-122`: reativar grava na auditoria os quatro valores, iguais aos da prévia do mesmo cenário
+- [x] Os testes de auditoria existentes da grupos-e-elenco passam a esperar os 4 campos a mais (Pergunta 1), sem asserção removida
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
 
 ---
 
+
+Gate (T33 a T35): vitest test/repositorios: todos os testes PAR-* verdes; 38 vermelhos GEL/FIN/ACE/NOT/PLA de outras features, iguais na main (preexistentes) @ 76114315fb9ecf8ee38ace1fad18da1969da6924
 #### Phase 14: Middlewares: prévia somente leitura e contexto público
 
 ### T36: Transação somente leitura nas prévias
