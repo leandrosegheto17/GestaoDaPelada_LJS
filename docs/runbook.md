@@ -179,6 +179,8 @@ Nenhum valor real vai para o repositório: o `.env.example` lista só os nomes, 
 
 O plano original previa um environment `previa` sobre a branch `dev` do Neon; pela AD-119 ele não é usado.
 
+**Proteção dos environments (A-10 do `/validar`, conferida em 2026-11-06 por `gh api`, só leitura):** `producao` e `backup` têm política de branch personalizada com **só a `main`** liberada; sem ela, uma branch com cópia do workflow sem o `if:` leria os secrets de produção. Não há revisor obrigatório (o repositório tem um único colaborador, a dona, e ela seria a própria revisora). Se entrar mais alguém com escrita, exija revisor em `producao`. Conferir de novo: `gh api repos/<dono>/<repo>/environments/producao/deployment-branch-policies`.
+
 ### Environment `backup` do GitHub (backup diário, AD-013)
 
 | Secret            | O que é                                                   |
