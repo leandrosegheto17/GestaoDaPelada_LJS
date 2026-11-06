@@ -1,6 +1,27 @@
+import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
 import { cloudflareTest } from '@cloudflare/vitest-pool-workers';
 import { defineConfig } from 'vitest/config';
 import { VERSAO_TESTE } from './test/rotas/constantes.ts';
+
+// O `pg` chama `require('pg-protocol')`; no workerd do vitest a resolução usa a condição `import` e cai em
+// `esm/index.js` (ESM sem `type: module`), que não carrega ("Cannot use import statement outside a module").
+// Já o `pg-cloudflare` sem a condição `workerd` cai em `dist/empty.js` (sem `CloudflareSocket`). O plugin abaixo
+// fixa o arquivo CommonJS certo de cada um.
+const exigirDoPg = createRequire(createRequire(import.meta.url).resolve('pg'));
+const posix = (caminho: string) => caminho.split(String.fromCharCode(92)).join('/');
+const PG_PROTOCOL_CJS = posix(exigirDoPg.resolve('pg-protocol'));
+const PG_CLOUDFLARE_REAL = posix(
+  posix(exigirDoPg.resolve('pg-cloudflare/package.json')).replace(
+    /package\.json$/,
+    'dist/index.js',
+  ),
+);
+
+// Cópia do `pg-cloudflare` que engole o fim normal do socket (ver `test/apoio/pg-cloudflare-teste.cjs`).
+const PG_CLOUDFLARE_TESTE = posix(
+  fileURLToPath(new URL('./test/apoio/pg-cloudflare-teste.cjs', import.meta.url)),
+);
 
 const URL_TESTE =
   process.env.DATABASE_URL_TESTE ?? 'postgres://postgres:postgres@127.0.0.1:5432/pelada';
@@ -12,6 +33,22 @@ const HYPERDRIVE_TESTE =
   `postgres://pelada_app:${encodeURIComponent(process.env.PELADA_APP_SENHA || 'sem-senha')}@127.0.0.1:5432/pelada`;
 
 export default defineConfig({
+  // O módulo de fallback do pool do Worker resolve `require` pelo servidor vite da raiz, não pelo do projeto:
+  // o plugin precisa ficar aqui.
+  plugins: [
+    {
+      name: 'pg-cjs-do-workerd',
+      enforce: 'pre',
+      resolveId(origem: string, importador?: string) {
+        if (/(^|\/)pg-protocol$/.test(origem)) return PG_PROTOCOL_CJS;
+        if (/(^|\/)pg-cloudflare$/.test(origem))
+          return importador && posix(importador).startsWith(PG_CLOUDFLARE_TESTE)
+            ? PG_CLOUDFLARE_REAL
+            : PG_CLOUDFLARE_TESTE;
+        return null;
+      },
+    },
+  ],
   test: {
     projects: [
       {
@@ -44,6 +81,7 @@ export default defineConfig({
         ],
         test: {
           name: 'worker',
+          globalSetup: ['./test/apoio/molde-worker.ts'],
           include: ['test/rotas/**/*.test.ts', 'test/infraestrutura/push/**/*.test.ts'],
         },
       },

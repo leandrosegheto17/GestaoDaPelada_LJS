@@ -84,7 +84,10 @@ describe('NOT-33: nada sensível no log', () => {
     try {
       expect((await pedir(caminho, { corpo: { endpoint, chaves } })).status).toBe(201);
       await pedir(`${caminho}/estado`, { corpo: { endpoint, chaves: { auth: chaves.auth } } });
-      await pedir(caminho, { metodo: 'DELETE', corpo: { endpoint, chaves: { auth: chaves.auth } } });
+      await pedir(caminho, {
+        metodo: 'DELETE',
+        corpo: { endpoint, chaves: { auth: chaves.auth } },
+      });
       // Um corpo recusado (422) também não ecoa o que veio no log.
       await pedir(caminho, { corpo: { endpoint, chaves, extra: chaves.p256dh } });
     } finally {

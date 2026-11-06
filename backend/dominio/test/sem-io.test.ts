@@ -11,7 +11,8 @@ async function errosDe(codigo: string) {
   return (resultado?.messages ?? []).filter((m) => m.ruleId === 'no-restricted-imports');
 }
 
-describe('domínio sem I/O', () => {
+// A primeira chamada do ESLint carrega a configuração do repositório (~10 s a frio).
+describe('domínio sem I/O', { timeout: 60_000 }, () => {
   it('FUN-06: import de node:fs no domínio é recusado pelo lint', async () => {
     const erros = await errosDe(
       "import { readFileSync } from 'node:fs';\nexport const x = readFileSync;\n",

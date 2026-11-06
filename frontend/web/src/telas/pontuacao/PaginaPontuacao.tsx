@@ -14,7 +14,10 @@ import { Casca, NOME_DO_APP } from '../../componentes/Casca.tsx';
 import { EsqueletoLista } from '../../componentes/EsqueletoLista.tsx';
 import { EstadoErro } from '../../componentes/EstadoErro.tsx';
 import { Faixa } from '../../componentes/Faixa.tsx';
-import { FaixaSomenteLeitura, TrechoSomenteLeitura } from '../../componentes/FaixaSomenteLeitura.tsx';
+import {
+  FaixaSomenteLeitura,
+  TrechoSomenteLeitura,
+} from '../../componentes/FaixaSomenteLeitura.tsx';
 import { LinkVoltar } from '../../componentes/LinkVoltar.tsx';
 import { ItemLista, Lista } from '../../componentes/Lista.tsx';
 import { ResumoErros, type ErroDoResumo } from '../../componentes/ResumoErros.tsx';
@@ -176,29 +179,29 @@ function Painel({ grupoId, painel }: { grupoId: string; painel: PesosPainel }) {
         </h2>
         <form className={estilos.formulario} noValidate onSubmit={enviar}>
           <TrechoSomenteLeitura grupoId={grupoId}>
-          <div className={modulo['duas-colunas']}>
-            {CAMPOS_PESO.map((c) => (
-              <Campo
-                key={c}
-                id={c}
-                rotulo={ROTULOS_PESO[c]}
-                type="number"
-                min={LIMITES_PESO.min}
-                max={LIMITES_PESO.max}
-                step={1}
-                inputMode="numeric"
-                value={textos[c]}
-                erro={erros[c]}
-                onChange={(e) => setTextos((t) => ({ ...t, [c]: e.target.value }))}
-              />
-            ))}
-          </div>
-          <p className={campo['campo__ajuda']}>{NOTA_PESOS}</p>
-          <div>
-            <Botao type="submit" variante="principal" carregando={salvar.isPending}>
-              Salvar nova configuração
-            </Botao>
-          </div>
+            <div className={modulo['duas-colunas']}>
+              {CAMPOS_PESO.map((c) => (
+                <Campo
+                  key={c}
+                  id={c}
+                  rotulo={ROTULOS_PESO[c]}
+                  type="number"
+                  min={LIMITES_PESO.min}
+                  max={LIMITES_PESO.max}
+                  step={1}
+                  inputMode="numeric"
+                  value={textos[c]}
+                  erro={erros[c]}
+                  onChange={(e) => setTextos((t) => ({ ...t, [c]: e.target.value }))}
+                />
+              ))}
+            </div>
+            <p className={campo['campo__ajuda']}>{NOTA_PESOS}</p>
+            <div>
+              <Botao type="submit" variante="principal" carregando={salvar.isPending}>
+                Salvar nova configuração
+              </Botao>
+            </div>
           </TrechoSomenteLeitura>
         </form>
       </section>

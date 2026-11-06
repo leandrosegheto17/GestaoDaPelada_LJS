@@ -96,9 +96,7 @@ export function rotasContaPush(opcoes: OpcoesRotas = {}): Hono<Ambiente> {
   rotas.delete('/conta/push', exigirSessao, limiteEscritaDaConta, limiteCorpoPush(), async (c) => {
     const corpo = await lerCorpoDoGrupo(c, criarCancelarPushCorpo(hostsExtras(c)));
     if (!corpo.ok) return corpo.resposta;
-    await naConta(c, (db) =>
-      push.cancelarConta(db, corpo.dados.endpoint, corpo.dados.chaves.auth),
-    );
+    await naConta(c, (db) => push.cancelarConta(db, corpo.dados.endpoint, corpo.dados.chaves.auth));
     return c.body(null, 204);
   });
 

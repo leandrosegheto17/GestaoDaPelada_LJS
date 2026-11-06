@@ -93,7 +93,7 @@ describe('wrangler.jsonc da prévia', () => {
   });
 
   it('FUN-23: VERSAO e URL_PUBLICA existem nas vars e URL_PUBLICA não traz endereço fixo', () => {
-    expect(Object.keys(config.vars).sort()).toEqual(['URL_PUBLICA', 'VERSAO']);
+    expect(Object.keys(config.vars).sort()).toEqual(['ASAAS_URL', 'URL_PUBLICA', 'VERSAO']);
     expect(config.vars.URL_PUBLICA).toBe('');
   });
 

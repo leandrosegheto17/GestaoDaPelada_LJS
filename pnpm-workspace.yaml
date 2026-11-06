@@ -9,3 +9,4 @@ allowBuilds:
   sharp: false
 blockExoticSubdeps: true
 minimumReleaseAge: 1440
+dedupePeers: true

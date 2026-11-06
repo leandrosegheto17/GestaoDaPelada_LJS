@@ -48,7 +48,9 @@ export const NOMES_DOS_RECURSOS: Readonly<Record<Recurso, string>> = {
 };
 
 /** "Trial Pro até 14/11/2026", "Pro até 05/12/2026" ou nada. */
-export function textoValidade(p: Pick<PlanoResposta, 'plano' | 'trialFimEm' | 'pagoAte'>): string | null {
+export function textoValidade(
+  p: Pick<PlanoResposta, 'plano' | 'trialFimEm' | 'pagoAte'>,
+): string | null {
   if (p.plano === 'trial' && p.trialFimEm) return `Trial Pro até ${dataBr(p.trialFimEm)}`;
   if (p.plano === 'pro' && p.pagoAte) return `Pro até ${dataBr(p.pagoAte)}`;
   return null;

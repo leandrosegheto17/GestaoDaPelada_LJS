@@ -300,15 +300,15 @@ T81 → T82
 **Depends on**: None
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-01
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: ação do usuário; nada a escrever. O /executar confere a máquina.
 
 **Done when**:
 
-- [ ] `node -v` imprime v26.x e `pnpm -v` imprime 11.x num terminal novo (o pnpm funciona fora do corepack quebrado)
-- [ ] `docker compose version` e `gh auth status` respondem sem erro
-- [ ] `python .claude/scripts/preparar-ambiente.py` imprime "Ambiente pronto" depois da T2
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] `node -v` imprime v26.x e `pnpm -v` imprime 11.x num terminal novo (o pnpm funciona fora do corepack quebrado)
+- [x] `docker compose version` e `gh auth status` respondem sem erro
+- [x] `python .claude/scripts/preparar-ambiente.py` imprime "Ambiente pronto" depois da T2
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
@@ -326,15 +326,15 @@ T81 → T82
 **Depends on**: T1
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-01
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: o `pnpm-lock.yaml` nasce no `pnpm install` do /executar. O `.gitattributes` já existia.
 
 **Done when**:
 
-- [ ] `pnpm install` termina sem erro
-- [ ] `git add --renormalize .` não deixa diferença e o git não avisa mais sobre CRLF
-- [ ] Commit com o `pnpm-lock.yaml`
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] `pnpm install` termina sem erro
+- [x] `git add --renormalize .` não deixa diferença e o git não avisa mais sobre CRLF
+- [x] Commit com o `pnpm-lock.yaml`
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
@@ -352,14 +352,14 @@ T81 → T82
 **Depends on**: T2
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-01, FUN-02
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] `test/estrutura.test.ts` (nomes citam FUN-01 e FUN-02) confere nos cinco pacotes: `type: module`, `engines`, `strict: true` e os scripts `lint`, `typecheck` e `test`
-- [ ] O teste falha quando se remove `strict` de um `tsconfig` (conferido uma vez e revertido)
-- [ ] `pnpm typecheck` e `pnpm test` na raiz saem com código 0, com 5 testes de fumaça mais o de estrutura
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] `test/estrutura.test.ts` (nomes citam FUN-01 e FUN-02) confere nos cinco pacotes: `type: module`, `engines`, `strict: true` e os scripts `lint`, `typecheck` e `test`
+- [x] O teste falha quando se remove `strict` de um `tsconfig` (conferido uma vez e revertido)
+- [x] `pnpm typecheck` e `pnpm test` na raiz saem com código 0, com 5 testes de fumaça mais o de estrutura
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -377,14 +377,14 @@ T81 → T82
 **Depends on**: T3
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-02
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: a formatação da base com `prettier --write .` fica para o /executar.
 
 **Done when**:
 
-- [ ] `pnpm lint` e `pnpm format:check` saem com código 0 na base limpa
-- [ ] Uma linha com `var` no pacote `dominio` faz o lint falhar (conferido uma vez e revertido)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] `pnpm lint` e `pnpm format:check` saem com código 0 na base limpa
+- [x] Uma linha com `var` no pacote `dominio` faz o lint falhar (conferido uma vez e revertido)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
@@ -402,14 +402,14 @@ T81 → T82
 **Depends on**: T4
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-06
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste `FUN-06` com um arquivo de exemplo que importa `node:fs`: o ESLint reporta o erro
-- [ ] Teste `FUN-06` com um arquivo sem I/O: o ESLint não reporta nada
-- [ ] `pnpm --filter @pelada/dominio test` passa com 2 testes novos
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-06` com um arquivo de exemplo que importa `node:fs`: o ESLint reporta o erro
+- [x] Teste `FUN-06` com um arquivo sem I/O: o ESLint não reporta nada
+- [x] `pnpm --filter @pelada/dominio test` passa com 2 testes novos
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -455,14 +455,14 @@ T81 → T82
 **Depends on**: T6
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-03
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste `FUN-03` lê o YAML: um serviço só, imagem `postgres:18`, porta presa em `127.0.0.1`, sem outro serviço
-- [ ] `docker compose up -d --wait` sobe e `psql` consegue `CREATE EXTENSION pgcrypto`
-- [ ] `pnpm --filter @pelada/scripts test` passa
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-03` lê o YAML: um serviço só, imagem `postgres:18`, porta presa em `127.0.0.1`, sem outro serviço
+- [x] `docker compose up -d --wait` sobe e `psql` consegue `CREATE EXTENSION pgcrypto`
+- [x] `pnpm --filter @pelada/scripts test` passa
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -480,15 +480,15 @@ T81 → T82
 **Depends on**: T7
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-19, FUN-05
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: o `.env.example` já listava as cinco variáveis de banco; não mudou.
 
 **Done when**:
 
-- [ ] Teste `FUN-19`: `localhost`, `127.0.0.1` e `postgres` passam; um host `*.neon.tech` lança erro sem abrir socket
-- [ ] Teste `FUN-19`: URL malformada lança erro; usuário e senha da URL nunca aparecem na mensagem
-- [ ] `.env.example` lista `DATABASE_URL`, `DATABASE_URL_TESTE`, `DATABASE_URL_MIGRACAO`, `PELADA_APP_SENHA` e `PELADA_BACKUP_RO_SENHA`, sem valores reais
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-19`: `localhost`, `127.0.0.1` e `postgres` passam; um host `*.neon.tech` lança erro sem abrir socket
+- [x] Teste `FUN-19`: URL malformada lança erro; usuário e senha da URL nunca aparecem na mensagem
+- [x] `.env.example` lista `DATABASE_URL`, `DATABASE_URL_TESTE`, `DATABASE_URL_MIGRACAO`, `PELADA_APP_SENHA` e `PELADA_BACKUP_RO_SENHA`, sem valores reais
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -506,14 +506,14 @@ T81 → T82
 **Depends on**: T8
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-55
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste `FUN-55` aponta para uma porta fechada: sai com código 1 e a mensagem cita `docker compose up -d`
-- [ ] Teste `FUN-55` com o Postgres de pé: conecta e fecha sem deixar conexão aberta
-- [ ] `pnpm --filter @pelada/scripts test` passa
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-55` aponta para uma porta fechada: sai com código 1 e a mensagem cita `docker compose up -d`
+- [x] Teste `FUN-55` com o Postgres de pé: conecta e fecha sem deixar conexão aberta
+- [x] `pnpm --filter @pelada/scripts test` passa
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -536,11 +536,11 @@ T81 → T82
 
 **Done when**:
 
-- [ ] Teste `FUN-19`: com `DATABASE_URL_TESTE` apontando para um host remoto, `bancoDeTeste()` lança erro e não abre conexão
-- [ ] Teste: cria o banco, grava uma linha, remove, e `pg_database` não tem `teste_*` órfão, mesmo quando o corpo do teste lança erro
-- [ ] `DATABASE_URL_TESTE` tem padrão local no `vitest.config.ts` e está documentada no `.env.example`
+- [x] Teste `FUN-19`: com `DATABASE_URL_TESTE` apontando para um host remoto, `bancoDeTeste()` lança erro e não abre conexão
+- [x] Teste: cria o banco, grava uma linha, remove, e `pg_database` não tem `teste_*` órfão, mesmo quando o corpo do teste lança erro
+- [x] `DATABASE_URL_TESTE` tem padrão local no `vitest.config.ts` e está documentada no `.env.example`
 - [ ] `testes.json` atualizado e `trava-testes.py --rodar` verde
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -560,15 +560,15 @@ T81 → T82
 **Depends on**: T10
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-47, FUN-49
-**Status**: rascunhada
+**Status**: concluída
 
 **Done when**:
 
-- [ ] Teste `FUN-47`: dump de um banco de teste com 2 grupos, decifrado com a chave privada de teste, passa em `pg_restore --list`
-- [ ] Teste `FUN-49`: URL inválida faz o script sair com código diferente de 0 e não deixa nenhum `.age`
-- [ ] Teste `FUN-49`: chave pública inválida faz o script sair com código diferente de 0 e não deixa arquivo parcial
-- [ ] O teste roda dentro de um container `postgres:18` com `age` instalado; o comando fica documentado no teste
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-47`: dump de um banco de teste com 2 grupos, decifrado com a chave privada de teste, passa em `pg_restore --list`
+- [x] Teste `FUN-49`: URL inválida faz o script sair com código diferente de 0 e não deixa nenhum `.age`
+- [x] Teste `FUN-49`: chave pública inválida faz o script sair com código diferente de 0 e não deixa arquivo parcial
+- [x] O teste roda dentro de um container `postgres:18` com `age` instalado; o comando fica documentado no teste
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full
@@ -586,16 +586,16 @@ T81 → T82
 **Depends on**: T11
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-47, FUN-49
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: SHAs das actions tirados da versão anterior (`b65b7d8`); o /executar confere. O gitleaks local fica para o /executar.
 
 **Done when**:
 
-- [ ] Teste `FUN-47` lê o YAML: cron `0 7 * * *`, `workflow_dispatch`, `environment: backup` (AD-013), `retention-days: 30`
-- [ ] Teste `FUN-49`: o passo do dump não usa `continue-on-error` nem `|| true`, e o upload tem `if-no-files-found: error`
-- [ ] Teste: todo `uses:` está fixado por SHA de 40 caracteres
-- [ ] Nenhum segredo literal no arquivo (gitleaks local limpo)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-47` lê o YAML: cron `0 7 * * *`, `workflow_dispatch`, `environment: backup` (AD-013), `retention-days: 30`
+- [x] Teste `FUN-49`: o passo do dump não usa `continue-on-error` nem `|| true`, e o upload tem `if-no-files-found: error`
+- [x] Teste: todo `uses:` está fixado por SHA de 40 caracteres
+- [x] Nenhum segredo literal no arquivo (gitleaks local limpo)
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
 **Gate**: quick
@@ -613,15 +613,15 @@ T81 → T82
 **Depends on**: T12
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-50
-**Status**: rascunhada
+**Status**: concluída
 **Nota do rascunho**: `pg_restore` sem `--no-acl`; os grants exigem as roles `pelada_*` no cluster local (criadas pelo `pnpm migrar`). O runbook (T73) diz isso.
 
 **Done when**:
 
-- [ ] Teste `FUN-50`: dump cifrado de um banco de teste, restaurado num banco vazio, dá contagem de linhas igual por tabela
-- [ ] Teste `FUN-50`: recusa restaurar num host fora da lista de permitidos (trava de host)
-- [ ] Teste `FUN-50`: recusa restaurar num banco que já tem tabelas
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Teste `FUN-50`: dump cifrado de um banco de teste, restaurado num banco vazio, dá contagem de linhas igual por tabela
+- [x] Teste `FUN-50`: recusa restaurar num host fora da lista de permitidos (trava de host)
+- [x] Teste `FUN-50`: recusa restaurar num banco que já tem tabelas
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: integration
 **Gate**: full

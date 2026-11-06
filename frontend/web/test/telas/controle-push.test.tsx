@@ -7,11 +7,7 @@ import { ProvedorCliente } from '../../src/dados/ContextoCliente.tsx';
 import { TEXTO_AVISO } from '../../src/pwa/AvisoInstalarIphone.tsx';
 import type { AmbienteNavegador } from '../../src/pwa/useModoInstalacao.ts';
 import { guardaMemoria } from '../../src/pwa/sw-assinatura.ts';
-import type {
-  AssinaturaLocal,
-  DependenciasPush,
-  GerentePush,
-} from '../../src/push/assinatura.ts';
+import type { AssinaturaLocal, DependenciasPush, GerentePush } from '../../src/push/assinatura.ts';
 import {
   ControlePush,
   TEXTO_ASSINADO_RANKING,

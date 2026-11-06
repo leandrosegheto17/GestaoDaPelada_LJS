@@ -100,7 +100,7 @@ export const SEM_VAPID: Partial<Env> = {
   VAPID_PUBLICA: undefined,
   VAPID_PRIVADA: undefined,
   VAPID_ASSUNTO: undefined,
-} as Partial<Env>;
+} as unknown as Partial<Env>;
 
 /** Plano do grupo, como superusuário: `ativo` é Pro, `inadimplente` é Free (`planoEfetivo`). */
 export async function planoDoGrupo(
@@ -108,10 +108,10 @@ export async function planoDoGrupo(
   grupo: string,
   situacao: 'ativo' | 'inadimplente',
 ): Promise<void> {
-  await db.query(
-    'UPDATE grupos SET situacao_comercial = $2, trial_inicio = NULL WHERE id = $1',
-    [grupo, situacao],
-  );
+  await db.query('UPDATE grupos SET situacao_comercial = $2, trial_inicio = NULL WHERE id = $1', [
+    grupo,
+    situacao,
+  ]);
 }
 
 export interface LinhaPushRanking {

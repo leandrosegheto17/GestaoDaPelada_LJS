@@ -96,7 +96,11 @@ async function estado() {
     'SELECT situacao_comercial AS s, trial_inicio::text AS t FROM grupos WHERE id = $1',
     [cenario.grupoH],
   );
-  const a = await db.query<{ situacao: string; pago_ate: string | null; cobranca_pro_id: string | null }>(
+  const a = await db.query<{
+    situacao: string;
+    pago_ate: string | null;
+    cobranca_pro_id: string | null;
+  }>(
     `SELECT situacao, pago_ate::text AS pago_ate, cobranca_pro_id FROM assinaturas WHERE asaas_assinatura_id = $1`,
     [SUB],
   );
@@ -155,7 +159,9 @@ afterAll(async () => {
 describe('aplicar o evento (T36)', () => {
   it('PLA-44: PAYMENT_RECEIVED de assinatura pendente: grupo ativo, assinatura ativa e pagoAte = vencimento + 1 mês', async () => {
     await preparar('trial', 'aguardando_pagamento');
-    const r = await enviar(pagamento('evt_t36_recebido', 'PAYMENT_RECEIVED', '2026-11-05 12:00:00'));
+    const r = await enviar(
+      pagamento('evt_t36_recebido', 'PAYMENT_RECEIVED', '2026-11-05 12:00:00'),
+    );
     expect(r.status).toBe(200);
     expect(await estado()).toEqual({
       grupo: 'ativo',

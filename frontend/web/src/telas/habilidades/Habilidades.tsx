@@ -9,7 +9,10 @@ import { Dialogo } from '../../componentes/Dialogo.tsx';
 import { EsqueletoLista } from '../../componentes/EsqueletoLista.tsx';
 import { EstadoErro } from '../../componentes/EstadoErro.tsx';
 import { Faixa } from '../../componentes/Faixa.tsx';
-import { FaixaSomenteLeitura, TrechoSomenteLeitura } from '../../componentes/FaixaSomenteLeitura.tsx';
+import {
+  FaixaSomenteLeitura,
+  TrechoSomenteLeitura,
+} from '../../componentes/FaixaSomenteLeitura.tsx';
 import { LinkVoltar } from '../../componentes/LinkVoltar.tsx';
 import listas from '../../componentes/Lista.module.css';
 import estilosCampo from '../../componentes/Campo.module.css';
