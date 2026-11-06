@@ -674,11 +674,11 @@ T81 → T82
 
 **Done when**:
 
-- [ ] `git ls-remote origin legado` mostra `e5572928703779787b93c8ca1d83457e6b452e17` (FUN-39)
-- [ ] A execução manual do `backup.yml` termina verde e gera o artefato `.age` (FUN-48)
-- [ ] O artefato decifrado e restaurado num banco local vazio tem contagem de linhas por tabela, registrada em `docs/restauracao-registro.md` com data (FUN-50)
+- [x] `git ls-remote origin legado` mostra `e5572928703779787b93c8ca1d83457e6b452e17` (FUN-39)
+- [x] A execução manual do `backup.yml` termina verde e gera o artefato `.age` (FUN-48)
+- [x] O artefato decifrado e restaurado num banco local vazio tem contagem de linhas por tabela, registrada em `docs/restauracao-registro.md` com data (FUN-50)
 - [ ] A próxima execução agendada das 07:00 UTC aparece no histórico do GitHub (conferida no dia seguinte)
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build

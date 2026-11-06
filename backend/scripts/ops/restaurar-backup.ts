@@ -108,6 +108,8 @@ export async function restaurarBackup(opcoes: OpcoesRestaurar): Promise<Record<s
   const pgRestore = [
     ...(opcoes.comandoPgRestore ?? COMANDO_PG_RESTORE),
     '--no-owner',
+    // Os GRANTs e ALTER DEFAULT PRIVILEGES do dump citam roles do Neon (neon_superuser, cloud_admin) que não existem aqui.
+    '--no-privileges',
     '--exit-on-error',
     '--dbname',
     opcoes.urlPgRestore ?? opcoes.urlDestino,
