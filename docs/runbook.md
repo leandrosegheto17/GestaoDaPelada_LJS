@@ -44,6 +44,14 @@ Ações deste runbook que mexem fora da máquina (disparar workflow, apagar bran
 
 Dois deploys não rodam ao mesmo tempo: o segundo espera o primeiro terminar (FUN-57). O deploy só roda na `main`; em outra branch o job é pulado.
 
+### Registro dos deploys
+
+| Data       | SHA                                        | URL da prévia                                    | Run do `deploy.yml` | Resultado                                                                                                                                    |
+| ---------- | ------------------------------------------ | ------------------------------------------------ | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-11-06 | `45ec02f018ecf84c7a90adc3f97ce19687bf8376` | `https://gestaodapelada-v2.prod-ljs.workers.dev` | `42266705190`       | Verde. Migrações aplicadas na `main` do Neon: `vinculos-travar` e `pesos-padrao-desde-o-inicio`. `GET /api/health` = 200 com a versão acima. |
+
+Branch de restauração do deploy de 2026-11-06: `restauracao-42266705190` (a anterior, `restauracao-42113261384`, foi apagada pelo job). A instalação do PWA no celular é conferida à mão, no aparelho (T82).
+
 ## Falha no deploy
 
 ### O build ou a conferência de `URL_PUBLICA` falhou

@@ -2446,16 +2446,16 @@ T81 → T82
 **Depends on**: T81
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-41, FUN-42, FUN-27, FUN-37
-**Status**: rascunhada
+**Status**: em andamento (falta só instalar o PWA no celular, passo do usuário)
 **Nota do rascunho**: disparar o `deploy.yml`, conferir a saúde e instalar o PWA no celular são ações externas, com confirmação específica, do `/executar`. O registro (data, SHA e URL da prévia) entra no `docs/runbook.md` com os números reais.
 
 **Done when**:
 
-- [ ] `deploy.yml` verde, com a branch de restauração criada e só 2 mantidas
-- [ ] `curl https://gestaodapelada-v2.<conta>.workers.dev/api/health` = 200 com o SHA do commit
+- [x] `deploy.yml` verde, com a branch de restauração criada e só 2 mantidas (run 42266705190: `restauracao-42266705190` criada, `restauracao-42113261384` apagada)
+- [x] `curl https://gestaodapelada-v2.prod-ljs.workers.dev/api/health` = 200 com o SHA do commit (`45ec02f0`)
 - [ ] O PWA instala no celular e abre sem rede na página offline
-- [ ] Registrado no runbook: data, SHA e URL da prévia
-- [ ] Gate passa, sem teste removido ou enfraquecido
+- [x] Registrado no runbook: data, SHA e URL da prévia
+- [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none
 **Gate**: build
