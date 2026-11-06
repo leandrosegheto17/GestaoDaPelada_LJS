@@ -220,13 +220,21 @@ describe('SEC-007: escrita em curso e arquivamento', () => {
       e.liberar.disparar();
       const r = await comPrazo(resposta, 'a escrita responder');
       await comPrazo(travou, 'o arquivar travar a linha');
+      // Prova determinística de que a escrita confirmou antes de a trava ser concedida: o arquivador, já com a
+      // linha travada, enxerga o nome gravado. (A ordem dos dois `then` não serve: a resposta HTTP chega depois.)
+      const nomeVisto = await arquivador.query<{ nome: string }>(
+        'SELECT nome FROM grupos WHERE id = $1',
+        [cenario.grupoG],
+      );
+      expect(nomeVisto.rows[0]?.nome).toBe('Nome da Escrita em Curso');
       await arquivador.query('UPDATE grupos SET arquivado_em = now() WHERE id = $1', [
         cenario.grupoG,
       ]);
       await arquivador.query('COMMIT');
 
       expect(r.status).toBe(200);
-      expect(ordem).toEqual(['escrita confirmou', 'arquivar travou a linha']);
+      expect(ordem).toContain('arquivar travou a linha');
+      expect(ordem).toContain('escrita confirmou');
       expect(await nomeDe(cenario.grupoG)).toBe('Nome da Escrita em Curso');
       expect(await arquivadoEm(cenario.grupoG)).not.toBeNull();
     } finally {

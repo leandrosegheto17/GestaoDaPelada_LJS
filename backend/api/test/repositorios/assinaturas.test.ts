@@ -55,11 +55,14 @@ describe('registrar e pendenteOuAtiva', () => {
         faturaUrl: DADOS.faturaUrl,
         asaasAssinaturaId: DADOS.assinaturaId,
       });
+      // `auditoria` é só de escrita para a aplicação: a leitura vem do dono, dentro da mesma transação.
+      await sql`RESET ROLE`.execute(db);
       const auditoria = await sql<{ n: number }>`
         SELECT count(*)::int AS n FROM auditoria WHERE grupo_id = ${cenario.grupoG} AND acao = 'plano_assinado'`.execute(
         db,
       );
       expect(auditoria.rows[0]?.n).toBeGreaterThanOrEqual(1);
+      await sql`SET ROLE pelada_app`.execute(db);
     });
   });
 

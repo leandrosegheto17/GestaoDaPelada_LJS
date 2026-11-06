@@ -65,6 +65,8 @@ async function presencaEm(jogador: string, data: string, situacao = 'presente'):
     [cenario.grupoG, data, cenario.contaC],
   );
   partidasCriadas.push(p.rows[0]!.id);
+  // Ausência não é gravada: o CHECK de `presencas` só aceita presente, lesionado e expulso. Ausente = partida sem linha.
+  if (situacao === 'ausente') return;
   await db.query(
     'INSERT INTO presencas (partida_id, jogador_id, grupo_id, situacao) VALUES ($1, $2, $3, $4)',
     [p.rows[0]!.id, jogador, cenario.grupoG, situacao],
