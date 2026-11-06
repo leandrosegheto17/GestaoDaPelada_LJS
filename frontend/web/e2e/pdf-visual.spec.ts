@@ -24,6 +24,9 @@ const RESULTADOS = fileURLToPath(new URL('../test-results/pdf-visual', import.me
 const resposta = (nome: string) => readFileSync(join(RESPOSTAS, nome), 'utf8');
 const json = (corpo: string) => ({ status: 200, contentType: 'application/json', body: corpo });
 
+/** Limite do controle: abaixo do que uma coluna deslocada 24 px produz (~0,15%). */
+const LIMITE_CONTROLE = 0.001;
+
 export const LIMITE_PDF = process.env.CI ? 0.09 : 0.045;
 
 const ESTADOS = [
@@ -110,11 +113,13 @@ for (const estado of ESTADOS) {
   });
 }
 
-test('PAR-108: controle, uma coluna deslocada de propósito reprova no limite do PDF', async ({
+test('PAR-108: controle, uma coluna deslocada de propósito reprova no limite estrito', async ({
   context,
 }) => {
   const certo = await folhaDoMockup(await context.newPage(), 'sucesso');
   const deslocado = await folhaDoMockup(await context.newPage(), 'sucesso', COLUNA_DESLOCADA);
-  const r = compararPng(certo, deslocado, { limite: LIMITE_PDF });
+  // Limite estrito: o deslocamento de uma coluna vira só ~0,15% dos pixels, abaixo do limite do PDF (4,5% local, 9%
+  // no CI), então o controle prova a sensibilidade do comparador, não o limite do PDF (decisão do usuário, 2026-11-06).
+  const r = compararPng(certo, deslocado, { limite: LIMITE_CONTROLE });
   expect(r.passou, `a coluna deslocada passou com ${porcentagem(r.proporcao)}`).toBe(false);
 });
