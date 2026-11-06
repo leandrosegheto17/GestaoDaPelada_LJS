@@ -159,6 +159,7 @@ export type PreviaResposta = z.infer<typeof previaResposta>;
 
 export const MENSAGEM_REPETIDO_NA_COMPOSICAO = 'Há jogador repetido na composição.';
 export const MENSAGEM_FORA_DOS_APTOS = 'Há jogador fora dos aptos na composição.';
+export const MENSAGEM_FALTA_APTO_NA_COMPOSICAO = 'A composição precisa incluir todos os aptos.';
 
 /** `POST …/simulador/sugerir`: a prévia mais a data da partida (SIM-47). */
 export const sugerirCorpo = z.discriminatedUnion(
@@ -223,14 +224,16 @@ export function idsDaComposicao(escalada: Escalada): string[] {
   ];
 }
 
-/** Repetido antes de fora dos aptos (SIM-63); nulo quando passa. */
+/** Repetido, depois fora dos aptos, depois falta de apto (SIM-63, AD-123); nulo quando passa. */
 function problemaNaComposicao(
   ids: readonly string[],
   aptos: readonly { id: string }[],
 ): string | null {
   if (new Set(ids).size !== ids.length) return MENSAGEM_REPETIDO_NA_COMPOSICAO;
   const permitidos = new Set(aptos.map((a) => a.id));
-  return ids.every((id) => permitidos.has(id)) ? null : MENSAGEM_FORA_DOS_APTOS;
+  if (!ids.every((id) => permitidos.has(id))) return MENSAGEM_FORA_DOS_APTOS;
+  // AD-123: a composição cobre todos os aptos (como o legado); repetido e fora dos aptos já foram recusados.
+  return ids.length < permitidos.size ? MENSAGEM_FALTA_APTO_NA_COMPOSICAO : null;
 }
 
 function conferirComposicao(

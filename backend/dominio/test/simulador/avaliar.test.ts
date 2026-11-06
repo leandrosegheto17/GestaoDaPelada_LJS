@@ -192,4 +192,23 @@ describe('avaliar em 3 ou mais times', () => {
       mensagem: 'Há jogador fora dos aptos na composição.',
     });
   });
+  it('SIM-63 (AD-123): composição sem algum dos aptos é recusada, em 2 times e em 3 ou mais', () => {
+    const s = sugestaoDois();
+    const e = entradaDe(s);
+    const faltando = {
+      ...e,
+      naoEntra: e.naoEntra.slice(1),
+    };
+    expect(e.naoEntra.length).toBeGreaterThan(0);
+    expect(avaliar(ENTRADA_DOIS, faltando, historico)).toEqual({
+      ok: false,
+      campo: 'composicao',
+      mensagem: 'A composição precisa incluir todos os aptos.',
+    });
+    const v = sugestaoVarios();
+    const times = v.times.map((t, i) => (i === 0 ? t.slice(1) : t));
+    expect(
+      avaliar(ENTRADA_VARIOS, { formato: 'varios_times', times }, historicoFixo(22)),
+    ).toMatchObject({ ok: false, mensagem: 'A composição precisa incluir todos os aptos.' });
+  });
 });

@@ -310,6 +310,16 @@ describe('avaliarCorpo', () => {
     });
   });
 
+  it('SIM-63 (AD-123): composição sem algum dos aptos é recusada no campo composicao', () => {
+    const composicao = {
+      ...COMPOSICAO_DOIS,
+      times: [{ ...COMPOSICAO_DOIS.times[0], entramNo2oTempo: [] }, COMPOSICAO_DOIS.times[1]],
+    };
+    expect(mensagens(avaliarCorpo.safeParse({ ...SUGERIR_DOIS, composicao }))).toEqual({
+      composicao: ['A composição precisa incluir todos os aptos.'],
+    });
+  });
+
   it('SIM-82: jogador da composição com apelido ou nível é recusado', () => {
     const titulares = [
       { id: u(1), so1oTempo: false, apelido: 'Toninho' },

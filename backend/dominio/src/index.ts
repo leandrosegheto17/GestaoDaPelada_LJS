@@ -287,6 +287,7 @@ export {
   avaliar,
   idsDaComposicaoEntrada,
   MENSAGEM_FORA_DOS_APTOS,
+  MENSAGEM_FALTA_APTO_NA_COMPOSICAO,
   MENSAGEM_REPETIDO_NA_COMPOSICAO,
   problemaNaComposicao,
   type Avaliacao,
