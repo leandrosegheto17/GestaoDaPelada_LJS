@@ -5,9 +5,10 @@ import {
   contextoResposta,
   escalacaoResposta,
   partidaNova,
-  previaResposta,
   sugerirResposta,
 } from '@pelada/contrato';
+// A raiz do contrato guarda a `previaResposta` dos períodos; a do simulador vem do subcaminho.
+import { previaResposta } from '@pelada/contrato/simulador';
 import { describe, expect, it } from 'vitest';
 
 /** O que o teste usa de um schema do contrato (o pacote web não depende do zod direto). */
