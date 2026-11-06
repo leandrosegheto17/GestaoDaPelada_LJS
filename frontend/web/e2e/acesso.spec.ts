@@ -151,6 +151,7 @@ test('J-08: A convida B, B aceita, os dois veem o grupo e A remove B', async ({ 
   const linkGrupo = a.getByRole('link', { name: /Pelada Local/ });
   await expect(linkGrupo).toBeVisible();
   await linkGrupo.click();
+  await a.getByRole('link', { name: /^Admins/ }).click();
   await expect(a).toHaveURL(/\/app\/grupos\/[^/]+\/admins$/);
   const rotaAdmins = new URL(a.url()).pathname;
 

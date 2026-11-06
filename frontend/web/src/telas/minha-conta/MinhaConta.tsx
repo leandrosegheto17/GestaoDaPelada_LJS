@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router';
 import { useSessao } from '../../app/guarda.tsx';
 import { Botao } from '../../componentes/Botao.tsx';
@@ -30,6 +30,8 @@ import estilos from '../acesso.module.css';
  */
 
 export const DESTINO_CONTA_EXCLUIDA = '/?aviso=conta-excluida';
+/** Estado da navegação: a guarda pública não devolve a `/app` pela sessão ainda em cache. */
+export const ESTADO_CONTA_EXCLUIDA = { contaExcluida: true } as const;
 export const TEXTO_UNICO_ADMIN =
   'Você é o único admin destes grupos. Convide outro admin ou arquive o grupo antes de excluir a conta.';
 export const ERRO_SENHA_INCORRETA = 'Senha incorreta.';
@@ -44,6 +46,15 @@ export function MinhaConta() {
   const consultas = useQueryClient();
   const navegar = useNavigate();
   const { data } = useSessao();
+  const excluida = useRef(false);
+  // Limpa o cache só quando a tela sai de cena: com a rota nova ainda carregando, a tela antiga
+  // segue montada e limpar antes refaz a sessão dela, que volta 401 e leva a `/entrar`.
+  useEffect(
+    () => () => {
+      if (excluida.current) consultas.clear();
+    },
+    [consultas],
+  );
   const [aberto, setAberto] = useState(false);
   const [senha, setSenha] = useState('');
   const [erroSenha, setErroSenha] = useState<string | undefined>(undefined);
@@ -72,8 +83,8 @@ export function MinhaConta() {
     setEnviando(true);
     try {
       await api.post('/api/conta/excluir', { senha });
-      await navegar(DESTINO_CONTA_EXCLUIDA, { replace: true });
-      consultas.clear();
+      await navegar(DESTINO_CONTA_EXCLUIDA, { replace: true, state: ESTADO_CONTA_EXCLUIDA });
+      excluida.current = true;
     } catch (erro) {
       if (erro instanceof ErroApi && erro.codigo === 'unico_admin') {
         setUnicoAdmin(erro.grupos);

@@ -91,7 +91,10 @@ export function GuardaApp() {
 export function GuardaPublica() {
   const { data } = useSessao();
   const [parametros] = useSearchParams();
-  if (data?.tipo === 'ativa')
+  const local = useLocation();
+  // Conta recém-excluída: a sessão em cache ainda diz "ativa" até a releitura (ACE-28).
+  const contaExcluida = (local.state as { contaExcluida?: boolean } | null)?.contaExcluida === true;
+  if (data?.tipo === 'ativa' && !contaExcluida)
     return <Navigate to={destinoSeguro(parametros.get(PARAMETRO_VOLTA))} replace />;
   // Carregando ou com erro, a tela pública aparece: ela funciona sem sessão.
   return <Outlet />;
