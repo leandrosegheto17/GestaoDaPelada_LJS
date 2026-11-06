@@ -49,6 +49,8 @@ beforeAll(async () => {
       'pelada-de-domingo-t32',
     )
   ).id;
+  // O cenário semeia uma assinatura cancelada em cada grupo (T10). Aqui B "nunca assinou" (cliente novo): tira as de B.
+  await aberto.db.query('DELETE FROM assinaturas WHERE criada_por = $1', [aberto.cenario.contaB]);
 });
 
 beforeEach(() => {
@@ -171,7 +173,7 @@ describe('assinar: recusas sem chamar o Asaas (PLA-32, PLA-33)', () => {
     await comDb(url, cenario.contaB, async (db) => {
       await assinar(db, asaas, pedido(cenario.grupoH, cenario.contaB));
       await sql`RESET ROLE`.execute(db);
-      await sql`UPDATE assinaturas SET situacao = 'ativa' WHERE grupo_id = ${cenario.grupoH} AND situacao = 'aguardando_pagamento'`.execute(
+      await sql`UPDATE assinaturas SET situacao = 'ativa', pago_ate = ${HOJE}::date WHERE grupo_id = ${cenario.grupoH} AND situacao = 'aguardando_pagamento'`.execute(
         db,
       );
       await sql`SET ROLE pelada_app`.execute(db);
