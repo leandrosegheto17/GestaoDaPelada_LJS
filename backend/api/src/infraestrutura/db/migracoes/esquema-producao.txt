@@ -262,6 +262,7 @@ funcao push_ranking_estado(p_slug text, p_endpoint text, p_auth text) retorna te
 funcao push_ranking_lote(p_grupo uuid, p_apos_id bigint, p_limite integer, p_desde timestamp with time zone) retorna TABLE(id bigint, endpoint text, p256dh text, auth text) plpgsql security definer stable config=search_path=public, pg_temp corpo=8c3022bfc2b1d9a625cac038755bff5c
 funcao push_ranking_resultado(p_grupo uuid, p_aceitos bigint[], p_revogados bigint[]) retorna void plpgsql security definer volatile config=search_path=public, pg_temp corpo=104868b0d8282c91bb020ffac48d2d05
 funcao sessao_tocar(p_token_hash bytea) retorna uuid plpgsql security definer volatile config=search_path=public, pg_temp corpo=99e32a4a19af0f2d5e615bf4fcb7ae27
+funcao vinculos_travar(p_grupo_id uuid, p_todos boolean) retorna TABLE(conta_id uuid) plpgsql security definer volatile config=search_path=public, pg_temp corpo=e5bf033945684507d1ed793399bd4770
 grant coluna config_pesos.expulso pelada_app UPDATE
 grant coluna config_pesos.expulso_com_chuva pelada_app UPDATE
 grant coluna config_pesos.lesionado_com_chuva pelada_app UPDATE
@@ -336,6 +337,7 @@ grant funcao push_ranking_estado(p_slug text, p_endpoint text, p_auth text) pela
 grant funcao push_ranking_lote(p_grupo uuid, p_apos_id bigint, p_limite integer, p_desde timestamp with time zone) pelada_app EXECUTE
 grant funcao push_ranking_resultado(p_grupo uuid, p_aceitos bigint[], p_revogados bigint[]) pelada_app EXECUTE
 grant funcao sessao_tocar(p_token_hash bytea) pelada_app EXECUTE
+grant funcao vinculos_travar(p_grupo_id uuid, p_todos boolean) pelada_app EXECUTE
 grant schema public PUBLIC USAGE
 grant schema public pelada_app USAGE
 grant schema public pelada_backup_ro USAGE

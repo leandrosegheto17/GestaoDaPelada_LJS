@@ -89,13 +89,14 @@ afterAll(async () => {
 
 afterEach(async () => {
   const { db, cenario } = aberto;
-  await db.query(
-    `DELETE FROM habilidades WHERE grupo_id = ANY($1::uuid[]) AND nome LIKE 'Rota %'`,
-    [[cenario.grupoG, cenario.grupoH]],
-  );
+  // Primeiro devolve o nome de "Drible"; senão o DELETE de 'Rota %' apagaria a própria habilidade renomeada.
   await db.query(
     `UPDATE habilidades SET nome = 'Drible' WHERE grupo_id = $1 AND nome = 'Rota Finta'`,
     [cenario.grupoG],
+  );
+  await db.query(
+    `DELETE FROM habilidades WHERE grupo_id = ANY($1::uuid[]) AND nome LIKE 'Rota %'`,
+    [[cenario.grupoG, cenario.grupoH]],
   );
 });
 

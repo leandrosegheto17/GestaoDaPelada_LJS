@@ -73,12 +73,15 @@ describe('GET /api/grupos/:grupoId', () => {
     const g = (await r.json()) as Record<string, unknown>;
     // A criadora tem acesso ao financeiro: o detalhe traz também o saldo (financeiro T30, FIN-34; autorização de
     // 2026-11-04 em `## Autorizações` do STATE.md). A lista continua exata.
+    // Mais `escalacaoNoProximoDia` e `proximoDiaDeJogo` (simulador T33, SIM-01 a SIM-04; autorização de 2026-11-05).
     // E os 6 campos do início do grupo (partidas-e-ranking T43, PAR-132; autorização de 2026-11-04 do STATE.md).
     expect(Object.keys(g).sort()).toEqual(
       [
         'admins',
         'aparelhosNaSemana',
         'dataSugeridaPartida',
+        'escalacaoNoProximoDia',
+        'proximoDiaDeJogo',
         'partidaNaDataSugerida',
         'partidasNoMes',
         'pesosPadrao',

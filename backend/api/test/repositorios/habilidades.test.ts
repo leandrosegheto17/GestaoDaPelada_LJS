@@ -29,8 +29,14 @@ afterAll(async () => {
 afterEach(async () => {
   const { db, cenario } = aberto;
   await db.query('DELETE FROM habilidades WHERE id = ANY($1::uuid[])', [criadas]);
+  // As notas dos jogadores criados saem antes (FK notas_jogador_id_grupo_id_fkey, sem cascata).
+  await db.query('DELETE FROM notas WHERE jogador_id = ANY($1::uuid[])', [jogadoresCriados]);
   await db.query('DELETE FROM jogadores WHERE id = ANY($1::uuid[])', [jogadoresCriados]);
   await db.query(`UPDATE habilidades SET nome = 'Drible' WHERE grupo_id = $1 AND nome = 'Finta'`, [
+    cenario.grupoG,
+  ]);
+  // A auditoria de um teste não vale para o seguinte (a "Drible" é a mesma linha em todos).
+  await db.query("DELETE FROM auditoria WHERE grupo_id = $1 AND acao LIKE 'habilidade_%'", [
     cenario.grupoG,
   ]);
   criadas.length = 0;

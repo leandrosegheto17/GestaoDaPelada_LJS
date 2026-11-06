@@ -42,18 +42,22 @@ describe('GET /api/health', () => {
   });
 });
 
+// `env` do pool do Worker não tem o binding tipado (vem do wrangler.jsonc).
+const assets = () =>
+  (env as unknown as { ASSETS: { fetch: (url: string) => Promise<Response> } }).ASSETS;
+
 describe('assets da SPA', () => {
   it('FUN-20: GET / entrega o index.html do build', async () => {
     // O pool do Worker manda o SELF direto ao Worker; quem serve os assets na nuvem é o roteador de assets, que aqui
     // é o binding ASSETS (mesma pasta e mesma regra de SPA do wrangler.jsonc).
-    const r = await env.ASSETS.fetch(`${BASE}/`);
+    const r = await assets().fetch(`${BASE}/`);
     expect(r.status).toBe(200);
     expect(r.headers.get('content-type')).toMatch(/text\/html/);
     expect(await r.text()).toContain('data-teste="spa-de-teste"');
   });
 
   it('FUN-20: GET /rota-qualquer cai na SPA', async () => {
-    const r = await env.ASSETS.fetch(`${BASE}/rota-qualquer/funda`);
+    const r = await assets().fetch(`${BASE}/rota-qualquer/funda`);
     expect(r.status).toBe(200);
     expect(await r.text()).toContain('data-teste="spa-de-teste"');
   });

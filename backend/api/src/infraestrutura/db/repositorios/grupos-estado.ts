@@ -89,9 +89,7 @@ async function travarComoCriadora(db: Db, grupoId: string): Promise<LinhaGrupo |
   const grupo = r.rows[0];
   if (!grupo) return null;
   const vinculo = await sql<{ conta_id: string }>`
-    SELECT conta_id FROM vinculos_admin
-     WHERE grupo_id = ${grupoId} AND conta_id = app_conta_id()
-       FOR KEY SHARE`.execute(db);
+    SELECT conta_id FROM vinculos_travar(${grupoId}, false)`.execute(db);
   if (vinculo.rows.length === 0) return null;
   return { ...grupo, souCriador: grupo.souCriador === true };
 }

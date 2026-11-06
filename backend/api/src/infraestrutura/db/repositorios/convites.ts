@@ -192,7 +192,7 @@ export type ResultadoRemover = 'ok' | 'ultimo_admin' | 'nao_encontrado' | 'criad
  */
 async function remover(db: Db, grupoId: string, contaId: string): Promise<ResultadoRemover> {
   const vinculos = await sql<{ conta_id: string }>`
-    SELECT conta_id FROM vinculos_admin WHERE grupo_id = ${grupoId} FOR UPDATE`.execute(db);
+    SELECT conta_id FROM vinculos_travar(${grupoId}, true)`.execute(db);
   const contas = vinculos.rows.map((v) => v.conta_id);
   if (!contas.includes(contaId)) return 'nao_encontrado';
   const grupo = await sql<{ criadora: boolean; propria: boolean }>`
@@ -202,14 +202,16 @@ async function remover(db: Db, grupoId: string, contaId: string): Promise<Result
   if (!g) return 'nao_encontrado';
   if (g.criadora === true && g.propria !== true) return 'criadora_nao_removivel';
   if (contas.length <= 1) return 'ultimo_admin';
-  await sql`DELETE FROM vinculos_admin WHERE grupo_id = ${grupoId} AND conta_id = ${contaId}`.execute(
-    db,
-  );
+  // A auditoria vem antes do DELETE: quem sai de si mesma perde a visibilidade do grupo (RLS de `auditoria`), e o
+  // INSERT depois do DELETE seria recusado. Mesma transação: se o DELETE falhar, a linha de auditoria some junto.
   await registrar(db, grupoId, {
     acao: 'remover_admin',
     entidade: 'vinculo_admin',
     entidadeId: contaId,
   });
+  await sql`DELETE FROM vinculos_admin WHERE grupo_id = ${grupoId} AND conta_id = ${contaId}`.execute(
+    db,
+  );
   return 'ok';
 }
 
