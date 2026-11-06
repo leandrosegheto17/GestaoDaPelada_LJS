@@ -1,13 +1,14 @@
 import { sql } from 'kysely';
 import { ativoNoMes, entradaDaMensalidade } from '@pelada/dominio';
 import { auditoria } from '../convites.ts';
+import { jogadores } from '../jogadores.ts';
 import type { Db } from '../tipos.ts';
 import { configFinanceira } from './config.ts';
 
 /**
  * Marcar o pagamento da mensalidade (financeiro T18; FIN-16, FIN-17, FIN-19, FIN-20, FIN-21; AD-038, AD-078). Tudo
- * numa transação, a da requisição: trava o jogador (`FOR UPDATE`, o mesmo bloqueio dos escritores de período,
- * AD-038), confere que ele é do grupo e ativo no mês (FIN-19), lê a configuração, cria o lançamento de entrada quando
+ * numa transação, a da requisição: trava o jogador (`jogadores.travarVarios`, o mesmo bloqueio dos escritores de
+ * período, AD-038), confere que ele é do grupo e ativo no mês (FIN-19), lê a configuração, cria o lançamento de entrada quando
  * há mensalidade (FIN-16; só o pagamento quando não há, FIN-17), cria o pagamento vinculado e audita
  * `pagamento_marcado` com o mês e o valor, sem apelido nem descrição (FIN-44).
  *
@@ -40,10 +41,11 @@ async function marcar(
   mes: string,
   hoje: string,
 ): Promise<ResultadoMarcar> {
+  // Mesma trava dos escritores de período (AD-038, AD-078): `travarVarios` do repositório de jogadores.
+  const travados = await jogadores.travarVarios(db, grupoId, [jogadorId]);
+  if (travados.length === 0) return { resultado: 'jogador_fora_do_mes' };
   const j = await sql<LinhaJogador>`
-    SELECT apelido FROM jogadores WHERE grupo_id = ${grupoId} AND id = ${jogadorId} FOR UPDATE`.execute(
-    db,
-  );
+    SELECT apelido FROM jogadores WHERE grupo_id = ${grupoId} AND id = ${jogadorId}`.execute(db);
   const jogador = j.rows[0];
   if (!jogador) return { resultado: 'jogador_fora_do_mes' };
 

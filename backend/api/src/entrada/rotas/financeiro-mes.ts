@@ -20,8 +20,7 @@ import { financeiroMes } from '../../infraestrutura/db/repositorios/financeiro/m
  * - responde com `financeiroMes.lerMes` (T17), que traz o mês, a data de hoje, a navegação, a configuração, o saldo, o
  *   resumo, os pagamentos e os lançamentos do mês do mais recente ao mais antigo (FIN-07, FIN-14).
  *
- * Molde: `GET …/simulador/contexto` (`rotas/simulador.ts:33`, consulta pelo zod); o `GET partidas?mes` de `PR:1436`
- * ainda não existe.
+ * Molde: `GET …/simulador/contexto` (`rotas/simulador.ts:33`, consulta pelo zod).
  */
 export function rotasFinanceiroMes(): Hono<Ambiente> {
   const rotas = new Hono<Ambiente>();

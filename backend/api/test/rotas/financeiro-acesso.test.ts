@@ -163,3 +163,26 @@ describe('PATCH …/admins/:contaId/financeiro', () => {
     );
   });
 });
+
+describe('PATCH …/admins/:contaId/financeiro: acesso da criadora (S-1)', () => {
+  it('FIN-35: admin convidada com acesso não retira o acesso da criadora: 409 acesso_da_criadora e nada muda', async () => {
+    const { contaO, contaC } = aberto.cenario;
+    expect((await alterar(contaO, { acessaFinanceiro: true })).status).toBe(200);
+    const antes = await retirados();
+    const r = await alterar(contaC, { acessaFinanceiro: false }, contaO);
+    expect(r.status).toBe(409);
+    expect(await r.json()).toEqual({
+      erro: 'A criadora do grupo mantém sempre o acesso ao financeiro.',
+      codigo: 'acesso_da_criadora',
+    });
+    expect(await acessoNoBanco(contaC)).toBe(true);
+    expect(await retirados()).toBe(antes);
+  });
+
+  it('FIN-35: admin convidada com acesso ainda retira o acesso de outra convidada', async () => {
+    const { contaO } = aberto.cenario;
+    expect((await alterar(contaO, { acessaFinanceiro: true })).status).toBe(200);
+    expect((await alterar(contaO, { acessaFinanceiro: false })).status).toBe(200);
+    expect(await acessoNoBanco(contaO)).toBe(false);
+  });
+});

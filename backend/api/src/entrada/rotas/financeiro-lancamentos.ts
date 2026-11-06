@@ -30,7 +30,7 @@ import { lancamentosExcluir } from '../../infraestrutura/db/repositorios/finance
  * - id inexistente, de outro grupo ou malformado: o mesmo 404 nos quatro métodos (FIN-31).
  *
  * A resposta não traz o `vinculo` do repositório (o contrato é `.strict()`). Molde: `GET`, `PATCH` e `DELETE
- * …/jogadores/:id` (`rotas/jogador.ts:36`); o `partidas/:data` de `PR:1487` ainda não existe.
+ * …/jogadores/:id` (`rotas/jogador.ts:36`).
  */
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
