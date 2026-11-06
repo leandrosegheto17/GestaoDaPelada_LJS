@@ -2638,3 +2638,110 @@ O diagrama de cada Phase tem só a cadeia sequencial. As dependências entre Pha
 | T81: CI verde na main | Config, docs e ações externas | none | none | ✅ |
 | T82: Primeiro deploy da prévia | Config, docs e ações externas | none | none | ✅ |
 
+---
+
+## Retrabalho R1 — pesos da J-17 (AD-125)
+
+### Phase R1: Pesos com efeito no passado sob escolha
+
+Origem: a J-17 do e2e (T81) exige que a partida de ontem mantenha o peso antigo; hoje a configuração padrão nasce datada em hoje e salvar no mesmo dia a substitui. Decisão do usuário (2026-11-06, AD-125): a primeira configuração vale desde o início do grupo; ao gravar com configuração já existente, a tela pergunta se reflete nas partidas já disputadas.
+
+### R1-T1: Spec e ADs dos pesos
+
+**What**: Ajustar PAR-03, PAR-04 e PAR-09 na spec da `partidas-e-ranking` para a regra da AD-125 (primeira configuração desde o início do grupo; pergunta "refletir nas partidas já disputadas?" quando já existe configuração) e escrever os casos limite: grupo sem partidas, gravação repetida no mesmo dia, resposta sim e não.
+**Estimativa**: 45 min
+**Risco**: alto
+**Domínio**: sim
+**Criticidade**: comum
+**Where**: .specs/features/partidas-e-ranking/spec.md (e o design, se citar PAR-04)
+**Depends on**: AD-125 (STATE.md)
+**Reuses**: AD-125; `backend/api/src/infraestrutura/db/repositorios/pesos.ts:86-99` (grava a configuração vigente), `backend/api/src/infraestrutura/db/migracoes/1792844640000_grupo-criar-pesos.sql` (config padrão datada em `p_hoje`)
+**Requirement**: PAR-03, PAR-04, PAR-09, PAR-56 (J-17); achado do e2e da T81
+**Status**: pendente
+
+**Done when**:
+
+- [ ] Spec lista os casos limite e o resultado de cada resposta (sim/não) com ID `PAR-NN`
+- [ ] Conferência spec × design registrada (AD-125 citada)
+- [ ] Gate passa, sem teste removido ou enfraquecido
+
+**Tests**: e2e
+**Gate**: typecheck e testes dos pacotes tocados
+
+---
+
+### R1-T2: Migração: configuração padrão desde o início do grupo
+
+**What**: Migração aditiva que data no início do grupo a configuração padrão criada por `grupo_criar` (e ajusta as já existentes ainda únicas e criadas hoje por padrão), sem editar migração aplicada. Teste por comando (SELECT, INSERT, UPDATE, DELETE) da RLS de `config_pesos` e teste de que a partida anterior à criação usa o peso padrão.
+**Estimativa**: 1h30
+**Risco**: alto
+**Domínio**: sim
+**Criticidade**: crítica
+**Where**: backend/api/src/infraestrutura/db/migracoes/ (nova), testes de `config_pesos`
+**Depends on**: R1-T1
+**Reuses**: AD-125; `backend/api/src/infraestrutura/db/repositorios/pesos.ts:86-99` (grava a configuração vigente), `backend/api/src/infraestrutura/db/migracoes/1792844640000_grupo-criar-pesos.sql` (config padrão datada em `p_hoje`)
+**Requirement**: PAR-03, PAR-04, PAR-09, PAR-56 (J-17); achado do e2e da T81
+**Status**: pendente
+
+**Done when**:
+
+- [ ] Grupo novo: partida de qualquer data anterior usa o peso padrão (teste cita PAR-09)
+- [ ] Matriz política × comando da `config_pesos` segue verde
+- [ ] `esquema-producao.txt` regerado (`pnpm esquema:gerar`)
+- [ ] Gate passa, sem teste removido ou enfraquecido
+
+**Tests**: integration
+**Gate**: typecheck e testes dos pacotes tocados
+
+---
+
+### R1-T3: Contrato e API: escolha de refletir no passado
+
+**What**: `PUT` dos pesos recebe `refletirNoPassado` (boolean). Sim: a configuração nova passa a valer desde o início do grupo (substitui a mais antiga e as intermediárias de acordo com a spec da R1-T1); não: vale a partir de hoje e o passado fica. Primeira gravação sem configuração própria: sem pergunta. Erro de entrada tem teste de erro.
+**Estimativa**: 2h
+**Risco**: alto
+**Domínio**: sim
+**Criticidade**: crítica
+**Where**: backend/contrato/src/pesos.ts, backend/api/src/entrada/rotas/pesos.ts, backend/api/src/infraestrutura/db/repositorios/pesos.ts
+**Depends on**: R1-T2
+**Reuses**: AD-125; `backend/api/src/infraestrutura/db/repositorios/pesos.ts:86-99` (grava a configuração vigente), `backend/api/src/infraestrutura/db/migracoes/1792844640000_grupo-criar-pesos.sql` (config padrão datada em `p_hoje`)
+**Requirement**: PAR-03, PAR-04, PAR-09, PAR-56 (J-17); achado do e2e da T81
+**Status**: pendente
+
+**Done when**:
+
+- [ ] Teste com `refletirNoPassado: true` mostra o ranking do passado com o peso novo (PAR-09)
+- [ ] Teste com `false` mantém o peso antigo nas partidas de ontem (PAR-56)
+- [ ] Campo ausente ou inválido responde 422 com a mensagem do contrato
+- [ ] Gate passa, sem teste removido ou enfraquecido
+
+**Tests**: integration
+**Gate**: typecheck e testes dos pacotes tocados
+
+---
+
+### R1-T4: Tela Pontuação: pergunta ao gravar e e2e da J-17
+
+**What**: Em Pontuação, ao salvar com configuração já existente, abrir diálogo "Refletir nas partidas já disputadas?" com Sim, Não e Cancelar (só `tokens.css` e componentes do guia; mockup do diálogo no guia ou pedir ao usuário se faltar). Ajustar o e2e da J-17 para responder Não e conferir 1 ponto na partida de ontem, e cobrir o Sim em teste de tela.
+**Estimativa**: 2h
+**Risco**: alto
+**Domínio**: não
+**Criticidade**: comum
+**Where**: frontend/web/src/telas/pontuacao/, frontend/web/e2e/partidas.spec.ts, frontend/web/test/telas/
+**Depends on**: R1-T3
+**Reuses**: AD-125; `backend/api/src/infraestrutura/db/repositorios/pesos.ts:86-99` (grava a configuração vigente), `backend/api/src/infraestrutura/db/migracoes/1792844640000_grupo-criar-pesos.sql` (config padrão datada em `p_hoje`)
+**Requirement**: PAR-03, PAR-04, PAR-09, PAR-56 (J-17); achado do e2e da T81
+**Status**: pendente
+
+**Done when**:
+
+- [ ] J-17 verde no Playwright (responde Não; partida de ontem com 1 ponto; "Vigente desde dd/mm/aaaa")
+- [ ] Teste de tela: Sim envia `refletirNoPassado: true`; Cancelar não chama a API
+- [ ] Mudança no teste da J-17 com motivo no commit (AD-125)
+- [ ] Gate passa, sem teste removido ou enfraquecido
+
+**Tests**: e2e
+**Gate**: typecheck e testes dos pacotes tocados
+
+---
+
