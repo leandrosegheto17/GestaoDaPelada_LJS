@@ -93,18 +93,29 @@ describe('ci.yml: job web', () => {
   const passosWeb = web?.steps ?? [];
   const runsWeb = runs(web);
 
-  it('FUN-40: o job web tem build, e2e e a comparação visual, nessa ordem', () => {
+  it('FUN-40: o job web tem build e e2e, nessa ordem, em 3 fatias em paralelo', () => {
     const iBuild = passosWeb.findIndex((p) =>
       /pnpm --filter @pelada\/web build\b/.test(p.run ?? ''),
     );
     const iE2e = passosWeb.findIndex((p) => /playwright test\b/.test(p.run ?? ''));
-    const iVisual = passosWeb.findIndex((p) =>
+    expect(iBuild).toBeGreaterThanOrEqual(0);
+    expect(iE2e).toBeGreaterThan(iBuild);
+    expect(passosWeb[iE2e]?.run).toMatch(/--shard=\$\{\{ matrix\.shard \}\}/);
+    expect(web?.strategy?.matrix?.shard).toEqual(['1/3', '2/3', '3/3']);
+    expect(runsWeb).toMatch(/playwright install --with-deps chromium/);
+  });
+
+  it('FUN-40: a comparação visual roda no job web-visual, depois do build, e não repete o e2e', () => {
+    const visual = wf.jobs['web-visual'];
+    const passos = visual?.steps ?? [];
+    const iBuild = passos.findIndex((p) => /pnpm --filter @pelada\/web build\b/.test(p.run ?? ''));
+    const iVisual = passos.findIndex((p) =>
       /pnpm --filter @pelada\/web visual\b/.test(p.run ?? ''),
     );
     expect(iBuild).toBeGreaterThanOrEqual(0);
-    expect(iE2e).toBeGreaterThan(iBuild);
-    expect(iVisual).toBeGreaterThan(iE2e);
-    expect(runsWeb).toMatch(/playwright install --with-deps chromium/);
+    expect(iVisual).toBeGreaterThan(iBuild);
+    expect(runs(visual)).not.toMatch(/playwright test\b/);
+    expect(runs(visual)).toMatch(/playwright install --with-deps chromium/);
   });
 
   it('FUN-40: em caso de falha, envia o relatório do Playwright e os prints', () => {
