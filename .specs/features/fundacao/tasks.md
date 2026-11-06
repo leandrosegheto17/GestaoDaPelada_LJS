@@ -669,7 +669,7 @@ T81 → T82
 **Depends on**: T14
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-48, FUN-50, FUN-39
-**Status**: concluída
+**Status**: rascunhada
 **Nota do rascunho**: push, disparo do workflow e restauração real são ações externas; ficam para o /executar, com confirmação. O `docs/restauracao-registro.md` nasce com os números reais.
 
 **Done when**:
@@ -2338,7 +2338,7 @@ T81 → T82
 **Depends on**: T77
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-27, FUN-18
-**Status**: concluída
+**Status**: rascunhada
 **Nota do rascunho**: ação do usuário na Cloudflare e no GitHub; nada a escrever. Além dos secrets listados, o `deploy.yml` da T70 usa `BACKUP_CHAVE` e o opcional `VITE_SENTRY_DSN` no environment `producao` (lista completa no `docs/runbook.md`, seção Segredos).
 
 **Done when**:
@@ -2389,7 +2389,7 @@ T81 → T82
 **Depends on**: T79, T21, T23, T18
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-08, FUN-09, FUN-11
-**Status**: concluída
+**Status**: rascunhada
 **Nota do rascunho**: o comando `pnpm esquema:comparar --alvo dev|local [--migrar]` lê `NEON_URL_DEV_MIGRACAO` (dev) ou `DATABASE_URL_TESTE` (local), com a trava de host (remoto só com `PELADA_PERMITIR_HOST_REMOTO=1`). Zero DDL na `dev` é medido por zero migrações aplicadas (event trigger, como no teste da T23, exige superusuário, que o Neon não dá); a contagem por tabela usa o `contarLinhas` do `restaurar-backup.ts`. Também lista se `pelada_owner`, `pelada_app` e `pelada_backup_ro` existem (AD-009, FUN-11). Sai com 1 quando há diferença. A execução na `dev` (critérios 2 a 4) é ação externa com confirmação específica, do `/executar`; a AD-120 já registra a lista de uma rodada anterior (52 faltando, 3 sobrando).
 
 **Done when**:
@@ -2418,7 +2418,7 @@ T81 → T82
 **Depends on**: T80
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-40, FUN-54
-**Status**: concluída
+**Status**: rascunhada
 **Nota do rascunho**: push e conferência do `ci.yml` são ações externas, com confirmação, do `/executar`. O `testes.json` já roda lint, format, typecheck, testes, checagens, e2e (o script `e2e` faz o build antes, T58) e visual (T62); o `/executar` decide se o build do web entra como passo próprio para espelhar o job `web` do CI.
 
 **Done when**:
@@ -2444,7 +2444,7 @@ T81 → T82
 **Depends on**: T81
 **Reuses**: Nada do LJS (do zero, AD-002)
 **Requirement**: FUN-41, FUN-42, FUN-27, FUN-37
-**Status**: concluída
+**Status**: rascunhada
 **Nota do rascunho**: disparar o `deploy.yml`, conferir a saúde e instalar o PWA no celular são ações externas, com confirmação específica, do `/executar`. O registro (data, SHA e URL da prévia) entra no `docs/runbook.md` com os números reais.
 
 **Done when**:
