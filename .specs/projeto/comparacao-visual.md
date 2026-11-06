@@ -25,7 +25,7 @@
 
 Causas já conhecidas, ainda sem ajuste:
 
-- **T04** (`Entrar`): o mockup tem "Voltar ao ranking" e o app não, por SPEC_DEVIATION registrada em `Entrar.tsx` (a tela de entrada não sabe o grupo). Decisão de produto.
-- **T01** `erro` e `carregando`: o app mostra "RANKING" e o ícone de erro; o mockup mostra "Gestão da Pelada" e o ícone de sem conexão, sem a engrenagem. A semântica de erro versus sem conexão foi desenhada na partidas-e-ranking (T73).
+- **T04** (`Entrar`): o mockup tem "Voltar ao ranking" e o app não, por SPEC_DEVIATION registrada em `Entrar.tsx` (a tela de entrada não sabe o grupo). **Aceita pelo usuário (AD-127)**: o app fica; o mockup não é editado.
+- **T01** `erro` e `carregando`: o app mostra "RANKING" e o ícone de erro; o mockup mostra "Gestão da Pelada" e o ícone de sem conexão, sem a engrenagem. A semântica de erro versus sem conexão foi desenhada na partidas-e-ranking (T73). **Aceita pelo usuário (AD-127)**.
 - **T27** `erro`: o mapa não tem a resposta 422 do `POST /api/grupos`; acrescentá-la não bastou (o runner não separa GET de POST, o e2e `erros-campo.spec.ts` separa).
 - **T16** (28 falhas) e **T13** (14): cada estado precisa de leitura própria; a maior parte é timeout de passo (botão ou dialog que o mockup tem e o app nomeia diferente).
