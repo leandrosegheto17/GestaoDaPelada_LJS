@@ -55,8 +55,9 @@ async function abrirRanking(page: Page, estado: (typeof ESTADOS)[number]) {
       body: '{"erro":"Não encontrado.","codigo":"nao_encontrado"}',
     }),
   );
+  // O mockup é anterior ao campo `pdfLiberado` (planos-e-cobranca T27); o contrato o exige.
   await page.route('**/api/publico/pelada-de-quinta/ranking*', (r) =>
-    r.fulfill(json(resposta(estado.ranking))),
+    r.fulfill(json(JSON.stringify({ ...JSON.parse(resposta(estado.ranking)), pdfLiberado: true }))),
   );
   await page.route('**/api/publico/pelada-de-quinta/pdf*', (r) =>
     r.fulfill(json(resposta(estado.pdf))),
