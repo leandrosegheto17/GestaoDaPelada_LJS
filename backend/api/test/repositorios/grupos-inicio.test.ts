@@ -30,14 +30,14 @@ afterAll(async () => {
 });
 
 describe('grupos.criar com a data', () => {
-  it('PAR-15: o grupo criado pelo repositório tem os pesos padrão vigentes desde o hoje recebido', async () => {
+  it('PAR-15: o grupo criado pelo repositório tem os pesos padrão vigentes desde o início do grupo (AD-125)', async () => {
     const { url, cenario } = aberto;
     const pesos = await comDb(url, cenario.contaB, async (db) => {
       const criado = await grupos.criar(db, DADOS, '2026-04-15');
       const detalhe = await grupos.ler(db, criado.id, '2026-04-15');
       return { vigente: detalhe?.pesosVigentesDesde, padrao: detalhe?.pesosPadrao };
     });
-    expect(pesos).toEqual({ vigente: '2026-04-15', padrao: true });
+    expect(pesos).toEqual({ vigente: '1900-01-01', padrao: true });
   });
 });
 
@@ -52,7 +52,7 @@ describe('grupos.ler com hoje', () => {
       dataSugeridaPartida: '2026-04-15',
       partidaNaDataSugerida: false,
       partidasNoMes: 0,
-      pesosVigentesDesde: '2026-04-15',
+      pesosVigentesDesde: '1900-01-01',
       pesosPadrao: true,
       aparelhosNaSemana: 0,
     });

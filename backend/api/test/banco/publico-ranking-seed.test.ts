@@ -165,7 +165,7 @@ describe('seed: ranking do exemplo da t01', () => {
       const presencas = RESPOSTA.linhas
         .flatMap((l) => l.rodadas)
         .filter((rd) => !['falta', 'fora'].includes(rd.situacao)).length;
-      expect(contagens).toEqual({ partidas: PARTIDAS_EXEMPLO.length, presencas, pesos: 2 });
+      expect(contagens).toEqual({ partidas: PARTIDAS_EXEMPLO.length, presencas, pesos: 3 });
       expect(PARTIDAS_EXEMPLO.length).toBe(3);
     }, 2);
   });

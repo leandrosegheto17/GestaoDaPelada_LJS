@@ -233,7 +233,7 @@ funcao email_origem_registrar(p_chave_hash bytea, p_teto integer) retorna boolea
 funcao email_origem_registrar_em(p_momento timestamp with time zone, p_chave_hash bytea, p_teto integer) retorna boolean plpgsql security invoker volatile config=search_path=public, pg_temp corpo=edbc7945b7b072e887d31f3468936ee5
 funcao envio_permitido(p_destino text, p_tipo text) retorna boolean sql security invoker volatile config=search_path=public, pg_temp corpo=3e17c005fff45cc2a751c0738ba0f387
 funcao evento_publico_registrar(p_slug text, p_tipo text, p_dispositivo uuid, p_mes text, p_momento timestamp with time zone) retorna boolean plpgsql security definer volatile config=search_path=public, pg_temp corpo=7eae5dc5f5fb48f09fe4bf106654a1d8
-funcao grupo_criar(p_nome text, p_dia_semana text, p_frequencia text, p_horario time without time zone, p_slug_base text, p_habilidades text[], p_hoje date) retorna TABLE(id uuid, slug text) plpgsql security definer volatile config=search_path=public, pg_temp corpo=ca12ced72e21da2568f507f98499c02d
+funcao grupo_criar(p_nome text, p_dia_semana text, p_frequencia text, p_horario time without time zone, p_slug_base text, p_habilidades text[], p_hoje date) retorna TABLE(id uuid, slug text) plpgsql security definer volatile config=search_path=public, pg_temp corpo=a7f36c3187fc1d41d61a5f1c28f13dbe
 funcao grupos_arquivado_so_criadora() retorna trigger plpgsql security invoker volatile config=search_path=public, pg_temp corpo=e0064fb029a5c1014410f102b0faba27
 funcao grupos_slug_imutavel() retorna trigger plpgsql security invoker volatile config= corpo=cfd170fd34060dae5286ec3f01b9ba8e
 funcao grupos_visiveis() retorna SETOF uuid sql security definer stable config=search_path=public, pg_temp corpo=58895f831b1a77ad9653600011669ff9

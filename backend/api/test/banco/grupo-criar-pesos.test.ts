@@ -63,7 +63,7 @@ const totais = async (d: pg.Client): Promise<number[]> => [
 ];
 
 describe('grupo_criar de 7 parâmetros', () => {
-  it('PAR-15: cria o grupo com 1, 1, 1, 1, -1, -1 vigentes desde p_hoje, registrados pela conta', async () => {
+  it('PAR-15: cria o grupo com 1, 1, 1, 1, -1, -1 vigentes desde o início do grupo (1900-01-01, AD-125), registrados pela conta', async () => {
     const { db, cenario } = aberto;
     await comoApp(db, { conta: cenario.contaC }, async (d) => {
       const r = await criar7(d, 'racha-novo', '2026-03-15');
@@ -72,7 +72,7 @@ describe('grupo_criar de 7 parâmetros', () => {
       await d.query('RESET ROLE');
       expect(await pesosDe(d, id)).toEqual([
         {
-          vigente_desde: '2026-03-15',
+          vigente_desde: '1900-01-01',
           pesos: [1, 1, 1, 1, -1, -1],
           registrado_por: cenario.contaC,
         },
