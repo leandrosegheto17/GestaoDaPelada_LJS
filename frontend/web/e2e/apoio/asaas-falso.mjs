@@ -47,6 +47,7 @@ export async function iniciarAsaasFalso(opcoes = {}) {
   let eventos = 0;
   const proximoId = (prefixo) => `${prefixo}_${String(++sequencia).padStart(6, '0')}`;
   let base = '';
+  const URL_FATURA_FALSA = 'https://fatura-falsa.asaas.test';
 
   const deveFalhar = (rota) => {
     const n = falhas.get(rota) ?? 0;
@@ -64,7 +65,8 @@ export async function iniciarAsaasFalso(opcoes = {}) {
     dueDate: a.nextDueDate,
     status: 'PENDING',
     billingType: 'UNDEFINED',
-    invoiceUrl: `${base}/fatura/${a.pagamento}`,
+    // https por exigência do banco (`assinaturas.fatura_url ~ '^https://'`); o e2e atende este host por interceptação.
+    invoiceUrl: `${URL_FATURA_FALSA}/fatura/${a.pagamento}`,
   });
 
   const servidor = createServer(async (req, res) => {

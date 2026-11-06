@@ -112,6 +112,9 @@ async function linkDoEmail(
 }
 
 let ultimoIp = 200;
+/** Host https da fatura falsa (o banco exige https): o contexto o atende, sem rede. */
+const URL_FATURA_FALSA = 'https://fatura-falsa.asaas.test';
+
 async function aparelho(browser: Browser): Promise<Page> {
   ultimoIp += 1;
   const contexto = await browser.newContext({
@@ -119,6 +122,13 @@ async function aparelho(browser: Browser): Promise<Page> {
     serviceWorkers: 'block',
     extraHTTPHeaders: { 'cf-connecting-ip': `198.51.100.${ultimoIp}` },
   });
+  await contexto.route(`${URL_FATURA_FALSA}/**`, (rota) =>
+    rota.fulfill({
+      status: 200,
+      contentType: 'text/html; charset=utf-8',
+      body: '<!doctype html><html lang="pt-BR"><body><h1>Fatura de teste do Asaas</h1></body></html>',
+    }),
+  );
   return contexto.newPage();
 }
 
@@ -208,7 +218,7 @@ async function assinarPelaTela(pagina: Page, grupoId: string): Promise<void> {
   await pagina.getByRole('button', { name: 'Assinar Pro' }).click();
   const aba = await fatura;
   await aba.waitForLoadState();
-  expect(aba.url()).toContain(`${URL_ASAAS_FALSO}/fatura/`);
+  expect(aba.url()).toContain(`${URL_FATURA_FALSA}/fatura/`);
   await expect(aba.getByRole('heading', { name: 'Fatura de teste do Asaas' })).toBeVisible();
   await aba.close();
 }
@@ -228,7 +238,7 @@ test('J-27 (PLA-53, PLA-54, PLA-44): a criadora assina, o pagamento confirma e M
   await expect(c.getByText(TEXTO_AGUARDANDO)).toBeVisible();
   await expect(c.getByRole('link', { name: /fatura/i })).toHaveAttribute(
     'href',
-    new RegExp(`^${URL_ASAAS_FALSO}/fatura/`),
+    new RegExp(`^${URL_FATURA_FALSA}/fatura/`),
   );
 
   // Passo 4 (PLA-44): o Asaas confirma o pagamento pelo webhook.
