@@ -1,4 +1,5 @@
 import { diaDaSemana, mesDe } from '@pelada/dominio';
+import { INICIO_DO_GRUPO } from '@pelada/contrato/pesos';
 import { Link, useLocation, useParams } from 'react-router';
 import { Casca, NOME_DO_APP } from '../../componentes/Casca.tsx';
 import estilosCasca from '../../componentes/Casca.module.css';
@@ -104,6 +105,7 @@ export function textoPartidasDoMes(n: number, mes: string): string {
 /** "Pesos padrão" ou "Vigente desde 01/09/2026" (PAR-135). */
 export function textoPontuacao(g: { pesosPadrao: boolean; pesosVigentesDesde: string }): string {
   if (g.pesosPadrao) return 'Pesos padrão';
+  if (g.pesosVigentesDesde === INICIO_DO_GRUPO) return 'Desde o início do grupo';
   const [ano, mes, dia] = g.pesosVigentesDesde.split('-');
   return `Vigente desde ${dia}/${mes}/${ano}`;
 }

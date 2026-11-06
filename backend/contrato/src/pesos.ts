@@ -6,6 +6,9 @@ import { z } from 'zod';
  * campo (PAR-08).
  */
 
+/** Data da configuração padrão: "desde o início do grupo" (PAR-165, AD-126). */
+export const INICIO_DO_GRUPO = '1900-01-01';
+
 export const LIMITES_PESO = { min: -10, max: 10 } as const;
 
 /** PAR-06 e PAR-07: a mesma mensagem para peso não inteiro, fora da faixa ou ausente. */

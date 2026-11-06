@@ -334,6 +334,11 @@ test('J-17: trocar os pesos sem mudar o passado', async ({ browser }) => {
     await pagina.goto(`/app/grupos/${grupo.id}/pontuacao`);
     await pagina.getByLabel('Presença com chuva').fill('2');
     await pagina.getByRole('button', { name: 'Salvar nova configuração' }).click();
+    // AD-125: a tela pergunta se reflete nas partidas já disputadas; "Não" mantém o peso antigo no passado.
+    await pagina
+      .getByRole('dialog', { name: 'Refletir nas partidas já disputadas?' })
+      .getByRole('button', { name: 'Não' })
+      .click();
     await expect(pagina.getByText('Nova configuração vale a partir de hoje.')).toBeVisible();
   }
   const painel = (await (await pagina.request.get(`/api/grupos/${grupo.id}/pesos`)).json()) as {

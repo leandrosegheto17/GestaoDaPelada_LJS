@@ -162,10 +162,12 @@ describe('Pontuação (t18)', () => {
     const campo = (await screen.findByLabelText('Lesionado com chuva')) as HTMLInputElement;
     fireEvent.change(campo, { target: { value: '2' } });
     fireEvent.click(screen.getByRole('button', { name: 'Salvar nova configuração' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Não' }));
     expect(await screen.findByText('Nova configuração vale a partir de hoje.')).toBeDefined();
     expect(t.chamadasA('POST', '/api/grupos/g-quinta/pesos')[0]?.corpo).toEqual({
       ...PESOS_SET,
       lesionadoComChuva: 2,
+      refletirNoPassado: false,
     });
     await waitFor(() =>
       expect(screen.getByRole('heading', { name: 'Vigente desde 22/10/2026' })).toBeDefined(),
@@ -187,6 +189,7 @@ describe('Pontuação (t18)', () => {
         }),
     });
     fireEvent.click(await screen.findByRole('button', { name: 'Salvar nova configuração' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Não' }));
     const resumo = (await screen.findByText('Corrija 2 campos:')).closest(
       '[role="alert"]',
     ) as HTMLElement;
@@ -211,5 +214,84 @@ describe('Pontuação (t18)', () => {
     const { container } = abrir({ [LER]: () => json(200, PAINEL) });
     await screen.findByRole('heading', { name: 'Vigente desde 01/09/2026' });
     await esperarSemViolacoes(container);
+  });
+});
+
+describe('Refletir nas partidas já disputadas (AD-125)', () => {
+  const TITULO = 'Refletir nas partidas já disputadas?';
+
+  async function salvarComDialogo(t: ReturnType<typeof abrir>) {
+    const campo = (await screen.findByLabelText('Lesionado com chuva')) as HTMLInputElement;
+    fireEvent.change(campo, { target: { value: '2' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Salvar nova configuração' }));
+    await screen.findByRole('dialog', { name: TITULO });
+    expect(t.chamadasA('POST', '/api/grupos/g-quinta/pesos')).toHaveLength(0);
+  }
+
+  it('PAR-166: salvar abre o diálogo com Sim, Não e Cancelar, sem chamar a API antes da resposta', async () => {
+    const t = abrir({ [LER]: () => json(200, PAINEL), [SALVAR]: () => json(200, SALVO) });
+    await salvarComDialogo(t);
+    const dialogo = screen.getByRole('dialog', { name: TITULO });
+    for (const nome of ['Sim', 'Não', 'Cancelar'])
+      expect(within(dialogo).getByRole('button', { name: nome })).toBeDefined();
+  });
+
+  it('PAR-164: Sim envia refletirNoPassado true com os 6 pesos', async () => {
+    const t = abrir({ [LER]: () => json(200, PAINEL), [SALVAR]: () => json(200, SALVO) });
+    await salvarComDialogo(t);
+    fireEvent.click(screen.getByRole('button', { name: 'Sim' }));
+    expect(await screen.findByText('Nova configuração vale a partir de hoje.')).toBeDefined();
+    expect(t.chamadasA('POST', '/api/grupos/g-quinta/pesos')[0]?.corpo).toEqual({
+      ...PESOS_SET,
+      lesionadoComChuva: 2,
+      refletirNoPassado: true,
+    });
+  });
+
+  it('PAR-163: Não envia refletirNoPassado false', async () => {
+    const t = abrir({ [LER]: () => json(200, PAINEL), [SALVAR]: () => json(200, SALVO) });
+    await salvarComDialogo(t);
+    fireEvent.click(screen.getByRole('button', { name: 'Não' }));
+    await waitFor(() => expect(t.chamadasA('POST', '/api/grupos/g-quinta/pesos')).toHaveLength(1));
+    expect(t.chamadasA('POST', '/api/grupos/g-quinta/pesos')[0]?.corpo).toMatchObject({
+      refletirNoPassado: false,
+    });
+  });
+
+  it('PAR-166: Cancelar fecha o diálogo e não chama a API', async () => {
+    const t = abrir({ [LER]: () => json(200, PAINEL), [SALVAR]: () => json(200, SALVO) });
+    await salvarComDialogo(t);
+    fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(t.chamadasA('POST', '/api/grupos/g-quinta/pesos')).toHaveLength(0);
+  });
+
+  it('PAR-166: peso inválido mostra o erro no campo e não abre o diálogo', async () => {
+    abrir({ [LER]: () => json(200, PAINEL) });
+    const campo = (await screen.findByLabelText('Presença sem chuva')) as HTMLInputElement;
+    fireEvent.change(campo, { target: { value: '' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Salvar nova configuração' }));
+    await screen.findByText('Use um número inteiro de −10 a 10.');
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('PAR-166: a configuração de 1900-01-01 aparece como "Desde o início do grupo"', async () => {
+    const painel = {
+      ...PAINEL,
+      vigente: { ...PAINEL.vigente, vigenteDesde: '1900-01-01' },
+      historico: [{ ...PAINEL.historico[0], vigenteDesde: '1900-01-01', vigenteAte: '2026-08-31' }],
+    };
+    abrir({ [LER]: () => json(200, painel) });
+    expect(await screen.findByRole('heading', { name: 'Desde o início do grupo' })).toBeDefined();
+    const lista = screen.getByRole('list', { name: 'Configurações anteriores' });
+    expect(within(lista).getByRole('listitem').textContent).toContain(
+      'Do início do grupo a 31/08/2026',
+    );
+  });
+
+  it('axe com o diálogo aberto', async () => {
+    const t = abrir({ [LER]: () => json(200, PAINEL) });
+    await salvarComDialogo(t);
+    await esperarSemViolacoes(document.body);
   });
 });

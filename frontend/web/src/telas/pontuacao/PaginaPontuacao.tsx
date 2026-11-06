@@ -1,5 +1,6 @@
 import {
   CAMPOS_PESO,
+  INICIO_DO_GRUPO,
   LIMITES_PESO,
   type CampoPeso,
   type PesosCorpo,
@@ -9,6 +10,7 @@ import { useState, type FormEvent } from 'react';
 import { useParams } from 'react-router';
 import { Botao } from '../../componentes/Botao.tsx';
 import { Campo } from '../../componentes/Campo.tsx';
+import { Dialogo } from '../../componentes/Dialogo.tsx';
 import campo from '../../componentes/Campo.module.css';
 import { Casca, NOME_DO_APP } from '../../componentes/Casca.tsx';
 import { EsqueletoLista } from '../../componentes/EsqueletoLista.tsx';
@@ -63,6 +65,13 @@ export const ROTULOS_PESO: Readonly<Record<CampoPeso, string>> = {
 };
 
 /** "2026-09-01" → "01/09/2026". */
+/** "Desde o início do grupo" para a padrão de 1900-01-01 (PAR-166), senão "Vigente desde dd/mm/aaaa". */
+export function textoVigencia(desde: string): string {
+  return desde === INICIO_DO_GRUPO
+    ? 'Desde o início do grupo'
+    : `Vigente desde ${dataCompleta(desde)}`;
+}
+
 export function dataCompleta(data: string): string {
   const [ano, mes, dia] = data.split('-');
   return `${dia}/${mes}/${ano}`;
@@ -98,6 +107,8 @@ function Painel({ grupoId, painel }: { grupoId: string; painel: PesosPainel }) {
   const [resumo, setResumo] = useState<ErroDoResumo[]>([]);
   const [salvo, setSalvo] = useState(false);
   const [falha, setFalha] = useState<string | null>(null);
+  // Pesos já validados à espera da resposta do diálogo "Refletir nas partidas já disputadas?" (PAR-166).
+  const [aperguntar, setAperguntar] = useState<Omit<PesosCorpo, 'refletirNoPassado'> | null>(null);
   const { vigente, historico } = painel;
 
   function enviar(e: FormEvent<HTMLFormElement>) {
@@ -106,7 +117,7 @@ function Painel({ grupoId, painel }: { grupoId: string; painel: PesosPainel }) {
     setSalvo(false);
     setFalha(null);
     const locais: Partial<Record<CampoPeso, string>> = {};
-    const corpo: Partial<PesosCorpo> = {};
+    const corpo: Partial<Omit<PesosCorpo, 'refletirNoPassado'>> = {};
     for (const c of CAMPOS_PESO) {
       const n = lerPeso(textos[c]);
       if (n === null) locais[c] = MENSAGEM_PESO_TELA;
@@ -120,30 +131,42 @@ function Painel({ grupoId, painel }: { grupoId: string; painel: PesosPainel }) {
     }
     setErros({});
     setResumo([]);
-    salvar.mutate(corpo as PesosCorpo, {
-      onSuccess: (novo) => {
-        setTextos(textosDe(novo.vigente));
-        setSalvo(true);
-      },
-      onError: (erro) => {
-        if (erro instanceof ErroApi && erro.status === 422) {
-          const porCampo = mensagensDosCampos(erro);
-          const conhecidos = Object.fromEntries(
-            Object.entries(porCampo).filter(([c]) => c in ROTULOS_PESO),
-          ) as Partial<Record<CampoPeso, string>>;
-          setErros(conhecidos);
-          setResumo(
-            CAMPOS_PESO.filter((c) => c in conhecidos).map((c) => ({
-              id: c,
-              rotulo: ROTULOS_PESO[c],
-            })),
+    setAperguntar(corpo as Omit<PesosCorpo, 'refletirNoPassado'>);
+  }
+
+  function gravar(refletirNoPassado: boolean) {
+    const pesos = aperguntar;
+    setAperguntar(null);
+    if (!pesos) return;
+    salvar.mutate(
+      { ...pesos, refletirNoPassado },
+      {
+        onSuccess: (novo) => {
+          setTextos(textosDe(novo.vigente));
+          setSalvo(true);
+        },
+        onError: (erro) => {
+          if (erro instanceof ErroApi && erro.status === 422) {
+            const porCampo = mensagensDosCampos(erro);
+            const conhecidos = Object.fromEntries(
+              Object.entries(porCampo).filter(([c]) => c in ROTULOS_PESO),
+            ) as Partial<Record<CampoPeso, string>>;
+            setErros(conhecidos);
+            setResumo(
+              CAMPOS_PESO.filter((c) => c in conhecidos).map((c) => ({
+                id: c,
+                rotulo: ROTULOS_PESO[c],
+              })),
+            );
+            if (Object.keys(conhecidos).length === 0) setFalha(erro.message);
+            return;
+          }
+          setFalha(
+            erro instanceof Error ? erro.message : 'Não foi possível salvar. Tente de novo.',
           );
-          if (Object.keys(conhecidos).length === 0) setFalha(erro.message);
-          return;
-        }
-        setFalha(erro instanceof Error ? erro.message : 'Não foi possível salvar. Tente de novo.');
+        },
       },
-    });
+    );
   }
 
   return (
@@ -151,9 +174,29 @@ function Painel({ grupoId, painel }: { grupoId: string; painel: PesosPainel }) {
       {salvo ? <Faixa tipo="sucesso">{TEXTO_SALVO}</Faixa> : null}
       {falha ? <Faixa tipo="erro">{falha}</Faixa> : null}
       <ResumoErros erros={resumo} />
+      {aperguntar ? (
+        <Dialogo
+          titulo="Refletir nas partidas já disputadas?"
+          descricao="Sim: os novos pesos valem também para as partidas passadas e o ranking é recalculado. Não: valem a partir de hoje e o passado fica como está."
+          aoFechar={() => setAperguntar(null)}
+          acoes={
+            <>
+              <Botao variante="secundario" autoFocus onClick={() => setAperguntar(null)}>
+                Cancelar
+              </Botao>
+              <Botao variante="secundario" onClick={() => gravar(false)}>
+                Não
+              </Botao>
+              <Botao variante="principal" onClick={() => gravar(true)}>
+                Sim
+              </Botao>
+            </>
+          }
+        />
+      ) : null}
       <section className={modulo.cartao} aria-labelledby="vig">
         <h2 id="vig" className={`${estilos.subtitulo} ${modulo['sem-topo']}`}>
-          {`Vigente desde ${dataCompleta(vigente.vigenteDesde)}`}
+          {textoVigencia(vigente.vigenteDesde)}
         </h2>
         <table className={tabela['tabela-simples']}>
           <caption className="sr">Pesos vigentes</caption>
@@ -216,7 +259,7 @@ function Painel({ grupoId, painel }: { grupoId: string; painel: PesosPainel }) {
             {historico.map((h) => (
               <ItemLista
                 key={h.vigenteDesde}
-                titulo={`De ${dataCompleta(h.vigenteDesde)} a ${dataCompleta(h.vigenteAte)}`}
+                titulo={`${h.vigenteDesde === INICIO_DO_GRUPO ? 'Do início do grupo' : `De ${dataCompleta(h.vigenteDesde)}`} a ${dataCompleta(h.vigenteAte)}`}
                 meta={`${textoPesos(h)} · registrado por ${h.registradoPor}`}
               />
             ))}

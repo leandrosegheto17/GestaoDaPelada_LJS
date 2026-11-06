@@ -186,6 +186,9 @@ describe('início do grupo com partidas (partidas-e-ranking T64)', () => {
     expect(textoPontuacao({ pesosPadrao: false, pesosVigentesDesde: '2026-09-01' })).toBe(
       'Vigente desde 01/09/2026',
     );
+    expect(textoPontuacao({ pesosPadrao: false, pesosVigentesDesde: '1900-01-01' })).toBe(
+      'Desde o início do grupo',
+    ); // PAR-166
     expect(textoUso(12)).toBe('Esta semana: 12 aparelhos');
   });
 
