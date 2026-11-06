@@ -101,6 +101,21 @@ describe('limparEvento', () => {
     expect(limpo.request.headers).toEqual({ Accept: 'json' });
   });
 
+  it('PLA-39: cabeçalho fora da lista de permissão não sai (token do webhook do Asaas)', () => {
+    const limpo = limparEvento({
+      request: {
+        headers: {
+          'asaas-access-token': 'segredo-do-webhook',
+          'X-Api-Key': 'outra',
+          'X-Pelada': '1',
+          'Content-Type': 'application/json',
+        },
+      },
+    });
+    expect(limpo.request.headers).toEqual({ 'X-Pelada': '1', 'Content-Type': 'application/json' });
+    expect(JSON.stringify(limpo)).not.toContain('segredo-do-webhook');
+  });
+
   it('FUN-24: o evento de entrada não é alterado', () => {
     const sujo = eventoSujo();
     const antes = structuredClone(sujo);

@@ -6,7 +6,9 @@ import {
   erroPagamentoIndisponivel,
   erroPlanoPro,
   erroSomenteLeitura,
+  MENSAGEM_CANCELE_ANTES_DE_ARQUIVAR,
   MENSAGEM_CPF,
+  mensagemCanceleAntesDeExcluir,
   MENSAGEM_PAGAMENTO_INDISPONIVEL,
   planoResposta,
 } from '../src/plano.ts';
@@ -173,5 +175,19 @@ describe('erros do plano (AD-091)', () => {
       assinaturaCriada.safeParse({ faturaUrl: 'https://sandbox.asaas.com/i/abc' }).success,
     ).toBe(true);
     expect(assinaturaCriada.safeParse({ faturaUrl: 'x', id: 'sub_1' }).success).toBe(false);
+  });
+});
+
+describe('textos literais do 409 de assinatura ativa (A-01)', () => {
+  it('PLA-69: arquivar o grupo com assinatura pede cancelar antes', () => {
+    expect(MENSAGEM_CANCELE_ANTES_DE_ARQUIVAR).toBe(
+      'Cancele a assinatura antes de arquivar o grupo',
+    );
+  });
+
+  it('PLA-68: excluir a conta cita o nome do grupo', () => {
+    expect(mensagemCanceleAntesDeExcluir('Pelada de Quinta')).toBe(
+      'Cancele a assinatura do grupo Pelada de Quinta antes de excluir a conta',
+    );
   });
 });

@@ -99,6 +99,34 @@ describe('plano_do_grupo', () => {
     }
   });
 
+  it('PLA-04 (A-03): cancelar e reassinar mantém o pago_ate da cancelada enquanto a nova está pendente', async () => {
+    const { db, cenario } = aberto;
+    await db.query('BEGIN');
+    try {
+      await db.query(
+        `INSERT INTO assinaturas (grupo_id, asaas_cliente_id, asaas_assinatura_id, valor_centavos, situacao, pago_ate,
+           criada_por, criada_em)
+         VALUES ($1, 'cus_r1', 'sub_r1_canc', 990, 'cancelada', '2026-04-05', $2, now() + interval '1 hour'),
+                ($1, 'cus_r1', 'sub_r1_pend', 990, 'aguardando_pagamento', NULL, $2, now() + interval '2 hours')`,
+        [cenario.grupoG, cenario.contaC],
+      );
+      await db.query('SET LOCAL ROLE pelada_app');
+      await db.query(`SELECT set_config('app.conta_id', $1, true)`, [cenario.contaC]);
+      const um = await db.query<{ pago_ate: string }>(
+        'SELECT pago_ate::text FROM plano_do_grupo($1)',
+        [cenario.grupoG],
+      );
+      expect(um.rows).toEqual([{ pago_ate: '2026-04-05' }]);
+      const todos = await db.query<{ id: string; pago_ate: string | null }>(
+        'SELECT id, pago_ate::text FROM plano_grupos_da_criadora($1) WHERE id = $1',
+        [cenario.grupoG],
+      );
+      expect(todos.rows).toEqual([{ id: cenario.grupoG, pago_ate: '2026-04-05' }]);
+    } finally {
+      await db.query('ROLLBACK');
+    }
+  });
+
   it('PLA-25: no contexto do slug de G1, plano_do_grupo(G1) responde', async () => {
     const { cenario } = aberto;
     expect(await planoDo({ slug: cenario.slugG }, cenario.grupoG)).toHaveLength(1);

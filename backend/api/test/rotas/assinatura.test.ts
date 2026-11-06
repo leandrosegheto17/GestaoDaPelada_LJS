@@ -171,6 +171,29 @@ describe('POST …/assinatura', () => {
     expect(await assinaturasNovas(cenario.grupoG)).toBe(0);
   });
 
+  it('PLA-02 (A-04): grupo de cortesia recebe 409 grupo_cortesia e o Asaas não recebe chamada', async () => {
+    const { cenario, db } = aberto;
+    await db.query(
+      `UPDATE grupos SET situacao_comercial = 'uso_proprio', trial_inicio = NULL WHERE id = $1`,
+      [cenario.grupoH],
+    );
+    try {
+      const r = await pedir(cenario.grupoH, { conta: cenario.contaB });
+      expect(r.status).toBe(409);
+      expect(await r.json()).toMatchObject({
+        erro: 'grupo_cortesia',
+        mensagem: 'Este grupo tem o Pro de cortesia e não precisa de assinatura.',
+      });
+      expect(asaas.chamadas).toEqual([]);
+      expect(await assinaturasNovas(cenario.grupoH)).toBe(0);
+    } finally {
+      await db.query(
+        `UPDATE grupos SET situacao_comercial = 'trial', trial_inicio = '2026-11-01' WHERE id = $1`,
+        [cenario.grupoH],
+      );
+    }
+  });
+
   it('PLA-33: segundo POST recebe 409 com a mesma faturaUrl', async () => {
     const { cenario } = aberto;
     const primeiro = assinaturaCriada.parse(

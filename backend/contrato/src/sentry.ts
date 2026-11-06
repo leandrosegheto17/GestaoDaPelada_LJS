@@ -1,7 +1,7 @@
 /**
  * Limpeza do evento do Sentry (FUN-24), usada no `beforeSend` do Worker e do front. Nenhum dado
- * pessoal sai para terceiros: tira o corpo e os cookies da requisição, os cabeçalhos `cookie`,
- * `set-cookie` e `authorization`, e troca todo e-mail que aparecer em qualquer texto do evento
+ * pessoal sai para terceiros: tira o corpo e os cookies da requisição, todos os cabeçalhos fora de uma lista de
+ * permissão (cookie, authorization, tokens), e troca todo e-mail que aparecer em qualquer texto do evento
  * (mensagem, exceções, breadcrumbs, `extra`, contextos, tags, usuário).
  *
  * Não depende dos tipos do Sentry: recebe e devolve o mesmo formato. É pura: o evento de
@@ -12,7 +12,22 @@ export const EMAIL_REMOVIDO = '[email removido]';
 
 const EMAIL = /[A-Z0-9._%+-]+@[A-Z0-9-]+(?:\.[A-Z0-9-]+)*\.[A-Z]{2,}/gi;
 
-const CABECALHOS_REMOVIDOS = new Set(['cookie', 'set-cookie', 'authorization']);
+/**
+ * Lista de permissão (A-07): só estes cabeçalhos seguem no evento. Segredo que chega em cabeçalho (como o
+ * `asaas-access-token` do webhook) nunca sai, mesmo sem ninguém ter pensado nele.
+ */
+const CABECALHOS_PERMITIDOS = new Set([
+  'accept',
+  'accept-encoding',
+  'accept-language',
+  'content-length',
+  'content-type',
+  'host',
+  'origin',
+  'referer',
+  'user-agent',
+  'x-pelada',
+]);
 
 type Objeto = Record<string, unknown>;
 
@@ -40,7 +55,7 @@ function limparRequisicao(requisicao: Objeto): Objeto {
   if (objeto(resto.headers)) {
     const cabecalhos: Objeto = {};
     for (const [nome, valor] of Object.entries(resto.headers)) {
-      if (!CABECALHOS_REMOVIDOS.has(nome.toLowerCase())) cabecalhos[nome] = valor;
+      if (CABECALHOS_PERMITIDOS.has(nome.toLowerCase())) cabecalhos[nome] = valor;
     }
     resto.headers = cabecalhos;
   }

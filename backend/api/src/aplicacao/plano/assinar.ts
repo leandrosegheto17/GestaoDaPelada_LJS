@@ -13,6 +13,7 @@ import type { Db } from '../../infraestrutura/db/repositorios/tipos.ts';
  *
  * Casos limite e estados (Domínio: sim), listados antes do código:
  * - quem não é a criadora (admin convidada): `so_quem_criou`, sem chamar o Asaas (PLA-32);
+ * - grupo de cortesia (`uso_proprio`): `grupo_cortesia`, sem chamar o Asaas (A-04, PLA-02);
  * - já há assinatura `aguardando_pagamento`: `assinatura_pendente` com a fatura dela, sem chamar o Asaas (PLA-33);
  * - já há assinatura `ativa`: `assinatura_ativa` com a fatura (se houver), sem chamar o Asaas (PLA-33);
  * - duas requisições simultâneas do mesmo grupo: a trava (AD-097) faz a segunda esperar e ver a pendente da primeira;
@@ -23,6 +24,8 @@ import type { Db } from '../../infraestrutura/db/repositorios/tipos.ts';
  * - falha em `primeiraCobranca` com a assinatura já criada no Asaas: `removerAssinatura` uma vez (compensação, não
  *   repetição) e `pagamento_indisponivel` sem gravar (AD-114); se a remoção também falha, o log leva o id da
  *   assinatura para a limpeza manual, nunca o CPF;
+ * - erro inesperado (lança) depois de a assinatura existir no Asaas: a mesma compensação e o erro sobe (A-06); a falha
+ *   do COMMIT depois do retorno fica fora do alcance desta função;
  * - a gravação recusa depois de a assinatura existir no Asaas (corrida rara, grupo arquivado): a mesma compensação;
  * - plano atual `trial`, Free, `inadimplente` ou `cancelado`: todos podem assinar; assinar não muda o plano (PLA-31,
  *   o webhook de pagamento é que ativa);
@@ -43,6 +46,7 @@ export type ResultadoAssinar =
   | { resultado: 'assinatura_pendente'; faturaUrl: string | null }
   | { resultado: 'assinatura_ativa'; faturaUrl: string | null }
   | { resultado: 'so_quem_criou' }
+  | { resultado: 'grupo_cortesia' }
   | { resultado: 'nao_encontrado' }
   | { resultado: 'pagamento_indisponivel' };
 
@@ -71,6 +75,8 @@ export async function assinar(
   const dados = await plano.ler(db, grupoId);
   if (dados === null) return { resultado: 'nao_encontrado' };
   if (dados.criadoPor !== conta) return { resultado: 'so_quem_criou' };
+  // A-04: a cortesia (`uso_proprio`) já tem o Pro; cobrar não faz sentido e `plano_ativar` a manteria (PLA-02, PLA-58).
+  if (dados.situacaoComercial === 'uso_proprio') return { resultado: 'grupo_cortesia' };
 
   const vigente = await assinaturas.pendenteOuAtiva(db, grupoId);
   if (vigente !== null) {
@@ -113,15 +119,22 @@ export async function assinar(
     return { resultado: 'pagamento_indisponivel' };
   };
 
-  const cobranca = await asaas.primeiraCobranca(criada.id);
-  if (cobranca === 'falhou') return compensar('primeira_cobranca');
+  // A-06: erro inesperado (a leitura da fatura ou a gravação lançam) depois de a assinatura existir no Asaas: remove-a
+  // antes de subir o erro, senão a cliente seria cobrada sem Pro e o webhook ignoraria a assinatura sem linha local.
+  try {
+    const cobranca = await asaas.primeiraCobranca(criada.id);
+    if (cobranca === 'falhou') return await compensar('primeira_cobranca');
 
-  const gravada = await assinaturas.registrar(db, grupoId, {
-    clienteId,
-    assinaturaId: criada.id,
-    valorCentavos: PRECO_PRO_CENTAVOS,
-    faturaUrl: cobranca.invoiceUrl,
-  });
-  if (gravada.resultado !== 'ok') return compensar(`registrar_${gravada.resultado}`);
-  return { resultado: 'criada', faturaUrl: cobranca.invoiceUrl };
+    const gravada = await assinaturas.registrar(db, grupoId, {
+      clienteId,
+      assinaturaId: criada.id,
+      valorCentavos: PRECO_PRO_CENTAVOS,
+      faturaUrl: cobranca.invoiceUrl,
+    });
+    if (gravada.resultado !== 'ok') return await compensar(`registrar_${gravada.resultado}`);
+    return { resultado: 'criada', faturaUrl: cobranca.invoiceUrl };
+  } catch (erro) {
+    await compensar('erro_inesperado').catch(() => undefined);
+    throw erro;
+  }
 }

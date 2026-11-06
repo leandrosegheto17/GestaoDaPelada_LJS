@@ -51,6 +51,12 @@ beforeAll(async () => {
   ).id;
   // O cenário semeia uma assinatura cancelada em cada grupo (T10). Aqui B "nunca assinou" (cliente novo): tira as de B.
   await aberto.db.query('DELETE FROM assinaturas WHERE criada_por = $1', [aberto.cenario.contaB]);
+  // O cenário cria os grupos com o padrão da coluna (`uso_proprio`, a cortesia). Grupo criado de verdade começa em
+  // `trial` (grupo_criar); a cortesia não assina (A-04), então estes testes partem do trial.
+  await aberto.db.query(
+    `UPDATE grupos SET situacao_comercial = 'trial', trial_inicio = '2026-11-01' WHERE id = ANY($1::uuid[])`,
+    [[aberto.cenario.grupoG, aberto.cenario.grupoH, h2]],
+  );
 });
 
 beforeEach(() => {
@@ -271,6 +277,66 @@ describe('assinar: plano atual (casos limite)', () => {
       });
     },
   );
+});
+
+describe('assinar: erro inesperado depois de criar a assinatura (A-06)', () => {
+  it('PLA-36: se a leitura da fatura lança, a assinatura é removida no Asaas e o erro sobe', async () => {
+    const { url, cenario } = aberto;
+    const quebrado: typeof asaas = {
+      ...asaas,
+      primeiraCobranca: async () => {
+        throw new Error('rede caiu de um jeito novo');
+      },
+    };
+    await comDb(url, cenario.contaB, async (db) => {
+      await expect(
+        assinar(db, quebrado, pedido(cenario.grupoH, cenario.contaB), { registrar }),
+      ).rejects.toThrow('rede caiu de um jeito novo');
+      const criada = [...asaas.assinaturas.values()][0]!;
+      expect(criada.removida).toBe(true);
+      expect(asaas.chamadas.at(-1)?.operacao).toBe('removerAssinatura');
+      expect(await assinaturasDe(db, cenario.grupoH)).toBe(0);
+    });
+  });
+
+  it('PLA-36: se a gravação lança, a assinatura é removida no Asaas e o erro sobe', async () => {
+    const { url, cenario } = aberto;
+    await comDb(url, cenario.contaB, async (db) => {
+      await sql`RESET ROLE`.execute(db);
+      // Trava que faz o INSERT em assinaturas lançar um erro que `assinaturas.registrar` não conhece.
+      await sql`CREATE FUNCTION pg_temp.quebra() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'quebrou' USING ERRCODE = 'XX001'; END $$`.execute(
+        db,
+      );
+      await sql`CREATE TRIGGER quebra_r1 BEFORE INSERT ON assinaturas FOR EACH ROW EXECUTE FUNCTION pg_temp.quebra()`.execute(
+        db,
+      );
+      await sql`SET ROLE pelada_app`.execute(db);
+      await expect(
+        assinar(db, asaas, pedido(cenario.grupoH, cenario.contaB), { registrar }),
+      ).rejects.toThrow();
+    });
+    const criada = [...asaas.assinaturas.values()][0]!;
+    expect(criada.removida).toBe(true);
+    expect(asaas.chamadas.at(-1)?.operacao).toBe('removerAssinatura');
+  });
+});
+
+describe('assinar: grupo de cortesia (A-04)', () => {
+  it('PLA-02: grupo uso_proprio responde grupo_cortesia, sem chamar o Asaas e sem gravar', async () => {
+    const { url, cenario } = aberto;
+    await comDb(url, cenario.contaB, async (db) => {
+      await sql`RESET ROLE`.execute(db);
+      await sql`UPDATE grupos SET situacao_comercial = 'uso_proprio', trial_inicio = NULL WHERE id = ${cenario.grupoH}`.execute(
+        db,
+      );
+      await sql`SET ROLE pelada_app`.execute(db);
+      expect(await assinar(db, asaas, pedido(cenario.grupoH, cenario.contaB))).toEqual({
+        resultado: 'grupo_cortesia',
+      });
+      expect(asaas.chamadas).toEqual([]);
+      expect(await assinaturasDe(db, cenario.grupoH)).toBe(0);
+    });
+  });
 });
 
 describe('assinar: CPF nunca guardado (PLA-35)', () => {

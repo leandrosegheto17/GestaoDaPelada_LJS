@@ -21,6 +21,7 @@ import { cancelar, type ResultadoCancelar } from '../../aplicacao/plano/cancelar
  * Respostas (AD-091):
  * - 201 `{ faturaUrl }`: assinatura `aguardando_pagamento` gravada; o plano não muda (PLA-31);
  * - 403 `so_quem_criou`: quem não criou o grupo, sem chamar o Asaas (PLA-32);
+ * - 409 `grupo_cortesia`: grupo `uso_proprio` não assina, sem chamar o Asaas (A-04);
  * - 409 `assinatura_pendente` com a fatura em aberto, ou `assinatura_ativa` (PLA-33);
  * - 502 `pagamento_indisponivel` com a mensagem da spec, sem gravar (PLA-36);
  * - 422 do corpo (nome, CPF), como as outras rotas.
@@ -52,6 +53,8 @@ function responder(c: Context<Ambiente>, r: ResultadoAssinar): Response {
       );
     case 'so_quem_criou':
       return c.json(corpoDoErro('so_quem_criou'), 403);
+    case 'grupo_cortesia':
+      return c.json({ erro: 'grupo_cortesia', mensagem: MENSAGENS_ERRO_PLANO.grupo_cortesia }, 409);
     case 'nao_encontrado':
       return c.json(corpoDoErro('nao_encontrado'), 404);
     case 'pagamento_indisponivel':

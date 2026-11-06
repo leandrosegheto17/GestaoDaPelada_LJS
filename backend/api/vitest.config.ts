@@ -85,6 +85,8 @@ export default defineConfig({
           include: ['test/rotas/**/*.test.ts', 'test/infraestrutura/push/**/*.test.ts'],
           // Matriz de plano e banco fora (conexão recusada) passam de 5 s no workerd do Windows.
           testTimeout: 30_000,
+          // Clonar o molde em paralelo passa de 10 s com a máquina carregada (A-02, como o projeto `banco`).
+          hookTimeout: 120_000,
         },
       },
     ],
