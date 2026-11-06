@@ -41,6 +41,8 @@ export async function migrar(url: string, opcoes: OpcoesMigrar = {}): Promise<st
     singleTransaction: false,
     checkOrder: true,
     noLock: false,
+    // O padrão da v9 é 'fail'; FUN-07 manda a segunda execução esperar a primeira.
+    advisoryLockMode: 'wait',
     verbose: false,
     log: opcoes.log ?? (() => undefined),
   });

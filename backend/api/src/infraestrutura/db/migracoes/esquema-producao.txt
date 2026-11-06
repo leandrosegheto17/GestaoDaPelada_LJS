@@ -1,0 +1,834 @@
+coluna assinaturas.asaas_assinatura_id text not null
+coluna assinaturas.asaas_cliente_id text not null
+coluna assinaturas.cobranca_pro_id text
+coluna assinaturas.criada_em timestamp with time zone not null
+coluna assinaturas.criada_por uuid not null
+coluna assinaturas.fatura_url text
+coluna assinaturas.grupo_id uuid not null
+coluna assinaturas.id uuid not null default gen_random_uuid()
+coluna assinaturas.pago_ate date
+coluna assinaturas.situacao text not null
+coluna assinaturas.ultimo_evento_em timestamp with time zone
+coluna assinaturas.valor_centavos integer not null
+coluna auditoria.acao text not null
+coluna auditoria.autor_conta_id uuid
+coluna auditoria.autor_tipo text not null
+coluna auditoria.entidade text not null
+coluna auditoria.entidade_id text
+coluna auditoria.grupo_id uuid
+coluna auditoria.id bigint not null identity always
+coluna auditoria.momento timestamp with time zone not null
+coluna auditoria.resumo jsonb not null default '{}'::jsonb
+coluna avisos_cobranca.enviado_em timestamp with time zone not null default now()
+coluna avisos_cobranca.grupo_id uuid not null
+coluna avisos_cobranca.id_externo text not null
+coluna avisos_cobranca.tipo text not null
+coluna config_financeira.data_saldo_inicial date not null
+coluna config_financeira.grupo_id uuid not null
+coluna config_financeira.mensalidade_centavos integer
+coluna config_financeira.saldo_inicial_centavos integer not null
+coluna config_pesos.expulso smallint not null
+coluna config_pesos.expulso_com_chuva smallint not null default '-1'::integer
+coluna config_pesos.grupo_id uuid not null
+coluna config_pesos.id uuid not null default gen_random_uuid()
+coluna config_pesos.lesionado_com_chuva smallint not null
+coluna config_pesos.lesionado_sem_chuva smallint not null
+coluna config_pesos.presenca_com_chuva smallint not null
+coluna config_pesos.presenca_sem_chuva smallint not null
+coluna config_pesos.registrado_em timestamp with time zone not null
+coluna config_pesos.registrado_por uuid not null
+coluna config_pesos.vigente_desde date not null
+coluna contas.aviso_privacidade_visto_em timestamp with time zone
+coluna contas.criada_em timestamp with time zone not null
+coluna contas.e_dono boolean not null default false
+coluna contas.email text not null
+coluna contas.email_confirmado_em timestamp with time zone
+coluna contas.excluida_em timestamp with time zone
+coluna contas.id uuid not null default gen_random_uuid()
+coluna contas.nome text not null
+coluna contas.senha_hash text not null
+coluna contas.senha_temporaria boolean not null default false
+coluna contas.termos_aceitos_em timestamp with time zone
+coluna contas.termos_versao text
+coluna convites_admin.cancelado_em timestamp with time zone
+coluna convites_admin.criado_em timestamp with time zone not null
+coluna convites_admin.criado_por uuid not null
+coluna convites_admin.email text not null
+coluna convites_admin.expira_em timestamp with time zone not null
+coluna convites_admin.grupo_id uuid not null
+coluna convites_admin.id uuid not null default gen_random_uuid()
+coluna convites_admin.token_hash bytea not null
+coluna convites_admin.usado_em timestamp with time zone
+coluna envios_email.destino_hash bytea not null
+coluna envios_email.enviado_em timestamp with time zone not null
+coluna envios_email.tipo text not null
+coluna envios_email_dia.dia date not null
+coluna envios_email_dia.total integer not null
+coluna escalacoes.composicao jsonb not null
+coluna escalacoes.confirmada_em timestamp with time zone not null
+coluna escalacoes.confirmada_por uuid not null
+coluna escalacoes.data date not null
+coluna escalacoes.formato text not null
+coluna escalacoes.grupo_id uuid not null
+coluna escalacoes.id uuid not null default gen_random_uuid()
+coluna escalacoes.k smallint
+coluna escalacoes.n smallint not null
+coluna eventos_asaas.assinatura_id text
+coluna eventos_asaas.cobranca_id text
+coluna eventos_asaas.data_criacao timestamp with time zone
+coluna eventos_asaas.efeito text
+coluna eventos_asaas.evento text not null
+coluna eventos_asaas.id text not null
+coluna eventos_asaas.recebido_em timestamp with time zone not null
+coluna eventos_asaas.status text
+coluna eventos_asaas.valor_centavos integer
+coluna eventos_uso.data_partida date
+coluna eventos_uso.dispositivo_id uuid
+coluna eventos_uso.grupo_id uuid not null
+coluna eventos_uso.id bigint not null identity always
+coluna eventos_uso.mes_exportado text
+coluna eventos_uso.momento timestamp with time zone not null
+coluna eventos_uso.tipo text not null
+coluna falhas_senha_atual.conta_id uuid not null
+coluna falhas_senha_atual.id bigint not null identity always
+coluna falhas_senha_atual.momento timestamp with time zone not null
+coluna grupos.arquivado_em timestamp with time zone
+coluna grupos.criado_em timestamp with time zone not null
+coluna grupos.criado_por uuid not null
+coluna grupos.dia_semana text not null
+coluna grupos.frequencia text not null
+coluna grupos.horario time without time zone not null
+coluna grupos.id uuid not null default gen_random_uuid()
+coluna grupos.nome text not null
+coluna grupos.situacao_comercial text not null default 'uso_proprio'::text
+coluna grupos.slug text not null
+coluna grupos.trial_inicio date
+coluna habilidades.grupo_id uuid not null
+coluna habilidades.id uuid not null default gen_random_uuid()
+coluna habilidades.nome text not null
+coluna habilidades.ordem bigint not null identity always
+coluna jogadores.alterado_em timestamp with time zone not null
+coluna jogadores.alterado_por uuid not null
+coluna jogadores.ano_nascimento smallint
+coluna jogadores.apelido text not null
+coluna jogadores.criado_em timestamp with time zone not null
+coluna jogadores.criado_por uuid not null
+coluna jogadores.grupo_id uuid not null
+coluna jogadores.id uuid not null default gen_random_uuid()
+coluna jogadores.inicio_pontuacao date
+coluna jogadores.pontuacao_inicial integer not null default 0
+coluna jogadores.posicao text
+coluna jogadores.telefone text
+coluna lancamentos.alterado_em timestamp with time zone not null
+coluna lancamentos.alterado_por uuid not null
+coluna lancamentos.criado_em timestamp with time zone not null
+coluna lancamentos.criado_por uuid not null
+coluna lancamentos.data date not null
+coluna lancamentos.descricao text not null
+coluna lancamentos.grupo_id uuid not null
+coluna lancamentos.id uuid not null default gen_random_uuid()
+coluna lancamentos.tipo text not null
+coluna lancamentos.valor_centavos integer not null
+coluna links_conta.conta_id uuid not null
+coluna links_conta.criado_em timestamp with time zone not null
+coluna links_conta.expira_em timestamp with time zone not null
+coluna links_conta.id uuid not null default gen_random_uuid()
+coluna links_conta.tipo text not null
+coluna links_conta.token_hash bytea not null
+coluna links_conta.usado_em timestamp with time zone
+coluna notas.grupo_id uuid not null
+coluna notas.habilidade_id uuid not null
+coluna notas.jogador_id uuid not null
+coluna notas.valor smallint not null
+coluna pagamentos_mes.grupo_id uuid not null
+coluna pagamentos_mes.jogador_id uuid not null
+coluna pagamentos_mes.lancamento_id uuid
+coluna pagamentos_mes.marcado_em timestamp with time zone not null
+coluna pagamentos_mes.marcado_por uuid not null
+coluna pagamentos_mes.mes text not null
+coluna partidas.alterada_em timestamp with time zone not null
+coluna partidas.alterada_por uuid not null
+coluna partidas.choveu boolean not null default false
+coluna partidas.criada_em timestamp with time zone not null
+coluna partidas.criada_por uuid not null
+coluna partidas.data date not null
+coluna partidas.grupo_id uuid not null
+coluna partidas.id uuid not null default gen_random_uuid()
+coluna pedidos_email_origem.chave_hash bytea not null
+coluna pedidos_email_origem.id bigint not null identity always
+coluna pedidos_email_origem.momento timestamp with time zone not null
+coluna pedidos_reset.conta_id uuid not null
+coluna pedidos_reset.id uuid not null default gen_random_uuid()
+coluna pedidos_reset.resolvido_em timestamp with time zone
+coluna pedidos_reset.resolvido_por uuid
+coluna pedidos_reset.ultimo_pedido_em timestamp with time zone not null
+coluna periodos_ativos.fim date
+coluna periodos_ativos.grupo_id uuid not null
+coluna periodos_ativos.id uuid not null default gen_random_uuid()
+coluna periodos_ativos.inicio date not null
+coluna periodos_ativos.jogador_id uuid not null
+coluna presencas.grupo_id uuid not null
+coluna presencas.jogador_id uuid not null
+coluna presencas.partida_id uuid not null
+coluna presencas.situacao text not null
+coluna push_conta.auth text not null
+coluna push_conta.conta_id uuid not null
+coluna push_conta.criada_em timestamp with time zone not null default now()
+coluna push_conta.endpoint text not null
+coluna push_conta.id bigint not null identity always
+coluna push_conta.p256dh text not null
+coluna push_conta.ultimo_envio_em timestamp with time zone
+coluna push_ranking.auth text not null
+coluna push_ranking.criada_em timestamp with time zone not null default now()
+coluna push_ranking.endpoint text not null
+coluna push_ranking.grupo_id uuid not null
+coluna push_ranking.id bigint not null identity always
+coluna push_ranking.p256dh text not null
+coluna push_ranking.ultimo_envio_em timestamp with time zone
+coluna sessoes.conta_id uuid not null
+coluna sessoes.criada_em timestamp with time zone not null
+coluna sessoes.escopo text not null
+coluna sessoes.expira_em timestamp with time zone not null
+coluna sessoes.id uuid not null default gen_random_uuid()
+coluna sessoes.token_hash bytea not null
+coluna sessoes.ultimo_uso_em timestamp with time zone not null
+coluna tentativas_login.email text not null
+coluna tentativas_login.id bigint not null identity always
+coluna tentativas_login.ip_hash bytea
+coluna tentativas_login.momento timestamp with time zone not null
+coluna tentativas_login.sucesso boolean not null
+coluna vinculos_admin.acessa_financeiro boolean not null default false
+coluna vinculos_admin.conta_id uuid not null
+coluna vinculos_admin.criado_em timestamp with time zone not null
+coluna vinculos_admin.criado_por uuid not null
+coluna vinculos_admin.grupo_id uuid not null
+extensao pgcrypto
+extensao plpgsql
+funcao admins_listar(p_grupo_id uuid) retorna TABLE(id uuid, nome text, email text, acessa_financeiro boolean) sql security definer stable config=search_path=public, pg_temp corpo=9c080514de1b6f530fddc593710589ab
+funcao app_acessa_financeiro(p_grupo_id uuid) retorna boolean sql security definer stable config=search_path=public, pg_temp corpo=a21fb63fa5f3f030894881bf4c17995d
+funcao app_conta_id() retorna uuid sql security invoker stable config= corpo=2d5f7e789b31709b1427863f1a8147e8
+funcao app_slug_publico() retorna text sql security invoker stable config= corpo=ac83591fe3bcfa971b0de1bd93fc5fa2
+funcao asaas_data(p_texto text) retorna timestamp with time zone sql security invoker stable config=search_path=public, pg_temp corpo=ac68f89cc6c7962a7f93eda1c3e6ffcb
+funcao asaas_evento_registrar(p_id text, p_evento text, p_data_criacao text, p_cobranca text, p_assinatura text, p_status text, p_valor_centavos integer) retorna TABLE(resultado text, grupo_id uuid, situacao text, valor_centavos integer, pago_ate date, cobranca_pro_id text, ultimo_evento_em text) plpgsql security definer volatile config=search_path=public, pg_temp corpo=aefc50c92ce3b0ad3dc48c31eb2afbd7
+funcao asaas_evento_sem_efeito(p_evento_id text, p_motivo text) retorna void plpgsql security definer volatile config=search_path=public, pg_temp corpo=b8712899ab1246fb06ac11f365c3aa1b
+funcao assinatura_cancelar(p_grupo_id uuid) retorna text plpgsql security definer volatile config=search_path=public, pg_temp corpo=641a44dc0cdf602f2a4b73d81841a0f7
+funcao assinatura_registrar(p_grupo_id uuid, p_cliente text, p_assinatura text, p_valor_centavos integer, p_fatura_url text) retorna uuid plpgsql security definer volatile config=search_path=public, pg_temp corpo=15ba52814ed9bbe283c3a0d2804c2948
+funcao aviso_cobranca_destino(p_grupo uuid) retorna TABLE(conta_id uuid, email text, nome text, grupo_nome text, assinaturas jsonb) plpgsql security definer stable config=search_path=public, pg_temp corpo=401f2c282bd0e508196075f8bafe0303
+funcao aviso_cobranca_registrar(p_id_externo text, p_tipo text, p_grupo uuid) retorna boolean plpgsql security definer volatile config=search_path=public, pg_temp corpo=d42a601575644363dbc37ba89618c3c6
+funcao conta_cadastrar(p_email text, p_nome text, p_senha text, p_termos_versao text, p_token_hash bytea) retorna TABLE(situacao text, conta_id uuid, enviar boolean) plpgsql security definer volatile config=search_path=public, pg_temp corpo=03b228b189b96135717df68a78e690e8
+funcao conta_definir_senha(p_email text, p_senha text, p_dono boolean) retorna uuid plpgsql security definer volatile config=search_path=public, pg_temp corpo=1eb43d953f77e509618a58eb95064f3e
+funcao conta_entrar(p_email text, p_senha text, p_ip_hash bytea, p_token_hash bytea) retorna TABLE(resultado text, conta_id uuid, nome text, bloqueado_ate timestamp with time zone) plpgsql security definer volatile config=search_path=public, pg_temp corpo=79eb7c12c91916817edc1af12e267049
+funcao conta_excluir(p_senha text) retorna TABLE(resultado text, grupos jsonb) plpgsql security definer volatile config=search_path=public, pg_temp corpo=0f6df8581186ef25ca53ff6932a11e70
+funcao conta_senha_bloqueada_ate(p_conta uuid) retorna timestamp with time zone sql security invoker stable config=search_path=public, pg_temp corpo=8d5f2973e492db6da5d21ba5c83ddefd
+funcao conta_senha_registrar_falha(p_conta uuid) retorna void sql security invoker volatile config=search_path=public, pg_temp corpo=0c153759c01c828c2c64e89f53022e2a
+funcao conta_trocar_senha(p_senha_atual text, p_senha_nova text, p_token_sessao_hash bytea) retorna boolean plpgsql security definer volatile config=search_path=public, pg_temp corpo=44eda3c85d8e04a210d9e4779c9e83d0
+funcao contas_nomes_do_grupo(p_grupo_id uuid) retorna TABLE(id uuid, nome text) sql security definer stable config=search_path=public, pg_temp corpo=b95290e0a509bb9c43614a384d84f92d
+funcao convite_aceitar(p_token_hash bytea) retorna TABLE(resultado text, grupo_id uuid) plpgsql security definer volatile config=search_path=public, pg_temp corpo=336329a5b2d58febe602e3332e9338f6
+funcao convite_cadastrar(p_token_hash bytea, p_nome text, p_senha text, p_termos_versao text, p_token_sessao_hash bytea) retorna TABLE(resultado text, conta_id uuid, grupo_id uuid) plpgsql security definer volatile config=search_path=public, pg_temp corpo=fe468c41e72833e37bd206573d13f978
+funcao convite_criar(p_grupo_id uuid, p_email text, p_token_hash bytea) retorna TABLE(resultado text, convite_id uuid, expira_em timestamp with time zone, enviar boolean) plpgsql security definer volatile config=search_path=public, pg_temp corpo=73fa2912e2ed4039a9a22d96ce82401c
+funcao convite_ler(p_token_hash bytea) retorna TABLE(email text, grupo_nome text, conta_existe boolean) sql security definer stable config=search_path=public, pg_temp corpo=1f9eb4f89c5547f30517df391ef9237a
+funcao email_cota_reservar(p_teto integer) retorna boolean sql security definer volatile config=search_path=public, pg_temp;lock_timeout=2s corpo=05751568088d403453296b31e35f2d3a
+funcao email_cota_reservar_em(p_momento timestamp with time zone, p_teto integer) retorna boolean sql security invoker volatile config=search_path=public, pg_temp corpo=cb17cdded4c6f8de75eac78a2ec45c92
+funcao email_origem_registrar(p_chave_hash bytea, p_teto integer) retorna boolean sql security definer volatile config=search_path=public, pg_temp corpo=32fec189fc7ad3117c8e5eee421f07e5
+funcao email_origem_registrar_em(p_momento timestamp with time zone, p_chave_hash bytea, p_teto integer) retorna boolean plpgsql security invoker volatile config=search_path=public, pg_temp corpo=edbc7945b7b072e887d31f3468936ee5
+funcao envio_permitido(p_destino text, p_tipo text) retorna boolean sql security invoker volatile config=search_path=public, pg_temp corpo=3e17c005fff45cc2a751c0738ba0f387
+funcao evento_publico_registrar(p_slug text, p_tipo text, p_dispositivo uuid, p_mes text, p_momento timestamp with time zone) retorna boolean plpgsql security definer volatile config=search_path=public, pg_temp corpo=7eae5dc5f5fb48f09fe4bf106654a1d8
+funcao grupo_criar(p_nome text, p_dia_semana text, p_frequencia text, p_horario time without time zone, p_slug_base text, p_habilidades text[], p_hoje date) retorna TABLE(id uuid, slug text) plpgsql security definer volatile config=search_path=public, pg_temp corpo=ca12ced72e21da2568f507f98499c02d
+funcao grupos_arquivado_so_criadora() retorna trigger plpgsql security invoker volatile config=search_path=public, pg_temp corpo=e0064fb029a5c1014410f102b0faba27
+funcao grupos_slug_imutavel() retorna trigger plpgsql security invoker volatile config= corpo=cfd170fd34060dae5286ec3f01b9ba8e
+funcao grupos_visiveis() retorna SETOF uuid sql security definer stable config=search_path=public, pg_temp corpo=58895f831b1a77ad9653600011669ff9
+funcao link_confirmar(p_token_hash bytea, p_token_sessao_hash bytea) retorna uuid plpgsql security definer volatile config=search_path=public, pg_temp corpo=f75d5b0e04da7381caa0c1a7ae41a5cf
+funcao link_nova_senha(p_token_hash bytea, p_senha text) retorna boolean plpgsql security definer volatile config=search_path=public, pg_temp corpo=a4cec2e32fea9b0a322a81de4ba73abc
+funcao link_pedir(p_email text, p_tipo text, p_token_hash bytea) retorna TABLE(enviar boolean, nome text) sql security definer volatile config=search_path=public, pg_temp corpo=be71c21ef9061a14204189e8b5e397fb
+funcao link_pedir_com_confirmacao(p_email text, p_tipo text, p_token_hash bytea) retorna TABLE(enviar boolean, nome text, confirmada boolean) plpgsql security definer volatile config=search_path=public, pg_temp corpo=6b7bf39ed013c4790daa5aa1464525d2
+funcao notificacoes_limpar() retorna TABLE(ranking integer, avisos integer) plpgsql security definer volatile config=search_path=public, pg_temp corpo=16ff6b0c7e7d324bc3a85eba2f8f12fd
+funcao notificacoes_limpar_em(p_momento timestamp with time zone) retorna TABLE(ranking integer, avisos integer) plpgsql security invoker volatile config=search_path=public, pg_temp corpo=79164d5a50de3b989710927b71fb9278
+funcao plano_ativar(p_assinatura text, p_pago_ate date, p_cobranca text, p_data_evento text, p_evento_id text) retorna boolean plpgsql security definer volatile config=search_path=public, pg_temp corpo=0098ce162367e91138212a6453194f5a
+funcao plano_cancelado(p_assinatura text, p_data_evento text, p_evento_id text) retorna boolean plpgsql security definer volatile config=search_path=public, pg_temp corpo=c8a0fad44825fed92e1dc9d6581c5329
+funcao plano_do_grupo(p_grupo_id uuid) retorna TABLE(situacao_comercial text, trial_inicio date, pago_ate date, criado_por uuid, criado_em timestamp with time zone, jogadores_ativos integer) sql security definer stable config=search_path=public, pg_temp corpo=401f892db907bc9d18f90d49a6e50bfc
+funcao plano_exigir_webhook() retorna void plpgsql security invoker stable config=search_path=public, pg_temp corpo=a0daf33035e05d08150a927689d124f9
+funcao plano_grupos_da_criadora(p_grupo_id uuid) retorna TABLE(id uuid, criado_em timestamp with time zone, situacao_comercial text, trial_inicio date, pago_ate date) sql security definer stable config=search_path=public, pg_temp corpo=610b3dfcc84c90fb1531c181f3221907
+funcao plano_inadimplente(p_assinatura text, p_data_evento text, p_evento_id text) retorna boolean plpgsql security definer volatile config=search_path=public, pg_temp corpo=4a5c6b12062d575f15c3c59b11a5ba13
+funcao push_conta_apagar_na_exclusao() retorna trigger plpgsql security definer volatile config=search_path=public, pg_temp corpo=8aeb8dcf08114f4623782068679b8909
+funcao push_conta_assinar(p_endpoint text, p_p256dh text, p_auth text) retorna text plpgsql security definer volatile config=search_path=public, pg_temp corpo=82d26fdc1edc0ce362c1ada18c4235e5
+funcao push_conta_cancelar(p_endpoint text, p_auth text) retorna void plpgsql security definer volatile config=search_path=public, pg_temp corpo=056ff956e55484183f42b734df529abf
+funcao push_conta_estado(p_endpoint text, p_auth text) retorna text plpgsql security definer stable config=search_path=public, pg_temp corpo=a5fe03cd5646c77b9f13d73b30a0ad93
+funcao push_conta_resultado(p_conta uuid, p_aceitos bigint[], p_revogados bigint[]) retorna void plpgsql security definer volatile config=search_path=public, pg_temp corpo=0a7bf27f558998366c2eeb3bcca04b8f
+funcao push_envio_grupo(p_grupo uuid) retorna TABLE(nome text, slug text, arquivado boolean, situacao_comercial text, trial_inicio date, pago_ate date) plpgsql security definer stable config=search_path=public, pg_temp corpo=3d58575e83e8a36da7c4c73e26d0816e
+funcao push_exigir_sem_contexto(p_funcao text) retorna void plpgsql security invoker stable config=search_path=public, pg_temp corpo=415378d987f2fa37d8d65fbd0dd70125
+funcao push_ranking_assinar(p_slug text, p_endpoint text, p_p256dh text, p_auth text) retorna text plpgsql security definer volatile config=search_path=public, pg_temp corpo=2f7d47516530e42b9064018594f9cf40
+funcao push_ranking_cancelar(p_slug text, p_endpoint text, p_auth text) retorna void plpgsql security definer volatile config=search_path=public, pg_temp corpo=a51052518151328faa93b341027ff4c8
+funcao push_ranking_estado(p_slug text, p_endpoint text, p_auth text) retorna text plpgsql security definer stable config=search_path=public, pg_temp corpo=c7809764ffd9662ae7298633cd6057d2
+funcao push_ranking_lote(p_grupo uuid, p_apos_id bigint, p_limite integer, p_desde timestamp with time zone) retorna TABLE(id bigint, endpoint text, p256dh text, auth text) plpgsql security definer stable config=search_path=public, pg_temp corpo=8c3022bfc2b1d9a625cac038755bff5c
+funcao push_ranking_resultado(p_grupo uuid, p_aceitos bigint[], p_revogados bigint[]) retorna void plpgsql security definer volatile config=search_path=public, pg_temp corpo=104868b0d8282c91bb020ffac48d2d05
+funcao sessao_tocar(p_token_hash bytea) retorna uuid plpgsql security definer volatile config=search_path=public, pg_temp corpo=99e32a4a19af0f2d5e615bf4fcb7ae27
+grant coluna config_pesos.expulso pelada_app UPDATE
+grant coluna config_pesos.expulso_com_chuva pelada_app UPDATE
+grant coluna config_pesos.lesionado_com_chuva pelada_app UPDATE
+grant coluna config_pesos.lesionado_sem_chuva pelada_app UPDATE
+grant coluna config_pesos.presenca_com_chuva pelada_app UPDATE
+grant coluna config_pesos.presenca_sem_chuva pelada_app UPDATE
+grant coluna config_pesos.registrado_em pelada_app UPDATE
+grant coluna config_pesos.registrado_por pelada_app UPDATE
+grant coluna contas.aviso_privacidade_visto_em pelada_app SELECT
+grant coluna contas.criada_em pelada_app SELECT
+grant coluna contas.e_dono pelada_app SELECT
+grant coluna contas.email pelada_app SELECT
+grant coluna contas.email_confirmado_em pelada_app SELECT
+grant coluna contas.excluida_em pelada_app SELECT
+grant coluna contas.id pelada_app SELECT
+grant coluna contas.nome pelada_app SELECT
+grant coluna contas.nome pelada_app UPDATE
+grant coluna contas.senha_temporaria pelada_app SELECT
+grant coluna contas.termos_aceitos_em pelada_app SELECT
+grant coluna contas.termos_versao pelada_app SELECT
+grant coluna grupos.arquivado_em pelada_app UPDATE
+grant coluna grupos.dia_semana pelada_app UPDATE
+grant coluna grupos.frequencia pelada_app UPDATE
+grant coluna grupos.horario pelada_app UPDATE
+grant coluna grupos.nome pelada_app UPDATE
+grant coluna partidas.alterada_em pelada_app UPDATE
+grant coluna partidas.alterada_por pelada_app UPDATE
+grant coluna partidas.choveu pelada_app UPDATE
+grant funcao admins_listar(p_grupo_id uuid) pelada_app EXECUTE
+grant funcao app_acessa_financeiro(p_grupo_id uuid) pelada_app EXECUTE
+grant funcao app_conta_id() PUBLIC EXECUTE
+grant funcao app_slug_publico() PUBLIC EXECUTE
+grant funcao asaas_evento_registrar(p_id text, p_evento text, p_data_criacao text, p_cobranca text, p_assinatura text, p_status text, p_valor_centavos integer) pelada_app EXECUTE
+grant funcao asaas_evento_sem_efeito(p_evento_id text, p_motivo text) pelada_app EXECUTE
+grant funcao assinatura_cancelar(p_grupo_id uuid) pelada_app EXECUTE
+grant funcao assinatura_registrar(p_grupo_id uuid, p_cliente text, p_assinatura text, p_valor_centavos integer, p_fatura_url text) pelada_app EXECUTE
+grant funcao aviso_cobranca_destino(p_grupo uuid) pelada_app EXECUTE
+grant funcao aviso_cobranca_registrar(p_id_externo text, p_tipo text, p_grupo uuid) pelada_app EXECUTE
+grant funcao conta_cadastrar(p_email text, p_nome text, p_senha text, p_termos_versao text, p_token_hash bytea) pelada_app EXECUTE
+grant funcao conta_entrar(p_email text, p_senha text, p_ip_hash bytea, p_token_hash bytea) pelada_app EXECUTE
+grant funcao conta_excluir(p_senha text) pelada_app EXECUTE
+grant funcao conta_trocar_senha(p_senha_atual text, p_senha_nova text, p_token_sessao_hash bytea) pelada_app EXECUTE
+grant funcao contas_nomes_do_grupo(p_grupo_id uuid) pelada_app EXECUTE
+grant funcao convite_aceitar(p_token_hash bytea) pelada_app EXECUTE
+grant funcao convite_cadastrar(p_token_hash bytea, p_nome text, p_senha text, p_termos_versao text, p_token_sessao_hash bytea) pelada_app EXECUTE
+grant funcao convite_criar(p_grupo_id uuid, p_email text, p_token_hash bytea) pelada_app EXECUTE
+grant funcao convite_ler(p_token_hash bytea) pelada_app EXECUTE
+grant funcao email_cota_reservar(p_teto integer) pelada_app EXECUTE
+grant funcao email_origem_registrar(p_chave_hash bytea, p_teto integer) pelada_app EXECUTE
+grant funcao evento_publico_registrar(p_slug text, p_tipo text, p_dispositivo uuid, p_mes text, p_momento timestamp with time zone) pelada_app EXECUTE
+grant funcao grupo_criar(p_nome text, p_dia_semana text, p_frequencia text, p_horario time without time zone, p_slug_base text, p_habilidades text[], p_hoje date) pelada_app EXECUTE
+grant funcao grupos_slug_imutavel() PUBLIC EXECUTE
+grant funcao grupos_visiveis() pelada_app EXECUTE
+grant funcao link_confirmar(p_token_hash bytea, p_token_sessao_hash bytea) pelada_app EXECUTE
+grant funcao link_nova_senha(p_token_hash bytea, p_senha text) pelada_app EXECUTE
+grant funcao link_pedir(p_email text, p_tipo text, p_token_hash bytea) pelada_app EXECUTE
+grant funcao link_pedir_com_confirmacao(p_email text, p_tipo text, p_token_hash bytea) pelada_app EXECUTE
+grant funcao notificacoes_limpar() pelada_app EXECUTE
+grant funcao plano_ativar(p_assinatura text, p_pago_ate date, p_cobranca text, p_data_evento text, p_evento_id text) pelada_app EXECUTE
+grant funcao plano_cancelado(p_assinatura text, p_data_evento text, p_evento_id text) pelada_app EXECUTE
+grant funcao plano_do_grupo(p_grupo_id uuid) pelada_app EXECUTE
+grant funcao plano_grupos_da_criadora(p_grupo_id uuid) pelada_app EXECUTE
+grant funcao plano_inadimplente(p_assinatura text, p_data_evento text, p_evento_id text) pelada_app EXECUTE
+grant funcao push_conta_assinar(p_endpoint text, p_p256dh text, p_auth text) pelada_app EXECUTE
+grant funcao push_conta_cancelar(p_endpoint text, p_auth text) pelada_app EXECUTE
+grant funcao push_conta_estado(p_endpoint text, p_auth text) pelada_app EXECUTE
+grant funcao push_conta_resultado(p_conta uuid, p_aceitos bigint[], p_revogados bigint[]) pelada_app EXECUTE
+grant funcao push_envio_grupo(p_grupo uuid) pelada_app EXECUTE
+grant funcao push_ranking_assinar(p_slug text, p_endpoint text, p_p256dh text, p_auth text) pelada_app EXECUTE
+grant funcao push_ranking_cancelar(p_slug text, p_endpoint text, p_auth text) pelada_app EXECUTE
+grant funcao push_ranking_estado(p_slug text, p_endpoint text, p_auth text) pelada_app EXECUTE
+grant funcao push_ranking_lote(p_grupo uuid, p_apos_id bigint, p_limite integer, p_desde timestamp with time zone) pelada_app EXECUTE
+grant funcao push_ranking_resultado(p_grupo uuid, p_aceitos bigint[], p_revogados bigint[]) pelada_app EXECUTE
+grant funcao sessao_tocar(p_token_hash bytea) pelada_app EXECUTE
+grant schema public PUBLIC USAGE
+grant schema public pelada_app USAGE
+grant schema public pelada_backup_ro USAGE
+grant tabela assinaturas pelada_app SELECT
+grant tabela assinaturas pelada_backup_ro SELECT
+grant tabela auditoria pelada_app INSERT
+grant tabela auditoria pelada_backup_ro SELECT
+grant tabela auditoria_id_seq pelada_backup_ro SELECT
+grant tabela avisos_cobranca pelada_backup_ro SELECT
+grant tabela config_financeira pelada_app INSERT
+grant tabela config_financeira pelada_app SELECT
+grant tabela config_financeira pelada_app UPDATE
+grant tabela config_financeira pelada_backup_ro SELECT
+grant tabela config_pesos pelada_app INSERT
+grant tabela config_pesos pelada_app SELECT
+grant tabela config_pesos pelada_backup_ro SELECT
+grant tabela contas pelada_backup_ro SELECT
+grant tabela convites_admin pelada_app INSERT
+grant tabela convites_admin pelada_app SELECT
+grant tabela convites_admin pelada_app UPDATE
+grant tabela convites_admin pelada_backup_ro SELECT
+grant tabela envios_email pelada_backup_ro SELECT
+grant tabela envios_email_dia pelada_backup_ro SELECT
+grant tabela escalacoes pelada_app DELETE
+grant tabela escalacoes pelada_app INSERT
+grant tabela escalacoes pelada_app SELECT
+grant tabela escalacoes pelada_app UPDATE
+grant tabela escalacoes pelada_backup_ro SELECT
+grant tabela eventos_asaas pelada_backup_ro SELECT
+grant tabela eventos_uso pelada_app INSERT
+grant tabela eventos_uso pelada_app SELECT
+grant tabela eventos_uso pelada_backup_ro SELECT
+grant tabela eventos_uso_id_seq pelada_backup_ro SELECT
+grant tabela falhas_senha_atual pelada_backup_ro SELECT
+grant tabela grupos pelada_app INSERT
+grant tabela grupos pelada_app SELECT
+grant tabela grupos pelada_backup_ro SELECT
+grant tabela habilidades pelada_app DELETE
+grant tabela habilidades pelada_app INSERT
+grant tabela habilidades pelada_app SELECT
+grant tabela habilidades pelada_app UPDATE
+grant tabela habilidades pelada_backup_ro SELECT
+grant tabela habilidades_ordem_seq pelada_backup_ro SELECT
+grant tabela jogadores pelada_app DELETE
+grant tabela jogadores pelada_app INSERT
+grant tabela jogadores pelada_app SELECT
+grant tabela jogadores pelada_app UPDATE
+grant tabela jogadores pelada_backup_ro SELECT
+grant tabela lancamentos pelada_app DELETE
+grant tabela lancamentos pelada_app INSERT
+grant tabela lancamentos pelada_app SELECT
+grant tabela lancamentos pelada_app UPDATE
+grant tabela lancamentos pelada_backup_ro SELECT
+grant tabela links_conta pelada_backup_ro SELECT
+grant tabela notas pelada_app DELETE
+grant tabela notas pelada_app INSERT
+grant tabela notas pelada_app SELECT
+grant tabela notas pelada_app UPDATE
+grant tabela notas pelada_backup_ro SELECT
+grant tabela pagamentos_mes pelada_app DELETE
+grant tabela pagamentos_mes pelada_app INSERT
+grant tabela pagamentos_mes pelada_app SELECT
+grant tabela pagamentos_mes pelada_app UPDATE
+grant tabela pagamentos_mes pelada_backup_ro SELECT
+grant tabela partidas pelada_app DELETE
+grant tabela partidas pelada_app INSERT
+grant tabela partidas pelada_app SELECT
+grant tabela partidas pelada_backup_ro SELECT
+grant tabela pedidos_email_origem pelada_backup_ro SELECT
+grant tabela pedidos_reset pelada_backup_ro SELECT
+grant tabela periodos_ativos pelada_app INSERT
+grant tabela periodos_ativos pelada_app SELECT
+grant tabela periodos_ativos pelada_app UPDATE
+grant tabela periodos_ativos pelada_backup_ro SELECT
+grant tabela presencas pelada_app DELETE
+grant tabela presencas pelada_app INSERT
+grant tabela presencas pelada_app SELECT
+grant tabela presencas pelada_app UPDATE
+grant tabela presencas pelada_backup_ro SELECT
+grant tabela push_conta pelada_backup_ro SELECT
+grant tabela push_conta_id_seq pelada_backup_ro SELECT
+grant tabela push_ranking pelada_backup_ro SELECT
+grant tabela push_ranking_id_seq pelada_backup_ro SELECT
+grant tabela sessoes pelada_app DELETE
+grant tabela sessoes pelada_app SELECT
+grant tabela sessoes pelada_backup_ro SELECT
+grant tabela tentativas_login pelada_backup_ro SELECT
+grant tabela tentativas_login_id_seq pelada_backup_ro SELECT
+grant tabela vinculos_admin pelada_app DELETE
+grant tabela vinculos_admin pelada_app INSERT
+grant tabela vinculos_admin pelada_app SELECT
+grant tabela vinculos_admin pelada_app UPDATE
+grant tabela vinculos_admin pelada_backup_ro SELECT
+indice assinaturas.assinaturas_asaas_assinatura_id_key CREATE UNIQUE INDEX assinaturas_asaas_assinatura_id_key ON public.assinaturas USING btree (asaas_assinatura_id)
+indice assinaturas.assinaturas_grupo_criada CREATE INDEX assinaturas_grupo_criada ON public.assinaturas USING btree (grupo_id, criada_em)
+indice assinaturas.assinaturas_pkey CREATE UNIQUE INDEX assinaturas_pkey ON public.assinaturas USING btree (id)
+indice assinaturas.assinaturas_uma_vigente CREATE UNIQUE INDEX assinaturas_uma_vigente ON public.assinaturas USING btree (grupo_id) WHERE (situacao = ANY (ARRAY['aguardando_pagamento'::text, 'ativa'::text]))
+indice auditoria.auditoria_grupo_momento CREATE INDEX auditoria_grupo_momento ON public.auditoria USING btree (grupo_id, momento)
+indice auditoria.auditoria_pkey CREATE UNIQUE INDEX auditoria_pkey ON public.auditoria USING btree (id)
+indice avisos_cobranca.avisos_cobranca_enviado CREATE INDEX avisos_cobranca_enviado ON public.avisos_cobranca USING btree (enviado_em)
+indice avisos_cobranca.avisos_cobranca_pkey CREATE UNIQUE INDEX avisos_cobranca_pkey ON public.avisos_cobranca USING btree (id_externo, tipo)
+indice config_financeira.config_financeira_pkey CREATE UNIQUE INDEX config_financeira_pkey ON public.config_financeira USING btree (grupo_id)
+indice config_pesos.config_pesos_grupo_id_vigente_desde_key CREATE UNIQUE INDEX config_pesos_grupo_id_vigente_desde_key ON public.config_pesos USING btree (grupo_id, vigente_desde)
+indice config_pesos.config_pesos_pkey CREATE UNIQUE INDEX config_pesos_pkey ON public.config_pesos USING btree (id)
+indice contas.contas_email_unico CREATE UNIQUE INDEX contas_email_unico ON public.contas USING btree (email)
+indice contas.contas_pkey CREATE UNIQUE INDEX contas_pkey ON public.contas USING btree (id)
+indice contas.contas_um_dono CREATE UNIQUE INDEX contas_um_dono ON public.contas USING btree ((true)) WHERE e_dono
+indice convites_admin.convites_admin_pkey CREATE UNIQUE INDEX convites_admin_pkey ON public.convites_admin USING btree (id)
+indice convites_admin.convites_admin_token_hash_key CREATE UNIQUE INDEX convites_admin_token_hash_key ON public.convites_admin USING btree (token_hash)
+indice convites_admin.convites_admin_um_pendente CREATE UNIQUE INDEX convites_admin_um_pendente ON public.convites_admin USING btree (grupo_id, email) WHERE ((usado_em IS NULL) AND (cancelado_em IS NULL))
+indice envios_email.envios_email_pkey CREATE UNIQUE INDEX envios_email_pkey ON public.envios_email USING btree (destino_hash, tipo)
+indice envios_email_dia.envios_email_dia_pkey CREATE UNIQUE INDEX envios_email_dia_pkey ON public.envios_email_dia USING btree (dia)
+indice escalacoes.escalacoes_grupo_data CREATE UNIQUE INDEX escalacoes_grupo_data ON public.escalacoes USING btree (grupo_id, data)
+indice escalacoes.escalacoes_pkey CREATE UNIQUE INDEX escalacoes_pkey ON public.escalacoes USING btree (id)
+indice eventos_asaas.eventos_asaas_assinatura CREATE INDEX eventos_asaas_assinatura ON public.eventos_asaas USING btree (assinatura_id, data_criacao)
+indice eventos_asaas.eventos_asaas_cobranca CREATE INDEX eventos_asaas_cobranca ON public.eventos_asaas USING btree (cobranca_id, evento)
+indice eventos_asaas.eventos_asaas_pkey CREATE UNIQUE INDEX eventos_asaas_pkey ON public.eventos_asaas USING btree (id)
+indice eventos_uso.eventos_uso_grupo_momento CREATE INDEX eventos_uso_grupo_momento ON public.eventos_uso USING btree (grupo_id, momento)
+indice eventos_uso.eventos_uso_pkey CREATE UNIQUE INDEX eventos_uso_pkey ON public.eventos_uso USING btree (id)
+indice falhas_senha_atual.falhas_senha_atual_conta_momento CREATE INDEX falhas_senha_atual_conta_momento ON public.falhas_senha_atual USING btree (conta_id, momento)
+indice falhas_senha_atual.falhas_senha_atual_pkey CREATE UNIQUE INDEX falhas_senha_atual_pkey ON public.falhas_senha_atual USING btree (id)
+indice grupos.grupos_pkey CREATE UNIQUE INDEX grupos_pkey ON public.grupos USING btree (id)
+indice grupos.grupos_slug_key CREATE UNIQUE INDEX grupos_slug_key ON public.grupos USING btree (slug)
+indice habilidades.habilidades_id_grupo_id_key CREATE UNIQUE INDEX habilidades_id_grupo_id_key ON public.habilidades USING btree (id, grupo_id)
+indice habilidades.habilidades_nome_grupo CREATE UNIQUE INDEX habilidades_nome_grupo ON public.habilidades USING btree (grupo_id, lower(nome))
+indice habilidades.habilidades_pkey CREATE UNIQUE INDEX habilidades_pkey ON public.habilidades USING btree (id)
+indice jogadores.jogadores_apelido_grupo CREATE UNIQUE INDEX jogadores_apelido_grupo ON public.jogadores USING btree (grupo_id, lower(apelido))
+indice jogadores.jogadores_id_grupo_id_key CREATE UNIQUE INDEX jogadores_id_grupo_id_key ON public.jogadores USING btree (id, grupo_id)
+indice jogadores.jogadores_pkey CREATE UNIQUE INDEX jogadores_pkey ON public.jogadores USING btree (id)
+indice lancamentos.lancamentos_grupo_data CREATE INDEX lancamentos_grupo_data ON public.lancamentos USING btree (grupo_id, data)
+indice lancamentos.lancamentos_id_grupo_id_key CREATE UNIQUE INDEX lancamentos_id_grupo_id_key ON public.lancamentos USING btree (id, grupo_id)
+indice lancamentos.lancamentos_pkey CREATE UNIQUE INDEX lancamentos_pkey ON public.lancamentos USING btree (id)
+indice links_conta.links_conta_pkey CREATE UNIQUE INDEX links_conta_pkey ON public.links_conta USING btree (id)
+indice links_conta.links_conta_token_hash_key CREATE UNIQUE INDEX links_conta_token_hash_key ON public.links_conta USING btree (token_hash)
+indice links_conta.links_conta_um_pendente CREATE UNIQUE INDEX links_conta_um_pendente ON public.links_conta USING btree (conta_id, tipo) WHERE (usado_em IS NULL)
+indice notas.notas_grupo_jogador CREATE INDEX notas_grupo_jogador ON public.notas USING btree (grupo_id, jogador_id)
+indice notas.notas_pkey CREATE UNIQUE INDEX notas_pkey ON public.notas USING btree (jogador_id, habilidade_id)
+indice pagamentos_mes.pagamentos_mes_grupo_mes CREATE INDEX pagamentos_mes_grupo_mes ON public.pagamentos_mes USING btree (grupo_id, mes)
+indice pagamentos_mes.pagamentos_mes_lancamento_id_key CREATE UNIQUE INDEX pagamentos_mes_lancamento_id_key ON public.pagamentos_mes USING btree (lancamento_id)
+indice pagamentos_mes.pagamentos_mes_pkey CREATE UNIQUE INDEX pagamentos_mes_pkey ON public.pagamentos_mes USING btree (jogador_id, mes)
+indice partidas.partidas_grupo_id_data_key CREATE UNIQUE INDEX partidas_grupo_id_data_key ON public.partidas USING btree (grupo_id, data)
+indice partidas.partidas_id_grupo_id_key CREATE UNIQUE INDEX partidas_id_grupo_id_key ON public.partidas USING btree (id, grupo_id)
+indice partidas.partidas_pkey CREATE UNIQUE INDEX partidas_pkey ON public.partidas USING btree (id)
+indice pedidos_email_origem.pedidos_email_origem_chave_momento CREATE INDEX pedidos_email_origem_chave_momento ON public.pedidos_email_origem USING btree (chave_hash, momento)
+indice pedidos_email_origem.pedidos_email_origem_momento CREATE INDEX pedidos_email_origem_momento ON public.pedidos_email_origem USING btree (momento)
+indice pedidos_email_origem.pedidos_email_origem_pkey CREATE UNIQUE INDEX pedidos_email_origem_pkey ON public.pedidos_email_origem USING btree (id)
+indice pedidos_reset.pedidos_reset_pkey CREATE UNIQUE INDEX pedidos_reset_pkey ON public.pedidos_reset USING btree (id)
+indice pedidos_reset.pedidos_reset_um_pendente CREATE UNIQUE INDEX pedidos_reset_um_pendente ON public.pedidos_reset USING btree (conta_id) WHERE (resolvido_em IS NULL)
+indice periodos_ativos.periodos_ativos_pkey CREATE UNIQUE INDEX periodos_ativos_pkey ON public.periodos_ativos USING btree (id)
+indice periodos_ativos.periodos_grupo_jogador CREATE INDEX periodos_grupo_jogador ON public.periodos_ativos USING btree (grupo_id, jogador_id, inicio)
+indice periodos_ativos.periodos_um_aberto CREATE UNIQUE INDEX periodos_um_aberto ON public.periodos_ativos USING btree (jogador_id) WHERE (fim IS NULL)
+indice presencas.presencas_grupo_jogador CREATE INDEX presencas_grupo_jogador ON public.presencas USING btree (grupo_id, jogador_id)
+indice presencas.presencas_pkey CREATE UNIQUE INDEX presencas_pkey ON public.presencas USING btree (partida_id, jogador_id)
+indice push_conta.push_conta_conta_endpoint CREATE UNIQUE INDEX push_conta_conta_endpoint ON public.push_conta USING btree (conta_id, endpoint)
+indice push_conta.push_conta_pkey CREATE UNIQUE INDEX push_conta_pkey ON public.push_conta USING btree (id)
+indice push_ranking.push_ranking_grupo_endpoint CREATE UNIQUE INDEX push_ranking_grupo_endpoint ON public.push_ranking USING btree (grupo_id, endpoint)
+indice push_ranking.push_ranking_grupo_id CREATE INDEX push_ranking_grupo_id ON public.push_ranking USING btree (grupo_id, id)
+indice push_ranking.push_ranking_pkey CREATE UNIQUE INDEX push_ranking_pkey ON public.push_ranking USING btree (id)
+indice sessoes.sessoes_conta CREATE INDEX sessoes_conta ON public.sessoes USING btree (conta_id)
+indice sessoes.sessoes_pkey CREATE UNIQUE INDEX sessoes_pkey ON public.sessoes USING btree (id)
+indice sessoes.sessoes_token_hash_key CREATE UNIQUE INDEX sessoes_token_hash_key ON public.sessoes USING btree (token_hash)
+indice tentativas_login.tentativas_login_email_ip_momento CREATE INDEX tentativas_login_email_ip_momento ON public.tentativas_login USING btree (email, ip_hash, momento)
+indice tentativas_login.tentativas_login_email_momento CREATE INDEX tentativas_login_email_momento ON public.tentativas_login USING btree (email, momento)
+indice tentativas_login.tentativas_login_pkey CREATE UNIQUE INDEX tentativas_login_pkey ON public.tentativas_login USING btree (id)
+indice vinculos_admin.vinculos_admin_grupo CREATE INDEX vinculos_admin_grupo ON public.vinculos_admin USING btree (grupo_id)
+indice vinculos_admin.vinculos_admin_pkey CREATE UNIQUE INDEX vinculos_admin_pkey ON public.vinculos_admin USING btree (conta_id, grupo_id)
+policy assinaturas.assinaturas_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
+policy assinaturas.assinaturas_ler SELECT PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=
+policy auditoria.auditoria_alterar UPDATE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy auditoria.auditoria_apagar DELETE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=
+policy auditoria.auditoria_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
+policy auditoria.auditoria_inserir INSERT PERMISSIVE roles=pelada_app using= check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy auditoria.auditoria_ler SELECT PERMISSIVE roles=pelada_app using=(grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)) check=
+policy avisos_cobranca.avisos_cobranca_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
+policy config_financeira.config_financeira_acesso_financeiro ALL RESTRICTIVE roles=pelada_app using=app_acessa_financeiro(grupo_id) check=app_acessa_financeiro(grupo_id)
+policy config_financeira.config_financeira_alterar UPDATE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy config_financeira.config_financeira_apagar DELETE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=
+policy config_financeira.config_financeira_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
+policy config_financeira.config_financeira_inserir INSERT PERMISSIVE roles=pelada_app using= check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy config_financeira.config_financeira_ler SELECT PERMISSIVE roles=pelada_app using=(grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)) check=
+policy config_pesos.config_pesos_alterar UPDATE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy config_pesos.config_pesos_apagar DELETE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=
+policy config_pesos.config_pesos_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
+policy config_pesos.config_pesos_inserir INSERT PERMISSIVE roles=pelada_app using= check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy config_pesos.config_pesos_ler SELECT PERMISSIVE roles=pelada_app using=(grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)) check=
+policy contas.contas_alterar UPDATE PERMISSIVE roles=pelada_app using=(id = app_conta_id()) check=(id = app_conta_id())
+policy contas.contas_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
+policy contas.contas_ler SELECT PERMISSIVE roles=pelada_app using=(id = app_conta_id()) check=
+policy convites_admin.convites_admin_alterar UPDATE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy convites_admin.convites_admin_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
+policy convites_admin.convites_admin_inserir INSERT PERMISSIVE roles=pelada_app using= check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy convites_admin.convites_admin_ler SELECT PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=
+policy envios_email.envios_email_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
+policy envios_email_dia.envios_email_dia_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
+policy escalacoes.escalacoes_alterar UPDATE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy escalacoes.escalacoes_apagar DELETE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=
+policy escalacoes.escalacoes_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
+policy escalacoes.escalacoes_inserir INSERT PERMISSIVE roles=pelada_app using= check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy escalacoes.escalacoes_ler SELECT PERMISSIVE roles=pelada_app using=(grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)) check=
+policy escalacoes.escalacoes_ler_so_conta SELECT RESTRICTIVE roles=pelada_app using=(app_conta_id() IS NOT NULL) check=
+policy eventos_asaas.eventos_asaas_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
+policy eventos_uso.eventos_uso_alterar UPDATE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy eventos_uso.eventos_uso_apagar DELETE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=
+policy eventos_uso.eventos_uso_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
+policy eventos_uso.eventos_uso_inserir INSERT PERMISSIVE roles=pelada_app using= check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy eventos_uso.eventos_uso_ler SELECT PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=
+policy falhas_senha_atual.falhas_senha_atual_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
+policy grupos.grupos_alterar UPDATE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=((app_conta_id() IS NOT NULL) AND (id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy grupos.grupos_apagar DELETE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=
+policy grupos.grupos_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
+policy grupos.grupos_inserir INSERT PERMISSIVE roles=pelada_app using= check=((app_conta_id() IS NOT NULL) AND (id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy grupos.grupos_ler SELECT PERMISSIVE roles=pelada_app using=(id IN ( SELECT grupos_visiveis() AS grupos_visiveis)) check=
+policy habilidades.habilidades_alterar UPDATE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy habilidades.habilidades_apagar DELETE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=
+policy habilidades.habilidades_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
+policy habilidades.habilidades_inserir INSERT PERMISSIVE roles=pelada_app using= check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy habilidades.habilidades_ler SELECT PERMISSIVE roles=pelada_app using=(grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)) check=
+policy jogadores.jogadores_alterar UPDATE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy jogadores.jogadores_apagar DELETE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=
+policy jogadores.jogadores_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
+policy jogadores.jogadores_inserir INSERT PERMISSIVE roles=pelada_app using= check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy jogadores.jogadores_ler SELECT PERMISSIVE roles=pelada_app using=(grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)) check=
+policy lancamentos.lancamentos_acesso_financeiro ALL RESTRICTIVE roles=pelada_app using=app_acessa_financeiro(grupo_id) check=app_acessa_financeiro(grupo_id)
+policy lancamentos.lancamentos_alterar UPDATE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy lancamentos.lancamentos_apagar DELETE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=
+policy lancamentos.lancamentos_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
+policy lancamentos.lancamentos_inserir INSERT PERMISSIVE roles=pelada_app using= check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy lancamentos.lancamentos_ler SELECT PERMISSIVE roles=pelada_app using=(grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)) check=
+policy links_conta.links_conta_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
+policy notas.notas_alterar UPDATE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy notas.notas_apagar DELETE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=
+policy notas.notas_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
+policy notas.notas_inserir INSERT PERMISSIVE roles=pelada_app using= check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy notas.notas_ler SELECT PERMISSIVE roles=pelada_app using=(grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)) check=
+policy pagamentos_mes.pagamentos_mes_acesso_financeiro ALL RESTRICTIVE roles=pelada_app using=app_acessa_financeiro(grupo_id) check=app_acessa_financeiro(grupo_id)
+policy pagamentos_mes.pagamentos_mes_alterar UPDATE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy pagamentos_mes.pagamentos_mes_apagar DELETE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=
+policy pagamentos_mes.pagamentos_mes_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
+policy pagamentos_mes.pagamentos_mes_inserir INSERT PERMISSIVE roles=pelada_app using= check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy pagamentos_mes.pagamentos_mes_ler SELECT PERMISSIVE roles=pelada_app using=(grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)) check=
+policy partidas.partidas_alterar UPDATE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy partidas.partidas_apagar DELETE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=
+policy partidas.partidas_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
+policy partidas.partidas_inserir INSERT PERMISSIVE roles=pelada_app using= check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy partidas.partidas_ler SELECT PERMISSIVE roles=pelada_app using=(grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)) check=
+policy pedidos_email_origem.pedidos_email_origem_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
+policy pedidos_reset.pedidos_reset_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
+policy periodos_ativos.periodos_ativos_alterar UPDATE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy periodos_ativos.periodos_ativos_apagar DELETE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=
+policy periodos_ativos.periodos_ativos_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
+policy periodos_ativos.periodos_ativos_inserir INSERT PERMISSIVE roles=pelada_app using= check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy periodos_ativos.periodos_ativos_ler SELECT PERMISSIVE roles=pelada_app using=(grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)) check=
+policy presencas.presencas_alterar UPDATE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy presencas.presencas_apagar DELETE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=
+policy presencas.presencas_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
+policy presencas.presencas_inserir INSERT PERMISSIVE roles=pelada_app using= check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy presencas.presencas_ler SELECT PERMISSIVE roles=pelada_app using=(grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)) check=
+policy push_conta.push_conta_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
+policy push_ranking.push_ranking_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
+policy sessoes.sessoes_apagar DELETE PERMISSIVE roles=pelada_app using=(conta_id = app_conta_id()) check=
+policy sessoes.sessoes_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
+policy sessoes.sessoes_ler SELECT PERMISSIVE roles=pelada_app using=(conta_id = app_conta_id()) check=
+policy tentativas_login.tentativas_login_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
+policy vinculos_admin.vinculos_admin_alterar UPDATE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy vinculos_admin.vinculos_admin_apagar DELETE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=
+policy vinculos_admin.vinculos_admin_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
+policy vinculos_admin.vinculos_admin_inserir INSERT PERMISSIVE roles=pelada_app using= check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
+policy vinculos_admin.vinculos_admin_ler SELECT PERMISSIVE roles=pelada_app using=(grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)) check=
+policy vinculos_admin.vinculos_admin_trava_financeiro_alterar UPDATE RESTRICTIVE roles=pelada_app using=((conta_id <> app_conta_id()) AND app_acessa_financeiro(grupo_id)) check=((conta_id <> app_conta_id()) AND app_acessa_financeiro(grupo_id))
+policy vinculos_admin.vinculos_admin_trava_financeiro_inserir INSERT RESTRICTIVE roles=pelada_app using= check=((NOT acessa_financeiro) OR app_acessa_financeiro(grupo_id))
+restricao assinaturas.assinaturas_asaas_assinatura_id_check CHECK (((char_length(asaas_assinatura_id) >= 1) AND (char_length(asaas_assinatura_id) <= 100)))
+restricao assinaturas.assinaturas_asaas_assinatura_id_key UNIQUE (asaas_assinatura_id)
+restricao assinaturas.assinaturas_asaas_cliente_id_check CHECK (((char_length(asaas_cliente_id) >= 1) AND (char_length(asaas_cliente_id) <= 100)))
+restricao assinaturas.assinaturas_ativa_tem_pago_ate CHECK (((situacao <> 'ativa'::text) OR (pago_ate IS NOT NULL)))
+restricao assinaturas.assinaturas_criada_por_fkey FOREIGN KEY (criada_por) REFERENCES contas(id)
+restricao assinaturas.assinaturas_fatura_url_check CHECK (((fatura_url IS NULL) OR (fatura_url ~ '^https://'::text)))
+restricao assinaturas.assinaturas_grupo_id_fkey FOREIGN KEY (grupo_id) REFERENCES grupos(id)
+restricao assinaturas.assinaturas_pkey PRIMARY KEY (id)
+restricao assinaturas.assinaturas_situacao_check CHECK ((situacao = ANY (ARRAY['aguardando_pagamento'::text, 'ativa'::text, 'cancelada'::text])))
+restricao assinaturas.assinaturas_valor_centavos_check CHECK ((valor_centavos > 0))
+restricao auditoria.auditoria_autor CHECK (((autor_tipo = 'conta'::text) = (autor_conta_id IS NOT NULL)))
+restricao auditoria.auditoria_autor_conta_id_fkey FOREIGN KEY (autor_conta_id) REFERENCES contas(id)
+restricao auditoria.auditoria_autor_tipo_check CHECK ((autor_tipo = ANY (ARRAY['conta'::text, 'infraestrutura'::text])))
+restricao auditoria.auditoria_pkey PRIMARY KEY (id)
+restricao avisos_cobranca.avisos_cobranca_grupo_id_fkey FOREIGN KEY (grupo_id) REFERENCES grupos(id) ON DELETE CASCADE
+restricao avisos_cobranca.avisos_cobranca_id_externo_check CHECK (((char_length(id_externo) >= 1) AND (char_length(id_externo) <= 100)))
+restricao avisos_cobranca.avisos_cobranca_pkey PRIMARY KEY (id_externo, tipo)
+restricao avisos_cobranca.avisos_cobranca_tipo_check CHECK ((tipo = ANY (ARRAY['cobranca_gerada'::text, 'pagamento_confirmado'::text, 'pagamento_atrasado'::text])))
+restricao config_financeira.config_financeira_grupo_id_fkey FOREIGN KEY (grupo_id) REFERENCES grupos(id)
+restricao config_financeira.config_financeira_mensalidade_centavos_check CHECK (((mensalidade_centavos >= 1) AND (mensalidade_centavos <= 99999999)))
+restricao config_financeira.config_financeira_pkey PRIMARY KEY (grupo_id)
+restricao config_financeira.config_financeira_saldo_inicial_centavos_check CHECK (((saldo_inicial_centavos >= '-99999999'::integer) AND (saldo_inicial_centavos <= 99999999)))
+restricao config_pesos.config_pesos_expulso_check CHECK (((expulso >= '-10'::integer) AND (expulso <= 10)))
+restricao config_pesos.config_pesos_expulso_com_chuva_check CHECK (((expulso_com_chuva >= '-10'::integer) AND (expulso_com_chuva <= 10)))
+restricao config_pesos.config_pesos_grupo_id_fkey FOREIGN KEY (grupo_id) REFERENCES grupos(id)
+restricao config_pesos.config_pesos_grupo_id_vigente_desde_key UNIQUE (grupo_id, vigente_desde)
+restricao config_pesos.config_pesos_lesionado_com_chuva_check CHECK (((lesionado_com_chuva >= '-10'::integer) AND (lesionado_com_chuva <= 10)))
+restricao config_pesos.config_pesos_lesionado_sem_chuva_check CHECK (((lesionado_sem_chuva >= '-10'::integer) AND (lesionado_sem_chuva <= 10)))
+restricao config_pesos.config_pesos_pkey PRIMARY KEY (id)
+restricao config_pesos.config_pesos_presenca_com_chuva_check CHECK (((presenca_com_chuva >= '-10'::integer) AND (presenca_com_chuva <= 10)))
+restricao config_pesos.config_pesos_presenca_sem_chuva_check CHECK (((presenca_sem_chuva >= '-10'::integer) AND (presenca_sem_chuva <= 10)))
+restricao config_pesos.config_pesos_registrado_por_fkey FOREIGN KEY (registrado_por) REFERENCES contas(id)
+restricao contas.contas_dono_email CHECK (((NOT e_dono) OR (email = 'leandrosegheto17@gmail.com'::text)))
+restricao contas.contas_email_check CHECK (((email = lower(btrim(email))) AND (char_length(email) <= 254)))
+restricao contas.contas_nome_check CHECK (((char_length(nome) >= 2) AND (char_length(nome) <= 60)))
+restricao contas.contas_pkey PRIMARY KEY (id)
+restricao convites_admin.convites_admin_criado_por_fkey FOREIGN KEY (criado_por) REFERENCES contas(id)
+restricao convites_admin.convites_admin_email_check CHECK (((email = lower(btrim(email))) AND (char_length(email) <= 254)))
+restricao convites_admin.convites_admin_grupo_id_fkey FOREIGN KEY (grupo_id) REFERENCES grupos(id)
+restricao convites_admin.convites_admin_pkey PRIMARY KEY (id)
+restricao convites_admin.convites_admin_token_hash_check CHECK ((octet_length(token_hash) = 32))
+restricao convites_admin.convites_admin_token_hash_key UNIQUE (token_hash)
+restricao envios_email.envios_email_destino_hash_check CHECK ((octet_length(destino_hash) = 32))
+restricao envios_email.envios_email_pkey PRIMARY KEY (destino_hash, tipo)
+restricao envios_email_dia.envios_email_dia_pkey PRIMARY KEY (dia)
+restricao envios_email_dia.envios_email_dia_total_check CHECK ((total >= 0))
+restricao escalacoes.escalacoes_composicao_check CHECK ((jsonb_typeof(composicao) = 'object'::text))
+restricao escalacoes.escalacoes_confirmada_por_fkey FOREIGN KEY (confirmada_por) REFERENCES contas(id)
+restricao escalacoes.escalacoes_formato_check CHECK ((formato = ANY (ARRAY['dois_times'::text, 'varios_times'::text])))
+restricao escalacoes.escalacoes_grupo_data UNIQUE (grupo_id, data)
+restricao escalacoes.escalacoes_grupo_id_fkey FOREIGN KEY (grupo_id) REFERENCES grupos(id)
+restricao escalacoes.escalacoes_k_check CHECK (((k >= 0) AND (k <= 20)))
+restricao escalacoes.escalacoes_k_so_em_dois_times CHECK (((formato = 'dois_times'::text) OR (k IS NULL)))
+restricao escalacoes.escalacoes_n_check CHECK (((n >= 2) AND (n <= 11)))
+restricao escalacoes.escalacoes_pkey PRIMARY KEY (id)
+restricao eventos_asaas.eventos_asaas_evento_check CHECK (((char_length(evento) >= 1) AND (char_length(evento) <= 100)))
+restricao eventos_asaas.eventos_asaas_id_check CHECK (((char_length(id) >= 1) AND (char_length(id) <= 100)))
+restricao eventos_asaas.eventos_asaas_pkey PRIMARY KEY (id)
+restricao eventos_uso.eventos_uso_data CHECK (((tipo = ANY (ARRAY['partida_lancada'::text, 'escalacao_confirmada'::text])) = (data_partida IS NOT NULL)))
+restricao eventos_uso.eventos_uso_dispositivo CHECK (((tipo = 'ranking_aberto'::text) = (dispositivo_id IS NOT NULL)))
+restricao eventos_uso.eventos_uso_grupo_id_fkey FOREIGN KEY (grupo_id) REFERENCES grupos(id)
+restricao eventos_uso.eventos_uso_mes CHECK (((tipo = 'pdf_exportado'::text) = (mes_exportado IS NOT NULL)))
+restricao eventos_uso.eventos_uso_mes_exportado_check CHECK ((mes_exportado ~ '^[0-9]{4}-(0[1-9]|1[0-2])$'::text))
+restricao eventos_uso.eventos_uso_pkey PRIMARY KEY (id)
+restricao eventos_uso.eventos_uso_tipo_check CHECK ((tipo = ANY (ARRAY['ranking_aberto'::text, 'pdf_exportado'::text, 'partida_lancada'::text, 'escalacao_confirmada'::text])))
+restricao falhas_senha_atual.falhas_senha_atual_conta_id_fkey FOREIGN KEY (conta_id) REFERENCES contas(id)
+restricao falhas_senha_atual.falhas_senha_atual_pkey PRIMARY KEY (id)
+restricao grupos.grupos_criado_por_fkey FOREIGN KEY (criado_por) REFERENCES contas(id)
+restricao grupos.grupos_dia_semana_check CHECK ((dia_semana = ANY (ARRAY['domingo'::text, 'segunda'::text, 'terca'::text, 'quarta'::text, 'quinta'::text, 'sexta'::text, 'sabado'::text])))
+restricao grupos.grupos_frequencia_check CHECK ((frequencia = ANY (ARRAY['semanal'::text, 'quinzenal'::text, 'mensal'::text])))
+restricao grupos.grupos_nome_check CHECK (((char_length(nome) >= 3) AND (char_length(nome) <= 60)))
+restricao grupos.grupos_pkey PRIMARY KEY (id)
+restricao grupos.grupos_situacao_comercial_check CHECK ((situacao_comercial = ANY (ARRAY['uso_proprio'::text, 'trial'::text, 'ativo'::text, 'inadimplente'::text, 'cancelado'::text])))
+restricao grupos.grupos_slug_check CHECK ((slug ~ '^[a-z0-9-]{1,64}$'::text))
+restricao grupos.grupos_slug_key UNIQUE (slug)
+restricao grupos.grupos_trial CHECK (((situacao_comercial = 'trial'::text) = (trial_inicio IS NOT NULL)))
+restricao habilidades.habilidades_grupo_id_fkey FOREIGN KEY (grupo_id) REFERENCES grupos(id)
+restricao habilidades.habilidades_id_grupo_id_key UNIQUE (id, grupo_id)
+restricao habilidades.habilidades_nome_check CHECK (((char_length(btrim(nome)) >= 2) AND (char_length(btrim(nome)) <= 30)))
+restricao habilidades.habilidades_pkey PRIMARY KEY (id)
+restricao jogadores.jogadores_alterado_por_fkey FOREIGN KEY (alterado_por) REFERENCES contas(id)
+restricao jogadores.jogadores_ano_nascimento_check CHECK ((ano_nascimento >= 1940))
+restricao jogadores.jogadores_apelido_check CHECK (((char_length(btrim(apelido)) >= 2) AND (char_length(btrim(apelido)) <= 30)))
+restricao jogadores.jogadores_criado_por_fkey FOREIGN KEY (criado_por) REFERENCES contas(id)
+restricao jogadores.jogadores_grupo_id_fkey FOREIGN KEY (grupo_id) REFERENCES grupos(id)
+restricao jogadores.jogadores_id_grupo_id_key UNIQUE (id, grupo_id)
+restricao jogadores.jogadores_pkey PRIMARY KEY (id)
+restricao jogadores.jogadores_pontuacao_inicial_check CHECK (((pontuacao_inicial >= 0) AND (pontuacao_inicial <= 9999)))
+restricao jogadores.jogadores_posicao_check CHECK ((posicao = ANY (ARRAY['goleiro'::text, 'zagueiro'::text, 'lateral'::text, 'volante'::text, 'meia'::text, 'atacante'::text, 'centroavante'::text])))
+restricao jogadores.jogadores_telefone_check CHECK ((telefone ~ '^[0-9]{11}$'::text))
+restricao lancamentos.lancamentos_alterado_por_fkey FOREIGN KEY (alterado_por) REFERENCES contas(id)
+restricao lancamentos.lancamentos_criado_por_fkey FOREIGN KEY (criado_por) REFERENCES contas(id)
+restricao lancamentos.lancamentos_descricao_check CHECK (((char_length(btrim(descricao)) >= 1) AND (char_length(btrim(descricao)) <= 80)))
+restricao lancamentos.lancamentos_grupo_id_fkey FOREIGN KEY (grupo_id) REFERENCES grupos(id)
+restricao lancamentos.lancamentos_id_grupo_id_key UNIQUE (id, grupo_id)
+restricao lancamentos.lancamentos_pkey PRIMARY KEY (id)
+restricao lancamentos.lancamentos_tipo_check CHECK ((tipo = ANY (ARRAY['entrada'::text, 'saida'::text])))
+restricao lancamentos.lancamentos_valor_centavos_check CHECK (((valor_centavos >= 1) AND (valor_centavos <= 99999999)))
+restricao links_conta.links_conta_conta_id_fkey FOREIGN KEY (conta_id) REFERENCES contas(id)
+restricao links_conta.links_conta_pkey PRIMARY KEY (id)
+restricao links_conta.links_conta_tipo_check CHECK ((tipo = ANY (ARRAY['confirmacao'::text, 'recuperacao'::text])))
+restricao links_conta.links_conta_token_hash_check CHECK ((octet_length(token_hash) = 32))
+restricao links_conta.links_conta_token_hash_key UNIQUE (token_hash)
+restricao notas.notas_habilidade_id_grupo_id_fkey FOREIGN KEY (habilidade_id, grupo_id) REFERENCES habilidades(id, grupo_id) ON DELETE CASCADE
+restricao notas.notas_jogador_id_grupo_id_fkey FOREIGN KEY (jogador_id, grupo_id) REFERENCES jogadores(id, grupo_id)
+restricao notas.notas_pkey PRIMARY KEY (jogador_id, habilidade_id)
+restricao notas.notas_valor_check CHECK (((valor >= 1) AND (valor <= 10)))
+restricao pagamentos_mes.pagamentos_mes_jogador_id_grupo_id_fkey FOREIGN KEY (jogador_id, grupo_id) REFERENCES jogadores(id, grupo_id)
+restricao pagamentos_mes.pagamentos_mes_lancamento_id_grupo_id_fkey FOREIGN KEY (lancamento_id, grupo_id) REFERENCES lancamentos(id, grupo_id) ON DELETE RESTRICT
+restricao pagamentos_mes.pagamentos_mes_lancamento_id_key UNIQUE (lancamento_id)
+restricao pagamentos_mes.pagamentos_mes_marcado_por_fkey FOREIGN KEY (marcado_por) REFERENCES contas(id)
+restricao pagamentos_mes.pagamentos_mes_mes_check CHECK ((mes ~ '^[0-9]{4}-(0[1-9]|1[0-2])$'::text))
+restricao pagamentos_mes.pagamentos_mes_pkey PRIMARY KEY (jogador_id, mes)
+restricao partidas.partidas_alterada_por_fkey FOREIGN KEY (alterada_por) REFERENCES contas(id)
+restricao partidas.partidas_criada_por_fkey FOREIGN KEY (criada_por) REFERENCES contas(id)
+restricao partidas.partidas_grupo_id_data_key UNIQUE (grupo_id, data)
+restricao partidas.partidas_grupo_id_fkey FOREIGN KEY (grupo_id) REFERENCES grupos(id)
+restricao partidas.partidas_id_grupo_id_key UNIQUE (id, grupo_id)
+restricao partidas.partidas_pkey PRIMARY KEY (id)
+restricao pedidos_email_origem.pedidos_email_origem_pkey PRIMARY KEY (id)
+restricao pedidos_reset.pedidos_reset_conta_id_fkey FOREIGN KEY (conta_id) REFERENCES contas(id)
+restricao pedidos_reset.pedidos_reset_pkey PRIMARY KEY (id)
+restricao pedidos_reset.pedidos_reset_resolvido_por_fkey FOREIGN KEY (resolvido_por) REFERENCES contas(id)
+restricao periodos_ativos.periodo_fim_depois_inicio CHECK (((fim IS NULL) OR (fim >= inicio)))
+restricao periodos_ativos.periodos_ativos_jogador_id_grupo_id_fkey FOREIGN KEY (jogador_id, grupo_id) REFERENCES jogadores(id, grupo_id) ON DELETE CASCADE
+restricao periodos_ativos.periodos_ativos_pkey PRIMARY KEY (id)
+restricao presencas.presencas_jogador_id_grupo_id_fkey FOREIGN KEY (jogador_id, grupo_id) REFERENCES jogadores(id, grupo_id)
+restricao presencas.presencas_partida_id_grupo_id_fkey FOREIGN KEY (partida_id, grupo_id) REFERENCES partidas(id, grupo_id) ON DELETE CASCADE
+restricao presencas.presencas_pkey PRIMARY KEY (partida_id, jogador_id)
+restricao presencas.presencas_situacao_check CHECK ((situacao = ANY (ARRAY['presente'::text, 'lesionado'::text, 'expulso'::text])))
+restricao push_conta.push_conta_auth_check CHECK (((char_length(auth) >= 1) AND (char_length(auth) <= 64)))
+restricao push_conta.push_conta_conta_endpoint UNIQUE (conta_id, endpoint)
+restricao push_conta.push_conta_conta_id_fkey FOREIGN KEY (conta_id) REFERENCES contas(id) ON DELETE CASCADE
+restricao push_conta.push_conta_endpoint_check CHECK (((char_length(endpoint) >= 1) AND (char_length(endpoint) <= 1024)))
+restricao push_conta.push_conta_p256dh_check CHECK (((char_length(p256dh) >= 1) AND (char_length(p256dh) <= 128)))
+restricao push_conta.push_conta_pkey PRIMARY KEY (id)
+restricao push_ranking.push_ranking_auth_check CHECK (((char_length(auth) >= 1) AND (char_length(auth) <= 64)))
+restricao push_ranking.push_ranking_endpoint_check CHECK (((char_length(endpoint) >= 1) AND (char_length(endpoint) <= 1024)))
+restricao push_ranking.push_ranking_grupo_endpoint UNIQUE (grupo_id, endpoint)
+restricao push_ranking.push_ranking_grupo_id_fkey FOREIGN KEY (grupo_id) REFERENCES grupos(id) ON DELETE CASCADE
+restricao push_ranking.push_ranking_p256dh_check CHECK (((char_length(p256dh) >= 1) AND (char_length(p256dh) <= 128)))
+restricao push_ranking.push_ranking_pkey PRIMARY KEY (id)
+restricao sessoes.sessoes_conta_id_fkey FOREIGN KEY (conta_id) REFERENCES contas(id)
+restricao sessoes.sessoes_escopo_check CHECK ((escopo = ANY (ARRAY['completo'::text, 'troca_de_senha'::text])))
+restricao sessoes.sessoes_pkey PRIMARY KEY (id)
+restricao sessoes.sessoes_token_hash_check CHECK ((octet_length(token_hash) = 32))
+restricao sessoes.sessoes_token_hash_key UNIQUE (token_hash)
+restricao tentativas_login.tentativas_login_ip_hash_check CHECK (((ip_hash IS NULL) OR (octet_length(ip_hash) = 32)))
+restricao tentativas_login.tentativas_login_pkey PRIMARY KEY (id)
+restricao vinculos_admin.vinculos_admin_conta_id_fkey FOREIGN KEY (conta_id) REFERENCES contas(id)
+restricao vinculos_admin.vinculos_admin_criado_por_fkey FOREIGN KEY (criado_por) REFERENCES contas(id)
+restricao vinculos_admin.vinculos_admin_grupo_id_fkey FOREIGN KEY (grupo_id) REFERENCES grupos(id)
+restricao vinculos_admin.vinculos_admin_pkey PRIMARY KEY (conta_id, grupo_id)
+rls assinaturas enable=true force=true
+rls auditoria enable=true force=true
+rls avisos_cobranca enable=true force=true
+rls config_financeira enable=true force=true
+rls config_pesos enable=true force=true
+rls contas enable=true force=true
+rls convites_admin enable=true force=true
+rls envios_email enable=true force=true
+rls envios_email_dia enable=true force=true
+rls escalacoes enable=true force=true
+rls eventos_asaas enable=true force=true
+rls eventos_uso enable=true force=true
+rls falhas_senha_atual enable=true force=true
+rls grupos enable=true force=true
+rls habilidades enable=true force=true
+rls jogadores enable=true force=true
+rls lancamentos enable=true force=true
+rls links_conta enable=true force=true
+rls notas enable=true force=true
+rls pagamentos_mes enable=true force=true
+rls partidas enable=true force=true
+rls pedidos_email_origem enable=true force=true
+rls pedidos_reset enable=true force=true
+rls periodos_ativos enable=true force=true
+rls presencas enable=true force=true
+rls push_conta enable=true force=true
+rls push_ranking enable=true force=true
+rls sessoes enable=true force=true
+rls tentativas_login enable=true force=true
+rls vinculos_admin enable=true force=true
+role pelada_app superuser=false createdb=false createrole=false inherit=true replication=false bypassrls=false connlimit=-1
+role pelada_backup_ro superuser=false createdb=false createrole=false inherit=true replication=false bypassrls=false connlimit=-1
+sequencia auditoria_id_seq
+sequencia eventos_uso_id_seq
+sequencia falhas_senha_atual_id_seq
+sequencia habilidades_ordem_seq
+sequencia pedidos_email_origem_id_seq
+sequencia push_conta_id_seq
+sequencia push_ranking_id_seq
+sequencia tentativas_login_id_seq
+tabela assinaturas
+tabela auditoria
+tabela avisos_cobranca
+tabela config_financeira
+tabela config_pesos
+tabela contas
+tabela convites_admin
+tabela envios_email
+tabela envios_email_dia
+tabela escalacoes
+tabela eventos_asaas
+tabela eventos_uso
+tabela falhas_senha_atual
+tabela grupos
+tabela habilidades
+tabela jogadores
+tabela lancamentos
+tabela links_conta
+tabela notas
+tabela pagamentos_mes
+tabela partidas
+tabela pedidos_email_origem
+tabela pedidos_reset
+tabela periodos_ativos
+tabela presencas
+tabela push_conta
+tabela push_ranking
+tabela sessoes
+tabela tentativas_login
+tabela vinculos_admin
+trigger contas.push_conta_apagar_na_exclusao CREATE TRIGGER push_conta_apagar_na_exclusao AFTER UPDATE OF excluida_em ON public.contas FOR EACH ROW WHEN (((old.excluida_em IS NULL) AND (new.excluida_em IS NOT NULL))) EXECUTE FUNCTION push_conta_apagar_na_exclusao()
+trigger grupos.grupos_arquivado_so_criadora CREATE TRIGGER grupos_arquivado_so_criadora BEFORE UPDATE OF arquivado_em ON public.grupos FOR EACH ROW WHEN ((old.arquivado_em IS DISTINCT FROM new.arquivado_em)) EXECUTE FUNCTION grupos_arquivado_so_criadora()
+trigger grupos.grupos_slug_imutavel CREATE TRIGGER grupos_slug_imutavel BEFORE UPDATE OF slug ON public.grupos FOR EACH ROW EXECUTE FUNCTION grupos_slug_imutavel()

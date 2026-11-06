@@ -37,9 +37,12 @@ describe('esquema-producao.txt', () => {
     );
   });
 
-  it('FUN-08: a referência cobre as 25 tabelas com FORCE', () => {
+  it('FUN-08: a referência cobre as tabelas com FORCE (as 25 herdadas e as das features)', () => {
+    const comRls = referencia.filter((l) => l.startsWith('rls '));
     const forcadas = referencia.filter((l) => /^rls \S+ enable=true force=true$/.test(l));
-    expect(forcadas).toHaveLength(25);
+    // Toda tabela com RLS na referência a tem forçada, e nenhuma das 25 herdadas deixou de estar lá.
+    expect(forcadas).toEqual(comRls);
+    expect(forcadas.length).toBeGreaterThanOrEqual(25);
   });
 
   it('FUN-08: a referência cobre toda função SECURITY DEFINER herdada', () => {

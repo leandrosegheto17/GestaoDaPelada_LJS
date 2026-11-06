@@ -1,4 +1,4 @@
-import { SELF } from 'cloudflare:test';
+import { env, SELF } from 'cloudflare:test';
 import { describe, expect, it } from 'vitest';
 import type { Env } from '../../src/entrada/ambiente.ts';
 import { criarApp } from '../../src/entrada/app.ts';
@@ -44,14 +44,16 @@ describe('GET /api/health', () => {
 
 describe('assets da SPA', () => {
   it('FUN-20: GET / entrega o index.html do build', async () => {
-    const r = await SELF.fetch(`${BASE}/`);
+    // O pool do Worker manda o SELF direto ao Worker; quem serve os assets na nuvem é o roteador de assets, que aqui
+    // é o binding ASSETS (mesma pasta e mesma regra de SPA do wrangler.jsonc).
+    const r = await env.ASSETS.fetch(`${BASE}/`);
     expect(r.status).toBe(200);
     expect(r.headers.get('content-type')).toMatch(/text\/html/);
     expect(await r.text()).toContain('data-teste="spa-de-teste"');
   });
 
   it('FUN-20: GET /rota-qualquer cai na SPA', async () => {
-    const r = await SELF.fetch(`${BASE}/rota-qualquer/funda`);
+    const r = await env.ASSETS.fetch(`${BASE}/rota-qualquer/funda`);
     expect(r.status).toBe(200);
     expect(await r.text()).toContain('data-teste="spa-de-teste"');
   });

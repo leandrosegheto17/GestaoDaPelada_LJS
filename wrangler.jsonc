@@ -14,6 +14,7 @@
   // O build do front é servido como SPA; só /api/* passa pelo Worker (Hono) antes dos assets.
   "assets": {
     "directory": "frontend/web/dist",
+    "binding": "ASSETS",
     "not_found_handling": "single-page-application",
     "run_worker_first": ["/api/*"]
   },
