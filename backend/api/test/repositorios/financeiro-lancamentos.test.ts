@@ -25,7 +25,11 @@ afterEach(async () => {
   const { db, cenario } = aberto;
   await db.query('DROP TRIGGER IF EXISTS falha_forcada_lancamento ON auditoria');
   await db.query('DROP FUNCTION IF EXISTS falha_forcada_lancamento()');
-  await db.query(`DELETE FROM lancamentos WHERE descricao LIKE 'T20%'`);
+  // Só os avulsos: a entrada vinculada (editada pelo FIN-27 com "T20" na descrição) é restaurada no UPDATE abaixo, e a
+  // FK RESTRICT impede apagá-la.
+  await db.query(`DELETE FROM lancamentos WHERE descricao LIKE 'T20%' AND id <> $1`, [
+    cenario.idsG.lancamento,
+  ]);
   await db.query(`DELETE FROM auditoria WHERE acao IN ('lancamento_criado', 'lancamento_editado')`);
   await db.query(
     `UPDATE lancamentos SET tipo = 'entrada', data = '2026-01-05', descricao = 'Mensalidade', valor_centavos = 5000,

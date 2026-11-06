@@ -149,11 +149,15 @@ describe('FIN-40: INSERT das 3 tabelas', () => {
     async (tabela) => {
       const { db, cenario } = aberto;
       const r = await comoApp(db, { conta: cenario.contaC }, async (d) => {
-        // A configuração é uma linha por grupo: sai a de G dentro da transação desfeita para o INSERT valer.
-        if (tabela === 'config_financeira')
-          await d.query('DELETE FROM config_financeira WHERE grupo_id = $1', [cenario.grupoG]);
         const [sql, valores] = inserir(tabela, cenario, cenario.contaC);
-        return d.query(sql, valores);
+        // A configuração é uma linha por grupo e o pelada_app não tem DELETE nela (M:1792843260000_roles.sql:21-24):
+        // o controle passa pelo upsert, que exige INSERT, UPDATE e o WITH CHECK da restritiva.
+        return d.query(
+          tabela === 'config_financeira'
+            ? `${sql} ON CONFLICT (grupo_id) DO UPDATE SET mensalidade_centavos = EXCLUDED.mensalidade_centavos`
+            : sql,
+          valores,
+        );
       });
       expect(r.rowCount).toBe(1);
     },

@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
 import { cleanup, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
@@ -18,10 +18,7 @@ import { abrirTela, json, pendente, SESSAO_ANA, type Manipulador } from '../apoi
 
 function resposta(nome: string): unknown {
   return JSON.parse(
-    readFileSync(
-      fileURLToPath(new URL(`../../../../.specs/mockup/respostas/${nome}`, import.meta.url)),
-      'utf8',
-    ),
+    readFileSync(resolve(process.cwd(), `../../.specs/mockup/respostas/${nome}`), 'utf8'),
   );
 }
 

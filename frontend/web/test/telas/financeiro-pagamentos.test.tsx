@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
 import { cleanup, fireEvent, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
@@ -15,9 +15,7 @@ import { abrirTela, json, pendente, SESSAO_ANA, type Manipulador } from '../apoi
 
 const OUTUBRO = JSON.parse(
   readFileSync(
-    fileURLToPath(
-      new URL('../../../../.specs/mockup/respostas/financeiro-2026-10.json', import.meta.url),
-    ),
+    resolve(process.cwd(), '../../.specs/mockup/respostas/financeiro-2026-10.json'),
     'utf8',
   ),
 ) as { pagamentos: Array<{ jogadorId: string; apelido: string; pagou: boolean }> };
@@ -63,10 +61,12 @@ describe('ListaPagamentos (FIN-24)', () => {
     await screen.findByRole('switch', { name: 'Pagou: Fumaça' });
     fireEvent.click(interruptor('Fumaça'));
     expect(interruptor('Fumaça').checked).toBe(true);
-    expect(chamadasA('POST', `${API}/pagamentos`)[0]?.corpo).toEqual({
-      jogadorId: idDe('Fumaça'),
-      mes: '2026-10',
-    });
+    await waitFor(() =>
+      expect(chamadasA('POST', `${API}/pagamentos`)[0]?.corpo).toEqual({
+        jogadorId: idDe('Fumaça'),
+        mes: '2026-10',
+      }),
+    );
     soltar(json(204));
   });
 

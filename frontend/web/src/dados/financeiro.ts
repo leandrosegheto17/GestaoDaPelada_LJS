@@ -69,10 +69,9 @@ function caminhoLancamento(grupoId: string, id: string): string {
 
 /** Invalida os meses e os lançamentos do grupo e o detalhe do grupo (o saldo do início). */
 export async function invalidarFinanceiro(consultas: QueryClient, grupoId: string): Promise<void> {
-  await Promise.all([
-    consultas.invalidateQueries({ queryKey: chaveFinanceiro(grupoId) }),
-    consultas.invalidateQueries({ queryKey: chaveGrupo(grupoId), exact: true }),
-  ]);
+  // O detalhe do grupo (saldo do início) atualiza em segundo plano: a tela do financeiro não espera por ele.
+  void consultas.invalidateQueries({ queryKey: chaveGrupo(grupoId), exact: true });
+  await consultas.invalidateQueries({ queryKey: chaveFinanceiro(grupoId) });
 }
 
 export function useMesFinanceiro(grupoId: string, mes?: string) {
