@@ -3,39 +3,38 @@ import { corpoDoErro } from '@pelada/contrato';
 import type { Ambiente } from '../ambiente.ts';
 
 /**
- * Host e origem da requisição (fundacao /validar, A-12; "Segurança padrão de app web" do CLAUDE.md).
+ * Origem das escritas (fundacao /validar, A-12; "Segurança padrão de app web" do CLAUDE.md; AD-131).
  *
- * - **Host** (421): contra DNS rebinding, que só existe contra o servidor local. Com `EMAIL_DEV=1` (o `.env` local e o
- *   e2e: quando `GET /api/dev/emails` expõe os tokens dos e-mails) só passam o loopback e o host da `URL_PUBLICA`. Sem
- *   `EMAIL_DEV`, nada é restrito: no ar, a Cloudflare só entrega ao Worker os endereços configurados (o `workers.dev`
- *   e o domínio próprio da AD-121, que não é o da `URL_PUBLICA`), e restringir pela `URL_PUBLICA` derrubaria o outro.
- *   Compara o cabeçalho `Host` (o `wrangler dev` troca o host da URL pelo da rota do `wrangler.jsonc`).
- * - **Origem** (403): escrita (todo método fora de GET e HEAD) é recusada quando `Sec-Fetch-Site` existe e não é
- *   `same-origin` nem `none`, ou quando `Origin` existe e não é o do próprio servidor. Sem diferenciar maiúsculas.
- *   O Worker não tem CORS; isto fecha também o formulário de outro site que o `X-Pelada` já barrava.
+ * Escrita (todo método fora de GET e HEAD) é recusada com 403 quando `Sec-Fetch-Site` existe e não é `same-origin` nem
+ * `none`, ou quando `Origin` existe e não é um destes (sem diferenciar maiúsculas, com porta): o cabeçalho `Host`, o
+ * host da `URL_PUBLICA` e, com `EMAIL_DEV=1` (só local), qualquer loopback. O Worker não tem CORS; isto fecha também o
+ * formulário de outro site que o `X-Pelada` já barrava.
+ *
+ * O 421 por `Host` (DNS rebinding) **não** está aqui (AD-131): o `wrangler dev` troca o `Host` pelo domínio da rota do
+ * `wrangler.jsonc` antes de o Worker ver a requisição (conferido, `mf-original-hostname` inclusive), então o Worker não
+ * tem como distinguir o host verdadeiro; e no ar a Cloudflare só entrega os endereços configurados.
  */
 
 const LOOPBACK = new Set(['localhost', '127.0.0.1', '[::1]']);
 
-/** Nome do host (sem porta), em minúsculas, a partir do valor do cabeçalho `Host` ou de uma URL. */
-function hostSemPorta(valor: string): string | null {
+function hostDe(valor: string): { host: string; nome: string } | null {
   try {
-    return new URL(valor.includes('://') ? valor : `http://${valor}`).hostname.toLowerCase();
+    const u = new URL(valor.includes('://') ? valor : `http://${valor}`);
+    return { host: u.host.toLowerCase(), nome: u.hostname.toLowerCase() };
   } catch {
     return null;
   }
 }
 
-export const exigirHostEsperado: MiddlewareHandler<Ambiente> = async (c, next) => {
-  if (c.env.EMAIL_DEV === '1') {
-    const host = hostSemPorta(c.req.header('Host') ?? c.req.url);
-    const publico = c.env.URL_PUBLICA ? hostSemPorta(c.env.URL_PUBLICA) : null;
-    if (host === null || !(LOOPBACK.has(host) || host === publico)) {
-      return c.json(corpoDoErro('origem_recusada'), 421);
-    }
-  }
-  await next();
-};
+function origemPermitida(origem: string, c: Parameters<MiddlewareHandler<Ambiente>>[0]): boolean {
+  const o = hostDe(origem);
+  if (o === null) return false;
+  const proprio = c.req.header('Host') ?? new URL(c.req.url).host;
+  if (o.host === proprio.toLowerCase()) return true;
+  const publico = c.env.URL_PUBLICA ? hostDe(c.env.URL_PUBLICA) : null;
+  if (publico !== null && o.host === publico.host) return true;
+  return c.env.EMAIL_DEV === '1' && LOOPBACK.has(o.nome);
+}
 
 function ehLeitura(metodo: string): boolean {
   const m = metodo.toUpperCase();
@@ -49,17 +48,8 @@ export const exigirOrigemPropria: MiddlewareHandler<Ambiente> = async (c, next) 
       return c.json(corpoDoErro('origem_recusada'), 403);
     }
     const origem = c.req.header('Origin');
-    if (origem !== undefined) {
-      // Compara host e porta com o cabeçalho `Host` (o `wrangler dev` troca o host da URL pelo da rota do
-      // `wrangler.jsonc`, mas o navegador manda `Origin` com o endereço que ele abriu).
-      let hostDaOrigem: string;
-      try {
-        hostDaOrigem = new URL(origem).host.toLowerCase();
-      } catch {
-        return c.json(corpoDoErro('origem_recusada'), 403);
-      }
-      const proprio = (c.req.header('Host') ?? new URL(c.req.url).host).toLowerCase();
-      if (hostDaOrigem !== proprio) return c.json(corpoDoErro('origem_recusada'), 403);
+    if (origem !== undefined && !origemPermitida(origem, c)) {
+      return c.json(corpoDoErro('origem_recusada'), 403);
     }
   }
   await next();
