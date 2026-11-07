@@ -7,6 +7,7 @@ import { comBanco } from './com-banco.ts';
 import { exigirGrupoAtivo } from './grupo-ativo.ts';
 import { exigirPlanoEditavel } from './plano-editavel.ts';
 import { exigirSessao } from './sessao.ts';
+import { UUID } from '../uuid.ts';
 
 /**
  * Vínculo com o grupo nas rotas `/api/grupos/:grupoId/*` (T21; ACE-41). A RLS decide: o
@@ -18,8 +19,6 @@ import { exigirSessao } from './sessao.ts';
  * `grupoId` que não é uuid responde o mesmo 404 sem consultar (o banco recusaria o cast com
  * erro, que viraria 500).
  */
-
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export const exigirVinculo: MiddlewareHandler<Ambiente> = async (c, next) => {
   const grupoId = c.req.param('grupoId') ?? '';

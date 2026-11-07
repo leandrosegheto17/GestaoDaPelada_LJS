@@ -94,6 +94,26 @@ describe('PATCH /api/grupos/:grupoId/jogadores/:id', () => {
     expect(ficha.periodos).toEqual([expect.objectContaining({ inicio: '2026-01-01', fim: null })]);
   });
 
+  it('GEL-41, GEL-43, AD-132: o PATCH substitui os campos: telefone ausente apaga, pontuação ausente mantém', async () => {
+    const id = await novoJogador('Substitui');
+    await aberto.db.query(
+      `UPDATE jogadores SET telefone = '11987654321', pontuacao_inicial = 7 WHERE id = $1`,
+      [id],
+    );
+    const r = await jogador(id, aberto.cenario.contaC, 'PATCH', EDICAO);
+    expect(r.status).toBe(200);
+    const linha = await aberto.db.query<{ telefone: string | null; pontuacao_inicial: number }>(
+      'SELECT telefone, pontuacao_inicial FROM jogadores WHERE id = $1',
+      [id],
+    );
+    expect(linha.rows[0]).toEqual({ telefone: null, pontuacao_inicial: 7 });
+    const auditoria = await aberto.db.query<{ resumo: { campos?: string[] } }>(
+      `SELECT resumo FROM auditoria WHERE entidade_id = $1 AND acao = 'jogador_editado'`,
+      [id],
+    );
+    expect(auditoria.rows[0]?.resumo.campos).toContain('telefone');
+  });
+
   it('GEL-41: as mesmas validações do cadastro: apelido curto dá 422', async () => {
     const id = await novoJogador('Valida');
     const r = await jogador(id, aberto.cenario.contaC, 'PATCH', { ...EDICAO, apelido: 'X' });
@@ -135,6 +155,29 @@ describe('DELETE /api/grupos/:grupoId/jogadores/:id', () => {
         ])
       ).rowCount,
     ).toBe(1);
+  });
+
+  it('GEL-85 (SV-02): admin sem acesso ao financeiro também recebe 409 quando o único histórico é um pagamento', async () => {
+    const id = await novoJogador('So Pagamento');
+    await aberto.db.query(
+      `INSERT INTO pagamentos_mes (grupo_id, jogador_id, mes, marcado_por, marcado_em)
+       VALUES ($1, $2, '2026-02', $3, now())`,
+      [aberto.cenario.grupoG, id, aberto.cenario.contaC],
+    );
+    try {
+      const r = await jogador(id, aberto.cenario.contaO, 'DELETE');
+      expect(r.status).toBe(409);
+      expect(await r.json()).toEqual({
+        codigo: 'jogador_com_historico',
+        erro: 'So Pagamento tem histórico de partidas e não pode ser excluído.',
+        sugestao: 'inativar',
+      });
+      expect((await aberto.db.query('SELECT 1 FROM jogadores WHERE id = $1', [id])).rowCount).toBe(
+        1,
+      );
+    } finally {
+      await aberto.db.query('DELETE FROM pagamentos_mes WHERE jogador_id = $1', [id]);
+    }
   });
 });
 

@@ -1,12 +1,15 @@
 import { join } from 'node:path';
 import { ESLint } from 'eslint';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 /**
  * Domínio sem relógio e sem zod (T7; GEL-70, GEL-104, AD-028). Estende a regra do domínio sem I/O da fundação
  * (`sem-io.test.ts`, FUN-06): `Date.now()`, `new Date()` sem argumento e `performance.now()` reprovam pelo
  * `no-restricted-syntax`; o import de `zod` reprova pelo `no-restricted-imports`.
  */
+
+/** O ESLint carrega a configuração do repositório na primeira chamada: leva mais que os 5 s padrão sob carga (V-A03). */
+vi.setConfig({ testTimeout: 60_000 });
 
 const RAIZ = join(import.meta.dirname, '..', '..', '..');
 const ARQUIVO = join(RAIZ, 'backend', 'dominio', 'src', 'exemplo-sem-relogio.ts');
