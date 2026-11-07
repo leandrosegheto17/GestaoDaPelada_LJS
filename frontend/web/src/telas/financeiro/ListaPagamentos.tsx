@@ -58,13 +58,20 @@ export function entradaDoPagamento(
 export interface PropsListaPagamentos {
   grupoId: string;
   dados: MesFinanceiroResposta;
+  /**
+   * Quem recebe a falha (texto, ou `null` para limpar). Sem ele, a faixa de erro aparece acima da lista; a tela do mês o
+   * passa para mostrá-la na largura toda, acima das duas colunas, como no mockup (t22 `erro-pagamento`, FIN-47).
+   */
+  aoFalhar?: ((texto: string | null) => void) | undefined;
 }
 
-export function ListaPagamentos({ grupoId, dados }: PropsListaPagamentos) {
+export function ListaPagamentos({ grupoId, dados, aoFalhar }: PropsListaPagamentos) {
   const marcar = useMarcarPagamento(grupoId);
   const desmarcar = useDesmarcarPagamento(grupoId);
   const [otimista, setOtimista] = useState<Record<string, boolean>>({});
-  const [falha, setFalha] = useState<string | null>(null);
+  const [falhaLocal, setFalhaLocal] = useState<string | null>(null);
+  const falha = aoFalhar ? null : falhaLocal;
+  const setFalha = aoFalhar ?? setFalhaLocal;
   const [confirmar, setConfirmar] = useState<{ jogadorId: string; apelido: string } | null>(null);
 
   // A lista nova da API (depois de invalidar) substitui o estado otimista.

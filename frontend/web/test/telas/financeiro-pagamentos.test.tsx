@@ -81,6 +81,15 @@ describe('ListaPagamentos (FIN-24)', () => {
     await waitFor(() => expect(interruptor('Fumaça').checked).toBe(false));
   });
 
+  it('FIN-47: a faixa de falha fica acima das duas colunas, fora da seção dos pagamentos (mockup t22 erro-pagamento)', async () => {
+    abrir({ [`POST ${API}/pagamentos`]: () => json(500, { erro: 'Erro interno.' }) });
+    await screen.findByRole('switch', { name: 'Pagou: Fumaça' });
+    fireEvent.click(interruptor('Fumaça'));
+    const faixa = await screen.findByText(textoFalhaMarcar('Fumaça'));
+    expect(faixa.closest('section[aria-labelledby="pag"]')).toBeNull();
+    expect(faixa.closest('[role="alert"], [class*="faixa"]')).not.toBeNull();
+  });
+
   it('FIN-24: desmarcar mostra o texto exato do diálogo; cancelar não chama a API', async () => {
     const { chamadasA } = abrir({
       [`DELETE ${API}/pagamentos/${idDe('Toninho')}/2026-10`]: () => json(204),

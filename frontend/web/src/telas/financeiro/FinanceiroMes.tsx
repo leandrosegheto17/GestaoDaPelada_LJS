@@ -1,4 +1,5 @@
 import type { LancamentoDoMes, MesFinanceiroResposta } from '@pelada/contrato/financeiro';
+import { useState } from 'react';
 import { useParams, useSearchParams } from 'react-router';
 import { AvisoRecursoPro } from '../../componentes/AvisoRecursoPro.tsx';
 import { Casca, NOME_DO_APP } from '../../componentes/Casca.tsx';
@@ -157,6 +158,8 @@ function Mes({
   /** Free sem o financeiro (planos-e-cobranca T50; PLA-27): os dados ficam, a escrita vira o aviso Pro. */
   semRecurso: boolean;
 }) {
+  // Falha ao marcar ou desmarcar: a faixa fica logo abaixo do título, na largura toda (mockup t22 `erro-pagamento`).
+  const [falhaPagamento, setFalhaPagamento] = useState<string | null>(null);
   const { config, resumoMes, saldoAtualCentavos } = dados;
   if (config === null || resumoMes === null || saldoAtualCentavos === null) {
     return (
@@ -181,6 +184,7 @@ function Mes({
       : `Pagamentos do mês · ${formatarReais(config.mensalidadeCentavos)}`;
   return (
     <>
+      {falhaPagamento ? <Faixa tipo="erro">{falhaPagamento}</Faixa> : null}
       <div className={fin.ferramentas}>
         <NavegacaoMes dados={dados} aoIr={aoIr} />
         {semRecurso ? null : (
@@ -211,7 +215,7 @@ function Mes({
             {titulo}
           </h2>
           <TrechoBloqueado bloqueado={semRecurso}>
-            <ListaPagamentos grupoId={grupoId} dados={dados} />
+            <ListaPagamentos grupoId={grupoId} dados={dados} aoFalhar={setFalhaPagamento} />
           </TrechoBloqueado>
         </section>
         <section aria-labelledby="lan">
