@@ -176,7 +176,7 @@ export async function executarPassos(pagina, passos = []) {
       // O interruptor é um label com o `input role=switch` escondido sob o trilho: o clique do usuário cai no trilho (o
       // Playwright recusa o clique no input coberto, como no e2e `alternarPagou`).
       const ehInterruptor = await alvo.evaluate(
-        (el) => el instanceof HTMLInputElement && el.getAttribute('role') === 'switch',
+        (el) => el.tagName === 'INPUT' && el.getAttribute('role') === 'switch',
       );
       await (ehInterruptor ? alvo.locator('xpath=ancestor::label[1]') : alvo).click();
     } else if ('esperar' in passo)
