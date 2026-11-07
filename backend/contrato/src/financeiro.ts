@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ehDataDoCalendario, MENSAGEM_DATA_INVALIDA } from './elenco.ts';
 import { grupoDetalhe } from './grupo.ts';
 
 /**
@@ -16,9 +17,6 @@ export const LIMITES_FINANCEIRO = {
 } as const;
 
 export const MENSAGEM_MES_INVALIDO = 'Mês inválido.';
-// Mesmo texto do `MENSAGEM_DATA_INVALIDA` da grupos-e-elenco (`elenco.ts`); fica local para este contrato não
-// depender da feature 3 na passada de rascunho. O /executar pode unificar.
-const MENSAGEM_DATA_INVALIDA = 'Informe uma data válida.';
 const MENSAGEM_VALOR = 'Informe um valor inteiro em centavos dentro do limite.';
 
 /** Inteiro seguro na faixa, em centavos (também usado pelo contrato dos lançamentos, T8). */
@@ -34,13 +32,21 @@ export const centavos = (min: number, max: number) =>
 const saldoResposta = centavos(Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER);
 const somaResposta = centavos(0, Number.MAX_SAFE_INTEGER);
 
-/** Data real `AAAA-MM-DD` (o `z.iso.date()` confere o calendário, inclusive o 29/02 de ano bissexto). */
-export const dataFinanceira = z.iso.date({ error: MENSAGEM_DATA_INVALIDA });
+/**
+ * Data real `AAAA-MM-DD`, do calendário (inclusive o 29/02 de ano bissexto) e de ano 0001 em diante: o Postgres recusa
+ * o ano 0000 (22008) e a rota daria 500 em vez de 422 (FIN-02, FIN-26).
+ */
+export const dataFinanceira = z
+  .string({ error: MENSAGEM_DATA_INVALIDA })
+  .refine((valor) => ehDataDoCalendario(valor) && valor >= '0001-01-01', {
+    error: MENSAGEM_DATA_INVALIDA,
+  });
 
-/** Mês `AAAA-MM`, de 01 a 12. */
+/** Mês `AAAA-MM`, de 01 a 12, de 0001-01 em diante (o ano 0000 não existe no Postgres). */
 export const mesFinanceiro = z
   .string({ error: MENSAGEM_MES_INVALIDO })
-  .regex(/^\d{4}-(0[1-9]|1[0-2])$/, MENSAGEM_MES_INVALIDO);
+  .regex(/^\d{4}-(0[1-9]|1[0-2])$/, MENSAGEM_MES_INVALIDO)
+  .refine((valor) => valor >= '0001-01', MENSAGEM_MES_INVALIDO);
 
 /** `PUT .../financeiro/config`: mensalidade obrigatória no corpo (nulo explícito = sem mensalidade). */
 export const configFinanceiraCorpo = z

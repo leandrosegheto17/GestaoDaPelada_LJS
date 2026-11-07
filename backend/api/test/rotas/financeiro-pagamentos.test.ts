@@ -144,6 +144,17 @@ describe('POST …/financeiro/pagamentos', () => {
     expect(await pagamentos(aberto.cenario.idsG.jogadorAtivo, '2026-11')).toEqual([]);
   });
 
+  it('FIN-18: mês anterior ao histórico do caixa (data inicial 2026-01-01) dá 422 no campo mes, sem gravar', async () => {
+    const r = await marcar({ jogadorId: aberto.cenario.idsG.jogadorAtivo, mes: '2025-12' });
+    expect(r.status).toBe(422);
+    expect(await r.json()).toMatchObject({
+      campos: ['mes'],
+      mensagens: { mes: 'Mês fora do histórico do caixa.' },
+    });
+    expect(await pagamentos(aberto.cenario.idsG.jogadorAtivo, '2025-12')).toEqual([]);
+    expect(await lancamentosComDescricao('Mensalidade Toninho 12/2025')).toEqual([]);
+  });
+
   it('FIN-18: mês malformado dá 422 no campo mes', async () => {
     const r = await marcar({ jogadorId: aberto.cenario.idsG.jogadorAtivo, mes: '2026-13' });
     expect(r.status).toBe(422);

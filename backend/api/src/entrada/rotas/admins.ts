@@ -4,6 +4,8 @@ import {
   acessoFinanceiroCorpo,
   conviteCorpo,
   corpoDoErro,
+  CODIGO_ACESSO_DA_CRIADORA,
+  MENSAGEM_ACESSO_DA_CRIADORA,
   MENSAGENS_ERRO_FINANCEIRO,
   type AdminsResposta,
   type ConviteCriado,
@@ -66,7 +68,7 @@ export function rotasAdmins(opcoes: OpcoesRotas = {}): Hono<Ambiente> {
    * Conceder ou retirar o acesso ao financeiro de outro admin (financeiro T29; FIN-35, FIN-36). A cadeia vem antes,
    * com o `exigirFinanceiro` (403 `sem_permissao_financeiro` para quem não tem acesso) e a trava de plano nas escritas
    * (403 `plano_pro`), ligados pelo `travarFinanceiro` neste caminho. Corpo `{ acessaFinanceiro }` (T8). A própria
-   * conta: 409 `acao_na_propria_conta`; alvo que não é admin do grupo (ou id malformado): 404; valor igual: 200 sem
+   * conta: 409 `acao_na_propria_conta`; retirar o acesso da criadora: 409 `acesso_da_criadora` (S-1); alvo que não é admin do grupo (ou id malformado): 404; valor igual: 200 sem
    * gravar nem auditar. Responde 200 com a lista de admins, como o GET. O banco recusar (zero linhas, T10) só acontece
    * com a checagem do repositório removida: 403, como o `exigirFinanceiro`.
    */
@@ -89,6 +91,9 @@ export function rotasAdmins(opcoes: OpcoesRotas = {}): Hono<Ambiente> {
         },
         409,
       );
+    }
+    if (r.resultado === 'criadora') {
+      return c.json({ erro: MENSAGEM_ACESSO_DA_CRIADORA, codigo: CODIGO_ACESSO_DA_CRIADORA }, 409);
     }
     if (r.resultado === 'nao_encontrado') return c.json(naoEncontrado, 404);
     if (r.resultado === 'sem_permissao') return c.json(corpoSemPermissaoFinanceiro(), 403);

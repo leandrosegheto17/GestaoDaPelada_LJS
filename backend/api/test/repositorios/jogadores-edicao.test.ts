@@ -308,3 +308,34 @@ describe('jogadoresEdicao.excluir', () => {
     expect((await aberto.db.query('SELECT 1 FROM jogadores WHERE id = $1', [id])).rowCount).toBe(1);
   });
 });
+
+describe('excluir por admin sem acesso ao financeiro (S-2; GEL-85, FIN-38)', () => {
+  it('GEL-85: com pagamento que a RLS esconde, recusa como com_historico em vez de estourar a FK (500)', async () => {
+    const { url, cenario, db } = aberto;
+    const id = await novoJogador('Histórico oculto');
+    const l = await db.query<{ id: string }>(
+      `INSERT INTO lancamentos (grupo_id, tipo, data, descricao, valor_centavos, criado_por, criado_em, alterado_por, alterado_em)
+       VALUES ($1, 'entrada', '2026-02-05', 'Mensalidade oculta', 5000, $2, now(), $2, now()) RETURNING id`,
+      [cenario.grupoG, cenario.contaC],
+    );
+    try {
+      await db.query(
+        `INSERT INTO pagamentos_mes (grupo_id, jogador_id, mes, lancamento_id, marcado_por, marcado_em)
+         VALUES ($1, $2, '2026-02', $3, $4, now())`,
+        [cenario.grupoG, id, l.rows[0]!.id, cenario.contaC],
+      );
+      const r = await comDb(
+        url,
+        cenario.contaO,
+        (conexao) => jogadoresEdicao.excluir(conexao, cenario.grupoG, id),
+        { confirmar: true },
+      );
+      expect(r).toEqual({ resultado: 'com_historico', apelido: 'Histórico oculto' });
+      expect((await db.query('SELECT 1 FROM jogadores WHERE id = $1', [id])).rowCount).toBe(1);
+      expect(await eventos('jogador_excluido', id)).toEqual([]);
+    } finally {
+      await db.query('DELETE FROM pagamentos_mes WHERE jogador_id = $1', [id]);
+      await db.query('DELETE FROM lancamentos WHERE id = $1', [l.rows[0]!.id]);
+    }
+  });
+});

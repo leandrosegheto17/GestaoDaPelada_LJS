@@ -171,12 +171,15 @@ export async function executarPassos(pagina, passos = []) {
         .locator(seletorDoApp(passo.selecionar))
         .first()
         .selectOption(String(passo.valor ?? ''));
-    else if ('clicar' in passo)
-      await pagina
-        .locator(seletorDoApp(passo.clicar))
-        .nth(passo.indice ?? 0)
-        .click();
-    else if ('esperar' in passo)
+    else if ('clicar' in passo) {
+      const alvo = pagina.locator(seletorDoApp(passo.clicar)).nth(passo.indice ?? 0);
+      // O interruptor é um label com o `input role=switch` escondido sob o trilho: o clique do usuário cai no trilho (o
+      // Playwright recusa o clique no input coberto, como no e2e `alternarPagou`).
+      const ehInterruptor = await alvo.evaluate(
+        (el) => el.tagName === 'INPUT' && el.getAttribute('role') === 'switch',
+      );
+      await (ehInterruptor ? alvo.locator('xpath=ancestor::label[1]') : alvo).click();
+    } else if ('esperar' in passo)
       await pagina.locator(seletorDoApp(passo.esperar)).first().waitFor({ state: 'visible' });
     else if ('aguardarMs' in passo) await pagina.waitForTimeout(passo.aguardarMs);
     else if ('rolar' in passo)

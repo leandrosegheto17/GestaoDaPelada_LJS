@@ -7,9 +7,15 @@ import {
   mesFinanceiro,
   pagamentoCorpo,
 } from '@pelada/contrato';
-import { MENSAGEM_MES_FUTURO, mesFuturo } from '@pelada/dominio';
+import {
+  MENSAGEM_MES_FORA_DO_HISTORICO,
+  MENSAGEM_MES_FUTURO,
+  mesFuturo,
+  mesNoHistoricoDoCaixa,
+} from '@pelada/dominio';
 import type { Ambiente } from '../ambiente.ts';
 import { lerCorpoDoGrupo, respostaDeCampo } from '../corpo.ts';
+import { configFinanceira } from '../../infraestrutura/db/repositorios/financeiro/config.ts';
 import { financeiroPagamentos } from '../../infraestrutura/db/repositorios/financeiro/pagamentos.ts';
 import { financeiroPagamentosDesmarcar } from '../../infraestrutura/db/repositorios/financeiro/pagamentos-desmarcar.ts';
 
@@ -20,6 +26,7 @@ import { financeiroPagamentosDesmarcar } from '../../infraestrutura/db/repositor
  * `POST …/financeiro/pagamentos`, corpo `{ jogadorId, mes }` (T8):
  * - corpo inválido (id que não é uuid, mês malformado, campo extra, valor no corpo): 422 com a mensagem do campo;
  * - mês depois do mês de hoje (São Paulo): 422 no campo `mes` (FIN-18); o mês de hoje e os passados são aceitos;
+ * - mês antes do mês da data inicial do caixa (com configuração): 422 "Mês fora do histórico do caixa." no campo `mes`;
  * - jogador inativo no mês, de outro grupo ou inexistente: 422 no campo `jogadorId`, a mesma mensagem nos três (FIN-19);
  * - já marcado, inclusive em corrida: 409 `pagamento_ja_marcado` (FIN-20);
  * - marcado: 204; o repositório (T18) cria o pagamento, a entrada da mensalidade quando há (FIN-16, FIN-17) e a
@@ -31,7 +38,7 @@ import { financeiroPagamentosDesmarcar } from '../../infraestrutura/db/repositor
  * - desmarcado: 204; o repositório (T19) apaga o pagamento e a entrada vinculada, mesmo editada, e audita (FIN-22).
  *
  * Os 4xx desfazem a transação no `comBanco`: nada é gravado. Molde: `POST …/escalacoes` (`rotas/escalacoes.ts:27`) e
- * `DELETE …/jogadores/:id` (`rotas/jogador.ts:60`); o `POST partidas` de `PR:1461` ainda não existe.
+ * `DELETE …/jogadores/:id` (`rotas/jogador.ts:60`).
  */
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -53,6 +60,11 @@ export function rotasFinanceiroPagamentos(): Hono<Ambiente> {
     const hoje = c.var.relogio.hoje();
     const { jogadorId, mes } = corpo.dados;
     if (mesFuturo(mes, hoje)) return respostaDeCampo(c, 'mes', MENSAGEM_MES_FUTURO);
+    // Mês antes da data inicial do caixa: o `GET …/mes` o recusa (FIN-09), então marcar nele criaria um pagamento (e a
+    // entrada, que entra no saldo) que nenhuma tela alcança. Sem configuração não há histórico a respeitar.
+    const config = await configFinanceira.lerConfig(c.var.db, c.req.param('grupoId'));
+    if (config !== null && !mesNoHistoricoDoCaixa(mes, config.dataSaldoInicial, hoje))
+      return respostaDeCampo(c, 'mes', MENSAGEM_MES_FORA_DO_HISTORICO);
 
     const r = await financeiroPagamentos.marcar(
       c.var.db,
