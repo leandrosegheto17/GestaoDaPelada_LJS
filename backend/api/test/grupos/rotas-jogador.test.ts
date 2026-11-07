@@ -94,6 +94,26 @@ describe('PATCH /api/grupos/:grupoId/jogadores/:id', () => {
     expect(ficha.periodos).toEqual([expect.objectContaining({ inicio: '2026-01-01', fim: null })]);
   });
 
+  it('GEL-41, GEL-43, AD-128: o PATCH substitui os campos: telefone ausente apaga, pontuação ausente mantém', async () => {
+    const id = await novoJogador('Substitui');
+    await aberto.db.query(
+      `UPDATE jogadores SET telefone = '11987654321', pontuacao_inicial = 7 WHERE id = $1`,
+      [id],
+    );
+    const r = await jogador(id, aberto.cenario.contaC, 'PATCH', EDICAO);
+    expect(r.status).toBe(200);
+    const linha = await aberto.db.query<{ telefone: string | null; pontuacao_inicial: number }>(
+      'SELECT telefone, pontuacao_inicial FROM jogadores WHERE id = $1',
+      [id],
+    );
+    expect(linha.rows[0]).toEqual({ telefone: null, pontuacao_inicial: 7 });
+    const auditoria = await aberto.db.query<{ resumo: { campos?: string[] } }>(
+      `SELECT resumo FROM auditoria WHERE entidade_id = $1 AND acao = 'jogador_editado'`,
+      [id],
+    );
+    expect(auditoria.rows[0]?.resumo.campos).toContain('telefone');
+  });
+
   it('GEL-41: as mesmas validações do cadastro: apelido curto dá 422', async () => {
     const id = await novoJogador('Valida');
     const r = await jogador(id, aberto.cenario.contaC, 'PATCH', { ...EDICAO, apelido: 'X' });

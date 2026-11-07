@@ -134,6 +134,48 @@ describe('corpo lento (SV-01)', () => {
   });
 });
 
+describe('corpo lento com Content-Length declarado (SV-01)', () => {
+  it('o bodyLimit não lê o corpo quando há Content-Length: nenhuma conexão abre antes de o corpo chegar', async () => {
+    const espia = fabricaEspiada();
+    const app = criarApp({ fabricaBanco: espia.fabrica });
+    const token = await sessao(aberto.cenario.contaC);
+    const bytes = new TextEncoder().encode(
+      JSON.stringify({ apelido: 'Lento CL', anoNascimento: 1990, posicao: 'meia' }),
+    );
+    let terminar!: () => void;
+    const fim = new Promise<void>((res) => {
+      terminar = res;
+    });
+    const corpo = new ReadableStream<Uint8Array>({
+      async start(controle) {
+        controle.enqueue(bytes.slice(0, 5));
+        await fim;
+        controle.enqueue(bytes.slice(5));
+        controle.close();
+      },
+    });
+    const headers = cabecalhos(token);
+    headers.set('content-length', String(bytes.length));
+    const ctx = contextoFalso();
+    const pedido = app.request(
+      `/api/grupos/${aberto.cenario.grupoG}/jogadores`,
+      { method: 'POST', headers, body: corpo, duplex: 'half' } as RequestInit,
+      envAcesso(aberto.url, { LIMITE_ESCRITA: permite }),
+      ctx,
+    );
+    await new Promise((res) => setTimeout(res, 400));
+    expect(espia.criadas()).toBe(0);
+    terminar();
+    const r = await pedido;
+    await ctx.esperar();
+    expect(r.status).toBe(201);
+    await aberto.db.query('DELETE FROM jogadores WHERE grupo_id = $1 AND apelido = $2', [
+      aberto.cenario.grupoG,
+      'Lento CL',
+    ]);
+  });
+});
+
 describe('POST /api/grupos (raiz da coleção)', () => {
   it('o corpo chega à rota uma vez só: 201 e o grupo gravado', async () => {
     const app = criarApp({ fabricaBanco: fabricaEspiada().fabrica });
