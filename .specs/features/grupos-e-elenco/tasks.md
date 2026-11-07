@@ -4,7 +4,7 @@
 **Passada**: rascunho
 **Base**: `ljs:.specs/features/grupos-e-elenco/spec.md` (aprovada em 2026-10-29, GEL-01 a GEL-118, e as regras da auditoria em `spec.md:541-548`), `ljs:.specs/features/grupos-e-elenco/context.md` (C1 a C10), `ljs:.specs/features/grupos-e-elenco/design.md` (aprovado em 2026-10-29), `ljs:.specs/features/grupos-e-elenco/seguranca.md` (SEC-001 a SEC-010, reteste de 2026-10-30), `ljs:.specs/features/grupos-e-elenco/validation.md` (PASS) e o mockup de módulo `ljs:.specs/features/grupos-e-elenco/mockup/`, com `ljs:` = `C:\Leandro\Projetos\GestaoDaPelada_LJS` @ `e557292` (branch `main`), conferido em 2026-11-04. A remota `feat/grupos-e-elenco` (`1380484`) é anterior (só a spec, sem aprovação) e não é a Base. Contratos da v2: `.specs/features/fundacao/` (spec, design, tasks) e `.specs/features/conta-e-acesso/tasks.md`.
 **Branch pai**: `feature/conta-e-acesso` (a conta-e-acesso ainda não estará integrada quando esta feature for executada). Se a conta-e-acesso já estiver integrada na `main` quando o `/executar` começar, a Branch pai passa a ser `main`.
-**Gate**: format, lint, typecheck, checagens e vitest por pacote @ abc17b49f3f1527747c2c9614614f25ab3b235a3 = verde, com pendências aceitas pelo usuário em 2026-11-06 (api: push-backup e push-cpu, por ambiente; dominio: SIM-57 e SIM-58, no CI; Playwright não rodado)
+**Gate**: format, lint, typecheck, checagens e vitest por pacote @ 5cbac0d3 (suíte inteira) e, depois, os arquivos tocados @ dd2834db09cade256b82e9ce9318ec3292777a46 = verde, com pendências aceitas (api: push-backup e push-cpu, por ambiente; simulador, outra feature: SIM-15, pior-entrada e SIM-57/58; falhas de timeout sob carga passam isoladas); e2e `elenco.spec.ts` e `erros-campo.spec.ts` verdes (12 de 12, banco `pelada_gel`, porta 8748); comparação visual: telas do módulo (T08, T16, T20, T27) sem falha, T09 fora por AD-029
 **Feature**: 3 de 8 do roteiro (AD-001, AD-015). Requisitos `GEL-*` e `SEC-*`.
 
 > Convenções desta lista: `F:` = `.specs/features/fundacao/tasks.md`; `FD:` = `.specs/features/fundacao/design.md`; `CA:` = `.specs/features/conta-e-acesso/tasks.md`; `M:` = `ljs:backend/api/src/infraestrutura/db/migracoes/` (as 23 migrações, copiadas byte a byte pela fundação, AD-003); `GS:` = `ljs:.specs/features/grupos-e-elenco/spec.md`; `GD:` = `ljs:.specs/features/grupos-e-elenco/design.md`; `GSEG:` = `ljs:.specs/features/grupos-e-elenco/seguranca.md`; `GT:` = `ljs:.specs/features/grupos-e-elenco/tasks.md` (só granularidade); `R-NN` = linha do `reuso.md` desta pasta; `telas.json` = `.specs/mockup/telas.json`. Do zero (AD-002): código e testes do LJS são só consulta. Nome de teste de tarefa de risco alto cita o `GEL-NN` ou o `SEC-NN`.
@@ -341,6 +341,12 @@ T69 → T70 → T71 → T72
 
 ```
 T73 → T74 → T75
+```
+
+### Phase 24: Retrabalho R1 (crítica, 5h)
+
+```
+T76 → T77 → T78 → T79
 ```
 
 ## Task Breakdown
@@ -2331,3 +2337,92 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 
 **Tests**: none
 **Gate**: build
+
+#### Phase 24: Retrabalho R1
+
+### T76: Retrabalho R1: corpo lido antes do banco, bodyLimit e tetos de tempo (SV-01, SV-04)
+
+**What**: Ler e limitar a 16 KB o corpo das escritas de `/api/grupos*` antes de qualquer conexão (413) e pôr `idle_in_transaction_session_timeout` e `statement_timeout` na transação do `comBanco`.
+**Estimativa**: 1h30
+**Risco**: alto
+**Domínio**: sim
+**Criticidade**: crítica
+**Where**: `backend/api/src/entrada/middlewares/corpo-antecipado.ts`, `backend/api/src/entrada/middlewares/com-banco.ts`, `backend/api/src/entrada/app.ts`
+**Depends on**: T75
+**Reuses**: `backend/api/src/entrada/middlewares/limite-escrita.ts` (molde de middleware)
+**Requirement**: SEC-003, SEC-007 (A-SV-01, A-SV-04)
+**Status**: concluída
+
+**Done when**:
+
+- [x] Corpo lento, com e sem `Content-Length`, não abre conexão antes de chegar (testes com falha provada por mutação)
+- [x] Corpo acima de 16 KB dá 413 em POST, PUT, PATCH e DELETE, na raiz e nas rotas do grupo
+- [x] A transação nasce com os dois tetos de tempo
+
+**Tests**: unit
+**Gate**: `typecheck` e o teste do pacote tocado
+
+### T77: Retrabalho R1: exclusão com pagamento, texto visível e arquivar bloqueado (SV-02, SV-03, RC-A01, RC-A04, RC-A05, V-A02)
+
+**What**: Traduzir o 23503 da exclusão de jogador em 409 `jogador_com_historico`; recusar invisíveis fora de Cc/Cf e exigir letra ou número, contando caracteres; mostrar a mensagem do 409 `assinatura_ativa` ao arquivar; uuid único e remover a constante sem uso.
+**Estimativa**: 2h
+**Risco**: alto
+**Domínio**: não
+**Criticidade**: crítica
+**Where**: `backend/api/src/infraestrutura/db/repositorios/jogadores-edicao.ts`, `backend/contrato/src/grupo.ts`, `frontend/web/src/telas/dados-grupo/DadosGrupo.tsx`, `backend/api/src/entrada/uuid.ts`
+**Depends on**: T76
+**Reuses**: `backend/api/src/entrada/middlewares/limite-escrita.ts` (molde de middleware)
+**Requirement**: GEL-85, SEC-005, PLA-69
+**Status**: concluída
+
+**Done when**:
+
+- [x] Admin sem acesso ao financeiro recebe 409 ao excluir jogador só com pagamento
+- [x] Apelido com U+034F, U+2800, U+3164 e afins é recusado; emoji conta 1
+- [x] Tela de arquivar mostra "Cancele a assinatura antes de arquivar o grupo"
+
+**Tests**: unit
+**Gate**: `typecheck` e o teste do pacote tocado
+
+### T78: Retrabalho R1: timeouts dos testes de ESLint, e2e isolável e README (V-A03, A-01)
+
+**What**: Timeout de 60 s nos 3 testes que chamam o ESLint (autorização em `STATE.md`); porta e banco do e2e por `PELADA_E2E_PORTA` e `PELADA_E2E_BANCO`; README cita as duas variáveis (FUN-51); AD-128 em `STATE.md`.
+**Estimativa**: 1h
+**Risco**: baixo
+**Domínio**: não
+**Criticidade**: comum
+**Where**: `backend/dominio/test/sem-relogio.test.ts`, `test/lint/`, `frontend/web/playwright.config.ts`, `.env.example`, `README.md`, `.specs/STATE.md`
+**Depends on**: T77
+**Reuses**: `backend/api/src/entrada/middlewares/limite-escrita.ts` (molde de middleware)
+**Requirement**: GEL-70, GEL-116, GEL-118, FUN-51
+**Status**: concluída
+
+**Done when**:
+
+- [x] Os 3 testes passam sob carga
+- [x] `elenco.spec.ts` e `erros-campo.spec.ts` rodam isolados (J-11 a J-14 e GEL-118, 12 de 12)
+- [x] `readme.test.ts` verde
+
+**Tests**: unit
+**Gate**: `typecheck` e o teste do pacote tocado
+
+### T79: Retrabalho R1: provas que faltavam (A-05, A-06)
+
+**What**: Teste do corpo lento com `Content-Length` declarado e teste da regra de substituição do PATCH (telefone ausente apaga, pontuação ausente mantém).
+**Estimativa**: 30 min
+**Risco**: alto
+**Domínio**: não
+**Criticidade**: crítica
+**Where**: `backend/api/test/sessao/corpo-antecipado.test.ts`, `backend/api/test/grupos/rotas-jogador.test.ts`
+**Depends on**: T78
+**Reuses**: `backend/api/src/entrada/middlewares/limite-escrita.ts` (molde de middleware)
+**Requirement**: SEC-007, GEL-41, GEL-43
+**Status**: concluída
+
+**Done when**:
+
+- [x] Mutante sem a leitura antecipada do corpo reprova o teste novo
+- [x] Mutante `telefone ?? atual.telefone` reprova o teste novo
+
+**Tests**: unit
+**Gate**: `typecheck` e o teste do pacote tocado
