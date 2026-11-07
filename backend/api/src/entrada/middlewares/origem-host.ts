@@ -5,9 +5,11 @@ import type { Ambiente } from '../ambiente.ts';
 /**
  * Host e origem da requisição (fundacao /validar, A-12; "Segurança padrão de app web" do CLAUDE.md).
  *
- * - **Host** (421): contra DNS rebinding. Hosts aceitos: loopback, o host da `URL_PUBLICA` e o endereço `*.workers.dev`
- *   da prévia. Sem `URL_PUBLICA` (local, testes, CI) o host só é restrito ao loopback quando `EMAIL_DEV=1`, que é
- *   quando `GET /api/dev/emails` expõe tokens dos e-mails; fora disso nada é restrito.
+ * - **Host** (421): contra DNS rebinding, que só existe contra o servidor local. Com `EMAIL_DEV=1` (o `.env` local e o
+ *   e2e: quando `GET /api/dev/emails` expõe os tokens dos e-mails) só passam o loopback e o host da `URL_PUBLICA`. Sem
+ *   `EMAIL_DEV`, nada é restrito: no ar, a Cloudflare só entrega ao Worker os endereços configurados (o `workers.dev`
+ *   e o domínio próprio da AD-121, que não é o da `URL_PUBLICA`), e restringir pela `URL_PUBLICA` derrubaria o outro.
+ *   Compara o cabeçalho `Host` (o `wrangler dev` troca o host da URL pelo da rota do `wrangler.jsonc`).
  * - **Origem** (403): escrita (todo método fora de GET e HEAD) é recusada quando `Sec-Fetch-Site` existe e não é
  *   `same-origin` nem `none`, ou quando `Origin` existe e não é o do próprio servidor. Sem diferenciar maiúsculas.
  *   O Worker não tem CORS; isto fecha também o formulário de outro site que o `X-Pelada` já barrava.
@@ -15,25 +17,22 @@ import type { Ambiente } from '../ambiente.ts';
 
 const LOOPBACK = new Set(['localhost', '127.0.0.1', '[::1]']);
 
-function hostDe(url: string): string | null {
+/** Nome do host (sem porta), em minúsculas, a partir do valor do cabeçalho `Host` ou de uma URL. */
+function hostSemPorta(valor: string): string | null {
   try {
-    return new URL(url).hostname.toLowerCase();
+    return new URL(valor.includes('://') ? valor : `http://${valor}`).hostname.toLowerCase();
   } catch {
     return null;
   }
 }
 
-function hostPermitido(host: string, urlPublica: string, emailDev: boolean): boolean {
-  if (LOOPBACK.has(host)) return true;
-  const publico = urlPublica === '' ? null : hostDe(urlPublica);
-  if (publico === null) return !emailDev;
-  return host === publico || host.endsWith('.workers.dev');
-}
-
 export const exigirHostEsperado: MiddlewareHandler<Ambiente> = async (c, next) => {
-  const host = hostDe(c.req.url);
-  if (host === null || !hostPermitido(host, c.env.URL_PUBLICA ?? '', c.env.EMAIL_DEV === '1')) {
-    return c.json(corpoDoErro('origem_recusada'), 421);
+  if (c.env.EMAIL_DEV === '1') {
+    const host = hostSemPorta(c.req.header('Host') ?? c.req.url);
+    const publico = c.env.URL_PUBLICA ? hostSemPorta(c.env.URL_PUBLICA) : null;
+    if (host === null || !(LOOPBACK.has(host) || host === publico)) {
+      return c.json(corpoDoErro('origem_recusada'), 421);
+    }
   }
   await next();
 };
@@ -51,13 +50,16 @@ export const exigirOrigemPropria: MiddlewareHandler<Ambiente> = async (c, next) 
     }
     const origem = c.req.header('Origin');
     if (origem !== undefined) {
-      let propria: string;
+      // Compara host e porta com o cabeçalho `Host` (o `wrangler dev` troca o host da URL pelo da rota do
+      // `wrangler.jsonc`, mas o navegador manda `Origin` com o endereço que ele abriu).
+      let hostDaOrigem: string;
       try {
-        propria = new URL(c.req.url).origin.toLowerCase();
+        hostDaOrigem = new URL(origem).host.toLowerCase();
       } catch {
         return c.json(corpoDoErro('origem_recusada'), 403);
       }
-      if (origem.toLowerCase() !== propria) return c.json(corpoDoErro('origem_recusada'), 403);
+      const proprio = (c.req.header('Host') ?? new URL(c.req.url).host).toLowerCase();
+      if (hostDaOrigem !== proprio) return c.json(corpoDoErro('origem_recusada'), 403);
     }
   }
   await next();

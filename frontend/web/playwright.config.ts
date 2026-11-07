@@ -16,14 +16,21 @@ const RAIZ = fileURLToPath(new URL('../..', import.meta.url));
 const ENV_DA_RAIZ = `${RAIZ}.env`;
 if (existsSync(ENV_DA_RAIZ)) process.loadEnvFile(ENV_DA_RAIZ);
 
-export const PORTA_E2E = 8788;
+/** Portas do e2e: o padrão, ou as de `PELADA_E2E_PORTA`, `PELADA_E2E_PORTA_ASAAS` e `PELADA_E2E_PORTA_PUSH` quando outra
+ * sessão usa as mesmas (sem isso o `reuseExistingServer` reaproveitaria os servidores dela). */
+function portaDe(variavel: string, padrao: number): number {
+  const valor = Number(process.env[variavel]);
+  return Number.isInteger(valor) && valor > 0 && valor < 65536 ? valor : padrao;
+}
+
+export const PORTA_E2E = portaDe('PELADA_E2E_PORTA', 8788);
 export const URL_BASE = `http://127.0.0.1:${PORTA_E2E}`;
 
 /**
  * Asaas falso do e2e (planos-e-cobranca T30): o Worker fala com ele por `ASAAS_URL`, e ele dispara o webhook no Worker
  * com o token. Chave e token são valores falsos, só do e2e (nunca com o prefixo das chaves do Asaas).
  */
-export const PORTA_ASAAS_FALSO = 8789;
+export const PORTA_ASAAS_FALSO = portaDe('PELADA_E2E_PORTA_ASAAS', 8789);
 export const URL_ASAAS_FALSO = `http://127.0.0.1:${PORTA_ASAAS_FALSO}`;
 const CHAVE_ASAAS_E2E = 'chave-falsa-do-e2e';
 export const TOKEN_WEBHOOK_E2E = 'token-falso-do-webhook-do-e2e-com-32-caracteres';
@@ -32,7 +39,7 @@ export const TOKEN_WEBHOOK_E2E = 'token-falso-do-webhook-do-e2e-com-32-caractere
  * Push falso do e2e (notificacoes T27, T41; NOT-63): o Worker manda o aviso cifrado a ele, e só aceita o endpoint
  * `http://localhost:<porta>` por `PUSH_HOSTS_DEV`, passada só aqui por `--var` (checagem `push-hosts-dev`).
  */
-export const PORTA_PUSH_FALSO = 8790;
+export const PORTA_PUSH_FALSO = portaDe('PELADA_E2E_PORTA_PUSH', 8790);
 export const URL_PUSH_FALSO = `http://localhost:${PORTA_PUSH_FALSO}`;
 
 /**

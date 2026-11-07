@@ -33,56 +33,63 @@ const pelada = { 'X-Pelada': '1' };
 const CSP = "default-src 'none'; frame-ancestors 'none'";
 
 describe('A-12: Host da requisição (421)', () => {
-  it('FUN-22: com URL_PUBLICA, o host dela passa', async () => {
-    const r = await app().request(`${PROD}/api/health`, {}, envProd);
+  it('FUN-22: com EMAIL_DEV=1, loopback e o host da URL_PUBLICA passam', async () => {
+    const env = { ...base, URL_PUBLICA: 'http://127.0.0.1:8788', EMAIL_DEV: '1' } as unknown as Env;
+    for (const host of ['http://127.0.0.1:8787', 'http://localhost:8787', 'http://[::1]:8787']) {
+      const r = await app().request(`${host}/api/health`, {}, env);
+      expect(r.status, host).toBe(200);
+    }
+    const proprio = {
+      ...base,
+      URL_PUBLICA: 'https://local.exemplo.test',
+      EMAIL_DEV: '1',
+    } as unknown as Env;
+    const r = await app().request('https://LOCAL.exemplo.test/api/health', {}, proprio);
     expect(r.status).toBe(200);
   });
 
-  it('FUN-22: com URL_PUBLICA, o endereço workers.dev da prévia e o loopback passam', async () => {
+  it('FUN-22: com EMAIL_DEV=1, outro host (DNS rebinding) responde 421, inclusive em /api/dev/emails', async () => {
+    for (const url of [
+      'http://rebind.example:8787/api/health',
+      'http://rebind.example:8787/api/dev/emails',
+      'http://127.0.0.1.rebind.example/api/health',
+      'http://localhost.rebind.example/api/health',
+    ]) {
+      const r = await app().request(url, {}, envLocal);
+      expect(r.status, url).toBe(421);
+    }
+  });
+
+  it('FUN-22: com EMAIL_DEV=1, vale o cabeçalho Host, não o host da URL (wrangler dev usa o da rota)', async () => {
+    const ok = await app().request(
+      'https://gestaodapelada.ljssoftware.exemplo/api/health',
+      { headers: { Host: '127.0.0.1:8851' } },
+      envLocal,
+    );
+    expect(ok.status).toBe(200);
+    const ruim = await app().request(
+      'http://127.0.0.1:8787/api/health',
+      { headers: { Host: 'rebind.example' } },
+      envLocal,
+    );
+    expect(ruim.status).toBe(421);
+  });
+
+  it('FUN-22: com EMAIL_DEV diferente de 1 nada é restrito: workers.dev, domínio próprio e URL_PUBLICA passam', async () => {
     for (const host of [
       'https://gestaodapelada-v2.prod-ljs.workers.dev',
-      'http://127.0.0.1:8787',
-      'http://localhost:8787',
+      'https://dominio-proprio.exemplo.test',
+      PROD,
     ]) {
       const r = await app().request(`${host}/api/health`, {}, envProd);
       expect(r.status, host).toBe(200);
     }
-  });
-
-  it('FUN-22: com URL_PUBLICA, outro host (DNS rebinding) responde 421', async () => {
-    const r = await app().request('https://atacante.example/api/health', {}, envProd);
-    expect(r.status).toBe(421);
-  });
-
-  it('FUN-22: o host comparado ignora a caixa; sufixo parecido não passa', async () => {
-    const ok = await app().request('https://GESTAODAPELADA.exemplo.test/api/health', {}, envProd);
-    expect(ok.status).toBe(200);
-    for (const host of [
-      'https://gestaodapelada.exemplo.test.atacante.example',
-      'https://x.gestaodapelada.exemplo.test',
-      'https://evil-workers.dev',
-    ]) {
-      const r = await app().request(`${host}/api/health`, {}, envProd);
-      expect(r.status, host).toBe(421);
-    }
-  });
-
-  it('FUN-22: local com EMAIL_DEV=1 (sem URL_PUBLICA) só aceita loopback', async () => {
-    const ok = await app().request('http://127.0.0.1:8787/api/health', {}, envLocal);
-    expect(ok.status).toBe(200);
-    const ok2 = await app().request('http://localhost:8787/api/health', {}, envLocal);
-    expect(ok2.status).toBe(200);
-    const ruim = await app().request('http://rebind.example:8787/api/dev/emails', {}, envLocal);
-    expect(ruim.status).toBe(421);
-  });
-
-  it('FUN-22: sem URL_PUBLICA e sem EMAIL_DEV (testes, CI) não restringe o host', async () => {
     const r = await app().request('https://qualquer.example/api/health', {}, envSemHost);
     expect(r.status).toBe(200);
   });
 
   it('FUN-22: a recusa por host também tem os cabeçalhos de segurança', async () => {
-    const r = await app().request('https://atacante.example/api/health', {}, envProd);
+    const r = await app().request('http://rebind.example/api/health', {}, envLocal);
     expect(r.headers.get('cache-control')).toBe('no-store');
     expect(r.headers.get('x-content-type-options')).toBe('nosniff');
   });
@@ -128,6 +135,28 @@ describe('A-12: origem das escritas (403)', () => {
       }
     });
   }
+
+  it('FUN-22: a origem é comparada com o cabeçalho Host (wrangler dev), com porta', async () => {
+    const url = 'https://rota-do-wrangler.exemplo.test/api/teste/escrita';
+    const ok = await app().request(
+      url,
+      {
+        method: 'POST',
+        headers: { ...pelada, Host: '127.0.0.1:8851', Origin: 'http://127.0.0.1:8851' },
+      },
+      envSemHost,
+    );
+    expect(ok.status).toBe(200);
+    const outraPorta = await app().request(
+      url,
+      {
+        method: 'POST',
+        headers: { ...pelada, Host: '127.0.0.1:8851', Origin: 'http://127.0.0.1:9999' },
+      },
+      envSemHost,
+    );
+    expect(outraPorta.status).toBe(403);
+  });
 
   it('FUN-22: Origin null (documento sem origem) em escrita responde 403', async () => {
     const r = await app().request(
