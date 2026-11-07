@@ -2426,8 +2426,8 @@ T81 → T82
 **Done when**:
 
 - [x] `ci.yml` verde no último commit da `main` (run 42264671967 @ 45ec02f0: qualidade, banco, testes em 3 jobs e web em 3 fatias; a comparação visual saiu do CI, AD-128)
-- [ ] `testes.json` roda lint, format, typecheck, testes, checagens, build, e2e e visual
-- [ ] `trava-testes.py --rodar` verde
+- [x] `testes.json` roda `docker compose up`, lint, format, typecheck, testes, checagens, build e e2e (o `visual` saiu, AD-128, A-01 do `/validar`)
+- [ ] `trava-testes.py --rodar` verde (não fecha nesta máquina por `pg_dump` 16, orçamento de CPU e `pdf-visual`; o CI fica verde no mesmo código; pendência registrada no `validation.md`)
 - [x] Gate passa, sem teste removido ou enfraquecido (testes mudados com motivo no commit e aprovação do usuário)
 
 **Tests**: none

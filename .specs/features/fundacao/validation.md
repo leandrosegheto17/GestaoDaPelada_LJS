@@ -1,6 +1,6 @@
-# Validação — fundacao (rodada 1)
+# Validação — fundacao (rodadas 1 a 3)
 
-**Veredito**: FAIL (achados abertos)
+**Veredito**: FAIL na rodada 1; rodada 2 FAIL (A-15 a A-19, corrigidos); rodada 3 sem reexecução completa do verificador. Integrada à `main` por decisão do usuário (2026-11-06), com as pendências abaixo registradas.
 **Árvore**: `6bfdb8be` (HEAD `f9801ec0`, worktree `feature/fundacao`, banco isolado `pelada-fundacao-pg`:5451)
 **Relatórios de origem**: `validation-verificador.md`, `seguranca-validacao.md`
 
@@ -34,3 +34,10 @@
 
 - R2-T1 (backup agendado) só conferível em 2026-11-07; já há runs verdes de 2026-11-06 a favor.
 - T81: itens 2 e 3 abertos (A-01).
+
+## Rodadas 2 e 3 (2026-11-06)
+
+- **Rodada 2** (`validation-verificador-r2.md`, `seguranca-validacao-r2.md`): A-01 a A-14 conferidos; A-15 (README sem as portas do e2e), A-16 (ramos de origem sem teste), A-17 (audit e gitleaks sem teste), A-18 (default privileges sem teste) e A-19 (ID citado) corrigidos nos commits `576dff2c` e seguintes. Segurança: 0 crítico, 0 alto, 0 médio; SEC-04r corrigido (`/api/dev/emails` exige `DEV_EMAILS_TOKEN`, `fd3562c7`).
+- **Gate da árvore final (`feature/fundacao`)**: lint, format, typecheck, checagens (134), contrato (567), domínio (668), scripts (332), web (1058), api worker (766) verdes. api banco 2880/2883 (`push-backup` x2: `pg_dump` 16 local contra servidor 18; `push-cpu`: orçamento de CPU sob carga). e2e 71/74 (`pdf-visual` PAR-108 x2: 5,8% contra 4,5%, API simulada, de `partidas-e-ranking`; J-23 estourou 30 s sob carga; J-14 também e passa com `--timeout=120000`).
+- **Pendências aceitas**: A-02 e a conferência de privilégios do A-09 na produção (R2-T1, depende do secret `NEON_URL_BACKUP` e só vale em 2026-11-07); ruleset da `main` e Dependabot (SEC-02r, SEC-05r: configuração do GitHub, do usuário); `trava-testes --rodar` não ficou verde nesta máquina pelos motivos acima, com o CI como prova (T81 item 3).
+- **Não executado**: terceira rodada completa do verificador e do auditor sobre `fd3562c7`.
