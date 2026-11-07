@@ -1,67 +1,52 @@
-# Validação: simulador — FAIL ❌ (rodada 1)
+# Validação: simulador — PASS ✅ (rodada 2, retrabalho da R1)
 
-- **Data**: 2026-11-06 · **Branch**: feature/simulador @ 97ecbea9 · **Árvore**: ea22ebb0156b48e6ba181ccfb500d504fcd71115 (o `Gate:` do `tasks.md` é de outra árvore, abc17b49: tudo repetido aqui)
-- **Critérios**: 95; 90 com asserção que confere o valor da spec; 5 com problema (SIM-57, SIM-58, SIM-59, SIM-61, SIM-85) · **Gate**: lint, format:check, typecheck e `scripts` (326, com as checagens) verdes; `contrato` 567/567; `web` 1058 (8 falhas só por carga, 56/56 no rerun isolado); `dominio` 666/668 (SIM-58 e GEL-70 falham sob carga, verdes isolados com limiar de 15 ms); `api` 3.623 testes, 3 falhas de ambiente (abaixo) e 9 arquivos com timeout de hook sob carga (rerun isolado dos 3 do simulador verde); raiz `test/`: 1 falha real (FUN-51, A-06); e2e J-22 a J-24 e SIM-08: 7/7; visual: 11 reprovadas (A-04)
-- **Sensor**: 17 mutações (acima do teto de 10, por causa de isolamento e dado pessoal), 13 mortas, 4 vivas (1 equivalente)
-- **Revisão de código**: skill `revisao-codigo` em modo curto: 0 bloqueios críticos, 4 achados comuns (A-09 a A-12) e 1 de nome de teste (dobrado em A-01) · **Segurança**: `auditoria-seguranca.md`: 0 crítico, 0 alto, 0 médio, 6 baixos (SEC-001 a SEC-006 viram A-13 a A-16); não bloqueia lançamento
-- **Isolamento**: tudo no Postgres 5452 e nas portas 8798, 8799, 8800 (mortas ao fim). A 4184 estava ocupada pela sessão `conta-e-acesso` (vite preview): visual rodou na 4194. A 8797 tem o `push-falso` de outra sessão. Nenhum teste tocou a 5432. Sem `teste_*` órfão ao fim; `git status` igual ao do início (a `auditoria-seguranca.md` nova é do outro agente).
+- **Data**: 2026-11-06 · **Branch**: feature/simulador @ 48c59f3d · **Árvore**: 4bf585e105b5f02fa24436294a89f02a4f20fb82 (sem `Gate:` registrado para ela: tudo repetido aqui). Escopo: `git diff 97ecbea9..HEAD` (1 commit de código) mais a regressão.
+- **Critérios**: 95; os 5 com problema na R1 (SIM-57, 58, 59, 61, 85) e os tocados pelo retrabalho conferem abaixo; SIM-61 segue sem prova por decisão do usuário (T42 e T43 reabertas)
+- **Gate**: lint, format:check, typecheck, `test:checagens` (134) verdes; `contrato` 571/571; `scripts` 326/326; raiz `test/` 50/50 (FUN-51 verde; 2 testes de lint estouraram 5 s sob carga na 1ª rodada, verdes no rerun); `dominio` 672/673 (GEL-70 estoura 5 s sob carga, verde isolado com timeout maior); `api` 3.625/3.628 (3 falhas de ambiente conhecidas: `push-backup` 2, `push-cpu` 1; 5 arquivos do worker estouraram hook sob carga e passam isolados, 92/92; `esquema-*` FUN-08 verde); `web` 1.060/1.062 (SIM-15 e SIM-66 estouraram 5 s, verdes isolados, 13/13); e2e `simulador.spec.ts` (J-22 a J-24) e `simulador-inicio.spec.ts`: 7/7; visual `^t1[234]-`: **36 de 36 em até 1%, 0 reprovadas** (maior diferença 0,41%)
+- **Sensor**: 17 mutações em cópia isolada (junção de `node_modules`, só o teste do arquivo), 15 mortas, 2 vivas sem achado (abaixo). Cópia descartada; `git status` igual ao do início, salvo `auditoria-seguranca.md` (do auditor, em paralelo)
+- **Processo**: migração `1794004229184_...sql` só `CREATE POLICY` (aditiva); `esquema-producao.txt` regerado e conferido pelos testes `esquema-*`; HEAD fecha o `typecheck` (único commit de código); nenhum teste removido, pulado ou enfraquecido (diff `-` só traz as linhas 60/61 trocadas por 40/41, o limiar e SIM-46/73/93 com as asserções originais mantidas: o corpo da escalação e o 409 continuam afirmados, só esperam o fim do recálculo); cada troca tem motivo em AD-128/129 e em `## Autorizações` de 2026-11-06; sem `teste_*` órfão; portas 8798, 8799, 8800 e 4194 livres ao fim (matei o `vite preview` órfão da R1 na 4194)
+- **Isolamento**: Postgres 5452 e portas 8798/8799/8800/4194; nada na 5432, 8787 a 8790, 4174, 4184 nem em `GestaoDaPelada_v2`
 
-## Critérios
+## Critérios tocados pelo retrabalho
 
 | Critério | `arquivo:linha` e asserção | Resultado |
 |---|---|---|
-| SIM-01 a 04 | `backend/dominio/test/simulador/base.test.ts:10-24` (quinta numa terça = quinta seguinte); `backend/api/test/rotas/simulador-contexto.test.ts:119-148`; `backend/contrato/test/simulador.test.ts:46` (data inválida 422) | ✅ |
-| SIM-05 a 07 | `frontend/web/test/telas/simulador-entradas.test.tsx:71,107,149`; `frontend/web/e2e/simulador.spec.ts:195` | ✅ |
-| SIM-08 | `frontend/web/e2e/simulador-inicio.spec.ts:63-80` (`boundingBox`: topo da linha abaixo da base do botão, PC e celular, 4 passaram) | ✅ |
-| SIM-09 a 13 | `backend/dominio/test/simulador/previa.test.ts:14-98` (`toEqual`: 19 aptos N=7 = 5 reservas; N=11 = maior N 9; 18 aptos 3+ N=4) | ✅ |
-| SIM-14, 15 | `frontend/web/test/telas/simulador-previa.test.tsx:85,138,146` (debounce, descrição da API, botão desabilitado) | ✅ |
-| SIM-16 a 20 | `prioridade.test.ts:49,60,71,87` (A 10 na véspera antes de B 8/12 com a própria data); `simulador-resultado-dois.test.tsx:153` | ✅ |
-| SIM-21 a 26 | `classificacao.test.ts:30-87`; `intervalo.test.ts:26` (`toEqual(['t3','t7'])`), `:56-75` (pares); tela `simulador-resultado-dois.test.tsx:18` | ✅ |
-| SIM-27 a 32, 91 | `distribuicao-dois.test.ts:76,108,122,130`; `chave-dois.test.ts:42,73` (chave lexicográfica) | ✅ |
-| SIM-33 a 38, 92 | `varios-inicial.test.ts:34-77`; `distribuicao-varios.test.ts:46-72`; `e2e/simulador.spec.ts:292` | ✅ |
-| SIM-39 a 46, 89, 90 | `indicadores-dois.test.ts:42`, `indicadores-varios.test.ts:26`, `avisos.test.ts:59,127,200,252,317`; `simulador-resultado-dois.test.tsx:77` | ✅ |
-| SIM-47 a 51 | `sugerir.test.ts:32-88` (outra ordem, mesma sugestão); `determinismo.test.ts:13-30,59` (varredura de `Math.random`, `crypto`, `Date`) | ✅ |
-| SIM-52 | `referencia.test.ts:78-79` contra `referencia-legado.json` (commit ece227e0; 19×N7×K2 e 22×N4); o legado fica fora da worktree: não rodei de novo | ✅ (esperado não reconferido) |
-| SIM-53 a 56, 80 | `contrato/test/simulador.test.ts:102,268`; `api/test/rotas/simulador-sugerir.test.ts:192-213` (422 no campo `aptos`, sem apelido nem id) | ✅ |
-| SIM-57 | `orcamento.test.ts:35-36` afirma `< LIMIAR_EFETIVO_MS` = **15 ms**, não 4 ms; medi 2×11 com 30 aptos: mediana 1,21, p99 4,46 ms | ⚠️ A-01 |
-| SIM-58 | `pior-entrada.test.ts:104-124` (também 15 ms); medi 60 aptos, 2×11, K ilimitado: mediana **7,78**, p99 17,3 ms | ❌ A-01 |
-| SIM-59 | `pior-entrada.test.ts:87` (composição válida); o teto de 200 trocas não é fixado por teste (mutantes M4, M5) | ⚠️ A-03 |
-| SIM-60 | `simulador-sugerir.test.ts:252-261` (`toEqual` exato da linha de log e sem id, apelido, grupo) | ✅ |
-| SIM-61 | sem medição na prévia nem `Evidência`: T42 e T43 estão `[x]` sem registro | ❌ A-05 |
-| SIM-62, 63 | `avaliar.test.ts:79-149`; `simulador-avaliar.test.ts` (rota) | ✅ |
-| SIM-64 a 66 | `simulador-mover.test.tsx:22` (300 ms, uma chamada), `simulador-acoes.test.tsx:99`; `e2e/simulador.spec.ts:206,225` | ✅ |
-| SIM-67 a 72, 87 | `escalacao.test.ts:81-139`; `escalacoes-confirmar.test.ts:159` (1 linha, 2 eventos), `:195`, `:220` (gatilho `RAISE` desfaz a escalação), `:263` (2 conexões, sem 23505); `rotas/escalacoes.test.ts:177-230` | ✅ |
-| SIM-68 | `api/test/sessao/recurso.test.ts:151,173` (hoje a trava é a do plano, feature 7; a spec ainda diz "libera todo grupo") | ✅ (spec velha) |
-| SIM-73, 74, 93 | `simulador-acoes.test.tsx:23`; `simulador-resultado-dois.test.tsx:66-99`; `rotas/escalacoes.test.ts:255` (409 `grupo_arquivado`, nada gravado); `e2e/simulador.spec.ts:247` | ✅ |
-| SIM-75 a 78, 88, 94 | `partidas-pre-marcada.test.ts:138,159`; `escalacoes-ler.test.ts:124,204`; `e2e/simulador.spec.ts:317-327` (J-24) | ✅ |
-| SIM-79 a 83 | `isolamento/rotas.test.ts:796,928`; matriz `banco/escalacoes-rls.test.ts:66-232` (SELECT 4, INSERT 4, UPDATE 4 com e sem `WHERE` e mover para B, DELETE 3; `eventos_uso` mantida da `partidas-e-ranking`, não reaberta); `rotas/simulador-dados-pessoais.test.ts:202,231` | ✅ |
-| SIM-84, 86 | `test/app/rotas-simulador.test.tsx:24-30`; `simulador-resultado-dois.test.tsx:18` | ✅ |
-| SIM-85 | `pnpm --filter @pelada/web visual`, 2 rodadas iguais: reprovam t12 tres-times-celular (1,27%), t12 insuficiente (PC 444x155 × 444x264; celular), t13 recalculando, erro-recalcular, erro-confirmar e trocar (PC e celular) | ❌ A-04 |
-| SIM-95 | `indicadores-varios.test.ts:31`; `simulador-entradas.test.tsx:71` ("sem ano") | ✅ |
+| SIM-53, 34, 59 (AD-128) | `contrato/test/simulador.test.ts` (41 recusados, 40 aceitos), `varios-inicial.test.ts` (`montar(aptos(41))` lança), `distribuicao-varios.test.ts` (40 aptos, 20 times) | ✅ (spec ainda diz 60: vale a AD) |
+| SIM-57, 58 | `orcamento.test.ts:36-37`, `pior-entrada.test.ts:104-124`: `toBeLessThan(LIMIAR_EFETIVO_MS)` = 10 (`medir.ts:41`); 3 rodadas seguidas verdes com 40 aptos sob carga | ✅ (spec ainda diz 4 ms: vale a AD) |
+| SIM-28, 36 | `teto-trocas.test.ts:12,16`: `toBe(200)` | ✅ |
+| SIM-79 | `escalacoes-ler.test.ts:192-193`: `porData` e `idsNaData` do grupo sem escalação dão `null` com a mesma conta em dois grupos | ✅ |
+| SIM-67, 76 | `escalacao.test.ts:204,213,222`: 422 em `composicao` (2 times vazios, 3+ sem times, 3+ com time vazio); `rotas/escalacoes.test.ts:205`: 422 e a linha da data não muda | ✅ |
+| SIM-69, 81 | `escalacoes-rls.test.ts:142,154`: INSERT e UPDATE com `confirmada_por` da conta B dão `42501`; upsert com a própria conta passa (`:156-169`); e2e J-22 confirma com 201 | ✅ |
+| SIM-14 | `simulador-previa.test.tsx:85-93`: data `""` e botão `disabled` | ✅ |
+| SIM-37 | `avaliar.test.ts:185,197`: `incompleto: 0` e `incompleto: 5` depois de mover | ✅ |
+| SIM-64, 46 (AD-129) | `simulador-mover.test.tsx:174`: `confirmar().disabled` é `true` durante o recálculo e volta a `false`; `previas-chave.test.tsx:28-40`: primeiro render da chave nova é `calculando` | ✅ |
+| SIM-82 | `indicadores-varios.test.ts:46-50`: `idadeMedia` nula com um só ano | ✅ |
+| SIM-85 | visual: 36 de 36 em até 1% (limite de `visual.mjs` intacto; `telas.json` só mudou os estados T12/T13 do simulador) | ✅ |
 
 ## Achados
 
-| ID | `arquivo:linha` | Achado e evidência | Correção sugerida | Criticidade | Situação |
-|---|---|---|---|---|---|
-| A-01 | `backend/dominio/test/simulador/medir.ts:46`, `orcamento.test.ts:~31` | O limiar de CPU passou de 4 ms para 15 ms (7bd60ff6, "aprovado pelo usuário") sem AD, sem `SPEC_DEVIATION` e fora de `## Autorizações`; os títulos ainda dizem "4 ms". 15 ms está acima do teto de 10 ms do Worker, então SIM-57/58 não protegem mais nada. A pior entrada válida (60 aptos, 2×11) tem mediana 7,78 ms em Node quente (solo), perto de 10 ms: risco real de 1102. O Delta 9 mandava parar e perguntar o teto de avaliações em vez de subir o limiar | Registrar a decisão (AD) e perguntar ao usuário: teto de avaliações (SIM-59), limiar de 10 ms ou limite menor de aptos; renomear os testes (nome diz 4 ms, a asserção 15 ms) | crítica | aberto |
-| A-02 | `backend/api/src/infraestrutura/db/repositorios/escalacoes.ts:100` | Mutante M6: sem `.where('grupo_id', '=', grupoId)` em `porData` os 11 testes de `escalacoes-ler.test.ts` seguem verdes. A RLS só separa contas; um admin de dois grupos leria a escalação do outro na mesma data (pré-marcação errada e `preMarcadaPelaEscalacao` falso positivo) | Teste com a mesma conta em dois grupos com escalação na mesma data (`porData`, `idsNaData` e `GET partidas/nova`) | crítica | aberto |
-| A-03 | `backend/dominio/src/simulador/distribuicao-dois.ts:20` e `distribuicao-varios.ts:14` | Mutantes M4 e M5: trocar `200` por `20` não derruba `distribuicao-*.test.ts`, `referencia.test.ts` nem `sugerir.test.ts`; SIM-28 e SIM-36 dizem 200 e só o teto injetado é testado (a paridade com o legado depende do 200) | Teste que fixa as constantes ou uma entrada que bate no teto de 200 e confere a composição | crítica | aberto |
-| A-04 | `.specs/mockup/telas.json`, `frontend/web/src/telas/simulador/*` | SIM-85 reprovado (11 comparações, ver tabela); `Gate:` dizia "Playwright não rodado". As alturas diferem (ex.: t13 trocar 572 × 1196), não é ruído | Ajustar as telas ou o mockup das 5 telas e rodar `visual` até 0 reprovadas | crítica | aberto |
-| A-05 | `.specs/features/simulador/tasks.md:1479,1506` | T42 e T43 (e a `Evidência` de T19/T20) estão `[x]` sem data, dump, contagens nem p99; SIM-61 exige o registro no `validation.md` e a migração `1792844940000_grupo-criar-contrair.sql` exige o ensaio antes do deploy (AD-033) | Registrar a evidência ou reabrir as tarefas; medição e ensaio dependem do usuário | crítica | aberto |
-| A-06 | `.env.example:121`, `README.md:109` | O commit 97ecbea9 acrescentou `PELADA_E2E_PORTA` ao `.env.example` sem citar no README: `test/readme.test.ts` (FUN-51) reprova e o `pnpm test` da raiz fica vermelho | Citar `PELADA_E2E_PORTA` na tabela do README | comum | aberto |
-| A-07 | histórico `13f63d1b`…`ede0d0cb` | Amostra de 3 commits do `dominio`: o do meio (8fa9ddb4) não fecha o `typecheck` (`src/index.ts:160` `EntradaRanking` duplicado; `distribuicao-dois.test.ts:4` importa `Limite` não exportado). Varredura dos 18: 11 não fecham (13f63d1b a ede0d0cb); primeiro e último fecham | Não se reescreve histórico: aceitar e registrar no `STATE.md` | crítica | aberto |
-| A-08 | `backend/api/test/banco/escalacoes-rls.test.ts:19`, `backend/api/src/entrada/rotas/partidas.ts:54` | Comentário velho (diz que o slug lê a escalação; a migração AD-122 já fechou); `[LACUNA] … O /executar confirma` sem resposta (escalação válida sem ativo na data marca `true`); SIM-68 da spec desatualizada pela feature 7 | Atualizar os comentários e a spec | comum | aberto |
-| A-09 | `frontend/web/src/telas/simulador/PaginaSimulador.tsx:121-124`, `PreviaSimulador.tsx:24` | Data apagada no campo (`""`) deixa "Sugerir times" ativo; a API responde 422 no campo `data` e a tela mostra erro genérico que "Tentar de novo" repete | Desabilitar o botão sem data completa (`dataCompletaNoCampo`) e/ou mostrar o erro do campo; teste de tela | comum | aberto |
-| A-10 | `backend/dominio/src/simulador/avaliar.ts:117-121`, `ResultadoVariosTimes.tsx:~85` | `incompleto = times.length - 1` fixo: com 9 aptos, N=4 (4/4/1), mover o jogador do Time 3 para o Time 1 dá 5/4/0 e o Time 3 segue "Incompleto (0 de 4)" | Derivar `incompleto` do tamanho real dos times; teste de domínio e de tela | comum | aberto |
-| A-11 | `backend/contrato/src/escalacao.ts:36-58`, `rotas/escalacoes.ts:34-47`, `repositorios/escalacoes.ts:~108` | `POST /escalacoes` aceita composição vazia, `times: []`, 60 times vazios e data 1900-01-01 (201): a escalação vazia substitui a válida da data e `GET partidas/nova` devolve `preMarcadaPelaEscalacao: true` com todos ausentes, contra SIM-76; cada confirmação gera evento de uso (SEC-002) | Recusar composição sem jogador, time vazio, teto de times e piso de data (422 em `composicao`); testes por ramo | crítica | aberto |
-| A-12 | `frontend/web/src/dados/previas.ts:36-58`, `MoverJogador.tsx:~178-181` | Do 2º ajuste em diante a tela mostra por um ciclo a composição anterior (estado `pronta` sem chave): o "aparece na hora" da SIM-64 não vale | Guardar a chave do corpo na resposta e só usar `pronta` quando bate; teste de tela | comum | aberto |
-| A-13 | `backend/contrato/src/simulador.ts:209-213`, `avaliar.ts:106-122`, `indicadores-varios.ts:37` | SEC-001: com um time por jogador a idade média do time é a idade do jogador, contra o texto de SIM-82 (impacto hoje nulo: o admin já vê o ano na ficha) | Omitir idade média de time com menos de 2 jogadores com ano, ou registrar AD | comum | aberto |
-| A-14 | `backend/api/src/infraestrutura/db/migracoes/1792843320000_rls.sql:51-56` | SEC-003: o banco não amarra `escalacoes.confirmada_por` à conta da sessão (provado em transação desfeita) | Migração aditiva: policy `RESTRICTIVE ... WITH CHECK (confirmada_por = app_conta_id())` com teste por comando | crítica | aberto |
-| A-15 | `1792844700000_eventos-uso.sql:61`, `1792843260000_roles.sql:30-32` | SEC-004 e SEC-006: conta com vínculo insere qualquer tipo em `eventos_uso`; `pelada_app` tem DELETE em `escalacoes` sem rota (a spec e a matriz SIM-79 contam o DELETE) | Decisão do usuário: restringir por migração aditiva ou aceitar com AD | comum | aberto |
-| A-16 | `backend/api/src/entrada/corpo.ts:29-37` | SEC-005: sem limite de tamanho do corpo antes do Zod (projeto todo, não só o simulador) | `bodyLimit` ~64 KB (413) ou registrar como dívida do projeto | comum | aberto |
+| ID | `arquivo:linha` | Verificação | Criticidade | Situação |
+|---|---|---|---|---|
+| A-01 | `medir.ts:41`, `varios-inicial.ts:12`, `contrato/simulador.ts:12` | 40 aptos e limiar de 10 ms (AD-128); títulos dizem 10 ms; M8a e M8b mortos | crítica | fechado |
+| A-02 | `escalacoes-ler.test.ts:185-200` | M2 (sem `.where('grupo_id')` em `porData`) reprova 1 teste | crítica | fechado |
+| A-03 | `teto-trocas.test.ts:12,16` | M1 e M1b (`200` vira `20`) mortos | crítica | fechado |
+| A-04 | `telas.json`, `AcoesResultado.tsx:68-73` | visual 0 reprovadas; AD-129/130 conferidas; M5 (tirar `disabled`) morto | crítica | fechado |
+| A-05 | `tasks.md` T42 e T43 | reabertas com a pendência escrita; aceita pelo usuário (SIM-61 e dump seguem sem prova) | crítica | fechado (pendência aceita) |
+| A-06 | `README.md` | `test/readme.test.ts` (FUN-51) verde | comum | fechado |
+| A-07 | histórico | aceito na AD-131(a); HEAD fecha o typecheck | crítica | fechado (aceito) |
+| A-08 | `partidas.ts:54`, `escalacoes-rls.test.ts:5-21`, `spec.md:273` | comentários e nota da spec atualizados | comum | fechado |
+| A-09 | `PaginaSimulador.tsx:255` | M10 morto | comum | fechado |
+| A-10 | `avaliar.ts:88-95,119-123` | M7 (`times.length - 1`) morto; sem teste de tela nem de rota do `incompleto` movido (só domínio) | comum | fechado |
+| A-11 | `escalacao.ts:21-37` | M4a a M4d mortos, um por ramo | crítica | fechado |
+| A-12 | `previas.ts:36-80` | M9 morto | comum | fechado |
+| A-13 | `indicadores-varios.ts:38` | M6 (`>= 1`) morto | comum | fechado |
+| A-14 | `1794004229184_...sql:8-11` | M3 (`WITH CHECK (true)`) reprova INSERT e UPDATE; matriz política × comando intacta | crítica | fechado |
+| A-15, A-16 | `1792844700000_eventos-uso.sql:61`, `corpo.ts:29-37` | dívida aceita (AD-131 b, c) | comum | fechado (aceito) |
+| A-17 | `varios-inicial.ts:38` ("acima de 60"), `pior-entrada.test.ts:20,22` e `distribuicao-varios.ts:106` ("4 ms"), `escalacao.ts:21` | comentários de limite velhos depois da AD-128; a mensagem "em cada time" vale só para 3+ (em 2 times o teste `escalacao.test.ts:225` aceita time vazio se houver "não entra", coerente com SIM-75). Só texto, não bloqueia. Fechado depois da R2: comentários e mensagem de `escalacao.ts` atualizados; guarda de idade também em `indicadores-dois.ts` (SEC-001) com teste; resíduos de SEC-001/SEC-002 aceitos na AD-131 (d) | comum | fechado |
 
 ## Lacunas e o que não foi validado
 
-- Falhas de ambiente verificadas: `push-backup` (2): `pg_dump` 16.15 contra servidor 18.6 ("server version mismatch"); `push-cpu` (1): medidas 47, 63, 94, 94, 141 ms são múltiplos de 15,6 ms, o relógio do Windows, não custo real. O ambiente não deixa provar nenhum dos dois; não são achados do simulador.
-- Mutantes: M1 desempate por id e M2 `vespera` (prioridade), M3 `min(K, N)`, M7 `Random`, M8 `MAX_APTOS` 61, M9 troca sem ganho, M10 chave invertida, M11 sem upsert, M12 sem evento, M13 sem checar ativos, M14 sem trava de recurso, M15 RLS `USING (true)`, M16 `anoNascimento` na resposta: todos mortos. Vivos: M4, M5 (A-03), M6 (A-02) e M17 (`historico.carregar` até a data em vez da véspera na rota, **equivalente**: o domínio já filtra pela véspera).
-- Não validado: SIM-61 (prévia publicada, ação externa), ensaio sobre dump da produção (T42), esperado do legado (fora da worktree), segurança e revisão de código (outros agentes). Cópia isolada e junções descartadas.
+- Mutantes vivos: M1c (`maxTrocas = 20` no parâmetro padrão: o teto de 200 só é provado como constante e, por injeção, como mecanismo, SIM-92; nenhuma entrada dos testes chega a 20 trocas) e M7b (empate entre dois times incompletos: a spec não define a regra, lacuna de precisão; o código fica com o último). M7c (`<= n`) é equivalente: sempre há um time abaixo de N.
+- Aparência: o recorte de `t13-recalculando` trocou `.barra-acao` por `.cartao-time` (AD-130); o botão desabilitado fica provado só pelo teste de tela (M5), não pela comparação visual.
+- Não validado, por decisão do usuário: SIM-61 (prévia publicada) e o ensaio sobre o dump (T42, T43); esperado do legado (SIM-52, fora da worktree, não reconferido).
+- Falhas de ambiente com causa verificada, sem achado: `push-backup` (`pg_dump` 16 contra servidor 18) e `push-cpu` (relógio do Windows em passos de 15,6 ms).

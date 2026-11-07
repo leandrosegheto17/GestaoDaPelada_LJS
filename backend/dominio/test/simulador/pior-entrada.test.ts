@@ -17,9 +17,9 @@ import { LIMIAR_EFETIVO_MS, medir } from './medir.ts';
  * - 3 ou mais com N = 2: 20 times de 2 (a maior vizinhança de 3 ou mais: 190 pares de times).
  * - 3 ou mais com N = 7, 8, 9 e 11: com incompleto.
  *
- * Se algum p99 passar de 4 ms, a tarefa para e pergunta o teto de avaliações (Delta 9 do tasks.md): o teto muda a
+ * Se algum p99 passar de 10 ms (AD-128), a tarefa para e pergunta o teto de avaliações (Delta 9 do tasks.md): o teto muda a
  * sugestão em relação ao legado (SIM-52). Evidência (registrar na T20, pelo /executar): a pior combinação e o tempo
- * dela, impressos abaixo; teto de avaliações [A ESCLARECER: só se a medição passar de 4 ms].
+ * dela, impressos abaixo; teto de avaliações [A ESCLARECER: só se a medição passar de 10 ms].
  */
 
 const APTOS = aptosGrandes(MAX_APTOS_SIMULADOR);

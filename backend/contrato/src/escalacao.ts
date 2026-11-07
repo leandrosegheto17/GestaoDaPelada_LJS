@@ -19,7 +19,7 @@ import {
  */
 
 export const MENSAGEM_COMPOSICAO_VAZIA =
-  'A composição precisa ter ao menos um jogador em cada time.';
+  'A composição precisa ter jogadores (em 3 ou mais times, nenhum time pode ficar vazio).';
 
 /**
  * Composição sem nenhum jogador, ou com time vazio em 3 ou mais, não é escalação (A-11): gravá-la trocaria a escalação

@@ -35,7 +35,7 @@ export function ordenarTimes(times: readonly (readonly string[])[], elenco: Elen
 
 /**
  * Monta os times. A ordem da entrada não influi: os aptos são ordenados por nível e id antes do vaivém. Aptos
- * insuficientes ou acima de 60 são erro de programação: a prévia e o contrato recusam antes (SIM-53, SIM-56).
+ * insuficientes ou acima de 40 (AD-128) são erro de programação: a prévia e o contrato recusam antes (SIM-53, SIM-56).
  */
 export function montarVariosTimes(elenco: Elenco, n: number): VariosTimes {
   const jogadores = [...elenco.values()];

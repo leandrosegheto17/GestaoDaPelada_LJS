@@ -71,7 +71,8 @@ export function indicadoresDoTime(
     nivelMedio1oTempo: mediaInteira(nivel1, titulares.length),
     nivelSoma2oTempo: nivel2,
     nivelMedio2oTempo: mediaInteira(nivel2, segundoTempo.length),
-    idadeMedia: mediaInteira(100 * somaIdade, comAno),
+    // Com um só jogador com ano a média seria a idade dele (SIM-82, SEC-001): só vale com dois ou mais.
+    idadeMedia: comAno >= 2 ? mediaInteira(100 * somaIdade, comAno) : null,
     substituicoes: pares.length,
     saem,
     pares,
