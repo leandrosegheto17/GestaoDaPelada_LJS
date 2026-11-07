@@ -406,6 +406,36 @@ describe('assinar: teto por conta (A-17)', () => {
   });
 });
 
+describe('assinar: teto por conta só conta a conta e a última hora (A-18)', () => {
+  it('PLA-60: 9 recentes da conta, 1 de 2 horas atrás e 1 recente de outra conta no mesmo grupo ainda deixam assinar', async () => {
+    const { url, cenario } = aberto;
+    await comDb(url, cenario.contaB, async (db) => {
+      await sql`RESET ROLE`.execute(db);
+      for (let i = 0; i < TETO_ASSINATURAS_POR_HORA_CONTA - 1; i += 1) {
+        await sql`INSERT INTO assinaturas (grupo_id, asaas_cliente_id, asaas_assinatura_id, valor_centavos, situacao,
+            criada_por, criada_em)
+          VALUES (${h2}, 'cus_a18', ${`sub_a18_${i}`}, 990, 'cancelada', ${cenario.contaB}, now() - interval '10 minutes')`.execute(
+          db,
+        );
+      }
+      await sql`INSERT INTO assinaturas (grupo_id, asaas_cliente_id, asaas_assinatura_id, valor_centavos, situacao,
+          criada_por, criada_em)
+        VALUES (${h2}, 'cus_a18', 'sub_a18_velha', 990, 'cancelada', ${cenario.contaB}, now() - interval '2 hours')`.execute(
+        db,
+      );
+      await sql`INSERT INTO assinaturas (grupo_id, asaas_cliente_id, asaas_assinatura_id, valor_centavos, situacao,
+          criada_por, criada_em)
+        VALUES (${h2}, 'cus_a18', 'sub_a18_alheia', 990, 'cancelada', ${cenario.contaC}, now() - interval '10 minutes')`.execute(
+        db,
+      );
+      await sql`SET ROLE pelada_app`.execute(db);
+      expect((await assinar(db, asaas, pedido(cenario.grupoH, cenario.contaB))).resultado).toBe(
+        'criada',
+      );
+    });
+  });
+});
+
 describe('assinar: grupo de cortesia (A-04)', () => {
   it('PLA-02: grupo uso_proprio responde grupo_cortesia, sem chamar o Asaas e sem gravar', async () => {
     const { url, cenario } = aberto;

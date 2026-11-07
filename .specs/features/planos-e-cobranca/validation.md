@@ -1,6 +1,6 @@
-# Planos e cobrança: Validação (rodada 2, retrabalho R1)
+# Planos e cobrança: Validação (rodada 3, retrabalho R1)
 
-**Data**: 2026-11-06 | **Spec**: `.specs/features/planos-e-cobranca/spec.md` | **Escopo**: `git diff d06e52f4^ HEAD` (T58 a T70, commits `16d0788b`, `3583c97f`, `9286663e`, `1fbee8fb`) mais regressão | **Árvore**: `66e8e95d` | **Verificador**: independente | **Veredito**: FAIL ❌ (A-01 a A-14 fechados; 1 achado comum de processo aberto: A-16)
+**Data**: 2026-11-06 | **Spec**: `.specs/features/planos-e-cobranca/spec.md` | **Escopo**: rodada 3 = `git diff 66e8e95d..HEAD` (T71, A-17, SEC-007, `87d4d8e1`, `1485d94c`) mais regressão; rodada 2 = `git diff d06e52f4^ HEAD` (T58 a T70) | **Árvore**: `fae49606` (HEAD `1485d94c`; código idêntico ao de `87d4d8e1`) | **Verificador**: independente | **Veredito**: FAIL ❌ (A-16 e A-17 fechados; 1 achado novo, A-18: mutantes vivos no teto por conta)
 
 A rodada 1 (72 de 74 critérios conformes, A-01 a A-15) está no git (`d06e52f4`). A-15 é risco aceito (AD-128), fora do retrabalho. Aqui só o diff do retrabalho. Caminhos: A=`backend/api`, C=`backend/contrato`, W=`frontend/web`.
 
@@ -38,8 +38,22 @@ A rodada 1 (72 de 74 critérios conformes, A-01 a A-15) está no git (`d06e52f4`
 
 lint, format, typecheck, checagens 134/134, build do web; contrato 570, dominio 668, scripts, web 1062/1063 (SIM-15 só por tempo sob carga, passa isolado), api 3663/3667 (push-backup x2 e push-cpu: pendências aceitas em `tasks.md:7`; FUN-08 corrigido depois), e2e 72/74 (2 de `pdf-visual` PAR-108, idênticas na `main` `f9801ec0`: pré-existente). Reconfirmado por mim na cópia limpa: contrato 30/30 (plano e sentry), api banco 84/84 nos 6 arquivos tocados, api worker 42/42 nos 3 arquivos de rota, web 16/16.
 
+## Rodada 3 (escopo curto)
+
+| ID | Evidência | Situação |
+|---|---|---|
+| A-16 | `tasks.md:299` (Phase 22) traz `Gate: lint, format, typecheck, vitest por pacote, checagens e build do web @ df3213e0… = verde, com pendências aceitas (…)`. `git rev-parse 87d4d8e1^{tree}` = `df3213e0…` (commit de código do lote; `git diff 87d4d8e1 HEAD` só tem `tasks.md`). Resultado conferido por mim: api banco 148/148 (aplicacao, asaas, concorrencia) e 53/53 nos 2 arquivos tocados, api worker 42/42 (assinatura, plano, webhook-asaas), contrato 570/570, checagens 134/134, FUN-08 (`esquema.test.ts`) 4/4, `tsc --noEmit` do api verde | fechado |
+| A-17 | `A/test/aplicacao/assinar.test.ts:371,390` (PLA-60: 10 da conta em outro grupo: `{resultado:'muitas_tentativas'}` e `asaas.chamadas` `[]`; 9: `'criada'`); `A/test/infraestrutura/asaas.test.ts:333` `toHaveBeenCalledWith(…, objectContaining({redirect:'error'}))`. Cenário compartilhado intacto: `assinar.test.ts` 22/22, rotas 42/42 | fechado (com A-18 em aberto) |
+
+**Sensor da rodada 3** (cópia `val3-mut-planos`, junções, só o teste do arquivo; 6 mutações): M1 checagem por conta anulada (a condição por conta em `assinar.ts` vira `false`): 1 falha, morta. M3 `>` no lugar de `>=` no teto por conta: 1 falha, morta. M2 `redirect:'error'` removido (`cliente.ts:139`): 1 falha, morta. M2b `redirect:'follow'`: 1 falha, morta. **M4** contagem sem `criada_por` (`assinaturas.ts:164`, conta de todos): 22/22, **sobrevive**. **M5** janela da conta de 1 dia (`assinaturas.ts:164`): 22/22, **sobrevive**. Nenhum dos dois é equivalente: M5 bloquearia a conta por um dia; M4 (parcial: a RLS do `pelada_app` esconde parte das linhas alheias, mas não as do mesmo grupo) bloquearia por assinaturas de outras contas. O teto por grupo tem o par que falta (`assinar.test.ts:359` com `now() - interval '2 hours'`). Cópia removida, `git status --porcelain` vazio, nenhum banco ou role `teste_*` em 5447.
+
+## Resumo das rodadas
+
+- R1 (72/74 critérios; A-01 a A-15; A-15 risco aceito, AD-128): `d06e52f4`. R2: A-01 a A-14 fechados, 17 mutações mortas. R3: A-16 e A-17 fechados; SEC-007 corrigido; SEC-005 de banco é risco aceito na AD-128 (decisão do usuário, mesmo tipo do A-15); A-18 novo.
+- Gate completo (árvore `df3213e0`, rodado pelo chamador): reaproveitado, não repetido.
+
 ## Achados abertos
 
 | ID | `arquivo:linha` | Achado e evidência | Correção sugerida | Criticidade |
 |---|---|---|---|---|
-| A-16 | `.specs/features/planos-e-cobranca/tasks.md:7` | O `Gate:` do topo segue na árvore `abc17b49` (rodada 1) e nenhuma linha `Gate: <comando> @ <árvore> = <resultado>` registra o lote Retrabalho R1 (`git diff d06e52f4^ HEAD -- tasks.md` só marca `[x]` e `Status`). O verificador não tem o que reaproveitar | Registrar `Gate: … @ <árvore> = <resultado>` (com as pendências aceitas) num commit de fechamento do lote | comum |
+| A-18 | `backend/api/test/aplicacao/assinar.test.ts:371-408`, `backend/api/src/infraestrutura/db/repositorios/assinaturas.ts:164` | O teto por conta só tem teste de contagem (10 bloqueia, 9 passa, todas com `criada_por` da conta e a 10 min). M4 (sem `criada_por`) e M5 (`interval '1 day'`) sobrevivem com 22/22. Falta o par do teto por grupo: linhas de 2 h atrás e linhas de outra conta no mesmo grupo não contam | No `describe` A-17, acrescentar: 9 recentes da conta mais 1 de 2 h atrás e 1 de outra conta, ainda `criada`; teste deve morrer com M4 e M5 | crítica (mutante vivo em isolamento por dono e janela do teto de cobrança) |

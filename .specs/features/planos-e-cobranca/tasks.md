@@ -300,10 +300,10 @@ T56 → T57
 
 
 ```
-T58 → T59 → T60 → T61 → T62 → T63 → T64 → T65 → T66 → T67 → T68 → T69 → T70 → T71
+T58 → T59 → T60 → T61 → T62 → T63 → T64 → T65 → T66 → T67 → T68 → T69 → T70 → T71 → T72
 ```
 
-### Phase 23: Retrabalho R2 (crítica, 1h)
+### Phase 23: Retrabalho R2 (crítica, 1,5h)
 
 ```
 T71
@@ -2168,6 +2168,28 @@ T71
 
 - [x] Teste: 10 assinaturas da conta em outro grupo bloqueiam o grupo sem nenhuma; 9 deixam assinar
 - [x] Teste: a chamada ao Asaas leva `redirect: 'error'`
+- [x] Gate passa, sem teste removido ou enfraquecido
+
+**Tests**: unit
+**Gate**: quick
+
+---
+
+### T72: Teste do teto por conta que mata o filtro de conta e a janela (A-18)
+
+**What**: Teste em `assinar.test.ts` com 9 assinaturas recentes da conta, 1 de 2 horas atrás e 1 recente de outra conta no mesmo grupo, que ainda deixa assinar; tem de morrer sem o `criada_por` e com a janela de 1 dia.
+**Estimativa**: 30 min
+**Risco**: alto
+**Domínio**: não
+**Criticidade**: crítica
+**Depends on**: T71
+**Reuses**: `assinar.test.ts:359` (par do teto por grupo)
+**Requirement**: PLA-60 · Achado: A-18 (validation.md)
+**Status**: concluída
+
+**Done when**:
+
+- [x] Teste novo passa com o código atual e falha com os dois mutantes (sem `criada_por`; janela de 1 dia)
 - [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
