@@ -82,6 +82,16 @@ function sugerir() {
 }
 
 describe('Simulador: prévia (t12)', () => {
+  it('SIM-14 (A-09): com a data apagada "Sugerir times" fica desabilitado, mesmo com a prévia válida', async () => {
+    abrir(() => json(200, VALIDA));
+    expect(await screen.findByText('2 times de 7 · 5 reservas')).toBeDefined();
+    expect(sugerir().disabled).toBe(false);
+    const data = screen.getByLabelText('Data da partida') as HTMLInputElement;
+    fireEvent.change(data, { target: { value: '' } });
+    await waitFor(() => expect(data.value).toBe(''));
+    expect(sugerir().disabled).toBe(true);
+  }, 15_000);
+
   it('SIM-15: três mudanças rápidas de N fazem uma chamada só, com o último valor', async () => {
     const t = abrir(() => json(200, VALIDA));
     await screen.findByLabelText('Jogadores por time');

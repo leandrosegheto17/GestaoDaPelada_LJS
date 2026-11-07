@@ -51,8 +51,8 @@ import { agendarAviso } from '../../infraestrutura/fila/avisos.ts';
  * Pré-marcação pela escalação (simulador T38; SIM-75, SIM-76, SIM-78, SIM-88): com escalação válida na data, os
  * ativos que estão nela vêm `presente` e os demais `ausente`, com `preMarcadaPelaEscalacao` verdadeiro; sem escalação
  * ou com escalação inválida (SIM-94), todos `ausente` e falso. A edição (`GET …/partidas/:data`) não muda (SIM-78).
- * [LACUNA] escalação válida em que nenhum id é ativo na data: a Base não diz; aqui a marca fica verdadeira (a escalação
- * existe) com todos `ausente`. O /executar confirma.
+ * Escalação válida em que nenhum id é ativo na data (só acontece se todos os escalados forem inativados depois da
+ * confirmação): a marca fica verdadeira (a escalação existe) com todos `ausente` (decisão da validação, A-08).
  */
 
 /**

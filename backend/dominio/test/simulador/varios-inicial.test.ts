@@ -82,7 +82,7 @@ describe('montarVariosTimes', () => {
     expect(() => montar(aptos(8), 4)).toThrow(RangeError);
   });
 
-  it('SIM-34: mais de 60 aptos lança', () => {
-    expect(() => montar(aptos(61), 4)).toThrow(RangeError);
+  it('SIM-34: mais de 40 aptos lança', () => {
+    expect(() => montar(aptos(41), 4)).toThrow(RangeError);
   });
 });

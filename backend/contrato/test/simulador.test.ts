@@ -265,15 +265,15 @@ describe('sugerirCorpo', () => {
     expect(Object.keys(mensagens(sugerirCorpo.safeParse(semK)))).toEqual(['k']);
   });
 
-  it('SIM-53: 61 aptos são recusados com "Há jogador repetido nos aptos." no campo aptos', () => {
-    const aptos = Array.from({ length: 61 }, (_, i) => ({ id: u(i + 1), so1oTempo: false }));
+  it('SIM-53: 41 aptos são recusados com "Há jogador repetido nos aptos." no campo aptos', () => {
+    const aptos = Array.from({ length: 41 }, (_, i) => ({ id: u(i + 1), so1oTempo: false }));
     expect(mensagens(sugerirCorpo.safeParse({ ...SUGERIR_DOIS, aptos }))).toEqual({
       aptos: [MENSAGEM_APTOS_REPETIDO],
     });
   });
 
-  it('SIM-53: 60 aptos são aceitos', () => {
-    const aptos = Array.from({ length: 60 }, (_, i) => ({ id: u(i + 1), so1oTempo: false }));
+  it('SIM-53: 40 aptos são aceitos', () => {
+    const aptos = Array.from({ length: 40 }, (_, i) => ({ id: u(i + 1), so1oTempo: false }));
     expect(sugerirCorpo.safeParse({ ...SUGERIR_DOIS, aptos }).success).toBe(true);
   });
 

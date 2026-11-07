@@ -2073,7 +2073,7 @@ T71
 **Depends on**: T66
 **Reuses**: molde do próprio arquivo; achado em `validation.md`
 **Requirement**: PLA-09, PLA-13 · Achado: A-10 (validation.md)
-**SPEC_DEVIATION**: só o lado da API foi feito (`faturaUrl` só para a criadora); a restrição da policy `assinaturas_ler` ficou na AD-128 (a convidada lê a situação da assinatura pela RLS em Meu plano).
+**SPEC_DEVIATION**: só o lado da API foi feito (`faturaUrl` só para a criadora); a restrição da policy `assinaturas_ler` ficou na AD-132 (a convidada lê a situação da assinatura pela RLS em Meu plano).
 **Status**: concluída
 
 **Done when**:
@@ -2154,7 +2154,7 @@ T71
 
 ### T71: Teto de assinaturas por conta e sem redirecionamento no Asaas (A-17, SEC-007)
 
-**What**: `assinar` também recusa (`muitas_tentativas`) quando a conta abriu 10 assinaturas na última hora somando todos os grupos; o cliente do Asaas passa `redirect: 'error'`; a AD-128 registra o SEC-005 de banco, o ajuste do SEC-003 e a T67 leva `SPEC_DEVIATION`.
+**What**: `assinar` também recusa (`muitas_tentativas`) quando a conta abriu 10 assinaturas na última hora somando todos os grupos; o cliente do Asaas passa `redirect: 'error'`; a AD-132 registra o SEC-005 de banco, o ajuste do SEC-003 e a T67 leva `SPEC_DEVIATION`.
 **Estimativa**: 1h
 **Risco**: alto
 **Domínio**: não

@@ -3,6 +3,7 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from
 import {
   escalacaoResposta,
   MENSAGEM_APTOS_INATIVOS,
+  MENSAGEM_COMPOSICAO_VAZIA,
   MENSAGEM_REPETIDO_NA_COMPOSICAO,
 } from '@pelada/contrato';
 import { criarApp } from '../../src/entrada/app.ts';
@@ -183,6 +184,36 @@ describe('POST …/escalacoes', () => {
       mensagens: { composicao: MENSAGEM_REPETIDO_NA_COMPOSICAO },
     });
     expect(await linhas()).toEqual([]);
+  });
+
+  it('SIM-67 (A-11): composição sem nenhum jogador dá 422 no campo composicao e não substitui a escalação da data', async () => {
+    expect((await confirmar(doisTimes())).status).toBe(201);
+    const antes = await linhas();
+    expect(antes).toHaveLength(1);
+    const vazia = {
+      ...doisTimes(),
+      composicao: {
+        times: [
+          { titulares: [], entramNo2oTempo: [] },
+          { titulares: [], entramNo2oTempo: [] },
+        ],
+        naoEntra: [],
+      },
+    };
+    const r = await confirmar(vazia);
+    expect(r.status).toBe(422);
+    expect(await r.json()).toMatchObject({ mensagens: { composicao: MENSAGEM_COMPOSICAO_VAZIA } });
+    expect(await linhas()).toEqual(antes);
+    const semTimes = await confirmar({
+      formato: 'varios_times',
+      data: DATA,
+      n: 2,
+      composicao: { times: [] },
+    });
+    expect(semTimes.status).toBe(422);
+    expect(await semTimes.json()).toMatchObject({
+      mensagens: { composicao: MENSAGEM_COMPOSICAO_VAZIA },
+    });
   });
 
   it('SIM-71: jogador inativo na data dá 422 no campo composicao, sem gravar', async () => {

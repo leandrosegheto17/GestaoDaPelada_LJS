@@ -7,19 +7,19 @@ import { aptosGrandes, DATA, historicoGrande } from './apoio.ts';
 import { LIMIAR_EFETIVO_MS, medir } from './medir.ts';
 
 /**
- * Pior entrada válida e teto da busca (T20; SIM-58, SIM-59). Com 60 aptos (`MAX_APTOS_SIMULADOR`), para todo N de 2 a
- * 11, nos dois formatos e com K ilimitado: `sugerir` e `avaliar` abaixo de 4 ms no p99, e toda combinação devolve
+ * Pior entrada válida e teto da busca (T20; SIM-58, SIM-59). Com 40 aptos (AD-128; eram 60) (`MAX_APTOS_SIMULADOR`), para todo N de 2 a
+ * 11, nos dois formatos e com K ilimitado: `sugerir` e `avaliar` abaixo de 10 ms no p99 (AD-128), e toda combinação devolve
  * composição válida. As 20 combinações × 2 funções medem 20 vezes cada, com 5 de aquecimento.
  *
  * Casos limite (Domínio: sim), listados antes do código:
- * - 2 times com N = 2 e 60 aptos: 4 titulares, 4 reservas e 52 em "não entra" (busca pequena, classificação grande).
+ * - 2 times com N = 2 e 40 aptos: 4 titulares, 4 reservas e 32 em "não entra" (busca pequena, classificação grande).
  * - 2 times com N = 11: 22 titulares e 22 reservas (a maior vizinhança de 2 times).
- * - 3 ou mais com N = 2: 30 times de 2 (a maior vizinhança de 3 ou mais: 435 pares de times).
+ * - 3 ou mais com N = 2: 20 times de 2 (a maior vizinhança de 3 ou mais: 190 pares de times).
  * - 3 ou mais com N = 7, 8, 9 e 11: com incompleto.
  *
- * Se algum p99 passar de 4 ms, a tarefa para e pergunta o teto de avaliações (Delta 9 do tasks.md): o teto muda a
+ * Se algum p99 passar de 10 ms (AD-128), a tarefa para e pergunta o teto de avaliações (Delta 9 do tasks.md): o teto muda a
  * sugestão em relação ao legado (SIM-52). Evidência (registrar na T20, pelo /executar): a pior combinação e o tempo
- * dela, impressos abaixo; teto de avaliações [A ESCLARECER: só se a medição passar de 4 ms].
+ * dela, impressos abaixo; teto de avaliações [A ESCLARECER: só se a medição passar de 10 ms].
  */
 
 const APTOS = aptosGrandes(MAX_APTOS_SIMULADOR);
@@ -101,7 +101,7 @@ describe('pior entrada válida', () => {
     }
   });
 
-  it('SIM-58: as 20 combinações × 2 funções ficam abaixo de 4 ms no p99', () => {
+  it('SIM-58: as 20 combinações × 2 funções ficam abaixo de 10 ms no p99', () => {
     const resultados = COMBINACOES.flatMap(([formato, n]) => {
       const entrada = entradaDe(formato, n);
       const composicao = composicaoDe(sugerir(entrada, HISTORICO));

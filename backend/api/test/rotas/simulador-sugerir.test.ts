@@ -233,8 +233,8 @@ describe('POST …/simulador/sugerir', () => {
     expect(await r.json()).toMatchObject({ campos: expect.arrayContaining(['n']) });
   });
 
-  it('SIM-53: mais de 60 aptos dá 422 no campo aptos', async () => {
-    const muitos = Array.from({ length: 61 }, () => crypto.randomUUID());
+  it('SIM-53: mais de 40 aptos dá 422 no campo aptos', async () => {
+    const muitos = Array.from({ length: 41 }, () => crypto.randomUUID());
     const r = await sugerir(dois(muitos));
     expect(r.status).toBe(422);
     expect(await r.json()).toMatchObject({ campos: expect.arrayContaining(['aptos']) });

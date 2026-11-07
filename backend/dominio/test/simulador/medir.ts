@@ -32,15 +32,10 @@ export function medir(fn: () => unknown, vezes = 50, aquecimento = 10): Medicao 
 export const LIMIAR_MS = 4;
 
 /**
- * Limiar no CI: o runner Linux compartilhado do GitHub mediu p99 de 4,3 a 11,2 ms nas mesmas entradas (2026-11-06), o
- * dobro ou mais do que numa máquina local. Teto de 15 ms no CI (decisão do usuário, 2026-11-06, como no PDF); o limiar
- * de 4 ms vale fora do CI.
+ * O limiar que os testes de CPU usam em qualquer ambiente: 10 ms, o teto de CPU por requisição do Worker Free (AD-128).
+ * A meta de 4 ms do legado (`LIMIAR_MS`) não se sustenta como teste: na máquina de desenvolvimento (Windows) e no runner
+ * do CI o p99 oscila de 4 a 11 ms nas mesmas entradas, só por ruído do relógio e do vizinho. Em vez de afrouxar o teste
+ * para 15 ms (acima do teto do Worker, decisão de 2026-11-06 que a validação reprovou, A-01), a entrada é que ficou
+ * menor: no máximo 40 aptos (`MAX_APTOS_SIMULADOR`), onde o pior caso mede mediana de ~2 ms e p99 de 4 a 8 ms.
  */
-export const LIMIAR_CI_MS = 15;
-
-/**
- * O limiar que os testes de CPU usam em qualquer ambiente: 15 ms. Na máquina local de desenvolvimento (Windows) o p99
- * de 4 ms reprovou 2 de cada 3 rodadas mesmo sem carga (pior caso de 5 a 14 ms, SIM-58); decisão do usuário,
- * 2026-11-06, de valer o teto do CI também fora dele. `LIMIAR_MS` fica como referência do legado.
- */
-export const LIMIAR_EFETIVO_MS = LIMIAR_CI_MS;
+export const LIMIAR_EFETIVO_MS = 10;
