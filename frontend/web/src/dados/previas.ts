@@ -33,9 +33,12 @@ export function usePrevia<T>(
   chave: string,
   atrasoMs = ATRASO_PREVIA_MS,
 ) {
-  const [estado, setEstado] = useState<EstadoPrevia<T>>(
-    pedir ? { tipo: 'calculando' } : { tipo: 'ocioso' },
-  );
+  // Cada estado guarda a chave a que pertence: na troca da chave, antes de o efeito rodar, o estado guardado ainda é o
+  // da chave anterior e não pode aparecer como resposta da nova (A-12).
+  const [guardado, setGuardado] = useState<{ chave: string; estado: EstadoPrevia<T> }>({
+    chave,
+    estado: pedir ? { tipo: 'calculando' } : { tipo: 'ocioso' },
+  });
   const [tentativa, setTentativa] = useState(0);
   const refPedir = useRef(pedir);
 
@@ -46,18 +49,18 @@ export function usePrevia<T>(
   useEffect(() => {
     const atual = refPedir.current;
     if (!atual) {
-      setEstado({ tipo: 'ocioso' });
+      setGuardado({ chave, estado: { tipo: 'ocioso' } });
       return;
     }
-    setEstado({ tipo: 'calculando' });
+    setGuardado({ chave, estado: { tipo: 'calculando' } });
     let vivo = true;
     const espera = setTimeout(() => {
       atual().then(
         (previa) => {
-          if (vivo) setEstado({ tipo: 'pronta', previa });
+          if (vivo) setGuardado({ chave, estado: { tipo: 'pronta', previa } });
         },
         (erro: unknown) => {
-          if (vivo) setEstado({ tipo: 'erro', erro });
+          if (vivo) setGuardado({ chave, estado: { tipo: 'erro', erro } });
         },
       );
     }, atrasoMs);
@@ -68,6 +71,12 @@ export function usePrevia<T>(
   }, [chave, atrasoMs, tentativa]);
 
   const tentarDeNovo = useCallback(() => setTentativa((n) => n + 1), []);
+  const estado: EstadoPrevia<T> =
+    guardado.chave === chave
+      ? guardado.estado
+      : pedir
+        ? { tipo: 'calculando' }
+        : { tipo: 'ocioso' };
   return { estado, tentarDeNovo };
 }
 

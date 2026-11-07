@@ -103,7 +103,7 @@ export function distribuirVariosTimes(
   const total = times.length;
 
   // Médias de cada time, mantidas ao lado dos agregados: uma troca mexe em dois times, então a chave candidata sai de
-  // um laço sobre as médias com os dois valores novos no lugar, sem alocar (o p99 de 60 aptos tem de caber em 4 ms,
+  // um laço sobre as médias com os dois valores novos no lugar, sem alocar (o p99 de 40 aptos tem de caber em 4 ms,
   // SIM-58). A idade média é nula (`SEM_IDADE`, NaN) em time sem ninguém com ano (SIM-95).
   const nivelMedio = agregados.map((ag) => mediaInteira(ag.somaNivel, ag.n) ?? 0);
   const idadeMedia = agregados.map(

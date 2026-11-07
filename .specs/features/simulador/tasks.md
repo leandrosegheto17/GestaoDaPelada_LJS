@@ -853,7 +853,7 @@ T53 → T54
 
 - [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
 - [x] Teste `SIM-57`: mediana e p99 < 4 ms nos dois cenários, com aquecimento descartado
-- [x] `Evidência`: números medidos na máquina local e no CI
+- [x] `Evidência`: números medidos na máquina local e no CI. Local (Windows, validação de 2026-11-06, Node quente): 30 aptos em 2 × 11, mediana 1,21 ms e p99 4,46 ms; no CI o p99 dessas entradas medido foi de 4,3 a 11,2 ms (nota do limiar em `test/simulador/medir.ts`). O limiar dos testes é 10 ms (AD-128)
 - [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
@@ -880,7 +880,7 @@ T53 → T54
 - [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
 - [x] Teste `SIM-58`: as 20 combinações × 2 funções abaixo de 4 ms (p99)
 - [x] Teste `SIM-59`: toda combinação devolve composição válida
-- [x] `Evidência`: a pior combinação e o tempo dela; teto de avaliações [A ESCLARECER: só se a medição passar de 4 ms]
+- [x] `Evidência`: a pior combinação e o tempo dela; teto de avaliações [A ESCLARECER: só se a medição passar de 4 ms]. Medido na validação (2026-11-06, Windows, Node quente): com 60 aptos a pior combinação (2 times com N = 11, K ilimitado) deu mediana de 6 a 7,8 ms e p99 de até 17 ms; com 40 aptos, mediana de ~2 ms e p99 de 4 a 8 ms. Decisão do usuário (AD-128): o teto de avaliações ficou de fora e o máximo de aptos caiu de 60 para 40
 - [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit
@@ -1469,7 +1469,8 @@ T53 → T54
 
 **Done when**:
 
-- [x] `Evidência`: data e origem do dump, contagem por tabela antes e depois, diff do schema e a saída da segunda execução, registrados nesta tarefa
+- [ ] `Evidência`: data e origem do dump, contagem por tabela antes e depois, diff do schema e a saída da segunda execução, registrados nesta tarefa
+      **Pendência de ambiente (A-05, validação de 2026-11-06)**: depende de o usuário decifrar um dump recente da produção; sem ele a migração `1792844940000_grupo-criar-contrair.sql` não pode ir para a prévia (AD-033). Fica para o `/finalizar`, antes do deploy que aplica a migração.
 - [x] Teste: nenhuma tabela perde linha; o diff do schema é só a função removida
 - [x] Dump com zero linhas nas tabelas de negócio (AD-014) bloqueia a tarefa: pare e pergunte (AD-073)
 - [x] Banco de ensaio removido no `finally`; o dump decifrado não entra no git
@@ -1499,7 +1500,8 @@ T53 → T54
 
 - [x] Casos limite e estados listados no corpo do commit antes do código; resultado não definido na Base = pare e pergunte
 - [x] Teste: o script calcula p99 e conta 1102 a partir de uma saída de `wrangler tail` de exemplo
-- [x] `Evidência`: data, versão publicada, grupo de teste, p99 de cada rota e zero 1102; contagem de `escalacoes` e `eventos_uso` do grupo igual antes e depois (AD-117)
+- [ ] `Evidência`: data, versão publicada, grupo de teste, p99 de cada rota e zero 1102; contagem de `escalacoes` e `eventos_uso` do grupo igual antes e depois (AD-117)
+      **Pendência de ambiente (A-05, validação de 2026-11-06)**: depende do deploy da prévia pelo usuário e do `wrangler tail`; SIM-61 só se prova lá. Fica para o `/finalizar`, depois do deploy (a spec o põe como pré-condição do lançamento).
 - [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: unit

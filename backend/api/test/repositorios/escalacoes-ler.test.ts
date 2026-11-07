@@ -1,6 +1,10 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { escalacoes } from '../../src/infraestrutura/db/repositorios/escalacoes.ts';
-import { abrirCenarioGrupos, type CenarioGruposAberto } from '../isolamento/cenario-grupos.ts';
+import {
+  abrirCenarioGrupos,
+  criarGrupoComoConta,
+  type CenarioGruposAberto,
+} from '../isolamento/cenario-grupos.ts';
 import { comDb } from './apoio.ts';
 
 /**
@@ -175,6 +179,23 @@ describe('escalacoes.porData', () => {
       JSON.stringify(COMPOSICAO_DOIS),
     );
     expect(await lerComo(aberto.cenario.grupoG, escalacoes.porData)).toBeNull();
+  });
+});
+
+describe('escalacoes: a mesma conta em dois grupos (A-02)', () => {
+  it('SIM-79: a escalação de um grupo da conta não é lida pelo outro grupo da mesma conta, na mesma data', async () => {
+    const { db, cenario } = aberto;
+    const segundo = await criarGrupoComoConta(db, cenario.contaC, 'Segundo Grupo', 'segundo-grupo');
+    try {
+      await gravarComoDono(segundo.id, 'dois_times', 2, 1, JSON.stringify(COMPOSICAO_DOIS));
+      // O vínculo e a RLS deixam a conta C ler os dois grupos; só o filtro por grupo separa as duas leituras.
+      expect(await lerComo(cenario.grupoG, escalacoes.porData)).toBeNull();
+      expect(await lerComo(cenario.grupoG, escalacoes.idsNaData)).toBeNull();
+      expect(await lerComo(segundo.id, escalacoes.porData)).not.toBeNull();
+      expect(await idsComo(segundo.id)).toHaveLength(7);
+    } finally {
+      await db.query('DELETE FROM escalacoes WHERE grupo_id = $1', [segundo.id]);
+    }
   });
 });
 

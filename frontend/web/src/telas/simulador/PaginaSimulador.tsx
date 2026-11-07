@@ -181,6 +181,7 @@ export function PaginaSimulador() {
       acoes: (
         <AcoesResultado
           ajustado={ajuste.ajustado}
+          recalculando={ajuste.recalculando}
           confirmando={confirmar.isPending}
           aoConfirmar={confirmarEscalacao}
           aoRefazer={refazer}
@@ -251,7 +252,7 @@ export function PaginaSimulador() {
             <Botao
               variante="principal"
               type="button"
-              disabled={!podeSugerir(previa.estado)}
+              disabled={!podeSugerir(previa.estado) || !dataCompletaNoCampo(entradas.data)}
               aria-describedby={previaInvalida(previa.estado) ? ID_PREVIA_ERRO : undefined}
               onClick={pedirSugestao}
             >

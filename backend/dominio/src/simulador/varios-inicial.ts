@@ -9,7 +9,7 @@ import { compararIds, jogadorDe, type Elenco, type JogadorSim } from './base.ts'
 import { calcularPrevia, timesVarios } from './previa.ts';
 
 /** Teto de aptos (SIM-53): a vizinhança da busca local cresce com o quadrado do número de jogadores. */
-export const MAX_APTOS_SIMULADOR = 60;
+export const MAX_APTOS_SIMULADOR = 40;
 
 export interface VariosTimes {
   /** Ids de cada time; cada time por nível (maior primeiro) e id. */

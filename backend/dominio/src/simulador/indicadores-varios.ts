@@ -34,7 +34,8 @@ export function indicadoresVariosTimes(
       jogadores: ids.length,
       nivelSoma,
       nivelMedio: mediaInteira(nivelSoma, ids.length),
-      idadeMedia: mediaInteira(100 * somaIdade, comAno),
+      // Com um só jogador com ano a média seria a idade dele (SIM-82, A-13): só vale com dois ou mais.
+      idadeMedia: comAno >= 2 ? mediaInteira(100 * somaIdade, comAno) : null,
     };
   });
 }

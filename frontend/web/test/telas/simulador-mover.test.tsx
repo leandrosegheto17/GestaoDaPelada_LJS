@@ -157,6 +157,50 @@ describe('Simulador: mover e trocar jogador', () => {
     expect(t.chamadasA('POST', AVALIAR)).toHaveLength(1);
   });
 
+  it('SIM-64 (A-04): enquanto recalcula, "Confirmar escalação" fica desabilitado (t13 recalculando) e volta com a resposta', async () => {
+    abrir(() => json(200, avaliacaoDois()));
+    await sugerir();
+    const confirmar = () =>
+      screen.getByRole('button', { name: 'Confirmar escalação' }) as HTMLButtonElement;
+    expect(confirmar().disabled).toBe(false);
+    fireEvent.click(
+      within(screen.getByRole('region', { name: 'Time A' })).getByRole('button', { name: 'Japa' }),
+    );
+    fireEvent.click(
+      within(screen.getByRole('dialog', { name: 'Japa' })).getByRole('button', {
+        name: 'Entra no 2º tempo pelo Time B',
+      }),
+    );
+    expect(confirmar().disabled).toBe(true);
+    await act(() => vi.advanceTimersByTimeAsync(300));
+    await waitFor(() => expect(confirmar().disabled).toBe(false));
+  });
+
+  it('SIM-64 (A-04): time sem titulares não mostra o título "Titulares" vazio (t13 recalculando)', async () => {
+    const semTitulares = (corpo: Json): Json => ({
+      ...corpo,
+      times: (corpo.times as Json[]).map((t) => ({ ...t, titulares: [] })),
+    });
+    abrirTela(
+      '/app/grupos/g-quinta/simulador',
+      {
+        'GET /api/sessao': () => json(200, SESSAO_ANA),
+        'GET /api/grupos/g-quinta': () => pendente(),
+        'GET /api/grupos/g-quinta/simulador/contexto': () =>
+          json(200, resposta('simulador-contexto-2026-10-22.json')),
+        'POST /api/grupos/g-quinta/simulador/previa': () =>
+          json(200, resposta('simulador-previa-dois.json')),
+        'POST /api/grupos/g-quinta/simulador/sugerir': () =>
+          json(200, semTitulares(resposta('simulador-sugestao-dois.json'))),
+      },
+      rotas,
+    );
+    await sugerir();
+    const timeA = screen.getByRole('region', { name: 'Time A' });
+    expect(within(timeA).queryByRole('heading', { name: 'Titulares' })).toBeNull();
+    expect(within(timeA).getByRole('heading', { name: 'Entram no 2º tempo' })).toBeDefined();
+  });
+
   it('SIM-64: "Trocar com…" lista os outros por lugar e troca os dois', async () => {
     abrir(() => pendente());
     await sugerir();
