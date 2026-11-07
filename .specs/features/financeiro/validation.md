@@ -30,16 +30,16 @@
 | ID | Resolução |
 |---|---|
 | A-01, A-02 | `FinanceiroMes.tsx` (cadeado, barra sem "Trocar grupo"), `ConfigCaixa.tsx` (ajuda some com erro): t22 sem-permissão e t24 erro em até 1% |
-| A-03 | `telas-reais.mjs`: clique no trilho do interruptor; t22 desmarcar ok; erro-pagamento: faixa sob o título (`FinanceiroMes.tsx`) e recorte `.faixa--erro` no mockup (AD-131, decisão do usuário) |
+| A-03 | `telas-reais.mjs`: clique no trilho do interruptor; t22 desmarcar ok; erro-pagamento: faixa sob o título (`FinanceiroMes.tsx`) e recorte `.faixa--erro` no mockup (AD-135, decisão do usuário) |
 | A-04 | registro da revisão manual do t19 em `tasks.md` (T46), com a observação do e-mail longo em 390 px mantida pelo mockup aprovado |
-| A-05 | AD-129 e `banco/vinculos-travar.test.ts` (um teste por ramo; guarda removida reprova 2) |
-| A-06 | AD-130 (história não se reescreve; a passada de rascunho aceita) |
+| A-05 | AD-133 e `banco/vinculos-travar.test.ts` (um teste por ramo; guarda removida reprova 2) |
+| A-06 | AD-134 (história não se reescreve; a passada de rascunho aceita) |
 | A-07 | `pagamentos.ts` usa `jogadores.travarVarios` |
 | A-08 | `PELADA_E2E_PORTA_API` no `.env.example` e no readme; format e FUN-46 verdes |
-| S-1 (AD-128) | 409 `acesso_da_criadora` + policy restritiva `vinculos_admin_protege_criadora`; testes de repositório, rota e banco |
+| S-1 (AD-132) | 409 `acesso_da_criadora` + policy restritiva `vinculos_admin_protege_criadora`; testes de repositório, rota e banco |
 | S-2 | exclusão de jogador com pagamento oculto pela RLS: 409 `com_historico` (SAVEPOINT) |
 | S-3, S-4 | contrato recusa ano 0000 e descrição com invisíveis (`textoVisivel`), 422 |
-| S-5 | trigger `vinculos_admin_so_acessa_financeiro`; INSERT direto segue como risco residual aceito (AD-128) |
+| S-5 | trigger `vinculos_admin_so_acessa_financeiro`; INSERT direto segue como risco residual aceito (AD-132) |
 | R-S1 | POST de pagamento em mês antes do histórico: 422 `mes` |
 | R-S2, R-S4 | comentários e textos unificados · R-S3 (extrair `saldoDe`) **não aplicada**: as duas consultas diferem de propósito e o revisor a deu por aceitável |
 

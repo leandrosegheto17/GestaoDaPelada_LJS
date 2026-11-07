@@ -539,6 +539,8 @@ policy envios_email_dia.envios_email_dia_backup SELECT PERMISSIVE roles=pelada_b
 policy escalacoes.escalacoes_alterar UPDATE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
 policy escalacoes.escalacoes_apagar DELETE PERMISSIVE roles=pelada_app using=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis))) check=
 policy escalacoes.escalacoes_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
+policy escalacoes.escalacoes_confirmada_por_alterar UPDATE RESTRICTIVE roles=pelada_app using=true check=(confirmada_por = app_conta_id())
+policy escalacoes.escalacoes_confirmada_por_inserir INSERT RESTRICTIVE roles=pelada_app using= check=(confirmada_por = app_conta_id())
 policy escalacoes.escalacoes_inserir INSERT PERMISSIVE roles=pelada_app using= check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
 policy escalacoes.escalacoes_ler SELECT PERMISSIVE roles=pelada_app using=(grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)) check=
 policy escalacoes.escalacoes_ler_so_conta SELECT RESTRICTIVE roles=pelada_app using=(app_conta_id() IS NOT NULL) check=

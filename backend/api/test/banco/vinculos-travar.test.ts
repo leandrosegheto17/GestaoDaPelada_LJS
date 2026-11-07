@@ -7,7 +7,7 @@ import {
 
 /**
  * `vinculos_travar(grupo, todos)` (migração `1793920000000_vinculos-travar`; FUN-12, ACE-39, ACE-40, GEL-22;
- * validação do financeiro, A-05, AD-129): função `SECURITY DEFINER` que trava vínculos sem passar pela policy
+ * validação do financeiro, A-05, AD-133): função `SECURITY DEFINER` que trava vínculos sem passar pela policy
  * restritiva de UPDATE. Um teste por ramo da guarda: sem conta, conta sem vínculo no grupo, `p_todos` falso (só a
  * própria linha) e `p_todos` verdadeiro (todos os vínculos do grupo). Atores: C = criadora de G, O = admin de G,
  * B = conta só do grupo H.
