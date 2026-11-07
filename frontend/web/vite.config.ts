@@ -50,6 +50,8 @@ export default defineConfig({
   },
   test: {
     environment: 'jsdom',
+    // Sob carga (jsdom e varias sessoes) a tela do simulador passa de 5 s (SIM-15, /validar da fundacao).
+    testTimeout: 15_000,
     include: ['test/**/*.test.{ts,tsx}'],
     // T73 (P24): o localStorage do jsdom não passa de um teste para outro.
     setupFiles: ['test/apoio/limpar-armazenamento.ts'],

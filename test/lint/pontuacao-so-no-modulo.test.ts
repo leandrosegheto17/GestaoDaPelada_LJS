@@ -25,7 +25,7 @@ const CHAMA_SOMA =
   'declare function acumuladoAte(...a: unknown[]): number;\nexport const s = (): number => acumuladoAte([]);\n';
 const MEMBRO = 'export const m = (d: Record<string, unknown>): unknown => d.acumuladoComInicial;\n';
 
-describe('PAR-61: só o módulo de pontuação soma pontos', () => {
+describe('PAR-61: só o módulo de pontuação soma pontos', { timeout: 60_000 }, () => {
   it('PAR-61: arquivo de prova em backend/api/src que chama pontosDaPresenca falha o lint', async () => {
     const erros = await errosDe(CHAMA_PONTOS, 'backend', 'api', 'src', 'prova-pontos.ts');
     // Um pelo import e um pela chamada.

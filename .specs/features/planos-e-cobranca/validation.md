@@ -1,7 +1,7 @@
 # Planos e cobrança: Validação (rodada 4, retrabalho R2)
 
 **Data**: 2026-11-06 | **Spec**: `.specs/features/planos-e-cobranca/spec.md` | **Escopo**: rodada 4 = `git diff 87d4d8e1..HEAD` (T72, A-18; só `assinar.test.ts`) mais regressão | **Árvore**: `c289f0a9` (HEAD `4aefc69b`) | **Verificador**: independente
-**Result**: PASS ✅ (A-01 a A-18 fechados; A-15, SEC-003, SEC-005 de banco e SEC-007 parcial são risco aceito na AD-133, decisão do usuário)
+**Result**: PASS ✅ (A-01 a A-18 fechados; A-15, SEC-003, SEC-005 de banco e SEC-007 parcial são risco aceito na AD-141, decisão do usuário)
 
 Rodadas anteriores: R1 (72 de 74 critérios conformes, A-01 a A-15) em `d06e52f4`; R2 (A-01 a A-14, 17 mutações mortas) e R3 (A-16, A-17; 6 mutações) com as tabelas completas em `1485d94c` (`git show 1485d94c:.specs/features/planos-e-cobranca/validation.md`). Não recontadas aqui. Caminhos: A=`backend/api`.
 

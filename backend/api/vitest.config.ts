@@ -73,7 +73,9 @@ export default defineConfig({
           cloudflareTest({
             wrangler: { configPath: '../../wrangler.jsonc' },
             miniflare: {
-              bindings: { VERSAO: VERSAO_TESTE },
+              // O cluster de teste também vale dentro do workerd (process.env vem dos bindings): sem isto os testes do
+              // Worker caem no 5432 padrão e disputam o banco de outra sessão.
+              bindings: { VERSAO: VERSAO_TESTE, DATABASE_URL_TESTE: URL_TESTE },
               hyperdrives: { HYPERDRIVE: HYPERDRIVE_TESTE },
               assets: { directory: './test/rotas/spa' },
             },

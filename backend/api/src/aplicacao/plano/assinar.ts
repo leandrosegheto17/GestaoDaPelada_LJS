@@ -16,7 +16,7 @@ import type { Db } from '../../infraestrutura/db/repositorios/tipos.ts';
  * - grupo de cortesia (`uso_proprio`): `grupo_cortesia`, sem chamar o Asaas (A-04, PLA-02);
  * - 5 assinaturas abertas pelo grupo, ou 10 pela conta somando os grupos dela, na última hora (assinar e cancelar em
  *   ciclo): `muitas_tentativas`, sem chamar o Asaas (A-08, A-17, SEC-002, SEC-007); tentativas que falham no Asaas não
- *   gravam linha e não contam (risco aceito, AD-133);
+ *   gravam linha e não contam (risco aceito, AD-141);
  * - já há assinatura `aguardando_pagamento`: `assinatura_pendente` com a fatura dela, sem chamar o Asaas (PLA-33);
  * - já há assinatura `ativa`: `assinatura_ativa` com a fatura (se houver), sem chamar o Asaas (PLA-33);
  * - duas requisições simultâneas do mesmo grupo: a trava (AD-097) faz a segunda esperar e ver a pendente da primeira;

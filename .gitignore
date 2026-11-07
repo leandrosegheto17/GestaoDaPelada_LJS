@@ -4,6 +4,10 @@ node_modules/
 dist/
 coverage/
 .env
+.env.*
+!.env.example
+.dev.vars
+.dev.vars.*
 test-results/
 playwright-report/
 .wrangler/

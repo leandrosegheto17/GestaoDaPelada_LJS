@@ -19,3 +19,15 @@ export const semCache = cabecalho('Cache-Control', 'no-store');
 
 /** `X-Content-Type-Options: nosniff`. */
 export const semSniff = cabecalho('X-Content-Type-Options', 'nosniff');
+
+/**
+ * `Content-Security-Policy` da API (A-12): a API só devolve JSON, então nada pode carregar nem ser embutido a partir
+ * dela. O front tem a CSP própria no `_headers` dos assets.
+ */
+export const csp = cabecalho(
+  'Content-Security-Policy',
+  "default-src 'none'; frame-ancestors 'none'",
+);
+
+/** `Referrer-Policy: same-origin` (`no-referrer` faria o Chromium mandar `Origin: null` nas escritas). */
+export const politicaReferrer = cabecalho('Referrer-Policy', 'same-origin');
