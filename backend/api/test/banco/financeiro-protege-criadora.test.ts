@@ -84,7 +84,7 @@ describe('UPDATE de vinculos_admin só na coluna acessa_financeiro (S-5)', () =>
   it('FIN-41: quem tem acesso não troca conta_id, grupo_id nem criado_por de outro vínculo', async () => {
     const { db, cenario } = aberto;
     for (const coluna of ['conta_id', 'grupo_id', 'criado_por']) {
-      const valor = coluna === 'grupo_id' ? cenario.grupoG : cenario.contaB;
+      const valor = coluna === 'grupo_id' ? cenario.grupoH : cenario.contaB;
       await expect(
         comoConta(db, cenario.contaC, (d) =>
           d.query(
@@ -93,7 +93,10 @@ describe('UPDATE de vinculos_admin só na coluna acessa_financeiro (S-5)', () =>
           ),
         ),
         coluna,
-      ).rejects.toMatchObject({ code: '42501', message: expect.stringContaining('permission') });
+      ).rejects.toMatchObject({
+        code: '42501',
+        message: expect.stringContaining('só acessa_financeiro'),
+      });
     }
   });
 });

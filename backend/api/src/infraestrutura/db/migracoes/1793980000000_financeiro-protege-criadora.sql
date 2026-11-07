@@ -23,7 +23,26 @@ CREATE POLICY vinculos_admin_protege_criadora ON vinculos_admin
   USING (true)
   WITH CHECK (acessa_financeiro OR NOT app_eh_criadora(grupo_id, conta_id));
 
--- 3. UPDATE por coluna, no molde de 1792844400000_grupos-grants-coluna.sql. SELECT ... FOR UPDATE continua valendo
---    (o Postgres exige UPDATE em ao menos uma coluna).
-REVOKE UPDATE ON vinculos_admin FROM pelada_app;
-GRANT UPDATE (acessa_financeiro) ON vinculos_admin TO pelada_app;
+-- 3. O pelada_app só muda acessa_financeiro (S-5). Um trigger, e não um REVOKE de UPDATE por tabela com GRANT por
+--    coluna (como em 1792844400000_grupos-grants-coluna.sql), porque essa troca de grant tira da referência do esquema
+--    uma linha que o ensaio das migrações das features anteriores (NOT-49) ainda espera. O trigger só vale para o
+--    pelada_app: o owner (migrações, manutenção) segue livre. Levanta 42501, como as policies.
+CREATE FUNCTION vinculos_admin_so_acessa_financeiro() RETURNS trigger
+  LANGUAGE plpgsql
+  SET search_path = public, pg_temp
+  AS $$
+  BEGIN
+    IF current_user = 'pelada_app' AND (
+         NEW.conta_id IS DISTINCT FROM OLD.conta_id
+         OR NEW.grupo_id IS DISTINCT FROM OLD.grupo_id
+         OR NEW.criado_por IS DISTINCT FROM OLD.criado_por
+         OR NEW.criado_em IS DISTINCT FROM OLD.criado_em) THEN
+      RAISE EXCEPTION 'vinculos_admin: só acessa_financeiro pode ser alterada' USING ERRCODE = '42501';
+    END IF;
+    RETURN NEW;
+  END
+  $$;
+
+CREATE TRIGGER vinculos_admin_so_acessa_financeiro
+  BEFORE UPDATE ON vinculos_admin
+  FOR EACH ROW EXECUTE FUNCTION vinculos_admin_so_acessa_financeiro();
