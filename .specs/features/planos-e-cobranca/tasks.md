@@ -296,6 +296,9 @@ T56 → T57
 
 ### Phase 22: Retrabalho R1 (crítica, 18,5h)
 
+**Gate**: lint, format, typecheck, vitest por pacote, checagens e build do web @ df3213e009955cfe6cf7e9da87d6e17e8044ab1b = verde, com pendências aceitas pelo usuário (api: push-backup x2 e push-cpu, por ambiente; dominio: GEL-70 e web: SIM-15/SIM-66/SIM-14 e `test/lint` só por tempo sob carga, verdes isolados; e2e 72/74 com as 2 de pdf-visual PAR-108 iguais na main f9801ec0, 5,81% e 5,59% contra 4,5%) — rodada 2 do `/validar`, 2026-11-06
+
+
 ```
 T58 → T59 → T60 → T61 → T62 → T63 → T64 → T65 → T66 → T67 → T68 → T69 → T70 → T71
 ```
