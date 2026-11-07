@@ -2,7 +2,8 @@ import { Hono } from 'hono';
 import type { Ambiente } from './ambiente.ts';
 import { exigirCabecalhoPelada } from './middlewares/cabecalho-pelada.ts';
 import { protegerRotasPublicas } from './middlewares/contexto-publico.ts';
-import { semCache, semSniff } from './middlewares/cabecalhos.ts';
+import { csp, politicaReferrer, semCache, semSniff } from './middlewares/cabecalhos.ts';
+import { exigirOrigemPropria } from './middlewares/origem-host.ts';
 import { travarFinanceiro } from './middlewares/financeiro.ts';
 import { limitarEscritasDeGrupo } from './middlewares/limite-escrita.ts';
 import { limitarRotasDeAcesso } from './middlewares/limite-taxa.ts';
@@ -93,7 +94,9 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
   });
 
   // Antes de qualquer rota, para valer também no 404 e no 500 (FUN-22).
-  api.use('*', semCache, semSniff);
+  api.use('*', semCache, semSniff, csp, politicaReferrer);
+  // Escrita de outra origem, antes de qualquer outra guarda (A-12, AD-135).
+  api.use('*', exigirOrigemPropria);
   // Escrita sem `X-Pelada: 1` é recusada antes de qualquer limitador (ACE-49, T18).
   api.use('*', exigirCabecalhoPelada);
   // LIMITE_ENTRAR nas rotas de acesso, antes da sessão e do banco (ACE-50, ACE-70, T19).

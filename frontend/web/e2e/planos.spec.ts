@@ -1,5 +1,5 @@
 import { expect, test, type Browser, type APIRequestContext, type Page } from '@playwright/test';
-import { URL_ASAAS_FALSO, URL_BASE } from '../playwright.config.ts';
+import { CABECALHO_DEV_EMAILS, URL_ASAAS_FALSO, URL_BASE } from '../playwright.config.ts';
 
 /**
  * Jornadas de planos ponta a ponta (planos-e-cobranca T56; J-27, J-28 e J-30 de `.specs/projeto/jornadas.md`; PLA-15,
@@ -95,7 +95,7 @@ async function linkDoEmail(
   await expect
     .poll(
       async () => {
-        const r = await request.get('/api/dev/emails');
+        const r = await request.get('/api/dev/emails', { headers: CABECALHO_DEV_EMAILS });
         expect(r.status()).toBe(200);
         const { mensagens } = (await r.json()) as { mensagens: MensagemDev[] };
         link = mensagens

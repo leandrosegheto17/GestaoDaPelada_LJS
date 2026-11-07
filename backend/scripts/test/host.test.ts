@@ -29,6 +29,26 @@ describe('exigirHostPermitido', () => {
     expect(exigirHostPermitido('postgres://u:p@127.0.0.1:5432/db')).toBe('127.0.0.1');
   });
 
+  for (const consulta of [
+    'host=ep-abc-123.sa-east-1.aws.neon.tech',
+    'HOST=ep-abc-123.sa-east-1.aws.neon.tech',
+    'hostaddr=203.0.113.9',
+    'sslmode=require&host=ep-abc-123.sa-east-1.aws.neon.tech',
+    'host=',
+  ]) {
+    it(`FUN-05, FUN-19: recusa host sobrescrito pela consulta da URL (?${consulta})`, () => {
+      expect(() =>
+        exigirHostPermitido(`postgres://u:p@127.0.0.1:5432/db?${consulta}`, HOSTS_TESTE),
+      ).toThrow(/não permitido|consulta/);
+    });
+  }
+
+  it('FUN-19: outros parâmetros da consulta continuam aceitos', () => {
+    expect(
+      exigirHostPermitido('postgres://u:p@127.0.0.1:5432/db?sslmode=disable', HOSTS_TESTE),
+    ).toBe('127.0.0.1');
+  });
+
   it('FUN-19: URL malformada lança erro', () => {
     expect(() => exigirHostPermitido('isto não é url', HOSTS_TESTE)).toThrow(/malformada/);
   });

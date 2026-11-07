@@ -17,10 +17,22 @@ export function exigirHostPermitido(
 ): string {
   if (!url) throw new ErroHostNaoPermitido('URL do banco não definida.');
   let host: string;
+  let consulta: URLSearchParams;
   try {
-    host = new URL(url).hostname.toLowerCase();
+    const analisada = new URL(url);
+    host = analisada.hostname.toLowerCase();
+    consulta = analisada.searchParams;
   } catch {
     throw new ErroHostNaoPermitido('URL do banco malformada.');
+  }
+  // O `pg-connection-string` deixa `?host=` e `?hostaddr=` sobrescreverem o host da URL: o host que a trava vê
+  // não seria o da conexão.
+  for (const chave of consulta.keys()) {
+    if (['host', 'hostaddr'].includes(chave.toLowerCase())) {
+      throw new ErroHostNaoPermitido(
+        `Host do banco não permitido: a consulta da URL não pode trazer "${chave}".`,
+      );
+    }
   }
   if (host === '' || !permitidos.includes(host)) {
     throw new ErroHostNaoPermitido(

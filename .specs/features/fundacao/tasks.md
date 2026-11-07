@@ -2425,9 +2425,9 @@ T81 → T82
 
 **Done when**:
 
-- [x] `ci.yml` verde no último commit da `main` (run 42264671967 @ 45ec02f0: qualidade, banco, testes em 3 jobs e web em 3 fatias; a comparação visual saiu do CI, AD-126)
-- [ ] `testes.json` roda lint, format, typecheck, testes, checagens, build, e2e e visual
-- [ ] `trava-testes.py --rodar` verde
+- [x] `ci.yml` verde no último commit da `main` (run 42264671967 @ 45ec02f0: qualidade, banco, testes em 3 jobs e web em 3 fatias; a comparação visual saiu do CI, AD-132)
+- [x] `testes.json` roda `docker compose up`, lint, format, typecheck, testes, checagens, build e e2e (o `visual` saiu, AD-132, A-01 do `/validar`)
+- [ ] `trava-testes.py --rodar` verde (não fecha nesta máquina por `pg_dump` 16, orçamento de CPU e `pdf-visual`; o CI fica verde no mesmo código; pendência registrada no `validation.md`)
 - [x] Gate passa, sem teste removido ou enfraquecido (testes mudados com motivo no commit e aprovação do usuário)
 
 **Tests**: none
@@ -2773,6 +2773,8 @@ Origem: o último critério da T15 só pode ser conferido no dia seguinte à pub
 
 - [ ] A execução agendada das 07:00 UTC de 2026-11-07 aparece no histórico do GitHub, verde, com o artefato `.age` (FUN-48)
 - [ ] Registro em `docs/restauracao-registro.md` com data, run e resultado (FUN-50)
+- [ ] Contagem por tabela pela role `pelada_backup_ro` na produção, comparada com o registro e anotada em `docs/restauracao-registro.md` (FUN-50, A-02)
+- [ ] O primeiro deploy depois da migração `1794000000000_backup-sequences` fecha verde no passo do dump completo (A-09)
 - [ ] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: none

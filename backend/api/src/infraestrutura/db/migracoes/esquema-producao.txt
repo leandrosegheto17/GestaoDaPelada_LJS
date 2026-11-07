@@ -372,6 +372,7 @@ grant tabela eventos_uso pelada_app SELECT
 grant tabela eventos_uso pelada_backup_ro SELECT
 grant tabela eventos_uso_id_seq pelada_backup_ro SELECT
 grant tabela falhas_senha_atual pelada_backup_ro SELECT
+grant tabela falhas_senha_atual_id_seq pelada_backup_ro SELECT
 grant tabela grupos pelada_app INSERT
 grant tabela grupos pelada_app SELECT
 grant tabela grupos pelada_backup_ro SELECT
@@ -407,6 +408,7 @@ grant tabela partidas pelada_app INSERT
 grant tabela partidas pelada_app SELECT
 grant tabela partidas pelada_backup_ro SELECT
 grant tabela pedidos_email_origem pelada_backup_ro SELECT
+grant tabela pedidos_email_origem_id_seq pelada_backup_ro SELECT
 grant tabela pedidos_reset pelada_backup_ro SELECT
 grant tabela periodos_ativos pelada_app INSERT
 grant tabela periodos_ativos pelada_app SELECT

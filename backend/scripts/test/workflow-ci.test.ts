@@ -49,6 +49,10 @@ describe('ci.yml', () => {
     ).toBe(true);
   });
 
+  it('A-13: o job qualidade audita as dependências de produção e falha em severidade alta ou crítica (AD-134)', () => {
+    expect(runs(wf.jobs.qualidade)).toMatch(/pnpm audit --prod --audit-level high$/m);
+  });
+
   it('FUN-40: o job testes roda a suíte inteira em 3 jobs paralelos, com as checagens na entrada demais', () => {
     const testes = wf.jobs.testes;
     const matriz = (testes?.strategy?.matrix?.include ?? []) as Array<{

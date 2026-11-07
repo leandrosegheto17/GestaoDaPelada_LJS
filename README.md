@@ -43,11 +43,11 @@ Os e-mails de conta (confirmação, recuperação de senha, convite) saem pelo R
 - **À mão:** o `pnpm dev` ainda não passa essas duas variáveis ao Worker (os links precisam da `URL_PUBLICA`, que é vazia no `wrangler.jsonc`). Para testar cadastro, recuperação ou convite local, suba a API assim, com o Vite à parte (`pnpm --filter @pelada/web dev`):
 
 ```bash
-pnpm --filter @pelada/api exec wrangler dev --config ../../wrangler.jsonc --ip 127.0.0.1 --port 8787   --var EMAIL_DEV:1 --var URL_PUBLICA:http://localhost:5173
-curl -s http://127.0.0.1:8787/api/dev/emails   # mensagens enviadas desde que o Worker subiu
+pnpm --filter @pelada/api exec wrangler dev --config ../../wrangler.jsonc --ip 127.0.0.1 --port 8787   --var EMAIL_DEV:1 --var DEV_EMAILS_TOKEN:meu-segredo-local --var URL_PUBLICA:http://localhost:5173
+curl -s -H 'X-Dev-Token: meu-segredo-local' http://127.0.0.1:8787/api/dev/emails   # mensagens enviadas desde que o Worker subiu
 ```
 
-A caixa some quando o Worker reinicia.
+A caixa só abre com o segredo (`DEV_EMAILS_TOKEN`, no cabeçalho `X-Dev-Token`): sem ele, ou com outro, responde o 404 de rota inexistente. Isso fecha o DNS rebinding contra o `wrangler dev` (AD-135). Escolha um valor aleatório a cada vez; o e2e gera o dele sozinho. A caixa some quando o Worker reinicia.
 
 ### Pagamentos (Asaas)
 
@@ -84,6 +84,7 @@ O `.env.example` lista todas, com obrigatoriedade, formato e se é segredo. Segr
 | `PUSH_FALSO_PORTA`                                              | Porta TCP (padrão 8790) do servidor de push falso do e2e                                                                                                                       |
 | `PELADA_E2E_VAPID_PUBLICA`                                      | Chave VAPID pública do e2e; sem ela o par é gerado na hora, só para o teste                                                                                                    |
 | `PELADA_E2E_VAPID_PRIVADA`                                      | Chave VAPID privada do e2e; sem ela o par é gerado na hora, só para o teste (segredo)                                                                                          |
+| `PELADA_E2E_DEV_EMAILS_TOKEN`                                   | Segredo da caixa de e-mails do e2e (`X-Dev-Token`); sem ele é gerado na hora, só para o teste (segredo)                                                                        |
 | `DATABASE_URL_MIGRACAO`                                         | Role de migração, host local; obrigatória em `pnpm migrar` e `pnpm seed`                                                                                                       |
 | `PELADA_APP_SENHA`                                              | Senha da role `pelada_app`; obrigatória em `pnpm seed` e `pnpm dev` (segredo)                                                                                                  |
 | `PELADA_BACKUP_RO_SENHA`                                        | Senha da role `pelada_backup_ro`; obrigatória em `pnpm seed` (segredo)                                                                                                         |
@@ -104,6 +105,7 @@ O `.env.example` lista todas, com obrigatoriedade, formato e se é segredo. Segr
 | `RESEND_REMETENTE`                                              | Remetente dos e-mails de conta, de domínio verificado no Resend                                                                                                                |
 | `LIMITE_EMAILS_DIA`                                             | Teto diário de e-mails de conta (padrão 100, o do Resend Free)                                                                                                                 |
 | `EMAIL_DEV`                                                     | `1` liga a caixa de e-mails em memória e `GET /api/dev/emails` (só local e e2e)                                                                                                |
+| `DEV_EMAILS_TOKEN`                                              | Segredo por execução de `GET /api/dev/emails` (cabeçalho `X-Dev-Token`); sem ele a caixa fica fechada (só local e e2e)                                                         |
 | `ASAAS_API_KEY`                                                 | Chave da API do Asaas sandbox, secret do Worker (segredo)                                                                                                                      |
 | `ASAAS_WEBHOOK_TOKEN`                                           | `authToken` do webhook do Asaas, 32 a 255 caracteres, secret do Worker (segredo)                                                                                               |
 | `ASAAS_URL`                                                     | URL base do Asaas; só `https://api-sandbox.asaas.com/v3` até haver AD de produção                                                                                              |

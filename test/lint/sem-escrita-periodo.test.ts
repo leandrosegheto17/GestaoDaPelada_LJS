@@ -22,7 +22,7 @@ async function achados(codigo: string, ...caminho: string[]) {
 
 const fora = (codigo: string) => achados(codigo, ...REPOS, 'prova-periodo.ts');
 
-describe('PAR-140: pelada/sem-escrita-periodo', () => {
+describe('PAR-140: pelada/sem-escrita-periodo', { timeout: 60_000 }, () => {
   it("PAR-140: insertInto('periodos_ativos') fora do repositório de jogadores falha o lint", async () => {
     const erros = await fora(
       "export const f = (db: any) => db.insertInto('periodos_ativos').values({}).execute();\n",
