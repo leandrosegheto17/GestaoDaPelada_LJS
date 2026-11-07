@@ -3,6 +3,7 @@ import { corpoDoErro, notaCorpo, type NotaResposta } from '@pelada/contrato';
 import type { Ambiente } from '../ambiente.ts';
 import { lerCorpoDoGrupo } from '../corpo.ts';
 import { notas } from '../../infraestrutura/db/repositorios/notas.ts';
+import { UUID } from '../uuid.ts';
 
 /**
  * `PUT /api/grupos/:grupoId/jogadores/:id/notas/:habilidadeId` (T48; GEL-97 a GEL-100, GEL-105), da tabela de
@@ -10,8 +11,6 @@ import { notas } from '../../infraestrutura/db/repositorios/notas.ts';
  * apaga; fora disso, 422 no campo `nota` (GEL-99). Jogador ou habilidade de outro grupo, ou id que não é uuid: 404
  * (GEL-100). Responde 200 `{ nivel, semNota }` do jogador depois da escrita (GEL-97).
  */
-
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export function rotasNotas(): Hono<Ambiente> {
   const rotas = new Hono<Ambiente>();

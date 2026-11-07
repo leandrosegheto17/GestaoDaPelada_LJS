@@ -114,7 +114,7 @@ async function excluir(db: Db, grupoId: string, id: string): Promise<ResultadoEx
 
   // A conferência acima roda sob a RLS: a admin sem acesso ao financeiro não enxerga `pagamentos_mes`, mas a FK
   // `ON DELETE RESTRICT` ignora a RLS e recusa o DELETE (23001 ou 23503). Um SAVEPOINT mantém a transação viva e a
-  // recusa vale como "com histórico", o mesmo 409 de quem vê o pagamento (S-2).
+  // recusa vale como "com histórico", o mesmo 409 de quem vê o pagamento (S-2; SV-02 da grupos-e-elenco).
   await sql`SAVEPOINT excluir_jogador`.execute(db);
   try {
     await sql`DELETE FROM jogadores WHERE grupo_id = ${grupoId} AND id = ${id}`.execute(db);

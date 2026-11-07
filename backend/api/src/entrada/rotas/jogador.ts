@@ -9,6 +9,7 @@ import {
 } from '../corpo.ts';
 import { jogadoresEdicao } from '../../infraestrutura/db/repositorios/jogadores-edicao.ts';
 import { jogadoresLeitura } from '../../infraestrutura/db/repositorios/jogadores-leitura.ts';
+import { UUID } from '../uuid.ts';
 
 /**
  * `GET`, `PATCH` e `DELETE /api/grupos/:grupoId/jogadores/:id` (T37; GEL-41, GEL-44, GEL-84, GEL-85), da tabela de
@@ -19,8 +20,6 @@ import { jogadoresLeitura } from '../../infraestrutura/db/repositorios/jogadores
  * - DELETE: 204 sem histórico (GEL-84); com histórico, 409 `jogador_com_historico` com a mensagem de `GS:295` e
  *   `sugestao: "inativar"` (GEL-85).
  */
-
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** GEL-85, texto de `GS:295`. */
 export function mensagemComHistorico(apelido: string): string {

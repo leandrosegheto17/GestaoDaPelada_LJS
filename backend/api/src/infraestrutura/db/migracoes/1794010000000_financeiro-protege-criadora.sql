@@ -1,6 +1,6 @@
 -- Up Migration
 -- A criadora do grupo não perde o acesso ao financeiro por ação de outro admin, e o pelada_app só altera a coluna
--- acessa_financeiro de vinculos_admin (validação do financeiro, S-1 e S-5; FIN-35, FIN-41; AD-132). Aditiva: nenhum DROP.
+-- acessa_financeiro de vinculos_admin (validação do financeiro, S-1 e S-5; FIN-35, FIN-41; AD-136). Aditiva: nenhum DROP.
 -- Motivo: um admin convidado com acesso podia retirar o acesso da criadora, que não conseguia recuperá-lo sozinha
 -- (a policy de FIN-41 só impede a própria conta de mudar a própria linha). O UPDATE de qualquer outra coluna não
 -- tem rota, mas o pelada_app tinha UPDATE na linha inteira (conta_id, grupo_id, criado_por).

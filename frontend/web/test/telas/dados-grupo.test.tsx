@@ -216,6 +216,29 @@ describe('tela Dados do grupo (t20)', () => {
     await esperarSemViolacoes(container);
   });
 
+  it('PLA-69 (RC-A01): 409 assinatura_ativa mostra a mensagem do servidor e não navega; axe sem violação', async () => {
+    const { container, local } = abrir({
+      'GET /api/grupos/g-quinta': () => json(200, QUINTA),
+      'POST /api/grupos/g-quinta/arquivar': () =>
+        json(409, {
+          erro: 'assinatura_ativa',
+          mensagem: 'Cancele a assinatura antes de arquivar o grupo',
+        }),
+    });
+    fireEvent.click(await screen.findByRole('button', { name: 'Arquivar grupo' }));
+    const dialogo = screen.getByRole('alertdialog');
+    fireEvent.change(within(dialogo).getByLabelText(ROTULO_CONFIRMACAO), {
+      target: { value: 'Pelada de Quinta' },
+    });
+    fireEvent.click(within(dialogo).getByRole('button', { name: 'Arquivar grupo' }));
+    expect(
+      await within(dialogo).findByText('Cancele a assinatura antes de arquivar o grupo'),
+    ).toBeTruthy();
+    expect(screen.queryByText('Algo deu errado. Tente de novo.')).toBeNull();
+    expect(local()).toBe('/app/grupos/g-quinta/dados');
+    await esperarSemViolacoes(container);
+  });
+
   it('GEL-22: Cancelar fecha o diálogo sem chamar a API', async () => {
     const { chamadasA } = abrir({ 'GET /api/grupos/g-quinta': () => json(200, QUINTA) });
     fireEvent.click(await screen.findByRole('button', { name: 'Arquivar grupo' }));
