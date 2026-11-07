@@ -144,7 +144,8 @@ function Formulario({
         inputMode="decimal"
         placeholder="0,00"
         autoComplete="off"
-        ajuda={AJUDA_MENSALIDADE}
+        // O mockup (t24 erro) mostra só a mensagem do campo com erro: a ajuda some enquanto há erro no formulário.
+        ajuda={Object.values(erros).some(Boolean) ? undefined : AJUDA_MENSALIDADE}
         erro={erros.mensalidadeCentavos}
         value={dados.mensalidade}
         onChange={(e) => mudar('mensalidade', e.target.value)}

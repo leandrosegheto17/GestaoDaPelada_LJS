@@ -275,9 +275,10 @@ export function FinanceiroMes() {
     const erro = erroDoFinanceiro(consulta.error);
     if (erro.codigo === 'sem_permissao_financeiro') {
       return (
-        <Casca grupo={barra} centralizada>
+        // O mockup (t22 sem-permissão) tem só o nome do grupo na barra, sem "Trocar grupo", e o cadeado.
+        <Casca grupo={{ nome: barra.nome }} centralizada>
           <TelaMensagem
-            icone="erro"
+            icone="cadeado"
             titulo={TEXTO_SEM_ACESSO}
             acao={
               <LinkBotao para={base} variante="secundario">
