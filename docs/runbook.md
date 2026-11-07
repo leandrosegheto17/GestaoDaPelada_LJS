@@ -199,7 +199,7 @@ O plano original previa um environment `previa` sobre a branch `dev` do Neon; pe
 | `ASAAS_API_KEY` | Chave da API do Asaas **sandbox**, para criar cliente e assinatura (PLA-37) |
 | `ASAAS_WEBHOOK_TOKEN` | `authToken` do webhook do Asaas: 32 a 255 caracteres, diferente da chave |
 
-`LIMITE_EMAILS_DIA` é opcional (padrão 100) e `EMAIL_DEV` nunca existe no Worker publicado: sem ela, `GET /api/dev/emails` responde 404. `ASAAS_URL` não é secret: é a variável do `wrangler.jsonc`, fixa no sandbox (`https://api-sandbox.asaas.com/v3`).
+`LIMITE_EMAILS_DIA` é opcional (padrão 100) e `EMAIL_DEV` e `DEV_EMAILS_TOKEN` nunca existem no Worker publicado: sem elas, `GET /api/dev/emails` responde 404 (com `EMAIL_DEV=1` ela ainda exige o `DEV_EMAILS_TOKEN` no cabeçalho `X-Dev-Token`, SEC-04r). `ASAAS_URL` não é secret: é a variável do `wrangler.jsonc`, fixa no sandbox (`https://api-sandbox.asaas.com/v3`).
 
 ### E-mails de conta (Resend)
 

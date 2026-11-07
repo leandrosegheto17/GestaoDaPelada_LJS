@@ -1,5 +1,5 @@
 import { expect, test, type APIRequestContext, type Browser, type Page } from '@playwright/test';
-import { URL_BASE } from '../playwright.config.ts';
+import { CABECALHO_DEV_EMAILS, URL_BASE } from '../playwright.config.ts';
 
 /**
  * Jornadas do financeiro ponta a ponta (financeiro T48; J-25 e J-26 de `.specs/projeto/jornadas.md`), contra o
@@ -59,7 +59,7 @@ async function linkDoEmail(
   await expect
     .poll(
       async () => {
-        const r = await request.get('/api/dev/emails');
+        const r = await request.get('/api/dev/emails', { headers: CABECALHO_DEV_EMAILS });
         expect(r.status()).toBe(200);
         const { mensagens } = (await r.json()) as { mensagens: MensagemDev[] };
         const ultima = mensagens.filter((m) => m.para === para && m.tipo === tipo).at(-1);

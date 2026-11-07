@@ -1,4 +1,4 @@
-import { generateKeyPairSync } from 'node:crypto';
+import { generateKeyPairSync, randomBytes } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, devices } from '@playwright/test';
@@ -66,6 +66,21 @@ function parVapidDoE2e(): { publica: string; privada: string } {
 
 export const VAPID_E2E = parVapidDoE2e();
 
+/**
+ * Segredo por execução da caixa `GET /api/dev/emails` (SEC-04r, AD-131): o Worker do e2e o recebe por `--var` e as
+ * jornadas o mandam em `X-Dev-Token`. Gerado uma vez por processo e repassado aos workers do Playwright por ambiente.
+ */
+function tokenDaCaixaDoE2e(): string {
+  const guardado = process.env.PELADA_E2E_DEV_EMAILS_TOKEN;
+  if (guardado) return guardado;
+  const token = randomBytes(24).toString('base64url');
+  process.env.PELADA_E2E_DEV_EMAILS_TOKEN = token;
+  return token;
+}
+
+export const TOKEN_DEV_EMAILS = tokenDaCaixaDoE2e();
+export const CABECALHO_DEV_EMAILS = { 'X-Dev-Token': TOKEN_DEV_EMAILS };
+
 function ambienteDoServidor(): Record<string, string> {
   const ambiente: Record<string, string> = {};
   const senha = process.env.PELADA_APP_SENHA;
@@ -111,7 +126,7 @@ export default defineConfig({
       // acesso leem (T57); URL_PUBLICA local, para os links dos e-mails apontarem para cá. As duas
       // só por --var: o wrangler.jsonc nunca leva EMAIL_DEV (checagem `email-dev`).
       // notificacoes T41: as VAPID do e2e e o PUSH_HOSTS_DEV do push falso, também só por --var.
-      command: `pnpm --filter @pelada/api exec wrangler dev --config ../../wrangler.jsonc --ip 127.0.0.1 --port ${PORTA_E2E} --var EMAIL_DEV:1 --var URL_PUBLICA:${URL_BASE} --var ASAAS_URL:${URL_ASAAS_FALSO}/v3 --var ASAAS_API_KEY:${CHAVE_ASAAS_E2E} --var ASAAS_WEBHOOK_TOKEN:${TOKEN_WEBHOOK_E2E} --var VAPID_PUBLICA:${VAPID_E2E.publica} --var VAPID_PRIVADA:${VAPID_E2E.privada} --var VAPID_ASSUNTO:mailto:avisos@exemplo.test --var PUSH_HOSTS_DEV:localhost:${PORTA_PUSH_FALSO}`,
+      command: `pnpm --filter @pelada/api exec wrangler dev --config ../../wrangler.jsonc --ip 127.0.0.1 --port ${PORTA_E2E} --var EMAIL_DEV:1 --var DEV_EMAILS_TOKEN:${TOKEN_DEV_EMAILS} --var URL_PUBLICA:${URL_BASE} --var ASAAS_URL:${URL_ASAAS_FALSO}/v3 --var ASAAS_API_KEY:${CHAVE_ASAAS_E2E} --var ASAAS_WEBHOOK_TOKEN:${TOKEN_WEBHOOK_E2E} --var VAPID_PUBLICA:${VAPID_E2E.publica} --var VAPID_PRIVADA:${VAPID_E2E.privada} --var VAPID_ASSUNTO:mailto:avisos@exemplo.test --var PUSH_HOSTS_DEV:localhost:${PORTA_PUSH_FALSO}`,
       url: `${URL_BASE}/api/health`,
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,

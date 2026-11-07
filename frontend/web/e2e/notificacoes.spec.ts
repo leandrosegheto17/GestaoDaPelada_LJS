@@ -1,5 +1,5 @@
 import { expect, test, type APIRequestContext, type Browser, type Page } from '@playwright/test';
-import { URL_BASE, URL_PUSH_FALSO, VAPID_E2E } from '../playwright.config.ts';
+import { CABECALHO_DEV_EMAILS, URL_BASE, URL_PUSH_FALSO, VAPID_E2E } from '../playwright.config.ts';
 
 /**
  * Jornada J-34 de `.specs/projeto/jornadas.md` (notificacoes T41; NOT-63, NOT-64; também NOT-02, NOT-05, NOT-13,
@@ -41,7 +41,7 @@ async function linkDoEmail(
   await expect
     .poll(
       async () => {
-        const r = await request.get('/api/dev/emails');
+        const r = await request.get('/api/dev/emails', { headers: CABECALHO_DEV_EMAILS });
         const { mensagens } = (await r.json()) as { mensagens: MensagemDev[] };
         link = mensagens
           .filter((m) => m.para === para && m.tipo === tipo)
