@@ -10,7 +10,7 @@
 | A-01 | `.specs/projeto/testes.json:2` sem `visual`, com `docker compose up -d --wait` | n/a (config) | **reaberto em parte**: T81 itens 2 e 3 seguem `[ ]` (`tasks.md:2427-2428`); `trava-testes --rodar` não ficou verde (A-15; e2e 71/74 informado) |
 | A-02 | `docs/restauracao-registro.md:15-19` + R2-T1 `tasks.md:2776` | n/a | **lacuna aceita**: a URL da role só existe no secret `NEON_URL_BACKUP`; registro e tarefa existem (AD-014 segue aberta) |
 | A-03, A-04, A-07 | `spec.md:138,153`; AD-133; `CLAUDE.md:52` | n/a (texto) | fechado |
-| A-05 | `STATE.md:131` AD-136 (visual), `:132` AD-126 (pesos), `:134` AD-127 | n/a | fechado |
+| A-05 | `STATE.md:131` AD-140 (visual), `:132` AD-126 (pesos), `:134` AD-127 | n/a | fechado |
 | A-06 | `test/lint/pontuacao-so-no-modulo.test.ts:25`, `sem-escrita-periodo.test.ts:25` `{timeout:60_000}`; `vitest.config.ts:90` `hookTimeout`; `web/vite.config.ts` `testTimeout 15_000` | PAR-61/PAR-140 passam na cópia limpa (antes estouravam 5 s) | fechado |
 | A-08 | `STATE.md` `## Autorizações` 2026-11-06 (retroativa, motivo) | n/a | fechado |
 | A-09 | migração `1794000000000_backup-sequences.sql:7-8` | `backup-sequences.test.ts:11` `rows.filter(!le) toEqual([])`, `:27` `le toEqual([true,true])`; mutantes G1, G2 mortos. `pg_dump` 18.6 (`docker exec`, role `pelada_backup_ro`, `--enable-row-security`): HEAD exit 0; clone do banco sem o SELECT nas 2 sequences: exit 1 "failed to get data for sequence" | fechado (conferência na produção = R2-T1 `tasks.md:2777`, aceita como lacuna) |
