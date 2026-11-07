@@ -182,6 +182,30 @@ describe('avaliar em 3 ou mais times', () => {
     });
   });
 
+  it('SIM-37 (A-10): depois de mover jogadores, o incompleto é o time que ficou abaixo de N, não o último', () => {
+    const s = sugestaoVarios();
+    expect(s.times.map((t) => t.length)).toEqual([4, 4, 4, 4, 4, 2]);
+    // Três do primeiro time vão para o último: 1, 4, 4, 4, 4, 5.
+    const mover = s.times[0]!.slice(1);
+    const times = s.times.map((t, i) =>
+      i === 0 ? t.slice(0, 1) : i === 5 ? [...t, ...mover] : [...t],
+    );
+    const r = avaliar(ENTRADA_VARIOS, { formato: 'varios_times', times }, historicoFixo(22));
+    expect(r).toMatchObject({ ok: true, incompleto: 0 });
+  });
+
+  it('SIM-37 (A-10): o time que ficou vazio depois de mover é o incompleto', () => {
+    const s = sugestaoVarios();
+    // Os dois do último time vão um para cada um dos dois primeiros: 5, 5, 4, 4, 4, 0.
+    const [a, b] = s.times[5]!;
+    const times = s.times.map((t, i) =>
+      i === 0 ? [...t, a!] : i === 1 ? [...t, b!] : i === 5 ? [] : [...t],
+    );
+    expect(
+      avaliar(ENTRADA_VARIOS, { formato: 'varios_times', times }, historicoFixo(22)),
+    ).toMatchObject({ ok: true, incompleto: 5 });
+  });
+
   it('SIM-63: jogador fora dos aptos em 3 ou mais é recusado', () => {
     const s = sugestaoVarios();
     const times = s.times.map((t, i) => (i === 0 ? [...t.slice(1), 'de-outro-grupo'] : t));

@@ -67,7 +67,13 @@ interface PropsResultadoDois {
   acoes?: ReactNode | undefined;
 }
 
-function Selos({ j }: { j: JogadorDaTela & { saiNoIntervalo?: boolean } }) {
+function Selos({
+  j,
+  movido = false,
+}: {
+  j: JogadorDaTela & { saiNoIntervalo?: boolean };
+  movido?: boolean;
+}) {
   const selos: ReactNode[] = [];
   if (j.so1oTempo)
     selos.push(
@@ -91,6 +97,13 @@ function Selos({ j }: { j: JogadorDaTela & { saiNoIntervalo?: boolean } }) {
     selos.push(
       <span key="ano" className={`${estilos.selo} ${estilos['selo--neutro']}`}>
         {TEXTO_SEM_ANO}
+      </span>,
+    );
+  // Marca visual do ajuste (t13 `recalculando`); fora do nome acessível do botão, que segue sendo só o apelido.
+  if (movido)
+    selos.push(
+      <span key="movido" aria-hidden="true" className={`${estilos.selo} ${estilos['selo--info']}`}>
+        movido
       </span>,
     );
   return selos.length > 0 ? <span className={estilos['jogador-time__selos']}>{selos}</span> : null;
@@ -123,7 +136,7 @@ export function ListaJogadores({
             onClick={() => aoTocar?.(j.id)}
           >
             <span>{j.apelido}</span>
-            <Selos j={j} />
+            <Selos j={j} movido={movidos?.has(j.id) ?? false} />
           </button>
         </li>
       ))}
@@ -250,8 +263,16 @@ export function ResultadoDoisTimes({
               <h2 id={idTitulo} className={estilos['cartao-time__titulo']}>
                 {t.nome}
               </h2>
-              <h3 className={estilos['cartao-time__grupo']}>Titulares</h3>
-              <ListaJogadores jogadores={t.titulares} aoTocar={aoTocarJogador} movidos={movidos} />
+              {t.titulares.length > 0 ? (
+                <>
+                  <h3 className={estilos['cartao-time__grupo']}>Titulares</h3>
+                  <ListaJogadores
+                    jogadores={t.titulares}
+                    aoTocar={aoTocarJogador}
+                    movidos={movidos}
+                  />
+                </>
+              ) : null}
               {t.entramNo2oTempo.length > 0 ? (
                 <>
                   <h3 className={estilos['cartao-time__grupo']}>Entram no 2º tempo</h3>

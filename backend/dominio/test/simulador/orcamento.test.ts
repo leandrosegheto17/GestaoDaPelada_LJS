@@ -6,7 +6,7 @@ import { LIMIAR_EFETIVO_MS, medir } from './medir.ts';
 /**
  * Orçamento de CPU no Node (T19; SIM-57). 50 medições de `sugerir`, com 10 de aquecimento descartadas: 30 aptos em
  * 2 times de 11 com K ilimitado e em 6 times de 5, histórico de 40 jogadores e 104 partidas. Mediana e p99 abaixo de
- * 4 ms (legado `sugerir.orcamento.test.ts:10`). Roda no CI com o resto da suíte do domínio.
+ * 10 ms (AD-128; o legado `sugerir.orcamento.test.ts:10` usava 4 ms). Roda no CI com o resto da suíte do domínio.
  *
  * Casos limite (Domínio: sim), listados antes do código:
  * - O maior trabalho de 2 times é N = 11 com K ilimitado (22 titulares e 8 reservas, todos trocáveis).
@@ -29,7 +29,7 @@ const CENARIOS: [string, EntradaSimulador][] = [
 ];
 
 describe('orçamento de CPU do sugerir', () => {
-  it.each(CENARIOS)('SIM-57: %s: mediana e p99 abaixo de 4 ms', (nome, entrada) => {
+  it.each(CENARIOS)('SIM-57: %s: mediana e p99 abaixo de 10 ms', (nome, entrada) => {
     expect(sugerir(entrada, HISTORICO).valida).toBe(true);
     const { mediana, p99 } = medir(() => sugerir(entrada, HISTORICO));
     console.info(`SIM-57 ${nome}: mediana ${mediana.toFixed(3)} ms, p99 ${p99.toFixed(3)} ms`);

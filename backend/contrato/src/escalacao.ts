@@ -18,6 +18,24 @@ import {
  * gravada é a mesma forma, lida com tolerância do banco.
  */
 
+export const MENSAGEM_COMPOSICAO_VAZIA =
+  'A composição precisa ter jogadores (em 3 ou mais times, nenhum time pode ficar vazio).';
+
+/**
+ * Composição sem nenhum jogador, ou com time vazio em 3 ou mais, não é escalação (A-11): gravá-la trocaria a escalação
+ * válida da data e marcaria a partida como pré-marcada com todos ausentes (SIM-76).
+ */
+function recusarVazia(corpo: Escalada, contexto: z.RefinementCtx): void {
+  const vazia =
+    corpo.formato === 'varios_times'
+      ? corpo.composicao.times.length === 0 ||
+        corpo.composicao.times.some((t) => t.jogadores.length === 0)
+      : idsDaComposicao(corpo).length === 0;
+  if (vazia) {
+    contexto.addIssue({ code: 'custom', path: ['composicao'], message: MENSAGEM_COMPOSICAO_VAZIA });
+  }
+}
+
 function recusarRepetidos(corpo: Escalada, contexto: z.RefinementCtx): void {
   const ids = idsDaComposicao(corpo);
   if (new Set(ids).size !== ids.length) {
@@ -44,7 +62,8 @@ export const escalacaoCorpo = z.discriminatedUnion(
         k: kSimulador,
         composicao: composicaoDois,
       })
-      .superRefine(recusarRepetidos),
+      .superRefine(recusarRepetidos)
+      .superRefine(recusarVazia),
     z
       .strictObject({
         formato: z.literal('varios_times'),
@@ -52,7 +71,8 @@ export const escalacaoCorpo = z.discriminatedUnion(
         n: nSimulador,
         composicao: composicaoVarios,
       })
-      .superRefine(recusarRepetidos),
+      .superRefine(recusarRepetidos)
+      .superRefine(recusarVazia),
   ],
   { error: MENSAGEM_FORMATO },
 );

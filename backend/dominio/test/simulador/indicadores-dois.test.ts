@@ -104,6 +104,11 @@ describe('indicadoresDoTime', () => {
     expect(ind.idadeMedia).toBe(3550);
   });
 
+  it('SIM-82 (SEC-001): com um só jogador com ano a idade média é nula, para não revelar a idade dele', () => {
+    const ind = indicadoresDoTime({ titulares: ['t1', 't2'], entram: ['r2'] }, ELENCO, POSICOES);
+    expect(ind.idadeMedia).toBeNull();
+  });
+
   it('SIM-95: ninguém com ano dá idade média nula', () => {
     const ind = indicadoresDoTime({ titulares: ['t2'], entram: ['r2'] }, ELENCO, POSICOES);
     expect(ind.idadeMedia).toBeNull();

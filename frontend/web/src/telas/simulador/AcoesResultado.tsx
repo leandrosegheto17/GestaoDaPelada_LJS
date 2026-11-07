@@ -10,7 +10,8 @@ import estilos from './simulador.module.css';
 /**
  * Ações do resultado (t13, t14; simulador T50; SIM-46, SIM-66, SIM-73, SIM-93), de
  * `.specs/mockup/telas/t13-resultado-dois--{sucesso,refazer,erro-confirmar}.html`:
- * - "Confirmar escalação" sempre ativo, mesmo com avisos (SIM-46): grava a composição na tela; o sucesso volta ao
+ * - "Confirmar escalação" ativo mesmo com avisos (SIM-46), só desabilitado enquanto os números recalculam (t13
+ *   `recalculando`, A-04 da validação): grava a composição na tela; o sucesso volta ao
  *   início com "Escalação de dd/mm confirmada."; a falha (inclusive 409 de grupo arquivado, SIM-93) mantém a
  *   composição e mostra "Não foi possível confirmar a escalação. Tente de novo." (SIM-73);
  * - "Refazer sugestão": sem ajuste, pede outra sugestão direto; com ajuste, pergunta "Descartar seus ajustes?" com
@@ -43,6 +44,8 @@ export function FalhaConfirmar() {
 
 interface PropsAcoes {
   ajustado: boolean;
+  /** Os números estão sendo recalculados depois de um ajuste: "Confirmar escalação" espera a resposta (t13 `recalculando`). */
+  recalculando?: boolean;
   confirmando: boolean;
   aoConfirmar: () => void;
   aoRefazer: () => void;
@@ -51,6 +54,7 @@ interface PropsAcoes {
 
 export function AcoesResultado({
   ajustado,
+  recalculando = false,
   confirmando,
   aoConfirmar,
   aoRefazer,
@@ -61,7 +65,12 @@ export function AcoesResultado({
     <>
       <div className={estilos['barra-acao']}>
         <div className={estilos['grupo-botoes']}>
-          <Botao variante="principal" carregando={confirmando} onClick={aoConfirmar}>
+          <Botao
+            variante="principal"
+            carregando={confirmando}
+            disabled={recalculando}
+            onClick={aoConfirmar}
+          >
             Confirmar escalação
           </Botao>
           <Botao

@@ -43,6 +43,12 @@ describe('indicadoresVariosTimes', () => {
     });
   });
 
+  it('SIM-82 (A-13): com um só jogador com ano a idade média é nula, para não revelar a idade dele', () => {
+    const [um, um2] = indicadoresVariosTimes([['a', 'c'], ['a']], ELENCO);
+    expect(um?.idadeMedia).toBeNull();
+    expect(um2?.idadeMedia).toBeNull();
+  });
+
   it('SIM-40: um bloco por time, na ordem recebida', () => {
     const blocos = indicadoresVariosTimes(
       [

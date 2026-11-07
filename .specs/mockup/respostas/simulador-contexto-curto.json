@@ -1,0 +1,27 @@
+{
+  "dataSugerida": "2026-10-22",
+  "hoje": "2026-10-22",
+  "jogadores": [
+    {
+      "id": "j-alemao",
+      "apelido": "Alemão",
+      "nivel": 610,
+      "semNota": false,
+      "semAno": false
+    },
+    {
+      "id": "j-bigode",
+      "apelido": "Bigode",
+      "nivel": 690,
+      "semNota": false,
+      "semAno": false
+    },
+    {
+      "id": "j-cabeca",
+      "apelido": "Cabeça",
+      "nivel": 580,
+      "semNota": false,
+      "semAno": false
+    }
+  ]
+}

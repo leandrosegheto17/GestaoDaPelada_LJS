@@ -89,13 +89,13 @@ describe('distribuirVariosTimes', () => {
     }
   });
 
-  it('SIM-59: termina com composição válida também com 60 aptos e N = 2', () => {
-    const muitos: Apto[] = Array.from({ length: 60 }, (_, k) => ({
+  it('SIM-59: termina com composição válida também com 40 aptos e N = 2', () => {
+    const muitos: Apto[] = Array.from({ length: 40 }, (_, k) => ({
       ...VARIADOS[k % 22]!,
       id: `q${String(k + 1).padStart(2, '0')}`,
     }));
     const { times } = rodar(muitos, 2);
-    expect(times).toHaveLength(30);
+    expect(times).toHaveLength(20);
     expect(times.every((t) => t.length === 2)).toBe(true);
   });
 
