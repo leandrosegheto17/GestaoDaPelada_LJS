@@ -82,6 +82,8 @@ O `.env.example` lista todas, com obrigatoriedade, formato e se é segredo. Segr
 | `DATABASE_URL_TESTE`                                            | Cluster dos testes de banco (padrão: o banco local)                                                                          |
 | `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE`      | URL do pool do Worker nos testes da `api` (vitest), no lugar do Hyperdrive; padrão: montada com `PELADA_APP_SENHA` (segredo) |
 | `PUSH_FALSO_PORTA`                                              | Porta TCP (padrão 8790) do servidor de push falso do e2e                                                                     |
+| `PELADA_E2E_PORTA`                                              | Porta TCP (padrão 8788) do wrangler dev do e2e                                                                               |
+| `PELADA_E2E_BANCO`                                              | Nome do banco do e2e no Postgres local (padrão `pelada`)                                                                     |
 | `PELADA_E2E_VAPID_PUBLICA`                                      | Chave VAPID pública do e2e; sem ela o par é gerado na hora, só para o teste                                                  |
 | `PELADA_E2E_VAPID_PRIVADA`                                      | Chave VAPID privada do e2e; sem ela o par é gerado na hora, só para o teste (segredo)                                        |
 | `DATABASE_URL_MIGRACAO`                                         | Role de migração, host local; obrigatória em `pnpm migrar` e `pnpm seed`                                                     |
