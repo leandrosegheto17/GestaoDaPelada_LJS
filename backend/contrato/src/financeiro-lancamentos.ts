@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { textoVisivel } from './grupo.ts';
+import { MENSAGENS_ERRO_PLANO } from './plano.ts';
 import {
   centavos,
   dataFinanceira,
@@ -30,12 +32,15 @@ export const pagamentoCorpo = z
   .strict();
 export type PagamentoCorpo = z.infer<typeof pagamentoCorpo>;
 
-/** Descrição de 1 a 80 caracteres depois de tirar os espaços das pontas; sai sem eles (FIN-25, FIN-26). */
-export const descricaoLancamento = z
-  .string({ error: MENSAGEM_DESCRICAO })
-  .trim()
-  .min(LIMITES_LANCAMENTO.descricaoMin, MENSAGEM_DESCRICAO)
-  .max(LIMITES_LANCAMENTO.descricaoMax, MENSAGEM_DESCRICAO);
+/**
+ * Descrição de 1 a 80 caracteres depois de tirar os espaços das pontas; sai sem eles (FIN-25, FIN-26). Sem controle nem
+ * invisível nem inversão de direção do texto, que forjam um registro enganoso no caixa (SEC-005).
+ */
+export const descricaoLancamento = textoVisivel(
+  LIMITES_LANCAMENTO.descricaoMin,
+  LIMITES_LANCAMENTO.descricaoMax,
+  MENSAGEM_DESCRICAO,
+);
 
 /** `POST` e `PUT .../financeiro/lancamentos[/:id]`. */
 export const lancamentoCorpo = z
@@ -68,9 +73,9 @@ export const acessoFinanceiroCorpo = z.object({ acessaFinanceiro: z.boolean() })
 export type AcessoFinanceiroCorpo = z.infer<typeof acessoFinanceiroCorpo>;
 
 /**
- * Códigos de erro do financeiro, com as mensagens da spec. `plano_pro` repete o código e o texto de
- * `CODIGOS_ERRO_PLANO` (`plano.ts`, feature 7) para o financeiro não depender da feature seguinte; o /executar pode
- * unificar. `jogador_fora_do_mes` é o motivo interno do 422 no campo `jogadorId` (FIN-19).
+ * Códigos de erro do financeiro, com as mensagens da spec. `plano_pro` repete o código de `CODIGOS_ERRO_PLANO`
+ * (`plano.ts`) e usa o mesmo texto (`MENSAGENS_ERRO_PLANO`). `jogador_fora_do_mes` é o motivo interno do 422 no campo
+ * `jogadorId` (FIN-19).
  */
 export const CODIGOS_ERRO_FINANCEIRO = [
   'pagamento_ja_marcado',
@@ -87,8 +92,16 @@ export const MENSAGENS_ERRO_FINANCEIRO: Readonly<
   pagamento_ja_marcado: 'O pagamento deste mês já está marcado.',
   sem_permissao_financeiro: 'Você não tem acesso ao financeiro deste grupo.',
   acao_na_propria_conta: 'Você não pode alterar a sua própria permissão.',
-  plano_pro: 'Este recurso é do plano Pro.',
+  plano_pro: MENSAGENS_ERRO_PLANO.plano_pro,
 };
+
+/**
+ * 409 ao retirar o acesso ao financeiro da criadora do grupo (S-1): ela sempre o mantém, senão não teria como
+ * recuperá-lo sozinha. Fora de `CODIGOS_ERRO_FINANCEIRO` (lista fixada pelo FIN-36); o front mostra o texto de `erro`.
+ */
+export const CODIGO_ACESSO_DA_CRIADORA = 'acesso_da_criadora' as const;
+export const MENSAGEM_ACESSO_DA_CRIADORA =
+  'A criadora do grupo mantém sempre o acesso ao financeiro.';
 
 /** Mensagem do 409 `lancamento_vinculado` (FIN-30); `mes` em `AAAA-MM` vira `MM/AAAA`. */
 export function mensagemLancamentoVinculado(apelido: string, mes: string): string {

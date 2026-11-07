@@ -207,6 +207,7 @@ extensao plpgsql
 funcao admins_listar(p_grupo_id uuid) retorna TABLE(id uuid, nome text, email text, acessa_financeiro boolean) sql security definer stable config=search_path=public, pg_temp corpo=9c080514de1b6f530fddc593710589ab
 funcao app_acessa_financeiro(p_grupo_id uuid) retorna boolean sql security definer stable config=search_path=public, pg_temp corpo=a21fb63fa5f3f030894881bf4c17995d
 funcao app_conta_id() retorna uuid sql security invoker stable config= corpo=2d5f7e789b31709b1427863f1a8147e8
+funcao app_eh_criadora(p_grupo_id uuid, p_conta_id uuid) retorna boolean sql security definer stable config=search_path=public, pg_temp corpo=d70ff65ef4ad0ca98196ae1f0442d40e
 funcao app_slug_publico() retorna text sql security invoker stable config= corpo=ac83591fe3bcfa971b0de1bd93fc5fa2
 funcao asaas_data(p_texto text) retorna timestamp with time zone sql security invoker stable config=search_path=public, pg_temp corpo=ac68f89cc6c7962a7f93eda1c3e6ffcb
 funcao asaas_evento_registrar(p_id text, p_evento text, p_data_criacao text, p_cobranca text, p_assinatura text, p_status text, p_valor_centavos integer) retorna TABLE(resultado text, grupo_id uuid, situacao text, valor_centavos integer, pago_ate date, cobranca_pro_id text, ultimo_evento_em text) plpgsql security definer volatile config=search_path=public, pg_temp corpo=aefc50c92ce3b0ad3dc48c31eb2afbd7
@@ -262,6 +263,7 @@ funcao push_ranking_estado(p_slug text, p_endpoint text, p_auth text) retorna te
 funcao push_ranking_lote(p_grupo uuid, p_apos_id bigint, p_limite integer, p_desde timestamp with time zone) retorna TABLE(id bigint, endpoint text, p256dh text, auth text) plpgsql security definer stable config=search_path=public, pg_temp corpo=8c3022bfc2b1d9a625cac038755bff5c
 funcao push_ranking_resultado(p_grupo uuid, p_aceitos bigint[], p_revogados bigint[]) retorna void plpgsql security definer volatile config=search_path=public, pg_temp corpo=104868b0d8282c91bb020ffac48d2d05
 funcao sessao_tocar(p_token_hash bytea) retorna uuid plpgsql security definer volatile config=search_path=public, pg_temp corpo=99e32a4a19af0f2d5e615bf4fcb7ae27
+funcao vinculos_admin_so_acessa_financeiro() retorna trigger plpgsql security invoker volatile config=search_path=public, pg_temp corpo=54c947d9f8ae41bc2d7964e1c005c5e8
 funcao vinculos_travar(p_grupo_id uuid, p_todos boolean) retorna TABLE(conta_id uuid) plpgsql security definer volatile config=search_path=public, pg_temp corpo=e5bf033945684507d1ed793399bd4770
 grant coluna config_pesos.expulso pelada_app UPDATE
 grant coluna config_pesos.expulso_com_chuva pelada_app UPDATE
@@ -294,6 +296,7 @@ grant coluna partidas.choveu pelada_app UPDATE
 grant funcao admins_listar(p_grupo_id uuid) pelada_app EXECUTE
 grant funcao app_acessa_financeiro(p_grupo_id uuid) pelada_app EXECUTE
 grant funcao app_conta_id() PUBLIC EXECUTE
+grant funcao app_eh_criadora(p_grupo_id uuid, p_conta_id uuid) pelada_app EXECUTE
 grant funcao app_slug_publico() PUBLIC EXECUTE
 grant funcao asaas_evento_registrar(p_id text, p_evento text, p_data_criacao text, p_cobranca text, p_assinatura text, p_status text, p_valor_centavos integer) pelada_app EXECUTE
 grant funcao asaas_evento_sem_efeito(p_evento_id text, p_motivo text) pelada_app EXECUTE
@@ -337,6 +340,7 @@ grant funcao push_ranking_estado(p_slug text, p_endpoint text, p_auth text) pela
 grant funcao push_ranking_lote(p_grupo uuid, p_apos_id bigint, p_limite integer, p_desde timestamp with time zone) pelada_app EXECUTE
 grant funcao push_ranking_resultado(p_grupo uuid, p_aceitos bigint[], p_revogados bigint[]) pelada_app EXECUTE
 grant funcao sessao_tocar(p_token_hash bytea) pelada_app EXECUTE
+grant funcao vinculos_admin_so_acessa_financeiro() PUBLIC EXECUTE
 grant funcao vinculos_travar(p_grupo_id uuid, p_todos boolean) pelada_app EXECUTE
 grant schema public PUBLIC USAGE
 grant schema public pelada_app USAGE
@@ -608,6 +612,7 @@ policy vinculos_admin.vinculos_admin_apagar DELETE PERMISSIVE roles=pelada_app u
 policy vinculos_admin.vinculos_admin_backup SELECT PERMISSIVE roles=pelada_backup_ro using=true check=
 policy vinculos_admin.vinculos_admin_inserir INSERT PERMISSIVE roles=pelada_app using= check=((app_conta_id() IS NOT NULL) AND (grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)))
 policy vinculos_admin.vinculos_admin_ler SELECT PERMISSIVE roles=pelada_app using=(grupo_id IN ( SELECT grupos_visiveis() AS grupos_visiveis)) check=
+policy vinculos_admin.vinculos_admin_protege_criadora UPDATE RESTRICTIVE roles=pelada_app using=true check=(acessa_financeiro OR (NOT app_eh_criadora(grupo_id, conta_id)))
 policy vinculos_admin.vinculos_admin_trava_financeiro_alterar UPDATE RESTRICTIVE roles=pelada_app using=((conta_id <> app_conta_id()) AND app_acessa_financeiro(grupo_id)) check=((conta_id <> app_conta_id()) AND app_acessa_financeiro(grupo_id))
 policy vinculos_admin.vinculos_admin_trava_financeiro_inserir INSERT RESTRICTIVE roles=pelada_app using= check=((NOT acessa_financeiro) OR app_acessa_financeiro(grupo_id))
 restricao assinaturas.assinaturas_asaas_assinatura_id_check CHECK (((char_length(asaas_assinatura_id) >= 1) AND (char_length(asaas_assinatura_id) <= 100)))
@@ -836,3 +841,4 @@ tabela vinculos_admin
 trigger contas.push_conta_apagar_na_exclusao CREATE TRIGGER push_conta_apagar_na_exclusao AFTER UPDATE OF excluida_em ON public.contas FOR EACH ROW WHEN (((old.excluida_em IS NULL) AND (new.excluida_em IS NOT NULL))) EXECUTE FUNCTION push_conta_apagar_na_exclusao()
 trigger grupos.grupos_arquivado_so_criadora CREATE TRIGGER grupos_arquivado_so_criadora BEFORE UPDATE OF arquivado_em ON public.grupos FOR EACH ROW WHEN ((old.arquivado_em IS DISTINCT FROM new.arquivado_em)) EXECUTE FUNCTION grupos_arquivado_so_criadora()
 trigger grupos.grupos_slug_imutavel CREATE TRIGGER grupos_slug_imutavel BEFORE UPDATE OF slug ON public.grupos FOR EACH ROW EXECUTE FUNCTION grupos_slug_imutavel()
+trigger vinculos_admin.vinculos_admin_so_acessa_financeiro CREATE TRIGGER vinculos_admin_so_acessa_financeiro BEFORE UPDATE ON public.vinculos_admin FOR EACH ROW EXECUTE FUNCTION vinculos_admin_so_acessa_financeiro()

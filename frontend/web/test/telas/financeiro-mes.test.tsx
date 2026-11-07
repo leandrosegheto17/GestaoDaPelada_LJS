@@ -108,6 +108,16 @@ describe('Financeiro do mês (t22)', () => {
     );
   });
 
+  it('FIN-47: 403 usa a barra do mockup (só o nome do grupo, sem "Trocar grupo") e o ícone do cadeado', async () => {
+    abrir(() => json(403, { erro: TEXTO_SEM_ACESSO_AJUDA, codigo: 'sem_permissao_financeiro' }));
+    expect(await screen.findByRole('heading', { name: TEXTO_SEM_ACESSO })).toBeTruthy();
+    expect(screen.queryByRole('link', { name: 'Trocar grupo' })).toBeNull();
+    // O cadeado do mockup (t22 sem-permissão) é um retângulo e um arco; o ícone de erro seria um círculo.
+    const svg = document.querySelector('svg[aria-hidden="true"]');
+    expect(svg?.querySelector('rect')).not.toBeNull();
+    expect(svg?.querySelector('circle')).toBeNull();
+  });
+
   it('FIN-09: 422 do mês fora do histórico mostra a mensagem e o caminho ao mês atual', async () => {
     abrir(
       () =>

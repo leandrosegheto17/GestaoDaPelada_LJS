@@ -8,7 +8,7 @@ import estilos from './TelaMensagem.module.css';
  * anunciar o resultado (confirmação, link inválido).
  */
 
-export type IconeTelaMensagem = 'sucesso' | 'erro' | 'email';
+export type IconeTelaMensagem = 'sucesso' | 'erro' | 'email' | 'cadeado';
 
 export interface PropsTelaMensagem {
   icone: IconeTelaMensagem;
@@ -39,6 +39,15 @@ function Icone({ tipo }: { tipo: IconeTelaMensagem }) {
       <svg {...comum}>
         <circle cx="12" cy="12" r="10" />
         <path d="m8 12 3 3 5-6" />
+      </svg>
+    );
+  }
+  if (tipo === 'cadeado') {
+    // Cadeado de `t22-financeiro--sem-permissao.html` do mockup.
+    return (
+      <svg {...comum}>
+        <rect x="4" y="11" width="16" height="10" rx="2" />
+        <path d="M8 11V7a4 4 0 0 1 8 0v4" />
       </svg>
     );
   }

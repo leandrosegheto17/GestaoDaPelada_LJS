@@ -141,3 +141,23 @@ describe('acessoFinanceiro.alterarFinanceiro', () => {
     }
   });
 });
+
+describe('acessoFinanceiro.alterarFinanceiro: acesso da criadora (S-1)', () => {
+  it('FIN-35: retirar o acesso da criadora por outra admin com acesso devolve criadora, sem gravar nem auditar', async () => {
+    const { cenario } = aberto;
+    await alterar(cenario.contaO, true);
+    const r = await alterar(cenario.contaC, false, cenario.contaO);
+    expect(r).toEqual({ resultado: 'criadora' });
+    expect(await acessaDe(cenario.contaC)).toBe(true);
+    expect(await auditorias()).toHaveLength(1);
+  });
+
+  it('FIN-41: sem a checagem do repositório, o banco ainda recusa a retirada (42501)', async () => {
+    const { cenario } = aberto;
+    await alterar(cenario.contaO, true);
+    await expect(
+      alterar(cenario.contaC, false, cenario.contaO, { pularChecagemDaCriadora: true }),
+    ).rejects.toMatchObject({ code: '42501' });
+    expect(await acessaDe(cenario.contaC)).toBe(true);
+  });
+});

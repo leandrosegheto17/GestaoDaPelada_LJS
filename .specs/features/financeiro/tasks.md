@@ -1522,6 +1522,7 @@ T47 → T48
 - [x] Teste `FIN-47`: a mensagem de cada campo do t23 e do t24 está à direita ou logo abaixo do campo, dentro da mesma linha do formulário (`boundingBox`)
 - [x] Teste `FIN-46`: Stylelint de tokens sem erro nos CSS novos
 - [x] Revisão manual do t19 (PC e celular) registrada nesta tarefa, com data e resultado (FIN-51)
+  - **Registro (2026-11-06, `/validar` R1, A-04):** feita por Claude (Sonnet), com prints do app em PC (1280) e celular (390) contra `L:.md/mockup/telas/t19-admins--sucesso.html:18-19`; o usuário pode refazer. Conferem com o legado: trilho 52×30 px com bolinha, verde ligado, opacidade 0,5 e texto "Você não pode alterar o seu próprio acesso." na própria conta, tokens do guia. Divergências: (1) o texto "Financeiro" ao lado do trilho só aparece ligado (SPEC_DEVIATION já registrada em `Admins.tsx`); (2) **observação, mantida:** com e-mails longos em 390 px o e-mail do convidado pode passar por baixo do interruptor; o layout é o do mockup aprovado (`.specs/mockup/telas/t19-admins--sucesso.html`, que o `visual` compara até 1%) e uma correção em `Lista.module.css` reprovou 6 comparações do t19, então o app segue o mockup (`.specs/mockup/` só muda por redesign, AD-127). Resultado: aprovado, com a observação para um redesign.
 - [x] Gate passa, sem teste removido ou enfraquecido
 
 **Tests**: e2e

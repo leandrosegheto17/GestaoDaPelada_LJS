@@ -9,6 +9,7 @@ import {
   mensagemLancamentoVinculado,
   pagamentoCorpo,
 } from '../src/financeiro-lancamentos.ts';
+import { MENSAGEM_TEXTO_INVISIVEL } from '../src/grupo.ts';
 
 /** Contrato de pagamentos, lançamentos e acesso (T8; FIN-25, FIN-26, FIN-35, FIN-36). */
 
@@ -61,6 +62,20 @@ describe('lancamentoCorpo', () => {
     expect(r.success).toBe(false);
     expect(mensagens(r, 'descricao')).toContain(MENSAGEM_DESCRICAO);
     expect(MENSAGEM_DESCRICAO).toBe('A descrição precisa ter de 1 a 80 caracteres.');
+  });
+
+  it('FIN-26: descrição com caractere invisível ou de inversão de direção é recusada', () => {
+    for (const descricao of ['\u200b', 'Pix \u202e05,99 R$\u202c recebido', 'a\u0000b']) {
+      const r = lancamentoCorpo.safeParse({ ...lancamentoValido, descricao });
+      expect(r.success, JSON.stringify(descricao)).toBe(false);
+      expect(mensagens(r, 'descricao')).toContain(MENSAGEM_TEXTO_INVISIVEL);
+    }
+  });
+
+  it('FIN-26: ano 0000 na data do lançamento dá a mensagem de data', () => {
+    const r = lancamentoCorpo.safeParse({ ...lancamentoValido, data: '0000-01-01' });
+    expect(r.success).toBe(false);
+    expect(mensagens(r, 'data')).toContain('Informe uma data válida.');
   });
 
   it('FIN-26: descrição só com espaços dá a mensagem da spec', () => {

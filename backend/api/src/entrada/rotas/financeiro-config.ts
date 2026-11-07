@@ -16,8 +16,7 @@ import { configFinanceira } from '../../infraestrutura/db/repositorios/financeir
  * - grava pelo `configFinanceira.salvarConfig` (T16), que audita antes e depois na mesma transação (FIN-04), e responde
  *   200 com os três campos gravados (FIN-01).
  *
- * Molde: `PATCH …/jogadores/:id` (`rotas/jogador.ts:44`) e `POST …/escalacoes` (`rotas/escalacoes.ts:27`); a rota de
- * pesos de `PR:1412` ainda não existe.
+ * Molde: `PATCH …/jogadores/:id` (`rotas/jogador.ts:44`) e `POST …/escalacoes` (`rotas/escalacoes.ts:27`).
  */
 
 export const MENSAGEM_DATA_SALDO_FUTURA = 'A data do saldo inicial não pode ser no futuro.';

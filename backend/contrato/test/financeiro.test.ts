@@ -35,6 +35,20 @@ describe('configFinanceiraCorpo', () => {
     ).toBeNull();
   });
 
+  it('FIN-02: ano 0000 na data do saldo inicial é recusado (o Postgres daria 500)', () => {
+    const r = configFinanceiraCorpo.safeParse({ ...corpoValido, dataSaldoInicial: '0000-01-01' });
+    expect(r.success).toBe(false);
+    expect(campos(r)).toEqual(['dataSaldoInicial']);
+    expect(
+      configFinanceiraCorpo.safeParse({ ...corpoValido, dataSaldoInicial: '0001-01-01' }).success,
+    ).toBe(true);
+  });
+
+  it('FIN-09: mês 0000-12 é recusado na consulta do mês', () => {
+    expect(mesFinanceiroConsulta.safeParse({ mes: '0000-12' }).success).toBe(false);
+    expect(mesFinanceiroConsulta.safeParse({ mes: '0001-01' }).success).toBe(true);
+  });
+
   it('FIN-01: limites exatos aceitos', () => {
     expect(
       configFinanceiraCorpo.safeParse({ ...corpoValido, mensalidadeCentavos: 1 }).success,
