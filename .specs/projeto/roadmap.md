@@ -10,5 +10,5 @@ Roteiro aprovado em 2026-11-03 (decisão AD-001 em `.specs/STATE.md`). Entrada: 
 | 4 | `partidas-e-ranking` | Não começada | G | 3 | PAR-* | Lançar partida com presença e chuva, pesos com vigência, ranking com desempate, ranking público `/g/:slug` e PDF |
 | 5 | `simulador` | Não começada | M | 4 | SIM-* | Sortear times (2 ou N) pela prioridade do ranking e confirmar a escalação, dentro do limite de CPU do Worker |
 | 6 | `financeiro` | Não começada | M | 3 | FIN-* | Marcar mensalidades, lançar entradas e saídas, ver o saldo e quem não pagou |
-| 7 | `planos-e-cobranca` | Não começada | G | 4, 5, 6 | PLA-* | Landing em `/` com os planos (AD-023), Free e Pro com trial de 14 dias, assinatura pelo Asaas (sandbox), Meu plano, cortesia Pro do grupo de teste, excedente somente leitura ao cair para Free |
+| 7 | `planos-e-cobranca` | Concluída | G | 4, 5, 6 | PLA-* | Landing em `/` com os planos (AD-023), Free e Pro com trial de 14 dias, assinatura pelo Asaas (sandbox), Meu plano, cortesia Pro do grupo de teste, excedente somente leitura ao cair para Free |
 | 8 | `notificacoes` | Não começada | M | 4, 7 | NOT-* | Push de ranking atualizado pelo link público e avisos de cobrança ao organizador |
