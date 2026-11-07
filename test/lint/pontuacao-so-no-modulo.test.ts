@@ -1,12 +1,15 @@
 import { join } from 'node:path';
 import { ESLint } from 'eslint';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 /**
  * Função única do acumulado (partidas-e-ranking T51; PAR-61; BD:306-308): `acumuladoAte`, `acumuladoComInicial` e
  * `pontosDaPresenca` só aparecem em `backend/dominio/src/pontuacao/`. O teste roda o ESLint do repositório sobre
  * arquivos de prova (`lintText` com um caminho que não existe em disco), como o `sem-relogio.test.ts` do domínio.
  */
+
+/** O ESLint carrega a configuração do repositório na primeira chamada: leva mais que os 5 s padrão sob carga (V-A03). */
+vi.setConfig({ testTimeout: 60_000 });
 
 const RAIZ = join(import.meta.dirname, '..', '..');
 

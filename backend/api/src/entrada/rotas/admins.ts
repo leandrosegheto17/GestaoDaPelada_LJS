@@ -28,14 +28,13 @@ import {
   lerCorpo,
   type OpcoesRotas,
 } from './apoio-acesso.ts';
+import { UUID } from '../uuid.ts';
 
 /**
  * Rotas de admins do grupo (T30; ACE-31, ACE-32, ACE-37 a ACE-42), da tabela do design do LJS
  * (`design.md:167-170`). A sessão (401), a transação com a conta e o vínculo (404) vêm da cadeia
  * de `/api/grupos/:grupoId/*` montada no `criarApp` (T21); aqui só os handlers.
  */
-
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** A lista de admins e convites no formato do contrato (o GET e o PATCH do financeiro, FIN-35). */
 function adminsResposta(lista: ListaAdmins): AdminsResposta {

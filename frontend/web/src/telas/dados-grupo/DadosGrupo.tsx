@@ -56,6 +56,23 @@ export const TEXTO_ARQUIVAR =
   'Os outros admins perdem o acesso e o grupo não pode ser alterado enquanto estiver arquivado. Os dados ficam guardados e você pode reativar em Seus grupos.';
 export const ROTULO_CONFIRMACAO = 'Digite o nome do grupo para confirmar';
 
+/**
+ * Mensagem da falha do arquivar. O 409 `assinatura_ativa` (PLA-69) vem no formato dos erros de plano, sem `codigo`:
+ * o cliente o guarda em `corpo`, e a mensagem do servidor é a que ensina o que fazer (RC-A01).
+ */
+function mensagemDaFalha(e: unknown): string {
+  if (!(e instanceof ErroApi)) return MENSAGEM_REDE;
+  const corpo = e.corpo as { erro?: unknown; mensagem?: unknown } | undefined;
+  if (
+    e.status === 409 &&
+    corpo?.erro === 'assinatura_ativa' &&
+    typeof corpo.mensagem === 'string'
+  ) {
+    return corpo.mensagem;
+  }
+  return e.message;
+}
+
 function DialogoArquivar({ grupo, aoFechar }: { grupo: GrupoDetalhe; aoFechar: () => void }) {
   const navegar = useNavigate();
   const arquivar = useArquivarGrupo(grupo.id);
@@ -73,7 +90,7 @@ function DialogoArquivar({ grupo, aoFechar }: { grupo: GrupoDetalhe; aoFechar: (
         onError: (e) => {
           const campo = mensagensDosCampos(e).nomeConfirmacao;
           setErro(campo);
-          if (!campo) setFalha(e instanceof ErroApi ? e.message : MENSAGEM_REDE);
+          if (!campo) setFalha(mensagemDaFalha(e));
         },
       },
     );

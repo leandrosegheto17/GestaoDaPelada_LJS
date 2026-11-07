@@ -9,9 +9,19 @@ import { z } from 'zod';
 /**
  * Caracteres de controle (`\p{Cc}`: NUL, tab, quebra de linha, DEL, C1) e de formatação invisíveis (`\p{Cf}`: U+200B a
  * U+200F, U+202A a U+202E, U+2066 a U+2069, U+FEFF...). NUL dá 500 no Postgres; os invisíveis deixam dois textos
- * iguais na tela com valores diferentes (SEC-005).
+ * iguais na tela com valores diferentes (SEC-005). Entram também os separadores de linha e de parágrafo (`\p{Zl}`,
+ * `\p{Zp}`) e os invisíveis fora dessas classes: junção de grafemas U+034F, preenchimentos hangul (U+115F, U+1160,
+ * U+3164, U+FFA0), braille em branco U+2800 e os seletores de variação U+FE00 a U+FE0E; o U+FE0F do emoji colorido
+ * segue aceito (SV-03).
  */
-const INVISIVEIS = /[\p{Cc}\p{Cf}]/u;
+const INVISIVEIS =
+  /[\p{Cc}\p{Cf}\p{Zl}\p{Zp}\u115F\u1160\u2800\u3164\uFFA0]|\u034F|[\uFE00-\uFE0E]/u;
+
+/** Pelo menos uma letra ou um número: o texto não pode ser só pontuação ou símbolo (SEC-005). */
+const TEM_LETRA_OU_NUMERO = /[\p{L}\p{N}]/u;
+
+/** Tamanho em caracteres (pontos de código), não em unidades UTF-16: emoji vale 1. */
+const tamanho = (valor: string): number => [...valor].length;
 
 export const MENSAGEM_TEXTO_INVISIVEL =
   'Use só caracteres visíveis, sem caracteres de controle ou invisíveis.';
@@ -27,8 +37,9 @@ export function textoVisivel(min: number, max: number, mensagemTamanho: string) 
     .trim()
     .normalize('NFC')
     .refine((valor) => !INVISIVEIS.test(valor), { error: MENSAGEM_TEXTO_INVISIVEL, abort: true })
-    .min(min, mensagemTamanho)
-    .max(max, mensagemTamanho);
+    .refine((valor) => tamanho(valor) >= min, { error: mensagemTamanho, abort: true })
+    .refine((valor) => tamanho(valor) <= max, { error: mensagemTamanho, abort: true })
+    .refine((valor) => TEM_LETRA_OU_NUMERO.test(valor), { error: MENSAGEM_TEXTO_INVISIVEL });
 }
 
 export const LIMITES_GRUPO = { nomeMin: 3, nomeMax: 60 } as const;

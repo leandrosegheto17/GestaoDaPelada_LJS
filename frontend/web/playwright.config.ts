@@ -64,7 +64,7 @@ function ambienteDoServidor(): Record<string, string> {
   const senha = process.env.PELADA_APP_SENHA;
   if (senha) {
     const porta = process.env.PELADA_DEV_BANCO_PORTA || '5432';
-    ambiente.CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE = `postgres://pelada_app:${encodeURIComponent(senha)}@127.0.0.1:${porta}/pelada`;
+    ambiente.CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE = `postgres://pelada_app:${encodeURIComponent(senha)}@127.0.0.1:${porta}/${process.env.PELADA_E2E_BANCO || 'pelada'}`;
   }
   return ambiente;
 }

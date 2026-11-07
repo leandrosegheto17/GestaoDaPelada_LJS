@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { ESLint } from 'eslint';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 /**
  * Regra `pelada/sem-escrita-periodo` ligada (partidas-e-ranking T52; PAR-140; BD:309-314; AD-039): fora de
@@ -9,6 +9,9 @@ import { describe, expect, it } from 'vitest';
  * Roda o ESLint do repositório sobre arquivos de prova (`lintText` com caminho que não existe em disco) e sobre os
  * arquivos reais que só leem os períodos.
  */
+
+/** O ESLint carrega a configuração do repositório na primeira chamada: leva mais que os 5 s padrão sob carga (V-A03). */
+vi.setConfig({ testTimeout: 60_000 });
 
 const RAIZ = join(import.meta.dirname, '..', '..');
 const REGRA = 'pelada/sem-escrita-periodo';
