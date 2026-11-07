@@ -91,6 +91,9 @@ O `.env.example` lista todas, com obrigatoriedade, formato e se é segredo. Segr
 | `PELADA_DEV_PORTA_API`                                          | Porta do `wrangler dev` (padrão 8787)                                                                                        |
 | `PELADA_DEV_PORTA_WEB`                                          | Porta do Vite (padrão 5173)                                                                                                  |
 | `PELADA_VISUAL_PORTA`                                           | Porta do `vite preview` da comparação visual, `pnpm visual` (padrão 4174)                                                    |
+| `PELADA_E2E_PORTA`                                              | Porta do `wrangler dev` do e2e (padrão 8788); troque quando outra sessão usa a mesma                                         |
+| `PELADA_E2E_PORTA_ASAAS`                                        | Porta do Asaas falso do e2e (padrão 8789)                                                                                    |
+| `PELADA_E2E_PORTA_PUSH`                                         | Porta do push falso do e2e (padrão 8790)                                                                                     |
 | `PELADA_VISUAL_FILTRO`                                          | Expressão regular sobre o nome da comparação visual, para iterar numa tela (ex. `^t20-`)                                     |
 | `PELADA_VISUAL_TIMEOUT`                                         | Teto de cada espera do app na comparação visual, em milissegundos (padrão 30000)                                             |
 | `VITE_VITRINE`                                                  | `1` inclui as rotas de vitrine no build (só a comparação visual usa)                                                         |

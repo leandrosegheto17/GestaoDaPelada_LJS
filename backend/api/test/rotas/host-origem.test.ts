@@ -39,7 +39,7 @@ const CSP = "default-src 'none'; frame-ancestors 'none'";
 
 describe('A-12: origem das escritas (403)', () => {
   for (const metodo of ESCRITAS) {
-    it(`FUN-22: ${metodo} com Origin de outro site responde 403`, async () => {
+    it(`AD-131: ${metodo} com Origin de outro site responde 403`, async () => {
       const r = await app().request(
         `${PROD}/api/teste/escrita`,
         { method: metodo, headers: { ...pelada, Origin: 'https://atacante.example' } },
@@ -48,7 +48,7 @@ describe('A-12: origem das escritas (403)', () => {
       expect(r.status).toBe(403);
     });
 
-    it(`FUN-22: ${metodo} com Sec-Fetch-Site cross-site, same-site ou desconhecido responde 403`, async () => {
+    it(`AD-131: ${metodo} com Sec-Fetch-Site cross-site, same-site ou desconhecido responde 403`, async () => {
       for (const valor of ['cross-site', 'same-site', 'CROSS-SITE', 'desconhecido']) {
         const r = await app().request(
           `${PROD}/api/teste/escrita`,
@@ -59,7 +59,7 @@ describe('A-12: origem das escritas (403)', () => {
       }
     });
 
-    it(`FUN-22: ${metodo} do próprio site passa (Origin igual, Sec-Fetch-Site same-origin ou none, ou sem os dois)`, async () => {
+    it(`AD-131: ${metodo} do próprio site passa (Origin igual, Sec-Fetch-Site same-origin ou none, ou sem os dois)`, async () => {
       for (const cabecalhos of [
         { Origin: PROD },
         { Origin: 'HTTPS://GESTAODAPELADA.EXEMPLO.TEST' },
@@ -78,7 +78,7 @@ describe('A-12: origem das escritas (403)', () => {
     });
   }
 
-  it('FUN-22: a origem é comparada com o cabeçalho Host (wrangler dev), com porta', async () => {
+  it('AD-131: a origem é comparada com o cabeçalho Host (wrangler dev), com porta', async () => {
     const url = 'https://rota-do-wrangler.exemplo.test/api/teste/escrita';
     const ok = await app().request(
       url,
@@ -100,7 +100,7 @@ describe('A-12: origem das escritas (403)', () => {
     expect(outraPorta.status).toBe(403);
   });
 
-  it('FUN-22: Origin do host da URL_PUBLICA passa mesmo com o Host trocado; outro site segue recusado', async () => {
+  it('AD-131: Origin do host da URL_PUBLICA passa mesmo com o Host trocado; outro site segue recusado', async () => {
     const url = 'https://rota-do-wrangler.exemplo.test/api/teste/escrita';
     const ok = await app().request(
       url,
@@ -116,7 +116,7 @@ describe('A-12: origem das escritas (403)', () => {
     expect(ruim.status).toBe(403);
   });
 
-  it('FUN-22: com EMAIL_DEV=1 qualquer loopback é origem própria (vite do pnpm dev); sem ele, não', async () => {
+  it('AD-131: com EMAIL_DEV=1 qualquer loopback é origem própria (vite do pnpm dev); sem ele, não', async () => {
     const url = 'https://rota-do-wrangler.exemplo.test/api/teste/escrita';
     const vite = { ...pelada, Origin: 'http://localhost:5751' };
     const dev = await app().request(url, { method: 'POST', headers: vite }, envLocal);
@@ -128,7 +128,34 @@ describe('A-12: origem das escritas (403)', () => {
     expect(ruim.status).toBe(403);
   });
 
-  it('FUN-22: Origin null (documento sem origem) em escrita responde 403', async () => {
+  it('AD-131: Origin do host da URL_PUBLICA (não loopback, sem EMAIL_DEV) passa com o Host trocado', async () => {
+    const url = 'https://rota-do-wrangler.exemplo.test/api/teste/escrita';
+    const r = await app().request(
+      url,
+      { method: 'POST', headers: { ...pelada, Origin: PROD } },
+      envProd,
+    );
+    expect(r.status).toBe(200);
+    const outro = await app().request(
+      url,
+      { method: 'POST', headers: { ...pelada, Origin: 'https://atacante.example' } },
+      envProd,
+    );
+    expect(outro.status).toBe(403);
+  });
+
+  it('AD-131: Origin que não é uma URL analisável responde 403, não 500', async () => {
+    for (const origem of ['http://[', 'http://', '::::', '']) {
+      const r = await app().request(
+        `${PROD}/api/teste/escrita`,
+        { method: 'POST', headers: { ...pelada, Origin: origem } },
+        envProd,
+      );
+      expect(r.status, JSON.stringify(origem)).toBe(403);
+    }
+  });
+
+  it('AD-131: Origin null (documento sem origem) em escrita responde 403', async () => {
     const r = await app().request(
       `${PROD}/api/teste/escrita`,
       { method: 'POST', headers: { ...pelada, Origin: 'null' } },
@@ -137,7 +164,7 @@ describe('A-12: origem das escritas (403)', () => {
     expect(r.status).toBe(403);
   });
 
-  it('FUN-22: GET e HEAD de outra origem não são recusados (só a escrita muda estado)', async () => {
+  it('AD-131: GET e HEAD de outra origem não são recusados (só a escrita muda estado)', async () => {
     for (const metodo of ['GET', 'HEAD']) {
       const r = await app().request(
         `${PROD}/api/health`,
@@ -151,7 +178,7 @@ describe('A-12: origem das escritas (403)', () => {
     }
   });
 
-  it('FUN-22: a recusa por origem também tem os cabeçalhos de segurança', async () => {
+  it('AD-131: a recusa por origem também tem os cabeçalhos de segurança', async () => {
     const r = await app().request(
       `${PROD}/api/teste/escrita`,
       { method: 'POST', headers: { ...pelada, 'Sec-Fetch-Site': 'cross-site' } },
@@ -162,7 +189,7 @@ describe('A-12: origem das escritas (403)', () => {
 });
 
 describe('A-12: CSP e Referrer-Policy em /api', () => {
-  it('FUN-22: 200, 404 e 500 de /api têm CSP restritiva e Referrer-Policy same-origin', async () => {
+  it('AD-131: 200, 404 e 500 de /api têm CSP restritiva e Referrer-Policy same-origin', async () => {
     const a = criarApp({
       registrarExtras: (api) =>
         api.get('/teste/erro', () => {
@@ -176,7 +203,7 @@ describe('A-12: CSP e Referrer-Policy em /api', () => {
     }
   });
 
-  it('FUN-22: o handler não consegue trocar a CSP nem a Referrer-Policy', async () => {
+  it('AD-131: o handler não consegue trocar a CSP nem a Referrer-Policy', async () => {
     const a = criarApp({
       registrarExtras: (api) =>
         api.get('/teste/troca', (c) =>

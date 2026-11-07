@@ -33,4 +33,16 @@ describe('A-09: a role de backup lê todas as sequences', () => {
       expect(r.rows.map((x) => x.le)).toEqual([true, true]);
     });
   });
+
+  it('FUN-11: sequence criada depois (migração futura) já nasce legível pela role de backup', async () => {
+    await comCenario(async (db) => {
+      await db.query('CREATE TABLE a09_futura (id int GENERATED ALWAYS AS IDENTITY, x int)');
+      const r = await db.query<{ le: boolean; usa: boolean; escreve: boolean }>(
+        `SELECT has_sequence_privilege('pelada_backup_ro', 'public.a09_futura_id_seq', 'SELECT') AS le,
+                has_sequence_privilege('pelada_backup_ro', 'public.a09_futura_id_seq', 'USAGE') AS usa,
+                has_sequence_privilege('pelada_backup_ro', 'public.a09_futura_id_seq', 'UPDATE') AS escreve`,
+      );
+      expect(r.rows[0]).toEqual({ le: true, usa: false, escreve: false });
+    });
+  });
 });
