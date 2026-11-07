@@ -135,9 +135,9 @@ A v2 reimplementa do zero o Gestão da Pelada sobre o **mesmo banco Neon** do LJ
 6. IF o usuário abre o app sem conexão numa rota fora do cache THEN o service worker SHALL mostrar a página offline no visual do mockup. [FUN-35]
 7. WHEN o app é aberto no Safari do iOS fora do modo standalone THEN o front SHALL mostrar a instrução de instalação do mockup. [FUN-36]
 8. WHEN o CI roda o teste de instalabilidade (Playwright contra o build) THEN ele SHALL confirmar o manifest válido (FUN-33), o service worker controlando a página, os ícones 192 e 512 acessíveis e a página offline servida sem rede. [FUN-37]
-9. The comparação visual (limite de 1% de pixels, viewports de 1280×800 e 390×844) SHALL rodar no `/validar` (verificador), não no CI (AD-128, AD-129), e reprovar se uma tela ativa divergir de `.specs/mockup/telas.json`; as exceções aceitas estão na AD-127. Na fundação, as telas ativas são as 3 de vitrine do mockup (erro de rede, carregando em lista e grupo indisponível); a página provisória não é comparada. [FUN-38]
+9. The comparação visual (limite de 1% de pixels, viewports de 1280×800 e 390×844) SHALL rodar no `/validar` (verificador), não no CI (AD-132, AD-133), e reprovar se uma tela ativa divergir de `.specs/mockup/telas.json`; as exceções aceitas estão na AD-127. Na fundação, as telas ativas são as 3 de vitrine do mockup (erro de rede, carregando em lista e grupo indisponível); a página provisória não é comparada. [FUN-38]
 
-**Independent Test**: instalar o PWA a partir da prévia no Chrome do Android e no Safari do iOS, abrir sem rede e ver a página offline. A instalabilidade fica verde no CI e a comparação visual no `/validar` (AD-128).
+**Independent Test**: instalar o PWA a partir da prévia no Chrome do Android e no Safari do iOS, abrir sem rede e ver a página offline. A instalabilidade fica verde no CI e a comparação visual no `/validar` (AD-132).
 
 ---
 
@@ -150,7 +150,7 @@ A v2 reimplementa do zero o Gestão da Pelada sobre o **mesmo banco Neon** do LJ
 **Acceptance Criteria**:
 
 1. WHEN a `main` do repositório é trocada pela v2 THEN a branch `legado` SHALL existir antes no remoto, apontando para o commit da main do LJS (`e557292` ou o mais recente dela), e SHALL nunca ser apagada nem reescrita. [FUN-39]
-2. WHEN há push ou PR THEN o `ci.yml` SHALL rodar lint, format, typecheck, testes, gitleaks, build do web, migrações do zero num Postgres 18 de serviço, impressão digital do schema (FUN-08), teste de isolamento e instalabilidade (a comparação visual é do `/validar`, AD-128), e SHALL falhar se qualquer um falhar. [FUN-40]
+2. WHEN há push ou PR THEN o `ci.yml` SHALL rodar lint, format, typecheck, testes, gitleaks, build do web, migrações do zero num Postgres 18 de serviço, impressão digital do schema (FUN-08), teste de isolamento e instalabilidade (a comparação visual é do `/validar`, AD-132), e SHALL falhar se qualquer um falhar. [FUN-40]
 3. The `deploy.yml` SHALL ser disparável só por `workflow_dispatch` na `main`, no environment `previa`, com `concurrency` sem cancelamento. [FUN-41]
 4. WHEN o `deploy.yml` roda THEN ele SHALL executar, nesta ordem e parando no primeiro erro: (1) build do web; (2) branch de restauração da `dev` no Neon, mantendo só as 2 mais recentes; (3) dump cifrado da `dev`; (4) migração com a role `pelada_owner`; (5) `wrangler deploy` do Worker `gestaodapelada-v2` com `URL_PUBLICA`; (6) `GET /api/health` = 200 com o SHA publicado. [FUN-42]
 5. IF o build do web falha THEN o `deploy.yml` SHALL parar antes de tocar o Neon ou o Worker. [FUN-43]

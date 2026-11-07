@@ -47,7 +47,7 @@ pnpm --filter @pelada/api exec wrangler dev --config ../../wrangler.jsonc --ip 1
 curl -s -H 'X-Dev-Token: meu-segredo-local' http://127.0.0.1:8787/api/dev/emails   # mensagens enviadas desde que o Worker subiu
 ```
 
-A caixa só abre com o segredo (`DEV_EMAILS_TOKEN`, no cabeçalho `X-Dev-Token`): sem ele, ou com outro, responde o 404 de rota inexistente. Isso fecha o DNS rebinding contra o `wrangler dev` (AD-131). Escolha um valor aleatório a cada vez; o e2e gera o dele sozinho. A caixa some quando o Worker reinicia.
+A caixa só abre com o segredo (`DEV_EMAILS_TOKEN`, no cabeçalho `X-Dev-Token`): sem ele, ou com outro, responde o 404 de rota inexistente. Isso fecha o DNS rebinding contra o `wrangler dev` (AD-135). Escolha um valor aleatório a cada vez; o e2e gera o dele sozinho. A caixa some quando o Worker reinicia.
 
 ### Pagamentos (Asaas)
 

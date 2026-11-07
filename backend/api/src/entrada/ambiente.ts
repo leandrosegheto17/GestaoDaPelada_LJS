@@ -36,7 +36,7 @@ export interface Env {
   /** `1` só no `.env` local e no e2e: e-mails na caixa em memória e `GET /api/dev/emails` (T17). */
   EMAIL_DEV?: string;
   /**
-   * Segredo por execução de `GET /api/dev/emails` (SEC-04r, AD-131): o `pnpm dev` e o e2e geram um e mandam no cabeçalho
+   * Segredo por execução de `GET /api/dev/emails` (SEC-04r, AD-135): o `pnpm dev` e o e2e geram um e mandam no cabeçalho
    * `X-Dev-Token`. Sem ele no ambiente, a caixa fica fechada mesmo com `EMAIL_DEV=1`. Só por `--var`, nunca no
    * `wrangler.jsonc` nem no deploy.
    */

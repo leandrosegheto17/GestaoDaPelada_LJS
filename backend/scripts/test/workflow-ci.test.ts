@@ -49,7 +49,7 @@ describe('ci.yml', () => {
     ).toBe(true);
   });
 
-  it('A-13: o job qualidade audita as dependências de produção e falha em severidade alta ou crítica (AD-130)', () => {
+  it('A-13: o job qualidade audita as dependências de produção e falha em severidade alta ou crítica (AD-134)', () => {
     expect(runs(wf.jobs.qualidade)).toMatch(/pnpm audit --prod --audit-level high$/m);
   });
 

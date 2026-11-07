@@ -95,7 +95,7 @@ export function criarApp(opcoes: OpcoesApp = {}): Hono<Ambiente> {
 
   // Antes de qualquer rota, para valer também no 404 e no 500 (FUN-22).
   api.use('*', semCache, semSniff, csp, politicaReferrer);
-  // Escrita de outra origem, antes de qualquer outra guarda (A-12, AD-131).
+  // Escrita de outra origem, antes de qualquer outra guarda (A-12, AD-135).
   api.use('*', exigirOrigemPropria);
   // Escrita sem `X-Pelada: 1` é recusada antes de qualquer limitador (ACE-49, T18).
   api.use('*', exigirCabecalhoPelada);

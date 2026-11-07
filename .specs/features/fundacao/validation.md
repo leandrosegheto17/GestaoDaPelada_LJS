@@ -26,7 +26,7 @@
 | A-09 (SEC-01) | migrações `1792843800000` e `1792843980000` | `pelada_backup_ro` sem SELECT nas 2 sequences: `pg_dump` completo falha (exit 1) | Migração aditiva com GRANT + teste de dump completo | crítica |
 | A-10 (SEC-02) | `deploy.yml:20-22`, `backup.yml:18-20` | Secrets de produção só protegidos por `if:` | Restringir environments à `main` + revisor; registrar no runbook | crítica |
 | A-11 (SEC-03) | `backend/scripts/src/host.ts:21` | Trava de host aceita `?host=` remoto | Recusar `host`/`hostaddr` na query | comum |
-| A-12 (SEC-04) | `app.ts:96-98`, `cabecalhos.ts` | Falta 421 por Host, 403 por Origin e CSP/Referrer em `/api` | 403 por origem + CSP + Referrer com teste por método/variante; 421 fica fora do Worker (AD-131) | crítica |
+| A-12 (SEC-04) | `app.ts:96-98`, `cabecalhos.ts` | Falta 421 por Host, 403 por Origin e CSP/Referrer em `/api` | 403 por origem + CSP + Referrer com teste por método/variante; 421 fica fora do Worker (AD-135) | crítica |
 | A-13 (SEC-05) | lockfile | 15 altas só em dev/teste, 2 moderadas em prod (`node-pg-migrate`) | Atualizar pool-workers; audit no CI | comum |
 | A-14 (SEC-06) | `.gitleaks.toml:11-16`, `.gitignore` | Allowlist por pasta; `.env.*`/`.dev.vars` fora do gitignore | Regexes específicas; ampliar gitignore | comum |
 

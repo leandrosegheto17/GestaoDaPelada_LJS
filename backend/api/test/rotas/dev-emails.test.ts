@@ -7,7 +7,7 @@ import { caixaDev, remetenteDoAmbiente } from '../../src/infraestrutura/email/ca
 
 const BASE = 'https://exemplo.test';
 const permite = { limit: async () => ({ success: true }) };
-/** Segredo por execução da caixa (A-12/SEC-04r, AD-131): o `pnpm dev` e o e2e geram um e mandam no cabeçalho. */
+/** Segredo por execução da caixa (A-12/SEC-04r, AD-135): o `pnpm dev` e o e2e geram um e mandam no cabeçalho. */
 const TOKEN = 'token-da-caixa-com-pelo-menos-32-caracteres-x';
 const CABECALHO = { 'X-Dev-Token': TOKEN };
 

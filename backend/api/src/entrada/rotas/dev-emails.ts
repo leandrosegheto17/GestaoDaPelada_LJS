@@ -8,7 +8,7 @@ import { caixaDev, emailDevLigado } from '../../infraestrutura/email/caixa-dev.t
  * qualquer rota que não existe (o Hono monta o app uma vez, sem o `env`, então a "rota só
  * registrada com a variável" é esta checagem no começo).
  *
- * SEC-04r (AD-131): além de `EMAIL_DEV=1`, exige o segredo por execução (`DEV_EMAILS_TOKEN`) no cabeçalho
+ * SEC-04r (AD-135): além de `EMAIL_DEV=1`, exige o segredo por execução (`DEV_EMAILS_TOKEN`) no cabeçalho
  * `X-Dev-Token`; sem token no ambiente, ou com cabeçalho diferente, o mesmo 404. Fecha o DNS rebinding contra o
  * `wrangler dev`, que reescreve o Host e o Origin e some com qualquer outra forma de distinguir a página do atacante.
  */

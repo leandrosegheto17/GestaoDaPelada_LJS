@@ -67,7 +67,7 @@ function parVapidDoE2e(): { publica: string; privada: string } {
 export const VAPID_E2E = parVapidDoE2e();
 
 /**
- * Segredo por execução da caixa `GET /api/dev/emails` (SEC-04r, AD-131): o Worker do e2e o recebe por `--var` e as
+ * Segredo por execução da caixa `GET /api/dev/emails` (SEC-04r, AD-135): o Worker do e2e o recebe por `--var` e as
  * jornadas o mandam em `X-Dev-Token`. Gerado uma vez por processo e repassado aos workers do Playwright por ambiente.
  */
 function tokenDaCaixaDoE2e(): string {

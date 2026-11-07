@@ -9,18 +9,18 @@
 |---|---|---|---|
 | A-01 | `.specs/projeto/testes.json:2` sem `visual`, com `docker compose up -d --wait` | n/a (config) | **reaberto em parte**: T81 itens 2 e 3 seguem `[ ]` (`tasks.md:2427-2428`); `trava-testes --rodar` não ficou verde (A-15; e2e 71/74 informado) |
 | A-02 | `docs/restauracao-registro.md:15-19` + R2-T1 `tasks.md:2776` | n/a | **lacuna aceita**: a URL da role só existe no secret `NEON_URL_BACKUP`; registro e tarefa existem (AD-014 segue aberta) |
-| A-03, A-04, A-07 | `spec.md:138,153`; AD-129; `CLAUDE.md:52` | n/a (texto) | fechado |
-| A-05 | `STATE.md:131` AD-128 (visual), `:132` AD-126 (pesos), `:134` AD-127 | n/a | fechado |
+| A-03, A-04, A-07 | `spec.md:138,153`; AD-133; `CLAUDE.md:52` | n/a (texto) | fechado |
+| A-05 | `STATE.md:131` AD-132 (visual), `:132` AD-126 (pesos), `:134` AD-127 | n/a | fechado |
 | A-06 | `test/lint/pontuacao-so-no-modulo.test.ts:25`, `sem-escrita-periodo.test.ts:25` `{timeout:60_000}`; `vitest.config.ts:90` `hookTimeout`; `web/vite.config.ts` `testTimeout 15_000` | PAR-61/PAR-140 passam na cópia limpa (antes estouravam 5 s) | fechado |
 | A-08 | `STATE.md` `## Autorizações` 2026-11-06 (retroativa, motivo) | n/a | fechado |
 | A-09 | migração `1794000000000_backup-sequences.sql:7-8` | `backup-sequences.test.ts:11` `rows.filter(!le) toEqual([])`, `:27` `le toEqual([true,true])`; mutantes G1, G2 mortos. `pg_dump` 18.6 (`docker exec`, role `pelada_backup_ro`, `--enable-row-security`): HEAD exit 0; clone do banco sem o SELECT nas 2 sequences: exit 1 "failed to get data for sequence" | fechado (conferência na produção = R2-T1 `tasks.md:2777`, aceita como lacuna) |
 | A-10 | `runbook.md:182`; `gh api` (GET) por mim: `producao` e `backup` com `custom_branch_policies`, só `main`, sem revisor | n/a | fechado (sem revisor obrigatório, documentado; aceito) |
 | A-11 | `backend/scripts/src/host.ts:28-35` | `host.test.ts:32-47` (5 variantes, caixa, vazio) + `:49` `sslmode` ainda aceito; H1-H4 mortos | fechado |
-| A-12 | `origem-host.ts`, `cabecalhos.ts:23-33`, `app.ts:97-99`; AD-131 | `host-origem.test.ts` (ver abaixo) | fechado com ressalva (A-16) |
-| A-13 | `ci.yml` passo `pnpm audit --prod --audit-level high` (exit 0 aqui, 2 moderadas) + AD-130 | nenhum (A-17) | fechado na prática, sem teste |
+| A-12 | `origem-host.ts`, `cabecalhos.ts:23-33`, `app.ts:97-99`; AD-135 | `host-origem.test.ts` (ver abaixo) | fechado com ressalva (A-16) |
+| A-13 | `ci.yml` passo `pnpm audit --prod --audit-level high` (exit 0 aqui, 2 moderadas) + AD-134 | nenhum (A-17) | fechado na prática, sem teste |
 | A-14 | `.gitleaks.toml:11-16` por arquivo; `.gitignore:7-10` | `gitleaks dir .` na árvore: no leaks; `git ls-files` só `.env.example` | fechado na prática, sem teste (A-17) |
 
-**A-12 e AD-131**: a AD justifica o desvio do 421: o `wrangler dev` troca o `Host` pelo da rota (o Worker não distingue o host real), no ar a Cloudflare só entrega os endereços configurados e o Vite já fecha `allowedHosts`; o objetivo do 421 (rebinding) fica coberto pela recusa de `Origin` fora de `Host`/`URL_PUBLICA`/loopback com `EMAIL_DEV=1`. Aceito. Ressalva: a AD vale como requisito (a regra aceita "FUN-NN ou AD"), mas os testes citam FUN-22, que só fala de `no-store` e `nosniff` (A-19).
+**A-12 e AD-135**: a AD justifica o desvio do 421: o `wrangler dev` troca o `Host` pelo da rota (o Worker não distingue o host real), no ar a Cloudflare só entrega os endereços configurados e o Vite já fecha `allowedHosts`; o objetivo do 421 (rebinding) fica coberto pela recusa de `Origin` fora de `Host`/`URL_PUBLICA`/loopback com `EMAIL_DEV=1`. Aceito. Ressalva: a AD vale como requisito (a regra aceita "FUN-NN ou AD"), mas os testes citam FUN-22, que só fala de `no-store` e `nosniff` (A-19).
 
 ## Sensor (cópia `git worktree` com `node_modules` por junção; só o arquivo de teste do mutante; descartada)
 
@@ -50,7 +50,7 @@ Reaproveitado: lint, format, typecheck, checagens 134/134, contrato 567, dominio
 
 ## Checagens de processo
 
-(a) `testes.json` roda os 5 pacotes por `pnpm test`; sem `visual`. (b) typecheck: `ea28d59c`, `57d33dac`, `494243de` verdes em scripts, api, contrato (e web em `494243de`); HEAD verde (gate). (c) só `test/lint/*` ganhou timeout (motivo no commit `149f486b`, autorizado pelo próprio A-06); `host.test.ts` só acrescenta. (d) IDs de teste: ver A-19. (e) sem banco ou role `teste_*` órfão no 5451 (conferido depois dos mutantes). (f) a guarda de origem tem um teste por método (POST/PUT/PATCH/DELETE) e por variante (caixa, `none`, sem cabeçalho, `Origin: null`, GET/HEAD); sem policy nova. (g) spec × design: AD-129, AD-131 cobrem; sem `SPEC_DEVIATION` novo.
+(a) `testes.json` roda os 5 pacotes por `pnpm test`; sem `visual`. (b) typecheck: `ea28d59c`, `57d33dac`, `494243de` verdes em scripts, api, contrato (e web em `494243de`); HEAD verde (gate). (c) só `test/lint/*` ganhou timeout (motivo no commit `149f486b`, autorizado pelo próprio A-06); `host.test.ts` só acrescenta. (d) IDs de teste: ver A-19. (e) sem banco ou role `teste_*` órfão no 5451 (conferido depois dos mutantes). (f) a guarda de origem tem um teste por método (POST/PUT/PATCH/DELETE) e por variante (caixa, `none`, sem cabeçalho, `Origin: null`, GET/HEAD); sem policy nova. (g) spec × design: AD-133, AD-135 cobrem; sem `SPEC_DEVIATION` novo.
 
 ## Achados novos
 
@@ -60,6 +60,6 @@ Reaproveitado: lint, format, typecheck, checagens 134/134, contrato 567, dominio
 | A-16 | `backend/api/test/rotas/host-origem.test.ts:103-117`, `origem-host.ts:31,34` | Mutantes O7 e O10 vivos: o teste do ramo `URL_PUBLICA` usa `URL_PUBLICA` loopback com `EMAIL_DEV=1` (o loopback já libera); nenhum teste manda `Origin` não analisável (`http://[`) esperando 403 | Teste com `URL_PUBLICA` não loopback, `Host` trocado e sem `EMAIL_DEV`, esperando 200; teste de `Origin: 'http://['` esperando 403 | comum (os dois ramos só endurecem: recusa a mais, nenhuma escrita indevida passa) |
 | A-17 | `.github/workflows/ci.yml` (passo audit), `.gitleaks.toml:11-16`, `.gitignore:7-10` | Correções de A-13 e A-14 sem teste (mutação X sobrevive; `workflow-ci.test.ts` não cita `audit`) | Afirmar o passo `pnpm audit --prod` em `workflow-ci.test.ts` e que a allowlist do gitleaks não traz pasta nem `.specs`/`.claude` | comum |
 | A-18 | `1794000000000_backup-sequences.sql:8`, `backup-sequences.test.ts` | Mutante G3 vivo: o `ALTER DEFAULT PRIVILEGES` (sequences futuras) não é provado | Teste que cria uma sequence com a role migradora em banco de teste e confere `SELECT` da role de backup | comum |
-| A-19 | `host-origem.test.ts:42,51,62,...` | Os testes citam `FUN-22` (spec `:109`: só `no-store` e `nosniff`) para 403 por origem, CSP e Referrer; esses requisitos só existem na AD-131 | Citar `AD-131` nos nomes ou acrescentar o critério à spec | comum |
+| A-19 | `host-origem.test.ts:42,51,62,...` | Os testes citam `FUN-22` (spec `:109`: só `no-store` e `nosniff`) para 403 por origem, CSP e Referrer; esses requisitos só existem na AD-135 | Citar `AD-135` nos nomes ou acrescentar o critério à spec | comum |
 
 `validate_state.py` não rodado: lê o `validation.md`, que a sessão consolida.
