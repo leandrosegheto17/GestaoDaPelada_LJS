@@ -270,7 +270,7 @@ Convenções que valem para todas as histórias:
 **Acceptance Criteria**:
 
 1. WHEN um admin envia `POST /api/grupos/:grupoId/escalacoes` com `formato`, `data`, `n`, `k` (só em 2 times) e `composicao` (2 times: os dois times com `titulares` e `entramNo2oTempo`, cada jogador com `id` e `so1oTempo`, e `naoEntra`; 3 ou mais: `times` com `jogadores`) THEN o sistema SHALL gravar a escalação do grupo naquela data, com a conta e o momento da confirmação, e responder 201 com `data` e `confirmadaEm`. [SIM-67]
-2. The rotas do simulador e de escalação SHALL passar por uma única verificação de recurso do plano (`simulador`), que nesta feature libera todo grupo, para a `planos-e-cobranca` ligar a trava num lugar só. [SIM-68]
+2. The rotas do simulador e de escalação SHALL passar por uma única verificação de recurso do plano (`simulador`), que nesta feature libera todo grupo, para a `planos-e-cobranca` ligar a trava num lugar só. [SIM-68] _(Nota da validação, 2026-11-06: a `planos-e-cobranca` já ligou a trava nesse ponto único; a prova do critério está em `backend/api/test/sessao/recurso.test.ts`.)_
 3. IF já existe escalação para o grupo na data THEN o sistema SHALL substituí-la, mantendo uma só linha por grupo e data. [SIM-69]
 4. WHEN a escalação é gravada THEN o sistema SHALL registrar, na mesma transação, o evento de uso `escalacao_confirmada` com a data da partida e o momento, sem dado de jogador; IF qualquer dos dois falha THEN nenhum dos dois SHALL ficar gravado. [SIM-70]
 5. IF a composição tem jogador repetido ou algum jogador que não está ativo no grupo na data THEN o sistema SHALL responder 422 com "Há jogador repetido na composição." ou "Há jogadores que não estão ativos no grupo nesta data." no campo `composicao`, sem gravar. [SIM-71]

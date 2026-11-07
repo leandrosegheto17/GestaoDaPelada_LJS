@@ -94,7 +94,7 @@ describe('PATCH /api/grupos/:grupoId/jogadores/:id', () => {
     expect(ficha.periodos).toEqual([expect.objectContaining({ inicio: '2026-01-01', fim: null })]);
   });
 
-  it('GEL-41, GEL-43, AD-128: o PATCH substitui os campos: telefone ausente apaga, pontuação ausente mantém', async () => {
+  it('GEL-41, GEL-43, AD-132: o PATCH substitui os campos: telefone ausente apaga, pontuação ausente mantém', async () => {
     const id = await novoJogador('Substitui');
     await aberto.db.query(
       `UPDATE jogadores SET telefone = '11987654321', pontuacao_inicial = 7 WHERE id = $1`,

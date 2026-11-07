@@ -5,6 +5,7 @@ import {
   escalacaoCorpo,
   escalacaoResposta,
   lerComposicao,
+  MENSAGEM_COMPOSICAO_VAZIA,
 } from '../src/escalacao.ts';
 import { idsDaComposicao } from '../src/simulador.ts';
 
@@ -180,5 +181,54 @@ describe('escalacaoResposta', () => {
         confirmadaPor: 'x',
       }).success,
     ).toBe(false);
+  });
+});
+
+describe('escalacaoCorpo: composição sem jogador (A-11, SEC-002)', () => {
+  const base = { data: '2026-10-22', n: 2 };
+  const VAZIA_DOIS = {
+    times: [
+      { titulares: [], entramNo2oTempo: [] },
+      { titulares: [], entramNo2oTempo: [] },
+    ],
+    naoEntra: [],
+  };
+
+  it('SIM-67: 2 times sem nenhum jogador é recusado no campo composicao', () => {
+    const r = escalacaoCorpo.safeParse({
+      ...base,
+      formato: 'dois_times',
+      k: 'ilimitado',
+      composicao: VAZIA_DOIS,
+    });
+    expect(mensagens(r)).toEqual({ composicao: [MENSAGEM_COMPOSICAO_VAZIA] });
+  });
+
+  it('SIM-67: 3 ou mais sem times é recusado no campo composicao', () => {
+    const r = escalacaoCorpo.safeParse({
+      ...base,
+      formato: 'varios_times',
+      composicao: { times: [] },
+    });
+    expect(mensagens(r)).toEqual({ composicao: [MENSAGEM_COMPOSICAO_VAZIA] });
+  });
+
+  it('SIM-67: 3 ou mais com um time vazio é recusado no campo composicao', () => {
+    const r = escalacaoCorpo.safeParse({
+      ...base,
+      formato: 'varios_times',
+      composicao: { times: [{ jogadores: [u(1), u(2)] }, { jogadores: [] }] },
+    });
+    expect(mensagens(r)).toEqual({ composicao: [MENSAGEM_COMPOSICAO_VAZIA] });
+  });
+
+  it('SIM-67: 2 times com jogador só em "não entra" continua aceito', () => {
+    const r = escalacaoCorpo.safeParse({
+      ...base,
+      formato: 'dois_times',
+      k: 'ilimitado',
+      composicao: { ...VAZIA_DOIS, naoEntra: [u(1)] },
+    });
+    expect(r.success).toBe(true);
   });
 });

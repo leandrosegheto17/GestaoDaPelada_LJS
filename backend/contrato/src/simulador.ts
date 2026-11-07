@@ -9,7 +9,7 @@ import { ehDataDoCalendario, MENSAGEM_DATA_INVALIDA } from './elenco.ts';
  * `ehDataDoCalendario` do contrato de elenco, a mesma regra.
  */
 
-export const LIMITES_SIMULADOR = { nMin: 2, nMax: 11, kMin: 0, kMax: 20, aptosMax: 60 } as const;
+export const LIMITES_SIMULADOR = { nMin: 2, nMax: 11, kMin: 0, kMax: 20, aptosMax: 40 } as const;
 
 export const MENSAGEM_N = `Informe um número inteiro de ${LIMITES_SIMULADOR.nMin} a ${LIMITES_SIMULADOR.nMax}.`;
 export const MENSAGEM_K = `Informe um número inteiro de ${LIMITES_SIMULADOR.kMin} a ${LIMITES_SIMULADOR.kMax} ou "ilimitado".`;
@@ -56,9 +56,9 @@ const semRepeticao = (lista: readonly { id: string }[]): boolean =>
   new Set(lista.map((a) => a.id)).size === lista.length;
 
 /**
- * Lista de aptos: até 60 e sem repetido (SIM-53). Vazia é aceita: a prévia e a sugestão a descrevem como insuficiente
+ * Lista de aptos: até 40 (AD-128, era 60) e sem repetido (SIM-53). Vazia é aceita: a prévia e a sugestão a descrevem como insuficiente
  * ("Faltam aptos para 2 times."), sem mensagem nova.
- * [LACUNA] SIM-53 dá a mesma mensagem ("Há jogador repetido nos aptos.") para mais de 60 aptos e para repetido; vale o
+ * [LACUNA] SIM-53 dá a mesma mensagem ("Há jogador repetido nos aptos.") para mais de 40 aptos e para repetido; vale o
  * texto da spec nos dois casos.
  */
 function listaDeAptos<T extends z.ZodType<{ id: string }>>(apto: T) {

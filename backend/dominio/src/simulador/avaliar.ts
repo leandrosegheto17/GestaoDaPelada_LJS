@@ -85,6 +85,15 @@ export function problemaNaComposicao(
   return ids.length < permitidos.size ? MENSAGEM_FALTA_APTO_NA_COMPOSICAO : null;
 }
 
+/** Índice do menor time abaixo de N (empate: o último); nulo quando nenhum time está abaixo de N. */
+function indiceDoIncompleto(times: readonly (readonly string[])[], n: number): number | null {
+  let indice: number | null = null;
+  times.forEach((t, i) => {
+    if (t.length < n && (indice === null || t.length <= times[indice]!.length)) indice = i;
+  });
+  return indice;
+}
+
 /**
  * Avalia a composição. A composição cobre todos os aptos, sem repetido nem fora dos aptos (SIM-63, AD-123).
  * Decisão do usuário em 2026-11-05: vale a recusa do legado (a spec não pedia).
@@ -107,9 +116,11 @@ export function avaliar(
     const aptos = normalizarAptos('varios_times', entrada.aptos);
     const elenco = montarElenco(aptos, data);
     const times = composicao.times.map((t) => [...t]);
+    // O incompleto é o time que ficou abaixo de N (o menor; empate fica com o último), não o último por posição:
+    // depois de mover jogadores o time que sobrou com menos de N pode ser qualquer um (A-10).
     const incompleto =
       previa.valida && previa.formato === 'varios_times' && previa.tamanhoIncompleto > 0
-        ? times.length - 1
+        ? indiceDoIncompleto(times, n)
         : null;
     return {
       ok: true,

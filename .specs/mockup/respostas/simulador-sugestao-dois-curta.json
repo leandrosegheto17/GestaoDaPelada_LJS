@@ -1,0 +1,132 @@
+{
+  "formato": "dois_times",
+  "data": "2026-10-22",
+  "n": 7,
+  "k": 2,
+  "descricao": "2 times de 7 · 5 reservas",
+  "avisos": [],
+  "ordemPrioridade": [
+    "j-toninho",
+    "j-bigode",
+    "j-careca",
+    "j-juninho",
+    "j-marcao",
+    "j-paulinho",
+    "j-ze",
+    "j-dudu",
+    "j-gordo",
+    "j-tiago",
+    "j-nenem",
+    "j-rafinha",
+    "j-alemao",
+    "j-pedrao",
+    "j-cabeca",
+    "j-vini",
+    "j-japa",
+    "j-leo",
+    "j-serginho"
+  ],
+  "times": [
+    {
+      "nome": "Time A",
+      "titulares": [
+        {
+          "id": "j-toninho",
+          "apelido": "Toninho",
+          "nivel": 680,
+          "semNota": false,
+          "semAno": false,
+          "so1oTempo": false,
+          "saiNoIntervalo": false
+        },
+        {
+          "id": "j-careca",
+          "apelido": "Careca",
+          "nivel": 640,
+          "semNota": false,
+          "semAno": false,
+          "so1oTempo": false,
+          "saiNoIntervalo": false
+        }
+      ],
+      "entramNo2oTempo": [
+        {
+          "id": "j-cabeca",
+          "apelido": "Cabeça",
+          "nivel": 580,
+          "semNota": false,
+          "semAno": false,
+          "so1oTempo": false
+        },
+        {
+          "id": "j-japa",
+          "apelido": "Japa",
+          "nivel": 630,
+          "semNota": false,
+          "semAno": false,
+          "so1oTempo": false
+        }
+      ],
+      "trocas": [],
+      "saiSemPar": [],
+      "entraSemPar": [],
+      "indicadores": {
+        "jogadores1oTempo": 7,
+        "jogadores2oTempo": 7,
+        "nivelSoma1oTempo": 4410,
+        "nivelMedio1oTempo": 630,
+        "nivelSoma2oTempo": 4350,
+        "nivelMedio2oTempo": 620,
+        "idadeMedia": 4230,
+        "substituicoes": 2
+      }
+    },
+    {
+      "nome": "Time B",
+      "titulares": [
+        {
+          "id": "j-bigode",
+          "apelido": "Bigode",
+          "nivel": 690,
+          "semNota": false,
+          "semAno": false,
+          "so1oTempo": false,
+          "saiNoIntervalo": false
+        }
+      ],
+      "entramNo2oTempo": [
+        {
+          "id": "j-vini",
+          "apelido": "Vini",
+          "nivel": 670,
+          "semNota": false,
+          "semAno": false,
+          "so1oTempo": false
+        }
+      ],
+      "trocas": [],
+      "saiSemPar": [],
+      "entraSemPar": [],
+      "indicadores": {
+        "jogadores1oTempo": 7,
+        "jogadores2oTempo": 7,
+        "nivelSoma1oTempo": 4480,
+        "nivelMedio1oTempo": 640,
+        "nivelSoma2oTempo": 4370,
+        "nivelMedio2oTempo": 620,
+        "idadeMedia": 4170,
+        "substituicoes": 2
+      }
+    }
+  ],
+  "naoEntra": [
+    {
+      "id": "j-serginho",
+      "apelido": "Serginho",
+      "nivel": 550,
+      "semNota": true,
+      "semAno": false,
+      "so1oTempo": false
+    }
+  ]
+}

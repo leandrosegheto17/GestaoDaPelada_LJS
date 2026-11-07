@@ -2386,7 +2386,7 @@ SPEC_DEVIATION: `admins.remover` foi estendido onde a CA o pôs, `backend/api/sr
 
 ### T78: Retrabalho R1: timeouts dos testes de ESLint, e2e isolável e README (V-A03, A-01)
 
-**What**: Timeout de 60 s nos 3 testes que chamam o ESLint (autorização em `STATE.md`); porta e banco do e2e por `PELADA_E2E_PORTA` e `PELADA_E2E_BANCO`; README cita as duas variáveis (FUN-51); AD-128 em `STATE.md`.
+**What**: Timeout de 60 s nos 3 testes que chamam o ESLint (autorização em `STATE.md`); porta e banco do e2e por `PELADA_E2E_PORTA` e `PELADA_E2E_BANCO`; README cita as duas variáveis (FUN-51); AD-132 em `STATE.md`.
 **Estimativa**: 1h
 **Risco**: baixo
 **Domínio**: não

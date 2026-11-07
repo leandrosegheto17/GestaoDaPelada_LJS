@@ -9,6 +9,7 @@ import {
   TEXTO_FALHA_CONFIRMAR,
   TITULO_DESCARTAR,
 } from '../../src/telas/simulador/AcoesResultado.tsx';
+import { moverNoDois } from '../../src/telas/simulador/MoverJogador.tsx';
 import { PaginaSimulador } from '../../src/telas/simulador/PaginaSimulador.tsx';
 import {
   abrirTela,
@@ -52,9 +53,16 @@ function AvisoDoInicio() {
   return <p>início</p>;
 }
 
+/** O que o `avaliar` responde depois de mover Japa para o Time B: a composição enviada, sem a ordem de prioridade. */
+function avaliacaoDois(): Json {
+  const { ordemPrioridade: _ordem, ...resto } = resposta('simulador-sugestao-dois.json');
+  return moverNoDois(resto as never, 'j-japa', { tipo: 'reserva', time: 1 }) as unknown as Json;
+}
+
 function abrir(
   escalacoes: Manipulador = () =>
     json(201, { data: '2026-10-22', confirmadaEm: '2026-10-20T21:30:00.000Z' }),
+  avaliar: Manipulador = () => pendente(),
 ) {
   return abrirTela(
     '/app/grupos/g-quinta/simulador',
@@ -66,7 +74,7 @@ function abrir(
       'POST /api/grupos/g-quinta/simulador/previa': () =>
         json(200, resposta('simulador-previa-dois.json')),
       [`POST ${SUGERIR}`]: () => json(200, resposta('simulador-sugestao-dois.json')),
-      'POST /api/grupos/g-quinta/simulador/avaliar': () => pendente(),
+      'POST /api/grupos/g-quinta/simulador/avaliar': avaliar,
       [`POST ${ESCALACOES}`]: escalacoes,
     },
     rotas,
@@ -144,14 +152,15 @@ describe('Simulador: ações do resultado', () => {
   });
 
   it('SIM-46: com avisos, "Confirmar escalação" continua ativo e confirma a composição ajustada', async () => {
-    const t = abrir();
+    const t = abrir(undefined, () => json(200, avaliacaoDois()));
     await sugerir();
     expect(screen.getByText('Léo Baiano e Serginho não têm nota: usamos nível 5,5.')).toBeDefined();
     moverJapaParaB();
     const confirmar = screen.getByRole('button', {
       name: 'Confirmar escalação',
     }) as HTMLButtonElement;
-    expect(confirmar.disabled).toBe(false);
+    // Enquanto os números recalculam o botão espera (t13 `recalculando`); com a resposta volta a ficar ativo.
+    await waitFor(() => expect(confirmar.disabled).toBe(false));
     fireEvent.click(confirmar);
     await waitFor(() => expect(t.chamadasA('POST', ESCALACOES)).toHaveLength(1));
     const corpo = t.chamadasA('POST', ESCALACOES)[0]?.corpo as {
@@ -180,10 +189,17 @@ describe('Simulador: ações do resultado', () => {
   });
 
   it('SIM-73, SIM-93: 409 de grupo arquivado mantém a composição e mostra a mensagem de erro', async () => {
-    abrir(() => erroApi(409, 'grupo_arquivado'));
+    abrir(
+      () => erroApi(409, 'grupo_arquivado'),
+      () => json(200, avaliacaoDois()),
+    );
     await sugerir();
     moverJapaParaB();
-    fireEvent.click(screen.getByRole('button', { name: 'Confirmar escalação' }));
+    const confirmar = screen.getByRole('button', {
+      name: 'Confirmar escalação',
+    }) as HTMLButtonElement;
+    await waitFor(() => expect(confirmar.disabled).toBe(false));
+    fireEvent.click(confirmar);
     expect(await screen.findByText(TEXTO_FALHA_CONFIRMAR)).toBeDefined();
     expect(
       within(screen.getByRole('region', { name: 'Time B' })).getByRole('button', { name: 'Japa' }),

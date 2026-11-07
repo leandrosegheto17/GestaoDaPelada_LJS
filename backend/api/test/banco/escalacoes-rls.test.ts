@@ -5,8 +5,9 @@ import { abrirCenario, comoApp, type CenarioAberto } from '../isolamento/apoio.t
 /**
  * Rede de proteção do simulador e matriz política × comando de `escalacoes` (T0; SIM-81, SIM-69, SIM-72).
  * Tabela: `1792843200000_linha-de-base.sql` (escalacoes); grants: `1792843260000_roles.sql:22-31`; policies: laço de
- * `1792843320000_rls.sql:51-56` (`grupo_id IN grupos_visiveis()`, escrita só com conta). Nenhuma migração desta feature
- * muda isso (AD-084): o arquivo fica verde até o fim.
+ * `1792843320000_rls.sql:51-56` (`grupo_id IN grupos_visiveis()`, escrita só com conta). Duas migrações desta feature
+ * estreitam isso com policies RESTRICTIVE: `1793919878922_escalacoes-leitura-so-conta.sql` (o slug público não lê,
+ * AD-122) e `1794004229184_escalacoes-confirmada-por-da-conta.sql` (`confirmada_por` é a conta da sessão, A-14).
  *
  * Cenário da fundação: conta A com o grupo A, conta B com o grupo B, uma escalação de 2026-01-03 em cada grupo.
  * Cada caso roda como `pelada_app` numa transação desfeita ao fim (`comoApp`), e a fotografia das linhas do B, lida
@@ -15,9 +16,9 @@ import { abrirCenario, comoApp, type CenarioAberto } from '../isolamento/apoio.t
  * Evidência da rede (registrar na T0 do tasks.md, pelo /executar): `CREATE POLICY escalacoes_aberta ON escalacoes FOR
  * SELECT TO pelada_app USING (true)` temporária deixa vermelho "SIM-81: SELECT da conta A vê só as escalações do A".
  *
- * [LACUNA] A matriz do tasks.md pede "slug público zero" no SELECT. A policy atual usa `grupos_visiveis()`, cujo ramo
- * do slug devolve o grupo do slug (FUN-14), então o slug do A hoje lê a escalação do A. O teste segue a matriz (zero
- * linhas, a leitura mais restrita); se ficar vermelho, o /executar pergunta se vale a matriz (migração) ou a policy.
+ * A matriz do tasks.md pede "slug público zero" no SELECT. A policy do laço usa `grupos_visiveis()`, cujo ramo do slug
+ * devolve o grupo do slug (FUN-14); a decisão do usuário (AD-122, 2026-11-05) foi valer a matriz, com a migração
+ * `escalacoes_ler_so_conta`: o teste do slug lê zero linhas.
  */
 
 let aberto: CenarioAberto;
@@ -127,6 +128,43 @@ describe('escalacoes: INSERT', () => {
       const r = await inserir(d, cenario.grupoA, cenario.contaA);
       expect(r.rowCount).toBe(1);
       expect(await fotografia(d, cenario.grupoB)).toEqual(antes);
+    });
+  });
+});
+
+describe('escalacoes: confirmada_por é a conta da sessão (A-14)', () => {
+  it('SIM-81: INSERT da conta A com confirmada_por da conta B é recusado', async () => {
+    const { cenario, db } = aberto;
+    await expect(
+      comoApp(db, { conta: cenario.contaA }, (d) =>
+        inserir(d, cenario.grupoA, cenario.contaB, '2026-02-14'),
+      ),
+    ).rejects.toMatchObject({ code: '42501' });
+  });
+
+  it('SIM-81: UPDATE da conta A que troca confirmada_por para a conta B é recusado', async () => {
+    const { cenario, db } = aberto;
+    await expect(
+      comoApp(db, { conta: cenario.contaA }, (d) =>
+        d.query('UPDATE escalacoes SET confirmada_por = $1 WHERE grupo_id = $2', [
+          cenario.contaB,
+          cenario.grupoA,
+        ]),
+      ),
+    ).rejects.toMatchObject({ code: '42501' });
+  });
+
+  it('SIM-81: o upsert da conta A (INSERT ... ON CONFLICT DO UPDATE) com a própria conta passa', async () => {
+    const { cenario, db } = aberto;
+    await comoApp(db, { conta: cenario.contaA }, async (d) => {
+      await d.query('SET LOCAL ROLE pelada_app');
+      const r = await d.query(
+        `INSERT INTO escalacoes (grupo_id, data, formato, n, k, composicao, confirmada_por, confirmada_em)
+         SELECT grupo_id, data, formato, n, k, composicao, $2, now() FROM escalacoes WHERE grupo_id = $1
+         ON CONFLICT (grupo_id, data) DO UPDATE SET confirmada_por = EXCLUDED.confirmada_por`,
+        [cenario.grupoA, cenario.contaA],
+      );
+      expect(r.rowCount).toBe(1);
     });
   });
 });
